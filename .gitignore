@@ -10,23 +10,21 @@
 !.vscode/extensions.json
 
 # vim
-# swap
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
 [._]s[a-v][a-z]
 [._]sw[a-p]
-# session
 Session.vim
-# temporary
 .netrwhist
 *~
 
-# mine
+# opensurge
 build/
 CMakeFiles/
 iconwin.res
 logfile.txt
 opensurge
 opensurge.exe
+preferences.dat
 *.dll
 !src/**
