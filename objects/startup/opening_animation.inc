@@ -236,7 +236,7 @@ object ".default_startup.opening_animation.title"
         hide
         set_zindex "$_ds_op_zindex + 0.04"
         set_absolute_position screen_width() 64
-        let "$speed = 960"
+        let "$speed = 1440"
         change_state "cooldown"
     }
 
@@ -320,7 +320,7 @@ object ".default_startup.opening_animation.subtexthideoverlay"
         set_animation "SD_HUDSUBTEXTHIDEOVERLAY" 0
         set_zindex "$_ds_op_zindex + 0.045"
         set_absolute_position -90 "ypos()"
-        let "$speed = 900"
+        let "$speed = 2440"
         change_state "cooldown"
     }
 
@@ -361,7 +361,8 @@ object ".default_startup.opening_animation.act"
         set_animation "SD_LEVELACT" "$anim"
         set_zindex "$_ds_op_zindex + 0.05"
         set_absolute_position screen_width() 165
-        let "$speed = 1440"
+        let "$speed = 426"
+        let "$right_margin = 15"
         change_state "cooldown"
     }
 
@@ -372,7 +373,7 @@ object ".default_startup.opening_animation.act"
 
     state "appear"
     {
-        set_absolute_position "max(371, xpos()-$speed*dt())" "ypos()"
+        set_absolute_position "max(screen_width()-(width()+$right_margin), xpos()-$speed*dt())" "ypos()"
         on_timeout 2.175 "disappear"
     }
 
