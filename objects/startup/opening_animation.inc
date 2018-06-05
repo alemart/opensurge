@@ -1,12 +1,5 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensnc.sourceforge.net
-//
-// File:   objects/default_startup/opening_animation.inc
-// Desc:   opening animation
-// Author: Alexandre
-// Date:   2011-01-01
-// ---------------------------------------------------------------------------
+// Opening animation script
+// by Alexandre
 
 object ".default_startup.opening_animation"
 {
@@ -25,8 +18,8 @@ object ".default_startup.opening_animation"
         create_child ".default_startup.opening_animation.background"
         create_child ".default_startup.opening_animation.topstrip"
         create_child ".default_startup.opening_animation.leftstrip" 0 0
-        create_child ".default_startup.opening_animation.leftstrip" 0 240
-        create_child ".default_startup.opening_animation.leftstrip" 0 480
+        create_child ".default_startup.opening_animation.leftstrip" 0 screen_height()
+        create_child ".default_startup.opening_animation.leftstrip" 0 2*screen_height()
         create_child ".default_startup.opening_animation.bottomstrip"
         create_child ".default_startup.opening_animation.title"
         create_child ".default_startup.opening_animation.subtext"
@@ -95,7 +88,7 @@ object ".default_startup.opening_animation.background"
     {
         set_animation "SD_HUDBACKGROUND" 0
         set_zindex "$_ds_op_zindex"
-        set_absolute_position 0 240
+        set_absolute_position 0 screen_height()
         let "$speed = 1440"
         change_state "appear"
     }
@@ -204,7 +197,7 @@ object ".default_startup.opening_animation.bottomstrip"
     {
         set_animation "SD_HUDBOTTOMSTRIP" 0
         set_zindex "$_ds_op_zindex + 0.03"
-        set_absolute_position 320 180
+        set_absolute_position screen_width() 180
         let "$speed = 1440"
         change_state "cooldown"
     }
@@ -242,7 +235,7 @@ object ".default_startup.opening_animation.title"
     {
         hide
         set_zindex "$_ds_op_zindex + 0.04"
-        set_absolute_position 320 64
+        set_absolute_position screen_width() 64
         let "$speed = 960"
         change_state "cooldown"
     }
@@ -367,7 +360,7 @@ object ".default_startup.opening_animation.act"
         let "$anim = clamp(act()-1, 0, 2)"
         set_animation "SD_LEVELACT" "$anim"
         set_zindex "$_ds_op_zindex + 0.05"
-        set_absolute_position 320 165
+        set_absolute_position screen_width() 165
         let "$speed = 1440"
         change_state "cooldown"
     }
@@ -379,7 +372,7 @@ object ".default_startup.opening_animation.act"
 
     state "appear"
     {
-        set_absolute_position "max(265, xpos()-$speed*dt())" "ypos()"
+        set_absolute_position "max(371, xpos()-$speed*dt())" "ypos()"
         on_timeout 2.175 "disappear"
     }
 

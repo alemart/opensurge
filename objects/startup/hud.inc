@@ -1,12 +1,5 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensnc.sourceforge.net
-//
-// File:   objects/default_startup/hud.inc
-// Desc:   default HUD (Heads-Up Display)
-// Author: Alexandre
-// Date:   2010-12-21, 2010-12-29
-// ---------------------------------------------------------------------------
+// HUD script
+// by Alexandre
 
 //
 // Provided that you use this object to handle the HUD
