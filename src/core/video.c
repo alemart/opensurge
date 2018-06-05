@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * video.c - video manager
- * Copyright (C) 2008-2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensnc.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,9 +51,9 @@ static int window_active = TRUE;
 static void draw_to_screen(image_t *img);
 static void setup_color_depth(int bpp);
 
-/* playarea video size (usually, 320x240) */
-static const v2d_t default_playarea_size = { 320, 240 }; /* this is set on stone! TODO: load these parameters from a file? */
-static v2d_t playarea_size = { 0, 0 }; /* represents the size of the playarea. This may change (eg, is the user on the level editor?) */
+/* screen size */
+static const v2d_t default_screen_size = { 426, 240 }; /* this is set on stone! Picked a 16:9 resolution */
+static v2d_t screen_size = { 0, 0 }; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
 
 /* Video Message */
 #define VIDEOMSG_TIMEOUT       5000
@@ -120,7 +120,7 @@ void video_changemode(int resolution, int smooth, int fullscreen)
     logfile_message("video_changemode(%d,%d,%d)", resolution, smooth, fullscreen);
 
     /* resolution */
-    playarea_size = (resolution == VIDEORESOLUTION_EDT) ? video_get_window_size() : default_playarea_size;
+    screen_size = (resolution == VIDEORESOLUTION_EDT) ? video_get_window_size() : default_screen_size;
     video_resolution = resolution;
 
     /* fullscreen */
@@ -208,16 +208,15 @@ int video_is_fullscreen()
 
 
 /*
- * video_get_playarea_size()
- * Returns the size of the playarea.
- * Usually, it's 320x240
+ * video_get_screen_size()
+ * Returns the size of the screen.
  */
-v2d_t video_get_playarea_size()
+v2d_t video_get_screen_size()
 {
-    if(playarea_size.x < 1) /* gotta be fast here */
-        return default_playarea_size;
+    if(screen_size.x < 1) /* gotta be fast here */
+        return default_screen_size;
     else
-        return playarea_size;
+        return screen_size;
 }
 
 
