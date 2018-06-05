@@ -1,11 +1,11 @@
-// Water
-// .spr definitions by Alexandre, 2012-02-04
+// Water sprite
+// by Alexandre
 
 sprite SD_WATERLEVEL
 {
-	source_file		images/water.png
-	source_rect     0 0 320 14
-    frame_size      320 7
+    source_file     "images/water.png"
+    source_rect     0 0 426 14
+    frame_size      426 7
     hot_spot        0 0
 
     animation 0
@@ -18,8 +18,8 @@ sprite SD_WATERLEVEL
 
 sprite SD_WATERCOUNTER
 {
-	source_file		images/water.png
-	source_rect     0 32 80 15
+    source_file     "images/water.png"
+    source_rect     0 32 80 15
     frame_size      8 15
     hot_spot        4 7
 
@@ -33,8 +33,8 @@ sprite SD_WATERCOUNTER
 
 sprite SD_WATERSPLASH
 {
-	source_file		images/water.png
-	source_rect     0 64 210 32
+    source_file     "images/water.png"
+    source_rect     0 64 210 32
     frame_size      70 32
     hot_spot        35 26
 
@@ -48,8 +48,8 @@ sprite SD_WATERSPLASH
 
 sprite SD_WATERAIRSOURCE
 {
-	source_file		images/water.png
-	source_rect     0 96 96 32
+    source_file     "images/water.png"
+    source_rect     0 96 96 32
     frame_size      32 32
     hot_spot        16 32
 
@@ -63,8 +63,8 @@ sprite SD_WATERAIRSOURCE
 
 sprite SD_WATERAIRBUBBLE
 {
-	source_file		images/water.png
-	source_rect     0 128 298 32
+    source_file     "images/water.png"
+    source_rect     0 128 298 32
     frame_size      32 32
     hot_spot        16 16
 

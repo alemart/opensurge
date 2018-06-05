@@ -1,11 +1,12 @@
-// script by Alexandre
+// HUD sprites
+// by Alexandre
 
 // Background
 sprite SD_HUDBACKGROUND
 {
-    source_file     images/hud.png
-    source_rect     0 0 320 240
-    frame_size      320 240
+    source_file     "images/hud.png"
+    source_rect     0 0 426 240
+    frame_size      426 240
     hot_spot        0 0
 
     animation 0
@@ -19,9 +20,9 @@ sprite SD_HUDBACKGROUND
 // Top strip
 sprite SD_HUDTOPSTRIP
 {
-    source_file     images/hud.png
-    source_rect     0 240 320 60
-    frame_size      320 60
+    source_file     "images/hud.png"
+    source_rect     0 240 426 60
+    frame_size      426 60
     hot_spot        0 0
 
     animation 0
@@ -35,8 +36,8 @@ sprite SD_HUDTOPSTRIP
 // Left strip
 sprite SD_HUDLEFTSTRIP
 {
-    source_file     images/hud.png
-    source_rect     320 0 90 240
+    source_file     "images/hud.png"
+    source_rect     426 0 90 240
     frame_size      90 240
     hot_spot        0 0
 
@@ -52,8 +53,8 @@ sprite SD_HUDLEFTSTRIP
 sprite SD_HUDBOTTOMSTRIP
 {
     source_file     images/hud.png
-    source_rect     320 240 320 60
-    frame_size      320 60
+    source_rect     426 240 426 60
+    frame_size      426 60
     hot_spot        0 0
 
     animation 0
@@ -68,7 +69,7 @@ sprite SD_HUDBOTTOMSTRIP
 sprite SD_HUDSUBTEXTHIDEOVERLAY
 {
     source_file     images/hud.png
-    source_rect     320 0 40 240
+    source_rect     426 0 40 240
     frame_size      40 240
     hot_spot        0 0
 
@@ -84,7 +85,7 @@ sprite SD_HUDSUBTEXTHIDEOVERLAY
 sprite SD_HUDHEAD
 {
     source_file     images/hud.png
-    source_rect     589 0 51 36
+    source_rect     801 0 51 36
     frame_size      17 18
     hot_spot        9 9
 
@@ -125,8 +126,8 @@ sprite SD_HUDHEAD
 sprite SD_HUDBLACKSCREEN
 {
     source_file     images/blackscreen.png
-    source_rect     0 0 320 240
-    frame_size      320 240
+    source_rect     0 0 426 240
+    frame_size      426 240
     hot_spot        0 0
 
     animation 0
