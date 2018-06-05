@@ -8,7 +8,7 @@ name "Sunshine Paradise"
 author "Alexandre"
 version "1.0"
 requires 0.2.0
-act 1
+act 2
 theme "themes/sunshine_solids.brk"
 bgtheme "themes/template.bg"
 spawn_point 48 464
