@@ -43,13 +43,13 @@ void video_changemode(int resolution, int smooth, int fullscreen);
 int video_get_resolution();
 int video_is_smooth();
 int video_is_fullscreen();
-v2d_t video_get_playarea_size(); /* usually, 320x240 */
+v2d_t video_get_screen_size(); /* usually, 320x240 */
 v2d_t video_get_window_size(); /* the real size of the window, in pixels */
 const image_t* video_get_window_surface();
 
 /* backbuffer */
-#define VIDEO_SCREEN_W            ((int)(video_get_playarea_size().x))
-#define VIDEO_SCREEN_H            ((int)(video_get_playarea_size().y))
+#define VIDEO_SCREEN_W            ((int)(video_get_screen_size().x))
+#define VIDEO_SCREEN_H            ((int)(video_get_screen_size().y))
 image_t *video_get_backbuffer();
 
 /* fps counter */
