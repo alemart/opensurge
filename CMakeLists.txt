@@ -1,6 +1,6 @@
 #
-# CMakeLists.txt - tells CMake how to build the game
-# Copyright (C) 2008-2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+# CMakeLists.txt
+# Copyright (C) 2008-2018  Alexandre Martins <alemartf(at)gmail(dot)com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(opensurge C)
 SET(GAME_UNIXNAME opensurge)
 SET(GAME_NAME "Open Surge")
-SET(GAME_VERSION "0.2.0")
+SET(GAME_VERSION "0.5.0")
 MESSAGE("${GAME_NAME} version ${GAME_VERSION}")
 
 # cool vars
