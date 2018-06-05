@@ -1,0 +1,163 @@
+// script by Alexandre
+
+// Charge
+sprite SD_CHARGE
+{
+    source_file     images/charge.png
+    source_rect     0 0 300 600
+    frame_size      50 50
+    hot_spot        25 50
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // walking
+    animation 1
+    {
+        repeat      TRUE
+        fps         12
+        data        3 4 5 6 7 8 9 10
+    }
+
+    // running
+    animation 2
+    {
+        repeat      TRUE
+        fps         16
+        data        30 31 32 33 34 33 32 31
+    }
+
+    // jumping / rolling
+    animation 3
+    {
+        repeat      TRUE
+        fps         32
+        data        16 17 18 19 20 21
+    }
+
+    // ducking
+    animation 4
+    {
+        repeat      FALSE
+        fps         12
+        data        1 2
+    }
+
+    // looking up
+    animation 5
+    {
+        repeat      FALSE
+        fps         12
+        data        35 36
+    }
+
+    // charging
+    animation 6
+    {
+        repeat      TRUE
+        fps         64
+        data        16 17 18 19 20 21
+    }
+
+    // braking
+    animation 7
+    {
+        repeat      FALSE
+        fps         8
+        data        11
+    }
+
+    // dead
+    animation 8
+    {
+        repeat      FALSE
+        fps         8
+        data        13
+    }
+
+    // drowned
+    animation 9
+    {
+        repeat      FALSE
+        fps         8
+        data        13
+    }
+
+    // ledge
+    animation 10
+    {
+        repeat      TRUE
+        fps         12
+        data        52 51 50 49
+    }
+
+    // getting hit
+    animation 11
+    {
+        repeat      FALSE
+        fps         8
+        data        12
+    }
+
+    // breathing
+    animation 12
+    {
+        repeat      FALSE
+        fps         8
+        data        53
+    }
+
+    // springing
+    animation 13
+    {
+        repeat      TRUE
+        fps         8
+        data        14
+    }
+
+    // pushing
+    animation 14
+    {
+        repeat      TRUE
+        fps         4
+        data        61 62 63 64
+    }
+
+    // waiting
+    animation 15
+    {
+        repeat      TRUE
+        fps         16
+        data        41 41 41 41 37 37 38 38 39 39 40 40 40 40 39 40 40 40 40 39 38 37 42 42 43 43 44 44 45 45 45 45 44 45 45 45 45 44 43 42 37 37 38 38 39 39 40 40 40 40 39 40 40 40 40 39 38 37 42 42 43 43 44 44 45 45 45 45 44 45 46 47 47 47 48 47 47 48 47 47 48 47 48 47 48 47 47 48 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 47 
+	  repeat_from 80
+    }
+
+    // ceiling (being carried)
+    animation 16
+    {
+        repeat      TRUE
+        fps         8
+        data        15
+    }
+
+    // winning (victory)
+    animation 17
+    {
+        repeat      FALSE
+        fps         8
+        data        55 54 54 54 55 56 56 56 57 58 58 59 59 60
+    }
+
+    // climbing
+    animation 18
+    {
+        repeat      TRUE
+        fps         16
+        data        22 23 24 25 26 27 28 29
+    }    
+}

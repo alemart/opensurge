@@ -1,0 +1,129 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/moviefx.obj
+// Desc:   this object is used to get a nice cutscene/movie effect
+// Author: Alexandre
+// Date:   2011-01-02
+// ---------------------------------------------------------------------------
+
+// How to use:
+// Whenever you want to activate the cutscene/movie mode, follow the instructions:
+//
+// 1. Spawn an instance of the ".moviefx" object.
+//    create_child ".moviefx"
+//
+// 2. When you're done with the cutscene,
+//    change_closest_object_state ".moviefx" "hide"
+
+object ".moviefx"
+{
+    requires 0.2.0
+    always_active
+
+    state "main"
+    {
+        hide
+        let "$_moviefx_stripspeed = 90"
+        let "$_moviefx_zindex = 999"
+        let "$_moviefx_end = 0"
+        let "$old_hide_hud = $_hide_hud"
+        let "$old_char_switch = $_disable_character_switching"
+        disable_player_movement
+
+        create_child ".moviefx.topstrip" 0 0 "topstrip"
+        create_child ".moviefx.bottomstrip" 0 0 "bottomstrip"
+        change_state "enabled"
+    }
+
+    state "enabled"
+    {
+        let "$_hide_hud = 1"
+        let "$_disable_character_switching = 1"
+    }
+
+    state "hide"
+    {
+        change_child_state "topstrip" "hide"
+        change_child_state "bottomstrip" "hide"
+        change_state "cooldown"
+    }
+
+    state "cooldown"
+    {
+        if "$_moviefx_end >= 2" "destroy"
+    }
+
+    state "destroy"
+    {
+        enable_player_movement
+        let "$_hide_hud = $old_hide_hud"
+        let "$_disable_character_switching = $old_char_switch"
+        destroy
+    }
+}
+
+object ".moviefx.topstrip"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state "main"
+    {
+        set_zindex "$_moviefx_zindex"
+        set_animation "SD_CUTSCENETOPSTRIP" 0
+        set_absolute_position 0 -height()
+        change_state "move"
+    }
+
+    state "move"
+    {
+        set_absolute_position xpos() min(0,ypos()+$_moviefx_stripspeed*dt())
+    }
+
+    state "hide"
+    {
+        set_absolute_position xpos() ypos()-$_moviefx_stripspeed*dt()
+        if "ypos() <= -height()" destroy
+    }
+
+    state "destroy"
+    {
+        let "$_moviefx_end += 1"
+        destroy
+    }
+}
+
+object ".moviefx.bottomstrip"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state "main"
+    {
+        set_zindex "$_moviefx_zindex"
+        set_animation "SD_CUTSCENEBOTTOMSTRIP" 0
+        set_absolute_position 0 screen_height()
+        change_state "move"
+    }
+
+    state "move"
+    {
+        set_absolute_position xpos() max(screen_height()-height(),ypos()-$_moviefx_stripspeed*dt())
+    }
+
+    state "hide"
+    {
+        set_absolute_position xpos() ypos()+$_moviefx_stripspeed*dt()
+        if "ypos() >= screen_height()" destroy
+    }
+
+    state "destroy"
+    {
+        let "$_moviefx_end += 1"
+        destroy
+    }
+}

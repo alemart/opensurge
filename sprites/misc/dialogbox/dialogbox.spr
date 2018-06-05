@@ -1,0 +1,195 @@
+// Dialog Box
+// .spr script by Alexandre
+
+sprite DIALOGBOX_BACKGROUND
+{
+    source_file     images/dialogs.png
+    source_rect     0 0 272 82
+    frame_size      272 82
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite DIALOGBOX_BUTTON
+{
+    source_file     images/dialogs.png
+    source_rect     272 0 64 80
+    frame_size      16 16
+    hot_spot        8 7
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+}
+
+sprite DIALOGBOX_BALLOON
+{
+    source_file     images/dialogs.png
+    source_rect     336 0 64 64
+    frame_size      64 64
+    hot_spot        32 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite DIALOGBOX_AVATAR
+{
+    source_file     images/dialogs.png
+    source_rect     0 100 360 180
+    frame_size      60 60
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        8
+    }
+
+    animation 9
+    {
+        repeat      TRUE
+        fps         8
+        data        9
+    }
+
+    animation 10
+    {
+        repeat      TRUE
+        fps         8
+        data        10
+    }
+
+    animation 11
+    {
+        repeat      TRUE
+        fps         8
+        data        11
+    }
+
+    animation 12
+    {
+        repeat      TRUE
+        fps         8
+        data        12
+    }
+
+    animation 13
+    {
+        repeat      TRUE
+        fps         8
+        data        13
+    }
+
+    animation 14
+    {
+        repeat      TRUE
+        fps         8
+        data        14
+    }
+
+    animation 15
+    {
+        repeat      TRUE
+        fps         8
+        data        15
+    }
+
+    animation 16
+    {
+        repeat      TRUE
+        fps         8
+        data        16
+    }
+
+    animation 17
+    {
+        repeat      TRUE
+        fps         8
+        data        17
+    }
+}

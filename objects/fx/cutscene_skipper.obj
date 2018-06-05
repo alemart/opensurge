@@ -1,0 +1,61 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   cutscene_skipper.obj
+// Desc:   used to skip cutscenes
+// Author: Alexandre
+// Date:   2013-01-05
+// ---------------------------------------------------------------------------
+
+// How to use:
+//
+// Spawn a ".cutscene_skipper" object. When the user presses FIRE4, the engine
+// will change the state of the parent object to ".cutscene_skipper:on_skip".
+// In that state, you may call next_level.
+//
+// You need to implement the state ".cutscene_skipper:on_skip" in the spawner
+// object. It can be very basic (just calls next_level), or it can perform any
+// operations of your liking, which will be executed immediately.
+//
+// Alternatively, you may spawn ".cutscene_skipper[pedantic]" if you want that
+// buttons FIRE1 and FIRE3 also get to skip the cutscene. You must also
+// implement ".cutscene_skipper:on_skip" on the spawner object.
+
+object ".cutscene_skipper"
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+        on_button_pressed fire4 fired
+    }
+
+    state fired
+    {
+        change_parent_state .cutscene_skipper:on_skip
+        destroy
+    }
+}
+
+object ".cutscene_skipper[pedantic]"
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+        on_button_pressed fire1 fired
+        on_button_pressed fire3 fired
+        on_button_pressed fire4 fired
+    }
+
+    state fired
+    {
+        change_parent_state .cutscene_skipper:on_skip
+        destroy
+    }
+}

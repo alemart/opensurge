@@ -1,0 +1,26 @@
+// script by Celdecea, modified by Alexandre
+
+// Switch
+sprite SD_SWITCH
+{
+    source_file     images/switches.png
+    source_rect     10 80 32 14
+    frame_size      32 7
+    hot_spot        16 7
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}

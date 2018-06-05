@@ -1,0 +1,26 @@
+// script by Celdecea, modified by Alexandre
+
+// Bumper
+sprite SD_BUMPER
+{
+    source_file     images/bumper.png
+    source_rect     10 60 40 80
+    frame_size      40 40
+    hot_spot        20 20
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0 1
+    }
+}

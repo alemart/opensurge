@@ -1,0 +1,28 @@
+// ----------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// Wolfredo
+//
+// Wolfredo was originally developed by Race the Hedgehog(Joao Victor)
+// 
+// Changelog:
+// 2011-08-21 - small modification by Alexandre
+// 2011-06-03 - first version by Joao Victor
+// ----------------------------------------
+
+object "Wolfredo"
+{
+    requires 0.2.0
+    category "enemy" "level 1"
+    annotation "A wolf"
+
+    state "main"
+    {
+        set_animation "Wolfredo" 0
+        enemy 100
+        walk 100
+        look_at_walking_direction
+    }
+}
+

@@ -1,0 +1,138 @@
+// script by Alexandre
+
+// Item Box
+sprite SD_ITEMBOX
+{
+    source_file     images/item_boxes.png
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    // Surge life box
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 1 1 1 1 1 1
+    }
+
+    // Neon life box
+    animation 1
+    {
+        repeat      TRUE
+        fps         24
+        data        2 2 2 2 2 0 2 0 2 0 0 0 2 2 0 0 2 2 2 2 2 2 2 2
+    }
+
+    // Charge life box
+    animation 2
+    {
+        repeat      TRUE
+        fps         24
+        data        3 3 3 3 3 0 3 0 3 0 0 0 3 3 0 0 3 3 3 3 3 3 3 3
+    }
+
+    // ring box
+    animation 3
+    {
+        repeat      TRUE
+        fps         24
+        data        4 4 4 4 4 0 4 0 4 0 0 0 4 4 0 0 4 4 4 4 4 4 4 4
+    }
+
+    // invencibility box
+    animation 4
+    {
+        repeat      TRUE
+        fps         24
+        data        5 5 5 5 5 0 5 0 5 0 0 0 5 5 0 0 5 5 5 5 5 5 5 5
+    }
+
+    // speed shoes box
+    animation 5
+    {
+        repeat      TRUE
+        fps         24
+        data        6 6 6 6 6 0 6 0 6 0 0 0 6 6 0 0 6 6 6 6 6 6 6 6
+    }
+
+    // glasses box
+    animation 6
+    {
+        repeat      TRUE
+        fps         24
+        data        7 7 7 7 7 0 7 0 7 0 0 0 7 7 0 0 7 7 7 7 7 7 7 7
+    }
+
+    // shield box
+    animation 7
+    {
+        repeat      TRUE
+        fps         24
+        data        8 8 8 8 8 0 8 0 8 0 0 0 8 8 0 0 8 8 8 8 8 8 8 8
+    }
+
+    // trap box
+    animation 8
+    {
+        repeat      TRUE
+        fps         24
+        data        9 9 9 9 9 0 9 0 9 0 0 0 9 9 0 0 9 9 9 9 9 9 9 9
+    }
+
+    // none
+    animation 9
+    {
+        repeat      TRUE
+        fps         24
+        data        10 10 10 10 10 0 10 0 10 0 0 0 10 10 0 0 10 10 10 10 10 10 10 10
+    }
+
+    // crushed box
+    animation 10
+    {
+        repeat      TRUE
+        fps         24
+        data        11
+    }
+    
+    // fire shield box
+    animation 11
+    {
+        repeat      TRUE
+        fps         24
+        data        12 12 12 12 12 0 12 0 12 0 0 0 12 12 0 0 12 12 12 12 12 12 12 12
+    }
+
+    // thunder shield box
+    animation 12
+    {
+        repeat      TRUE
+        fps         24
+        data        13 13 13 13 13 0 13 0 13 0 0 0 13 13 0 0 13 13 13 13 13 13 13 13
+    }
+
+    // water shield box
+    animation 13
+    {
+        repeat      TRUE
+        fps         24
+        data        14 14 14 14 14 0 14 0 14 0 0 0 14 14 0 0 14 14 14 14 14 14 14 14
+    }
+
+    // acid shield box
+    animation 14
+    {
+        repeat      TRUE
+        fps         24
+        data        15 15 15 15 15 0 15 0 15 0 0 0 15 15 0 0 15 15 15 15 15 15 15 15
+    }
+
+    // wind shield box
+    animation 15
+    {
+        repeat      TRUE
+        fps         24
+        data        16 16 16 16 16 0 16 0 16 0 0 0 16 16 0 0 16 16 16 16 16 16 16 16
+    }
+}

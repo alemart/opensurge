@@ -1,0 +1,50 @@
+// script by Alexandre
+
+// A single pixel
+sprite SD_PIXEL
+{
+    source_file     images/pixel.png
+    source_rect     0 0 5 1
+    frame_size      1 1
+    hot_spot        0 0
+
+    // black
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // dark grey
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // grey
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // silver
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // white
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+}

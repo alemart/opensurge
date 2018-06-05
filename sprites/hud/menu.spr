@@ -1,0 +1,18 @@
+// script by Alexandre
+
+// GUI Arrow
+sprite SD_GUIARROW
+{
+    source_file     images/arrow_right.png
+    source_rect     0 0 7 8
+    frame_size      7 8
+    hot_spot        -5 -2
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

@@ -1,0 +1,138 @@
+// script by Alexandre
+
+// Box Icon
+sprite SD_ICON
+{
+    source_file     images/item_boxes.png
+    source_rect     200 100 96 42
+    frame_size      16 14
+    hot_spot        8 20
+
+    // Surge life icon
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        1
+    }
+
+    // Neon life icon
+    animation 1
+    {
+        repeat      TRUE
+        fps         24
+        data        2
+    }
+
+    // Charge life icon
+    animation 2
+    {
+        repeat      TRUE
+        fps         24
+        data        3
+    }
+
+    // ring icon
+    animation 3
+    {
+        repeat      TRUE
+        fps         24
+        data        4
+    }
+
+    // invencibility icon
+    animation 4
+    {
+        repeat      TRUE
+        fps         24
+        data        5
+    }
+
+    // speed shoes icon
+    animation 5
+    {
+        repeat      TRUE
+        fps         24
+        data        6
+    }
+
+    // glasses icon
+    animation 6
+    {
+        repeat      TRUE
+        fps         24
+        data        7
+    }
+
+    // shield icon
+    animation 7
+    {
+        repeat      TRUE
+        fps         24
+        data        8
+    }
+
+    // none
+    animation 8
+    {
+        repeat      TRUE
+        fps         24
+        data        9
+    }
+
+    // none
+    animation 9
+    {
+        repeat      TRUE
+        fps         24
+        data        10
+    }
+
+    // none
+    animation 10
+    {
+        repeat      TRUE
+        fps         24
+        data        11
+    }
+    
+    // fire shield
+    animation 11
+    {
+        repeat      TRUE
+        fps         24
+        data        12
+    }
+
+    // thunder shield
+    animation 12
+    {
+        repeat      TRUE
+        fps         24
+        data        13
+    }
+
+    // water shield
+    animation 13
+    {
+        repeat      TRUE
+        fps         24
+        data        14
+    }
+
+    // acid shield
+    animation 14
+    {
+        repeat      TRUE
+        fps         24
+        data        15
+    }
+
+    // wind shield
+    animation 15
+    {
+        repeat      TRUE
+        fps         24
+        data        16
+    }
+}

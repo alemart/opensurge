@@ -1,0 +1,33 @@
+// Water Skimmer
+// image by svgmovement, sprite script by Alexandre
+sprite WaterSkimmer
+{
+    source_file     images/levels/1/waterskimmer.png
+    source_rect     0 0 150 50
+    frame_size      50 50
+    hot_spot        24 50
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // jumping
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // solid block
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+}

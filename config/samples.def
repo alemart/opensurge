@@ -1,0 +1,284 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   config/samples.def
+// Desc:   this file specifies the default sound effects used in the game
+// Author: script by Alexandre
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Player
+// ---------------------------------------------------------------------------
+sample "jump"
+{
+    source_file         "samples/jump.wav"
+}
+
+sample "brake"
+{
+    source_file         "samples/brake.wav"
+}
+
+sample "death"
+{
+    source_file         "samples/death.wav"
+}
+
+sample "damaged"
+{
+    source_file         "samples/damaged.wav"
+}
+
+sample "collectible loss"
+{
+    source_file         "samples/collectible_loss.wav"
+}
+
+sample "drown"
+{
+    source_file         "samples/drown.wav"
+}
+
+sample "breathing"
+{
+    source_file         "samples/bubbleget.wav"
+}
+
+sample "charge"
+{
+    source_file         "samples/charge.wav"
+}
+
+sample "release"
+{
+    source_file         "samples/release.wav"
+}
+
+sample "roll"
+{
+    source_file         "samples/roll.wav"
+}
+
+sample "enter water"
+{
+    source_file         "samples/water_in.wav"
+}
+
+sample "leave water"
+{
+    source_file         "samples/water_out.wav"
+}
+
+
+// ---------------------------------------------------------------------------
+// Items
+// ---------------------------------------------------------------------------
+sample "collectible"
+{
+    source_file         "samples/collectible.wav"
+}
+
+sample "super collectible"
+{
+    source_file         "samples/collectible.wav"
+}
+
+sample "ring"
+{
+    source_file         "samples/collectible.wav"
+}
+
+sample "blue ring"
+{
+    source_file         "samples/collectible.wav"
+}
+
+sample "big ring"
+{
+    source_file         "samples/bigring.wav"
+}
+
+sample "bumper"
+{
+    source_file         "samples/bumper.wav"
+}
+
+sample "checkpoint orb"
+{
+    source_file         "samples/checkpoint.wav"
+}
+
+sample "switch"
+{
+    source_file         "samples/switch.wav"
+}
+
+sample "open door"
+{
+    source_file         "samples/door1.wav"
+}
+
+sample "close door"
+{
+    source_file         "samples/door2.wav"
+}
+
+sample "teleporter"
+{
+    source_file         "samples/teleporter.wav"
+}
+
+sample "end sign"
+{
+    source_file         "samples/endsign.wav"
+}
+
+sample "spikes appearing"
+{
+    source_file         "samples/spikes_appearing.wav"
+}
+
+sample "spikes disappearing"
+{
+    source_file         "samples/spikes_disappearing.wav"
+}
+
+sample "spikes hit"
+{
+    source_file         "samples/spikes.wav"
+}
+
+sample "spring"
+{
+    source_file         "samples/spring.wav"
+}
+
+sample "shield"
+{
+    source_file         "samples/shield.wav"
+}
+
+sample "fire shield"
+{
+    source_file         "samples/fireshield.wav"
+}
+
+sample "thunder shield"
+{
+    source_file         "samples/thundershield.wav"
+}
+
+sample "water shield"
+{
+    source_file         "samples/watershield.wav"
+}
+
+sample "acid shield"
+{
+    source_file         "samples/acidshield.wav"
+}
+
+sample "wind shield"
+{
+    source_file         "samples/windshield.wav"
+}
+
+sample "jetpack"
+{
+    source_file         "samples/neon_jetpack.wav"
+}
+
+sample "power up"
+{
+    source_file         "samples/powerup.wav"
+}
+
+// ---------------------------------------------------------------------------
+// Enemies
+// ---------------------------------------------------------------------------
+sample "destroy"
+{
+    source_file         "samples/destroypop.wav"
+}
+
+sample "boss hit"
+{
+    source_file         "samples/bosshit.wav"
+}
+
+sample "explode"
+{
+    source_file         "samples/bosshit.wav"
+}
+
+// ---------------------------------------------------------------------------
+// User Interface
+// ---------------------------------------------------------------------------
+sample "bonus count"
+{
+    source_file         "samples/collectible_count.wav"
+}
+
+sample "cash"
+{
+    source_file         "samples/cash.wav"
+}
+
+sample "choose"
+{
+    source_file         "samples/choose.wav"
+}
+
+sample "deny"
+{
+    source_file         "samples/deny.wav"
+}
+
+sample "glasses"
+{
+    source_file         "samples/glasses.wav"
+}
+
+sample "return"
+{
+    source_file         "samples/return.wav"
+}
+
+sample "select"
+{
+    source_file         "samples/select.wav"
+}
+
+sample "level saved"
+{
+    source_file         "samples/glasses.wav"
+}
+
+sample "pause"
+{
+    source_file         "samples/select_2.wav"
+}
+
+sample "secret"
+{
+    source_file         "samples/secret.wav"
+}
+
+// ---------------------------------------------------------------------------
+// Other sample effects
+// ---------------------------------------------------------------------------
+sample "1up"
+{
+    source_file         "samples/1up.ogg"
+}
+
+sample "goal"
+{
+    source_file         "samples/goal.ogg"
+}
+
+sample "break"
+{
+    source_file         "samples/break.wav"
+}

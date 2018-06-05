@@ -1,0 +1,17 @@
+// script by Alexandre
+
+// Explosion
+sprite SD_EXPLOSION
+{
+    source_file     images/explosion.png
+    source_rect     0 0 192 92
+    frame_size      48 46
+    hot_spot        24 23
+
+    animation 0
+    {
+        repeat      FALSE
+        fps         16
+        data        0 1 2 3 4 5 6
+    }
+}

@@ -1,0 +1,73 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/fade_effect.obj
+// Desc:   this object is used to simulate a fade-in/fade-out effect
+// Author: Alexandre
+// Date:   2010-12-20 (updated at 2012-12-18)
+// ---------------------------------------------------------------------------
+
+// How to use:
+// Whenever you want to simulate a fade-in/fade-out effect, follow the instructions:
+//
+// 1. If you want a fade-in effect, set $_fade_in = 1 (true). Otherwise, define $_fade_in = 0 (false).
+//
+// 2. Define the duration of the effect, in seconds, using the global variable $_fade_duration.
+//    So, for example, if you want that the fade effect lasts for 1.5 seconds, define $_fade_duration = 1.5
+//    Optionally, you may also define $_fade_zindex.
+//
+// 3. Spawn an instance of the ".fade_effect" object
+//
+// You can stop the fade effect by changing the state of the ".fade_effect" object to "destroy". In other words,
+// -- change_closest_object_state ".fade_effect" "destroy"
+// You may also, optionally, set $_fade_zindex to some POSITIVE value of your liking before spawing the object.
+
+object ".fade_effect"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state "main"
+    {
+        // initializing...
+        hide
+        set_zindex "cond($_fade_zindex <= 0, infinity(), $_fade_zindex)"
+        set_animation SD_FADEEFFECT 0
+        set_absolute_position 0 0
+        let $_fade_zindex=0
+
+        // ensure that we're not dividing by zero...
+        let "$speed = 1.0 / max(0.1, $_fade_duration)"
+
+        // select the desired effect
+        set_alpha "cond($_fade_in, 1.0, 0.0)"
+        if $_fade_in in
+        change_state out
+    }
+
+    state "in"
+    {
+        set_alpha 1.0 // opaque
+        let "$speed *= -1"
+        change_state fade
+    }
+
+    state "out"
+    {
+        set_alpha 0.0 // transparent
+        change_state fade
+    }
+
+    state "fade"
+    {
+        show
+        set_alpha "clamp(alpha() + $speed * dt(), 0.0, 1.0)"
+    }
+
+    state "destroy"
+    {
+        destroy
+    }
+}

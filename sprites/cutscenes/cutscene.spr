@@ -1,0 +1,34 @@
+// cutscene stuff (movie effect)
+// script by Alexandre
+
+// Cutscene top strip
+sprite SD_CUTSCENETOPSTRIP
+{
+    source_file     images/cutscene.png
+    source_rect     0 0 320 30
+    frame_size      320 30
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Cutscene bottom strip
+sprite SD_CUTSCENEBOTTOMSTRIP
+{
+    source_file     images/cutscene.png
+    source_rect     0 0 320 30
+    frame_size      320 30
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

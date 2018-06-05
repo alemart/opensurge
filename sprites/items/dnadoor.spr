@@ -1,0 +1,67 @@
+// script by Alexandre
+
+// DNA Door
+sprite SD_DNADOOR
+{
+    source_file     images/dnadoors.png
+    source_rect     0 0 144 64
+    frame_size      16 64
+    hot_spot        8 63
+
+    // Surge
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        6 7 8
+    }
+
+    // Neon
+    animation 1
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2
+    }
+
+    // Charge
+    animation 2
+    {
+        repeat      TRUE
+        fps         16
+        data        3 4 5
+    }
+}
+
+// Horizontal DNA Door
+sprite SD_HORIZONTALDNADOOR
+{
+    source_file     images/dnadoors.png
+    source_rect     0 86 192 48
+    frame_size      64 16
+    hot_spot        32 15
+
+    // Surge
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        6 7 8
+    }
+
+    // Neon
+    animation 1
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2
+    }
+
+    // Charge
+    animation 2
+    {
+        repeat      TRUE
+        fps         16
+        data        3 4 5
+    }
+}

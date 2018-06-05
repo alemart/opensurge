@@ -1,0 +1,155 @@
+// script by Alexandre
+
+// Tux
+sprite SD_TUX
+{
+    source_file     images/tux.png
+    source_rect     0 20 200 675
+    frame_size      40 45
+    hot_spot        20 45
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // walking
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        30 31 32 33 34 35 36 37
+    }
+
+    // running
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        26 27 28 29   
+    }
+
+    // jumping / rolling
+    animation 3
+    {
+        repeat      TRUE
+        fps         16
+        data        15 16 17 18 19
+    }
+
+    // ducking
+    animation 4
+    {
+        repeat      FALSE
+        fps         12
+        data        5 6
+    }
+
+    // looking up
+    animation 5
+    {
+        repeat      FALSE
+        fps         12
+        data        3 4
+    }
+
+    // charging
+    animation 6
+    {
+        repeat      TRUE
+        fps         32
+        data        20 21 22 23 24 25
+    }
+
+    // braking
+    animation 7
+    {
+        repeat      FALSE
+        fps         8
+        data        7 8 9
+    }
+
+    // dead
+    animation 8
+    {
+        repeat      FALSE
+        fps         8
+        data        13
+    }
+
+    // drowned
+    animation 9
+    {
+        repeat      FALSE
+        fps         8
+        data        14
+    }
+
+    // ledge
+    animation 10
+    {
+        repeat      TRUE
+        fps         6
+        data        39 40 41
+    }
+
+    // getting hit
+    animation 11
+    {
+        repeat      FALSE
+        fps         8
+        data        10 11
+    }
+
+    // breathing
+    animation 12
+    {
+        repeat      FALSE
+        fps         8
+        data        38
+    }
+
+    // springing
+    animation 13
+    {
+        repeat      TRUE
+        fps         8
+        data        12
+    }
+
+    // pushing
+    animation 14
+    {
+        repeat      TRUE
+        fps         8
+        data        42 43 44 45
+    }
+
+    // waiting
+    animation 15
+    {
+        repeat      TRUE
+        fps         6
+        data        1 2
+    }
+
+    // ceiling (being carried)
+    animation 16
+    {
+        repeat      TRUE
+        fps         8
+        data        12
+    }
+
+    // winning (victory)
+    animation 17
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }    
+}
+

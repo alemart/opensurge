@@ -1,0 +1,15 @@
+// script by Alexandre
+sprite SD_FOG
+{
+    source_file     images/fog2.jpg
+    source_rect     0 0 960 320
+    frame_size      960 320
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

@@ -1,0 +1,239 @@
+// script by Celdecea
+
+
+// 2x2 plain
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              0              0           0
+    brick              0             48           0
+    brick              0              0           48
+    brick              0             48           48
+}
+
+// 3x3 plain
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              0              0           0
+    brick              0             48           0
+	brick              0             96           0
+    brick              0              0           48
+    brick              0             48           48
+	brick              0             96           48
+    brick              0              0           96
+    brick              0             48           96
+	brick              0             96           96
+}
+
+
+//downhill forward diagonal start
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              206              0           0
+    brick              207              0          11
+	brick              208              0          35
+	brick              205             42          11
+}
+
+//downhill forward diagonal short section
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              200             24           0
+    brick              201              0           0
+}
+
+//downhill forward diagonal long section
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              200             24           0
+    brick              201              0           0
+	brick              200             48          24
+    brick              201             24          24
+	brick              200             72          48
+    brick              201             48          48
+}
+
+
+//downhill forward diagonal end
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              204              0           0
+    brick              203             24           0
+	brick              202             24          27
+}
+
+
+
+//downhill backward diagonal start
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              106             30           0
+    brick              107             30          11
+	brick              108             24          35
+	brick              105              0          11
+}
+
+//downhill backward diagonal short section
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              100             0           0
+    brick              101             24          0
+}
+
+//downhill backward diagonal long section
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              100             0           48
+    brick              101             24          48
+	brick              100             24          24
+    brick              101             48          24
+	brick              100             48          0
+    brick              101             72          0
+}
+
+//downhill backward diagonal end
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick              104             45          0
+    brick              103             0           0
+	brick              102             0           27
+}
+
+
+
+
+
+//flat step up
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick               4             0           48
+	brick               5             48          48
+	brick               4             48          0
+	brick               5             96          0
+}
+
+
+//flat step up flat
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick               7             0           48
+	brick               7             144         0
+	brick               2             96          0
+	brick               5             96          48
+	brick               8             48          48
+}
+
+//flat step down
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+	brick               12            48          0
+	brick               13            0           0
+	brick               12            96          48
+	brick               13            48          48
+}
+
+
+//flat step down flat
+group
+{
+    // object_type   // object_id     // xpos      // ypos
+    brick               7             0           0
+	brick               7             144         48
+	brick               10            48          0
+	brick               13            48          48
+	brick               6             96          48
+}
+
+
+//loop section A
+group 
+{
+   // object_type   // object_id     // xpos      // ypos
+    brick              300            63           0
+	brick              301            27          25
+	brick              302             0          61
+	brick              303            93          47
+	brick              304            63          63
+	brick              305            47          93
+	brick              306            93          26
+	brick              307            63          26
+	brick              308            27          61
+	brick              309            27          93
+}
+
+//loop section B
+group 
+{
+   // object_type   // object_id     // xpos      // ypos
+    brick              310             0           0
+	brick              311            82          25
+	brick              312           118          61
+	brick              313             0          47
+	brick              314            52          63
+	brick              315            82          93
+	brick              316             0          26
+	brick              317            52          26
+	brick              318            82          61
+	brick              319            98          93
+}
+
+//loop section C
+group 
+{
+   // object_type   // object_id     // xpos      // ypos
+    brick              320             0          119
+	brick              321            82           84
+	brick              322           118           0
+	brick              323             0           82
+	brick              324            52           52
+	brick              325            82           0
+	brick              326             0           98
+	brick              327            52           82
+	brick              328            82           52
+	brick              329            98           0
+}
+
+//loop section D
+group 
+{
+   // object_type   // object_id     // xpos      // ypos
+    brick              330            63          119
+	brick              331            27           84
+	brick              332             0           0
+	brick              333            93           82
+	brick              334            63           52
+	brick              335            47           0
+	brick              336            93           98
+	brick              337            63           82
+	brick              338            27           52
+	brick              339            27           0 
+}
+
+//loop vertical piece
+group
+{
+   // object_type   // object_id     // xpos      // ypos
+    brick              340            0          0
+	brick              341            24         0
+}
+
+//loop horizontal piece
+group
+{
+   // object_type   // object_id     // xpos      // ypos
+    brick              342            0          24
+	brick              343            0           0
+}
+

@@ -1,0 +1,129 @@
+// Old loop objects
+// script by Alexandre
+
+// LoopRight - Special object
+sprite SD_LOOPRIGHT
+{
+    source_file     images/special.png
+    source_rect     0 0 32 96
+    frame_size      32 96
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+// LoopTop - Special object
+sprite SD_LOOPMIDDLE
+{
+    source_file     images/special.png
+    source_rect     64 0 32 16
+    frame_size      32 16
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+
+// LoopLeft - Special object
+sprite SD_LOOPLEFT
+{
+    source_file     images/special.png
+    source_rect     32 0 32 96
+    frame_size      32 96
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+
+// LoopNone - Special object
+sprite SD_LOOPNONE
+{
+    source_file     images/special.png
+    source_rect     96 0 32 96
+    frame_size      32 96
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+// LoopFloor - Special object
+sprite SD_LOOPFLOOR
+{
+    source_file     images/special.png
+    source_rect     64 16 32 32
+    frame_size      32 32
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+// LoopFloorNone - Special object
+sprite SD_LOOPFLOORNONE
+{
+    source_file     images/special.png
+    source_rect     64 48 32 32
+    frame_size      32 32
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+// LoopFloorTop - Special Object
+sprite SD_LOOPFLOORTOP
+{
+    source_file     images/special.png
+    source_rect     128 0 64 16
+    frame_size      64 16
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

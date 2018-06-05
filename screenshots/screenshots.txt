@@ -1,0 +1,1 @@
+Screenshots are placed here.

@@ -1,0 +1,300 @@
+// ----------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// T-Bar Zipline
+// By Alexandre (inspired on ssdw's zipline)
+//
+// Changelog:
+// 2012-03-26 - first version
+// ----------------------------------------
+
+object "Zipline.Grabber"
+{
+    requires 0.2.0
+    always_active
+    category "level 1"
+    annotation "Please make sure this always touches a Zipline.Line object"
+
+    state "main"
+    {
+        let "$max_speed = 2000" // maximum speed, in pixels per second
+        let "$acc_factor = 2" // acceleration factor
+        set_animation Zipline.Grabber 0
+        on_player_collision activate
+    }
+
+    // --------- activation phase
+
+    state activate
+    {
+        let "$sx = 0"
+        let "$sy = 0"
+        let "$dx = 0"
+        let "$dy = 0"
+        play_sample samples/zipline.wav
+        strong_player
+        disable_player_movement
+        create_child .Zipline.GrabberPlayerAnim 0 0 anim
+        create_child .Zipline.GrabberSound 0 0 snd
+        request_camera_focus
+        change_state set_initial_speed
+        change_state main_loop
+    }
+
+    state set_initial_speed
+    {
+        unless $dx==0 set_initial_speed2
+        on_collision Zipline.Line.32x33/ collision_32x33/
+        on_collision Zipline.Line.32x33L collision_32x33L
+        on_collision Zipline.Line.32x17/ collision_32x17/
+        on_collision Zipline.Line.32x17L collision_32x17L
+    }
+
+    state set_initial_speed2
+    {
+        let "$sx = 0.5 * abs(player_xspeed()) * cos(atan2(-$dy, $dx))"
+        let "$sy = 0.5 * abs(player_xspeed()) * sin(atan2($dy, $dx))"
+        change_state main_loop
+    }
+
+    // ---------------- working phase (main loooooooooop!!!!!!!)
+
+    state main_loop
+    {
+        execute _run
+        on_brick_collision deactivate
+        on_collision Zipline.Line.32x33/ collision_32x33/
+        on_collision Zipline.Line.32x33L collision_32x33L
+        on_collision Zipline.Line.32x17/ collision_32x17/
+        on_collision Zipline.Line.32x17L collision_32x17L
+        change_state deactivate
+    }
+
+    state collision_32x33/
+    {
+        execute _run
+        let $dx=-100
+        let $dy=100
+        return_to_previous_state
+    }
+
+    state collision_32x33L
+    {
+        execute _run
+        let $dx=100
+        let $dy=100
+        return_to_previous_state
+    }
+
+    state collision_32x17/
+    {
+        execute _run
+        let $dx=-100
+        let $dy=50
+        return_to_previous_state
+    }
+
+    state collision_32x17L
+    {
+        execute _run
+        let $dx=100
+        let $dy=50
+        return_to_previous_state
+    }
+
+    state _run
+    {
+        on_button_pressed fire1 jump
+        let "$c = ($sx^2 + $sy^2 < $max_speed ^ 2)"
+        let "$sx = cond($c, $sx + $acc_factor * $dx * dt(), $sx)"
+        let "$sy = cond($c, $sy + $acc_factor * $dy * dt(), $sy)"
+        move $sx $sy
+        set_player_position $_zipline_offx*player_direction() 20
+    }
+
+    // -------------- deactivation phase
+
+    state deactivate
+    {
+        weak_player
+        enable_player_movement
+        set_player_xspeed $sx
+        set_player_yspeed $sy
+        change_child_state anim destroy
+        change_child_state snd destroy
+        drop_camera_focus
+        change_state respawn
+    }
+
+    state jump
+    {
+        play_sample jump
+        execute deactivate
+        set_player_yspeed -300
+        simulate_button_down fire1
+    }
+
+    state respawn
+    {
+        create_child .Zipline.FakeGrabber 0 0
+        set_absolute_position spawnpoint_x() spawnpoint_y()
+        change_state hide_and_wait
+    }
+
+    state hide_and_wait
+    {
+        hide
+        if "(player_xpos()-xpos())^2 + (player_ypos()-ypos())^2 < screen_width()^2" hide_and_wait
+        show
+        change_state main
+    }
+}
+
+object "Zipline.Pole"
+{
+    requires 0.2.0
+    category "level 1"
+
+    state "main"
+    {
+        set_animation Zipline.Pole 0
+        set_zindex 0.45
+    }
+}
+
+object "Zipline.Line.32x33/"
+{
+    requires 0.2.0
+    category "level 1"
+
+    state "main"
+    {
+        set_animation Zipline.Line 0
+        set_zindex 0.4
+    }
+}
+
+object "Zipline.Line.32x33L"
+{
+    requires 0.2.0
+    category "level 1"
+
+    state "main"
+    {
+        set_animation Zipline.Line 1
+        set_zindex 0.4
+    }
+}
+
+object "Zipline.Line.32x17/"
+{
+    requires 0.2.0
+    category "level 1"
+
+    state "main"
+    {
+        set_animation Zipline.Line 2
+        set_zindex 0.4
+    }
+}
+
+object "Zipline.Line.32x17L"
+{
+    requires 0.2.0
+    category "level 1"
+
+    state "main"
+    {
+        set_animation Zipline.Line 3
+        set_zindex 0.4
+    }
+}
+
+object ".Zipline.FakeGrabber"
+{
+    requires 0.2.0
+    destroy_if_far_from_play_area
+
+    state "main"
+    {
+        set_animation Zipline.Grabber 0
+        move 0 $vel+=gravity()*dt()
+    }
+}
+
+object ".Zipline.GrabberPlayerAnim"
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+        let $anim=16
+        on_observed_player Surge activate_surge // todo: improve this?
+        on_observed_player Neon activate_neon // why do we need a switch
+        on_observed_player Charge activate_charge
+        on_observed_player Tux activate_tux
+        change_state activate_surge
+    }
+
+    state activate_surge
+    {
+        set_player_animation SD_SURGE $anim
+        let $_zipline_offx=7
+    }
+
+    state activate_neon
+    {
+        set_player_animation SD_NEON $anim
+        let $_zipline_offx=0
+    }
+
+    state activate_charge
+    {
+        set_player_animation SD_CHARGE $anim
+        let $_zipline_offx=0
+    }
+
+    state activate_tux
+    {
+        set_player_animation SD_TUX $anim
+        let $_zipline_offx=0
+    }
+
+    state destroy
+    {
+        destroy
+    }
+}
+
+object ".Zipline.GrabberSound"
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+        change_state play
+    }
+
+    state play
+    {
+        play_sample samples/zipline2.wav $t*0.25*($dy/$dx)
+        change_state wait
+    }
+
+    state wait
+    {
+        let $t+=dt()
+        on_timeout 0.25 play
+    }
+
+    state destroy
+    {
+        stop_sample samples/zipline2.wav
+        destroy
+    }
+}

@@ -1,0 +1,75 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/fademusic.obj
+// Desc:   this object is used to simulate a fade-in/fade-out music effect
+// Author: Alexandre
+// Date:   2012-12-27
+// ---------------------------------------------------------------------------
+
+// How to use:
+// Whenever you want to simulate a fade-in/fade-out music effect, follow the instructions:
+//
+// 1. If you want a fade-in effect, set $_fademusic_in = 1 (true). Otherwise, define $_fademusic_in = 0 (false).
+//
+// 2. Define the duration of the effect, in seconds, using the global variable $_fademusic_duration.
+//    So, for example, if you want that the fade effect lasts for 1.5 seconds, define $_fademusic_duration = 1.5
+//
+// 3. Spawn an instance of the ".fademusic" object
+
+object ".fademusic"
+{
+    requires 0.2.0
+    always_active
+
+    state "main"
+    {
+        // initializing...
+        hide
+        let "$fade_in = $_fademusic_in"
+        let "$duration = max(0.1, $_fademusic_duration)"
+
+        // configuring...
+        let "$old_volume = cond(music_volume() <= 0, 1.0, music_volume())"
+        let "$speed = $old_volume / $duration"
+
+        // select the desired effect
+        if $fade_in in
+        change_state out
+    }
+
+    state "in"
+    {
+        set_music_volume 0
+        change_state fade
+    }
+
+    state "out"
+    {
+        let "$speed *= -1"
+        change_state fade
+    }
+
+    state "fade"
+    {
+        set_music_volume "clamp(music_volume() + $speed * dt(), 0.0, $old_volume)"
+        if "(music_volume() == 0) and not($fade_in)" "destroy"
+        if "(music_volume() == $old_volume) and $fade_in" "destroy"
+    }
+
+    state "destroy"
+    {
+        execute !silence if not($fade_in)
+        set_music_volume $old_volume
+        destroy
+    }
+
+
+    // ----------------------
+
+    state !silence
+    {
+        play_music "musics/silence.ogg" -1
+    }
+}

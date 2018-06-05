@@ -1,0 +1,256 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:     languages/spanish.lng
+// Desc:     Spanish translation (encoding: utf-8)
+// Author:   Santiago Tabarez
+// File rev: 1.3.1 (10/21/2012)
+// Comments: Updated to Open Surge Engine version 0.2.0 build 716
+//           Si abriste este archivo y entiendes lo que estoy diciendo,
+//           avísame si cometo algún error o si tienes una sugerencia,
+//			 en mi cuenta @CharlyTx en la Open Surge Community.
+// ---------------------------------------------------------------------------
+
+// Meta data
+LANG_LANGUAGE               "Español"
+LANG_AUTHOR                 "Santiago Tabarez"
+LANG_LASTUPDATE             "2012-10-21"
+LANG_COMPATIBILITY          "0.2.0"
+
+
+// Colors
+COLOR_P1                    "ff8000"
+COLOR_P2                    "bf7a0d"
+COLOR_P3                    "aca5a5"
+COLOR_INPUT                 "aaaaaa"
+COLOR_SPECIAL               "ffff00"
+
+
+// Main menu
+MENU_1PGAME                 "INICIAR JUEGO"
+MENU_CUSTOMQUESTS           "EXTRAS"
+MENU_OPTIONS                "OPCIONES"
+MENU_EXIT                   "SALIR"
+
+
+// Options
+OPTIONS_TITLE               "<color=$COLOR_P1>OPCIONES</color>"
+OPTIONS_YES                 "SÍ"
+OPTIONS_NO                  "NO"
+OPTIONS_GRAPHICS            "GRÁFICOS"
+OPTIONS_FULLSCREEN          "Pantalla completa"
+OPTIONS_RESOLUTION          "Resolución"
+OPTIONS_RESOLUTION_OPT1     "1x"
+OPTIONS_RESOLUTION_OPT2     "2x"
+OPTIONS_RESOLUTION_OPT3     "3x"
+OPTIONS_RESOLUTION_OPT4     "4x"
+OPTIONS_SMOOTHGFX           "suavidad de gráficos"
+OPTIONS_SMOOTHGFX_ERROR     "[sólo 32 bpp]"
+OPTIONS_FPS                 "Mostrar FPS"
+OPTIONS_GAME                "JUEGO"
+OPTIONS_GAMEPAD             "Usar gamepad"
+OPTIONS_LANGUAGE            "Cambiar lenguaje"
+OPTIONS_STAGESELECT         "Seleccionar escena"
+OPTIONS_CREDITS             "Créditos & donaciones"
+OPTIONS_BACK                "ATRÁS"
+
+
+// Stage Select
+STAGESELECT_TITLE           "<color=$COLOR_P1>SELECCIONAR ESCENA</color>"
+STAGESELECT_MSG             "Presiona <color=ffff00>$INPUT_FIRE4</color> para cancelar"
+STAGESELECT_PAGE            "página %d/%d"
+STAGESELECT_ACT             "Acto"
+
+
+// Custom quests
+QUESTSELECT_TITLE           "<color=$COLOR_P1>SLECCIONAR QUEST</color>"
+QUESTSELECT_MSG             "Presiona <color=ffff00>$INPUT_FIRE4</color> para cancelar"
+QUESTSELECT_PAGE            "página %d/%d"
+QUESTSELECT_INFO            "<color=ffff00>Versión:</color> %s\n<color=ffff00>Autor:</color> %s\n<color=ffff00>Descripción:</color> %s"
+MENU_CQ_TUTORIAL            "Aprende cómo jugar Open Surge"
+MENU_CQ_EXTRA               "Niveles Extra"
+
+
+// Languages (please do not translate these!)
+LANGSELECT_TITLE1           "<color=$COLOR_P1>SELECT YOUR</color>"
+LANGSELECT_TITLE2           "<color=$COLOR_P1>LANGUAGE</color>"
+LANGSELECT_AUTHOR           "<color=ffff00>Translation by:</color> %s"
+LANGSELECT_PAGE             "page %d/%d"
+
+
+// Credits
+CREDITS_TITLE               "<color=$COLOR_P1>CRÉDITOS</color>"
+CREDITS_KEY                 "Presiona <color=ffff00>$INPUT_FIRE4</color> para regresar, o <color=ffff00>$INPUT_FIRE8</color> para ver los donadores"
+CREDITS_ACTIVE              "Equipo del Proyecto"
+CREDITS_CONTRIB             "Colaboradores especiales"
+CREDITS_RETIRED             "Miembros Retirados"
+CREDITS_THANKS              "Gracias a"
+
+CREDITS_ALEXANDRE           "Fundador, Líder del proyecto, Programador"
+CREDITS_DI                  "Músico"
+CREDITS_COLIN               "Diseñador de la historia, moderador del Foro"
+CREDITS_MATEUSREIS          "Diseñador de efectos de sonido"
+CREDITS_JOHAN               "Músico, Administrador de medios sociales"
+CREDITS_CELDECEA            "Artista"
+CREDITS_JOAO                "Artista"
+CREDITS_RAMON               "Ilustraciones"
+CREDITS_CHRISTOPHER         "Administrador del Wiki, Traducción al Indonesio"
+CREDITS_RUBEN               "Diseñador de niveles"
+CREDITS_SSDW                "Traducción al Neerlandés"
+CREDITS_ARTHURBLOT          "Traducción al Francés"
+CREDITS_REIMUND             "Traducción al Alemán"
+CREDITS_SZYMON              "Traducción al Polaco"
+CREDITS_TOMIRES             "Traducción al Checo"
+CREDITS_FRANCESCO           "Traducción al Italiano"
+CREDITS_SANTIAGO            "Traducción al Español"
+CREDITS_RAXILLAN            "Traducción al Ruso"
+
+CREDITS_RES_TITLE           "Créditos por recursos individuales"
+CREDITS_RES_TEXT            "A menos que se indique lo contrario, los archivos listados más abajo poseen una licencia Creative Commons Attribution-ShareAlike 3.0 (CC-BY-SA 3.0)."
+CREDITS_RES_IMAGES          "Imágenes"
+CREDITS_RES_MUSICS          "Música"
+CREDITS_RES_SAMPLES         "Efectos de sonido"
+CREDITS_RES_SCRIPTS         "Scripts"
+CREDITS_RES_SCRIPTS_TEXT    "Los autores se especifican en los mismos ficheros."
+
+
+// Donations
+DONORS_TITLE                "<color=$COLOR_P1>POR FAVOR HAZ UNA DONACIÓN</color>"
+DONORS_KEY                  "Presiona <color=ffff00>$INPUT_FIRE4</color> para regresar"
+DONORS_HEADER               "Como un juego de código abierto, Open Surge necesita dinero para pagar por código, arte, música, etc.\n\nÉstos son los entusiastas quienes han ayudado dando fondos al proyecto:"
+
+
+// "Please donate" screen
+DONATE_TITLE                "<color=$COLOR_P1>HAZ UNA DONACIÓN</color>"
+DONATE_TEXT                 "¡Por favor ayúdanos a crear el episodio 2!\n\nOpen Surge es un juego libre y de código abierto, disponible para tí sin costo. Sin embargo, hacer un juego nos cuesta dinero. <color=ffff00>Por favor danos tu soporte.</color> Haciendo una <color=ffff00>donacion de cualquier valor</color>, tu estarás ayudándonos a crear el siguiente episodio. Tambien obtendrás acceso a varios <color=ffff00>beneficios adicionales</color>!\n\nTu donacion es abolutamente necesaria para el avance de este proyecto. Tu aporte será invertido en código, arte, musica, etc.\n\n¿Te gustaría donar ahora?"
+DONATE_YES                  "Claro!"
+DONATE_NO                   "Después."
+DONATE_ALREADYHAVE          "Ya he donado."
+
+// Quest names
+TUTORIAL_QUEST_NAME         "Tutorial"
+EXTRA_LEVELS_NAME           "Niveles Extra"
+
+
+// Bonus levels
+BONUSMSG_TITLE              "BONUS"
+BONUSMSG_TEXT               "Escenas de bono aún no implementadas ;)"
+
+
+// Confirm boxes
+    // Quit game?
+    CBOX_QUIT_QUESTION      "REALMENTE QUIERES SALIR?"
+    CBOX_QUIT_OPTION1       "SÍ"
+    CBOX_QUIT_OPTION2       "NO"
+
+
+// Input devices
+    // keyboard
+    INPUT_KEYB_DIRECTIONAL  "las TECLAS de DIRECCIÓN"
+    INPUT_KEYB_LEFT         "la TECLA IZQUIERDA"
+    INPUT_KEYB_RIGHT        "la TECLA DERECHA"
+    INPUT_KEYB_UP           "la TECLA ARRIBA"
+    INPUT_KEYB_DOWN         "la TECLA ABAJO"
+    INPUT_KEYB_FIRE1        "la BARRA de ESPACIO"
+    INPUT_KEYB_FIRE2        "la TECLA CTRL IZQ."
+    INPUT_KEYB_FIRE3        "INTRO"
+    INPUT_KEYB_FIRE4        "ESC"
+    INPUT_KEYB_FIRE5        "W"
+    INPUT_KEYB_FIRE6        "A"
+    INPUT_KEYB_FIRE7        "S"
+    INPUT_KEYB_FIRE8        "D"
+
+
+    // joystick
+    INPUT_JOY_DIRECTIONAL   "los BOTONES DIRECCIONALES"
+    INPUT_JOY_LEFT          "the LEFT BUTTON"
+    INPUT_JOY_RIGHT         "the RIGHT BUTTON"
+    INPUT_JOY_UP            "the UP BUTTON"
+    INPUT_JOY_DOWN          "the DOWN BUTTON"
+    INPUT_JOY_FIRE1         "BUTTON 1"
+    INPUT_JOY_FIRE2         "BUTTON 2"
+    INPUT_JOY_FIRE3         "BUTTON 3"
+    INPUT_JOY_FIRE4         "BUTTON 4"
+    INPUT_JOY_FIRE5         "BUTTON 5"
+    INPUT_JOY_FIRE6         "BUTTON 6"
+    INPUT_JOY_FIRE7         "BUTTON 7"
+    INPUT_JOY_FIRE8         "BUTTON 8"
+
+
+// HUD (Heads-Up Display)
+HUD_SCORE                   "Puntos:"
+HUD_TIME                    "Tiempo: "
+HUD_COLLECTIBLES            "Anillos:"
+HUD_SPACES                  "      " // the same amount of spaces
+HUD_CLEARED_LINE1           "HAS"
+HUD_CLEARED_LINE2           "TERMINADO"
+HUD_CLEARED_LINE2_ACT       "EL ACTO"
+HUD_CLEARED_COLLECTIBLES    "BONO de ANILLOS"
+HUD_CLEARED_TIME            "BONO de TIEMPO"
+HUD_CLEARED_SECRET          "BONO de SECRETOS"
+HUD_CLEARED_TOTAL           "TOTAL"
+
+
+// Chilpoctli Temple Zone
+    // act 1
+    DESERT1_TITLE_0         "Bienvenido" 
+    DESERT1_MSG_0           "Este mini nivel muestra el primer brickset Open Surge de Celdecea!"
+    DESERT1_TITLE_1         "META" 
+    DESERT1_MSG_1           "Qué pensabas? La meta está justo en frente!"
+    DESERT1_TITLE_2         "Secreto" 
+    DESERT1_MSG_2           "Este es un lugar para aquellos quienes puedan ver..."
+    DESERT1_TITLE_3         "Reservado"
+    DESERT1_MSG_3           "Un bucle irá aquí algún día."
+
+
+// Generic Dialog boxes
+    // test 
+    DIALOGBOX_MESSAGE_0     ""
+    DIALOGBOX_MESSAGE_1     "Hola! Esta es una <color=ffff00>caja de diálogo</color>! Testeando una cadena de texto muy larga. No tengo nada más que decir."
+    DIALOGBOX_MESSAGE_2     "¿En serio?"
+	
+
+	
+// ===================== CUTSCENES ==============================
+
+
+// Opening cutscene
+OPENING_1				"Hace mucho tiempo, los antiguos dioses habian creado un objeto sagrado y poderoso: el <color=ff8000>Cetro Dimensional</color>."
+OPENING_2				"Este Cetro otorga el máximo poder a quien lo posee, "
+OPENING_3				"y dado que puede ser muy peligroso en las manos equivocadas, los dioses la han ocultado en el <color=ff8000>Portal Dimensional</color>."
+OPENING_4				"<color=ff8000>Gimacian the Dark</color> es un malvado mago que necesita la oscuridad para incrementar sus poderes."
+OPENING_5				"Él sabe donde se localiza el <color=ff8000>Portal Dimensional</color> e intentará abrirlo usando los <color=ff8000>Anillos Dimensionales</color>." 
+OPENING_6				"Si él consigue ese poder, podría dominar el universo, y nada podrá detenerlo." 
+OPENING_7				"<color=ff8000>Surge</color> y sus amigos deben impedir que <color=ff8000>Gimacian the Dark</color> abra el portal,"
+OPENING_8				"o la existencia como la conocemos"
+OPENING_9				"se acabará!"
+
+// cutscene 1: Surge and Neon
+    // generic texts
+    CUTSCENE1_SKIP          "Presiona <color=ffff00>$INPUT_FIRE4</color> para saltar la escena"
+
+    // dialog boxes
+    DIALOGBOX_MESSAGE_100   "Ahhh, esto es vida, eh amigo?"
+    DIALOGBOX_MESSAGE_101   "Siii..."
+    DIALOGBOX_MESSAGE_102   "Crees que nosotros --"
+    DIALOGBOX_MESSAGE_103   "Oh?!?"
+    DIALOGBOX_MESSAGE_104   "<color=$COLOR_P2>Neon</color>, quédate aquí."
+    DIALOGBOX_MESSAGE_105   "¿Crees que esto tiene que ver con estas extrañas desapariciones?"
+    DIALOGBOX_MESSAGE_106   "No sé, amigo. Voy a ir a ver qué está pasando, sólo para evitar estas... cosas que son..."
+    DIALOGBOX_MESSAGE_107   "Pero <color=$COLOR_P1>Surge</color>, podrías herirte! Quiero ayudarte!"
+    DIALOGBOX_MESSAGE_108   "No, <color=$COLOR_P2>Neon</color>. Espera aquí y mantente a salvo. No puedo permitir que te lastimes con estas cosas!"
+    DIALOGBOX_MESSAGE_109   "pero, <color=$COLOR_P1>Surge</color>..."
+    DIALOGBOX_MESSAGE_110   "Bien..."
+    DIALOGBOX_MESSAGE_111   "Vamos a reunirnos en la cascada luego. Solo quédate en guardia. Recuerda, si esto es demasiado para tí, corre."
+    DIALOGBOX_MESSAGE_112   "Muy bien, pero tú también debes ser muy cuidadoso... está bien?"
+    DIALOGBOX_MESSAGE_113   "Lo seré. Ahora, date prisa!"
+    DIALOGBOX_MESSAGE_114   "Ve!"
+
+
+
+// ========================== LEVELS ====================================
+
+    // Sunshine Paradise
+    DIALOGBOX_MESSAGE_130   "shhhhh! Se supone que nadie me debería ver en este juego! Aquí, toma <color=ffff00>50 anillos</color> y vete."
+    DIALOGBOX_MESSAGE_131   "PIERDETE!"

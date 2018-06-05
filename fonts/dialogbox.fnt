@@ -1,0 +1,21 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   fonts/dialogbox.fnt
+// Desc:   font for the dialog boxes
+// Author: Alexandre (script),
+//         Ste Pickford (images/font.png),
+//         DejaVu (ttf/DejaVuSans.ttf)
+// ---------------------------------------------------------------------------
+
+font "dialogbox"
+{
+    truetype
+    {
+        source_file             "ttf/DejaVuSans.ttf"
+        size                    12
+        antialias
+        shadow
+    }
+}

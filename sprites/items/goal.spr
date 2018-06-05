@@ -1,0 +1,118 @@
+// script by Alexandre
+
+// Goal
+sprite SD_GOAL
+{
+    source_file     images/goal_sign.png
+    source_rect     0 0 76 56
+    frame_size      38 56
+    hot_spot        19 56
+
+    // --->
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // <---
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+
+// End sign
+sprite SD_ENDSIGN
+{
+    source_file     images/goal.png
+    source_rect     0 0 184 107
+    frame_size      46 54
+    hot_spot        23 53
+
+    // idle (Gimacian)
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         16
+        data        1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
+    }
+
+    // Surge
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // Neon
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    // Charge
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+
+    // Other
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+}
+
+
+// Animal Prison
+sprite SD_ENDLEVEL
+{
+    source_file     images/animalprison.png
+    source_rect     0 0 98 82
+    frame_size      49 41
+    hot_spot        25 40
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // hit
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        2
+    }
+
+    // broken
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}

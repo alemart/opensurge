@@ -1,0 +1,18 @@
+// script by Alexandre
+
+// A transparent sprite
+sprite SD_NONE
+{
+    source_file     images/none.png
+    source_rect     0 0 16 16
+    frame_size      16 16
+    hot_spot        8 8
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

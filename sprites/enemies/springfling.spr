@@ -1,0 +1,29 @@
+//Spring Fling: Sprite By SilverstepP
+// script by SilverstepP, modified by Alexandre
+sprite "Springfling"
+{
+	source_file	"images/levels/1/springfling.png"
+	source_rect	0 0 64 64
+	frame_size		32 32
+	hot_spot		16 30
+
+	animation 0
+	{
+		repeat	TRUE
+		fps		8
+		data		0
+	}
+	animation 1
+	{
+		repeat	FALSE
+		fps		16
+		data		3 2 2 1
+	}
+
+	animation 2
+	{
+		repeat	FALSE
+		fps		16
+		data		0 3 2 3
+	}
+}

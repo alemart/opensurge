@@ -1,0 +1,83 @@
+// ----------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// Barrels
+// 
+// Changelog:
+// 2012-03-16 - first version by Alexandre
+// 2012-03-23 - second version, featuring svgmovement's improved sprite
+// ----------------------------------------
+
+object "Barrel - right,rotation"
+{
+    requires 0.2.0
+    category "level 1"
+    annotation "A barrel facing right. It rotates once the player gets into it."
+
+    state main
+    {
+        let "$strength = 1000" // the higher the value, the stronger the cannon
+
+        set_animation "Barrel" 0
+        look_right
+        set_zindex 0.6
+        set_angle 0
+        change_state idle
+    }
+
+    state idle
+    {
+        observe_all_players
+        on_player_rect_collision -2 -2 2 2 enter
+    }
+
+    state enter
+    {
+        observe_current_player
+        set_player_position 1 -5
+        disable_player_movement
+        change_state rotate
+    }
+
+    state rotate
+    {
+        set_player_animation SD_NONE 0
+        set_angle "45 * sin(2 * pi() * ($t += dt()))"
+        on_button_pressed fire1 fire
+    }
+
+    state fire
+    {
+        create_child .barrel.explosion
+        play_sample samples/cannon.ogg
+        set_player_xspeed "$strength * cos(deg2rad(angle()))"
+        set_player_yspeed "-$strength * sin(deg2rad(angle()))"
+        roll_player
+        enable_player_movement
+        change_state cooldown
+    }
+
+    state cooldown
+    {
+        on_timeout 1.0 main
+    }
+}
+
+object ".barrel.explosion"
+{
+    requires 0.2.0
+    destroy_if_far_from_play_area
+
+    state main
+    {
+        set_animation SD_EXPLOSION 0
+        set_zindex 0.6
+        on_animation_finished destroy
+    }
+
+    state destroy
+    {
+        destroy
+    }
+}

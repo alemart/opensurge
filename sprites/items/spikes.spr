@@ -1,0 +1,42 @@
+// script by Celdecea, modified by Alexandre
+
+// Spikes
+sprite SD_SPIKES
+{
+    source_file     images/spikes.png
+    source_rect     10 80 128 32
+    frame_size      32 32
+    hot_spot        16 31
+
+    // floor
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // left wall
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // ceiling
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // right wall
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+}

@@ -1,0 +1,229 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   languages/polish.lng
+// Desc:   Polish translation
+// Author: Szymon Weihs
+// ---------------------------------------------------------------------------
+
+// Meta data
+LANG_LANGUAGE               "Polski"
+LANG_AUTHOR                 "Szymon Weihs"
+LANG_LASTUPDATE             "2010-09-07"
+LANG_COMPATIBILITY          "0.2.0"
+
+
+// Colors
+COLOR_P1                    "0077ff"
+COLOR_P2                    "ff7700"
+COLOR_P3                    "ff0000"
+COLOR_INPUT                 "aaaaaa"
+COLOR_SPECIAL               "ffff00"
+
+
+// Main menu
+MENU_1PGAME                 "ROZPOCZNIJ GRE"
+MENU_TUTORIAL               "SAMOUCZEK"
+MENU_CUSTOMQUESTS           "DODATKI"
+MENU_OPTIONS                "OPCJE"
+MENU_EXIT                   "WYJSCIE"
+
+
+// Options
+OPTIONS_TITLE               "OPCJE"
+OPTIONS_YES                 "TAK"
+OPTIONS_NO                  "NIE"
+OPTIONS_GRAPHICS            "GRAFIKA"
+OPTIONS_FULLSCREEN          "Pelny ekran"
+OPTIONS_RESOLUTION          "Rozdzielczosc"
+OPTIONS_RESOLUTION_OPT1     "MIN."
+OPTIONS_RESOLUTION_OPT2     "NORMAL"
+OPTIONS_RESOLUTION_OPT3     "MAX"
+OPTIONS_SMOOTHGFX           "Plynne GFX"
+OPTIONS_FPS                 "Pokaz FPS"
+OPTIONS_GAME                "GRA"
+OPTIONS_LANGUAGE            "Zmien jezyk"
+OPTIONS_STAGESELECT         "Wybierz etap"
+OPTIONS_CREDITS             "Tworcy"
+OPTIONS_BACK                "POWROT"
+
+
+// Stage Select
+STAGESELECT_TITLE           "WYBOR ETAPU"
+STAGESELECT_MSG             "Wcisnij <color=ffff00>$INPUT_FIRE4</color> aby anulowac,"
+STAGESELECT_PAGE            "strona %d/%d"
+STAGESELECT_ACT             "Akt"
+
+
+// Credits
+CREDITS_TITLE               "TWORCY"
+CREDITS_KEY                 "Wcisnij <color=ffff00>$INPUT_FIRE4</color> , aby wrocic do menu."
+
+CREDITS_ENGINE              "Silnik gry"
+CREDITS_ACTIVE              "Ekipa projektu"
+CREDITS_RETIRED             "Byli czlonkowie"
+CREDITS_THANKS              "Podziekowania dla"
+
+CREDITS_ALEXANDRE           "Lider projektu, programista"
+CREDITS_DI                  "Muzyk"
+CREDITS_COLIN               "Tworca fabuly, Moderator forum, Grafik, Muzyk"
+CREDITS_MATEUSREIS          "Tworca efektow dzwiekowych"
+CREDITS_CHRISTOPHER         "MenedÅ¼er Wiki, Indonezyjskie tlumaczenie"
+CREDITS_CELDECEA            "Grafik"
+CREDITS_SSDW                "Holenderskie tlumaczenie"
+CREDITS_XENO                "Port na system Mac OS X"
+CREDITS_LAINZ               "Hiszpanskie tlumaczenie"
+CREDITS_ARTHURBLOT          "Francuskie tlumaczenie"
+CREDITS_REIMUND             "Niemieckie tlumaczenie"
+CREDITS_SZYMON              "Polskie tlumaczenie"
+CREDITS_TOMIRES             "Czeskie tlumaczenie"
+CREDITS_JOGAIT              "Portugalskie PT tlumaczenie"
+CREDITS_NEOBLAST            "Port na platforme Dreamcast"
+CREDITS_BASTIAN             "Grafik"
+CREDITS_FRANCESCO           "Wloskie tlumaczenie"
+CREDITS_JOE                 "Muzyk"
+
+
+// Main menu -> Custom Quests
+MENU_CQ_SELECT              "<color=0077ff>Prosze wybrac misje:</color> [page %d/%d]"
+MENU_CQ_BACK                "<color=0077ff>Wcisnij $INPUT_FIRE4 , aby wrocic do menu.</color>"
+MENU_CQ_INFO                "<color=ffff00>Informacje:</color> (version %s)\n\n<color=ffff00>Tytul:</color>  %s\n<color=ffff00>Autor:</color> %s\n%s"
+MENU_CQ_DEFAULT             "Domyslny quest"
+MENU_CQ_TUTORIAL            "Poznaj zasady gry w Open Sonic."
+MENU_CQ_SUPERBOSSES         "Walcz z poteznymi bossami!"
+MENU_CQ_EXTRA               "Dodatkowe poziomy"
+
+
+// Quest names
+TUTORIAL_QUEST_NAME         "Samouczek"
+SUPERBOSSES_NAME            "Super Bossowie" 
+EXTRA_LEVELS_NAME           "Dodatkowe poziomy"
+DEFAULT_QUEST_NAME          "Domyslny quest"
+
+
+// Quest cleared!
+QUESTCLEARED_TITLE          "MISJA ZAKONCZONA"
+QUESTCLEARED_TEXT           "Gratulacje!\n'%s'\nzostal ukonczony!\n\n\n     <color=0077ff>Suma punktow:</color> %d\n\n     <color=0077ff>Calkowity czas:</color> %dh %dm %ds\n\n     <color=0077ff>Magiczne okulary:</color> %d\n\n     <color=0077ff>Wielkie pierscienie:</color> %d\n\nDziekuje za gre. Poczekaj na\nnowe wersje gry %s!\nOdwiedz nas w sieci:\n<color=ffff00>%s</color>\nWcisnij $INPUT_FIRE3 aby zrestartowac gre"
+
+
+// End of demo
+ENDOFDEMO_TITLE             "DZIEKUJE"
+ENDOFDEMO_TEXT              "Dziekuje za gre w %s!\nMam nadzieje, ze podobala ci sie\nona tak, jak nam jej tworzenie!\n\nTo juz koniec tego dema,\nale nie koniec gry.\nPobierz nowe poziomy z naszej\nwitryny!\n\nTa gra jest ciagle w fazie rozwoju.\nSprawdz dostepnosc nowych wersji na:\n<color=ffff00>%s</color>\n\nProsze poczekac %d sekund..."
+
+
+// Bonus levels
+BONUSMSG_TITLE              "BONUS"
+BONUSMSG_TEXT               "Premiowe poziomy nie zostaly jeszcze stworzone ;)"
+
+
+// Confirm boxes
+    // Quit game?
+    CBOX_QUIT_QUESTION      "CZY NA PEWNO CHCESZ OPUSCIC GRE?"
+    CBOX_QUIT_OPTION1       "TAK"
+    CBOX_QUIT_OPTION2       "NIE"
+
+
+// Input devices
+    // keyboard
+    INPUT_KEYB_DIRECTIONAL  "KLAWISZE STRZALEK"
+    INPUT_KEYB_LEFT         "PRZYCISK 'W LEWO'"
+    INPUT_KEYB_RIGHT        "PRZYCISK 'W PRAWO'"
+    INPUT_KEYB_UP           "PRZYCISK 'W GORE'"
+    INPUT_KEYB_DOWN         "PRZYCISK 'W DOL'"
+    INPUT_KEYB_FIRE1        "SPACJA"
+    INPUT_KEYB_FIRE2        "LEWY CTRL"
+    INPUT_KEYB_FIRE3        "ENTER"
+    INPUT_KEYB_FIRE4        "ESC"
+
+
+    // joystick
+    INPUT_JOY_DIRECTIONAL   "PRZYCISKI KIERUNKOWE"
+    INPUT_JOY_LEFT          "LEWY PRZYCISK"
+    INPUT_JOY_RIGHT         "PRAWY PRZYCISK"
+    INPUT_JOY_UP            "GORNY PRZYCISK"
+    INPUT_JOY_DOWN          "DOLNY PRZYCISK"
+    INPUT_JOY_FIRE1         "PRZYCISK 1"
+    INPUT_JOY_FIRE2         "PRZYCISK 2"
+    INPUT_JOY_FIRE3         "PRZYCISK 3"
+    INPUT_JOY_FIRE4         "PRZYCISK 4"
+
+
+// Tutorial
+    // act 1
+    TUTORIAL_1_TITLE_0      "SONIC"
+    TUTORIAL_1_MSG_0        "Witaj w przewodniku po grze! Uzyj <color=$COLOR_INPUT>$INPUT_DIRECTIONAL</color> do poruszania <color=$COLOR_P1>Soniciem</color> i <color=$COLOR_INPUT>$INPUT_FIRE1</color> do skakania."
+    TUTORIAL_1_TITLE_1      "DRZWI"
+    TUTORIAL_1_MSG_1        "Twoj <color=$COLOR_SPECIAL>PARTNER</color> moze otworzyc dla ciebie te drzwi. Wcisnij <color=$COLOR_INPUT>$INPUT_FIRE2</color> , aby zmienic aktualna postac."
+    TUTORIAL_1_TITLE_2      "KNUCKLES"
+    TUTORIAL_1_MSG_2        "<color=$COLOR_P3>Knuckles</color> moze wspinac sie po scianach! Uzywajac <color=$COLOR_P3>Knucklesa</color>, nacisnij dwukrotnie <color=$COLOR_INPUT>SPACJE</color> (powoli) i uderz w sciane."
+    TUTORIAL_1_TITLE_3      "TELEPORTER"
+    TUTORIAL_1_MSG_3        "To jest <color=$COLOR_SPECIAL>teleporter</color>. Wcisnij przelacznik, aby sprowadzic cala druzyne do tego miejsca. Dziala to tylko raz."
+    TUTORIAL_1_TITLE_4      "TAILS"
+    TUTORIAL_1_MSG_4        "<color=$COLOR_P2>Tails</color> moze latac jak helikopter! Uzywajac <color=$COLOR_P2>Tailsa</color>, wciskaj szybko <color=$COLOR_INPUT>SPACJE</color> (ale nie przytrzymuj jej)."
+    TUTORIAL_1_TITLE_5      "META"
+    TUTORIAL_1_MSG_5        "Dobra robota!"
+
+    // act 2
+    TUTORIAL_2_TITLE_0      "SAMOUCZEK"
+    TUTORIAL_2_MSG_0        "Teraz mozesz sprobowac samodzielnie wykonac misje. Znajduje sie takze tutaj troche wrogow."
+    TUTORIAL_2_TITLE_1      "DRZWI"
+    TUTORIAL_2_MSG_1        "Zwroc uwage na to, ze mozesz zmienic postac tylko wtedy, gdy stoisz na twardym gruncie!"
+    TUTORIAL_2_TITLE_2      "SPINDASH
+    TUTORIAL_2_MSG_2        "Aby uzyc <color=$COLOR_SPECIAL>szybkiego wirujacego ataku</color> przytrzymaj klawisz <color=$COLOR_INPUT>W DOL</color>, wcisnij <color=$COLOR_INPUT>SPACJE</color>, a potem zwolnij klawisz <color=$COLOR_INPUT>W DOL</color>."
+    TUTORIAL_2_TITLE_3      "META"
+    TUTORIAL_2_MSG_3        "Gratulacje! Teraz juz wiesz, jak grac w Open Sonic!"
+
+
+// Blue Ocean Zone
+    // act 1
+    BOZ_1_TITLE_0           "WITAJ!"
+    BOZ_1_MSG_0             "Jesli uruchamiasz gre po raz pierwszy, to powinienes zapoznac sie wczesniej z <color=$COLOR_SPECIAL>samouczkiem</color>."
+    BOZ_1_TITLE_1           "DRZWI"
+    BOZ_1_MSG_1             "Jesli stoisz na ziemi, mozesz wcisnac <color=$COLOR_INPUT>$INPUT_FIRE2</color> , aby zmienic postac."
+    BOZ_1_TITLE_2           "OKULARY"
+    BOZ_1_MSG_2             "Rozwal to pudelko, aby zdobyc <color=$COLOR_SPECIAL>magiczne okulary</color>, ktore maja specjalne moce!"
+    BOZ_1_TITLE_3           "LATANIE!"
+    BOZ_1_MSG_3             "Zarowno <color=$COLOR_P2>Tails</color>, jak i <color=$COLOR_P3>Knuckles</color> potrafia latac. Sprobuj wciskajac kilkakrotnie <color=$COLOR_INPUT>SPACJE</color>."
+    BOZ_1_TITLE_4           "DOBRZE!"
+    BOZ_1_MSG_4             "Niezle sobie radzisz! Twoj <color=$COLOR_SPECIAL>PARTNER</color> moze pomoc ci z otwarciem tych drzwi."
+    BOZ_1_TITLE_5           "SPINDASH"
+    BOZ_1_MSG_5             "Aby uzyc <color=$COLOR_SPECIAL>szybkiego wirujacego ataku</color> przytrzymaj klawisz <color=$COLOR_INPUT>W DOL</color>, wcisnij <color=$COLOR_INPUT>SPACJE</color>, a potem zwolnij klawisz <color=$COLOR_INPUT>W DOL</color>."
+
+    // act 3
+    BOZ_3_TITLE_0           "BOSS"
+    BOZ_3_MSG_0             "Wybierz teraz postac, ktora bedziesz walczyc z bossem, poniewaz pozniej zmiana bedzie niemozliwa."
+
+
+// Exotic Paradise
+    // act 1
+    EP_1_TITLE_0            "SPINDASH"
+    EP_1_MSG_0              "Aby uzyc <color=$COLOR_SPECIAL>szybkiego wirujacego ataku</color> przytrzymaj klawisz <color=$COLOR_INPUT>W DOL</color>, wcisnij <color=$COLOR_INPUT>SPACJE</color>, a potem zwolnij klawisz <color=$COLOR_INPUT>W DOL</color>."
+
+    // act 2
+    EP_2_TITLE_0            "DRZWI DNA"
+    EP_2_MSG_0              "To sa <color=$COLOR_SPECIAL>DRZWI DNA</color>. Tylko <color=$COLOR_P1>Sonic</color> moze przez nie przejsc."
+
+
+// Prototype Level
+    // act 1
+    PROTOTYPE_1_TITLE_0     "PROTOTYP"
+    PROTOTYPE_1_MSG_0       "Ten piekny, jak widac, levelek byl on niegdys uzywany w projektowaniu gry. Baw sie dobrze! ;)"
+
+
+// Test Zone
+    // act 1
+    TESTZONE_1_TITLE_0      "STREFA TESTOWA"
+    TESTZONE_1_MSG_0        "Ten obszar gry byl kiedys uzywany do testowania niektorych elementow silnika gry. Baw sie dobrze! ;)"
+
+
+// Chilpoctli Temple Zone
+    // act 1
+    DESERT1_TITLE_0         "Witaj" 
+    DESERT1_MSG_0           "Ten mini poziom przedstawia pierwszy zmodyfikowany zestaw grafik dla OpenSonic autorstwa Celdecea!"
+    DESERT1_TITLE_1         "META" 
+    DESERT1_MSG_1           "Czego sie spodziewales? Meta jest wlasnie przed toba!"
+    DESERT1_TITLE_2         "Sekret" 
+    DESERT1_MSG_2           "To miejsce dla tych, ktorzy umieja obserwowac..."
+    DESERT1_TITLE_3         "Zarezerwowany"
+    DESERT1_MSG_3           "W przyszlosci pojawi sie tutaj peÅ§la."

@@ -1,0 +1,308 @@
+// script by Alexandre
+
+// Surge
+sprite SD_SURGE
+{
+    source_file     images/surge.png
+    source_rect     0 0 512 704
+    frame_size      64 64
+    hot_spot        32 63
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // walking
+    animation 1
+    {
+        repeat      TRUE
+        fps         16
+        data        1 2 3 4 5 4 3 2
+    }
+
+    // running
+    animation 2
+    {
+        repeat      TRUE
+        fps         20
+        data        6 7 8 9 10 9 8 7   
+    }
+
+    // jumping / rolling
+    animation 3
+    {
+        repeat      TRUE
+        fps         16
+        data        11 12 13 14
+    }
+
+    // ducking
+    animation 4
+    {
+        repeat      FALSE
+        fps         12
+        data        19
+    }
+
+    // looking up
+    animation 5
+    {
+        repeat      FALSE
+        fps         8
+        data        16 
+    }
+
+    // charging
+    animation 6
+    {
+        repeat      TRUE
+        fps         32
+        data        11 12 13 14
+    }
+
+    // braking
+    animation 7
+    {
+        repeat      FALSE
+        fps         8
+        data        15
+    }
+
+    // dead
+    animation 8
+    {
+        repeat      FALSE
+        fps         8
+        data        18
+    }
+
+    // drowned
+    animation 9
+    {
+        repeat      FALSE
+        fps         8
+        data        20
+    }
+
+    // ledge
+    animation 10
+    {
+        repeat      TRUE
+        fps         5
+        data        23 24
+    }
+
+    // getting hit
+    animation 11
+    {
+        repeat      FALSE
+        fps         8
+        data        20
+    }
+
+    // breathing
+    animation 12
+    {
+        repeat      FALSE
+        fps         8
+        data        21
+    }
+
+    // springing
+    animation 13
+    {
+        repeat      TRUE
+        fps         8
+        data        17
+    }
+
+    // pushing
+    animation 14
+    {
+        repeat      TRUE
+        fps         8
+        data        36 37 36 38
+    }
+
+    // waiting
+    animation 15
+    {
+        repeat      TRUE
+        fps         6
+        data        30 31 32 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 35 35 35 35 35 35 35 32 31 0 0 0 0 0 0 0 0 0 0
+    }
+
+    // ceiling (being carried)
+    animation 16
+    {
+        repeat      TRUE
+        fps         8
+        data        22
+    }
+
+    // winning (victory)
+    animation 17
+    {
+        repeat      FALSE
+        fps         8
+        data        30 39 40 42 43 44
+    }
+
+    // walking (no lights in the shoes)
+    animation 18
+    {
+        repeat      TRUE
+        fps         16
+        data        25 26 27 28 29 28 27 26
+    }
+
+    // running (no lights in the shoes)
+    animation 19
+    {
+        repeat      TRUE
+        fps         20
+        data        6 7 45 9 10 9 45 7   
+    }
+
+    // braking (no lights in the shoes)
+    animation 20
+    {
+        repeat      FALSE
+        fps         8
+        data        46
+    }
+
+    // with sun glasses
+    animation 21
+    {
+        repeat      TRUE
+        fps         8
+        data        42
+    }
+    
+    // holding his sun glasses
+    animation 22
+    {
+        repeat      FALSE
+        fps         8
+        data        42 41 40
+        repeat_from 2
+    }
+
+    // relaxing, talking and smiling
+    animation 23
+    {
+        repeat      FALSE
+        fps         8
+        data        47 48 49 47 48 49 47 48 49 47 48 49 47
+    }
+
+    // relaxing, talking, smiling and looking to his side
+    animation 24
+    {
+        repeat      FALSE
+        fps         8
+        data        50 51 52 53 51 52 53 51 52 53 51 52 53 51 52 53
+    }
+
+    // relaxing, but no longer smiling
+    animation 25
+    {
+        repeat      FALSE
+        fps         8
+        data        54 55 56
+    }
+
+    // standing up
+    animation 26
+    {
+        repeat      FALSE
+        fps         8
+        data        57 58 59
+    }
+
+    // protesting!
+    animation 27
+    {
+        repeat      FALSE
+        fps         8
+        data        60 61 62 63 61 62 63 61 62 63 61
+    }
+
+    // criticism
+    animation 28
+    {
+        repeat      FALSE
+        fps         8
+        data        64 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65
+    }
+
+    // relaxing
+    animation 29
+    {
+        repeat      TRUE
+        fps         8
+        data        49
+    }
+
+    // confident talking
+    animation 30
+    {
+        repeat      FALSE
+        fps         8
+        data        68 69 70 68 69 70 68 69 70 68 69 70 68 69 70
+    }
+
+    // pointing the finger
+    animation 31
+    {
+        repeat      TRUE
+        fps         8
+        data        71
+    }
+
+    // looking up, very shocked
+    animation 32
+    {
+        repeat      TRUE
+        fps         8
+        data        72
+    }
+
+    // looking up, a bit shocked
+    animation 33
+    {
+        repeat      TRUE
+        fps         8
+        data        73
+    }
+
+    // taking off his glasses
+    animation 34
+    {
+        repeat      FALSE
+        fps         8
+        data        42 41 40 39 0
+    }
+
+    // listening, a bit worried
+    animation 35
+    {
+        repeat      TRUE
+        fps         8
+        data        59
+    }
+
+    // crossing the arms
+    animation 36
+    {
+        repeat      FALSE
+        fps         8
+        data        64 65
+    }
+}
+

@@ -1,0 +1,61 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   characters/none.chr
+// Desc:   character definitions: None. 
+//         None is a special player that does not move and does not appear in the screen
+// Author: script by Alexandre
+// Date:   2011-02-08
+// ---------------------------------------------------------------------------
+
+character "None"
+{
+    companion_object                ".none_companion"
+    
+    multipliers
+    {
+        acceleration                1.0
+        deceleration                1.0
+        topspeed                    1.0
+        jump                        1.0
+        jumprel                     1.0
+        gravity                     1.0
+        rollthreshold               1.0
+        brakingthreshold            1.0
+        slope                       1.0
+        rolluphillslope             1.0
+        rolldownhillslope           1.0
+    }
+    
+    animations
+    {
+        sprite_name                 "SD_NONE"
+        stopped                     0
+        walking                     0
+        running                     0
+        jumping                     0
+        springing                   0
+        rolling                     0
+        pushing                     0
+        gettinghit                  0
+        dead                        0
+        braking                     0
+        ledge                       0
+        drowned                     0
+        breathing                   0
+        waiting                     0
+        ducking                     0
+        lookingup                   0
+        winning                     0
+        ceiling                     0
+    }
+    
+    samples
+    {
+        jump                        "samples/jump.wav"
+        roll                        "samples/roll.wav"
+        death                       "samples/death.wav"
+        brake                       "samples/brake.wav"
+    }
+}

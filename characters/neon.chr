@@ -1,0 +1,60 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   characters/neon.chr
+// Desc:   character definitions: Neon
+// Author: script by Alexandre
+// Date:   2011-02-08
+// ---------------------------------------------------------------------------
+
+character "Neon"
+{
+    companion_object                ".neon_companion"
+    
+    multipliers
+    {
+        acceleration                1.0
+        deceleration                1.0
+        topspeed                    1.0
+        jump                        1.0
+        jumprel                     1.0
+        gravity                     1.0
+        rollthreshold               1.0
+        brakingthreshold            1.0
+        slope                       1.0
+        rolluphillslope             1.0
+        rolldownhillslope           1.0
+    }
+    
+    animations
+    {
+        sprite_name                 "SD_NEON"
+        stopped                     0
+        walking                     1
+        running                     2
+        jumping                     3
+        springing                   13
+        rolling                     3
+        pushing                     14
+        gettinghit                  11
+        dead                        8
+        braking                     7
+        ledge                       10
+        drowned                     9
+        breathing                   12
+        waiting                     15
+        ducking                     4
+        lookingup                   5
+        winning                     17
+        ceiling                     16
+    }
+    
+    samples
+    {
+        jump                        "samples/jump.wav"
+        roll                        "samples/roll.wav"
+        death                       "samples/death.wav"
+        brake                       "samples/brake.wav"
+    }
+}
