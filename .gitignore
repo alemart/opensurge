@@ -22,8 +22,11 @@ Session.vim
 *~
 
 # mine
-opensurge.exe
-*.dll
 build/
 CMakeFiles/
 iconwin.res
+logfile.txt
+opensurge
+opensurge.exe
+*.dll
+!src/**
