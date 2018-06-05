@@ -1,0 +1,469 @@
+//
+// ----------------------------------------------------------------------------
+// Dialog Box Object
+// A configurable dialog box made using a component-based approach.
+// ----------------------------------------------------------------------------
+// Author: Alexandre
+// Initial date: 2011-09-22
+// Last update:  2013-01-06
+// ----------------------------------------------------------------------------
+//
+//
+// BASIC USAGE:
+//
+// Set $_dialogbox_text_id = <TEXT_ID> and $_dialogbox_avatar_id = <AVATAR_ID>
+// before spawning '.dialogbox'. The STRING_<TEXTID> string, defined in the
+// .lng file (in the languages/ folder) will be displayed along with the
+// animation #<AVATAR_ID> of the DIALOGBOX_AVATAR sprite (defined in a .spr
+// file of the sprites/ folder)
+//
+// The spawner object MUST have a state named '.dialogbox:on_destroy', which
+// will be called when the dialog box gets destroyed. You may choose to take
+// some action when this happens, or just 'return_to_previous_state'.
+//
+// If you don't want an avatar in your dialog box, just set $_dialogbox_avatar_id
+// to -1 (or any other value less than zero).
+// 
+// Example:
+//
+// object foo {
+//     requires 0.2.0
+//     always_active // the spawner object should be always_active!
+//
+//     state main {
+//         let $_dialogbox_text_id=310 // display message $STRING_310
+//         let $_dialogbox_avatar_id=0 // display avatar 0
+//         create_child .dialogbox
+//         change_state freeze
+//     }
+//
+//     state freeze {
+//     }
+//
+//     state .dialogbox:on_destroy {
+//         destroy
+//     }
+// }
+//
+// If you wish to terminate the execution of the dialog box, change its
+// state to @destroy.
+//
+//
+// INTERMEDIATE USAGE:
+//
+// If both $_dialogbox_text_id and $_dialogbox_avatar_id are arrays, then
+// spawning '.dialogbox' will result in a sequence of messages. Of course,
+// both arrays must have the same size. The rest is similar to the basic
+// usage.
+//
+// Please remember to delete your arrays after spawning the dialog box.
+//
+// 
+// Example:
+//
+// object foo {
+//     requires 0.2.0
+//     always_active
+//
+//     state main {
+//         let "$_dialogbox_text_id = new_array(5)"
+//         let "set_array_element($_dialogbox_text_id, 0, 310)" // 1st msg: $STRING_310
+//         let "set_array_element($_dialogbox_text_id, 1, 311)" // second message
+//         let "set_array_element($_dialogbox_text_id, 2, 312)" // and so on...
+//         let "set_array_element($_dialogbox_text_id, 3, 313)"
+//         let "set_array_element($_dialogbox_text_id, 4, 314)"
+//         let "$_dialogbox_avatar_id = new_array(5)"
+//         let "set_array_element($_dialogbox_avatar_id, 0, 0)"  // some avatar
+//         let "set_array_element($_dialogbox_avatar_id, 1, 1)"  // another avatar
+//         let "set_array_element($_dialogbox_avatar_id, 2, -1)" // no avatar
+//         let "set_array_element($_dialogbox_avatar_id, 3, 1)"
+//         let "set_array_element($_dialogbox_avatar_id, 4, 1)"
+//         create_child .dialogbox
+//         let "delete_array($_dialogbox_avatar_id)" // <--- IMPORTANT!!!
+//         let "delete_array($_dialogbox_text_id)"   // <--- DELETE THE ARRAYS
+//         change_state freeze
+//     }
+//
+//     state freeze {
+//     }
+//
+//     state .dialogbox:on_destroy {
+//         destroy
+//     }
+// }
+//
+//
+//
+// ADVANCED USAGE:
+//
+// If you want to create your own customized dialog box, script a new object
+// called '.dialogbox.<PICK_A_NAME>'. Your customized dialog box may have
+// any behavior you want. Here's what you need to do:
+//
+// 1. Upon creation, spawn the following objects:
+//
+//    a) .dialogbox.base.background
+//    b) .dialogbox.base.avatar (optional)
+//    c) .dialogbox.base.text
+//    d) .dialogbox.base.button (optional)
+//
+//    These objects behave in a way that is documented in the base/ folder.
+//    You may check that out, or read some examples below. These objects
+//    provide default functionality.
+//
+//    This system is meant to be flexible enough, so if you need that, for
+//    example, the dialog box behaves in a completely different manner,
+//    you can replace its components by customized ones you write. For example,
+//    you can replace '.dialogbox.base.background' by
+//    '.dialogbox.base.background[slide_from_bottom]', and your dialog box will
+//    suddenly become much richer.
+//
+//    You don't need to change existing code: just create new components, and
+//    attach them to your objects. This is the beauty of the component-based
+//    approach.
+//
+// 2. Your dialogbox must implement the following states:
+//
+//    a) .dialogbox.base.background:on_appear
+//       Will be called when the dialog completes its "appearing" animation.
+//       Normally you want to start writing the dialog text here. You do that
+//       by changing the state of the text object to 'start'.
+//
+//    b) .dialogbox.base.background:on_disappear
+//       Will be called when the dialog completes its "disappearing" animation.
+//       Normally you will delete the object in this state (see #3).
+//
+//    c) .dialogbox.base.text:on_complete
+//       Will be called when the full text is rendered to the screen.
+//
+//    d) .dialogbox.base.text:on_start
+//       Will be called when a text begins to be rendered on the screen.
+//
+// 3. Upon deletion, it's mandatory to change the state of its parent object to
+//    '.dialogbox:on_destroy' !
+//
+// Whenever you want to show your dialogbox in the game, spawn the
+// '.dialogbox.<DIALOGNAME>' object in the level. Your other scripts should NOT
+// have any logic to handle dialog boxes other than that. The dialog boxes
+// should take care of themselves.
+//
+// Upon deletion, the dialog box will change the state of its parent object to
+// '.dialogbox:on_destroy'. You may choose to take some action when this state
+// gets called, or maybe just 'return_to_previous_state'.
+//
+
+#include "base/background.inc"
+#include "base/avatar.inc"
+#include "base/text.inc"
+#include "base/button.inc"
+
+//
+// The Dialog Box ;)
+//
+object .dialogbox
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+        execute !spawn_sequence if is_array($_dialogbox_text_id)
+        execute !spawn_unique if not(is_array($_dialogbox_text_id))
+        change_state do_nothing
+    }
+
+    state do_nothing
+    {
+    }
+
+    state !spawn_sequence
+    {
+        create_child .dialogbox.sequence 0 0 dlgbox
+    }
+
+    state !spawn_unique
+    {
+        create_child .dialogbox.unique 0 0 dlgbox
+    }
+
+    state .dialogbox:on_destroy
+    {
+        change_parent_state .dialogbox:on_destroy
+        destroy
+    }
+
+    // == public states ==
+    state @destroy
+    {
+        change_child_state dlgbox @destroy
+        return_to_previous_state
+    }
+}
+
+
+
+
+// ================== built-in dialog boxes ========================
+
+// If you just want a one-message default dialog box, spawn .dialogbox.unique.
+// Please set $_dialogbox_avatar_id and $dialogbox_text_id first.
+object .dialogbox.unique
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+        create_child .dialogbox.base.background[slide_from_bottom] 0 0 background
+        execute !create_avatar if "$_dialogbox_avatar_id >= 0"
+        create_child .dialogbox.base.text[typewriter] 0 0 text
+        create_child .dialogbox.base.button 0 0 button
+        disable_player_movement
+        change_state wait
+    }
+
+    state !create_avatar
+    {
+        create_child .dialogbox.base.avatar 0 0 avatar
+    }
+
+    state wait
+    {
+    }
+
+    state .dialogbox.base.background:on_appear
+    {
+        change_child_state text start
+        change_state wait
+    }
+
+    state .dialogbox.base.background:on_disappear
+    {
+        change_child_state background destroy
+        change_child_state avatar destroy
+        change_child_state text destroy
+        change_child_state button destroy
+        change_parent_state .dialogbox:on_destroy
+        enable_player_movement
+        destroy
+    }
+
+    state .dialogbox.base.text:on_complete
+    {
+        change_child_state button stop
+        change_state completed
+    }
+
+    state .dialogbox.base.text:on_start
+    {
+    }
+
+    state completed
+    {
+        on_button_pressed fire1 disappear
+    }
+
+    state disappear
+    {
+        change_child_state background disappear
+        change_state wait
+    }
+
+    state hide
+    {
+        // hide
+        change_child_state background hide
+        change_state wait
+    }
+
+    state show
+    {
+        // show the dialog box after it's been hidden
+        change_child_state background show
+        change_state wait
+    }
+
+    // == public states ==
+    state @destroy
+    {
+        change_state disappear
+    }
+}
+
+// Display a sequence of dialog boxes.
+// Date: 2013-01-06, by Alexandre
+//
+// $_dialogbox_avatar_id and $_dialogbox_text_id will be arrays
+// of the same size.
+//
+// If you do not want an avatar at some point of the sequence,
+// set the corresponding array cell of the avatar array to -1.
+object .dialogbox.sequence
+{
+    requires 0.2.0
+    always_active
+
+    // ------- setup logic -------
+    state main
+    {
+        hide
+        disable_player_movement
+
+        let "$texts = clone_array($_dialogbox_text_id)"
+        let "$avatars = clone_array($_dialogbox_avatar_id)"
+        execute !invalid_input if array_length($texts)<>array_length($avatars)
+        let "$n = array_length($texts)"
+        let "$idx = -1"
+
+        // let the caller object delete the arrays,
+        // since we're gonna reuse these very same globals
+        change_state create_components
+    }
+
+    state !invalid_input
+    {
+        change_parent_state .dialogbox:on_invalidinput
+        change_state destroy
+    }
+
+    state destroy
+    {
+        let delete_array($texts)
+        let delete_array($avatars)
+        change_parent_state .dialogbox:on_destroy
+        enable_player_movement
+        destroy
+    }
+
+    state create_components
+    {
+        create_child .dialogbox.base.background[slide_from_bottom] 0 0 background
+        execute !create_emergency_avatar if "array_element($avatars, 0) >= 0"
+        create_child .dialogbox.base.text[typewriter] 0 0 text
+        create_child .dialogbox.base.button 0 0 button
+        change_state do_nothing
+    }
+
+    state do_nothing
+    {
+    }
+
+    state destroy_components
+    {
+        change_child_state background destroy
+        change_child_state avatar destroy // let it be here, just in case...
+        change_child_state text destroy
+        change_child_state button destroy
+        change_state destroy
+    }
+
+    state !create_emergency_avatar
+    {
+        let "$tmp = $_dialogbox_avatar_id"
+        let "$_dialogbox_avatar_id = array_element($avatars, 0)"
+        create_child .dialogbox.base.avatar 0 0 avatar
+        let "$_dialogbox_avatar_id = $tmp"
+    }
+
+    // ------- my super logic, at 3 in the morning -------
+    state next_message
+    {
+        let "$idx += 1"
+        if "$idx >= $n" finish
+
+        let "$_dialogbox_text_id = array_element($texts, $idx)"
+        let "$_dialogbox_avatar_id = array_element($avatars, $idx)"
+        execute !redo_avatar if "($idx > 0) and ($_dialogbox_avatar_id * array_element($avatars, $idx-1)) < 0"
+        execute !first_message if "$idx == 0"
+        execute !not_first_message if "$idx > 0"
+
+        change_state do_nothing
+    }
+
+    state !redo_avatar
+    {
+        change_child_state avatar destroy
+        execute !create_avatar if "$_dialogbox_avatar_id >= 0 and $idx > 0"
+    }
+
+    state !create_avatar
+    {
+        create_child .dialogbox.base.avatar 0 0 avatar
+    }
+
+    state !first_message
+    {
+        change_child_state text start
+    }
+
+    state !not_first_message
+    {
+        change_child_state text refresh
+        change_child_state avatar refresh
+    }
+
+    state !last_message
+    {
+        change_child_state button stop
+    }
+
+    state !not_last_message
+    {
+        change_child_state button continue
+    }
+
+    state finish
+    {
+        let $idx=999 // just in case
+        change_child_state background disappear
+        change_state do_nothing
+    }
+
+    state wait_for_userinput
+    {
+        on_button_pressed fire1 next_message
+    }
+
+    // ------- callbacks -------
+    state .dialogbox.base.background:on_appear
+    {
+        change_state next_message
+    }
+
+    state .dialogbox.base.background:on_disappear
+    {
+        change_state destroy_components
+    }
+
+    state .dialogbox.base.text:on_complete
+    {
+        execute !last_message if "$idx == $n-1"
+        execute !not_last_message if "$idx < $n-1"
+        change_state wait_for_userinput
+    }
+
+    state .dialogbox.base.text:on_start
+    {
+    }
+
+    // ------- other dialogbox stuff -------
+    state hide
+    {
+        change_child_state background hide
+        change_state do_nothing
+    }
+
+    state show
+    {
+        change_child_state background show
+        change_state do_nothing
+    }
+
+    // == public states ==
+    state @destroy
+    {
+        change_state finish
+    }
+}

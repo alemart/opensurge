@@ -1,0 +1,34 @@
+// script by Alexandre
+
+// Level Act
+sprite SD_LEVELACT
+{
+    source_file     images/acts.png
+    source_rect     0 0 144 32
+    frame_size      48 32
+    hot_spot        0 0
+
+    // act 1
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // act 2
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // act 3
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+}

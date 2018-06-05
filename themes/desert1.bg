@@ -1,0 +1,252 @@
+// Author: script by Celdecea
+
+
+// bottom - layer 0
+background
+{
+    initial_position    0 400
+    scroll_speed        -0.30 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 730 470 45
+        frame_size      470 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// layer 1
+background
+{
+    initial_position    0 300
+    scroll_speed        -0.25 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 630 470 100
+        frame_size      470 100
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// layer 2
+background
+{
+    initial_position    0 253
+    scroll_speed        -0.20 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 582 470 47
+        frame_size      470 47
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// layer 3 
+background
+{
+    initial_position    0 225
+    scroll_speed        -0.15 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 553 470 28
+        frame_size      470 28
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// layer 4 
+background
+{
+    initial_position    0 195
+    scroll_speed        -0.10 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 520 470 30
+        frame_size      470 30
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// layer 5 
+background
+{
+    initial_position    0 170
+    scroll_speed        -0.05 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 500 470 25
+        frame_size      470 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// layer 6 - far land
+background
+{
+    initial_position    0 110
+    scroll_speed        -0.01 -0.04
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 440 470 60
+        frame_size      470 60
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// layer 7 (sky)
+background
+{
+    initial_position    0 70
+    scroll_speed        -0.10 -0.04
+    behavior            LINEAR -4.0 0.0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 400 470 40
+        frame_size      470 40
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// layer 8 (sky)
+background
+{
+    initial_position    0 30
+    scroll_speed        -0.10 -0.04
+    behavior            LINEAR -4.5 0.0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 400 470 40
+        frame_size      470 40
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// layer 9 (sky)
+background
+{
+    initial_position    0 -10
+    scroll_speed        -0.10 -0.04
+    behavior            LINEAR -5.0 0.0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     0 400 470 40
+        frame_size      470 40
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}

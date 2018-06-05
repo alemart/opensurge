@@ -1,0 +1,264 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   config/input.def
+// Desc:   configuration of the input controls
+// Author: script by Alexandre
+// ---------------------------------------------------------------------------
+//
+// +-------------------------------------------------------------------------------+
+// | if you are a regular player who wants to reconfigure the buttons of the game, |
+// | please scroll down and modify the inputmap "default" { ... } block below.     |
+// +-------------------------------------------------------------------------------+
+//
+// this files contains a series of input mappings. Syntax:
+//
+// inputmap <name_of_the_inputmap>
+// {
+//     keyboard // optional: declare it if you want keyboard access
+//     {
+//         <button_name>     <key_name> // a list of lines like this
+//                                      // <button_name> may be: up, right, down, left, right, fire1, fire2, ..., fire7, fire8
+//                                      // <key_name>: see the list of valid key names below
+//     }
+//
+//     joystick <id_joystick> // optional. id_joystick may be: 0, 1, 2, ... 7, where 0 is the first joystick, 1 the second one, and so on.
+//     {
+//         <button_name>     <joystick_button_name> // a list of lines like this
+//                                                  // <button_name> may be: fire1, fire2, ..., fire7, fire8
+//                                                  // <joystick_button_name> may be: BUTTON_1, BUTTON_2, ..., BUTTON_8
+//     }
+// }
+//
+// Please remember that, in order to make the joysticks work correctly, you need to enable them at the
+// options screen of the game! Also, make sure to have connected all joysticks you want BEFORE you
+// start the application.
+//
+// List of valid key names:
+//
+//      KEY_A ... KEY_Z,
+//      KEY_0 ... KEY_9,
+//      KEY_0_PAD ... KEY_9_PAD,
+//      KEY_F1 ... KEY_F12,
+//
+//      KEY_ESC, KEY_TILDE, KEY_MINUS, KEY_EQUALS,
+//      KEY_BACKSPACE, KEY_TAB, KEY_OPENBRACE, KEY_CLOSEBRACE,
+//      KEY_ENTER, KEY_COLON, KEY_QUOTE, KEY_BACKSLASH,
+//      KEY_BACKSLASH2, KEY_COMMA, KEY_STOP, KEY_SLASH,
+//      KEY_SPACE,
+//
+//      KEY_INSERT, KEY_DEL, KEY_HOME, KEY_END, KEY_PGUP,
+//      KEY_PGDN, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN,
+//
+//      KEY_SLASH_PAD, KEY_ASTERISK, KEY_MINUS_PAD,
+//      KEY_PLUS_PAD, KEY_DEL_PAD, KEY_ENTER_PAD,
+//
+//      KEY_PRTSCR, KEY_PAUSE,
+//
+//      KEY_ABNT_C1, KEY_YEN, KEY_KANA, KEY_CONVERT, KEY_NOCONVERT,
+//      KEY_AT, KEY_CIRCUMFLEX, KEY_COLON2, KEY_KANJI,
+//
+//      KEY_LSHIFT, KEY_RSHIFT,
+//      KEY_LCONTROL, KEY_RCONTROL,
+//      KEY_ALT, KEY_ALTGR,
+//      KEY_LWIN, KEY_RWIN, KEY_MENU,
+//      KEY_SCRLOCK, KEY_NUMLOCK, KEY_CAPSLOCK
+//
+//      KEY_EQUALS_PAD, KEY_BACKQUOTE, KEY_SEMICOLON, KEY_COMMAND (Mac OS X)
+//      KEY_NONE (ignore the key)
+//
+
+
+
+
+
+// this inputmap is used by Open Surge by default.
+// this will accept commands issued from the keyboard and from the first joystick (joystick 0), if it is connected.
+// DO NOT ERASE THIS INPUTMAP!
+inputmap "default"
+{
+    keyboard
+    {
+        up              KEY_UP         // up arrow key
+        right           KEY_RIGHT      // right arrow key
+        down            KEY_DOWN       // down arrow key
+        left            KEY_LEFT       // left arrow key
+        fire1           KEY_SPACE      // space bar (jump)
+        fire2           KEY_LCONTROL   // left ctrl (switch character)
+        fire3           KEY_ENTER      // enter (pause game)
+        fire4           KEY_ESC        // escape (leave game)
+        fire5           KEY_W          // w
+        fire6           KEY_A          // a
+        fire7           KEY_S          // s
+        fire8           KEY_D          // d
+    }
+
+    joystick 0
+    {
+        fire1           BUTTON_1       // fire1 (jump) is the first button of the joystick
+        fire2           BUTTON_2       // fire2 (switch character) is the second button of the joystick
+        fire3           BUTTON_3       // and so on...
+        fire4           BUTTON_4
+        fire5           BUTTON_5
+        fire6           BUTTON_6
+        fire7           BUTTON_7
+        fire8           BUTTON_8
+    }
+}
+
+
+
+
+// << add your custom inputmaps here >>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ====================================================
+// 
+//             uuuuuuuuuuuuuuuuuuuu                                    
+//           u" uuuuuuuuuuuuuuuuuu "u                                  
+//         u" u####################u "u 
+//       u" u########################u "u                              
+//     u" u############################u "u                            
+//   u" u################################u "u                          
+// u" u####################################u "u                        
+// # ######################################## #                        
+// # ######################################## #                        
+// # ###" ... "#...  ...#" ... "###  ... "### #                        
+// # ###u `"#######  ###  #####  ##  ###  ### #                        
+// # ######uu "####  ###  #####  ##  """ u### #                        
+// # ###""###  ####  ###u "###" u##  ######## #                        
+// # ####....,#####..#####....,####..######## #                        
+// # ######################################## #                        
+// "u "####################################" u"                        
+//   "u "################################" u"                          
+//     "u "############################" u"                            
+//       "u "########################" u"                              
+//         "u "####################" u"                                
+//           "u """""""""""""""""" u"                                  
+//             """"""""""""""""""""             
+// 
+//      DO NOT MODIFY THE INPUTMAPS BELOW!!!
+//      unless you know what you are doing ;)
+// ====================================================
+
+// this is a backup of the "default" inputmap,
+// in case you lose the original configuration.
+// DO NOT CHANGE THIS INPUTMAP, EVER!
+inputmap "backup"
+{
+    keyboard
+    {
+        up              KEY_UP         // up arrow key
+        right           KEY_RIGHT      // right arrow key
+        down            KEY_DOWN       // down arrow key
+        left            KEY_LEFT       // left arrow key
+        fire1           KEY_SPACE      // space bar (jump)
+        fire2           KEY_LCONTROL   // left ctrl (switch character)
+        fire3           KEY_ENTER      // enter (pause game)
+        fire4           KEY_ESC        // escape (leave game)
+        fire5           KEY_W          // w
+        fire6           KEY_A          // a
+        fire7           KEY_S          // s
+        fire8           KEY_D          // d
+    }
+
+    joystick 0
+    {
+        fire1           BUTTON_1       // fire1 (jump) is the first button of the joystick
+        fire2           BUTTON_2       // fire2 (switch character) is the second button of the joystick
+        fire3           BUTTON_3       // and so on...
+        fire4           BUTTON_4
+        fire5           BUTTON_5
+        fire6           BUTTON_6
+        fire7           BUTTON_7
+        fire8           BUTTON_8
+    }
+}
+
+// internals
+inputmap "screenshots"
+{
+    keyboard
+    {
+        fire1           KEY_EQUALS
+        fire2           KEY_PRTSCR
+    }
+}
+
+inputmap "editorhelp"
+{
+    keyboard
+    {
+        fire1           KEY_ESC
+    }
+}
+
+inputmap "editor1"
+{
+    keyboard
+    {
+        up              KEY_UP
+        right           KEY_RIGHT
+        down            KEY_DOWN
+        left            KEY_LEFT
+        fire1           KEY_N
+        fire2           KEY_B
+        fire3           KEY_LCONTROL
+        fire4           KEY_F12
+    }
+}
+
+inputmap "editor2"
+{
+    keyboard
+    {
+        up              KEY_W
+        right           KEY_D
+        down            KEY_S
+        left            KEY_A
+        fire1           KEY_Z
+        fire2           KEY_Y
+        fire3           KEY_G
+        fire4           KEY_P
+    }
+}
+
+inputmap "editor3"
+{
+    keyboard
+    {
+        fire1           KEY_LSHIFT
+        fire2           KEY_DEL
+        fire3           KEY_L
+        fire4           KEY_F1
+    }
+}

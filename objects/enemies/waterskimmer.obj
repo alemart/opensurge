@@ -1,0 +1,106 @@
+// ----------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// Water Skimmer (Skater bug)
+//
+// Water Skimmer - script by Alexandre
+//
+// Changelog:
+// 2012-04-02 - first version by Alexandre
+// ----------------------------------------
+
+object "Water Skimmer"
+{
+    requires 0.2.0
+    category "friend" "level 1"
+    annotation "A boat-like bug that jumps to the right, staying on the surface of the water"
+
+    state "main"
+    {
+        hide
+        look_right
+        set_animation "WaterSkimmer" 2
+        create_child .waterskimmer.skin
+        set_obstacle TRUE 0
+        let $waterlevel=waterlevel()+2
+        change_state sleep
+    }
+
+    state "sleep"
+    {
+        let $anim=0
+        set_absolute_position xpos() max(ypos()-50*dt(),$waterlevel)
+        on_timeout 2.0 prepare_to_jump
+        set_absolute_position xpos() "cond( (ypos()<$waterlevel) and not(brick_exists(0,0)), ypos()+gravity()*dt(), ypos() )" // gravity
+
+        // will jump after the player gets on top of it
+        execute _enable if "(player_xpos() >= xpos() - hotspot_x() + width()*0.2) and (player_xpos() < xpos() - hotspot_x() + width()*0.8) and (player_ypos() >= ypos() - 40) and (player_ypos() < ypos() + 20)"
+    }
+
+    state prepare_to_jump
+    {
+        unless $enabled sleep
+        execute _disable
+        let $speed_x=300
+        let $speed_y=-200
+        play_sample jump
+        change_state jump
+    }
+
+    state jump
+    {
+        let $anim=1
+        let $speed_x=cond(brick_exists(20,0),0,$speed_x)
+        let $speed_y+=gravity()*dt()
+        set_absolute_position xpos()+$speed_x*dt() ypos()+$speed_y*dt()
+        execute _reposition_player if "(player_xpos() >= xpos() - hotspot_x() + width()*0.2) and (player_xpos() < xpos() - hotspot_x() + width()*0.8) and (player_ypos() >= ypos() - 40) and (player_ypos() < ypos() + 20)"
+        if ypos()>$waterlevel sleep
+    }
+
+    // ------------------------
+
+    state _reposition_player
+    {
+        let $ox=player_xpos()-xpos()
+        let $oy=player_ypos()-ypos()
+        set_player_position $ox+$speed_x*dt() $oy+$speed_y*dt()
+    }
+
+    state _enable
+    {
+        let $enabled=1
+    }
+
+    state _disable
+    {
+        let $enabled=0
+    }
+
+    state @get_position
+    {
+        let $_wsx=xpos()
+        let $_wsy=ypos()
+        let $_wsa=$anim
+        return_to_previous_state
+    }
+
+    state foo
+    {
+        // so that the correct animation will appear in the editor
+        set_animation "WaterSkimmer" 0
+    }
+}
+
+object ".waterskimmer.skin"
+{
+    requires 0.2.0
+    
+    state main
+    {
+        change_parent_state @get_position
+        set_absolute_position $_wsx $_wsy
+        set_animation WaterSkimmer $_wsa
+        set_zindex 0.6
+    }
+}

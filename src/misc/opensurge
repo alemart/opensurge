@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# Open Surge Engine
+# opensurge - game startup script
+# Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+# http://opensnc.sourceforge,net
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+GAME_BIN="opensurge_bin"
+PWD_DIR=`pwd`
+GAME_DIR=`echo $0 | sed 's,^\(.*\)/\(.*\)$,\1,g'`
+GAME_PATH="${GAME_DIR}/${GAME_BIN}"
+
+# Set LD_LIBRARY_PATH
+LIBPATH="${GAME_DIR}"
+if [ "${LD_LIBRARY_PATH}" ]; then
+    LD_LIBRARY_PATH="${LIBPATH}:${LD_LIBRARY_PATH}"
+else
+    LD_LIBRARY_PATH="${LIBPATH}"
+fi
+export LD_LIBRARY_PATH
+
+
+# Run the game
+if [ -e "${GAME_PATH}" ]; then
+    cd ${GAME_DIR}
+    ./${GAME_BIN} $@
+    cd ${PWD_DIR}
+else
+    echo "ERROR: '${GAME_PATH}' not found!"
+    echo "Make sure you have installed the game properly. If you have"
+    echo "downloaded the source code, you must compile it manually."
+    echo "Please read the docs for more information."
+fi

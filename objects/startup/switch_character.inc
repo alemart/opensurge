@@ -1,0 +1,55 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/default_startup/switch_character.inc
+// Desc:   enables one to switch characters
+// Author: Alexandre
+// Date:   2010-12-22, 2011-02-09
+// ---------------------------------------------------------------------------
+
+//
+// Provided that you use this object to handle the character switching
+// (this assumption is true by default),
+//
+// 1) if you want to disable character switching, run in your script
+//    let "$_disable_character_switching = 1"
+//
+// 2) if you want to enable character switching again, run
+//    let "$_disable_character_switching = 0"
+//
+object ".default_startup.switch_character"
+{
+    requires 0.2.0
+    always_active
+
+    state "main"
+    {
+        hide
+        change_state "cooldown"
+    }
+
+    state "cooldown"
+    {
+        on_timeout 4.0 "stand by"
+    }
+
+    state "sleep"
+    {
+        if "not($_disable_character_switching)" "main"
+    }
+
+    state "stand by"
+    {
+        if "$_disable_character_switching" "sleep"
+        on_button_pressed "fire2" "switch"
+    }
+
+    state "switch"
+    {
+        observe_next_player
+        switch_character
+        observe_active_player // switch_character may have failed (if the character is in the air, for example)
+        change_state "stand by"
+    }
+}

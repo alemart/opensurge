@@ -1,0 +1,20 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   quests/extra.qst
+// Desc:   extra levels
+// Author: script by Alexandre
+// ---------------------------------------------------------------------------
+
+// quest properties
+name            "$CQ_EXTRA_NAME"
+author          "Various authors"
+version         "0.1"
+description     "$CQ_EXTRA_DESC"
+image           "images/quest_extra.png"
+
+// level list (in order of appearance)
+level           "levels/template.lev"
+level           "levels/grassland.lev"
+level           "levels/desert1.lev"

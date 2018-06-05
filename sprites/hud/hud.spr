@@ -1,0 +1,138 @@
+// script by Alexandre
+
+// Background
+sprite SD_HUDBACKGROUND
+{
+    source_file     images/hud.png
+    source_rect     0 0 320 240
+    frame_size      320 240
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Top strip
+sprite SD_HUDTOPSTRIP
+{
+    source_file     images/hud.png
+    source_rect     0 240 320 60
+    frame_size      320 60
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Left strip
+sprite SD_HUDLEFTSTRIP
+{
+    source_file     images/hud.png
+    source_rect     320 0 90 240
+    frame_size      90 240
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Bottom strip
+sprite SD_HUDBOTTOMSTRIP
+{
+    source_file     images/hud.png
+    source_rect     320 240 320 60
+    frame_size      320 60
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Subtext hide overlay
+sprite SD_HUDSUBTEXTHIDEOVERLAY
+{
+    source_file     images/hud.png
+    source_rect     320 0 40 240
+    frame_size      40 240
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Heads (life counter)
+sprite SD_HUDHEAD
+{
+    source_file     images/hud.png
+    source_rect     589 0 51 36
+    frame_size      17 18
+    hot_spot        9 9
+
+    // Surge
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // Neon
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // Charge
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // Tux
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+}
+
+// Black screen
+sprite SD_HUDBLACKSCREEN
+{
+    source_file     images/blackscreen.png
+    source_rect     0 0 320 240
+    frame_size      320 240
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

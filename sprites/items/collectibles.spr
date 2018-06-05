@@ -1,0 +1,51 @@
+// script by svgmovement & Alexandre
+
+// Collectible
+sprite SD_COLLECTIBLE
+{
+    source_file     images/collectibles.png
+    source_rect     0 0 304 16
+    frame_size      16 16
+    hot_spot        8 12
+
+    // spinning
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+    }
+
+    // disappearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        16 17 18
+    }
+}
+
+// Super collectible
+sprite SD_SUPERCOLLECTIBLE
+{
+    source_file     images/collectibles.png
+    source_rect     0 0 304 32
+    frame_size      16 16
+    hot_spot        8 12
+
+    // spinning
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
+    }
+
+    // disappearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        35 36 37
+    }
+}

@@ -1,0 +1,2361 @@
+//
+// Grassland brickset
+// By Celdecea
+//
+
+// Plain square
+brick 0
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     96 96 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-left
+brick 1
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 288 48 48
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-left, chisel down
+brick 2
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 240 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-left, chisel right
+brick 3
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     96 288 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-left, chisel both
+brick 4
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     48 48 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Top-left, remaining
+brick 5
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 192 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top, chisel left
+brick 6
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     48 192 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Top
+brick 7
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     96 192 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Top, chisel right
+brick 8
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 192 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+// Top-right
+brick 9
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 288 48 48
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-right, chisel down
+brick 10
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 240 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-right, chisel left
+brick 11
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     240 288 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Top-right, chisel both
+brick 12
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 48 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Top-right, remaining
+brick 13
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 192 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Right, chisel top
+brick 14
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 48 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Right
+brick 15
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 96 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Right, chisel bottom
+brick 16
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 144 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Bottom-right
+brick 17
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 336 48 48
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom-right, chisel left
+brick 18
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     240 336 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom-right, chisel top
+brick 19
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 384 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom-right, chisel both
+brick 20
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 144 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Bottom-right, remaining
+brick 21
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 0 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom, chisel left
+brick 22
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     48 0 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Bottom
+brick 23
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     96 0 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Bottom, chisel right
+brick 24
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 0 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+// Bottom-left
+brick 25
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 336 48 48
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom-left, chisel right
+brick 26
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     96 336 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom-left, chisel top
+brick 27
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     144 384 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Bottom-left, chisel both
+brick 28
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     48 144 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Bottom-left, remaining
+brick 29
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     192 0 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Left, chisel top
+brick 30
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 48 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Left
+brick 31
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 96 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Left, chisel bottom
+brick 32
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 144 48 48 
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+// diagonal - forward, top piece
+brick 100
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               45
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     118 477 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 101
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     142 477 24 66
+        frame_size      24 66
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+brick 102
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     73 528 45 47
+        frame_size      45 47
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+brick 103
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               31
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     73 501 45 27
+        frame_size      45 27
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 104
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     118 501 24 63
+        frame_size      24 63
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+brick 105
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               39
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     142 453 30 24
+        frame_size      30 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+brick 106
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               15
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     172 442 42 11
+        frame_size      42 11
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+brick 107
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     172 453 42 24
+        frame_size      42 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+brick 108
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     166 477 48 43
+        frame_size      48 43
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// diagonal - backward, top piece
+brick 200
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               315
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     290 477 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 201
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     269 480 24 67
+        frame_size      24 67
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 202
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     314 528 45 47
+        frame_size      45 47
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+brick 203
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               329
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     314 501 45 27
+        frame_size      45 27
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 204
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     290 501 24 63
+        frame_size      24 63
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+brick 205
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               321
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     260 453 30 24
+        frame_size      30 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+brick 206
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               345
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     218 442 42 11
+        frame_size      42 11
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+brick 207
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     218 453 42 24
+        frame_size      42 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+brick 208
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     218 477 48 43
+        frame_size      48 43
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+//loop, A curve piece A-J
+
+brick 300
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               18	
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     351 144 82 26
+        frame_size      82 26
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 301
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               45
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     315 169 36 36
+        frame_size      36 36
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 302
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               72
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     288 205 27 84
+        frame_size      27 84
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 303
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               197
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     381 191 52 16
+        frame_size      52 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 304
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               225
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     351 207 30 30
+        frame_size      30 30
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 305
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               253
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     335 237 16 52
+        frame_size      16 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 306
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     381 170 52 21
+        frame_size      52 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 307
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     351 170 30 37
+        frame_size      30 37
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 308
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     315 205 36 32
+        frame_size      36 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 309
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     315 237 20 52
+        frame_size      20 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+//loop, B curve piece A-J
+
+brick 310
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               342
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     479 144 82 26
+        frame_size      82 26
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 311
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               315
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     561 169 36 36
+        frame_size      36 36
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 312
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               288
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     597 205 27 84
+        frame_size      27 84
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 313
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               163
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     479 191 52 16
+        frame_size      52 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 314
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               135
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     531 207 30 30
+        frame_size      30 30
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 315
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               107
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     561 237 16 52
+        frame_size      16 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 316
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     479 170 52 21
+        frame_size      52 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 317
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     531 170 30 37
+        frame_size      30 37
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 318
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     561 205 36 32
+        frame_size      36 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 319
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     577 237 20 52
+        frame_size      20 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+//loop, C curve piece A-J
+
+brick 320
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               198
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     479 454 82 26
+        frame_size      82 26
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 321
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               225
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     561 419 36 36
+        frame_size      36 36
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 322
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               252
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     597 335 27 84
+        frame_size      27 84
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 323
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               17
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     479 417 52 16
+        frame_size      52 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 324
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               45
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     531 387 30 30
+        frame_size      30 30
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 325
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               73
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     561 335 16 52
+        frame_size      16 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 326
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     479 433 52 21
+        frame_size      52 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 327
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     531 417 30 37
+        frame_size      30 37
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 328
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     561 387 36 32
+        frame_size      36 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 329
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     577 335 20 52
+        frame_size      20 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+//loop, D curve piece A-J
+
+brick 330
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               162
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     351 454 82 26
+        frame_size      82 26
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 331
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               135
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     315 419 36 36
+        frame_size      36 36
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 332
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               108
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     288 335 27 84
+        frame_size      27 84
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 333
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               343
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     381 417 52 16
+        frame_size      52 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 334
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               315
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     351 387 30 30
+        frame_size      30 30
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 335
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               287
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     335 335 16 52
+        frame_size      16 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 336
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     381 433 52 21
+        frame_size      52 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 337
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     351 417 30 37
+        frame_size      30 37
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 338
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     315 387 36 32
+        frame_size      36 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 339
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     315 335 20 52
+        frame_size      20 52
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Vertical pieces
+brick 340
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               90
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     576 305 24 18
+        frame_size      24 18
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 341
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               270
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     600 305 24 18
+        frame_size      24 18
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+//horizontal pieces
+brick 342
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               180
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     448 168 18 24
+        frame_size      18 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 343
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     448 144 18 24
+        frame_size      18 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//log
+brick 500
+{
+    type                CLOUD
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 240 36 36
+        frame_size      36 36
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+//log - small
+brick 501
+{
+    type                CLOUD
+    behavior            DEFAULT
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     48 240 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+//breakable
+brick 502
+{
+    type                OBSTACLE
+    behavior            BREAKABLE 2 2
+    angle               0
+    zindex              1.0
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 288 48 48
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+

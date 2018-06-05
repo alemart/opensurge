@@ -1,0 +1,68 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/smooth_camera_movement.obj
+// Desc:   this object is used to get the camera moving nicely (smoothly) from point A to point B
+// Author: Alexandre
+// Date:   2012-12-26
+// ---------------------------------------------------------------------------
+
+// How to use:
+//
+// 1. This provides a smooth camera movement from one point to another.
+//    Before spawning this object, set the following globals:
+//    $_scm_source_x , $_scm_source_y , $_scm_destiny_x , $_scm_destiny_y
+//
+// 2. You may optionally set $_scm_timespan (in seconds) to specify how long
+//    should the movement take.
+//
+// 3. In order to get the camera back, you must manually destroy this object:
+//    change_closest_object_state ".smooth_camera_movement" "@destroy"
+
+object .smooth_camera_movement
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+
+        let "$sx = $_scm_source_x"
+        let "$sy = $_scm_source_y"
+        let "$dx = $_scm_destiny_x"
+        let "$dy = $_scm_destiny_y"
+        let "$t = cond($_scm_timespan <= 0, 0.5, $_scm_timespan)"
+
+        let "$dist = sqrt(($dx - $sx)^2 + ($dy - $sy)^2)"
+        let "$spd = $dist / $t"
+        let "$_scm_timespan = 0"
+
+        set_absolute_position $sx $sy
+        request_camera_focus
+        change_state loop
+    }
+
+    state loop
+    {
+        let "$vx = $dx - xpos()"
+        let "$vy = $dy - ypos()"
+
+        let "$d = sqrt($vx^2 + $vy^2)"
+        if "$d <= 15" freeze
+
+        move "$spd * $vx / $d" "$spd * $vy / $d"
+    }
+
+    state freeze
+    {
+    }
+
+    // === callbacks ===
+    state @destroy
+    {
+        drop_camera_focus
+        destroy
+    }
+}

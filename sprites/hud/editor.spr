@@ -1,0 +1,49 @@
+// script by Alexandre
+
+// Arrow
+sprite SD_ARROW
+{
+    source_file     images/editor.png
+    source_rect     16 18 12 16
+    frame_size      12 16
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Eraser
+sprite SD_ERASER
+{
+    source_file     images/editor.png
+    source_rect     16 0 19 18
+    frame_size      19 18
+    hot_spot        9 9
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Question Mark
+sprite SD_QUESTIONMARK
+{
+    source_file     images/editor.png
+    source_rect     0 0 16 30
+    frame_size      16 30
+    hot_spot        8 30
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

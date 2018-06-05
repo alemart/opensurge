@@ -1,0 +1,331 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>Open Surge&trade; User Manual</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="author" content="Alexandre Martins">
+    <style type="text/css" media="all">
+    <!--
+    body {
+      background-color: #5b4330;
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sGGhM7E6Klt9gAAABwSURBVGje7dmxDcAgDEVBEwVlmOzAFNl/D0QBK9A5EvcWsE6/dPnaOyOhp9aMs3HFYQEDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD73ZnffH6GBYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBv5TC7eBBUe7zkD8AAAAAElFTkSuQmCC');
+      font-family: sans-serif;
+      font-size: medium;
+      line-height: 140%;
+    }
+
+    #content {
+      background-color: #fff;
+      border-radius: 15px;
+      color: #111;
+      margin: 10px auto 10px auto;
+      padding: 10px 10px 10px 10px;
+      width: 75%;
+      position: relative;
+    }
+
+    p {
+      text-indent: 40px;
+    }
+
+    p.note {
+      font-size: small;
+      font-style: italic;
+      line-height: 105%;
+      margin-top: 20px;
+    }
+
+    h1 {
+      color: #ff7733;
+      border-bottom: 1px solid #ffbb77;
+      margin-top: 50px;
+      clear: both;
+      font-size: 18pt;
+    }
+
+    h2 {
+      color: #ff8000;
+      margin-bottom: -10px;
+      font-size: 14pt;
+    }
+
+    pre {
+      font-family: monospace;
+      width: 90%;
+      background-color: #fec;
+      color: #510;
+      border-left: 5px solid #fb7;
+      padding-left: 5px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    a, a:link, a:visited {
+      color: #ff7300;
+      text-decoration: underline;
+    }
+
+    a:hover, a:active {
+      text-decoration: none;
+    }
+
+    h1 > a, h2 > a {
+      text-decoration: none;
+    }
+
+    ul {
+      margin-left: 10px;
+      list-style-position: inside;
+      list-style-type: square;
+    }
+
+    table {
+      margin: 10px auto 10px auto;
+      border-spacing: 0;
+      width: 70%;
+      border-radius: 15px;
+      background-color: #fec;
+      border: 1px solid #fb7;
+    }
+
+    table th {
+      font-weight: bold;
+      padding: 5px 10px 5px 10px;
+      text-align: left;
+      background-color: #fda;
+      border-bottom: 1px solid #fb7;
+    }
+
+    table th:first-child {
+      border-top-left-radius: 15px;
+    }
+
+    table th:last-child {
+      border-top-right-radius: 15px;
+    }
+
+    table td {
+      padding: 5px 10px 5px 10px;
+    }
+
+    .tip {
+      font-size: small;
+    }
+
+    #index > ul {
+      color: #ff8000;
+      list-style-position: outside;
+    }
+
+    #surge {
+      position: absolute;
+      right: 20px;
+      top: 90px;
+      width: 168px;
+      height: 384px;
+    }
+
+    #introduction {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    -->
+    </style>
+  </head>
+  <body>
+  <div id="content">
+
+
+
+  <!-- introduction -->
+  <div id="introduction">
+    <img id="surge" src="surge.png" alt="Surge">
+    <img id="logo" src="logo.png" alt="Logo">
+  </div>
+
+
+
+  <!-- menu -->
+  <div id="menu">
+    <div id="index">
+      <h2><a id="indlink">Index</a></h2>
+      <ul>
+        <li><a href="#whatis">What is Open Surge&trade;?</a></li>
+        <li><a href="#howto">How to play</a></li>
+        <li><a href="#editor">Level Editor</a></li>
+        <li><a href="#mods">MODs and Hacks</a></li>
+        <li><a href="#trouble">Troubleshooting</a></li>
+        <li><a href="#advanced">Advanced features</a></li>
+        <li><a href="#compile">How to compile</a></li>
+        <li><a href="#credits">Credits</a></li>
+      </ul>
+    </div>
+  </div>
+
+
+
+  <!-- what is Open Surge -->
+  <h1><a id="whatis">What is Open Surge&trade;?</a></h1>
+  <p>Open Surge&trade; is an open source retro-style 2D sidescroller inspired by old-school games. Join Surge, Neon and Charge and save the world from the evil Gimacian the Dark! This version, 0.2.0, features:</p>
+  <ul>
+    <li>One level: Sunshine Paradise.</li>
+    <li>A nice story with charismatic characters!</li>
+    <li>Physics: slopes, loops, etc.</li>
+    <li>Translations to multiple languages!</li>
+    <li>A level editor and a highly moddable engine!</li>
+    <li>Good performance even on old computers!</li>
+    <li>The complete source code!</li>
+  </ul>
+  <p>Open Surge&trade; is available for Windows, Linux and other platforms.</p>
+
+
+
+  <!-- how to play -->
+  <h1><a id="howto">How to play</a></h1>
+
+  <h2>Starting the game</h2>
+  <p>Run the <em>opensurge</em> program.</p>
+
+  <h2>Menu</h2>
+  <ul>
+    <li><strong>Start Game:</strong> starts the 1-player game mode;</li>
+    <li><strong>Options:</strong> options screen;</li>
+    <li><strong>Exit:</strong> quits the game.</li>
+  </ul>
+
+  <h2>Moving your character</h2>
+  <p>You can play using a keyboard or a gamepad. If you decide for the latter, plug it before you start the game and activate it on the options screen. On the other hand, if you just want to use your keyboard, check out the table below:</p>
+  <table>
+   <thead>
+    <tr>
+      <th>Key</th>
+      <th>Effect</th>
+    </tr>
+   </thead>
+   <tbody>
+    <tr>
+      <td>Arrow keys</td>
+      <td>Move</td>
+    </tr>
+    <tr>
+      <td>Space bar</td>
+      <td>Jump</td>
+    </tr>
+    <tr>
+      <td>ENTER</td>
+      <td>Pause</td>
+    </tr>
+    <tr>
+      <td>Left CTRL key</td>
+      <td>Switch character (if team play)</td>
+    </tr>
+    <tr>
+      <td>PrintScreen or '='</td>
+      <td>Screenshot</td>
+    </tr>
+    <tr>
+      <td>ESC</td>
+      <td>Quit</td>
+    </tr>
+   </tbody>
+  </table>
+  <p class="tip"><strong>Tip:</strong> in order to change the controls, open <em>config/input.def</em> with a simple text editor (like notepad or gedit) and follow the instructions written in the file.</p>
+
+  <!-- level editor -->
+  <h1><a id="editor">Level Editor</a></h1>
+
+  <p>During gameplay, press F12 to enter the level editor. Once you get in, you may press F1 to get further help. Our <a href="http://opensnc.sourceforge.net">website</a> features more detailed tutorials.</p>
+
+
+  <!-- MODs -->
+  <h1><a id="mods">MODs and Hacks</a></h1>
+
+  <p>Open Surge&trade; is a highly flexible game, enabling users to hack it in a huge variety of forms. Modifications may range from small hacks to whole new games. You can learn all this cool stuff <a href="http://opensnc.sourceforge.net">online</a>.
+
+
+  <!-- troubleshooting -->
+  <h1><a id="trouble">Troubleshooting</a></h1>
+
+  <p>Banging your head against the wall? Please check out our <a href="http://opensnc.sourceforge.net">online FAQ</a>.</p>
+
+
+  <!-- advanced features -->
+  <h1><a id="advanced">Advanced features</a></h1>
+
+  <h2>Command line options</h2>
+  <p>The game provides several features via command line. Open a terminal and type:</p>
+  <pre>opensurge --help</pre>
+
+  <h2>Game resources</h2>
+  <p>You can store various forms of game media (levels, images, sounds and so on) in GAMEDIR/ (default) and also in $HOME/.opensurge/ (Linux only). GAMEDIR is, not surprisingly, the directory where the game is located. If you're a modder, this is for you.</p>
+
+
+
+  <!-- how to compile -->
+  <h1><a id="compile">How to compile</a></h1>
+
+  <h2>Overview</h2>
+  <p>In order to build the game from the source code, you need a C language compiler and a few programming libraries. You also need <a href="http://www.cmake.org/">CMake</a>, a cross-platform open-source build system.</p>
+  <p>Let's define GAMEDIR as the directory where you unpacked the game. GAMEDIR stores, among other things, this readme.html page and a file called CMakeLists.txt</p>
+
+  <h2>Obtaining the libraries</h2>
+  <p>Once your compiler is working properly, you'll need to install the following free programming libraries:</p>
+  <ul>
+    <li>
+      <a href="http://alleg.sourceforge.net">Allegro 4.4.2</a>, with (at least) the following addons:
+      <ul>
+        <li><a href="http://www.ecplusplus.com/index.php?page=projects&amp;pid=1">JPGalleg</a></li>
+        <li><a href="http://tjaden.strangesoft.net/loadpng/">loadpng</a> - requires: zlib and libpng</li>
+        <li><a href="http://trent.gamblin.ca/logg/">LOGG</a> - requires: libogg and libvorbis</li>
+      </ul>
+    </li>
+    <li><a href="http://opensnc.sourceforge.net/alfont/">Modified Alfont 2.0.9</a></li>
+    <li>Linux user? You'll also need <a href="http://kcat.strangesoft.net/openal.html">OpenAL</a> and <a href="http://kcat.strangesoft.net/alure.html">ALURE</a> (with VorbisFile enabled)</li>
+  </ul>
+  <p>In a regular installation of Allegro 4.4, JPGalleg and loadpng and LOGG are already included by default.</p>
+  <p>We won't get into details on how to install these libraries. Please check out their respective websites to know the detailed instructions.</p>
+
+  <h2>Compiling: GNU/Linux - gcc</h2>
+  <p>Open a terminal, go to GAMEDIR and run the following commands:</p>
+  <pre>cmake .
+make
+sudo make install</pre>
+  <p>To launch the game, type:</p>
+  <pre>opensurge</pre>
+  <p class="tip"><strong>Note:</strong> if you find errors related to &quot;allegro-config&quot;, we recommend that you compile Allegro from the source code.</p>
+
+  <h2>Compiling: Windows - MinGW</h2>
+  <p>Are you a <a href="http://www.mingw.org/">MinGW</a> user? Make sure both <em>lib\</em> and <em>bin\</em> folders are listed on your PATH. You don't know? If MinGW is installed on C:\MinGW\, simply open a Command Prompt and type</p>
+  <pre>set PATH=%PATH%;C:\MinGW\bin;C:\MinGW\lib</pre>
+  <p>On the same Command Prompt, please go to GAMEDIR and run the following commands:</p>
+  <pre>cmake -G "MinGW Makefiles" .
+mingw32-make</pre>
+  <p>Note that little '.' at the end of the first command. If everything works well, <em>opensurge.exe</em> will be in GAMEDIR.</p>
+
+  <h2>Compiling: Mac OS X</h2>
+  <p>We have no idea how to compile this on a Mac, but the instructions for Linux may give you some insight. ;)</p>
+
+  <h2>Other compilers/IDEs</h2>
+  <p>Please open a terminal and run:</p>
+  <pre>cmake --help</pre>
+  <p>CMake can generate all the data required by various compilers. It can also generate project files for popular IDEs like: Code::Blocks, Visual C++, KDevelop, etc.</p>
+
+
+
+  <!-- credits -->
+  <h1><a id="credits">Credits</a></h1>
+
+  <h2>License</h2>
+  <p>Open Surge&trade; is <a href="http://en.wikipedia.org/wiki/Free_software">free software</a>!</p>
+  <p>The code of the engine is licensed under the GPL version 2 (or, at your option, any later version). The media attached to the game (graphics, sounds, levels, scripts, etc.) is mostly licensed under the Creative Commons Attribution-ShareAlike 3.0. Please check the credits screen and the licenses/ folder for more information.</p>
+
+  <h2>About this game</h2>
+  <p>Open Surge&trade; is written from the ground up in <a href="http://en.wikipedia.org/wiki/C_language">C language</a>, using the <a href="http://alleg.sourceforge.net/">Allegro game programming library</a>. It also uses <a href="http://trent.gamblin.ca/logg/">LOGG</a> for music playback, <a href="http://tjaden.strangesoft.net/loadpng/">loadpng</a> and <a href="http://www.ecplusplus.com/index.php?page=projects&amp;pid=1">JPGalleg</a> for image loading/saving routines, <a href="http://opensnc.sourceforge.net/alfont/">alfont</a> for True-Type font routines (which uses code from the <a href="http://www.freetype.org">FreeType</a> project) and <a href="http://code.google.com/p/hqx/">hqx</a> for improved graphic rendering. <a href="http://kcat.strangesoft.net/openal.html">OpenAL</a> and <a href="http://kcat.strangesoft.net/alure.html">ALURE</a> may be optionally used for audio playback. This game was originally written by <a href="http://opensnc.sourceforge.net/alemart">Alexandre Martins</a>, a computer science student from Brazil. Nowadays, this project has several contributors all over the world! Game development is a such a beautiful and fascinating area, and one can learn a lot with it.</p>
+  <p>Thank you for reading.</p>
+
+
+  </div>
+  </body>
+</html>
+

@@ -1,0 +1,2874 @@
+// Author: script by Celdecea
+
+
+
+
+// Solid block
+brick 0
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     70 10 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Open block
+brick 1
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     210 10 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Solid platform
+brick 2
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     350 10 144 43
+        frame_size      144 43
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Open platform
+brick 3
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     350 60 144 37
+        frame_size      144 37
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Pillar 16
+brick 4
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 10 48 16
+        frame_size      48 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Pillar 18
+brick 6
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 26 48 18
+        frame_size      48 18
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Pillar 32
+brick 7
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 44 48 32
+        frame_size      48 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Pillar 24
+brick 8
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 76 48 24
+        frame_size      48 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Short Platform
+brick 9
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 110 40 72
+        frame_size      40 72
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Useful Block 1
+brick 10
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     70 10 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Useful Block 2
+brick 11
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     70 74 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Useful Block 3
+brick 12
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     210 10 16 64
+        frame_size      16 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Useful Block 4
+brick 13
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     210 74 16 64
+        frame_size      16 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Sign - Arrow Right
+brick 14
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 200 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Sign - Arrow Down
+brick 15
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     37 200 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Sign - Arrow Left
+brick 16
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     64 200 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Sign - Arrow Up
+brick 17
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     91 200 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Sign - Star
+brick 18
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 250 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Sign - X
+brick 19
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     37 250 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+// Sign - Upside-down star
+brick 20
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     64 250 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Sign - Upside-down X
+brick 21
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     91 250 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Dirt - 10x20
+brick 22
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     485 110 10 20
+        frame_size      10 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Dirt - 20x20
+brick 23
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     350 110 20 20
+        frame_size      20 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Dirt - 20x20
+brick 24
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     375 110 40 20
+        frame_size      40 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Dirt - 60x20
+brick 25
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     420 110 60 20
+        frame_size      60 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Dirt - 10x20
+brick 26
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     485 135 10 20
+        frame_size      10 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Dirt - 20x20
+brick 27
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     350 135 20 20
+        frame_size      20 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Dirt - 20x20
+brick 28
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     375 135 40 20
+        frame_size      40 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Dirt - 60x20
+brick 29
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     420 135 60 20
+        frame_size      60 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Noise - Small
+brick 30
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     500 135 23 21
+        frame_size      23 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Noise - Medium
+brick 31
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     525 135 41 20
+        frame_size      41 20
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Noise - Large
+brick 32
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     500 110 114 21
+        frame_size      114 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Ramp Piece
+brick 33
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               -10
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     500 10 12 2
+        frame_size      12 2
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 34
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     500 12 12 8
+        frame_size      12 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+// Ramp Piece
+brick 35
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               10
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     513 10 12 2
+        frame_size      12 2
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 36
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     513 12 12 8
+        frame_size      12 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ramp Piece
+brick 39
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               10
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 10 24 6
+        frame_size      24 6
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 40
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 16 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+// Ramp Piece
+brick 41
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               -20
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     530 24 24 8
+        frame_size      24 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 42
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     530 32 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Ramp Piece
+brick 43
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               20
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 24 24 8
+        frame_size      24 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 44
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 32 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ramp Piece
+brick 45
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               -30
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     530 40 24 12
+        frame_size      24 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 46
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     530 52 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Ramp Piece
+brick 47
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               30
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 40 24 12
+        frame_size      24 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 48
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 52 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+// Ramp Piece
+brick 49
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               -45
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     530 60 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 50
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     530 84 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Ramp Piece
+brick 51
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               45
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 60 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Ramp Piece
+brick 52
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     555 84 24 7
+        frame_size      24 7
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Sign - Arrow Right
+brick 53
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     10 300 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Sign - Arrow Down
+brick 54
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     37 300 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Sign - Arrow Left
+brick 55
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     64 300 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Sign - Arrow Up
+brick 56
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     91 300 26 45
+        frame_size      26 45
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Pyramid
+brick 57
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     120 200 60 30
+        frame_size      60 30
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Pyramid bridge left
+brick 58
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               45
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     120 235 16 17
+        frame_size      16 17
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Pyramid bridge left-middle
+brick 59
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     136 235 14 17
+        frame_size      14 17
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Pyramid middle
+brick 60
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     140 235 15 5
+        frame_size      15 5
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Pyramid bridge right-middle
+brick 61
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     160 235 14 17
+        frame_size      14 17
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Pyramid bridge right
+brick 62
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               -45
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     174 235 16 17
+        frame_size      16 17
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Passable Pillar
+brick 63
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     120 260 48 16
+        frame_size      48 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Passable Pillar
+brick 64
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     120 276 48 18
+        frame_size      48 18
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Passable Pillar
+brick 65
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     120 326 48 24
+        frame_size      48 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Passable Pillar
+brick 66
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     120 294 48 32
+        frame_size      48 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Vine 1
+brick 67
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     200 200 31 84
+        frame_size      31 84
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Vine 2
+brick 68
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     240 200 30 84
+        frame_size      30 84
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+// Skull Rock
+brick 69
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     180 300 24 32
+        frame_size      24 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Vase
+brick 70
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     210 300 18 47
+        frame_size      18 47
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Short Platform
+brick 71
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     70 145 41 37
+        frame_size      41 37
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Dark Brick A
+brick 72
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     115 145 20 15
+        frame_size      20 15
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Dark Brick B
+brick 73
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     115 165 20 15
+        frame_size      20 15
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Dark Brick C
+brick 74
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     140 145 20 15
+        frame_size      20 15
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Dark Brick D
+brick 75
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     140 165 20 15
+        frame_size      20 15
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Dark Brick E
+brick 76
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     165 145 10 5
+        frame_size      10 5
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Dark Brick F
+brick 77
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     165 155 5 5
+        frame_size      5 5
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+// Spikes up
+brick 78
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     180 144 21 22
+        frame_size      21 22
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Spikes down
+brick 79
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     205 145 21 22
+        frame_size      21 22
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Spikes right
+brick 80
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     180 170 22 21
+        frame_size      22 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Spikes left
+brick 81
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     205 170 22 21
+        frame_size      22 21
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+// Useful block
+brick 82
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     226 10 64 16
+        frame_size      64 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Useful block
+brick 83
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     258 106 64 16
+        frame_size      64 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+// Loop - Lower Right Piece - 1/8
+brick 84
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               18
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     337 259 25 8
+        frame_size      25 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Lower Right Piece - 2/8
+brick 85
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               9
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     337 267 25 16
+        frame_size      25 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Lower Right Piece - 3/8
+brick 86
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               45
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     362 247 12 12
+        frame_size      12 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Lower Right Piece - 4/8
+brick 87
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               40
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     362 259 12 24
+        frame_size      12 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Lower Right Piece - 5/8
+brick 88
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               72
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     374 222 8 25
+        frame_size      8 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Lower Right Piece - 6/8
+brick 89
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               90
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     382 222 16 25
+        frame_size      16 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+// Loop - Lower Right Piece - 7/8
+brick 90
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               50
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     374 247 24 12
+        frame_size      24 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Loop - Lower Right Piece - 8/8
+brick 91
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     374 259 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Loop - Upper Right Piece - 1/8
+brick 92
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               108
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     374 196 8 25
+        frame_size      8 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Upper Right Piece - 2/8
+brick 93
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               90
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     382 196 16 25
+        frame_size      16 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Upper Right Piece - 3/8
+brick 94
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               130
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     374 184 24 12
+        frame_size      24 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Upper Right Piece - 4/8
+brick 95
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               180
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     374 160 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Upper Right Piece - 5/8
+brick 96
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               135
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     362 184 12 12 
+        frame_size      12 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Upper Right Piece - 6/8
+brick 97
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               140
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     362 160 12 24
+        frame_size      12 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+// Loop - Upper Right Piece - 7/8
+brick 98
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               162
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     337 176 25 8
+        frame_size      25 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Loop - Upper Right Piece - 8/8
+brick 99
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               180
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     337 160 25 16
+        frame_size      25 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Loop - Wall Piece
+brick 100
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               90
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     336 218 17 32
+        frame_size      17 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Ceiling piece
+brick 101
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               180
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     320 200 32 17
+        frame_size      32 17
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Loop - Upper Left Piece - 1/8
+brick 102
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               198
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     311 176 25 8
+        frame_size      25 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Upper Left Piece - 2/8
+brick 103
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               180
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     311 160 25 16
+        frame_size      25 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Upper Left Piece - 3/8
+brick 104
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               225
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     299 184 12 12
+        frame_size      12 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Upper Left Piece - 4/8
+brick 105
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               220
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     299 160 12 24
+        frame_size      12 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Upper Left Piece - 5/8
+brick 106
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               252
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     291 196 8 25
+        frame_size      8 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Upper Left Piece - 6/8
+brick 107
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               270
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     275 196 16 25
+        frame_size      16 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+// Loop - Upper Left Piece - 7/8
+brick 108
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               230
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     275 184 24 12
+        frame_size      24 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Loop - Upper Left Piece - 8/8
+brick 109
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               180
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     275 160 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Loop - Lower Left Piece - 1/8
+brick 110
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               288
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     291 222 8 25
+        frame_size      8 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Lower Left Piece - 2/8
+brick 111
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               270
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     275 222 16 25
+        frame_size      16 25
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Lower Left Piece - 3/8
+brick 112
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               310
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     275 247 24 12
+        frame_size      24 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Lower Left Piece - 4/8
+brick 113
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     275 259 24 24
+        frame_size      24 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// Loop - Upper Left Piece - 5/8
+brick 114
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               315
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     299 247 12 12
+        frame_size      12 12
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+// Loop - Lower Left Piece - 6/8
+brick 115
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               320
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     299 259 12 24
+        frame_size      12 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Loop - Lower Left Piece - 7/8
+brick 116
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               342
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     311 259 25 8
+        frame_size      25 8
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+// Loop - Lower Left Piece - 8/8
+brick 117
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               0
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     311 267 25 16
+        frame_size      25 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+// Loop - Wall Piece
+brick 118
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    angle               270
+
+    sprite
+    {
+        source_file     images/desert1.png
+        source_rect     318 218 17 32
+        frame_size      17 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

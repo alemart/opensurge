@@ -1,0 +1,161 @@
+// creative commons screen
+// script by Alexandre, 2012-02-22, 2:22 AM
+
+object ".creativecommons_startup"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main
+    {
+        create_child .cutscene_skipper[pedantic]
+        set_zindex 0
+        set_animation SD_FADEEFFECT_WHITE 0
+
+        let $_fade_in=1
+        let $_fade_duration=0.5
+        create_child .fade_effect
+
+        change_state wait
+    }
+
+    state wait
+    {
+        on_timeout 0.5 create_logo
+    }
+
+    state create_logo
+    {
+        play_sample samples/creativecommons2.ogg
+        create_child .creativecommons_startup.logo
+        change_state wait_some_more
+    }
+
+    state wait_some_more
+    {
+        on_timeout 4.0 fadeout2
+    }
+
+    state fadeout
+    {
+        stop_sample samples/creativecommons2.ogg
+        let $_fade_in=0
+        let $_fade_duration=0.5
+        create_child .fade_effect
+        change_state wait2
+    }
+
+    state wait2
+    {
+        if ($wt+=dt())<1 wait2
+        next_level
+    }
+
+    state fadeout2
+    {
+        stop_sample samples/creativecommons2.ogg
+        let $_fade_in=0
+        let $_fade_duration=0.5
+        create_child .fade_effect
+        change_state wait3
+    }
+
+    state wait3
+    {
+        if ($wt+=dt())<1 wait3
+        next_level
+        //load_level levels/cutscenes/allegro.lev
+    }
+
+    // ---------------------
+
+    state .cutscene_skipper:on_skip
+    {
+        execute fadeout
+    }
+}
+
+object ".creativecommons_startup.logo"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main
+    {
+        set_animation SD_CREATIVECOMMONS 0
+        set_absolute_position $_cclogo_x=-width() (screen_height()-height())/2
+        let $_cclogo_w=width()
+        create_child .creativecommons_startup.logo.aux
+
+        change_state move_right
+    }
+
+    state move_right
+    {
+        let $v=screen_width()/0.4
+        move $v 0
+        let $_cclogo_x=xpos()
+        if "xpos() >= (screen_width() - width() * 0.24)/2" wait
+    }
+
+    state wait
+    {
+        if ($t+=dt())<0.5 wait
+        create_child .creativecommons_startup.logo.by_sa
+        change_state move_left
+    }
+
+    state move_left
+    {
+        let $_cclogo_x+=$v*dt()/2
+        set_absolute_position max(xpos()-$v*dt()/2,(screen_width()-width())/2) ypos()
+    }
+
+    state fadeout_please
+    {
+        change_parent_state fadeout
+        change_state wait
+    }
+}
+
+object ".creativecommons_startup.logo.aux"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main
+    {
+        set_animation SD_FADEEFFECT_WHITE 0
+        set_zindex 1.0
+        change_state loop
+    }
+
+    state loop
+    {
+        set_absolute_position $_cclogo_x+$_cclogo_w*0.22 0
+    }
+}
+
+object ".creativecommons_startup.logo.by_sa"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main
+    {
+        set_animation SD_CREATIVECOMMONS_BY_SA 0
+        set_alpha 0
+        set_zindex 1.1
+        set_absolute_position screen_width()-width()-3 screen_height()-height()-3
+        change_state appear
+    }
+
+    state appear
+    {
+        set_alpha alpha()+2*dt()
+    }
+}

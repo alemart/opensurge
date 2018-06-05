@@ -1,0 +1,35 @@
+// script by Alexandre
+
+// Confirm Box
+sprite SD_CONFIRMBOX
+{
+    source_file     images/dialogbox.png
+    source_rect     0 76 179 63
+    frame_size      179 63
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Dialog Box
+sprite SD_DIALOGBOX
+{
+    source_file     images/dialogbox.png
+    source_rect     0 0 272 68
+    frame_size      272 68
+    hot_spot        0 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

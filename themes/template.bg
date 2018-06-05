@@ -1,0 +1,31 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   themes/template.bg
+// Desc:   this background is displayed on the template level
+// Author: script by Alexandre
+// ---------------------------------------------------------------------------
+
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     images/editorbg.png
+        source_rect     0 0 640 480
+        frame_size      640 480
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}

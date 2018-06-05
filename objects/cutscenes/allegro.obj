@@ -1,0 +1,75 @@
+// Allegro logo
+// script by Alexandre
+object ".allegro_startup"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    // main
+    state "main"
+    {
+        create_child .cutscene_skipper[pedantic]
+        set_absolute_position screen_width()/2 screen_height()/2
+        set_animation SD_ALLEGRO 0
+        play_sample samples/allegro.ogg
+        change_state wait
+    }
+
+    state wait
+    {
+        on_timeout 3.5 fadeout
+    }
+
+    state stop
+    {
+        stop_sample samples/allegro.ogg
+        change_state fadeout_fast
+    }
+
+    state fadeout
+    {
+        let $s=1
+        let $_fade_in=0
+        let $_fade_duration=0.5
+        create_child .fade_effect
+        change_state wait2
+    }
+
+    state fadeout_fast
+    {
+        let $_fade_in=0
+        let $_fade_duration=0.5
+        create_child .fade_effect
+        change_state wait3
+    }
+
+    state wait2
+    {
+        let $s=max(0,$s-2*dt())
+        set_scale $s $s
+        on_timeout 2 cc
+    }
+
+    state wait3
+    {
+        on_timeout 1 next
+    }
+
+    state next
+    {
+        next_level
+    }
+
+    state cc
+    {
+        load_level levels/cutscenes/creativecommons.lev
+    }
+
+    // -------------
+
+    state .cutscene_skipper:on_skip
+    {
+        execute stop
+    }
+}

@@ -1,0 +1,629 @@
+// script by Celdecea, modified by Alexandre
+
+// (Top) Yellow spring
+sprite SD_YELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     16 82 64 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Bottom yellow spring
+sprite SD_BYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     80 82 64 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Top-right yellow spring
+sprite SD_TRYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     16 195 78 39
+    frame_size      39 39
+    hot_spot        0 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Right yellow spring
+sprite SD_RYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     144 82 64 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Bottom-right yellow spring
+sprite SD_BRYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     190 195 78 39
+    frame_size      39 39
+    hot_spot        0 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Bottom-left yellow spring
+sprite SD_BLYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     274 195 78 39
+    frame_size      39 39
+    hot_spot        39 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Left yellow spring
+sprite SD_LYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     208 82 64 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Top-left yellow spring
+sprite SD_TLYELLOWSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     100 195 78 39
+    frame_size      39 39
+    hot_spot        39 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+
+
+
+
+
+
+
+// (Top) Red spring
+sprite SD_REDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     16 50 64 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+
+// Bottom red spring
+sprite SD_BREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     80 50 64 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Top-right red spring
+sprite SD_TRREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     16 150 78 39
+    frame_size      39 39
+    hot_spot        0 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Right red spring
+sprite SD_RREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     144 50 64 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Bottom-right red spring
+sprite SD_BRREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     190 150 78 39
+    frame_size      39 39
+    hot_spot        0 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Bottom-left red spring
+sprite SD_BLREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     274 150 78 39
+    frame_size      39 39
+    hot_spot        39 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Left red spring
+sprite SD_LREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     208 50 64 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Top-left red spring
+sprite SD_TLREDSPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     100 150 78 39
+    frame_size      39 39
+    hot_spot        39 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+
+
+
+
+// (Top) Blue spring
+sprite SD_BLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     16 114 64 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+
+// Bottom blue spring
+sprite SD_BBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     80 114 64 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Top-right blue spring
+sprite SD_TRBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     16 240 78 39
+    frame_size      39 39
+    hot_spot        0 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Right blue spring
+sprite SD_RBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     144 114 64 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Bottom-right blue spring
+sprite SD_BRBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     190 240 78 39
+    frame_size      39 39
+    hot_spot        0 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Bottom-left blue spring
+sprite SD_BLBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     274 240 78 39
+    frame_size      39 39
+    hot_spot        39 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+
+// Left blue spring
+sprite SD_LBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     208 114 64 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+// Top-left blue spring
+sprite SD_TLBLUESPRING
+{
+    source_file     images/spring_pads.png
+    source_rect     100 240 78 39
+    frame_size      39 39
+    hot_spot        39 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // action!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+

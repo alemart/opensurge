@@ -1,0 +1,255 @@
+//
+// Open Surge
+// Title screen
+//
+// Script by Alexandre
+// Last update: 2013-02-13
+//
+
+//
+// logic of the title screen
+//
+object ".title_screen"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+
+        // TODO: move these to the main menu
+        set_player_position -9999 -9999
+        add_lives -lives()
+        add_lives initial_lives()
+        add_to_score -score()
+        reset_globals
+
+        // spawn entrance animation
+        create_child ".title_screen.black_screen" 0 0 black_screen
+        create_child ".title_screen.surge" 0 0 surge
+
+        // done!
+        change_state "entrance_animation"
+    }
+
+    state "entrance_animation"
+    {
+        // wait until Surge appears completely
+        change_child_state surge @finished?
+        if not($_title_screen_surge_finished) entrance_animation
+
+        // okay, Surge has appeared. Destroy the black screen now.
+        change_child_state black_screen @destroy
+
+        // creating components...
+        create_child ".title_screen.logo"
+        create_child ".title_screen.message" 0 0 message
+        create_child ".title_screen.version"
+        create_child ".title_screen.website"
+
+        // done!
+        change_state "idle"
+    }
+
+    state "idle"
+    {
+        on_timeout 0.5 "wait_for_input"
+    }
+
+    state "wait_for_input"
+    {
+        on_button_pressed "fire1" "done"
+        on_button_pressed "fire3" "done"
+    }
+
+    state "done"
+    {
+        play_sample "select"
+
+        change_child_state message @freeze
+
+        let $_fade_in=0
+        let $_fade_duration=0.5
+        create_child .fade_effect
+
+        let $_fademusic_in=0
+        let $_fademusic_duration=1.0
+        create_child .fademusic
+
+        change_state cooldown
+    }
+
+    state "cooldown"
+    {
+        on_timeout 0.75 finish
+    }
+
+    state "finish"
+    {
+        push_quest "quests/default.qst"
+    }
+}
+
+//
+// The "PRESS ENTER" message
+//
+object ".title_screen.message"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+        set_zindex 1
+        set_absolute_position screen_width()/2 screen_height()-25
+        let "$tmr = 0.5"
+        change_state "invisible"
+    }
+
+    state "invisible"
+    {
+        on_timeout $tmr visible
+    }
+
+    state "visible"
+    {
+        textout_centre "powerfest" 1 1 "<color=000000>$TITLE_MESSAGE</color>"
+        textout_centre "powerfest" 0 0 "<color=fff585>$TITLE_MESSAGE</color>"
+        on_timeout $tmr invisible
+    }
+
+    // callbacks
+    state @freeze {
+        let $tmr=9999
+        return_to_previous_state
+    }
+}
+
+//
+// displays the engine version
+//
+object ".title_screen.version"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+        set_zindex 1
+        set_absolute_position screen_width()-3 screen_height()-11
+        change_state "display"
+    }
+
+    state "display"
+    {
+        textout_right "menu.tiny" 0 0 "$TITLE_VERSION $ENGINE_VERSION"
+    }
+}
+
+//
+// displays the engine website
+//
+object ".title_screen.website"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+        set_zindex 1
+        set_absolute_position 3 screen_height()-11
+        change_state "display"
+    }
+
+    state "display"
+    {
+        textout "menu.tiny" 0 0 "$ENGINE_WEBSITE"
+    }
+}
+
+//
+// the big nice Surge
+//
+object ".title_screen.surge"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        let $finished=0
+
+        set_zindex 0.6
+        set_animation SD_SURGEENTRANCE 0
+        set_alpha 0
+        set_absolute_position (screen_width()-106)/2 screen_height()-height()
+
+        change_state wait_a_bit
+    }
+
+    state wait_a_bit {
+        set_alpha "min(1, alpha() + 1*dt())"
+        on_timeout 1.0/2.15 appear
+    }
+
+    state appear {
+        set_alpha "min(1, alpha() + 1*dt())"
+        set_animation SD_SURGEENTRANCE 1
+        on_animation_finished done
+    }
+
+    state done {
+        set_alpha "min(1, alpha() + 1*dt())"
+        let $finished=1
+    }
+
+    // --- callbacks ---
+    state @finished? {
+        let "$_title_screen_surge_finished = $finished"
+        return_to_previous_state
+    }
+}
+
+//
+// a black screen
+//
+object ".title_screen.black_screen"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        set_zindex 0.5
+        set_animation SD_HUDBLACKSCREEN 0
+    }
+
+    // --- callbacks ---
+    state @destroy {
+        destroy
+    }
+}
+
+//
+// Open Surge Logo!
+//
+object ".title_screen.logo"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        set_zindex 0.7
+        set_animation SD_LOGO 0
+        set_absolute_position (screen_width()-243)/2 12
+    }
+}

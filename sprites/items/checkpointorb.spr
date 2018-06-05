@@ -1,0 +1,34 @@
+// script by Celdecea, modified by Alexandre
+
+// Checkpoint orb
+sprite SD_CHECKPOINT
+{
+    source_file     images/checkpoint_orb.png
+    source_rect     0 80 259 65
+    frame_size      37 65
+    hot_spot        18 63
+
+    // disabled
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // activating...
+    animation 1
+    {
+        repeat      FALSE
+        fps         24
+        data        1 2 3 4 5 0 1 2 3 4 5
+    }
+
+    // active
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        6 0
+    }
+}

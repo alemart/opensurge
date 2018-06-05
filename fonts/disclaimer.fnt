@@ -1,0 +1,19 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   fonts/disclaimer.fnt
+// Desc:   disclaimer font
+// Author: Alexandre (script),
+//         DejaVu (ttf/DejaVuSans.ttf)
+// ---------------------------------------------------------------------------
+
+font "disclaimer"
+{
+    truetype
+    {
+        source_file             "ttf/DejaVuSans.ttf"
+        size                    13
+        antialias
+    }
+}

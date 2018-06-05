@@ -1,0 +1,40 @@
+// script by Alexandre
+sprite SD_LOGO
+{
+    source_file     images/logo.png
+    source_rect     0 0 254 73
+    frame_size      254 73
+    hot_spot        0 0
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite SD_SURGEENTRANCE
+{
+    source_file     images/extra/surge_entrance.png
+    source_rect     0 0 414 276
+    frame_size      138 138
+    hot_spot        0 0
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // entrance
+    animation 1
+    {
+        repeat      FALSE
+        fps         12
+        data        0 1 2 3 4 5
+    }
+}

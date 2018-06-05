@@ -1,0 +1,47 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/pixelparticle.obj
+// Desc:   a pixel affected by gravity
+// Author: Alexandre
+// Date:   2012-02-23
+// ---------------------------------------------------------------------------
+
+// How to use:
+//
+// 1. Set $_pixelparticle_anim to a number between 0 (black) and 4 (white),
+//    inclusive. Other numbers are variations of grey.
+//
+// 2. Set $_pixelparticle_xvel and $_pixelparticle_yvel to the initial speed
+//    of the pixel particle
+//
+// 3. Spawn an instance of ".pixelparticle" at the position you want to
+//    It will be destroyed once it collides with a solid brick.
+//
+
+object ".pixelparticle"
+{
+    requires 0.2.0
+    destroy_if_far_from_play_area
+
+    state "main"
+    {
+        set_animation SD_PIXEL $_pixelparticle_anim
+        let $xv=$_pixelparticle_xvel
+        let $yv=$_pixelparticle_yvel
+        change_state move
+    }
+
+    state "move"
+    {
+        move $xv $yv
+        let $yv+=gravity()*dt()
+        if brick_exists(0,0) destroy
+    }
+
+    state "destroy"
+    {
+        destroy
+    }
+}

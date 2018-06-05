@@ -1,0 +1,16 @@
+// Awesome (O)Possum, from Ultimate Smash Friends
+// script by Alexandre
+sprite SD_AWOP
+{
+    source_file     images/awop.png
+    source_rect     0 0 44 49
+    frame_size      44 49
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

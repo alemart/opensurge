@@ -1,0 +1,18 @@
+// script by Alexandre
+
+// Invincibility stars
+sprite SD_INVSTAR
+{
+    source_file     images/stars.png
+    source_rect     0 0 48 32
+    frame_size      16 16
+    hot_spot        8 8
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1 2 3 4 5
+    }
+}

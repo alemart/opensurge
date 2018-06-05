@@ -1,0 +1,100 @@
+// ----------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// Changelog:
+// 2012-12-26 - first version by Alexandre
+// ----------------------------------------
+
+// spiral ring special effect
+//
+// before creating this object, you may optionally
+// set the variable $_spiralringfx_numberofrings to
+// something like, say, 50. If you don't set it,
+// 25 rings will be created by default.
+
+object .spiralringfx
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+
+        let "$counter = $_spiralringfx_numberofrings"
+        let "$counter = cond($counter <= 0, 25, 0)"
+        let "$_spiralringfx_numberofrings = 0"
+
+        change_state loop
+    }
+
+    state loop
+    {
+        on_timeout 0.01 create_ring
+let $_spiralringfx_initialangle+=2*pi()*dt()
+    }
+
+    state create_ring
+    {
+        if "$counter <= 0" destroy
+        create_child .spiralringfx.ring
+        let "$counter -= 1"
+        change_state loop
+    }
+
+    state destroy
+    {
+        destroy
+    }
+}
+
+
+object .spiralringfx.ring
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        set_animation SD_COLLECTIBLE 0
+        set_zindex 0.6
+        let "$angle = $_spiralringfx_initialangle"
+        let "$radius = max(screen_width(), screen_height())/2"
+
+        let "$secs_to_complete = 1.2"
+        let "$angular_speed = 2.5*(2*pi())"
+        let "$speed = $radius / $secs_to_complete"
+
+        hide
+        change_state loop
+    }
+
+    state loop
+    {
+        on_player_collision collected
+        set_absolute_position "player_xpos() + $radius * cos($angle)" "player_ypos()-40 + $radius * sin($angle)"
+        let "$angle += $angular_speed * dt()"
+        let "$radius -= $speed * dt()"
+        //let "$angular_speed += 2*pi()*dt()"
+        show
+    }
+
+    state collected
+    {
+        set_animation SD_COLLECTIBLE 1
+        play_sample samples/ring.wav
+        add_collectibles 1
+        change_state wait
+    }
+
+    state wait
+    {
+        on_animation_finished destroy
+    }
+
+    state destroy
+    {
+        destroy
+    }
+}

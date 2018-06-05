@@ -1,0 +1,130 @@
+//
+// Open Surge
+// main menu
+//
+// Script by Alexandre
+// Last update: 2013-02-11
+//
+
+// main menu
+// this object creates the menu
+object ".main_menu"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+        create_child ".main_menu.option_manager"
+        destroy
+    }
+}
+
+object ".main_menu.option_manager"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+
+        create_child ".main_menu.option" 0 0 opt1
+        create_child ".main_menu.option" 0 0 opt2
+        create_child ".main_menu.option" 0 0 opt3
+
+        change_child_state opt1 @appear_from_right
+        destroy
+    }
+}
+
+object ".main_menu.option"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        //hide
+
+        // id of this menu option (0, 1 or 2)
+        let "$id = $_mainmenu_option_id mod 3"
+        let "$_mainmenu_option_id += 1"
+
+        // movement script
+        let "$speed = screen_width() / 0.5"
+        let "$dir = 0"
+        let "$highlighted = 0"
+        let "$q = 2 * screen_width()"
+        let "$m = 0.5 * screen_width()"
+        set_absolute_position "$q" "screen_height() * 0.8"
+
+        // i'm alive
+        change_state "active"
+    }
+
+    state "active"
+    {
+        // movement
+        let "$x = cond($highlighted, cond($dir>0, min($m, xpos()+$speed*dt()), max($m, xpos()-$speed*dt())), clamp(xpos()+$dir*$speed*dt(), 0-$q, $q))"
+        set_absolute_position $x ypos()
+
+        // text
+        textout_centre "menu.main" 0 0 "$MENU_1PGAME : $id"
+        execute "!opt_1pgame" if "$id == 0"
+        execute "!opt_options" if "$id == 1"
+        execute "!opt_quit" if "$id == 2"
+    }
+
+    // ---- callbacks ----
+    state "@appear_from_right"
+    {
+        let "$dir = -1"
+        let "$highlighted = 1"
+        return_to_previous_state
+    }
+
+    state "@appear_from_left"
+    {
+        let "$dir = 1"
+        let "$highlighted = 1"
+        return_to_previous_state
+    }
+
+    state "@disappear_to_right"
+    {
+        let "$dir = 1"
+        let "$highlighted = 0"
+        return_to_previous_state
+    }
+
+    state "@disappear_to_left"
+    {
+        let "$dir = -1"
+        let "$highlighted = 0"
+        return_to_previous_state
+    }
+
+    // ---- display option text ----
+    state "!opt_1pgame"
+    {
+        textout_centre "menu.main" 0 0 "$MENU_1PGAME"
+        let "$len = $_STRLEN"
+    }
+
+    state "!opt_options"
+    {
+        textout_centre "menu.main" 0 0 "$MENU_OPTIONS"
+        let "$len = $_STRLEN"
+    }
+
+    state "!opt_quit"
+    {
+        textout_centre "menu.main" 0 0 "$MENU_QUIT"
+        let "$len = $_STRLEN"
+    }
+}

@@ -1,0 +1,227 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   languages/cestina.lng
+// Desc:   Czech translation
+// Author: Tomas Havlik
+// ---------------------------------------------------------------------------
+
+// Meta data
+LANG_LANGUAGE               "Cestina"
+LANG_AUTHOR                 "Tomires"
+LANG_LASTUPDATE             "2010-09-12"
+LANG_COMPATIBILITY          "0.2.0"
+
+
+// Colors
+COLOR_P1                    "0077ff"
+COLOR_P2                    "ff7700"
+COLOR_P3                    "ff0000"
+COLOR_INPUT                 "aaaaaa"
+COLOR_SPECIAL               "ffff00"
+
+
+// Main menu
+MENU_1PGAME                 "HRA"
+MENU_TUTORIAL               "TUTORIAL"
+MENU_CUSTOMQUESTS           "PRIDAVKY"
+MENU_OPTIONS                "NASTAVENI"
+MENU_EXIT                   "KONEC"
+
+
+// Options
+OPTIONS_TITLE               "NASTAVENI"
+OPTIONS_YES                 "ANO"
+OPTIONS_NO                  "NE"
+OPTIONS_GRAPHICS            "GRAFIKA"
+OPTIONS_FULLSCREEN          "Cela obrazovka"
+OPTIONS_RESOLUTION          "Rozliseni"
+OPTIONS_RESOLUTION_OPT1     "MALE"
+OPTIONS_RESOLUTION_OPT2     "STREDNI"
+OPTIONS_RESOLUTION_OPT3     "VELKE"
+OPTIONS_SMOOTHGFX           "Jemna GFX"
+OPTIONS_FPS                 "Ukaz FPS"
+OPTIONS_GAME                "HRA"
+OPTIONS_LANGUAGE            "Zmena jazyku"
+OPTIONS_STAGESELECT         "Volba urovne"
+OPTIONS_CREDITS             "Autori"
+OPTIONS_BACK                "ZPET"
+
+
+// Stage Select
+STAGESELECT_TITLE           "VOLBA UROVNE"
+STAGESELECT_MSG             "Stisknete <color=ffff00>$INPUT_FIRE4</color> pro navrat."
+STAGESELECT_PAGE            "strana %d/%d"
+STAGESELECT_ACT             "Akt"
+
+
+// Credits
+CREDITS_TITLE               "AUTORI"
+CREDITS_KEY                 "Stisknete <color=ffff00>$INPUT_FIRE4</color> pro navrat."
+
+CREDITS_ACTIVE              "Tym projektu"
+CREDITS_RETIRED             "Byvali clenove"
+CREDITS_THANKS              "Dekujeme"
+
+CREDITS_ALEXANDRE           "Vedouci projektu, Programator"
+CREDITS_DI                  "Hudba"
+CREDITS_COLIN               "Navrh urovni, Moderator fora, Vytvarnik"
+CREDITS_MATEUSREIS          "Zvukove efekty"
+CREDITS_CHRISTOPHER         "Moderator wiki, Preklad do indonestiny"
+CREDITS_CELDECEA            "Vytvarnik"
+CREDITS_SSDW                "Preklad do nizozemstiny"
+CREDITS_XENO                "Mac OS X port"
+CREDITS_LAINZ               "Preklad do spanelstiny"
+CREDITS_ARTHURBLOT          "Preklad do francouzstiny"
+CREDITS_REIMUND             "Preklad do nemciny"
+CREDITS_SZYMON              "Preklad do polstiny"
+CREDITS_TOMIRES             "Preklad do cestiny"
+CREDITS_JOGAIT              "Preklad do portugalstiny"
+CREDITS_NEOBLAST            "Dreamcast port"
+CREDITS_BASTIAN             "Vytvarnik"
+CREDITS_FRANCESCO           "Preklad do italstiny"
+
+
+// Main menu -> Custom Quests
+MENU_CQ_SELECT              "<color=0077ff>Vyberte ukol:</color> [strana %d/%d]"
+MENU_CQ_BACK                "<color=0077ff>Stisknete $INPUT_FIRE4 pro navrat.</color>"
+MENU_CQ_INFO                "<color=ffff00>Informace o ukolu:</color> (verze %s)\n\n<color=ffff00>Nazev:</color>  %s\n<color=ffff00>Autor:</color> %s\n%s"
+MENU_CQ_DEFAULT             "Vychozi ukol"
+MENU_CQ_TUTORIAL            "Naucte se hrat Open Sonic"
+MENU_CQ_SUPERBOSSES         "Bojujte se silnymi neprateli!"
+MENU_CQ_EXTRA               "Dalsi urovne"
+
+
+// Quest names
+TUTORIAL_QUEST_NAME         "Tutorial"
+SUPERBOSSES_NAME            "Super Bossove" 
+EXTRA_LEVELS_NAME           "Dalsi urovne"
+DEFAULT_QUEST_NAME          "Vychozi ukol"
+
+
+// Quest cleared!
+QUESTCLEARED_TITLE          "UKOL SPLNEN"
+QUESTCLEARED_TEXT           "Gratulujeme!\n'%s'\nje nyni dokoncen!\n\n\n     <color=0077ff>Celkove skore:</color> %d\n\n     <color=0077ff>Celkovy cas:</color> %dh %dm %ds\n\n     <color=0077ff>Kouzelne bryle:</color> %d\n\n     <color=0077ff>Velke prsteny:</color> %d\n\nDekujeme za zahrani. Pockejte si \nna novou verzi %s!\nNavstivte nas na webu:\n<color=ffff00>%s</color>\nStisknete $INPUT_FIRE3 pro restart hry."
+
+
+// End of demo
+ENDOFDEMO_TITLE             "PODEKOVANI"
+ENDOFDEMO_TEXT              "Dekujeme za zahrani %s!\nDoufame, ze jste si hru\nuzili stejne jako my pri jeji tvorbe!\n\nToto je konec dema,\nale nikoli cele hry.\nStahnete si nove urovne\nna nasem webu!\n\nTato hra je stale ve vyvoji.\nVyhlizejte novou verzi na:\n<color=ffff00>%s</color>\n\nProsim cekejte %d sekund..."
+
+
+// Bonus levels
+BONUSMSG_TITLE              "BONUS"
+BONUSMSG_TEXT               "Bonusove urovne jeste nejsou implementovany ;)"
+
+
+// Confirm boxes
+    // Quit game?
+    CBOX_QUIT_QUESTION      "OPRAVDU CHCETE UKONCIT HRU?"
+    CBOX_QUIT_OPTION1       "ANO"
+    CBOX_QUIT_OPTION2       "NE"
+
+
+// Input devices
+    // keyboard
+    INPUT_KEYB_DIRECTIONAL  "KURZOROVE SIPKY"
+    INPUT_KEYB_LEFT         "DOLEVA"
+    INPUT_KEYB_RIGHT        "DOPRAVA"
+    INPUT_KEYB_UP           "NAHORU"
+    INPUT_KEYB_DOWN         "DOLU"
+    INPUT_KEYB_FIRE1        "MEZERNIK"
+    INPUT_KEYB_FIRE2        "LEVY CTRL"
+    INPUT_KEYB_FIRE3        "ENTER"
+    INPUT_KEYB_FIRE4        "ESC"
+
+
+    // joystick
+    INPUT_JOY_DIRECTIONAL   "SMEROVE KLAVESY"
+    INPUT_JOY_LEFT          "DOLEVA"
+    INPUT_JOY_RIGHT         "DOPRAVA"
+    INPUT_JOY_UP            "NAHORU"
+    INPUT_JOY_DOWN          "DOLU"
+    INPUT_JOY_FIRE1         "TLACITKO 1"
+    INPUT_JOY_FIRE2         "TLACITKO 2"
+    INPUT_JOY_FIRE3         "TLACITKO 3"
+    INPUT_JOY_FIRE4         "TLACITKO 4"
+
+
+// Tutorial
+    // act 1
+    TUTORIAL_1_TITLE_0      "SONIC"
+    TUTORIAL_1_MSG_0        "Vitejte v tutorialu! Pouzijte <color=$COLOR_INPUT>$INPUT_DIRECTIONAL</color> pro pohyb <color=$COLOR_P1>Sonica</color> a <color=$COLOR_INPUT>$INPUT_FIRE1</color> pro vyskok."
+    TUTORIAL_1_TITLE_1      "DVERE"
+    TUTORIAL_1_MSG_1        "<color=$COLOR_SPECIAL>PARTNER</color> pro vas ty dvere muze otevrit. Stisknete <color=$COLOR_INPUT>$INPUT_FIRE2</color> pro zmenu aktivni postavy."
+    TUTORIAL_1_TITLE_2      "KNUCKLES"
+    TUTORIAL_1_MSG_2        "<color=$COLOR_P3>Knuckles</color> muze lezt po stenach! Vyberte si <color=$COLOR_P3>Knuckles</color>, stisknete <color=$COLOR_INPUT>VYSKOK</color> dvakrat (pomalu) a narazte do steny."
+    TUTORIAL_1_TITLE_3      "TELEPORTER"
+    TUTORIAL_1_MSG_3        "Toto je <color=$COLOR_SPECIAL>teleporter</color>. Stoupnutim na tlacitko teleportujete cely svuj tym sem. Lze jej pouzit pouze jednou."
+    TUTORIAL_1_TITLE_4      "TAILS"
+    TUTORIAL_1_MSG_4        "<color=$COLOR_P2>Tails</color> muze letat! Vyberte si <color=$COLOR_P2>Tails</color> a vicenasobne stisknete tlacitko pro <color=$COLOR_INPUT>VYSKOK</color> (ale nedrzte jej)."
+    TUTORIAL_1_TITLE_5      "CIL"
+    TUTORIAL_1_MSG_5        "Gratuluji!"
+
+    // act 2
+    TUTORIAL_2_TITLE_0      "TUTORIAL"
+    TUTORIAL_2_MSG_0        "Nyni si to muzete vyzkouset sami. Pridali jsme ale nekolik nepratel."
+    TUTORIAL_2_TITLE_1      "DVERE"
+    TUTORIAL_2_MSG_1        "Aktivni postavu muzete zmenit pouze pokud stojite na zemi!"
+    TUTORIAL_2_TITLE_2      "SPINDASH"
+    TUTORIAL_2_MSG_2        "Vite ze muzete pouzit specialni pohyb <color=$COLOR_SPECIAL>spindash</color>? Podrzte klavesu <color=$COLOR_INPUT>DOLU</color>, stisknete <color=$COLOR_INPUT>VYSKOK</color> a pak prestante drzet klavesu <color=$COLOR_INPUT>DOLU</color>."
+    TUTORIAL_2_TITLE_3      "CIL"
+    TUTORIAL_2_MSG_3        "Gratuluji! Nyni vite jak hrat Open Sonic!"
+
+
+// Blue Ocean Zone
+    // act 1
+    BOZ_1_TITLE_0           "VITEJTE!"
+    BOZ_1_MSG_0             "Vitejte! Pokud nyni hrajete poprve, zkuste si nejprve zahrat <color=$COLOR_SPECIAL>tutorial</color> (v menu)"
+    BOZ_1_TITLE_1           "DVERE"
+    BOZ_1_MSG_1             "Stisknete <color=$COLOR_INPUT>$INPUT_FIRE2</color> kdyz stojite na zemi pro zmenu aktivni postavy"
+    BOZ_1_TITLE_2           "BRYLE"
+    BOZ_1_MSG_2             "Rozbijte tuto bednu pro ziskani <color=$COLOR_SPECIAL>Kouzelnych bryli</color>! Tyto bryle maji specialni vlastnost."
+    BOZ_1_TITLE_3           "LETTE!"
+    BOZ_1_MSG_3             "Jak <color=$COLOR_P2>Tails</color>, tak <color=$COLOR_P3>Knuckles</color> umi letat. Zkuste nekolikrat stisknout <color=$COLOR_INPUT>VYSKOK</color>."
+    BOZ_1_TITLE_4           "SKVELE!"
+    BOZ_1_MSG_4             "Vedes si dobre! <color=$COLOR_SPECIAL>PARTNER</color> ti muze pomoci otevrit tyto dvere."
+    BOZ_1_TITLE_5           "SPINDASH"
+    BOZ_1_MSG_5             "Vite ze muzete pouzit specialni pohyb <color=$COLOR_SPECIAL>spindash</color>? Podrzte klavesu <color=$COLOR_INPUT>DOLU</color>, stisknete <color=$COLOR_INPUT>VYSKOK</color> a pak prestante drzet klavesu <color=$COLOR_INPUT>DOLU</color>."
+
+    // act 3
+    BOZ_3_TITLE_0           "BOSS"
+    BOZ_3_MSG_0             "Prosim vyberte si nyni svoji postavu. Behem souboje s bossem ji nebudete moci prepinat."
+
+
+// Exotic Paradise
+    // act 1
+    EP_1_TITLE_0            "SPINDASH"
+    EP_1_MSG_0              "Vite ze muzete pouzit specialni pohyb <color=$COLOR_SPECIAL>spindash</color>? Podrzte klavesu <color=$COLOR_INPUT>DOLU</color>, stisknete <color=$COLOR_INPUT>VYSKOK</color> a pak prestante drzet klavesu <color=$COLOR_INPUT>DOLU</color>."
+
+    // act 2
+    EP_2_TITLE_0            "DNA DVERE"
+    EP_2_MSG_0              "Toto jsou <color=$COLOR_SPECIAL>DNA DVERE</color>. Jen <color=$COLOR_P1>Sonic</color> je muze projit."
+
+
+// Prototype Level
+    // act 1
+    PROTOTYPE_1_TITLE_0     "PROTOTYP"
+    PROTOTYPE_1_MSG_0       "Tato mapa byla drive pouzita pro testovani. Jak vidite, jedna Se nadherny level. Uzijte si jej! ;)"
+
+
+// Test Zone
+    // act 1
+    TESTZONE_1_TITLE_0      "TESTOVACI OBLAST"
+    TESTZONE_1_MSG_0        "Toto je testovaci oblast. Byla vyuzivana pro testovani ruznych veci ve hre. Uzijte si to! ;)"
+
+
+// Chilpoctli Temple Zone
+    // act 1
+    DESERT1_TITLE_0         "Vitejte" 
+    DESERT1_MSG_0           "Tato miniuroven ukazuje Celdeceuv prvni OpenSonic brickset!"
+    DESERT1_TITLE_1         "CIL" 
+    DESERT1_MSG_1           "Co sis myslel? Uz jsi skoro u cile!"
+    DESERT1_TITLE_2         "Tajne" 
+    DESERT1_MSG_2           "Toto je misto pro jasnovidce..."
+    DESERT1_TITLE_3         "Rezervovano"
+    DESERT1_MSG_3           "Nekdy sem pribyde smycka."

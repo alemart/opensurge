@@ -1,0 +1,27 @@
+//
+// Grassland background
+// by Celdecea
+//
+
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            LINEAR -10 -10
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     images/grassland_template.png
+        source_rect     0 384 48 48
+        frame_size      48 48
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}

@@ -1,0 +1,26 @@
+// script by Alexandre
+
+// Teleporter
+sprite SD_TELEPORTER
+{
+    source_file     images/teleporter.png
+    source_rect     0 0 220 111
+    frame_size      110 111
+    hot_spot        55 110
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      TRUE
+        fps         16
+        data        1 0
+    }
+}

@@ -1,0 +1,638 @@
+// introduction cutscene
+// by Joao Victor, SilverstepP, KZR, jobromedia, Alexandre
+
+object ".intro_startup"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    // main
+    state "main"
+    {
+        set_alpha $_slide_alpha=1.0
+        set_zindex 0.9999
+
+        create_child ".moviefx"
+        create_child ".intro_subtitles"
+        create_child ".intro_background"
+        create_child ".cutscene_skipper[pedantic]"
+
+        play_music "musics/intro.ogg" 0
+        change_state "start 1st slide"
+    }
+
+    // skip cutscene
+    state .cutscene_skipper:on_skip
+    {
+        next_level
+    }
+
+    // first slide
+    state "start 1st slide"
+    {
+        set_absolute_position -160 0
+        set_animation "SD_INTROCUTSCENE_SLIDE1" 0
+        create_child ".intro_scepter" 0 60
+        change_state "1st slide"
+    }
+
+    state "1st slide"
+    {
+        set_absolute_position xpos() max(-240,ypos()-6*dt())
+    }
+
+    state "show 2nd slide" // called by someone else
+    {
+        set_absolute_position xpos() max(-240,ypos()-6*dt())
+        set_alpha $_slide_alpha=max(0,alpha()-(1.0/1.5)*dt())
+        if alpha()<=0 "start 2nd slide"
+    }
+
+    // second slide
+    state "start 2nd slide"
+    {
+        set_absolute_position 0 0
+        set_animation "SD_INTROCUTSCENE_SLIDE2" 0
+        change_state "2nd slide"
+    }
+
+    state "2nd slide"
+    {
+        set_alpha min(1,alpha()+(1.0/1.5)*dt())
+    }
+
+    state "show 3rd slide" // called by someone else
+    {
+        set_alpha max(0,alpha()-(1.0/0.85)*dt())
+        if alpha()<=0 "start 3rd slide"
+    }
+
+    // third slide
+    state "start 3rd slide"
+    {
+        set_animation "SD_INTROCUTSCENE_SLIDE3" 0
+        create_child ".intro_rain"
+        create_child ".intro_thunder"
+        set_absolute_position 320 0
+        change_state "3rd slide"
+    }
+
+    state "3rd slide"
+    {
+        set_alpha $_slide_alpha=min(1,alpha()+(1.0/2.5)*dt())
+        set_absolute_position cond(alpha()>=0.5,max(160,xpos()-10*dt()),xpos()) ypos()
+    }
+
+    state "show 4th slide" // called by someone else
+    {
+        set_alpha $_slide_alpha=max(0,alpha()-(1.0/1.5)*dt())
+        if alpha()<=0 "start 4th slide"
+    }
+
+    // fourth slide
+    state "start 4th slide"
+    {
+        change_closest_object_state .intro_rain destroy
+        set_absolute_position 0 0
+        set_animation "SD_INTROCUTSCENE_SLIDE4" 0
+        let $_base_x=240
+        let $_base_y=infinity()
+        create_child ".intro_surge"
+        create_child ".intro_neon"
+        create_child ".intro_animal"
+        create_child ".intro_animal"
+        create_child ".intro_animal"
+        create_child ".intro_animal"
+        create_child ".intro_ground"
+        change_state "4th slide"
+    }
+
+    state "4th slide"
+    {
+        set_alpha $_base_alpha=min(1,alpha()+(1.0/1.5)*dt())
+        set_absolute_position max(-640,xpos()-12*dt()) max(-240,ypos()-60*dt())
+        let $_base_y=0.7*(ypos()+height()+37)
+    }
+
+    state "show 5th slide" // called by someone else
+    {
+        set_absolute_position max(-640,xpos()-12*dt()) ypos()
+        on_timeout 11.0 haha
+    }
+
+    state haha {
+        set_alpha $_base_alpha=max(0,alpha()-(1.0/0.5)*dt())
+    }
+}
+
+object ".intro_surge"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main {
+        set_animation SD_SURGE 21
+        set_zindex 0.99991
+        set_absolute_position $_base_x+20 $_base_y-4
+        look_at_player
+        set_alpha $_base_alpha
+        if ($t+=dt())>=7.8 main2
+    }
+
+    state main2 {
+        set_animation SD_SURGE 22
+        set_animation_speed_factor 0.07
+        set_alpha $_base_alpha
+    }
+}
+
+object ".intro_neon"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main {
+        set_animation SD_NEON 18
+        set_zindex 0.99991
+        set_absolute_position $_base_x+50 $_base_y-50-10*cos(pi()*($t+=dt()))
+        look_at_player
+        set_alpha $_base_alpha
+    }
+}
+
+object ".intro_ground"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main {
+        set_animation SD_INTROCUTSCENE_SLIDE4GROUND 0
+        set_zindex 0.999901
+        set_absolute_position $_base_x-40 $_base_y-10
+        set_alpha $_base_alpha
+    }
+}
+
+object ".intro_animal"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main {
+        set_animation SD_INTROCUTSCENE_SLIDE4ANIMAL $id=$_slide4animal
+        set_animation_speed_factor 0*cond($id==0,1,0)
+        set_zindex 0.999905+0.000001*(5-$id)
+        look_at_player
+
+        let "$dx = 37+12*$id"
+        let "$_slide4animal = ($_slide4animal + 1) mod 4"
+        change_state go
+    }
+
+    state go {
+        set_absolute_position $_base_x+$dx $_base_y-0*cond($id==0,1,0)*abs((12+($id-2)^2)*cos(2*pi()*($t+=dt())+2*pi()*$id/5))
+        set_alpha $_base_alpha
+    }
+}
+
+object ".intro_subtitles"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    // state detection
+    state "main"
+    {
+        set_absolute_position 0 0
+        set_zindex 1+infinity()//0.999919
+
+        let "$strlen = 0"
+        if "$text == 9" "length9"
+        if "$text == 8" "length8"
+        if "$text == 7" "length7"
+        if "$text == 6" "length6"
+        if "$text == 5" "length5"
+        if "$text == 4" "length4"
+        if "$text == 3" "length3"
+        if "$text == 2" "length2"
+        change_state "length1"
+    }
+
+    // synchronization issues
+    state "show 2nd slide"
+    {
+        textout "menu.small" 7 180 "$OPENING_3" 291 0 $strlen
+        change_closest_object_state ".intro_startup" "show 2nd slide"
+        let "$second_slide_ok = 1"
+        change_state text3
+    }
+
+    state "show 3rd slide"
+    {
+        change_closest_object_state ".intro_startup" "show 3rd slide"
+        change_state "wait_fade"
+    }
+
+    state "show 4th slide"
+    {
+        change_closest_object_state ".intro_startup" "show 4th slide"
+        change_state "wait_fade"
+    }
+
+    state "show 5th slide"
+    {
+        change_closest_object_state ".intro_startup" "show 5th slide"
+        change_state "wait_fade"
+    }
+
+    // wait or fade
+    state "wait_fade"
+    {
+        on_timeout 1.25 "main"
+    }
+
+    // detect length and play narration
+    state "length1"
+    {
+        let "$displaytime = 10"
+        textout "menu.small" -1000 -1000 "$OPENING_1"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 1"
+        //play_sample "samples/intro1.ogg"
+        change_state "text1"
+    }
+
+    state "length2"
+    {
+        let "$displaytime = 10"
+        textout "menu.small" -1000 -1000 "$OPENING_2"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 2"
+        //play_sample "samples/intro2.ogg"
+        change_state "text2"
+    }
+
+    state "length3"
+    {
+        let "$displaytime = 11"
+        textout "menu.small" -1000 -1000 "$OPENING_3"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 3"
+        //play_sample "samples/intro3.ogg"
+        change_state "text3"
+    }
+
+    state "length4"
+    {
+        let "$displaytime = 9"
+        textout "menu.small" -1000 -1000 "$OPENING_4"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 4"
+        //play_sample "samples/intro4.ogg"
+        change_state "text4"
+    }
+
+    state "length5"
+    {
+        let "$displaytime = 10"
+        textout "menu.small" -1000 -1000 "$OPENING_5"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 5"
+        //play_sample "samples/intro5.ogg"
+        change_state "text5"
+    }
+
+    state "length6"
+    {
+        let "$displaytime = 9"
+        textout "menu.small" -1000 -1000 "$OPENING_6"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 6"
+        //play_sample "samples/intro6.ogg"
+        change_state "text6"
+    }
+
+    state "length7"
+    {
+        let "$displaytime = 9"
+        textout "menu.small" -1000 -1000 "$OPENING_7"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 7"
+        //play_sample "samples/intro7.ogg"
+        change_state "text7"
+    }
+
+    state "length8"
+    {
+        let "$displaytime = 3"
+        textout "menu.small" -1000 -1000 "$OPENING_8"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 8"
+        //play_sample "samples/intro8.ogg"
+        change_state "text8"
+    }
+
+    state "length9"
+    {
+        let "$displaytime = 1.5"
+        textout "menu.small" -1000 -1000 "$OPENING_9"
+        let "$length = $_STRLEN"
+        let "$typerate = 1.5*$length/$displaytime"
+        let "$_introtextout = 9"
+        //play_sample "samples/intro9.ogg"
+        //change_state "text9"
+        on_timeout $displaytime*1 text9
+    }
+
+    // real text display
+    state "text1"
+    {
+        textout "menu.small" 7 180 "$OPENING_1" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 2"
+        on_timeout "$displaytime" "wait_fade"
+    }
+
+    state "text2"
+    {
+        textout "menu.small" 7 192 "$OPENING_2" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 3"
+        on_timeout "$displaytime" "wait_fade"
+    }
+
+    state "text3"
+    {
+        textout "menu.small" 7 180 "$OPENING_3" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 4"
+        if "not($second_slide_ok) and (($tx3 += dt()) >= ($displaytime * 0.45))" "show 2nd slide"
+        on_timeout "$displaytime" "show 3rd slide"
+    }
+
+    state "text4"
+    {
+        textout "menu.small" 7 180 "$OPENING_4" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 5"
+        on_timeout "$displaytime" "wait_fade"
+    }
+
+    state "text5"
+    {
+        textout "menu.small" 7 180 "$OPENING_5" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 6"
+        on_timeout "$displaytime" "wait_fade"
+    }
+
+    state "text6"
+    {
+        textout "menu.small" 7 180 "$OPENING_6" 291 0 $strlen
+        let "$strlen += $typerate/0.8*dt()"
+        let "$text = 7"
+        on_timeout "$displaytime*0.9" "show 4th slide"
+    }
+
+    state "text7"
+    {
+        textout "menu.small" 7 180 "$OPENING_7" 236 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 8"
+        on_timeout "$displaytime" "show 5th slide"
+    }
+
+    state "text8"
+    {
+        textout "menu.small" 7 192 "$OPENING_8" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        let "$text = 9"
+        on_timeout "$displaytime*2" "wait_fade"
+    }
+
+    state "text9"
+    {
+        textout "menu.small" 7 192 "$OPENING_9" 291 0 $strlen
+        let "$strlen += $typerate*dt()"
+        on_timeout "$displaytime*6" "end"
+    }
+
+    // end
+    state "end"
+    {
+        let $_hide_hud=0
+        next_level
+    }
+}
+
+object ".intro_background"
+{
+    requires 0.2.0
+    detach_from_camera
+
+    state "main"
+    {
+        set_absolute_position 0 0
+        set_animation SD_FADEEFFECT 0
+    }
+}
+
+object .intro_scepter
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        set_zindex 0.99991
+        let $speed=12
+        set_animation SD_INTROCUTSCENE_SCEPTER 1
+        set_absolute_position 160 295
+        create_child .intro_scepter_spark
+        change_state go
+    }
+
+    state go {
+        set_alpha $_slide_alpha
+        //set_alpha (0.001+min(1,$t+=0.02*dt()))*$_slide_alpha
+        let $_scepter_x=xpos()
+        let $_scepter_y=ypos()
+        set_absolute_position xpos() max(screen_height()/2,ypos()-$speed*dt())
+        if alpha()<=0 destroy
+    }
+
+    state destroy {
+        destroy
+    }
+}
+
+object .intro_scepter_spark
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        set_zindex 0.99992
+        let $limit=6
+        let $r=1
+        hide
+
+        let $id=$_intro_scepter_spark
+        let "$_intro_scepter_spark = ($_intro_scepter_spark + 1) mod $limit"
+
+        if $id<$limit-1 create
+        change_state select
+    }
+
+    state create {
+        create_child .intro_scepter_spark
+        change_state select
+    }
+
+    state select {
+        set_animation SD_INTROCUTSCENE_SPARK "$id mod 2"
+        change_state go
+    }
+
+    state go {
+        let $r+=cond($_slide_alpha<$os,25*dt(),0)
+
+        set_alpha (0.001+min(1,$a+=0.017*dt()))*$_slide_alpha
+        set_absolute_position "$_scepter_x + ($r*32)*cos(pi()*$t+(2*pi()*$id)/($limit))" "$_scepter_y-43 + $e=($r*abs(ypos()-10)/10)*-sin(pi()*($t+=dt())+(2*pi()*$id)/($limit))"
+        set_zindex cond($e>=0,0.99992,0.999905)
+        if alpha()<=0 destroy
+        on_timeout 0.5 show
+
+        let $os=$_slide_alpha
+    }
+
+    state show {
+        show
+        return_to_previous_state
+    }
+
+    state destroy {
+        destroy
+    }
+}
+
+object .intro_rain {
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        create_child .intro_rain2 0 0 rain2
+        set_zindex 0.99991
+        set_alpha 0
+        set_animation SD_INTROCUTSCENE_SLIDE3RAIN 0
+        change_state wrap_y
+    }
+
+    state move {
+        set_alpha $_slide_alpha
+        move -1*screen_width() 2.5*screen_height()
+        if xpos()<-width()/2 wrap_x
+        if ypos()>=0 wrap_y
+    }
+
+    state wrap_x {
+        set_absolute_position 0 ypos()
+        change_state move
+    }
+
+    state wrap_y {
+        set_absolute_position xpos() -height()/2
+        change_state move
+    }
+
+    state destroy {
+        change_child_state rain2 destroy
+        destroy
+    }
+}
+
+object .intro_rain2 {
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        set_zindex 0.99991
+        set_alpha 0
+        set_animation SD_INTROCUTSCENE_SLIDE3RAIN 0
+        change_state wrap_y
+    }
+
+    state move {
+        set_alpha $_slide_alpha
+        move -1*screen_width()/2 2.5*screen_height()
+        if xpos()<-width()/2 wrap_x
+        if ypos()>=0 wrap_y
+    }
+
+    state wrap_x {
+        set_absolute_position 0 ypos()
+        change_state move
+    }
+
+    state wrap_y {
+        set_absolute_position xpos() -height()/2
+        change_state move
+    }
+
+    state destroy {
+        destroy
+    }
+}
+
+object ".intro_thunder"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state main {
+        hide
+        set_absolute_position 0 0
+        on_timeout 13.6 go
+    }
+
+    state go {
+        set_zindex 0.99992
+        set_alpha 0.5
+        set_animation SD_FADEEFFECT_WHITE 0
+        change_state loop
+    }
+
+    state loop {
+        show
+        on_timeout 0.7 destroy
+        on_timeout 0.05 loop2
+    }
+
+    state loop2 {
+        hide
+        on_timeout 0.7 destroy
+        on_timeout 0.05 loop
+    }
+
+    state destroy {
+        destroy
+    }
+}

@@ -1,0 +1,428 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   objects/textualcutscene.obj
+// Desc:   this object is used to make a text-only cutscene (texts in the center of the screen)
+// Author: Alexandre
+// Date:   2012-12-27
+// ---------------------------------------------------------------------------
+
+//
+// How to use:
+//
+// 1. This object accepts a sequence of texts (with its corresponding sequence of timeouts)
+//    Create two arrays: $_textualcutscene_text and $_textualcutscene_timeout (same size).
+//    Each entry of $_textualcutscene_text should be a number. The text $STRING_<number> will be displayed,
+//    for each entry. On the other hand, each entry of $_textualcutscene_timeout is given in seconds.
+//
+// 2. Spawn .textualcutscene
+//
+// 3. When the object is done, the caller object will have its state changed to
+//    .textualcutscene:on_finish - so you better implement it.
+//
+// 4. REMEMBER TO DELETE THE ARRAYS $_textualcutscene_text AND $_textualcutscene_timeout THAT YOU CREATED!
+//
+// 5. Optionally, you may also spawn .darkambiance (for a nice fog effect & music fade-in/out). When you're
+//    done with the cutscene, change the state of .darkambiance to @destroy (so the fog and the music will fade-out).
+//
+// PS: other callbacks:
+//     @destroy (terminates before the animation is over), @get_numberoftexts, @get_currenttextindex
+//
+//
+// Example:
+//
+//    state foo
+//    {
+//        ...
+//
+//        let "$_textualcutscene_text=new_array(2)"                 // there are only 2 strings to display
+//        let "set_array_element($_textualcutscene_text, 0, 210)"   // it will display $STRING_210 for 0.5 seconds
+//        let "set_array_element($_textualcutscene_text, 1, 211)"   // it will display $STRING_211 for 4 seconds
+//        let "$_textualcutscene_timeout=new_array(2)"
+//        let "set_array_element($_textualcutscene_timeout, 0, 0.5)"
+//        let "set_array_element($_textualcutscene_timeout, 1, 4)"
+//
+//        create_child .textualcutscene
+//
+//        let "delete_array($_textualcutscene_text)"                // you must delete your arrays
+//        let "delete_array($_textualcutscene_timeout)"
+//
+//        ...
+//    }
+//
+//    ...
+//
+//    state .textualcutscene:on_finish
+//    {
+//        ...
+//    }
+//
+
+object .textualcutscene
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main
+    {
+        let "$FADE_DURATION = 0.5"
+
+        let "$text = clone_array($_textualcutscene_text)"
+        let "$timeout = clone_array($_textualcutscene_timeout)"
+        execute !invalid_input if array_length($text)<>array_length($timeout)
+        let "$n = array_length($text)"
+        let "$idx = 0"
+
+        set_zindex 0.1
+        set_animation SD_FADEEFFECT 0
+        set_absolute_position 0 0
+
+        create_child .textualcutscene.text 0 0 text
+        create_child .textualcutscene.translucency 0 0 translucency
+        change_state start
+    }
+
+    state start
+    {
+        let "$str = array_element($text, $idx)"
+        let "$tmr = array_element($timeout, $idx)"
+
+        let "$_fade_in = 1"
+        let "$_fade_duration = $FADE_DURATION"
+        let "$_fade_zindex = 999"
+        create_child ".fade_effect" 0 0 fade
+
+        change_state start_cooldown
+    }
+
+    state start_cooldown
+    {
+        on_timeout $FADE_DURATION*0.2 show_text
+    }
+
+    state show_text
+    {
+        if "($t += dt()) > $FADE_DURATION + $tmr" finish
+
+        let "$_textualcutscene_text_id = $str"
+        change_child_state text @show
+
+        on_button_pressed fire1 skip // SKIP TEXT!!!
+        on_button_pressed fire3 skip // SKIP TEXT!!!
+        //on_button_pressed fire4 abort // no way. bugs things
+    }
+
+    state finish
+    {
+        change_child_state fade destroy
+
+        let "$_fade_in = 0"
+        let "$_fade_duration = $FADE_DURATION"
+        let "$_fade_zindex = 999"
+        create_child ".fade_effect" 0 0 fade
+
+        let $t=0
+        change_state cooldown
+    }
+
+    state cooldown
+    {
+        on_timeout $FADE_DURATION reset
+    }
+
+    state reset
+    {
+        change_child_state text @hide
+        change_child_state fade destroy
+
+        let "$idx += 1"
+        if "$idx >= $n" end
+        change_state start
+    }
+
+    state end
+    {
+        change_parent_state .textualcutscene:on_finish
+        change_state destroy
+    }
+
+    state destroy
+    {
+        change_child_state text @destroy
+        change_child_state translucency @destroy
+        let cond(is_array($text),delete_array($text),0)
+        let cond(is_array($timeout),delete_array($timeout),0)
+        destroy
+    }
+
+    // -------------------------------
+
+    state abort
+    {
+        //play_sample samples/return.wav
+        let "$idx = $n"
+        change_state finish
+    }
+
+    state skip
+    {
+        //play_sample samples/select_2.wav
+        change_state finish
+    }
+
+
+
+    // ===========================
+
+    state !invalid_input
+    {
+        change_parent_state .textualcutscene:on_invalidinput
+        change_state destroy
+    }
+
+
+
+    // ====== callbacks =======
+
+    state @destroy
+    {
+        change_state abort
+    }
+
+    state @get_currenttextindex // 0 <= idx < n
+    {
+        let "$_textualcutscene_currenttextindex = $idx"
+        return_to_previous_state
+    }
+
+    state @get_numberoftexts
+    {
+        let "$_textualcutscene_numberoftexts = $n"
+        return_to_previous_state
+    }
+}
+
+
+
+object .textualcutscene.text
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main
+    {
+        set_zindex 99.1
+        let "$id = 0"
+        hide
+        change_state loop
+    }
+
+    state loop
+    {
+        set_absolute_position screen_width()/2 screen_height()/2
+        textout_centre "default_ttf_aa" 0 0 "$STRING_$id"
+    }
+
+
+    // === callbacks ===
+    state @show // will display $STRING_$id
+    {
+        let "$id = $_textualcutscene_text_id"
+        return_to_previous_state
+    }
+
+    state @hide
+    {
+        let "$id = 0"
+        return_to_previous_state
+    }
+
+    state @destroy
+    {
+        destroy
+    }
+}
+
+
+object .textualcutscene.translucency
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main
+    {
+        hide // do we need this???
+
+        set_zindex 99.9
+        set_alpha 0.15
+        set_animation SD_CUTSCENETOPSTRIP 0
+        set_absolute_position 0 screen_height()/2
+        change_state foo
+    }
+
+    state foo
+    {
+    }
+
+    state @destroy
+    {
+        destroy
+    }
+}
+
+
+
+
+
+// ============== darkambiance =================
+// TODO: move to some other file?
+
+object ".darkambiance"
+{
+    requires 0.2.0
+    always_active
+
+    state main
+    {
+        hide
+
+        let $_fademusic_in=1
+        let $_fademusic_duration=1
+        create_child .fademusic 0 0 fademusic
+
+        create_child .darkambiance.bg
+        create_child .darkambiance.fog 0 0 fog
+
+        change_state frozen
+    }
+
+    state frozen
+    {
+    }
+
+
+    // ==== callbacks ====
+    state @destroy
+    {
+        let $_fademusic_in=0
+        let $_fademusic_duration=1
+        create_child .fademusic 0 0 fademusic
+        change_child_state fog @destroy
+        change_child_state bg @destroy
+        destroy
+    }
+}
+
+
+object .darkambiance.bg
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main
+    {
+        set_absolute_position 0 0
+        set_animation SD_FADEEFFECT 0
+        set_zindex 0
+        change_state frozen
+    }
+
+    state frozen
+    {
+    }
+
+    state destroy
+    {
+        destroy
+    }
+
+    // ==== callbacks ====
+    state @destroy
+    {
+        on_timeout 2 destroy
+    }
+}
+
+
+object ".darkambiance.fog"
+{
+    requires 0.2.0
+    always_active
+    detach_from_camera
+
+    state main
+    {
+        let "$speed = 16"
+        let "$fadespeed = 1.0 / 0.5"
+
+        set_alpha 0
+        let $fadein=1
+
+        set_animation SD_FOG 0
+        set_zindex 999.9
+
+        let "$id = ($_darkambiance_fog += 1) mod 2"
+        execute !clone if $id==1
+
+        let "$x = width() * $id - width()/2"
+        let "$y = screen_height() * 0.6"
+        set_absolute_position $x $y
+
+        change_state move
+    }
+
+    state move
+    {
+        let "$x = cond($x <= -width(), $x+2*width(), $x)"
+        let "$x -= $speed * dt()"
+        set_absolute_position $x $y
+
+        // fade effect
+        execute !fadein if $fadein
+        execute !fadeout if $fadeout
+    }
+
+    state destroy
+    {
+        destroy
+    }
+
+    // ------------
+
+    state !clone
+    {
+        create_child .darkambiance.fog 0 0 clone
+    }
+
+    state !fadein
+    {
+        set_alpha min(1,alpha()+$fadespeed*dt())
+        let "$fadein = cond(alpha() >= 1, 0, $fadein)"
+    }
+
+    state !fadeout
+    {
+        set_alpha max(0,alpha()-$fadespeed*dt())
+        //let "$fadeout = cond(alpha() <= 0, 0, $fadeout)"
+        if "alpha() <= 0" destroy
+    }
+
+
+
+    // === callbacks ===
+    state @destroy
+    {
+        let $fadeout=1
+        set_alpha 1
+        change_child_state clone @destroy
+        return_to_previous_state
+    }
+}
+
+
+

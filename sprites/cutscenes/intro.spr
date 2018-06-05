@@ -1,0 +1,187 @@
+// script by Alexandre
+
+// Slide 1: Dimensional Scepter
+sprite SD_INTROCUTSCENE_SLIDE1
+{
+    source_file     images/fog.jpg
+    source_rect     0 0 653 480
+    frame_size      653 480
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+sprite SD_INTROCUTSCENE_SCEPTER
+{
+    source_file     images/scepter.png
+    source_rect     0 0 290 110
+    frame_size      29 110
+    hot_spot        14 55
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // appearing from the dark
+    animation 1
+    {
+        repeat      FALSE
+        fps         1
+        data        9 9 9 8 7 6 5 4 3 2 1 0
+    }
+}
+sprite SD_INTROCUTSCENE_SPARK
+{
+    source_file     images/rings.png
+    source_rect     128 128 48 32
+    frame_size      16 16
+    hot_spot        8 8
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1 2
+    }
+
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        3 4 5
+    }
+}
+
+// Slide 2: Dimensional Gate
+sprite SD_INTROCUTSCENE_SLIDE2
+{
+    source_file     images/dimensional_gate.png
+    source_rect     0 0 320 240
+    frame_size      320 240
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Gimacian and the Ring
+sprite SD_INTROCUTSCENE_SLIDE3
+{
+    source_file     images/dimensionalring.png
+    source_rect     0 0 480 240
+    frame_size      480 240
+    hot_spot        320 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// Rain
+sprite SD_INTROCUTSCENE_SLIDE3RAIN
+{
+    source_file     images/rain.png
+    source_rect     0 0 640 480
+    frame_size      640 480
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+// clouds
+sprite SD_INTROCUTSCENE_SLIDE4
+{
+    source_file     images/violet.png
+    source_rect     0 0 960 480
+    frame_size      960 480
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+// gd
+sprite SD_INTROCUTSCENE_SLIDE4GROUND
+{
+    source_file     images/introplat.png
+    source_rect     0 0 242 72
+    frame_size      242 72
+    hot_spot        0 0
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+// Little Animal
+sprite SD_INTROCUTSCENE_SLIDE4ANIMAL
+{
+    source_file     images/animals.png
+    source_rect     0 0 180 180
+    frame_size      30 30
+    hot_spot        15 30
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        2 1
+    }
+
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        5 4
+    }
+
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        8 7
+    }
+
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        14 13
+    }
+
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        11 10
+    }
+}

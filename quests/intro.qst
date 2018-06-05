@@ -1,0 +1,18 @@
+// ---------------------------------------------------------------------------
+// Open Surge Engine
+// http://opensnc.sourceforge.net
+//
+// File:   quests/intro.qst
+// Desc:   this is the introduction cutscene, displayed before the menu screen
+// Author: script by Alexandre
+// ---------------------------------------------------------------------------
+
+// quest properties
+name            "Introduction cutscene"
+hidden
+
+// level list (in order of appearance)
+level           "levels/cutscenes/allegro.lev"
+//level           "levels/menus/donate.lev"
+level           "levels/cutscenes/intro.lev"
+level           "levels/menus/title_screen.lev"
