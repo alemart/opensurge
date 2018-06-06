@@ -123,16 +123,8 @@ CREDITS_RAXILLAN            "Russian translation"
 CREDITS2_TITLE              "<color=$COLOR_MENUTITLE>CREDITS</color>"
 CREDITS2_KEY                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
 
-// "Please donate" screen
-DONATE_TITLE                "<color=$COLOR_MENUTITLE>PLEASE DONATE</color>"
-DONATE_TEXT                 "Please help us create the next version of Open Surge!\n\n$DONATE_COMMONTEXT"
-DONATE2_TEXT                "Did you enjoy the demo? <color=$COLOR_MENUSELECTEDOPTION>Wanna play more?</color> We are raising funds to develop the next version of the game!\n\n$DONATE_COMMONTEXT"
-DONATE_YES                  "Sure!"
-DONATE_NO                   "Later."
-DONATE_DONTASK              "Don't ask."
-DONATE_COMMONTEXT           "Open Surge is a free and open source game, made available for you at no cost. However, making a game costs us real money. <color=$COLOR_MENUSELECTEDOPTION>Please show your support</color> by making <color=$COLOR_MENUSELECTEDOPTION>a donation of any value</color>.\n\nYour donation is critical to the advancement of this project. Your money will be invested in code, art, music, etc.\n\nWould you like to donate now?"
-
-
+// Creative Commons screen
+CC_DISCLAIMER               "Game assets under the CC-BY"
 
 // ======================= INPUT DEVICES ====================
 

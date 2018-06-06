@@ -12,11 +12,6 @@ name            "Default quest"
 hidden
 
 // level list (in order of appearance)
-<options> // TODO: replace by main menu
-level           "levels/cutscenes/cutscene1.lev"
-level           "levels/sunshine.lev"
-level           "levels/cutscenes/cutscene2.lev"
-level           "levels/cutscenes/cutscene3.lev"
-level           "levels/sunshine3.lev"
-level           "levels/cutscenes/cutscene4.lev"
-level           "levels/menus/donate_final.lev"
+<options>
+//level           "levels/sunshine.lev"
+//level           "levels/sunshine3.lev"

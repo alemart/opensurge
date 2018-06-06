@@ -48,7 +48,7 @@ object ".allegro_startup"
     {
         let $s=max(0,$s-2*dt())
         set_scale $s $s
-        on_timeout 2 cc
+        on_timeout 3 next
     }
 
     state wait3
@@ -60,13 +60,6 @@ object ".allegro_startup"
     {
         next_level
     }
-
-    state cc
-    {
-        load_level levels/cutscenes/creativecommons.lev
-    }
-
-    // -------------
 
     state .cutscene_skipper:on_skip
     {

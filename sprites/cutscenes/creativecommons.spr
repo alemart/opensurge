@@ -1,4 +1,4 @@
-// creative commons logo
+// Creative Commons logo
 // script by Alexandre
 
 sprite SD_CREATIVECOMMONS
@@ -6,21 +6,6 @@ sprite SD_CREATIVECOMMONS
     source_file     images/creativecommons.png
     source_rect     0 0 198 75
     frame_size      198 75
-    hot_spot        0 0
-
-    animation 0
-    {
-        repeat      TRUE
-        fps         8
-        data        0
-    }
-}
-
-sprite SD_CREATIVECOMMONS_BY_SA
-{
-    source_file     images/creativecommons.png
-    source_rect     0 75 198 42
-    frame_size      198 42
     hot_spot        0 0
 
     animation 0

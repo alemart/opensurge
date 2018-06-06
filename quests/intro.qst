@@ -3,7 +3,7 @@
 // http://opensnc.sourceforge.net
 //
 // File:   quests/intro.qst
-// Desc:   this is the introduction cutscene, displayed before the menu screen
+// Desc:   this is the introduction cutscene, displayed before the menu
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
@@ -13,6 +13,5 @@ hidden
 
 // level list (in order of appearance)
 level           "levels/cutscenes/allegro.lev"
-//level           "levels/menus/donate.lev"
-level           "levels/cutscenes/intro.lev"
+level           "levels/cutscenes/creativecommons.lev"
 level           "levels/menus/title_screen.lev"
