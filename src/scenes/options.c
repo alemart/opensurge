@@ -50,6 +50,7 @@ static scene_t *jump_to;
 static float scene_time;
 static bgtheme_t *bgtheme;
 static int stageselect_enable_debug;
+static const int OFFSET_X = 60;
 
 /* private methods */
 static void save_preferences();
@@ -328,7 +329,7 @@ static void group_root_init(group_t *g)
 {
     group_label_init(g);
     font_set_text(g->font, "");
-    font_set_position(g->font, v2d_new(0, 25));
+    font_set_position(g->font, v2d_new(OFFSET_X, 25));
 }
 
 static void group_root_release(group_t *g)
@@ -433,7 +434,7 @@ static void group_fullscreen_render(group_t *g, v2d_t camera_position)
 
     /* derived class */
     f = font_create("menu.text");
-    font_set_position(f, v2d_new(175, font_get_position(g->font).y));
+    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
@@ -509,7 +510,7 @@ static void group_smooth_render(group_t *g, v2d_t camera_position)
 
     /* derived class */
     f = font_create("menu.text");
-    font_set_position(f, v2d_new(175, font_get_position(g->font).y));
+    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
@@ -587,7 +588,7 @@ static void group_fps_render(group_t *g, v2d_t camera_position)
 
     /* derived class */
     f = font_create("menu.text");
-    font_set_position(f, v2d_new(175, font_get_position(g->font).y));
+    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
@@ -697,7 +698,7 @@ static void group_resolution_render(group_t *g, v2d_t camera_position)
 
     /* derived class */
     f = font_create("menu.text");
-    font_set_position(f, v2d_new(175, font_get_position(g->font).y));
+    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_RESOLUTION_OPT1"), sizeof(v[0]));
     str_cpy(v[1], lang_get("OPTIONS_RESOLUTION_OPT2"), sizeof(v[1]));
@@ -1005,7 +1006,7 @@ static void group_gamepad_render(group_t *g, v2d_t camera_position)
 
     /* derived class */
     f = font_create("menu.text");
-    font_set_position(f, v2d_new(175, font_get_position(g->font).y));
+    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
