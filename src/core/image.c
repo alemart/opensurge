@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <png.h>
 #include <allegro.h>
 #include <loadpng.h>
@@ -304,7 +305,7 @@ void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
 
 /*
  * image_rgb()
- * Generates an uint32 color
+ * Generates a uint32 color
  */
 uint32 image_rgb(uint8 r, uint8 g, uint8 b)
 {
@@ -314,13 +315,42 @@ uint32 image_rgb(uint8 r, uint8 g, uint8 b)
 
 /*
  * image_color2rgb()
- * Converts an uint32 to a (r,g,b) triple
+ * Converts a uint32 to a (r,g,b) triple
  */
 void image_color2rgb(uint32 color, uint8 *r, uint8 *g, uint8 *b)
 {
     if(r) *r = getr(color);
     if(g) *g = getg(color);
     if(b) *b = getb(color);
+}
+
+
+/*
+ * image_hex2rgb()
+ * Converts a 6-character RGB hex string to a uint32 color
+ * Example: "ffffff" becomes white
+ */
+uint32 image_hex2rgb(const char* hex)
+{
+    char buf[7] = "000000", *p, c;
+    uint8 r, g, b;
+
+    /* sanitize hex RGB color */
+    for(p = buf; *p && *hex; p++) {
+        c = tolower(*hex++);
+        if(c >= 'a' && c <= 'f')
+            *p = c - 'a' + 10;
+        else if(c >= '0' && c <= '9')
+            *p = c - '0';
+    }
+
+    /* obtain colors */
+    r = buf[0] * 16 + buf[1];
+    g = buf[2] * 16 + buf[3];
+    b = buf[4] * 16 + buf[5];
+
+    /* done! */
+    return image_rgb(r, g, b);
 }
 
 
