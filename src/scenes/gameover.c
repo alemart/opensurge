@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * gameover.c - "game over" scene
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensnc.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ void gameover_init(void *foo)
     font_set_text(gameover_fnt[0], "GAME");
 
     gameover_fnt[1] = font_create("gameover");
-    font_set_position(gameover_fnt[1], v2d_new(384, 112));
+    font_set_position(gameover_fnt[1], v2d_new(VIDEO_SCREEN_W+64, 112));
     font_set_text(gameover_fnt[1], "OVER");
 
     gameover_buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
@@ -66,6 +66,8 @@ void gameover_init(void *foo)
  */
 void gameover_update()
 {
+    float distance = 16.0f;
+    float speed = VIDEO_SCREEN_W / 2.0f;
     float dt = timer_get_delta();
     v2d_t pos;
 
@@ -82,11 +84,11 @@ void gameover_update()
 
     /* "game over" text */
     pos = font_get_position(gameover_fnt[0]);
-    pos.x = min(pos.x + 200*dt, 160-8*4.5f);
+    pos.x = min(pos.x + speed * dt, (VIDEO_SCREEN_W - font_get_textsize(gameover_fnt[0]).x - distance) / 2.0f);
     font_set_position(gameover_fnt[0], pos);
 
     pos = font_get_position(gameover_fnt[1]);
-    pos.x = max(pos.x - 200*dt, 160+8*0.5f);
+    pos.x = max(pos.x - speed * dt, (VIDEO_SCREEN_W + font_get_textsize(gameover_fnt[1]).x + distance) / 2.0f);
     font_set_position(gameover_fnt[1], pos);
 }
 
