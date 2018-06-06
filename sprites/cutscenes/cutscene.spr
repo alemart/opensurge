@@ -5,8 +5,8 @@
 sprite SD_CUTSCENETOPSTRIP
 {
     source_file     images/cutscene.png
-    source_rect     0 0 320 30
-    frame_size      320 30
+    source_rect     0 0 426 30
+    frame_size      426 30
     hot_spot        0 0
 
     animation 0
@@ -21,8 +21,8 @@ sprite SD_CUTSCENETOPSTRIP
 sprite SD_CUTSCENEBOTTOMSTRIP
 {
     source_file     images/cutscene.png
-    source_rect     0 0 320 30
-    frame_size      320 30
+    source_rect     0 0 426 30
+    frame_size      426 30
     hot_spot        0 0
 
     animation 0

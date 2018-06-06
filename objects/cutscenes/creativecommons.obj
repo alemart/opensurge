@@ -102,8 +102,8 @@ object ".creativecommons_startup.logo"
 
     state wait
     {
-        if ($t+=dt())<0.5 wait
-        create_child .creativecommons_startup.logo.by_sa
+        if ($t+=dt())<1.2 wait
+        create_child .creativecommons_startup.disclaimer
         change_state move_left
     }
 
@@ -139,7 +139,7 @@ object ".creativecommons_startup.logo.aux"
     }
 }
 
-object ".creativecommons_startup.logo.by_sa"
+object ".creativecommons_startup.disclaimer"
 {
     requires 0.2.0
     detach_from_camera
@@ -147,15 +147,13 @@ object ".creativecommons_startup.logo.by_sa"
 
     state main
     {
-        set_animation SD_CREATIVECOMMONS_BY_SA 0
-        set_alpha 0
-        set_zindex 1.1
-        set_absolute_position screen_width()-width()-3 screen_height()-height()-3
-        change_state appear
+        hide
+        set_absolute_position screen_width()/2 screen_height()-15
+        change_state show_text
     }
 
-    state appear
+    state show_text
     {
-        set_alpha alpha()+2*dt()
+        textout_centre "disclaimer" 0 0 "<color=000000>$CC_DISCLAIMER</color>"
     }
 }

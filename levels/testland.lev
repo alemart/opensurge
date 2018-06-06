@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 // header
-name "Grassland"
+name "Testland"
 author "Celdecea & Alexandre"
 version "1.0"
 requires 0.2.0
