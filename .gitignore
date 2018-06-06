@@ -28,3 +28,4 @@ opensurge.exe
 preferences.dat
 *.dll
 !src/**
+screenshots/*.png
