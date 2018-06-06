@@ -1,12 +1,5 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensnc.sourceforge.net'
-//
-// File:   objects/default_startup/hud.inc
-// Desc:   "you got through act X" animation
-// Author: Alexandre
-// Date:   2010-12-20, 2011-01-02
-// ---------------------------------------------------------------------------
+// Level cleared script
+// by Alexandre
 
 //
 // In case you want to create an object that gives a
@@ -232,7 +225,7 @@ object ".default_startup.level_cleared.title"
 
     state "move"
     {
-        set_absolute_position "min(160, xpos()+1280*dt())" "ypos()"
+        set_absolute_position "min(screen_width()/2, xpos()+1280*dt())" "ypos()"
         textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE1"
     }
 }
@@ -246,8 +239,9 @@ object ".default_startup.level_cleared.title2"
     state "main"
     {
         hide
-        set_absolute_position 432 75
+        set_absolute_position screen_width()+112 75
         set_zindex "$_ds_levelcleared_zindex"
+        let "$act_number = act()"
         change_state "cooldown"
     }
 
@@ -258,28 +252,8 @@ object ".default_startup.level_cleared.title2"
 
     state "move"
     {
-        if "act() == 1" "move1"
-        if "act() == 2" "move2"
-        if "act() == 3" "move3"
-        change_state "move1"
-    }
-
-    state "move1"
-    {
-        set_absolute_position "max(160, xpos()-1280*dt())" "ypos()"
-        textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE2 <color=ffdd00>$HUD_CLEARED_LINE2_ACT 1</color>"
-    }
-
-    state "move2"
-    {
-        set_absolute_position "max(160, xpos()-1280*dt())" "ypos()"
-        textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE2 <color=ff2211>$HUD_CLEARED_LINE2_ACT 2</color>"
-    }
-
-    state "move3"
-    {
-        set_absolute_position "max(160, xpos()-1280*dt())" "ypos()"
-        textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE2 <color=0022ff>$HUD_CLEARED_LINE2_ACT 3</color>"
+        set_absolute_position "max(screen_width()/2, xpos()-1280*dt())" "ypos()"
+        textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE2 <color=ffff00>$HUD_CLEARED_LINE2_ACT $act_number</color>"
     }
 }
 
@@ -293,7 +267,7 @@ object ".default_startup.level_cleared.ringbonus"
     state "main"
     {
         hide
-        set_absolute_position -112 120
+        set_absolute_position -112 screen_height()/2
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -305,7 +279,7 @@ object ".default_startup.level_cleared.ringbonus"
 
     state "move"
     {
-        set_absolute_position "min(150, xpos()+640*dt())" "ypos()"
+        set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_COLLECTIBLES</color>"
     }
 }
@@ -319,7 +293,7 @@ object ".default_startup.level_cleared.ringbonus_counter"
     state "main"
     {
         hide
-        set_absolute_position 432 120
+        set_absolute_position screen_width()+112 screen_height()/2
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -331,7 +305,7 @@ object ".default_startup.level_cleared.ringbonus_counter"
 
     state "move"
     {
-        set_absolute_position "max(220, xpos()-640*dt())" "ypos()"
+        set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "$_ds_levelcleared_ringbonus"
     }
 }
@@ -346,7 +320,7 @@ object ".default_startup.level_cleared.timebonus"
     state "main"
     {
         hide
-        set_absolute_position -112 135
+        set_absolute_position -112 screen_height()/2+15
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -358,7 +332,7 @@ object ".default_startup.level_cleared.timebonus"
 
     state "move"
     {
-        set_absolute_position "min(150, xpos()+640*dt())" "ypos()"
+        set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_TIME</color>"
     }
 }
@@ -372,7 +346,7 @@ object ".default_startup.level_cleared.timebonus_counter"
     state "main"
     {
         hide
-        set_absolute_position 432 135
+        set_absolute_position screen_width()+112 screen_height()/2+15
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -384,7 +358,7 @@ object ".default_startup.level_cleared.timebonus_counter"
 
     state "move"
     {
-        set_absolute_position "max(220, xpos()-640*dt())" "ypos()"
+        set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "$_ds_levelcleared_timebonus"
     }
 }
@@ -399,7 +373,7 @@ object ".default_startup.level_cleared.secretbonus"
     state "main"
     {
         hide
-        set_absolute_position -112 150
+        set_absolute_position -112 screen_height()/2+30
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -411,7 +385,7 @@ object ".default_startup.level_cleared.secretbonus"
 
     state "move"
     {
-        set_absolute_position "min(150, xpos()+640*dt())" "ypos()"
+        set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_SECRET</color>"
     }
 }
@@ -425,7 +399,7 @@ object ".default_startup.level_cleared.secretbonus_counter"
     state "main"
     {
         hide
-        set_absolute_position 432 150
+        set_absolute_position screen_width()+112 screen_height()/2+30
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -437,7 +411,7 @@ object ".default_startup.level_cleared.secretbonus_counter"
 
     state "move"
     {
-        set_absolute_position "max(220, xpos()-640*dt())" "ypos()"
+        set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "$_ds_levelcleared_secretbonus"
     }
 }
@@ -452,7 +426,7 @@ object ".default_startup.level_cleared.totalbonus"
     state "main"
     {
         hide
-        set_absolute_position -112 180
+        set_absolute_position -112 screen_height()/2+60
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -464,7 +438,7 @@ object ".default_startup.level_cleared.totalbonus"
 
     state "move"
     {
-        set_absolute_position "min(150, xpos()+640*dt())" "ypos()"
+        set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_TOTAL</color>"
     }
 }
@@ -478,7 +452,7 @@ object ".default_startup.level_cleared.totalbonus_counter"
     state "main"
     {
         hide
-        set_absolute_position 432 180
+        set_absolute_position screen_width()+112 screen_height()/2+60
         set_zindex "$_ds_levelcleared_zindex"
         change_state "cooldown"
     }
@@ -490,7 +464,7 @@ object ".default_startup.level_cleared.totalbonus_counter"
 
     state "move"
     {
-        set_absolute_position "max(220, xpos()-640*dt())" "ypos()"
+        set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
         textout_right "hud" 0 0 "$_ds_levelcleared_totalbonus"
     }
 }
