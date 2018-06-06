@@ -45,9 +45,10 @@ static input_t* in;
 #define COLOR_1            "ffe13e"
 #define COLOR_2            "cdc3b6"
 #define COLOR_3            "eabd85"
+#define BACKGROUND         "0a0a0a"
 static const char *text = 
  "<color=" COLOR_1 ">"
- GAME_TITLE " version " GAME_VERSION_STRING
+ GAME_TITLE " " GAME_VERSION_STRING
  "</color>\n"
  "<color=" COLOR_2 ">"
  GAME_WEBSITE
@@ -63,8 +64,8 @@ static const char *text =
  "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
  "GNU General Public License for more details.\n"
  "\n"
- "You should have received a copy of the GNU General Public License "
- "along with this program; if not, see http://www.gnu.org/licenses/"
+ /*"You should have received a copy of the GNU General Public License "
+ "along with this program.  If not, see http://www.gnu.org/licenses/"*/
 ;
 
 static image_t* create_background();
@@ -152,13 +153,13 @@ void load_intro_quest()
 image_t* create_background()
 {
     image_t* img = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-    font_t *fnt = font_create("disclaimer");
+    font_t *fnt = font_create("small");
     v2d_t camera = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
-    image_clear(video_get_backbuffer(), image_rgb(0,0,0));
-    font_set_width(fnt, VIDEO_SCREEN_W - 6);
+    image_clear(video_get_backbuffer(), image_hex2rgb(BACKGROUND));
+    font_set_width(fnt, VIDEO_SCREEN_W - 5);
     font_set_text(fnt, "%s", text);
-    font_set_position(fnt, v2d_new(3,3));
+    font_set_position(fnt, v2d_new(5, 5));
     font_render(fnt, camera);
     image_blit(video_get_backbuffer(), img, 0, 0, 0, 0, image_width(img), image_height(img));
 
