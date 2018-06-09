@@ -166,7 +166,11 @@ void video_changemode(int resolution, int smooth, int fullscreen)
     /* setting up the window... */
     logfile_message("setting up the window...");
     mode = video_fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED;
+    #ifdef _WIN32
+    width = (int)(video_get_window_size().x) + (int)(video_get_window_size().x) % 4; /* A4 bug? let width be a multiple of 4 */
+    #else
     width = (int)(video_get_window_size().x);
+    #endif
     height = (int)(video_get_window_size().y);
     if(set_gfx_mode(mode, width, height, 0, 0) < 0)
         fatal_error("video_changemode(): couldn't set the graphic mode (%dx%d)!\n%s", width, height, allegro_error);
