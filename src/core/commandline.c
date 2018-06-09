@@ -66,6 +66,8 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.use_gamepad = preferences_get_usegamepad();
     cmd.optimize_cpu_usage = TRUE;
     cmd.allow_font_smoothing = TRUE;
+    cmd.user_argv = NULL;
+    cmd.user_argc = 0;
 
     /* logfile */
     logfile_message("game arguments:");
@@ -97,6 +99,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --basedir \"/path/to/data\" pretends that all data files are located in the provided folder (***)\n"
                 "    --full-cpu-usage          uses 100%% of the CPU (**)\n"
                 "    --no-font-smoothing       disable antialiased fonts (improves the speed **)\n"
+                "    -- -arg1 -arg2 -arg3...   user-defined arguments (useful for scripting)\n"
                 "\n"
                 "(*) This option may be used to improve the graphic quality using a special algorithm.\n"
                 "    You should NOT use this option on slow computers, since it may imply a severe performance hit.\n"
@@ -106,11 +109,12 @@ commandline_t commandline_parse(int argc, char **argv)
                 "(***) Please provide an absolute path. If this option is not specified, then the data files will be loaded\n"
                 "      from the installation folder (and also from $HOME/.%s, if applicable).\n"
                 "\n"
-                "Please read the user manual for more information.",
+                "Visit %s at <%s>",
             GAME_TITLE, basename(argv[0]),
             VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
             VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4,
-            DEFAULT_LANGUAGE_FILEPATH, GAME_UNIXNAME);
+            DEFAULT_LANGUAGE_FILEPATH, GAME_UNIXNAME,
+            GAME_TITLE, GAME_WEBSITE);
             exit(0);
         }
 
@@ -201,6 +205,14 @@ commandline_t commandline_parse(int argc, char **argv)
         else if(str_icmp(argv[i], "--basedir") == 0) {
             if(++i < argc)
                 str_cpy(cmd.basedir, argv[i], sizeof(cmd.basedir));
+        }
+
+        else if(str_icmp(argv[i], "--") == 0) {
+            if(++i < argc) {
+                cmd.user_argv = (const char**)(argv + i);
+                cmd.user_argc = argc - i;
+                break;
+            }
         }
 
         else { /* unknown option */
