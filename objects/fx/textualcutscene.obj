@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Open Surge Engine
-// http://opensnc.sourceforge.net
+// http://opensurge2d.org
 //
 // File:   objects/textualcutscene.obj
 // Desc:   this object is used to make a text-only cutscene (texts in the center of the screen)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Open Surge Engine
-// http://opensnc.sourceforge.net
+// http://opensurge2d.org
 //
 // File:   objects/default_startup/switch_character.inc
 // Desc:   enables one to switch characters

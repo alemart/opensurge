@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Open Surge Engine
-// http://opensnc.sourceforge.net
+// http://opensurge2d.org
 //
 // File:   objects/default_startup/pause.inc
 // Desc:   enables the player to pause the game
