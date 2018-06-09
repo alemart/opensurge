@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * engine.c - game engine facade
- * Copyright (C) 2010, 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include <allegro.h>
 #include <string.h>
+#include <surgescript.h>
 #include "engine.h"
 #include "global.h"
 #include "scene.h"
@@ -58,8 +59,10 @@ static void clean_garbage();
 static void init_basic_stuff(const char *basedir);
 static void init_managers(commandline_t cmd);
 static void init_accessories(commandline_t cmd);
+static void init_scripting(commandline_t cmd);
 static void init_game_data();
 static void push_initial_scene(commandline_t cmd);
+static void release_scripting();
 static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
@@ -92,6 +95,7 @@ void engine_init(int argc, char **argv)
 
     init_managers(cmd);
     init_accessories(cmd);
+    init_scripting(cmd);
     init_game_data();
 
     push_initial_scene(cmd);
@@ -136,6 +140,7 @@ void engine_mainloop()
  */
 void engine_release()
 {
+    release_scripting();
     release_accessories();
     release_managers();
     release_basic_stuff();
@@ -218,6 +223,14 @@ void init_accessories(commandline_t cmd)
     scenestack_init();
 }
 
+/*
+ * init_scripting()
+ * Initializes SurgeScript
+ */
+void init_scripting(commandline_t cmd)
+{
+    ;
+}
 
 /*
  * init_game_data()
@@ -249,6 +262,14 @@ void push_initial_scene(commandline_t cmd)
     }
 }
 
+/*
+ * release_scripting()
+ * Releases SurgeScript
+ */
+void release_scripting()
+{
+    ;
+}
 
 /*
  * release_accessories()
@@ -388,6 +409,8 @@ const char* find_basedir(int argc, char *argv[])
             if(++i < argc)
                 return argv[i];
         }
+        else if(str_icmp(argv[i], "--") == 0)
+            return NULL;
     }
 
     return NULL;
