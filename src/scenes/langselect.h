@@ -2,7 +2,7 @@
  * Open Surge Engine
  * langselect.h - language selection screen
  * Copyright (C) 2009  Alexandre Martins <alemartf(at)gmail(dot)com>
- * http://opensnc.sourceforge.net
+ * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

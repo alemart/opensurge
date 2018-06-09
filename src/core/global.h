@@ -2,7 +2,7 @@
  * Open Surge Engine
  * global.h - global definitions
  * Copyright (C) 2008-2018  Alexandre Martins <alemartf(at)gmail(dot)com>
- * http://opensnc.sourceforge.net
+ * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #define GAME_VERSION            0
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        0
-#define GAME_WEBSITE            "opensnc.sourceforge.net"
+#define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2018"
 
 /* Cute stuff */

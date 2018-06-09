@@ -2,7 +2,7 @@
  * Open Surge Engine
  * attach_to_player.h - Attaches this object to the observed player
  * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
- * http://opensnc.sourceforge.net
+ * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

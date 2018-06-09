@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Open Surge Engine
-// http://opensnc.sourceforge.net
+// http://opensurge2d.org
 //
 // File:   objects/smooth_camera_movement.obj
 // Desc:   this object is used to get the camera moving nicely (smoothly) from point A to point B

@@ -2,7 +2,7 @@
  * Open Surge Engine
  * set_obstacle.c - This decorator makes the object behave like an obstacle brick (or not)
  * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
- * http://opensnc.sourceforge.net
+ * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

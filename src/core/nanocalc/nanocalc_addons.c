@@ -2,7 +2,7 @@
  * nanocalc addons
  * Mathematical built-in functions for nanocalc
  * Copyright (c) 2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
- * http://opensnc.sourceforge.net
+ * http://opensurge2d.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
  * software and associated documentation files (the "Software"), to deal in the Software 

@@ -2,7 +2,7 @@
  * nanocalc 1.1
  * A tiny stand-alone easy-to-use expression evaluator written in C
  * Copyright (c) 2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
- * http://opensnc.sourceforge.net
+ * http://opensurge2d.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
  * software and associated documentation files (the "Software"), to deal in the Software 
