@@ -44,6 +44,8 @@ typedef struct commandline_t {
     int use_gamepad;
     int optimize_cpu_usage;
     int allow_font_smoothing;
+    const char** user_argv; /* user arguments: what comes after "--" */
+    int user_argc;
 } commandline_t;
 
 /* command line interface */
