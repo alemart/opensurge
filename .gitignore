@@ -21,7 +21,6 @@ Session.vim
 # opensurge
 build/
 CMakeFiles/
-iconwin.res
 logfile.txt
 opensurge
 opensurge.exe
@@ -29,3 +28,4 @@ preferences.dat
 *.dll
 !src/**
 screenshots/*.png
+iconwin.res
