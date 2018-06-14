@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include <string.h>
 #include "../core/v2d.h"
 #include "../core/video.h"
 #include "../core/image.h"
@@ -179,10 +180,13 @@ surgescript_var_t* fun_setsprite(surgescript_object_t* object, const surgescript
 {
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
+    const char* prev_sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITE_ADDR));
     char* sprite_name = surgescript_var_get_string(param[0], surgescript_object_manager(object));
-    int anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIM_ADDR));
-    surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), sprite_name);
-    actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
+    if(strcmp(sprite_name, prev_sprite_name) != 0) {
+        int anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIM_ADDR));
+        surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), sprite_name);
+        actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
+    }
     ssfree(sprite_name);
     return NULL;
 }
@@ -199,10 +203,13 @@ surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_v
 {
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITE_ADDR));
     int anim_id = (int)surgescript_var_get_number(param[0]);
-    surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), anim_id);
-    actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
+    int prev_anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIM_ADDR));
+    if(prev_anim_id != anim_id) {
+        const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITE_ADDR));
+        surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), anim_id);
+        actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
+    }
     return NULL;
 }
 
