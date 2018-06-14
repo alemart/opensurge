@@ -111,7 +111,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_heap_t* heap = surgescript_object_heap(object);
     actor_t* actor = actor_create();
 
-    /* initial configuration */
+    /* internal data */
     ssassert(ZINDEX_ADDR == surgescript_heap_malloc(heap));
     ssassert(TRANSFORM_ADDR == surgescript_heap_malloc(heap));
     ssassert(DETACHED_ADDR == surgescript_heap_malloc(heap));
@@ -122,6 +122,8 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_bool(surgescript_heap_at(heap, DETACHED_ADDR), is_detached);
     surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), DEFAULT_SPRITE);
     surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), DEFAULT_ANIM);
+
+    /* initial configuration */
     actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
     surgescript_object_set_userdata(object, actor);
     actor->spawn_point = world_position(object);
