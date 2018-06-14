@@ -124,8 +124,8 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), DEFAULT_ANIM);
 
     /* initial configuration */
-    actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
     surgescript_object_set_userdata(object, actor);
+    actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
     actor->spawn_point = world_position(object);
 
     /* sanity check */
