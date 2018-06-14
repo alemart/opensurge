@@ -28,7 +28,7 @@ MESSAGE("${GAME_NAME} version ${GAME_VERSION}")
 MARK_AS_ADVANCED(CMAKE_BUILD_TYPE CMAKE_INSTALL_PREFIX)
 SET(CMAKE_BUILD_TYPE Release)
 SET(CMAKE_INSTALL_PREFIX "")
-SET(RTFM "Please read the user manual (readme.html) to get help.")
+SET(RTFM "")
 SET(ALLEGRO_RECOMMENDED_VERSION "4.4.2")
 SET(DEFS "") # #define'd stuff
 SET(CFLAGS_EXTRA "") #SET(CFLAGS_EXTRA "-g")
@@ -182,6 +182,11 @@ IF(NOT LALFONT)
   MESSAGE(FATAL_ERROR "Fatal error: modified alfont not found! ${RTFM}")
 ENDIF(NOT LALFONT)
 
+# SurgeScript: libsurgescript
+FIND_LIBRARY(LSURGESCRIPT NAMES surgescript PATH "${CMAKE_LIBRARY_PATH}")
+IF(NOT LSURGESCRIPT)
+  MESSAGE(FATAL_ERROR "Fatal error: can't find libsurgescript! ${RTFM}")
+ENDIF(NOT LSURGESCRIPT)
 
 
 
@@ -256,6 +261,10 @@ SET(
   src/scenes/quest.c
   src/scenes/questselect.c
   src/scenes/stageselect.c
+
+  src/scripting/surgeengine.c
+  src/scripting/scripting.c
+  src/scripting/actor.c
 
   src/entities/object_decorators/base/objectbasicmachine.c
   src/entities/object_decorators/base/objectdecorator.c
@@ -373,7 +382,7 @@ IF(UNIX)
   SET(GAME_SRCS ${GAME_SRCS} src/misc/iconlin.c)
   ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
   SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS ${ALLEGRO_UNIX_LIBS})
-  TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${AUDIO_LIBS} jpgalleg loadpng png z alfont alleg)
+  TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${AUDIO_LIBS} surgescript jpgalleg loadpng png z alfont alleg)
   SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall -O2 ${CFLAGS} ${CFLAGS_EXTRA}")
 ENDIF(UNIX)
 
@@ -437,6 +446,8 @@ IF(WIN32)
       src/scenes/quest.h
       src/scenes/questselect.h
       src/scenes/stageselect.h
+
+      src/scripting/scripting.h
 
       src/entities/object_decorators/base/objectbasicmachine.h
       src/entities/object_decorators/base/objectdecorator.h
@@ -555,15 +566,15 @@ IF(WIN32)
   # Other properties
   IF(MSVC)
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "/D_CRT_SECURE_NO_DEPRECATE /D__WIN32__ /D__MSVC__ ${CFLAGS} ${CFLAGS_EXTRA}")
-    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} jpgalleg loadpng alfont alleg png z)
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} surgescript jpgalleg loadpng alfont alleg png z)
   ELSEIF(MINGW)
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall -O2 -D__WIN32__ ${CFLAGS} ${CFLAGS_EXTRA}")
-    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} jpgalleg loadpng alfont alleg png z m)
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} surgescript jpgalleg loadpng alfont alleg png z m)
     EXECUTE_PROCESS(COMMAND ${CMAKE_RC_COMPILER} -O coff -o "${CMAKE_SOURCE_DIR}/src/misc/iconwin.res" -i "${CMAKE_SOURCE_DIR}/src/misc/iconwin.rc" -I "${CMAKE_SOURCE_DIR}")
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS "-static-libgcc \"${CMAKE_SOURCE_DIR}/src/misc/iconwin.res\"")
   ELSE(MSVC)
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-D__WIN32__ ${CFLAGS} ${CFLAGS_EXTRA} ${CMAKE_C_FLAGS}")
-    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} jpgalleg loadpng alfont alleg png z m)
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} surgescript jpgalleg loadpng alfont alleg png z m)
   ENDIF(MSVC)
 ENDIF(WIN32)
 
@@ -579,8 +590,8 @@ SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CM
 IF(UNIX)
   INSTALL(CODE "MESSAGE(\"Installing ${GAME_NAME} ${GAME_VERSION} at ${GAME_UNIX_INSTALLDIR}... Please make sure you have enough privileges.\")")
   INSTALL(TARGETS ${GAME_UNIXNAME} RUNTIME DESTINATION ${GAME_UNIX_INSTALLDIR})
-  INSTALL(FILES license.txt readme.html logo.png surge.png DESTINATION ${GAME_UNIX_INSTALLDIR})
-  INSTALL(DIRECTORY characters objects sprites config images levels licenses musics quests samples screenshots themes languages fonts ttf DESTINATION ${GAME_UNIX_INSTALLDIR} PATTERN ".svn" EXCLUDE)
+  INSTALL(FILES LICENSE README.md logo.png surge.png DESTINATION ${GAME_UNIX_INSTALLDIR})
+  INSTALL(DIRECTORY characters objects sprites config images levels licenses musics quests samples screenshots scripts themes languages fonts ttf DESTINATION ${GAME_UNIX_INSTALLDIR} PATTERN ".git" EXCLUDE)
 
   INSTALL(CODE "MESSAGE(\"Copying executable to ${GAME_UNIX_EXECDIR}...\")")
   INSTALL(CODE "EXECUTE_PROCESS(COMMAND \"cmake\" \"-E\" \"copy\" \"${GAME_UNIX_INSTALLDIR}/${GAME_UNIXNAME}\" \"${GAME_UNIX_EXECDIR}/${GAME_UNIXNAME}\")")

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * renderqueue.h - render queue
- * Copyright (C) 2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <surgescript.h>
 #include <math.h>
 #include "../core/util.h"
 #include "renderqueue.h"
@@ -35,6 +36,7 @@ union renderable_t {
     brick_t *brick;
     item_t *item;
     object_t *object;
+    surgescript_object_t* ssobject;
 };
 
 typedef struct renderqueue_cell_t renderqueue_cell_t;
@@ -93,30 +95,51 @@ static float brick_zindex_offset(const brick_t *b)
     return s;
 }
 
+static float ssobject_zindex(surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
+    const char* object_name = surgescript_object_name(object);
+    float zindex = 0.5f;
+
+    if(surgescript_programpool_exists(pool, object_name, "get_zindex")) {
+        surgescript_var_t* tmp = surgescript_var_create();
+        surgescript_object_call_function(object, "get_zindex", NULL, 0, tmp);
+        zindex = surgescript_var_get_number(tmp);
+        surgescript_var_destroy(tmp);
+    }
+
+    return zindex;
+}
+
 /* private strategies */
 static float zindex_particles(renderable_t r) { return 1.0f; }
 static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 1.0f : 0.5f; }
 static float zindex_item(renderable_t r) { return 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return r.brick->brick_ref->zindex + brick_zindex_offset(r.brick); }
+static float zindex_ssobject(renderable_t r) { return ssobject_zindex(r.ssobject); }
 
 static void render_particles(renderable_t r, v2d_t camera_position) { particle_render_all(camera_position); }
 static void render_player(renderable_t r, v2d_t camera_position) { player_render(r.player, camera_position); }
 static void render_item(renderable_t r, v2d_t camera_position) { item_render(r.item, camera_position); }
 static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(r.object, camera_position); }
 static void render_brick(renderable_t r, v2d_t camera_position) { brick_render(r.brick, camera_position); }
+static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "render", NULL, 0, NULL); }
 
 static int ypos_particles(renderable_t r) { return 0; }
-static int ypos_player(renderable_t r) { return 0; /*(int)(r.player->actor->position.y);*/ }
+static int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
 static int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
 static int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
 static int ypos_brick(renderable_t r) { return r.brick->y; }
+static int ypos_ssobject(renderable_t r) { return 0; } /* TODO (not needed?) */
 
 static int type_particles(renderable_t r) { return 0; }
 static int type_player(renderable_t r) { return 1; }
 static int type_item(renderable_t r) { return 2; }
 static int type_object(renderable_t r) { return 3; }
 static int type_brick(renderable_t r) { return 4; }
+static int type_ssobject(renderable_t r) { return 5; }
 
 
 
@@ -223,6 +246,19 @@ void renderqueue_enqueue_particles()
     node->cell.render = render_particles;
     node->cell.ypos = ypos_particles;
     node->cell.type = type_particles;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_ssobject(surgescript_object_t* object)
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.entity.ssobject = object;
+    node->cell.zindex = zindex_ssobject;
+    node->cell.render = render_ssobject;
+    node->cell.ypos = ypos_ssobject;
+    node->cell.type = type_ssobject;
     node->next = queue;
     queue = node;
     size++;

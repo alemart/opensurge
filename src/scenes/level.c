@@ -30,6 +30,7 @@
 #include "gameover.h"
 #include "pause.h"
 #include "quest.h"
+#include "util/editorgrp.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/global.h"
@@ -57,7 +58,7 @@
 #include "../entities/renderqueue.h"
 #include "../entities/items/flyingtext.h"
 #include "../entities/entitymanager.h"
-#include "util/editorgrp.h"
+#include "../scripting/scripting.h"
 
 
 /* ------------------------
@@ -192,6 +193,11 @@ static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
 static void render_water();
+static void update_ssobjects();
+static void update_ssobject(surgescript_object_t* object, void* param);
+static void late_update_ssobject(surgescript_object_t* object, void* param);
+static void render_ssobjects();
+static bool render_ssobject(surgescript_object_t* object, void* param);
 
 
 
@@ -987,6 +993,12 @@ void level_update()
         return;
     }
 
+    /* should we quit due to scripting? */
+    if(!surgescript_vm_is_active(surgescript_vm())) {
+        game_quit();
+        return;
+    }
+
     /* updating the level... */
     if(!editor_is_enabled()) {
 
@@ -1212,6 +1224,9 @@ void level_update()
             /* update this brick */
             brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
         }
+
+        /* update scripts */
+        update_ssobjects();
 
         /* update particles */
         particle_update_all(major_bricks);
@@ -1828,6 +1843,9 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
                 renderqueue_enqueue_object(enode->data);
         }
 
+        /* render non-HUD objects (surgescript) */
+        render_ssobjects();
+
         /* render players (bring to front?) */
         render_players(FALSE);
 
@@ -2239,6 +2257,83 @@ void render_powerups()
 }
 
 
+/* scripting */
+#define TRANSFORM_MAX_DEPTH 32
+struct ssaux_t { int origin_top; v2d_t origin[TRANSFORM_MAX_DEPTH]; }; /* auxiliary stack for surgescript update */
+
+/* update surgescript */
+void update_ssobjects()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    if(surgescript_vm_is_active(vm)) {
+        struct ssaux_t ssaux = { .origin_top = 0, .origin = { [0] = v2d_new(0, 0) } };
+        surgescript_vm_update_ex(vm, &ssaux, update_ssobject, late_update_ssobject);
+    }
+}
+
+void update_ssobject(surgescript_object_t* object, void* param)
+{
+    /* initialization */
+    struct ssaux_t* ssaux = (struct ssaux_t*)param;
+    if(ssaux->origin_top >= TRANSFORM_MAX_DEPTH) {
+        fatal_error("TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
+        return;
+    }
+
+    /* get the transform origin */
+    v2d_t origin = ssaux->origin[ssaux->origin_top];
+    if(surgescript_object_transform_changed(object)) {
+        surgescript_transform_t transform;
+        surgescript_object_peek_transform(object, &transform);
+        surgescript_transform_apply2d(&transform, &origin.x, &origin.y);
+        if(++ssaux->origin_top < TRANSFORM_MAX_DEPTH)
+            ssaux->origin[ssaux->origin_top] = origin;
+    }
+
+    /* are we dealing with a level entity? */
+    if(surgescript_object_has_tag(object, "entity")) {
+        bool nearby = level_inside_screen(origin.x, origin.y, 1, 1);
+        bool awake = surgescript_object_has_tag(object, "awake");
+        if(awake || nearby || surgescript_object_has_tag(object, "detached"))
+            surgescript_object_set_active(object, true);
+        else if(!surgescript_object_has_tag(object, "disposable"))
+            surgescript_object_set_active(object, false);
+        else
+            surgescript_object_kill(object);
+    }
+}
+
+void late_update_ssobject(surgescript_object_t* object, void* param)
+{
+    struct ssaux_t* ssaux = (struct ssaux_t*)param;
+    if(surgescript_object_transform_changed(object))
+        --ssaux->origin_top;
+    if(!surgescript_object_is_active(object) && surgescript_object_has_tag(object, "entity"))
+        surgescript_object_set_active(object, true); /* the object may reawaken in the future */
+}
+
+/* render objects */
+
+void render_ssobjects()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* root = surgescript_vm_root_object(vm);
+        surgescript_object_traverse_tree_ex(root, surgescript_vm_programpool(vm), render_ssobject);
+    }
+}
+
+bool render_ssobject(surgescript_object_t* object, void* param)
+{
+    surgescript_programpool_t* pool = (surgescript_programpool_t*)param;
+    if(surgescript_object_is_active(object)) {
+        if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render"))
+            renderqueue_enqueue_ssobject(object);
+        return true;
+    }
+    else
+        return false;
+}
 
 
 

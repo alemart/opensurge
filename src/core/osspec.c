@@ -178,6 +178,7 @@ void osspec_init(const char *basedir)
                 "quests",
                 "samples",
                 "screenshots",
+                "scripts",
                 "sprites",
                 "themes",
                 "ttf",
