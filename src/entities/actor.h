@@ -44,7 +44,7 @@ typedef struct actor_t {
     float animation_frame; /* controlled by a timer */
     float animation_speed_factor; /* default value: 1.0 */
     int synchronized_animation; /* synchronized animation? */
-    int mirror; /* see the IF_* flags at video.h */
+    int mirror; /* see the IF_* flags at image.h */
     int visible; /* is this actor visible? */
     float alpha; /* 0.0f (invisible) <= alpha <= 1.0f (opaque) */
     v2d_t hot_spot; /* anchor */

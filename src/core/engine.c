@@ -20,7 +20,6 @@
 
 #include <allegro.h>
 #include <string.h>
-#include <surgescript.h>
 #include "engine.h"
 #include "global.h"
 #include "scene.h"
@@ -53,6 +52,7 @@
 #include "../entities/enemy.h"
 #include "../entities/player.h"
 #include "../entities/character.h"
+#include "../scripting/scripting.h"
 
 /* private stuff ;) */
 static void clean_garbage();
@@ -229,7 +229,7 @@ void init_accessories(commandline_t cmd)
  */
 void init_scripting(commandline_t cmd)
 {
-    ;
+    scripting_init(cmd.user_argc, cmd.user_argv);
 }
 
 /*
@@ -268,7 +268,7 @@ void push_initial_scene(commandline_t cmd)
  */
 void release_scripting()
 {
-    ;
+    scripting_release();
 }
 
 /*

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * renderqueue.h - render queue
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ struct brick_t;
 struct item_t;
 struct enemy_t;
 struct player_t;
+struct surgescript_object_t;
 
 /* starts a new rendering process */
 void renderqueue_begin(v2d_t camera_position);
@@ -49,5 +50,6 @@ void renderqueue_enqueue_item(struct item_t *item);
 void renderqueue_enqueue_object(struct enemy_t *object);
 void renderqueue_enqueue_player(struct player_t *player);
 void renderqueue_enqueue_particles(); /* enqueues the whole particle system defined in particle.h */
+void renderqueue_enqueue_ssobject(struct surgescript_object_t* object);
 
 #endif
