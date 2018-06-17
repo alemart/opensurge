@@ -625,7 +625,7 @@ videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line)
             return videomsg_delete(videomsg);
 
         /* render current message */
-        textout_ex(IMAGE2BITMAP(dst), font, videomsg->message, 0, image_height(dst) - text_height(font) * (1 + line), makecol(255,255,255), makecol(0,0,0));
+        textout_ex(IMAGE2BITMAP(dst), font, videomsg->message, 0, image_height(dst) - text_height(font) * (line + 1), makecol(255,255,255), makecol(0,0,0));
 
         /* render next message */
         videomsg->next = videomsg_render(videomsg->next, dst, line + 1);
