@@ -28,7 +28,6 @@
 #include "../entities/camera.h"
 
 /* private */
-extern surgescript_objecthandle_t require_component(const surgescript_object_t* object, const char* component_name);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -51,7 +50,8 @@ static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_animationfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static v2d_t world_position(const surgescript_object_t* object);
+extern surgescript_objecthandle_t require_component(const surgescript_object_t* object, const char* component_name);
+extern v2d_t world_position(const surgescript_object_t* object);
 static float world_angle(const surgescript_object_t* object);
 static const surgescript_heapptr_t ZINDEX_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
@@ -317,18 +317,6 @@ surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescr
 
 
 /* --- helpers --- */
-
-/* compute the world position of an object */
-v2d_t world_position(const surgescript_object_t* object)
-{
-    surgescript_transform_t transform;
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
-    v2d_t parent_origin = (parent != object) ? world_position(parent) : v2d_new(0, 0);
-    surgescript_object_peek_transform(object, &transform);
-    surgescript_transform_apply2d(&transform, &parent_origin.x, &parent_origin.y);
-    return parent_origin;
-}
 
 /* compute the world angle of an object */
 float world_angle(const surgescript_object_t* object)
