@@ -30,6 +30,7 @@
 #include "timer.h"
 #include "logfile.h"
 #include "util.h"
+#include "stringutil.h"
 
 /* private stuff */
 #define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
@@ -56,9 +57,18 @@ static const v2d_t default_screen_size = { 426, 240 }; /* this is set on stone! 
 static v2d_t screen_size = { 0, 0 }; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
 
 /* Video Message */
-#define VIDEOMSG_TIMEOUT       5000
-static uint32 videomsg_endtime;
-static char videomsg_data[512];
+#define VIDEOMSG_TIMEOUT        5000
+#define VIDEOMSG_MAXLINES       30
+typedef struct videomsg_t videomsg_t;
+struct videomsg_t {
+    char* message;
+    uint32 endtime;
+    videomsg_t* next;
+};
+static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
+static videomsg_t* videomsg_delete(videomsg_t* videomsg);
+static videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line);
+static videomsg_t* videomsg = NULL;
 
 /* Loading screen */
 #define LOADINGSCREEN_FILE     "images/loading.png"
@@ -105,7 +115,7 @@ void video_init(const char *window_title, int resolution, int smooth, int fullsc
         logfile_message("can't set_display_switch_mode(SWITCH_BACKGROUND)");
 
     /* video message */
-    videomsg_endtime = 0;
+    videomsg = NULL;
 }
 
 /*
@@ -287,8 +297,7 @@ image_t* video_get_backbuffer()
 void video_render()
 {
     /* video message */
-    if(timer_get_ticks() < videomsg_endtime)
-        textout_ex(IMAGE2BITMAP(video_get_backbuffer()), font, videomsg_data, 0, VIDEO_SCREEN_H-text_height(font), makecol(255,255,255), makecol(0,0,0));
+    videomsg_render(videomsg, video_get_backbuffer(), 0);
 
     /* fps counter */
     if(video_is_fps_visible())
@@ -388,13 +397,14 @@ void video_release()
  */
 void video_showmessage(const char *fmt, ...)
 {
+    char message[512] = " ";
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(videomsg_data, fmt, args);
+    vsnprintf(message, sizeof(message), fmt, args);
     va_end(args);
 
-    videomsg_endtime = timer_get_ticks() + VIDEOMSG_TIMEOUT;
+    videomsg = videomsg_new(message, videomsg);
 }
 
 
@@ -584,4 +594,43 @@ void setup_color_depth(int bpp)
 
     set_color_depth(bpp);
     set_color_conversion(COLORCONV_TOTAL);
+}
+
+/* creates a new videomsg_t node */
+videomsg_t* videomsg_new(const char* message, videomsg_t* next)
+{
+    videomsg_t* node = mallocx(sizeof *node);
+    node->message = str_dup(message);
+    node->endtime = timer_get_ticks() + VIDEOMSG_TIMEOUT;
+    node->next = next;
+    return node;
+}
+
+/* deletes an existing videomsg_t node */
+videomsg_t* videomsg_delete(videomsg_t* videomsg)
+{
+    if(videomsg->next)
+        videomsg->next = videomsg_delete(videomsg->next);
+    free(videomsg->message);
+    free(videomsg);
+    return NULL;
+}
+
+/* updates and renders a videomsg_t linked list; returns the updated list */
+videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line)
+{
+    if(videomsg != NULL) {
+        /* got timeout? */
+        if(timer_get_ticks() >= videomsg->endtime || line + 1 > VIDEOMSG_MAXLINES)
+            return videomsg_delete(videomsg);
+
+        /* render current message */
+        textout_ex(IMAGE2BITMAP(dst), font, videomsg->message, 0, image_height(dst) - text_height(font) * (1 + line), makecol(255,255,255), makecol(0,0,0));
+
+        /* render next message */
+        videomsg->next = videomsg_render(videomsg->next, dst, line + 1);
+    }
+
+    /* done! */
+    return videomsg;
 }
