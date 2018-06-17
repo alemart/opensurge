@@ -263,6 +263,7 @@ SET(
   src/scenes/stageselect.c
 
   src/scripting/scripting.c
+  src/scripting/application.c
   src/scripting/surgeengine.c
   src/scripting/actor.c
   src/scripting/obstaclemap.c
