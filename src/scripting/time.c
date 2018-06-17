@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * application.c - scripting system: application object
+ * time.c - scripting system: time object
  * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -19,22 +19,25 @@
  */
 
 #include <surgescript.h>
+#include "../core/timer.h"
 
 /* private */
-static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getdelta(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
- * scripting_register_application()
- * Register the default Application object
+ * scripting_register_time()
+ * Register the engine-replacement for Time
  */
-void scripting_register_application(surgescript_vm_t* vm)
+void scripting_register_time(surgescript_vm_t* vm)
 {
-    surgescript_vm_bind(vm, "Application", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Time", "get_delta", fun_getdelta, 0);
 }
 
-/* main state */
-surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    return NULL;
-}
+/* Time routines */
 
+/* the time (in seconds) taken to complete the last frame */
+surgescript_var_t* fun_getdelta(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* get the engine delta, rather than the SurgeScript delta, for synchronized results */
+    return surgescript_var_set_number(surgescript_var_create(), timer_get_delta());
+}

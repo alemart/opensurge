@@ -266,8 +266,10 @@ SET(
   src/scripting/application.c
   src/scripting/surgeengine.c
   src/scripting/actor.c
+  src/scripting/console.c
   src/scripting/obstaclemap.c
   src/scripting/sensor.c
+  src/scripting/time.c
 
   src/entities/object_decorators/base/objectbasicmachine.c
   src/entities/object_decorators/base/objectdecorator.c
