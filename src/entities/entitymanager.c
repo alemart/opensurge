@@ -100,12 +100,15 @@ void entitymanager_release()
 
     logfile_message("releasing bricks...");
     bricks = spatialhash_brick_t_destroy(bricks);
+    brick_count = 0;
 
     logfile_message("releasing built-in items...");
     items = spatialhash_item_t_destroy(items);
+    item_count = 0;
 
     logfile_message("releasing custom objects...");
     objects = spatialhash_enemy_t_destroy(objects);
+    object_count = 0;
 }
 
 void entitymanager_store_brick(brick_t *brick)
@@ -137,42 +140,48 @@ void entitymanager_set_active_region(int rectangle_xpos, int rectangle_ypos, int
 brick_list_t* entitymanager_retrieve_active_bricks()
 {
     brick_list_t *list = NULL;
-    spatialhash_brick_t_foreach(bricks, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_bricks);
+    if(bricks != NULL)
+        spatialhash_brick_t_foreach(bricks, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_bricks);
     return list;
 }
 
 item_list_t* entitymanager_retrieve_active_items()
 {
     item_list_t *list = NULL;
-    spatialhash_item_t_foreach(items, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_items);
+    if(items != NULL)
+        spatialhash_item_t_foreach(items, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_items);
     return list;
 }
 
 enemy_list_t* entitymanager_retrieve_active_objects()
 {
     enemy_list_t *list = NULL;
-    spatialhash_enemy_t_foreach(objects, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_objects);
+    if(objects != NULL)
+        spatialhash_enemy_t_foreach(objects, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_objects);
     return list;
 }
 
 brick_list_t* entitymanager_retrieve_all_bricks()
 {
     brick_list_t *list = NULL;
-    spatialhash_brick_t_forall(bricks, (void*)(&list), retrieve_bricks);
+    if(bricks != NULL)
+        spatialhash_brick_t_forall(bricks, (void*)(&list), retrieve_bricks);
     return list;
 }
 
 item_list_t* entitymanager_retrieve_all_items()
 {
     item_list_t *list = NULL;
-    spatialhash_item_t_forall(items, (void*)(&list), retrieve_items);
+    if(items != NULL)
+        spatialhash_item_t_forall(items, (void*)(&list), retrieve_items);
     return list;
 }
 
 enemy_list_t* entitymanager_retrieve_all_objects()
 {
     enemy_list_t *list = NULL;
-    spatialhash_enemy_t_forall(objects, (void*)(&list), retrieve_objects);
+    if(objects != NULL)
+        spatialhash_enemy_t_forall(objects, (void*)(&list), retrieve_objects);
     return list;
 }
 
