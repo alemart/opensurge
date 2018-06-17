@@ -42,8 +42,10 @@ static bool found_test_script(const surgescript_vm_t* vm);
 extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
+extern void scripting_register_console(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
+extern void scripting_register_time(surgescript_vm_t* vm);
 
 /*
  * scripting_init()
@@ -64,8 +66,10 @@ void scripting_init(int argc, const char** argv)
     /* register SurgeEngine builtins */
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
+    scripting_register_console(vm);
     scripting_register_obstaclemap(vm);
     scripting_register_sensor(vm);
+    scripting_register_time(vm);
 
     /* compile scripts */
     foreach_resource(path, compile_script, NULL, TRUE);
@@ -73,6 +77,8 @@ void scripting_init(int argc, const char** argv)
     /* if no test script is present... */
     if(!found_test_script(vm))
         scripting_register_application(vm);
+    else
+        logfile_message("Got a test script...");
 
     /* launch VM */
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);

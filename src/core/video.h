@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * video.h - video manager
- * Copyright (C) 2008-2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@ void video_changemode(int resolution, int smooth, int fullscreen);
 int video_get_resolution();
 int video_is_smooth();
 int video_is_fullscreen();
-v2d_t video_get_screen_size(); /* usually, 320x240 */
+v2d_t video_get_screen_size(); /* usually, 426x240 */
 v2d_t video_get_window_size(); /* the real size of the window, in pixels */
 const image_t* video_get_window_surface();
 
