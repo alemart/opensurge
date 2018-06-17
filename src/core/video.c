@@ -397,7 +397,7 @@ void video_release()
  */
 void video_showmessage(const char *fmt, ...)
 {
-    char message[512] = " ";
+    char message[512] = "";
     va_list args;
 
     va_start(args, fmt);
