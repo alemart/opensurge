@@ -36,8 +36,10 @@ static int vm_argc = 0;
 static void log_fun(const char* message);
 static void err_fun(const char* message);
 static int compile_script(const char* filepath, void* param);
+static bool found_test_script(const surgescript_vm_t* vm);
 
 /* SurgeEngine */
+extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
@@ -67,6 +69,10 @@ void scripting_init(int argc, const char** argv)
 
     /* compile scripts */
     foreach_resource(path, compile_script, NULL, TRUE);
+
+    /* if no test script is present... */
+    if(!found_test_script(vm))
+        scripting_register_application(vm);
 
     /* launch VM */
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
@@ -168,4 +174,11 @@ int compile_script(const char* filepath, void* param)
         return 0;
     else
         return -1; /* error */
+}
+
+/* do we have a test script? (that is, did the user write his/her own "Application" object?) */
+bool found_test_script(const surgescript_vm_t* vm)
+{
+    surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
+    return surgescript_programpool_exists(pool, "Application", "state:main");
 }
