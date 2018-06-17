@@ -409,16 +409,6 @@ void video_showmessage(const char *fmt, ...)
 
 
 /*
- * video_clearmessages()
- * Clears the text messages displayed with video_showmessage()
- */
-void video_clearmessages()
-{
-    videomsg = videomsg_delete(videomsg);
-}
-
-
-/*
  * video_get_color_depth()
  * Returns the current color depth
  */
