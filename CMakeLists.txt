@@ -262,9 +262,11 @@ SET(
   src/scenes/questselect.c
   src/scenes/stageselect.c
 
-  src/scripting/surgeengine.c
   src/scripting/scripting.c
+  src/scripting/surgeengine.c
   src/scripting/actor.c
+  src/scripting/obstaclemap.c
+  src/scripting/sensor.c
 
   src/entities/object_decorators/base/objectbasicmachine.c
   src/entities/object_decorators/base/objectdecorator.c

@@ -24,6 +24,11 @@
 #include "../core/util.h"
 #include "../core/stringutil.h"
 
+/* utilities */
+#include "../core/v2d.h"
+#include "../core/video.h"
+#include "../entities/camera.h"
+
 /* private area */
 static surgescript_vm_t* vm = NULL;
 static char** vm_argv = NULL;
@@ -35,6 +40,8 @@ static int compile_script(const char* filepath, void* param);
 /* SurgeEngine */
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
+extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
+extern void scripting_register_sensor(surgescript_vm_t* vm);
 
 /*
  * scripting_init()
@@ -55,6 +62,8 @@ void scripting_init(int argc, const char** argv)
     /* register SurgeEngine builtins */
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
+    scripting_register_obstaclemap(vm);
+    scripting_register_sensor(vm);
 
     /* compile scripts */
     foreach_resource(path, compile_script, NULL, TRUE);
@@ -102,6 +111,37 @@ surgescript_objecthandle_t require_component(const surgescript_object_t* object,
         component = surgescript_objectmanager_spawn(manager, parent_handle, component_name, NULL);
 
     return component;
+}
+
+/* compute the world position of an object */
+v2d_t world_position(const surgescript_object_t* object)
+{
+    surgescript_transform_t transform;
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
+    v2d_t parent_origin = (parent != object) ? world_position(parent) : v2d_new(0, 0);
+    surgescript_object_peek_transform(object, &transform);
+    surgescript_transform_apply2d(&transform, &parent_origin.x, &parent_origin.y);
+    return parent_origin;
+}
+
+/* compute the proper camera position for an object (will check if it's detached or not) */
+v2d_t object_camera(const surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    bool is_detached = surgescript_object_has_tag(parent, "detached");
+    return !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
+}
+
+/* the name of the parent object */
+const char* parent_name(const surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    return surgescript_object_name(parent);
 }
 
 
