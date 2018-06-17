@@ -58,6 +58,7 @@ int video_is_fps_visible();
 
 /* video message */
 void video_showmessage(const char *fmt, ...);
+void video_clearmessages();
 
 /* loading screen */
 void video_display_loading_screen();
