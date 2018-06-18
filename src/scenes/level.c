@@ -1201,6 +1201,10 @@ void level_update()
             }
         }
 
+        /* if someone is dying, fade out the music */
+        if(got_dying_player)
+            music_set_volume(music_get_volume() - 0.5*dt);
+
         /* some objects are attached to the player... */
         for(enode = major_enemies; enode != NULL; enode = enode->next) {
             float x = enode->data->actor->position.x;
@@ -1225,6 +1229,17 @@ void level_update()
             brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
         }
 
+        /* update camera */
+        if(level_cleared)
+            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
+        else if(!got_dying_player)
+            camera_move_to(camera_focus->position, 0); /* the camera will be locked on its focus (usually, the player) */
+        camera_update();
+
+        /* level timer */
+        if(!got_dying_player && !level_cleared)
+            level_timer += timer_get_delta();
+
         /* update scripts */
         update_ssobjects();
 
@@ -1239,22 +1254,6 @@ void level_update()
         /* -------------------------------------- */
         /* updating the entities */
         /* -------------------------------------- */
-
-        /* level timer */
-        if(!got_dying_player && !level_cleared)
-            level_timer += timer_get_delta();
-
-        /* if someone is dying, fade out the music */
-        if(got_dying_player)
-            music_set_volume(music_get_volume() - 0.5*dt);
-
-        /* update camera */
-        if(level_cleared)
-            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
-        else if(!got_dying_player)
-            camera_move_to(camera_focus->position, 0); /* the camera will be locked on its focus (usually, the player) */
-
-        camera_update();
     }
     else {
         entitymanager_set_active_region(
