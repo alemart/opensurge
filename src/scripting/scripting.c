@@ -42,6 +42,7 @@ static bool found_test_script(const surgescript_vm_t* vm);
 extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
+extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
@@ -66,6 +67,7 @@ void scripting_init(int argc, const char** argv)
     /* register SurgeEngine builtins */
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
+    scripting_register_camera(vm);
     scripting_register_console(vm);
     scripting_register_obstaclemap(vm);
     scripting_register_sensor(vm);
