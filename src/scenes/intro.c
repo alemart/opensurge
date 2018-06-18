@@ -34,21 +34,20 @@
 
 
 /* private data */
-#define INTRO_TIMEOUT       3.0f
+#define INTRO_TIMEOUT       5.0f
 static float elapsed_time;
 static int must_fadein;
 static image_t* bg;
 static input_t* in;
 
 #define COLOR_1            "ffe13e"
-#define COLOR_2            "cdc3b6"
-#define COLOR_3            "eabd85"
-#define BACKGROUND         "0a0a0a"
+#define COLOR_2            "ed8217"
+#define BGCOLOR            "0a0a0a"
 static const char *text = 
  "<color=" COLOR_1 ">"
  GAME_TITLE " " GAME_VERSION_STRING
  "</color>\n"
- "<color=" COLOR_2 ">"
+ "<color=" COLOR_2 ">http://"
  GAME_WEBSITE
  "</color>\n"
  "\n"
@@ -62,8 +61,8 @@ static const char *text =
  "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
  "GNU General Public License for more details.\n"
  "\n"
- /*"You should have received a copy of the GNU General Public License "
- "along with this program.  If not, see http://www.gnu.org/licenses/"*/
+ "You should have received a copy of the GNU General Public License "
+ "along with this program.  If not, see http://www.gnu.org/licenses/"
 ;
 
 static image_t* create_background();
@@ -142,10 +141,10 @@ void intro_render()
 image_t* create_background()
 {
     image_t* img = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-    font_t *fnt = font_create("small");
+    font_t *fnt = font_create("disclaimer");
     v2d_t camera = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
-    image_clear(video_get_backbuffer(), image_hex2rgb(BACKGROUND));
+    image_clear(video_get_backbuffer(), image_hex2rgb(BGCOLOR));
     font_set_width(fnt, VIDEO_SCREEN_W - 5);
     font_set_text(fnt, "%s", text);
     font_set_position(fnt, v2d_new(5, 5));
