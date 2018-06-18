@@ -34,10 +34,8 @@
 
 
 /* private data */
-#define INTRO_TIMEOUT       4.0f
-#define INTRO_QUEST         "quests/intro.qst"
+#define INTRO_TIMEOUT       3.0f
 static float elapsed_time;
-static void load_intro_quest();
 static int must_fadein;
 static image_t* bg;
 static input_t* in;
@@ -116,7 +114,6 @@ void intro_update()
     else if(elapsed_time >= INTRO_TIMEOUT) {
         if(fadefx_over()) {
             scenestack_pop();
-            load_intro_quest();
             return;
         }
         fadefx_out(image_rgb(0,0,0), 1.0f);
@@ -140,14 +137,6 @@ void intro_render()
 
 
 
-
-/* loads the introduction quest (used for cutscenes, etc) */
-void load_intro_quest()
-{
-    char abs_path[1024];
-    resource_filepath(abs_path, INTRO_QUEST, sizeof(abs_path), RESFP_READ);
-    scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)abs_path);
-}
 
 /* creates the background */
 image_t* create_background()

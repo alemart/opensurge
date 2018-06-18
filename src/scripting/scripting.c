@@ -33,6 +33,7 @@
 static surgescript_vm_t* vm = NULL;
 static char** vm_argv = NULL;
 static int vm_argc = 0;
+static bool test_mode = false;
 static void log_fun(const char* message);
 static void err_fun(const char* message);
 static int compile_script(const char* filepath, void* param);
@@ -77,10 +78,14 @@ void scripting_init(int argc, const char** argv)
     foreach_resource(path, compile_script, NULL, TRUE);
 
     /* if no test script is present... */
-    if(!found_test_script(vm))
-        scripting_register_application(vm);
-    else
+    if(found_test_script(vm)) {
         logfile_message("Got a test script...");
+        test_mode = true;
+    }
+    else {
+        scripting_register_application(vm);
+        test_mode = false;
+    }
 
     /* launch VM */
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
@@ -108,6 +113,16 @@ void scripting_release()
 surgescript_vm_t* surgescript_vm()
 {
     return vm;
+}
+
+
+/*
+ * scripting_testmode()
+ * Are we in test mode?
+ */
+bool scripting_testmode()
+{
+    return test_mode;
 }
 
 
