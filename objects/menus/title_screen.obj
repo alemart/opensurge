@@ -118,7 +118,7 @@ object ".title_screen.message"
     state "visible"
     {
         textout_centre "powerfest" 1 1 "<color=000000>$TITLE_MESSAGE</color>"
-        textout_centre "powerfest" 0 0 "<color=fff585>$TITLE_MESSAGE</color>"
+        textout_centre "powerfest" 0 0 "<color=ffff33>$TITLE_MESSAGE</color>"
         on_timeout $tmr invisible
     }
 
@@ -142,13 +142,13 @@ object ".title_screen.version"
     {
         hide
         set_zindex 1
-        set_absolute_position screen_width()-3 screen_height()-11
+        set_absolute_position 3 screen_height()-11
         change_state "display"
     }
 
     state "display"
     {
-        textout_right "menu.tiny" 0 0 "$TITLE_VERSION $ENGINE_VERSION"
+        //textout "menu.footer" 0 0 "$TITLE_VERSION $ENGINE_VERSION"
     }
 }
 
@@ -165,13 +165,13 @@ object ".title_screen.website"
     {
         hide
         set_zindex 1
-        set_absolute_position 3 screen_height()-11
+        set_absolute_position screen_width()-1 screen_height()-14
         change_state "display"
     }
 
     state "display"
     {
-        textout "menu.tiny" 0 0 "$ENGINE_WEBSITE"
+        textout_right "menu.footer" 0 0 "$ENGINE_WEBSITE"
     }
 }
 

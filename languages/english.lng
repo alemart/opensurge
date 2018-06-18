@@ -124,7 +124,7 @@ CREDITS2_TITLE              "<color=$COLOR_MENUTITLE>CREDITS</color>"
 CREDITS2_KEY                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
 
 // Creative Commons screen
-CC_DISCLAIMER               "Game assets under the CC-BY"
+CC_DISCLAIMER               "Game assets under the CC"
 
 // ======================= INPUT DEVICES ====================
 

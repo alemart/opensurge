@@ -56,17 +56,18 @@ font "menu.small"
     }
 }
 
-// menu: tiny
-font "menu.tiny"
+// menu: footer
+font "menu.footer"
 {
-    truetype
+    bitmap
     {
-        source_file             "ttf/DejaVuSans.ttf"
-        size                    11
-        //antialias
-        shadow
+        source_file             "images/smallfont.png"
+        source_rect             0 0 128 72
+        frame_size              8 12
+        keymap                  " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\x60abcdefghijklmnopqrstuvwxyz{|}~"
     }
 }
+
 
 // menu: credits
 font "menu.credits"
