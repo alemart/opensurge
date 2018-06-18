@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include "../core/global.h"
 
 /* The SurgeEngine object
    coded in SurgeScript */
@@ -80,6 +81,9 @@ static const char* code = ""
     "}"                                                                     "\n"
 ;
 
+/* stuff coded in C */
+static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
 /*
  * scripting_register_surgeengine()
  * Register SurgeEngine
@@ -87,4 +91,11 @@ static const char* code = ""
 void scripting_register_surgeengine(surgescript_vm_t* vm)
 {
     surgescript_vm_compile_code_in_memory(vm, code);
+    surgescript_vm_bind(vm, "SurgeEngine", "get_version", fun_getversion, 0);
+}
+
+/* SurgeEngine version */
+surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), GAME_VERSION_STRING);
 }
