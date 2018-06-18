@@ -154,6 +154,6 @@ object ".creativecommons_startup.disclaimer"
 
     state show_text
     {
-        textout_centre "disclaimer" 0 0 "<color=000000>$CC_DISCLAIMER</color>"
+        textout_centre "small" 0 0 "$CC_DISCLAIMER"
     }
 }
