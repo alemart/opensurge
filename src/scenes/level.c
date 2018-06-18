@@ -198,6 +198,10 @@ static void update_ssobject(surgescript_object_t* object, void* param);
 static void late_update_ssobject(surgescript_object_t* object, void* param);
 static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
+static bool ssobject_exists(const char* object_name);
+static bool ssobject_is_entity(const char* object_name);
+static surgescript_object_t* get_level_ssobject();
+static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
 
 
 
@@ -830,7 +834,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             x = atoi(param[1]);
             y = atoi(param[2]);
 
-            level_create_item(type, v2d_new(x,y));
+            level_create_item(type, v2d_new(x, y));
         }
         else
             logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
@@ -844,8 +848,19 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             x = atoi(param[1]);
             y = atoi(param[2]);
 
-            if(str_icmp(name, DEFAULT_STARTUP_OBJECT) != 0)
-                level_create_enemy(name, v2d_new(x,y));
+            if(str_icmp(name, DEFAULT_STARTUP_OBJECT) != 0) {
+                if(ssobject_exists(name)) {
+                    /* new API */
+                    if(ssobject_is_entity(name))
+                        spawn_ssobject(name, v2d_new(x, y));
+                    else
+                        fatal_error("Can't spawn level object \"%s\": object is not an entity.", name);
+                }
+                else {
+                    /* old API */
+                    level_create_enemy(name, v2d_new(x, y));
+                }
+            }
         }
         else
             logfile_message("Level loader - command '%s' expects three parameters: enemy_name, xpos, ypos", identifier);
@@ -2179,14 +2194,20 @@ void add_to_startup_object_list(const char *object_name)
 void spawn_startup_objects()
 {
     startupobject_list_t *me;
-    enemy_t *e;
 
     if(startupobject_list == NULL)
         add_to_startup_object_list(DEFAULT_STARTUP_OBJECT);
 
     for(me=startupobject_list; me; me=me->next) {
-        e = level_create_enemy(me->object_name, v2d_new(0,0));
-        e->created_from_editor = FALSE;
+        if(ssobject_exists(me->object_name)) {
+            /* new API */
+            spawn_ssobject(me->object_name, v2d_new(0, 0));
+        }
+        else {
+            /* old API */
+            enemy_t* e = level_create_enemy(me->object_name, v2d_new(0, 0));
+            e->created_from_editor = FALSE;
+        }
     }
 }
 
@@ -2332,6 +2353,53 @@ bool render_ssobject(surgescript_object_t* object, void* param)
     }
     else
         return false;
+}
+
+
+/* SurgeScript object utilities */
+
+/* does the specified object exist? */
+bool ssobject_exists(const char* object_name)
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
+    return surgescript_programpool_exists(pool, object_name, "state:main");
+}
+
+/* is the given ssobject an entity? */
+bool ssobject_is_entity(const char* object_name)
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_tagsystem_t* ts = surgescript_vm_tagsystem(vm);
+    return surgescript_tagsystem_has_tag(ts, object_name, "entity");
+}
+
+/* get the handle to the Level object */
+surgescript_object_t* get_level_ssobject()
+{
+    /* TODO */
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    surgescript_objecthandle_t app = surgescript_objectmanager_application(manager);
+    return surgescript_objectmanager_get(manager, app);
+}
+
+/* spawns a ssobject */
+surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
+{
+    if(ssobject_exists(object_name)) {
+        surgescript_vm_t* vm = surgescript_vm();
+        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+        surgescript_object_t* parent = get_level_ssobject();
+        surgescript_objecthandle_t parent_handle = surgescript_object_handle(parent);
+        surgescript_objecthandle_t child_handle = surgescript_objectmanager_spawn(manager, parent_handle, object_name, NULL);
+        /* TODO: spawn point */
+        return surgescript_objectmanager_get(manager, child_handle);
+    }
+    else {
+        fatal_error("Can't spawn level object \"%s\": object does not exist.");
+        return NULL;
+    }
 }
 
 

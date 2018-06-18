@@ -26,5 +26,6 @@
 surgescript_vm_t* surgescript_vm();
 void scripting_init(int argc, const char** argv);
 void scripting_release();
+bool scripting_testmode();
 
 #endif

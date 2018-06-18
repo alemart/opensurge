@@ -98,7 +98,6 @@ const char** objects_get_list_of_categories(int *n);
 
 
 
-
 /* ------ public instance methods: generic routines ------- */
 
 /* creates a new enemy instance */
@@ -148,5 +147,8 @@ void enemy_observe_active_player(enemy_t *enemy);
 
 /* checks if a given object belongs to a category */
 int enemy_belongs_to_category(enemy_t *enemy, const char *category);
+
+/* checks if an object exists */
+int enemy_exists(const char* object_name);
 
 #endif

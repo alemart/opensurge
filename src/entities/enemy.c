@@ -153,7 +153,6 @@ const char** objects_get_list_of_categories(int *n)
 
 
 
-
 /* ------ public instance methods ------- */
 
 
@@ -338,6 +337,15 @@ int enemy_belongs_to_category(enemy_t *enemy, const char *category)
     }
     else
         return TRUE;
+}
+
+/*
+ * enemy_exists()
+ * Does the specified object exist?
+ */
+int enemy_exists(const char* object_name)
+{
+    return NULL != hashtable_objectcode_t_find(lookup_table, object_name);
 }
 
 

@@ -75,7 +75,11 @@ static void calc_error(const char *msg);
 static void init_nanocalc();
 static void release_nanocalc();
 static const char* find_basedir(int argc, char *argv[]);
+static const char* fullpath_of(const char* relative_path);
 static int display_langselect_screen = FALSE;
+static const char* INTRO_QUEST = "quests/intro.qst";
+static const char* SSAPP_LEVEL = "levels/surgescript.lev";
+
 
 
 
@@ -250,12 +254,18 @@ void init_game_data()
 void push_initial_scene(commandline_t cmd)
 {
     if(cmd.custom_level) {
-        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)cmd.custom_level_path);
+        scenestack_push(storyboard_get_scene(SCENE_LEVEL), cmd.custom_level_path);
     }
     else if(cmd.custom_quest) {
-        scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)cmd.custom_quest_path);
+        scenestack_push(storyboard_get_scene(SCENE_QUEST), cmd.custom_quest_path);
+        scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
+    }
+    else if(scripting_testmode()) {
+        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)fullpath_of(SSAPP_LEVEL));
+        scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);       
     }
     else {
+        scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)fullpath_of(INTRO_QUEST));
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
         if(display_langselect_screen)
             scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
@@ -414,4 +424,15 @@ const char* find_basedir(int argc, char *argv[])
     }
 
     return NULL;
+}
+
+/*
+ * fullpath_of()
+ * Returns the absolute filepath of the parameter
+ */
+const char* fullpath_of(const char* relative_path)
+{
+    static char abs_path[1024] = "";
+    resource_filepath(abs_path, relative_path, sizeof(abs_path), RESFP_READ);
+    return abs_path;
 }

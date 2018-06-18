@@ -297,7 +297,7 @@ image_t* video_get_backbuffer()
 void video_render()
 {
     /* video message */
-    videomsg_render(videomsg, video_get_backbuffer(), 0);
+    videomsg = videomsg_render(videomsg, video_get_backbuffer(), 0);
 
     /* fps counter */
     if(video_is_fps_visible())
