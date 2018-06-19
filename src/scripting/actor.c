@@ -61,6 +61,7 @@ static const surgescript_heapptr_t ANIM_ADDR = 4;
 static const float DEFAULT_ZINDEX = 0.5f;
 static const char* DEFAULT_SPRITE = "SD_QUESTIONMARK";
 static const int DEFAULT_ANIM = 0;
+static const double DEG2RAD = 0.01745329251994329576;
 
 /*
  * scripting_register_actor()
@@ -156,7 +157,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
 
     actor->position = world_position(object);
-    actor->angle = world_angle(object);
+    actor->angle = world_angle(object) * DEG2RAD;
     actor_render(actor, camera);
 
     return NULL;
