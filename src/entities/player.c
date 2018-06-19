@@ -152,8 +152,12 @@ player_t *player_create(const char *character_name)
 
     /* character system */
     if(str_icmp(c->companion_object_name, "") != 0) {
-        object_t *companion = level_create_enemy(c->companion_object_name, v2d_new(0, 0));
-        companion->created_from_editor = FALSE;
+        /* try to create the companion object using the new API if possible */
+        if(!level_create_ssobject(c->companion_object_name, v2d_new(0, 0))) {
+            /* not possible; use the old API */
+            enemy_t* e = level_create_enemy(c->companion_object_name, v2d_new(0, 0));
+            e->created_from_editor = FALSE;
+        }
     }
 
     physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);

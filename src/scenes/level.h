@@ -21,6 +21,7 @@
 #ifndef _LEVEL_H
 #define _LEVEL_H
 
+#include <surgescript.h>
 #include "../core/v2d.h"
 #include "../core/global.h"
 
@@ -67,6 +68,7 @@ struct item_t* level_create_item(int type, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
 void level_add_to_score(int score);
 struct item_t* level_create_animal(v2d_t position);
+surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position);
 
 /* camera */
 void level_set_camera_focus(struct actor_t *act);

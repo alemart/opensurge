@@ -165,6 +165,7 @@ void createchild_strategy(objectdecorator_children_t *me, player_t **team, int t
     offset.y = expression_evaluate(me->offset_y);
     child = level_create_enemy(me->object_name, v2d_add(object->actor->position, offset));
     if(child != NULL) {
+        child->created_from_editor = FALSE;
         enemy_add_child(object, me->child_name, child);
         enemy_update(child, team, team_size, brick_list, item_list, object_list); /* important to exchange data between objects */
         nanocalcext_set_target_object(object, brick_list, item_list, object_list); /* restore nanocalc's target object */
