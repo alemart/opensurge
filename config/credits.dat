@@ -171,13 +171,13 @@ Alexandre Martins
 --- images/quest_tutorial.png
 --- images/special.png
 --- images/stars.png
---- images/upper.png
 --- images/whitebg.png
 --- images/rain.png
 --- images/squarebg2.png
 --- images/pixel.png
 --- images/impact.png
 --- images/shoutpanic.png
+--- fonts/upper.png
 
 Ramon
 --- images/dimensional_gate.png
@@ -210,11 +210,11 @@ MTK358
 --- images/goal_sign.png
 
 Ste Pickford
---- images/font.png
---- images/powerfest.png
+--- fonts/default.png
+--- fonts/powerfest.png
 
 pfunked (opengameart.org)
---- images/smallfont.png
+--- fonts/small.png
 
 Constantin (supertuxkart-team)
 --- images/tux.png
