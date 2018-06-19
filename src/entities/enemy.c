@@ -90,7 +90,7 @@ static hashtable_objectcode_t* lookup_table;
  */
 void objects_init()
 {
-    const char *path = "objects/*.obj";
+    const char *path = "scripts/legacy/*.obj";
 
     logfile_message("Loading objects scripts...");
     objects = NULL;

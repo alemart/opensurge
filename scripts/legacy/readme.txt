@@ -1,0 +1,1 @@
+This is the legacy folder for scripts. Scripts placed here use the old scripting system (.obj files). SurgeScript files (.ss) should NOT be placed here.
