@@ -199,7 +199,6 @@ static void late_update_ssobject(surgescript_object_t* object, void* param);
 static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
-static bool ssobject_is_entity(const char* object_name);
 static surgescript_object_t* get_level_ssobject();
 static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
 
@@ -849,11 +848,10 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             y = atoi(param[2]);
 
             if(str_icmp(name, DEFAULT_STARTUP_OBJECT) != 0) {
-                if(ssobject_exists(name)) {
+                surgescript_object_t* obj = level_create_ssobject(name, v2d_new(x, y));
+                if(obj != NULL) {
                     /* new API */
-                    if(ssobject_is_entity(name))
-                        spawn_ssobject(name, v2d_new(x, y));
-                    else
+                    if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Can't spawn level object \"%s\": object is not an entity.", name);
                 }
                 else {
@@ -1515,6 +1513,19 @@ enemy_t* level_create_enemy(const char *name, v2d_t position)
     return object;
 }
 
+
+/*
+ * level_create_ssobject()
+ * Creates a SurgeScript object and adds it to the level.
+ * Returns the new object, or NULL if the object couldn't be found
+ */
+surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position)
+{
+    if(ssobject_exists(object_name))
+        return spawn_ssobject(object_name, position);
+    else
+        return NULL;
+}
 
 
 /*
@@ -2199,12 +2210,9 @@ void spawn_startup_objects()
         add_to_startup_object_list(DEFAULT_STARTUP_OBJECT);
 
     for(me=startupobject_list; me; me=me->next) {
-        if(ssobject_exists(me->object_name)) {
-            /* new API */
-            spawn_ssobject(me->object_name, v2d_new(0, 0));
-        }
-        else {
-            /* old API */
+        /* try to create an object using the new API.
+           if failure, use the old API. */
+        if(!level_create_ssobject(me->object_name, v2d_new(0, 0))) {
             enemy_t* e = level_create_enemy(me->object_name, v2d_new(0, 0));
             e->created_from_editor = FALSE;
         }
@@ -2364,14 +2372,6 @@ bool ssobject_exists(const char* object_name)
     surgescript_vm_t* vm = surgescript_vm();
     surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
     return surgescript_programpool_exists(pool, object_name, "state:main");
-}
-
-/* is the given ssobject an entity? */
-bool ssobject_is_entity(const char* object_name)
-{
-    surgescript_vm_t* vm = surgescript_vm();
-    surgescript_tagsystem_t* ts = surgescript_vm_tagsystem(vm);
-    return surgescript_tagsystem_has_tag(ts, object_name, "entity");
 }
 
 /* get the handle to the Level object */
