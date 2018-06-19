@@ -17,5 +17,10 @@ object ".none_companion"
     {
         hide
         disable_player_movement
+        change_state "wait"
+    }
+
+    state "wait"
+    {
     }
 }
