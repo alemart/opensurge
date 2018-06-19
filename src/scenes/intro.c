@@ -103,7 +103,7 @@ void intro_release()
 void intro_update()
 {
     elapsed_time += timer_get_delta();
-    if(!fadefx_is_fading() && !must_fadein && (input_button_pressed(in, IB_FIRE3) || input_button_pressed(in, IB_FIRE4)))
+    if(!fadefx_is_fading() && !must_fadein && (input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE3) || input_button_pressed(in, IB_FIRE4)))
         elapsed_time += INTRO_TIMEOUT;
 
     if(must_fadein) {
