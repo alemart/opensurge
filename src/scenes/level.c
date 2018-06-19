@@ -1926,8 +1926,8 @@ void update_level_size()
     }
     brick_list = entitymanager_release_retrieved_brick_list(brick_list);
 
-    level_width = max(max_x, 320);
-    level_height = max(max_y, 240);
+    level_width = max(max_x, VIDEO_SCREEN_W);
+    level_height = max(max_y, VIDEO_SCREEN_H);
 }
 
 /* returns the ID of a given brick,
