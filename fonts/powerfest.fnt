@@ -1,18 +1,11 @@
-// ---------------------------------------------------------------------------
 // Open Surge Engine
 // http://opensurge2d.org
-//
-// File:   fonts/powerfest.fnt
-// Desc:   powerfest font by Ste Pickford
-// Author: Alexandre (script),
-//         Ste Pickford (images/powerfest.png)
-// ---------------------------------------------------------------------------
 
 font "powerfest"
 {
     bitmap
     {
-        source_file             "images/powerfest.png"
+        source_file             "fonts/powerfest.png"
         source_rect             0 0 208 32
         frame_size              8 16
         keymap                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?: "

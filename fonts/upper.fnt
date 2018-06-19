@@ -1,17 +1,11 @@
-// ---------------------------------------------------------------------------
 // Open Surge Engine
 // http://opensurge2d.org
-//
-// File:   fonts/upper.fnt
-// Desc:   font with upper-case letters
-// Author: script by Alexandre
-// ---------------------------------------------------------------------------
 
 font "upper"
 {
     bitmap
     {
-        source_file             "images/upper.png"
+        source_file             "fonts/upper.png"
         source_rect             0 0 736 16
         frame_size              16 16
         keymap                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.+-*%,:?! "
