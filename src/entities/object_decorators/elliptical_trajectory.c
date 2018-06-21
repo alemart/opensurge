@@ -34,10 +34,10 @@ struct objectdecorator_ellipticaltrajectory_t {
 };
 
 /* private methods */
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void ellipticaltrajectory_init(objectmachine_t *obj);
+static void ellipticaltrajectory_release(objectmachine_t *obj);
+static void ellipticaltrajectory_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void ellipticaltrajectory_render(objectmachine_t *obj, v2d_t camera_position);
 
 
 
@@ -50,10 +50,10 @@ objectmachine_t* objectdecorator_ellipticaltrajectory_new(objectmachine_t *decor
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = ellipticaltrajectory_init;
+    obj->release = ellipticaltrajectory_release;
+    obj->update = ellipticaltrajectory_update;
+    obj->render = ellipticaltrajectory_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
     me->amplitude_x = amplitude_x;
@@ -71,7 +71,7 @@ objectmachine_t* objectdecorator_ellipticaltrajectory_new(objectmachine_t *decor
 
 
 /* private methods */
-void init(objectmachine_t *obj)
+void ellipticaltrajectory_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -81,7 +81,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void ellipticaltrajectory_release(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -98,7 +98,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void ellipticaltrajectory_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -175,7 +175,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void ellipticaltrajectory_render(objectmachine_t *obj, v2d_t camera_position)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;

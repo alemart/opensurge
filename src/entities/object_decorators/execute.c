@@ -80,10 +80,10 @@ static void objectdecorator_executefor_render(objectdecorator_executebase_t *ex,
 static void objectdecorator_executefor_destructor(objectdecorator_executebase_t *ex);
 
 /* private methods */
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void executecommand_init(objectmachine_t *obj);
+static void executecommand_release(objectmachine_t *obj);
+static void executecommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void executecommand_render(objectmachine_t *obj, v2d_t camera_position);
 
 
 
@@ -95,10 +95,10 @@ objectmachine_t* objectdecorator_execute_new(objectmachine_t *decorated_machine,
     objectmachine_t *obj = (objectmachine_t*)dec;
     objectdecorator_executebase_t *_me = (objectdecorator_executebase_t*)me;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = executecommand_init;
+    obj->release = executecommand_release;
+    obj->update = executecommand_update;
+    obj->render = executecommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -117,10 +117,10 @@ objectmachine_t* objectdecorator_executeif_new(objectmachine_t *decorated_machin
     objectmachine_t *obj = (objectmachine_t*)dec;
     objectdecorator_executebase_t *_me = (objectdecorator_executebase_t*)me;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = executecommand_init;
+    obj->release = executecommand_release;
+    obj->update = executecommand_update;
+    obj->render = executecommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -140,10 +140,10 @@ objectmachine_t* objectdecorator_executeunless_new(objectmachine_t *decorated_ma
     objectmachine_t *obj = (objectmachine_t*)dec;
     objectdecorator_executebase_t *_me = (objectdecorator_executebase_t*)me;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = executecommand_init;
+    obj->release = executecommand_release;
+    obj->update = executecommand_update;
+    obj->render = executecommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -163,10 +163,10 @@ objectmachine_t* objectdecorator_executewhile_new(objectmachine_t *decorated_mac
     objectmachine_t *obj = (objectmachine_t*)dec;
     objectdecorator_executebase_t *_me = (objectdecorator_executebase_t*)me;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = executecommand_init;
+    obj->release = executecommand_release;
+    obj->update = executecommand_update;
+    obj->render = executecommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -179,17 +179,17 @@ objectmachine_t* objectdecorator_executewhile_new(objectmachine_t *decorated_mac
     return obj;
 }
 
-objectmachine_t* objectdecorator_executefor_new(objectmachine_t *decorated_machine, const char *state_name, expression_t* initial, expression_t* condition, expression_t* iteration)
+objectmachine_t* objectdecorator_executefor_new(objectmachine_t *decorated_machine, const char *state_name, expression_t* executecommand_initial, expression_t* condition, expression_t* iteration)
 {
     objectdecorator_executefor_t *me = mallocx(sizeof *me);
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
     objectdecorator_executebase_t *_me = (objectdecorator_executebase_t*)me;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = executecommand_init;
+    obj->release = executecommand_release;
+    obj->update = executecommand_update;
+    obj->render = executecommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -197,7 +197,7 @@ objectmachine_t* objectdecorator_executefor_new(objectmachine_t *decorated_machi
     _me->update = objectdecorator_executefor_update;
     _me->render = objectdecorator_executefor_render;
     _me->destructor = objectdecorator_executefor_destructor;
-    me->initial = initial;
+    me->initial = executecommand_initial;
     me->condition = condition;
     me->iteration = iteration;
 
@@ -206,7 +206,7 @@ objectmachine_t* objectdecorator_executefor_new(objectmachine_t *decorated_machi
 
 
 /* private methods */
-void init(objectmachine_t *obj)
+void executecommand_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -216,7 +216,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void executecommand_release(objectmachine_t *obj)
 {
     objectdecorator_executebase_t *me = (objectdecorator_executebase_t*)obj;
     objectdecorator_t *dec = (objectdecorator_t*)obj;
@@ -229,7 +229,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void executecommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_executebase_t *me = (objectdecorator_executebase_t*)obj;
     objectdecorator_t *dec = (objectdecorator_t*)obj;
@@ -241,7 +241,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void executecommand_render(objectmachine_t *obj, v2d_t camera_position)
 {
     objectdecorator_executebase_t *me = (objectdecorator_executebase_t*)obj;
     objectdecorator_t *dec = (objectdecorator_t*)obj;

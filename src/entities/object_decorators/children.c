@@ -44,10 +44,10 @@ static void changechildstate_strategy(objectdecorator_children_t *me, player_t *
 static void changeparentstate_strategy(objectdecorator_children_t *me, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
 
 /* private methods */
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void childrencommand_init(objectmachine_t *obj);
+static void childrencommand_release(objectmachine_t *obj);
+static void childrencommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void childrencommand_render(objectmachine_t *obj, v2d_t camera_position);
 
 static objectmachine_t *make_decorator(objectmachine_t *decorated_machine, childrenstrategy_t strategy, expression_t *offset_x, expression_t *offset_y, const char *object_name, const char *child_name, const char *new_state_name);
 
@@ -77,10 +77,10 @@ objectmachine_t *make_decorator(objectmachine_t *decorated_machine, childrenstra
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = childrencommand_init;
+    obj->release = childrencommand_release;
+    obj->update = childrencommand_update;
+    obj->render = childrencommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -96,7 +96,7 @@ objectmachine_t *make_decorator(objectmachine_t *decorated_machine, childrenstra
 
 
 /* private methods */
-void init(objectmachine_t *obj)
+void childrencommand_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -106,7 +106,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void childrencommand_release(objectmachine_t *obj)
 {
     objectdecorator_children_t *me = (objectdecorator_children_t*)obj;
     objectdecorator_t *dec = (objectdecorator_t*)obj;
@@ -131,7 +131,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void childrencommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_children_t *me = (objectdecorator_children_t*)obj;
     objectdecorator_t *dec = (objectdecorator_t*)obj;
@@ -142,7 +142,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void childrencommand_render(objectmachine_t *obj, v2d_t camera_position)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;

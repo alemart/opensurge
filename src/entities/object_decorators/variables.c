@@ -35,10 +35,10 @@ struct objectdecorator_variables_t {
 };
 
 /* private methods */
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void varcommand_init(objectmachine_t *obj);
+static void varcommand_release(objectmachine_t *obj);
+static void varcommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void varcommand_render(objectmachine_t *obj, v2d_t camera_position);
 
 /* private strategies */
 static int let_strategy(float expr_result) { return FALSE; }
@@ -57,10 +57,10 @@ objectmachine_t* objectdecorator_let_new(objectmachine_t *decorated_machine, exp
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = varcommand_init;
+    obj->release = varcommand_release;
+    obj->update = varcommand_update;
+    obj->render = varcommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -77,10 +77,10 @@ objectmachine_t* objectdecorator_if_new(objectmachine_t *decorated_machine, expr
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = varcommand_init;
+    obj->release = varcommand_release;
+    obj->update = varcommand_update;
+    obj->render = varcommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -97,10 +97,10 @@ objectmachine_t* objectdecorator_unless_new(objectmachine_t *decorated_machine, 
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = varcommand_init;
+    obj->release = varcommand_release;
+    obj->update = varcommand_update;
+    obj->render = varcommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -114,7 +114,7 @@ objectmachine_t* objectdecorator_unless_new(objectmachine_t *decorated_machine, 
 
 
 /* private methods */
-void init(objectmachine_t *obj)
+void varcommand_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -124,7 +124,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void varcommand_release(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -138,7 +138,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void varcommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -152,7 +152,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
         decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void varcommand_render(objectmachine_t *obj, v2d_t camera_position)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
