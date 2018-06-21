@@ -36,10 +36,10 @@ static int shock_strategy(player_t *p);
 static int acid_strategy(player_t *p);
 
 /* private methods */
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void hitplayer_init(objectmachine_t *obj);
+static void hitplayer_release(objectmachine_t *obj);
+static void hitplayer_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void hitplayer_render(objectmachine_t *obj, v2d_t camera_position);
 static objectmachine_t *make_decorator(objectmachine_t *decorated_machine, int (*strategy)(player_t*));
 
 
@@ -76,10 +76,10 @@ objectmachine_t *make_decorator(objectmachine_t *decorated_machine, int (*strate
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = hitplayer_init;
+    obj->release = hitplayer_release;
+    obj->update = hitplayer_update;
+    obj->render = hitplayer_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
     me->should_hit_the_player = strategy;
@@ -87,7 +87,7 @@ objectmachine_t *make_decorator(objectmachine_t *decorated_machine, int (*strate
     return obj;
 }
 
-void init(objectmachine_t *obj)
+void hitplayer_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -97,7 +97,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void hitplayer_release(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -108,7 +108,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void hitplayer_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -122,7 +122,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void hitplayer_render(objectmachine_t *obj, v2d_t camera_position)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;

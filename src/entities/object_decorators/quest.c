@@ -27,7 +27,7 @@
 typedef struct objectdecorator_quest_t objectdecorator_quest_t;
 struct objectdecorator_quest_t {
     objectdecorator_t base; /* inherits from objectdecorator_t */
-    void (*update)(objectdecorator_quest_t*); /* update function */
+    void (*update)(objectdecorator_quest_t*); /* questcommand_update function */
 };
 
 typedef struct objectdecorator_pushquest_t objectdecorator_pushquest_t;
@@ -42,10 +42,10 @@ struct objectdecorator_popquest_t {
 };
 
 /* private methods */
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void questcommand_init(objectmachine_t *obj);
+static void questcommand_release(objectmachine_t *obj);
+static void questcommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void questcommand_render(objectmachine_t *obj, v2d_t camera_position);
 
 
 static objectmachine_t* setup_decorator(objectdecorator_quest_t *me, objectmachine_t *decorated_machine, void (*update_fun)(objectdecorator_quest_t*));
@@ -80,10 +80,10 @@ objectmachine_t* setup_decorator(objectdecorator_quest_t *me, objectmachine_t *d
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = questcommand_init;
+    obj->release = questcommand_release;
+    obj->update = questcommand_update;
+    obj->render = questcommand_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
 
@@ -92,7 +92,7 @@ objectmachine_t* setup_decorator(objectdecorator_quest_t *me, objectmachine_t *d
     return obj;
 }
 
-void init(objectmachine_t *obj)
+void questcommand_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -102,7 +102,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void questcommand_release(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -113,7 +113,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void questcommand_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_quest_t *me = (objectdecorator_quest_t*)obj;
     /*objectdecorator_t *dec = (objectdecorator_t*)obj;
@@ -124,7 +124,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
     /*decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);*/
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void questcommand_render(objectmachine_t *obj, v2d_t camera_position)
 {
     /*objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;*/

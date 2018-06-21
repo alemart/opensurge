@@ -306,10 +306,10 @@ static int onmusicplay_should_trigger_event(eventstrategy_t *event, object_t *ob
 
 /* private methods */
 static objectmachine_t *make_decorator(objectmachine_t *decorated_machine, const char *new_state_name, eventstrategy_t *strategy);
-static void init(objectmachine_t *obj);
-static void release(objectmachine_t *obj);
-static void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static void render(objectmachine_t *obj, v2d_t camera_position);
+static void onevent_init(objectmachine_t *obj);
+static void onevent_release(objectmachine_t *obj);
+static void onevent_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
+static void onevent_render(objectmachine_t *obj, v2d_t camera_position);
 
 
 
@@ -587,10 +587,10 @@ objectmachine_t *make_decorator(objectmachine_t *decorated_machine, const char *
     objectdecorator_t *dec = (objectdecorator_t*)me;
     objectmachine_t *obj = (objectmachine_t*)dec;
 
-    obj->init = init;
-    obj->release = release;
-    obj->update = update;
-    obj->render = render;
+    obj->init = onevent_init;
+    obj->release = onevent_release;
+    obj->update = onevent_update;
+    obj->render = onevent_render;
     obj->get_object_instance = objectdecorator_get_object_instance; /* inherits from superclass */
     dec->decorated_machine = decorated_machine;
     me->new_state_name = str_dup(new_state_name);
@@ -599,7 +599,7 @@ objectmachine_t *make_decorator(objectmachine_t *decorated_machine, const char *
     return obj;
 }
 
-void init(objectmachine_t *obj)
+void onevent_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectdecorator_onevent_t *me = (objectdecorator_onevent_t*)obj;
@@ -610,7 +610,7 @@ void init(objectmachine_t *obj)
     decorated_machine->init(decorated_machine);
 }
 
-void release(objectmachine_t *obj)
+void onevent_release(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectdecorator_onevent_t *me = (objectdecorator_onevent_t*)obj;
@@ -624,7 +624,7 @@ void release(objectmachine_t *obj)
     free(obj);
 }
 
-void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void onevent_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
@@ -637,7 +637,7 @@ void update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *
         decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 
-void render(objectmachine_t *obj, v2d_t camera_position)
+void onevent_render(objectmachine_t *obj, v2d_t camera_position)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
