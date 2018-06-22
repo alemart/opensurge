@@ -272,65 +272,6 @@ SET(
   src/scripting/sensor.c
   src/scripting/time.c
 
-  src/entities/object_decorators/base/objectbasicmachine.c
-  src/entities/object_decorators/base/objectdecorator.c
-  src/entities/object_decorators/add_lives.c
-  src/entities/object_decorators/add_collectibles.c
-  src/entities/object_decorators/ask_to_leave.c
-  src/entities/object_decorators/add_to_score.c
-  src/entities/object_decorators/attach_to_player.c
-  src/entities/object_decorators/audio.c
-  src/entities/object_decorators/bounce_player.c
-  src/entities/object_decorators/bullet_trajectory.c
-  src/entities/object_decorators/enemy.c
-  src/entities/object_decorators/change_closest_object_state.c
-  src/entities/object_decorators/children.c
-  src/entities/object_decorators/clear_level.c
-  src/entities/object_decorators/create_item.c
-  src/entities/object_decorators/destroy.c
-  src/entities/object_decorators/elliptical_trajectory.c
-  src/entities/object_decorators/showhide.c
-  src/entities/object_decorators/gravity.c
-  src/entities/object_decorators/jump.c
-  src/entities/object_decorators/lock_camera.c
-  src/entities/object_decorators/look.c
-  src/entities/object_decorators/mosquito_movement.c
-  src/entities/object_decorators/move_player.c
-  src/entities/object_decorators/next_level.c
-  src/entities/object_decorators/on_event.c
-  src/entities/object_decorators/return_to_previous_state.c
-  src/entities/object_decorators/hit_player.c
-  src/entities/object_decorators/kill_player.c
-  src/entities/object_decorators/pause.c
-  src/entities/object_decorators/player_movement.c
-  src/entities/object_decorators/player_action.c
-  src/entities/object_decorators/set_absolute_position.c
-  src/entities/object_decorators/set_alpha.c
-  src/entities/object_decorators/set_angle.c
-  src/entities/object_decorators/set_scale.c
-  src/entities/object_decorators/set_animation.c
-  src/entities/object_decorators/set_obstacle.c
-  src/entities/object_decorators/set_player_speed.c
-  src/entities/object_decorators/set_player_animation.c
-  src/entities/object_decorators/set_player_position.c
-  src/entities/object_decorators/set_player_inputmap.c
-  src/entities/object_decorators/dialog_box.c
-  src/entities/object_decorators/walk.c
-  src/entities/object_decorators/observe_player.c
-  src/entities/object_decorators/variables.c
-  src/entities/object_decorators/set_zindex.c
-  src/entities/object_decorators/textout.c
-  src/entities/object_decorators/simulate_button.c
-  src/entities/object_decorators/switch_character.c
-  src/entities/object_decorators/load_level.c
-  src/entities/object_decorators/restart_level.c
-  src/entities/object_decorators/save_level.c
-  src/entities/object_decorators/camera_focus.c
-  src/entities/object_decorators/execute.c
-  src/entities/object_decorators/launch_url.c
-  src/entities/object_decorators/quest.c
-  src/entities/object_decorators/reset_globals.c
-
   src/entities/items/util/itemutil.c
   src/entities/items/animal.c
   src/entities/items/animalprison.c
@@ -363,6 +304,11 @@ SET(
   src/entities/physics/sensor.c
   src/entities/physics/sensorstate.c
 
+  src/entities/legacy/object_compiler.c
+  src/entities/legacy/object_decorators.c
+  src/entities/legacy/object_machine.c
+  src/entities/legacy/object_vm.c
+
   src/entities/actor.c
   src/entities/background.c
   src/entities/brick.c
@@ -370,8 +316,6 @@ SET(
   src/entities/character.c
   src/entities/enemy.c
   src/entities/entitymanager.c
-  src/entities/object_compiler.c
-  src/entities/object_vm.c
   src/entities/item.c
   src/entities/player.c
   src/entities/particle.c
@@ -455,66 +399,6 @@ IF(WIN32)
 
       src/scripting/scripting.h
 
-      src/entities/object_decorators/base/objectbasicmachine.h
-      src/entities/object_decorators/base/objectdecorator.h
-      src/entities/object_decorators/base/objectmachine.h
-      src/entities/object_decorators/add_lives.h
-      src/entities/object_decorators/add_collectibles.h
-      src/entities/object_decorators/ask_to_leave.h
-      src/entities/object_decorators/add_to_score.h
-      src/entities/object_decorators/attach_to_player.h
-      src/entities/object_decorators/audio.h
-      src/entities/object_decorators/bounce_player.h
-      src/entities/object_decorators/bullet_trajectory.h
-      src/entities/object_decorators/enemy.h
-      src/entities/object_decorators/change_closest_object_state.h
-      src/entities/object_decorators/children.h
-      src/entities/object_decorators/clear_level.h
-      src/entities/object_decorators/create_item.h
-      src/entities/object_decorators/destroy.h
-      src/entities/object_decorators/elliptical_trajectory.h
-      src/entities/object_decorators/showhide.h
-      src/entities/object_decorators/gravity.h
-      src/entities/object_decorators/jump.h
-      src/entities/object_decorators/lock_camera.h
-      src/entities/object_decorators/look.h
-      src/entities/object_decorators/mosquito_movement.h
-      src/entities/object_decorators/move_player.h
-      src/entities/object_decorators/next_level.h
-      src/entities/object_decorators/on_event.h
-      src/entities/object_decorators/return_to_previous_state.h
-      src/entities/object_decorators/hit_player.h
-      src/entities/object_decorators/kill_player.h
-      src/entities/object_decorators/pause.h
-      src/entities/object_decorators/player_movement.h
-      src/entities/object_decorators/player_action.h
-      src/entities/object_decorators/set_absolute_position.h
-      src/entities/object_decorators/set_alpha.h
-      src/entities/object_decorators/set_angle.h
-      src/entities/object_decorators/set_scale.h
-      src/entities/object_decorators/set_animation.h
-      src/entities/object_decorators/set_obstacle.h
-      src/entities/object_decorators/set_player_speed.h
-      src/entities/object_decorators/set_player_animation.h
-      src/entities/object_decorators/set_player_position.h
-      src/entities/object_decorators/set_player_inputmap.h
-      src/entities/object_decorators/dialog_box.h
-      src/entities/object_decorators/walk.h
-      src/entities/object_decorators/observe_player.h
-      src/entities/object_decorators/variables.h
-      src/entities/object_decorators/set_zindex.h
-      src/entities/object_decorators/textout.h
-      src/entities/object_decorators/simulate_button.h
-      src/entities/object_decorators/switch_character.h
-      src/entities/object_decorators/load_level.h
-      src/entities/object_decorators/restart_level.h
-      src/entities/object_decorators/save_level.h
-      src/entities/object_decorators/camera_focus.h
-      src/entities/object_decorators/execute.h
-      src/entities/object_decorators/launch_url.h
-      src/entities/object_decorators/quest.h
-      src/entities/object_decorators/reset_globals.h
-
       src/entities/items/util/itemutil.h
       src/entities/items/animal.h
       src/entities/items/animalprison.h
@@ -546,6 +430,11 @@ IF(WIN32)
       src/entities/physics/physicsactor.h
       src/entities/physics/sensor.h
       src/entities/physics/sensorstate.h
+
+      src/entities/legacy/object_compiler.h
+      src/entities/legacy/object_decorators.h
+      src/entities/legacy/object_machine.h
+      src/entities/legacy/object_vm.h
 
       src/entities/actor.h
       src/entities/background.h
