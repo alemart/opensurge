@@ -33,11 +33,11 @@
 #include "../core/hashtable.h"
 #include "../core/nanoparser/nanoparser.h"
 #include "../scenes/level.h"
+#include "legacy/object_vm.h"
+#include "legacy/object_compiler.h"
 #include "actor.h"
 #include "player.h"
 #include "enemy.h"
-#include "object_vm.h"
-#include "object_compiler.h"
 #include "item.h"
 #include "brick.h"
 
