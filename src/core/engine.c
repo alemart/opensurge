@@ -43,16 +43,16 @@
 #include "font.h"
 #include "fontext.h"
 #include "nanoparser/nanoparser.h"
-#include "nanocalc/nanocalc.h"
-#include "nanocalc/nanocalc_addons.h"
-#include "nanocalcext.h"
-#include "../scenes/quest.h"
-#include "../scenes/level.h"
+#include "../entities/legacy/nanocalc/nanocalc.h"
+#include "../entities/legacy/nanocalc/nanocalc_addons.h"
+#include "../entities/legacy/nanocalc/nanocalcext.h"
 #include "../entities/actor.h"
 #include "../entities/enemy.h"
 #include "../entities/player.h"
 #include "../entities/character.h"
 #include "../scripting/scripting.h"
+#include "../scenes/quest.h"
+#include "../scenes/level.h"
 
 /* private stuff ;) */
 static void clean_garbage();

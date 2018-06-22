@@ -20,19 +20,19 @@
 
 #include <time.h>
 #include <math.h>
-#include "nanocalc/nanocalc.h"
+#include "nanocalc.h"
 #include "nanocalcext.h"
-#include "video.h"
-#include "audio.h"
-#include "timer.h"
-#include "input.h"
-#include "../scenes/level.h"
-#include "../entities/actor.h"
-#include "../entities/player.h"
-#include "../entities/enemy.h"
-#include "../entities/item.h"
-#include "../entities/brick.h"
-#include "../entities/camera.h"
+#include "../../actor.h"
+#include "../../player.h"
+#include "../../enemy.h"
+#include "../../item.h"
+#include "../../brick.h"
+#include "../../camera.h"
+#include "../../../core/video.h"
+#include "../../../core/audio.h"
+#include "../../../core/timer.h"
+#include "../../../core/input.h"
+#include "../../../scenes/level.h"
 
 /* private stuff ;) */
 #define PLAYER (enemy_get_observed_player(target))

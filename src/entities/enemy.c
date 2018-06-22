@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include <math.h>
+#include "../core/nanoparser/nanoparser.h"
 #include "../core/global.h"
 #include "../core/util.h"
 #include "../core/audio.h"
@@ -28,13 +29,12 @@
 #include "../core/logfile.h"
 #include "../core/stringutil.h"
 #include "../core/osspec.h"
-#include "../core/nanocalcext.h"
 #include "../core/video.h"
 #include "../core/hashtable.h"
-#include "../core/nanoparser/nanoparser.h"
 #include "../scenes/level.h"
 #include "legacy/object_vm.h"
 #include "legacy/object_compiler.h"
+#include "legacy/nanocalc/nanocalcext.h"
 #include "actor.h"
 #include "player.h"
 #include "enemy.h"

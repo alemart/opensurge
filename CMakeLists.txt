@@ -215,8 +215,6 @@ ENDIF(MSVC)
 SET(
   GAME_SRCS
 
-  src/core/nanocalc/nanocalc.c
-  src/core/nanocalc/nanocalc_addons.c
   src/core/nanoparser/nanoparser.c
   src/core/audio.c
   src/core/commandline.c
@@ -228,7 +226,6 @@ SET(
   src/core/inputmap.c
   src/core/lang.c
   src/core/logfile.c
-  src/core/nanocalcext.c
   src/core/osspec.c
   src/core/preferences.c
   src/core/quest.c
@@ -304,6 +301,9 @@ SET(
   src/entities/physics/sensor.c
   src/entities/physics/sensorstate.c
 
+  src/entities/legacy/nanocalc/nanocalc.c
+  src/entities/legacy/nanocalc/nanocalc_addons.c
+  src/entities/legacy/nanocalc/nanocalcext.c
   src/entities/legacy/object_compiler.c
   src/entities/legacy/object_decorators.c
   src/entities/legacy/object_machine.c
@@ -347,8 +347,6 @@ IF(WIN32)
       GAME_SRCS
       ${GAME_SRCS}
 
-      src/core/nanocalc/nanocalc.h
-      src/core/nanocalc/nanocalc_addons.h
       src/core/nanoparser/nanoparser.h
       src/core/audio.h
       src/core/commandline.h
@@ -362,7 +360,6 @@ IF(WIN32)
       src/core/inputmap.h
       src/core/lang.h
       src/core/logfile.h
-      src/core/nanocalcext.h
       src/core/osspec.h
       src/core/preferences.h
       src/core/quest.h
@@ -435,6 +432,9 @@ IF(WIN32)
       src/entities/legacy/object_decorators.h
       src/entities/legacy/object_machine.h
       src/entities/legacy/object_vm.h
+      src/entities/legacy/nanocalc/nanocalc.h
+      src/entities/legacy/nanocalc/nanocalc_addons.h
+      src/entities/legacy/nanocalc/nanocalcext.h
 
       src/entities/actor.h
       src/entities/background.h

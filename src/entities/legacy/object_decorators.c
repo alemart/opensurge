@@ -22,6 +22,9 @@
 #include <string.h>
 #include "object_decorators.h"
 #include "object_vm.h"
+#include "nanocalc/nanocalc.h"
+#include "nanocalc/nanocalc_addons.h"
+#include "nanocalc/nanocalcext.h"
 #include "../actor.h"
 #include "../player.h"
 #include "../../core/util.h"
@@ -34,9 +37,6 @@
 #include "../../core/image.h"
 #include "../../core/font.h"
 #include "../../core/input.h"
-#include "../../core/nanocalc/nanocalc.h"
-#include "../../core/nanocalc/nanocalc_addons.h"
-#include "../../core/nanocalcext.h"
 #include "../../core/v2d.h"
 #include "../../scenes/level.h"
 

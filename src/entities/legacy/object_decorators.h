@@ -22,7 +22,7 @@
 #define _OBJECT_DECORATORS_H
 
 #include "object_machine.h"
-#include "../../core/nanocalc/nanocalc.h"
+#include "nanocalc/nanocalc.h"
 
 /* commands */
 objectmachine_t* objectdecorator_addcollectibles_new(objectmachine_t *decorated_machine, expression_t *collectibles);
