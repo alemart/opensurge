@@ -24,9 +24,6 @@
 #include "stageselect.h"
 #include "options.h"
 #include "level.h"
-#include "../entities/player.h"
-#include "../core/nanocalc/nanocalc.h"
-#include "../core/nanocalc/nanocalc_addons.h"
 #include "../core/util.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
@@ -45,6 +42,8 @@
 #include "../core/font.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
+#include "../entities/player.h"
+#include "../entities/legacy/nanocalc/nanocalc.h"
 
 
 

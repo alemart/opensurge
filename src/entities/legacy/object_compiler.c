@@ -25,9 +25,9 @@
 #include <ctype.h>
 #include "object_compiler.h"
 #include "object_decorators.h"
+#include "nanocalc/nanocalc.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
-#include "../../core/nanocalc/nanocalc.h"
 
 /* expression evaluator (nanocalc) helper */
 /* given a string, makes an expression_t object */

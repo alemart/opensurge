@@ -21,9 +21,9 @@
 #ifndef _OBJECT_VM_H
 #define _OBJECT_VM_H
 
-#include "../enemy.h"
 #include "object_machine.h"
-#include "../../core/nanocalc/nanocalc.h"
+#include "nanocalc/nanocalc.h"
+#include "../enemy.h"
 
 /* an objectvm_t is a finite state machine.
    Every state has a name an can be decorated

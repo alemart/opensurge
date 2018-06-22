@@ -21,7 +21,6 @@
 #include "object_vm.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
-#include "../../core/nanocalc/nanocalc.h"
 
 /* private stuff */
 typedef struct objectmachine_list_t objectmachine_list_t;
