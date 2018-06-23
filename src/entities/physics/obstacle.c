@@ -46,7 +46,7 @@ obstacle_t* obstacle_create_solid(const image_t *image, int angle, v2d_t positio
     o->position = position;
     o->width = image_width(image);
     o->height = image_height(image);
-    o->angle = angle & 0xFF;
+    o->angle = angle;
     o->is_solid = solidobstacle_is_solid;
     o->image = image;
 
@@ -60,7 +60,7 @@ obstacle_t* obstacle_create_oneway(const image_t *image, int angle, v2d_t positi
     o->position = position;
     o->width = image_width(image);
     o->height = image_height(image);
-    o->angle = angle & 0xFF;
+    o->angle = angle;
     o->is_solid = onewayobstacle_is_solid;
     o->image = image;
 
@@ -101,9 +101,9 @@ int obstacle_get_angle(const obstacle_t *obstacle)
 int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis, obstaclebaselevel_t base_level)
 {
     uint32 mask = video_get_maskcolor();
-    int w = obstacle_get_width(obstacle);
-    int h = obstacle_get_height(obstacle);
-    const image_t *image = obstacle_get_image(obstacle);
+    int w = obstacle->width;
+    int h = obstacle->height;
+    const image_t *image = obstacle->image;
     int x, y;
 
     if(NULL == image)
@@ -191,9 +191,36 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
     return 0;
 }
 
-const image_t *obstacle_get_image(const obstacle_t *obstacle)
+/* detects a pixel-perfect collision between an obstacle and a sensor
+ * (x1, y1, x2, y2) are given in world-coordinates */
+int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
 {
-    return obstacle->image;
+    /* bounding box collision */
+    const image_t *img = obstacle->image;
+    int o_x1 = (int)obstacle->position.x;
+    int o_y1 = (int)obstacle->position.y;
+    int o_x2 = o_x1 + obstacle->width;
+    int o_y2 = o_y1 + obstacle->height;
+
+    if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1 && img != NULL) {
+        /* pixel perfect collision */
+        int x, y, px, py;
+        uint32 mask = video_get_maskcolor();
+
+        /* since y1 == y2 XOR x1 == x2, it's really a linear loop */
+        for(y=y1; y<=y2; y++) {
+            for(x=x1; x<=x2; x++) {
+                px = x - o_x1;
+                py = y - o_y1;
+                if(px >= 0 && px < image_width(img) && py >= 0 && py < image_height(img)) {
+                    if(image_getpixel(img, px, py) != mask)
+                        return TRUE;
+                }
+            }
+        }
+    }
+
+    return FALSE;
 }
 
 /* private methods */

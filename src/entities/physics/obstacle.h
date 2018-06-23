@@ -54,6 +54,6 @@ int obstacle_get_width(const obstacle_t *obstacle); /* width of the bounding box
 int obstacle_get_height(const obstacle_t *obstacle); /* height of the bounding box */
 int obstacle_get_angle(const obstacle_t *obstacle); /* angle */
 int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis, obstaclebaselevel_t base_level); /* height map */
-const struct image_t* obstacle_get_image(const obstacle_t *obstacle); /* the image */
+int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2); /* check for collision with sensor (x1,y1,x2,y2) */
 
 #endif
