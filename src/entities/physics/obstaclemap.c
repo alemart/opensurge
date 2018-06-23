@@ -80,9 +80,11 @@ const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstacle
     for(l = obstaclemap->list; l != NULL; l = l->next) {
         /* l->data is colliding with the sensor */
         if(obstacle_got_collision(l->data, x1, y1, x2, y2)) {
-            /* l->data is better than o */
-            if((!o) || (o && pick_best_obstacle(l->data, o, x1, y1, x2, y2, mm) == l->data))
+            /* the C standard mandates short-circuit evaluation */
+            if((o == NULL) || pick_best_obstacle(l->data, o, x1, y1, x2, y2, mm) == l->data) {
+                /* l->data is better than o */
                 o = l->data;
+            }
         }
     }
 
