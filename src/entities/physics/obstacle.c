@@ -192,7 +192,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 }
 
 /* detects a pixel-perfect collision between an obstacle and a sensor
- * (x1, y1, x2, y2) are given in world-coordinates */
+ * (x1, y1, x2, y2) are given in world-coordinates; also, x1 <= x2 and y1 <= y2 */
 int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
 {
     /* bounding box collision */
