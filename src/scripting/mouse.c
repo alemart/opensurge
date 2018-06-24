@@ -19,6 +19,8 @@
  */
 
 #include <surgescript.h>
+#include <math.h>
+#include "../core/video.h"
 #include "../core/input.h"
 
 /* private */
@@ -94,14 +96,16 @@ surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_v
 surgescript_var_t* fun_getxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_number(surgescript_var_create(), input_get_xy((inputmouse_t*)input).x);
+    float mul = video_get_screen_size().x / video_get_window_size().x;
+    return surgescript_var_set_number(surgescript_var_create(), floor(input_get_xy((inputmouse_t*)input).x * mul));
 }
 
 /* get y-position (in screen coordinates) */
 surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_number(surgescript_var_create(), input_get_xy((inputmouse_t*)input).y);
+    float mul = video_get_screen_size().y / video_get_window_size().y;
+    return surgescript_var_set_number(surgescript_var_create(), floor(input_get_xy((inputmouse_t*)input).y * mul));
 }
 
 /* buttonDown(button): is the given button being held down?
