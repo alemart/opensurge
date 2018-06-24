@@ -207,27 +207,27 @@ void input_release()
  */
 int input_button_down(input_t *in, inputbutton_t button)
 {
-    return in->enabled ? in->state[(int)button] : FALSE;
+    return in->enabled && in->state[(int)button];
 }
 
 
 /*
  * input_button_pressed()
- * Checks if a given button is pressed, not holded
+ * Checks if a given button has just been pressed (not held down)
  */
 int input_button_pressed(input_t *in, inputbutton_t button)
 {
-    return in->enabled ? (in->state[(int)button] && !in->oldstate[(int)button]) : FALSE;
+    return in->enabled && (in->state[(int)button] && !in->oldstate[(int)button]);
 }
 
 
 /*
  * input_button_up()
- * Checks if a given button is up
+ * Checks if a given button has just been released
  */
 int input_button_up(input_t *in, inputbutton_t button)
 {
-    return in->enabled ? (!in->state[(int)button] && in->oldstate[(int)button]) : FALSE;
+    return in->enabled && (!in->state[(int)button] && in->oldstate[(int)button]);
 }
 
 
