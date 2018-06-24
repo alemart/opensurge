@@ -174,7 +174,7 @@ void osspec_init(const char *basedir)
                 "levels",
                 "licenses",
                 "musics",
-                "objects",
+                "scripts",
                 "quests",
                 "samples",
                 "screenshots",

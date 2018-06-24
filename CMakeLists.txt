@@ -486,7 +486,7 @@ IF(UNIX)
   INSTALL(CODE "MESSAGE(\"Installing ${GAME_NAME} ${GAME_VERSION} at ${GAME_UNIX_INSTALLDIR}... Please make sure you have enough privileges.\")")
   INSTALL(TARGETS ${GAME_UNIXNAME} RUNTIME DESTINATION ${GAME_UNIX_INSTALLDIR})
   INSTALL(FILES LICENSE README.md logo.png surge.png DESTINATION ${GAME_UNIX_INSTALLDIR})
-  INSTALL(DIRECTORY characters objects sprites config images levels licenses musics quests samples screenshots scripts themes languages fonts ttf DESTINATION ${GAME_UNIX_INSTALLDIR} PATTERN ".git" EXCLUDE)
+  INSTALL(DIRECTORY characters scripts sprites config images levels licenses musics quests samples screenshots scripts themes languages fonts ttf DESTINATION ${GAME_UNIX_INSTALLDIR} PATTERN ".git" EXCLUDE)
 
   INSTALL(CODE "MESSAGE(\"Copying executable to ${GAME_UNIX_EXECDIR}...\")")
   INSTALL(CODE "EXECUTE_PROCESS(COMMAND \"cmake\" \"-E\" \"copy\" \"${GAME_UNIX_INSTALLDIR}/${GAME_UNIXNAME}\" \"${GAME_UNIX_EXECDIR}/${GAME_UNIXNAME}\")")
