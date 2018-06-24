@@ -20,6 +20,7 @@
 
 #include <surgescript.h>
 #include <string.h>
+#include <math.h>
 #include "../core/v2d.h"
 #include "../core/video.h"
 #include "../core/image.h"
@@ -53,6 +54,7 @@ static surgescript_var_t* fun_animationfinished(surgescript_object_t* object, co
 extern surgescript_objecthandle_t require_component(const surgescript_object_t* object, const char* component_name);
 extern v2d_t world_position(const surgescript_object_t* object);
 static float world_angle(const surgescript_object_t* object);
+static v2d_t world_lossyscale(const surgescript_object_t* object);
 static const surgescript_heapptr_t ZINDEX_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t DETACHED_ADDR = 2;
@@ -150,7 +152,6 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* render */
 surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* TODO: scale */
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
     v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
@@ -158,8 +159,9 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
     actor->position = world_position(object);
     actor->angle = world_angle(object) * DEG2RAD;
-    actor_render(actor, camera);
+    actor->scale = world_lossyscale(object);
 
+    actor_render(actor, camera);
     return NULL;
 }
 
@@ -328,4 +330,22 @@ float world_angle(const surgescript_object_t* object)
     float parent_angle = (parent != object) ? world_angle(parent) : 0.0f;
     surgescript_object_peek_transform(object, &transform);
     return parent_angle + transform.rotation.z;
+}
+
+/* computes the approximate scale (not very accurate; does not account for shearing) */
+v2d_t world_lossyscale(const surgescript_object_t* object)
+{
+    static const float eps = 1e-5;
+    surgescript_transform_t transform;
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);   
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
+    v2d_t scale = (parent != object) ? world_lossyscale(parent) : v2d_new(1.0f, 1.0f);
+
+    surgescript_object_peek_transform(object, &transform);
+    if(transform.scale.x >= 1.0f - eps && transform.scale.x <= 1.0f + eps && transform.scale.y >= 1.0f - eps && transform.scale.y <= 1.0f + eps)
+        return scale;
+
+    scale.x *= transform.scale.x;
+    scale.y *= transform.scale.y;
+    return v2d_new(ssmax(scale.x, 0), ssmax(scale.y, 0));
 }
