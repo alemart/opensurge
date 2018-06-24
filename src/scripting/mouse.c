@@ -44,7 +44,7 @@ void scripting_register_mouse(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Mouse", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Mouse", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Mouse", "destructor", fun_destructor, 0);
-    surgescript_vm_bind(vm, "Mouse", "spawn", fun_spawn, 0);
+    surgescript_vm_bind(vm, "Mouse", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Mouse", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Mouse", "get_xpos", fun_getxpos, 0);
     surgescript_vm_bind(vm, "Mouse", "get_ypos", fun_getypos, 0);
