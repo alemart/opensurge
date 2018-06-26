@@ -265,6 +265,7 @@ SET(
   src/scripting/actor.c
   src/scripting/camera.c
   src/scripting/console.c
+  src/scripting/input.c
   src/scripting/obstaclemap.c
   src/scripting/sensor.c
   src/scripting/time.c

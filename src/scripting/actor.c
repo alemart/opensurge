@@ -295,14 +295,14 @@ surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* actor width */
+/* actor frame width */
 surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
     return surgescript_var_set_number(surgescript_var_create(), image_width(actor_image(actor)));
 }
 
-/* actor height */
+/* actor frame height */
 surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
