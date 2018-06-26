@@ -45,10 +45,11 @@ extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
+extern void scripting_register_input(surgescript_vm_t* vm);
+extern void scripting_register_mouse(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
 extern void scripting_register_time(surgescript_vm_t* vm);
-extern void scripting_register_mouse(surgescript_vm_t* vm);
 
 /*
  * scripting_init()
@@ -71,10 +72,11 @@ void scripting_init(int argc, const char** argv)
     scripting_register_actor(vm);
     scripting_register_camera(vm);
     scripting_register_console(vm);
+    scripting_register_input(vm);
+    scripting_register_mouse(vm);
     scripting_register_obstaclemap(vm);
     scripting_register_sensor(vm);
     scripting_register_time(vm);
-    scripting_register_mouse(vm);
 
     /* compile scripts */
     foreach_resource(path, compile_script, NULL, TRUE);
