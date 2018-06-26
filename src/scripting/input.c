@@ -85,7 +85,7 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* init(inputMap): set an input map */
+/* __init(inputMap): set an input map */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
@@ -97,7 +97,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
 /* buttonDown(button): is the given button being held down?
  * valid buttons are: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8"
- * for optimization reasons, its mandatory: button must be of the string type */
+ * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
@@ -121,7 +121,7 @@ surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescrip
 
 /* buttonPressed(button): has the given button just been pressed?
  * valid buttons are: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8"
- * for optimization reasons, its mandatory: button must be of the string type */
+ * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
@@ -145,7 +145,7 @@ surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgesc
 
 /* buttonReleased(button): has the given button just been released?
  * valid buttons are: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8"
- * for optimization reasons, its mandatory: button must be of the string type */
+ * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
