@@ -116,6 +116,7 @@
 /* forward declarations */
 struct actor_t;
 struct player_t;
+struct collisionmask_t;
 struct brick_list_t;
 struct item_list_t;
 struct enemy_list_t;
@@ -145,6 +146,7 @@ struct item_t {
     int preserve; /* should we delete this item when it's outside the screen? */
     int bring_to_back; /* TODO: z-index?? */
     int always_active; /* always active? */
+    struct collisionmask_t* mask; /* collision mask */
 };
 
 /* linked list of items */

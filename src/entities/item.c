@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * item.c - code for the items
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,8 @@
 #include "player.h"
 #include "enemy.h"
 #include "brick.h"
+#include "actor.h"
+#include "collisionmask.h"
 
 #include "../core/global.h"
 #include "../core/audio.h"
@@ -394,6 +396,13 @@ item_t *item_create(int type)
         item->type = type;
         item->state = IS_IDLE;
         item->init(item);
+        item->mask = item->obstacle ? collisionmask_create(
+            actor_image(item->actor),
+            0,
+            0,
+            image_width(actor_image(item->actor)),
+            image_height(actor_image(item->actor))
+        ) : NULL;
     }
 
     return item;
@@ -407,6 +416,8 @@ item_t *item_create(int type)
  */
 item_t* item_destroy(item_t *item)
 {
+    if(item->mask != NULL)
+        collisionmask_destroy(item->mask);
     item->release(item);
     free(item);
     return NULL;
