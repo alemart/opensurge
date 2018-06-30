@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * brick.c - brick module
- * Copyright (C) 2008-2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,12 @@
 #define BRKDATA_MAX                 16384 /* this engine supports up to BRKDATA_MAX bricks per theme */
 static int brickdata_count; /* size of brickdata[] */
 static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
+typedef struct cmdetails_t { /* collision mask */
+    const char *source_file;
+    int x, y, w, h;
+} cmdetails_t;
+
+
 
 /* private functions */
 static void brick_animate(brick_t *brk);
@@ -51,6 +57,8 @@ static brickdata_t* brickdata_delete(brickdata_t *obj);
 static void validate_brickdata(const brickdata_t *obj);
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata);
+static int traverse_collisionmask(const parsetree_statement_t *stmt, void *cmdetails);
+static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
 
 /* misc */
 #define BRB_FALL_TIME               1.0 /* time in seconds before a BRB_FALL gets destroyed */
@@ -89,8 +97,16 @@ void brickdata_load(const char *filename)
 
     logfile_message("Creating collision masks...");
     for(i=0; i<brickdata_count; i++) {
-        if(brickdata[i] != NULL && brickdata[i]->collisionmask == NULL)
-            brickdata[i]->collisionmask = collisionmask_create_from_sprite(brickdata[i]->data);
+        if(brickdata[i] != NULL && brickdata[i]->collisionmask == NULL) {
+            spriteinfo_t* sprite = brickdata[i]->data;
+            brickdata[i]->collisionmask = collisionmask_create(
+                image_load(sprite->source_file),
+                sprite->rect_x,
+                sprite->rect_y,
+                sprite->frame_w,
+                sprite->frame_h
+            );
+        }
     }
 
     logfile_message("brickdata_load('%s') ok!", filename);
@@ -683,7 +699,7 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         nanoparser_expect_program(p1, "Can't read brick attributes: collision_mask expects a block");
         if(dat->collisionmask != NULL)
             collisionmask_destroy(dat->collisionmask);
-        dat->collisionmask = collisionmask_create_from_parsetree(nanoparser_get_program(p1));
+        dat->collisionmask = read_collisionmask(nanoparser_get_program(p1));
     }
     else if(str_icmp(identifier, "sprite") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
@@ -698,3 +714,50 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
     return 0;
 }
 
+/* this will read a collision_mask { ... } block */
+int traverse_collisionmask(const parsetree_statement_t *stmt, void *cmdetails)
+{
+    const char *identifier;
+    const parsetree_parameter_t *param_list;
+    const parsetree_parameter_t *p1, *p2, *p3, *p4;
+    cmdetails_t *s = (cmdetails_t*)cmdetails;
+
+    identifier = nanoparser_get_identifier(stmt);
+    param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "source_file") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "collision_mask: must provide path to source_file");
+        s->source_file = nanoparser_get_string(p1);
+    }
+    else if(str_icmp(identifier, "source_rect") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        p3 = nanoparser_get_nth_parameter(param_list, 3);
+        p4 = nanoparser_get_nth_parameter(param_list, 4);
+
+        nanoparser_expect_string(p1, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
+        nanoparser_expect_string(p2, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
+        nanoparser_expect_string(p3, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
+        nanoparser_expect_string(p4, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
+
+        s->x = max(0, atoi(nanoparser_get_string(p1)));
+        s->y = max(0, atoi(nanoparser_get_string(p2)));
+        s->w = max(1, atoi(nanoparser_get_string(p3)));
+        s->h = max(1, atoi(nanoparser_get_string(p4)));
+    }
+
+    return 0;
+}
+
+/* read a collision mask from a file */
+collisionmask_t *read_collisionmask(const parsetree_program_t *block)
+{
+    cmdetails_t s = { NULL, 0, 0, 0, 0 };
+
+    nanoparser_traverse_program_ex(block, (void*)(&s), traverse_collisionmask);
+    if(s.source_file == NULL)
+        fatal_error("collision_mask: a source_file must be specified");
+
+    return collisionmask_create(image_load(s.source_file), s.x, s.y, s.w, s.h);
+}

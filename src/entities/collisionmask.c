@@ -29,14 +29,9 @@
 /* private stuff ;) */
 struct collisionmask_t {
     image_t *mask; /* it's a sub-image from some sheet */
+    int width;
+    int height;
 };
-
-typedef struct cmdetails_t {
-    const char *source_file;
-    int x, y, w, h;
-} cmdetails_t;
-
-static int traverse(const parsetree_statement_t *stmt, void *cmdetails);
 
 
 /* public methods */
@@ -44,23 +39,9 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
 {
     collisionmask_t *cm = mallocx(sizeof *cm);
     cm->mask = image_create_shared(image, x, y, width, height);
+    cm->width = width;
+    cm->height = height;
     return cm;
-}
-
-collisionmask_t *collisionmask_create_from_parsetree(const struct parsetree_program_t *block)
-{
-    cmdetails_t s = { NULL, 0, 0, 0, 0 };
-
-    nanoparser_traverse_program_ex(block, (void*)(&s), traverse);
-    if(s.source_file == NULL)
-        fatal_error("collision_mask: a source_file must be specified");
-
-    return collisionmask_create(image_load(s.source_file), s.x, s.y, s.w, s.h);
-}
-
-collisionmask_t *collisionmask_create_from_sprite(const struct spriteinfo_t *sprite)
-{
-    return collisionmask_create(image_load(sprite->source_file), sprite->rect_x, sprite->rect_y, sprite->frame_w, sprite->frame_h);
 }
 
 collisionmask_t *collisionmask_destroy(collisionmask_t *cm)
@@ -84,49 +65,3 @@ int collisionmask_height(const collisionmask_t* cm)
 {
     return image_height(cm->mask);
 }
-
-
-
-
-
-
-/* aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
-
-
-
-/* this will read a collision_mask { ... } block */
-int traverse(const parsetree_statement_t *stmt, void *cmdetails)
-{
-    const char *identifier;
-    const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1, *p2, *p3, *p4;
-    cmdetails_t *s = (cmdetails_t*)cmdetails;
-
-    identifier = nanoparser_get_identifier(stmt);
-    param_list = nanoparser_get_parameter_list(stmt);
-
-    if(str_icmp(identifier, "source_file") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "collision_mask: must provide path to source_file");
-        s->source_file = nanoparser_get_string(p1);
-    }
-    else if(str_icmp(identifier, "source_rect") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        p2 = nanoparser_get_nth_parameter(param_list, 2);
-        p3 = nanoparser_get_nth_parameter(param_list, 3);
-        p4 = nanoparser_get_nth_parameter(param_list, 4);
-
-        nanoparser_expect_string(p1, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
-        nanoparser_expect_string(p2, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
-        nanoparser_expect_string(p3, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
-        nanoparser_expect_string(p4, "collision_mask: must provide four numbers to source_rect - xpos, ypos, width, height");
-
-        s->x = max(0, atoi(nanoparser_get_string(p1)));
-        s->y = max(0, atoi(nanoparser_get_string(p2)));
-        s->w = max(1, atoi(nanoparser_get_string(p3)));
-        s->h = max(1, atoi(nanoparser_get_string(p4)));
-    }
-
-    return 0;
-}
-
