@@ -92,10 +92,10 @@ obstaclemap_t* create_obstaclemap()
 /* converts a brick to an obstacle */
 obstacle_t* brick2obstacle(const brick_t *brick)
 {
-    const image_t *image = collisionmask_image(brick_collisionmask(brick));
+    const collisionmask_t* collisionmask = brick_collisionmask(brick);
     /*int angle = (int)(256 - (brick->brick_ref->angle % 360) / 1.40625f) % 256;*/
     int angle = brick->brick_ref->angle % 360;
     v2d_t position = v2d_new(brick->x, brick->y);
     bool cloud = (brick->brick_ref->property == BRK_CLOUD);
-    return (cloud ? obstacle_create_oneway : obstacle_create_solid)(image, angle, position);
+    return (cloud ? obstacle_create_oneway : obstacle_create_solid)(collisionmask, angle, position);
 }

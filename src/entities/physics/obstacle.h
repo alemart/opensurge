@@ -40,11 +40,11 @@ enum obstaclebaselevel_t {
 };
 
 /* forward declarations */
-struct image_t;
+struct collisionmask_t;
 
 /* create and destroy */
-obstacle_t* obstacle_create_solid(const struct image_t *image, int angle, v2d_t position);
-obstacle_t* obstacle_create_oneway(const struct image_t *image, int angle, v2d_t position);
+obstacle_t* obstacle_create_solid(const struct collisionmask_t *mask, int angle, v2d_t position);
+obstacle_t* obstacle_create_oneway(const struct collisionmask_t *mask, int angle, v2d_t position);
 obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 
 /* public methods */

@@ -70,18 +70,20 @@ collisionmask_t *collisionmask_destroy(collisionmask_t *cm)
     return NULL;
 }
 
-int collisionmask_check(collisionmask_t *cm, int x, int y)
+int collisionmask_check(const collisionmask_t *cm, int x, int y)
 {
     return image_getpixel(cm->mask, x, y) != video_get_maskcolor();
 }
 
-const image_t *collisionmask_image(const collisionmask_t *cm)
+int collisionmask_width(const collisionmask_t* cm)
 {
-    return cm->mask;
+    return image_width(cm->mask);
 }
 
-
-
+int collisionmask_height(const collisionmask_t* cm)
+{
+    return image_height(cm->mask);
+}
 
 
 
