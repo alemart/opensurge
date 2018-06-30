@@ -116,7 +116,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             y = position_on_base_axis;
             for(x=w-1; x>=0; x--) {
-                if(collisionmask_check(mask, x, y))
+                if(collisionmask_check(mask, x, y, w))
                     break;
             }
 
@@ -135,7 +135,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             x = position_on_base_axis;
             for(y=h-1; y>=0; y--) {
-                if(collisionmask_check(mask, x, y))
+                if(collisionmask_check(mask, x, y, w))
                     break;
             }
 
@@ -153,7 +153,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             y = position_on_base_axis;
             for(x=0; x<w; x++) {
-                if(collisionmask_check(mask, x, y))
+                if(collisionmask_check(mask, x, y, w))
                     break;
             }
 
@@ -173,7 +173,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             x = position_on_base_axis;
             for(y=0; y<h; y++) {
-                if(collisionmask_check(mask, x, y))
+                if(collisionmask_check(mask, x, y, w))
                     break;
             }
 
@@ -205,7 +205,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
                 px = x - o_x1;
                 py = y - o_y1;
                 if(px >= 0 && px < obstacle->width && py >= 0 && py < obstacle->height) {
-                    if(collisionmask_check(mask, px, py))
+                    if(collisionmask_check(mask, px, py, obstacle->width))
                         return TRUE;
                 }
             }
