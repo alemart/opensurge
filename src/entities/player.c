@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * player.c - player module
- * Copyright (C) 2008-2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1060,12 +1060,12 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         if(brick_list->data->brick_ref->property != BRK_NONE && brick_list->data->enabled && brick_image(brick_list->data) != NULL && !ignore_obstacle(brick_list->data->brick_ref->angle, player->disable_wall, brick_list->data->layer, player->layer))
             obstaclemap_add_obstacle(obstaclemap, brick2obstacle(brick_list->data));
     }
-    #if 0
-    /* no collision mask ... */
     for(; item_list; item_list = item_list->next) {
         if(item_list->data->obstacle && !ignore_obstacle(0, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, item2obstacle(item_list->data));
     }
+    #if 0
+    /* no collision mask ... */
     for(; object_list; object_list = object_list->next) {
         if(object_list->data->obstacle && !ignore_obstacle(object_list->data->obstacle_angle, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, object2obstacle(object_list->data));
@@ -1113,15 +1113,11 @@ obstacle_t* brick2obstacle(const brick_t *brick)
 /* converts a built-in item to an obstacle */
 obstacle_t* item2obstacle(const item_t *item)
 {
-    #if 0
-    const image_t *image = actor_image(item->actor);
+    const collisionmask_t* mask = item->mask;
     int angle = 0;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
 
-    return obstacle_create_solid(image, angle, position);
-    #else
-    return NULL;
-    #endif
+    return obstacle_create_solid(mask, angle, position);
 }
 
 /* converts a custom object to an obstacle */
