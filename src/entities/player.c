@@ -1057,11 +1057,11 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     /* creating the obstacle map */
     obstaclemap = obstaclemap_create();
     for(; brick_list; brick_list = brick_list->next) {
-        if(brick_list->data->brick_ref->property != BRK_NONE && brick_list->data->enabled && brick_image(brick_list->data) != NULL && !ignore_obstacle(brick_list->data->brick_ref->angle, player->disable_wall, brick_list->data->layer, player->layer))
+        if(brick_list->data->brick_ref->property != BRK_NONE && brick_list->data->enabled && !ignore_obstacle(brick_list->data->brick_ref->angle, player->disable_wall, brick_list->data->layer, player->layer))
             obstaclemap_add_obstacle(obstaclemap, brick2obstacle(brick_list->data));
     }
     for(; item_list; item_list = item_list->next) {
-        if(item_list->data->obstacle && !ignore_obstacle(0, player->disable_wall, BRL_DEFAULT, player->layer))
+        if(item_list->data->obstacle && item_list->data->mask && !ignore_obstacle(0, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, item2obstacle(item_list->data));
     }
     for(; object_list; object_list = object_list->next) {

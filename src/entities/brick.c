@@ -97,9 +97,9 @@ void brickdata_load(const char *filename)
 
     logfile_message("Creating collision masks...");
     for(i=0; i<brickdata_count; i++) {
-        if(brickdata[i] != NULL && brickdata[i]->collisionmask == NULL) {
+        if(brickdata[i] != NULL && brickdata[i]->mask == NULL) {
             spriteinfo_t* sprite = brickdata[i]->data;
-            brickdata[i]->collisionmask = collisionmask_create(
+            brickdata[i]->mask = collisionmask_create(
                 image_load(sprite->source_file),
                 sprite->rect_x,
                 sprite->rect_y,
@@ -453,7 +453,7 @@ const image_t *brick_image(const brick_t *brk)
  */
 const collisionmask_t *brick_collisionmask(const brick_t *brk)
 {
-    return brk->brick_ref->collisionmask;
+    return brk->brick_ref->mask;
 }
 
 
@@ -567,7 +567,7 @@ brickdata_t* brickdata_new()
 
     obj->data = NULL;
     obj->image = NULL;
-    obj->collisionmask = NULL;
+    obj->mask = NULL;
     obj->property = BRK_NONE;
     obj->angle = 0;
     obj->behavior = BRB_DEFAULT;
@@ -585,7 +585,7 @@ brickdata_t* brickdata_delete(brickdata_t *obj)
     if(obj != NULL) {
         if(obj->data != NULL)
             spriteinfo_destroy(obj->data);
-        collisionmask_destroy(obj->collisionmask);
+        collisionmask_destroy(obj->mask);
         free(obj);
     }
 
@@ -697,9 +697,9 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
     else if(str_icmp(identifier, "collision_mask") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_program(p1, "Can't read brick attributes: collision_mask expects a block");
-        if(dat->collisionmask != NULL)
-            collisionmask_destroy(dat->collisionmask);
-        dat->collisionmask = read_collisionmask(nanoparser_get_program(p1));
+        if(dat->mask != NULL)
+            collisionmask_destroy(dat->mask);
+        dat->mask = read_collisionmask(nanoparser_get_program(p1));
     }
     else if(str_icmp(identifier, "sprite") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);

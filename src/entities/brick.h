@@ -78,7 +78,7 @@ typedef enum bricklayer_t bricklayer_t;
 struct brickdata_t {
     spriteinfo_t *data; /* this is not stored in the main hash */
     image_t *image; /* pointer to the current brick image in the animation */
-    struct collisionmask_t *collisionmask; /* collision mask */
+    struct collisionmask_t *mask; /* collision mask */
     int angle; /* in degrees, 0 <= angle < 360 */
     float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
     brickproperty_t property;
