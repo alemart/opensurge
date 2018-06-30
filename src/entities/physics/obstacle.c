@@ -19,6 +19,7 @@
  */
 
 #include "obstacle.h"
+#include "../collisionmask.h";
 #include "../../core/util.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
@@ -31,7 +32,7 @@ struct obstacle_t
     int height;
     int angle;
     int (*is_solid)(const obstacle_t*);
-    const image_t *image;
+    const collisionmask_t* mask;
 };
 
 /* private methods */
@@ -39,30 +40,30 @@ static int solidobstacle_is_solid(const obstacle_t *obstacle);
 static int onewayobstacle_is_solid(const obstacle_t *obstacle);
 
 /* public methods */
-obstacle_t* obstacle_create_solid(const image_t *image, int angle, v2d_t position)
+obstacle_t* obstacle_create_solid(const collisionmask_t* mask, int angle, v2d_t position)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
     o->position = position;
-    o->width = image_width(image);
-    o->height = image_height(image);
+    o->width = collisionmask_width(mask);
+    o->height = collisionmask_height(mask);
     o->angle = angle;
     o->is_solid = solidobstacle_is_solid;
-    o->image = image;
+    o->mask = mask;
 
     return o;
 }
 
-obstacle_t* obstacle_create_oneway(const image_t *image, int angle, v2d_t position)
+obstacle_t* obstacle_create_oneway(const collisionmask_t* mask, int angle, v2d_t position)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
     o->position = position;
-    o->width = image_width(image);
-    o->height = image_height(image);
+    o->width = collisionmask_width(mask);
+    o->height = collisionmask_height(mask);
     o->angle = angle;
     o->is_solid = onewayobstacle_is_solid;
-    o->image = image;
+    o->mask = mask;
 
     return o;
 }
@@ -100,14 +101,10 @@ int obstacle_get_angle(const obstacle_t *obstacle)
 
 int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis, obstaclebaselevel_t base_level)
 {
-    uint32 mask = video_get_maskcolor();
+    const collisionmask_t* mask = obstacle->mask;
     int w = obstacle->width;
     int h = obstacle->height;
-    const image_t *image = obstacle->image;
     int x, y;
-
-    if(NULL == image)
-        return 0;
 
     switch(base_level) {
 
@@ -123,7 +120,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             y = position_on_base_axis;
             for(x=w-1; x>=0; x--) {
-                if(image_getpixel(image, x, y) != mask)
+                if(collisionmask_check(mask, x, y))
                     break;
             }
 
@@ -142,7 +139,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             x = position_on_base_axis;
             for(y=h-1; y>=0; y--) {
-                if(image_getpixel(image, x, y) != mask)
+                if(collisionmask_check(mask, x, y))
                     break;
             }
 
@@ -160,7 +157,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             y = position_on_base_axis;
             for(x=0; x<w; x++) {
-                if(image_getpixel(image, x, y) != mask)
+                if(collisionmask_check(mask, x, y))
                     break;
             }
 
@@ -180,7 +177,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 
             x = position_on_base_axis;
             for(y=0; y<h; y++) {
-                if(image_getpixel(image, x, y) != mask)
+                if(collisionmask_check(mask, x, y))
                     break;
             }
 
@@ -196,24 +193,23 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
 {
     /* bounding box collision */
-    const image_t *img = obstacle->image;
+    const collisionmask_t* mask = obstacle->mask;
     int o_x1 = (int)obstacle->position.x;
     int o_y1 = (int)obstacle->position.y;
     int o_x2 = o_x1 + obstacle->width;
     int o_y2 = o_y1 + obstacle->height;
 
-    if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1 && img != NULL) {
+    if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1) {
         /* pixel perfect collision */
         int x, y, px, py;
-        uint32 mask = video_get_maskcolor();
 
         /* since y1 == y2 XOR x1 == x2, it's really a linear loop */
         for(y=y1; y<=y2; y++) {
             for(x=x1; x<=x2; x++) {
                 px = x - o_x1;
                 py = y - o_y1;
-                if(px >= 0 && px < image_width(img) && py >= 0 && py < image_height(img)) {
-                    if(image_getpixel(img, px, py) != mask)
+                if(px >= 0 && px < obstacle->width && py >= 0 && py < obstacle->height) {
+                    if(collisionmask_check(mask, px, py))
                         return TRUE;
                 }
             }

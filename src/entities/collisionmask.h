@@ -35,13 +35,11 @@ collisionmask_t *collisionmask_create_from_sprite(const struct spriteinfo_t *spr
 /* destroys an existing collision mask */
 collisionmask_t *collisionmask_destroy(collisionmask_t *cm);
 
-/* check for collision */
-int collisionmask_check(collisionmask_t *cm, int x, int y);
+/* retrieve dimensions */
+int collisionmask_width(const collisionmask_t* cm);
+int collisionmask_height(const collisionmask_t* cm);
 
-/* returns the collision mask as an image, where each pixel is:
-       magenta if non-solid
-       non-magenta if solid
-*/
-const struct image_t *collisionmask_image(const collisionmask_t *cm);
+/* check for collision */
+int collisionmask_check(const collisionmask_t *cm, int x, int y);
 
 #endif

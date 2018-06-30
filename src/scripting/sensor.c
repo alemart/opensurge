@@ -36,7 +36,7 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_check(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -54,7 +54,7 @@ static const surgescript_heapptr_t ANGLE_ADDR = 3;
 #define SENSOR_COLOR (image_hex2rgb("ffff00"))
 static const int STATUS_NONE = 0;
 static const int STATUS_SOLID = 1;
-static const int STATUS_NONSOLID = 2;
+static const int STATUS_ONEWAY = 2;
 
 /*
  * scripting_register_sensor()
@@ -68,7 +68,7 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "__init", fun_init, 5);
     surgescript_vm_bind(vm, "Sensor", "get_zindex", fun_getzindex, 0);
     surgescript_vm_bind(vm, "Sensor", "render", fun_render, 0);
-    surgescript_vm_bind(vm, "Sensor", "check", fun_check, 0);
+    surgescript_vm_bind(vm, "Sensor", "update", fun_update, 0);
     surgescript_vm_bind(vm, "Sensor", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Sensor", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
@@ -157,12 +157,12 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     return NULL;
 }
 
-/* check for collisions AT THIS MOMENT IN TIME; returns STATUS_NONE, STATUS_SOLID or STATUS_NONSOLID */
-surgescript_var_t* fun_check(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* update the collision status AT THIS MOMENT IN TIME;
+   useful if you move the object and, in the same frame, need to revalidate the collision status */
+surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
     update(object);
-    return surgescript_var_clone(surgescript_heap_at(heap, STATUS_ADDR));
+    return NULL;
 }
 
 /* render */
@@ -251,7 +251,7 @@ void update(surgescript_object_t* object)
         if(obstacle_is_solid(obstacle))
             surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_SOLID);
         else
-            surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_NONSOLID);
+            surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_ONEWAY);
         surgescript_var_set_number(surgescript_heap_at(heap, ANGLE_ADDR), obstacle_get_angle(obstacle));
     }
     else {
