@@ -192,6 +192,10 @@ enemy_t *enemy_destroy(enemy_t *enemy)
     if(enemy->category != NULL)
         free(enemy->category);
 
+    /* destroy my collision mask (if any) */
+    if(enemy->mask != NULL)
+        collisionmask_destroy(enemy->mask);
+
     /* destroy me */
     actor_destroy(enemy->actor);
     free(enemy->name);
@@ -374,6 +378,7 @@ enemy_t* create_from_script(const char *object_name)
     e->always_active = FALSE;
     e->hide_unless_in_editor_mode = FALSE;
     e->detach_from_camera = FALSE;
+    e->mask = NULL;
     e->vm = objectvm_create(e);
     e->created_from_editor = TRUE;
     e->parent = NULL;

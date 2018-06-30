@@ -61,6 +61,7 @@ struct enemy_t {
     int always_active; /* is this object always active, even if it's far away from the camera? */
     int hide_unless_in_editor_mode; /* this object will be displayed only in the level editor */
     int detach_from_camera; /* this object will not be affected by the camera (scrolling) */
+    struct collisionmask_t *mask; /* collision mask */
     
     struct objectvm_t *vm; /* virtual machine (programming related to objects) */
     const char *annotation; /* optional annotation (example: "This is a soccer ball") */

@@ -1064,13 +1064,10 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         if(item_list->data->obstacle && !ignore_obstacle(0, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, item2obstacle(item_list->data));
     }
-    #if 0
-    /* no collision mask ... */
     for(; object_list; object_list = object_list->next) {
-        if(object_list->data->obstacle && !ignore_obstacle(object_list->data->obstacle_angle, player->disable_wall, BRL_DEFAULT, player->layer))
+        if(object_list->data->obstacle && object_list->data->mask && !ignore_obstacle(object_list->data->obstacle_angle, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, object2obstacle(object_list->data));
     }
-    #endif
 
     /* updating the physics actor */
     physicsactor_update(pa, obstaclemap);
@@ -1123,15 +1120,11 @@ obstacle_t* item2obstacle(const item_t *item)
 /* converts a custom object to an obstacle */
 obstacle_t* object2obstacle(const object_t *object)
 {
-    #if 0
-    const image_t *image = actor_image(object->actor);
+    const collisionmask_t* mask = object->mask;
     int angle = (int)(256 - (object->obstacle_angle % 360) / 1.40625f) % 256;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
 
-    return obstacle_create_solid(image, angle, position);
-    #else
-    return NULL;
-    #endif
+    return obstacle_create_solid(mask, angle, position);
 }
 
 /* ignore the obstacle? */
