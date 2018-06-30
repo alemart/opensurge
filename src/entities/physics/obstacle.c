@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/obstacle.c - physics system: obstacles
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,13 +31,9 @@ struct obstacle_t
     int width;
     int height;
     int angle;
-    int (*is_solid)(const obstacle_t*);
+    int is_solid;
     const collisionmask_t* mask;
 };
-
-/* private methods */
-static int solidobstacle_is_solid(const obstacle_t *obstacle);
-static int onewayobstacle_is_solid(const obstacle_t *obstacle);
 
 /* public methods */
 obstacle_t* obstacle_create_solid(const collisionmask_t* mask, int angle, v2d_t position)
@@ -48,7 +44,7 @@ obstacle_t* obstacle_create_solid(const collisionmask_t* mask, int angle, v2d_t 
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
     o->angle = angle;
-    o->is_solid = solidobstacle_is_solid;
+    o->is_solid = TRUE;
     o->mask = mask;
 
     return o;
@@ -62,7 +58,7 @@ obstacle_t* obstacle_create_oneway(const collisionmask_t* mask, int angle, v2d_t
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
     o->angle = angle;
-    o->is_solid = onewayobstacle_is_solid;
+    o->is_solid = FALSE;
     o->mask = mask;
 
     return o;
@@ -81,7 +77,7 @@ v2d_t obstacle_get_position(const obstacle_t *obstacle)
 
 int obstacle_is_solid(const obstacle_t *obstacle)
 {
-    return obstacle->is_solid(obstacle);
+    return obstacle->is_solid;
 }
 
 int obstacle_get_width(const obstacle_t *obstacle)
@@ -216,16 +212,5 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
         }
     }
 
-    return FALSE;
-}
-
-/* private methods */
-int solidobstacle_is_solid(const obstacle_t *obstacle)
-{
-    return TRUE;
-}
-
-int onewayobstacle_is_solid(const obstacle_t *obstacle)
-{
     return FALSE;
 }
