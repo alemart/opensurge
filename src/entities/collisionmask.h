@@ -33,7 +33,8 @@ collisionmask_t *collisionmask_destroy(collisionmask_t *cm);
 int collisionmask_width(const collisionmask_t* cm);
 int collisionmask_height(const collisionmask_t* cm);
 
-/* check for collision */
-int collisionmask_check(const collisionmask_t *cm, int x, int y);
+/* collision checking
+   WARNING: no boundary checking!! (for faster access) */
+#define collisionmask_check(cm, x, y, w) *(*((char**)(cm)) + (y) * (w) + (x))
 
 #endif

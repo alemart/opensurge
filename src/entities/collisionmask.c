@@ -28,7 +28,7 @@
 
 /* private stuff ;) */
 struct collisionmask_t {
-    image_t *mask; /* it's a sub-image from some sheet */
+    char* mask;
     int width;
     int height;
 };
@@ -38,30 +38,32 @@ struct collisionmask_t {
 collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height)
 {
     collisionmask_t *cm = mallocx(sizeof *cm);
-    cm->mask = image_create_shared(image, x, y, width, height);
-    cm->width = width;
-    cm->height = height;
+    uint32 maskcolor = video_get_maskcolor();
+
+    cm->width = max(1, width);
+    cm->height = max(1, height);
+    cm->mask = mallocx(cm->width * cm->height);
+    for(int j = 0; j < cm->height; j++) {
+        for(int i = 0; i < cm->width; i++)
+            cm->mask[j * cm->width + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
+    }
+
     return cm;
 }
 
 collisionmask_t *collisionmask_destroy(collisionmask_t *cm)
 {
-    image_destroy(cm->mask);
+    free(cm->mask);
     free(cm);
     return NULL;
 }
 
-int collisionmask_check(const collisionmask_t *cm, int x, int y)
-{
-    return image_getpixel(cm->mask, x, y) != video_get_maskcolor();
-}
-
 int collisionmask_width(const collisionmask_t* cm)
 {
-    return image_width(cm->mask);
+    return cm->width;
 }
 
 int collisionmask_height(const collisionmask_t* cm)
 {
-    return image_height(cm->mask);
+    return cm->height;
 }
