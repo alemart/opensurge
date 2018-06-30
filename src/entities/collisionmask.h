@@ -23,16 +23,10 @@
 
 struct image_t;
 struct collisionmask_t;
-struct parsetree_program_t;
-struct spriteinfo_t;
 typedef struct collisionmask_t collisionmask_t;
 
-/* creates a new collision mask */
+/* create and destroy a collision mask */
 collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height);
-collisionmask_t *collisionmask_create_from_parsetree(const struct parsetree_program_t *block);
-collisionmask_t *collisionmask_create_from_sprite(const struct spriteinfo_t *sprite);
-
-/* destroys an existing collision mask */
 collisionmask_t *collisionmask_destroy(collisionmask_t *cm);
 
 /* retrieve dimensions */

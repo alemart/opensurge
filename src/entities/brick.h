@@ -55,7 +55,7 @@ enum bricklayer_t {
 };
 
 /* misc */
-#define BRICK_MAXVALUES         3
+#define BRICK_MAXVALUES         2
 #define BRICKBEHAVIOR_MAXARGS   5
 
 

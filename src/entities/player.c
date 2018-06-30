@@ -1060,6 +1060,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         if(brick_list->data->brick_ref->property != BRK_NONE && brick_list->data->enabled && brick_image(brick_list->data) != NULL && !ignore_obstacle(brick_list->data->brick_ref->angle, player->disable_wall, brick_list->data->layer, player->layer))
             obstaclemap_add_obstacle(obstaclemap, brick2obstacle(brick_list->data));
     }
+    #if 0
+    /* no collision mask ... */
     for(; item_list; item_list = item_list->next) {
         if(item_list->data->obstacle && !ignore_obstacle(0, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, item2obstacle(item_list->data));
@@ -1068,6 +1070,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         if(object_list->data->obstacle && !ignore_obstacle(object_list->data->obstacle_angle, player->disable_wall, BRL_DEFAULT, player->layer))
             obstaclemap_add_obstacle(obstaclemap, object2obstacle(object_list->data));
     }
+    #endif
 
     /* updating the physics actor */
     physicsactor_update(pa, obstaclemap);
@@ -1110,21 +1113,29 @@ obstacle_t* brick2obstacle(const brick_t *brick)
 /* converts a built-in item to an obstacle */
 obstacle_t* item2obstacle(const item_t *item)
 {
+    #if 0
     const image_t *image = actor_image(item->actor);
     int angle = 0;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
 
     return obstacle_create_solid(image, angle, position);
+    #else
+    return NULL;
+    #endif
 }
 
 /* converts a custom object to an obstacle */
 obstacle_t* object2obstacle(const object_t *object)
 {
+    #if 0
     const image_t *image = actor_image(object->actor);
     int angle = (int)(256 - (object->obstacle_angle % 360) / 1.40625f) % 256;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
 
     return obstacle_create_solid(image, angle, position);
+    #else
+    return NULL;
+    #endif
 }
 
 /* ignore the obstacle? */

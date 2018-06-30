@@ -19,7 +19,7 @@
  */
 
 #include "obstacle.h"
-#include "../collisionmask.h";
+#include "../collisionmask.h"
 #include "../../core/util.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
