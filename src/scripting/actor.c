@@ -51,7 +51,9 @@ static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_animationfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_animfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_animrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_animfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 extern surgescript_objecthandle_t require_component(const surgescript_object_t* object, const char* component_name);
 extern v2d_t world_position(const surgescript_object_t* object);
 static float world_angle(const surgescript_object_t* object);
@@ -94,7 +96,9 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Actor", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
-    surgescript_vm_bind(vm, "Actor", "animationFinished", fun_animationfinished, 0);
+    surgescript_vm_bind(vm, "Actor", "animFinished", fun_animfinished, 0);
+    surgescript_vm_bind(vm, "Actor", "animRepeats", fun_animrepeats, 0);
+    surgescript_vm_bind(vm, "Actor", "animFPS", fun_animfps, 0);
 }
 
 /* private */
@@ -228,11 +232,27 @@ surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_v
 }
 
 /* has the animation finished playing? */
-surgescript_var_t* fun_animationfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_animfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
     return surgescript_var_set_bool(surgescript_var_create(), actor_animation_finished(actor));
 }
+
+/* does the animation repeat itself? */
+surgescript_var_t* fun_animrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    return surgescript_var_set_bool(surgescript_var_create(), actor->animation->repeat);
+}
+
+/* animation fps */
+surgescript_var_t* fun_animfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    return surgescript_var_set_number(surgescript_var_create(), actor->animation->fps);
+}
+
+
 
 /* get horizontal flip */
 surgescript_var_t* fun_gethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
