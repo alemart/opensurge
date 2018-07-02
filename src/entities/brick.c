@@ -97,7 +97,7 @@ void brickdata_load(const char *filename)
 
     logfile_message("Creating collision masks...");
     for(i=0; i<brickdata_count; i++) {
-        if(brickdata[i] != NULL && brickdata[i]->mask == NULL) {
+        if(brickdata[i] != NULL && brickdata[i]->property != BRK_NONE && brickdata[i]->mask == NULL) {
             spriteinfo_t* sprite = brickdata[i]->data;
             brickdata[i]->mask = collisionmask_create(
                 image_load(sprite->source_file),
@@ -450,6 +450,7 @@ const image_t *brick_image(const brick_t *brk)
 /*
  * brick_collisionmask()
  * Returns the collision mask of a brick
+ * WARNING: will be NULL if the brick is passable!
  */
 const collisionmask_t *brick_collisionmask(const brick_t *brk)
 {
@@ -585,7 +586,8 @@ brickdata_t* brickdata_delete(brickdata_t *obj)
     if(obj != NULL) {
         if(obj->data != NULL)
             spriteinfo_destroy(obj->data);
-        collisionmask_destroy(obj->mask);
+        if(obj->mask != NULL)
+            collisionmask_destroy(obj->mask);
         free(obj);
     }
 
