@@ -53,17 +53,19 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
 
 collisionmask_t *collisionmask_destroy(collisionmask_t *cm)
 {
-    free(cm->mask);
-    free(cm);
+    if(cm != NULL) {
+        free(cm->mask);
+        free(cm);
+    }
     return NULL;
 }
 
 int collisionmask_width(const collisionmask_t* cm)
 {
-    return cm->width;
+    return cm ? cm->width : 0;
 }
 
 int collisionmask_height(const collisionmask_t* cm)
 {
-    return cm->height;
+    return cm ? cm->height : 0;
 }
