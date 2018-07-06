@@ -47,24 +47,26 @@
 
 
 /* Uncomment to render the sensors */
-/*#define SHOW_SENSORS*/
+#define SHOW_SENSORS
 
+/* Rotate character (effect) */
+#define ANGLE_CHANGE_INTENSITY 0.3f /* a value in [0, 1] */
 
 /* macros */
 #define ON_STATE(s) \
     if(p->pa_old_state != (s) && physicsactor_get_state(p->pa) == (s))
 
-#define CHANGE_ANIM(id) { \
+#define CHANGE_ANIM(id) do { \
     animation_t *an = sprite_get_animation(charactersystem_get(p->name)->animation.sprite_name, charactersystem_get(p->name)->animation.id); \
-    /*float xsp = fabs(p->actor->speed.x / 60.0f), sf = 1.0f;*/ \
     actor_change_animation(p->actor, an); \
+    /*float xsp = fabs(p->actor->speed.x / 60.0f), sf = 1.0f;*/ \
     /*if( strcmp( #id, "walking" ) == 0 ) sf = 0.5f * 60.0f / ( 8 * max(1, 8 - xsp) );*/ \
     /*else if( strcmp( #id, "running" ) == 0 ) sf = 0.5f * 60.0f / ( 8 * max(1, 8 - xsp) );*/ \
     /*else if( strcmp( #id, "jumping" ) == 0 ) sf = 0.5f * 60.0f / ( 8 * max(1, 5 - xsp) );*/ \
     /*else if( strcmp( #id, "rolling" ) == 0 ) sf = 0.5f * 60.0f / ( 8 * max(1, 5 - xsp) );*/  \
     /* sf = 60.0f / ( an->fps * max(1, 8 - xsp) ); */ \
     /* actor_change_animation_speed_factor(p->actor, sf); */ \
-}
+} while(0)
 
 /* private data */
 #define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player must blink if he/she gets hurt? */
@@ -331,24 +333,23 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
  */
 void player_render(player_t *player, v2d_t camera_position)
 {
+    float ang;
     actor_t *act = player->actor;
     int i, behind_player[PLAYER_MAX_INVSTAR];
-    float ang;
-    for(i=0;i<PLAYER_MAX_INVSTAR && player->invincible;i++)
-        behind_player[i] = (int)((180*4) * timer_get_ticks()*0.001 + (i+1)*(360/PLAYER_MAX_INVSTAR)) % 360 >= 180;
 
     /* invincibility stars I */
-    for(i=0;i<PLAYER_MAX_INVSTAR && player->invincible;i++) {
+    for(i=0; i<PLAYER_MAX_INVSTAR && player->invincible; i++) {
+        behind_player[i] = (int)((180*4) * timer_get_ticks()*0.001 + (i+1)*(360/PLAYER_MAX_INVSTAR)) % 360 >= 180;
         if(behind_player[i])
             actor_render(player->invstar[i], camera_position);
     }
 
     /* render the player */
     switch(physicsactor_get_movmode(player->pa)) {
-    case MM_FLOOR: act->position.y -= 1; break;
-    case MM_LEFTWALL: act->position.x += 3; break;
-    case MM_RIGHTWALL: act->position.x -= 1; break;
-    case MM_CEILING: act->position.y += 3; break;
+        case MM_FLOOR: act->position.y -= 1; break;
+        case MM_LEFTWALL: act->position.x += 3; break;
+        case MM_RIGHTWALL: act->position.x -= 1; break;
+        case MM_CEILING: act->position.y += 3; break;
     }
 
     act->angle = old_school_angle(ang = act->angle);
@@ -356,10 +357,10 @@ void player_render(player_t *player, v2d_t camera_position)
     act->angle = ang;
 
     switch(physicsactor_get_movmode(player->pa)) {
-    case MM_FLOOR: act->position.y += 1; break;
-    case MM_LEFTWALL: act->position.x -= 3; break;
-    case MM_RIGHTWALL: act->position.x += 1; break;
-    case MM_CEILING: act->position.y -= 3; break;
+        case MM_FLOOR: act->position.y += 1; break;
+        case MM_LEFTWALL: act->position.x -= 3; break;
+        case MM_RIGHTWALL: act->position.x += 1; break;
+        case MM_CEILING: act->position.y -= 3; break;
     }
 
     /* render the shield */
@@ -367,7 +368,7 @@ void player_render(player_t *player, v2d_t camera_position)
         actor_render(player->shield, camera_position);
 
     /* invincibility stars II */
-    for(i=0;i<PLAYER_MAX_INVSTAR && player->invincible;i++) {
+    for(i=0; i<PLAYER_MAX_INVSTAR && player->invincible; i++) {
         if(!behind_player[i])
             actor_render(player->invstar[i], camera_position);
     }
@@ -1093,7 +1094,12 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* misc */
     act->mirror = !physicsactor_is_facing_right(pa) ? IF_HFLIP : IF_NONE;
-    act->angle = ((int)((256 - physicsactor_get_angle(pa)) * 1.40625f) % 360) * PI / 180.0f;
+    float new_angle = ((int)((256 - physicsactor_get_angle(pa)) * 1.40625f) % 360) * PI / 180.0f;
+    //float delta_angle = new_angle - act->angle <= PI ? new_angle - act->angle : act->angle - new_angle;
+    //act->angle += 15.0f * sign(delta_angle) * timer_get_delta();//fmod(act->angle + ANGLE_CHANGE_INTENSITY * delta_angle, 2*PI);
+    // perform vector lerp
+    act->angle = new_angle;
+    //video_showmessage("%f", act->angle);
 }
 
 /* converts a brick to an obstacle */

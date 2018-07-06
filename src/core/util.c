@@ -31,6 +31,7 @@
 
 
 /* private stuff */
+/*#define ENABLE_OLD_SCHOOL_ANGLE */
 static volatile int game_over = FALSE;
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
@@ -191,6 +192,7 @@ void fatal_error(const char *fmt, ...)
  */
 float old_school_angle(float angle)
 {
+#ifdef ENABLE_OLD_SCHOOL_ANGLE
     if(angle >= 0 && angle < PI/4-EPSILON)
         return 0;
     else if(angle >= PI/4-EPSILON && angle < PI/2-EPSILON)
@@ -209,6 +211,9 @@ float old_school_angle(float angle)
         return 7*PI/4;
     else
         return 0;
+#else
+    return angle;
+#endif
 }
 
 /*

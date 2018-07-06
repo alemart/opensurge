@@ -645,7 +645,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->gsp = 0.0f;
 
         /* slope factor */
-        pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+        //pa->gsp += pa->slp * -SIN(pa->angle) * dt;
 
         /* animation issues */
         if(fabs(pa->gsp) < walk_threshold && pa->angle == 0x0) {
@@ -936,7 +936,39 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->position.y = obstacle_get_position(ground).y + (obstacle_get_height(ground) - 1) - obstacle_get_height_at(ground, (int)(pa->position.x + sensor_get_x1(ground_sensor) - obstacle_get_position(ground).x), FROM_BOTTOM) - (HEIGHT - u);
 
         /* updating the angle */
-        pa->angle = obstacle_get_angle(ground);
+        #define MAX_HEIGHT 31 /* must be a number of the form 2^n - 1, n > 0 */
+        #define FEET_OFFSET 2//5
+pa->state = PAS_STOPPED;
+        if(pa->movmode == MM_FLOOR) {
+            int ha = MAX_HEIGHT + 1, hb = MAX_HEIGHT + 1;
+            int x = pa->position.x + (sensor_get_x1(sensor_A(pa)) + sensor_get_x1(sensor_B(pa))) / 2, y = pa->position.y;
+            for(int j = 0; j <= MAX_HEIGHT; j++) {
+                if(ha > MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x - FEET_OFFSET, y + sensor_get_y2(sensor_A(pa)) + j))
+                    ha = j;
+                if(hb > MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x + FEET_OFFSET, y + sensor_get_y2(sensor_B(pa)) + j))
+                    hb = j;
+            }
+            if(!(ha > MAX_HEIGHT || hb > MAX_HEIGHT))
+                pa->angle = (int)(256 + (atan2(hb - ha, FEET_OFFSET * 2) * 40.7436654315)) & 0xFF;
+            //video_showmessage("%d --- %d", ha, hb);
+            video_showmessage("%d --- %d : %d", ha, hb, pa->angle);
+        }
+        else if(pa->movmode == MM_LEFTWALL) {
+            int ha = -MAX_HEIGHT-1, hb = -MAX_HEIGHT-1;
+            //int ha = -INFINITY, hb = -INFINITY;
+            int x = pa->position.x, y = pa->position.y - (sensor_get_x1(sensor_A(pa)) + sensor_get_x1(sensor_B(pa))) / 2;
+            for(int j = 0; j <= MAX_HEIGHT; j++) {
+                if(ha < -MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x - sensor_get_y2(sensor_A(pa)) - j, y - FEET_OFFSET))
+                    ha = -j;
+                if(hb < -MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x - sensor_get_y2(sensor_B(pa)) - j, y + FEET_OFFSET))
+                    hb = -j;
+            }
+            if(!(ha < -MAX_HEIGHT || hb < -MAX_HEIGHT))
+                pa->angle = (int)(256 + (atan2(FEET_OFFSET * 2, hb - ha) * 40.7436654315)) & 0xFF;
+            video_showmessage("LW >> %d --- %d : %d", ha, hb, pa->angle);
+        }
+        else
+            pa->angle = obstacle_get_angle(ground); /* TODO */
         UPDATE_MOVMODE
 
         /* update the sensors */
@@ -976,7 +1008,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* reattach to the ceiling */
-        if((obstacle_get_angle(ceiling) > 0xA0 && obstacle_get_angle(ceiling) <= 0xBF) || (obstacle_get_angle(ceiling) > 0x40 && obstacle_get_angle(ceiling) <= 0x5F)) {
+        if((obstacle_get_angle(ceiling) > 0xA0 && obstacle_get_angle(ceiling) < 0xC0) || (obstacle_get_angle(ceiling) > 0x40 && obstacle_get_angle(ceiling) < 0x60)) {
             pa->gsp = pa->ysp * -sign(SIN(obstacle_get_angle(ceiling)));
             pa->xsp = 0.0f;
             pa->ysp = 0.0f;

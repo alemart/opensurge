@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/obstaclemap.c - physics system: obstacle map
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -91,6 +91,36 @@ const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstacle
     return o;
 }
 
+int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y)
+{
+    obstacle_list_t *l;
+
+    for(l = obstaclemap->list; l != NULL; l = l->next) {
+        if(obstacle_got_collision(l->data, x, y, x, y))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+/* 2D raycasting */
+const obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t origin, v2d_t direction, float max_distance, v2d_t* hitpoint, float* distance)
+{
+    /* rays can't be larger than infty */
+    const float infty = 2.0f * max(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
+    v2d_t p = origin;
+
+    /* sanity checks */
+    max_distance = clip(max_distance, 0.0f, infty);
+    if(v2d_magnitude(direction) < EPSILON || max_distance < EPSILON)
+        return NULL;
+
+    /* DDA algorithm */
+    direction = v2d_normalize(direction);
+
+    /* 404 not found */
+    return NULL;
+}
 
 /* private methods */
 
