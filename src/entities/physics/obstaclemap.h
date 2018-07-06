@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/obstaclemap.h - physics system: obstacle map
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,8 @@
 #ifndef _OBSTACLEMAP_H
 #define _OBSTACLEMAP_H
 
+#include "../../core/v2d.h"
+
 /*
  * an obstacle map is a set of obstacles
  */
@@ -35,7 +37,9 @@ obstaclemap_t* obstaclemap_create();
 obstaclemap_t* obstaclemap_destroy(obstaclemap_t *obstaclemap);
 
 /* public methods */
+void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, struct obstacle_t *obstacle); /* adds an obstacle to the map */
+int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if an obstacle exists at (x,y) */
 const struct obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, enum movmode_t mm); /* x2 > x1 && y2 > y1; NULL may be returned */
-void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, struct obstacle_t *obstacle);
+const struct obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t origin, v2d_t direction, float max_distance, v2d_t* hitpoint, float* distance); /* raycasting */
 
 #endif

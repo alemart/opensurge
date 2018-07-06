@@ -29,7 +29,6 @@
 struct sensor_t
 {
     /* a sensor is a segment (x1,y1)~(x2,y2) such that x1=x2 or y1=y2 */
-
     int x1, y1, x2, y2; /* coordinates relative to the physics actor */
     uint32 color; /* color of the sensor (used for rendering) */
 
