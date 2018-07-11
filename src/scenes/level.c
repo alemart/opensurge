@@ -490,7 +490,7 @@ void level_unload()
 
     /* unloading the brickset */
     logfile_message("unloading the brickset...");
-    brickdata_unload();
+    brickset_unload();
 
     /* unloading the background */
     logfile_message("unloading the background...");
@@ -687,9 +687,9 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     /* interpreting the command */
     if(str_icmp(identifier, "theme") == 0) {
         if(param_count == 1) {
-            if(brickdata_size() == 0) {
+            if(!brickset_loaded()) {
                 str_cpy(theme, param[0], sizeof(theme));
-                brickdata_load(theme);
+                brickset_load(theme);
             }
         }
         else
@@ -3199,7 +3199,7 @@ void editor_next_entity()
     switch(editor_cursor_entity_type) {
         /* brick */
         case EDT_BRICK: {
-            size = brickdata_size();
+            size = brickset_size();
             editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
             if(!brick_exists(editor_cursor_entity_id))
                 editor_next_entity(); /* invalid brick? */
@@ -3249,7 +3249,7 @@ void editor_previous_entity()
     switch(editor_cursor_entity_type) {
         /* brick */
         case EDT_BRICK: {
-            size = brickdata_size();
+            size = brickset_size();
             editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             if(!brick_exists(editor_cursor_entity_id))
                 editor_previous_entity(); /* invalid brick? */

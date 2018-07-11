@@ -70,10 +70,11 @@ struct brick_list_t {
     brick_list_t *next;
 };
 
-/* brick theme interface */
-void brickdata_load(const char *filename); /* loads a brick theme */
-void brickdata_unload(); /* unloads the current brick theme */
-int brickdata_size(); /* number of bricks */
+/* brickset: theme interface */
+void brickset_load(const char *filename); /* loads a brickset */
+void brickset_unload(); /* unloads the current brickset */
+int brickset_size(); /* number of bricks */
+int brickset_loaded(); /* is a brickset loaded? */
 
 /* brick interface */
 brick_t* brick_create(int id, v2d_t position, bricklayer_t layer); /* spawns a new brick at the specified position */

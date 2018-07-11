@@ -110,16 +110,21 @@ static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 /* ========== brick theme interface ================ */
 
 /*
- * brickdata_load()
- * Loads all the brick theme from a file
+ * brickset_load()
+ * Loads a brickset from a file
  */
-void brickdata_load(const char *filename)
+void brickset_load(const char *filename)
 {
     int i;
     char abs_path[1024];
     parsetree_program_t *tree;
 
-    logfile_message("brickdata_load(\"%s\")", filename);
+    if(brickset_loaded()) {
+        fatal_error("Can't load brickset \"%s\": another brickset is already loaded.", filename);
+        return;
+    }
+
+    logfile_message("brickset_load(\"%s\")", filename);
     resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
 
     brickdata_count = 0;
@@ -148,47 +153,45 @@ void brickdata_load(const char *filename)
         }
     }
 
-    logfile_message("brickdata_load(\"%s\") ok!", filename);
+    logfile_message("The brickset has been loaded.");
 }
 
 
 
 /*
- * brickdata_unload()
- * Unloads brick data
+ * brickset_unload()
+ * Unloads the current brickset
  */
-void brickdata_unload()
+void brickset_unload()
 {
     int i;
 
-    logfile_message("brickdata_unload()");
+    logfile_message("brickset_unload()");
 
-    for(i=0; i<brickdata_count; i++)
+    for(i = 0; i < brickdata_count; i++)
         brickdata[i] = brickdata_delete(brickdata[i]);
     brickdata_count = 0;
 
-    logfile_message("brickdata_unload() ok");
+    logfile_message("The brickset has been unloaded.");
 }
 
 
 /*
- * brickdata_get()
- * Gets a brickdata_t* object
+ * brickset_size()
+ * How many bricks are there (in this brickset)?
  */
-brickdata_t *brickdata_get(int id)
-{
-    id = clip(id, 0, brickdata_count-1);
-    return brickdata[id];
-}
-
-
-/*
- * brickdata_size()
- * How many bricks are loaded?
- */
-int brickdata_size()
+int brickset_size()
 {
     return brickdata_count;
+}
+
+/*
+ * brickset_loaded()
+ * Checks if a brickset is currently loaded
+ */
+int brickset_loaded()
+{
+    return brickset_size() > 0;
 }
 
 
@@ -784,6 +787,13 @@ brickdata_t* brickdata_delete(brickdata_t *obj)
     }
 
     return NULL;
+}
+
+/* gets a brickdata object */
+brickdata_t *brickdata_get(int id)
+{
+    id = clip(id, 0, brickdata_count-1);
+    return brickdata[id];
 }
 
 /* validates a brick theme */
