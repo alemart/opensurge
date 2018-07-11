@@ -217,6 +217,31 @@ float old_school_angle(float angle)
 }
 
 /*
+ * lerp()
+ * Linear interpolation from a to b
+ * 0 <= t <= 1
+ */
+float lerp(float a, float b, float t)
+{
+    t = clip(t, 0.0f, 1.0f);
+    return a + (b - a) * t;
+}
+
+/*
+ * lerp_angle()
+ * Linear interpolation from alpha to beta, both given in radians
+ * 0 <= t <= 1
+ */
+float lerp_angle(float alpha, float beta, float t)
+{
+    v2d_t a = v2d_new(cos(alpha), sin(alpha));
+    v2d_t b = v2d_new(cos(beta), sin(beta));
+    v2d_t c = v2d_lerp(a, b, t);
+    return atan2(c.y, c.x);
+}
+
+
+/*
  * merge_sort()
  * Similar to stdlib's qsort, but merge_sort is
  * a stable sorting algorithm

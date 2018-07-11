@@ -40,7 +40,7 @@
 #include "enemy.h"
 #include "item.h"
 #include "brick.h"
-#include "collisionmask.h"
+#include "physics/collisionmask.h"
 
 /* private stuff */
 #define MAX_OBJECTS                     10240
@@ -375,7 +375,6 @@ enemy_t* create_from_script(const char *object_name)
     actor_change_animation(e->actor, sprite_get_animation("SD_QUESTIONMARK", 0));
     e->preserve = TRUE;
     e->obstacle = FALSE;
-    e->obstacle_angle = 0;
     e->always_active = FALSE;
     e->hide_unless_in_editor_mode = FALSE;
     e->detach_from_camera = FALSE;

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Edits by Dalton Sterritt (all edits released under same license):
+ * Edits by Dalton Sterritt (all edits released under same license, copyright given to Alexandre):
  * player_enable_roll, player_disable_roll
  */
 
@@ -25,16 +25,17 @@
 #include "actor.h"
 #include "player.h"
 #include "brick.h"
-#include "collisionmask.h"
 #include "enemy.h"
 #include "item.h"
 #include "character.h"
+#include "physics/collisionmask.h"
 #include "items/collectible.h"
 #include "items/bouncingcollectible.h"
 #include "../core/global.h"
 #include "../core/audio.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
+#include "../core/darray.h"
 #include "../core/timer.h"
 #include "../core/logfile.h"
 #include "../core/input.h"
@@ -47,10 +48,10 @@
 
 
 /* Uncomment to render the sensors */
-#define SHOW_SENSORS
+/*#define SHOW_SENSORS*/
 
-/* Rotate character (effect) */
-#define ANGLE_CHANGE_INTENSITY 0.3f /* a value in [0, 1] */
+/* Smoothing the angle (the greater the value, the faster it rotates) */
+#define ANGLE_SMOOTHING 4
 
 /* macros */
 #define ON_STATE(s) \
@@ -79,10 +80,10 @@ static int score;                        /* shared score */
 static void update_shield(player_t *p);
 static void update_animation(player_t *p);
 static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static obstacle_t* brick2obstacle(const brick_t *brick);
 static obstacle_t* item2obstacle(const item_t *item);
 static obstacle_t* object2obstacle(const object_t *object);
-static int ignore_obstacle(int brick_angle, int old_loop_system_flags, bricklayer_t brick_layer, bricklayer_t player_layer);
+static int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer);
+static float ang_diff(float alpha, float beta);
 
 
 /*
@@ -1028,9 +1029,12 @@ void update_animation(player_t *p)
 /* the interface between player_t and physicsactor_t */
 void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
+    DARRAY(obstacle_t*, tmp_obstacle);
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
     obstaclemap_t *obstaclemap;
+    float new_angle;
+    int i;
 
     /* converting variables */
     physicsactor_set_position(pa, act->position);
@@ -1055,19 +1059,28 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     if(input_button_down(act->input, IB_FIRE1))
         physicsactor_jump(pa);
 
+    /* create a container for temp obstacles */
+    darray_init(tmp_obstacle);
+
     /* creating the obstacle map */
     obstaclemap = obstaclemap_create();
     for(; brick_list; brick_list = brick_list->next) {
-        if(brick_list->data->brick_ref->property != BRK_NONE && brick_list->data->enabled && !ignore_obstacle(brick_list->data->brick_ref->angle, player->disable_wall, brick_list->data->layer, player->layer))
-            obstaclemap_add_obstacle(obstaclemap, brick2obstacle(brick_list->data));
+        if(brick_obstacle(brick_list->data) != NULL && !ignore_obstacle(brick_list->data->layer, player->layer))
+            obstaclemap_add_obstacle(obstaclemap, brick_obstacle(brick_list->data));
     }
     for(; item_list; item_list = item_list->next) {
-        if(item_list->data->obstacle && item_list->data->mask && !ignore_obstacle(0, player->disable_wall, BRL_DEFAULT, player->layer))
-            obstaclemap_add_obstacle(obstaclemap, item2obstacle(item_list->data));
+        if(item_list->data->obstacle && item_list->data->mask && !ignore_obstacle(BRL_DEFAULT, player->layer)) {
+            obstacle_t* obstacle = item2obstacle(item_list->data);
+            obstaclemap_add_obstacle(obstaclemap, obstacle);
+            darray_push(tmp_obstacle, obstacle);
+        }
     }
     for(; object_list; object_list = object_list->next) {
-        if(object_list->data->obstacle && object_list->data->mask && !ignore_obstacle(object_list->data->obstacle_angle, player->disable_wall, BRL_DEFAULT, player->layer))
-            obstaclemap_add_obstacle(obstaclemap, object2obstacle(object_list->data));
+        if(object_list->data->obstacle && object_list->data->mask && !ignore_obstacle(BRL_DEFAULT, player->layer)) {
+            obstacle_t* obstacle = object2obstacle(object_list->data);
+            obstaclemap_add_obstacle(obstaclemap, obstacle);
+            darray_push(tmp_obstacle, obstacle);
+        }
     }
 
     /* updating the physics actor */
@@ -1075,6 +1088,11 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* destroying the obstacle map */
     obstaclemap = obstaclemap_destroy(obstaclemap);
+
+    /* removing temp obstacles */
+    for(i = 0; i < darray_length(tmp_obstacle); i++)
+        obstacle_destroy(tmp_obstacle[i]);
+    darray_release(tmp_obstacle);
 
     /* can't leave the screen */
     if(physicsactor_get_position(pa).x < 20) {
@@ -1092,60 +1110,43 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     act->position = physicsactor_get_position(pa);
     act->speed = physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player) ? v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa)) : v2d_new(physicsactor_get_gsp(pa), 0.0f);
 
+    /* smoothing the angle */
+    new_angle = ((256 - physicsactor_get_angle(pa)) * 1.40625f) / 57.2957795131f;
+    if(ang_diff(new_angle, act->angle) < 1.6f)
+        act->angle = lerp_angle(act->angle, new_angle, (ANGLE_SMOOTHING * PI * timer_get_delta()));
+    else
+        act->angle = new_angle;
+
     /* misc */
     act->mirror = !physicsactor_is_facing_right(pa) ? IF_HFLIP : IF_NONE;
-    float new_angle = ((int)((256 - physicsactor_get_angle(pa)) * 1.40625f) % 360) * PI / 180.0f;
-    //float delta_angle = new_angle - act->angle <= PI ? new_angle - act->angle : act->angle - new_angle;
-    //act->angle += 15.0f * sign(delta_angle) * timer_get_delta();//fmod(act->angle + ANGLE_CHANGE_INTENSITY * delta_angle, 2*PI);
-    // perform vector lerp
-    act->angle = new_angle;
-    //video_showmessage("%f", act->angle);
-}
-
-/* converts a brick to an obstacle */
-obstacle_t* brick2obstacle(const brick_t *brick)
-{
-    const collisionmask_t* collisionmask = brick_collisionmask(brick);
-    int angle = (int)(256 - (brick->brick_ref->angle % 360) / 1.40625f) % 256;
-    v2d_t position = v2d_new(brick->x, brick->y);
-    int cloud = brick->brick_ref->property == BRK_CLOUD;
-
-    return (cloud ? obstacle_create_oneway : obstacle_create_solid)(collisionmask, angle, position);
 }
 
 /* converts a built-in item to an obstacle */
 obstacle_t* item2obstacle(const item_t *item)
 {
     const collisionmask_t* mask = item->mask;
-    int angle = 0;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
-
-    return obstacle_create_solid(mask, angle, position);
+    return obstacle_create_solid(mask, position);
 }
 
 /* converts a custom object to an obstacle */
 obstacle_t* object2obstacle(const object_t *object)
 {
     const collisionmask_t* mask = object->mask;
-    int angle = (int)(256 - (object->obstacle_angle % 360) / 1.40625f) % 256;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
-
-    return obstacle_create_solid(mask, angle, position);
+    return obstacle_create_solid(mask, position);
 }
 
 /* ignore the obstacle? */
-int ignore_obstacle(int brick_angle, int old_loop_system_flags, bricklayer_t brick_layer, bricklayer_t player_layer)
+int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer)
 {
-    int f = old_loop_system_flags, a = brick_angle % 360;
+    return (brick_layer != BRL_DEFAULT && player_layer != brick_layer);
+}
 
-    return (
-        /* loop system */
-        (brick_layer != BRL_DEFAULT && player_layer != brick_layer) ||
-
-        /* old loop system */
-        ((f & PLAYER_WALL_BOTTOM) && (a == 0)) ||
-        ((f & PLAYER_WALL_TOP) && (a == 180)) ||
-        ((f & PLAYER_WALL_LEFT) && (a > 180+30 && a < 360)) ||
-        ((f & PLAYER_WALL_RIGHT) && (a > 0 && a < 180-30))
-    );
+/* given two angles in [0, 2pi], return their difference */
+float ang_diff(float alpha, float beta)
+{
+    float twopi = PI * 2;
+    float diff = fmod(fabs(alpha - beta), twopi);
+    return min(twopi - diff, diff);
 }

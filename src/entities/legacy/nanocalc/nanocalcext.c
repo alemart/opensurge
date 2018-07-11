@@ -104,7 +104,7 @@ static float f_waterlevel() { return (float)level_waterlevel(); }
 
 static float f_brick_exists(float offset_x, float offset_y) { return (NULL == BRICK_AT(offset_x, offset_y) ? 0.0f : 1.0f); } /* 1 = exists; 0 = otherwise */
 static float f_brick_type(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return (b && b->brick_ref) ? (float)(b->brick_ref->property) : 0.0f; }
-static float f_brick_angle(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return (b && b->brick_ref) ? (float)(b->brick_ref->angle) : 0.0f; }
+static float f_brick_angle(float offset_x, float offset_y) { return 0.0f; } /* obsolete */
 static float f_brick_layer(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return b ? (float)(b->layer) : 0.0f; }
 
 static float f_obstacle_exists(float offset_x, float offset_y) { return OBSTACLE_EXISTS(offset_x, offset_y); }

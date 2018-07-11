@@ -19,7 +19,7 @@
  */
 
 #include "obstacle.h"
-#include "../collisionmask.h"
+#include "collisionmask.h"
 #include "../../core/util.h"
 
 /* obstacle struct */
@@ -28,7 +28,6 @@ struct obstacle_t
     v2d_t position;
     int width;
     int height;
-    int angle;
     uint8 is_solid;
     uint16* height_map[4];
     const collisionmask_t* mask;
@@ -39,14 +38,13 @@ static uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_
 static uint16* destroy_height_map(uint16* height_map);
 
 /* public methods */
-obstacle_t* obstacle_create_solid(const collisionmask_t* mask, int angle, v2d_t position)
+obstacle_t* obstacle_create_solid(const collisionmask_t* mask, v2d_t position)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
     o->position = position;
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
-    o->angle = angle;
     o->is_solid = TRUE;
     o->height_map[0] = create_height_map(mask, FROM_BOTTOM);
     o->height_map[1] = create_height_map(mask, FROM_LEFT);
@@ -57,14 +55,13 @@ obstacle_t* obstacle_create_solid(const collisionmask_t* mask, int angle, v2d_t 
     return o;
 }
 
-obstacle_t* obstacle_create_oneway(const collisionmask_t* mask, int angle, v2d_t position)
+obstacle_t* obstacle_create_oneway(const collisionmask_t* mask, v2d_t position)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
     o->position = position;
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
-    o->angle = angle;
     o->is_solid = FALSE;
     o->height_map[0] = create_height_map(mask, FROM_BOTTOM);
     o->height_map[1] = create_height_map(mask, FROM_LEFT);
@@ -105,38 +102,42 @@ int obstacle_get_height(const obstacle_t *obstacle)
     return obstacle->height;
 }
 
-int obstacle_get_angle(const obstacle_t *obstacle)
-{
-    return obstacle->angle;
-}
-
 int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis, obstaclebaselevel_t base_level)
 {
     /* get the cached height map */
+    /* assume the base extends to infinity */
     switch(base_level) {
         case FROM_BOTTOM:
             if(position_on_base_axis >= 0 && position_on_base_axis < obstacle->width)
                 return obstacle->height_map[0][position_on_base_axis]; 
+            else if(position_on_base_axis >= obstacle->width)
+                return obstacle->height_map[0][obstacle->width - 1];
             else
-                return 0;
+                return obstacle->height_map[0][0];
 
         case FROM_LEFT:
             if(position_on_base_axis >= 0 && position_on_base_axis < obstacle->height)
                 return obstacle->height_map[1][position_on_base_axis]; 
+            else if(position_on_base_axis >= obstacle->height)
+                return obstacle->height_map[1][obstacle->height - 1];
             else
-                return 0;
+                return obstacle->height_map[1][0];
 
         case FROM_TOP:
             if(position_on_base_axis >= 0 && position_on_base_axis < obstacle->width)
                 return obstacle->height_map[2][position_on_base_axis]; 
+            else if(position_on_base_axis >= obstacle->width)
+                return obstacle->height_map[2][obstacle->width - 1];
             else
-                return 0;
+                return obstacle->height_map[2][0];
 
         case FROM_RIGHT:
             if(position_on_base_axis >= 0 && position_on_base_axis < obstacle->height)
                 return obstacle->height_map[3][position_on_base_axis]; 
+            else if(position_on_base_axis >= obstacle->height)
+                return obstacle->height_map[3][obstacle->height - 1];
             else
-                return 0;
+                return obstacle->height_map[3][0];
 
         default:
             return 0;
@@ -169,7 +170,6 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
                     }
                 }
             }
-            return FALSE;
         }
         else {
             /* single-pixel collision check */
@@ -189,7 +189,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
     int h = collisionmask_height(mask);
 
     switch(base_level) {
-        /* will compute the height counting from the left side to the right side of the obstacle */
+        /* compute the height counting from the left side to the right side of the obstacle */
         /* +---------------+ */
         /* |               / */
         /* | ----->        \ */
@@ -209,7 +209,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             return height;
         }
 
-        /* will compute the height counting from the top side to the bottom side of the obstacle */
+        /* compute the height counting from the top side to the bottom side of the obstacle */
         /*  +-----------------+  */
         /*  |         |       |  */
         /*  |        \|/      |  */
@@ -230,7 +230,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             return height;
         }
 
-        /* will compute the height counting from the right side to the left side of the obstacle */
+        /* compute the height counting from the right side to the left side of the obstacle */
         /* +---------------+ */
         /* \               | */
         /* /        <----- | */
@@ -250,7 +250,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             return height;
         }
 
-        /* will compute the height counting from the bottom side to the top side of the obstacle */
+        /* compute the height counting from the bottom side to the top side of the obstacle */
         /*   __    __     _  _   */
         /*  /  \__/  \___/ \/ \  */
         /*  |                 |  */
@@ -258,7 +258,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
         /*  |      /|\        |  */
         /*  |       |         |  */
         /*  +-----------------+  */
-        default: {
+        case FROM_BOTTOM: {
             uint16* height = mallocx(w * sizeof(*height));
             for(int x = 0; x < w; x++) {
                 height[x] = 0;
@@ -271,11 +271,16 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             }
             return height;
         }
+
+        /* this shouldn't happen */
+        default:
+            return NULL;
     }
 }
 
 uint16* destroy_height_map(uint16* height_map)
 {
-    free(height_map);
+    if(height_map)
+        free(height_map);
     return NULL;
 }

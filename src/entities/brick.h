@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * brick.h - brick module
- * Copyright (C) 2008-2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 enum brickproperty_t
 {
     BRK_NONE,           /* passable brick */
-    BRK_OBSTACLE,       /* non-passable bricks (walls, etc) */
+    BRK_OBSTACLE,       /* solid bricks (floors, walls, etc) */
     BRK_CLOUD           /* clouds (one-way platforms) */
 };
 
@@ -66,6 +66,7 @@ struct player_t;
 struct item_list_t;
 struct enemy_list_t;
 struct collisionmask_t;
+struct obstacle_t;
 typedef struct brickdata_t brickdata_t;
 typedef struct brick_t brick_t;
 typedef struct brick_list_t brick_list_t;
@@ -79,7 +80,6 @@ struct brickdata_t {
     spriteinfo_t *data; /* this is not stored in the main hash */
     image_t *image; /* pointer to the current brick image in the animation */
     struct collisionmask_t *mask; /* collision mask */
-    int angle; /* in degrees, 0 <= angle < 360 */
     float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
     brickproperty_t property;
     brickbehavior_t behavior;
@@ -91,11 +91,11 @@ struct brick_t { /* a real, concrete brick */
     brickdata_t *brick_ref; /* brick metadata */
     int x, y; /* current position */
     int sx, sy; /* spawn point */
-    int enabled; /* obsolete: old loop system */
     brickstate_t state; /* brick state: BRS_* */
     float value[BRICK_MAXVALUES]; /* alterable values */
     float animation_frame; /* controlled by a timer */
     bricklayer_t layer; /* loop system: BRL_* */
+    struct obstacle_t* obstacle; /* used by the physics system */
 };
 
 /* linked list of bricks */
@@ -111,7 +111,7 @@ brickdata_t *brickdata_get(int id); /* returns the specified brickdata */
 int brickdata_size(); /* number of bricks */
 
 /* brick interface */
-brick_t* brick_create(int id); /* spawns a new brick */
+brick_t* brick_create(int id, v2d_t position); /* spawns a new brick at the specified position */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
 void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
 void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
@@ -121,7 +121,8 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position); /* moveable p
 const char* brick_get_property_name(brickproperty_t property); /* property name */
 const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
 const image_t* brick_image(const brick_t *brk); /* returns the image of the brick */
-const struct collisionmask_t* brick_collisionmask(const brick_t *brk); /* returns the collision mask (will never be null) */
+const struct collisionmask_t* brick_collisionmask(const brick_t *brk); /* returns the collision mask of the brick (may be NULL) */
+const struct obstacle_t* brick_obstacle(const brick_t* brk); /* returns the obstacle associated with this brick (may be NULL) */
 
 /* brick utilities */
 uint32 bricklayer2color(bricklayer_t layer);

@@ -22,21 +22,13 @@
 #include "obstacle.h"
 #include "physicsactor.h"
 #include "../../core/util.h"
-#include "../../core/image.h"
 #include "../../core/video.h"
+#include "../../core/darray.h"
 
-/* linked list of obstacles */
-typedef struct obstacle_list_t obstacle_list_t;
-struct obstacle_list_t
-{
-    obstacle_t *data;
-    obstacle_list_t *next;
-};
-
-/* obstaclemap class */
+/* an obstacle map is just a set of obstacles */
 struct obstaclemap_t
 {
-    obstacle_list_t *list;
+    DARRAY(const obstacle_t*, obstacle);
 };
 
 /* private methods */
@@ -45,58 +37,55 @@ static const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_
 /* public methods */
 obstaclemap_t* obstaclemap_create()
 {
-    obstaclemap_t *o = mallocx(sizeof *o);
-    o->list = NULL;
-    return o;
+    obstaclemap_t *obstaclemap = mallocx(sizeof *obstaclemap);
+    darray_init_ex(obstaclemap->obstacle, 32);
+    return obstaclemap;
 }
 
 obstaclemap_t* obstaclemap_destroy(obstaclemap_t *obstaclemap)
 {
-    obstacle_list_t *l, *next;
-
-    for(l = obstaclemap->list; l != NULL; l = next) {
-        next = l->next;
-        obstacle_destroy(l->data);
-        free(l);
-    }
-
+    darray_release(obstaclemap->obstacle);
     free(obstaclemap);
     return NULL;
 }
 
-void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, obstacle_t *obstacle)
+void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, const obstacle_t *obstacle)
 {
-    obstacle_list_t *l = mallocx(sizeof *l);
-    l->data = obstacle;
-    l->next = obstaclemap->list;
-    obstaclemap->list = l;
+    darray_push(obstaclemap->obstacle, obstacle);
 }
 
 const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm)
 {
-    obstacle_t *o = NULL;
-    obstacle_list_t *l;
+    const obstacle_t *best = NULL;
 
-    for(l = obstaclemap->list; l != NULL; l = l->next) {
-        /* l->data is colliding with the sensor */
-        if(obstacle_got_collision(l->data, x1, y1, x2, y2)) {
+    for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
+        /* the i-th obstacle collides with the sensor */
+        if(obstacle_got_collision(obstaclemap->obstacle[i], x1, y1, x2, y2)) {
             /* the C standard mandates short-circuit evaluation */
-            if((o == NULL) || pick_best_obstacle(l->data, o, x1, y1, x2, y2, mm) == l->data) {
-                /* l->data is better than o */
-                o = l->data;
+            if((best == NULL) || pick_best_obstacle(obstaclemap->obstacle[i], best, x1, y1, x2, y2, mm) == obstaclemap->obstacle[i]) {
+                /* the i-th obstacle is the best one (up until now) */
+                best = obstaclemap->obstacle[i];
             }
         }
     }
 
-    return o;
+    return best;
 }
 
 int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y)
 {
-    obstacle_list_t *l;
+    for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
+        if(obstacle_got_collision(obstaclemap->obstacle[i], x, y, x, y))
+            return TRUE;
+    }
 
-    for(l = obstaclemap->list; l != NULL; l = l->next) {
-        if(obstacle_got_collision(l->data, x, y, x, y))
+    return FALSE;
+}
+
+int obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y)
+{
+    for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
+        if(obstacle_got_collision(obstaclemap->obstacle[i], x, y, x, y) && obstacle_is_solid(obstaclemap->obstacle[i]))
             return TRUE;
     }
 
@@ -108,15 +97,14 @@ const obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t or
 {
     /* rays can't be larger than infty */
     const float infty = 2.0f * max(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-    v2d_t p = origin;
+    /*v2d_t p = origin;*/
 
     /* sanity checks */
     max_distance = clip(max_distance, 0.0f, infty);
     if(v2d_magnitude(direction) < EPSILON || max_distance < EPSILON)
         return NULL;
 
-    /* DDA algorithm */
-    direction = v2d_normalize(direction);
+    /* TODO */
 
     /* 404 not found */
     return NULL;
@@ -151,22 +139,22 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
         case MM_FLOOR:
             ha = obstacle_get_height_at(a, x-xa, FROM_BOTTOM);
             hb = obstacle_get_height_at(b, x-xb, FROM_BOTTOM);
-            return (ya + (h(a)-1) - ha < yb + (h(b)-1) - hb) ? a : b;
+            return (ya + h(a) - ha <= yb + h(b) - hb) ? a : b;
 
         case MM_LEFTWALL:
             ha = obstacle_get_height_at(a, y-ya, FROM_LEFT);
             hb = obstacle_get_height_at(b, y-yb, FROM_LEFT);
-            return (xa + ha > xb + hb) ? a : b;
+            return (xa + ha >= xb + hb) ? a : b;
 
         case MM_CEILING:
             ha = obstacle_get_height_at(a, x-xa, FROM_TOP);
             hb = obstacle_get_height_at(b, x-xb, FROM_TOP);
-            return (ya + ha > yb + hb) ? a : b;
+            return (ya + ha >= yb + hb) ? a : b;
 
         case MM_RIGHTWALL:
             ha = obstacle_get_height_at(a, y-ya, FROM_RIGHT);
             hb = obstacle_get_height_at(b, y-yb, FROM_RIGHT);
-            return (xa + (w(a)-1) - ha < xb + (w(b)-1) - hb) ? a : b;
+            return (xa + w(a) - ha <= xb + w(b) - hb) ? a : b;
     }
 
     /* this shouldn't happen */

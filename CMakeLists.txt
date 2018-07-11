@@ -302,6 +302,7 @@ SET(
   src/entities/physics/physicsactor.c
   src/entities/physics/sensor.c
   src/entities/physics/sensorstate.c
+  src/entities/physics/collisionmask.c
 
   src/entities/legacy/nanocalc/nanocalc.c
   src/entities/legacy/nanocalc/nanocalc_addons.c
@@ -321,7 +322,6 @@ SET(
   src/entities/item.c
   src/entities/player.c
   src/entities/particle.c
-  src/entities/collisionmask.c
   src/entities/renderqueue.c
 
   src/main.c
@@ -429,6 +429,7 @@ IF(WIN32)
       src/entities/physics/physicsactor.h
       src/entities/physics/sensor.h
       src/entities/physics/sensorstate.h
+      src/entities/physics/collisionmask.h
 
       src/entities/legacy/object_compiler.h
       src/entities/legacy/object_decorators.h
@@ -450,7 +451,6 @@ IF(WIN32)
       src/entities/item.h
       src/entities/player.h
       src/entities/particle.h
-      src/entities/collisionmask.h
       src/entities/renderqueue.h
 
       src/misc/iconwin.rc

@@ -23,17 +23,16 @@
 #include "../core/v2d.h"
 #include "../core/image.h"
 #include "../entities/brick.h"
-#include "../entities/collisionmask.h"
 #include "../entities/entitymanager.h"
 #include "../entities/physics/obstacle.h"
 #include "../entities/physics/obstaclemap.h"
+#include "../entities/physics/collisionmask.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static obstaclemap_t* create_obstaclemap();
-static inline obstacle_t* brick2obstacle(const brick_t *brick);
 
 /*
  * scripting_register_obstaclemap()
@@ -82,20 +81,9 @@ obstaclemap_t* create_obstaclemap()
     obstaclemap_t* obstaclemap = obstaclemap_create();
     brick_list_t* brick_list = entitymanager_retrieve_active_bricks();
     for(brick_list_t* brick = brick_list; brick != NULL; brick = brick->next) {
-        if(brick->data->brick_ref->property != BRK_NONE && brick->data->enabled && brick_image(brick->data) != NULL)
-            obstaclemap_add_obstacle(obstaclemap, brick2obstacle(brick->data));
+        if(brick_obstacle(brick->data) != NULL)
+            obstaclemap_add_obstacle(obstaclemap, brick_obstacle(brick->data));
     }
     entitymanager_release_retrieved_brick_list(brick_list);
     return obstaclemap;
-}
-
-/* converts a brick to an obstacle */
-obstacle_t* brick2obstacle(const brick_t *brick)
-{
-    const collisionmask_t* collisionmask = brick_collisionmask(brick);
-    /*int angle = (int)(256 - (brick->brick_ref->angle % 360) / 1.40625f) % 256;*/
-    int angle = brick->brick_ref->angle % 360;
-    v2d_t position = v2d_new(brick->x, brick->y);
-    bool cloud = (brick->brick_ref->property == BRK_CLOUD);
-    return (cloud ? obstacle_create_oneway : obstacle_create_solid)(collisionmask, angle, position);
 }

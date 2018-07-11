@@ -44,6 +44,7 @@
 #include "../entities/background.h"
 #include "../entities/player.h"
 #include "../entities/legacy/nanocalc/nanocalc.h"
+#include "../entities/legacy/nanocalc/nanocalc_addons.h"
 
 
 

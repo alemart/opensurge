@@ -93,6 +93,7 @@ struct physicsactor_t
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap);
 static char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
+static int ang_diff(int alpha, int beta);
 
 
 /*
@@ -137,8 +138,7 @@ static const sensor_t* sensor_U(const physicsactor_t *pa);
 /* use these macros to get the values */
 #define SIN(a) cos_table[((a) + 0x40) & 0xFF]
 #define COS(a) cos_table[(a) & 0xFF]
-
-static float cos_table[256] = {
+static const float cos_table[256] = {
      1.00000f,  0.99970f,  0.99880f,  0.99729f,  0.99518f,  0.99248f,  0.98918f,  0.98528f, 
      0.98079f,  0.97570f,  0.97003f,  0.96378f,  0.95694f,  0.94953f,  0.94154f,  0.93299f, 
      0.92388f,  0.91421f,  0.90399f,  0.89322f,  0.88192f,  0.87009f,  0.85773f,  0.84485f, 
@@ -173,11 +173,40 @@ static float cos_table[256] = {
      0.98079f,  0.98528f,  0.98918f,  0.99248f,  0.99518f,  0.99729f,  0.99880f,  0.99970f
 };
 
+/* slope table: stored angles */
+/* SLOPE(y,x) is the angle of the (y,x) slope, where -11 <= y,x <= 11 */
+#define SLOPE(y,x) slp_table[11 + ((y) + ((y)<-11)*(-11-(y)) + ((y)>11)*(11-(y)))][11 + ((x) + ((x)<-11)*(-11-(x)) + ((x)>11)*(11-(x)))]
+static const int slp_table[23][23] = {
+    { 0xA0, 0xA2, 0xA4, 0xA6, 0xA9, 0xAC, 0xAF, 0xB2, 0xB5, 0xB9, 0xBC, 0xC0, 0xC4, 0xC7, 0xCB, 0xCE, 0xD1, 0xD4, 0xD7, 0xDA, 0xDC, 0xDE, 0xE0 },
+    { 0x9E, 0xA0, 0xA2, 0xA5, 0xA7, 0xAA, 0xAD, 0xB0, 0xB4, 0xB8, 0xBC, 0xC0, 0xC4, 0xC8, 0xCC, 0xD0, 0xD3, 0xD6, 0xD9, 0xDB, 0xDE, 0xE0, 0xE2 },
+    { 0x9C, 0x9E, 0xA0, 0xA2, 0xA5, 0xA8, 0xAB, 0xAF, 0xB3, 0xB7, 0xBB, 0xC0, 0xC5, 0xC9, 0xCD, 0xD1, 0xD5, 0xD8, 0xDB, 0xDE, 0xE0, 0xE2, 0xE4 },
+    { 0x9A, 0x9B, 0x9E, 0xA0, 0xA3, 0xA6, 0xA9, 0xAD, 0xB1, 0xB6, 0xBB, 0xC0, 0xC5, 0xCA, 0xCF, 0xD3, 0xD7, 0xDA, 0xDD, 0xE0, 0xE2, 0xE5, 0xE6 },
+    { 0x97, 0x99, 0x9B, 0x9D, 0xA0, 0xA3, 0xA7, 0xAB, 0xB0, 0xB5, 0xBA, 0xC0, 0xC6, 0xCB, 0xD0, 0xD5, 0xD9, 0xDD, 0xE0, 0xE3, 0xE5, 0xE7, 0xE9 },
+    { 0x94, 0x96, 0x98, 0x9A, 0x9D, 0xA0, 0xA4, 0xA8, 0xAD, 0xB3, 0xB9, 0xC0, 0xC7, 0xCD, 0xD3, 0xD8, 0xDC, 0xE0, 0xE3, 0xE6, 0xE8, 0xEA, 0xEC },
+    { 0x91, 0x93, 0x95, 0x97, 0x99, 0x9C, 0xA0, 0xA5, 0xAA, 0xB0, 0xB8, 0xC0, 0xC8, 0xD0, 0xD6, 0xDB, 0xE0, 0xE4, 0xE7, 0xE9, 0xEB, 0xED, 0xEF },
+    { 0x8E, 0x90, 0x91, 0x93, 0x95, 0x98, 0x9B, 0xA0, 0xA6, 0xAD, 0xB6, 0xC0, 0xCA, 0xD3, 0xDA, 0xE0, 0xE5, 0xE8, 0xEB, 0xED, 0xEF, 0xF0, 0xF2 },
+    { 0x8B, 0x8C, 0x8D, 0x8F, 0x90, 0x93, 0x96, 0x9A, 0xA0, 0xA8, 0xB3, 0xC0, 0xCD, 0xD8, 0xE0, 0xE6, 0xEA, 0xED, 0xF0, 0xF1, 0xF3, 0xF4, 0xF5 },
+    { 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8D, 0x90, 0x93, 0x98, 0xA0, 0xAD, 0xC0, 0xD3, 0xE0, 0xE8, 0xED, 0xF0, 0xF3, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9 },
+    { 0x84, 0x84, 0x85, 0x85, 0x86, 0x87, 0x88, 0x8A, 0x8D, 0x93, 0xA0, 0xC0, 0xE0, 0xED, 0xF3, 0xF6, 0xF8, 0xF9, 0xFA, 0xFB, 0xFB, 0xFC, 0xFC },
+    { 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+    { 0x7C, 0x7C, 0x7B, 0x7B, 0x7A, 0x79, 0x78, 0x76, 0x73, 0x6D, 0x60, 0x40, 0x20, 0x13, 0x0D, 0x0A, 0x08, 0x07, 0x06, 0x05, 0x05, 0x04, 0x04 },
+    { 0x79, 0x78, 0x77, 0x76, 0x75, 0x73, 0x70, 0x6D, 0x68, 0x60, 0x53, 0x40, 0x2D, 0x20, 0x18, 0x13, 0x10, 0x0D, 0x0B, 0x0A, 0x09, 0x08, 0x07 },
+    { 0x75, 0x74, 0x73, 0x71, 0x70, 0x6D, 0x6A, 0x66, 0x60, 0x58, 0x4D, 0x40, 0x33, 0x28, 0x20, 0x1A, 0x16, 0x13, 0x10, 0x0F, 0x0D, 0x0C, 0x0B },
+    { 0x72, 0x70, 0x6F, 0x6D, 0x6B, 0x68, 0x65, 0x60, 0x5A, 0x53, 0x4A, 0x40, 0x36, 0x2D, 0x26, 0x20, 0x1B, 0x18, 0x15, 0x13, 0x11, 0x10, 0x0E },
+    { 0x6F, 0x6D, 0x6B, 0x69, 0x67, 0x64, 0x60, 0x5B, 0x56, 0x50, 0x48, 0x40, 0x38, 0x30, 0x2A, 0x25, 0x20, 0x1C, 0x19, 0x17, 0x15, 0x13, 0x11 },
+    { 0x6C, 0x6A, 0x68, 0x66, 0x63, 0x60, 0x5C, 0x58, 0x53, 0x4D, 0x47, 0x40, 0x39, 0x33, 0x2D, 0x28, 0x24, 0x20, 0x1D, 0x1A, 0x18, 0x16, 0x14 },
+    { 0x69, 0x67, 0x65, 0x63, 0x60, 0x5D, 0x59, 0x55, 0x50, 0x4B, 0x46, 0x40, 0x3A, 0x35, 0x30, 0x2B, 0x27, 0x23, 0x20, 0x1D, 0x1B, 0x19, 0x17 },
+    { 0x66, 0x65, 0x62, 0x60, 0x5D, 0x5A, 0x57, 0x53, 0x4F, 0x4A, 0x45, 0x40, 0x3B, 0x36, 0x31, 0x2D, 0x29, 0x26, 0x23, 0x20, 0x1E, 0x1B, 0x1A },
+    { 0x64, 0x62, 0x60, 0x5E, 0x5B, 0x58, 0x55, 0x51, 0x4D, 0x49, 0x45, 0x40, 0x3B, 0x37, 0x33, 0x2F, 0x2B, 0x28, 0x25, 0x22, 0x20, 0x1E, 0x1C },
+    { 0x62, 0x60, 0x5E, 0x5B, 0x59, 0x56, 0x53, 0x50, 0x4C, 0x48, 0x44, 0x40, 0x3C, 0x38, 0x34, 0x30, 0x2D, 0x2A, 0x27, 0x25, 0x22, 0x20, 0x1E },
+    { 0x60, 0x5E, 0x5C, 0x5A, 0x57, 0x54, 0x51, 0x4E, 0x4B, 0x47, 0x44, 0x40, 0x3C, 0x39, 0x35, 0x32, 0x2F, 0x2C, 0x29, 0x26, 0x24, 0x22, 0x20 }
+};
+
 /* public methods */
 physicsactor_t* physicsactor_create(v2d_t position)
 {
     physicsactor_t *pa = mallocx(sizeof *pa);
-    float fpsmul = 60.0f;
+    const float fpsmul = 60.0f;
 
     /* initializing... */
     pa->position = position;
@@ -518,37 +547,93 @@ GENERATE_SENSOR_ACCESSOR(U)
  * ---------------------------------------
  */
 
-
 /* call UPDATE_SENSORS whenever you update pa->position */
-#define UPDATE_SENSORS \
-    at_A = sensor_check(sensor_A(pa), pa->position, pa->movmode, obstaclemap); \
-    at_B = sensor_check(sensor_B(pa), pa->position, pa->movmode, obstaclemap); \
-    at_C = sensor_check(sensor_C(pa), pa->position, pa->movmode, obstaclemap); \
-    at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, obstaclemap); \
-    at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, obstaclemap); \
-    at_A = (at_A != NULL && !obstacle_is_solid(at_A)) ? (pa->ysp >= 0.0f && pa->position.y + sensor_get_y2(sensor_A(pa)) - min(15, obstacle_get_height_at(at_A, (int)(pa->position.x + sensor_get_x1(sensor_A(pa)) - obstacle_get_position(at_A).x), FROM_BOTTOM)/3) <= obstacle_get_position(at_A).y + (obstacle_get_height(at_A) - 1) - obstacle_get_height_at(at_A, (int)(pa->position.x + sensor_get_x1(sensor_A(pa)) - obstacle_get_position(at_A).x), FROM_BOTTOM) ? at_A : NULL) : at_A; \
-    at_B = (at_B != NULL && !obstacle_is_solid(at_B)) ? (pa->ysp >= 0.0f && pa->position.y + sensor_get_y2(sensor_B(pa)) - min(15, obstacle_get_height_at(at_B, (int)(pa->position.x + sensor_get_x1(sensor_B(pa)) - obstacle_get_position(at_B).x), FROM_BOTTOM)/3) <= obstacle_get_position(at_B).y + (obstacle_get_height(at_B) - 1) - obstacle_get_height_at(at_B, (int)(pa->position.x + sensor_get_x1(sensor_B(pa)) - obstacle_get_position(at_B).x), FROM_BOTTOM) ? at_B : NULL) : at_B; \
-    at_C = (at_C != NULL && !obstacle_is_solid(at_C)) ? NULL : at_C; \
-    at_D = (at_D != NULL && !obstacle_is_solid(at_D)) ? NULL : at_D; \
-    at_M = (at_M != NULL && !obstacle_is_solid(at_M)) ? NULL : at_M; \
-    pa->in_the_air = (at_A == NULL) && (at_B == NULL); \
-    ;
-    /*DEBUG("A: %8X B: %8X M: %8X $%02Xh", at_A ? obstacle_get_angle(at_A) : -1, at_B ? obstacle_get_angle(at_B) : -1, at_M ? obstacle_get_angle(at_M) : -1, pa->angle);*/
-
-/* call UPDATE_MOVMODE whenever you update pa->angle */
-#define UPDATE_MOVMODE \
-    if(pa->angle < 0x20 || pa->angle > 0xE0) \
-        pa->movmode = MM_FLOOR; \
-    else if(pa->angle > 0x20 && pa->angle < 0x60) \
-        pa->movmode = MM_LEFTWALL; \
-    else if(pa->angle > 0x60 && pa->angle < 0xA0) \
-        pa->movmode = MM_CEILING; \
-    else if(pa->angle > 0xA0 && pa->angle < 0xE0) \
-        pa->movmode = MM_RIGHTWALL;
+#define UPDATE_SENSORS() \
+    do { \
+        at_A = sensor_check(sensor_A(pa), pa->position, pa->movmode, obstaclemap); \
+        at_B = sensor_check(sensor_B(pa), pa->position, pa->movmode, obstaclemap); \
+        at_C = sensor_check(sensor_C(pa), pa->position, pa->movmode, obstaclemap); \
+        at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, obstaclemap); \
+        at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, obstaclemap); \
+        at_A = (at_A != NULL && !obstacle_is_solid(at_A)) ? (pa->ysp >= 0.0f && pa->position.y + sensor_get_y2(sensor_A(pa)) - min(15, obstacle_get_height_at(at_A, (int)(pa->position.x + sensor_get_x1(sensor_A(pa)) - obstacle_get_position(at_A).x), FROM_BOTTOM)/3) <= obstacle_get_position(at_A).y + (obstacle_get_height(at_A) - 1) - obstacle_get_height_at(at_A, (int)(pa->position.x + sensor_get_x1(sensor_A(pa)) - obstacle_get_position(at_A).x), FROM_BOTTOM) ? at_A : NULL) : at_A; \
+        at_B = (at_B != NULL && !obstacle_is_solid(at_B)) ? (pa->ysp >= 0.0f && pa->position.y + sensor_get_y2(sensor_B(pa)) - min(15, obstacle_get_height_at(at_B, (int)(pa->position.x + sensor_get_x1(sensor_B(pa)) - obstacle_get_position(at_B).x), FROM_BOTTOM)/3) <= obstacle_get_position(at_B).y + (obstacle_get_height(at_B) - 1) - obstacle_get_height_at(at_B, (int)(pa->position.x + sensor_get_x1(sensor_B(pa)) - obstacle_get_position(at_B).x), FROM_BOTTOM) ? at_B : NULL) : at_B; \
+        at_C = (at_C != NULL && !obstacle_is_solid(at_C)) ? NULL : at_C; \
+        at_D = (at_D != NULL && !obstacle_is_solid(at_D)) ? NULL : at_D; \
+        at_M = (at_M != NULL && !obstacle_is_solid(at_M)) ? NULL : at_M; \
+        pa->in_the_air = (at_A == NULL) && (at_B == NULL); \
+    } while(0)
 
 /* height of the physics actor */
-#define HEIGHT \
-    20 /*abs(sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)))*/
+#define HEIGHT 20 /*abs(sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)))*/
+
+/* call UPDATE_MOVMODE whenever you update pa->angle */
+#define UPDATE_MOVMODE() \
+    do { \
+        if(pa->angle < 0x20 || pa->angle > 0xE0) \
+            pa->movmode = MM_FLOOR; \
+        else if(pa->angle > 0x20 && pa->angle < 0x60) \
+            pa->movmode = MM_LEFTWALL; \
+        else if(pa->angle > 0x60 && pa->angle < 0xA0) \
+            pa->movmode = MM_CEILING; \
+        else if(pa->angle > 0xA0 && pa->angle < 0xE0) \
+            pa->movmode = MM_RIGHTWALL; \
+    } while(0)
+
+/* compute the current pa->angle */
+#define UPDATE_ANGLE(ground) \
+    do { \
+        if(ground == NULL || obstacle_is_solid(ground)) { \
+            const int hoff = 5; \
+            int found_a = FALSE, found_b = FALSE; \
+            int h, x, y, xa, ya, xb, yb, ang; \
+            for(int i = 0; i < HEIGHT * 2 && !(found_a && found_b); i++) { \
+                h = i + HEIGHT / 2; \
+                x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
+                y = pa->position.y + h * COS(pa->angle) + 0.5f; \
+                if(!found_a) { \
+                    xa = x - hoff * COS(pa->angle); \
+                    ya = y + hoff * SIN(pa->angle); \
+                    found_a = obstaclemap_solid_exists(obstaclemap, xa, ya); \
+                } \
+                if(!found_b) { \
+                    xb = x + hoff * COS(pa->angle); \
+                    yb = y - hoff * SIN(pa->angle); \
+                    found_b = obstaclemap_solid_exists(obstaclemap, xb, yb); \
+                } \
+            } \
+            if(found_a && found_b) { \
+                const obstacle_t* ga = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode); \
+                const obstacle_t* gb = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode); \
+                if(ga && gb) { \
+                    v2d_t a = obstacle_get_position(ga), b = obstacle_get_position(gb); \
+                    switch(pa->movmode) { \
+                        case MM_FLOOR: \
+                            ya = a.y + obstacle_get_height(ga) - obstacle_get_height_at(ga, xa - a.x, FROM_BOTTOM); \
+                            yb = b.y + obstacle_get_height(gb) - obstacle_get_height_at(gb, xb - b.x, FROM_BOTTOM); \
+                            break; \
+                        case MM_LEFTWALL: \
+                            xa = a.x + obstacle_get_height_at(ga, ya - a.y, FROM_LEFT); \
+                            xb = b.x + obstacle_get_height_at(gb, yb - b.y, FROM_LEFT); \
+                            break; \
+                        case MM_CEILING: \
+                            ya = a.y + obstacle_get_height_at(ga, xa - a.x, FROM_TOP); \
+                            yb = b.y + obstacle_get_height_at(gb, xb - b.x, FROM_TOP); \
+                            break; \
+                        case MM_RIGHTWALL: \
+                            xa = a.x + obstacle_get_width(ga) - obstacle_get_height_at(ga, ya - a.y, FROM_RIGHT); \
+                            xb = b.x + obstacle_get_width(gb) - obstacle_get_height_at(gb, yb - b.y, FROM_RIGHT); \
+                            break; \
+                    } \
+                    x = xb - xa; y = yb - ya; \
+                    ang = SLOPE(y, x); \
+                    if(ga == gb || ang_diff(ang, pa->angle) <= 0x25) \
+                        pa->angle = ang; \
+                } \
+            } \
+        } \
+        else \
+            pa->angle = 0x0; \
+    } while(0)
 
 /* wall detection */
 #define THERE_IS_A_WALL_ON_THE_RIGHT \
@@ -576,6 +661,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
     int was_in_the_air;
 
+    UPDATE_SENSORS();
+
     /*
      *
      * death
@@ -588,8 +675,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->facing_right = TRUE;
         return;
     }
-
-    UPDATE_SENSORS
 
     /*
      *
@@ -645,7 +730,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->gsp = 0.0f;
 
         /* slope factor */
-        //pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+        pa->gsp += pa->slp * -SIN(pa->angle) * dt;
 
         /* animation issues */
         if(fabs(pa->gsp) < walk_threshold && pa->angle == 0x0) {
@@ -719,7 +804,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             else if(pa->movmode == MM_LEFTWALL) pa->position.x -= 4;
             /*pa->gsp = 0.0f;*/
             pa->angle = 0x0;
-            UPDATE_MOVMODE
+            UPDATE_MOVMODE();
             pa->horizontal_control_lock_timer = 0.5f;
         }
     }
@@ -773,7 +858,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle) * grv_attenuation;
             pa->gsp = 0.0f;
             pa->angle = 0x0;
-            UPDATE_MOVMODE
+            UPDATE_MOVMODE();
             pa->state = PAS_JUMPING;
         }
 
@@ -812,7 +897,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     was_in_the_air = pa->in_the_air;
     pa->position.x += pa->xsp * dt;
     pa->position.y += pa->ysp * dt;
-    UPDATE_SENSORS
+    UPDATE_SENSORS();
 
     /* pushing against the walls */
     if(at_M != NULL) {
@@ -832,7 +917,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 }
                 else
                     pa->xsp = min(pa->xsp, 0.0f);
-                UPDATE_SENSORS
+                UPDATE_SENSORS();
             }
             else if(obstacle_get_position(at_M).x + obstacle_get_width(at_M)/2 < pa->position.x) {
                 pa->position.x = obstacle_get_position(at_M).x + (obstacle_get_width(at_M) - 1) + 11;
@@ -848,13 +933,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 }
                 else
                     pa->xsp = max(pa->xsp, 0.0f);
-                UPDATE_SENSORS
+                UPDATE_SENSORS();
             }
         }
         else {
             if(!(pa->angle >= 0x40 && pa->angle <= 0xC0)) {
                 pa->angle = 0x0;
-                UPDATE_MOVMODE
+                UPDATE_MOVMODE();
             }
             else {
                 /* right wall and ceiling modes */
@@ -867,7 +952,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     }
                     else
                         pa->ysp = min(pa->ysp, 0.0f);
-                    UPDATE_SENSORS
+                    UPDATE_SENSORS();
                 }
                 else if(obstacle_get_position(at_M).y + obstacle_get_height(at_M)/2 < pa->position.y) {
                     pa->position.y = obstacle_get_position(at_M).y + (obstacle_get_height(at_M) - 1) + 11;
@@ -878,7 +963,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     }
                     else
                         pa->ysp = max(pa->ysp, 0.0f);
-                    UPDATE_SENSORS
+                    UPDATE_SENSORS();
                 }
             }
         }
@@ -890,7 +975,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         v2d_t offset = v2d_new(0,0);
 
         if(pa->state != PAS_JUMPING && ((pa->facing_right && pa->angle < 0x40) || (!pa->facing_right && pa->angle > 0xC0)))
-            u += 1;
+            u += 2;
 
         if(pa->movmode == MM_FLOOR)
             offset = v2d_new(0,u);
@@ -901,11 +986,18 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else if(pa->movmode == MM_RIGHTWALL)
             offset = v2d_new(u,0);
 
+        /* offset the character */
         pa->position = v2d_add(pa->position, offset);
-        UPDATE_SENSORS
+        UPDATE_ANGLE(NULL);
+        UPDATE_MOVMODE();
+        UPDATE_SENSORS();
+
+        /* undo the offset */
         if(pa->in_the_air) {
             pa->position = v2d_subtract(pa->position, offset);
-            UPDATE_SENSORS
+            UPDATE_ANGLE(NULL);
+            UPDATE_MOVMODE();
+            UPDATE_SENSORS();
         }
     }
 
@@ -935,44 +1027,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else if(pa->movmode == MM_FLOOR)
             pa->position.y = obstacle_get_position(ground).y + (obstacle_get_height(ground) - 1) - obstacle_get_height_at(ground, (int)(pa->position.x + sensor_get_x1(ground_sensor) - obstacle_get_position(ground).x), FROM_BOTTOM) - (HEIGHT - u);
 
-        /* updating the angle */
-        #define MAX_HEIGHT 31 /* must be a number of the form 2^n - 1, n > 0 */
-        #define FEET_OFFSET 2//5
-pa->state = PAS_STOPPED;
-        if(pa->movmode == MM_FLOOR) {
-            int ha = MAX_HEIGHT + 1, hb = MAX_HEIGHT + 1;
-            int x = pa->position.x + (sensor_get_x1(sensor_A(pa)) + sensor_get_x1(sensor_B(pa))) / 2, y = pa->position.y;
-            for(int j = 0; j <= MAX_HEIGHT; j++) {
-                if(ha > MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x - FEET_OFFSET, y + sensor_get_y2(sensor_A(pa)) + j))
-                    ha = j;
-                if(hb > MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x + FEET_OFFSET, y + sensor_get_y2(sensor_B(pa)) + j))
-                    hb = j;
-            }
-            if(!(ha > MAX_HEIGHT || hb > MAX_HEIGHT))
-                pa->angle = (int)(256 + (atan2(hb - ha, FEET_OFFSET * 2) * 40.7436654315)) & 0xFF;
-            //video_showmessage("%d --- %d", ha, hb);
-            video_showmessage("%d --- %d : %d", ha, hb, pa->angle);
-        }
-        else if(pa->movmode == MM_LEFTWALL) {
-            int ha = -MAX_HEIGHT-1, hb = -MAX_HEIGHT-1;
-            //int ha = -INFINITY, hb = -INFINITY;
-            int x = pa->position.x, y = pa->position.y - (sensor_get_x1(sensor_A(pa)) + sensor_get_x1(sensor_B(pa))) / 2;
-            for(int j = 0; j <= MAX_HEIGHT; j++) {
-                if(ha < -MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x - sensor_get_y2(sensor_A(pa)) - j, y - FEET_OFFSET))
-                    ha = -j;
-                if(hb < -MAX_HEIGHT && obstaclemap_obstacle_exists(obstaclemap, x - sensor_get_y2(sensor_B(pa)) - j, y + FEET_OFFSET))
-                    hb = -j;
-            }
-            if(!(ha < -MAX_HEIGHT || hb < -MAX_HEIGHT))
-                pa->angle = (int)(256 + (atan2(FEET_OFFSET * 2, hb - ha) * 40.7436654315)) & 0xFF;
-            video_showmessage("LW >> %d --- %d : %d", ha, hb, pa->angle);
-        }
-        else
-            pa->angle = obstacle_get_angle(ground); /* TODO */
-        UPDATE_MOVMODE
-
-        /* update the sensors */
-        UPDATE_SENSORS
+        /* update the angle */
+        UPDATE_ANGLE(ground);
+        UPDATE_MOVMODE();
+        UPDATE_SENSORS();
     }
 
     /* reacquisition of the ground */
@@ -993,11 +1051,10 @@ pa->state = PAS_STOPPED;
 
     /* bump into ceilings */
     if(pa->in_the_air && (at_C != NULL || at_D != NULL)) {
-        /* picking the ceiling */
-        int u = 0;
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
 
+        /* picking the ceiling */
         if(pick_the_best_ceiling(pa, at_C, at_D, sensor_C(pa), sensor_D(pa)) == 'c') {
             ceiling = at_C;
             ceiling_sensor = sensor_C(pa);
@@ -1008,16 +1065,15 @@ pa->state = PAS_STOPPED;
         }
 
         /* reattach to the ceiling */
-        if((obstacle_get_angle(ceiling) > 0xA0 && obstacle_get_angle(ceiling) < 0xC0) || (obstacle_get_angle(ceiling) > 0x40 && obstacle_get_angle(ceiling) < 0x60)) {
-            pa->gsp = pa->ysp * -sign(SIN(obstacle_get_angle(ceiling)));
+        if((pa->angle > 0xA0 && pa->angle < 0xC0) || (pa->angle > 0x40 && pa->angle < 0x60)) {
+            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
             pa->xsp = 0.0f;
             pa->ysp = 0.0f;
-            pa->angle = obstacle_get_angle(ceiling);
             pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
-            UPDATE_MOVMODE
-            UPDATE_SENSORS
         }
         else {
+            /* won't reattach */
+            int u = 0;
 
             /* adjust position */
             if(pa->movmode == MM_RIGHTWALL)
@@ -1033,8 +1089,7 @@ pa->state = PAS_STOPPED;
             pa->ysp = max(pa->ysp, 0.0f);
 
             /* update the sensors */
-            UPDATE_SENSORS
-
+            UPDATE_SENSORS();
         }
     }
 
@@ -1047,10 +1102,10 @@ pa->state = PAS_STOPPED;
     /* reset the angle */
     if(pa->in_the_air) {
         pa->angle = 0x0;
-        UPDATE_MOVMODE
+        UPDATE_MOVMODE();
     }
 
-    /* balancing on edges */
+    /* I'm on the edge */
     if(!pa->in_the_air && fabs(pa->gsp) < EPSILON && pa->state != PAS_PUSHING) {
         if(at_A != NULL && at_B == NULL && pa->position.x >= obstacle_get_position(at_A).x + obstacle_get_width(at_A)) {
             pa->state = PAS_LEDGE;
@@ -1101,22 +1156,22 @@ char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const o
     if(pa->movmode == MM_FLOOR) {
         ha = obstacle_get_height_at(a, x + sensor_get_x1(a_sensor) - xa, FROM_BOTTOM);
         hb = obstacle_get_height_at(b, x + sensor_get_x1(b_sensor) - xb, FROM_BOTTOM);
-        return (ya + (h(a)-1) - ha < yb + (h(b)-1) - hb) ? 'a' : 'b';
+        return (ya + h(a) - ha <= yb + h(b) - hb) ? 'a' : 'b';
     }
     else if(pa->movmode == MM_LEFTWALL) {
         ha = obstacle_get_height_at(a, y + sensor_get_x1(a_sensor) - ya, FROM_LEFT);
         hb = obstacle_get_height_at(b, y + sensor_get_x1(b_sensor) - yb, FROM_LEFT);
-        return (xa + ha > xb + hb) ? 'a' : 'b';
+        return (xa + ha >= xb + hb) ? 'a' : 'b';
     }
     else if(pa->movmode == MM_CEILING) {
         ha = obstacle_get_height_at(a, x - sensor_get_x1(a_sensor) - xa, FROM_TOP);
         hb = obstacle_get_height_at(b, x - sensor_get_x1(b_sensor) - xb, FROM_TOP);
-        return (ya + ha > yb + hb) ? 'a' : 'b';
+        return (ya + ha >= yb + hb) ? 'a' : 'b';
     }
     else if(pa->movmode == MM_RIGHTWALL) {
         ha = obstacle_get_height_at(a, y - sensor_get_x1(a_sensor) - ya, FROM_RIGHT);
         hb = obstacle_get_height_at(b, y - sensor_get_x1(b_sensor) - yb, FROM_RIGHT);
-        return (xa + (w(a)-1) - ha < xb + (w(b)-1) - hb) ? 'a' : 'b';
+        return (xa + w(a) - ha <= xb + w(b) - hb) ? 'a' : 'b';
     }
 
     return 'a';
@@ -1145,23 +1200,30 @@ char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const 
     if(pa->movmode == MM_CEILING) {
         hc = obstacle_get_height_at(c, x + sensor_get_x1(c_sensor) - xc, FROM_BOTTOM);
         hd = obstacle_get_height_at(d, x + sensor_get_x1(d_sensor) - xd, FROM_BOTTOM);
-        return (yc + (h(c)-1) - hc < yd + (h(d)-1) - hd) ? 'c' : 'd';
+        return (yc + h(c) - hc <= yd + h(d) - hd) ? 'c' : 'd';
     }
     else if(pa->movmode == MM_RIGHTWALL) {
         hc = obstacle_get_height_at(c, y + sensor_get_x1(c_sensor) - yc, FROM_LEFT);
         hd = obstacle_get_height_at(d, y + sensor_get_x1(d_sensor) - yd, FROM_LEFT);
-        return (xc + hc > xd + hd) ? 'c' : 'd';
+        return (xc + hc >= xd + hd) ? 'c' : 'd';
     }
     else if(pa->movmode == MM_FLOOR) {
         hc = obstacle_get_height_at(c, x - sensor_get_x1(c_sensor) - xc, FROM_TOP);
         hd = obstacle_get_height_at(d, x - sensor_get_x1(d_sensor) - xd, FROM_TOP);
-        return (yc + hc > yd + hd) ? 'c' : 'd';
+        return (yc + hc >= yd + hd) ? 'c' : 'd';
     }
     else if(pa->movmode == MM_LEFTWALL) {
         hc = obstacle_get_height_at(c, y - sensor_get_x1(c_sensor) - yc, FROM_RIGHT);
         hd = obstacle_get_height_at(d, y - sensor_get_x1(d_sensor) - yd, FROM_RIGHT);
-        return (xc + (w(c)-1) - hc < xd + (w(d)-1) - hd) ? 'c' : 'd';
+        return (xc + w(c) - hc <= xd + w(d) - hd) ? 'c' : 'd';
     }
 
     return 'c';
+}
+
+/* the min angle between alpha and beta, assuming 0x0 <= alpha, beta <= 0xFF */
+int ang_diff(int alpha, int beta)
+{
+    int diff = alpha > beta ? alpha - beta : beta - alpha;
+    return diff > 0x80 ? 0xFF - diff + 1 : diff;
 }

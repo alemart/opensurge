@@ -57,7 +57,6 @@ struct enemy_t {
 
     int preserve; /* should not be removed if far from play area? */
     int obstacle; /* does this behave like an obstacle brick? */
-    int obstacle_angle; /* if this is an obstacle, what is my angle a, 0 <= a < 360? */
     int always_active; /* is this object always active, even if it's far away from the camera? */
     int hide_unless_in_editor_mode; /* this object will be displayed only in the level editor */
     int detach_from_camera; /* this object will not be affected by the camera (scrolling) */

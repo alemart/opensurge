@@ -25,7 +25,7 @@
 #include "enemy.h"
 #include "brick.h"
 #include "actor.h"
-#include "collisionmask.h"
+#include "physics/collisionmask.h"
 
 #include "../core/global.h"
 #include "../core/audio.h"

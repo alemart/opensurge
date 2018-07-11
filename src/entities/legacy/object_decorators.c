@@ -27,7 +27,7 @@
 #include "nanocalc/nanocalcext.h"
 #include "../actor.h"
 #include "../player.h"
-#include "../collisionmask.h"
+#include "../physics/collisionmask.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
 #include "../../core/audio.h"
@@ -6700,7 +6700,7 @@ void setobstacle_update(objectmachine_t *obj, player_t **team, int team_size, br
     objectmachine_t *decorated_machine = dec->decorated_machine;
     objectdecorator_setobstacle_t *me = (objectdecorator_setobstacle_t*)obj;
     object_t *object = obj->get_object_instance(obj);
-    float angle = expression_evaluate(me->angle);
+    /*float angle = expression_evaluate(me->angle);*/ /* deprecated */
 
     /* update collision mask */
     if(object->obstacle != me->is_obstacle) {
@@ -6718,8 +6718,8 @@ void setobstacle_update(objectmachine_t *obj, player_t **team, int team_size, br
 
     /* update attributes */
     object->obstacle = me->is_obstacle;
-    object->obstacle_angle = angle;
 
+    /* done */
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
 

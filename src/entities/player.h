@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Edits by Dalton Sterritt (all edits released under same license):
+ * Edits by Dalton Sterritt (all edits released under same license, copyright given to Alexandre):
  * player_enable_roll, player_disable_roll
  */
 
