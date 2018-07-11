@@ -80,13 +80,13 @@ static float brick_zindex_offset(const brick_t *b)
     float s = 0.0f;
 
     /* a hackish solution... */
-    switch(b->brick_ref->property) {
+    switch(brick_type(b)) {
         case BRK_NONE:      s -= 0.00002f;
         case BRK_CLOUD:     s -= 0.00001f;
         case BRK_OBSTACLE:  s -= 0.00000f;
     }
 
-    switch(b->layer) {
+    switch(brick_layer(b)) {
         case BRL_YELLOW:    s -= 0.0002f;
         case BRL_GREEN:     s += 0.0001f;
         case BRL_DEFAULT:   s += 0.0000f;
@@ -117,7 +117,7 @@ static float zindex_particles(renderable_t r) { return 1.0f; }
 static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 1.0f : 0.5f; }
 static float zindex_item(renderable_t r) { return 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
-static float zindex_brick(renderable_t r) { return r.brick->brick_ref->zindex + brick_zindex_offset(r.brick); }
+static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
 static float zindex_ssobject(renderable_t r) { return ssobject_zindex(r.ssobject); }
 
 static void render_particles(renderable_t r, v2d_t camera_position) { particle_render_all(camera_position); }
@@ -131,7 +131,7 @@ static int ypos_particles(renderable_t r) { return 0; }
 static int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
 static int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
 static int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
-static int ypos_brick(renderable_t r) { return r.brick->y; }
+static int ypos_brick(renderable_t r) { return brick_position(r.brick).y; }
 static int ypos_ssobject(renderable_t r) { return 0; } /* TODO (not needed?) */
 
 static int type_particles(renderable_t r) { return 0; }

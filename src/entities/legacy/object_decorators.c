@@ -1867,22 +1867,22 @@ void ellipticaltrajectory_update(objectmachine_t *obj, player_t **team, int team
     /* I don't want to get stuck into walls */
     if(right != NULL) {
         if(act->position.x > old_position.x)
-            act->position.x = act->hot_spot.x - image_width(actor_image(act)) + right->x;
+            act->position.x = act->hot_spot.x - image_width(actor_image(act)) + brick_position(right).x;
     }
 
     if(left != NULL) {
         if(act->position.x < old_position.x)
-            act->position.x = act->hot_spot.x + left->x + image_width(brick_image(left));
+            act->position.x = act->hot_spot.x + brick_position(left).x + brick_size(left).x;
     }
 
     if(down != NULL) {
         if(act->position.y > old_position.y)
-            act->position.y = act->hot_spot.y - image_height(actor_image(act)) + down->y;
+            act->position.y = act->hot_spot.y - image_height(actor_image(act)) + brick_position(down).y;
     }
 
     if(up != NULL) {
         if(act->position.y < old_position.y)
-            act->position.y = act->hot_spot.y + up->y + image_height(brick_image(up));
+            act->position.y = act->hot_spot.y + brick_position(up).y + brick_size(up).y;
     }
 
     /* decorator pattern */
@@ -1974,7 +1974,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
     /* player x object collision */
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
-        if(actor_pixelperfect_collision(object->actor, player->actor)) {
+        if(actor_collision(object->actor, player->actor)) {
             if(player_is_attacking(player) || player->invincible) {
                 /* I've been defeated */
                 player_bounce(player, object->actor);
@@ -2355,7 +2355,7 @@ static void gravity_release(objectmachine_t *obj);
 static void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
 static void gravity_render(objectmachine_t *obj, v2d_t camera_position);
 
-static int hit_test(int x, int y, const image_t *brk_image, int brk_x, int brk_y);
+static int hit_test(const brick_t* brk, int x, int y);
 static int sticky_test(const actor_t *act, const brick_list_t *brick_list);
 
 
@@ -2415,11 +2415,11 @@ void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_
 
     /* in order to avoid too much processor load,
        we adopt this simplified platform system */
-    int rx, ry, rw, rh, bx, by, bw, bh, j;
-    const image_t *ri, *bi;
+    int rx, ry, rw, rh, bx, by, bw, bh;
+    const image_t *ri;
     brick_list_t *it;
     enum { NONE, FLOOR, CEILING } collided = NONE;
-    int i, sticky_max_offset = 3;
+    int i, j, sticky_max_offset = 3;
 
     ri = actor_image(act);
     rx = (int)(act->position.x - act->hot_spot.x);
@@ -2429,29 +2429,28 @@ void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_
 
     /* check for collisions */
     for(it = brick_list; it != NULL && collided == NONE; it = it->next) {
-        if(it->data->brick_ref->property != BRK_NONE) {
-            bi = it->data->brick_ref->image;
-            bx = it->data->x;
-            by = it->data->y;
-            bw = image_width(bi);
-            bh = image_height(bi);
+        if(brick_type(it->data) != BRK_NONE) {
+            bx = brick_position(it->data).x;
+            by = brick_position(it->data).y;
+            bw = brick_size(it->data).x;
+            bh = brick_size(it->data).y;
 
             if(rx<bx+bw && rx+rw>bx && ry<by+bh && ry+rh>by) {
-                if(image_pixelperfect_collision(ri, bi, rx, ry, bx, by)) {
-                    if(hit_test(rx+rw/2, ry, bi, bx, by)) {
+                if(1) { /*if(image_pixelperfect_collision(ri, bi, rx, ry, bx, by)) {*/
+                    if(hit_test(it->data, rx+rw/2, ry)) {
                         /* ceiling */
                         collided = CEILING;
-                        for(j=1; j<=bh; j++) {
+                        /*for(j=1; j<=bh; j++) {
                             if(!image_pixelperfect_collision(ri, bi, rx, ry+j, bx, by)) {
                                 act->position.y += j-1;
                                 break;
                             }
-                        }
+                        }*/
                     }
-                    else if(hit_test(rx+rw/2, ry+rh-1, bi, bx, by)) {
+                    else if(hit_test(it->data, rx+rw/2, ry+rh-1)) {
                         /* floor */
                         collided = FLOOR;
-                        for(j=1; j<=bh && hit_test(rx+rw/2, ry+rh-j, bi, bx, by); j++)
+                        for(j=1; j<=bh && hit_test(it->data, rx+rw/2, ry+rh-j); j++)
                             act->position.y -= 1;
                         if(j > 1) act->position.y += 1;
                     }
@@ -2512,10 +2511,15 @@ void gravity_render(objectmachine_t *obj, v2d_t camera_position)
 
 
 /* (x,y) collides with the brick */
-int hit_test(int x, int y, const image_t *brk_image, int brk_x, int brk_y)
+int hit_test(const brick_t* brk, int x, int y)
 {
-    if(x >= brk_x && x < brk_x + image_width(brk_image) && y >= brk_y && y < brk_y + image_height(brk_image))
-        return image_getpixel(brk_image, x - brk_x, y - brk_y) != video_get_maskcolor();
+    const collisionmask_t* mask = brick_collisionmask(brk);
+    if(mask != NULL) {
+        v2d_t position = brick_position(brk);
+        int ox = x - position.x, oy = y - position.y;
+        if(ox >= 0 && ox < collisionmask_width(mask) && oy >= 0 && oy < collisionmask_height(mask))
+            return collisionmask_check(mask, ox, oy, collisionmask_width(mask));
+    }
 
     return FALSE;
 }
@@ -2536,8 +2540,8 @@ int sticky_test(const actor_t *act, const brick_list_t *brick_list)
 
     for(it = brick_list; it; it = it->next) {
         b = it->data;
-        if(b->brick_ref->property != BRK_NONE) {
-            if(hit_test(rx+rw/2, ry+rh-1, brick_image(b), b->x, b->y))
+        if(brick_type(b) != BRK_NONE) {
+            if(hit_test(b, rx+rw/2, ry+rh-1))
                 return TRUE;
         }
     }
@@ -4556,7 +4560,7 @@ int oncollision_should_trigger_event(eventstrategy_t *event, object_t *object, p
 
     for(it = object_list; it != NULL; it = it->next) {
         if(strcmp(it->data->name, x->target_name) == 0) {
-            if(actor_pixelperfect_collision(it->data->actor, object->actor))
+            if(actor_collision(it->data->actor, object->actor))
                 return TRUE;
         }
     }
@@ -4683,7 +4687,7 @@ void onplayercollision_release(eventstrategy_t *event)
 int onplayercollision_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     player_t *player = enemy_get_observed_player(object);
-    return actor_pixelperfect_collision(object->actor, player->actor);
+    return actor_collision(object->actor, player->actor);
 }
 
 
@@ -4713,7 +4717,7 @@ void onplayerattack_release(eventstrategy_t *event)
 int onplayerattack_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     player_t *player = enemy_get_observed_player(object);
-    return player_is_attacking(player) && actor_pixelperfect_collision(object->actor, player->actor);
+    return player_is_attacking(player) && actor_collision(object->actor, player->actor);
 }
 
 
@@ -4910,14 +4914,14 @@ int onbrickcollision_should_trigger_event(eventstrategy_t *event, object_t *obje
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (up != NULL && up->brick_ref->property == BRK_OBSTACLE) ||
-        (upright != NULL && upright->brick_ref->property == BRK_OBSTACLE) ||
-        (right != NULL && right->brick_ref->property == BRK_OBSTACLE) ||
-        (downright != NULL && downright->brick_ref->property != BRK_NONE) ||
-        (down != NULL && down->brick_ref->property != BRK_NONE) ||
-        (downleft != NULL && downleft->brick_ref->property != BRK_NONE) ||
-        (left != NULL && left->brick_ref->property == BRK_OBSTACLE) ||
-        (upleft != NULL && upleft->brick_ref->property == BRK_OBSTACLE)
+        (up != NULL && brick_type(up) == BRK_OBSTACLE) ||
+        (upright != NULL && brick_type(upright) == BRK_OBSTACLE) ||
+        (right != NULL && brick_type(right) == BRK_OBSTACLE) ||
+        (downright != NULL && brick_type(downright) != BRK_NONE) ||
+        (down != NULL && brick_type(down) != BRK_NONE) ||
+        (downleft != NULL && brick_type(downleft) != BRK_NONE) ||
+        (left != NULL && brick_type(left) == BRK_OBSTACLE) ||
+        (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE)
     ;
 }
 
@@ -4952,9 +4956,9 @@ int onfloorcollision_should_trigger_event(eventstrategy_t *event, object_t *obje
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (downright != NULL && downright->brick_ref->property != BRK_NONE) ||
-        (down != NULL && down->brick_ref->property != BRK_NONE) ||
-        (downleft != NULL && downleft->brick_ref->property != BRK_NONE)
+        (downright != NULL && brick_type(downright) != BRK_NONE) ||
+        (down != NULL && brick_type(down) != BRK_NONE) ||
+        (downleft != NULL && brick_type(downleft) != BRK_NONE)
     ;
 }
 
@@ -4989,9 +4993,9 @@ int onceilingcollision_should_trigger_event(eventstrategy_t *event, object_t *ob
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (upleft != NULL && upleft->brick_ref->property == BRK_OBSTACLE) ||
-        (up != NULL && up->brick_ref->property == BRK_OBSTACLE) ||
-        (upright != NULL && upright->brick_ref->property == BRK_OBSTACLE)
+        (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE) ||
+        (up != NULL && brick_type(up) == BRK_OBSTACLE) ||
+        (upright != NULL && brick_type(upright) == BRK_OBSTACLE)
     ;
 }
 
@@ -5026,8 +5030,8 @@ int onleftwallcollision_should_trigger_event(eventstrategy_t *event, object_t *o
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (left != NULL && left->brick_ref->property == BRK_OBSTACLE) ||
-        (upleft != NULL && upleft->brick_ref->property == BRK_OBSTACLE)
+        (left != NULL && brick_type(left) == BRK_OBSTACLE) ||
+        (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE)
     ;
 }
 
@@ -5062,8 +5066,8 @@ int onrightwallcollision_should_trigger_event(eventstrategy_t *event, object_t *
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (right != NULL && right->brick_ref->property == BRK_OBSTACLE) ||
-        (upright != NULL && upright->brick_ref->property == BRK_OBSTACLE)
+        (right != NULL && brick_type(right) == BRK_OBSTACLE) ||
+        (upright != NULL && brick_type(upright) == BRK_OBSTACLE)
     ;
 }
 
@@ -8018,14 +8022,14 @@ void walk_update(objectmachine_t *obj, player_t **team, int team_size, brick_lis
     /* swap direction when a wall is touched */
     if(right != NULL) {
         if(me->direction > 0.0f) {
-            act->position.x = act->hot_spot.x - image_width(actor_image(act)) + right->x;
+            act->position.x = act->hot_spot.x - image_width(actor_image(act)) + brick_position(right).x;
             me->direction = -1.0f;
         }
     }
 
     if(left != NULL) {
         if(me->direction < 0.0f) {
-            act->position.x = act->hot_spot.x + left->x + image_width(brick_image(left));
+            act->position.x = act->hot_spot.x + brick_position(left).x + brick_size(left).x;
             me->direction = 1.0f;
         }
     }

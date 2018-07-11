@@ -180,7 +180,6 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
-static int get_brick_id(brick_t *b);
 static void update_level_size();
 static void restart(int preserve_current_spawnpoint);
 static void render_players(int bring_to_back);
@@ -604,8 +603,8 @@ int level_save(const char *filepath)
     /* brick list */
     fprintf(fp, "\n// brick list\n");
     for(itb=brick_list; itb; itb=itb->next)  {
-        if(itb->data->state != BRS_DEAD)
-            fprintf(fp, "brick %d %d %d%s%s\n", get_brick_id(itb->data), (int)itb->data->sx, (int)itb->data->sy, itb->data->layer != BRL_DEFAULT ? " " : "", itb->data->layer != BRL_DEFAULT ? bricklayer2colorname(itb->data->layer) : "");
+        if(brick_is_alive(itb->data))
+            fprintf(fp, "brick %d %d %d%s%s\n", brick_id(itb->data), (int)brick_spawnpoint(itb->data).x, (int)brick_spawnpoint(itb->data).y, brick_layer(itb->data) != BRL_DEFAULT ? " " : "", brick_layer(itb->data) != BRL_DEFAULT ? bricklayer2colorname(brick_layer(itb->data)) : "");
     }
 
     /* item list */
@@ -802,27 +801,24 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     else if(str_icmp(identifier, "brick") == 0) {
         if(param_count >= 3 && param_count <= 4) {
             if(str_icmp(theme, "") != 0) {
-                int type;
-                int x, y;
+                int id, x, y;
                 bricklayer_t layer;
 
-                type = clip(atoi(param[0]), 0, brickdata_size()-1);
+                id = atoi(param[0]);
                 x = atoi(param[1]);
                 y = atoi(param[2]);
                 layer = (param_count >= 4) ? colorname2bricklayer(param[3]) : BRL_DEFAULT;
 
-                if(brickdata_get(type) != NULL) {
-                    brick_t *brk = level_create_brick(type, v2d_new(x,y));
-                    brk->layer = layer;
-                }
+                if(brick_exists(id))
+                    level_create_brick(id, v2d_new(x,y), layer);
                 else
-                    logfile_message("Level loader - invalid brick: %d", type);
+                    logfile_message("Level loader - invalid brick: %d", id);
             }
             else
                 logfile_message("Level loader - warning: cannot create a new brick if the theme is not defined");
         }
         else
-            logfile_message("Level loader - command 'brick' expects three or four parameters: type, xpos, ypos [, layer_name]");
+            logfile_message("Level loader - command 'brick' expects three or four parameters: id, xpos, ypos [, layer_name]");
     }
     else if(str_icmp(identifier, "item") == 0) {
         if(param_count == 3) {
@@ -1472,9 +1468,9 @@ void level_change_player(player_t *new_player)
  * Creates and adds a brick to the level. This function
  * returns a pointer to the created brick.
  */
-brick_t* level_create_brick(int type, v2d_t position)
+brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer)
 {
-    brick_t *brick = brick_create(type, position);
+    brick_t *brick = brick_create(id, position, layer);
     entitymanager_store_brick(brick);
     return brick;
 }
@@ -1486,9 +1482,9 @@ brick_t* level_create_brick(int type, v2d_t position)
  * Creates and adds an item to the level. Returns the
  * created item.
  */
-item_t* level_create_item(int type, v2d_t position)
+item_t* level_create_item(int id, v2d_t position)
 {
-    item_t *item = item_create(type);
+    item_t *item = item_create(id);
     item->actor->spawn_point = position;
     item->actor->position = position;
     entitymanager_store_item(item);
@@ -1832,8 +1828,7 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
 
         /* render bricks - background */
         for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            brickdata_t *ref = bnode->data->brick_ref;
-            if(ref->zindex < 0.5f)
+            if(brick_zindex(bnode->data) < 0.5f)
                 renderqueue_enqueue_brick(bnode->data);
         }
 
@@ -1842,8 +1837,7 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
 
         /* render bricks - platform level (back) */
         for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            brickdata_t *ref = bnode->data->brick_ref;
-            if(fabs(ref->zindex-0.5f) < EPSILON && ref->property != BRK_OBSTACLE)
+            if(brick_type(bnode->data) != BRK_OBSTACLE && fabs(brick_zindex(bnode->data) - 0.5f) < EPSILON)
                 renderqueue_enqueue_brick(bnode->data);
         }
 
@@ -1855,8 +1849,7 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
 
         /* render bricks - platform level (front) */
         for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            brickdata_t *ref = bnode->data->brick_ref;
-            if(fabs(ref->zindex-0.5f) < EPSILON && ref->property == BRK_OBSTACLE)
+            if(brick_type(bnode->data) == BRK_OBSTACLE && fabs(brick_zindex(bnode->data) - 0.5f) < EPSILON)
                 renderqueue_enqueue_brick(bnode->data);
         }
 
@@ -1883,8 +1876,7 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
 
         /* render bricks - foreground */
         for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            brickdata_t *ref = bnode->data->brick_ref;
-            if(ref->zindex > 0.5f)
+            if(brick_zindex(bnode->data) > 0.5f)
                 renderqueue_enqueue_brick(bnode->data);
         }
 
@@ -1911,35 +1903,23 @@ int inside_screen(int x, int y, int w, int h, int margin)
 void update_level_size()
 {
     int max_x, max_y;
+    v2d_t bottomright;
     brick_list_t *p, *brick_list;
 
     max_x = max_y = -INFINITY;
 
     brick_list = entitymanager_retrieve_all_bricks();
     for(p=brick_list; p; p=p->next) {
-        if(p->data->brick_ref->property != BRK_NONE) {
-            max_x = max(max_x, p->data->sx + image_width(brick_image(p->data)));
-            max_y = max(max_y, p->data->sy + image_height(brick_image(p->data)));
+        if(brick_type(p->data) != BRK_NONE) {
+            bottomright = v2d_add(brick_spawnpoint(p->data), brick_size(p->data));
+            max_x = max(max_x, (int)bottomright.x);
+            max_y = max(max_y, (int)bottomright.y);
         }
     }
     brick_list = entitymanager_release_retrieved_brick_list(brick_list);
 
     level_width = max(max_x, VIDEO_SCREEN_W);
     level_height = max(max_y, VIDEO_SCREEN_H);
-}
-
-/* returns the ID of a given brick,
- * or -1 if it was not found */
-int get_brick_id(brick_t *b)
-{
-    int i;
-
-    for(i=0; i<brickdata_size(); i++) {
-        if(b->brick_ref == brickdata_get(i))
-            return i;
-    }
-
-    return -1;
 }
 
 /* restarts the level preserving
@@ -2653,21 +2633,23 @@ void editor_update()
                 brick_t *candidate = NULL;
 
                 for(itb=major_bricks;itb;itb=itb->next) {
-                    float a[4] = {itb->data->x, itb->data->y, itb->data->x + image_width(itb->data->brick_ref->image), itb->data->y + image_height(itb->data->brick_ref->image)};
+                    v2d_t brk_topleft = brick_position(itb->data);
+                    v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(itb->data));
+                    float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
                     if(bounding_box(a,b)) {
-                        if(!candidate || (candidate && itb->data->brick_ref->zindex >= candidate->brick_ref->zindex))
+                        if(!candidate || (candidate && brick_zindex(itb->data) >= brick_zindex(candidate)))
                             candidate = itb->data;
                     }
                 }
 
                 if(candidate != NULL) {
                     if(pick_object) {
-                        editor_cursor_entity_id = get_brick_id(candidate);
-                        editor_layer = candidate->layer;
+                        editor_cursor_entity_id = brick_id(candidate);
+                        editor_layer = brick_layer(candidate);
                     }
                     else {
-                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_BRICK, get_brick_id(candidate), v2d_new(candidate->x, candidate->y));
+                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_BRICK, brick_id(candidate), brick_position(candidate));
                         editor_action_commit(eda);
                         editor_action_register(eda);
                     }
@@ -2886,7 +2868,7 @@ void editor_enable()
     editor_camera.x = (int)camera_get_position().x;
     editor_camera.y = (int)camera_get_position().y;
     editor_cursor = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-    video_showmessage("Welcome to the Level Editor! Read readme.html to know how to use it.");
+    video_showmessage("Welcome to the Level Editor!");
 
     /* changing the video resolution */
     editor_previous_video_resolution = video_get_resolution();
@@ -3085,9 +3067,18 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
 
     switch(objtype) {
         case EDT_BRICK: {
-            brickdata_t *x = brickdata_get(objid);
-            if(x && x->image)
-                sprintf(buf, "property: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf", brick_get_property_name(x->property), brick_get_behavior_name(x->behavior), image_width(x->image), image_height(x->image), x->zindex);
+            if(brick_exists(objid)) {
+                brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT);
+                sprintf(buf,
+                    "property: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
+                    brick_get_property_name(brick_type(x)),
+                    brick_get_behavior_name(brick_behavior(x)),
+                    (int)brick_size(x).x,
+                    (int)brick_size(x).y,
+                    brick_zindex(x)
+                );
+                brick_destroy(x);
+            }
             else
                 sprintf(buf, "WARNING: missing brick");
             break;
@@ -3171,7 +3162,7 @@ void editor_next_class()
     if(editor_cursor_entity_type == EDT_ENEMY && editor_enemy_name_length == 0)
         editor_next_class();
 
-    if(editor_cursor_entity_type == EDT_BRICK && brickdata_get(editor_cursor_entity_id) == NULL)
+    if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
         editor_next_entity();
 }
 
@@ -3195,7 +3186,7 @@ void editor_previous_class()
     if(editor_cursor_entity_type == EDT_ENEMY && editor_enemy_name_length == 0)
         editor_previous_class();
 
-    if(editor_cursor_entity_type == EDT_BRICK && brickdata_get(editor_cursor_entity_id) == NULL)
+    if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
         editor_next_entity();
 }
 
@@ -3210,7 +3201,7 @@ void editor_next_entity()
         case EDT_BRICK: {
             size = brickdata_size();
             editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
-            if(brickdata_get(editor_cursor_entity_id) == NULL)
+            if(!brick_exists(editor_cursor_entity_id))
                 editor_next_entity(); /* invalid brick? */
             break;
         }
@@ -3260,7 +3251,7 @@ void editor_previous_entity()
         case EDT_BRICK: {
             size = brickdata_size();
             editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
-            if(brickdata_get(editor_cursor_entity_id) == NULL)
+            if(!brick_exists(editor_cursor_entity_id))
                 editor_previous_entity(); /* invalid brick? */
             break;
         }
@@ -3330,18 +3321,15 @@ int editor_is_valid_item(int item_id)
 /* draws the given object at [position] */
 void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t position)
 {
-    image_t *cursor = NULL;
+    const image_t *cursor = NULL;
     v2d_t offset = v2d_new(0, 0);
-    float alpha = 1.0f;
+    float alpha = 0.75f;
 
     /* getting the image of the current object */
     switch(obj_type) {
         case EDT_BRICK: {
-            if(brickdata_get(obj_id) != NULL) {
-                cursor = brickdata_get(obj_id)->image;
-                if(brickdata_get(obj_id)->property == BRK_NONE)
-                    alpha = 0.5f;
-            }
+            if(brick_exists(obj_id))
+                cursor = brick_image_preview(obj_id);
             break;
         }
         case EDT_ITEM: {
@@ -3462,7 +3450,7 @@ v2d_t editor_grid_size()
     if(!editor_grid_enabled)
         return v2d_new(1,1);
     else
-        return v2d_new(8,8);
+        return v2d_new(16,16);
 }
 
 /* aligns position to a cell in the grid */
@@ -3500,13 +3488,12 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
     /* are we removing a brick? Store its layer */
     if(!is_new_object && obj_type == EDT_BRICK) {
         brick_list_t *it, *brick_list = entitymanager_retrieve_all_bricks();
-        brickdata_t *ref = brickdata_get(o.obj_id);
         for(it=brick_list; it; it=it->next) {
-            if(it->data->brick_ref == ref) {
-                float dist = v2d_magnitude(v2d_subtract(v2d_new(it->data->x, it->data->y), o.obj_position));
+            if(brick_id(it->data) == o.obj_id) {
+                float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), o.obj_position));
                 if(dist < EPSILON) {
-                    it->data->state = BRS_DEAD;
-                    o.layer = it->data->layer;
+                    o.layer = brick_layer(it->data);
+                    brick_kill(it->data);
                 }
             }
         }
@@ -3688,8 +3675,7 @@ void editor_action_commit(editor_action_t action)
         switch(action.obj_type) {
             case EDT_BRICK: {
                 /* new brick */
-                brick_t *brk = level_create_brick(action.obj_id, action.obj_position);
-                brk->layer = action.layer;
+                level_create_brick(action.obj_id, action.obj_position, action.layer);
                 break;
             }
 
@@ -3731,12 +3717,11 @@ void editor_action_commit(editor_action_t action)
             case EDT_BRICK: {
                 /* delete brick */
                 brick_list_t *it;
-                brickdata_t *ref = brickdata_get(action.obj_id);
                 for(it=brick_list; it; it=it->next) {
-                    if(it->data->brick_ref == ref) {
-                        float dist = v2d_magnitude(v2d_subtract(v2d_new(it->data->x, it->data->y), action.obj_position));
+                    if(brick_id(it->data) == action.obj_id) {
+                        float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), action.obj_position));
                         if(dist < EPSILON)
-                            it->data->state = BRS_DEAD;
+                            brick_kill(it->data);
                     }
                 }
                 break;

@@ -105,8 +105,10 @@ void particle_update_all(const struct brick_list_t* brick_list)
             const brick_list_t *itb;
             for(itb=brick_list; itb && !got_brick; itb=itb->next) {
                 const brick_t *brk = itb->data;
-                if(brk->brick_ref->property == BRK_OBSTACLE) {
-                    float b[4] = { brk->x, brk->y, brk->x+image_width(brk->brick_ref->image), brk->y+image_height(brk->brick_ref->image) };
+                if(brick_type(brk) == BRK_OBSTACLE) {
+                    v2d_t topleft = brick_position(brk);
+                    v2d_t bottomright = v2d_add(topleft, brick_size(brk));
+                    float b[4] = { topleft.x, topleft.y, bottomright.x, bottomright.y };
                     if(bounding_box(a,b))
                         got_brick = TRUE;
                 }

@@ -185,8 +185,7 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
     param_list = nanoparser_get_parameter_list(stmt);
 
     if(str_icmp(identifier, "brick") == 0) {
-        int id;
-        int x, y;
+        int id, x, y;
         bricklayer_t layer;
 
         p1 = nanoparser_get_nth_parameter(param_list, 1);
@@ -205,10 +204,10 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
         layer = p4 ? colorname2bricklayer(nanoparser_get_string(p4)) : BRL_DEFAULT;
 
         e.type = EDITORGRP_ENTITY_BRICK;
-        e.id = clip(id, 0, brickdata_size()-1);
+        e.id = id;
         e.position = v2d_new(x,y);
         e.layer = (int)layer;
-        if(NULL != brickdata_get(e.id)) /* valid brick? */
+        if(brick_exists(e.id))
             *list = add_to_list(*list, e);
     }
     else if(str_icmp(identifier, "item") == 0) {

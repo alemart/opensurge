@@ -113,7 +113,7 @@ void entitymanager_release()
 
 void entitymanager_store_brick(brick_t *brick)
 {
-    (brick->brick_ref->behavior == BRB_CIRCULAR ? spatialhash_brick_t_add_persistent : spatialhash_brick_t_add)(bricks, brick);
+    (brick_behavior(brick) == BRB_CIRCULAR ? spatialhash_brick_t_add_persistent : spatialhash_brick_t_add)(bricks, brick);
     brick_count++;
 }
 
@@ -284,22 +284,22 @@ void entitymanager_remove_dead_objects()
 /* private methods */
 int get_brick_xpos(const brick_t *brick)
 {
-    return brick->x;
+    return (int)brick_position(brick).x;
 }
 
 int get_brick_ypos(const brick_t *brick)
 {
-    return brick->y;
+    return (int)brick_position(brick).y;
 }
 
 int get_brick_width(const brick_t *brick)
 {
-    return image_width(brick->brick_ref->image);
+    return (int)brick_size(brick).x;
 }
 
 int get_brick_height(const brick_t *brick)
 {
-    return image_height(brick->brick_ref->image);
+    return (int)brick_size(brick).y;
 }
 
 int get_item_xpos(const item_t *item)
@@ -346,7 +346,7 @@ int retrieve_bricks(brick_t *brick, void *ref_to_brick_list)
 {
     brick_list_t **list = (brick_list_t**)ref_to_brick_list;
 
-    if(brick->state != BRS_DEAD) {
+    if(brick_is_alive(brick)) {
         brick_list_t *p = mallocx(sizeof *p);
         p->data = brick;
         p->next = *list;
