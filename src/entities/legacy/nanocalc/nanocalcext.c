@@ -103,9 +103,9 @@ static float f_camera_y() { return camera_get_position().y; }
 static float f_waterlevel() { return (float)level_waterlevel(); }
 
 static float f_brick_exists(float offset_x, float offset_y) { return (NULL == BRICK_AT(offset_x, offset_y) ? 0.0f : 1.0f); } /* 1 = exists; 0 = otherwise */
-static float f_brick_type(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return (b && b->brick_ref) ? (float)(b->brick_ref->property) : 0.0f; }
+static float f_brick_type(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return b ? (float)brick_type(b) : 0.0f; }
 static float f_brick_angle(float offset_x, float offset_y) { return 0.0f; } /* obsolete */
-static float f_brick_layer(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return b ? (float)(b->layer) : 0.0f; }
+static float f_brick_layer(float offset_x, float offset_y) { const brick_t *b = BRICK_AT(offset_x, offset_y); return b ? (float)brick_layer(b) : 0.0f; }
 
 static float f_obstacle_exists(float offset_x, float offset_y) { return OBSTACLE_EXISTS(offset_x, offset_y); }
 
@@ -203,7 +203,7 @@ void nanocalcext_set_target_object(object_t *o, brick_list_t *bricks_nearby, ite
 int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_t *os, v2d_t offset)
 {
     actor_t *me = o->actor, *other;
-    v2d_t p = v2d_add(me->position, offset), q;
+    v2d_t p = v2d_add(me->position, offset);
     image_t *img;
 
     if(!actor_brick_at(me, bs, offset)) {
@@ -213,9 +213,10 @@ int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_
                 img = actor_image(other);
                 if(p.x >= other->position.x - other->hot_spot.x && p.x < other->position.x - other->hot_spot.x + image_width(img)) {
                     if(p.y >= other->position.y - other->hot_spot.y && p.y < other->position.y - other->hot_spot.y + image_height(img)) {
-                        q = v2d_subtract(p, v2d_subtract(other->position, other->hot_spot));
+                        /*v2d_t q = v2d_subtract(p, v2d_subtract(other->position, other->hot_spot));
                         if(image_getpixel(img, (int)q.x, (int)q.y) != video_get_maskcolor())
-                            return TRUE;
+                            return TRUE;*/
+                        return TRUE;
                     }
                 }
             }
@@ -227,9 +228,10 @@ int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_
                 img = actor_image(other);
                 if(p.x >= other->position.x - other->hot_spot.x && p.x < other->position.x - other->hot_spot.x + image_width(img)) {
                     if(p.y >= other->position.y - other->hot_spot.y && p.y < other->position.y - other->hot_spot.y + image_height(img)) {
-                        q = v2d_subtract(p, v2d_subtract(other->position, other->hot_spot));
+                        /*v2d_t q = v2d_subtract(p, v2d_subtract(other->position, other->hot_spot));
                         if(image_getpixel(img, (int)q.x, (int)q.y) != video_get_maskcolor())
-                            return TRUE;
+                            return TRUE;*/
+                        return TRUE;
                     }
                 }
             }

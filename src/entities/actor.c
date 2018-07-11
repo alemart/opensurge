@@ -28,6 +28,7 @@
 #include "../core/logfile.h"
 #include "../core/video.h"
 #include "../core/timer.h"
+#include "physics/collisionmask.h"
 
 
 /* constants */
@@ -304,11 +305,12 @@ int actor_pixelperfect_collision(const actor_t *a, const actor_t *b)
  */
 int actor_brick_collision(actor_t *act, brick_t *brk)
 {
-    v2d_t topleft = v2d_subtract(act->position, v2d_rotate(act->hot_spot, act->angle));
-    v2d_t bottomright = v2d_add( topleft , v2d_rotate(v2d_new(image_width(actor_image(act)), image_height(actor_image(act))), act->angle) );
-    float a[4] = { topleft.x , topleft.y , bottomright.x , bottomright.y };
-    float b[4] = { (float)brk->x , (float)brk->y , (float)(brk->x+image_width(brk->brick_ref->image)) , (float)(brk->y+image_height(brk->brick_ref->image)) };
-
+    v2d_t actor_topleft = v2d_subtract(act->position, v2d_rotate(act->hot_spot, act->angle));
+    v2d_t actor_bottomright = v2d_add( actor_topleft , v2d_rotate(v2d_new(image_width(actor_image(act)), image_height(actor_image(act))), act->angle) );
+    v2d_t brick_topleft = brick_position(brk);
+    v2d_t brick_bottomright = v2d_add( brick_topleft, brick_size(brk) );
+    float a[4] = { actor_topleft.x , actor_topleft.y , actor_bottomright.x , actor_bottomright.y };
+    float b[4] = { brick_topleft.x , brick_topleft.y , brick_bottomright.x , brick_bottomright.y };
     return bounding_box(a,b);
 }
 
@@ -443,14 +445,14 @@ void actor_sensors_ex(actor_t *act, v2d_t vup, v2d_t vupright, v2d_t vright, v2d
     for(i=0; i<5; i++) {
         /* forget bricks */
         brick_t **brk = cloud_off[i];
-        if(brk && *brk && (*brk)->brick_ref && (*brk)->brick_ref->property == BRK_CLOUD)
+        if(brk && *brk && brick_type(*brk) == BRK_CLOUD)
             *brk = NULL;
     }
 
     /* bricks: down, downleft, downright */
-    if(down && *down && (*down)->brick_ref->property == BRK_CLOUD) {
-        float offset = min(15, image_height((*down)->brick_ref->image)/3);
-        if(!(act->speed.y >= 0 && act->position.y < ((*down)->y+diff+1)+offset)) {
+    if(down && *down && brick_type(*down) == BRK_CLOUD) {
+        float offset = min(15, brick_size(*down).y / 3);
+        if(!(act->speed.y >= 0 && act->position.y < (brick_position(*down).y + diff + 1) + offset)) {
             /* forget bricks */
             if(downleft && *downleft == *down)
                 *downleft = NULL;
@@ -488,45 +490,47 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
 {
     const brick_list_t *p;
     brick_t *ret = NULL;
-    v2d_t offset;
-    float br[4];
+    v2d_t pos, size;
 
     /* main algorithm */
     for(p=list; p; p=p->next) {
 
         /* ignore passable bricks */
-        if(p->data->brick_ref->property == BRK_NONE)
+        if(brick_type(p->data) == BRK_NONE)
             continue;
-
+#if 0
         /* I don't want clouds. */
-        if(p->data->brick_ref->property == BRK_CLOUD && (ret && ret->brick_ref->property == BRK_OBSTACLE))
+        if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_OBSTACLE))
             continue;
 
         /* I don't want moving platforms */
-        if(p->data->brick_ref->behavior == BRB_CIRCULAR && (ret && ret->brick_ref->behavior != BRB_CIRCULAR) && p->data->y >= ret->y)
+        if(brick_behavior(p->data) == BRB_CIRCULAR && (ret && brick_behavior(ret) != BRB_CIRCULAR) && brick_position(p->data).y >= brick_position(ret).y)
             continue;
-
+#endif
         /* here's something I want... */
-        br[0] = (float)p->data->x;
-        br[1] = (float)p->data->y;
-        br[2] = (float)(p->data->x + image_width(p->data->brick_ref->image));
-        br[3] = (float)(p->data->y + image_height(p->data->brick_ref->image));
-        offset = v2d_subtract(spot, v2d_new(p->data->x, p->data->y));
-
-        if((spot.x >= br[0] && spot.y >= br[1] && spot.x < br[2] && spot.y < br[3]) && image_getpixel(brick_image(p->data), (int)offset.x, (int)offset.y) != video_get_maskcolor()) {
-            if(p->data->brick_ref->behavior != BRB_CIRCULAR && (ret && ret->brick_ref->behavior == BRB_CIRCULAR) && p->data->y <= ret->y) {
-                ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
+        pos = brick_position(p->data);
+        size = brick_size(p->data);
+        if(spot.x >= pos.x && spot.y >= pos.y && spot.x < pos.x + size.x && spot.y < pos.y + size.y) {
+            const collisionmask_t* mask = brick_collisionmask(p->data);
+            if(mask != NULL) {
+                int ox = (int)(spot.x - pos.x), oy = (int)(spot.y - pos.y);
+                if(ox >= 0 && oy >= 0 && ox < collisionmask_width(mask) && oy < collisionmask_height(mask)) {
+                    if(collisionmask_check(mask, ox, oy, collisionmask_width(mask))) {
+                        if(brick_behavior(p->data) != BRB_CIRCULAR && (ret && brick_behavior(ret) == BRB_CIRCULAR) && brick_position(p->data).y <= brick_position(ret).y) {
+                            ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
+                        }
+                        else if(brick_type(p->data) == BRK_OBSTACLE && (ret && brick_type(ret) == BRK_CLOUD)) {
+                            ret = p->data; /* No clouds. Let's grab an obstacle instead. */
+                        }
+                        else if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_CLOUD)) {
+                            if(brick_position(p->data).y > brick_position(ret).y) /* two conflicting clouds */
+                                ret = p->data;
+                        }
+                        else if(!ret)
+                            ret = p->data;
+                    }
+                }
             }
-            else if(p->data->brick_ref->property == BRK_OBSTACLE && (ret && ret->brick_ref->property == BRK_CLOUD)) {
-                ret = p->data; /* No clouds. Let's grab an obstacle instead. */
-            }
-            else if(p->data->brick_ref->property == BRK_CLOUD && (ret && ret->brick_ref->property == BRK_CLOUD)) {
-                /* oh no, two conflicting clouds! */
-                if(p->data->y > ret->y)
-                    ret = p->data;
-            }
-            else
-                ret = p->data;
         }
     }
 

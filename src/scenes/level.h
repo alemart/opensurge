@@ -24,6 +24,7 @@
 #include <surgescript.h>
 #include "../core/v2d.h"
 #include "../core/global.h"
+#include "../entities/brick.h"
 
 /* scene methods */
 void level_init(void *path_to_lev_file); /* pass an string containing the path to the .lev file */
@@ -63,8 +64,8 @@ void level_set_spawn_point(v2d_t newpos);
 
 /* entities */
 void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
-struct brick_t* level_create_brick(int type, v2d_t position);
-struct item_t* level_create_item(int type, v2d_t position);
+struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer);
+struct item_t* level_create_item(int id, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
 void level_add_to_score(int score);
 struct item_t* level_create_animal(v2d_t position);

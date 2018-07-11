@@ -110,12 +110,12 @@ void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
     /* check for collisions */
     for(it = brick_list; it != NULL && bounce == NONE; it = it->next) {
-        if(it->data->brick_ref->property != BRK_NONE) {
-            bi = it->data->brick_ref->image;
-            bx = it->data->x;
-            by = it->data->y;
-            bw = image_width(bi);
-            bh = image_height(bi);
+        if(brick_type(it->data) != BRK_NONE) {
+            bi = brick_image(it->data);
+            bx = brick_position(it->data).x;
+            by = brick_position(it->data).y;
+            bw = brick_size(it->data).x;
+            bh = brick_size(it->data).y;
 
             if(rx<bx+bw && rx+rw>bx && ry<by+bh && ry+rh>by) {
                 if(image_pixelperfect_collision(ri, bi, rx, ry, bx, by)) {

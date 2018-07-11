@@ -22,9 +22,9 @@
 #define _BRICK_H
 
 #include "../core/v2d.h"
-#include "../core/sprite.h"
+#include "../core/image.h"
 
-/* brick properties */
+/* brick type */
 enum brickproperty_t
 {
     BRK_NONE,           /* passable brick */
@@ -40,25 +40,12 @@ enum brickbehavior_t {
     BRB_FALL            /* bricks that are broken once you step on them */
 };
 
-/* brick state */
-enum brickstate_t {
-    BRS_IDLE,           /* the brick is alive, idle */
-    BRS_DEAD,           /* must be removed from the level */
-    BRS_ACTIVE,         /* generic action */
-};
-
 /* brick layer (loop system) */
 enum bricklayer_t {
     BRL_DEFAULT,
     BRL_GREEN,
     BRL_YELLOW
 };
-
-/* misc */
-#define BRICK_MAXVALUES         2
-#define BRICKBEHAVIOR_MAXARGS   5
-
-
 
 /* forward declarations */
 struct actor_t;
@@ -67,37 +54,15 @@ struct item_list_t;
 struct enemy_list_t;
 struct collisionmask_t;
 struct obstacle_t;
-typedef struct brickdata_t brickdata_t;
+struct brickdata_t;
+struct brick_t;
+
+/* typedefs */
 typedef struct brick_t brick_t;
 typedef struct brick_list_t brick_list_t;
-typedef enum brickstate_t brickstate_t;
-typedef enum brickbehavior_t brickbehavior_t;
 typedef enum brickproperty_t brickproperty_t;
+typedef enum brickbehavior_t brickbehavior_t;
 typedef enum bricklayer_t bricklayer_t;
-
-/* brick theme: meta data of bricks */
-struct brickdata_t {
-    spriteinfo_t *data; /* this is not stored in the main hash */
-    image_t *image; /* pointer to the current brick image in the animation */
-    char* maskfile; /* collision mask file (may be NULL) */
-    struct collisionmask_t *mask; /* collision mask (may be NULL) */
-    float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
-    brickproperty_t property;
-    brickbehavior_t behavior;
-    float behavior_arg[BRICKBEHAVIOR_MAXARGS];
-};
-
-/* brick instances */
-struct brick_t { /* a real, concrete brick */
-    brickdata_t *brick_ref; /* brick metadata */
-    int x, y; /* current position */
-    int sx, sy; /* spawn point */
-    brickstate_t state; /* brick state: BRS_* */
-    float value[BRICK_MAXVALUES]; /* alterable values */
-    float animation_frame; /* controlled by a timer */
-    bricklayer_t layer; /* loop system: BRL_* */
-    struct obstacle_t* obstacle; /* used by the physics system */
-};
 
 /* linked list of bricks */
 struct brick_list_t {
@@ -108,26 +73,38 @@ struct brick_list_t {
 /* brick theme interface */
 void brickdata_load(const char *filename); /* loads a brick theme */
 void brickdata_unload(); /* unloads the current brick theme */
-brickdata_t *brickdata_get(int id); /* returns the specified brickdata */
 int brickdata_size(); /* number of bricks */
 
 /* brick interface */
-brick_t* brick_create(int id, v2d_t position); /* spawns a new brick at the specified position */
+brick_t* brick_create(int id, v2d_t position, bricklayer_t layer); /* spawns a new brick at the specified position */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
 void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
 void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
 
-v2d_t brick_moveable_platform_offset(const brick_t *brk); /* moveable platforms must move actors on top of them. Returns a delta_space vector */
-void brick_render_path(const brick_t *brk, v2d_t camera_position); /* moveable platforms path */
-const char* brick_get_property_name(brickproperty_t property); /* property name */
-const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
+/* brick properties & operations */
+int brick_id(const brick_t* brk); /* brick id (its number in the brickset) */
+brickproperty_t brick_type(const brick_t* brk); /* brick type */
+brickbehavior_t brick_behavior(const brick_t* brk); /* brick behavior */
+bricklayer_t brick_layer(const brick_t* brk); /* brick layer */
 const image_t* brick_image(const brick_t *brk); /* returns the image of the brick */
 const struct collisionmask_t* brick_collisionmask(const brick_t *brk); /* returns the collision mask of the brick (may be NULL) */
 const struct obstacle_t* brick_obstacle(const brick_t* brk); /* returns the obstacle associated with this brick (may be NULL) */
+float brick_zindex(const brick_t* brk); /* brick zindex */
+v2d_t brick_position(const brick_t* brk); /* brick position */
+v2d_t brick_spawnpoint(const brick_t* brk); /* brick spawn point */
+v2d_t brick_size(const brick_t* brk); /* brick size, in pixels */
+void brick_kill(brick_t* brk); /* kills a brick */
+int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
 
 /* brick utilities */
 uint32 bricklayer2color(bricklayer_t layer);
 const char* bricklayer2colorname(bricklayer_t layer);
 bricklayer_t colorname2bricklayer(const char *name);
+v2d_t brick_moveable_platform_offset(const brick_t *brk); /* moveable platforms must move actors on top of them. Returns a delta_space vector */
+void brick_render_path(const brick_t *brk, v2d_t camera_position); /* moveable platforms path */
+const char* brick_get_property_name(brickproperty_t property); /* property name */
+const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
+int brick_exists(int id); /* does a brick with the given id exist? */
+const image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
 
 #endif

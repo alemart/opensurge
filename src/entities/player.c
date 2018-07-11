@@ -1065,7 +1065,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     /* creating the obstacle map */
     obstaclemap = obstaclemap_create();
     for(; brick_list; brick_list = brick_list->next) {
-        if(brick_obstacle(brick_list->data) != NULL && !ignore_obstacle(brick_list->data->layer, player->layer))
+        if(brick_obstacle(brick_list->data) != NULL && !ignore_obstacle(brick_layer(brick_list->data), player->layer))
             obstaclemap_add_obstacle(obstaclemap, brick_obstacle(brick_list->data));
     }
     for(; item_list; item_list = item_list->next) {

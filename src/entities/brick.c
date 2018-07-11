@@ -36,22 +36,64 @@
 #include "../core/util.h"
 #include "../core/timer.h"
 #include "../core/audio.h"
+#include "../core/sprite.h"
 #include "../core/soundfactory.h"
 #include "../core/nanoparser/nanoparser.h"
 
+/* private stuff */
+#define BRKDATA_MAX             16384 /* up to BRKDATA_MAX bricks per theme are supported */
+#define BRICK_MAXVALUES         2
+#define BRICKBEHAVIOR_MAXARGS   5
+#define BRB_FALL_TIME           1.0 /* time in seconds before a BRB_FALL gets destroyed */
 
-/* private data */
-#define BRKDATA_MAX                 16384 /* this engine supports up to BRKDATA_MAX bricks per theme */
-static int brickdata_count; /* size of brickdata[] */
-static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
-typedef struct maskdetails_t { /* collision mask */
+/* types */
+typedef enum brickstate_t brickstate_t;
+typedef struct brickdata_t brickdata_t;
+typedef struct maskdetails_t maskdetails_t;
+
+/* brick state */
+enum brickstate_t {
+    BRS_IDLE,           /* the brick is alive, idle */
+    BRS_DEAD,           /* must be removed from the level */
+    BRS_ACTIVE,         /* generic action */
+};
+
+/* brick theme: meta data of bricks */
+struct brickdata_t {
+    spriteinfo_t *data; /* this is not stored in the main hash */
+    image_t *image; /* pointer to the current brick image in the animation */
+    char* maskfile; /* collision mask file (may be NULL) */
+    struct collisionmask_t *mask; /* collision mask (may be NULL) */
+    float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
+    brickproperty_t property;
+    brickbehavior_t behavior;
+    float behavior_arg[BRICKBEHAVIOR_MAXARGS];
+};
+
+/* brick instances */
+struct brick_t { /* a real, concrete brick */
+    brickdata_t *brick_ref; /* brick metadata */
+    int x, y; /* current position */
+    int sx, sy; /* spawn point */
+    brickstate_t state; /* brick state: BRS_* */
+    float value[BRICK_MAXVALUES]; /* alterable values */
+    float animation_frame; /* controlled by a timer */
+    bricklayer_t layer; /* loop system: BRL_* */
+    struct obstacle_t* obstacle; /* used by the physics system */
+};
+
+/* collision mask (parsed data) */
+struct maskdetails_t {
     const char *source_file;
     int x, y, w, h;
-} maskdetails_t;
+};
 
-
+/* private data */
+static int brickdata_count = 0; /* size of brickdata[] */
+static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
 
 /* private functions */
+static brickdata_t *brickdata_get(int id);
 static void brick_animate(brick_t *brk);
 static brickdata_t* brickdata_new();
 static brickdata_t* brickdata_delete(brickdata_t *obj);
@@ -63,14 +105,7 @@ static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
 static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 
-/* misc */
-#define BRB_FALL_TIME               1.0 /* time in seconds before a BRB_FALL gets destroyed */
-
-
 /* public functions */
-
-
-
 
 /* ========== brick theme interface ================ */
 
@@ -84,7 +119,7 @@ void brickdata_load(const char *filename)
     char abs_path[1024];
     parsetree_program_t *tree;
 
-    logfile_message("brickdata_load('%s')", filename);
+    logfile_message("brickdata_load(\"%s\")", filename);
     resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
 
     brickdata_count = 0;
@@ -113,7 +148,7 @@ void brickdata_load(const char *filename)
         }
     }
 
-    logfile_message("brickdata_load('%s') ok!", filename);
+    logfile_message("brickdata_load(\"%s\") ok!", filename);
 }
 
 
@@ -143,8 +178,6 @@ void brickdata_unload()
 brickdata_t *brickdata_get(int id)
 {
     id = clip(id, 0, brickdata_count-1);
-    if(brickdata[id] == NULL)
-        fatal_error("Can't find brick %d in the brickset.", id);
     return brickdata[id];
 }
 
@@ -167,17 +200,20 @@ int brickdata_size()
  * brick_create()
  * Spawns a new brick
  */
-brick_t* brick_create(int id, v2d_t position)
+brick_t* brick_create(int id, v2d_t position, bricklayer_t layer)
 {
     brick_t *b = mallocx(sizeof *b);
     int i;
 
     b->brick_ref = brickdata_get(id);
+    if(b->brick_ref == NULL)
+        fatal_error("Can't create brick %d: brick not found.", id);
+
     b->x = b->sx = (int)position.x;
     b->y = b->sy = (int)position.y;
     b->animation_frame = 0;
     b->state = BRS_IDLE;
-    b->layer = BRL_DEFAULT;
+    b->layer = layer;
     b->obstacle = create_obstacle(b);
 
     for(i=0; i<BRICK_MAXVALUES; i++)
@@ -330,7 +366,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 team[i]->on_moveable_platform = FALSE;
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && bounding_box(a,b)) {
                     brick_t *down = NULL, *left = NULL, *right = NULL;
-                    int cloud = brk->brick_ref->property == BRK_CLOUD;
+                    int cloud = (brk->brick_ref->property == BRK_CLOUD);
                     actor_sensors(team[i]->actor, brick_list, NULL, NULL, &right, NULL, &down, NULL, &left, NULL);
                     if((cloud && down == brk) || (!cloud && (down == brk || left == brk || right == brk))) {
                         team[i]->on_moveable_platform = TRUE;
@@ -377,8 +413,8 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
 {
     float oldx = 0.0f, oldy = 0.0f, x = 0.0f, y = 0.0f, t = 0.0f;
     float rx, ry, sx, sy, ph, off;
-    int w = image_width(brick_image(brk));
-    int h = image_height(brick_image(brk));
+    int w = brick_size(brk).x;
+    int h = brick_size(brk).y;
     v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
     switch(brk->brick_ref->behavior) {
@@ -443,7 +479,53 @@ v2d_t brick_moveable_platform_offset(const brick_t *brk)
     }
 }
 
+/*
+ * brick_id()
+ * Returns the brick ID, i.e., its number in the brickset
+ */
+int brick_id(const brick_t* brk)
+{
+    for(int i = 0; i < brickdata_count; i++) {
+        if(brk->brick_ref == brickdata[i])
+            return i;
+    }
 
+    return -1; /* not found */
+}
+
+/*
+ * brick_type()
+ * Returns the type of the brick
+ */
+brickproperty_t brick_type(const brick_t* brk)
+{
+    if(brk->brick_ref)
+        return brk->brick_ref->property;
+    else
+        return BRK_OBSTACLE;
+}
+
+
+/*
+ * brick_behavior()
+ * Returns the behavior of the brick
+ */
+brickbehavior_t brick_behavior(const brick_t* brk)
+{
+    if(brk->brick_ref)
+        return brk->brick_ref->behavior;
+    else
+        return BRB_DEFAULT;
+}
+
+/*
+ * brick_layer()
+ * Returns the layer of the brick (green, yellow, default)
+ */
+bricklayer_t brick_layer(const brick_t* brk)
+{
+    return brk->layer;
+}
 
 /*
  * brick_image()
@@ -451,22 +533,25 @@ v2d_t brick_moveable_platform_offset(const brick_t *brk)
  */
 const image_t *brick_image(const brick_t *brk)
 {
-    return brk->brick_ref->image;
+    if(brk->brick_ref)
+        return brk->brick_ref->image;
+    else
+        return NULL;
 }
-
-
 
 /*
  * brick_collisionmask()
  * Returns the collision mask of a brick
  * WARNING: will be NULL if the brick is passable!
+ *          (or if it's not a "true" brick)
  */
 const collisionmask_t *brick_collisionmask(const brick_t *brk)
 {
-    return brk->brick_ref->mask;
+    if(brk->brick_ref)
+        return brk->brick_ref->mask;
+    else
+        return NULL;
 }
-
-
 
 /*
  * brick_obstacle()
@@ -478,6 +563,66 @@ const obstacle_t* brick_obstacle(const brick_t* brk)
     return brk->obstacle;
 }
 
+/*
+ * brick_zindex()
+ * Returns the zindex of the brick
+ */
+float brick_zindex(const brick_t* brk)
+{
+    if(brk->brick_ref)
+        return brk->brick_ref->zindex;
+    else
+        return 0.5f;
+}
+
+/*
+ * brick_position()
+ * Returns the position of the
+ * (topleft corner of the) brick
+ */
+v2d_t brick_position(const brick_t* brk)
+{
+    return v2d_new(brk->x, brk->y);
+}
+
+/*
+ * brick_spawnpoint()
+ * Returns the spawn point of the brick
+ */
+v2d_t brick_spawnpoint(const brick_t* brk)
+{
+    return v2d_new(brk->sx, brk->sy);
+}
+
+/*
+ * brick_size()
+ * Returns the size of the brick
+ */
+v2d_t brick_size(const brick_t* brk)
+{
+    if(brk->brick_ref && brk->brick_ref->image)
+        return v2d_new(image_width(brk->brick_ref->image), image_height(brk->brick_ref->image));
+    else
+        return v2d_new(0, 0);
+}
+
+/*
+ * brick_kill()
+ * Kills a brick
+ */
+void brick_kill(brick_t* brk)
+{
+    brk->state = BRS_DEAD;
+}
+
+/*
+ * brick_is_alive()
+ * Checks if a brick is alive
+ */
+int brick_is_alive(const brick_t* brk)
+{
+    return brk->state != BRS_DEAD;
+}
 
 /*
  * brick_get_property_name()
@@ -555,6 +700,31 @@ bricklayer_t colorname2bricklayer(const char *name)
         return BRL_DEFAULT;
 }
 
+/*
+ * brick_exists()
+ * Does a brick with the given id exist?
+ */
+int brick_exists(int id)
+{
+    if(id >= 0 && id < brickdata_count)
+        return brickdata[id] != NULL;
+    else
+        return FALSE;
+}
+
+/*
+ * brick_image_preview()
+ * Image of the brick with the given id (may be NULL)
+ */
+const image_t* brick_image_preview(int id)
+{
+    if(id >= 0 && id < brickdata_count) {
+        if(brickdata[id] != NULL)
+            return brickdata[id]->image;
+    }
+    return NULL;
+}
+
 
 
 /* === private stuff === */
@@ -626,9 +796,9 @@ void validate_brickdata(const brickdata_t *obj)
 /* creates an obstacle (for the physics engine) corresponding to the brick */
 obstacle_t* create_obstacle(const brick_t* brick)
 {
-    if(brick->brick_ref->property != BRK_NONE) {
+    if(brick->brick_ref && brick->brick_ref->property != BRK_NONE) {
         const collisionmask_t* mask = brick_collisionmask(brick);
-        v2d_t position = v2d_new(brick->x, brick->y);
+        v2d_t position = brick_position(brick);
         int solid = (brick->brick_ref->property == BRK_OBSTACLE);
         return solid ? obstacle_create_solid(mask, position) : obstacle_create_oneway(mask, position);
     }
