@@ -1474,9 +1474,7 @@ void level_change_player(player_t *new_player)
  */
 brick_t* level_create_brick(int type, v2d_t position)
 {
-    brick_t *brick = brick_create(type);
-    brick->x = brick->sx = (int)position.x;
-    brick->y = brick->sy = (int)position.y;
+    brick_t *brick = brick_create(type, position);
     entitymanager_store_brick(brick);
     return brick;
 }
@@ -3078,7 +3076,7 @@ const char *editor_entity_class(enum editor_entity_type objtype)
 }
 
 
-/* returns a string containing information
+/* returns a string containing data
  * about a given object */
 const char *editor_entity_info(enum editor_entity_type objtype, int objid)
 {
@@ -3089,7 +3087,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
         case EDT_BRICK: {
             brickdata_t *x = brickdata_get(objid);
             if(x && x->image)
-                sprintf(buf, "angle: %d\nsize: %dx%d\nproperty: %s\nbehavior: %s\nzindex: %.2lf", x->angle, image_width(x->image), image_height(x->image), brick_get_property_name(x->property), brick_get_behavior_name(x->behavior), x->zindex);
+                sprintf(buf, "property: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf", brick_get_property_name(x->property), brick_get_behavior_name(x->behavior), image_width(x->image), image_height(x->image), x->zindex);
             else
                 sprintf(buf, "WARNING: missing brick");
             break;

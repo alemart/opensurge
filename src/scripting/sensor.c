@@ -40,7 +40,6 @@ static surgescript_var_t* fun_update(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static inline const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object);
 static inline sensor_t* get_sensor(const surgescript_object_t* object);
 static inline void update(surgescript_object_t* object);
@@ -50,7 +49,6 @@ extern const char* parent_name(const surgescript_object_t* object);
 static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
-static const surgescript_heapptr_t ANGLE_ADDR = 3;
 #define SENSOR_COLOR (image_hex2rgb("ffff00"))
 static const int STATUS_NONE = 0;
 static const int STATUS_SOLID = 1;
@@ -72,7 +70,6 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Sensor", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
-    surgescript_vm_bind(vm, "Sensor", "get_angle", fun_getangle, 0);
 }
 
 
@@ -148,10 +145,8 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     /* initial configuration */
     ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));
     ssassert(STATUS_ADDR == surgescript_heap_malloc(heap));
-    ssassert(ANGLE_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), false);
     surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), 0);
-    surgescript_var_set_number(surgescript_heap_at(heap, ANGLE_ADDR), 0);
 
     /* done! */
     return NULL;
@@ -208,14 +203,6 @@ surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript
     return surgescript_var_clone(surgescript_heap_at(heap, STATUS_ADDR));
 }
 
-/* get angle of the overlapping obstacle */
-surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    return surgescript_var_clone(surgescript_heap_at(heap, ANGLE_ADDR));
-}
-
-
 
 
 
@@ -252,10 +239,7 @@ void update(surgescript_object_t* object)
             surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_SOLID);
         else
             surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_ONEWAY);
-        surgescript_var_set_number(surgescript_heap_at(heap, ANGLE_ADDR), obstacle_get_angle(obstacle));
     }
-    else {
+    else
         surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_NONE);
-        surgescript_var_set_number(surgescript_heap_at(heap, ANGLE_ADDR), 0);
-    }
 }

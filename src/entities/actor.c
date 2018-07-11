@@ -36,13 +36,7 @@
 
 
 /* private data */
-static int floor_priority = TRUE; /* default behavior: priority(floor) > priority(wall) */
-static int slope_priority = TRUE; /* default behavior: priority(slope) > priority(floor) */
-static brick_t* brick_at(const brick_list_t *list, v2d_t spot);
-static int is_leftwall_disabled = FALSE;
-static int is_rightwall_disabled = FALSE;
-static int is_floor_disabled = FALSE;
-static int is_ceiling_disabled = FALSE;
+static brick_t* brick_at(const brick_list_t *list, v2d_t spot); /* obsolete */
 
 /* private functions */
 static void calculate_rotated_boundingbox(const actor_t *act, v2d_t spot[4]);
@@ -489,6 +483,7 @@ const brick_t* actor_brick_at(actor_t *act, const brick_list_t *brick_list, v2d_
  * one that collides with the given spot
  * PS: this code ignores the bricks that are
  * not obstacles */
+/* NOTE: this is old (deprecated) code -- see obstaclemap.c */
 static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
 {
     const brick_list_t *p;
@@ -499,35 +494,19 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
     /* main algorithm */
     for(p=list; p; p=p->next) {
 
-        /* I don't care about passable/disabled bricks. */
-        if(p->data->brick_ref->property == BRK_NONE || !p->data->enabled)
+        /* ignore passable bricks */
+        if(p->data->brick_ref->property == BRK_NONE)
             continue;
 
-        /* I don't like clouds. */
+        /* I don't want clouds. */
         if(p->data->brick_ref->property == BRK_CLOUD && (ret && ret->brick_ref->property == BRK_OBSTACLE))
             continue;
 
-        /* I don't like moving platforms */
+        /* I don't want moving platforms */
         if(p->data->brick_ref->behavior == BRB_CIRCULAR && (ret && ret->brick_ref->behavior != BRB_CIRCULAR) && p->data->y >= ret->y)
             continue;
 
-        /* I don't want a floor! */
-        if(is_floor_disabled && p->data->brick_ref->angle == 0)
-            continue;
-
-        /* I don't want a ceiling! */
-        if(is_ceiling_disabled && p->data->brick_ref->angle == 180)
-            continue;
-
-        /* I don't want a right wall */
-        if(is_rightwall_disabled && p->data->brick_ref->angle > 0 && p->data->brick_ref->angle < 180)
-            continue;
-
-        /* I don't want a left wall */
-        if(is_leftwall_disabled && p->data->brick_ref->angle > 180 && p->data->brick_ref->angle < 360)
-            continue;
-
-        /* here's something I like... */
+        /* here's something I want... */
         br[0] = (float)p->data->x;
         br[1] = (float)p->data->y;
         br[2] = (float)(p->data->x + image_width(p->data->brick_ref->image));
@@ -536,37 +515,18 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
 
         if((spot.x >= br[0] && spot.y >= br[1] && spot.x < br[2] && spot.y < br[3]) && image_getpixel(brick_image(p->data), (int)offset.x, (int)offset.y) != video_get_maskcolor()) {
             if(p->data->brick_ref->behavior != BRB_CIRCULAR && (ret && ret->brick_ref->behavior == BRB_CIRCULAR) && p->data->y <= ret->y) {
-                ret = p->data; /* I don't like moving platforms. Let's grab a regular platform instead. */
+                ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
             }
             else if(p->data->brick_ref->property == BRK_OBSTACLE && (ret && ret->brick_ref->property == BRK_CLOUD)) {
-                ret = p->data; /* I don't like clouds. Let's grab an obstacle instead. */
+                ret = p->data; /* No clouds. Let's grab an obstacle instead. */
             }
             else if(p->data->brick_ref->property == BRK_CLOUD && (ret && ret->brick_ref->property == BRK_CLOUD)) {
                 /* oh no, two conflicting clouds! */
                 if(p->data->y > ret->y)
                     ret = p->data;
             }
-            else if(p->data->brick_ref->angle % 90 == 0) { /* if not slope */
-                if(slope_priority) {
-                    if(!ret) /* this code priorizes the slopes */
-                        ret = p->data;
-                    else {
-                        if(floor_priority) {
-                            if(ret->brick_ref->angle % 180 != 0) /* priorizes the floor/ceil */
-                                ret = p->data;
-                        }
-                        else {
-                            if(ret->brick_ref->angle % 180 == 0) /* priorizes the walls (not floor/ceil) */
-                                ret = p->data;
-                        }
-                    }
-                }
-                else
-                    ret = p->data; /* priorizes the floors & walls */
-            }
-            else if(slope_priority) { /* if slope */
+            else
                 ret = p->data;
-            }
         }
     }
 

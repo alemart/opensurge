@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * v2d.c - 2D vectors
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -93,12 +93,10 @@ float v2d_dotproduct(v2d_t u, v2d_t v)
  */
 v2d_t v2d_rotate(v2d_t v, float ang)
 {
-    float x = v.x, y = v.y;
-    v2d_t w;
-
-    w.x = x*cos(ang) - y*sin(ang);
-    w.y = y*cos(ang) + x*sin(ang);
-
+    v2d_t w = {
+        v.x * cos(ang) - v.y * sin(ang),
+        v.y * cos(ang) + v.x * sin(ang)
+    };
     return w;
 }
 
@@ -127,7 +125,6 @@ v2d_t v2d_normalize(v2d_t v)
 v2d_t v2d_lerp(v2d_t u, v2d_t v, float weight)
 {
     float w = clip(weight, 0.0, 1.0);
-    float c = 1.0 - w;
-    return v2d_new(u.x*c+v.x*w, u.y*c+v.y*w);
+    return v2d_new(u.x + (v.x - u.x) * w, u.y + (v.y - u.y) * w);
 }
 

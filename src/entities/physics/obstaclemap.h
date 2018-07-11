@@ -37,8 +37,9 @@ obstaclemap_t* obstaclemap_create();
 obstaclemap_t* obstaclemap_destroy(obstaclemap_t *obstaclemap);
 
 /* public methods */
-void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, struct obstacle_t *obstacle); /* adds an obstacle to the map */
+void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, const struct obstacle_t *obstacle); /* adds an obstacle to the map (you have to release it) */
 int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if an obstacle exists at (x,y) */
+int obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if a solid obstacle exists at (x,y) */
 const struct obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, enum movmode_t mm); /* x2 > x1 && y2 > y1; NULL may be returned */
 const struct obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t origin, v2d_t direction, float max_distance, v2d_t* hitpoint, float* distance); /* raycasting */
 

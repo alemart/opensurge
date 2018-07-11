@@ -25,7 +25,8 @@
 #include "enemy.h"
 #include "item.h"
 #include "actor.h"
-#include "collisionmask.h"
+#include "physics/collisionmask.h"
+#include "physics/obstacle.h"
 #include "../scenes/level.h"
 #include "../core/global.h"
 #include "../core/video.h"
@@ -59,6 +60,8 @@ static int traverse(const parsetree_statement_t *stmt);
 static int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata);
 static int traverse_collisionmask(const parsetree_statement_t *stmt, void *cmdetails);
 static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
+static obstacle_t* create_obstacle(const brick_t* brick);
+static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 
 /* misc */
 #define BRB_FALL_TIME               1.0 /* time in seconds before a BRB_FALL gets destroyed */
@@ -139,6 +142,8 @@ void brickdata_unload()
 brickdata_t *brickdata_get(int id)
 {
     id = clip(id, 0, brickdata_count-1);
+    if(brickdata[id] == NULL)
+        fatal_error("Can't find brick %d in the brickset.", id);
     return brickdata[id];
 }
 
@@ -161,16 +166,18 @@ int brickdata_size()
  * brick_create()
  * Spawns a new brick
  */
-brick_t* brick_create(int id)
+brick_t* brick_create(int id, v2d_t position)
 {
     brick_t *b = mallocx(sizeof *b);
     int i;
 
     b->brick_ref = brickdata_get(id);
+    b->x = b->sx = (int)position.x;
+    b->y = b->sy = (int)position.y;
     b->animation_frame = 0;
-    b->enabled = TRUE;
     b->state = BRS_IDLE;
     b->layer = BRL_DEFAULT;
+    b->obstacle = create_obstacle(b);
 
     for(i=0; i<BRICK_MAXVALUES; i++)
         b->value[i] = 0.0f;
@@ -185,6 +192,7 @@ brick_t* brick_create(int id)
  */
 brick_t* brick_destroy(brick_t *brk)
 {
+    destroy_obstacle(brk->obstacle);
     free(brk);
     return NULL;
 }
@@ -460,6 +468,17 @@ const collisionmask_t *brick_collisionmask(const brick_t *brk)
 
 
 /*
+ * brick_obstacle()
+ * Returns the obstacle associated with this brick
+ * WARNING: will be NULL if the brick is passable!
+ */
+const obstacle_t* brick_obstacle(const brick_t* brk)
+{
+    return brk->obstacle;
+}
+
+
+/*
  * brick_get_property_name()
  * Returns the name of a given brick property
  */
@@ -570,7 +589,6 @@ brickdata_t* brickdata_new()
     obj->image = NULL;
     obj->mask = NULL;
     obj->property = BRK_NONE;
-    obj->angle = 0;
     obj->behavior = BRB_DEFAULT;
     obj->zindex = 0.5f;
 
@@ -599,6 +617,25 @@ void validate_brickdata(const brickdata_t *obj)
 {
     if(obj->data == NULL)
         fatal_error("Can't load bricks: all bricks must have a sprite!");
+}
+
+/* creates an obstacle (for the physics engine) corresponding to the brick */
+obstacle_t* create_obstacle(const brick_t* brick)
+{
+    if(brick->brick_ref->property != BRK_NONE) {
+        const collisionmask_t* mask = brick_collisionmask(brick);
+        v2d_t position = v2d_new(brick->x, brick->y);
+        int solid = (brick->brick_ref->property == BRK_OBSTACLE);
+        return solid ? obstacle_create_solid(mask, position) : obstacle_create_oneway(mask, position);
+    }
+    else
+        return NULL;
+}
+
+/* destroys an obstacle associated to a brick */
+obstacle_t* destroy_obstacle(obstacle_t* obstacle)
+{
+    return (obstacle != NULL) ? obstacle_destroy(obstacle) : NULL;
 }
 
 /* traverses a .brk file */
@@ -687,9 +724,9 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         }
     }
     else if(str_icmp(identifier, "angle") == 0) {
+        /* brick angle is obsolete, but this section has been kept for compatibility */
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "Can't read brick attributes: must specify brick angle, a number between 0 and 359");
-        dat->angle = ((atoi(nanoparser_get_string(p1)) % 360) + 360) % 360;
     }
     else if(str_icmp(identifier, "zindex") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);

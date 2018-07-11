@@ -19,12 +19,9 @@
  */
 
 #include "collisionmask.h"
-#include "../core/video.h"
-#include "../core/image.h"
-#include "../core/stringutil.h"
-#include "../core/util.h"
-#include "../core/sprite.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../../core/video.h"
+#include "../../core/image.h"
+#include "../../core/util.h"
 
 /* private stuff ;) */
 struct collisionmask_t {

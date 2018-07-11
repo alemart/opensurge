@@ -112,7 +112,7 @@ static float f_asin(float x) { return asin(f_clamp(x,-1,1)); }
 static float f_acos(float x) { return acos(f_clamp(x,-1,1)); }
 
 /* returns the arc tangent of x, in the interval [-pi/2,pi/2] radians */
-/* Notice that because of the sign ambiguity, a function cannot determine with certainty in which quadrant the angle falls only by its tangent value. You can use atan2 if you need to determine the quadrant. */
+/* Notice that because of the sign ambiguity, atan cannot determine with certainty in which quadrant the angle falls. Please use atan2 if you need to determine the quadrant. */
 static float f_atan(float x) { return atan(x); }
 
 /* hyperbolic sine of x */
