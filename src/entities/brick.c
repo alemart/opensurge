@@ -44,10 +44,10 @@
 #define BRKDATA_MAX                 16384 /* this engine supports up to BRKDATA_MAX bricks per theme */
 static int brickdata_count; /* size of brickdata[] */
 static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
-typedef struct cmdetails_t { /* collision mask */
+typedef struct maskdetails_t { /* collision mask */
     const char *source_file;
     int x, y, w, h;
-} cmdetails_t;
+} maskdetails_t;
 
 
 
@@ -58,7 +58,7 @@ static brickdata_t* brickdata_delete(brickdata_t *obj);
 static void validate_brickdata(const brickdata_t *obj);
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata);
-static int traverse_collisionmask(const parsetree_statement_t *stmt, void *cmdetails);
+static int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskdetails);
 static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
 static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
@@ -101,9 +101,10 @@ void brickdata_load(const char *filename)
     logfile_message("Creating collision masks...");
     for(i=0; i<brickdata_count; i++) {
         if(brickdata[i] != NULL && brickdata[i]->property != BRK_NONE && brickdata[i]->mask == NULL) {
+            const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
             spriteinfo_t* sprite = brickdata[i]->data;
             brickdata[i]->mask = collisionmask_create(
-                image_load(sprite->source_file),
+                image_load(maskfile),
                 sprite->rect_x,
                 sprite->rect_y,
                 sprite->frame_w,
@@ -588,6 +589,7 @@ brickdata_t* brickdata_new()
     obj->data = NULL;
     obj->image = NULL;
     obj->mask = NULL;
+    obj->maskfile = NULL;
     obj->property = BRK_NONE;
     obj->behavior = BRB_DEFAULT;
     obj->zindex = 0.5f;
@@ -606,6 +608,8 @@ brickdata_t* brickdata_delete(brickdata_t *obj)
             spriteinfo_destroy(obj->data);
         if(obj->mask != NULL)
             collisionmask_destroy(obj->mask);
+        if(obj->maskfile != NULL)
+            free(obj->maskfile);
         free(obj);
     }
 
@@ -733,6 +737,13 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         nanoparser_expect_string(p1, "Can't read brick attributes: zindex must be a number between 0.0 and 1.0");
         dat->zindex = clip(atof(nanoparser_get_string(p1)), 0.0f, 1.0f);
     }
+    else if(str_icmp(identifier, "mask") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "Can't read brick attrbitues: mask must be a filename");
+        if(dat->maskfile != NULL)
+            free(dat->maskfile);
+        dat->maskfile = str_dup(nanoparser_get_string(p1));
+    }
     else if(str_icmp(identifier, "collision_mask") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_program(p1, "Can't read brick attributes: collision_mask expects a block");
@@ -754,12 +765,12 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
 }
 
 /* this will read a collision_mask { ... } block */
-int traverse_collisionmask(const parsetree_statement_t *stmt, void *cmdetails)
+int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskdetails)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2, *p3, *p4;
-    cmdetails_t *s = (cmdetails_t*)cmdetails;
+    maskdetails_t *s = (maskdetails_t*)maskdetails;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
@@ -792,7 +803,7 @@ int traverse_collisionmask(const parsetree_statement_t *stmt, void *cmdetails)
 /* read a collision mask from a file */
 collisionmask_t *read_collisionmask(const parsetree_program_t *block)
 {
-    cmdetails_t s = { NULL, 0, 0, 0, 0 };
+    maskdetails_t s = { NULL, 0, 0, 0, 0 };
 
     nanoparser_traverse_program_ex(block, (void*)(&s), traverse_collisionmask);
     if(s.source_file == NULL)
