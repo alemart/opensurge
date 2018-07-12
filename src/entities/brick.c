@@ -63,7 +63,7 @@ struct brickdata_t {
     spriteinfo_t *data; /* this is not stored in the main hash */
     image_t *image; /* pointer to the current brick image in the animation */
     char* maskfile; /* collision mask file (may be NULL) */
-    struct collisionmask_t *mask; /* collision mask (may be NULL) */
+    collisionmask_t *mask; /* collision mask (may be NULL) */
     float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
     brickproperty_t property;
     brickbehavior_t behavior;
@@ -79,7 +79,7 @@ struct brick_t { /* a real, concrete brick */
     float value[BRICK_MAXVALUES]; /* alterable values */
     float animation_frame; /* controlled by a timer */
     bricklayer_t layer; /* loop system: BRL_* */
-    struct obstacle_t* obstacle; /* used by the physics system */
+    obstacle_t* obstacle; /* used by the physics system */
 };
 
 /* collision mask (parsed data) */

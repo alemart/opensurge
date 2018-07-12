@@ -27,14 +27,15 @@ typedef struct collisionmask_t collisionmask_t;
 
 /* create and destroy a collision mask */
 collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height);
-collisionmask_t *collisionmask_destroy(collisionmask_t *cm);
+collisionmask_t *collisionmask_destroy(collisionmask_t *mask);
 
 /* retrieve dimensions */
-int collisionmask_width(const collisionmask_t* cm);
-int collisionmask_height(const collisionmask_t* cm);
+int collisionmask_width(const collisionmask_t* mask);
+int collisionmask_height(const collisionmask_t* mask);
+int collisionmask_pitch(const collisionmask_t* mask);
 
 /* collision checking
-   WARNING: no boundary checking and no (cm == NULL) checking!! (for faster access) */
-#define collisionmask_check(cm, x, y, w) *(*((char**)(cm)) + (y) * (w) + (x))
+   WARNING: no boundary checking and no (mask == NULL) checking!! (for faster access) */
+#define collisionmask_check(mask, x, y, pitch) *(*((char**)(mask)) + (y) * (pitch) + (x))
 
 #endif
