@@ -25,7 +25,7 @@
 
 /* private stuff ;) */
 #define MEM_ALIGNMENT               sizeof(void*) /* 4 */ /* must be a power of two */
-#define MASK_ALIGN(x)               (((x) + (MEM_ALIGNMENT - 1)) & ~(MEM_ALIGNMENT - 1))
+#define MASK_ALIGN(x)               (((x) + (MEM_ALIGNMENT - 1)) & ~(MEM_ALIGNMENT - 1)) /* make x a multiple of MEM_ALIGNMENT */
 struct collisionmask_t {
     char* mask;
     int width;
@@ -52,7 +52,7 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
         for(int i = 0; i < mask->width; i++)
             mask->mask[j * pitch + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
     }
-    video_showmessage("%d, %d", mask->width, pitch);
+
     return mask;
 }
 
