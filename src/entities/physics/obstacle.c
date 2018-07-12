@@ -157,6 +157,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
     /* bounding box collision check */
     if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1) {
         /* pixel perfect collision check */
+        int pitch = collisionmask_pitch(mask);
         if((x1 != x2) || (y1 != y2)) {
             /* since y1 == y2 XOR x1 == x2, it's really a linear loop */
             int px, py;
@@ -165,7 +166,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
                     px = x - o_x1;
                     py = y - o_y1;
                     if(px >= 0 && px < obstacle->width && py >= 0 && py < obstacle->height) {
-                        if(collisionmask_check(mask, px, py, obstacle->width))
+                        if(collisionmask_check(mask, px, py, pitch))
                             return TRUE;
                     }
                 }
@@ -173,7 +174,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
         }
         else {
             /* single-pixel collision check */
-            return collisionmask_check(mask, x1 - o_x1, y1 - o_y1, obstacle->width);
+            return collisionmask_check(mask, x1 - o_x1, y1 - o_y1, pitch);
         }
     }
 
@@ -187,6 +188,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
 {
     int w = collisionmask_width(mask);
     int h = collisionmask_height(mask);
+    int pitch = collisionmask_pitch(mask);
 
     switch(base_level) {
         /* compute the height counting from the left side to the right side of the obstacle */
@@ -200,7 +202,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             for(int y = 0; y < h; y++) {
                 height[y] = 0;
                 for(int x = w-1; x >= 0; x--) {
-                    if(collisionmask_check(mask, x, y, w)) {
+                    if(collisionmask_check(mask, x, y, pitch)) {
                         height[y] = x;
                         break;
                     }
@@ -221,7 +223,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             for(int x = 0; x < w; x++) {
                 height[x] = 0;
                 for(int y = h-1; y >= 0; y--) {
-                    if(collisionmask_check(mask, x, y, w)) {
+                    if(collisionmask_check(mask, x, y, pitch)) {
                         height[x] = y;
                         break;
                     }
@@ -241,7 +243,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             for(int y = 0; y < h; y++) {
                 height[y] = 0;
                 for(int x = 0; x < w; x++) {
-                    if(collisionmask_check(mask, x, y, w)) {
+                    if(collisionmask_check(mask, x, y, pitch)) {
                         height[y] = w-x;
                         break;
                     }
@@ -263,7 +265,7 @@ uint16* create_height_map(const collisionmask_t* mask, obstaclebaselevel_t base_
             for(int x = 0; x < w; x++) {
                 height[x] = 0;
                 for(int y = 0; y < h; y++) {
-                    if(collisionmask_check(mask, x, y, w)) {
+                    if(collisionmask_check(mask, x, y, pitch)) {
                         height[x] = h-y;
                         break;
                     }

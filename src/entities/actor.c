@@ -515,7 +515,7 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
             if(mask != NULL) {
                 int ox = (int)(spot.x - pos.x), oy = (int)(spot.y - pos.y);
                 if(ox >= 0 && oy >= 0 && ox < collisionmask_width(mask) && oy < collisionmask_height(mask)) {
-                    if(collisionmask_check(mask, ox, oy, collisionmask_width(mask))) {
+                    if(collisionmask_check(mask, ox, oy, collisionmask_pitch(mask))) {
                         if(brick_behavior(p->data) != BRB_CIRCULAR && (ret && brick_behavior(ret) == BRB_CIRCULAR) && brick_position(p->data).y <= brick_position(ret).y) {
                             ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
                         }

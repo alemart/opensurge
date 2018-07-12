@@ -24,45 +24,58 @@
 #include "../../core/util.h"
 
 /* private stuff ;) */
+#define MEM_ALIGNMENT               sizeof(void*) /* 4 */ /* must be a power of two */
+#define MASK_ALIGN(x)               (((x) + (MEM_ALIGNMENT - 1)) & ~(MEM_ALIGNMENT - 1))
 struct collisionmask_t {
     char* mask;
     int width;
     int height;
 };
 
+/* is MEM_ALIGNMENT a power of two? */
+#define IS_POWER_OF_TWO(n)          (((n) & ((n) - 1)) == 0)
+typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ];
 
 /* public methods */
 collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height)
 {
-    collisionmask_t *cm = mallocx(sizeof *cm);
+    collisionmask_t *mask = mallocx(sizeof *mask);
     uint32 maskcolor = video_get_maskcolor();
+    int pitch;
 
-    cm->width = max(1, width);
-    cm->height = max(1, height);
-    cm->mask = mallocx(cm->width * cm->height);
-    for(int j = 0; j < cm->height; j++) {
-        for(int i = 0; i < cm->width; i++)
-            cm->mask[j * cm->width + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
+    mask->width = max(1, width);
+    mask->height = max(1, height);
+    pitch = MASK_ALIGN(mask->width);
+
+    mask->mask = mallocx(pitch * mask->height);
+    for(int j = 0; j < mask->height; j++) {
+        for(int i = 0; i < mask->width; i++)
+            mask->mask[j * pitch + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
     }
-
-    return cm;
+    video_showmessage("%d, %d", mask->width, pitch);
+    return mask;
 }
 
-collisionmask_t *collisionmask_destroy(collisionmask_t *cm)
+collisionmask_t *collisionmask_destroy(collisionmask_t *mask)
 {
-    if(cm != NULL) {
-        free(cm->mask);
-        free(cm);
+    if(mask != NULL) {
+        free(mask->mask);
+        free(mask);
     }
     return NULL;
 }
 
-int collisionmask_width(const collisionmask_t* cm)
+int collisionmask_width(const collisionmask_t* mask)
 {
-    return cm ? cm->width : 0;
+    return mask ? mask->width : 0;
 }
 
-int collisionmask_height(const collisionmask_t* cm)
+int collisionmask_height(const collisionmask_t* mask)
 {
-    return cm ? cm->height : 0;
+    return mask ? mask->height : 0;
+}
+
+int collisionmask_pitch(const collisionmask_t* mask)
+{
+    return mask ? MASK_ALIGN(mask->width) : 0;
 }

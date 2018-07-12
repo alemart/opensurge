@@ -2518,7 +2518,7 @@ int hit_test(const brick_t* brk, int x, int y)
         v2d_t position = brick_position(brk);
         int ox = x - position.x, oy = y - position.y;
         if(ox >= 0 && ox < collisionmask_width(mask) && oy >= 0 && oy < collisionmask_height(mask))
-            return collisionmask_check(mask, ox, oy, collisionmask_width(mask));
+            return collisionmask_check(mask, ox, oy, collisionmask_pitch(mask));
     }
 
     return FALSE;
