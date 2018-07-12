@@ -3423,12 +3423,10 @@ void editor_grid_render()
 
         /* creating the grid image */
         grid = image_create(EDITOR_GRID_W, EDITOR_GRID_H);
-        color = image_rgb(0,128,160);
+        color = image_rgb(0, 128, 160);
         image_clear(grid, video_get_maskcolor());
-        for(i=0; i<image_height(grid); i++)
-            image_putpixel(grid, image_width(grid)-1, i, color);
-        for(i=0; i<image_width(grid); i++)
-            image_putpixel(grid, i, image_height(grid)-1, color);
+        image_line(grid, EDITOR_GRID_W-1, 0, EDITOR_GRID_W-1, EDITOR_GRID_H-1, color);
+        image_line(grid, 0, EDITOR_GRID_H-1, EDITOR_GRID_W-1, EDITOR_GRID_H-1, color);
 
         /* drawing the grid... */
         for(i=0; i<=VIDEO_SCREEN_W/image_width(grid); i++) {
