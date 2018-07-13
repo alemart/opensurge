@@ -1,0 +1,612 @@
+// =================================
+//  Template Brickset by Alexandre
+//       for Open Surge
+//    http://opensurge2d.org
+// =================================
+
+//
+// Section 1: Generics
+//
+
+brick 0
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 128 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 1
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     112 128 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 2
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     176 128 80 192
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 3
+{
+    type                OBSTACLE
+    behavior            FALL 8 2
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     272 128 128 32
+        frame_size      128 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 4
+{
+    type                OBSTACLE
+    behavior            BREAKABLE 2 4
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     432 128 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 5
+{
+    type                OBSTACLE
+    behavior            CIRCULAR 128 0 1 1 0
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     272 160 96 32
+        frame_size      96 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// Section 2: Ramps
+//
+
+brick 16
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 224 128 64
+        frame_size      128 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 17
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     144 224 128 64
+        frame_size      128 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 18
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     304 224 192 64
+        frame_size      192 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 19
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 320 192 64
+        frame_size      192 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 20
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     240 320 256 64
+        frame_size      256 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 21
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 416 256 64
+        frame_size      256 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 22
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     304 416 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 23
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     368 416 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// Section 3: Curvy Roads
+//
+
+brick 32
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 512 128 64
+        frame_size      128 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 33
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 608 128 64
+        frame_size      128 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 34
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 704 128 92
+        frame_size      128 92
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 35
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 800 128 92
+        frame_size      128 92
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 36
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     208 512 256 384
+        frame_size      256 384
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// Section 4: Circles
+//
+
+brick 48
+{
+    type                PASSABLE
+    behavior            DEFAULT
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 928 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 49
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     176 928 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 50
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     240 928 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 51
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     176 992 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 52
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     240 992 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 53
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     336 928 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 54
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     400 928 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 55
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     336 992 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 56
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     400 992 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// Section 5: Loops
+//
