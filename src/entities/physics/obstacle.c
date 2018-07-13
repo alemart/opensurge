@@ -104,7 +104,7 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
 /* if the ground direction is left or right, this returns the absolute x position of the ground */
 int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir_t ground_direction)
 {
-    /* this should be fast... */
+    /* no need to perform any clipping */
     int ox = (int)obstacle->position.x;
     int oy = (int)obstacle->position.y;
 
@@ -139,9 +139,9 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
         int pitch = collisionmask_pitch(mask);
         if((x1 != x2) || (y1 != y2)) {
             /* since y1 == y2 XOR x1 == x2, it's really a linear loop */
-            int px, py;
-            for(int y = y1; y <= y2; y++) {
-                for(int x = x1; x <= x2; x++) {
+            int px, py, x, y;
+            for(y = y2; y >= y1; y--) {
+                for(x = x2; x >= x1; x--) {
                     px = x - o_x1;
                     py = y - o_y1;
                     if(px >= 0 && px < obstacle->width && py >= 0 && py < obstacle->height) {
