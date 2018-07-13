@@ -43,7 +43,6 @@ typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ];
 static const int MASK_MAXSIZE = UINT16_MAX; /* masks cannot be larger than this */
 static uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
 static inline uint16* destroy_groundmap(uint16* gmap);
-static inline uint16* get_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
 
 /* public methods */
 collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height)
@@ -56,7 +55,7 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
     mask->height = clip(height, 1, image_height(image));
     mask->pitch = MASK_ALIGN(mask->width);
 
-    /* validating the size */
+    /* really?? */
     if(mask->width > MASK_MAXSIZE || mask->height > MASK_MAXSIZE) {
         fatal_error("Masks cannot be larger than %d pixels.", MASK_MAXSIZE);
         free(mask);
@@ -110,29 +109,39 @@ int collisionmask_pitch(const collisionmask_t* mask)
 
 int collisionmask_peek(const collisionmask_t* mask, int x, int y)
 {
-    if(mask) {
-        if(x >= 0 && x < mask->width && y >= 0 && y < mask->height)
-            return collisionmask_at(mask, x, y, MASK_ALIGN(mask->width));
-    }
-    return 0;
+    if(mask && x >= 0 && x < mask->width && y >= 0 && y < mask->height)
+        return collisionmask_at(mask, x, y, MASK_ALIGN(mask->width));
+    else
+        return 0;
 }
 
 int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, grounddir_t ground_direction)
 {
-    if(mask != NULL) {
-        const uint16* gmap = get_groundmap(mask, ground_direction);
-        if(gmap != NULL) {
-            x = clip(x, 0, mask->width - 1);
-            y = clip(y, 0, mask->height - 1);
-            if(ground_direction == GD_DOWN || ground_direction == GD_UP) {
-                int p = MASK_ALIGN(mask->width);
-                return gmap[p * y + x];
-            }
-            else {
-                int p = MASK_ALIGN(mask->height);
-                return gmap[p * x + y];
-            }
-        }
+    int p;
+
+    if(!mask)
+        return 0;
+
+    x = clip(x, 0, mask->width-1);
+    y = clip(y, 0, mask->height-1);
+
+    /* this is very fast */
+    switch(ground_direction) {
+        case GD_DOWN:
+            p = MASK_ALIGN(mask->width);
+            return mask->gmap[0][p * y + x];
+
+        case GD_LEFT:
+            p = MASK_ALIGN(mask->height);
+            return mask->gmap[1][p * x + y];
+
+        case GD_UP:
+            p = MASK_ALIGN(mask->width);
+            return mask->gmap[2][p * y + x];
+
+        case GD_RIGHT:
+            p = MASK_ALIGN(mask->height);
+            return mask->gmap[3][p * x + y];
     }
 
     return 0;
@@ -268,21 +277,4 @@ uint16* destroy_groundmap(uint16* gmap)
     if(gmap != NULL)
         free(gmap);
     return NULL;
-}
-
-/* Gets a ground map from a mask */
-uint16* get_groundmap(const collisionmask_t* mask, grounddir_t ground_direction)
-{
-    switch(ground_direction) {
-        case GD_DOWN:
-            return mask->gmap[0];
-        case GD_LEFT:
-            return mask->gmap[1];
-        case GD_UP:
-            return mask->gmap[2];
-        case GD_RIGHT:
-            return mask->gmap[3];
-        default:
-            return NULL;
-    }
 }

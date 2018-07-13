@@ -99,6 +99,30 @@ int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis
         return 0;
 }
 
+/* find the ground position, given (x,y) in world coordinates */
+/* if the ground direction is up or down, this returns the absolute y position of the ground */
+/* if the ground direction is left or right, this returns the absolute x position of the ground */
+int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir_t ground_direction)
+{
+    /* this should be fast... */
+    int ox = (int)obstacle->position.x;
+    int oy = (int)obstacle->position.y;
+
+    /* get the absolute ground position */
+    switch(ground_direction) {
+        case GD_DOWN:
+        case GD_UP:
+            return oy + collisionmask_locate_ground(obstacle->mask, x - ox, y - oy, ground_direction);
+
+        case GD_LEFT:
+        case GD_RIGHT:
+            return ox + collisionmask_locate_ground(obstacle->mask, x - ox, y - oy, ground_direction);
+    }
+
+    /* this shouldn't happen */
+    return oy + obstacle->height - 1;
+}
+
 /* detects a pixel-perfect collision between an obstacle and a sensor
  * (x1, y1, x2, y2) are given in world-coordinates; also, x1 <= x2 and y1 <= y2 */
 int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
