@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
 #include "collisionmask.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
@@ -26,12 +27,12 @@
 /* private stuff ;) */
 #define MEM_ALIGNMENT               sizeof(void*) /* 4 */ /* must be a power of two */
 #define MASK_ALIGN(x)               (((x) + (MEM_ALIGNMENT - 1)) & ~(MEM_ALIGNMENT - 1)) /* make x a multiple of MEM_ALIGNMENT */
-#define MASK_MAXSIZE                65535 /* masks cannot be larger than this */
 struct collisionmask_t {
     char* mask;
-    uint16* gmap[4];
     int width;
     int height;
+    int pitch;
+    uint16* gmap[4];
 };
 
 /* is MEM_ALIGNMENT a power of two? */
@@ -39,6 +40,7 @@ struct collisionmask_t {
 typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ];
 
 /* utilities */
+static const int MASK_MAXSIZE = UINT16_MAX; /* masks cannot be larger than this */
 static uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
 static inline uint16* destroy_groundmap(uint16* gmap);
 static inline uint16* get_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
@@ -48,14 +50,13 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
 {
     collisionmask_t *mask = mallocx(sizeof *mask);
     uint32 maskcolor = video_get_maskcolor();
-    int pitch;
 
     /* basic params */
     mask->width = clip(width, 1, image_width(image));
     mask->height = clip(height, 1, image_height(image));
-    pitch = MASK_ALIGN(mask->width);
+    mask->pitch = MASK_ALIGN(mask->width);
 
-    /* validating size */
+    /* validating the size */
     if(mask->width > MASK_MAXSIZE || mask->height > MASK_MAXSIZE) {
         fatal_error("Masks cannot be larger than %d pixels.", MASK_MAXSIZE);
         free(mask);
@@ -63,10 +64,10 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
     }
 
     /* create the collision mask */
-    mask->mask = mallocx(pitch * mask->height);
+    mask->mask = mallocx((mask->pitch * mask->height) * sizeof(*(mask->mask)));
     for(int j = 0; j < mask->height; j++) {
         for(int i = 0; i < mask->width; i++)
-            mask->mask[j * pitch + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
+            mask->mask[j * mask->pitch + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
     }
 
     /* create the ground maps */
@@ -104,14 +105,14 @@ int collisionmask_height(const collisionmask_t* mask)
 
 int collisionmask_pitch(const collisionmask_t* mask)
 {
-    return mask ? MASK_ALIGN(mask->width) : 0;
+    return mask ? mask->pitch : 0;
 }
 
-int collisionmask_at(const collisionmask_t* mask, int x, int y)
+int collisionmask_peek(const collisionmask_t* mask, int x, int y)
 {
     if(mask) {
         if(x >= 0 && x < mask->width && y >= 0 && y < mask->height)
-            return collisionmask_check(mask, x, y, MASK_ALIGN(mask->width));
+            return collisionmask_at(mask, x, y, MASK_ALIGN(mask->width));
     }
     return 0;
 }
@@ -145,7 +146,7 @@ int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, groun
 uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction)
 {
     int w = mask->width, h = mask->height;
-    int pitch = collisionmask_pitch(mask);
+    int pitch = mask->pitch;
     uint16* gmap = NULL;
     int x, y, p;
 
@@ -159,26 +160,26 @@ uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_directi
          *                  y                        if mask(x,y) = 1 and mask(x,y-1) = 0
          * gmap(x,y)   =    gmap(x,y-1)              if mask(x,y) = 1 and mask(x,y-1) = 1
          *                  gmap(x,y+1)              if mask(x,y) = 0 and y < h-1
-         *                  h-1                      if mask(x,y) = 0 and y = h-1
+         *                  y                        if mask(x,y) = 0 and y = h-1
          */
         case GD_DOWN:
             p = MASK_ALIGN(mask->width);
             gmap = mallocx((p * h) * sizeof(*gmap));
             for(x = 0; x < w; x++) {
-                if(collisionmask_check(mask, x, 0, pitch))
+                if(collisionmask_at(mask, x, 0, pitch))
                     gmap[x] = 0;
                 for(y = 1; y < h; y++) {
-                    if(collisionmask_check(mask, x, y, pitch)) {
-                        if(collisionmask_check(mask, x, y-1, pitch))
+                    if(collisionmask_at(mask, x, y, pitch)) {
+                        if(collisionmask_at(mask, x, y-1, pitch))
                             gmap[p * y + x] = gmap[p * (y-1) + x];
                         else
                             gmap[p * y + x] = y;
                     }
                 }
-                if(!collisionmask_check(mask, x, h-1, pitch))
+                if(!collisionmask_at(mask, x, h-1, pitch))
                     gmap[p * (h-1) + x] = h-1;
                 for(y = h-2; y >= 0; y--) {
-                    if(!collisionmask_check(mask, x, y, pitch))
+                    if(!collisionmask_at(mask, x, y, pitch))
                         gmap[p * y + x] = gmap[p * (y+1) + x];
                 }
             }
@@ -189,20 +190,20 @@ uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_directi
             p = MASK_ALIGN(mask->height);
             gmap = mallocx((p *  w) * sizeof(*gmap));
             for(y = 0; y < h; y++) {
-                if(collisionmask_check(mask, w-1, y, pitch))
+                if(collisionmask_at(mask, w-1, y, pitch))
                     gmap[p * (w-1) + y] = w-1;
                 for(x = w-2; x >= 0; x--) {
-                    if(collisionmask_check(mask, x, y, pitch)) {
-                        if(collisionmask_check(mask, x+1, y, pitch))
+                    if(collisionmask_at(mask, x, y, pitch)) {
+                        if(collisionmask_at(mask, x+1, y, pitch))
                             gmap[p * x + y] = gmap[p * (x+1) + y];
                         else
                             gmap[p * x + y] = x;
                     }
                 }
-                if(!collisionmask_check(mask, 0, y, pitch))
+                if(!collisionmask_at(mask, 0, y, pitch))
                     gmap[y] = 0;
                 for(x = 1; x < w; x++) {
-                    if(!collisionmask_check(mask, x, y, pitch))
+                    if(!collisionmask_at(mask, x, y, pitch))
                         gmap[p * x + y] = gmap[p * (x-1) + y];
                 }
             }
@@ -213,20 +214,20 @@ uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_directi
             p = MASK_ALIGN(mask->width);
             gmap = mallocx((p * h) * sizeof(*gmap));
             for(x = 0; x < w; x++) {
-                if(collisionmask_check(mask, x, h-1, pitch))
+                if(collisionmask_at(mask, x, h-1, pitch))
                     gmap[p * (h-1) + x] = h-1;
                 for(y = h-2; y >= 0; y--) {
-                    if(collisionmask_check(mask, x, y, pitch)) {
-                        if(collisionmask_check(mask, x, y+1, pitch))
+                    if(collisionmask_at(mask, x, y, pitch)) {
+                        if(collisionmask_at(mask, x, y+1, pitch))
                             gmap[p * y + x] = gmap[p * (y+1) + x];
                         else
                             gmap[p * y + x] = y;
                     }
                 }
-                if(!collisionmask_check(mask, x, 0, pitch))
+                if(!collisionmask_at(mask, x, 0, pitch))
                     gmap[x] = 0;
                 for(y = 1; y < h; y++) {
-                    if(!collisionmask_check(mask, x, y, pitch))
+                    if(!collisionmask_at(mask, x, y, pitch))
                         gmap[p * y + x] = gmap[p * (y-1) + x];
                 }
             }
@@ -237,20 +238,20 @@ uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_directi
             p = MASK_ALIGN(mask->height);
             gmap = mallocx((p * w) * sizeof(*gmap));
             for(y = 0; y < h; y++) {
-                if(collisionmask_check(mask, 0, y, pitch))
+                if(collisionmask_at(mask, 0, y, pitch))
                     gmap[y] = 0;
                 for(x = 1; x < w; x++) {
-                    if(collisionmask_check(mask, x, y, pitch)) {
-                        if(collisionmask_check(mask, x-1, y, pitch))
+                    if(collisionmask_at(mask, x, y, pitch)) {
+                        if(collisionmask_at(mask, x-1, y, pitch))
                             gmap[p * x + y] = gmap[p * (x-1) + y];
                         else
                             gmap[p * x + y] = x;
                     }
                 }
-                if(!collisionmask_check(mask, w-1, y, pitch))
+                if(!collisionmask_at(mask, w-1, y, pitch))
                     gmap[p * (w-1) + y] = w-1;
                 for(x = w-2; x >=0; x--) {
-                    if(!collisionmask_check(mask, x, y, pitch))
+                    if(!collisionmask_at(mask, x, y, pitch))
                         gmap[p * x + y] = gmap[p * (x+1) + y];
                 }
             }
