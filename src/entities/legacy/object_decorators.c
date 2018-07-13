@@ -242,7 +242,6 @@ static void addtoscore_update(objectmachine_t *obj, player_t **team, int team_si
 static void addtoscore_render(objectmachine_t *obj, v2d_t camera_position);
 
 
-
 /* public methods */
 
 /* class constructor */
@@ -2518,7 +2517,7 @@ int hit_test(const brick_t* brk, int x, int y)
         v2d_t position = brick_position(brk);
         int ox = x - position.x, oy = y - position.y;
         if(ox >= 0 && ox < collisionmask_width(mask) && oy >= 0 && oy < collisionmask_height(mask))
-            return collisionmask_check(mask, ox, oy, collisionmask_pitch(mask));
+            return collisionmask_at(mask, ox, oy, collisionmask_pitch(mask));
     }
 
     return FALSE;

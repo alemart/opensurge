@@ -498,7 +498,6 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
         /* ignore passable bricks */
         if(brick_type(p->data) == BRK_NONE)
             continue;
-#if 0
         /* I don't want clouds. */
         if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_OBSTACLE))
             continue;
@@ -506,7 +505,7 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
         /* I don't want moving platforms */
         if(brick_behavior(p->data) == BRB_CIRCULAR && (ret && brick_behavior(ret) != BRB_CIRCULAR) && brick_position(p->data).y >= brick_position(ret).y)
             continue;
-#endif
+            
         /* here's something I want... */
         pos = brick_position(p->data);
         size = brick_size(p->data);
@@ -515,7 +514,7 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
             if(mask != NULL) {
                 int ox = (int)(spot.x - pos.x), oy = (int)(spot.y - pos.y);
                 if(ox >= 0 && oy >= 0 && ox < collisionmask_width(mask) && oy < collisionmask_height(mask)) {
-                    if(collisionmask_check(mask, ox, oy, collisionmask_pitch(mask))) {
+                    if(collisionmask_at(mask, ox, oy, collisionmask_pitch(mask))) {
                         if(brick_behavior(p->data) != BRB_CIRCULAR && (ret && brick_behavior(ret) == BRB_CIRCULAR) && brick_position(p->data).y <= brick_position(ret).y) {
                             ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
                         }

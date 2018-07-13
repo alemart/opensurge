@@ -36,8 +36,8 @@ int collisionmask_pitch(const collisionmask_t* mask);
 
 /* collision checking */
 /* WARNING: no boundary checking and no (mask == NULL) checking!! (for faster access) */
-#define collisionmask_check(mask, x, y, pitch) *(*((char**)(mask)) + (y) * (pitch) + (x)) /* very fast */
-int collisionmask_at(const collisionmask_t* mask, int x, int y); /* mask value with boundary checking (slower access) */
+#define collisionmask_at(mask, x, y, pitch) *(*((char**)(mask)) + (y) * (pitch) + (x)) /* fast */
+int collisionmask_peek(const collisionmask_t* mask, int x, int y); /* mask value with boundary checking (slower) */
 
 /* locating the ground */
 typedef enum { GD_DOWN, GD_LEFT, GD_UP, GD_RIGHT } grounddir_t;
