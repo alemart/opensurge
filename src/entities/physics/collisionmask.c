@@ -26,6 +26,7 @@
 /* private stuff ;) */
 #define MEM_ALIGNMENT               sizeof(void*) /* 4 */ /* must be a power of two */
 #define MASK_ALIGN(x)               (((x) + (MEM_ALIGNMENT - 1)) & ~(MEM_ALIGNMENT - 1)) /* make x a multiple of MEM_ALIGNMENT */
+#define MASK_MAXSIZE                65535 /* masks cannot be larger than this */
 struct collisionmask_t {
     char* mask;
     int width;
@@ -46,6 +47,12 @@ collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y,
     mask->width = max(1, width);
     mask->height = max(1, height);
     pitch = MASK_ALIGN(mask->width);
+
+    if(mask->width > MASK_MAXSIZE || mask->height > MASK_MAXSIZE) {
+        fatal_error("Masks cannot be larger than %d pixels.", MASK_MAXSIZE);
+        free(mask);
+        return NULL;
+    }
 
     mask->mask = mallocx(pitch * mask->height);
     for(int j = 0; j < mask->height; j++) {
