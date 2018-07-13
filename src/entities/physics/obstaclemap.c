@@ -158,44 +158,4 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 
     /* this shouldn't happen */
     return a;
-
-    #if 0
-    static int (*w)(const obstacle_t*) = obstacle_get_width;
-    static int (*h)(const obstacle_t*) = obstacle_get_height;
-    int ha, hb, xa, xb, ya, yb, x, y;
-
-
-    /* configuring */
-    xa = (int)obstacle_get_position(a).x;
-    xb = (int)obstacle_get_position(b).x;
-    ya = (int)obstacle_get_position(a).y;
-    yb = (int)obstacle_get_position(b).y;
-    x = (x1+x2)/2; /* x1 == x2 in floor/ceiling mode */
-    y = (y1+y2)/2; /* y1 == y2 in left/right wall mode */
-
-    switch(mm) {
-        case MM_FLOOR:
-            ha = obstacle_get_height_at(a, x-xa, FROM_BOTTOM);
-            hb = obstacle_get_height_at(b, x-xb, FROM_BOTTOM);
-            return (ya + h(a) - ha <= yb + h(b) - hb) ? a : b;
-
-        case MM_LEFTWALL:
-            ha = obstacle_get_height_at(a, y-ya, FROM_LEFT);
-            hb = obstacle_get_height_at(b, y-yb, FROM_LEFT);
-            return (xa + ha >= xb + hb) ? a : b;
-
-        case MM_CEILING:
-            ha = obstacle_get_height_at(a, x-xa, FROM_TOP);
-            hb = obstacle_get_height_at(b, x-xb, FROM_TOP);
-            return (ya + ha >= yb + hb) ? a : b;
-
-        case MM_RIGHTWALL:
-            ha = obstacle_get_height_at(a, y-ya, FROM_RIGHT);
-            hb = obstacle_get_height_at(b, y-yb, FROM_RIGHT);
-            return (xa + w(a) - ha <= xb + w(b) - hb) ? a : b;
-    }
-
-    /* this shouldn't happen */
-    return a;
-    #endif
 }
