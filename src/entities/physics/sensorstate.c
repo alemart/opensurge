@@ -122,8 +122,6 @@ void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2,
 
     image_rectfill(video_get_backbuffer(), min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2), color);
     image_rectfill(video_get_backbuffer(), x2, y2, x2, y2, ~color); /* render the tail (x2,y2) differently */
-    float cx = camera_position.x - VIDEO_SCREEN_W/2, cy = camera_position.y - VIDEO_SCREEN_H/2;
-    image_rectfill(video_get_backbuffer(), actor_position.x - cx - 2, actor_position.y - cy - 2, actor_position.x - cx + 2, actor_position.y - cy + 2, image_rgb(0,122,255));
 }
 
 const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2)

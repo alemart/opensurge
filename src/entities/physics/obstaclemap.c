@@ -113,11 +113,10 @@ const obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t or
 /* private methods */
 
 /* considering that a and b overlap, which one should we pick? */
+/* we know that x1 <= x2 and y1 <= y2; these values already come rotated according to the movmode */
 const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, int x1, int y1, int x2, int y2, movmode_t mm)
 {
-    static int (*w)(const obstacle_t*) = obstacle_get_width;
-    static int (*h)(const obstacle_t*) = obstacle_get_height;
-    int ha, hb, xa, xb, ya, yb, x, y;
+    int x, y, ha, hb;
 
     /* solid obstacles are better than one-way platforms */
     if(!obstacle_is_solid(a) && obstacle_is_solid(b))
@@ -125,6 +124,46 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 
     if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
+
+    /* get the tallest obstacle */
+    switch(mm) {
+        case MM_FLOOR:
+            x = x2; /* x1 == x2 */
+            y = y2; /* y2 == max(y1, y2) */
+            ha = obstacle_ground_position(a, x, y, GD_DOWN);
+            hb = obstacle_ground_position(b, x, y, GD_DOWN);
+            return ha < hb ? a : b;
+
+        case MM_LEFTWALL:
+            x = x1; /* x1 == min(x1, x2) */
+            y = y2; /* y1 == y2 */
+            ha = obstacle_ground_position(a, x, y, GD_LEFT);
+            hb = obstacle_ground_position(b, x, y, GD_LEFT);
+            return ha >= hb ? a : b;
+
+        case MM_CEILING:
+            x = x2; /* x1 == x2 */
+            y = y1; /* y1 == min(y1, y2) */
+            ha = obstacle_ground_position(a, x, y, GD_UP);
+            hb = obstacle_ground_position(b, x, y, GD_UP);
+            return ha >= hb ? a : b;
+
+        case MM_RIGHTWALL:
+            x = x2; /* x2 == max(x1, x2) */
+            y = y2; /* y1 == y2 */
+            ha = obstacle_ground_position(a, x, y, GD_RIGHT);
+            hb = obstacle_ground_position(b, x, y, GD_RIGHT);
+            return ha < hb ? a : b;
+    }
+
+    /* this shouldn't happen */
+    return a;
+
+    #if 0
+    static int (*w)(const obstacle_t*) = obstacle_get_width;
+    static int (*h)(const obstacle_t*) = obstacle_get_height;
+    int ha, hb, xa, xb, ya, yb, x, y;
+
 
     /* configuring */
     xa = (int)obstacle_get_position(a).x;
@@ -134,7 +173,6 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     x = (x1+x2)/2; /* x1 == x2 in floor/ceiling mode */
     y = (y1+y2)/2; /* y1 == y2 in left/right wall mode */
 
-    /* get the tallest obstacle */
     switch(mm) {
         case MM_FLOOR:
             ha = obstacle_get_height_at(a, x-xa, FROM_BOTTOM);
@@ -159,4 +197,5 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 
     /* this shouldn't happen */
     return a;
+    #endif
 }

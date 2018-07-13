@@ -1134,6 +1134,45 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
 }
 
+#if 0
+/* which one is the tallest obstacle, a or b? */
+char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor)
+{
+    int xa, ya, xb, yb;
+    float ha, hb;
+
+    if(a == NULL)
+        return 'b';
+    else if(b == NULL)
+        return 'a';
+
+    xa = (int)pa->position.x + sensor_get_x2(a_sensor);
+    ya = (int)pa->position.y + sensor_get_y2(a_sensor);
+    xb = (int)pa->position.x + sensor_get_x2(b_sensor);
+    yb = (int)pa->position.y + sensor_get_y2(b_sensor);
+
+    switch(pa->movmode) {
+        case MM_FLOOR:
+            ha = obstacle_ground_position(a, xa, ya, GD_DOWN).y;
+            hb = obstacle_ground_position(b, xb, yb, GD_DOWN).y;
+            return ha < hb ? 'a' : 'b';
+    }
+
+    if(pa->movmode == MM_FLOOR) {
+        ha = obstacle_get_height_at(a, x + sensor_get_x1(a_sensor) - xa, FROM_BOTTOM);
+        hb = obstacle_get_height_at(b, x + sensor_get_x1(b_sensor) - xb, FROM_BOTTOM);
+        return (ya + h(a) - ha <= yb + h(b) - hb) ? 'a' : 'b';
+    }
+}
+
+/* which one is the best ceiling, c or d? */
+char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor)
+{
+
+}
+#endif
+
+#if 1
 /* which one is the tallest obstacle, a or b? */
 char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor)
 {
@@ -1220,6 +1259,7 @@ char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const 
 
     return 'c';
 }
+#endif
 
 /* the min angle between alpha and beta, assuming 0x0 <= alpha, beta <= 0xFF */
 int ang_diff(int alpha, int beta)
