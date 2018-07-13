@@ -155,7 +155,7 @@ uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_directi
     switch(ground_direction)
     {
         /*
-         * the ground is "down":
+         * the ground is "down": (gravity -> "down")
          *
          *                  y                        if mask(x,y) = 1 and mask(x,y-1) = 0
          * gmap(x,y)   =    gmap(x,y-1)              if mask(x,y) = 1 and mask(x,y-1) = 1
