@@ -1076,13 +1076,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
             /* adjust position */
             if(pa->movmode == MM_RIGHTWALL)
-                pa->position.x = obstacle_get_position(ceiling).x + obstacle_get_height_at(ceiling, (int)(pa->position.y - sensor_get_x1(ceiling_sensor) - obstacle_get_position(ceiling).y), FROM_LEFT) + (HEIGHT - u);
+                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_y1(ceiling_sensor), (int)pa->position.y - sensor_get_x1(ceiling_sensor), GD_LEFT) + (HEIGHT - u);
             else if(pa->movmode == MM_FLOOR)
-                pa->position.y = obstacle_get_position(ceiling).y + obstacle_get_height_at(ceiling, (int)(pa->position.x + sensor_get_x1(ceiling_sensor) - obstacle_get_position(ceiling).x), FROM_TOP) + (HEIGHT - u);
+                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + (HEIGHT - u);
             else if(pa->movmode == MM_LEFTWALL)
-                pa->position.x = obstacle_get_position(ceiling).x + (obstacle_get_width(ceiling) - 1) - obstacle_get_height_at(ceiling, (int)(pa->position.y + sensor_get_x1(ceiling_sensor) - obstacle_get_position(ceiling).y), FROM_RIGHT) - (HEIGHT - u);
+                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_y1(ceiling_sensor), (int)pa->position.y + sensor_get_x1(ceiling_sensor), GD_RIGHT) - (HEIGHT - u);
             else if(pa->movmode == MM_CEILING)
-                pa->position.y = obstacle_get_position(ceiling).y + (obstacle_get_height(ceiling) - 1) - obstacle_get_height_at(ceiling, (int)(pa->position.x - sensor_get_x1(ceiling_sensor) - obstacle_get_position(ceiling).x), FROM_BOTTOM) - (HEIGHT - u);
+                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_x1(ceiling_sensor), (int)pa->position.y - sensor_get_y1(ceiling_sensor), GD_DOWN) - (HEIGHT - u);
 
             /* adjust speed */
             pa->ysp = max(pa->ysp, 0.0f);
