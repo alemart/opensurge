@@ -85,20 +85,6 @@ int obstacle_get_height(const obstacle_t *obstacle)
     return obstacle->height;
 }
 
-int obstacle_get_height_at(const obstacle_t *obstacle, int position_on_base_axis, obstaclebaselevel_t base_level)
-{
-    if(base_level == FROM_BOTTOM)
-        return obstacle->height - collisionmask_locate_ground(obstacle->mask, position_on_base_axis, 0, GD_DOWN);
-    else if(base_level == FROM_TOP)
-        return collisionmask_locate_ground(obstacle->mask, position_on_base_axis, 0, GD_UP);
-    else if(base_level == FROM_LEFT)
-        return collisionmask_locate_ground(obstacle->mask, 0, position_on_base_axis, GD_LEFT);
-    else if(base_level == FROM_RIGHT)
-        return obstacle->width - collisionmask_locate_ground(obstacle->mask, 0, position_on_base_axis, GD_RIGHT);
-    else
-        return 0;
-}
-
 /* find the ground position, given (x,y) in world coordinates */
 /* if the ground direction is up or down, this returns the absolute y position of the ground */
 /* if the ground direction is left or right, this returns the absolute x position of the ground */

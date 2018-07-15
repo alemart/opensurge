@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/physicsactor.h - physics system: actor
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -120,12 +120,8 @@ float physicsactor_get_topyspeed(const physicsactor_t *pa); /* top y speed */
 void physicsactor_set_topyspeed(physicsactor_t *pa, float value);
 float physicsactor_get_air(const physicsactor_t *pa); /* air acceleration */
 void physicsactor_set_air(physicsactor_t *pa, float value);
-float physicsactor_get_airdragmultiplier(const physicsactor_t *pa); /* air drag multiplier */
-void physicsactor_set_airdragmultiplier(physicsactor_t *pa, float value);
 float physicsactor_get_airdragthreshold(const physicsactor_t *pa); /* air drag threshold */
 void physicsactor_set_airdragthreshold(physicsactor_t *pa, float value);
-float physicsactor_get_airdragcondition(const physicsactor_t *pa); /* air drag condition */
-void physicsactor_set_airdragcondition(physicsactor_t *pa, float value);
 float physicsactor_get_jmp(const physicsactor_t *pa); /* initial jump velocity */
 void physicsactor_set_jmp(physicsactor_t *pa, float value);
 float physicsactor_get_jmprel(const physicsactor_t *pa); /* release jump velocity */

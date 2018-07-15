@@ -47,6 +47,9 @@ brick 0 192 10064
 brick 0 128 10064
 brick 0 64 10064
 brick 0 0 10064
+brick 2 320 9936
+brick 2 384 9936
+brick 2 384 9872
 brick 0 384 1000
 
 // item list

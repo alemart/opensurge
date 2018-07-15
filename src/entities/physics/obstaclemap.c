@@ -125,7 +125,16 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
 
-    /* get the tallest obstacle */
+    /* one-way platforms only: get the shortest obstacle */
+    if(!obstacle_is_solid(a) && !obstacle_is_solid(b)) {
+        if(mm == MM_FLOOR) { /* just in case... */
+            ha = obstacle_ground_position(a, x2, y2, GD_DOWN);
+            hb = obstacle_ground_position(b, x2, y2, GD_DOWN);
+            return ha >= hb ? a : b;
+        }
+    }
+
+    /* solid obstacles only: get the tallest one */
     switch(mm) {
         case MM_FLOOR:
             x = x2; /* x1 == x2 */
