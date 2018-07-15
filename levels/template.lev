@@ -11,7 +11,7 @@ requires 0.5.0
 act 1
 theme "themes/brickset.brk"
 bgtheme "themes/default.bg"
-spawn_point 210 9910
+spawn_point 112 9984
 music "musics/template.ogg"
 startup ".default_startup"
 players "Surge" "Neon" "Charge"
@@ -27,6 +27,9 @@ brick 0 896 10128
 brick 36 960 10032
 brick 0 1216 10384
 brick 0 1280 10384
+brick 4 960 10096
+brick 4 992 10096
+brick 4 1024 10096
 brick 0 0 10000
 brick 0 64 10000
 brick 0 128 10000
@@ -58,7 +61,7 @@ brick 2 320 9872
 brick 0 384 1000
 
 // item list
-item 4 352 9936
+item 2 352 9936
 
 // object list
 
