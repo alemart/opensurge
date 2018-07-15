@@ -268,8 +268,8 @@ physicsactor_t* physicsactor_create(v2d_t position)
 
     pa->A_jumproll = sensor_create_vertical(-7, 0, 20, image_rgb(0,255,0));
     pa->B_jumproll = sensor_create_vertical(7, 0, 20, image_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-7, -20, 0, image_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(7, -20, 0, image_rgb(128,128,0));
+    pa->C_jumproll = sensor_create_vertical(-7, -10, 0, image_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(7, -10, 0, image_rgb(128,128,0));
     pa->M_jumproll = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
     pa->U_jumproll = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
 
@@ -567,9 +567,6 @@ GENERATE_SENSOR_ACCESSOR(U)
         pa->in_the_air = (at_A == NULL) && (at_B == NULL); \
     } while(0)
 
-/* height of the physics actor */
-#define HEIGHT 20 /*abs(sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)))*/
-
 /* call UPDATE_MOVMODE whenever you update pa->angle */
 #define UPDATE_MOVMODE() \
     do { \
@@ -590,8 +587,8 @@ GENERATE_SENSOR_ACCESSOR(U)
             const int hoff = 5; \
             int found_a = FALSE, found_b = FALSE; \
             int h, x, y, xa, ya, xb, yb, ang; \
-            for(int i = 0; i < HEIGHT * 2 && !(found_a && found_b); i++) { \
-                h = i + HEIGHT / 2; \
+            for(int i = 0; i < pa_height * 2 && !(found_a && found_b); i++) { \
+                h = i + pa_height / 2; \
                 x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
                 y = pa->position.y + h * COS(pa->angle) + 0.5f; \
                 if(!found_a) { \
@@ -643,8 +640,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
     const float walk_threshold = 30.0f;
     const float wait_threshold = 5.0f;
-    float dt = timer_get_delta();
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
+    float dt = timer_get_delta();
+    int pa_height = sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)); /* 20 */
     int was_in_the_air;
 
     UPDATE_SENSORS();
@@ -885,10 +883,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* pushing against the walls */
     if(at_M != NULL) {
+        int sensor_offset = (sensor_get_x2(sensor_M(pa)) - sensor_get_x1(sensor_M(pa))) / 2;
         if(pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) {
             /* floor and ceiling modes */
             if(obstacle_get_position(at_M).x + obstacle_get_width(at_M)/2 > pa->position.x) {
-                pa->position.x = obstacle_get_position(at_M).x - 11;
+                pa->position.x = obstacle_get_position(at_M).x - sensor_offset;
                 pa->gsp = 0.0f;
                 if(!pa->in_the_air) {
                     pa->xsp = 0.0f;
@@ -1003,13 +1002,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* adjust position */
         if(pa->movmode == MM_LEFTWALL)
-            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_y2(ground_sensor), (int)pa->position.y + sensor_get_x2(ground_sensor), GD_LEFT) + (HEIGHT - u);
+            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_y2(ground_sensor), (int)pa->position.y + sensor_get_x2(ground_sensor), GD_LEFT) + (pa_height - u);
         else if(pa->movmode == MM_CEILING)
-            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_x2(ground_sensor), (int)pa->position.y - sensor_get_y2(ground_sensor), GD_UP) + (HEIGHT - u);
+            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_x2(ground_sensor), (int)pa->position.y - sensor_get_y2(ground_sensor), GD_UP) + (pa_height - u);
         else if(pa->movmode == MM_RIGHTWALL)
-            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_y2(ground_sensor), (int)pa->position.y - sensor_get_x2(ground_sensor), GD_RIGHT) - (HEIGHT - u);
+            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_y2(ground_sensor), (int)pa->position.y - sensor_get_x2(ground_sensor), GD_RIGHT) - (pa_height - u);
         else if(pa->movmode == MM_FLOOR)
-            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - (HEIGHT - u);
+            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - (pa_height - u);
 
         /* update the angle */
         UPDATE_ANGLE(ground);
@@ -1061,21 +1060,20 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
         else {
             /* won't reattach */
-            int u = 2; //HEIGHT / 2; //0;
+            int u = sensor_get_y2(sensor_C(pa)) - sensor_get_y1(sensor_C(pa));
 
             /* adjust position */
             if(pa->movmode == MM_RIGHTWALL)
-                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_y1(ceiling_sensor), (int)pa->position.y - sensor_get_x1(ceiling_sensor), GD_LEFT) + (HEIGHT - u);
+                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_y1(ceiling_sensor), (int)pa->position.y - sensor_get_x1(ceiling_sensor), GD_LEFT) + (pa_height - u);
             else if(pa->movmode == MM_FLOOR)
-                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + (HEIGHT - u);
+                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + (pa_height - u);
             else if(pa->movmode == MM_LEFTWALL)
-                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_y1(ceiling_sensor), (int)pa->position.y + sensor_get_x1(ceiling_sensor), GD_RIGHT) - (HEIGHT - u);
+                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_y1(ceiling_sensor), (int)pa->position.y + sensor_get_x1(ceiling_sensor), GD_RIGHT) - (pa_height - u);
             else if(pa->movmode == MM_CEILING)
-                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_x1(ceiling_sensor), (int)pa->position.y - sensor_get_y1(ceiling_sensor), GD_DOWN) - (HEIGHT - u);
+                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_x1(ceiling_sensor), (int)pa->position.y - sensor_get_y1(ceiling_sensor), GD_DOWN) - (pa_height - u);
 
             /* adjust speed */
             pa->ysp = max(pa->ysp, 0.0f);
-            video_showmessage("%f", pa->ysp);
 
             /* update the sensors */
             UPDATE_SENSORS();
