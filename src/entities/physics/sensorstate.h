@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/sensorstate.h - physics system: sensor state
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -47,5 +47,6 @@ sensorstate_t* sensorstate_destroy(sensorstate_t *sensorstate);
 /* public methods */
 const struct obstacle_t* sensorstate_check(const sensorstate_t *sensorstate, v2d_t actor_position, const struct obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2); /* x2 > x1 && y2 > y1 */
 void sensorstate_render(const sensorstate_t *sensorstate, v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, uint32 color);
+void sensorstate_worldpos(const sensorstate_t *sensorstate, v2d_t actor_position, int *x1, int *y1, int *x2, int *y2);
 
 #endif
