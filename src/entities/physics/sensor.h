@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/sensor.h - physics system: sensors
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,7 @@ sensor_t* sensor_destroy(sensor_t *sensor);
 /* public methods */
 const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */
 void sensor_render(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, v2d_t camera_position);
+void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int *x1, int *y1, int *x2, int *y2);
 int sensor_get_x1(const sensor_t *sensor);
 int sensor_get_y1(const sensor_t *sensor);
 int sensor_get_x2(const sensor_t *sensor);

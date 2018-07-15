@@ -90,7 +90,7 @@ struct physicsactor_t
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap);
 static char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
-static int ang_diff(int alpha, int beta);
+static inline int ang_diff(int alpha, int beta);
 
 
 /*
@@ -110,7 +110,7 @@ static int ang_diff(int alpha, int beta);
    according to the state of the player.
    Instead of modifying the coordinates of
    the sensors, which could complicate
-   things, we have multiple, non-mutable
+   things, we have multiple, immutable
    copies of them, and we retrieve them
    appropriately.
 */
@@ -883,11 +883,21 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* pushing against the walls */
     if(at_M != NULL) {
-        int sensor_offset = (sensor_get_x2(sensor_M(pa)) - sensor_get_x1(sensor_M(pa))) / 2;
+        const sensor_t* sensor = sensor_M(pa);
+        int sensor_offset = 1 + (sensor_get_x2(sensor) - sensor_get_x1(sensor)) / 2;
+        int x1, y1, x2, y2;
+
+        sensor_worldpos(sensor, pa->position, pa->movmode, &x1, &y1, &x2, &y2);
         if(pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) {
             /* floor and ceiling modes */
-            if(obstacle_get_position(at_M).x + obstacle_get_width(at_M)/2 > pa->position.x) {
-                pa->position.x = obstacle_get_position(at_M).x - sensor_offset;
+            if(obstacle_got_collision(at_M, x2, y2, x2, y2)) {
+                /* adjust position */
+                if(pa->movmode == MM_FLOOR)
+                    pa->position.x = obstacle_ground_position(at_M, x2, y2, GD_RIGHT) - sensor_offset;
+                else
+                    pa->position.x = obstacle_ground_position(at_M, x2, y2, GD_LEFT) + sensor_offset;
+
+                /* set speed */
                 pa->gsp = 0.0f;
                 if(!pa->in_the_air) {
                     pa->xsp = 0.0f;
@@ -900,10 +910,16 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 }
                 else
                     pa->xsp = min(pa->xsp, 0.0f);
-                UPDATE_SENSORS();
+                UPDATE_SENSORS(); /* at_M should be set to NULL */
             }
-            else if(obstacle_get_position(at_M).x + obstacle_get_width(at_M)/2 < pa->position.x) {
-                pa->position.x = obstacle_get_position(at_M).x + (obstacle_get_width(at_M) - 1) + 11;
+            else if(obstacle_got_collision(at_M, x1, y1, x1, y1)) {
+                /* adjust position */
+                if(pa->movmode == MM_FLOOR)
+                    pa->position.x = obstacle_ground_position(at_M, x1, y1, GD_LEFT) + sensor_offset;
+                else
+                    pa->position.x = obstacle_ground_position(at_M, x1, y1, GD_RIGHT) - sensor_offset;
+
+                /* set speed */
                 pa->gsp = 0.0f;
                 if(!pa->in_the_air) {
                     pa->xsp = 0.0f;
@@ -916,7 +932,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 }
                 else
                     pa->xsp = max(pa->xsp, 0.0f);
-                UPDATE_SENSORS();
+                UPDATE_SENSORS(); /* at_M should be set to NULL */
             }
         }
         else {
@@ -925,9 +941,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 UPDATE_MOVMODE();
             }
             else {
-                /* right wall and ceiling modes */
-                if(obstacle_get_position(at_M).y + obstacle_get_height(at_M)/2 > pa->position.y) {
-                    pa->position.y = obstacle_get_position(at_M).y - 11;
+                /* right wall and left wall modes */
+                if(obstacle_got_collision(at_M, x2, y2, x2, y2)) {
+                    /* adjust position */
+                    if(pa->movmode == MM_RIGHTWALL)
+                        pa->position.y = obstacle_ground_position(at_M, x2, y2, GD_UP) + sensor_offset;
+                    else
+                        pa->position.y = obstacle_ground_position(at_M, x2, y2, GD_DOWN) - sensor_offset;
+
+                    /* set speed */
                     pa->gsp = 0.0f;
                     if(!pa->in_the_air) {
                         pa->xsp = 0.0f;
@@ -937,8 +959,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                         pa->ysp = min(pa->ysp, 0.0f);
                     UPDATE_SENSORS();
                 }
-                else if(obstacle_get_position(at_M).y + obstacle_get_height(at_M)/2 < pa->position.y) {
-                    pa->position.y = obstacle_get_position(at_M).y + (obstacle_get_height(at_M) - 1) + 11;
+                else if(obstacle_got_collision(at_M, x1, y1, x1, y1)) {
+                    /* adjust position */
+                    if(pa->movmode == MM_RIGHTWALL)
+                        pa->position.y = obstacle_ground_position(at_M, x1, y1, GD_DOWN) - sensor_offset;
+                    else
+                        pa->position.y = obstacle_ground_position(at_M, x1, y1, GD_UP) + sensor_offset;
+
+                    /* set speed */
                     pa->gsp = 0.0f;
                     if(!pa->in_the_air) {
                         pa->xsp = 0.0f;
@@ -954,7 +982,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* sticky physics */
     if(pa->in_the_air && !was_in_the_air) {
-        int u = fabs(pa->gsp) > 360.0f && pa->state != PAS_JUMPING ? 5 : 2;
+        int u = fabs(pa->gsp) > pa->topspeed && pa->state != PAS_JUMPING ? 5 : 2;
         v2d_t offset = v2d_new(0,0);
 
         if(pa->state != PAS_JUMPING && ((pa->facing_right && pa->angle < 0x40) || (!pa->facing_right && pa->angle > 0xC0)))

@@ -102,6 +102,20 @@ void sensor_render(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, v
     sensorstate_render(s, actor_position, camera_position, sensor->x1, sensor->y1, sensor->x2, sensor->y2, sensor->color);
 }
 
+void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, movmode_t mm, int *x1, int *y1, int *x2, int *y2)
+{
+    sensorstate_t *s = get_active_state(sensor, mm);
+    int xa = sensor->x1, ya = sensor->y1;
+    int xb = sensor->x2, yb = sensor->y2;
+
+    sensorstate_worldpos(s, actor_position, &xa, &ya, &xb, &yb);
+
+    if(x1) *x1 = xa;
+    if(y1) *y1 = ya;
+    if(x2) *x2 = xb;
+    if(y2) *y2 = yb;
+}
+
 int sensor_get_x1(const sensor_t *sensor)
 {
     return sensor->x1;
