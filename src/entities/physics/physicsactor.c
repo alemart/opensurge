@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physics/physicsactor.c - physics system: actor
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,9 +42,6 @@ struct physicsactor_t
     float topspeed; /* top speed */
     float topyspeed; /* top y speed */
     float air; /* air acceleration */
-    float airdragmultiplier; /* air drag multiplier */
-    float airdragthreshold; /* air drag threshold */
-    float airdragcondition; /* air drag condition */
     float jmp; /* initial jump velocity */
     float jmprel; /* release jump velocity */
     float grv; /* gravity */
@@ -57,6 +54,7 @@ struct physicsactor_t
     float rolldownhillslp; /* roll downhill slope */
     float falloffthreshold; /* fall off threshold */
     float brakingthreshold; /* braking animation treshold */
+    float airdragthreshold; /* air drag threshold */
     int angle; /* angle (0-255 clockwise) */
     int in_the_air; /* is the player in the air? */
     physicsactorstate_t state; /* state */
@@ -89,7 +87,6 @@ struct physicsactor_t
 };
 
 /* private stuff ;-) */
-#define DEBUG video_showmessage
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap);
 static char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
@@ -202,6 +199,9 @@ static const int slp_table[23][23] = {
     { 0x60, 0x5E, 0x5C, 0x5A, 0x57, 0x54, 0x51, 0x4E, 0x4B, 0x47, 0x44, 0x40, 0x3C, 0x39, 0x35, 0x32, 0x2F, 0x2C, 0x29, 0x26, 0x24, 0x22, 0x20 }
 };
 
+/* helper macro */
+#define ANG2DEG(ang) ((int)((256 - (ang)) * 1.40625f) % 360)
+
 /* public methods */
 physicsactor_t* physicsactor_create(v2d_t position)
 {
@@ -237,8 +237,6 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
     pa->air =                   0.09375f    * fpsmul * fpsmul ;
-    pa->airdragthreshold =      0.125f      * fpsmul * 1.0f   ;
-    pa->airdragcondition =      -4.0f       * fpsmul * 1.0f   ;
     pa->jmp =                   -6.5f       * fpsmul * 1.0f   ;
     pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
     pa->grv =                   0.21875f    * fpsmul * fpsmul ;
@@ -251,27 +249,27 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->rolldownhillslp =       0.3125f     * fpsmul * fpsmul ;
     pa->falloffthreshold =      2.5f        * fpsmul * 1.0f   ;
     pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
-    pa->airdragmultiplier =     0.96875f    * 1.0f   * 1.0f   ;
+    pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
     
     /* sensors */
     pa->A_normal = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
     pa->B_normal = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
-    pa->C_normal = sensor_create_vertical(-9, -20, 0, image_rgb(0,64,0));
-    pa->D_normal = sensor_create_vertical(9, -20, 0, image_rgb(64,64,0));
+    pa->C_normal = sensor_create_vertical(-9, -20, 0, image_rgb(0,128,0));
+    pa->D_normal = sensor_create_vertical(9, -20, 0, image_rgb(128,128,0));
     pa->M_normal = sensor_create_horizontal(4, -10, 10, image_rgb(255,0,0));
     pa->U_normal = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
 
     pa->A_intheair = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
     pa->B_intheair = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
-    pa->C_intheair = sensor_create_vertical(-9, -20, 0, image_rgb(0,64,0));
-    pa->D_intheair = sensor_create_vertical(9, -20, 0, image_rgb(64,64,0));
+    pa->C_intheair = sensor_create_vertical(-9, -20, 0, image_rgb(0,128,0));
+    pa->D_intheair = sensor_create_vertical(9, -20, 0, image_rgb(128,128,0));
     pa->M_intheair = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
     pa->U_intheair = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
 
     pa->A_jumproll = sensor_create_vertical(-7, 0, 20, image_rgb(0,255,0));
     pa->B_jumproll = sensor_create_vertical(7, 0, 20, image_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-7, -20, 0, image_rgb(0,64,0));
-    pa->D_jumproll = sensor_create_vertical(7, -20, 0, image_rgb(64,64,0));
+    pa->C_jumproll = sensor_create_vertical(-7, -20, 0, image_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(7, -20, 0, image_rgb(128,128,0));
     pa->M_jumproll = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
     pa->U_jumproll = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
 
@@ -501,9 +499,7 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(frc)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(topspeed)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(topyspeed)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(air)
-GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragmultiplier)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragthreshold)
-GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragcondition)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(jmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(jmprel)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(grv)
@@ -555,8 +551,16 @@ GENERATE_SENSOR_ACCESSOR(U)
         at_C = sensor_check(sensor_C(pa), pa->position, pa->movmode, obstaclemap); \
         at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, obstaclemap); \
         at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, obstaclemap); \
-        at_A = (at_A != NULL && !obstacle_is_solid(at_A)) ? (pa->ysp >= 0.0f && pa->position.y + sensor_get_y2(sensor_A(pa)) - min(15, obstacle_get_height_at(at_A, (int)(pa->position.x + sensor_get_x1(sensor_A(pa)) - obstacle_get_position(at_A).x), FROM_BOTTOM)/3) <= obstacle_get_position(at_A).y + (obstacle_get_height(at_A) - 1) - obstacle_get_height_at(at_A, (int)(pa->position.x + sensor_get_x1(sensor_A(pa)) - obstacle_get_position(at_A).x), FROM_BOTTOM) ? at_A : NULL) : at_A; \
-        at_B = (at_B != NULL && !obstacle_is_solid(at_B)) ? (pa->ysp >= 0.0f && pa->position.y + sensor_get_y2(sensor_B(pa)) - min(15, obstacle_get_height_at(at_B, (int)(pa->position.x + sensor_get_x1(sensor_B(pa)) - obstacle_get_position(at_B).x), FROM_BOTTOM)/3) <= obstacle_get_position(at_B).y + (obstacle_get_height(at_B) - 1) - obstacle_get_height_at(at_B, (int)(pa->position.x + sensor_get_x1(sensor_B(pa)) - obstacle_get_position(at_B).x), FROM_BOTTOM) ? at_B : NULL) : at_B; \
+        if(at_A != NULL && !obstacle_is_solid(at_A)) { \
+            int ypos = (int)(pa->position.y + sensor_get_y2(sensor_A(pa))); \
+            int ygnd = obstacle_ground_position(at_A, (int)(pa->position.x + sensor_get_x2(sensor_A(pa))), ypos, GD_DOWN); \
+            at_A = (pa->ysp >= 0.0f && ypos < ygnd + 16 && pa->movmode == MM_FLOOR) ? at_A : NULL; \
+        } \
+        if(at_B != NULL && !obstacle_is_solid(at_B)) { \
+            int ypos = (int)(pa->position.y + sensor_get_y2(sensor_B(pa))); \
+            int ygnd = obstacle_ground_position(at_B, (int)(pa->position.x + sensor_get_x2(sensor_B(pa))), ypos, GD_DOWN); \
+            at_B = (pa->ysp >= 0.0f && ypos < ygnd + 16 && pa->movmode == MM_FLOOR) ? at_B : NULL; \
+        } \
         at_C = (at_C != NULL && !obstacle_is_solid(at_C)) ? NULL : at_C; \
         at_D = (at_D != NULL && !obstacle_is_solid(at_D)) ? NULL : at_D; \
         at_M = (at_M != NULL && !obstacle_is_solid(at_M)) ? NULL : at_M; \
@@ -633,23 +637,6 @@ GENERATE_SENSOR_ACCESSOR(U)
         else \
             pa->angle = 0x0; \
     } while(0)
-
-/* wall detection */
-#define THERE_IS_A_WALL_ON_THE_RIGHT \
-    (at_M != NULL && ( \
-        (pa->movmode == MM_FLOOR && pa->position.x < obstacle_get_position(at_M).x) || \
-        (pa->movmode == MM_RIGHTWALL && pa->position.y > obstacle_get_position(at_M).y + obstacle_get_height(at_M)) || \
-        (pa->movmode == MM_CEILING && pa->position.x > obstacle_get_position(at_M).x + obstacle_get_width(at_M)) || \
-        (pa->movmode == MM_LEFTWALL && pa->position.y < obstacle_get_position(at_M).y) \
-    ))
-
-#define THERE_IS_A_WALL_ON_THE_LEFT \
-    (at_M != NULL && ( \
-        (pa->movmode == MM_FLOOR && pa->position.x > obstacle_get_position(at_M).x + obstacle_get_width(at_M)) || \
-        (pa->movmode == MM_RIGHTWALL && pa->position.y < obstacle_get_position(at_M).y) || \
-        (pa->movmode == MM_CEILING && pa->position.x < obstacle_get_position(at_M).x) || \
-        (pa->movmode == MM_LEFTWALL && pa->position.y > obstacle_get_position(at_M).y + obstacle_get_height(at_M)) \
-    ))
 
 /* physics simulation */
 void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
@@ -798,7 +785,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->ysp = pa->gsp * -SIN(pa->angle);
 
         /* BUGGED? falling off walls and ceilings */
-        if(fabs(pa->gsp) < pa->falloffthreshold*0.25f && pa->angle >= 0x40 && pa->angle <= 0xC0) {
+        if(fabs(pa->gsp) < pa->falloffthreshold * 0.25f && pa->angle >= 0x40 && pa->angle <= 0xC0) {
             if(pa->movmode == MM_RIGHTWALL) pa->position.x += 5;
             else if(pa->movmode == MM_LEFTWALL) pa->position.x -= 4;
             /*pa->gsp = 0.0f;*/
@@ -829,11 +816,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* air drag */
-        if(pa->ysp < 0.0f && pa->ysp > pa->airdragcondition) {
-            if(fabs(pa->xsp) >= pa->airdragthreshold) {
-                float correction = pow(pa->airdragmultiplier, 60.0f * dt - 1.0f);
-                pa->xsp *= pa->airdragmultiplier * correction;
-            }
+        if(pa->ysp < 0.0f && pa->ysp > pa->airdragthreshold) {
+            /*pa->xsp *= powf(31.0f / 32.0f, 60.0f * dt);*/
+            pa->xsp *= 0.99955f - 1.84845f * dt;
         }
 
         /* jump sensitivity */
@@ -846,7 +831,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->state != PAS_GETTINGHIT)
             pa->ysp = min(pa->ysp + pa->grv * dt, pa->topyspeed);
         else
-            pa->ysp = min(pa->ysp + 0.1875f * (pa->grv / 0.21875f) * dt, pa->topyspeed);
+            pa->ysp = min(pa->ysp + (0.1875f * pa->grv / 0.21875f) * dt, pa->topyspeed);
     }
     else {
 
@@ -1052,6 +1037,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(pa->in_the_air && (at_C != NULL || at_D != NULL)) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
+        int ceiling_angle = pa->angle; /* TODO */
 
         /* picking the ceiling */
         if(pick_the_best_ceiling(pa, at_C, at_D, sensor_C(pa), sensor_D(pa)) == 'c') {
@@ -1064,15 +1050,18 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* reattach to the ceiling */
-        if((pa->angle > 0xA0 && pa->angle < 0xC0) || (pa->angle > 0x40 && pa->angle < 0x60)) {
+        if((ceiling_angle > 0xA0 && ceiling_angle < 0xC0) || (ceiling_angle > 0x40 && ceiling_angle < 0x60)) {
+            pa->angle = ceiling_angle;
             pa->gsp = pa->ysp * -sign(SIN(pa->angle));
             pa->xsp = 0.0f;
             pa->ysp = 0.0f;
             pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+            UPDATE_MOVMODE();
+            UPDATE_SENSORS();
         }
         else {
             /* won't reattach */
-            int u = 0;
+            int u = 2; //HEIGHT / 2; //0;
 
             /* adjust position */
             if(pa->movmode == MM_RIGHTWALL)
@@ -1086,6 +1075,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
             /* adjust speed */
             pa->ysp = max(pa->ysp, 0.0f);
+            video_showmessage("%f", pa->ysp);
 
             /* update the sensors */
             UPDATE_SENSORS();
