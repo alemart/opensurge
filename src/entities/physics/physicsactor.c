@@ -1060,7 +1060,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
         else {
             /* won't reattach */
-            int u = sensor_get_y2(sensor_C(pa)) - sensor_get_y1(sensor_C(pa));
+            int u = sensor_get_y2(ceiling_sensor) - sensor_get_y1(ceiling_sensor);
 
             /* adjust position */
             if(pa->movmode == MM_RIGHTWALL)
