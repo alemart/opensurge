@@ -95,6 +95,27 @@ brick 3
 brick 4
 {
     type                OBSTACLE
+    behavior            BREAKABLE 2 2
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     432 128 32 32
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 5
+{
+    type                OBSTACLE
     behavior            BREAKABLE 2 4
     mask                "images/brickset_mask.png"
 
@@ -113,7 +134,7 @@ brick 4
     }
 }
 
-brick 5
+brick 6
 {
     type                OBSTACLE
     behavior            CIRCULAR 128 0 1 1 0
