@@ -1060,17 +1060,17 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
         else {
             /* won't reattach */
-            int u = sensor_get_y2(ceiling_sensor) - sensor_get_y1(ceiling_sensor);
+            int offset = sensor_get_y2(ceiling_sensor) - sensor_get_y1(ceiling_sensor);
 
             /* adjust position */
             if(pa->movmode == MM_RIGHTWALL)
-                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_y1(ceiling_sensor), (int)pa->position.y - sensor_get_x1(ceiling_sensor), GD_LEFT) + (pa_height - u);
+                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_y1(ceiling_sensor), (int)pa->position.y - sensor_get_x1(ceiling_sensor), GD_LEFT) + offset;
             else if(pa->movmode == MM_FLOOR)
-                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + (pa_height - u);
+                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + offset;
             else if(pa->movmode == MM_LEFTWALL)
-                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_y1(ceiling_sensor), (int)pa->position.y + sensor_get_x1(ceiling_sensor), GD_RIGHT) - (pa_height - u);
+                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_y1(ceiling_sensor), (int)pa->position.y + sensor_get_x1(ceiling_sensor), GD_RIGHT) - offset;
             else if(pa->movmode == MM_CEILING)
-                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_x1(ceiling_sensor), (int)pa->position.y - sensor_get_y1(ceiling_sensor), GD_DOWN) - (pa_height - u);
+                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_x1(ceiling_sensor), (int)pa->position.y - sensor_get_y1(ceiling_sensor), GD_DOWN) - offset;
 
             /* adjust speed */
             pa->ysp = max(pa->ysp, 0.0f);
