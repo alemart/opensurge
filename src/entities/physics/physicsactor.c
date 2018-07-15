@@ -585,10 +585,11 @@ GENERATE_SENSOR_ACCESSOR(U)
     do { \
         if(ground == NULL || obstacle_is_solid(ground)) { \
             const int hoff = 5; \
+            int sensor_len = sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)); \
             int found_a = FALSE, found_b = FALSE; \
             int h, x, y, xa, ya, xb, yb, ang; \
-            for(int i = 0; i < pa_height * 2 && !(found_a && found_b); i++) { \
-                h = i + pa_height / 2; \
+            for(int i = 0; i < sensor_len * 2 && !(found_a && found_b); i++) { \
+                h = i + sensor_len / 2; \
                 x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
                 y = pa->position.y + h * COS(pa->angle) + 0.5f; \
                 if(!found_a) { \
@@ -642,7 +643,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     const float wait_threshold = 5.0f;
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
     float dt = timer_get_delta();
-    int pa_height = sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)); /* 20 */
     int was_in_the_air;
 
     UPDATE_SENSORS();
@@ -985,12 +985,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* stick to the ground */
-    if(!pa->in_the_air && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT) && pa->ysp < 0.0f)) {
+    if((!pa->in_the_air) && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT) && pa->ysp < 0.0f)) {
         /* picking the ground */
-        int u = 1;
         const obstacle_t *ground = NULL;
         const sensor_t *ground_sensor = NULL;
+        int offset = 0;
 
+        /* picking the ground */
         if(pick_the_best_ground(pa, at_A, at_B, sensor_A(pa), sensor_B(pa)) == 'a') {
             ground = at_A;
             ground_sensor = sensor_A(pa);
@@ -1000,15 +1001,18 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             ground_sensor = sensor_B(pa);
         }
 
+        /* computing the offset (note: if !pa->in_the_air, then ground_sensor != NULL) */
+        offset = sensor_get_y2(ground_sensor) - sensor_get_y1(ground_sensor) - 1;
+
         /* adjust position */
         if(pa->movmode == MM_LEFTWALL)
-            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_y2(ground_sensor), (int)pa->position.y + sensor_get_x2(ground_sensor), GD_LEFT) + (pa_height - u);
+            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_y2(ground_sensor), (int)pa->position.y + sensor_get_x2(ground_sensor), GD_LEFT) + offset;
         else if(pa->movmode == MM_CEILING)
-            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_x2(ground_sensor), (int)pa->position.y - sensor_get_y2(ground_sensor), GD_UP) + (pa_height - u);
+            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_x2(ground_sensor), (int)pa->position.y - sensor_get_y2(ground_sensor), GD_UP) + offset;
         else if(pa->movmode == MM_RIGHTWALL)
-            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_y2(ground_sensor), (int)pa->position.y - sensor_get_x2(ground_sensor), GD_RIGHT) - (pa_height - u);
+            pa->position.x = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_y2(ground_sensor), (int)pa->position.y - sensor_get_x2(ground_sensor), GD_RIGHT) - offset;
         else if(pa->movmode == MM_FLOOR)
-            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - (pa_height - u);
+            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
 
         /* update the angle */
         UPDATE_ANGLE(ground);
