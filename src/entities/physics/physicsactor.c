@@ -1125,12 +1125,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* I'm on the edge */
-    if(!pa->in_the_air && fabs(pa->gsp) < EPSILON && pa->state != PAS_PUSHING) {
-        if(at_A != NULL && at_B == NULL && pa->position.x >= obstacle_get_position(at_A).x + obstacle_get_width(at_A)) {
+    if(!pa->in_the_air && fabs(pa->gsp) < EPSILON && pa->state != PAS_PUSHING && pa->movmode == MM_FLOOR) {
+        int x = (int)pa->position.x;
+        int y = obstacle_ground_position(at_A ? at_A : at_B, x, (int)pa->position.y, GD_DOWN);
+        if(at_A != NULL && at_B == NULL && !obstacle_got_collision(at_A, x, y, x, y)) {
             pa->state = PAS_LEDGE;
             pa->facing_right = TRUE;
         }
-        else if(at_A == NULL && at_B != NULL && pa->position.x < obstacle_get_position(at_B).x) {
+        else if(at_A == NULL && at_B != NULL && !obstacle_got_collision(at_B, x, y, x, y)) {
             pa->state = PAS_LEDGE;
             pa->facing_right = FALSE;
         }
