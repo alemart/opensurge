@@ -19,10 +19,14 @@ players "Surge" "Neon" "Charge"
 // dialog regions (xpos ypos width height title message)
 
 // brick list
+brick 0 1344 10384
 brick 0 704 10128
 brick 0 768 10128
 brick 0 832 10128
 brick 0 896 10128
+brick 36 960 10032
+brick 0 1216 10384
+brick 0 1280 10384
 brick 0 0 10000
 brick 0 64 10000
 brick 0 128 10000
@@ -49,10 +53,12 @@ brick 0 64 10064
 brick 0 0 10064
 brick 2 320 9936
 brick 2 384 9936
-brick 2 384 9872
+brick 2 256 9936
+brick 2 320 9872
 brick 0 384 1000
 
 // item list
+item 4 352 9936
 
 // object list
 
