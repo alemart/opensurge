@@ -631,3 +631,109 @@ brick 56
 //
 // Section 5: Loops
 //
+
+brick 64
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 1312 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 65
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     144 1200 128 112
+        frame_size      128 112
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 66
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 1088 256 112
+        frame_size      256 112
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 67
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 1200 128 112
+        frame_size      128 112
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 68
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+    zindex              0.4999
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     16 1344 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
