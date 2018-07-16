@@ -71,6 +71,7 @@ brick 2 384 9936
 brick 2 256 9936
 brick 2 320 9872
 brick 0 384 1000
+brick 6 1328 10256
 
 // item list
 item 82 1520 10352
@@ -83,6 +84,7 @@ item 83 1808 10320
 item 83 1808 10352
 item 83 1648 10160
 item 82 1680 10160
+item 20 1264 10384
 item 2 352 9936
 
 // object list

@@ -101,8 +101,8 @@ int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
 uint32 bricklayer2color(bricklayer_t layer);
 const char* bricklayer2colorname(bricklayer_t layer);
 bricklayer_t colorname2bricklayer(const char *name);
-v2d_t brick_moveable_platform_offset(const brick_t *brk); /* moveable platforms must move actors on top of them. Returns a delta_space vector */
-void brick_render_path(const brick_t *brk, v2d_t camera_position); /* moveable platforms path */
+v2d_t brick_movable_platform_offset(const brick_t *brk); /* movable platforms must move actors on top of them. Returns a delta_space vector */
+void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
 const char* brick_get_property_name(brickproperty_t property); /* property name */
 const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
 int brick_exists(int id); /* does a brick with the given id exist? */

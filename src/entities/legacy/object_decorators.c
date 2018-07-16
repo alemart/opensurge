@@ -7605,7 +7605,7 @@ void switchcharacter_update(objectmachine_t *obj, player_t **team, int team_size
         for(i=0; i<team_size && !got_dying_player; i++)
             got_dying_player = player_is_dying(team[i]);
 
-        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_moveable_platform && !player->disable_movement && !player->in_locked_area;
+        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_movable_platform && !player->disable_movement && !player->in_locked_area;
 
         if(allow_switching || me->force_switch)
             level_change_player(new_player);
