@@ -106,7 +106,7 @@ player_t *player_create(const char *character_name)
     CHANGE_ANIM(stopped);
 
     /* auxiliary variables */
-    p->on_moveable_platform = FALSE;
+    p->on_movable_platform = FALSE;
     p->got_glasses = FALSE;
 
     /* blink */

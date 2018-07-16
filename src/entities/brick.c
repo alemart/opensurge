@@ -334,7 +334,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             break;
         }
 
-        /* moveable bricks */
+        /* movable bricks */
         case BRB_CIRCULAR: {
             int brkw = image_width(brk->brick_ref->image);
             int brkh = image_height(brk->brick_ref->image);
@@ -355,27 +355,31 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             if(brk->brick_ref->property == BRK_NONE)
                 break;
 
+            if(brk->obstacle != NULL)
+                obstacle_set_position(brk->obstacle, v2d_new(brk->x, brk->y));
+
             for(i=0; i<team_size; i++) {
-                a[0] = team[i]->actor->position.x - team[i]->actor->hot_spot.x - 3;
-                a[1] = team[i]->actor->position.y - team[i]->actor->hot_spot.y - 3;
-                a[2] = a[0] + image_width(actor_image(team[i]->actor)) + 6;
-                a[3] = a[1] + image_height(actor_image(team[i]->actor)) + 6;
+                image_t* actor = actor_image(team[i]->actor);
+                v2d_t box_size = v2d_new(image_width(actor), image_height(actor));
+                v2d_t position = v2d_subtract(team[i]->actor->position, team[i]->actor->hot_spot);
+                v2d_t offset = v2d_new(4.0f, 4.0f);
+
+                a[0] = position.x + box_size.x / 2 - offset.x;
+                a[1] = position.y + box_size.y - offset.y;
+                a[2] = position.x + box_size.x / 2 + offset.x;
+                a[3] = position.y + box_size.y + offset.y;
 
                 b[0] = brk->x;
                 b[1] = brk->y;
                 b[2] = b[0] + brkw;
                 b[3] = b[1] + brkh;
 
-                team[i]->on_moveable_platform = FALSE;
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && bounding_box(a,b)) {
-                    brick_t *down = NULL, *left = NULL, *right = NULL;
-                    int cloud = (brk->brick_ref->property == BRK_CLOUD);
-                    actor_sensors(team[i]->actor, brick_list, NULL, NULL, &right, NULL, &down, NULL, &left, NULL);
-                    if((cloud && down == brk) || (!cloud && (down == brk || left == brk || right == brk))) {
-                        team[i]->on_moveable_platform = TRUE;
-                        team[i]->actor->position = v2d_add(team[i]->actor->position, v2d_multiply(brick_moveable_platform_offset(brk), timer_get_delta()));
-                    }
+                    team[i]->on_movable_platform = TRUE;
+                    team[i]->actor->position = v2d_add(team[i]->actor->position, v2d_multiply(brick_movable_platform_offset(brk), timer_get_delta()));
                 }
+                else
+                    team[i]->on_movable_platform = FALSE;
             }
             break;
         }
@@ -410,7 +414,7 @@ void brick_render(brick_t *brk, v2d_t camera_position)
 
 /*
  * brick_render_path()
- * Renders the path of a brick (if it's a moveable platform)
+ * Renders the path of a brick (if it's a movable platform)
  */
 void brick_render_path(const brick_t *brk, v2d_t camera_position)
 {
@@ -453,11 +457,11 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
 
 
 /*
- * brick_moveable_platform_offset()
- * Moveable platforms must move actors on top of them.
+ * brick_movable_platform_offset()
+ * movable platforms must move actors on top of them.
  * Returns a delta_space vector.
  */
-v2d_t brick_moveable_platform_offset(const brick_t *brk)
+v2d_t brick_movable_platform_offset(const brick_t *brk)
 {
     float t, rx, ry, sx, sy, ph;
 

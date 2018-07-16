@@ -38,7 +38,8 @@ obstacle_t* obstacle_create_oneway(const collisionmask_t *mask, v2d_t position);
 obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 
 /* public methods */
-v2d_t obstacle_get_position(const obstacle_t *obstacle); /* position (in world coordinates) */
+v2d_t obstacle_get_position(const obstacle_t *obstacle); /* get position (in world coordinates) */
+void obstacle_set_position(obstacle_t* obstacle, v2d_t position); /* set position (in world coordinates) */
 int obstacle_is_solid(const obstacle_t *obstacle); /* is it solid or oneway? */
 int obstacle_get_width(const obstacle_t *obstacle); /* width of the bounding box */
 int obstacle_get_height(const obstacle_t *obstacle); /* height of the bounding box */

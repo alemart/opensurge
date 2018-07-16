@@ -229,7 +229,7 @@ static void editor_render();
 static int editor_is_enabled();
 static int editor_want_to_activate();
 static void editor_render_background();
-static void editor_moveable_platforms_path_render(brick_list_t *major_bricks);
+static void editor_movable_platforms_path_render(brick_list_t *major_bricks);
 static void editor_waterline_render(int ycoord, uint32 color);
 static void editor_save();
 static void editor_scroll();
@@ -2808,8 +2808,8 @@ void editor_render()
     /* grid */
     editor_grid_render();
 
-    /* path of the moveable platforms */
-    editor_moveable_platforms_path_render(major_bricks);
+    /* path of the movable platforms */
+    editor_movable_platforms_path_render(major_bricks);
 
     /* entities */
     render_entities(major_bricks, major_items, major_enemies);
@@ -2932,10 +2932,10 @@ void editor_render_background()
 
 
 /*
- * editor_moveable_platforms_path_render()
- * Renders the path of the moveable platforms
+ * editor_movable_platforms_path_render()
+ * Renders the path of the movable platforms
  */
-void editor_moveable_platforms_path_render(brick_list_t *major_bricks)
+void editor_movable_platforms_path_render(brick_list_t *major_bricks)
 {
     brick_list_t *it;
 

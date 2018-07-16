@@ -70,6 +70,11 @@ v2d_t obstacle_get_position(const obstacle_t *obstacle)
     return obstacle->position;
 }
 
+void obstacle_set_position(obstacle_t* obstacle, v2d_t position)
+{
+    obstacle->position = position;
+}
+
 int obstacle_is_solid(const obstacle_t *obstacle)
 {
     return obstacle->is_solid;
