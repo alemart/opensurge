@@ -4,7 +4,11 @@ Welcome to the **Open Surge** game engine repository!
 
 ## What is Open Surge?
 
-Open Surge is an open source retro-style 2D sidescroller inspired by old-school games. It is also a flexible, hackable game engine that enables users to express their creativity and create their games while having fun doing it!
+Open Surge is a fun 2D retro platformer that is empowering creators to make their own games and unleash their creativity! Currently under development.
+
+## Where do I find it?
+
+Visit [opensurge2d.org](http://opensurge2d.org)
 
 ## About Open Surge
 
