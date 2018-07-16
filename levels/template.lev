@@ -20,20 +20,18 @@ players "Surge" "Neon" "Charge"
 
 // brick list
 brick 0 1344 10384
-brick 66 1552 10144
 brick 0 1408 10384
 brick 0 1472 10384
-brick 0 1536 10384
-brick 0 1600 10384
-brick 0 1664 10384
 brick 0 1728 10384
 brick 0 1792 10384
 brick 0 1856 10384
 brick 0 1920 10384
-brick 65 1680 10256 green
-brick 64 1552 10368 green
-brick 67 1552 10256 yellow
-brick 68 1552 10368 yellow
+brick 0 1536 10384
+brick 0 1600 10384
+brick 0 1664 10384
+brick 64 1552 10256 green
+brick 66 1552 10256 yellow
+brick 65 1552 10128
 brick 0 704 10128
 brick 0 768 10128
 brick 0 832 10128
@@ -83,8 +81,8 @@ item 83 1808 10256
 item 83 1808 10288
 item 83 1808 10320
 item 83 1808 10352
-item 83 1648 10176
-item 82 1680 10176
+item 83 1648 10160
+item 82 1680 10160
 item 2 352 9936
 
 // object list
