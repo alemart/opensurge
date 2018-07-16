@@ -74,7 +74,7 @@
 #undef EPSILON
 #endif
 
-#define TRUE                    -1
+#define TRUE                    1
 #define FALSE                   0
 #define EPSILON                 1e-5
 #define PI                      3.14159265
@@ -92,8 +92,6 @@ static const float ZERO_FLT = 0.0;
 #define STRVALUE(x)             QUOTEME(x)
 
 /* Exact-width integer types */
-#ifndef __MSVC__
-
 #include <stdint.h>
 typedef int8_t int8;
 typedef int16_t int16;
@@ -103,18 +101,5 @@ typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
 typedef uint64_t uint64;
-
-#else
-
-typedef __int8 int8;
-typedef __int16 int16;
-typedef __int32 int32;
-typedef __int64 int64;
-typedef unsigned __int8 uint8;
-typedef unsigned __int16 uint16;
-typedef unsigned __int32 uint32;
-typedef unsigned __int64 uint64;
-
-#endif
 
 #endif
