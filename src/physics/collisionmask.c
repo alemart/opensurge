@@ -109,7 +109,7 @@ int collisionmask_pitch(const collisionmask_t* mask)
 int collisionmask_peek(const collisionmask_t* mask, int x, int y)
 {
     if(mask && x >= 0 && x < mask->width && y >= 0 && y < mask->height)
-        return collisionmask_at(mask, x, y, MASK_ALIGN(mask->width));
+        return collisionmask_at(mask, x, y, mask->pitch);
     else
         return 0;
 }
