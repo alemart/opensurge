@@ -28,7 +28,7 @@
 #include "../core/logfile.h"
 #include "../core/video.h"
 #include "../core/timer.h"
-#include "physics/collisionmask.h"
+#include "../physics/collisionmask.h"
 
 
 /* constants */

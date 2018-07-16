@@ -40,7 +40,7 @@
 #include "enemy.h"
 #include "item.h"
 #include "brick.h"
-#include "physics/collisionmask.h"
+#include "../physics/collisionmask.h"
 
 /* private stuff */
 #define MAX_OBJECTS                     10240

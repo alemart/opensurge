@@ -28,7 +28,6 @@
 #include "enemy.h"
 #include "item.h"
 #include "character.h"
-#include "physics/collisionmask.h"
 #include "items/collectible.h"
 #include "items/bouncingcollectible.h"
 #include "../core/global.h"
@@ -42,9 +41,10 @@
 #include "../core/sprite.h"
 #include "../core/soundfactory.h"
 #include "../scenes/level.h"
-#include "physics/physicsactor.h"
-#include "physics/obstaclemap.h"
-#include "physics/obstacle.h"
+#include "../physics/physicsactor.h"
+#include "../physics/obstaclemap.h"
+#include "../physics/obstacle.h"
+#include "../physics/collisionmask.h"
 
 
 /* Uncomment to render the sensors */

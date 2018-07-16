@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/sensorstate.h - physics system: sensor state
+ * sensorstate.h - physics system: sensor state
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -21,8 +21,8 @@
 #ifndef _SENSORSTATE_H
 #define _SENSORSTATE_H
 
-#include "../../core/v2d.h"
-#include "../../core/global.h"
+#include "../core/v2d.h"
+#include "../core/global.h"
 
 /*
  * there are four modes of movement:

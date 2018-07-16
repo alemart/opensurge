@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/physicsactor.h - physics system: actor
+ * physicsactor.h - physics system: actor
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -21,7 +21,7 @@
 #ifndef _PHYSICSACTOR_H
 #define _PHYSICSACTOR_H
 
-#include "../../core/v2d.h"
+#include "../core/v2d.h"
 
 /*
  * a physics actor is a sprite that respects the laws of

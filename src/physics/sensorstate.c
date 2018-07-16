@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/sensorstate.c - physics system: sensor state
+ * sensorstate.c - physics system: sensor state
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -22,8 +22,8 @@
 #include "physicsactor.h"
 #include "obstacle.h"
 #include "obstaclemap.h"
-#include "../../core/util.h"
-#include "../../core/video.h"
+#include "../core/util.h"
+#include "../core/video.h"
 
 /* auxiliary structure: stores world coordinates */
 typedef struct swpos_t

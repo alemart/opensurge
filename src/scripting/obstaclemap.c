@@ -24,9 +24,9 @@
 #include "../core/image.h"
 #include "../entities/brick.h"
 #include "../entities/entitymanager.h"
-#include "../entities/physics/obstacle.h"
-#include "../entities/physics/obstaclemap.h"
-#include "../entities/physics/collisionmask.h"
+#include "../physics/obstacle.h"
+#include "../physics/obstaclemap.h"
+#include "../physics/collisionmask.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

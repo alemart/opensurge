@@ -297,12 +297,12 @@ SET(
   src/entities/items/switch.c
   src/entities/items/teleporter.c
 
-  src/entities/physics/obstacle.c
-  src/entities/physics/obstaclemap.c
-  src/entities/physics/physicsactor.c
-  src/entities/physics/sensor.c
-  src/entities/physics/sensorstate.c
-  src/entities/physics/collisionmask.c
+  src/physics/obstacle.c
+  src/physics/obstaclemap.c
+  src/physics/physicsactor.c
+  src/physics/sensor.c
+  src/physics/sensorstate.c
+  src/physics/collisionmask.c
 
   src/entities/legacy/nanocalc/nanocalc.c
   src/entities/legacy/nanocalc/nanocalc_addons.c
@@ -424,12 +424,12 @@ IF(WIN32)
       src/entities/items/switch.h
       src/entities/items/teleporter.h
 
-      src/entities/physics/obstacle.h
-      src/entities/physics/obstaclemap.h
-      src/entities/physics/physicsactor.h
-      src/entities/physics/sensor.h
-      src/entities/physics/sensorstate.h
-      src/entities/physics/collisionmask.h
+      src/physics/obstacle.h
+      src/physics/obstaclemap.h
+      src/physics/physicsactor.h
+      src/physics/sensor.h
+      src/physics/sensorstate.h
+      src/physics/collisionmask.h
 
       src/entities/legacy/object_compiler.h
       src/entities/legacy/object_decorators.h

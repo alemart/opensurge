@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/physicsactor.c - physics system: actor
+ * physicsactor.c - physics system: actor
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -23,11 +23,11 @@
 #include "sensor.h"
 #include "obstaclemap.h"
 #include "obstacle.h"
-#include "../../core/util.h"
-#include "../../core/image.h"
-#include "../../core/video.h"
-#include "../../core/input.h"
-#include "../../core/timer.h"
+#include "../core/util.h"
+#include "../core/image.h"
+#include "../core/video.h"
+#include "../core/input.h"
+#include "../core/timer.h"
 
 /* physicsactor class */
 struct physicsactor_t

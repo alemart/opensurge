@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/sensor.c - physics system: sensors
+ * sensor.c - physics system: sensors
  * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -23,7 +23,7 @@
 #include "obstaclemap.h"
 #include "obstacle.h"
 #include "physicsactor.h"
-#include "../../core/util.h"
+#include "../core/util.h"
 
 /* sensor class */
 struct sensor_t

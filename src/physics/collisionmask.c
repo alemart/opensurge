@@ -18,11 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
 #include "collisionmask.h"
-#include "../../core/video.h"
-#include "../../core/image.h"
-#include "../../core/util.h"
+#include "../core/video.h"
+#include "../core/image.h"
+#include "../core/util.h"
 
 /* private stuff ;) */
 #define MEM_ALIGNMENT               sizeof(void*) /* 4 */ /* must be a power of two */

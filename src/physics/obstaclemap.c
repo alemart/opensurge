@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/obstaclemap.c - physics system: obstacle map
+ * obstaclemap.c - physics system: obstacle map
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -21,9 +21,9 @@
 #include "obstaclemap.h"
 #include "obstacle.h"
 #include "physicsactor.h"
-#include "../../core/util.h"
-#include "../../core/video.h"
-#include "../../core/darray.h"
+#include "../core/util.h"
+#include "../core/video.h"
+#include "../core/darray.h"
 
 /* an obstacle map is just a set of obstacles */
 struct obstaclemap_t

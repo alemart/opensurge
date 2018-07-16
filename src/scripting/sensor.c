@@ -24,10 +24,10 @@
 #include "../core/util.h"
 #include "../core/image.h"
 #include "../entities/camera.h"
-#include "../entities/physics/obstacle.h"
-#include "../entities/physics/obstaclemap.h"
-#include "../entities/physics/physicsactor.h"
-#include "../entities/physics/sensor.h"
+#include "../physics/obstacle.h"
+#include "../physics/obstaclemap.h"
+#include "../physics/physicsactor.h"
+#include "../physics/sensor.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

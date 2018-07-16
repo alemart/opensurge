@@ -28,7 +28,7 @@
 #include "../item.h"
 #include "../enemy.h"
 #include "../actor.h"
-#include "../physics/physicsactor.h"
+#include "../../physics/physicsactor.h"
 
 /* loop class */
 typedef struct oldloop_t oldloop_t;

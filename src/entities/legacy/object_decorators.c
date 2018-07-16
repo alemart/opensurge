@@ -27,7 +27,6 @@
 #include "nanocalc/nanocalcext.h"
 #include "../actor.h"
 #include "../player.h"
-#include "../physics/collisionmask.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
 #include "../../core/audio.h"
@@ -40,6 +39,7 @@
 #include "../../core/input.h"
 #include "../../core/v2d.h"
 #include "../../scenes/level.h"
+#include "../../physics/collisionmask.h"
 
 
 
