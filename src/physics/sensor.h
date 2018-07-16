@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/sensor.h - physics system: sensors
+ * sensor.h - physics system: sensors
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -21,8 +21,8 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
 
-#include "../../core/v2d.h"
-#include "../../core/global.h"
+#include "../core/v2d.h"
+#include "../core/global.h"
 
 /*
  * a sensor detects collisions between the

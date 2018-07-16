@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/obstacle.h - physics system: obstacles
+ * obstacle.h - physics system: obstacles
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -21,7 +21,7 @@
 #ifndef _OBSTACLE_H
 #define _OBSTACLE_H
 
-#include "../../core/v2d.h"
+#include "../core/v2d.h"
 #include "collisionmask.h"
 
 /*

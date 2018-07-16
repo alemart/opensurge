@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * physics/obstaclemap.h - physics system: obstacle map
+ * obstaclemap.h - physics system: obstacle map
  * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -21,7 +21,7 @@
 #ifndef _OBSTACLEMAP_H
 #define _OBSTACLEMAP_H
 
-#include "../../core/v2d.h"
+#include "../core/v2d.h"
 
 /*
  * an obstacle map is a set of obstacles

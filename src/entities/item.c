@@ -25,12 +25,12 @@
 #include "enemy.h"
 #include "brick.h"
 #include "actor.h"
-#include "physics/collisionmask.h"
 
 #include "../core/global.h"
 #include "../core/audio.h"
 #include "../scenes/quest.h"
 #include "../scenes/level.h"
+#include "../physics/collisionmask.h"
 
 #include "items/animal.h"
 #include "items/animalprison.h"
