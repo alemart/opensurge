@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 // header
-name "Template"
+name "Template Level"
 author "Alexandre"
 version "1.0"
 requires 0.5.0
