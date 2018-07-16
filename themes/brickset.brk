@@ -641,8 +641,8 @@ brick 64
     sprite
     {
         source_file     "images/brickset.png"
-        source_rect     16 1312 256 16
-        frame_size      256 16
+        source_rect     16 1216 256 128
+        frame_size      256 128
 
         animation
         {
@@ -662,8 +662,8 @@ brick 65
     sprite
     {
         source_file     "images/brickset.png"
-        source_rect     144 1200 128 112
-        frame_size      128 112
+        source_rect     16 1088 256 128
+        frame_size      256 128
 
         animation
         {
@@ -679,55 +679,13 @@ brick 66
     type                OBSTACLE
     behavior            DEFAULT
     mask                "images/brickset_mask.png"
-
-    sprite
-    {
-        source_file     "images/brickset.png"
-        source_rect     16 1088 256 112
-        frame_size      256 112
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 67
-{
-    type                OBSTACLE
-    behavior            DEFAULT
-    mask                "images/brickset_mask.png"
-
-    sprite
-    {
-        source_file     "images/brickset.png"
-        source_rect     16 1200 128 112
-        frame_size      128 112
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 68
-{
-    type                OBSTACLE
-    behavior            DEFAULT
-    mask                "images/brickset_mask.png"
     zindex              0.4999
 
     sprite
     {
         source_file     "images/brickset.png"
-        source_rect     16 1344 256 16
-        frame_size      256 16
+        source_rect     16 1376 256 128
+        frame_size      256 128
 
         animation
         {
