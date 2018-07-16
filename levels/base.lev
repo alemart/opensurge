@@ -24,7 +24,7 @@
 //
 
 // header
-name "Base Level"
+name "Empty Level"
 author "YOUR_NAME_HERE"
 version "1.0"
 requires "0.5.0"
