@@ -48,7 +48,7 @@
 
 
 /* Uncomment to render the sensors */
-#define SHOW_SENSORS
+/*#define SHOW_SENSORS*/
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 4
@@ -1023,7 +1023,6 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
     obstaclemap_t *obstaclemap;
-    float new_angle;
     int i;
 
     /* converting variables */
@@ -1101,11 +1100,19 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     act->speed = physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player) ? v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa)) : v2d_new(physicsactor_get_gsp(pa), 0.0f);
 
     /* smoothing the angle */
-    new_angle = ((256 - physicsactor_get_angle(pa)) * 1.40625f) / 57.2957795131f;
-    if(ang_diff(new_angle, act->angle) < 1.6f)
-        act->angle = lerp_angle(act->angle, new_angle, (ANGLE_SMOOTHING * PI * timer_get_delta()));
+    if(
+        physicsactor_get_movmode(pa) != MM_FLOOR ||
+        (!player_is_stopped(player) && !player_is_waiting(player) &&
+        !player_is_jumping(player) && !player_is_rolling(player))
+    ) {
+        float new_angle = physicsactor_get_angle(pa) / 57.2957795131f;
+        if(ang_diff(new_angle, act->angle) < 1.6f)
+            act->angle = lerp_angle(act->angle, new_angle, (ANGLE_SMOOTHING * PI * timer_get_delta()));
+        else
+            act->angle = new_angle;
+    }
     else
-        act->angle = new_angle;
+        act->angle = 0.0f;
 
     /* misc */
     act->mirror = !physicsactor_is_facing_right(pa) ? IF_HFLIP : IF_NONE;
