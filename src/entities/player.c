@@ -327,7 +327,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
  */
 void player_render(player_t *player, v2d_t camera_position)
 {
-    float ang;
     actor_t *act = player->actor;
     int i, behind_player[PLAYER_MAX_INVSTAR];
 
@@ -346,9 +345,7 @@ void player_render(player_t *player, v2d_t camera_position)
         case MM_CEILING: act->position.y += 2; break;
     }
 
-    act->angle = old_school_angle(ang = act->angle);
     actor_render(act, camera_position);
-    act->angle = ang;
 
     switch(physicsactor_get_movmode(player->pa)) {
         case MM_FLOOR: act->position.y += 1; break;
@@ -944,7 +941,7 @@ void update_shield(player_t *p)
 {
     actor_t *sh = p->shield, *act = p->actor;
     v2d_t off = v2d_new(0,0);
-    sh->position = v2d_add(act->position, v2d_rotate(off, -old_school_angle(act->angle)));
+    sh->position = v2d_add(act->position, v2d_rotate(off, -act->angle));
 
     switch(p->shield_type) {
 

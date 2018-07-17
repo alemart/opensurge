@@ -77,7 +77,6 @@ int bounding_box(float a[4], float b[4]); /* rect[4] = x1, y1, x2(=x1+w), y2(=y1
 int circular_collision(v2d_t a, float r_a, v2d_t b, float r_b);
 void swap_ex(void *a, void *b, size_t size);
 void fatal_error(const char *fmt, ...);
-float old_school_angle(float angle);
 void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
