@@ -384,7 +384,7 @@ physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa)
 
 int physicsactor_get_angle(const physicsactor_t *pa)
 {
-    return pa->angle;
+    return (int)((256 - pa->angle) * 1.40625) % 360;
 }
 
 v2d_t physicsactor_get_position(const physicsactor_t *pa)
@@ -719,18 +719,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* slope factor */
-        if(fabs(pa->gsp) >= walk_threshold) {
+        if(fabs(pa->gsp) >= walk_threshold || fabs(SIN(pa->angle)) >= 0.707f)
             pa->gsp += pa->slp * -SIN(pa->angle) * dt;
-        }
-        else if(fabs(SIN(pa->angle)) < 0.707f) {
-            if(
-                (!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) ||
-                (input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT))
-            ) {
-                pa->gsp = 0.0f;
-                pa->state = PAS_STOPPED;
-            }
-        }
 
         /* animation issues */
         if(fabs(pa->gsp) < walk_threshold && pa->angle == 0x0) {
@@ -1174,7 +1164,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* animation bugfix */
     if(pa->in_the_air && (pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP))
         pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
-    pa->state = PAS_STOPPED;
 }
 
 /* which one is the tallest obstacle, a or b? */
