@@ -465,7 +465,7 @@ void attachtoplayer_update(objectmachine_t *obj, player_t **team, int team_size,
     v2d_t offset = v2d_new(player_direction * expression_evaluate(me->offset_x), expression_evaluate(me->offset_y));
 
     object->attached_to_player = TRUE;
-    object->attached_to_player_offset = v2d_rotate(offset, -old_school_angle(player->actor->angle));
+    object->attached_to_player_offset = v2d_rotate(offset, -player->actor->angle);
     object->actor->position = v2d_add(player->actor->position, object->attached_to_player_offset);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
