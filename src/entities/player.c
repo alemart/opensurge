@@ -48,7 +48,7 @@
 
 
 /* Uncomment to render the sensors */
-/*#define SHOW_SENSORS*/
+#define SHOW_SENSORS
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 4
@@ -208,7 +208,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     float dt = timer_get_delta();
 
     /* "gambiarra" */
-    act->hot_spot = v2d_new(image_width(actor_image(act))/2, image_height(actor_image(act))-20);
+    /*act->hot_spot = v2d_new(image_width(actor_image(act))/2, image_height(actor_image(act))-20);*/
 
     /* physics */
     if(!player->disable_movement) {
@@ -341,9 +341,9 @@ void player_render(player_t *player, v2d_t camera_position)
     /* render the player */
     switch(physicsactor_get_movmode(player->pa)) {
         case MM_FLOOR: act->position.y -= 1; break;
-        case MM_LEFTWALL: act->position.x += 3; break;
+        case MM_LEFTWALL: act->position.x += 2; break;
         case MM_RIGHTWALL: act->position.x -= 1; break;
-        case MM_CEILING: act->position.y += 3; break;
+        case MM_CEILING: act->position.y += 2; break;
     }
 
     act->angle = old_school_angle(ang = act->angle);
@@ -352,9 +352,9 @@ void player_render(player_t *player, v2d_t camera_position)
 
     switch(physicsactor_get_movmode(player->pa)) {
         case MM_FLOOR: act->position.y += 1; break;
-        case MM_LEFTWALL: act->position.x -= 3; break;
+        case MM_LEFTWALL: act->position.x -= 2; break;
         case MM_RIGHTWALL: act->position.x += 1; break;
-        case MM_CEILING: act->position.y -= 3; break;
+        case MM_CEILING: act->position.y -= 2; break;
     }
 
     /* render the shield */
