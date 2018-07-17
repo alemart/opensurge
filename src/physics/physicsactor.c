@@ -312,7 +312,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* getting hit & winning pose */
     if(pa->state == PAS_GETTINGHIT) {
         input_ignore(pa->input);
-        pa->facing_right = pa->xsp < 0.0f;
+        pa->facing_right = (pa->xsp < 0.0f);
     }
     else if(pa->winning_pose) {
         /* brake on level clear */
@@ -340,7 +340,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->horizontal_control_lock_timer = max(0.0f, pa->horizontal_control_lock_timer - dt);
         input_simulate_button_up(pa->input, IB_LEFT);
         input_simulate_button_up(pa->input, IB_RIGHT);
-        pa->facing_right = pa->gsp > EPSILON;
+        pa->facing_right = (pa->gsp > 0.0f);
     }
 
     /* don't bother jumping */
@@ -349,9 +349,9 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         input_simulate_button_up(pa->input, IB_FIRE1);
 
     /* face left/right */
-    if((pa->gsp > EPSILON || pa->in_the_air) && input_button_down(pa->input, IB_RIGHT))
+    if((pa->gsp > 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_RIGHT))
         pa->facing_right = TRUE;
-    else if((pa->gsp < -EPSILON || pa->in_the_air) && input_button_down(pa->input, IB_LEFT))
+    else if((pa->gsp < 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_LEFT))
         pa->facing_right = FALSE;
 
     /* get to the real physics... */
@@ -704,17 +704,33 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* friction */
         if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
-            if(!(fabs(pa->gsp) < walk_threshold && pa->angle == 0x0))
-                pa->gsp -= min(fabs(pa->gsp), pa->frc) * sign(pa->gsp) * dt;
-            else
+            if(fabs(pa->gsp) <= pa->frc * dt) {
                 pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
+            }
+            else
+                pa->gsp -= pa->frc * sign(pa->gsp) * dt;
+        }
+        else if(input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT)) {
+            if(fabs(pa->gsp) <= pa->frc * dt) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
+            }
         }
 
-        if(input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT) && fabs(pa->gsp) < pa->frc)
-            pa->gsp = 0.0f;
-
         /* slope factor */
-        pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+        if(fabs(pa->gsp) >= walk_threshold) {
+            pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+        }
+        else if(fabs(SIN(pa->angle)) < 0.707f) {
+            if(
+                (!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) ||
+                (input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT))
+            ) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
+            }
+        }
 
         /* animation issues */
         if(fabs(pa->gsp) < walk_threshold && pa->angle == 0x0) {
@@ -727,10 +743,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             else if((pa->state != PAS_PUSHING && pa->state != PAS_WAITING) || (pa->state == PAS_PUSHING && !input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)))
                 pa->state = PAS_STOPPED;
         }
-        else if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING)
-            pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
-        else if(pa->state == PAS_PUSHING && fabs(pa->gsp) >= 3.0)
-            pa->state = PAS_WALKING;
+        else if(fabs(pa->gsp) >= 3.0f) {
+            if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING)
+                pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+            else if(pa->state == PAS_PUSHING)
+                pa->state = PAS_WALKING;
+        }
     }
 
     /*
@@ -754,7 +772,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->gsp = max(0.0f, pa->gsp - pa->rolldec * dt);
 
         /* friction */
-        pa->gsp -= min(fabs(pa->gsp), pa->rollfrc) * sign(pa->gsp) * dt;
+        if(fabs(pa->gsp) > pa->rollfrc * dt)
+            pa->gsp -= pa->rollfrc * sign(pa->gsp) * dt;
+        else
+            pa->gsp = 0.0f;
 
         /* slope factor */
         if(pa->gsp * SIN(pa->angle) >= 0.0f)
@@ -1153,6 +1174,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* animation bugfix */
     if(pa->in_the_air && (pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP))
         pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+    pa->state = PAS_STOPPED;
 }
 
 /* which one is the tallest obstacle, a or b? */
