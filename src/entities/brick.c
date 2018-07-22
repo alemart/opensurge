@@ -799,8 +799,9 @@ obstacle_t* create_obstacle(const brick_t* brick)
     if(brick->brick_ref && brick->brick_ref->property != BRK_NONE && brick->brick_ref->mask) {
         const collisionmask_t* mask = brick->brick_ref->mask;
         v2d_t position = brick_position(brick);
-        int solid = (brick->brick_ref->property == BRK_OBSTACLE);
-        return solid ? obstacle_create_solid(mask, position) : obstacle_create_oneway(mask, position);
+        int solid = (brick->brick_ref->property != BRK_CLOUD);
+        int flags = (solid ? OF_SOLID : OF_CLOUD);
+        return obstacle_create(mask, position, flags);
     }
     else
         return NULL;

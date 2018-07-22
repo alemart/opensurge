@@ -22,38 +22,31 @@
 #include "collisionmask.h"
 #include "../core/util.h"
 
+/* obstacle flags */
+const int OF_SOLID = 0x0;
+const int OF_CLOUD = 0x1;
+const int OF_HFLIP = 0x2;
+const int OF_VFLIP = 0x4;
+
 /* obstacle struct */
 struct obstacle_t
 {
     v2d_t position;
     int width;
     int height;
-    uint8 is_solid;
+    uint8 flags;
     const collisionmask_t* mask;
 };
 
 /* public methods */
-obstacle_t* obstacle_create_solid(const collisionmask_t* mask, v2d_t position)
+obstacle_t* obstacle_create(const collisionmask_t* mask, v2d_t position, int flags)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
     o->position = position;
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
-    o->is_solid = TRUE;
-    o->mask = mask;
-
-    return o;
-}
-
-obstacle_t* obstacle_create_oneway(const collisionmask_t* mask, v2d_t position)
-{
-    obstacle_t *o = mallocx(sizeof *o);
-
-    o->position = position;
-    o->width = collisionmask_width(mask);
-    o->height = collisionmask_height(mask);
-    o->is_solid = FALSE;
+    o->flags = flags;
     o->mask = mask;
 
     return o;
@@ -77,7 +70,7 @@ void obstacle_set_position(obstacle_t* obstacle, v2d_t position)
 
 int obstacle_is_solid(const obstacle_t *obstacle)
 {
-    return obstacle->is_solid;
+    return !(obstacle->flags & OF_CLOUD);
 }
 
 int obstacle_get_width(const obstacle_t *obstacle)

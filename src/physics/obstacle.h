@@ -32,9 +32,12 @@
 struct obstacle_t;
 typedef struct obstacle_t obstacle_t;
 
+/* obstacle flags */
+extern const int OF_SOLID, OF_CLOUD;
+extern const int OF_HFLIP, OF_VFLIP;
+
 /* create and destroy */
-obstacle_t* obstacle_create_solid(const collisionmask_t *mask, v2d_t position);
-obstacle_t* obstacle_create_oneway(const collisionmask_t *mask, v2d_t position);
+obstacle_t* obstacle_create(const collisionmask_t *mask, v2d_t position, int flags);
 obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 
 /* public methods */
