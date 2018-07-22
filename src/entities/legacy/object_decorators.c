@@ -39,7 +39,7 @@
 #include "../../core/input.h"
 #include "../../core/v2d.h"
 #include "../../scenes/level.h"
-#include "../../physics/collisionmask.h"
+#include "../../physics/obstacle.h"
 
 
 
@@ -2512,15 +2512,12 @@ void gravity_render(objectmachine_t *obj, v2d_t camera_position)
 /* (x,y) collides with the brick */
 int hit_test(const brick_t* brk, int x, int y)
 {
-    const collisionmask_t* mask = brick_collisionmask(brk);
-    if(mask != NULL) {
-        v2d_t position = brick_position(brk);
-        int ox = x - position.x, oy = y - position.y;
-        if(ox >= 0 && ox < collisionmask_width(mask) && oy >= 0 && oy < collisionmask_height(mask))
-            return collisionmask_at(mask, ox, oy, collisionmask_pitch(mask));
-    }
+    const obstacle_t* obstacle = brick_obstacle(brk);
 
-    return FALSE;
+    if(obstacle != NULL)
+        return obstacle_got_collision(obstacle, x, y, x, y);
+    else
+        return FALSE;
 }
 
 /* act collides with some brick? */

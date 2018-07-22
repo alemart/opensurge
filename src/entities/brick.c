@@ -547,20 +547,6 @@ const image_t *brick_image(const brick_t *brk)
 }
 
 /*
- * brick_collisionmask()
- * Returns the collision mask of a brick
- * WARNING: will be NULL if the brick is passable!
- *          (or if it's not a "true" brick)
- */
-const collisionmask_t *brick_collisionmask(const brick_t *brk)
-{
-    if(brk->brick_ref)
-        return brk->brick_ref->mask;
-    else
-        return NULL;
-}
-
-/*
  * brick_obstacle()
  * Returns the obstacle associated with this brick
  * WARNING: will be NULL if the brick is passable!
@@ -810,8 +796,8 @@ void validate_brickdata(const brickdata_t *obj)
 /* creates an obstacle (for the physics engine) corresponding to the brick */
 obstacle_t* create_obstacle(const brick_t* brick)
 {
-    if(brick->brick_ref && brick->brick_ref->property != BRK_NONE) {
-        const collisionmask_t* mask = brick_collisionmask(brick);
+    if(brick->brick_ref && brick->brick_ref->property != BRK_NONE && brick->brick_ref->mask) {
+        const collisionmask_t* mask = brick->brick_ref->mask;
         v2d_t position = brick_position(brick);
         int solid = (brick->brick_ref->property == BRK_OBSTACLE);
         return solid ? obstacle_create_solid(mask, position) : obstacle_create_oneway(mask, position);

@@ -28,7 +28,7 @@
 #include "../core/logfile.h"
 #include "../core/video.h"
 #include "../core/timer.h"
-#include "../physics/collisionmask.h"
+#include "../physics/obstacle.h"
 
 
 /* constants */
@@ -489,8 +489,8 @@ const brick_t* actor_brick_at(actor_t *act, const brick_list_t *brick_list, v2d_
 static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
 {
     const brick_list_t *p;
+    const obstacle_t* obstacle;
     brick_t *ret = NULL;
-    v2d_t pos, size;
 
     /* main algorithm */
     for(p=list; p; p=p->next) {
@@ -498,6 +498,7 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
         /* ignore passable bricks */
         if(brick_type(p->data) == BRK_NONE)
             continue;
+
         /* I don't want clouds. */
         if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_OBSTACLE))
             continue;
@@ -506,29 +507,21 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
         if(brick_behavior(p->data) == BRB_CIRCULAR && (ret && brick_behavior(ret) != BRB_CIRCULAR) && brick_position(p->data).y >= brick_position(ret).y)
             continue;
             
-        /* here's something I want... */
-        pos = brick_position(p->data);
-        size = brick_size(p->data);
-        if(spot.x >= pos.x && spot.y >= pos.y && spot.x < pos.x + size.x && spot.y < pos.y + size.y) {
-            const collisionmask_t* mask = brick_collisionmask(p->data);
-            if(mask != NULL) {
-                int ox = (int)(spot.x - pos.x), oy = (int)(spot.y - pos.y);
-                if(ox >= 0 && oy >= 0 && ox < collisionmask_width(mask) && oy < collisionmask_height(mask)) {
-                    if(collisionmask_at(mask, ox, oy, collisionmask_pitch(mask))) {
-                        if(brick_behavior(p->data) != BRB_CIRCULAR && (ret && brick_behavior(ret) == BRB_CIRCULAR) && brick_position(p->data).y <= brick_position(ret).y) {
-                            ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
-                        }
-                        else if(brick_type(p->data) == BRK_OBSTACLE && (ret && brick_type(ret) == BRK_CLOUD)) {
-                            ret = p->data; /* No clouds. Let's grab an obstacle instead. */
-                        }
-                        else if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_CLOUD)) {
-                            if(brick_position(p->data).y > brick_position(ret).y) /* two conflicting clouds */
-                                ret = p->data;
-                        }
-                        else if(!ret)
-                            ret = p->data;
-                    }
+        /* Check for collision */
+        if(NULL != (obstacle = brick_obstacle(p->data))) {
+            if(obstacle_got_collision(obstacle, spot.x, spot.y, spot.x, spot.y)) {
+                if(brick_behavior(p->data) != BRB_CIRCULAR && (ret && brick_behavior(ret) == BRB_CIRCULAR) && brick_position(p->data).y <= brick_position(ret).y) {
+                    ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
                 }
+                else if(brick_type(p->data) == BRK_OBSTACLE && (ret && brick_type(ret) == BRK_CLOUD)) {
+                    ret = p->data; /* No clouds. Let's grab an obstacle instead. */
+                }
+                else if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_CLOUD)) {
+                    if(brick_position(p->data).y > brick_position(ret).y) /* two conflicting clouds */
+                        ret = p->data;
+                }
+                else if(!ret)
+                    ret = p->data;
             }
         }
     }
