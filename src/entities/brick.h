@@ -47,6 +47,14 @@ enum bricklayer_t {
     BRL_YELLOW
 };
 
+/* brick flipping (mirroring) */
+enum brickflip_t {
+    BRF_NONE = 0x0,
+    BRF_HFLIP = 0x1,
+    BRF_VFLIP = 0x2,
+    BRF_VHFLIP = 0x3
+};
+
 /* forward declarations */
 struct actor_t;
 struct player_t;
@@ -62,6 +70,7 @@ typedef struct brick_list_t brick_list_t;
 typedef enum brickproperty_t brickproperty_t;
 typedef enum brickbehavior_t brickbehavior_t;
 typedef enum bricklayer_t bricklayer_t;
+typedef enum brickflip_t brickflip_t;
 
 /* linked list of bricks */
 struct brick_list_t {
@@ -76,7 +85,7 @@ int brickset_size(); /* number of bricks */
 int brickset_loaded(); /* is a brickset loaded? */
 
 /* brick interface */
-brick_t* brick_create(int id, v2d_t position, bricklayer_t layer); /* spawns a new brick at the specified position */
+brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t flip_flags); /* creates a new brick */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
 void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
 void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
@@ -86,6 +95,7 @@ int brick_id(const brick_t* brk); /* brick id (its number in the brickset) */
 brickproperty_t brick_type(const brick_t* brk); /* brick type */
 brickbehavior_t brick_behavior(const brick_t* brk); /* brick behavior */
 bricklayer_t brick_layer(const brick_t* brk); /* brick layer */
+brickflip_t brick_flip(const brick_t* brk); /* brick flip status */
 const image_t* brick_image(const brick_t *brk); /* returns the image of the brick */
 const struct obstacle_t* brick_obstacle(const brick_t* brk); /* returns the obstacle associated with this brick (may be NULL) */
 float brick_zindex(const brick_t* brk); /* brick zindex */
