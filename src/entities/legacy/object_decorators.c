@@ -2428,7 +2428,7 @@ void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_
 
     /* check for collisions */
     for(it = brick_list; it != NULL && collided == NONE; it = it->next) {
-        if(brick_type(it->data) != BRK_NONE) {
+        if(brick_type(it->data) != BRK_PASSABLE) {
             bx = brick_position(it->data).x;
             by = brick_position(it->data).y;
             bw = brick_size(it->data).x;
@@ -2536,7 +2536,7 @@ int sticky_test(const actor_t *act, const brick_list_t *brick_list)
 
     for(it = brick_list; it; it = it->next) {
         b = it->data;
-        if(brick_type(b) != BRK_NONE) {
+        if(brick_type(b) != BRK_PASSABLE) {
             if(hit_test(b, rx+rw/2, ry+rh-1))
                 return TRUE;
         }
@@ -4913,9 +4913,9 @@ int onbrickcollision_should_trigger_event(eventstrategy_t *event, object_t *obje
         (up != NULL && brick_type(up) == BRK_OBSTACLE) ||
         (upright != NULL && brick_type(upright) == BRK_OBSTACLE) ||
         (right != NULL && brick_type(right) == BRK_OBSTACLE) ||
-        (downright != NULL && brick_type(downright) != BRK_NONE) ||
-        (down != NULL && brick_type(down) != BRK_NONE) ||
-        (downleft != NULL && brick_type(downleft) != BRK_NONE) ||
+        (downright != NULL && brick_type(downright) != BRK_PASSABLE) ||
+        (down != NULL && brick_type(down) != BRK_PASSABLE) ||
+        (downleft != NULL && brick_type(downleft) != BRK_PASSABLE) ||
         (left != NULL && brick_type(left) == BRK_OBSTACLE) ||
         (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE)
     ;
@@ -4952,9 +4952,9 @@ int onfloorcollision_should_trigger_event(eventstrategy_t *event, object_t *obje
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (downright != NULL && brick_type(downright) != BRK_NONE) ||
-        (down != NULL && brick_type(down) != BRK_NONE) ||
-        (downleft != NULL && brick_type(downleft) != BRK_NONE)
+        (downright != NULL && brick_type(downright) != BRK_PASSABLE) ||
+        (down != NULL && brick_type(down) != BRK_PASSABLE) ||
+        (downleft != NULL && brick_type(downleft) != BRK_PASSABLE)
     ;
 }
 

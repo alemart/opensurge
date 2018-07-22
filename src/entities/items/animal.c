@@ -110,7 +110,7 @@ void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
     /* check for collisions */
     for(it = brick_list; it != NULL && bounce == NONE; it = it->next) {
-        if(brick_type(it->data) != BRK_NONE) {
+        if(brick_type(it->data) != BRK_PASSABLE) {
             bi = brick_image(it->data);
             bx = brick_position(it->data).x;
             by = brick_position(it->data).y;

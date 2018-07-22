@@ -143,7 +143,7 @@ void brickset_load(const char *filename)
 
     logfile_message("Creating collision masks...");
     for(i=0; i<brickdata_count; i++) {
-        if(brickdata[i] != NULL && brickdata[i]->type != BRK_NONE && brickdata[i]->mask == NULL) {
+        if(brickdata[i] != NULL && brickdata[i]->type != BRK_PASSABLE && brickdata[i]->mask == NULL) {
             const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
             spriteinfo_t* sprite = brickdata[i]->data;
             brickdata[i]->mask = collisionmask_create(
@@ -356,7 +356,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             brk->x = brk->sx + round(rx*cos(sx*t+ph));
             brk->y = brk->sy + round(ry*sin(sy*t+ph));
 
-            if(brk->brick_ref->type == BRK_NONE)
+            if(brk->brick_ref->type == BRK_PASSABLE)
                 break;
 
             if(brk->obstacle != NULL)
@@ -637,7 +637,7 @@ int brick_is_alive(const brick_t* brk)
 const char* brick_get_type_name(bricktype_t type)
 {
     switch(type) {
-        case BRK_NONE:
+        case BRK_PASSABLE:
             return "PASSABLE";
 
         case BRK_OBSTACLE:
@@ -798,7 +798,7 @@ brickdata_t* brickdata_new()
     obj->image = NULL;
     obj->mask = NULL;
     obj->maskfile = NULL;
-    obj->type = BRK_NONE;
+    obj->type = BRK_PASSABLE;
     obj->behavior = BRB_DEFAULT;
     obj->zindex = 0.5f;
 
@@ -841,7 +841,7 @@ void validate_brickdata(const brickdata_t *obj)
 /* creates an obstacle (for the physics engine) corresponding to the brick */
 obstacle_t* create_obstacle(const brick_t* brick)
 {
-    if(brick->brick_ref && brick->brick_ref->type != BRK_NONE && brick->brick_ref->mask) {
+    if(brick->brick_ref && brick->brick_ref->type != BRK_PASSABLE && brick->brick_ref->mask) {
         const collisionmask_t* mask = brick->brick_ref->mask;
         v2d_t position = brick_position(brick);
         int flags = obstacle_flags(brick);
@@ -929,7 +929,7 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         if(str_icmp(type, "OBSTACLE") == 0)
             dat->type = BRK_OBSTACLE;
         else if(str_icmp(type, "PASSABLE") == 0)
-            dat->type = BRK_NONE;
+            dat->type = BRK_PASSABLE;
         else if(str_icmp(type, "CLOUD") == 0)
             dat->type = BRK_CLOUD;
         else
