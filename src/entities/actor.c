@@ -496,7 +496,7 @@ static brick_t* brick_at(const brick_list_t *list, v2d_t spot)
     for(p=list; p; p=p->next) {
 
         /* ignore passable bricks */
-        if(brick_type(p->data) == BRK_NONE)
+        if(brick_type(p->data) == BRK_PASSABLE)
             continue;
 
         /* I don't want clouds. */

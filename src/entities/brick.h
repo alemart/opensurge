@@ -27,7 +27,7 @@
 /* brick type */
 enum bricktype_t
 {
-    BRK_NONE,           /* passable brick */
+    BRK_PASSABLE,       /* passable bricks */
     BRK_OBSTACLE,       /* solid bricks (floors, walls, etc) */
     BRK_CLOUD           /* clouds (one-way platforms) */
 };
