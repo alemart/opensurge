@@ -65,7 +65,7 @@ struct brickdata_t {
     char* maskfile; /* collision mask file (may be NULL) */
     collisionmask_t *mask; /* collision mask (may be NULL) */
     float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
-    brickproperty_t property;
+    bricktype_t type;
     brickbehavior_t behavior;
     float behavior_arg[BRICKBEHAVIOR_MAXARGS];
 };
@@ -143,7 +143,7 @@ void brickset_load(const char *filename)
 
     logfile_message("Creating collision masks...");
     for(i=0; i<brickdata_count; i++) {
-        if(brickdata[i] != NULL && brickdata[i]->property != BRK_NONE && brickdata[i]->mask == NULL) {
+        if(brickdata[i] != NULL && brickdata[i]->type != BRK_NONE && brickdata[i]->mask == NULL) {
             const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
             spriteinfo_t* sprite = brickdata[i]->data;
             brickdata[i]->mask = collisionmask_create(
@@ -356,7 +356,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             brk->x = brk->sx + round(rx*cos(sx*t+ph));
             brk->y = brk->sy + round(ry*sin(sy*t+ph));
 
-            if(brk->brick_ref->property == BRK_NONE)
+            if(brk->brick_ref->type == BRK_NONE)
                 break;
 
             if(brk->obstacle != NULL)
@@ -508,10 +508,10 @@ int brick_id(const brick_t* brk)
  * brick_type()
  * Returns the type of the brick
  */
-brickproperty_t brick_type(const brick_t* brk)
+bricktype_t brick_type(const brick_t* brk)
 {
     if(brk->brick_ref)
-        return brk->brick_ref->property;
+        return brk->brick_ref->type;
     else
         return BRK_OBSTACLE;
 }
@@ -631,12 +631,12 @@ int brick_is_alive(const brick_t* brk)
 }
 
 /*
- * brick_get_property_name()
- * Returns the name of a given brick property
+ * brick_get_type_name()
+ * Returns the name of a given brick type
  */
-const char* brick_get_property_name(brickproperty_t property)
+const char* brick_get_type_name(bricktype_t type)
 {
-    switch(property) {
+    switch(type) {
         case BRK_NONE:
             return "PASSABLE";
 
@@ -798,7 +798,7 @@ brickdata_t* brickdata_new()
     obj->image = NULL;
     obj->mask = NULL;
     obj->maskfile = NULL;
-    obj->property = BRK_NONE;
+    obj->type = BRK_NONE;
     obj->behavior = BRB_DEFAULT;
     obj->zindex = 0.5f;
 
@@ -841,7 +841,7 @@ void validate_brickdata(const brickdata_t *obj)
 /* creates an obstacle (for the physics engine) corresponding to the brick */
 obstacle_t* create_obstacle(const brick_t* brick)
 {
-    if(brick->brick_ref && brick->brick_ref->property != BRK_NONE && brick->brick_ref->mask) {
+    if(brick->brick_ref && brick->brick_ref->type != BRK_NONE && brick->brick_ref->mask) {
         const collisionmask_t* mask = brick->brick_ref->mask;
         v2d_t position = brick_position(brick);
         int flags = obstacle_flags(brick);
@@ -927,11 +927,11 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         type = nanoparser_get_string(p1);
 
         if(str_icmp(type, "OBSTACLE") == 0)
-            dat->property = BRK_OBSTACLE;
+            dat->type = BRK_OBSTACLE;
         else if(str_icmp(type, "PASSABLE") == 0)
-            dat->property = BRK_NONE;
+            dat->type = BRK_NONE;
         else if(str_icmp(type, "CLOUD") == 0)
-            dat->property = BRK_CLOUD;
+            dat->type = BRK_CLOUD;
         else
             fatal_error("Can't read brick attributes: unknown brick type '%s'", type);
     }
