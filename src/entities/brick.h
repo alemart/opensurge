@@ -52,7 +52,6 @@ struct actor_t;
 struct player_t;
 struct item_list_t;
 struct enemy_list_t;
-struct collisionmask_t;
 struct obstacle_t;
 struct brickdata_t;
 struct brick_t;
