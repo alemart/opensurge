@@ -307,8 +307,9 @@ static const char* editor_enemy_selected_category();
 static void editor_next_object_category();
 static void editor_previous_object_category();
 
-/* editor: brick layer */
+/* editor: brick layer & flip flags */
 static bricklayer_t editor_layer;
+static brickflip_t editor_flip;
 
 /* editor: grid */
 #define EDITOR_GRID_W         (int)(editor_grid_size().x)
@@ -346,6 +347,7 @@ typedef struct editor_action_t {
     v2d_t obj_position;
     v2d_t obj_old_position;
     bricklayer_t layer;
+    brickflip_t flip;
 } editor_action_t;
 
 /* action: constructors */
@@ -603,8 +605,17 @@ int level_save(const char *filepath)
     /* brick list */
     fprintf(fp, "\n// brick list\n");
     for(itb=brick_list; itb; itb=itb->next)  {
-        if(brick_is_alive(itb->data))
-            fprintf(fp, "brick %d %d %d%s%s\n", brick_id(itb->data), (int)brick_spawnpoint(itb->data).x, (int)brick_spawnpoint(itb->data).y, brick_layer(itb->data) != BRL_DEFAULT ? " " : "", brick_layer(itb->data) != BRL_DEFAULT ? bricklayer2colorname(brick_layer(itb->data)) : "");
+        if(brick_is_alive(itb->data)) {
+            fprintf(fp,
+                "brick %d %d %d%s%s%s%s\n",
+                brick_id(itb->data),
+                (int)(brick_spawnpoint(itb->data).x), (int)(brick_spawnpoint(itb->data).y),
+                brick_layer(itb->data) != BRL_DEFAULT ? " " : "",
+                brick_layer(itb->data) != BRL_DEFAULT ? bricklayer2colorname(brick_layer(itb->data)) : "",
+                brick_flip(itb->data) != BRF_NOFLIP ? " " : "",
+                brick_flip(itb->data) != BRF_NOFLIP ? brickflip2str(brick_flip(itb->data)) : ""
+            );
+        }
     }
 
     /* item list */
@@ -801,16 +812,20 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     else if(str_icmp(identifier, "brick") == 0) {
         if(param_count >= 3 && param_count <= 4) {
             if(str_icmp(theme, "") != 0) {
-                int id, x, y;
-                bricklayer_t layer;
-
-                id = atoi(param[0]);
-                x = atoi(param[1]);
-                y = atoi(param[2]);
-                layer = (param_count >= 4) ? colorname2bricklayer(param[3]) : BRL_DEFAULT;
+                bricklayer_t layer = BRL_DEFAULT;
+                brickflip_t flip = BRF_NOFLIP;
+                int id = atoi(param[0]);
+                int x = atoi(param[1]);
+                int y = atoi(param[2]);
+                for(int j = 3; j < param_count; j++) {
+                    if(layer == BRL_DEFAULT && colorname2bricklayer(param[j]) != BRL_DEFAULT)
+                        layer = colorname2bricklayer(param[j]);
+                    else if(flip == BRF_NOFLIP && str2brickflip(param[j]) != BRF_NOFLIP)
+                        flip = str2brickflip(param[j]);
+                }
 
                 if(brick_exists(id))
-                    level_create_brick(id, v2d_new(x,y), layer);
+                    level_create_brick(id, v2d_new(x,y), layer, flip);
                 else
                     logfile_message("Level loader - invalid brick: %d", id);
             }
@@ -818,7 +833,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 logfile_message("Level loader - warning: cannot create a new brick if the theme is not defined");
         }
         else
-            logfile_message("Level loader - command 'brick' expects three or four parameters: id, xpos, ypos [, layer_name]");
+            logfile_message("Level loader - command 'brick' expects three or four parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
     }
     else if(str_icmp(identifier, "item") == 0) {
         if(param_count == 3) {
@@ -1468,9 +1483,9 @@ void level_change_player(player_t *new_player)
  * Creates and adds a brick to the level. This function
  * returns a pointer to the created brick.
  */
-brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer)
+brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip)
 {
-    brick_t *brick = brick_create(id, position, layer, BRF_NONE);
+    brick_t *brick = brick_create(id, position, layer, flip);
     entitymanager_store_brick(brick);
     return brick;
 }
@@ -2451,8 +2466,9 @@ void editor_init()
     /* groups */
     editorgrp_init();
 
-    /* layer */
+    /* layer & flip flags */
     editor_layer = BRL_DEFAULT;
+    editor_flip = BRF_NOFLIP;
 
     /* grid */
     editor_grid_init();
@@ -2594,8 +2610,20 @@ void editor_update()
         }
     }
 
+    /* change brick flip mode */
+    if(input_button_pressed(editor_keyboard3, IB_FIRE4)) {
+        if(editor_cursor_entity_type == EDT_BRICK) {
+            editor_flip = (editor_flip + 1) & BRF_VHFLIP;
+            video_showmessage("Flip mode: %s", brickflip2str(editor_flip));
+        }
+        else {
+            sound_play( soundfactory_get("deny") );
+            video_showmessage("Must be in brick/group mode");
+        }
+    }
+
     /* help */
-     if(input_button_pressed(editor_keyboard3, IB_FIRE4)) {
+     if(input_button_pressed(editor_keyboard3, IB_FIRE8)) {
         scenestack_push(storyboard_get_scene(SCENE_EDITORHELP), NULL);
         return;
     }   
@@ -2647,6 +2675,7 @@ void editor_update()
                     if(pick_object) {
                         editor_cursor_entity_id = brick_id(candidate);
                         editor_layer = brick_layer(candidate);
+                        editor_flip = brick_flip(candidate);
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_BRICK, brick_id(candidate), brick_position(candidate));
@@ -3063,12 +3092,12 @@ const char *editor_entity_class(enum editor_entity_type objtype)
 const char *editor_entity_info(enum editor_entity_type objtype, int objid)
 {
     static char buf[128];
-    strcpy(buf, "");
+    *buf = 0;
 
     switch(objtype) {
         case EDT_BRICK: {
             if(brick_exists(objid)) {
-                brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NONE);
+                brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 sprintf(buf,
                     "property: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
                     brick_get_property_name(brick_type(x)),
@@ -3324,12 +3353,15 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
     const image_t *cursor = NULL;
     v2d_t offset = v2d_new(0, 0);
     float alpha = 0.75f;
+    int flags = IF_NONE;
 
     /* getting the image of the current object */
     switch(obj_type) {
         case EDT_BRICK: {
-            if(brick_exists(obj_id))
+            if(brick_exists(obj_id)) {
                 cursor = brick_image_preview(obj_id);
+                flags = brick_image_flags(editor_flip);
+            }
             break;
         }
         case EDT_ITEM: {
@@ -3363,7 +3395,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
 
     /* drawing the object */
     if(cursor != NULL)
-        image_draw_trans(cursor, video_get_backbuffer(), (int)(position.x-offset.x), (int)(position.y-offset.y), alpha, IF_NONE);
+        image_draw_trans(cursor, video_get_backbuffer(), (int)(position.x-offset.x), (int)(position.y-offset.y), alpha, flags);
 }
 
 
@@ -3482,8 +3514,9 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
     o.obj_position = obj_position;
     o.obj_old_position = obj_position;
     o.layer = editor_layer;
+    o.flip = editor_flip;
 
-    /* are we removing a brick? Store its layer */
+    /* are we removing a brick? Store its layer & flip flags */
     if(!is_new_object && obj_type == EDT_BRICK) {
         brick_list_t *it, *brick_list = entitymanager_retrieve_all_bricks();
         for(it=brick_list; it; it=it->next) {
@@ -3491,6 +3524,7 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
                 float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), o.obj_position));
                 if(dist < EPSILON) {
                     o.layer = brick_layer(it->data);
+                    o.flip = brick_flip(it->data);
                     brick_kill(it->data);
                 }
             }
@@ -3510,6 +3544,7 @@ editor_action_t editor_action_spawnpoint_new(int is_changing, v2d_t obj_position
     o.obj_old_position = obj_old_position;
     o.obj_type = EDT_ITEM;
     o.layer = editor_layer;
+    o.flip = editor_flip;
     return o;
 }
 
@@ -3673,7 +3708,7 @@ void editor_action_commit(editor_action_t action)
         switch(action.obj_type) {
             case EDT_BRICK: {
                 /* new brick */
-                level_create_brick(action.obj_id, action.obj_position, action.layer);
+                level_create_brick(action.obj_id, action.obj_position, action.layer, action.flip);
                 break;
             }
 

@@ -49,7 +49,7 @@ enum bricklayer_t {
 
 /* brick flipping (mirroring) */
 enum brickflip_t {
-    BRF_NONE = 0x0,
+    BRF_NOFLIP = 0x0,
     BRF_HFLIP = 0x1,
     BRF_VFLIP = 0x2,
     BRF_VHFLIP = 0x3
@@ -106,14 +106,17 @@ void brick_kill(brick_t* brk); /* kills a brick */
 int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
 
 /* brick utilities */
+int brick_exists(int id); /* does a brick with the given id exist? */
 uint32 bricklayer2color(bricklayer_t layer);
 const char* bricklayer2colorname(bricklayer_t layer);
 bricklayer_t colorname2bricklayer(const char *name);
+const char* brickflip2str(brickflip_t flip);
+brickflip_t str2brickflip(const char* str);
 v2d_t brick_movable_platform_offset(const brick_t *brk); /* movable platforms must move actors on top of them. Returns a delta_space vector */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
 const char* brick_get_property_name(brickproperty_t property); /* property name */
 const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
-int brick_exists(int id); /* does a brick with the given id exist? */
 const image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
+int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
 
 #endif

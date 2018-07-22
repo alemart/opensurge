@@ -64,7 +64,7 @@ void level_set_spawn_point(v2d_t newpos);
 
 /* entities */
 void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
-struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer);
+struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip);
 struct item_t* level_create_item(int id, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
 void level_add_to_score(int score);

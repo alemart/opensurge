@@ -706,6 +706,28 @@ bricklayer_t colorname2bricklayer(const char *name)
         return BRL_DEFAULT;
 }
 
+const char* brickflip2str(brickflip_t flip)
+{
+    switch(flip) {
+        case BRF_HFLIP:     return "hflip";
+        case BRF_VFLIP:     return "vflip";
+        case BRF_VHFLIP:    return "vhflip";
+        default:            return "noflip";
+    }
+}
+
+brickflip_t str2brickflip(const char* str)
+{
+    if(str_icmp(str, "hflip") == 0)
+        return BRF_HFLIP;
+    else if(str_icmp(str, "vflip") == 0)
+        return BRF_VFLIP;
+    else if(str_icmp(str, "vhflip") == 0)
+        return BRF_VHFLIP;
+    else
+        return BRF_NOFLIP;
+}
+
 /*
  * brick_exists()
  * Does a brick with the given id exist?
@@ -729,6 +751,16 @@ const image_t* brick_image_preview(int id)
             return brickdata[id]->image;
     }
     return NULL;
+}
+
+/*
+ * brick_image_flags()
+ * Convert flags: brick flip to image flip
+ */
+int brick_image_flags(brickflip_t flip)
+{
+    brick_t b = { flip: flip }; /* hackish */
+    return image_flags(&b);
 }
 
 
