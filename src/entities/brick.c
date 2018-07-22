@@ -79,6 +79,7 @@ struct brick_t { /* a real, concrete brick */
     float value[BRICK_MAXVALUES]; /* alterable values */
     float animation_frame; /* controlled by a timer */
     bricklayer_t layer; /* loop system: BRL_* */
+    brickflip_t flip; /* flip bitwise flags */
     obstacle_t* obstacle; /* used by the physics system */
 };
 
@@ -104,6 +105,8 @@ static int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskd
 static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
 static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
+static inline int obstacle_flags(const brick_t* brick);
+static inline int image_flags(const brick_t* brick);
 
 /* public functions */
 
@@ -203,7 +206,7 @@ int brickset_loaded()
  * brick_create()
  * Spawns a new brick
  */
-brick_t* brick_create(int id, v2d_t position, bricklayer_t layer)
+brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t flip_flags)
 {
     brick_t *b = mallocx(sizeof *b);
     int i;
@@ -217,6 +220,7 @@ brick_t* brick_create(int id, v2d_t position, bricklayer_t layer)
     b->animation_frame = 0;
     b->state = BRS_IDLE;
     b->layer = layer;
+    b->flip = flip_flags;
     b->obstacle = create_obstacle(b);
 
     for(i=0; i<BRICK_MAXVALUES; i++)
@@ -401,9 +405,9 @@ void brick_render(brick_t *brk, v2d_t camera_position)
     brick_animate(brk);
 
     if(brk->layer == BRL_DEFAULT || !level_editmode())
-        image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), IF_NONE);
+        image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), image_flags(brk));
     else
-        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), bricklayer2color(brk->layer), 0.5f, IF_NONE);
+        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), bricklayer2color(brk->layer), 0.5f, image_flags(brk));
 }
 
 
@@ -532,6 +536,15 @@ brickbehavior_t brick_behavior(const brick_t* brk)
 bricklayer_t brick_layer(const brick_t* brk)
 {
     return brk->layer;
+}
+
+/*
+ * brick_flip()
+ * Returns the flip (mirroring) status of the brick
+ */
+brickflip_t brick_flip(const brick_t* brk)
+{
+    return brk->flip;
 }
 
 /*
@@ -799,8 +812,7 @@ obstacle_t* create_obstacle(const brick_t* brick)
     if(brick->brick_ref && brick->brick_ref->property != BRK_NONE && brick->brick_ref->mask) {
         const collisionmask_t* mask = brick->brick_ref->mask;
         v2d_t position = brick_position(brick);
-        int solid = (brick->brick_ref->property != BRK_CLOUD);
-        int flags = (solid ? OF_SOLID : OF_CLOUD);
+        int flags = obstacle_flags(brick);
         return obstacle_create(mask, position, flags);
     }
     else
@@ -811,6 +823,20 @@ obstacle_t* create_obstacle(const brick_t* brick)
 obstacle_t* destroy_obstacle(obstacle_t* obstacle)
 {
     return (obstacle != NULL) ? obstacle_destroy(obstacle) : NULL;
+}
+
+int obstacle_flags(const brick_t* brick)
+{
+    return
+        ((brick_type(brick) == BRK_OBSTACLE) ? OF_SOLID : OF_CLOUD) |
+        ((brick->flip & BRF_HFLIP) ? OF_HFLIP : 0) |
+        ((brick->flip & BRF_VFLIP) ? OF_VFLIP : 0)
+    ;
+}
+
+int image_flags(const brick_t* brick)
+{
+    return ((brick->flip & BRF_HFLIP) ? IF_HFLIP : 0) | ((brick->flip & BRF_VFLIP) ? IF_VFLIP : 0);
 }
 
 /* traverses a .brk file */

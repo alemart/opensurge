@@ -1470,7 +1470,7 @@ void level_change_player(player_t *new_player)
  */
 brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer)
 {
-    brick_t *brick = brick_create(id, position, layer);
+    brick_t *brick = brick_create(id, position, layer, BRF_NONE);
     entitymanager_store_brick(brick);
     return brick;
 }
@@ -3068,7 +3068,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
     switch(objtype) {
         case EDT_BRICK: {
             if(brick_exists(objid)) {
-                brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT);
+                brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NONE);
                 sprintf(buf,
                     "property: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
                     brick_get_property_name(brick_type(x)),
