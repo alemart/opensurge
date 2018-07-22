@@ -25,7 +25,7 @@
 #include "../core/image.h"
 
 /* brick type */
-enum brickproperty_t
+enum bricktype_t
 {
     BRK_NONE,           /* passable brick */
     BRK_OBSTACLE,       /* solid bricks (floors, walls, etc) */
@@ -67,7 +67,7 @@ struct brick_t;
 /* typedefs */
 typedef struct brick_t brick_t;
 typedef struct brick_list_t brick_list_t;
-typedef enum brickproperty_t brickproperty_t;
+typedef enum bricktype_t bricktype_t;
 typedef enum brickbehavior_t brickbehavior_t;
 typedef enum bricklayer_t bricklayer_t;
 typedef enum brickflip_t brickflip_t;
@@ -92,7 +92,7 @@ void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
 
 /* brick properties & operations */
 int brick_id(const brick_t* brk); /* brick id (its number in the brickset) */
-brickproperty_t brick_type(const brick_t* brk); /* brick type */
+bricktype_t brick_type(const brick_t* brk); /* brick type */
 brickbehavior_t brick_behavior(const brick_t* brk); /* brick behavior */
 bricklayer_t brick_layer(const brick_t* brk); /* brick layer */
 brickflip_t brick_flip(const brick_t* brk); /* brick flip status */
@@ -114,7 +114,7 @@ const char* brickflip2str(brickflip_t flip);
 brickflip_t str2brickflip(const char* str);
 v2d_t brick_movable_platform_offset(const brick_t *brk); /* movable platforms must move actors on top of them. Returns a delta_space vector */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
-const char* brick_get_property_name(brickproperty_t property); /* property name */
+const char* brick_get_type_name(bricktype_t type); /* type name */
 const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
 const image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */

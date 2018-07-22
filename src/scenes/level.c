@@ -3099,8 +3099,8 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
             if(brick_exists(objid)) {
                 brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 sprintf(buf,
-                    "property: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
-                    brick_get_property_name(brick_type(x)),
+                    "type: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
+                    brick_get_type_name(brick_type(x)),
                     brick_get_behavior_name(brick_behavior(x)),
                     (int)brick_size(x).x,
                     (int)brick_size(x).y,
