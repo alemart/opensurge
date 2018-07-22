@@ -88,7 +88,6 @@ brickproperty_t brick_type(const brick_t* brk); /* brick type */
 brickbehavior_t brick_behavior(const brick_t* brk); /* brick behavior */
 bricklayer_t brick_layer(const brick_t* brk); /* brick layer */
 const image_t* brick_image(const brick_t *brk); /* returns the image of the brick */
-const struct collisionmask_t* brick_collisionmask(const brick_t *brk); /* returns the collision mask of the brick (may be NULL) */
 const struct obstacle_t* brick_obstacle(const brick_t* brk); /* returns the obstacle associated with this brick (may be NULL) */
 float brick_zindex(const brick_t* brk); /* brick zindex */
 v2d_t brick_position(const brick_t* brk); /* brick position */
