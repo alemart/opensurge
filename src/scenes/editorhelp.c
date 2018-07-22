@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorhelp.c - level editor help
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,8 +41,9 @@ static const char text[] =
 "Arrow keys or WASD                 Move the camera\n"
 "LCtrl + Arrows or LCtrl + WASD     Move the camera (faster)\n"
 "LCtrl + Left mouse button          Change the spawn point\n"
-"G                                  Enable/disable the grid\n"
 "L                                  Switch brick layer\n"
+"F                                  Flip brick\n"
+"G                                  Enable/disable the grid\n"
 "\n\n"
 "<color=00bbff>Entity placement</color>\n\n"
 "Left mouse button                  Create an entity\n"

@@ -259,6 +259,7 @@ inputmap "editor3"
         fire1           KEY_LSHIFT
         fire2           KEY_DEL
         fire3           KEY_L
-        fire4           KEY_F1
+        fire4           KEY_F
+        fire8           KEY_F1
     }
 }
