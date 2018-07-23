@@ -14,4 +14,4 @@ hidden
 // level list (in order of appearance)
 level           "levels/cutscenes/allegro.lev"
 level           "levels/cutscenes/creativecommons.lev"
-level           "levels/menus/title_screen.lev"
+level           "levels/menus/title.lev"

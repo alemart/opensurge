@@ -39,7 +39,7 @@
 
 /* private data */
 #define CREDITS2_FILE               "config/credits2.dat"
-#define CREDITS2_BGFILE             "themes/credits2.bg"
+#define CREDITS2_BGFILE             "themes/credits.bg"
 static image_t *box;
 static int quit;
 static font_t *title, *text, *back;

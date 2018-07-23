@@ -48,7 +48,7 @@
 
 
 /* Uncomment to render the sensors */
-#define SHOW_SENSORS
+/*#define SHOW_SENSORS*/
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 4

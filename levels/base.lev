@@ -29,8 +29,8 @@ author "YOUR_NAME_HERE"
 version "1.0"
 requires "0.5.0"
 act 1
-theme "themes/brickset.brk"
-bgtheme "themes/default.bg"
+theme "themes/template.brk"
+bgtheme "themes/template.bg"
 spawn_point 210 9910
 music "musics/template.ogg"
 startup ".default_startup"
