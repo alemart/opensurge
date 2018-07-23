@@ -40,7 +40,7 @@
 
 /* private data */
 #define CREDITS_FILE               "config/credits.dat"
-#define CREDITS_BGFILE             "themes/credits.bg"
+#define CREDITS_BGFILE             "themes/menus/credits.bg"
 static image_t *box;
 static int quit;
 static font_t *title, *text, *back;

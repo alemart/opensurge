@@ -63,7 +63,7 @@ static int traverse(const parsetree_statement_t *stmt, void *stagedata);
 
 
 /* private data */
-#define STAGE_BGFILE             "themes/levelselect.bg"
+#define STAGE_BGFILE             "themes/menus/levelselect.bg"
 #define STAGE_MAXPERPAGE         (VIDEO_SCREEN_H / 30)
 #define STAGE_MAX                1024 /* can't have more than STAGE_MAX levels installed */
 static font_t *title; /* title */
