@@ -9,11 +9,11 @@ author "Alexandre"
 version "1.0"
 requires 0.2.0
 act 3
-theme "themes/template.brk"
-bgtheme "themes/sunshine.bg"
+theme "themes/legacy/template.brk"
+bgtheme "themes/legacy/sunshine.bg"
 spawn_point 64 5048
 music "musics/sunshine.ogg"
-grouptheme "themes/template.grp"
+grouptheme "themes/legacy/template.grp"
 startup ".default_startup"
 players "Surge"
 

@@ -9,11 +9,11 @@ author "Alexandre"
 version "1.0"
 requires 0.2.0
 act 1
-theme "themes/sunshine.brk"
-bgtheme "themes/sunshine.bg"
+theme "themes/legacy/sunshine.brk"
+bgtheme "themes/legacy/sunshine.bg"
 spawn_point 88 6400
 music "musics/sunshine.ogg"
-grouptheme "themes/sunshine.grp"
+grouptheme "themes/legacy/sunshine.grp"
 startup ".default_startup"
 players "Surge"
 waterlevel 6992

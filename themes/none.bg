@@ -17,7 +17,7 @@ background
 
     sprite
     {
-        source_file     images/fade_effect.png
+        source_file     images/blackscreen.png
         source_rect     0 0 320 240
         frame_size      320 240
 

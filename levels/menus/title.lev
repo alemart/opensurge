@@ -10,7 +10,7 @@ version "1.0"
 requires 0.2.0
 act 1
 theme "themes/none.brk"
-bgtheme "themes/title_screen.bg"
+bgtheme "themes/title.bg"
 spawn_point 0 0
 startup ".title_screen"
 players "none"

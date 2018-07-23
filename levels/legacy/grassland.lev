@@ -4,16 +4,16 @@
 // ------------------------------------------------------------
 
 // header
-name "Testland"
+name "Grassland"
 author "Celdecea & Alexandre"
 version "1.0"
 requires 0.2.0
 act 1
-theme "themes/grassland.brk"
-bgtheme "themes/grassland.bg"
+theme "themes/legacy/grassland.brk"
+bgtheme "themes/legacy/grassland.bg"
 spawn_point 296 4080
-music "musics/calm.ogg"
-grouptheme "themes/grassland.grp"
+music "musics/template.ogg"
+grouptheme "themes/legacy/grassland.grp"
 startup ".default_startup"
 players "Surge"
 waterlevel 5682
