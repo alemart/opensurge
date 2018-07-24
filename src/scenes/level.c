@@ -2601,29 +2601,35 @@ void editor_update()
     /* change brick layer */
     if(input_button_pressed(editor_keyboard3, IB_FIRE3)) {
         if(editor_cursor_entity_type == EDT_BRICK || editor_cursor_entity_type == EDT_GROUP) {
-            editor_layer = (editor_layer + 1) % 3;
+            if(!input_button_down(editor_keyboard3, IB_FIRE1))
+                editor_layer = (editor_layer + 1) % 3;
+            else
+                editor_layer = (editor_layer + 2) % 3;
             video_showmessage("Switched to %s layer", brick_util_layername(editor_layer));
         }
-        else {
+        else
             sound_play( soundfactory_get("deny") );
-            video_showmessage("Must be in brick/group mode");
-        }
     }
 
     /* change brick flip mode */
     if(input_button_pressed(editor_keyboard3, IB_FIRE4)) {
         if(editor_cursor_entity_type == EDT_BRICK) {
-            editor_flip = (editor_flip + 1) & BRF_VHFLIP;
+            if(!input_button_down(editor_keyboard3, IB_FIRE1)) {
+                int delta = (3 + editor_flip) / 2;
+                editor_flip = (editor_flip + delta) & BRF_VHFLIP;
+            }
+            else {
+                int delta = 2 + editor_flip + editor_flip / 2;
+                editor_flip = (editor_flip + delta) & BRF_VHFLIP;
+            }
             video_showmessage("Flip mode: %s", brick_util_flipstr(editor_flip));
         }
-        else {
+        else
             sound_play( soundfactory_get("deny") );
-            video_showmessage("Must be in brick/group mode");
-        }
     }
 
     /* help */
-     if(input_button_pressed(editor_keyboard3, IB_FIRE8)) {
+    if(input_button_pressed(editor_keyboard3, IB_FIRE8)) {
         scenestack_push(storyboard_get_scene(SCENE_EDITORHELP), NULL);
         return;
     }   
@@ -3015,7 +3021,7 @@ void editor_scroll()
     float dt = timer_get_delta();
 
     /* camera speed */
-    if(input_button_down(editor_keyboard, IB_FIRE3))
+    if(input_button_down(editor_keyboard3, IB_FIRE1))
         camera_speed = 5 * 750;
     else
         camera_speed = 750;
