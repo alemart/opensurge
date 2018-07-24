@@ -59,7 +59,7 @@ brick 2
     sprite
     {
         source_file     "images/brickset.png"
-        source_rect     176 128 80 192
+        source_rect     176 128 64 64
         frame_size      64 64
 
         animation
@@ -72,6 +72,27 @@ brick 2
 }
 
 brick 3
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     176 160 64 32
+        frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 4
 {
     type                OBSTACLE
     behavior            FALL 8 2
@@ -92,7 +113,7 @@ brick 3
     }
 }
 
-brick 4
+brick 5
 {
     type                OBSTACLE
     behavior            BREAKABLE 4 4
@@ -113,7 +134,7 @@ brick 4
     }
 }
 
-brick 5
+brick 6
 {
     type                OBSTACLE
     behavior            BREAKABLE 4 8
@@ -134,7 +155,7 @@ brick 5
     }
 }
 
-brick 6
+brick 7
 {
     type                OBSTACLE
     behavior            CIRCULAR 128 0 0.25 0.25 0
@@ -145,6 +166,27 @@ brick 6
         source_file     "images/brickset.png"
         source_rect     272 160 96 32
         frame_size      96 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 8
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     176 128 64 32
+        frame_size      64 32
 
         animation
         {

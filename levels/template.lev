@@ -25,10 +25,17 @@ brick 0 128 10000
 brick 0 192 10000
 brick 0 256 10000
 brick 0 320 10000
-brick 17 384 9936 hflip
+brick 2 320 9936 hflip
+brick 2 384 9936 hflip
+brick 2 384 9872 hflip
+brick 2 448 9936 hflip
+brick 0 384 10000
+brick 0 448 10000
+brick 0 512 10000
 brick 0 384 1000
 
 // item list
+item 2 416 9872
 
 // object list
 

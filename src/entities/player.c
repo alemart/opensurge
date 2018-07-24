@@ -1101,11 +1101,12 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* smoothing the angle */
     if(
-        physicsactor_get_movmode(pa) != MM_FLOOR ||
-        (!player_is_stopped(player) && !player_is_waiting(player) &&
+        (physicsactor_get_movmode(pa) != MM_FLOOR) || (
+        !player_is_stopped(player) && !player_is_waiting(player) &&
         !player_is_ducking(player) && !player_is_lookingup(player) &&
-        !player_is_jumping(player) && !player_is_rolling(player))
-    ) {
+        !player_is_jumping(player) && !player_is_rolling(player) &&
+        !player_is_pushing(player)
+    )) {
         float new_angle = physicsactor_get_angle(pa) / 57.2957795131f;
         if(ang_diff(new_angle, act->angle) < 1.6f)
             act->angle = lerp_angle(act->angle, new_angle, (ANGLE_SMOOTHING * PI * timer_get_delta()));
@@ -1144,7 +1145,7 @@ int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer)
 /* given two angles in [0, 2pi], return their difference */
 float ang_diff(float alpha, float beta)
 {
-    float twopi = PI * 2;
+    static const float twopi = PI * 2;
     float diff = fmod(fabs(alpha - beta), twopi);
     return min(twopi - diff, diff);
 }
