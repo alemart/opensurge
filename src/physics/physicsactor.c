@@ -724,16 +724,16 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* animation issues */
         if(fabs(pa->gsp) < walk_threshold) {
-            if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_DOWN))
+            if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_DOWN) && fabs(pa->gsp) < EPSILON)
                 pa->state = PAS_DUCKING;
-            else if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_UP))
+            else if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_UP) && fabs(pa->gsp) < EPSILON)
                 pa->state = PAS_LOOKINGUP;
             else if(pa->state != PAS_PUSHING && (input_button_down(pa->input, IB_LEFT) || input_button_down(pa->input, IB_RIGHT)))
                 pa->state = input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT) ? PAS_STOPPED : PAS_WALKING;
             else if((pa->state != PAS_PUSHING && pa->state != PAS_WAITING) || (pa->state == PAS_PUSHING && !input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)))
                 pa->state = PAS_STOPPED;
         }
-        else if(fabs(pa->gsp) >= 3.0f) {
+        else {
             if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING)
                 pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
             else if(pa->state == PAS_PUSHING)
