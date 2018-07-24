@@ -52,15 +52,15 @@ static const char text[] =
 "LCtrl + Z                          Undo\n"
 "LCtrl + Y                          Redo\n"
 "Mouse wheel or B/N                 Previous/next entity\n"
-"LCtrl + wheel or LCtrl + B/N       Previous/next edit mode\n"
-"LShift + wheel or LShift + B/N     Previous/next object category\n"
+"LShift + wheel or LShift + B/N     Previous/next edit mode\n"
+"LCtrl + wheel or LCtrl + B/N       Previous/next object category\n"
 "Hold Delete                        Eraser\n"
 "\n\n"
 "<color=00bbff>Tips</color>\n\n"
 "<color=ffff00>1)</color> There are 3 entity types: bricks, items and objects;\n"
-"<color=ffff00>2)</color> In order to pick up (or delete) an item, you must select the item mode. Same about bricks and custom objects;\n"
+"<color=ffff00>2)</color> In order to pick up (or delete) an item, you must select the item mode. Same about bricks and objects;\n"
 "<color=ffff00>3)</color> Hold Delete to get an eraser. The eraser will delete entities (depending on the edit mode) that are under the mouse cursor;\n"
-"<color=ffff00>4)</color> Loop system summary: Yellow activates yellow layer and disables green. Green activates green layer and disables yellow. Change layers by pressing L. Works with bricks and groups.\n"
+"<color=ffff00>4)</color> Loop system summary: Yellow activates yellow layer and disables green. Green activates green layer and disables yellow. Change brick layers by pressing L.\n"
 ;
 
 

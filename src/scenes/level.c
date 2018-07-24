@@ -2572,29 +2572,26 @@ void editor_update()
 
     /* change class / entity / object category */
     if(input_button_down(editor_keyboard, IB_FIRE3)) {
+        /* change object category - TODO: remove? */
+        if(editor_cursor_entity_type == EDT_ENEMY) {
+            if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
+                editor_next_object_category();
+            else if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
+                editor_previous_object_category();
+        }
+    }
+    else if(input_button_down(editor_keyboard3, IB_FIRE1)) {
         /* change class */
         if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
             editor_next_class();
-
-        if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
+        else if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
             editor_previous_class();
-    }
-    else if(input_button_down(editor_keyboard3, IB_FIRE1)) {
-        if(editor_cursor_entity_type == EDT_ENEMY) {
-            /* change object category */
-            if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
-                editor_next_object_category();
-
-            if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
-                editor_previous_object_category();
-        }
     }
     else {
         /* change entity */
         if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
             editor_next_entity();
-
-        if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
+        else if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
             editor_previous_entity();
     }
 
