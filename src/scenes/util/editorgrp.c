@@ -201,7 +201,7 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
         id = atoi(nanoparser_get_string(p1));
         x = atoi(nanoparser_get_string(p2));
         y = atoi(nanoparser_get_string(p3));
-        layer = p4 ? colorname2bricklayer(nanoparser_get_string(p4)) : BRL_DEFAULT;
+        layer = p4 ? brick_util_layercode(nanoparser_get_string(p4)) : BRL_DEFAULT;
 
         e.type = EDITORGRP_ENTITY_BRICK;
         e.id = id;

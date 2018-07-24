@@ -611,9 +611,9 @@ int level_save(const char *filepath)
                 brick_id(itb->data),
                 (int)(brick_spawnpoint(itb->data).x), (int)(brick_spawnpoint(itb->data).y),
                 brick_layer(itb->data) != BRL_DEFAULT ? " " : "",
-                brick_layer(itb->data) != BRL_DEFAULT ? bricklayer2colorname(brick_layer(itb->data)) : "",
+                brick_layer(itb->data) != BRL_DEFAULT ? brick_util_layername(brick_layer(itb->data)) : "",
                 brick_flip(itb->data) != BRF_NOFLIP ? " " : "",
-                brick_flip(itb->data) != BRF_NOFLIP ? brickflip2str(brick_flip(itb->data)) : ""
+                brick_flip(itb->data) != BRF_NOFLIP ? brick_util_flipstr(brick_flip(itb->data)) : ""
             );
         }
     }
@@ -818,10 +818,10 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 int x = atoi(param[1]);
                 int y = atoi(param[2]);
                 for(int j = 3; j < param_count; j++) {
-                    if(layer == BRL_DEFAULT && colorname2bricklayer(param[j]) != BRL_DEFAULT)
-                        layer = colorname2bricklayer(param[j]);
-                    else if(flip == BRF_NOFLIP && str2brickflip(param[j]) != BRF_NOFLIP)
-                        flip = str2brickflip(param[j]);
+                    if(layer == BRL_DEFAULT && brick_util_layercode(param[j]) != BRL_DEFAULT)
+                        layer = brick_util_layercode(param[j]);
+                    else if(flip == BRF_NOFLIP && brick_util_flipcode(param[j]) != BRF_NOFLIP)
+                        flip = brick_util_flipcode(param[j]);
                 }
 
                 if(brick_exists(id))
@@ -2602,7 +2602,7 @@ void editor_update()
     if(input_button_pressed(editor_keyboard3, IB_FIRE3)) {
         if(editor_cursor_entity_type == EDT_BRICK || editor_cursor_entity_type == EDT_GROUP) {
             editor_layer = (editor_layer + 1) % 3;
-            video_showmessage("Switched to %s layer", bricklayer2colorname(editor_layer));
+            video_showmessage("Switched to %s layer", brick_util_layername(editor_layer));
         }
         else {
             sound_play( soundfactory_get("deny") );
@@ -2614,7 +2614,7 @@ void editor_update()
     if(input_button_pressed(editor_keyboard3, IB_FIRE4)) {
         if(editor_cursor_entity_type == EDT_BRICK) {
             editor_flip = (editor_flip + 1) & BRF_VHFLIP;
-            video_showmessage("Flip mode: %s", brickflip2str(editor_flip));
+            video_showmessage("Flip mode: %s", brick_util_flipstr(editor_flip));
         }
         else {
             sound_play( soundfactory_get("deny") );
@@ -2852,7 +2852,7 @@ void editor_render()
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
-            image_draw_lit(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, bricklayer2color(editor_layer), 0.5f, IF_NONE);
+            image_draw_lit(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), 0.5f, IF_NONE);
 
         /* cursor coordinates */
         font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
@@ -3100,8 +3100,8 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
                 brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 sprintf(buf,
                     "type: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
-                    brick_get_type_name(brick_type(x)),
-                    brick_get_behavior_name(brick_behavior(x)),
+                    brick_util_typename(brick_type(x)),
+                    brick_util_behaviorname(brick_behavior(x)),
                     (int)brick_size(x).x,
                     (int)brick_size(x).y,
                     brick_zindex(x)

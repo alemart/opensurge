@@ -106,16 +106,16 @@ void brick_kill(brick_t* brk); /* kills a brick */
 int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
 
 /* brick utilities */
-int brick_exists(int id); /* does a brick with the given id exist? */
-uint32 bricklayer2color(bricklayer_t layer);
-const char* bricklayer2colorname(bricklayer_t layer);
-bricklayer_t colorname2bricklayer(const char *name);
-const char* brickflip2str(brickflip_t flip);
-brickflip_t str2brickflip(const char* str);
+int brick_exists(int id); /* does a brick with the given id exist in the brickset? */
+uint32 brick_util_layercolor(bricklayer_t layer);
+bricklayer_t brick_util_layercode(const char *name);
+brickflip_t brick_util_flipcode(const char* str);
+const char* brick_util_typename(bricktype_t type); /* type name */
+const char* brick_util_behaviorname(brickbehavior_t behavior); /* behavior name */
+const char* brick_util_layername(bricklayer_t layer); /* layer name */
+const char* brick_util_flipstr(brickflip_t flip); /* flip string */
 v2d_t brick_movable_platform_offset(const brick_t *brk); /* movable platforms must move actors on top of them. Returns a delta_space vector */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
-const char* brick_get_type_name(bricktype_t type); /* type name */
-const char* brick_get_behavior_name(brickbehavior_t behavior); /* behavior name */
 const image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
 
