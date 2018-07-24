@@ -723,7 +723,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->gsp += pa->slp * -SIN(pa->angle) * dt;
 
         /* animation issues */
-        if(fabs(pa->gsp) < walk_threshold && pa->angle == 0x0) {
+        if(fabs(pa->gsp) < walk_threshold) {
             if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_DOWN))
                 pa->state = PAS_DUCKING;
             else if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_UP))
