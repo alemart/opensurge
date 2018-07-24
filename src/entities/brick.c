@@ -407,7 +407,7 @@ void brick_render(brick_t *brk, v2d_t camera_position)
     if(brk->layer == BRL_DEFAULT || !level_editmode())
         image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), image_flags(brk));
     else
-        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), bricklayer2color(brk->layer), 0.5f, image_flags(brk));
+        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), 0.5f, image_flags(brk));
 }
 
 
@@ -631,10 +631,10 @@ int brick_is_alive(const brick_t* brk)
 }
 
 /*
- * brick_get_type_name()
+ * brick_util_typename()
  * Returns the name of a given brick type
  */
-const char* brick_get_type_name(bricktype_t type)
+const char* brick_util_typename(bricktype_t type)
 {
     switch(type) {
         case BRK_PASSABLE:
@@ -654,10 +654,10 @@ const char* brick_get_type_name(bricktype_t type)
 
 
 /*
- * brick_get_behavior_name()
+ * brick_util_behaviorname()
  * Returns the name of a given brick behavior
  */
-const char* brick_get_behavior_name(brickbehavior_t behavior)
+const char* brick_util_behaviorname(brickbehavior_t behavior)
 {
     switch(behavior) {
         case BRB_DEFAULT:
@@ -678,7 +678,7 @@ const char* brick_get_behavior_name(brickbehavior_t behavior)
 }
 
 /* utilities */
-uint32 bricklayer2color(bricklayer_t layer)
+uint32 brick_util_layercolor(bricklayer_t layer)
 {
     switch(layer) {
         case BRL_GREEN:     return image_rgb(0,255,0);
@@ -687,7 +687,7 @@ uint32 bricklayer2color(bricklayer_t layer)
     }
 }
 
-const char* bricklayer2colorname(bricklayer_t layer)
+const char* brick_util_layername(bricklayer_t layer)
 {
     switch(layer) {
         case BRL_GREEN:     return "green";
@@ -696,7 +696,7 @@ const char* bricklayer2colorname(bricklayer_t layer)
     }
 }
 
-bricklayer_t colorname2bricklayer(const char *name)
+bricklayer_t brick_util_layercode(const char *name)
 {
     if(str_icmp(name, "green") == 0)
         return BRL_GREEN;
@@ -706,7 +706,7 @@ bricklayer_t colorname2bricklayer(const char *name)
         return BRL_DEFAULT;
 }
 
-const char* brickflip2str(brickflip_t flip)
+const char* brick_util_flipstr(brickflip_t flip)
 {
     switch(flip) {
         case BRF_HFLIP:     return "hflip";
@@ -716,7 +716,7 @@ const char* brickflip2str(brickflip_t flip)
     }
 }
 
-brickflip_t str2brickflip(const char* str)
+brickflip_t brick_util_flipcode(const char* str)
 {
     if(str_icmp(str, "hflip") == 0)
         return BRF_HFLIP;
