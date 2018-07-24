@@ -1103,6 +1103,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     if(
         physicsactor_get_movmode(pa) != MM_FLOOR ||
         (!player_is_stopped(player) && !player_is_waiting(player) &&
+        !player_is_ducking(player) && !player_is_lookingup(player) &&
         !player_is_jumping(player) && !player_is_rolling(player))
     ) {
         float new_angle = physicsactor_get_angle(pa) / 57.2957795131f;
