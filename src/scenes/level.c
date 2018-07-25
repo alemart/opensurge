@@ -810,13 +810,14 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'readonly' expects no parameters");
     }
     else if(str_icmp(identifier, "brick") == 0) {
-        if(param_count >= 3 && param_count <= 4) {
-            if(str_icmp(theme, "") != 0) {
+        if(param_count >= 3) {
+            if(*theme != 0) {
                 bricklayer_t layer = BRL_DEFAULT;
                 brickflip_t flip = BRF_NOFLIP;
                 int id = atoi(param[0]);
                 int x = atoi(param[1]);
                 int y = atoi(param[2]);
+
                 for(int j = 3; j < param_count; j++) {
                     if(layer == BRL_DEFAULT && brick_util_layercode(param[j]) != BRL_DEFAULT)
                         layer = brick_util_layercode(param[j]);
