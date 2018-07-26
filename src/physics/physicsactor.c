@@ -247,7 +247,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->rolldec =               0.125f      * fpsmul * fpsmul ;
     pa->rolluphillslp =         0.07812f    * fpsmul * fpsmul ;
     pa->rolldownhillslp =       0.3125f     * fpsmul * fpsmul ;
-    pa->falloffthreshold =      2.5f        * fpsmul * 1.0f   ;
+    pa->falloffthreshold =      0.625f        * fpsmul * 1.0f   ;
     pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
     
@@ -681,8 +681,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     pa->state = PAS_WALKING;
             }
         }
-
-        if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT) && pa->gsp <= 0.0f) {
+        else if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT) && pa->gsp <= 0.0f) {
             if(pa->gsp > -pa->topspeed) {
                 pa->gsp -= pa->acc * dt;
                 if(pa->gsp <= -pa->topspeed) {
@@ -695,13 +694,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* deceleration / braking */
-        if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f && (pa->angle % 0x40 == 0x0 || !pa->facing_right)) {
+        if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
             pa->gsp += pa->dec * dt;
             if(fabs(pa->gsp) >= pa->brakingthreshold)
                 pa->state = PAS_BRAKING;
         }
-
-        if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f && (pa->angle % 0x40 == 0x0 || pa->facing_right)) {
+        else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
             pa->gsp -= pa->dec * dt;
             if(fabs(pa->gsp) >= pa->brakingthreshold)
                 pa->state = PAS_BRAKING;
@@ -772,7 +770,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->angle % 0x40 == 0) {
 
             /* deceleration */
-            if(pa->angle == 0) {
+            if(pa->angle == 0x0) {
                 if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f)
                     pa->gsp = min(0.0f, pa->gsp + pa->rolldec * dt);
                 else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f)
@@ -789,6 +787,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             if(fabs(pa->gsp) < pa->unrollthreshold)
                 pa->state = PAS_WALKING;
         }
+
+        /* face right? */
+        pa->facing_right = (pa->gsp >= 0.0f);
     }
 
     /*
@@ -807,13 +808,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->ysp = pa->gsp * -SIN(pa->angle);
 
         /* BUGGED? falling off walls and ceilings */
-        if(fabs(pa->gsp) < pa->falloffthreshold * 0.25f && pa->angle >= 0x40 && pa->angle <= 0xC0) {
-            if(pa->movmode == MM_RIGHTWALL) pa->position.x += 5;
-            else if(pa->movmode == MM_LEFTWALL) pa->position.x -= 4;
-            /*pa->gsp = 0.0f;*/
-            pa->angle = 0x0;
-            UPDATE_MOVMODE();
-            pa->horizontal_control_lock_timer = 0.5f;
+        if(fabs(pa->gsp) < pa->falloffthreshold) {
+            if(pa->movmode != MM_FLOOR) {
+                pa->horizontal_control_lock_timer = 0.5f;
+                if(pa->angle >= 0x40 && pa->angle <= 0xC0) {
+                    pa->angle = 0x0;
+                    UPDATE_MOVMODE();
+                }
+            }
         }
     }
 
@@ -1005,21 +1007,24 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* sticky physics */
-    if(pa->in_the_air && !was_in_the_air) {
-        int u = fabs(pa->gsp) > pa->topspeed && pa->state != PAS_JUMPING ? 5 : 2;
+    if(pa->in_the_air && !was_in_the_air && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) {
         v2d_t offset = v2d_new(0,0);
+        float u = 4.0f;
 
-        if(pa->state != PAS_JUMPING && ((pa->facing_right && pa->angle < 0x40) || (!pa->facing_right && pa->angle > 0xC0)))
-            u += 2;
+        /* mystery */
+        u *= pa->topspeed / 360.0f;
+        if(fabs(pa->gsp) > pa->topspeed)
+            u *= fabs(pa->gsp) / pa->topspeed;
 
+        /* computing the test offset */
         if(pa->movmode == MM_FLOOR)
             offset = v2d_new(0,u);
-        else if(pa->movmode == MM_LEFTWALL)
-            offset = v2d_new(-u,0);
         else if(pa->movmode == MM_CEILING)
             offset = v2d_new(0,-u);
         else if(pa->movmode == MM_RIGHTWALL)
             offset = v2d_new(u,0);
+        else if(pa->movmode == MM_LEFTWALL)
+            offset = v2d_new(-u,0);
 
         /* offset the character */
         pa->position = v2d_add(pa->position, offset);
@@ -1027,7 +1032,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         UPDATE_MOVMODE();
         UPDATE_SENSORS();
 
-        /* undo the offset */
+        /* if the player is still in the air,
+           undo the offset */
         if(pa->in_the_air) {
             pa->position = v2d_subtract(pa->position, offset);
             UPDATE_ANGLE(NULL);

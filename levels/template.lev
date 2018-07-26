@@ -11,10 +11,10 @@ requires 0.5.0
 act 1
 theme "themes/template.brk"
 bgtheme "themes/template.bg"
-spawn_point 208 9968
+spawn_point 216 9976
 music "musics/template.ogg"
 startup ".default_startup"
-players "Surge" "Neon" "Charge"
+players "Surge" "Neon"
 waterlevel 10944
 
 // dialog regions (xpos ypos width height title message)
@@ -1567,6 +1567,7 @@ brick 51 2656 9968
 brick 51 2704 9984
 brick 51 2752 10000
 brick 51 2640 9712
+brick 0 2624 10000
 brick 3 1984 10096
 brick 3 1984 10064
 brick 0 1984 10128
@@ -1605,6 +1606,10 @@ brick 3 2352 10112
 brick 3 2352 10144
 brick 3 2352 10176
 brick 0 1984 10288
+brick 22 2480 10128
+brick 0 2416 10128
+brick 0 2416 10064
+brick 0 2416 10000
 brick 0 1344 10064
 brick 22 1472 10064
 brick 0 1408 10064
@@ -2080,6 +2085,7 @@ item 50 2416 9904
 item 50 2048 9984
 item 0 1936 9952
 item 0 1984 9952
+item 43 1944 10128
 item 0 1808 10112
 item 0 1856 10112
 item 0 1904 10112

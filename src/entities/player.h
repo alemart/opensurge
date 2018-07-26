@@ -72,7 +72,7 @@ struct player_t {
     int attacking; /* this is set by the user, and if it's true, player_is_attacking() will return true */
 
     /* magic glasses */
-    int got_glasses; /* got glasses? */
+    int got_glasses;
 
     /* shields */
     int shield_type;
@@ -103,6 +103,7 @@ struct player_t {
     int blinking;
     float blink_timer;
     float blink_visibility_timer;
+    v2d_t hot_spot;
 };
 
 /* public functions */

@@ -93,7 +93,6 @@ player_t *player_create(const char *character_name)
 
     /* initializing... */
     p->name = str_dup(character_name);
-    p->actor = actor_create();
     p->disable_movement = FALSE;
     p->disable_roll = FALSE;
     p->in_locked_area = FALSE;
@@ -102,12 +101,14 @@ player_t *player_create(const char *character_name)
     p->disable_collectible_loss = FALSE;
     p->disable_animation_control = FALSE;
     p->attacking = FALSE;
+    p->actor = actor_create();
     p->actor->input = input_create_user(NULL);
     CHANGE_ANIM(stopped);
 
     /* auxiliary variables */
     p->on_movable_platform = FALSE;
     p->got_glasses = FALSE;
+    p->hot_spot = p->actor->hot_spot;
 
     /* blink */
     p->blinking = FALSE;
@@ -206,9 +207,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     int i;
     actor_t *act = player->actor;
     float dt = timer_get_delta();
-
-    /* "gambiarra" */
-    /*act->hot_spot = v2d_new(image_width(actor_image(act))/2, image_height(actor_image(act))-20);*/
 
     /* physics */
     if(!player->disable_movement) {
@@ -1012,8 +1010,18 @@ void update_animation(player_t *p)
         sound_play( charactersystem_get(p->name)->sample.brake );
     }
 
-    /* "gambiarra" */
-    p->actor->hot_spot = v2d_new(image_width(actor_image(p->actor))/2, image_height(actor_image(p->actor))-20);
+    /* hotspot "gambiarra" */
+    p->actor->hot_spot = p->hot_spot;
+    if(physicsactor_get_angle(p->pa) % 90 != 0 && !physicsactor_is_in_the_air(p->pa)) {
+        physicsactorstate_t state = physicsactor_get_state(p->pa);
+        if(!(
+            state == PAS_STOPPED || state == PAS_WAITING ||
+            state == PAS_LEDGE || state == PAS_ROLLING ||
+            state == PAS_DUCKING || state == PAS_LOOKINGUP ||
+            state == PAS_PUSHING || state == PAS_WINNING
+        ))
+            p->actor->hot_spot.y = p->hot_spot.y - 2;
+    }
 }
 
 /* the interface between player_t and physicsactor_t */
@@ -1100,12 +1108,11 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     act->speed = physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player) ? v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa)) : v2d_new(physicsactor_get_gsp(pa), 0.0f);
 
     /* smoothing the angle */
-    if(
-        (physicsactor_get_movmode(pa) != MM_FLOOR) || (
-        !player_is_stopped(player) && !player_is_waiting(player) &&
-        !player_is_ducking(player) && !player_is_lookingup(player) &&
-        !player_is_jumping(player) && !player_is_rolling(player) &&
-        !player_is_pushing(player)
+    if(physicsactor_get_movmode(pa) != MM_FLOOR || !(
+       player_is_stopped(player) || player_is_waiting(player) ||
+       player_is_ducking(player) || player_is_lookingup(player) ||
+       player_is_jumping(player) || player_is_rolling(player) ||
+       player_is_pushing(player)
     )) {
         float new_angle = physicsactor_get_angle(pa) / 57.2957795131f;
         if(ang_diff(new_angle, act->angle) < 1.6f)
@@ -1116,7 +1123,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     else
         act->angle = 0.0f;
 
-    /* misc */
+    /* mirroring */
     act->mirror = !physicsactor_is_facing_right(pa) ? IF_HFLIP : IF_NONE;
 }
 

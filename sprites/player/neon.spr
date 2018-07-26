@@ -6,7 +6,7 @@ sprite SD_NEON
     source_file     images/neon.png
     source_rect     0 0 500 600
     frame_size      50 50
-    hot_spot        25 50
+    hot_spot        25 30
 
     // stopped
     animation 0
