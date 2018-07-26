@@ -319,8 +319,6 @@ static int editor_grid_enabled; /* is the grid enabled? */
 static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
-static void editor_grid_render();
-
 static v2d_t editor_grid_size(); /* returns the size of the grid */
 static v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
 
@@ -2838,9 +2836,6 @@ void editor_render()
     /* background */
     editor_render_background();
 
-    /* grid */
-    editor_grid_render();
-
     /* path of the movable platforms */
     editor_movable_platforms_path_render(major_bricks);
 
@@ -3445,36 +3440,6 @@ void editor_grid_update()
 {
     if(input_button_pressed(editor_keyboard2, IB_FIRE3))
         editor_grid_enabled = !editor_grid_enabled;
-}
-
-
-/* renders the grid */
-void editor_grid_render()
-{
-    if(editor_grid_enabled) {
-        int i, j;
-        image_t *grid;
-        uint32 color;
-        v2d_t v, topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-
-        /* creating the grid image */
-        grid = image_create(EDITOR_GRID_W, EDITOR_GRID_H);
-        color = image_rgb(0, 128, 160);
-        image_clear(grid, video_get_maskcolor());
-        image_line(grid, EDITOR_GRID_W-1, 0, EDITOR_GRID_W-1, EDITOR_GRID_H-1, color);
-        image_line(grid, 0, EDITOR_GRID_H-1, EDITOR_GRID_W-1, EDITOR_GRID_H-1, color);
-
-        /* drawing the grid... */
-        for(i=0; i<=VIDEO_SCREEN_W/image_width(grid); i++) {
-            for(j=0; j<=VIDEO_SCREEN_H/image_height(grid); j++) {
-                v = v2d_subtract(editor_grid_snap(v2d_new(i*image_width(grid), j*image_height(grid))), topleft);
-                image_draw(grid, video_get_backbuffer(), (int)v.x, (int)v.y, IF_NONE);
-            }
-        }
-
-        /* done! */
-        image_destroy(grid);
-    }
 }
 
 

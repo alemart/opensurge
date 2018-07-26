@@ -42,7 +42,7 @@ static const char text[] =
 "LShift + Arrows or LShift + WASD   Move the camera (faster)\n"
 "L / LShift + L                     Switch brick layer\n"
 "F / LShift + F                     Flip brick\n"
-"G                                  Enable/disable the grid\n"
+"G                                  Snap to grid\n"
 "\n\n"
 "<color=00bbff>Entity placement</color>\n\n"
 "Left mouse button                  Create an entity\n"
