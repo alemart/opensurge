@@ -124,7 +124,7 @@ CREDITS2_TITLE              "<color=$COLOR_MENUTITLE>CREDITS</color>"
 CREDITS2_KEY                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
 
 // Creative Commons screen
-CC_DISCLAIMER               "Game assets under the CC"
+CC_DISCLAIMER               "Game assets under the CC-BY"
 
 // ======================= INPUT DEVICES ====================
 
@@ -260,7 +260,7 @@ STRING_113          "I will. Now, hurry!"
 STRING_114          "Go!"
 
 // Sunshine Paradise act 1
-STRING_130          "shhhhht! Nobody is supposed to see me in this game! Here, take <color=ffff00>50 rings</color> and go away."
+STRING_130          "shhhhht! Nobody is supposed to see me in this game! Here, take <color=ffff00>50 batteries</color> and go away."
 STRING_131          "GET LOST!"
 
 // cutscene 2: Sunshine Paradise, between act 1 and 2
