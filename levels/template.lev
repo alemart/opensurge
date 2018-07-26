@@ -11,7 +11,7 @@ requires 0.5.0
 act 1
 theme "themes/template.brk"
 bgtheme "themes/template.bg"
-spawn_point 216 9976
+spawn_point 2432 9984
 music "musics/template.ogg"
 startup ".default_startup"
 players "Surge" "Neon"
@@ -1568,6 +1568,9 @@ brick 51 2704 9984
 brick 51 2752 10000
 brick 51 2640 9712
 brick 0 2624 10000
+brick 2 2624 9936
+brick 2 2624 9872
+brick 2 2624 9744
 brick 3 1984 10096
 brick 3 1984 10064
 brick 0 1984 10128
@@ -1610,6 +1613,10 @@ brick 22 2480 10128
 brick 0 2416 10128
 brick 0 2416 10064
 brick 0 2416 10000
+brick 2 2416 9936
+brick 2 2416 9872
+brick 2 2416 9808
+brick 2 2416 9744
 brick 0 1344 10064
 brick 22 1472 10064
 brick 0 1408 10064

@@ -266,11 +266,11 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->M_intheair = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
     pa->U_intheair = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-7, 0, 20, image_rgb(0,255,0));
-    pa->B_jumproll = sensor_create_vertical(7, 0, 20, image_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-7, -10, 0, image_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(7, -10, 0, image_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
+    pa->A_jumproll = sensor_create_vertical(-7, 0, 14, image_rgb(0,255,0));
+    pa->B_jumproll = sensor_create_vertical(7, 0, 14, image_rgb(255,255,0));
+    pa->C_jumproll = sensor_create_vertical(-7, -14, 0, image_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(7, -14, 0, image_rgb(128,128,0));
+    pa->M_jumproll = sensor_create_horizontal(0, -9, 9, image_rgb(255,0,0));
     pa->U_jumproll = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
 
     /* success!!! ;-) */
@@ -465,7 +465,10 @@ void physicsactor_spring(physicsactor_t *pa)
 
 void physicsactor_roll(physicsactor_t *pa)
 {
-    pa->state = PAS_ROLLING;
+    /*pa->state = PAS_ROLLING;*/
+    pa->gsp = sign(pa->gsp) * pa->rollthreshold;
+    pa->state = PAS_WALKING;
+    input_simulate_button_down(pa->input, IB_DOWN);
 }
 
 void physicsactor_drown(physicsactor_t *pa)
@@ -520,7 +523,7 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(brakingthreshold)
 #define GENERATE_SENSOR_ACCESSOR(x) \
 const sensor_t* sensor_##x(const physicsactor_t *pa) \
 { \
-    if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) \
+    if(pa->state == PAS_JUMPING  || pa->state == PAS_ROLLING) \
         return pa->x##_jumproll; \
     else if(pa->in_the_air || pa->state == PAS_SPRINGING) \
         return pa->x##_intheair; \
@@ -753,8 +756,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(!pa->in_the_air && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
 
         /* start rolling */
-        if(fabs(pa->gsp) > pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
+        if(fabs(pa->gsp) > pa->rollthreshold && input_button_down(pa->input, IB_DOWN)) {
+            const sensor_t *s1 = sensor_A(pa), *s2 = pa->A_jumproll;
+            int delta = sensor_get_y2(s1) - sensor_get_y2(s2);
+            pa->position.x += delta * SIN(pa->angle);
+            pa->position.y += delta * COS(pa->angle);
             pa->state = PAS_ROLLING;
+        }
 
     }
 
