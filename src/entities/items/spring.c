@@ -192,7 +192,7 @@ void volatilespring_strategy(item_t *item, player_t *player)
 /* springs using the classic strategy are activated when you jump on them */
 void classicspring_strategy(item_t *item, player_t *player)
 {
-    if(player->actor->speed.y >= 1.0f)
+    if(player->actor->speed.y >= 1.0f || fabs(player->actor->angle) > EPSILON)
         activate_spring((spring_t*)item, player);
 }
 

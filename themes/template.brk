@@ -76,6 +76,7 @@ brick 3
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/brickset_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -294,7 +295,7 @@ brick 20
     sprite
     {
         source_file     "images/brickset.png"
-        source_rect     304 320 64 64
+        source_rect     336 320 64 64
         frame_size      64 64
 
         animation
@@ -316,6 +317,27 @@ brick 21
     {
         source_file     "images/brickset.png"
         source_rect     400 320 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 22
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/brickset_mask.png"
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     272 320 64 64
         frame_size      64 64
 
         animation
@@ -444,6 +466,7 @@ brick 48
 {
     type                PASSABLE
     behavior            DEFAULT
+    zindex              0.3
 
     sprite
     {
@@ -456,6 +479,68 @@ brick 48
             repeat      TRUE
             fps         8
             data        0
+        }
+    }
+}
+
+brick 49
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              0.35
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     272 1120 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 50
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              0.75
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     272 1184 64 64
+        frame_size      64 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 51
+{
+    type                PASSABLE
+    behavior            DEFAULT
+
+    sprite
+    {
+        source_file     "images/brickset.png"
+        source_rect     336 1120 128 128
+        frame_size      16 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         15
+            data        0 7 6 5 4 3 2 1
         }
     }
 }
