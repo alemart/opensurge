@@ -4,7 +4,6 @@
 //
 // File:   quests/default.qst
 // Desc:   this is the default quest
-// Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
 // quest properties
@@ -13,5 +12,4 @@ hidden
 
 // level list (in order of appearance)
 <options>
-//level           "levels/sunshine.lev"
-//level           "levels/sunshine3.lev"
+level           "levels/template.lev"
