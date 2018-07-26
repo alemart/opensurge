@@ -171,7 +171,7 @@ object ".title_screen.website"
 
     state "display"
     {
-        textout_right "menu.footer" 0 0 "$ENGINE_WEBSITE"
+        textout_right "menu.main" 0 0 "$ENGINE_WEBSITE"
     }
 }
 
