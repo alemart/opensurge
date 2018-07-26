@@ -3449,7 +3449,7 @@ v2d_t editor_grid_size()
     if(!editor_grid_enabled)
         return v2d_new(1,1);
     else
-        return v2d_new(16,16);
+        return v2d_new(8,8);
 }
 
 /* aligns position to a cell in the grid */
