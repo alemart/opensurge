@@ -18,6 +18,9 @@ object ".default_startup.camera"
 
     state "main"
     {
+        // this object is obsolete.
+        destroy
+
         hide
         set_animation SD_CAMERA 2
         set_zindex 1.1
