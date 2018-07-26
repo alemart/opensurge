@@ -460,6 +460,7 @@ void physicsactor_bounce(physicsactor_t *pa)
 void physicsactor_spring(physicsactor_t *pa)
 {
     pa->state = PAS_SPRINGING;
+    //pa->angle = 0x0;
 }
 
 void physicsactor_roll(physicsactor_t *pa)
