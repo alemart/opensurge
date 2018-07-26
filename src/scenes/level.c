@@ -3438,8 +3438,10 @@ void editor_grid_release()
 /* updates the grid module */
 void editor_grid_update()
 {
-    if(input_button_pressed(editor_keyboard2, IB_FIRE3))
+    if(input_button_pressed(editor_keyboard2, IB_FIRE3)) {
         editor_grid_enabled = !editor_grid_enabled;
+        video_showmessage("Snap to grid: %s", editor_grid_enabled ? "ON" : "OFF");
+    }
 }
 
 
