@@ -247,7 +247,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->rolldec =               0.125f      * fpsmul * fpsmul ;
     pa->rolluphillslp =         0.07812f    * fpsmul * fpsmul ;
     pa->rolldownhillslp =       0.3125f     * fpsmul * fpsmul ;
-    pa->falloffthreshold =      0.625f        * fpsmul * 1.0f   ;
+    pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
     pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
     
@@ -270,8 +270,8 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->B_jumproll = sensor_create_vertical(7, 0, 14, image_rgb(255,255,0));
     pa->C_jumproll = sensor_create_vertical(-7, -14, 0, image_rgb(0,128,0));
     pa->D_jumproll = sensor_create_vertical(7, -14, 0, image_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -9, 9, image_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
+    pa->M_jumproll = sensor_create_horizontal(0, -8, 8, image_rgb(255,0,0));
+    pa->U_jumproll = sensor_create_horizontal(-14, -7, 7, image_rgb(255,255,255));
 
     /* success!!! ;-) */
     return pa;
@@ -460,7 +460,6 @@ void physicsactor_bounce(physicsactor_t *pa)
 void physicsactor_spring(physicsactor_t *pa)
 {
     pa->state = PAS_SPRINGING;
-    /*pa->angle = 0x0;*/
 }
 
 void physicsactor_roll(physicsactor_t *pa)
@@ -756,7 +755,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(!pa->in_the_air && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
 
         /* start rolling */
-        if(fabs(pa->gsp) > pa->rollthreshold && input_button_down(pa->input, IB_DOWN)) {
+        if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN)) {
             const sensor_t *s1 = sensor_A(pa), *s2 = pa->A_jumproll;
             int delta = sensor_get_y2(s1) - sensor_get_y2(s2);
             pa->position.x += delta * SIN(pa->angle);
