@@ -264,8 +264,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         int invangle[PLAYER_MAX_INVSTAR];
         v2d_t starpos;
 
-        player->invtimer += dt;
-
         for(i=0; i<PLAYER_MAX_INVSTAR; i++) {
             invangle[i] = (180*4) * timer_get_ticks()*0.001 + (i+1)*(360/PLAYER_MAX_INVSTAR);
             starpos.x = 25*cos(invangle[i]*PI/180);
@@ -276,6 +274,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             actor_change_animation_frame(player->invstar[i], random(maxf));
         }
 
+        player->invtimer += dt;
         if(player->invtimer >= PLAYER_MAX_INVINCIBILITY)
             player->invincible = FALSE;
     }
@@ -290,7 +289,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * 2.0f);
             physicsactor_set_air(pa, physicsactor_get_air(pa) * 2.0f);
             physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * 2.0f);
-            player->speedshoes_timer += dt;
         }
         else if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES) {
             physicsactor_set_acc(pa, physicsactor_get_acc(pa) / 2.0f);
@@ -300,8 +298,8 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) / 2.0f);
             player->got_speedshoes = FALSE;
         }
-        else
-            player->speedshoes_timer += dt;
+
+        player->speedshoes_timer += dt;
     }
 
     /* animation */
@@ -335,22 +333,31 @@ void player_render(player_t *player, v2d_t camera_position)
             actor_render(player->invstar[i], camera_position);
     }
 
+    /* hotspot "gambiarra" */
+    if(!player_is_rolling(player)) {
+        switch(physicsactor_get_movmode(player->pa)) {
+            case MM_FLOOR: act->hot_spot.y += 1; break;
+            case MM_LEFTWALL: act->hot_spot.x -= 2; break;
+            case MM_RIGHTWALL: act->hot_spot.x += 1; break;
+            case MM_CEILING: act->hot_spot.y -= 2; break;
+        }
+    }
+    else {
+        /* FIXME: rolling delta */
+        /* the difference of the height of the (foot) sensors */
+        act->hot_spot.y += 6;
+        if(physicsactor_get_angle(player->pa) % 90 == 0) {
+            switch(physicsactor_get_movmode(player->pa)) {
+                case MM_FLOOR: act->hot_spot.y += 1; break;
+                case MM_LEFTWALL: act->hot_spot.x -= 2; break;
+                case MM_RIGHTWALL: act->hot_spot.x += 1; break;
+                case MM_CEILING: act->hot_spot.y -= 2; break;
+            }
+        }
+    }
+
     /* render the player */
-    switch(physicsactor_get_movmode(player->pa)) {
-        case MM_FLOOR: act->position.y -= 1; break;
-        case MM_LEFTWALL: act->position.x += 2; break;
-        case MM_RIGHTWALL: act->position.x -= 1; break;
-        case MM_CEILING: act->position.y += 2; break;
-    }
-
     actor_render(act, camera_position);
-
-    switch(physicsactor_get_movmode(player->pa)) {
-        case MM_FLOOR: act->position.y += 1; break;
-        case MM_LEFTWALL: act->position.x -= 2; break;
-        case MM_RIGHTWALL: act->position.x += 1; break;
-        case MM_CEILING: act->position.y -= 2; break;
-    }
 
     /* render the shield */
     if(player->shield_type != SH_NONE)
@@ -361,6 +368,9 @@ void player_render(player_t *player, v2d_t camera_position)
         if(!behind_player[i])
             actor_render(player->invstar[i], camera_position);
     }
+
+    /* undo hotspot "gambiarra" */
+    act->hot_spot = player->hot_spot;
 
 #ifdef SHOW_SENSORS
     /* sensors */
@@ -1011,17 +1021,22 @@ void update_animation(player_t *p)
     }
 
     /* hotspot "gambiarra" */
-    p->actor->hot_spot = p->hot_spot;
-    if(physicsactor_get_angle(p->pa) % 90 != 0 && !physicsactor_is_in_the_air(p->pa)) {
-        physicsactorstate_t state = physicsactor_get_state(p->pa);
-        if(!(
-            state == PAS_STOPPED || state == PAS_WAITING ||
-            state == PAS_LEDGE || state == PAS_ROLLING ||
-            state == PAS_DUCKING || state == PAS_LOOKINGUP ||
-            state == PAS_PUSHING || state == PAS_WINNING
-        ))
-            p->actor->hot_spot.y = p->hot_spot.y - 2;
+    if(physicsactor_get_angle(p->pa) % 90 != 0) {
+        if(!physicsactor_is_in_the_air(p->pa)) {
+            physicsactorstate_t state = physicsactor_get_state(p->pa);
+            if(!(
+                state == PAS_STOPPED || state == PAS_WAITING ||
+                state == PAS_LEDGE || state == PAS_ROLLING ||
+                state == PAS_DUCKING || state == PAS_LOOKINGUP ||
+                state == PAS_PUSHING || state == PAS_WINNING
+            )) {
+                p->actor->hot_spot.x = p->hot_spot.x;
+                p->actor->hot_spot.y = p->hot_spot.y - 2;
+            }
+        }
     }
+    else
+        p->actor->hot_spot = p->hot_spot;
 }
 
 /* the interface between player_t and physicsactor_t */
@@ -1108,15 +1123,17 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     act->speed = physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player) ? v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa)) : v2d_new(physicsactor_get_gsp(pa), 0.0f);
 
     /* smoothing the angle */
-    if(physicsactor_get_movmode(pa) != MM_FLOOR || !(
-       player_is_stopped(player) || player_is_waiting(player) ||
-       player_is_ducking(player) || player_is_lookingup(player) ||
-       player_is_jumping(player) || player_is_rolling(player) ||
-       player_is_pushing(player)
-    )) {
-        float new_angle = physicsactor_get_angle(pa) / 57.2957795131f;
-        if(ang_diff(new_angle, act->angle) < 1.6f)
-            act->angle = lerp_angle(act->angle, new_angle, (ANGLE_SMOOTHING * PI * timer_get_delta()));
+    if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
+        player_is_stopped(player) || player_is_waiting(player) ||
+        player_is_ducking(player) || player_is_lookingup(player) ||
+        player_is_jumping(player) || player_is_pushing(player)
+    )) && !player_is_rolling(player)) {
+        int degrees = physicsactor_get_angle(pa);
+        float new_angle = degrees / 57.2957795131f;
+        if(ang_diff(new_angle, act->angle) < 1.6f) {
+            float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
+            act->angle = lerp_angle(act->angle, new_angle, t);
+        }
         else
             act->angle = new_angle;
     }
