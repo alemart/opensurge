@@ -15,12 +15,19 @@
         <link rel="shortcut icon" href="favicon.ico">
         <style>
         html, body { height: 100%; margin: 0; padding: 0; }
-        body { background-color: #fff; }
+        body { background-color: #fff; color: #444; }
         .container { background-color: #fff; }
-        .bg-success { background-color: #fecc3f !important; }
-        .btn-warning { background-color: #E84C3D !important; font-weight: bold; }
-        a, a:hover, a:visited, a:active { color: #ff6716 !important; font-weight: bold; }
+        .btn-warning { background-color: #E84C3D !important; font-weight: bold; border: 0; }
+        .btn-warning { background-color: #ff6716 !important; font-weight: bold; border: 0; }
+        .bg-success { background-color: #fe3 !important; position: relative; color: #444; border: 0; }
+        .background { background: url("pics/surge_stand.png") center; background-size: cover; width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0.15; z-index: 0; }
+        .bg-success .card-body { z-index: 2; }
+        a, a:hover, a:visited, a:active { color: #ff6716; font-weight: bold; }
         a .success { color: #fff; }
+        .img-bullet { border-radius: 512px; }
+        @media screen and (min-width: 700px) {
+            .img-bullet { transform: scale(1.25); }
+        }
         </style>
     </head>
     <body>
@@ -43,74 +50,75 @@
                         <h2>Why Open Surge</h2>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col text-left">
+                <div class="row align-items-center">
+                    <div class="col text-right my-2 pt-3">
                         <h3>Do you love fast-paced 2D platformers?</h3>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-sm-9 text-left">
+                <div class="row align-items-center mt-2">
+                    <div class="col-sm-3">
+                        <img src="pics/surge_run.png" class="img-fluid img-bullet">
+                    </div>
+                    <div class="col-sm-9 text-right">
                         <p class="lead">We too! The 90's were awesome. But now we can go further. This is an age of creators, not just consumers.</p>
                     </div>
-                    <div class="col-sm-3">
-                        <img src="surge-demo.gif" class="img-fluid">
-                    </div>
                 </div>
-                <div class="row mt-5">
-                    <div class="col text-right">
+                <div class="row align-items-center mt-5">
+                    <div class="col text-left my-2 pt-3">
                         <h3>Unleash your creativity!</h3>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-sm-3">
-                        <img src="surge-demo.gif" class="img-fluid">
-                    </div>
-                    <div class="col-sm-9 text-right">
+                <div class="row align-items-center mt-2">
+                    <div class="col-sm-9 text-left">
                         <p class="lead">Open Surge lets you play and make your own games. Forget about just consuming! Create!</p>
                     </div>
+                    <div class="col-sm-3">
+                        <img src="pics/neon_win2.png" class="img-fluid img-bullet">
+                    </div>
                 </div>
-                <div class="row mt-5">
-                    <div class="col text-left">
+                <div class="row align-items-center mt-5">
+                    <div class="col text-right my-2 pt-3">
                         <h3>Explore, remix and create!</h3>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-sm-9 text-left">
-                        <p class="lead">A very exciting way to play and do game design in a retro setting. Just dig at it and look!</p>
-                    </div>
+                <div class="row align-items-center mt-2">
                     <div class="col-sm-3">
-                        <img src="surge-demo.gif" class="img-fluid">
+                        <img src="pics/surge_play.png" class="img-fluid img-bullet">
+                    </div>
+                    <div class="col-sm-9 text-right">
+                        <p class="lead">Here's a very exciting way to play and do game design in a retro setting. Just dig at it and look!</p>
                     </div>
                 </div>
-                <div class="row mt-5">
-                    <div class="col text-right">
+                <div class="row align-items-center mt-5">
+                    <div class="col text-left my-2 pt-3">
                         <h3>Learn how to code with SurgeScript<sup>&trade;</sup></h3>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-sm-3">
-                        <img src="surge-demo.gif" class="img-fluid">
-                    </div>
-                    <div class="col-sm-9 text-right">
+                <div class="row align-items-center mt-2">
+                    <div class="col-sm-9 text-left">
                         <p class="lead">Coding can be really fun once you know what it can do. The sky is the limit with <a href="https://alemart.github.io/surgescript" target="_blank">SurgeScript</a>!</p>
                     </div>
+                    <div class="col-sm-3">
+                        <img src="pics/neon_run.png" class="img-fluid img-bullet">
+                    </div>
                 </div>
-                <div class="row mt-5">
-                    <div class="col text-left">
+                <div class="row align-items-center mt-5">
+                    <div class="col text-right my-2 pt-3">
                         <h3>Embrace software freedom</h3>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-sm-9 text-left">
+                <div class="row align-items-center mt-2">
+                    <div class="col-sm-3">
+                        <img src="pics/surge_win.png" class="img-fluid img-bullet">
+                    </div>
+                    <div class="col-sm-9 text-right">
                         <p class="lead">Open Surge promotes the free software and the open source culture. Use, study, hack and share!</p>
                     </div>
-                    <div class="col-sm-3">
-                        <img src="surge-demo.gif" class="img-fluid">
-                    </div>
                 </div>
-                <div class="row mt-5 mb-4">
+                <div class="row align-items-center mt-5 mb-4">
                     <div class="col text-center">
-                        <div class="card bg-success p-3">
+                        <div class="card bg-success px-3 py-5 mt-4">
+                            <div class="background"></div>
                             <div class="card-body">
                                 <h2>Ready to start?</h2>
                                 <a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank" role="button" class="btn btn-lg btn-warning my-4 p-4">
