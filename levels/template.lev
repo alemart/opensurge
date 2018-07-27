@@ -10,7 +10,7 @@ version "1.0"
 requires 0.5.0
 act 1
 theme "themes/template.brk"
-bgtheme "themes/menus/title.bg"
+bgtheme "themes/sunset.bg"
 spawn_point 232 9976
 music "musics/sunshine.ogg"
 startup ".default_startup"
@@ -18,6 +18,7 @@ players "Surge" "Neon"
 waterlevel 10944
 
 // dialog regions (xpos ypos width height title message)
+dialogbox 320 9000 512 1024 "$SUNSETPAR_MESSAGE_10" "$SUNSETPAR_MESSAGE_20"
 
 // brick list
 brick 0 10368 9072
@@ -2080,7 +2081,6 @@ item 50 2416 9904
 item 50 2048 9984
 item 0 1936 9952
 item 0 1984 9952
-item 43 1944 10128
 item 0 1808 10112
 item 0 1856 10112
 item 0 1904 10112
