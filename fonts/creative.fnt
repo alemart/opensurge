@@ -1,0 +1,14 @@
+// Open Surge Engine
+// http://opensurge2d.org
+
+// font for the creative
+// commons animation
+font "creative"
+{
+    truetype
+    {
+        source_file             "fonts/DejaVuSans.ttf"
+        size                    13
+        antialias
+    }
+}
