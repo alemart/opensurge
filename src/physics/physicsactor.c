@@ -271,7 +271,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->C_jumproll = sensor_create_vertical(-8, -10, 0, image_rgb(0,128,0));
     pa->D_jumproll = sensor_create_vertical(8, -10, 0, image_rgb(128,128,0));
     pa->M_jumproll = sensor_create_horizontal(0, -9, 9, image_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-16, -8, 8, image_rgb(255,255,255)); /* use 16 > 32 (px) - 18 */
+    pa->U_jumproll = sensor_create_horizontal(-24, -8, 8, image_rgb(255,255,255));
 
     /* success!!! ;-) */
     return pa;
