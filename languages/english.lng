@@ -218,7 +218,7 @@ CBOX_QUIT_OPTION2       "NO"
 // ===================== LEVELS ==============================
 
 // Sunset Paradise (Demo Level)
-SUNSETPAR_MESSAGE_10    "How to play"
+SUNSETPAR_MESSAGE_10    "<color=$COLOR_HIGHLIGHT>How to play</color>"
 SUNSETPAR_MESSAGE_20    "Welcome to the new Open Surge Demo Level! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. Press F12 to see how it was made."
 
 
