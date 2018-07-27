@@ -2,8 +2,8 @@
 sprite SD_LOGO
 {
     source_file     images/logo.png
-    source_rect     0 0 254 73
-    frame_size      254 73
+    source_rect     0 0 256 75
+    frame_size      256 75
     hot_spot        0 0
 
     // stopped
