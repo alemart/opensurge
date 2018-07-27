@@ -48,7 +48,7 @@
 
 
 /* Uncomment to render the sensors */
-#define SHOW_SENSORS
+/*#define SHOW_SENSORS*/
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 4
@@ -345,13 +345,61 @@ void player_render(player_t *player, v2d_t camera_position)
     else {
         /* FIXME: rolling delta */
         /* the difference of the height of the (foot) sensors */
-        act->hot_spot.y += 6;
-        if(physicsactor_get_angle(player->pa) % 90 == 0) {
-            switch(physicsactor_get_movmode(player->pa)) {
-                case MM_FLOOR: act->hot_spot.y += 1; break;
-                case MM_LEFTWALL: act->hot_spot.x -= 2; break;
-                case MM_RIGHTWALL: act->hot_spot.x += 1; break;
-                case MM_CEILING: act->hot_spot.y -= 2; break;
+        int roll_delta = 2;
+
+        /* adjust hot spot */
+        switch(physicsactor_get_movmode(player->pa)) {
+            case MM_LEFTWALL: {
+                if(physicsactor_get_angle(player->pa) % 90 == 0) {
+                    act->angle = 0.0f;
+                    act->hot_spot.x += roll_delta;
+                }
+                if(!physicsactor_is_in_the_air(player->pa)) {
+                    if(physicsactor_get_angle(player->pa) % 90 != 0)
+                        act->hot_spot.y += roll_delta;
+                }
+                break;
+            }
+            case MM_RIGHTWALL: {
+                if(physicsactor_get_angle(player->pa) % 90 == 0) {
+                    act->angle = 0.0f;
+                    act->hot_spot.x -= roll_delta + 1;
+                }
+                if(!physicsactor_is_in_the_air(player->pa)) {
+                    if(physicsactor_get_angle(player->pa) % 90 != 0)
+                        act->hot_spot.y += roll_delta + 1;
+                }
+                break;
+            }
+            case MM_FLOOR: {
+                if(physicsactor_get_angle(player->pa) % 90 == 0) {
+                    act->angle = 0.0f;
+                    act->hot_spot.y += roll_delta + 1;
+                    if(physicsactor_is_facing_right(player->pa))
+                        act->hot_spot.x -= 3;
+                    else
+                        act->hot_spot.x += 2;
+                }
+                if(!physicsactor_is_in_the_air(player->pa)) {
+                    if(physicsactor_get_angle(player->pa) % 90 != 0)
+                        act->hot_spot.y += roll_delta + 1;
+                }
+                break;
+            }
+            case MM_CEILING: {
+                if(physicsactor_get_angle(player->pa) % 90 == 0) {
+                    act->angle = PI;
+                    act->hot_spot.y += roll_delta + 2;
+                    if(physicsactor_is_facing_right(player->pa))
+                        act->mirror = IF_HFLIP;
+                    else
+                        act->mirror = IF_NONE;
+                }
+                if(!physicsactor_is_in_the_air(player->pa)) {
+                    if(physicsactor_get_angle(player->pa) % 90 != 0)
+                        act->hot_spot.y += roll_delta + 2;
+                }
+                break;
             }
         }
     }
@@ -369,7 +417,7 @@ void player_render(player_t *player, v2d_t camera_position)
             actor_render(player->invstar[i], camera_position);
     }
 
-    /* undo hotspot "gambiarra" */
+    /* restore hot spot */
     act->hot_spot = player->hot_spot;
 
 #ifdef SHOW_SENSORS
@@ -1026,7 +1074,7 @@ void update_animation(player_t *p)
             physicsactorstate_t state = physicsactor_get_state(p->pa);
             if(!(
                 state == PAS_STOPPED || state == PAS_WAITING ||
-                state == PAS_LEDGE || state == PAS_ROLLING ||
+                state == PAS_LEDGE || /*state == PAS_ROLLING ||*/
                 state == PAS_DUCKING || state == PAS_LOOKINGUP ||
                 state == PAS_PUSHING || state == PAS_WINNING
             )) {
@@ -1126,8 +1174,9 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
         player_is_stopped(player) || player_is_waiting(player) ||
         player_is_ducking(player) || player_is_lookingup(player) ||
-        player_is_jumping(player) || player_is_pushing(player)
-    )) && !player_is_rolling(player)) {
+        player_is_jumping(player) || player_is_pushing(player) ||
+        player_is_rolling(player)
+    )) && (1 || !player_is_rolling(player))) {
         int degrees = physicsactor_get_angle(pa);
         float new_angle = degrees / 57.2957795131f;
         if(ang_diff(new_angle, act->angle) < 1.6f) {
