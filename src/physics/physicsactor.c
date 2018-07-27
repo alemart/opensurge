@@ -254,24 +254,24 @@ physicsactor_t* physicsactor_create(v2d_t position)
     /* sensors */
     pa->A_normal = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
     pa->B_normal = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
-    pa->C_normal = sensor_create_vertical(-9, -20, 0, image_rgb(0,128,0));
-    pa->D_normal = sensor_create_vertical(9, -20, 0, image_rgb(128,128,0));
-    pa->M_normal = sensor_create_horizontal(4, -10, 10, image_rgb(255,0,0));
-    pa->U_normal = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
+    pa->C_normal = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
+    pa->D_normal = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
+    pa->M_normal = sensor_create_horizontal(4, -10, 10, image_rgb(255,0,0)); /* use 10 = 9 (A) + 1 */
+    pa->U_normal = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
     pa->A_intheair = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
     pa->B_intheair = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
-    pa->C_intheair = sensor_create_vertical(-9, -20, 0, image_rgb(0,128,0));
-    pa->D_intheair = sensor_create_vertical(9, -20, 0, image_rgb(128,128,0));
+    pa->C_intheair = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
+    pa->D_intheair = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
     pa->M_intheair = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
-    pa->U_intheair = sensor_create_horizontal(-25, -9, 9, image_rgb(255,255,255));
+    pa->U_intheair = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-7, 0, 14, image_rgb(0,255,0));
-    pa->B_jumproll = sensor_create_vertical(7, 0, 14, image_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-7, -14, 0, image_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(7, -14, 0, image_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -8, 8, image_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-14, -7, 7, image_rgb(255,255,255));
+    pa->A_jumproll = sensor_create_vertical(-8, 0, 18, image_rgb(0,255,0)); /* use 18 = 20 (A) - 2 */
+    pa->B_jumproll = sensor_create_vertical(8, 0, 18, image_rgb(255,255,0)); /* use 8 = 9 (A) - 1 */
+    pa->C_jumproll = sensor_create_vertical(-8, -10, 0, image_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(8, -10, 0, image_rgb(128,128,0));
+    pa->M_jumproll = sensor_create_horizontal(0, -9, 9, image_rgb(255,0,0));
+    pa->U_jumproll = sensor_create_horizontal(-16, -8, 8, image_rgb(255,255,255)); /* use 16 > 32 (px) - 18 */
 
     /* success!!! ;-) */
     return pa;
@@ -522,7 +522,7 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(brakingthreshold)
 #define GENERATE_SENSOR_ACCESSOR(x) \
 const sensor_t* sensor_##x(const physicsactor_t *pa) \
 { \
-    if(pa->state == PAS_JUMPING  || pa->state == PAS_ROLLING) \
+    if((pa->state == PAS_JUMPING  || pa->state == PAS_ROLLING) && (!pa->in_the_air || pa->ysp <= 0.0f)) \
         return pa->x##_jumproll; \
     else if(pa->in_the_air || pa->state == PAS_SPRINGING) \
         return pa->x##_intheair; \
@@ -929,6 +929,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     pa->position.x = obstacle_ground_position(at_M, x2, y2, GD_RIGHT) - sensor_offset;
                 else
                     pa->position.x = obstacle_ground_position(at_M, x2, y2, GD_LEFT) + sensor_offset;
+                UPDATE_SENSORS(); /* at_M should be set to NULL */
 
                 /* set speed */
                 pa->gsp = 0.0f;
@@ -943,7 +944,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 }
                 else
                     pa->xsp = min(pa->xsp, 0.0f);
-                UPDATE_SENSORS(); /* at_M should be set to NULL */
             }
             else if(obstacle_got_collision(at_M, x1, y1, x1, y1)) {
                 /* adjust position */
@@ -951,6 +951,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     pa->position.x = obstacle_ground_position(at_M, x1, y1, GD_LEFT) + sensor_offset;
                 else
                     pa->position.x = obstacle_ground_position(at_M, x1, y1, GD_RIGHT) - sensor_offset;
+                UPDATE_SENSORS(); /* at_M should be set to NULL */
 
                 /* set speed */
                 pa->gsp = 0.0f;
@@ -965,7 +966,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 }
                 else
                     pa->xsp = max(pa->xsp, 0.0f);
-                UPDATE_SENSORS(); /* at_M should be set to NULL */
             }
         }
         else {
@@ -981,6 +981,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                         pa->position.y = obstacle_ground_position(at_M, x2, y2, GD_UP) + sensor_offset;
                     else
                         pa->position.y = obstacle_ground_position(at_M, x2, y2, GD_DOWN) - sensor_offset;
+                    UPDATE_SENSORS();
 
                     /* set speed */
                     pa->gsp = 0.0f;
@@ -990,7 +991,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     }
                     else
                         pa->ysp = min(pa->ysp, 0.0f);
-                    UPDATE_SENSORS();
                 }
                 else if(obstacle_got_collision(at_M, x1, y1, x1, y1)) {
                     /* adjust position */
@@ -998,6 +998,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                         pa->position.y = obstacle_ground_position(at_M, x1, y1, GD_DOWN) - sensor_offset;
                     else
                         pa->position.y = obstacle_ground_position(at_M, x1, y1, GD_UP) + sensor_offset;
+                    UPDATE_SENSORS();
 
                     /* set speed */
                     pa->gsp = 0.0f;
@@ -1007,7 +1008,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                     }
                     else
                         pa->ysp = max(pa->ysp, 0.0f);
-                    UPDATE_SENSORS();
                 }
             }
         }
@@ -1097,6 +1097,16 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->xsp = 0.0f;
         pa->ysp = 0.0f;
 
+        #if 0
+        if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) {
+            video_showmessage("foo");
+            const sensor_t *s1 = pa->A_normal, *s2 = pa->A_jumproll;
+            int delta = sensor_get_y2(s1) - sensor_get_y2(s2);
+            pa->position.x -= delta * SIN(pa->angle);
+            pa->position.y -= delta * COS(pa->angle);
+            UPDATE_SENSORS();
+        }
+        #endif
         if(pa->state != PAS_ROLLING)
             pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
     }
