@@ -182,6 +182,7 @@ INPUT_JOY_FIRE8         "BUTTON 8"
 // Title screen
 TITLE_MESSAGE               "PRESS $INPUT_FIRE3"
 TITLE_VERSION               "ver."
+TITLE_DEVELOPMENT           "Development version"
 
 // Main menu
 MENU_PLAY                   "PLAY"

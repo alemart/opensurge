@@ -48,6 +48,7 @@ object ".title_screen"
         create_child ".title_screen.message" 0 0 message
         create_child ".title_screen.version"
         create_child ".title_screen.website"
+        create_child ".title_screen.development"
 
         // done!
         change_state "idle"
@@ -142,13 +143,13 @@ object ".title_screen.version"
     {
         hide
         set_zindex 1
-        set_absolute_position 3 screen_height()-11
+        set_absolute_position 4 screen_height()-14
         change_state "display"
     }
 
     state "display"
     {
-        //textout "menu.footer" 0 0 "$TITLE_VERSION $ENGINE_VERSION"
+        textout "menu.main" 0 0 "$ENGINE_VERSION"
     }
 }
 
@@ -172,6 +173,29 @@ object ".title_screen.website"
     state "display"
     {
         textout_right "menu.main" 0 0 "$ENGINE_WEBSITE"
+    }
+}
+
+//
+// displays the "development version" disclaimer
+//
+object ".title_screen.development"
+{
+    requires 0.2.0
+    detach_from_camera
+    always_active
+
+    state "main"
+    {
+        hide
+        set_zindex 1
+        set_absolute_position screen_width()/2 83
+        change_state "display"
+    }
+
+    state "display"
+    {
+        textout_centre "menu.main" 0 0 "$TITLE_DEVELOPMENT"
     }
 }
 
@@ -250,6 +274,6 @@ object ".title_screen.logo"
     state main {
         set_zindex 0.7
         set_animation SD_LOGO 0
-        set_absolute_position (screen_width()-243)/2 12
+        set_absolute_position (screen_width()-243)/2 4
     }
 }
