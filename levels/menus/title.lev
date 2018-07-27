@@ -10,7 +10,7 @@ version "1.0"
 requires 0.2.0
 act 1
 theme "themes/none.brk"
-bgtheme "themes/menus/title.bg"
+bgtheme "themes/menus/levelselect.bg"
 spawn_point 0 0
 startup ".title_screen"
 players "none"
