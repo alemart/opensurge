@@ -105,8 +105,8 @@ object ".title_screen.message"
     state "main"
     {
         hide
-        set_zindex 1
-        set_absolute_position screen_width()/2 screen_height()-25
+        set_zindex 0.7
+        set_absolute_position screen_width()/2 screen_height()-21
         let "$tmr = 0.5"
         change_state "invisible"
     }
