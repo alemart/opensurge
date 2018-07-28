@@ -44,7 +44,7 @@ static uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_
 static inline uint16* destroy_groundmap(uint16* gmap);
 
 /* public methods */
-collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height)
+collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int width, int height)
 {
     collisionmask_t *mask = mallocx(sizeof *mask);
     uint32 maskcolor = video_get_maskcolor();

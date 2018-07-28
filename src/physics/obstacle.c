@@ -163,7 +163,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
 /* ground_direction may be NULL */
 void flip(const obstacle_t* obstacle, int *local_x, int *local_y, grounddir_t *ground_direction)
 {
-    if(obstacle->flags) {
+    if(obstacle->flags != OF_SOLID) {
         if(obstacle->flags & OF_HFLIP)
             *local_x = obstacle->width - (*local_x) - 1;
         if(obstacle->flags & OF_VFLIP)
