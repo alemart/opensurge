@@ -4,7 +4,8 @@
 // http://opensurge2d.org
 //
 // ** DO NOT MODIFY THIS FILE! **
-//   (it's fine to study it ;)
+// unless you know what you're doing.
+// it's fine to study it ;)
 //
 
 @Plugin
