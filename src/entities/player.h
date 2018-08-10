@@ -103,7 +103,6 @@ struct player_t {
     int blinking;
     float blink_timer;
     float blink_visibility_timer;
-    v2d_t hot_spot;
 };
 
 /* public functions */

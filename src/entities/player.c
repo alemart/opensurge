@@ -77,6 +77,7 @@ static obstacle_t* item2obstacle(const item_t *item);
 static obstacle_t* object2obstacle(const object_t *object);
 static int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer);
 static float ang_diff(float alpha, float beta);
+static void hotspot_magic(player_t* player);
 
 
 /*
@@ -108,7 +109,6 @@ player_t *player_create(const char *character_name)
     /* auxiliary variables */
     p->on_movable_platform = FALSE;
     p->got_glasses = FALSE;
-    p->hot_spot = p->actor->hot_spot;
 
     /* blink */
     p->blinking = FALSE;
@@ -324,6 +324,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 void player_render(player_t *player, v2d_t camera_position)
 {
     actor_t *act = player->actor;
+    v2d_t hot_spot = act->hot_spot;
     int i, behind_player[PLAYER_MAX_INVSTAR];
 
     /* invincibility stars I */
@@ -334,75 +335,7 @@ void player_render(player_t *player, v2d_t camera_position)
     }
 
     /* hotspot "gambiarra" */
-    if(!player_is_rolling(player)) {
-        switch(physicsactor_get_movmode(player->pa)) {
-            case MM_FLOOR: act->hot_spot.y += 1; break;
-            case MM_LEFTWALL: act->hot_spot.x -= 2; break;
-            case MM_RIGHTWALL: act->hot_spot.x += 1; break;
-            case MM_CEILING: act->hot_spot.y -= 2; break;
-        }
-    }
-    else {
-        /* FIXME: rolling delta */
-        /* the difference of the height of the (foot) sensors */
-        int roll_delta = 2;
-
-        /* adjust hot spot */
-        switch(physicsactor_get_movmode(player->pa)) {
-            case MM_LEFTWALL: {
-                if(physicsactor_get_angle(player->pa) % 90 == 0) {
-                    act->angle = 0.0f;
-                    act->hot_spot.x += roll_delta;
-                }
-                if(!physicsactor_is_in_the_air(player->pa)) {
-                    if(physicsactor_get_angle(player->pa) % 90 != 0)
-                        act->hot_spot.y += roll_delta;
-                }
-                break;
-            }
-            case MM_RIGHTWALL: {
-                if(physicsactor_get_angle(player->pa) % 90 == 0) {
-                    act->angle = 0.0f;
-                    act->hot_spot.x -= roll_delta + 1;
-                }
-                if(!physicsactor_is_in_the_air(player->pa)) {
-                    if(physicsactor_get_angle(player->pa) % 90 != 0)
-                        act->hot_spot.y += roll_delta + 1;
-                }
-                break;
-            }
-            case MM_FLOOR: {
-                if(physicsactor_get_angle(player->pa) % 90 == 0) {
-                    act->angle = 0.0f;
-                    act->hot_spot.y += roll_delta + 1;
-                    if(physicsactor_is_facing_right(player->pa))
-                        act->hot_spot.x -= 3;
-                    else
-                        act->hot_spot.x += 2;
-                }
-                if(!physicsactor_is_in_the_air(player->pa)) {
-                    if(physicsactor_get_angle(player->pa) % 90 != 0)
-                        act->hot_spot.y += roll_delta + 1;
-                }
-                break;
-            }
-            case MM_CEILING: {
-                if(physicsactor_get_angle(player->pa) % 90 == 0) {
-                    act->angle = PI;
-                    act->hot_spot.y += roll_delta + 2;
-                    if(physicsactor_is_facing_right(player->pa))
-                        act->mirror = IF_HFLIP;
-                    else
-                        act->mirror = IF_NONE;
-                }
-                if(!physicsactor_is_in_the_air(player->pa)) {
-                    if(physicsactor_get_angle(player->pa) % 90 != 0)
-                        act->hot_spot.y += roll_delta + 2;
-                }
-                break;
-            }
-        }
-    }
+    hotspot_magic(player);
 
     /* render the player */
     actor_render(act, camera_position);
@@ -418,7 +351,7 @@ void player_render(player_t *player, v2d_t camera_position)
     }
 
     /* restore hot spot */
-    act->hot_spot = player->hot_spot;
+    act->hot_spot = hot_spot;
 
 #ifdef SHOW_SENSORS
     /* sensors */
@@ -1067,24 +1000,6 @@ void update_animation(player_t *p)
     ON_STATE(PAS_BRAKING) {
         sound_play( charactersystem_get(p->name)->sample.brake );
     }
-
-    /* hotspot "gambiarra" */
-    if(physicsactor_get_angle(p->pa) % 90 != 0) {
-        if(!physicsactor_is_in_the_air(p->pa)) {
-            physicsactorstate_t state = physicsactor_get_state(p->pa);
-            if(!(
-                state == PAS_STOPPED || state == PAS_WAITING ||
-                state == PAS_LEDGE || /*state == PAS_ROLLING ||*/
-                state == PAS_DUCKING || state == PAS_LOOKINGUP ||
-                state == PAS_PUSHING || state == PAS_WINNING
-            )) {
-                p->actor->hot_spot.x = p->hot_spot.x;
-                p->actor->hot_spot.y = p->hot_spot.y - 2;
-            }
-        }
-    }
-    else
-        p->actor->hot_spot = p->hot_spot;
 }
 
 /* the interface between player_t and physicsactor_t */
@@ -1213,6 +1128,79 @@ obstacle_t* object2obstacle(const object_t *object)
 int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer)
 {
     return (brick_layer != BRL_DEFAULT && player_layer != brick_layer);
+}
+
+/* hotspot "gambiarra" */
+void hotspot_magic(player_t* player)
+{
+    actor_t* act = player->actor;
+    physicsactor_t* pa = player->pa;
+
+    if(!player_is_rolling(player)) {
+        if(physicsactor_get_angle(pa) % 90 == 0) {
+            switch(physicsactor_get_movmode(pa)) {
+                case MM_FLOOR: act->hot_spot.y += 1; break;
+                case MM_LEFTWALL: act->hot_spot.y += 2; break;
+                case MM_RIGHTWALL: act->hot_spot.y += 1; break;
+                case MM_CEILING: act->hot_spot.y += 2; break;
+            }
+        }
+        else if(!physicsactor_is_in_the_air(pa)) {
+            physicsactorstate_t state = physicsactor_get_state(pa);
+            if(!(
+                state == PAS_STOPPED || state == PAS_WAITING || state == PAS_LEDGE ||
+                state == PAS_DUCKING || state == PAS_LOOKINGUP ||
+                state == PAS_PUSHING || state == PAS_WINNING
+            )) {
+                act->hot_spot.y -= 1;
+            }
+        }
+    }
+    else {
+        /* FIXME: rolling delta */
+        /* the difference of the height of the (foot) sensors */
+        const int roll_delta = 2;
+
+        /* adjust hot spot */
+        switch(physicsactor_get_movmode(pa)) {
+            case MM_FLOOR:
+                act->hot_spot.y += roll_delta;
+                if(physicsactor_get_angle(pa) % 90 == 0) {
+                    act->hot_spot.y += 1;
+                    if(physicsactor_is_facing_right(pa))
+                        act->hot_spot.x -= roll_delta + 1;
+                    else
+                        act->hot_spot.x += roll_delta;
+                }
+                break;
+
+            case MM_LEFTWALL:
+                act->hot_spot.y += roll_delta;
+                act->hot_spot.x += roll_delta - cosf(act->angle - PI * 3 / 2);
+                if(physicsactor_get_angle(pa) < 270) {
+                    act->hot_spot.x -= 6 * sinf(act->angle - PI * 3 / 2);
+                    act->hot_spot.y -= 4 * sinf(act->angle - PI * 3 / 2);
+                }
+                break;
+
+            case MM_RIGHTWALL:
+                act->hot_spot.y += roll_delta;
+                act->hot_spot.x -= roll_delta + 1 + cosf(act->angle - PI / 2);
+                if(physicsactor_get_angle(pa) > 90) {
+                    act->hot_spot.x -= 6 * sinf(act->angle - PI / 2);
+                    act->hot_spot.y += 4 * sinf(act->angle - PI / 2);
+                }
+                break;
+
+            case MM_CEILING:
+                act->hot_spot.x += 4 * sinf(act->angle - PI);
+                act->hot_spot.y += roll_delta + 6 * cosf(act->angle - PI);
+                break;
+        }
+
+        /* disable angle */
+        act->angle = 0.0f;
+    }
 }
 
 /* given two angles in [0, 2pi], return their difference */
