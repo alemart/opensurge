@@ -88,8 +88,8 @@ struct physicsactor_t
 
 /* private stuff ;-) */
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap);
-static char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
-static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
+static inline char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
+static inline char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
 static inline int ang_diff(int alpha, int beta);
 
 
@@ -349,10 +349,12 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         input_simulate_button_up(pa->input, IB_FIRE1);
 
     /* face left/right */
-    if((pa->gsp > 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_RIGHT))
-        pa->facing_right = TRUE;
-    else if((pa->gsp < 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_LEFT))
-        pa->facing_right = FALSE;
+    if(pa->state != PAS_ROLLING) {
+        if((pa->gsp > 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_RIGHT))
+            pa->facing_right = TRUE;
+        else if((pa->gsp < 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_LEFT))
+            pa->facing_right = FALSE;
+    }
 
     /* get to the real physics... */
     run_simulation(pa, obstaclemap);
@@ -1094,28 +1096,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
             pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
 
-        pa->xsp = 0.0f;
-        pa->ysp = 0.0f;
-
-        #if 0
-        if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) {
-            video_showmessage("foo");
-            const sensor_t *s1 = pa->A_normal, *s2 = pa->A_jumproll;
-            int delta = sensor_get_y2(s1) - sensor_get_y2(s2);
-            pa->position.x -= delta * SIN(pa->angle);
-            pa->position.y -= delta * COS(pa->angle);
-            UPDATE_SENSORS();
-        }
-        #endif
+        pa->xsp = pa->ysp = 0.0f;
         if(pa->state != PAS_ROLLING)
             pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
     }
 
     /* bump into ceilings */
-    if(pa->in_the_air && (at_C != NULL || at_D != NULL)) {
+    if(pa->in_the_air && (at_C != NULL || at_D != NULL) && pa->ysp < 0.0f) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
-        int ceiling_angle = pa->angle; /* TODO */
 
         /* picking the ceiling */
         if(pick_the_best_ceiling(pa, at_C, at_D, sensor_C(pa), sensor_D(pa)) == 'c') {
@@ -1127,34 +1116,33 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             ceiling_sensor = sensor_D(pa);
         }
 
+        /* compute the angle */
+        pa->angle = 0x80;
+        UPDATE_MOVMODE();
+        UPDATE_SENSORS();
+        UPDATE_ANGLE(ceiling);
+        UPDATE_MOVMODE();
+        UPDATE_SENSORS();
+
         /* reattach to the ceiling */
-        if((ceiling_angle > 0xA0 && ceiling_angle < 0xC0) || (ceiling_angle > 0x40 && ceiling_angle < 0x60)) {
-            pa->angle = ceiling_angle;
-            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
-            pa->xsp = 0.0f;
-            pa->ysp = 0.0f;
-            pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
-            UPDATE_MOVMODE();
-            UPDATE_SENSORS();
+        if((pa->angle >= 0xA0 && pa->angle <= 0xC0) || (pa->angle >= 0x40 && pa->angle <= 0x60)) {
+            pa->gsp = (fabs(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+            pa->xsp = pa->ysp = 0.0f;
+            if(pa->state != PAS_ROLLING)
+                pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
         }
         else {
             /* won't reattach */
             int offset = sensor_get_y2(ceiling_sensor) - sensor_get_y1(ceiling_sensor);
 
+            /* adjust speed & angle */
+            pa->ysp = 0.0f;
+            pa->angle = 0x0;
+            UPDATE_MOVMODE();
+            UPDATE_SENSORS();
+
             /* adjust position */
-            if(pa->movmode == MM_RIGHTWALL)
-                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_y1(ceiling_sensor), (int)pa->position.y - sensor_get_x1(ceiling_sensor), GD_LEFT) + offset;
-            else if(pa->movmode == MM_FLOOR)
-                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + offset;
-            else if(pa->movmode == MM_LEFTWALL)
-                pa->position.x = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_y1(ceiling_sensor), (int)pa->position.y + sensor_get_x1(ceiling_sensor), GD_RIGHT) - offset;
-            else if(pa->movmode == MM_CEILING)
-                pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x - sensor_get_x1(ceiling_sensor), (int)pa->position.y - sensor_get_y1(ceiling_sensor), GD_DOWN) - offset;
-
-            /* adjust speed */
-            pa->ysp = max(pa->ysp, 0.0f);
-
-            /* update the sensors */
+            pa->position.y = obstacle_ground_position(ceiling, (int)pa->position.x + sensor_get_x1(ceiling_sensor), (int)pa->position.y + sensor_get_y1(ceiling_sensor), GD_UP) + offset;
             UPDATE_SENSORS();
         }
     }
