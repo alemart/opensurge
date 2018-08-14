@@ -56,6 +56,8 @@
 #define clip(val,a,b)           ( ((val)<(a) && (val)<(b)) ? min((a),(b)) : ( ((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)  ) )
 #define swap(a,b)               swap_ex(&(a), &(b), sizeof(a))
 #define atob(str)               ((str_icmp(str, "true") == 0) || (str_icmp(str, "yes") == 0))
+#define rad2deg(x)              ((x) * 57.2957795147f)
+#define deg2rad(x)              ((x) / 57.2957795147f)
 
 
 /* Game routines */

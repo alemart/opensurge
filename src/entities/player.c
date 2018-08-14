@@ -402,8 +402,8 @@ void player_hit(player_t *player, actor_t *hazard)
         return;
 
     if(player_get_collectibles() > 0 || player->shield_type != SH_NONE) {
-        player->actor->speed.x = 120.0f * sign(player->actor->position.x - hazard_centre.x);
-        player->actor->speed.y = -240.0f;
+        player->actor->speed.x = (physicsactor_get_hitjmp(player->pa) * -0.5f) * sign(player->actor->position.x - hazard_centre.x);
+        player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
         player->actor->position.y -= 2; /* bugfix */
 
         player->pa_old_state = physicsactor_get_state(player->pa);
@@ -414,23 +414,22 @@ void player_hit(player_t *player, actor_t *hazard)
             sound_play( soundfactory_get("damaged") );
         }
         else if(!player->disable_collectible_loss) {
-            float a = 101.25f, spd = 240.0f*2;
-            int i, r = min(32, player_get_collectibles());
-            item_t *b;
-            player_set_collectibles(0);
+            float a = 101.25f, spd = 240.0f;
+            int r = min(32, player_get_collectibles());
 
             /* create collectibles */
-            for(i=0; i<r; i++) {
-                b = level_create_item(IT_BOUNCINGRING, player->actor->position);
-                bouncingcollectible_set_speed(b, v2d_new(-sin(a*PI/180.0f)*spd*(1-2*(i%2)), cos(a*PI/180.0f)*spd));
+            for(int i = 0; i < r; i++) {
+                item_t* b = level_create_item(IT_BOUNCINGRING, player->actor->position);
+                bouncingcollectible_set_speed(b, v2d_new(-sinf(deg2rad(a)) * spd * (1-2*(i%2)), cosf(deg2rad(a)) * spd));
                 a += 22.5f * (i%2);
 
-                if(i%16 == 0) {
-                    spd /= 2.0f;
-                    a = 101.25f;
+                if(i == 16) {
+                    spd *= 0.5f;
+                    a -= 180.0f;
                 }
             }
 
+            player_set_collectibles(0);
             sound_play( soundfactory_get("collectible loss") );
         }
         else
@@ -456,7 +455,7 @@ void player_kill(player_t *player)
         player->attacking = FALSE;
 
         player->actor->position.y -= 2;
-        player->actor->speed = v2d_new(0, -420);
+        player->actor->speed = v2d_new(0, physicsactor_get_diejmp(player->pa));
 
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_kill(player->pa);
@@ -518,7 +517,7 @@ void player_spring(player_t *player)
  */
 void player_drown(player_t *player)
 {
-    if(player->underwater && !player_is_dying(player)) {
+    if(player_is_underwater(player) && !player_is_dying(player)) {
         player->actor->position.y -= 2;
         player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
@@ -534,7 +533,7 @@ void player_drown(player_t *player)
  */
 void player_breathe(player_t *player)
 {
-    if(player->underwater && physicsactor_get_state(player->pa) != PAS_BREATHING && physicsactor_get_state(player->pa) != PAS_DROWNED && physicsactor_get_state(player->pa) != PAS_DEAD) {
+    if(player_is_underwater(player) && physicsactor_get_state(player->pa) != PAS_BREATHING && physicsactor_get_state(player->pa) != PAS_DROWNED && physicsactor_get_state(player->pa) != PAS_DEAD) {
         player_reset_underwater_timer(player);
         player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
@@ -552,7 +551,7 @@ void player_enter_water(player_t *player)
 {
     physicsactor_t *pa = player->pa;
 
-    if(!player->underwater) {
+    if(!player_is_underwater(player)) {
         player->actor->speed.x *= 0.5f;
         player->actor->speed.y *= 0.25f;
 
@@ -565,6 +564,8 @@ void player_enter_water(player_t *player)
         physicsactor_set_grv(pa, physicsactor_get_grv(pa) / 3.5f);
         physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) / 1.85f);
         physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) / 2.0f);
+        physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) / 2.0f);
+        physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) / 2.0f);
 
         sound_play( soundfactory_get("enter water") );
         player->underwater_timer = 0.0f;
@@ -581,7 +582,7 @@ void player_leave_water(player_t *player)
 {
     physicsactor_t *pa = player->pa;
 
-    if(player->underwater) {
+    if(player_is_underwater(player)) {
         if(!player_is_springing(player) && !player_is_dying(player))
             player->actor->speed.y *= 2.0f;
 
@@ -594,6 +595,8 @@ void player_leave_water(player_t *player)
         physicsactor_set_grv(pa, physicsactor_get_grv(pa) * 3.5f);
         physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * 1.85f);
         physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) * 2.0f);
+        physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) * 2.0f);
+        physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) * 2.0f);
 
         sound_play( soundfactory_get("leave water") );
         player->underwater = FALSE;
