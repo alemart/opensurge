@@ -28,7 +28,7 @@ sprite SD_SURGE
     animation 2
     {
         repeat      TRUE
-        fps         20
+        fps         16
         data        6 7 8 9 10 9 8 7   
     }
 
@@ -164,7 +164,7 @@ sprite SD_SURGE
     animation 19
     {
         repeat      TRUE
-        fps         20
+        fps         16
         data        6 7 45 9 10 9 45 7   
     }
 
