@@ -134,6 +134,8 @@ float physicsactor_get_grv(const physicsactor_t *pa); /* gravity */
 void physicsactor_set_grv(physicsactor_t *pa, float value);
 float physicsactor_get_slp(const physicsactor_t *pa); /* slope */
 void physicsactor_set_slp(physicsactor_t *pa, float value);
+float physicsactor_get_walkthreshold(const physicsactor_t *pa); /* walk threshold */
+void physicsactor_set_walkthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_unrollthreshold(const physicsactor_t *pa); /* unroll threshold */
 void physicsactor_set_unrollthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_rollthreshold(const physicsactor_t *pa); /* roll threshold */
