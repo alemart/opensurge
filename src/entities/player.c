@@ -1160,7 +1160,7 @@ void hotspot_magic(player_t* player)
     }
     else {
         /* FIXME: rolling delta */
-        /* the difference of the height of the (foot) sensors */
+        /* the difference of the height of the (foot) sensors in different modes */
         const int roll_delta = 2;
 
         /* adjust hot spot */
@@ -1169,10 +1169,13 @@ void hotspot_magic(player_t* player)
                 act->hot_spot.y += roll_delta;
                 if(physicsactor_get_angle(pa) % 90 == 0) {
                     act->hot_spot.y += 1;
+                }
+                if(1){
+                    int u = (physicsactor_get_gsp(pa) * sinf(deg2rad(physicsactor_get_angle(pa))) < 0.0f) ? -1 : 0;
                     if(physicsactor_is_facing_right(pa))
-                        act->hot_spot.x -= roll_delta + 1;
+                        act->hot_spot.x -= roll_delta + u + 1;
                     else
-                        act->hot_spot.x += roll_delta;
+                        act->hot_spot.x += roll_delta + u;
                 }
                 break;
 
