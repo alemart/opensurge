@@ -451,11 +451,6 @@ void physicsactor_jump(physicsactor_t *pa)
 void physicsactor_kill(physicsactor_t *pa)
 {
     pa->state = PAS_DEAD;
-    pa->xsp = 0.0f;
-    pa->ysp = pa->jmp;
-    pa->gsp = 0.0f;
-    pa->angle = 0x0;
-    pa->movmode = MM_FLOOR;
 }
 
 void physicsactor_hit(physicsactor_t *pa)
