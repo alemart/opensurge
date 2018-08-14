@@ -269,15 +269,15 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->B_intheair = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
     pa->C_intheair = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
     pa->D_intheair = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
-    pa->M_intheair = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
+    pa->M_intheair = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0));
     pa->U_intheair = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-8, 0, 18, image_rgb(0,255,0)); /* use 18 = 20 (A) - 2 */
-    pa->B_jumproll = sensor_create_vertical(8, 0, 18, image_rgb(255,255,0)); /* use 8 = 9 (A) - 1 */
-    pa->C_jumproll = sensor_create_vertical(-8, -10, 0, image_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(8, -10, 0, image_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -9, 9, image_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-24, -8, 8, image_rgb(255,255,255));
+    pa->A_jumproll = sensor_create_vertical(-9, 0, 18, image_rgb(0,255,0));
+    pa->B_jumproll = sensor_create_vertical(9, 0, 18, image_rgb(255,255,0));
+    pa->C_jumproll = sensor_create_vertical(-9, -10, 0, image_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(9, -10, 0, image_rgb(128,128,0));
+    pa->M_jumproll = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0));
+    pa->U_jumproll = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
     /* success!!! ;-) */
     return pa;
