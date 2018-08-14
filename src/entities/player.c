@@ -518,7 +518,6 @@ void player_spring(player_t *player)
 void player_drown(player_t *player)
 {
     if(player_is_underwater(player) && !player_is_dying(player)) {
-        player->actor->position.y -= 2;
         player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_drown(player->pa);
