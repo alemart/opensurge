@@ -59,13 +59,19 @@
 
 #define CHANGE_ANIM(id) do { \
     animation_t *an = sprite_get_animation(charactersystem_get(p->name)->animation.sprite_name, charactersystem_get(p->name)->animation.id); \
+    float sf = p->actor->animation_speed_factor; \
     actor_change_animation(p->actor, an); \
+    actor_change_animation_speed_factor(p->actor, sf); \
 } while(0)
 
+#define ANIM_SPEED_FACTOR(k, spd) \
+    1.5f * min(1, (max((spd), 100)) / (k)) /* 24 / 16 */
+
 /* private data */
-#define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player must blink if he/she gets hurt? */
-#define PLAYER_UNDERWATER_BREATH    30.0 /* how many seconds does the player can stay underwater before drowning? */
-static int collectibles, hundred_collectibles;         /* shared collectibles */
+#define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player blink if he/she gets hurt? */
+#define PLAYER_UNDERWATER_BREATH    30.0 /* how many seconds can the player stay underwater before drowning? */
+static int hundred_collectibles;         /* counter (extra lives) */
+static int collectibles;                 /* shared collectibles */
 static int lives;                        /* shared lives */
 static int score;                        /* shared score */
 
@@ -967,7 +973,11 @@ void update_animation(player_t *p)
 {
     /* animations */
     if(!p->disable_animation_control) {
-        switch(physicsactor_get_state(p->pa)) {
+        physicsactorstate_t state = physicsactor_get_state(p->pa);
+        float xsp = fabs(physicsactor_get_xsp(p->pa));
+        float gsp = fabs(physicsactor_get_gsp(p->pa));
+
+        switch(state) {
             case PAS_STOPPED:    CHANGE_ANIM(stopped);    break;
             case PAS_WALKING:    CHANGE_ANIM(walking);    break;
             case PAS_RUNNING:    CHANGE_ANIM(running);    break;
@@ -986,6 +996,15 @@ void update_animation(player_t *p)
             case PAS_LOOKINGUP:  CHANGE_ANIM(lookingup);  break;
             case PAS_WINNING:    CHANGE_ANIM(winning);    break;
         }
+
+        if(state == PAS_WALKING || state == PAS_RUNNING)
+            actor_change_animation_speed_factor(p->actor, ANIM_SPEED_FACTOR(480, gsp));
+        else if(state == PAS_ROLLING && !physicsactor_is_in_the_air(p->pa))
+            actor_change_animation_speed_factor(p->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
+        else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_in_the_air(p->pa))))
+            actor_change_animation_speed_factor(p->actor, 1.0f);
+        else if(state == PAS_JUMPING && p->actor->animation_speed_factor < 1.0f)
+            actor_change_animation_speed_factor(p->actor, 1.0f);
     }
     else
         p->disable_animation_control = FALSE; /* for set_player_animation (scripting) */

@@ -20,7 +20,7 @@ sprite SD_NEON
     animation 1
     {
         repeat      TRUE
-        fps         8
+        fps         12
         data        1 2 3 4 5 4 3 2
     }
 
@@ -28,7 +28,7 @@ sprite SD_NEON
     animation 2
     {
         repeat      TRUE
-        fps         8
+        fps         12
         data        6 7
     }
 
