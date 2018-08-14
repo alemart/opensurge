@@ -44,6 +44,8 @@ struct physicsactor_t
     float air; /* air acceleration */
     float jmp; /* initial jump velocity */
     float jmprel; /* release jump velocity */
+    float diejmp; /* death jump velocity */
+    float hitjmp; /* get hit jump velocity */
     float grv; /* gravity */
     float slp; /* slope factor */
     float unrollthreshold; /* unroll threshold */
@@ -231,15 +233,17 @@ physicsactor_t* physicsactor_create(v2d_t position)
       | name                 | magic number | fps multitplier |
       +----------------------+--------------+-----------------+
      */
-    pa->acc =                   0.046875f   * fpsmul * fpsmul ;
+    pa->acc =                   0.06f       * fpsmul * fpsmul ;
     pa->dec =                   0.5f        * fpsmul * fpsmul ;
-    pa->frc =                   0.046875f   * fpsmul * fpsmul ;
+    pa->frc =                   0.06f       * fpsmul * fpsmul ;
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
-    pa->air =                   0.09375f    * fpsmul * fpsmul ;
+    pa->air =                   0.1f        * fpsmul * fpsmul ;
     pa->jmp =                   -6.5f       * fpsmul * 1.0f   ;
     pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
-    pa->grv =                   0.21875f    * fpsmul * fpsmul ;
+    pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
+    pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
+    pa->grv =                   0.23f       * fpsmul * fpsmul ;
     pa->slp =                   0.125f      * fpsmul * fpsmul ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
     pa->rollthreshold =         1.03125f    * fpsmul * 1.0f   ;
@@ -447,6 +451,11 @@ void physicsactor_jump(physicsactor_t *pa)
 void physicsactor_kill(physicsactor_t *pa)
 {
     pa->state = PAS_DEAD;
+    pa->xsp = 0.0f;
+    pa->ysp = pa->jmp;
+    pa->gsp = 0.0f;
+    pa->angle = 0x0;
+    pa->movmode = MM_FLOOR;
 }
 
 void physicsactor_hit(physicsactor_t *pa)
@@ -507,6 +516,8 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(air)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(jmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(jmprel)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(diejmp)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(hitjmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(grv)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(slp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(unrollthreshold)
@@ -870,7 +881,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* jumping */
         if(input_button_down(pa->input, IB_FIRE1) && !input_button_down(pa->input, IB_DOWN) && !input_button_down(pa->input, IB_UP)) {
-            float grv_attenuation = (sign(pa->gsp * SIN(pa->angle)) < 0.0f) ? 1.0f : 0.5f;
+            float grv_attenuation = (pa->gsp * SIN(pa->angle) < 0.0f) ? 1.0f : 0.5f;
             pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
             pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle) * grv_attenuation;
             pa->gsp = 0.0f;
