@@ -48,6 +48,7 @@ struct physicsactor_t
     float hitjmp; /* get hit jump velocity */
     float grv; /* gravity */
     float slp; /* slope factor */
+    float walkthreshold; /* walk threshold */
     float unrollthreshold; /* unroll threshold */
     float rollthreshold; /* roll threshold */
     float rollfrc; /* roll friction */
@@ -245,6 +246,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
     pa->grv =                   0.23f       * fpsmul * fpsmul ;
     pa->slp =                   0.125f      * fpsmul * fpsmul ;
+    pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
     pa->rollthreshold =         1.03125f    * fpsmul * 1.0f   ;
     pa->rollfrc =               0.0234375f  * fpsmul * fpsmul ;
@@ -515,6 +517,7 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(diejmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(hitjmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(grv)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(slp)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(walkthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(unrollthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rollthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rollfrc)
@@ -650,8 +653,6 @@ GENERATE_SENSOR_ACCESSOR(U)
 /* physics simulation */
 void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
-    const float walk_threshold = 30.0f;
-    const float wait_threshold = 5.0f;
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
     float dt = timer_get_delta();
     int was_in_the_air;
@@ -732,11 +733,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* slope factor */
-        if(fabs(pa->gsp) >= walk_threshold || fabs(SIN(pa->angle)) >= 0.707f)
+        if(fabs(pa->gsp) >= pa->walkthreshold || fabs(SIN(pa->angle)) >= 0.707f)
             pa->gsp += pa->slp * -SIN(pa->angle) * dt;
 
         /* animation issues */
-        if(fabs(pa->gsp) < walk_threshold) {
+        if(fabs(pa->gsp) < pa->walkthreshold) {
             if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_DOWN) && fabs(pa->gsp) < EPSILON)
                 pa->state = PAS_DUCKING;
             else if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_UP) && fabs(pa->gsp) < EPSILON)
@@ -870,7 +871,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->state != PAS_GETTINGHIT)
             pa->ysp = min(pa->ysp + pa->grv * dt, pa->topyspeed);
         else
-            pa->ysp = min(pa->ysp + (0.1875f * pa->grv / 0.21875f) * dt, pa->topyspeed);
+            pa->ysp = min(pa->ysp + (0.65f * pa->grv) * dt, pa->topyspeed);
     }
     else {
 
@@ -1181,14 +1182,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* waiting... */
     if(pa->state == PAS_STOPPED) {
-        if((pa->wait_timer += dt) >= wait_threshold)
+        if((pa->wait_timer += dt) >= 3.0f)
             pa->state = PAS_WAITING;
     }
     else
         pa->wait_timer = 0.0f;
 
     /* winning */
-    if(pa->winning_pose && fabs(pa->gsp) < walk_threshold && !pa->in_the_air)
+    if(pa->winning_pose && fabs(pa->gsp) < pa->walkthreshold && !pa->in_the_air)
         pa->state = PAS_WINNING;
 
     /* animation bugfix */
