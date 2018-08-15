@@ -248,11 +248,11 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->slp =                   0.125f      * fpsmul * fpsmul ;
     pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
-    pa->rollthreshold =         1.03125f    * fpsmul * 1.0f   ;
-    pa->rollfrc =               0.0234375f  * fpsmul * fpsmul ;
+    pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
+    pa->rollfrc =               0.03f       * fpsmul * fpsmul ;
     pa->rolldec =               0.125f      * fpsmul * fpsmul ;
-    pa->rolluphillslp =         0.07812f    * fpsmul * fpsmul ;
-    pa->rolldownhillslp =       0.3125f     * fpsmul * fpsmul ;
+    pa->rolluphillslp =         0.078f      * fpsmul * fpsmul ;
+    pa->rolldownhillslp =       0.312f      * fpsmul * fpsmul ;
     pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
     pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
@@ -472,10 +472,7 @@ void physicsactor_spring(physicsactor_t *pa)
 
 void physicsactor_roll(physicsactor_t *pa)
 {
-    /*pa->state = PAS_ROLLING;*/
-    pa->gsp = sign(pa->gsp) * pa->rollthreshold;
-    pa->state = PAS_WALKING;
-    input_simulate_button_down(pa->input, IB_DOWN);
+    pa->state = PAS_ROLLING;
 }
 
 void physicsactor_drown(physicsactor_t *pa)
@@ -764,13 +761,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(!pa->in_the_air && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
 
         /* start rolling */
-        if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN)) {
-            const sensor_t *s1 = sensor_A(pa), *s2 = pa->A_jumproll;
-            int delta = sensor_get_y2(s1) - sensor_get_y2(s2);
-            pa->position.x += delta * SIN(pa->angle);
-            pa->position.y += delta * COS(pa->angle);
+        if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
             pa->state = PAS_ROLLING;
-        }
 
     }
 
@@ -917,8 +909,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
-    /* moving */
+    /* previous air state */
+    UPDATE_SENSORS();
     was_in_the_air = pa->in_the_air;
+
+    /* moving */
     pa->position.x += pa->xsp * dt;
     pa->position.y += pa->ysp * dt;
     UPDATE_SENSORS();
