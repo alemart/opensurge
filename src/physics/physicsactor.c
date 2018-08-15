@@ -816,8 +816,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->ysp = pa->gsp * -SIN(pa->angle);
 
         /* BUGGED? falling off walls and ceilings */
-        if(fabs(pa->gsp) < pa->falloffthreshold) {
-            if(pa->movmode != MM_FLOOR) {
+        if(pa->movmode != MM_FLOOR) {
+            if(fabs(pa->gsp) < pa->falloffthreshold) {
                 pa->horizontal_control_lock_timer = 0.5f;
                 if(pa->angle >= 0x40 && pa->angle <= 0xC0) {
                     pa->angle = 0x0;
