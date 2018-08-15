@@ -154,7 +154,7 @@ player_t *player_create(const char *character_name)
     p->underwater_timer = 0.0f;
 
     /* character system */
-    if(str_icmp(c->companion_object_name, "") != 0) {
+    if(c->companion_object_name[0] != '\0') {
         /* try to create the companion object using the new API if possible */
         if(!level_create_ssobject(c->companion_object_name, v2d_new(0, 0))) {
             /* not possible; use the old API */
@@ -427,7 +427,7 @@ void player_hit(player_t *player, actor_t *hazard)
             for(int i = 0; i < r; i++) {
                 item_t* b = level_create_item(IT_BOUNCINGRING, player->actor->position);
                 bouncingcollectible_set_speed(b, v2d_new(-sinf(deg2rad(a)) * spd * (1-2*(i%2)), cosf(deg2rad(a)) * spd));
-                a += 22.5f * (i%2);
+                a += 22.5f * (i % 2);
 
                 if(i == 16) {
                     spd *= 0.5f;
