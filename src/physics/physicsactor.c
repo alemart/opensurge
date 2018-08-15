@@ -863,7 +863,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->state != PAS_GETTINGHIT)
             pa->ysp = min(pa->ysp + pa->grv * dt, pa->topyspeed);
         else
-            pa->ysp = min(pa->ysp + (0.65f * pa->grv) * dt, pa->topyspeed);
+            pa->ysp = min(pa->ysp + (0.85f * pa->grv) * dt, pa->topyspeed);
     }
     else {
 
