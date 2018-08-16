@@ -1164,8 +1164,8 @@ void hotspot_magic(player_t* player)
     int angle = physicsactor_get_angle(pa);
 
     if(!player_is_rolling(player)) {
-        
-        if(angle % 90 == 0 || player_is_at_ledge(player)) {
+        const float angthr = sinf(deg2rad(11.25f));
+        if(angle % 90 == 0 || player_is_at_ledge(player) || fabs(sinf(act->angle)) < angthr) {
             switch(physicsactor_get_movmode(pa)) {
                 case MM_FLOOR: act->hot_spot.y += 1; break;
                 case MM_LEFTWALL: act->hot_spot.y += 2; break;
