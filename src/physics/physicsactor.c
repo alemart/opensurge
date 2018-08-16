@@ -1087,7 +1087,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* computing the offset (note: if !pa->in_the_air, then ground_sensor != NULL) */
-        offset = sensor_get_y2(ground_sensor) - sensor_get_y1(ground_sensor) - 1;
+        offset = sensor_get_y2(ground_sensor) - sensor_get_y1(ground_sensor) - 1; /* need -1 */
 
         /* adjust position */
         if(pa->movmode == MM_LEFTWALL)
