@@ -1186,7 +1186,6 @@ void hotspot_magic(player_t* player)
     }
     else {
         const int roll_delta = physicsactor_roll_delta(pa);
-        const float angthr = sinf(deg2rad(15));
 
         /* adjust hot spot */
         switch(physicsactor_get_movmode(pa)) {
@@ -1198,12 +1197,10 @@ void hotspot_magic(player_t* player)
                     else
                         act->hot_spot.x += 4 - roll_delta;
                 }
-                else if(fabsf(sinf(act->angle) > angthr))
-                    act->hot_spot.y += 1 * cosf(act->angle);
                 break;
 
             case MM_LEFTWALL:
-                act->hot_spot.y += roll_delta + 1;
+                act->hot_spot.y += roll_delta;
                 act->hot_spot.x += 4 - roll_delta;
                 if(angle > 270) {
                     act->hot_spot.x += 6 * sinf(act->angle);

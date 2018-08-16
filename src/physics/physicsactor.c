@@ -1032,7 +1032,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         int h = 16;
 
         /* mystery */
-        const sensor_t* s = pa->facing_right ? sensor_B(pa) : sensor_A(pa);
+        const sensor_t* s = (pa->xsp > 0) ? sensor_B(pa) : sensor_A(pa);
         float x = pa->position.x + sensor_get_x1(s);
         float y = pa->position.y + sensor_get_y2(s);
         if(pa->state == PAS_ROLLING) /* rolling hack */
