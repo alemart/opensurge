@@ -87,6 +87,7 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds); /* s
 int physicsactor_is_in_the_air(const physicsactor_t *pa);
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(physicsactor_t *pa);
+int physicsactor_roll_delta(const physicsactor_t* pa); /* roll delta (sensors) */
 
 void physicsactor_walk_right(physicsactor_t *pa); /* call before physicsactor_update() */
 void physicsactor_walk_left(physicsactor_t *pa);
