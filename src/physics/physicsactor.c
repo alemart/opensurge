@@ -764,14 +764,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
+    /* start rolling */
     if(!pa->in_the_air && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
-
-        /* start rolling */
         if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
             pa->state = PAS_ROLLING;
-
     }
 
+    /* roll */
     if(!pa->in_the_air && pa->state == PAS_ROLLING) {
 
         /* slope factor */
@@ -1024,14 +1023,25 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* sticky physics */
-    if(pa->in_the_air && !was_in_the_air && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) {
+    if(pa->in_the_air && (
+        (!was_in_the_air && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) ||
+        (pa->ysp >= 0.0f && pa->state == PAS_ROLLING)
+    )){
         v2d_t offset = v2d_new(0,0);
         float u = 4.0f;
+        int h = 16;
 
         /* mystery */
-        u *= pa->topspeed / 360.0f;
-        if(fabs(pa->gsp) > pa->topspeed)
-            u *= fabs(pa->gsp) / pa->topspeed;
+        const sensor_t* s = pa->facing_right ? sensor_B(pa) : sensor_A(pa);
+        float x = pa->position.x + sensor_get_x1(s);
+        float y = pa->position.y + sensor_get_y2(s);
+        if(pa->state == PAS_ROLLING) /* rolling hack */
+            u += 8.0f;
+        while(h--) {
+            if(obstaclemap_obstacle_exists(obstaclemap, x, y + u))
+                break;
+            u += 1.0f;
+        }
 
         /* computing the test offset */
         if(pa->movmode == MM_FLOOR)
@@ -1097,7 +1107,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* reacquisition of the ground */
     if(!pa->in_the_air && was_in_the_air) {
-        video_showmessage("xsp: %f", pa->xsp);
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
