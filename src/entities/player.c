@@ -48,7 +48,7 @@
 
 
 /* Uncomment to render the sensors */
-/*#define SHOW_SENSORS*/
+#define SHOW_SENSORS
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 4
@@ -115,6 +115,7 @@ player_t *player_create(const char *character_name)
     /* auxiliary variables */
     p->on_movable_platform = FALSE;
     p->got_glasses = FALSE;
+    p->thrown_while_rolling = FALSE;
 
     /* blink */
     p->blinking = FALSE;
@@ -245,13 +246,11 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     if(player->shield_type != SH_NONE)
         update_shield(player);
 
-    /* get underwater */
+    /* underwater logic */
     if(!(player->underwater) && player->actor->position.y >= level_waterlevel())
         player_enter_water(player);
     else if(player->underwater && player->actor->position.y < level_waterlevel())
         player_leave_water(player);
-
-    /* underwater? */
     if(player->underwater) {
         player->speedshoes_timer = max(player->speedshoes_timer, PLAYER_MAX_SPEEDSHOES); /* disable speed shoes */
 
@@ -320,6 +319,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     /* winning pose */
     if(level_has_been_cleared())
         physicsactor_enable_winning_pose(player->pa);
+
+    /* rolling misc */
+    if(!player_is_in_the_air(player))
+        player->thrown_while_rolling = FALSE;
+    else if(physicsactor_get_ysp(player->pa) < 0.0f && player_is_rolling(player))
+        player->thrown_while_rolling = TRUE;
 }
 
 
@@ -1111,8 +1116,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_stopped(player) || player_is_waiting(player) ||
         player_is_ducking(player) || player_is_lookingup(player) ||
         player_is_jumping(player) || player_is_pushing(player) ||
-        player_is_rolling(player)
-    )) && (1 || !player_is_rolling(player))) {
+        player_is_rolling(player) || player_is_at_ledge(player)
+    ))) {
         int degrees = physicsactor_get_angle(pa);
         float new_angle = degrees / 57.2957795131f;
         if(ang_diff(new_angle, act->angle) < 1.6f) {
@@ -1156,9 +1161,11 @@ void hotspot_magic(player_t* player)
 {
     actor_t* act = player->actor;
     physicsactor_t* pa = player->pa;
+    int angle = physicsactor_get_angle(pa);
 
     if(!player_is_rolling(player)) {
-        if(physicsactor_get_angle(pa) % 90 == 0) {
+        
+        if(angle % 90 == 0 || player_is_at_ledge(player)) {
             switch(physicsactor_get_movmode(pa)) {
                 case MM_FLOOR: act->hot_spot.y += 1; break;
                 case MM_LEFTWALL: act->hot_spot.y += 2; break;
@@ -1169,7 +1176,7 @@ void hotspot_magic(player_t* player)
         else if(!physicsactor_is_in_the_air(pa)) {
             physicsactorstate_t state = physicsactor_get_state(pa);
             if(!(
-                state == PAS_STOPPED || state == PAS_WAITING || state == PAS_LEDGE ||
+                state == PAS_STOPPED || state == PAS_WAITING ||
                 state == PAS_DUCKING || state == PAS_LOOKINGUP ||
                 state == PAS_PUSHING || state == PAS_WINNING
             )) {
@@ -1178,47 +1185,44 @@ void hotspot_magic(player_t* player)
         }
     }
     else {
-        /* FIXME: rolling delta */
-        /* the difference of the height of the (foot) sensors in different modes */
-        const int roll_delta = 2;
+        const int roll_delta = physicsactor_roll_delta(pa);
+        const float angthr = sinf(deg2rad(15));
 
         /* adjust hot spot */
         switch(physicsactor_get_movmode(pa)) {
             case MM_FLOOR:
-                act->hot_spot.y += roll_delta;
-                if(physicsactor_get_angle(pa) % 90 == 0) {
-                    act->hot_spot.y += 1;
-                }
-                if(1){
-                    int u = (physicsactor_get_gsp(pa) * sinf(deg2rad(physicsactor_get_angle(pa))) < 0.0f) ? -1 : 0;
+                act->hot_spot.y += roll_delta + 1;
+                if(player->thrown_while_rolling) {
                     if(physicsactor_is_facing_right(pa))
-                        act->hot_spot.x -= roll_delta + u + 1;
+                        act->hot_spot.x -= 5 - roll_delta;
                     else
-                        act->hot_spot.x += roll_delta + u;
+                        act->hot_spot.x += 4 - roll_delta;
                 }
+                else if(fabsf(sinf(act->angle) > angthr))
+                    act->hot_spot.y += 1 * cosf(act->angle);
                 break;
 
             case MM_LEFTWALL:
-                act->hot_spot.y += roll_delta;
-                act->hot_spot.x += roll_delta - cosf(act->angle - PI * 3 / 2);
-                if(physicsactor_get_angle(pa) < 270) {
-                    act->hot_spot.x -= 6 * sinf(act->angle - PI * 3 / 2);
-                    act->hot_spot.y -= 4 * sinf(act->angle - PI * 3 / 2);
+                act->hot_spot.y += roll_delta + 1;
+                act->hot_spot.x += 4 - roll_delta;
+                if(angle > 270) {
+                    act->hot_spot.x += 6 * sinf(act->angle);
+                    act->hot_spot.y += 4 * sinf(act->angle);
                 }
                 break;
 
             case MM_RIGHTWALL:
-                act->hot_spot.y += roll_delta;
-                act->hot_spot.x -= roll_delta + 1 + cosf(act->angle - PI / 2);
-                if(physicsactor_get_angle(pa) > 90) {
-                    act->hot_spot.x -= 6 * sinf(act->angle - PI / 2);
-                    act->hot_spot.y += 4 * sinf(act->angle - PI / 2);
+                act->hot_spot.y += roll_delta + 1;
+                act->hot_spot.x -= 5 - roll_delta;
+                if(angle < 90) {
+                    act->hot_spot.x += 6 * sinf(act->angle);
+                    act->hot_spot.y -= 4 * sinf(act->angle);
                 }
                 break;
 
             case MM_CEILING:
-                act->hot_spot.x += 4 * sinf(act->angle - PI);
-                act->hot_spot.y += roll_delta + 6 * cosf(act->angle - PI);
+                act->hot_spot.x -= (6 - roll_delta) * sinf(act->angle);
+                act->hot_spot.y += 4 - roll_delta - 6 * cosf(act->angle);
                 break;
         }
 

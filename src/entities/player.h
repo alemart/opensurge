@@ -70,8 +70,6 @@ struct player_t {
     int disable_collectible_loss;
     int disable_animation_control;
     int attacking; /* this is set by the user, and if it's true, player_is_attacking() will return true */
-
-    /* magic glasses */
     int got_glasses;
 
     /* shields */
@@ -103,6 +101,7 @@ struct player_t {
     int blinking;
     float blink_timer;
     float blink_visibility_timer;
+    int thrown_while_rolling;
 };
 
 /* public functions */

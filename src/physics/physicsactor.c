@@ -262,21 +262,21 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->B_normal = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
     pa->C_normal = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
     pa->D_normal = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
-    pa->M_normal = sensor_create_horizontal(4, -10, 10, image_rgb(255,0,0)); /* use 10 = 9 (A) + 1 */
+    pa->M_normal = sensor_create_horizontal(4, -10, 10, image_rgb(255,0,0)); /* use 9 (sensor A) + 1 */
     pa->U_normal = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
     pa->A_intheair = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
     pa->B_intheair = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
     pa->C_intheair = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
     pa->D_intheair = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
-    pa->M_intheair = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0));
+    pa->M_intheair = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0)); /* use 10 (sensor M_normal) + 1 */
     pa->U_intheair = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-9, 0, 18, image_rgb(0,255,0));
-    pa->B_jumproll = sensor_create_vertical(9, 0, 18, image_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-9, -10, 0, image_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(9, -10, 0, image_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0));
+    pa->A_jumproll = sensor_create_vertical(-4, 0, 18, image_rgb(0,255,0));
+    pa->B_jumproll = sensor_create_vertical(4, 0, 18, image_rgb(255,255,0));
+    pa->C_jumproll = sensor_create_vertical(-4, -10, 0, image_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(4, -10, 0, image_rgb(128,128,0));
+    pa->M_jumproll = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
     pa->U_jumproll = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
     /* success!!! ;-) */
@@ -423,6 +423,12 @@ void physicsactor_enable_winning_pose(physicsactor_t *pa)
 movmode_t physicsactor_get_movmode(physicsactor_t *pa)
 {
     return pa->movmode;
+}
+
+int physicsactor_roll_delta(const physicsactor_t* pa)
+{
+    /* the difference of the height of the (foot) sensors */
+    return sensor_get_y2(pa->A_normal) - sensor_get_y2(pa->A_jumproll);
 }
 
 void physicsactor_walk_right(physicsactor_t *pa)
@@ -1091,6 +1097,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* reacquisition of the ground */
     if(!pa->in_the_air && was_in_the_air) {
+        video_showmessage("xsp: %f", pa->xsp);
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
