@@ -60,14 +60,15 @@ struct physicsactor_t
     float airdragthreshold; /* air drag threshold */
     int angle; /* angle (0-255 clockwise) */
     int in_the_air; /* is the player in the air? */
-    physicsactorstate_t state; /* state */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
     int facing_right; /* is the player facing right? */
-    movmode_t movmode; /* current movement mode, based on the angle */
-    input_t *input; /* input device */
     float wait_timer; /* the time, in seconds, that the physics actor is stopped */
     int winning_pose; /* winning pose enabled? */
     float breathe_timer; /* if greater than zero, set animation to breathing */
+    int sticky_lock; /* sticky physics lock */
+    physicsactorstate_t state; /* state */
+    movmode_t movmode; /* current movement mode, based on the angle */
+    input_t *input; /* input device */
 
     sensor_t *A_normal; /* sensors */
     sensor_t *B_normal;
@@ -226,6 +227,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->wait_timer = 0.0f;
     pa->winning_pose = FALSE;
     pa->breathe_timer = 0.0f;
+    pa->sticky_lock = FALSE;
 
     /* initializing some constants ;-) */
 
@@ -240,7 +242,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
     pa->air =                   0.1f        * fpsmul * fpsmul ;
-    pa->jmp =                   -6.5f       * fpsmul * 1.0f   ;
+    pa->jmp =                   -6.7f       * fpsmul * 1.0f   ;
     pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
     pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
     pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
@@ -272,8 +274,8 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->M_intheair = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0)); /* use 10 (sensor M_normal) + 1 */
     pa->U_intheair = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-4, 0, 18, image_rgb(0,255,0));
-    pa->B_jumproll = sensor_create_vertical(4, 0, 18, image_rgb(255,255,0));
+    pa->A_jumproll = sensor_create_vertical(-4, 0, 18, image_rgb(0,255,0)); /* use 9 (sensor A) / 2 */
+    pa->B_jumproll = sensor_create_vertical(4, 0, 18, image_rgb(255,255,0)); /* use 20 (sensor A) - 2 */
     pa->C_jumproll = sensor_create_vertical(-4, -10, 0, image_rgb(0,128,0));
     pa->D_jumproll = sensor_create_vertical(4, -10, 0, image_rgb(128,128,0));
     pa->M_jumproll = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
@@ -1025,22 +1027,36 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* sticky physics */
     if(pa->in_the_air && (
         (!was_in_the_air && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) ||
-        (pa->ysp >= 0.0f && pa->state == PAS_ROLLING)
+        (pa->state == PAS_ROLLING && !pa->sticky_lock)
     )){
         v2d_t offset = v2d_new(0,0);
-        float u = 4.0f;
-        int h = 16;
+        int u = 4; /* FIXME: try to use a fraction of the sensor height as well */
 
         /* mystery */
-        const sensor_t* s = (pa->xsp > 0) ? sensor_B(pa) : sensor_A(pa);
-        float x = pa->position.x + sensor_get_x1(s);
-        float y = pa->position.y + sensor_get_y2(s);
-        if(pa->state == PAS_ROLLING) /* rolling hack */
-            u += 8.0f;
-        while(h--) {
-            if(obstaclemap_obstacle_exists(obstaclemap, x, y + u))
-                break;
-            u += 1.0f;
+        if(fabs(pa->xsp) > pa->topspeed || pa->state == PAS_ROLLING) {
+            int x, y, h = u * 4; /* h = 16 */
+            const sensor_t* s = (pa->xsp > 0) ? sensor_B(pa) : sensor_A(pa);
+            sensor_worldpos(s, pa->position, pa->movmode, NULL, NULL, &x, &y);
+            if(pa->state == PAS_ROLLING) /* rolling hack */
+                u *= 2;
+            for(; h--; u++) {
+                if(pa->movmode == MM_FLOOR) {
+                    if(obstaclemap_obstacle_exists(obstaclemap, x, y + u))
+                        break;
+                }
+                else if(pa->movmode == MM_RIGHTWALL) {
+                    if(obstaclemap_obstacle_exists(obstaclemap, y + u, x))
+                        break;
+                }
+                else if(pa->movmode == MM_CEILING) {
+                    if(obstaclemap_obstacle_exists(obstaclemap, x, y - u))
+                        break;
+                }
+                else if(pa->movmode == MM_LEFTWALL) {
+                    if(obstaclemap_obstacle_exists(obstaclemap, y - u, x))
+                        break;
+                }
+            }
         }
 
         /* computing the test offset */
@@ -1066,7 +1082,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             UPDATE_ANGLE(NULL);
             UPDATE_MOVMODE();
             UPDATE_SENSORS();
+
+            /* sticky physics hack */
+            if(pa->state == PAS_ROLLING)
+                pa->sticky_lock = TRUE;
         }
+    }
+    else if(!pa->in_the_air && pa->state == PAS_ROLLING) {
+        /* undo sticky physics hack */
+        pa->sticky_lock = FALSE;
     }
 
     /* stick to the ground */
@@ -1110,7 +1134,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 0.5f * -sign(SIN(pa->angle));
+            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 1.0f * -sign(SIN(pa->angle));
         else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
             pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
 

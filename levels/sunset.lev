@@ -11,7 +11,7 @@ requires 0.5.0
 act 1
 theme "themes/template.brk"
 bgtheme "themes/sunset.bg"
-spawn_point 232 9976
+spawn_point 184 9976
 music "musics/sunshine.ogg"
 startup ".default_startup"
 players "Surge" "Neon"
@@ -1020,7 +1020,6 @@ brick 48 6592 10864
 brick 0 6464 11056 green
 brick 0 6464 10608
 brick 21 6528 10608 vflip
-brick 16 6528 10512 hflip
 brick 0 6528 10544
 brick 49 6720 10928 hflip
 brick 0 6592 11248
@@ -1051,6 +1050,7 @@ brick 6 7072 10928
 brick 0 6912 10928 green hflip
 brick 0 6976 10928 green hflip
 brick 0 7040 10928 green hflip
+brick 17 6464 10528 hflip
 brick 17 5824 10416
 brick 65 5952 10352 green
 brick 66 5952 10352 yellow
@@ -1936,17 +1936,17 @@ item 0 7728 10736
 item 0 7200 10944
 item 0 7200 10896
 item 0 7200 10848
-item 0 6784 10352
-item 0 6816 10352
-item 0 6752 10352
-item 0 6848 10352
-item 0 6768 10320
-item 0 6800 10320
-item 0 6832 10320
 item 20 6816 11120
 item 0 6624 11104
 item 0 6688 11104
 item 1 6880 10992
+item 0 6800 10408
+item 0 6768 10408
+item 0 6832 10408
+item 0 6752 10440
+item 0 6784 10440
+item 0 6816 10440
+item 0 6848 10440
 item 82 5920 10448
 item 82 5920 10416
 item 82 5920 10384
@@ -1967,14 +1967,6 @@ item 0 5840 9936
 item 0 5872 9936
 item 0 5824 9904
 item 0 5856 9904
-item 0 6080 10272
-item 0 6080 10432
-item 0 6160 10352
-item 0 6144 10400
-item 0 6144 10304
-item 0 6000 10352
-item 0 6016 10304
-item 0 6016 10400
 item 43 6208 10240
 item 82 6112 10256
 item 83 6016 10256
@@ -2007,10 +1999,6 @@ item 0 5248 11168
 item 0 5296 11168
 item 0 5776 9936
 item 0 5792 9904
-item 0 5696 10336
-item 0 5728 10352
-item 0 5760 10368
-item 0 5792 10384
 item 0 5456 10160
 item 0 5440 10208
 item 0 5440 10112

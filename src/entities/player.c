@@ -48,7 +48,7 @@
 
 
 /* Uncomment to render the sensors */
-#define SHOW_SENSORS
+/*#define SHOW_SENSORS*/
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 4
@@ -1118,8 +1118,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
     ))) {
-        int degrees = physicsactor_get_angle(pa);
-        float new_angle = degrees / 57.2957795131f;
+        float new_angle = deg2rad(physicsactor_get_angle(pa));
         if(ang_diff(new_angle, act->angle) < 1.6f) {
             float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
             act->angle = lerp_angle(act->angle, new_angle, t);

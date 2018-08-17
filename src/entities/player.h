@@ -129,8 +129,8 @@ float player_seconds_remaining_to_drown(const player_t *player);
 
 int player_is_in_the_air(const player_t *player);
 int player_is_attacking(const player_t *player);
-int player_is_ultrafast(const player_t *player); /* wearing speed shoes? */
-int player_is_invincible(const player_t *player); /* invunerible? */
+int player_is_ultrafast(const player_t *player); /* wearing faster shoes? */
+int player_is_invincible(const player_t *player);
 
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);
