@@ -51,7 +51,7 @@
 /*#define SHOW_SENSORS*/
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
-#define ANGLE_SMOOTHING 4
+#define ANGLE_SMOOTHING 3
 
 /* macros */
 #define ON_STATE(s) \
@@ -84,6 +84,7 @@ static obstacle_t* object2obstacle(const object_t *object);
 static int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer);
 static float ang_diff(float alpha, float beta);
 static void hotspot_magic(player_t* player);
+static int fixangle(int degrees, int threshold);
 
 
 /*
@@ -1096,13 +1097,13 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     darray_release(tmp_obstacle);
 
     /* can't leave the screen */
-    if(physicsactor_get_position(pa).x < 20) {
-        physicsactor_set_position(pa, v2d_new(20, physicsactor_get_position(pa).y));
+    if(physicsactor_get_position(pa).x < 10) {
+        physicsactor_set_position(pa, v2d_new(10, physicsactor_get_position(pa).y));
         physicsactor_set_xsp(pa, 0.0f);
         physicsactor_set_gsp(pa, 0.0f);
     }
-    else if(physicsactor_get_position(pa).x > level_size().x - 20) {
-        physicsactor_set_position(pa, v2d_new(level_size().x - 20, physicsactor_get_position(pa).y));
+    else if(physicsactor_get_position(pa).x > level_size().x - 10) {
+        physicsactor_set_position(pa, v2d_new(level_size().x - 10, physicsactor_get_position(pa).y));
         physicsactor_set_xsp(pa, 0.0f);
         physicsactor_set_gsp(pa, 0.0f);
     }
@@ -1118,7 +1119,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
     ))) {
-        float new_angle = deg2rad(physicsactor_get_angle(pa));
+        float new_angle = deg2rad(fixangle(physicsactor_get_angle(pa), 15));
         if(ang_diff(new_angle, act->angle) < 1.6f) {
             float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
             act->angle = lerp_angle(act->angle, new_angle, t);
@@ -1233,4 +1234,20 @@ float ang_diff(float alpha, float beta)
     static const float twopi = PI * 2;
     float diff = fmod(fabs(alpha - beta), twopi);
     return min(twopi - diff, diff);
+}
+
+/* truncates the angle within a given threshold, assuming 0 <= degrees < 360 */
+int fixangle(int degrees, int threshold)
+{
+    int t = threshold / 2;
+    if(degrees <= t || degrees >= 360 - t)
+        return 0;
+    else if(degrees <= 90 + t && degrees >= 90 - t)
+        return 90;
+    else if(degrees <= 180 + t && degrees >= 180 - t)
+        return 180;
+    else if(degrees <= 270 + t && degrees >= 270 - t)
+        return 270;
+    else
+        return degrees;
 }

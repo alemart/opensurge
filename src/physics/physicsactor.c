@@ -571,18 +571,20 @@ GENERATE_SENSOR_ACCESSOR(U)
         at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, obstaclemap); \
         at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, obstaclemap); \
         if(at_A != NULL && !obstacle_is_solid(at_A)) { \
-            int ypos = (int)(pa->position.y + sensor_get_y2(sensor_A(pa))); \
-            int ygnd = obstacle_ground_position(at_A, (int)(pa->position.x + sensor_get_x2(sensor_A(pa))), ypos, GD_DOWN); \
-            at_A = (pa->ysp >= 0.0f && ypos < ygnd + 16 && pa->movmode == MM_FLOOR) ? at_A : NULL; \
+            int xpos, ypos, ygnd; \
+            sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &xpos, &ypos); \
+            ygnd = obstacle_ground_position(at_A, xpos, ypos, GD_DOWN); \
+            at_A = (pa->ysp >= 0.0f && ypos < ygnd + 8 && pa->movmode == MM_FLOOR) ? at_A : NULL; \
         } \
         if(at_B != NULL && !obstacle_is_solid(at_B)) { \
-            int ypos = (int)(pa->position.y + sensor_get_y2(sensor_B(pa))); \
-            int ygnd = obstacle_ground_position(at_B, (int)(pa->position.x + sensor_get_x2(sensor_B(pa))), ypos, GD_DOWN); \
-            at_B = (pa->ysp >= 0.0f && ypos < ygnd + 16 && pa->movmode == MM_FLOOR) ? at_B : NULL; \
+            int xpos, ypos, ygnd; \
+            sensor_worldpos(sensor_B(pa), pa->position, pa->movmode, NULL, NULL, &xpos, &ypos); \
+            ygnd = obstacle_ground_position(at_B, xpos, ypos, GD_DOWN); \
+            at_B = (pa->ysp >= 0.0f && ypos < ygnd + 8 && pa->movmode == MM_FLOOR) ? at_B : NULL; \
         } \
-        at_C = (at_C != NULL && !obstacle_is_solid(at_C)) ? NULL : at_C; \
-        at_D = (at_D != NULL && !obstacle_is_solid(at_D)) ? NULL : at_D; \
-        at_M = (at_M != NULL && !obstacle_is_solid(at_M)) ? NULL : at_M; \
+        at_C = (at_C != NULL && obstacle_is_solid(at_C)) ? at_C : NULL; \
+        at_D = (at_D != NULL && obstacle_is_solid(at_D)) ? at_D : NULL; \
+        at_M = (at_M != NULL && obstacle_is_solid(at_M)) ? at_M : NULL; \
         pa->in_the_air = (at_A == NULL) && (at_B == NULL); \
     } while(0)
 
@@ -1120,8 +1122,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->position.y = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_x2(ground_sensor), (int)pa->position.y - sensor_get_y2(ground_sensor), GD_UP) + offset;
         else if(pa->movmode == MM_RIGHTWALL)
             pa->position.x = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_y2(ground_sensor), (int)pa->position.y - sensor_get_x2(ground_sensor), GD_RIGHT) - offset;
-        else if(pa->movmode == MM_FLOOR)
-            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
+        else if(pa->movmode == MM_FLOOR) {
+            if(obstacle_is_solid(ground))
+                pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
+            else /* cloud fix */
+                pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x1(ground_sensor), (int)pa->position.y + sensor_get_y1(ground_sensor), GD_DOWN) - offset;
+        }
 
         /* update the angle */
         UPDATE_ANGLE(ground);
@@ -1203,8 +1209,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* I'm on the edge */
     if(!pa->in_the_air && fabs(pa->gsp) < EPSILON && pa->state != PAS_PUSHING && pa->movmode == MM_FLOOR) {
+        const sensor_t* s = at_A ? sensor_A(pa) : sensor_B(pa);
         int x = (int)pa->position.x;
-        int y = obstacle_ground_position(at_A ? at_A : at_B, x, (int)pa->position.y, GD_DOWN);
+        int y = (int)pa->position.y + sensor_get_y2(s) + (sensor_get_y2(s) - sensor_get_y1(s)) / 2;
         if(at_A != NULL && at_B == NULL && !obstacle_got_collision(at_A, x, y, x, y)) {
             pa->state = PAS_LEDGE;
             pa->facing_right = TRUE;
@@ -1250,6 +1257,16 @@ char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const o
             yb = (int)pa->position.y + sensor_get_y2(b_sensor);
             ha = obstacle_ground_position(a, xa, ya, GD_DOWN);
             hb = obstacle_ground_position(b, xb, yb, GD_DOWN);
+            if(!obstacle_is_solid(a)) { /* cloud fix */
+                xa = (int)pa->position.x + sensor_get_x1(a_sensor);
+                ya = (int)pa->position.y + sensor_get_y1(a_sensor);
+                ha = obstacle_ground_position(a, xa, ya, GD_DOWN);
+            }
+            if(!obstacle_is_solid(b)) {
+                xb = (int)pa->position.x + sensor_get_x1(b_sensor);
+                yb = (int)pa->position.y + sensor_get_y1(b_sensor);
+                hb = obstacle_ground_position(a, xb, yb, GD_DOWN);
+            }
             return ha < hb ? 'a' : 'b';
 
         case MM_LEFTWALL:
