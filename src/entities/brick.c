@@ -105,8 +105,8 @@ static int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskd
 static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
 static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
-static inline int obstacle_flags(const brick_t* brick);
-static inline int image_flags(const brick_t* brick);
+static inline int get_obstacle_flags(const brick_t* brick);
+static inline int get_image_flags(const brick_t* brick);
 
 /* public functions */
 
@@ -360,7 +360,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 break;
 
             if(brk->obstacle != NULL)
-                obstacle_set_position(brk->obstacle, v2d_new(brk->x, brk->y));
+                obstacle_set_position(brk->obstacle, brk->x, brk->y);
 
             for(i=0; i<team_size; i++) {
                 image_t* actor = actor_image(team[i]->actor);
@@ -405,9 +405,9 @@ void brick_render(brick_t *brk, v2d_t camera_position)
     brick_animate(brk);
 
     if(brk->layer == BRL_DEFAULT || !level_editmode())
-        image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), image_flags(brk));
+        image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
     else
-        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), 0.5f, image_flags(brk));
+        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), 0.5f, get_image_flags(brk));
 }
 
 
@@ -760,7 +760,7 @@ const image_t* brick_image_preview(int id)
 int brick_image_flags(brickflip_t flip)
 {
     brick_t b = { flip: flip }; /* hackish */
-    return image_flags(&b);
+    return get_image_flags(&b);
 }
 
 
@@ -843,9 +843,8 @@ obstacle_t* create_obstacle(const brick_t* brick)
 {
     if(brick->brick_ref && brick->brick_ref->type != BRK_PASSABLE && brick->brick_ref->mask) {
         const collisionmask_t* mask = brick->brick_ref->mask;
-        v2d_t position = brick_position(brick);
-        int flags = obstacle_flags(brick);
-        return obstacle_create(mask, position, flags);
+        int flags = get_obstacle_flags(brick);
+        return obstacle_create(mask, brick->x, brick->y, flags);
     }
     else
         return NULL;
@@ -857,7 +856,7 @@ obstacle_t* destroy_obstacle(obstacle_t* obstacle)
     return (obstacle != NULL) ? obstacle_destroy(obstacle) : NULL;
 }
 
-int obstacle_flags(const brick_t* brick)
+int get_obstacle_flags(const brick_t* brick)
 {
     return
         ((brick_type(brick) == BRK_OBSTACLE) ? OF_SOLID : OF_CLOUD) |
@@ -866,7 +865,7 @@ int obstacle_flags(const brick_t* brick)
     ;
 }
 
-int image_flags(const brick_t* brick)
+int get_image_flags(const brick_t* brick)
 {
     return ((brick->flip & BRF_HFLIP) ? IF_HFLIP : 0) | ((brick->flip & BRF_VFLIP) ? IF_VFLIP : 0);
 }

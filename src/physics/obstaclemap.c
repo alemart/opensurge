@@ -59,14 +59,8 @@ const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstacle
     const obstacle_t *best = NULL;
 
     for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
-        /* the i-th obstacle collides with the sensor */
-        if(obstacle_got_collision(obstaclemap->obstacle[i], x1, y1, x2, y2)) {
-            /* the C standard mandates short-circuit evaluation */
-            if((best == NULL) || pick_best_obstacle(obstaclemap->obstacle[i], best, x1, y1, x2, y2, mm) == obstaclemap->obstacle[i]) {
-                /* the i-th obstacle is the best one (up until now) */
-                best = obstaclemap->obstacle[i];
-            }
-        }
+        if(obstacle_got_collision(obstaclemap->obstacle[i], x1, y1, x2, y2))
+            best = pick_best_obstacle(obstaclemap->obstacle[i], best, x1, y1, x2, y2, mm);
     }
 
     return best;
@@ -118,11 +112,16 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 {
     int x, y, ha, hb;
 
+    /* NULL pointers should be handled */
+    if(a == NULL)
+        return b;
+    else if(b == NULL)
+        return a;
+
     /* solid obstacles are better than one-way platforms */
     if(!obstacle_is_solid(a) && obstacle_is_solid(b))
         return b;
-
-    if(!obstacle_is_solid(b) && obstacle_is_solid(a))
+    else if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
 
     /* one-way platforms only: get the shortest obstacle */
@@ -134,7 +133,7 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
         }
     }
 
-    /* solid obstacles only: get the tallest one */
+    /* solid obstacles: get the tallest one */
     switch(mm) {
         case MM_FLOOR:
             x = x2; /* x1 == x2 */

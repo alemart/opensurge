@@ -1139,7 +1139,7 @@ obstacle_t* item2obstacle(const item_t *item)
 {
     const collisionmask_t* mask = item->mask;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
-    return obstacle_create(mask, position, OF_SOLID);
+    return obstacle_create(mask, position.x, position.y, OF_SOLID);
 }
 
 /* converts a custom object to an obstacle */
@@ -1147,7 +1147,7 @@ obstacle_t* object2obstacle(const object_t *object)
 {
     const collisionmask_t* mask = object->mask;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
-    return obstacle_create(mask, position, OF_SOLID);
+    return obstacle_create(mask, position.x, position.y, OF_SOLID);
 }
 
 /* ignore the obstacle? */

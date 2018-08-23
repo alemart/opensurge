@@ -571,16 +571,24 @@ GENERATE_SENSOR_ACCESSOR(U)
         at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, obstaclemap); \
         at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, obstaclemap); \
         if(at_A != NULL && !obstacle_is_solid(at_A)) { \
-            int xpos, ypos, ygnd; \
-            sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &xpos, &ypos); \
-            ygnd = obstacle_ground_position(at_A, xpos, ypos, GD_DOWN); \
-            at_A = (pa->ysp >= 0.0f && ypos < ygnd + 8 && pa->movmode == MM_FLOOR) ? at_A : NULL; \
+            int x, y; \
+            sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
+            if(obstacle_got_collision(at_A, x, y, x, y) && pa->movmode == MM_FLOOR) { \
+                int ygnd = obstacle_ground_position(at_A, x, y, GD_DOWN); \
+                at_A = (pa->ysp >= 0.0f && y < ygnd + 8) ? at_A : NULL; \
+            } \
+            else \
+                at_A = NULL; \
         } \
         if(at_B != NULL && !obstacle_is_solid(at_B)) { \
-            int xpos, ypos, ygnd; \
-            sensor_worldpos(sensor_B(pa), pa->position, pa->movmode, NULL, NULL, &xpos, &ypos); \
-            ygnd = obstacle_ground_position(at_B, xpos, ypos, GD_DOWN); \
-            at_B = (pa->ysp >= 0.0f && ypos < ygnd + 8 && pa->movmode == MM_FLOOR) ? at_B : NULL; \
+            int x, y; \
+            sensor_worldpos(sensor_B(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
+            if(obstacle_got_collision(at_B, x, y, x, y) && pa->movmode == MM_FLOOR) { \
+                int ygnd = obstacle_ground_position(at_B, x, y, GD_DOWN); \
+                at_B = (pa->ysp >= 0.0f && y < ygnd + 8) ? at_B : NULL; \
+            } \
+            else \
+                at_B = NULL; \
         } \
         at_C = (at_C != NULL && obstacle_is_solid(at_C)) ? at_C : NULL; \
         at_D = (at_D != NULL && obstacle_is_solid(at_D)) ? at_D : NULL; \
@@ -1095,9 +1103,24 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->sticky_lock = FALSE;
     }
 
-    /* stick to the ground */
+    /* reacquisition of the ground */
+    if(!pa->in_the_air && was_in_the_air) {
+        if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
+            pa->gsp = pa->xsp;
+        else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
+            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 1.0f * -sign(SIN(pa->angle));
+        else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
+            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+
+        pa->xsp = pa->ysp = 0.0f;
+        if(pa->state != PAS_ROLLING)
+            pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+    }
+
+    /* stick to the ground
+     * this block adjusts the position of the player and
+     * must come AFTER 'reacquisition of the ground' */
     if((!pa->in_the_air) && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT) && pa->ysp < 0.0f)) {
-        /* picking the ground */
         const obstacle_t *ground = NULL;
         const sensor_t *ground_sensor = NULL;
         int offset = 0;
@@ -1122,31 +1145,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->position.y = obstacle_ground_position(ground, (int)pa->position.x - sensor_get_x2(ground_sensor), (int)pa->position.y - sensor_get_y2(ground_sensor), GD_UP) + offset;
         else if(pa->movmode == MM_RIGHTWALL)
             pa->position.x = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_y2(ground_sensor), (int)pa->position.y - sensor_get_x2(ground_sensor), GD_RIGHT) - offset;
-        else if(pa->movmode == MM_FLOOR) {
-            if(obstacle_is_solid(ground))
-                pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
-            else /* cloud fix */
-                pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x1(ground_sensor), (int)pa->position.y + sensor_get_y1(ground_sensor), GD_DOWN) - offset;
-        }
+        else if(pa->movmode == MM_FLOOR)
+            pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
 
         /* update the angle */
         UPDATE_ANGLE(ground);
         UPDATE_MOVMODE();
         UPDATE_SENSORS();
-    }
-
-    /* reacquisition of the ground */
-    if(!pa->in_the_air && was_in_the_air) {
-        if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
-            pa->gsp = pa->xsp;
-        else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 1.0f * -sign(SIN(pa->angle));
-        else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
-
-        pa->xsp = pa->ysp = 0.0f;
-        if(pa->state != PAS_ROLLING)
-            pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
     }
 
     /* bump into ceilings */
@@ -1257,16 +1262,6 @@ char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const o
             yb = (int)pa->position.y + sensor_get_y2(b_sensor);
             ha = obstacle_ground_position(a, xa, ya, GD_DOWN);
             hb = obstacle_ground_position(b, xb, yb, GD_DOWN);
-            if(!obstacle_is_solid(a)) { /* cloud fix */
-                xa = (int)pa->position.x + sensor_get_x1(a_sensor);
-                ya = (int)pa->position.y + sensor_get_y1(a_sensor);
-                ha = obstacle_ground_position(a, xa, ya, GD_DOWN);
-            }
-            if(!obstacle_is_solid(b)) {
-                xb = (int)pa->position.x + sensor_get_x1(b_sensor);
-                yb = (int)pa->position.y + sensor_get_y1(b_sensor);
-                hb = obstacle_ground_position(a, xb, yb, GD_DOWN);
-            }
             return ha < hb ? 'a' : 'b';
 
         case MM_LEFTWALL:
