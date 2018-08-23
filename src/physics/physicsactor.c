@@ -1104,7 +1104,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* reacquisition of the ground */
-    if(!pa->in_the_air && was_in_the_air) {
+    if(!pa->in_the_air && was_in_the_air && pa->ysp > 0.0f) {
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))

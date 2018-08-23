@@ -133,16 +133,19 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
     int o_x2 = o_x1 + obstacle->width;
     int o_y2 = o_y1 + obstacle->height;
     int pitch = collisionmask_pitch(mask);
+    int px, py;
+
+    /* assert: x1 == x2 or y1 == y2 */
 
     /* bounding box collision check */
     if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1) {
         /* pixel perfect collision check */
         if(x1 != x2) {
             /* horizontal sensor */
-            int py = y1 - o_y1;
-            if(py >= 0 && py < obstacle->height) {
+            if(y1 >= o_y1 && y1 < o_y2) {
                 for(int x = x2; x >= x1; x--) {
-                    int px = x - o_x1;
+                    px = x - o_x1;
+                    py = y1 - o_y1;
                     if(px >= 0 && px < obstacle->width) {
                         flip(obstacle, &px, &py, NULL);
                         if(collisionmask_at(mask, px, py, pitch))
@@ -153,10 +156,10 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
         }
         else if(y1 != y2) {
             /* vertical sensor */
-            int px = x1 - o_x1;
-            if(px >= 0 && px < obstacle->width) {
+            if(x1 >= o_x1 && x1 < o_x2) {
                 for(int y = y2; y >= y1; y--) {
-                    int py = y - o_y1;
+                    py = y - o_y1;
+                    px = x1 - o_x1;
                     if(py >= 0 && py < obstacle->height) {
                         flip(obstacle, &px, &py, NULL);
                         if(collisionmask_at(mask, px, py, pitch))
@@ -167,8 +170,8 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
         }
         else {
             /* single-pixel collision check */
-            int px = x1 - o_x1;
-            int py = y1 - o_y1;
+            px = x1 - o_x1;
+            py = y1 - o_y1;
             flip(obstacle, &px, &py, NULL);
             return collisionmask_at(mask, px, py, pitch);
         }

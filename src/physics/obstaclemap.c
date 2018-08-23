@@ -115,13 +115,13 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     /* NULL pointers should be handled */
     if(a == NULL)
         return b;
-    else if(b == NULL)
+    if(b == NULL)
         return a;
 
     /* solid obstacles are better than one-way platforms */
     if(!obstacle_is_solid(a) && obstacle_is_solid(b))
         return b;
-    else if(!obstacle_is_solid(b) && obstacle_is_solid(a))
+    if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
 
     /* one-way platforms only: get the shortest obstacle */
