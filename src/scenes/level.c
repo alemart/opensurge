@@ -1849,9 +1849,9 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
         /* render players (bring to back?) */
         render_players(TRUE);
 
-        /* render bricks - platform level (back) */
+        /* render bricks - platform level */
         for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            if(brick_type(bnode->data) != BRK_OBSTACLE && fabs(brick_zindex(bnode->data) - 0.5f) < EPSILON)
+            if(fabs(brick_zindex(bnode->data) - 0.5f) < EPSILON)
                 renderqueue_enqueue_brick(bnode->data);
         }
 
@@ -1859,12 +1859,6 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
         for(inode=major_items; inode; inode=inode->next) {
             if(inode->data->bring_to_back)
                 renderqueue_enqueue_item(inode->data);
-        }
-
-        /* render bricks - platform level (front) */
-        for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            if(brick_type(bnode->data) == BRK_OBSTACLE && fabs(brick_zindex(bnode->data) - 0.5f) < EPSILON)
-                renderqueue_enqueue_brick(bnode->data);
         }
 
         /* render non-HUD objects */

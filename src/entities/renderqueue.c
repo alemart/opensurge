@@ -81,17 +81,17 @@ static float brick_zindex_offset(const brick_t *b)
 
     /* a hackish solution... */
     switch(brick_type(b)) {
-        case BRK_PASSABLE:      s -= 0.00002f;
-        case BRK_CLOUD:     s -= 0.00001f;
-        case BRK_OBSTACLE:  s -= 0.00000f;
+        case BRK_PASSABLE:  s -= 0.0002f;
+        case BRK_CLOUD:     s -= 0.0001f;
+        case BRK_OBSTACLE:  s -= 0.0000f;
     }
 
     switch(brick_layer(b)) {
-        case BRL_YELLOW:    s -= 0.0001f;
-        case BRL_GREEN:     s += 0.0001f;
+        case BRL_YELLOW:    s -= 0.0005f;
+        case BRL_GREEN:     s += 0.0005f;
         case BRL_DEFAULT:   s += 0.0000f;
     }
-
+    
     return s;
 }
 
