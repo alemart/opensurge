@@ -144,9 +144,9 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
             /* horizontal sensor */
             if(y1 >= o_y1 && y1 < o_y2) {
                 for(int x = x2; x >= x1; x--) {
-                    px = x - o_x1;
-                    py = y1 - o_y1;
-                    if(px >= 0 && px < obstacle->width) {
+                    if(x >= o_x1 && x < o_x2) {
+                        px = x - o_x1;
+                        py = y1 - o_y1;
                         flip(obstacle, &px, &py, NULL);
                         if(collisionmask_at(mask, px, py, pitch))
                             return TRUE;
@@ -158,9 +158,9 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
             /* vertical sensor */
             if(x1 >= o_x1 && x1 < o_x2) {
                 for(int y = y2; y >= y1; y--) {
-                    py = y - o_y1;
-                    px = x1 - o_x1;
-                    if(py >= 0 && py < obstacle->height) {
+                    if(y >= o_y1 && y < o_y2) {
+                        px = x1 - o_x1;
+                        py = y - o_y1;
                         flip(obstacle, &px, &py, NULL);
                         if(collisionmask_at(mask, px, py, pitch))
                             return TRUE;
