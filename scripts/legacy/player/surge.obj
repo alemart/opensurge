@@ -101,6 +101,11 @@ object ".surge_spindash_controller"
         enable_player_movement
         weak_player
         set_player_xspeed "(480 + 30 * floor($p)) * player_direction()"
+        change_state "roll"
+    }
+
+    state "roll"
+    {
         roll_player
         change_state "stand by"
     }
