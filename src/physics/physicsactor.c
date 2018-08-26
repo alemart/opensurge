@@ -236,9 +236,9 @@ physicsactor_t* physicsactor_create(v2d_t position)
       | name                 | magic number | fps multitplier |
       +----------------------+--------------+-----------------+
      */
-    pa->acc =                   0.06f       * fpsmul * fpsmul ;
+    pa->acc =                   0.05f       * fpsmul * fpsmul ;
     pa->dec =                   0.5f        * fpsmul * fpsmul ;
-    pa->frc =                   0.06f       * fpsmul * fpsmul ;
+    pa->frc =                   0.05f       * fpsmul * fpsmul ;
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
     pa->air =                   0.1f        * fpsmul * fpsmul ;
@@ -247,7 +247,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
     pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
     pa->grv =                   0.23f       * fpsmul * fpsmul ;
-    pa->slp =                   0.125f      * fpsmul * fpsmul ;
+    pa->slp =                   0.16f       * fpsmul * fpsmul ;
     pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
     pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
@@ -748,7 +748,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* slope factor */
-        if(fabs(pa->gsp) >= pa->walkthreshold || fabs(SIN(pa->angle)) >= 0.707f)
+        if(fabs(pa->gsp) >= pa->walkthreshold || fabs(SIN(pa->angle)) >= 0.5f || pa->gsp * SIN(pa->angle) < 0.0f)
             pa->gsp += pa->slp * -SIN(pa->angle) * dt;
 
         /* animation issues */
@@ -761,6 +761,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 pa->state = input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT) ? PAS_STOPPED : PAS_WALKING;
             else if((pa->state != PAS_PUSHING && pa->state != PAS_WAITING) || (pa->state == PAS_PUSHING && !input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)))
                 pa->state = PAS_STOPPED;
+            else if((pa->state == PAS_STOPPED || pa->state == PAS_WAITING) && fabs(pa->gsp) > EPSILON)
+                pa->state = PAS_WALKING;
         }
         else {
             if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING)
