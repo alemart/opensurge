@@ -4,9 +4,8 @@
 //
 // File:   characters/none.chr
 // Desc:   character definitions: None. 
-//         None is a special player that does not move and does not appear in the screen
+//         a special player that doesn't move and doesn't appear in the screen
 // Author: script by Alexandre
-// Date:   2011-02-08
 // ---------------------------------------------------------------------------
 
 character "None"
@@ -17,15 +16,12 @@ character "None"
     {
         acceleration                1.0
         deceleration                1.0
+        friction                    1.0
         topspeed                    1.0
         jump                        1.0
-        jumprel                     1.0
         gravity                     1.0
-        rollthreshold               1.0
-        brakingthreshold            1.0
         slope                       1.0
-        rolluphillslope             1.0
-        rolldownhillslope           1.0
+        charge                      1.0
     }
     
     animations
@@ -49,6 +45,14 @@ character "None"
         lookingup                   0
         winning                     0
         ceiling                     0
+        charging                    0
+    }
+
+    abilities
+    {
+        roll                        FALSE
+        brake                       FALSE
+        charge                      FALSE
     }
     
     samples
@@ -57,5 +61,6 @@ character "None"
         roll                        "samples/roll.wav"
         death                       "samples/death.wav"
         brake                       "samples/brake.wav"
+        charge                      "samples/charge.wav"
     }
 }
