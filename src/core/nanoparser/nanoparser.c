@@ -100,7 +100,7 @@ pre-processing phase:
 #undef FALSE
 #endif
 
-#define TRUE -1
+#define TRUE  1
 #define FALSE 0
 
 /*#define NANOPARSER_DEBUG_MODE*/
