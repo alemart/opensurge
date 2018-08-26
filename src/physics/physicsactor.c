@@ -721,12 +721,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         /* deceleration / braking */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
             pa->gsp += pa->dec * dt;
-            if(fabs(pa->gsp) >= pa->brakingthreshold)
+            if(pa->movmode == MM_FLOOR && fabs(pa->gsp) >= pa->brakingthreshold)
                 pa->state = PAS_BRAKING;
         }
         else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
             pa->gsp -= pa->dec * dt;
-            if(fabs(pa->gsp) >= pa->brakingthreshold)
+            if(pa->movmode == MM_FLOOR && fabs(pa->gsp) >= pa->brakingthreshold)
                 pa->state = PAS_BRAKING;
         }
 
