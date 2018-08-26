@@ -182,9 +182,9 @@ player_t *player_create(const char *character_name)
 
     /* character system: configuring the abilities */
     if(!c->ability.roll)
-        physicsactor_set_rollthreshold(p->pa, physicsactor_get_rollthreshold(p->pa) * 1000.0f);
+        physicsactor_set_rollthreshold(p->pa, 20000.0f);
     if(!c->ability.brake)
-        physicsactor_set_brakingthreshold(p->pa, physicsactor_get_brakingthreshold(p->pa) * 1000.0f);
+        physicsactor_set_brakingthreshold(p->pa, 20000.0f);
     if(!c->ability.charge)
         physicsactor_set_chrg(p->pa, 0.0f);
 
