@@ -255,42 +255,42 @@ int traverse_multipliers(const parsetree_statement_t *stmt, void *character)
     if(str_icmp(identifier, "acceleration") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "acceleration must be a positive number");
-        c->multiplier.acc = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.acc = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "deceleration") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "deceleration must be a positive number");
-        c->multiplier.dec = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.dec = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "friction") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "friction must be a positive number");
-        c->multiplier.frc = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.frc = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "topspeed") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "topspeed must be a positive number");
-        c->multiplier.topspeed = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.topspeed = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "jump") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "jump must be a positive number");
-        c->multiplier.jmp = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.jmp = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "gravity") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "gravity must be a positive number");
-        c->multiplier.grv = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.grv = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "slope") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "slope must be a positive number");
-        c->multiplier.slp = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.slp = max(0.0f, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "charge") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "charge must be a positive number");
-        c->multiplier.chrg = max(0, atof(nanoparser_get_string(p1)));
+        c->multiplier.chrg = max(0.0f, atof(nanoparser_get_string(p1)));
     }
 
     /* the multipliers below have been deprecated, but their identifiers
