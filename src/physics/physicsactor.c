@@ -48,6 +48,7 @@ struct physicsactor_t
     float hitjmp; /* get hit jump velocity */
     float grv; /* gravity */
     float slp; /* slope factor */
+    float chrg; /* charge-and-release max speed */
     float walkthreshold; /* walk threshold */
     float unrollthreshold; /* unroll threshold */
     float rollthreshold; /* roll threshold */
@@ -248,6 +249,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
     pa->grv =                   0.23f       * fpsmul * fpsmul ;
     pa->slp =                   0.14f       * fpsmul * fpsmul ;
+    pa->chrg =                  12.0f       * fpsmul * 1.0f   ;
     pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
     pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
@@ -522,6 +524,7 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(diejmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(hitjmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(grv)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(slp)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(chrg)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(walkthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(unrollthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rollthreshold)

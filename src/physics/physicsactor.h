@@ -123,18 +123,20 @@ float physicsactor_get_air(const physicsactor_t *pa); /* air acceleration */
 void physicsactor_set_air(physicsactor_t *pa, float value);
 float physicsactor_get_airdragthreshold(const physicsactor_t *pa); /* air drag threshold */
 void physicsactor_set_airdragthreshold(physicsactor_t *pa, float value);
-float physicsactor_get_jmp(const physicsactor_t *pa); /* initial jump velocity */
+float physicsactor_get_jmp(const physicsactor_t *pa); /* initial jump speed */
 void physicsactor_set_jmp(physicsactor_t *pa, float value);
-float physicsactor_get_jmprel(const physicsactor_t *pa); /* release jump velocity */
+float physicsactor_get_jmprel(const physicsactor_t *pa); /* release jump speed */
 void physicsactor_set_jmprel(physicsactor_t *pa, float value);
-float physicsactor_get_diejmp(const physicsactor_t *pa); /* death jump velocity */
+float physicsactor_get_diejmp(const physicsactor_t *pa); /* death jump speed */
 void physicsactor_set_diejmp(physicsactor_t *pa, float value);
-float physicsactor_get_hitjmp(const physicsactor_t *pa); /* get hit jump velocity */
+float physicsactor_get_hitjmp(const physicsactor_t *pa); /* get hit jump speed */
 void physicsactor_set_hitjmp(physicsactor_t *pa, float value);
 float physicsactor_get_grv(const physicsactor_t *pa); /* gravity */
 void physicsactor_set_grv(physicsactor_t *pa, float value);
 float physicsactor_get_slp(const physicsactor_t *pa); /* slope */
 void physicsactor_set_slp(physicsactor_t *pa, float value);
+float physicsactor_get_chrg(const physicsactor_t *pa); /* charge-and-release max speed */
+void physicsactor_set_chrg(physicsactor_t *pa, float value);
 float physicsactor_get_walkthreshold(const physicsactor_t *pa); /* walk threshold */
 void physicsactor_set_walkthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_unrollthreshold(const physicsactor_t *pa); /* unroll threshold */
