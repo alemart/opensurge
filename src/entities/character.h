@@ -32,14 +32,11 @@ typedef struct {
         float acc; /* acceleration */
         float dec; /* deceleration */
         float topspeed; /* top speed */
-        float jmp; /* initial jump velocity */
-        float jmprel; /* release jump velocity */
+        float jmp; /* jump velocity */
         float grv; /* gravity */
-        float rollthreshold; /* roll threshold */
-        float brakingthreshold; /* braking animation treshold */
         float slp; /* slope factor */
-        float rolluphillslp; /* slope factor (rolling uphill) */
-        float rolldownhillslp; /* slope factor (rolling downhill) */
+        float frc; /* friction */
+        float chrg; /* charge speed */
     } multiplier;
 
     struct {
@@ -69,7 +66,14 @@ typedef struct {
         struct sound_t *roll;
         struct sound_t *brake;
         struct sound_t *death;
+        struct sound_t* charge;
     } sample;
+
+    struct {
+        int roll;
+        int charge;
+        int brake;
+    } ability;
 
 } character_t;
 

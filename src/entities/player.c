@@ -167,15 +167,20 @@ player_t *player_create(const char *character_name)
 
     physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);
     physicsactor_set_dec(p->pa, physicsactor_get_dec(p->pa) * c->multiplier.dec);
-    physicsactor_set_topspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
-    physicsactor_set_jmp(p->pa, physicsactor_get_jmp(p->pa) * c->multiplier.jmp);
-    physicsactor_set_jmprel(p->pa, physicsactor_get_jmprel(p->pa) * c->multiplier.jmprel);
+    physicsactor_set_frc(p->pa, physicsactor_get_frc(p->pa) * c->multiplier.frc);
     physicsactor_set_grv(p->pa, physicsactor_get_grv(p->pa) * c->multiplier.grv);
+    physicsactor_set_slp(p->pa, physicsactor_get_slp(p->pa) * c->multiplier.slp);
+    physicsactor_set_jmp(p->pa, physicsactor_get_jmp(p->pa) * c->multiplier.jmp);
+    physicsactor_set_jmprel(p->pa, physicsactor_get_jmprel(p->pa) * c->multiplier.jmp);
+    physicsactor_set_topspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
+    physicsactor_set_rolluphillslp(p->pa, physicsactor_get_rolluphillslp(p->pa) * c->multiplier.slp);
+    physicsactor_set_rolldownhillslp(p->pa, physicsactor_get_rolldownhillslp(p->pa) * c->multiplier.slp);
+    physicsactor_set_rollfrc(p->pa, physicsactor_get_rollfrc(p->pa) * c->multiplier.frc);
+    physicsactor_set_rolldec(p->pa, physicsactor_get_rolldec(p->pa) * c->multiplier.dec);
+    /*
     physicsactor_set_rollthreshold(p->pa, physicsactor_get_rollthreshold(p->pa) * c->multiplier.rollthreshold);
     physicsactor_set_brakingthreshold(p->pa, physicsactor_get_brakingthreshold(p->pa) * c->multiplier.brakingthreshold);
-    physicsactor_set_slp(p->pa, physicsactor_get_slp(p->pa) * c->multiplier.slp);
-    physicsactor_set_rolluphillslp(p->pa, physicsactor_get_rolluphillslp(p->pa) * c->multiplier.rolluphillslp);
-    physicsactor_set_rolldownhillslp(p->pa, physicsactor_get_rolldownhillslp(p->pa) * c->multiplier.rolldownhillslp);
+    */
 
     /* success! */
     hundred_collectibles = collectibles = 0;

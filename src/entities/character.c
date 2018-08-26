@@ -94,13 +94,10 @@ character_t *character_new(const char *name)
     c->multiplier.dec = 1.0f;
     c->multiplier.topspeed = 1.0f;
     c->multiplier.jmp = 1.0f;
-    c->multiplier.jmprel = 1.0f;
     c->multiplier.grv = 1.0f;
-    c->multiplier.rollthreshold = 1.0f;
-    c->multiplier.brakingthreshold = 1.0f;
     c->multiplier.slp = 1.0f;
-    c->multiplier.rolluphillslp = 1.0f;
-    c->multiplier.rolldownhillslp = 1.0f;
+    c->multiplier.frc = 1.0f;
+    c->multiplier.chrg = 1.0f;
     
     c->animation.sprite_name = str_dup("");
     c->animation.stopped = 0;
@@ -125,6 +122,11 @@ character_t *character_new(const char *name)
     c->sample.roll = NULL;
     c->sample.brake = NULL;
     c->sample.death = NULL;
+    c->sample.charge = NULL;
+
+    c->ability.roll = TRUE;
+    c->ability.charge = TRUE;
+    c->ability.brake = TRUE;
 
     return c;
 }
@@ -253,6 +255,11 @@ int traverse_multipliers(const parsetree_statement_t *stmt, void *character)
         nanoparser_expect_string(p1, "deceleration must be a positive number");
         c->multiplier.dec = max(0, atof(nanoparser_get_string(p1)));
     }
+    else if(str_icmp(identifier, "friction") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "friction must be a positive number");
+        c->multiplier.frc = max(0, atof(nanoparser_get_string(p1)));
+    }
     else if(str_icmp(identifier, "topspeed") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "topspeed must be a positive number");
@@ -263,41 +270,35 @@ int traverse_multipliers(const parsetree_statement_t *stmt, void *character)
         nanoparser_expect_string(p1, "jump must be a positive number");
         c->multiplier.jmp = max(0, atof(nanoparser_get_string(p1)));
     }
-    else if(str_icmp(identifier, "jumprel") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "jumprel must be a positive number");
-        c->multiplier.jmprel = max(0, atof(nanoparser_get_string(p1)));
-    }
     else if(str_icmp(identifier, "gravity") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "gravity must be a positive number");
         c->multiplier.grv = max(0, atof(nanoparser_get_string(p1)));
-    }
-    else if(str_icmp(identifier, "rollthreshold") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "rollthreshold must be a positive number");
-        c->multiplier.rollthreshold = max(0, atof(nanoparser_get_string(p1)));
-    }
-    else if(str_icmp(identifier, "brakingthreshold") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "brakingthreshold must be a positive number");
-        c->multiplier.brakingthreshold = max(0, atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "slope") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "slope must be a positive number");
         c->multiplier.slp = max(0, atof(nanoparser_get_string(p1)));
     }
-    else if(str_icmp(identifier, "rolluphillslope") == 0) {
+    else if(str_icmp(identifier, "charge") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "rolluphillslope must be a positive number");
-        c->multiplier.rolluphillslp = max(0, atof(nanoparser_get_string(p1)));
+        nanoparser_expect_string(p1, "charge must be a positive number");
+        c->multiplier.chrg = max(0, atof(nanoparser_get_string(p1)));
     }
-    else if(str_icmp(identifier, "rolldownhillslope") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "rolldownhillslope must be a positive number");
-        c->multiplier.rolldownhillslp = max(0, atof(nanoparser_get_string(p1)));
+
+    /* the multipliers below have been deprecated, but their identifiers
+       are still matched for compatibility purposes */
+    else if(
+        str_icmp(identifier, "jumprel") == 0 ||
+        str_icmp(identifier, "rollthreshold") == 0 ||
+        str_icmp(identifier, "brakingthreshold") == 0 ||
+        str_icmp(identifier, "rolluphillslope") == 0 ||
+        str_icmp(identifier, "rolldownhillslope") == 0
+    ) {
+        ;
     }
+
+    /* unknown identifier */
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
