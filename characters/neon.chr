@@ -5,7 +5,6 @@
 // File:   characters/neon.chr
 // Desc:   character definitions: Neon
 // Author: script by Alexandre
-// Date:   2011-02-08
 // ---------------------------------------------------------------------------
 
 character "Neon"
@@ -16,15 +15,12 @@ character "Neon"
     {
         acceleration                1.0
         deceleration                1.0
+        friction                    1.0
         topspeed                    1.0
         jump                        1.0
-        jumprel                     1.0
         gravity                     1.0
-        rollthreshold               1.0
-        brakingthreshold            1.0
         slope                       1.0
-        rolluphillslope             1.0
-        rolldownhillslope           1.0
+        charge                      1.0
     }
     
     animations
@@ -48,6 +44,14 @@ character "Neon"
         lookingup                   5
         winning                     17
         ceiling                     16
+        charging                    3
+    }
+
+    abilities
+    {
+        roll                        TRUE
+        brake                       TRUE
+        charge                      TRUE
     }
     
     samples
@@ -56,5 +60,6 @@ character "Neon"
         roll                        "samples/roll.wav"
         death                       "samples/death.wav"
         brake                       "samples/brake.wav"
+        charge                      "samples/charge.wav"
     }
 }

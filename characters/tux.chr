@@ -5,7 +5,6 @@
 // File:   characters/tux.chr
 // Desc:   character definitions: Tux
 // Author: script by Alexandre, sprite by Constantin from supertuxkart-team
-// Date:   2011-02-08
 // ---------------------------------------------------------------------------
 
 character "Tux"
@@ -16,15 +15,12 @@ character "Tux"
     {
         acceleration                1.0
         deceleration                1.0
+        friction                    1.0
         topspeed                    1.0
         jump                        1.0
-        jumprel                     1.0
         gravity                     1.0
-        rollthreshold               1.0
-        brakingthreshold            1.0
         slope                       1.0
-        rolluphillslope             1.0
-        rolldownhillslope           1.0
+        charge                      1.0
     }
     
     animations
@@ -48,6 +44,14 @@ character "Tux"
         lookingup                   5
         winning                     17
         ceiling                     16
+        charging                    6
+    }
+
+    abilities
+    {
+        roll                        TRUE
+        brake                       TRUE
+        charge                      TRUE
     }
     
     samples
@@ -56,5 +60,6 @@ character "Tux"
         roll                        "samples/roll.wav"
         death                       "samples/death.wav"
         brake                       "samples/brake.wav"
+        charge                      "samples/charge.wav"
     }
 }

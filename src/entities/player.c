@@ -155,7 +155,7 @@ player_t *player_create(const char *character_name)
     p->underwater = FALSE;
     p->underwater_timer = 0.0f;
 
-    /* character system */
+    /* character system: spawning the companion object */
     if(c->companion_object_name[0] != '\0') {
         /* try to create the companion object using the new API if possible */
         if(!level_create_ssobject(c->companion_object_name, v2d_new(0, 0))) {
@@ -165,22 +165,28 @@ player_t *player_create(const char *character_name)
         }
     }
 
+    /* character system: setting the multipliers */
     physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);
     physicsactor_set_dec(p->pa, physicsactor_get_dec(p->pa) * c->multiplier.dec);
     physicsactor_set_frc(p->pa, physicsactor_get_frc(p->pa) * c->multiplier.frc);
     physicsactor_set_grv(p->pa, physicsactor_get_grv(p->pa) * c->multiplier.grv);
     physicsactor_set_slp(p->pa, physicsactor_get_slp(p->pa) * c->multiplier.slp);
     physicsactor_set_jmp(p->pa, physicsactor_get_jmp(p->pa) * c->multiplier.jmp);
+    physicsactor_set_chrg(p->pa, physicsactor_get_chrg(p->pa) * c->multiplier.chrg);
     physicsactor_set_jmprel(p->pa, physicsactor_get_jmprel(p->pa) * c->multiplier.jmp);
     physicsactor_set_topspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
     physicsactor_set_rolluphillslp(p->pa, physicsactor_get_rolluphillslp(p->pa) * c->multiplier.slp);
     physicsactor_set_rolldownhillslp(p->pa, physicsactor_get_rolldownhillslp(p->pa) * c->multiplier.slp);
     physicsactor_set_rollfrc(p->pa, physicsactor_get_rollfrc(p->pa) * c->multiplier.frc);
     physicsactor_set_rolldec(p->pa, physicsactor_get_rolldec(p->pa) * c->multiplier.dec);
-    /*
-    physicsactor_set_rollthreshold(p->pa, physicsactor_get_rollthreshold(p->pa) * c->multiplier.rollthreshold);
-    physicsactor_set_brakingthreshold(p->pa, physicsactor_get_brakingthreshold(p->pa) * c->multiplier.brakingthreshold);
-    */
+
+    /* character system: configuring the abilities */
+    if(!c->ability.roll)
+        physicsactor_set_rollthreshold(p->pa, physicsactor_get_rollthreshold(p->pa) * 1000.0f);
+    if(!c->ability.brake)
+        physicsactor_set_brakingthreshold(p->pa, physicsactor_get_brakingthreshold(p->pa) * 1000.0f);
+    if(!c->ability.charge)
+        physicsactor_set_chrg(p->pa, 0.0f);
 
     /* success! */
     hundred_collectibles = collectibles = 0;

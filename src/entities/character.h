@@ -59,6 +59,7 @@ typedef struct {
         int lookingup;
         int winning;
         int ceiling;
+        int charging;
     } animation;
 
     struct {

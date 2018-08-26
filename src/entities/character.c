@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * character.c - Character system: meta data about a playable character
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ static int traverse_character(const parsetree_statement_t *stmt, void *character
 static int traverse_multipliers(const parsetree_statement_t *stmt, void *character);
 static int traverse_animations(const parsetree_statement_t *stmt, void *character);
 static int traverse_samples(const parsetree_statement_t *stmt, void *character);
+static int traverse_abilities(const parsetree_statement_t *stmt, void *character);
 
 
 /* public */
@@ -117,6 +118,7 @@ character_t *character_new(const char *name)
     c->animation.ducking = 0;
     c->animation.lookingup = 0;
     c->animation.winning = 0;
+    c->animation.charging = 0;
 
     c->sample.jump = NULL;
     c->sample.roll = NULL;
@@ -228,6 +230,11 @@ int traverse_character(const parsetree_statement_t *stmt, void *character)
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_program(p1, "samples must be a block");
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), character, traverse_samples);
+    }
+    else if(str_icmp(identifier, "abilities") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_program(p1, "abilities must be a block");
+        nanoparser_traverse_program_ex(nanoparser_get_program(p1), character, traverse_abilities);
     }
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -411,6 +418,11 @@ int traverse_animations(const parsetree_statement_t *stmt, void *character)
         nanoparser_expect_string(p1, "the animations must be non-negative numbers");
         c->animation.ceiling = max(0, atoi(nanoparser_get_string(p1)));
     }
+    else if(str_icmp(identifier, "charging") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "the animations must be non-negative numbers");
+        c->animation.charging = max(0, atoi(nanoparser_get_string(p1)));
+    }
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
@@ -446,6 +458,42 @@ int traverse_samples(const parsetree_statement_t *stmt, void *character)
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples");
         c->sample.death = soundfactory_get(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "charge") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "must specify the samples");
+        c->sample.charge = soundfactory_get(nanoparser_get_string(p1));
+    }
+    else
+        fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    return 0;
+}
+
+int traverse_abilities(const parsetree_statement_t *stmt, void *character)
+{
+    const char *identifier;
+    const parsetree_parameter_t *param_list;
+    const parsetree_parameter_t *p1;
+    character_t *c = (character_t*)character;
+
+    identifier = nanoparser_get_identifier(stmt);
+    param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "charge") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "the abilities must be either TRUE or FALSE");
+        c->ability.charge = atob(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "roll") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "the abilities must be either TRUE or FALSE");
+        c->ability.roll = atob(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "brake") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "the abilities must be either TRUE or FALSE");
+        c->ability.brake = atob(nanoparser_get_string(p1));
     }
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
