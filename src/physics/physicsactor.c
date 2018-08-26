@@ -580,7 +580,7 @@ GENERATE_SENSOR_ACCESSOR(U)
                 int ygnd = obstacle_ground_position(at_A, x, y, GD_DOWN); \
                 at_A = (pa->ysp >= 0.0f && y < ygnd + 12) ? at_A : NULL; \
             } \
-            else if(pa->in_the_air) \
+            else if(pa->in_the_air || at_A == at_M) \
                 at_A = NULL; \
         } \
         if(at_B != NULL && !obstacle_is_solid(at_B)) { \
@@ -590,7 +590,7 @@ GENERATE_SENSOR_ACCESSOR(U)
                 int ygnd = obstacle_ground_position(at_B, x, y, GD_DOWN); \
                 at_B = (pa->ysp >= 0.0f && y < ygnd + 12) ? at_B : NULL; \
             } \
-            else if(pa->in_the_air) \
+            else if(pa->in_the_air || at_B == at_M) \
                 at_B = NULL; \
         } \
         at_C = (at_C != NULL && obstacle_is_solid(at_C)) ? at_C : NULL; \
@@ -616,6 +616,7 @@ GENERATE_SENSOR_ACCESSOR(U)
 #define UPDATE_ANGLE() \
     do { \
         const int hoff = 5; \
+        const obstacle_t* gnd = NULL; \
         int sensor_len = sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)); \
         int found_a = FALSE, found_b = FALSE; \
         int h, x, y, xa, ya, xb, yb, ang; \
@@ -626,12 +627,24 @@ GENERATE_SENSOR_ACCESSOR(U)
             if(!found_a) { \
                 xa = x - hoff * COS(pa->angle); \
                 ya = y + hoff * SIN(pa->angle); \
-                found_a = obstaclemap_obstacle_exists(obstaclemap, xa, ya); \
+                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode); \
+                found_a = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
+                    (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + 12) || \
+                    (pa->movmode == MM_CEILING && ya > obstacle_ground_position(gnd, xa, ya, GD_UP) - 12) || \
+                    (pa->movmode == MM_LEFTWALL && xa > obstacle_ground_position(gnd, xa, ya, GD_LEFT) - 12) || \
+                    (pa->movmode == MM_RIGHTWALL && xa < obstacle_ground_position(gnd, xa, ya, GD_RIGHT) + 12) \
+                ))); \
             } \
             if(!found_b) { \
                 xb = x + hoff * COS(pa->angle); \
                 yb = y - hoff * SIN(pa->angle); \
-                found_b = obstaclemap_obstacle_exists(obstaclemap, xb, yb); \
+                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode); \
+                found_b = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
+                    (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + 12) || \
+                    (pa->movmode == MM_CEILING && yb > obstacle_ground_position(gnd, xb, yb, GD_UP) - 12) || \
+                    (pa->movmode == MM_LEFTWALL && xb > obstacle_ground_position(gnd, xb, yb, GD_LEFT) - 12) || \
+                    (pa->movmode == MM_RIGHTWALL && xb < obstacle_ground_position(gnd, xb, yb, GD_RIGHT) + 12) \
+                ))); \
             } \
         } \
         if(found_a && found_b) { \

@@ -126,10 +126,26 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 
     /* one-way platforms only: get the shortest obstacle */
     if(!obstacle_is_solid(a) && !obstacle_is_solid(b)) {
-        if(mm == MM_FLOOR) { /* just in case... */
-            ha = obstacle_ground_position(a, x2, y2, GD_DOWN);
-            hb = obstacle_ground_position(b, x2, y2, GD_DOWN);
-            return ha >= hb ? a : b;
+        switch(mm) {
+            case MM_FLOOR:
+                ha = obstacle_ground_position(a, x2, y2, GD_DOWN);
+                hb = obstacle_ground_position(b, x2, y2, GD_DOWN);
+                return ha >= hb ? a : b;
+
+            case MM_RIGHTWALL:
+                ha = obstacle_ground_position(a, x2, y2, GD_RIGHT);
+                hb = obstacle_ground_position(b, x2, y2, GD_RIGHT);
+                return ha >= hb ? a : b;
+
+            case MM_CEILING:
+                ha = obstacle_ground_position(a, x2, y1, GD_UP);
+                hb = obstacle_ground_position(b, x2, y1, GD_UP);
+                return ha < hb ? a : b;
+                
+            case MM_LEFTWALL:
+                ha = obstacle_ground_position(a, x1, y2, GD_LEFT);
+                hb = obstacle_ground_position(b, x1, y2, GD_LEFT);
+                return ha < hb ? a : b;
         }
     }
 
