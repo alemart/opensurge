@@ -650,7 +650,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop)
 {
     int id;
 
-    if(sample) {
+    if(sample != NULL) { /* important to check for NULL */
         /* ajusting parameters */
         vol = clip(vol, 0.0f, 1.0f);
         pan = clip(pan, -1.0f, 1.0f);
@@ -665,7 +665,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop)
 #else
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop)
 {
-    if(sample) {
+    if(sample != NULL) { /* important to check for NULL */
         /* ajusting parameters */
         vol = clip(vol, 0.0f, 1.0f);
         pan = clip(pan, -1.0f, 1.0f);

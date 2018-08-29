@@ -62,5 +62,6 @@ character "None"
         death                       "samples/death.wav"
         brake                       "samples/brake.wav"
         charge                      "samples/charge.wav"
+        release                     "samples/release.wav"
     }
 }

@@ -68,6 +68,7 @@ typedef struct {
         struct sound_t *brake;
         struct sound_t *death;
         struct sound_t* charge;
+        struct sound_t* release;
     } sample;
 
     struct {

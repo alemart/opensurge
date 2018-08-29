@@ -125,6 +125,7 @@ character_t *character_new(const char *name)
     c->sample.brake = NULL;
     c->sample.death = NULL;
     c->sample.charge = NULL;
+    c->sample.release = NULL;
 
     c->ability.roll = TRUE;
     c->ability.charge = TRUE;
@@ -463,6 +464,11 @@ int traverse_samples(const parsetree_statement_t *stmt, void *character)
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples");
         c->sample.charge = soundfactory_get(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "release") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "must specify the samples");
+        c->sample.release = soundfactory_get(nanoparser_get_string(p1));
     }
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
