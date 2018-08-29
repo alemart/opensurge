@@ -138,6 +138,7 @@ int player_is_running(const player_t *player);
 int player_is_jumping(const player_t *player);
 int player_is_springing(const player_t *player);
 int player_is_rolling(const player_t *player);
+int player_is_charging(const player_t *player);
 int player_is_pushing(const player_t *player);
 int player_is_getting_hit(const player_t *player);
 int player_is_dying(const player_t *player);

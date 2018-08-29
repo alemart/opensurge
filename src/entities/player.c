@@ -78,6 +78,7 @@ static int score;                        /* shared score */
 
 static void update_shield(player_t *p);
 static void update_animation(player_t *p);
+static void play_sounds(player_t *p);
 static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
 static obstacle_t* item2obstacle(const item_t *item);
 static obstacle_t* object2obstacle(const object_t *object);
@@ -321,6 +322,9 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
     /* animation */
     update_animation(player);
+
+    /* play sounds */
+    play_sounds(player);
 
     /* is it a CPU controlled player? */
     if(player != level_player()) {
@@ -674,7 +678,7 @@ void player_lock_horizontally_for(player_t *player, float seconds)
  */
 int player_is_attacking(const player_t *player)
 {
-    return player->attacking || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING;
+    return player->attacking || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING || physicsactor_get_state(player->pa) == PAS_CHARGING;
 }
 
 
@@ -687,6 +691,14 @@ int player_is_rolling(const player_t *player)
     return physicsactor_get_state(player->pa) == PAS_ROLLING;
 }
 
+/*
+ * player_is_charging()
+ * TRUE iff the player is charging
+ */
+int player_is_charging(const player_t *player)
+{
+    return physicsactor_get_state(player->pa) == PAS_CHARGING;
+}
 
 /*
  * player_is_getting_hit()
@@ -833,9 +845,6 @@ int player_is_winning(const player_t *player)
     return physicsactor_get_state(player->pa) == PAS_WINNING;
 }
 
-
-
-
 /*
  * player_is_in_the_air()
  * TRUE iff the player is in the air
@@ -844,7 +853,6 @@ int player_is_in_the_air(const player_t *player)
 {
     return physicsactor_is_in_the_air(player->pa);
 }
-
 
 /*
  * player_is_ultrafast()
@@ -855,6 +863,10 @@ int player_is_ultrafast(const player_t* player)
     return player->got_speedshoes;
 }
 
+/*
+ * player_is_invincible()
+ * TRUE iff the player is invincible
+ */
 int player_is_invincible(const player_t* player)
 {
     return player->invincible;
@@ -1001,6 +1013,7 @@ void update_animation(player_t *p)
             case PAS_JUMPING:    CHANGE_ANIM(jumping);    break;
             case PAS_SPRINGING:  CHANGE_ANIM(springing);  break;
             case PAS_ROLLING:    CHANGE_ANIM(rolling);    break;
+            case PAS_CHARGING:   CHANGE_ANIM(charging);   break;
             case PAS_PUSHING:    CHANGE_ANIM(pushing);    break;
             case PAS_GETTINGHIT: CHANGE_ANIM(gettinghit); break;
             case PAS_DEAD:       CHANGE_ANIM(dead);       break;
@@ -1025,18 +1038,33 @@ void update_animation(player_t *p)
     }
     else
         p->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
+}
 
-    /* sounds */
+/* play sounds as needed */
+void play_sounds(player_t* p)
+{
     ON_STATE(PAS_JUMPING) {
         sound_play( charactersystem_get(p->name)->sample.jump );
     }
 
-    ON_STATE(PAS_ROLLING) {
-        sound_play( charactersystem_get(p->name)->sample.roll );
-    }
-
     ON_STATE(PAS_BRAKING) {
         sound_play( charactersystem_get(p->name)->sample.brake );
+    }
+
+    ON_STATE(PAS_CHARGING) {
+        sound_play( charactersystem_get(p->name)->sample.charge );
+    }
+
+    ON_STATE(PAS_ROLLING) {
+        if(p->pa_old_state != PAS_CHARGING)
+            sound_play( charactersystem_get(p->name)->sample.roll );
+        else
+            sound_play( charactersystem_get(p->name)->sample.release );
+    }
+
+    if(physicsactor_get_state(p->pa) == PAS_CHARGING) {
+        if(input_button_pressed(p->actor->input, IB_FIRE1))
+            sound_play( charactersystem_get(p->name)->sample.charge );
     }
 }
 
@@ -1174,7 +1202,7 @@ void hotspot_magic(player_t* player)
     physicsactor_t* pa = player->pa;
     int angle = physicsactor_get_angle(pa);
 
-    if(!player_is_rolling(player)) {
+    if(!player_is_rolling(player) && !player_is_charging(player)) {
         const float angthr = sinf(deg2rad(11.25f));
         if(angle % 90 == 0 || player_is_at_ledge(player) || fabs(sinf(act->angle)) < angthr) {
             switch(physicsactor_get_movmode(pa)) {
@@ -1195,7 +1223,7 @@ void hotspot_magic(player_t* player)
             }
         }
     }
-    else {
+    else if(player_is_rolling(player)) {
         const int roll_delta = physicsactor_roll_delta(pa);
 
         /* adjust hot spot */
@@ -1236,6 +1264,10 @@ void hotspot_magic(player_t* player)
 
         /* disable angle */
         act->angle = 0.0f;
+    }
+    else {
+        /* disable angle */
+        act->angle = 0.0f;       
     }
 }
 

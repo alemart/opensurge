@@ -42,6 +42,7 @@ enum physicsactorstate_t
     PAS_JUMPING,
     PAS_SPRINGING,
     PAS_ROLLING,
+    PAS_CHARGING,
     PAS_PUSHING,
     PAS_GETTINGHIT,
     PAS_DEAD,

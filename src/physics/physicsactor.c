@@ -67,6 +67,7 @@ struct physicsactor_t
     int winning_pose; /* winning pose enabled? */
     float breathe_timer; /* if greater than zero, set animation to breathing */
     int sticky_lock; /* sticky physics lock */
+    float charge_intensity; /* charge intensity */
     physicsactorstate_t state; /* state */
     movmode_t movmode; /* current movement mode, based on the angle */
     input_t *input; /* input device */
@@ -229,6 +230,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->winning_pose = FALSE;
     pa->breathe_timer = 0.0f;
     pa->sticky_lock = FALSE;
+    pa->charge_intensity = 0.0f;
 
     /* initializing some constants ;-) */
 
@@ -705,7 +707,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
-    if(!pa->in_the_air && pa->state != PAS_ROLLING) {
+    if(!pa->in_the_air && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING) {
 
         /* acceleration */
         if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT) && pa->gsp >= 0.0f) {
@@ -829,6 +831,34 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* face right? */
         pa->facing_right = (pa->gsp >= 0.0f);
+    }
+
+    /*
+     * charge and release
+     */
+
+    /* begin to charge */
+    if(pa->state == PAS_DUCKING) {
+        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1))
+            pa->state = PAS_CHARGING;
+    }
+
+    /* charging... */
+    if(pa->state == PAS_CHARGING) {
+        /* charging more...! */
+        if(input_button_pressed(pa->input, IB_FIRE1)) {
+        }
+
+        /* release */
+        if(!input_button_down(pa->input, IB_DOWN)) {
+            pa->state = PAS_ROLLING;
+            if(pa->facing_right)
+                pa->gsp = pa->chrg;
+            else
+                pa->gsp = -pa->chrg;
+        }
+        else
+            pa->gsp = 0.0f;
     }
 
     /*
