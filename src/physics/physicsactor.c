@@ -839,26 +839,29 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* begin to charge */
     if(pa->state == PAS_DUCKING) {
-        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1))
-            pa->state = PAS_CHARGING;
+        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1)) {
+            if(fabs(pa->chrg) > EPSILON) /* check if the player has the ability to charge */
+                pa->state = PAS_CHARGING;
+        }
     }
 
     /* charging... */
     if(pa->state == PAS_CHARGING) {
-        /* charging more...! */
-        if(input_button_pressed(pa->input, IB_FIRE1)) {
-        }
-
         /* release */
         if(!input_button_down(pa->input, IB_DOWN)) {
+            float s = pa->facing_right ? 1.0f : -1.0f;
+            pa->gsp = (s * pa->chrg) * (0.67f + pa->charge_intensity * 0.33f);
             pa->state = PAS_ROLLING;
-            if(pa->facing_right)
-                pa->gsp = pa->chrg;
-            else
-                pa->gsp = -pa->chrg;
+            pa->charge_intensity = 0.0f;
         }
         else
             pa->gsp = 0.0f;
+
+        /* charging more...! */
+        if(input_button_pressed(pa->input, IB_FIRE1))
+            pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
+        else
+            pa->charge_intensity *= 0.99955f - 1.84845f * dt; /* attenuate charge intensity */
     }
 
     /*

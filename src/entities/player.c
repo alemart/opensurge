@@ -1266,8 +1266,8 @@ void hotspot_magic(player_t* player)
         act->angle = 0.0f;
     }
     else {
-        /* disable angle */
-        act->angle = 0.0f;       
+        act->hot_spot.y += 1;
+        act->angle = 0.0f;
     }
 }
 

@@ -5,7 +5,6 @@
 // File:   default_companions/neon.inc
 // Desc:   Neon's companion
 // Author: Alexandre
-// Date:   2011-02-09, 2011-02-11, 2011-04-23, 2012-02-23
 // ---------------------------------------------------------------------------
 
 object ".neon_companion"
@@ -15,99 +14,8 @@ object ".neon_companion"
 
     state "main"
     {
-        create_child ".neon_spindash_controller"
         create_child ".neon_easter"
         destroy
-    }
-}
-
-
-object ".neon_spindash_controller"
-{
-    requires 0.2.0
-    always_active
-
-    state "main"
-    {
-        hide
-        observe_player "Neon"
-        change_state "stand by"
-    }
-
-    state "stand by"
-    {
-        on_player_duck "duck"
-    }
-
-    state "duck"
-    {
-        let "$p = 0"
-        on_button_pressed "fire1" "charge"
-        on_player_duck "duck"
-        change_state "stand by"
-    }
-
-    state "charge"
-    {
-        set_player_animation "SD_NEON" "6"
-        strong_player
-        springfy_player // so that the camera won't go down, since the player is ducking
-        disable_player_movement
-        play_sample "charge"
-        let "$p = min($p+2, 8)"
-        change_state "hold"
-    }
-
-    state "hold"
-    {
-        //textout menu.small 0 0 $p
-        set_player_animation "SD_NEON" "6"
-        let "$p -= 0.234 * floor(8*$p) * dt()"
-
-        // check if there's a platform underneath the player
-        attach_to_player 0 20
-        unless "obstacle_exists(0,8)" "cancel"
-
-        // create cool particles
-        let "$_pixelparticle_anim = 1 + random(3)"
-        let "$_pixelparticle_xvel = -player_direction() * (120 + random(60))"
-        let "$_pixelparticle_yvel = -60 - random(120)"
-        create_child .pixelparticle -player_direction()*7 -2
-        let "$_pixelparticle_anim = 1 + random(3)"
-        let "$_pixelparticle_xvel = -player_direction() * (120 + random(60))"
-        let "$_pixelparticle_yvel = -60 - random(120)"
-        create_child .pixelparticle -player_direction()*7 -2
-        let "$_pixelparticle_anim = 1 + random(3)"
-        let "$_pixelparticle_xvel = -player_direction() * (120 + random(60))"
-        let "$_pixelparticle_yvel = -60 - random(120)"
-        create_child .pixelparticle -player_direction()*7 -2
-
-        // check if the user wants to charge more, or if we can release the player
-        on_button_pressed "fire1" "charge"
-        on_button_down "down" "hold"
-        change_state "release"
-    }
-
-    state "cancel"
-    {
-        enable_player_movement
-        weak_player
-        change_state "stand by"
-    }
-
-    state "release"
-    {
-        play_sample "release"
-        enable_player_movement
-        weak_player
-        set_player_xspeed "(480 + 30 * floor($p)) * player_direction()"
-        change_state "roll"
-    }
-
-    state "roll"
-    {
-        roll_player
-        change_state "stand by"
     }
 }
 
@@ -174,4 +82,3 @@ object ".neon_easter"
         set_player_animation "SD_EASTERNEON" 0
     }
 }
-
