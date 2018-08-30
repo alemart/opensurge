@@ -38,6 +38,10 @@ static void log_fun(const char* message);
 static void err_fun(const char* message);
 static int compile_script(const char* filepath, void* param);
 static bool found_test_script(const surgescript_vm_t* vm);
+static void check_if_compatible();
+
+/* minimum required version */
+static const char* min_surgescript_version = "0.5.3";
 
 /* SurgeEngine */
 extern void scripting_register_application(surgescript_vm_t* vm);
@@ -60,6 +64,7 @@ void scripting_init(int argc, const char** argv)
     /* create VM */
     const char* path = "scripts/*.ss";
     surgescript_util_set_error_functions(log_fun, err_fun);
+    check_if_compatible();
     vm = surgescript_vm_create();
 
     /* copy command line arguments */
@@ -180,6 +185,14 @@ const char* parent_name(const surgescript_object_t* object)
 
 
 /* private stuff */
+
+/* will check if the compiled SurgeScript version is compatible
+   to this build of Open Surge */
+void check_if_compatible()
+{
+    if(surgescript_util_versioncode(NULL) < surgescript_util_versioncode(min_surgescript_version))
+        fatal_error("This build requires at least SurgeScript %s (using: %s)", min_surgescript_version, SSVERSION);
+}
 
 /* log function */
 void log_fun(const char* message)
