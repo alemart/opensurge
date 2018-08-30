@@ -575,9 +575,12 @@ void player_breathe(player_t *player)
  */
 void player_enter_water(player_t *player)
 {
-    physicsactor_t *pa = player->pa;
+    if(player_is_dying(player))
+        return;
 
     if(!player_is_underwater(player)) {
+        physicsactor_t *pa = player->pa;
+        
         player->actor->speed.x /= 2.0f;
         player->actor->speed.y /= 4.0f;
 
@@ -606,9 +609,9 @@ void player_enter_water(player_t *player)
  */
 void player_leave_water(player_t *player)
 {
-    physicsactor_t *pa = player->pa;
-
     if(player_is_underwater(player)) {
+        physicsactor_t *pa = player->pa;
+
         if(!player_is_springing(player) && !player_is_dying(player))
             player->actor->speed.y *= 2.0f;
 
