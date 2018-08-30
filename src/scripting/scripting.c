@@ -191,7 +191,7 @@ const char* parent_name(const surgescript_object_t* object)
 void check_if_compatible()
 {
     if(surgescript_util_versioncode(NULL) < surgescript_util_versioncode(min_surgescript_version))
-        fatal_error("This build requires at least SurgeScript %s (using: %s)", min_surgescript_version, SSVERSION);
+        fatal_error("This build requires at least SurgeScript %s (using: %s)", min_surgescript_version, surgescript_util_version());
 }
 
 /* log function */
