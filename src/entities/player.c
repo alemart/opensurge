@@ -392,24 +392,24 @@ void player_render(player_t *player, v2d_t camera_position)
  * player_bounce()
  * Rebound
  */
-void player_bounce(player_t *player, actor_t *hazard)
+void player_bounce(player_t *player, actor_t *hazard, int is_heavy_object)
 {
-    int w = image_width(actor_image(hazard))/2, h = image_height(actor_image(hazard))/2;
-    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(w/2, h/2));
-    actor_t *act = player->actor;
-
     if(physicsactor_is_in_the_air(player->pa)) {
-        if(act->position.y <= hazard_centre.y && act->speed.y > 0.0f) {
-            if(input_button_down(act->input, IB_FIRE1) || physicsactor_get_state(player->pa) == PAS_ROLLING)
-                act->speed.y *= -1.0f;
-            else
-                act->speed.y = 4 * max(-60.0f, -60.0f * act->speed.y);
+        actor_t *act = player->actor;
+        int hw = image_width(actor_image(hazard))/2, hh = image_height(actor_image(hazard))/2;
+        int pw = image_width(actor_image(act))/2, ph = image_height(actor_image(act))/2;
+        v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(hw/2, hh/2));
+        v2d_t player_centre = v2d_add(v2d_subtract(act->position, act->hot_spot), v2d_new(pw/2, ph/2));
 
-            player->pa_old_state = physicsactor_get_state(player->pa);
-            physicsactor_bounce(player->pa);
-        }
+        if(player_centre.y <= hazard_centre.y && act->speed.y >= 0.0f)
+            act->speed.y = -fabs(act->speed.y);
+        else if(is_heavy_object)
+            act->speed.y = fabs(act->speed.y) / 2.0f;
         else
-            act->speed.y -= 4 * 60.0f * sign(act->speed.y);
+            act->speed.y += 60.0f * sign(act->speed.y);
+
+        player->pa_old_state = physicsactor_get_state(player->pa);
+        physicsactor_bounce(player->pa);
     }
 }
 
@@ -578,8 +578,8 @@ void player_enter_water(player_t *player)
     physicsactor_t *pa = player->pa;
 
     if(!player_is_underwater(player)) {
-        player->actor->speed.x *= 0.5f;
-        player->actor->speed.y *= 0.25f;
+        player->actor->speed.x /= 2.0f;
+        player->actor->speed.y /= 4.0f;
 
         physicsactor_set_acc(pa, physicsactor_get_acc(pa) / 2.0f);
         physicsactor_set_dec(pa, physicsactor_get_dec(pa) / 2.0f);

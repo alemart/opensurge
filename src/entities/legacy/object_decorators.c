@@ -868,7 +868,7 @@ void bounceplayer_update(objectmachine_t *obj, player_t **team, int team_size, b
     object_t *object = obj->get_object_instance(obj);
     player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
 
-    player_bounce(player, object->actor);
+    player_bounce(player, object->actor, FALSE);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
@@ -1976,7 +1976,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
         if(actor_collision(object->actor, player->actor)) {
             if(player_is_attacking(player) || player->invincible) {
                 /* I've been defeated */
-                player_bounce(player, object->actor);
+                player_bounce(player, object->actor, FALSE);
                 level_add_to_score(score);
                 level_create_item(IT_EXPLOSION, v2d_add(object->actor->position, v2d_new(0,-15)));
                 level_create_animal(object->actor->position);

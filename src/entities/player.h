@@ -111,7 +111,7 @@ void player_update(player_t *player, struct player_t **team, int team_size, stru
 void player_render(player_t *player, v2d_t camera_position);
 
 void player_hit(player_t *player, struct actor_t *hazard);
-void player_bounce(player_t *player, struct actor_t *hazard);
+void player_bounce(player_t *player, struct actor_t *hazard, int is_heavy_object);
 void player_kill(player_t *player);
 void player_spring(player_t *player);
 void player_roll(player_t *player);

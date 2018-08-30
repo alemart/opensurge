@@ -273,7 +273,7 @@ void itembox_update(item_t* item, player_t** team, int team_size, brick_list_t* 
             level_create_item(IT_CRUSHEDBOX, act->position);
 
             sound_play( soundfactory_get("destroy") );
-            player_bounce(player, act);
+            player_bounce(player, act, TRUE);
 
             me->on_destroy(item, player);
             item->state = IS_DEAD;
