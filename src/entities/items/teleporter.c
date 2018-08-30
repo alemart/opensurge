@@ -154,9 +154,6 @@ void teleport_player_to(player_t *player, v2d_t position)
     player->actor->position = position;
     player->actor->speed = v2d_new(0,0);
     player->actor->angle = 0;
-    player->disable_wall = PLAYER_WALL_NONE;
-    player->entering_loop = FALSE;
-    player->at_loopfloortop = FALSE;
     player->bring_to_back = FALSE;
 }
 

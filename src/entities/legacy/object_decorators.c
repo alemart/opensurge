@@ -6987,7 +6987,6 @@ void setplayerposition_update(objectmachine_t *obj, player_t **team, int team_si
     v2d_t offset = v2d_new(expression_evaluate(me->offset_x), expression_evaluate(me->offset_y));
 
     player->actor->position = v2d_add(object->actor->position, offset);
-    player->disable_wall = PLAYER_WALL_NONE;
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }

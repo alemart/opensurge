@@ -1093,7 +1093,6 @@ void level_update()
         /* things... player */
         got_dying_player = FALSE;
         for(i=0; i<team_size; i++) {
-            team[i]->entering_loop=FALSE;
             if(player_is_dying(team[i]))
                 got_dying_player = TRUE;
         }

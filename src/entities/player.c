@@ -140,11 +140,6 @@ player_t *player_create(const char *character_name)
     p->got_speedshoes = FALSE;
     p->speedshoes_timer = 0;
 
-    /* old loop system */
-    p->disable_wall = PLAYER_WALL_NONE;
-    p->entering_loop = FALSE;
-    p->at_loopfloortop = FALSE;
-
     /* loop system */
     p->layer = BRL_DEFAULT;
 

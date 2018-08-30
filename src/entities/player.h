@@ -32,13 +32,6 @@
 #define PLAYER_MAX_SPEEDSHOES       23.0 /* speed shoes timer */
 #define PLAYER_MAX_INVSTAR          5    /* how many invincibility stars */
 
-/* old loop system */
-#define PLAYER_WALL_NONE            0
-#define PLAYER_WALL_TOP             1
-#define PLAYER_WALL_RIGHT           2
-#define PLAYER_WALL_BOTTOM          4
-#define PLAYER_WALL_LEFT            8
-
 /* shield list */
 #define SH_NONE                     0 /* no shield */
 #define SH_SHIELD                   1 /* regular shield */
@@ -85,11 +78,6 @@ struct player_t {
     /* speed shoes */
     int got_speedshoes;
     float speedshoes_timer;
-
-    /* old loop system (PLAYER_WALL_*) */
-    int disable_wall;
-    int entering_loop;
-    int at_loopfloortop;
 
     /* loop system */
     int layer;
