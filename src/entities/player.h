@@ -54,6 +54,7 @@ struct brick_list_t;
 struct item_list_t;
 struct enemy_list_t;
 struct physicsactor_t;
+struct obstaclemap_t;
 typedef struct player_t player_t;
 
 /* player structure */
@@ -102,6 +103,7 @@ struct player_t {
     float blink_timer;
     float blink_visibility_timer;
     int thrown_while_rolling;
+    struct obstaclemap_t* obstaclemap;
 };
 
 /* public functions */

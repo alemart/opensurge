@@ -151,6 +151,7 @@ player_t *player_create(const char *character_name)
     /* physics */
     p->pa = physicsactor_create(p->actor->position);
     p->pa_old_state = physicsactor_get_state(p->pa);
+    p->obstaclemap = obstaclemap_create();
 
     /* misc */
     p->underwater = FALSE;
@@ -207,6 +208,7 @@ player_t* player_destroy(player_t *player)
     for(i=0; i<PLAYER_MAX_INVSTAR; i++)
         actor_destroy(player->invstar[i]);
 
+    obstaclemap_destroy(player->obstaclemap);
     physicsactor_destroy(player->pa);
     actor_destroy(player->shield);
     actor_destroy(player->actor);
@@ -580,7 +582,7 @@ void player_enter_water(player_t *player)
 
     if(!player_is_underwater(player)) {
         physicsactor_t *pa = player->pa;
-        
+
         player->actor->speed.x /= 2.0f;
         player->actor->speed.y /= 4.0f;
 
@@ -1077,7 +1079,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     DARRAY(obstacle_t*, tmp_obstacle);
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
-    obstaclemap_t *obstaclemap;
+    obstaclemap_t* obstaclemap = player->obstaclemap;
     int i;
 
     /* converting variables */
@@ -1107,7 +1109,6 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     darray_init(tmp_obstacle);
 
     /* creating the obstacle map */
-    obstaclemap = obstaclemap_create();
     for(; brick_list; brick_list = brick_list->next) {
         if(brick_obstacle(brick_list->data) != NULL && !ignore_obstacle(brick_layer(brick_list->data), player->layer))
             obstaclemap_add_obstacle(obstaclemap, brick_obstacle(brick_list->data));
@@ -1130,8 +1131,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     /* updating the physics actor */
     physicsactor_update(pa, obstaclemap);
 
-    /* destroying the obstacle map */
-    obstaclemap = obstaclemap_destroy(obstaclemap);
+    /* clearing the obstacle map */
+    obstaclemap_clear(obstaclemap);
 
     /* removing temp obstacles */
     for(i = 0; i < darray_length(tmp_obstacle); i++)

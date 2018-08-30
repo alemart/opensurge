@@ -42,5 +42,6 @@ int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y);
 int obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if a solid obstacle exists at (x,y) */
 const struct obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, enum movmode_t mm); /* x2 > x1 && y2 > y1; NULL may be returned */
 const struct obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t origin, v2d_t direction, float max_distance, v2d_t* hitpoint, float* distance); /* raycasting */
+void obstaclemap_clear(obstaclemap_t* obstaclemap); /* removes all obstacles from the obstacle map */
 
 #endif

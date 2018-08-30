@@ -86,6 +86,12 @@ int obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y)
     return FALSE;
 }
 
+/* removes all obstacles from the obstacle map */
+void obstaclemap_clear(obstaclemap_t* obstaclemap)
+{
+    darray_clear(obstaclemap->obstacle);
+}
+
 /* 2D raycasting */
 const obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t origin, v2d_t direction, float max_distance, v2d_t* hitpoint, float* distance)
 {
