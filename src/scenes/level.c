@@ -2373,13 +2373,20 @@ surgescript_object_t* get_level_ssobject()
 surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
 {
     if(ssobject_exists(object_name)) {
+        /* create object */
         surgescript_vm_t* vm = surgescript_vm();
         surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
         surgescript_object_t* parent = get_level_ssobject();
         surgescript_objecthandle_t parent_handle = surgescript_object_handle(parent);
         surgescript_objecthandle_t child_handle = surgescript_objectmanager_spawn(manager, parent_handle, object_name, NULL);
-        /* TODO: spawn point */
-        return surgescript_objectmanager_get(manager, child_handle);
+        surgescript_object_t* object = surgescript_objectmanager_get(manager, child_handle);
+
+        /* set the spawn point */
+        surgescript_transform_t* transform = surgescript_object_transform(object);
+        surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
+
+        /* done! */
+        return object;
     }
     else {
         fatal_error("Can't spawn level object \"%s\": object does not exist.");
