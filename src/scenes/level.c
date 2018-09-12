@@ -104,6 +104,7 @@ static void init_startup_object_list();
 static void release_startup_object_list();
 static void add_to_startup_object_list(const char *object_name);
 static void spawn_startup_objects();
+static int is_startup_object(const char* object_name);
 
 
 
@@ -779,9 +780,8 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "spawn_point") == 0) {
         if(param_count == 2) {
-            int x, y;
-            x = atoi(param[0]);
-            y = atoi(param[1]);
+            int x = atoi(param[0]);
+            int y = atoi(param[1]);
             spawn_point = v2d_new(x, y);
         }
         else
@@ -836,28 +836,31 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "item") == 0) {
         if(param_count == 3) {
-            int type;
-            int x, y;
-
-            type = clip(atoi(param[0]), 0, ITEMDATA_MAX-1);
-            x = atoi(param[1]);
-            y = atoi(param[2]);
-
+            int type = clip(atoi(param[0]), 0, ITEMDATA_MAX-1);
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
             level_create_item(type, v2d_new(x, y));
         }
         else
             logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
     }
-    else if((str_icmp(identifier, "enemy") == 0) || (str_icmp(identifier, "object") == 0)) {
+    else if(str_icmp(identifier, "enemy") == 0) {
         if(param_count == 3) {
-            const char *name;
-            int x, y;
-
-            name = param[0];
-            x = atoi(param[1]);
-            y = atoi(param[2]);
-
-            if(str_icmp(name, DEFAULT_STARTUP_OBJECT) != 0) {
+            const char* name = param[0];
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
+            if(!is_startup_object(name))
+                level_create_enemy(name, v2d_new(x, y)); /* old API */
+        }
+        else
+            logfile_message("Level loader - command 'enemy' expects three parameters: name, xpos, ypos");
+    }
+    else if(str_icmp(identifier, "object") == 0) {
+        if(param_count == 3) {
+            const char* name = param[0];
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
+            if(!is_startup_object(name)) {
                 surgescript_object_t* obj = level_create_ssobject(name, v2d_new(x, y));
                 if(obj != NULL) {
                     /* new API */
@@ -871,12 +874,11 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             }
         }
         else
-            logfile_message("Level loader - command '%s' expects three parameters: enemy_name, xpos, ypos", identifier);
+            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
     }
     else if(str_icmp(identifier, "startup") == 0) {
         if(param_count > 0) {
-            int i;
-            for(i=param_count-1; i>=0; i--)
+            for(int i = param_count - 1; i >= 0; i--)
                 add_to_startup_object_list(param[i]);
         }
         else
@@ -884,10 +886,9 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "players") == 0) {
         if(param_count > 0) {
-            int i, j;
-            for(i=0; i<param_count; i++) {
+            for(int i = 0; i < param_count; i++) {
                 if(team_size < TEAM_MAX) {
-                    for(j=0; j<team_size; j++) {
+                    for(int j = 0; j < team_size; j++) {
                         if(str_icmp(team[j]->name, param[i]) == 0)
                             fatal_error("Level loader - duplicate entry of player '%s'\nin '%s' near line %d", param[i], filename, fileline);
                     }
@@ -2202,6 +2203,18 @@ void spawn_startup_objects()
             e->created_from_editor = FALSE;
         }
     }
+}
+
+/* check if object_name is in the startup object list */
+int is_startup_object(const char* object_name)
+{
+    for(startupobject_list_t* me = startupobject_list; me != NULL; me = me->next) {
+        if(str_icmp(object_name, me->object_name) == 0)
+            return TRUE;
+    }
+    if(str_icmp(object_name, DEFAULT_STARTUP_OBJECT) == 0)
+        return TRUE;
+    return FALSE;
 }
 
 
