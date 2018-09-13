@@ -25,7 +25,7 @@
 #include "logfile.h"
 
 /* utilities */
-#define SPATIALHASH_GRID_WIDTH      140
+#define SPATIALHASH_GRID_WIDTH      105
 #define SPATIALHASH_GRID_HEIGHT     21
 
 /* spatialhash_<typename> class: pretty much like C++ templates */

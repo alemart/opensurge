@@ -73,6 +73,9 @@ animation_t *sprite_get_animation(const char *sprite_name, int anim_id);
 /* returns the specified frame of the given animation */
 struct image_t *sprite_get_image(const animation_t *anim, int frame_id);
 
+/* checks if an animation exists */
+int sprite_animation_exists(const char* sprite_name, int anim_id);
+
 
 
 

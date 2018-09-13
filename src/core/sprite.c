@@ -111,7 +111,6 @@ animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
 }
 
 
-
 /*
  * sprite_get_image()
  * Receives an animation and the desired frame number.
@@ -122,6 +121,21 @@ image_t *sprite_get_image(const animation_t *anim, int frame_id)
     frame_id = clip(frame_id, 0, anim->frame_count-1);
     return anim->frame_data[ anim->data[frame_id] ];
 }
+
+
+/*
+ * sprite_animation_exists()
+ * Checks if an animation exists (for a given sprite)
+ */
+int sprite_animation_exists(const char* sprite_name, int anim_id)
+{
+    spriteinfo_t *info = hashtable_spriteinfo_t_find(sprites, sprite_name);
+    return info != NULL;
+}
+
+
+
+
 
 /*
  * spriteinfo_create()

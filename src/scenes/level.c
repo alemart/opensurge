@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - code for the game levels
- * Copyright (C) 2008-2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -241,7 +241,8 @@ enum editor_entity_type {
     EDT_BRICK,
     EDT_ITEM,
     EDT_ENEMY,
-    EDT_GROUP
+    EDT_GROUP,
+    EDT_SSOBJ
 };
 #define EDITORGRP_ENTITY_TO_EDT(t) \
                 ( ((t) == EDITORGRP_ENTITY_BRICK) ? EDT_BRICK : \
@@ -265,11 +266,13 @@ static font_t *editor_properties_font;
 static font_t *editor_help_font;
 static const char* editor_entity_class(enum editor_entity_type objtype);
 static const char* editor_entity_info(enum editor_entity_type objtype, int objid);
-static const char* editor_enemy_annotation(const char *name);
+static void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t position);
 static void editor_next_class();
 static void editor_previous_class();
 static void editor_next_entity();
 static void editor_previous_entity();
+
+/* editor: legacy items */
 static int editor_item_list[] = {
     IT_RING, IT_LIFEBOX, IT_RINGBOX, IT_STARBOX, IT_SPEEDBOX, IT_GLASSESBOX, IT_TRAPBOX,
     IT_SHIELDBOX, IT_FIRESHIELDBOX, IT_THUNDERSHIELDBOX, IT_WATERSHIELDBOX,
@@ -292,21 +295,32 @@ static int editor_item_list[] = {
 static int editor_item_list_size; /* counted automatically */
 static int editor_item_list_get_index(int item_id);
 int editor_is_valid_item(int item_id); /* this is used by editorgrp */
-static void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t position);
 
-/* editor: enemy name list */
+/* editor: legacy objects (enemy type) */
 static const char** editor_enemy_name;
 static int editor_enemy_name_length;
 int editor_enemy_name2key(const char *name);
 const char* editor_enemy_key2name(int key);
-
-/* editor: enemy category list */
+static const char* editor_enemy_annotation(const char *name);
 static const char** editor_enemy_category;
 static int editor_enemy_category_length;
 static int editor_enemy_selected_category_id; /* a value between 0 and editor_enemy_category_length - 1, inclusive */
 static const char* editor_enemy_selected_category();
 static void editor_next_object_category();
 static void editor_previous_object_category();
+
+/* editor: SurgeScript entities */
+static char** editor_ssobj;
+static int editor_ssobj_count;
+static void editor_ssobj_init();
+static void editor_ssobj_release();
+static int editor_ssobj_id(const char* entity_name);
+static const char* editor_ssobj_name(int entity_id);
+static void editor_ssobj_register(const char* entity_name, void* data);
+static bool editor_remove_ssobject(surgescript_object_t* object, void* data);
+static bool editor_pick_ssobject(surgescript_object_t* object, void* data);
+extern v2d_t world_position(const surgescript_object_t* object);
+extern float object_zindex(surgescript_object_t* object);
 
 /* editor: brick layer & flip flags */
 static bricklayer_t editor_layer;
@@ -316,7 +330,6 @@ static brickflip_t editor_flip;
 #define EDITOR_GRID_W         (int)(editor_grid_size().x)
 #define EDITOR_GRID_H         (int)(editor_grid_size().y)
 static int editor_grid_enabled; /* is the grid enabled? */
-
 static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
@@ -1017,281 +1030,274 @@ void level_update()
         return;
     }
 
+    /* music */
+    update_music();
+
+    /* level editor */
+    if(editor_is_enabled()) {
+        entitymanager_set_active_region(
+            (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
+            (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
+            VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
+            VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+        );
+        editor_update();
+        return;
+    }
+
     /* should we quit due to scripting? */
     if(!surgescript_vm_is_active(surgescript_vm())) {
         game_quit();
         return;
     }
 
-    /* updating the level... */
-    if(!editor_is_enabled()) {
+    /* displaying message: "do you really want to quit?" */
+    block_quit = FALSE;
+    for(i=0; i<team_size && !block_quit; i++)
+        block_quit = player_is_dying(team[i]);
 
-        /* displaying message: "do you really want to quit?" */
-        block_quit = FALSE;
-        for(i=0; i<team_size && !block_quit; i++)
-            block_quit = player_is_dying(team[i]);
+    if(wants_to_leave && !block_quit) {
+        char op[3][512];
+        confirmboxdata_t cbd = { op[0], op[1], op[2] };
 
-        if(wants_to_leave && !block_quit) {
-            char op[3][512];
-            confirmboxdata_t cbd = { op[0], op[1], op[2] };
+        wants_to_leave = FALSE;
+        image_blit(video_get_backbuffer(), quit_level_img, 0, 0, 0, 0, image_width(quit_level_img), image_height(quit_level_img));
+        music_pause();
 
-            wants_to_leave = FALSE;
-            image_blit(video_get_backbuffer(), quit_level_img, 0, 0, 0, 0, image_width(quit_level_img), image_height(quit_level_img));
-            music_pause();
+        lang_getstring("CBOX_QUIT_QUESTION", op[0], sizeof(op[0]));
+        lang_getstring("CBOX_QUIT_OPTION1", op[1], sizeof(op[1]));
+        lang_getstring("CBOX_QUIT_OPTION2", op[2], sizeof(op[2]));
 
-            lang_getstring("CBOX_QUIT_QUESTION", op[0], sizeof(op[0]));
-            lang_getstring("CBOX_QUIT_OPTION1", op[1], sizeof(op[1]));
-            lang_getstring("CBOX_QUIT_OPTION2", op[2], sizeof(op[2]));
+        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+        return;
+    }
 
-            scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+    cbox = confirmbox_selected_option();
+    if(cbox == 1)
+        quit_level = TRUE;
+    else if(cbox == 2)
+        music_resume();
+
+    if(quit_level) {
+        if(fadefx_over()) {
+            scenestack_pop();
+            quest_abort();
             return;
         }
+        fadefx_out(image_rgb(0,0,0), 1.0);
+        return;
+    }
 
-        cbox = confirmbox_selected_option();
-        if(cbox == 1)
-            quit_level = TRUE;
-        else if(cbox == 2)
-            music_resume();
+    /* pause game */
+    block_pause = block_pause || (level_timer < 1.0f);
+    for(i=0; i<team_size; i++)
+        block_pause = block_pause || player_is_dying(team[i]);
 
-        if(quit_level) {
-            if(fadefx_over()) {
-                scenestack_pop();
-                quest_abort();
-                return;
-            }
-            fadefx_out(image_rgb(0,0,0), 1.0);
+    if(wants_to_pause && !block_pause) {
+        wants_to_pause = FALSE;
+        sound_play( soundfactory_get("pause") );
+        scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
+        return;
+    }
+
+    /* open level editor */
+    if(editor_want_to_activate()) {
+        if(readonly) {
+            video_showmessage("No way!");
+            sound_play( soundfactory_get("deny") );
+        }
+        else {
+            editor_enable();
             return;
         }
+    }
 
-        /* pause game */
-        block_pause = block_pause || (level_timer < 1.0f);
-        for(i=0; i<team_size; i++)
-            block_pause = block_pause || player_is_dying(team[i]);
+    /* dialog box */
+    update_dialogregions();
+    update_dlgbox();
 
-        if(wants_to_pause && !block_pause) {
-            wants_to_pause = FALSE;
-            sound_play( soundfactory_get("pause") );
-            scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
-            return;
+    /* things... player */
+    got_dying_player = FALSE;
+    for(i=0; i<team_size; i++) {
+        if(player_is_dying(team[i]))
+            got_dying_player = TRUE;
+    }
+
+
+    /* -------------------------------------- */
+    /* updating the entities */
+    /* -------------------------------------- */
+
+    /* getting the major entities */
+    entitymanager_set_active_region(
+        (int)cam.x - VIDEO_SCREEN_W/2 - (DEFAULT_MARGIN*3)/2,
+        (int)cam.y - VIDEO_SCREEN_H/2 - (DEFAULT_MARGIN*3)/2,
+        VIDEO_SCREEN_W + (DEFAULT_MARGIN*3),
+        VIDEO_SCREEN_H + (DEFAULT_MARGIN*3)
+    );
+
+    major_enemies = entitymanager_retrieve_active_objects();
+    major_items = entitymanager_retrieve_active_items();
+
+    entitymanager_set_active_region(
+        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
+        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
+        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
+        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+    );
+
+    major_bricks = entitymanager_retrieve_active_bricks();
+
+    /* update background */
+    background_update(backgroundtheme);
+
+    /* update items */
+    for(inode = major_items; inode != NULL; inode = inode->next) {
+        float x = inode->data->actor->position.x;
+        float y = inode->data->actor->position.y;
+        float w = image_width(actor_image(inode->data->actor));
+        float h = image_height(actor_image(inode->data->actor));
+        int inside_playarea = inside_screen(x, y, w, h, DEFAULT_MARGIN);
+        int always_active = inode->data->always_active;
+
+        if(inside_playarea || always_active) {
+            /* update this item */
+            item_update(inode->data, team, team_size, major_bricks, major_items, major_enemies);
         }
-
-        /* open level editor */
-        if(editor_want_to_activate()) {
-            if(readonly) {
-                video_showmessage("No way!");
-                sound_play( soundfactory_get("deny") );
-            }
-            else {
-                editor_enable();
-                return;
-            }
+        else if(!inside_playarea) {
+            /* this item is outside the screen... (and it's not always active) */
+            if(!inode->data->preserve)
+                inode->data->state = IS_DEAD;
+            else if(!inside_screen(inode->data->actor->spawn_point.x, inode->data->actor->spawn_point.y, w, h, DEFAULT_MARGIN))
+                inode->data->actor->position = inode->data->actor->spawn_point;
         }
+    }
 
-        /* dialog box */
-        update_dialogregions();
-        update_dlgbox();
+    /* update objects */
+    for(enode = major_enemies; enode != NULL; enode = enode->next) {
+        float x = enode->data->actor->position.x;
+        float y = enode->data->actor->position.y;
+        float w = image_width(actor_image(enode->data->actor));
+        float h = image_height(actor_image(enode->data->actor));
+        int always_active = enode->data->always_active;
+        int inside_playarea = inside_screen(x, y, w, h, DEFAULT_MARGIN);
 
-        /* things... player */
-        got_dying_player = FALSE;
-        for(i=0; i<team_size; i++) {
-            if(player_is_dying(team[i]))
-                got_dying_player = TRUE;
+        if(inside_playarea || always_active) {
+            /* update this object */
+            enemy_update(enode->data, team, team_size, major_bricks, major_items, major_enemies);
         }
-
-
-        /* -------------------------------------- */
-        /* updating the entities */
-        /* -------------------------------------- */
-
-        /* getting the major entities */
-        entitymanager_set_active_region(
-            (int)cam.x - VIDEO_SCREEN_W/2 - (DEFAULT_MARGIN*3)/2,
-            (int)cam.y - VIDEO_SCREEN_H/2 - (DEFAULT_MARGIN*3)/2,
-            VIDEO_SCREEN_W + (DEFAULT_MARGIN*3),
-            VIDEO_SCREEN_H + (DEFAULT_MARGIN*3)
-        );
-
-        major_enemies = entitymanager_retrieve_active_objects();
-        major_items = entitymanager_retrieve_active_items();
-
-        entitymanager_set_active_region(
-            (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-            (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-            VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-            VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-        );
-
-        major_bricks = entitymanager_retrieve_active_bricks();
-
-        /* update background */
-        background_update(backgroundtheme);
-
-        /* update items */
-        for(inode = major_items; inode != NULL; inode = inode->next) {
-            float x = inode->data->actor->position.x;
-            float y = inode->data->actor->position.y;
-            float w = image_width(actor_image(inode->data->actor));
-            float h = image_height(actor_image(inode->data->actor));
-            int inside_playarea = inside_screen(x, y, w, h, DEFAULT_MARGIN);
-            int always_active = inode->data->always_active;
-
-            if(inside_playarea || always_active) {
-                /* update this item */
-                item_update(inode->data, team, team_size, major_bricks, major_items, major_enemies);
-           }
-            else if(!inside_playarea) {
-                /* this item is outside the screen... (and it's not always active) */
-                if(!inode->data->preserve)
-                    inode->data->state = IS_DEAD;
-                else if(!inside_screen(inode->data->actor->spawn_point.x, inode->data->actor->spawn_point.y, w, h, DEFAULT_MARGIN))
-                    inode->data->actor->position = inode->data->actor->spawn_point;
-            }
+        else if(!inside_playarea) {
+            /* this object is outside the play area... (and it's not always active) */
+            if(!enode->data->preserve)
+                enode->data->state = ES_DEAD;
+            else if(!inside_screen(enode->data->actor->spawn_point.x, enode->data->actor->spawn_point.y, w, h, DEFAULT_MARGIN))
+                enode->data->actor->position = enode->data->actor->spawn_point;
         }
+    }
 
-        /* update objects */
-        for(enode = major_enemies; enode != NULL; enode = enode->next) {
-            float x = enode->data->actor->position.x;
-            float y = enode->data->actor->position.y;
-            float w = image_width(actor_image(enode->data->actor));
-            float h = image_height(actor_image(enode->data->actor));
-            int always_active = enode->data->always_active;
-            int inside_playarea = inside_screen(x, y, w, h, DEFAULT_MARGIN);
+    /* update players */
+    for(i=0; i<team_size; i++) {
+        float x = team[i]->actor->position.x;
+        float y = team[i]->actor->position.y;
+        float w = image_width(actor_image(team[i]->actor));
+        float h = image_height(actor_image(team[i]->actor));
+        float hy = team[i]->actor->hot_spot.y;
 
-            if(inside_playarea || always_active) {
-                /* update this object */
-                enemy_update(enode->data, team, team_size, major_bricks, major_items, major_enemies);
-            }
-            else if(!inside_playarea) {
-                /* this object is outside the play area... (and it's not always active) */
-                if(!enode->data->preserve)
-                    enode->data->state = ES_DEAD;
-                else if(!inside_screen(enode->data->actor->spawn_point.x, enode->data->actor->spawn_point.y, w, h, DEFAULT_MARGIN))
-                    enode->data->actor->position = enode->data->actor->spawn_point;
+        /* somebody is hurt! show it to the user */
+        if(team[i] != player) {
+            if(player_is_getting_hit(team[i]))
+                level_change_player(team[i]);
+
+            if(player_is_dying(team[i])) {
+                level_change_player(team[i]);
+                if(camera_focus != team[i]->actor)
+                    camera_move_to(team[i]->actor->position, 0.0);
             }
         }
 
-        /* update players */
-        for(i=0; i<team_size; i++) {
-            float x = team[i]->actor->position.x;
-            float y = team[i]->actor->position.y;
-            float w = image_width(actor_image(team[i]->actor));
-            float h = image_height(actor_image(team[i]->actor));
-            float hy = team[i]->actor->hot_spot.y;
-
-            /* somebody is hurt! show it to the user */
-            if(team[i] != player) {
-                if(player_is_getting_hit(team[i]))
-                    level_change_player(team[i]);
-
-                if(player_is_dying(team[i])) {
-                    level_change_player(team[i]);
-                    if(camera_focus != team[i]->actor)
-                        camera_move_to(team[i]->actor->position, 0.0);
-                }
-            }
-
-            /* death */
-            if(got_dying_player && ((dead_player_timeout += dt) >= 2.5f)) {
-                if(player_get_lives() > 1) {
-                    /* restart the level! */
-                    if(fadefx_over()) {
-                        player_set_lives(player_get_lives()-1);
-                        restart(TRUE);
-                        return;
-                    }
-                    fadefx_out(image_rgb(0,0,0), 1.0);
-                }
-                else {
-                    /* game over */
-                    scenestack_pop();
-                    scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
+        /* death */
+        if(got_dying_player && ((dead_player_timeout += dt) >= 2.5f)) {
+            if(player_get_lives() > 1) {
+                /* restart the level! */
+                if(fadefx_over()) {
+                    player_set_lives(player_get_lives()-1);
+                    restart(TRUE);
                     return;
                 }
+                fadefx_out(image_rgb(0,0,0), 1.0);
             }
-
-            /* updating... */
-            if(entitymanager_get_number_of_bricks() > 0) {
-                if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
-                    if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
-                        player_update(team[i], team, team_size, major_bricks, major_items, major_enemies);
-                }
-
-                /* pitfall */
-                if(team[i]->actor->position.y > level_height-(h-hy)) {
-                    if(inside_screen(x,y,w,h,DEFAULT_MARGIN/4))
-                        player_kill(team[i]);
-                }
+            else {
+                /* game over */
+                scenestack_pop();
+                scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
+                return;
             }
         }
 
-        /* if someone is dying, fade out the music */
-        if(got_dying_player)
-            music_set_volume(music_get_volume() - 0.5*dt);
+        /* updating... */
+        if(entitymanager_get_number_of_bricks() > 0) {
+            if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
+                if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
+                    player_update(team[i], team, team_size, major_bricks, major_items, major_enemies);
+            }
 
-        /* some objects are attached to the player... */
-        for(enode = major_enemies; enode != NULL; enode = enode->next) {
-            float x = enode->data->actor->position.x;
-            float y = enode->data->actor->position.y;
-            float w = image_width(actor_image(enode->data->actor));
-            float h = image_height(actor_image(enode->data->actor));
-            int always_active = enode->data->always_active;
-            int inside_playarea = inside_screen(x, y, w, h, DEFAULT_MARGIN);
-
-            if(inside_playarea || always_active) {
-                if(enode->data->attached_to_player) {
-                    enode->data->actor->position = enemy_get_observed_player(enode->data)->actor->position;
-                    enode->data->actor->position = v2d_add(enode->data->actor->position, enode->data->attached_to_player_offset);
-                    enode->data->attached_to_player = FALSE;
-                }
+            /* pitfall */
+            if(team[i]->actor->position.y > level_height-(h-hy)) {
+                if(inside_screen(x,y,w,h,DEFAULT_MARGIN/4))
+                    player_kill(team[i]);
             }
         }
-
-        /* update bricks */
-        for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
-            /* update this brick */
-            brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
-        }
-
-        /* update camera */
-        if(level_cleared)
-            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
-        else if(!got_dying_player)
-            camera_move_to(camera_focus->position, 0); /* the camera will be locked on its focus (usually, the player) */
-        camera_update();
-
-        /* level timer */
-        if(!got_dying_player && !level_cleared)
-            level_timer += timer_get_delta();
-
-        /* update scripts */
-        update_ssobjects();
-
-        /* update particles */
-        particle_update_all(major_bricks);
-
-        /* "ungetting" major entities */
-        entitymanager_release_retrieved_brick_list(major_bricks);
-        entitymanager_release_retrieved_item_list(major_items);
-        entitymanager_release_retrieved_object_list(major_enemies);
-
-        /* -------------------------------------- */
-        /* updating the entities */
-        /* -------------------------------------- */
-    }
-    else {
-        entitymanager_set_active_region(
-            (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-            (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-            VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-            VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-        );
-
-        /* level editor */
-        editor_update();
     }
 
-    /* other stuff */
-    update_music();
+    /* if someone is dying, fade out the music */
+    if(got_dying_player)
+        music_set_volume(music_get_volume() - 0.5*dt);
+
+    /* some objects are attached to the player... */
+    for(enode = major_enemies; enode != NULL; enode = enode->next) {
+        float x = enode->data->actor->position.x;
+        float y = enode->data->actor->position.y;
+        float w = image_width(actor_image(enode->data->actor));
+        float h = image_height(actor_image(enode->data->actor));
+        int always_active = enode->data->always_active;
+        int inside_playarea = inside_screen(x, y, w, h, DEFAULT_MARGIN);
+
+        if(inside_playarea || always_active) {
+            if(enode->data->attached_to_player) {
+                enode->data->actor->position = enemy_get_observed_player(enode->data)->actor->position;
+                enode->data->actor->position = v2d_add(enode->data->actor->position, enode->data->attached_to_player_offset);
+                enode->data->attached_to_player = FALSE;
+            }
+        }
+    }
+
+    /* update bricks */
+    for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
+        /* update this brick */
+        brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
+    }
+
+    /* update camera */
+    if(level_cleared)
+        camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
+    else if(!got_dying_player)
+        camera_move_to(camera_focus->position, 0); /* the camera will be locked on its focus (usually, the player) */
+    camera_update();
+
+    /* level timer */
+    if(!got_dying_player && !level_cleared)
+        level_timer += timer_get_delta();
+
+    /* update scripts */
+    update_ssobjects();
+
+    /* update particles */
+    particle_update_all(major_bricks);
+
+    /* "ungetting" major entities */
+    entitymanager_release_retrieved_brick_list(major_bricks);
+    entitymanager_release_retrieved_item_list(major_items);
+    entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -2475,15 +2481,18 @@ void editor_init()
     editor_properties_font = font_create("default");
     editor_help_font = font_create("default");
 
-    /* groups */
-    editorgrp_init();
-
     /* layer & flip flags */
     editor_layer = BRL_DEFAULT;
     editor_flip = BRF_NOFLIP;
 
+    /* groups */
+    editorgrp_init();
+
     /* grid */
     editor_grid_init();
+
+    /* SurgeScript entities */
+    editor_ssobj_init();
 
     /* done */
     logfile_message("editor_init() ok");
@@ -2503,6 +2512,9 @@ void editor_release()
 
     /* groups */
     editorgrp_release();
+
+    /* SurgeScript entities */
+    editor_ssobj_release();
 
     /* destroying objects */
     image_unref(EDITOR_BGFILE);
@@ -2609,7 +2621,7 @@ void editor_update()
 
     /* change brick layer */
     if(input_button_pressed(editor_keyboard3, IB_FIRE3)) {
-        if(editor_cursor_entity_type == EDT_BRICK || editor_cursor_entity_type == EDT_GROUP) {
+        if(editor_cursor_entity_type == EDT_BRICK) {
             if(!input_button_down(editor_keyboard3, IB_FIRE1))
                 editor_layer = (editor_layer + 1) % 3;
             else
@@ -2768,6 +2780,25 @@ void editor_update()
             /* can't pick-up/delete a group */
             case EDT_GROUP:
                 break;
+
+            /* SurgeScript object */
+            case EDT_SSOBJ: {
+                surgescript_vm_t* vm = surgescript_vm();
+                surgescript_object_t* root = surgescript_vm_root_object(vm);
+                surgescript_object_t* ssobject = NULL;
+                surgescript_object_traverse_tree_ex(root, &ssobject, editor_pick_ssobject);
+                if(ssobject != NULL) {
+                    int ssobj_id = editor_ssobj_id(surgescript_object_name(ssobject));
+                    if(!pick_object) {
+                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, ssobj_id, world_position(ssobject));
+                        editor_action_commit(eda);
+                        editor_action_register(eda);
+                    }
+                    else
+                        editor_cursor_entity_id = ssobj_id;
+                }
+                break;               
+            }
         }
     }
 
@@ -2792,32 +2823,17 @@ void editor_update()
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
-    font_set_text(editor_help_font, "<color=ffff00>F1</color>: help");
-    font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 10, 10));
+    font_set_text(editor_help_font, "<color=ffff88>F1</color>: help");
+    font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 8, 8));
 
     /* object properties */
-    font_set_position(editor_properties_font, v2d_new(10, 10));
-    
-    if(editor_cursor_entity_type != EDT_ENEMY) {
-        font_set_text(
-            editor_properties_font,
-            "<color=ffff00>%s %d</color>\n%s",
-            editor_entity_class(editor_cursor_entity_type),
-            editor_cursor_entity_id,
-            editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
-        );
-    }
-    else {
-        font_set_text(
-            editor_properties_font,
-            "<color=77bbff>Selected category: %s</color>\n\n<color=ffff00>%s \"%s\"</color>\n%s\n%s",
-            editor_enemy_selected_category(),
-            editor_entity_class(editor_cursor_entity_type),
-            str_addslashes(editor_enemy_key2name(editor_cursor_entity_id)),
-            editor_enemy_annotation(editor_enemy_key2name(editor_cursor_entity_id)),
-            editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
-        );
-    }
+    font_set_position(editor_properties_font, v2d_new(8, 8));
+    font_set_text(
+        editor_properties_font,
+        "<color=ffff88>%s</color> <color=ffffff>%s</color>",
+        editor_entity_class(editor_cursor_entity_type),
+        editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
+    );
 
     /* "ungetting" major entities */
     entitymanager_release_retrieved_brick_list(major_bricks);
@@ -2879,9 +2895,8 @@ void editor_render()
     editor_waterline_render((int)(waterlevel - topleft.y), image_rgb(255, 255, 255));
 
     /* object properties */
+    /*image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(40, 44, 52));*/
     font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-
-    /* help label */
     font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
 
@@ -3086,13 +3101,16 @@ const char *editor_entity_class(enum editor_entity_type objtype)
             return "brick";
 
         case EDT_ITEM:
-            return "built-in item";
+            return "legacy item";
 
         case EDT_ENEMY:
-            return "object";
+            return "legacy object";
 
         case EDT_GROUP:
             return "group";
+
+        case EDT_SSOBJ:
+            return "object";
     }
 
     return "unknown";
@@ -3111,9 +3129,10 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
             if(brick_exists(objid)) {
                 brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 sprintf(buf,
-                    "type: %s\nbehavior: %s\nsize: %dx%d\nzindex: %.2lf",
-                    brick_util_typename(brick_type(x)),
+                    "%4d %12s %12s    %3dx%3d   z=%.2lf",
+                    objid,
                     brick_util_behaviorname(brick_behavior(x)),
+                    brick_util_typename(brick_type(x)),
                     (int)brick_size(x).x,
                     (int)brick_size(x).y,
                     brick_zindex(x)
@@ -3121,22 +3140,31 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
                 brick_destroy(x);
             }
             else
-                sprintf(buf, "WARNING: missing brick");
+                strcpy(buf, "<missing>");
             break;
         }
 
         case EDT_ITEM: {
-            item_t *x = item_create(objid);
-            sprintf(buf, "obstacle: %s\nbring_to_back: %s", x->obstacle ? "TRUE" : "FALSE", x->bring_to_back ? "TRUE" : "FALSE");
-            item_destroy(x);
+            sprintf(buf, "%2d", objid);
             break;
         }
 
         case EDT_ENEMY: {
+            int len = 0;
+            if(strcmp(editor_enemy_selected_category(), "*") != 0) {
+                sprintf(buf, "[%s] ", editor_enemy_selected_category());
+                len = strlen(buf);
+            }
+            str_cpy(buf + len, editor_enemy_key2name(editor_cursor_entity_id), sizeof(buf) - len);
             break;
         }
 
         case EDT_GROUP: {
+            break;
+        }
+
+        case EDT_SSOBJ: {
+            str_cpy(buf, editor_ssobj_name(objid), sizeof(buf));
             break;
         }
     }
@@ -3188,8 +3216,9 @@ void editor_previous_object_category()
 void editor_next_class()
 {
     editor_cursor_entity_type =
-    (editor_cursor_entity_type == EDT_BRICK) ? EDT_ITEM :
-    (editor_cursor_entity_type == EDT_ITEM) ? EDT_ENEMY :
+    (editor_cursor_entity_type == EDT_BRICK) ? EDT_ITEM  :
+    (editor_cursor_entity_type == EDT_ITEM)  ? EDT_SSOBJ :
+    (editor_cursor_entity_type == EDT_SSOBJ) ? EDT_ENEMY :
     (editor_cursor_entity_type == EDT_ENEMY) ? EDT_GROUP :
     (editor_cursor_entity_type == EDT_GROUP) ? EDT_BRICK :
     editor_cursor_entity_type;
@@ -3212,8 +3241,9 @@ void editor_next_class()
 void editor_previous_class()
 {
     editor_cursor_entity_type =
-    (editor_cursor_entity_type == EDT_ITEM) ? EDT_BRICK :
-    (editor_cursor_entity_type == EDT_ENEMY) ? EDT_ITEM :
+    (editor_cursor_entity_type == EDT_ITEM)  ? EDT_BRICK :
+    (editor_cursor_entity_type == EDT_SSOBJ) ? EDT_ITEM  :
+    (editor_cursor_entity_type == EDT_ENEMY) ? EDT_SSOBJ :
     (editor_cursor_entity_type == EDT_GROUP) ? EDT_ENEMY :
     (editor_cursor_entity_type == EDT_BRICK) ? EDT_GROUP :
     editor_cursor_entity_type;
@@ -3241,9 +3271,9 @@ void editor_next_entity()
         /* brick */
         case EDT_BRICK: {
             size = brickset_size();
-            editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
-            if(!brick_exists(editor_cursor_entity_id))
-                editor_next_entity(); /* invalid brick? */
+            do {
+                editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
+            } while(!brick_exists(editor_cursor_entity_id));
             break;
         }
 
@@ -3278,6 +3308,13 @@ void editor_next_entity()
             editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
             break;
         }
+
+        /* SurgeScript entity */
+        case EDT_SSOBJ: {
+            size = editor_ssobj_count;
+            editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
+            break;
+        }
     }
 }
 
@@ -3291,9 +3328,9 @@ void editor_previous_entity()
         /* brick */
         case EDT_BRICK: {
             size = brickset_size();
-            editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
-            if(!brick_exists(editor_cursor_entity_id))
-                editor_previous_entity(); /* invalid brick? */
+            do {
+                editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
+            } while(!brick_exists(editor_cursor_entity_id));
             break;
         }
 
@@ -3325,6 +3362,13 @@ void editor_previous_entity()
         /* group */
         case EDT_GROUP: {
             size = editorgrp_group_count();
+            editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
+            break;
+        }
+
+        /* SurgeScript entity */
+        case EDT_SSOBJ: {
+            size = editor_ssobj_count;
             editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             break;
         }
@@ -3376,6 +3420,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
             }
             break;
         }
+
         case EDT_ITEM: {
             item_t *item = item_create(obj_id);
             if(item != NULL) {
@@ -3385,6 +3430,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
             }
             break;
         }
+
         case EDT_ENEMY: {
             enemy_t *enemy = enemy_create(editor_enemy_key2name(obj_id));
             if(enemy != NULL) {
@@ -3394,6 +3440,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
             }
             break;
         }
+
         case EDT_GROUP: {
             editorgrp_entity_list_t *list, *it;
             list = editorgrp_get_group(obj_id);
@@ -3401,6 +3448,17 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
                 enum editor_entity_type my_type = EDITORGRP_ENTITY_TO_EDT(it->entity.type);
                 editor_draw_object(my_type, it->entity.id, v2d_add(position, it->entity.position));
             }
+            break;
+        }
+
+        case EDT_SSOBJ: {
+            const animation_t* anim = NULL;
+            const char* object_name = editor_ssobj_name(obj_id);
+            if(sprite_animation_exists(object_name, 0))
+                anim = sprite_get_animation(object_name, 0);
+            else
+                anim = sprite_get_animation("SD_QUESTIONMARK", 0);
+            cursor = sprite_get_image(anim, 0);
             break;
         }
     }
@@ -3430,7 +3488,57 @@ const char* editor_enemy_key2name(int key)
     return editor_enemy_name[key];
 }
 
+void editor_ssobj_init()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+    int fill_counter = 0;
 
+    editor_ssobj = NULL;
+    editor_ssobj_count = 0;
+
+    /* count SurgeScript objects tagged as "entity" */
+    surgescript_tagsystem_foreach_tagged_object(tag_system, "entity", &editor_ssobj_count, editor_ssobj_register);
+
+    /* register entities */
+    editor_ssobj = mallocx(editor_ssobj_count * sizeof(*editor_ssobj));
+    surgescript_tagsystem_foreach_tagged_object(tag_system, "entity", &fill_counter, editor_ssobj_register);
+}
+
+void editor_ssobj_register(const char* entity_name, void* data)
+{
+    int *counter = (int*)data;
+    if(editor_ssobj != NULL)
+        editor_ssobj[*counter] = str_dup(entity_name);
+    (*counter)++;
+}
+
+void editor_ssobj_release()
+{
+    for(int i = 0; i < editor_ssobj_count; i++)
+        free(editor_ssobj[i]);
+    free(editor_ssobj);
+    editor_ssobj = NULL;
+}
+
+/* associates an integer to each SurgeScript entity */
+int editor_ssobj_id(const char* entity_name)
+{
+    /* find i such that editor_ssobj[i] == entity_name */
+    for(int i = 0; i < editor_ssobj_count; i++) {
+        if(strcmp(entity_name, editor_ssobj[i]) == 0)
+            return i;
+    }
+
+    /* not found */
+    return -1;
+}
+
+const char* editor_ssobj_name(int entity_id)
+{
+    int id = clip(entity_id, 0, editor_ssobj_count - 1);
+    return editor_ssobj[id];
+}
 
 
 /* level editor: grid */
@@ -3708,6 +3816,12 @@ void editor_action_commit(editor_action_t action)
                 break;
             }
 
+            case EDT_SSOBJ: {
+                /* new SurgeScript object */
+                level_create_ssobject(editor_ssobj_name(action.obj_id), action.obj_position);
+                break;
+            }
+
             case EDT_GROUP: {
                 /* new group of objects */
                 editorgrp_entity_list_t *list, *it;
@@ -3743,6 +3857,7 @@ void editor_action_commit(editor_action_t action)
                 }
                 break;
             }
+
             case EDT_ITEM: {
                 /* delete item */
                 item_list_t *it;
@@ -3756,6 +3871,7 @@ void editor_action_commit(editor_action_t action)
                 }
                 break;
             }
+
             case EDT_ENEMY: {
                 /* delete object */
                 enemy_list_t *it;
@@ -3769,8 +3885,16 @@ void editor_action_commit(editor_action_t action)
                 }
                 break;
             }
+
             case EDT_GROUP: {
                 /* can't delete a group directly */
+                break;
+            }
+
+            case EDT_SSOBJ: {
+                surgescript_vm_t* vm = surgescript_vm();
+                surgescript_object_t* root = surgescript_vm_root_object(vm);
+                surgescript_object_traverse_tree_ex(root, &action, editor_remove_ssobject);
                 break;
             }
         }
@@ -3789,4 +3913,61 @@ void editor_action_commit(editor_action_t action)
     brick_list = entitymanager_release_retrieved_brick_list(brick_list);
     item_list = entitymanager_release_retrieved_item_list(item_list);
     object_list = entitymanager_release_retrieved_object_list(object_list);
+}
+
+bool editor_remove_ssobject(surgescript_object_t* object, void* data)
+{
+    if(surgescript_object_is_active(object)) {
+        if(surgescript_object_has_tag(object, "entity")) {
+            const char* object_name = surgescript_object_name(object);
+            editor_action_t *action = (editor_action_t*)data;
+            if(editor_ssobj_id(object_name) == action->obj_id) {
+                v2d_t delta = v2d_subtract(world_position(object), action->obj_position);
+                if(v2d_magnitude(delta) < EPSILON)
+                    surgescript_object_kill(object);
+            }
+        }
+
+        return true;
+    }
+    else
+        return false;
+}
+
+bool editor_pick_ssobject(surgescript_object_t* object, void* data)
+{
+    if(surgescript_object_is_active(object)) {
+        if(surgescript_object_has_tag(object, "entity")) {
+            v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+            float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x + 1 , editor_cursor.y + topleft.y + 1 };
+
+            /* find the bounding box of the entity */
+            v2d_t worldpos = world_position(object);
+            const char* object_name = surgescript_object_name(object);
+            a[0] = worldpos.x - 32; a[1] = worldpos.y - 32;
+            a[2] = worldpos.x + 32; a[3] = worldpos.y + 32;
+            if(sprite_animation_exists(object_name, 0)) { /* use the object name as the reference sprite */
+                const animation_t* anim = sprite_get_animation(object_name, 0);
+                const image_t* img = sprite_get_image(anim, 0);
+                v2d_t hot_spot = anim->hot_spot;
+                v2d_t size = v2d_new(image_width(img), image_height(img));
+                a[0] = worldpos.x - hot_spot.x;
+                a[1] = worldpos.y - hot_spot.y;
+                a[2] = a[0] + size.x;
+                a[3] = a[1] + size.y;
+            }
+
+            /* got collision between the cursor and the entity */
+            if(bounding_box(a, b)) {
+                surgescript_object_t** result = (surgescript_object_t**)data;
+                if(NULL == *result || object_zindex(object) >= object_zindex(*result))
+                    *result = object;
+            }
+        }
+
+        return true;
+    }
+    else
+        return false;
 }

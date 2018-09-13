@@ -173,6 +173,24 @@ v2d_t object_camera(const surgescript_object_t* object)
     return !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
 }
 
+/* get the zindex of an object */
+float object_zindex(surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
+    const char* object_name = surgescript_object_name(object);
+    float zindex = 0.5f;
+
+    if(surgescript_programpool_exists(pool, object_name, "get_zindex")) {
+        surgescript_var_t* tmp = surgescript_var_create();
+        surgescript_object_call_function(object, "get_zindex", NULL, 0, tmp);
+        zindex = surgescript_var_get_number(tmp);
+        surgescript_var_destroy(tmp);
+    }
+
+    return zindex;
+}
+
 /* the name of the parent object */
 const char* parent_name(const surgescript_object_t* object)
 {
