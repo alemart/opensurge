@@ -198,7 +198,7 @@ static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
 static surgescript_object_t* get_level_ssobject();
-static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
+static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor);
 static bool save_ssobject(surgescript_object_t* object, void* param);
 
 
@@ -319,13 +319,18 @@ static void editor_ssobj_register(const char* entity_name, void* data);
 static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
 static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
 static v2d_t editor_get_ssobj_spawnpoint(surgescript_object_t* object);
-static void editor_set_ssobj_spawnpoint(surgescript_object_t* object, v2d_t spawn_point);
+static int editor_is_ssobj_spawned_in_the_editor(surgescript_object_t* object);
+static void editor_set_ssobj_editordata(surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor);
 extern v2d_t world_position(const surgescript_object_t* object);
 extern float object_zindex(surgescript_object_t* object);
-typedef v2d_t ssobj_spawnpoint_t;
-HASHTABLE_GENERATE_CODE(ssobj_spawnpoint_t);
-hashtable_ssobj_spawnpoint_t* editor_ssobj_spawnpoint = NULL;
-static void editor_free_ssobj_spawnpoint(ssobj_spawnpoint_t* sp);
+typedef struct ssobj_editordata_t ssobj_editordata_t;
+struct ssobj_editordata_t { /* SurgeScript entity: extra data */
+    v2d_t spawn_point;
+    int spawned_in_the_editor;
+};
+HASHTABLE_GENERATE_CODE(ssobj_editordata_t);
+hashtable_ssobj_editordata_t* editor_ssobj_editordata = NULL;
+static void editor_free_ssobj_editordata(ssobj_editordata_t* data);
 
 /* editor: brick layer & flip flags */
 static bricklayer_t editor_layer;
@@ -1548,8 +1553,15 @@ enemy_t* level_create_enemy(const char *name, v2d_t position)
  */
 surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position)
 {
-    if(ssobject_exists(object_name))
-        return spawn_ssobject(object_name, position);
+    if(ssobject_exists(object_name)) {
+        surgescript_vm_t* vm = surgescript_vm();
+        int spawned_in_the_editor =
+            /* note: objects not created with this function will not have this flag set to true */
+            surgescript_tagsystem_has_tag(surgescript_vm_tagsystem(vm), object_name, "entity") &&
+            !is_startup_object(object_name)
+        ;
+        return spawn_ssobject(object_name, position, spawned_in_the_editor);
+    }
     else
         return NULL;
 }
@@ -2341,14 +2353,10 @@ void update_ssobject(surgescript_object_t* object, void* param)
         bool awake = surgescript_object_has_tag(object, "awake");
         if(awake || nearby || surgescript_object_has_tag(object, "detached"))
             surgescript_object_set_active(object, true);
-        else if(!surgescript_object_has_tag(object, "disposable")) {
-            puts("heey");
+        else if(!surgescript_object_has_tag(object, "disposable"))
             surgescript_object_set_active(object, false);
-        }
-        else {
-            puts("haaa!!");
+        else
             surgescript_object_kill(object);
-        }
     }
 }
 
@@ -2406,7 +2414,7 @@ surgescript_object_t* get_level_ssobject()
 }
 
 /* spawns a ssobject */
-surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
+surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor)
 {
     if(ssobject_exists(object_name)) {
         /* create object */
@@ -2421,9 +2429,9 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
         surgescript_transform_t* transform = surgescript_object_transform(object);
         surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
 
-        /* save the spawn point (entities only) */
+        /* save the editor-related data (entities only) */
         if(surgescript_object_has_tag(object, "entity"))
-            editor_set_ssobj_spawnpoint(object, spawn_point);
+            editor_set_ssobj_editordata(object, spawn_point, spawned_in_the_editor);
 
         /* done! */
         return object;
@@ -2438,16 +2446,12 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
 bool save_ssobject(surgescript_object_t* object, void* param)
 {
     if(!surgescript_object_is_killed(object)) {
-        surgescript_objecthandle_t level = surgescript_object_handle(get_level_ssobject());
-        if(surgescript_object_parent(object) == level) {
-            if(surgescript_object_has_tag(object, "entity")) {
-                FILE* fp = (FILE*)param;
-                const char* object_name = surgescript_object_name(object);
-                v2d_t spawn_point = editor_get_ssobj_spawnpoint(object); /* only entities have a spawn point! */
-                fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
-            }
+        if(editor_is_ssobj_spawned_in_the_editor(object)) {
+            FILE* fp = (FILE*)param;
+            const char* object_name = surgescript_object_name(object);
+            v2d_t spawn_point = editor_get_ssobj_spawnpoint(object);
+            fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
         }
-
         return true;
     }
     else
@@ -3499,6 +3503,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
             else
                 anim = sprite_get_animation("SD_QUESTIONMARK", 0);
             cursor = sprite_get_image(anim, 0);
+            offset = anim->hot_spot;
             break;
         }
     }
@@ -3544,8 +3549,8 @@ void editor_ssobj_init()
     editor_ssobj = mallocx(editor_ssobj_count * sizeof(*editor_ssobj));
     surgescript_tagsystem_foreach_tagged_object(tag_system, "entity", &fill_counter, editor_ssobj_register);
 
-    /* create spawnpoint table */
-    editor_ssobj_spawnpoint = hashtable_ssobj_spawnpoint_t_create(editor_free_ssobj_spawnpoint);
+    /* create editordata table */
+    editor_ssobj_editordata = hashtable_ssobj_editordata_t_create(editor_free_ssobj_editordata);
 }
 
 void editor_ssobj_register(const char* entity_name, void* data)
@@ -3562,7 +3567,7 @@ void editor_ssobj_release()
         free(editor_ssobj[i]);
     free(editor_ssobj);
     editor_ssobj = NULL;
-    editor_ssobj_spawnpoint = hashtable_ssobj_spawnpoint_t_destroy(editor_ssobj_spawnpoint);
+    editor_ssobj_editordata = hashtable_ssobj_editordata_t_destroy(editor_ssobj_editordata);
 }
 
 /* associates an integer to each SurgeScript entity */
@@ -4009,27 +4014,36 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 v2d_t editor_get_ssobj_spawnpoint(surgescript_object_t* object)
 {
     /* TODO: use a faster key type */
-    char hash[24] = "", *p = hash; v2d_t *sp;
+    char hash[24] = "", *p = hash; ssobj_editordata_t* data;
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
     do { *p++ = "0123456789abcdef"[handle & 0xF]; } while(handle >>= 4); *p = '\0';
-    return (sp = hashtable_ssobj_spawnpoint_t_find(editor_ssobj_spawnpoint, hash)) ? *sp : v2d_new(0, 0);
+    return (data = hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash)) ? data->spawn_point : v2d_new(0, 0);
 }
 
-void editor_set_ssobj_spawnpoint(surgescript_object_t* object, v2d_t spawn_point)
+int editor_is_ssobj_spawned_in_the_editor(surgescript_object_t* object)
 {
-    char hash[24] = "", *p = hash; v2d_t *sp;
+    char hash[24] = "", *p = hash; ssobj_editordata_t* data;
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
     do { *p++ = "0123456789abcdef"[handle & 0xF]; } while(handle >>= 4); *p = '\0';
-    if(NULL == (sp = hashtable_ssobj_spawnpoint_t_find(editor_ssobj_spawnpoint, hash))) {
-        sp = mallocx(sizeof *sp);
-        *sp = spawn_point;
-        hashtable_ssobj_spawnpoint_t_add(editor_ssobj_spawnpoint, hash, sp);
+    return (data = hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash)) ? data->spawned_in_the_editor : FALSE;
+}
+
+void editor_set_ssobj_editordata(surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor)
+{
+    char hash[24] = "", *p = hash; ssobj_editordata_t* data;
+    surgescript_objecthandle_t handle = surgescript_object_handle(object);
+    do { *p++ = "0123456789abcdef"[handle & 0xF]; } while(handle >>= 4); *p = '\0';
+    if(NULL == (data = hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash))) {
+        data = mallocx(sizeof *data);
+        data->spawn_point = spawn_point;
+        data->spawned_in_the_editor = spawned_in_the_editor;
+        hashtable_ssobj_editordata_t_add(editor_ssobj_editordata, hash, data);
     }
     else
-        *sp = spawn_point;
+        data->spawn_point = spawn_point;
 }
 
-void editor_free_ssobj_spawnpoint(ssobj_spawnpoint_t* sp)
+void editor_free_ssobj_editordata(ssobj_editordata_t* data)
 {
-    free(sp);
+    free(data);
 }
