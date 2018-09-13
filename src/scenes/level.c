@@ -91,15 +91,12 @@ static void update_dialogregions();
  * Startup objects
  * ------------------------ */
 #define DEFAULT_STARTUP_OBJECT ".default_startup"
-
 typedef struct startupobject_list_t startupobject_list_t;
 struct startupobject_list_t {
     char *object_name;
     startupobject_list_t *next;
 };
-
 static startupobject_list_t *startupobject_list;
-
 static void init_startup_object_list();
 static void release_startup_object_list();
 static void add_to_startup_object_list(const char *object_name);
@@ -201,6 +198,7 @@ static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
 static surgescript_object_t* get_level_ssobject();
 static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
+static bool save_ssobject(surgescript_object_t* object, void* param);
 
 
 
@@ -615,7 +613,7 @@ int level_save(const char *filepath)
     }
 
     /* brick list */
-    fprintf(fp, "\n// brick list\n");
+    fprintf(fp, "\n// bricks\n");
     for(itb=brick_list; itb; itb=itb->next)  {
         if(brick_is_alive(itb->data)) {
             fprintf(fp,
@@ -631,14 +629,22 @@ int level_save(const char *filepath)
     }
 
     /* item list */
-    fprintf(fp, "\n// item list\n");
+    fprintf(fp, "\n// items\n");
     for(iti=item_list; iti; iti=iti->next) {
         if(iti->data->state != IS_DEAD)
            fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
     }
 
     /* object list */
-    fprintf(fp, "\n// object list\n");
+    fprintf(fp, "\n// objects\n");
+    do {
+        surgescript_vm_t* vm = surgescript_vm();
+        surgescript_object_t* root = surgescript_vm_root_object(vm);
+        surgescript_object_traverse_tree_ex(root, fp, save_ssobject);
+    } while(0);
+
+    /* legacy object list */
+    fprintf(fp, "\n// legacy objects\n");
     for(ite=object_list; ite; ite=ite->next) {
         if(ite->data->created_from_editor && ite->data->state != ES_DEAD)
             fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
@@ -2328,10 +2334,14 @@ void update_ssobject(surgescript_object_t* object, void* param)
         bool awake = surgescript_object_has_tag(object, "awake");
         if(awake || nearby || surgescript_object_has_tag(object, "detached"))
             surgescript_object_set_active(object, true);
-        else if(!surgescript_object_has_tag(object, "disposable"))
+        else if(!surgescript_object_has_tag(object, "disposable")) {
+            puts("heey");
             surgescript_object_set_active(object, false);
-        else
+        }
+        else {
+            puts("haaa!!");
             surgescript_object_kill(object);
+        }
     }
 }
 
@@ -2358,7 +2368,7 @@ void render_ssobjects()
 bool render_ssobject(surgescript_object_t* object, void* param)
 {
     surgescript_programpool_t* pool = (surgescript_programpool_t*)param;
-    if(surgescript_object_is_active(object)) {
+    if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
         if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render"))
             renderqueue_enqueue_ssobject(object);
         return true;
@@ -2404,6 +2414,11 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
         surgescript_transform_t* transform = surgescript_object_transform(object);
         surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
 
+        /* save the spawn point (entities only) */
+        /*if(surgescript_object_has_tag(object, "entity")) {
+            surgescript_object_set_userdata(object, );
+        }*/
+
         /* done! */
         return object;
     }
@@ -2413,6 +2428,26 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
     }
 }
 
+/* writes an object declaration to a file */
+bool save_ssobject(surgescript_object_t* object, void* param)
+{
+    if(!surgescript_object_is_killed(object)) {
+        surgescript_objecthandle_t level = surgescript_object_handle(get_level_ssobject());
+        if(surgescript_object_parent(object) == level) {
+            if(surgescript_object_has_tag(object, "entity")) {
+                FILE* fp = (FILE*)param;
+                const char* object_name = surgescript_object_name(object);
+                v2d_t worldpos = world_position(object);
+                v2d_t spawn_point = worldpos; /* FIXME */
+                fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
+            }
+        }
+
+        return true;
+    }
+    else
+        return false;
+}
 
 
 
@@ -2693,7 +2728,7 @@ void editor_update()
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
                     if(bounding_box(a,b)) {
-                        if(!candidate || (candidate && brick_zindex(itb->data) >= brick_zindex(candidate)))
+                        if(candidate == NULL || brick_zindex(itb->data) >= brick_zindex(candidate))
                             candidate = itb->data;
                     }
                 }
@@ -2723,7 +2758,7 @@ void editor_update()
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
 
                     if(bounding_box(a,b)) {
-                        if(!candidate || (candidate && !(iti->data->bring_to_back)))
+                        if(candidate == NULL || !iti->data->bring_to_back)
                             candidate = iti->data;
                     }
                 }
@@ -2756,7 +2791,7 @@ void editor_update()
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
                     int mykey = editor_enemy_name2key(ite->data->name);
                     if(mykey >= 0 && bounding_box(a,b)) {
-                        if(!candidate || (candidate && ite->data->zindex >= candidate->zindex)) {
+                        if(candidate == NULL || ite->data->zindex >= candidate->zindex) {
                             candidate = ite->data;
                             candidate_key = mykey;
                         }
@@ -2781,7 +2816,7 @@ void editor_update()
             case EDT_GROUP:
                 break;
 
-            /* SurgeScript object */
+            /* SurgeScript entity */
             case EDT_SSOBJ: {
                 surgescript_vm_t* vm = surgescript_vm();
                 surgescript_object_t* root = surgescript_vm_root_object(vm);
@@ -3787,14 +3822,6 @@ void editor_action_redo()
 /* commit action */
 void editor_action_commit(editor_action_t action)
 {
-    brick_list_t *brick_list;
-    item_list_t *item_list;
-    enemy_list_t *object_list;
-
-    brick_list = entitymanager_retrieve_all_bricks(); /* FIXME: retrieve relevant entities only? */
-    item_list = entitymanager_retrieve_all_items();
-    object_list = entitymanager_retrieve_all_objects();
-
     if(action.type == EDA_NEWOBJECT) {
         /* new object */
         switch(action.obj_type) {
@@ -3847,42 +3874,43 @@ void editor_action_commit(editor_action_t action)
         switch(action.obj_type) {
             case EDT_BRICK: {
                 /* delete brick */
-                brick_list_t *it;
-                for(it=brick_list; it; it=it->next) {
+                brick_list_t *brick_list = entitymanager_retrieve_all_bricks(); /* FIXME: retrieve relevant entities only? */
+                for(brick_list_t *it = brick_list; it != NULL; it = it->next) {
                     if(brick_id(it->data) == action.obj_id) {
                         float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), action.obj_position));
                         if(dist < EPSILON)
                             brick_kill(it->data);
                     }
                 }
+                entitymanager_release_retrieved_brick_list(brick_list);
                 break;
             }
 
             case EDT_ITEM: {
-                /* delete item */
-                item_list_t *it;
-                int id = action.obj_id;
-                for(it=item_list; it; it=it->next) {
-                    if(it->data->type == id) {
+                /* delete legacy item */
+                item_list_t *item_list = entitymanager_retrieve_all_items();
+                for(item_list_t *it = item_list; it != NULL; it = it->next) {
+                    if(it->data->type == action.obj_id) {
                         float dist = v2d_magnitude(v2d_subtract(it->data->actor->position, action.obj_position));
                         if(dist < EPSILON)
                             it->data->state = IS_DEAD;
                     }
                 }
+                entitymanager_release_retrieved_item_list(item_list);
                 break;
             }
 
             case EDT_ENEMY: {
-                /* delete object */
-                enemy_list_t *it;
-                int id = action.obj_id;
-                for(it=object_list; it; it=it->next) {
-                    if(editor_enemy_name2key(it->data->name) == id) {
+                /* delete legacy object */
+                enemy_list_t *enemy_list = entitymanager_retrieve_all_objects();
+                for(enemy_list_t *it = enemy_list; it != NULL; it = it->next) {
+                    if(editor_enemy_name2key(it->data->name) == action.obj_id) {
                         float dist = v2d_magnitude(v2d_subtract(it->data->actor->position, action.obj_position));
                         if(dist < EPSILON)
                             it->data->state = ES_DEAD;
                     }
                 }
+                entitymanager_release_retrieved_object_list(enemy_list);
                 break;
             }
 
@@ -3892,6 +3920,7 @@ void editor_action_commit(editor_action_t action)
             }
 
             case EDT_SSOBJ: {
+                /* delete SurgeScript entity */
                 surgescript_vm_t* vm = surgescript_vm();
                 surgescript_object_t* root = surgescript_vm_root_object(vm);
                 surgescript_object_traverse_tree_ex(root, &action, editor_remove_ssobject);
@@ -3909,10 +3938,6 @@ void editor_action_commit(editor_action_t action)
         level_set_spawn_point(action.obj_old_position);
         spawn_players();
     }
-
-    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
-    item_list = entitymanager_release_retrieved_item_list(item_list);
-    object_list = entitymanager_release_retrieved_object_list(object_list);
 }
 
 bool editor_remove_ssobject(surgescript_object_t* object, void* data)
