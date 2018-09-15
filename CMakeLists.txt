@@ -266,10 +266,11 @@ SET(
   src/scripting/camera.c
   src/scripting/console.c
   src/scripting/input.c
+  src/scripting/level.c
+  src/scripting/mouse.c
   src/scripting/obstaclemap.c
   src/scripting/sensor.c
   src/scripting/time.c
-  src/scripting/mouse.c
 
   src/entities/items/util/itemutil.c
   src/entities/items/animal.c

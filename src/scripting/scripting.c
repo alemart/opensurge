@@ -50,6 +50,7 @@ extern void scripting_register_actor(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
 extern void scripting_register_input(surgescript_vm_t* vm);
+extern void scripting_register_level(surgescript_vm_t* vm);
 extern void scripting_register_mouse(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
@@ -78,6 +79,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_camera(vm);
     scripting_register_console(vm);
     scripting_register_input(vm);
+    scripting_register_level(vm);
     scripting_register_mouse(vm);
     scripting_register_obstaclemap(vm);
     scripting_register_sensor(vm);
@@ -198,6 +200,18 @@ const char* parent_name(const surgescript_object_t* object)
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     return surgescript_object_name(parent);
+}
+
+/* get the SurgeEngine object */
+surgescript_object_t* surgeengine_object(surgescript_vm_t* vm)
+{
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    static surgescript_objecthandle_t cached_ref = 0;
+    
+    if(!cached_ref)
+        cached_ref = surgescript_objectmanager_plugin_object(manager, "SurgeEngine");
+
+    return surgescript_objectmanager_get(manager, cached_ref);
 }
 
 

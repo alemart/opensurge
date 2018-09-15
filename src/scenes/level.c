@@ -300,7 +300,6 @@ static const char** editor_enemy_name;
 static int editor_enemy_name_length;
 int editor_enemy_name2key(const char *name);
 const char* editor_enemy_key2name(int key);
-static const char* editor_enemy_annotation(const char *name);
 static const char** editor_enemy_category;
 static int editor_enemy_category_length;
 static int editor_enemy_selected_category_id; /* a value between 0 and editor_enemy_category_length - 1, inclusive */
@@ -323,6 +322,7 @@ static int editor_is_ssobj_spawned_in_the_editor(surgescript_object_t* object);
 static void editor_set_ssobj_editordata(surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor);
 extern v2d_t world_position(const surgescript_object_t* object);
 extern float object_zindex(surgescript_object_t* object);
+extern surgescript_object_t* surgeengine_object(surgescript_vm_t* vm);
 typedef struct ssobj_editordata_t ssobj_editordata_t;
 struct ssobj_editordata_t { /* SurgeScript entity: extra data */
     v2d_t spawn_point;
@@ -649,11 +649,7 @@ int level_save(const char *filepath)
 
     /* object list */
     fprintf(fp, "\n// objects\n");
-    do {
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_object_t* root = surgescript_vm_root_object(vm);
-        surgescript_object_traverse_tree_ex(root, fp, save_ssobject);
-    } while(0);
+    surgescript_object_traverse_tree_ex(get_level_ssobject(), fp, save_ssobject);
 
     /* legacy object list */
     fprintf(fp, "\n// legacy objects\n");
@@ -2406,27 +2402,41 @@ bool ssobject_exists(const char* object_name)
 /* get the handle to the Level object */
 surgescript_object_t* get_level_ssobject()
 {
-    /* TODO */
     surgescript_vm_t* vm = surgescript_vm();
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-    surgescript_objecthandle_t app = surgescript_objectmanager_application(manager);
-    return surgescript_objectmanager_get(manager, app);
+    static surgescript_objecthandle_t cached_ref = 0;
+
+    if(!cached_ref) {
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_object_t* surgeengine = surgeengine_object(vm);
+        surgescript_object_call_function(surgeengine, "get_Level", NULL, 0, ret);
+        cached_ref = surgescript_var_get_objecthandle(ret);
+        surgescript_var_destroy(ret);
+    }
+
+    return surgescript_objectmanager_get(manager, cached_ref);
 }
 
 /* spawns a ssobject */
 surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor)
 {
     if(ssobject_exists(object_name)) {
-        /* create object */
+        /* create the object by invoking Level.spawn */
         surgescript_vm_t* vm = surgescript_vm();
         surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-        surgescript_object_t* parent = get_level_ssobject();
-        surgescript_objecthandle_t parent_handle = surgescript_object_handle(parent);
-        surgescript_objecthandle_t child_handle = surgescript_objectmanager_spawn(manager, parent_handle, object_name, NULL);
-        surgescript_object_t* object = surgescript_objectmanager_get(manager, child_handle);
+        surgescript_transform_t* transform = NULL;
+        surgescript_object_t* object = NULL;
+        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
+        surgescript_var_t* ret = surgescript_var_create();
+        const surgescript_var_t* param[] = { tmp };
+
+        surgescript_object_call_function(get_level_ssobject(), "spawn", param, 1, ret);
+        object = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(ret));
+        surgescript_var_destroy(ret);
+        surgescript_var_destroy(tmp);
 
         /* set the spawn point */
-        surgescript_transform_t* transform = surgescript_object_transform(object);
+        transform = surgescript_object_transform(object);
         surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
 
         /* save the editor-related data (entities only) */
@@ -3214,19 +3224,6 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
     }
 
     return buf;
-}
-
-
-/* returns the annotation of a given enemy */
-const char* editor_enemy_annotation(const char *name)
-{
-    static char buf[512] = "";
-
-    enemy_t *x = enemy_create(name);
-    str_cpy(buf, x->annotation, sizeof(buf));
-    enemy_destroy(x);
-
-    return buf;    
 }
 
 /* returns the name of the selected category */
