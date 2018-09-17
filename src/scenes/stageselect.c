@@ -102,7 +102,7 @@ static int sort_cmp(const void *a, const void *b);
  */
 void stageselect_init(void *should_enable_debug)
 {
-    enable_debug = ((int)should_enable_debug) ? TRUE : FALSE;
+    enable_debug = *((int*)should_enable_debug) ? TRUE : FALSE;
 
     option = 0;
     scene_time = 0;
