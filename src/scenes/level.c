@@ -3258,8 +3258,11 @@ void editor_next_class()
     if(editor_cursor_entity_type == EDT_ENEMY && editor_enemy_name_length == 0)
         editor_next_class();
 
+    if(editor_cursor_entity_type == EDT_SSOBJ && editor_ssobj_count == 0)
+        editor_next_class();
+
     if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
-        editor_next_entity();
+        editor_next_entity(); /* it's guaranteed that we'll always have a brick (see brickdata_load)*/
 }
 
 
@@ -3283,8 +3286,11 @@ void editor_previous_class()
     if(editor_cursor_entity_type == EDT_ENEMY && editor_enemy_name_length == 0)
         editor_previous_class();
 
+    if(editor_cursor_entity_type == EDT_SSOBJ && editor_ssobj_count == 0)
+        editor_previous_class();
+
     if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
-        editor_next_entity();
+        editor_previous_entity();
 }
 
 
