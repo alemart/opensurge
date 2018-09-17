@@ -210,18 +210,6 @@ static bool save_ssobject(surgescript_object_t* object, void* param);
  * Level Editor
  * ------------------------ */
 
-/*
-IMPORTANT:
-1. an object is a custom object made by the user
-2. an entity may be: a brick, a built-in item or an object made by the user
-
-Object categories are defined by the user
-Entity classes are: bricks, items and objects
-*/
-
-/* constants */
-#define EDITOR_BGFILE       "images/editorbg.png"
-
 /* methods */
 static void editor_init();
 static void editor_release();
@@ -257,7 +245,6 @@ enum editor_entity_type {
 static int editor_enabled; /* is the level editor enabled? */
 static int editor_previous_video_resolution;
 static int editor_previous_video_smooth;
-static image_t *editor_bgimage;
 static input_t *editor_mouse;
 static input_t *editor_keyboard, *editor_keyboard2, *editor_keyboard3;
 static v2d_t editor_camera, editor_cursor;
@@ -320,21 +307,24 @@ static const char* editor_ssobj_name(int entity_id);
 static void editor_ssobj_register(const char* entity_name, void* data);
 static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
 static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
-static v2d_t editor_get_ssobj_spawnpoint(surgescript_object_t* object);
-static int editor_is_ssobj_spawned_in_the_editor(surgescript_object_t* object);
-static void editor_set_ssobj_editordata(surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor);
+static v2d_t editor_get_ssobj_spawnpoint(const surgescript_object_t* object);
+static int editor_is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
+
 extern v2d_t world_position(const surgescript_object_t* object);
 extern float object_zindex(surgescript_object_t* object);
 extern surgescript_object_t* surgeengine_object(surgescript_vm_t* vm);
 extern surgescript_object_t* surgeengine_component(surgescript_vm_t* vm, const char* component_name);
+
 typedef struct ssobj_editordata_t ssobj_editordata_t;
+static ssobj_editordata_t* editor_get_ssobj_editordata(const surgescript_object_t* object);
+static void editor_set_ssobj_editordata(const surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor);
+static void editor_free_ssobj_editordata(ssobj_editordata_t* data);
 struct ssobj_editordata_t { /* SurgeScript entity: extra data */
     v2d_t spawn_point;
     int spawned_in_the_editor;
 };
 HASHTABLE_GENERATE_CODE(ssobj_editordata_t);
 hashtable_ssobj_editordata_t* editor_ssobj_editordata = NULL;
-static void editor_free_ssobj_editordata(ssobj_editordata_t* data);
 
 /* editor: brick layer & flip flags */
 static bricklayer_t editor_layer;
@@ -520,6 +510,10 @@ void level_unload()
     /* entity manager */
     entitymanager_release();
 
+    /* scripting */
+    surgescript_object_call_function(surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
+    cached_level_ssobject = NULL;
+
     /* unloading the brickset */
     logfile_message("unloading the brickset...");
     brickset_unload();
@@ -534,10 +528,6 @@ void level_unload()
         player_destroy(team[i]);
     team_size = 0;
     player = NULL;
-
-    /* scripting */
-    surgescript_object_call_function(surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
-    cached_level_ssobject = NULL;
 
     /* success! */
     logfile_message("level_unload() ok");
@@ -2414,7 +2404,6 @@ bool ssobject_exists(const char* object_name)
 /* get the Level object (SurgeScript) */
 surgescript_object_t* level_ssobject()
 {
-    return surgeengine_component(surgescript_vm(), "Level");
     if(cached_level_ssobject == NULL)
         cached_level_ssobject = surgeengine_component(surgescript_vm(), "Level");
     return cached_level_ssobject;
@@ -2464,11 +2453,11 @@ bool save_ssobject(surgescript_object_t* object, void* param)
             const char* object_name = surgescript_object_name(object);
             v2d_t spawn_point = editor_get_ssobj_spawnpoint(object);
             fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
+            return true;
         }
-        return true;
     }
-    else
-        return false;
+
+    return false;
 }
 
 
@@ -2529,7 +2518,6 @@ void editor_init()
     editor_enemy_category = objects_get_list_of_categories(&editor_enemy_category_length);
 
     /* creating objects */
-    editor_bgimage = image_load(EDITOR_BGFILE);
     editor_keyboard = input_create_user("editor1");
     editor_keyboard2 = input_create_user("editor2");
     editor_keyboard3 = input_create_user("editor3");
@@ -2574,7 +2562,6 @@ void editor_release()
     editor_ssobj_release();
 
     /* destroying objects */
-    image_unref(EDITOR_BGFILE);
     input_destroy(editor_keyboard3);
     input_destroy(editor_keyboard2);
     input_destroy(editor_keyboard);
@@ -2880,14 +2867,15 @@ void editor_update()
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
-    font_set_text(editor_help_font, "<color=ffff88>F1</color>: help");
+    font_set_text(editor_help_font, "<color=ff8060>F1</color>: help");
     font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 8, 8));
+    font_set_visible(editor_help_font, video_get_window_size().x > 512);
 
     /* object properties */
     font_set_position(editor_properties_font, v2d_new(8, 8));
     font_set_text(
         editor_properties_font,
-        "<color=ffff88>%s</color> <color=ffffff>%s</color>",
+        "<color=ff8060>%s</color> <color=ffffff>%s</color>",
         editor_entity_class(editor_cursor_entity_type),
         editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
     );
@@ -2953,6 +2941,7 @@ void editor_render()
 
     /* object properties */
     /*image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(40, 44, 52));*/
+    /*image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(37, 37, 38));*/
     font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
@@ -3033,14 +3022,11 @@ int editor_want_to_activate()
 
 /*
  * editor_render_background()
- * Renders the background image of the
- * level editor
+ * Renders the background of the level editor
  */
 void editor_render_background()
 {
-    float x = (float)VIDEO_SCREEN_W / image_width(editor_bgimage);
-    float y = (float)VIDEO_SCREEN_H / image_height(editor_bgimage);
-    image_draw_scaled(editor_bgimage, video_get_backbuffer(), 0, 0, v2d_new(x,y), IF_NONE);
+    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, image_rgb(40, 44, 52));
 }
 
 
@@ -3129,11 +3115,7 @@ void editor_scroll()
  */
 int editor_is_eraser_enabled()
 {
-    if(
-        editor_cursor_entity_type != EDT_BRICK &&
-        editor_cursor_entity_type != EDT_ITEM &&
-        editor_cursor_entity_type != EDT_ENEMY
-    ) {
+    if(editor_cursor_entity_type == EDT_GROUP) {
         if(input_button_pressed(editor_keyboard3, IB_FIRE2))
             sound_play( soundfactory_get("deny") );
 
@@ -3167,7 +3149,7 @@ const char *editor_entity_class(enum editor_entity_type objtype)
             return "group";
 
         case EDT_SSOBJ:
-            return "object";
+            return "entity";
     }
 
     return "unknown";
@@ -3186,7 +3168,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
             if(brick_exists(objid)) {
                 brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 sprintf(buf,
-                    "%4d %12s %12s    %3dx%3d   z=%.2lf",
+                    "%4d %12s %12s    %3dx%3d    z=%.2lf",
                     objid,
                     brick_util_behaviorname(brick_behavior(x)),
                     brick_util_typename(brick_type(x)),
@@ -4011,24 +3993,30 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
         return false;
 }
 
-v2d_t editor_get_ssobj_spawnpoint(surgescript_object_t* object)
+v2d_t editor_get_ssobj_spawnpoint(const surgescript_object_t* object)
+{
+    ssobj_editordata_t* data = editor_get_ssobj_editordata(object);
+    return data != NULL ? data->spawn_point : v2d_new(0, 0);
+}
+
+int editor_is_ssobj_spawned_in_the_editor(const surgescript_object_t* object)
+{
+    ssobj_editordata_t* data = editor_get_ssobj_editordata(object);
+    return data != NULL ? data->spawned_in_the_editor : FALSE;
+}
+
+/* Get the editor data of a given object
+   It may return NULL (if no such data exists) */
+ssobj_editordata_t* editor_get_ssobj_editordata(const surgescript_object_t* object)
 {
     /* TODO: use a faster key type */
-    char hash[24] = "", *p = hash; ssobj_editordata_t* data;
+    char hash[24] = "", *p = hash;
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
     do { *p++ = "0123456789abcdef"[handle & 0xF]; } while(handle >>= 4); *p = '\0';
-    return (data = hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash)) ? data->spawn_point : v2d_new(0, 0);
+    return hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash); /* may be NULL */
 }
 
-int editor_is_ssobj_spawned_in_the_editor(surgescript_object_t* object)
-{
-    char hash[24] = "", *p = hash; ssobj_editordata_t* data;
-    surgescript_objecthandle_t handle = surgescript_object_handle(object);
-    do { *p++ = "0123456789abcdef"[handle & 0xF]; } while(handle >>= 4); *p = '\0';
-    return (data = hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash)) ? data->spawned_in_the_editor : FALSE;
-}
-
-void editor_set_ssobj_editordata(surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor)
+void editor_set_ssobj_editordata(const surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor)
 {
     char hash[24] = "", *p = hash; ssobj_editordata_t* data;
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
