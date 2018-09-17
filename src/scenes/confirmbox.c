@@ -30,6 +30,7 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/scene.h"
+#include "../core/stringutil.h"
 #include "../core/soundfactory.h"
 
 
@@ -224,11 +225,11 @@ int confirmbox_selected_option()
 void setup(const char *ptext, const char *option1, const char *option2)
 {
     current_option = -1;
-    strcpy(text, ptext);
-    strcpy(option[0], option1);
+    str_cpy(text, ptext, sizeof(text));
+    str_cpy(option[0], option1, sizeof(option[0]));
 
     if(option2) {
-        strcpy(option[1], option2);
+        str_cpy(option[1], option2, sizeof(option[1]));
         option_count = 2;
     }
     else

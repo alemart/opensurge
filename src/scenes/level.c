@@ -60,6 +60,7 @@
 #include "../entities/items/flyingtext.h"
 #include "../entities/entitymanager.h"
 #include "../scripting/scripting.h"
+#include "../scenes/editorpal.h"
 
 
 /* ------------------------
@@ -298,13 +299,13 @@ static void editor_next_object_category();
 static void editor_previous_object_category();
 
 /* editor: SurgeScript entities */
-static char** editor_ssobj;
-static int editor_ssobj_count;
+static char** editor_ssobj; /* the names of all SurgeScript entities; a vector of strings */
+static int editor_ssobj_count; /* length of editor_ssobj */
 static void editor_ssobj_init();
 static void editor_ssobj_release();
-static int editor_ssobj_id(const char* entity_name);
-static const char* editor_ssobj_name(int entity_id);
-static void editor_ssobj_register(const char* entity_name, void* data);
+static void editor_ssobj_register(const char* entity_name, void* data); /* internal */
+static int editor_ssobj_id(const char* entity_name); /* an index k such that editor_ssobj[k] is entity_name */
+static const char* editor_ssobj_name(int entity_id); /* the inverse of editor_ssobj_id() */
 static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
 static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
 static v2d_t editor_get_ssobj_spawnpoint(const surgescript_object_t* object);
@@ -317,7 +318,7 @@ extern surgescript_object_t* surgeengine_component(surgescript_vm_t* vm, const c
 
 typedef struct ssobj_editordata_t ssobj_editordata_t;
 static ssobj_editordata_t* editor_get_ssobj_editordata(const surgescript_object_t* object);
-static void editor_set_ssobj_editordata(const surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor);
+static void editor_set_ssobj_editordata(const surgescript_object_t* object, ssobj_editordata_t editordata);
 static void editor_free_ssobj_editordata(ssobj_editordata_t* data);
 struct ssobj_editordata_t { /* SurgeScript entity: extra data */
     v2d_t spawn_point;
@@ -1554,7 +1555,8 @@ surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t posit
     if(ssobject_exists(object_name)) {
         surgescript_vm_t* vm = surgescript_vm();
         int spawned_in_the_editor =
-            /* note: objects not created with this function will not have this flag set to true */
+            /* note: objects not created with this function (e.g., via scripting)
+               will not have this flag set to true */
             surgescript_tagsystem_has_tag(surgescript_vm_tagsystem(vm), object_name, "entity") &&
             !is_startup_object(object_name)
         ;
@@ -2432,8 +2434,13 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point,
         surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
 
         /* save the editor-related data (entities only) */
-        if(surgescript_object_has_tag(object, "entity"))
-            editor_set_ssobj_editordata(object, spawn_point, spawned_in_the_editor);
+        if(surgescript_object_has_tag(object, "entity")) {
+            ssobj_editordata_t editordata = {
+                .spawn_point = spawn_point,
+                .spawned_in_the_editor = spawned_in_the_editor
+            };
+            editor_set_ssobj_editordata(object, editordata);
+        }
 
         /* done! */
         return object;
@@ -2627,6 +2634,25 @@ void editor_update()
         return;
     }
 
+    /* help */
+    if(input_button_pressed(editor_keyboard3, IB_FIRE8)) {
+        scenestack_push(storyboard_get_scene(SCENE_EDITORHELP), NULL);
+        return;
+    }
+
+    /* open palette */
+    if(input_button_pressed(editor_keyboard2, IB_FIRE4)) {
+        editorpal_config_t config = {
+            .type = EDITORPAL_SSOBJ, /* TODO */
+            .ssobj = {
+                .name = (const char**)editor_ssobj,
+                .count = editor_ssobj_count
+            }
+        };
+        scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
+        return;
+    }
+
     /* ----------------------------------------- */
 
     /* getting major entities */
@@ -2693,15 +2719,9 @@ void editor_update()
             sound_play( soundfactory_get("deny") );
     }
 
-    /* help */
-    if(input_button_pressed(editor_keyboard3, IB_FIRE8)) {
-        scenestack_push(storyboard_get_scene(SCENE_EDITORHELP), NULL);
-        return;
-    }   
-
     /* mouse cursor. note: editor_mouse is a input_t*, but also a inputmouse_t*, so it's safe to cast it */
-    editor_cursor.x = clip(input_get_xy((inputmouse_t*)editor_mouse).x, 0, VIDEO_SCREEN_W - image_width(cursor_arrow));
-    editor_cursor.y = clip(input_get_xy((inputmouse_t*)editor_mouse).y, 0, VIDEO_SCREEN_H - image_height(cursor_arrow));
+    editor_cursor.x = clip(input_get_xy((inputmouse_t*)editor_mouse).x, 0, VIDEO_SCREEN_W - image_width(cursor_arrow)/2);
+    editor_cursor.y = clip(input_get_xy((inputmouse_t*)editor_mouse).y, 0, VIDEO_SCREEN_H - image_height(cursor_arrow)/2);
 
     /* new spawn point */
     if(input_button_pressed(editor_mouse, IB_FIRE1) && input_button_down(editor_keyboard, IB_FIRE3)) {
@@ -2719,7 +2739,7 @@ void editor_update()
     }
 
     /* pick or delete object */
-    pick_object = input_button_pressed(editor_mouse, IB_FIRE3) || input_button_pressed(editor_keyboard2, IB_FIRE4);
+    pick_object = input_button_pressed(editor_mouse, IB_FIRE3);
     delete_object = input_button_pressed(editor_mouse, IB_FIRE2) || editor_is_eraser_enabled();
     if(pick_object || delete_object) {
         brick_list_t *itb;
@@ -3139,14 +3159,14 @@ const char *editor_entity_class(enum editor_entity_type objtype)
         case EDT_BRICK:
             return "brick";
 
+        case EDT_GROUP:
+            return "brick group";
+
         case EDT_ITEM:
             return "legacy item";
 
         case EDT_ENEMY:
             return "legacy object";
-
-        case EDT_GROUP:
-            return "group";
 
         case EDT_SSOBJ:
             return "entity";
@@ -3262,7 +3282,7 @@ void editor_next_class()
         editor_next_class();
 
     if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
-        editor_next_entity(); /* it's guaranteed that we'll always have a brick (see brickdata_load)*/
+        editor_next_entity(); /* it's guaranteed that we'll always have a brick (see brickdata_load) */
 }
 
 
@@ -3297,12 +3317,10 @@ void editor_previous_class()
 /* select the next object */
 void editor_next_entity()
 {
-    int size;
-
     switch(editor_cursor_entity_type) {
         /* brick */
         case EDT_BRICK: {
-            size = brickset_size();
+            int size = brickset_size();
             do {
                 editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
             } while(!brick_exists(editor_cursor_entity_id));
@@ -3311,7 +3329,7 @@ void editor_next_entity()
 
         /* item */
         case EDT_ITEM: {
-            size = editor_item_list_size;
+            int size = editor_item_list_size;
             editor_cursor_itemid = (editor_cursor_itemid + 1) % size;
             editor_cursor_entity_id = editor_item_list[editor_cursor_itemid];
             break;
@@ -3320,7 +3338,7 @@ void editor_next_entity()
         /* enemy */
         case EDT_ENEMY: {
             enemy_t *enemy;
-            size = editor_enemy_name_length;
+            int size = editor_enemy_name_length;
             editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
 
             enemy = enemy_create(editor_enemy_key2name(editor_cursor_entity_id));
@@ -3336,14 +3354,14 @@ void editor_next_entity()
 
         /* group */
         case EDT_GROUP: {
-            size = editorgrp_group_count();
+            int size = editorgrp_group_count();
             editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
             break;
         }
 
         /* SurgeScript entity */
         case EDT_SSOBJ: {
-            size = editor_ssobj_count;
+            int size = editor_ssobj_count;
             editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
             break;
         }
@@ -3354,12 +3372,10 @@ void editor_next_entity()
 /* select the previous object */
 void editor_previous_entity()
 {
-    int size;
-
     switch(editor_cursor_entity_type) {
         /* brick */
         case EDT_BRICK: {
-            size = brickset_size();
+            int size = brickset_size();
             do {
                 editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             } while(!brick_exists(editor_cursor_entity_id));
@@ -3368,7 +3384,7 @@ void editor_previous_entity()
 
         /* item */
         case EDT_ITEM: {
-            size = editor_item_list_size;
+            int size = editor_item_list_size;
             editor_cursor_itemid = ((editor_cursor_itemid - 1) + size) % size;
             editor_cursor_entity_id = editor_item_list[editor_cursor_itemid];
             break;
@@ -3377,7 +3393,7 @@ void editor_previous_entity()
         /* enemy */
         case EDT_ENEMY: {
             enemy_t *enemy;
-            size = editor_enemy_name_length;
+            int size = editor_enemy_name_length;
             editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
 
             enemy = enemy_create(editor_enemy_key2name(editor_cursor_entity_id));
@@ -3393,14 +3409,14 @@ void editor_previous_entity()
 
         /* group */
         case EDT_GROUP: {
-            size = editorgrp_group_count();
+            int size = editorgrp_group_count();
             editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             break;
         }
 
         /* SurgeScript entity */
         case EDT_SSOBJ: {
-            size = editor_ssobj_count;
+            int size = editor_ssobj_count;
             editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             break;
         }
@@ -4022,15 +4038,14 @@ ssobj_editordata_t* editor_get_ssobj_editordata(const surgescript_object_t* obje
     return hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash); /* may be NULL */
 }
 
-void editor_set_ssobj_editordata(const surgescript_object_t* object, v2d_t spawn_point, int spawned_in_the_editor)
+void editor_set_ssobj_editordata(const surgescript_object_t* object, ssobj_editordata_t editordata)
 {
     char hash[24] = "", *p = hash; ssobj_editordata_t* data;
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
     do { *p++ = "0123456789abcdef"[handle & 0xF]; } while(handle >>= 4); *p = '\0';
     if(NULL == (data = hashtable_ssobj_editordata_t_find(editor_ssobj_editordata, hash))) {
         data = mallocx(sizeof *data);
-        data->spawn_point = spawn_point;
-        data->spawned_in_the_editor = spawned_in_the_editor;
+        *data = editordata;
         hashtable_ssobj_editordata_t_add(editor_ssobj_editordata, hash, data);
     }
     else

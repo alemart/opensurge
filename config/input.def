@@ -8,7 +8,7 @@
 // ---------------------------------------------------------------------------
 //
 // +-------------------------------------------------------------------------------+
-// | if you are a regular player who wants to reconfigure the buttons of the game, |
+// | If you are a regular player who wants to reconfigure the buttons of the game, |
 // | please scroll down and modify the inputmap "default" { ... } block below.     |
 // +-------------------------------------------------------------------------------+
 //
@@ -35,7 +35,7 @@
 // options screen of the game! Also, make sure to have connected all joysticks you want BEFORE you
 // start the application.
 //
-// List of valid key names:
+// List of valid key names (based on liballeg):
 //
 //      KEY_A ... KEY_Z,
 //      KEY_0 ... KEY_9,
@@ -215,6 +215,14 @@ inputmap "screenshots"
 }
 
 inputmap "editorhelp"
+{
+    keyboard
+    {
+        fire1           KEY_ESC
+    }
+}
+
+inputmap "editorpal"
 {
     keyboard
     {
