@@ -59,10 +59,8 @@ static void clean_garbage();
 static void init_basic_stuff(const char *basedir);
 static void init_managers(commandline_t cmd);
 static void init_accessories(commandline_t cmd);
-static void init_scripting(commandline_t cmd);
 static void init_game_data();
 static void push_initial_scene(commandline_t cmd);
-static void release_scripting();
 static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
@@ -99,7 +97,6 @@ void engine_init(int argc, char **argv)
 
     init_managers(cmd);
     init_accessories(cmd);
-    init_scripting(cmd);
     init_game_data();
 
     push_initial_scene(cmd);
@@ -144,7 +141,6 @@ void engine_mainloop()
  */
 void engine_release()
 {
-    release_scripting();
     release_accessories();
     release_managers();
     release_basic_stuff();
@@ -218,6 +214,7 @@ void init_accessories(commandline_t cmd)
     soundfactory_init();
     charactersystem_init();
     objects_init();
+    scripting_init(cmd.user_argc, cmd.user_argv);
     storyboard_init();
     screenshot_init();
     fadefx_init();
@@ -225,15 +222,6 @@ void init_accessories(commandline_t cmd)
     if(strcmp(cmd.language_filepath, "") != 0)
         lang_loadfile(cmd.language_filepath);
     scenestack_init();
-}
-
-/*
- * init_scripting()
- * Initializes SurgeScript
- */
-void init_scripting(commandline_t cmd)
-{
-    scripting_init(cmd.user_argc, cmd.user_argv);
 }
 
 /*
@@ -272,14 +260,6 @@ void push_initial_scene(commandline_t cmd)
     }
 }
 
-/*
- * release_scripting()
- * Releases SurgeScript
- */
-void release_scripting()
-{
-    scripting_release();
-}
 
 /*
  * release_accessories()
@@ -292,6 +272,7 @@ void release_accessories()
     lang_release();
     fadefx_release();
     screenshot_release();
+    scripting_release();
     objects_release();
     charactersystem_release();
     soundfactory_release();

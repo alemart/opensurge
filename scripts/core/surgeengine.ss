@@ -14,8 +14,8 @@ object "SurgeEngine"
     actorFactory = spawn("ActorFactory");
     inputFactory = spawn("InputFactory");
     sensorFactory = spawn("SensorFactory");
+    levelManager = spawn("LevelManager");
     camera = spawn("Camera");
-    level = spawn("Level");
     mouse = spawn("Mouse");
 
     fun get_Actor()
@@ -33,9 +33,14 @@ object "SurgeEngine"
         return inputFactory;
     }
 
+    fun get_LevelManager()
+    {
+        return levelManager;
+    }
+
     fun get_Level()
     {
-        return level;
+        return levelManager.currentLevel;
     }
 
     fun get_Camera()
@@ -46,10 +51,6 @@ object "SurgeEngine"
     fun get_Mouse()
     {
         return mouse;
-    }
-
-    fun destroy()
-    {
     }
 }
 

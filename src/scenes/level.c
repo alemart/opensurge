@@ -191,13 +191,16 @@ static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
 static void render_water();
+
+/* Scripting */
+static surgescript_object_t* cached_level_ssobject = NULL;
 static void update_ssobjects();
 static void update_ssobject(surgescript_object_t* object, void* param);
 static void late_update_ssobject(surgescript_object_t* object, void* param);
 static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
-static surgescript_object_t* get_level_ssobject();
+static surgescript_object_t* level_ssobject();
 static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor);
 static bool save_ssobject(surgescript_object_t* object, void* param);
 
@@ -323,6 +326,7 @@ static void editor_set_ssobj_editordata(surgescript_object_t* object, v2d_t spaw
 extern v2d_t world_position(const surgescript_object_t* object);
 extern float object_zindex(surgescript_object_t* object);
 extern surgescript_object_t* surgeengine_object(surgescript_vm_t* vm);
+extern surgescript_object_t* surgeengine_component(surgescript_vm_t* vm, const char* component_name);
 typedef struct ssobj_editordata_t ssobj_editordata_t;
 struct ssobj_editordata_t { /* SurgeScript entity: extra data */
     v2d_t spawn_point;
@@ -443,6 +447,10 @@ void level_load(const char *filepath)
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR;
 
+    /* scripting: preparing a new Level... */
+    cached_level_ssobject = NULL;
+    surgescript_object_call_function(surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
+
     /* entity manager */
     entitymanager_init();
 
@@ -526,6 +534,10 @@ void level_unload()
         player_destroy(team[i]);
     team_size = 0;
     player = NULL;
+
+    /* scripting */
+    surgescript_object_call_function(surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
+    cached_level_ssobject = NULL;
 
     /* success! */
     logfile_message("level_unload() ok");
@@ -649,7 +661,7 @@ int level_save(const char *filepath)
 
     /* object list */
     fprintf(fp, "\n// objects\n");
-    surgescript_object_traverse_tree_ex(get_level_ssobject(), fp, save_ssobject);
+    surgescript_object_traverse_tree_ex(level_ssobject(), fp, save_ssobject);
 
     /* legacy object list */
     fprintf(fp, "\n// legacy objects\n");
@@ -2399,22 +2411,13 @@ bool ssobject_exists(const char* object_name)
     return surgescript_programpool_exists(pool, object_name, "state:main");
 }
 
-/* get the handle to the Level object */
-surgescript_object_t* get_level_ssobject()
+/* get the Level object (SurgeScript) */
+surgescript_object_t* level_ssobject()
 {
-    surgescript_vm_t* vm = surgescript_vm();
-    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-    static surgescript_objecthandle_t cached_ref = 0;
-
-    if(!cached_ref) {
-        surgescript_var_t* ret = surgescript_var_create();
-        surgescript_object_t* surgeengine = surgeengine_object(vm);
-        surgescript_object_call_function(surgeengine, "get_Level", NULL, 0, ret);
-        cached_ref = surgescript_var_get_objecthandle(ret);
-        surgescript_var_destroy(ret);
-    }
-
-    return surgescript_objectmanager_get(manager, cached_ref);
+    return surgeengine_component(surgescript_vm(), "Level");
+    if(cached_level_ssobject == NULL)
+        cached_level_ssobject = surgeengine_component(surgescript_vm(), "Level");
+    return cached_level_ssobject;
 }
 
 /* spawns a ssobject */
@@ -2430,7 +2433,7 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point,
         surgescript_var_t* ret = surgescript_var_create();
         const surgescript_var_t* param[] = { tmp };
 
-        surgescript_object_call_function(get_level_ssobject(), "spawn", param, 1, ret);
+        surgescript_object_call_function(level_ssobject(), "spawn", param, 1, ret);
         object = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(ret));
         surgescript_var_destroy(ret);
         surgescript_var_destroy(tmp);

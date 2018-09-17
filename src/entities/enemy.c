@@ -93,7 +93,7 @@ void objects_init()
 {
     const char *path = "scripts/legacy/*.obj";
 
-    logfile_message("Loading objects scripts...");
+    logfile_message("Loading legacy scripts...");
     objects = NULL;
 
     /* reading the parse tree */
@@ -115,7 +115,7 @@ void objects_init()
     nanoparser_traverse_program_ex(objects, (void*)lookup_table, fill_lookup_table);
 
     /* done! */
-    logfile_message("All objects have been loaded!");
+    logfile_message("All legacy scripts have been loaded!");
 }
 
 /*
@@ -124,9 +124,11 @@ void objects_init()
  */
 void objects_release()
 {
+    logfile_message("Releasing legacy scripts...");
     lookup_table = hashtable_objectcode_t_destroy(lookup_table);
     name_table.length = category_table.length = 0;
     objects = nanoparser_deconstruct_tree(objects);
+    logfile_message("All legacy scripts have been released!");
 }
 
 /*

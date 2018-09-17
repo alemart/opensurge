@@ -267,6 +267,7 @@ SET(
   src/scripting/console.c
   src/scripting/input.c
   src/scripting/level.c
+  src/scripting/levelmanager.c
   src/scripting/mouse.c
   src/scripting/obstaclemap.c
   src/scripting/sensor.c

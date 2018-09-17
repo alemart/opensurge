@@ -23,6 +23,7 @@
 
 /* stuff coded in C */
 static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
  * scripting_register_surgeengine()
@@ -31,6 +32,13 @@ static surgescript_var_t* fun_getversion(surgescript_object_t* object, const sur
 void scripting_register_surgeengine(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "SurgeEngine", "get_version", fun_getversion, 0);
+    surgescript_vm_bind(vm, "SurgeEngine", "destroy", fun_destroy, 0);
+}
+
+/* can't destroy this object */
+surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return NULL;
 }
 
 /* SurgeEngine version */

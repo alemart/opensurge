@@ -27,8 +27,6 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_onload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_onunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t IDX_ADDR = 0;
 
 /*
@@ -41,8 +39,6 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Level", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "Level", "__onload", fun_onload, 0);
-    surgescript_vm_bind(vm, "Level", "__onunload", fun_onunload, 0);
 }
 
 /* constructor */
@@ -116,36 +112,5 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 /* can't destroy this object */
 surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return NULL;
-}
-
-/* called when a level is loaded */
-surgescript_var_t* fun_onload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-
-    return NULL;
-}
-
-/* called when a level is unloaded */
-surgescript_var_t* fun_onunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    size_t heap_size = surgescript_heap_size(heap);
-
-    /* delete all Level objects */
-    for(surgescript_heapptr_t idx = IDX_ADDR + 1; idx < heap_size; idx++) {
-        if(surgescript_heap_validaddress(heap, idx)) {
-            surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, idx));
-            if(surgescript_objectmanager_exists(manager, handle)) {
-                surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
-                surgescript_object_kill(obj);
-            }
-            surgescript_heap_free(heap, idx);
-        }
-    }
-
-    /* restart the memory scanning process */
-    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), IDX_ADDR);
     return NULL;
 }
