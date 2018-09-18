@@ -2594,6 +2594,7 @@ void editor_update()
     enemy_list_t *major_enemies;
     image_t *cursor_arrow = sprite_get_image(sprite_get_animation("SD_ARROW", 0), 0);
     int pick_object, delete_object = FALSE;
+    int selected_item;
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     v2d_t pos;
 
@@ -2642,16 +2643,25 @@ void editor_update()
 
     /* open palette */
     if(input_button_pressed(editor_keyboard2, IB_FIRE4)) {
-        editorpal_config_t config = {
-            .type = EDITORPAL_SSOBJ, /* TODO */
-            .ssobj = {
-                .name = (const char**)editor_ssobj,
-                .count = editor_ssobj_count
-            }
-        };
-        scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
-        return;
+        if(editor_cursor_entity_type == EDT_BRICK || editor_cursor_entity_type == EDT_SSOBJ) {
+            editorpal_config_t config = {
+                .type = EDITORPAL_SSOBJ, /* TODO */
+                .ssobj = {
+                    .name = (const char**)editor_ssobj,
+                    .count = editor_ssobj_count
+                }
+            };
+            scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
+            return;
+        }
+        else {
+            video_showmessage("Palette available for bricks and SurgeScript entities.");
+            sound_play( soundfactory_get("deny") );
+        }
     }
+
+    if(-1 < (selected_item = editorpal_selected_item()))
+        editor_cursor_entity_id = selected_item;
 
     /* ----------------------------------------- */
 

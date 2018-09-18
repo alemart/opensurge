@@ -49,6 +49,6 @@ void editorpal_render();
 void editorpal_release();
 
 /* interface */
-int editorpal_selected_item(); /* a brick ID, a SurgeScript entity ID... or -1 if no item was selected */
+int editorpal_selected_item(); /* an index of ssobj.name[] or brick.id[]... or -1 if no item was selected */
 
 #endif
