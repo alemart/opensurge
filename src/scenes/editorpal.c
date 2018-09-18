@@ -36,6 +36,7 @@
 #define CURSOR_SPRITE               "SD_ARROW"
 #define ITEM_SPRITE_MAXSIZE         128
 #define ITEM_BOX_SIZE               160 /* sprite size + padding */
+#define ITEM_MAX_ZOOM               2.0f
 #define SCROLLBAR_WIDTH             24
 #define NO_ITEM                     -1
 static editorpal_config_t config;
@@ -290,10 +291,9 @@ void draw_item(image_t* dest, int item_number, v2d_t center)
 {
     if(item_number >= 0 && item_number < item_count) {
         const image_t* image = item[item_number];
-        int width = max(1, image_width(image));
-        int height = max(1, image_height(image));
-        int size = max(width, height);
-        float factor = min((float)ITEM_SPRITE_MAXSIZE / size, 2.0f);
+        int width = image_width(image);
+        int height = image_height(image);
+        float factor = min((float)ITEM_SPRITE_MAXSIZE / max(width, height), ITEM_MAX_ZOOM);
         v2d_t scale = v2d_new(factor, factor);
         image_draw_scaled(image, dest, center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
     }
