@@ -2516,7 +2516,7 @@ void editor_init()
     editor_enabled = FALSE;
     editor_item_list_size = -1;
     while(editor_item_list[++editor_item_list_size] >= 0) { }
-    editor_cursor_entity_type = EDT_ITEM;
+    editor_cursor_entity_type = EDT_BRICK;
     editor_cursor_entity_id = 0;
     editor_previous_video_resolution = video_get_resolution();
     editor_previous_video_smooth = video_is_smooth();
@@ -3272,9 +3272,9 @@ void editor_previous_object_category()
 void editor_next_class()
 {
     editor_cursor_entity_type =
-    (editor_cursor_entity_type == EDT_BRICK) ? EDT_ITEM  :
-    (editor_cursor_entity_type == EDT_ITEM)  ? EDT_SSOBJ :
-    (editor_cursor_entity_type == EDT_SSOBJ) ? EDT_ENEMY :
+    (editor_cursor_entity_type == EDT_BRICK) ? EDT_SSOBJ :
+    (editor_cursor_entity_type == EDT_SSOBJ) ? EDT_ITEM  :
+    (editor_cursor_entity_type == EDT_ITEM)  ? EDT_ENEMY :
     (editor_cursor_entity_type == EDT_ENEMY) ? EDT_GROUP :
     (editor_cursor_entity_type == EDT_GROUP) ? EDT_BRICK :
     editor_cursor_entity_type;
@@ -3300,11 +3300,11 @@ void editor_next_class()
 void editor_previous_class()
 {
     editor_cursor_entity_type =
-    (editor_cursor_entity_type == EDT_ITEM)  ? EDT_BRICK :
-    (editor_cursor_entity_type == EDT_SSOBJ) ? EDT_ITEM  :
-    (editor_cursor_entity_type == EDT_ENEMY) ? EDT_SSOBJ :
-    (editor_cursor_entity_type == EDT_GROUP) ? EDT_ENEMY :
     (editor_cursor_entity_type == EDT_BRICK) ? EDT_GROUP :
+    (editor_cursor_entity_type == EDT_SSOBJ) ? EDT_BRICK :
+    (editor_cursor_entity_type == EDT_ITEM)  ? EDT_SSOBJ :
+    (editor_cursor_entity_type == EDT_ENEMY) ? EDT_ITEM  :
+    (editor_cursor_entity_type == EDT_GROUP) ? EDT_ENEMY :
     editor_cursor_entity_type;
 
     editor_cursor_entity_id = 0;
