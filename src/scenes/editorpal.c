@@ -293,10 +293,8 @@ void draw_item(image_t* dest, int item_number, v2d_t center)
         int width = max(1, image_width(image));
         int height = max(1, image_height(image));
         int size = max(width, height);
-        v2d_t scale = v2d_new(
-            (float)ITEM_SPRITE_MAXSIZE / size,
-            (float)ITEM_SPRITE_MAXSIZE / size
-        );
+        float factor = min((float)ITEM_SPRITE_MAXSIZE / size, 2.0f);
+        v2d_t scale = v2d_new(factor, factor);
         image_draw_scaled(image, dest, center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
     }
 }
