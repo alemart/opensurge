@@ -54,7 +54,7 @@ static const char text[] =
 "LCtrl + Y                          Redo\n"
 "Mouse wheel or B/N                 Previous/next item\n"
 "LShift + wheel or LShift + B/N     Previous/next edit mode\n"
-"LCtrl + wheel or LCtrl + B/N       Previous/next object category\n"
+"LCtrl + wheel or LCtrl + B/N       Previous/next legacy object category\n"
 "Hold Delete                        Eraser\n"
 "\n\n"
 "<color=00bbff>Tips</color>\n\n"

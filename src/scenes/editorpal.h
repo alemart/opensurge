@@ -37,7 +37,7 @@ typedef struct editorpal_config_t {
 
     /* config: valid bricks */
     struct {
-        int* id;
+        const int* id;
         int count;
     } brick;
 } editorpal_config_t;

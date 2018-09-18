@@ -327,9 +327,15 @@ struct ssobj_editordata_t { /* SurgeScript entity: extra data */
 HASHTABLE_GENERATE_CODE(ssobj_editordata_t);
 hashtable_ssobj_editordata_t* editor_ssobj_editordata = NULL;
 
-/* editor: brick layer & flip flags */
-static bricklayer_t editor_layer;
-static brickflip_t editor_flip;
+/* editor: bricks */
+static int* editor_brick; /* an array of all valid brick numbers */
+static int editor_brick_count; /* length of editor_brick */
+static bricklayer_t editor_layer; /* current layer */
+static brickflip_t editor_flip; /* flip flags */
+static void editor_brick_init();
+static void editor_brick_release();
+static int editor_brick_index(int brick_id); /* index of brick_id at editor_brick[] */
+static int editor_brick_id(int index); /* the index-th valid brick - at editor_brick[] */
 
 /* editor: grid */
 #define EDITOR_GRID_W         (int)(editor_grid_size().x)
@@ -978,7 +984,6 @@ void level_init(void *path_to_lev_file)
 
     /* helpers */
     particle_init();
-    editor_init();
 
     /* level init */
     level_load(file);
@@ -993,6 +998,10 @@ void level_init(void *path_to_lev_file)
     dlgbox_title = font_create("default_ttf");
     dlgbox_message = font_create("default_ttf");
 
+    /* editor */
+    editor_init();
+
+    /* done! */
     logfile_message("level_init() ok");
 }
 
@@ -2243,8 +2252,10 @@ int is_startup_object(const char* object_name)
         if(str_icmp(object_name, me->object_name) == 0)
             return TRUE;
     }
+
     if(str_icmp(object_name, DEFAULT_STARTUP_OBJECT) == 0)
         return TRUE;
+
     return FALSE;
 }
 
@@ -2533,15 +2544,14 @@ void editor_init()
     editor_properties_font = font_create("default");
     editor_help_font = font_create("default");
 
-    /* layer & flip flags */
-    editor_layer = BRL_DEFAULT;
-    editor_flip = BRF_NOFLIP;
+    /* grid */
+    editor_grid_init();
+
+    /* bricks */
+    editor_brick_init();
 
     /* groups */
     editorgrp_init();
-
-    /* grid */
-    editor_grid_init();
 
     /* SurgeScript entities */
     editor_ssobj_init();
@@ -2564,6 +2574,9 @@ void editor_release()
 
     /* groups */
     editorgrp_release();
+
+    /* bricks */
+    editor_brick_release();
 
     /* SurgeScript entities */
     editor_ssobj_release();
@@ -2643,16 +2656,27 @@ void editor_update()
 
     /* open palette */
     if(input_button_pressed(editor_keyboard2, IB_FIRE4)) {
-        if(editor_cursor_entity_type == EDT_BRICK || editor_cursor_entity_type == EDT_SSOBJ) {
+        if(editor_cursor_entity_type == EDT_BRICK) {
             editorpal_config_t config = {
-                .type = EDITORPAL_SSOBJ, /* TODO */
+                .type = EDITORPAL_BRICK,
+                .brick = {
+                    .id = (const int*)editor_brick,
+                    .count = editor_brick_count
+                }
+            };
+            scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
+            return;
+        }
+        else if(editor_cursor_entity_type == EDT_SSOBJ) {
+            editorpal_config_t config = {
+                .type = EDITORPAL_SSOBJ,
                 .ssobj = {
                     .name = (const char**)editor_ssobj,
                     .count = editor_ssobj_count
                 }
             };
             scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
-            return;
+            return;           
         }
         else {
             video_showmessage("Palette available for bricks and SurgeScript entities.");
@@ -2660,8 +2684,15 @@ void editor_update()
         }
     }
 
-    if(-1 < (selected_item = editorpal_selected_item()))
-        editor_cursor_entity_id = selected_item;
+    if(-1 < (selected_item = editorpal_selected_item())) {
+        if(editor_cursor_entity_type == EDT_BRICK) {
+            editor_cursor_entity_id = editor_brick_id(selected_item);
+            editor_layer = BRL_DEFAULT;
+            editor_flip = BRF_NOFLIP;
+        }
+        else if(editor_cursor_entity_type == EDT_SSOBJ)
+            editor_cursor_entity_id = selected_item;
+    }
 
     /* ----------------------------------------- */
 
@@ -2897,7 +2928,7 @@ void editor_update()
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
-    font_set_text(editor_help_font, "<color=ff8060>F1</color>: help");
+    font_set_text(editor_help_font, "<color=ff8060>P</color>: palette   <color=ff8060>F1</color>: help");
     font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 8, 8));
     font_set_visible(editor_help_font, video_get_window_size().x > 512);
 
@@ -3172,14 +3203,14 @@ const char *editor_entity_class(enum editor_entity_type objtype)
         case EDT_GROUP:
             return "brick group";
 
+        case EDT_SSOBJ:
+            return "entity";
+
         case EDT_ITEM:
             return "legacy item";
 
         case EDT_ENEMY:
             return "legacy object";
-
-        case EDT_SSOBJ:
-            return "entity";
     }
 
     return "unknown";
@@ -3292,7 +3323,7 @@ void editor_next_class()
         editor_next_class();
 
     if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
-        editor_next_entity(); /* it's guaranteed that we'll always have a brick (see brickdata_load) */
+        editor_next_entity(); /* it's guaranteed that we'll always have a brick (see brickset_load) */
 }
 
 
@@ -3330,10 +3361,23 @@ void editor_next_entity()
     switch(editor_cursor_entity_type) {
         /* brick */
         case EDT_BRICK: {
-            int size = brickset_size();
-            do {
-                editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
-            } while(!brick_exists(editor_cursor_entity_id));
+            editor_cursor_entity_id = editor_brick_id(
+                (editor_brick_index(editor_cursor_entity_id) + 1) % editor_brick_count
+            );
+            break;
+        }
+
+        /* group */
+        case EDT_GROUP: {
+            int size = editorgrp_group_count();
+            editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
+            break;
+        }
+
+        /* SurgeScript entity */
+        case EDT_SSOBJ: {
+            int size = editor_ssobj_count;
+            editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
             break;
         }
 
@@ -3361,20 +3405,6 @@ void editor_next_entity()
 
             break;
         }
-
-        /* group */
-        case EDT_GROUP: {
-            int size = editorgrp_group_count();
-            editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
-            break;
-        }
-
-        /* SurgeScript entity */
-        case EDT_SSOBJ: {
-            int size = editor_ssobj_count;
-            editor_cursor_entity_id = (editor_cursor_entity_id + 1) % size;
-            break;
-        }
     }
 }
 
@@ -3385,10 +3415,23 @@ void editor_previous_entity()
     switch(editor_cursor_entity_type) {
         /* brick */
         case EDT_BRICK: {
-            int size = brickset_size();
-            do {
-                editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
-            } while(!brick_exists(editor_cursor_entity_id));
+            editor_cursor_entity_id = editor_brick_id(
+                ((editor_brick_index(editor_cursor_entity_id) - 1) + editor_brick_count) % editor_brick_count
+            );
+            break;
+        }
+
+        /* group */
+        case EDT_GROUP: {
+            int size = editorgrp_group_count();
+            editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
+            break;
+        }
+
+        /* SurgeScript entity */
+        case EDT_SSOBJ: {
+            int size = editor_ssobj_count;
+            editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             break;
         }
 
@@ -3414,20 +3457,6 @@ void editor_previous_entity()
             else
                 enemy_destroy(enemy);
 
-            break;
-        }
-
-        /* group */
-        case EDT_GROUP: {
-            int size = editorgrp_group_count();
-            editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
-            break;
-        }
-
-        /* SurgeScript entity */
-        case EDT_SSOBJ: {
-            int size = editor_ssobj_count;
-            editor_cursor_entity_id = ((editor_cursor_entity_id - 1) + size) % size;
             break;
         }
     }
@@ -3547,6 +3576,8 @@ const char* editor_enemy_key2name(int key)
     return editor_enemy_name[key];
 }
 
+
+/* level editor: SurgeScript entities */
 void editor_ssobj_init()
 {
     surgescript_vm_t* vm = surgescript_vm();
@@ -3604,6 +3635,82 @@ const char* editor_ssobj_name(int entity_id)
 }
 
 
+
+/* level editor: bricks */
+void editor_brick_init()
+{
+    /* layer & flip flags */
+    editor_layer = BRL_DEFAULT;
+    editor_flip = BRF_NOFLIP;
+
+    /* which are the valid bricks? */
+    if(brickset_loaded()) {
+        int i, j;
+
+        /* count valid bricks */
+        editor_brick_count = 0;
+        for(i = 0; i < brickset_size(); i++)
+            editor_brick_count += brick_exists(i) ? 1 : 0;
+
+        /* read valid bricks */
+        editor_brick = mallocx(editor_brick_count * sizeof(*editor_brick));
+        for(i = j = 0; i < brickset_size(); i++) {
+            if(brick_exists(i))
+                editor_brick[j++] = i;
+        }
+    }
+    else {
+        editor_brick = NULL;
+        editor_brick_count = 0;
+    }
+
+    printf("nt: %d\n", editor_brick_count);
+}
+
+void editor_brick_release()
+{
+    if(editor_brick != NULL)
+        free(editor_brick);
+
+    editor_brick = NULL;
+    editor_brick_count = 0;
+}
+
+/* index of brick_id at editor_brick[], or -1 if not found */
+int editor_brick_index(int brick_id)
+{
+    if(editor_brick != NULL) {
+        int begin = 0, mid = 0;
+        int end = editor_brick_count - 1;
+        while(begin <= end) {
+            mid = (begin + end) / 2;
+            if(brick_id < editor_brick[mid])
+                end = mid - 1;
+            else if(brick_id > editor_brick[mid])
+                begin = mid + 1;
+            else
+                return mid;
+        }
+        return -1;
+    }
+    else
+        return -1;    
+}
+
+/* the index-th valid brick - at editor_brick[] */
+int editor_brick_id(int index)
+{
+    if(editor_brick != NULL) {
+        index = clip(index, 0, editor_brick_count - 1);
+        return editor_brick[index];
+    }
+    else
+        return 0;
+}
+
+
+
+
 /* level editor: grid */
 
 /* initializes the grid module */
@@ -3612,12 +3719,10 @@ void editor_grid_init()
     editor_grid_enabled = TRUE;
 }
 
-
 /* releases the grid module */
 void editor_grid_release()
 {
 }
-
 
 /* updates the grid module */
 void editor_grid_update()
@@ -3627,7 +3732,6 @@ void editor_grid_update()
         video_showmessage("Snap to grid: %s", editor_grid_enabled ? "ON" : "OFF");
     }
 }
-
 
 /* returns the size of the grid */
 v2d_t editor_grid_size()

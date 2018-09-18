@@ -79,7 +79,7 @@ void editorpal_init(void *config_ptr)
     }
     else if(config.type == EDITORPAL_BRICK) {
         item_count = config.brick.count;
-        item = mallocx(sizeof(item_count * sizeof(*item)));
+        item = mallocx(item_count * sizeof(*item));
         for(i = 0; i < item_count; i++) {
             if(brick_exists(config.brick.id[i]))
                 item[i] = brick_image_preview(config.brick.id[i]);
@@ -294,8 +294,8 @@ void draw_item(image_t* dest, int item_number, v2d_t center)
         int height = max(1, image_height(image));
         int size = max(width, height);
         v2d_t scale = v2d_new(
-            ITEM_SPRITE_MAXSIZE / size,
-            ITEM_SPRITE_MAXSIZE / size
+            (float)ITEM_SPRITE_MAXSIZE / size,
+            (float)ITEM_SPRITE_MAXSIZE / size
         );
         image_draw_scaled(image, dest, center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
     }
