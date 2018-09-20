@@ -2780,7 +2780,7 @@ void editor_update()
 
     /* pick or delete object */
     pick_object = input_button_pressed(editor_mouse, IB_FIRE3);
-    delete_object = input_button_pressed(editor_mouse, IB_FIRE2) || editor_is_eraser_enabled();
+    delete_object = editor_is_eraser_enabled();
     if(pick_object || delete_object) {
         brick_list_t *itb;
         item_list_t *iti;
@@ -3188,13 +3188,13 @@ void editor_scroll()
 int editor_is_eraser_enabled()
 {
     if(editor_cursor_entity_type == EDT_GROUP) {
-        if(input_button_pressed(editor_keyboard3, IB_FIRE2))
+        if(input_button_pressed(editor_mouse, IB_FIRE2))
             sound_play( soundfactory_get("deny") );
 
         return FALSE;
     }
     else
-        return input_button_down(editor_keyboard3, IB_FIRE2);
+        return input_button_down(editor_mouse, IB_FIRE2);
 }
 
 

@@ -55,7 +55,7 @@ static const char text[] =
 "<color=ff8060>Item placement</color>\n\n"
 "Left mouse button                  Create an item\n"
 "Middle mouse button                Pick an item\n"
-"Right mouse button                 Delete an item\n"
+"Right mouse button                 Erase an item\n"
 "Mouse wheel | B/N                  Change the current item\n"
 "LCtrl + Left mouse button          Change the spawn point\n"
 "L | LShift + L                     Switch brick layer\n"
