@@ -3675,8 +3675,6 @@ void editor_brick_init()
         editor_brick = NULL;
         editor_brick_count = 0;
     }
-
-    printf("nt: %d\n", editor_brick_count);
 }
 
 void editor_brick_release()

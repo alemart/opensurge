@@ -241,7 +241,7 @@ void editorpal_render()
         int num_steps = 1 + scroll_max / ITEM_BOX_SIZE;
         int curr_step = scroll_y / ITEM_BOX_SIZE;
         int ypos = VIDEO_SCREEN_H * curr_step / num_steps;
-        image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, image_rgb(18, 18, 18));
+        image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, image_rgb(40, 44, 52));
         image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, ypos, VIDEO_SCREEN_W, ypos + VIDEO_SCREEN_H / num_steps, image_rgb(52, 52, 52));
     }
 

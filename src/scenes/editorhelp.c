@@ -82,6 +82,15 @@ void editorhelp_init(void *foo)
     font_set_position(label, v2d_new(BOX_XPOS + BOX_PADDING, BOX_YPOS + BOX_PADDING));
     font_set_width(label, BOX_WIDTH - BOX_PADDING * 2);
     font_set_text(label, "%s", text);
+    if(video_get_window_size().x < BOX_WIDTH) {
+        font_set_position(label, v2d_new(BOX_PADDING, BOX_PADDING));
+        font_set_width(label, VIDEO_SCREEN_W - BOX_PADDING * 2);
+        font_set_text(label,
+            "<color=ff8060>LEVEL EDITOR</color>\n\n"
+            "Please increase the window size on the options screen and try again.\n\n"
+            "Press <color=ff8060>ESC</color> to go back."
+        );
+    }
 
     quitlabel = font_create("default");
     font_set_text(quitlabel, "[press <color=ff8060>ESC</color>]");
