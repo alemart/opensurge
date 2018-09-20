@@ -50,7 +50,8 @@ static image_t* background;
 static const image_t** item; /* an array of images */
 static int item_count;
 static int selected_item;
-static int scroll_y, scroll_max;
+static int scroll_y = 0; /* initial value */
+static int scroll_max;
 static int item_at(v2d_t position);
 static void draw_item(image_t* dest, int item_number, v2d_t center);
 
@@ -105,9 +106,9 @@ void editorpal_init(void *config_ptr)
     image_draw_trans(video_get_backbuffer(), background, 0, 0, 0.15f, IF_NONE);
 
     /* misc */
-    scroll_y = 0;
-    scroll_max = (int)((item_count - 1) / (int)((VIDEO_SCREEN_W - SCROLLBAR_WIDTH) / ITEM_BOX_SIZE)) * ITEM_BOX_SIZE - (int)(VIDEO_SCREEN_H / ITEM_BOX_SIZE) * ITEM_BOX_SIZE + ITEM_BOX_SIZE;
     selected_item = NO_ITEM;
+    scroll_max = (int)((item_count - 1) / (int)((VIDEO_SCREEN_W - SCROLLBAR_WIDTH) / ITEM_BOX_SIZE)) * ITEM_BOX_SIZE - (int)(VIDEO_SCREEN_H / ITEM_BOX_SIZE) * ITEM_BOX_SIZE + ITEM_BOX_SIZE;
+    scroll_y = clip(scroll_y, 0, scroll_max); /* preserve previous value */
     pal_input = input_create_user("editorpal");
     error_font = font_create("default");
     font_set_position(error_font, v2d_new(8, 8));
