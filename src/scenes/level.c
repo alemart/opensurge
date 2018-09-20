@@ -220,6 +220,7 @@ static void editor_update();
 static void editor_render();
 static int editor_is_enabled();
 static int editor_want_to_activate();
+static void editor_update_background();
 static void editor_render_background();
 static void editor_movable_platforms_path_render(brick_list_t *major_bricks);
 static void editor_waterline_render(int ycoord, uint32 color);
@@ -2687,8 +2688,8 @@ void editor_update()
     if(-1 < (selected_item = editorpal_selected_item())) {
         if(editor_cursor_entity_type == EDT_BRICK) {
             editor_cursor_entity_id = editor_brick_id(selected_item);
-            editor_layer = BRL_DEFAULT;
             editor_flip = BRF_NOFLIP;
+            /*editor_layer = BRL_DEFAULT;*/ /* is this desirable? */
         }
         else if(editor_cursor_entity_type == EDT_SSOBJ)
             editor_cursor_entity_id = selected_item;
@@ -2737,7 +2738,6 @@ void editor_update()
                 editor_layer = (editor_layer + 1) % 3;
             else
                 editor_layer = (editor_layer + 2) % 3;
-            video_showmessage("Switched to %s layer", brick_util_layername(editor_layer));
         }
         else
             sound_play( soundfactory_get("deny") );
@@ -2754,7 +2754,6 @@ void editor_update()
                 int delta = 2 + editor_flip + editor_flip / 2;
                 editor_flip = (editor_flip + delta) & BRF_VHFLIP;
             }
-            video_showmessage("Flip mode: %s", brick_util_flipstr(editor_flip));
         }
         else
             sound_play( soundfactory_get("deny") );
@@ -2915,6 +2914,9 @@ void editor_update()
             editor_action_redo();
     }
 
+    /* background */
+    editor_update_background();
+
     /* grid */
     editor_grid_update();
 
@@ -2977,6 +2979,15 @@ void editor_render()
     /* entities */
     render_entities(major_bricks, major_items, major_enemies);
 
+    /* draw editor water line */
+    editor_waterline_render((int)(waterlevel - topleft.y), image_rgb(255, 255, 255));
+
+    /* top bar */
+    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(40, 44, 52));
+    font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+    font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+
+    /* mouse cursor */
     if(!editor_is_eraser_enabled()) {
         /* drawing the object */
         editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(editor_grid_snap(editor_cursor), topleft));
@@ -2996,15 +3007,6 @@ void editor_render()
         cursor = sprite_get_image(sprite_get_animation("SD_ERASER", 0), 0);
         image_draw(cursor, video_get_backbuffer(), (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
-
-    /* draw editor water line */
-    editor_waterline_render((int)(waterlevel - topleft.y), image_rgb(255, 255, 255));
-
-    /* object properties */
-    /*image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(40, 44, 52));*/
-    /*image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(37, 37, 38));*/
-    font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
 
 
@@ -3080,6 +3082,14 @@ int editor_want_to_activate()
     return input_button_pressed(editor_keyboard, IB_FIRE4);
 }
 
+/*
+ * editor_update_background()
+ * Updates the background of the level editor
+ */
+void editor_update_background()
+{
+    background_update(backgroundtheme);
+}
 
 /*
  * editor_render_background()
@@ -3088,6 +3098,7 @@ int editor_want_to_activate()
 void editor_render_background()
 {
     image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, image_rgb(40, 44, 52));
+    background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
 }
 
 
@@ -3229,13 +3240,14 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
             if(brick_exists(objid)) {
                 brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 sprintf(buf,
-                    "%4d %12s %12s    %3dx%3d    z=%.2lf",
+                    "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s",
                     objid,
                     brick_util_behaviorname(brick_behavior(x)),
                     brick_util_typename(brick_type(x)),
                     (int)brick_size(x).x,
                     (int)brick_size(x).y,
-                    brick_zindex(x)
+                    brick_zindex(x),
+                    brick_util_flipstr(editor_flip)
                 );
                 brick_destroy(x);
             }

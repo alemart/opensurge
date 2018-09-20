@@ -29,38 +29,41 @@
 
 
 /* private data */
+#define BOX_WIDTH               615
+#define BOX_HEIGHT              360
+#define BOX_XPOS                ((VIDEO_SCREEN_W - BOX_WIDTH) / 2)
+#define BOX_YPOS                ((VIDEO_SCREEN_H - BOX_HEIGHT) / 2)
+#define BOX_PADDING             15
+
 static font_t *title, *label, *quitlabel;
 static image_t *buf;
 static input_t *in;
 
 static const char text[] = 
-"<color=00bbff>General</color>\n\n"
-"F12                                Leave the editor\n"
+"<color=ff8060>General</color>\n\n"
+"F12                                Return to the game\n"
 "LCtrl + F12                        Save the level\n"
 "LShift + F12                       Reload the level\n"
-"Arrow keys or WASD                 Move the camera\n"
-"LShift + Arrows or LShift + WASD   Move the camera (faster)\n"
-"L / LShift + L                     Switch brick layer\n"
-"F / LShift + F                     Flip brick\n"
+"Arrow keys | WASD                  Move the camera\n"
+"LShift + Arrows | LShift + WASD    Move the camera (faster)\n"
+"LCtrl + Z | LCtrl + Y              Undo | Redo\n"
+"F1                                 Show help\n"
 "G                                  Snap to grid\n"
-"P                                  Open item palette\n"
+"P                                  Open the palette\n"
+"1 | 2                              Work with bricks | entities\n"
 "\n\n"
-"<color=00bbff>Item placement</color>\n\n"
+"<color=ff8060>Item placement</color>\n\n"
 "Left mouse button                  Create an item\n"
 "Middle mouse button                Pick an item\n"
 "Right mouse button                 Delete an item\n"
+"Mouse wheel | B/N                  Change the current item\n"
 "LCtrl + Left mouse button          Change the spawn point\n"
-"LCtrl + Z                          Undo\n"
-"LCtrl + Y                          Redo\n"
-"Mouse wheel or B/N                 Previous/next item\n"
-"LShift + wheel or LShift + B/N     Previous/next edit mode\n"
-"LCtrl + wheel or LCtrl + B/N       Previous/next legacy object category\n"
-"Hold Delete                        Eraser\n"
+"L | LShift + L                     Switch brick layer\n"
+"F | LShift + F                     Flip brick\n"
+"LShift + wheel | LShift + B/N      Change item type (legacy)\n"
+"LCtrl + wheel | LCtrl + B/N        Change obj. category (legacy)\n"
 "\n\n"
-"<color=00bbff>Tips</color>\n\n"
-"<color=ffff00>1)</color> In order to pick up / delete a brick, you must select the brick edit mode. Same about entities;\n"
-"<color=ffff00>2)</color> Hold Delete to get an eraser. The eraser will delete items that are under the mouse cursor;\n"
-"<color=ffff00>3)</color> Loop system summary: yellow activates yellow layer and disables green. Green activates green layer and disables yellow. Change brick layers with L.\n"
+"<color=ff8060>Layer system summary</color>: yellow object activates yellow layer and disables green. Green object activates green layer and disables yellow. Change brick layers with L.\n"
 ;
 
 
@@ -70,25 +73,25 @@ static const char text[] =
  */
 void editorhelp_init(void *foo)
 {
-    title = font_create("powerfest");
-    font_set_text(title, "<color=77ff00>LEVEL EDITOR</color>");
-    font_set_position(title, v2d_new((VIDEO_SCREEN_W - font_get_textsize(title).x)/2, 20));
+    title = font_create("default");
+    font_set_text(title, "<color=80ff60>LEVEL EDITOR</color>");
+    font_set_position(title, v2d_new(BOX_XPOS + (BOX_WIDTH - font_get_textsize(title).x) / 2, BOX_YPOS + BOX_PADDING));
+    font_set_visible(title, FALSE);
 
     label = font_create("default");
-    font_set_position(label, v2d_new(20, 50));
-    font_set_width(label, VIDEO_SCREEN_W - 40);
+    font_set_position(label, v2d_new(BOX_XPOS + BOX_PADDING, BOX_YPOS + BOX_PADDING));
+    font_set_width(label, BOX_WIDTH - BOX_PADDING * 2);
     font_set_text(label, "%s", text);
 
     quitlabel = font_create("default");
-    font_set_position(quitlabel, v2d_new(20, VIDEO_SCREEN_H - 28));
-    font_set_text(quitlabel, "Press <color=ffff00>ESC</color> to go back");
+    font_set_text(quitlabel, "[press <color=ff8060>ESC</color>]");
+    font_set_position(quitlabel, v2d_new(BOX_XPOS + BOX_WIDTH - BOX_PADDING - font_get_textsize(quitlabel).x, BOX_YPOS + BOX_PADDING));
 
     buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
-    image_clear(buf, image_rgb(0,0,0));
+    image_clear(buf, image_rgb(18, 18, 18));
     image_draw_trans(video_get_backbuffer(), buf, 0, 0, 0.15f, IF_NONE);
 
     in = input_create_user("editorhelp");
-
     sound_play( soundfactory_get("select") );
 }
 
@@ -115,8 +118,8 @@ void editorhelp_update()
 void editorhelp_render()
 {
     v2d_t v = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-
     image_blit(buf, video_get_backbuffer(), 0, 0, 0, 0, image_width(buf), image_height(buf));
+    image_rectfill(video_get_backbuffer(), BOX_XPOS, BOX_YPOS, BOX_XPOS + BOX_WIDTH - 1, BOX_YPOS + BOX_HEIGHT - 1, image_rgb(40, 44, 52));
     font_render(title, v);
     font_render(label, v);
     font_render(quitlabel, v);
