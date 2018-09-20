@@ -58,7 +58,7 @@ static const char text[] =
 "Right mouse button                 Erase an item\n"
 "Mouse wheel | B/N                  Change the current item\n"
 "LCtrl + Left mouse button          Change the spawn point\n"
-"L | LShift + L                     Switch brick layer\n"
+"L | LShift + L                     Change brick layer\n"
 "F | LShift + F                     Flip brick\n"
 "LShift + wheel | LShift + B/N      Change item type (legacy)\n"
 "LCtrl + wheel | LCtrl + B/N        Change obj. category (legacy)\n"
