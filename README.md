@@ -4,7 +4,7 @@ Welcome to the **Open Surge** game engine repository!
 
 ## What is Open Surge?
 
-Open Surge is a fun 2D retro platformer inspired by old-school games, featuring tools that empower creators to make their own games and unleash their creativity! Currently under development.
+Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, hack, create worlds and unleash your creativity! Currently under development.
 
 ## Where do I find it?
 
