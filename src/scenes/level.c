@@ -2706,6 +2706,18 @@ void editor_update()
     for(it=major_items; it!=NULL; it=it->next)
         item_update(it->data, team, team_size, major_bricks, major_items, major_enemies);
 
+    /* work with bricks or entities */
+    if(input_button_pressed(editor_keyboard3, IB_FIRE5)) {
+        while(editor_cursor_entity_type != EDT_BRICK)
+            editor_next_class();
+    }
+    else if(input_button_pressed(editor_keyboard3, IB_FIRE6)) {
+        if(editor_ssobj_count > 0) {
+            while(editor_cursor_entity_type != EDT_SSOBJ)
+                editor_next_class();
+        }
+    }
+
     /* change class / entity / object category */
     if(input_button_down(editor_keyboard, IB_FIRE3)) {
         /* change object category - TODO: remove? */
