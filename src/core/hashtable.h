@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * hashtable.h - generic-type hash table
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _HASHTABLE_H
 #define _HASHTABLE_H
 
+#include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include "util.h"
@@ -171,6 +172,18 @@ int hashtable_##T##_unref(hashtable_##T *h, const char *key) \
     logfile_message("hashtable_" #T "_unref(): element '%s' does not exist.", key); \
     return 0; \
 } \
+int hashtable_##T##_refcount(const hashtable_##T *h, const char *key) \
+{ \
+    int k = HASHTABLE_HASHFUNCTION(key); \
+    const hashtable_list_##T *q = h->data[k]; \
+    while(q != NULL) { \
+        if(str_icmp(q->key, key) == 0) \
+            return q->reference_count; \
+        else \
+            q = q->next; \
+    } \
+    return 0; \
+} \
 void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
 { \
     /* TODO: improve the performance of this routine by using a queue
@@ -186,6 +199,5 @@ void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
         } \
     } \
 }
-
 
 #endif

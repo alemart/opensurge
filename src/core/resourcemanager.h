@@ -36,6 +36,7 @@ void resourcemanager_add_image(const char *key, struct image_t *data); /* adds a
 struct image_t* resourcemanager_find_image(const char *key); /* finds an image in the dictionary */
 int resourcemanager_ref_image(const char *key); /* increments and returns the reference counting */
 int resourcemanager_unref_image(const char *key); /* decrements and returns the reference counting */
+int resourcemanager_purge_image(const char *key); /* use with care */
 
 void resourcemanager_add_music(const char *key, struct music_t *data);
 struct music_t* resourcemanager_find_music(const char *key);

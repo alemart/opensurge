@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sprite.c - code for the sprites/animations
- * Copyright (C) 2008-2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 #include "logfile.h"
 #include "osspec.h"
 #include "hashtable.h"
+#include "resourcemanager.h"
 #include "nanoparser/nanoparser.h"
 
 /* private stuff ;) */
@@ -163,8 +164,11 @@ void spriteinfo_destroy(spriteinfo_t *info)
 {
     int i;
 
-    if(info->source_file != NULL)
-        free(info->source_file);
+    if(info->animation_data != NULL) {
+        for(i=0; i<info->animation_count; i++)
+            info->animation_data[i] = animation_delete(info->animation_data[i]);
+        free(info->animation_data);
+    }
 
     if(info->frame_data != NULL) {
         for(i=0; i<info->frame_count; i++)
@@ -172,10 +176,9 @@ void spriteinfo_destroy(spriteinfo_t *info)
         free(info->frame_data);
     }
 
-    if(info->animation_data != NULL) {
-        for(i=0; i<info->animation_count; i++)
-            info->animation_data[i] = animation_delete(info->animation_data[i]);
-        free(info->animation_data);
+    if(info->source_file != NULL) {
+        resourcemanager_purge_image(info->source_file); /* force reload */
+        free(info->source_file);
     }
 
     free(info);
@@ -360,7 +363,7 @@ void load_sprite_images(spriteinfo_t *spr)
         }
     }
 
-    image_unref(spr->source_file);
+    image_unload(sheet);
 }
 
 /*

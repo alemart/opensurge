@@ -970,6 +970,7 @@ fontdata_t* fontdata_bmp_new(const char *source_file, const char *keymap, int sh
     }
 
     /* done! ;) */
+    image_unload(img);
     return (fontdata_t*)f;
 }
 

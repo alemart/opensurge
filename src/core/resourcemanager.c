@@ -22,6 +22,7 @@
 #include "hashtable.h"
 #include "image.h"
 #include "audio.h"
+#include "logfile.h"
 
 /* code generation */
 HASHTABLE_GENERATE_CODE(image_t)
@@ -32,6 +33,7 @@ HASHTABLE_GENERATE_CODE(music_t)
 static hashtable_image_t* images;
 static hashtable_sound_t* samples;
 static hashtable_music_t* musics;
+static int is_valid = FALSE; /* validity flag */
 
 
 /* public methods */
@@ -42,10 +44,12 @@ void resourcemanager_init()
     images = hashtable_image_t_create(image_destroy);
     samples = hashtable_sound_t_create(sound_destroy);
     musics = hashtable_music_t_create(music_destroy);
+    is_valid = TRUE;
 }
 
 void resourcemanager_release()
 {
+    is_valid = FALSE;
     images = hashtable_image_t_destroy(images);
     samples = hashtable_sound_t_destroy(samples);
     musics = hashtable_music_t_destroy(musics);
@@ -53,9 +57,11 @@ void resourcemanager_release()
 
 void resourcemanager_release_unused_resources()
 {
-    /*hashtable_image_t_release_unreferenced_entries(images);*/ /* can't do it, because we use shared images to display the sprites */
-    hashtable_sound_t_release_unreferenced_entries(samples);
-    hashtable_music_t_release_unreferenced_entries(musics);
+    if(is_valid) {
+        hashtable_image_t_release_unreferenced_entries(images);
+        hashtable_sound_t_release_unreferenced_entries(samples);
+        hashtable_music_t_release_unreferenced_entries(musics);
+    }
 }
 
 
@@ -79,9 +85,29 @@ int resourcemanager_ref_image(const char *key)
 
 int resourcemanager_unref_image(const char *key)
 {
-    return hashtable_image_t_unref(images, key);
+    return is_valid ? hashtable_image_t_unref(images, key) : 0;
 }
 
+/* returns TRUE on success (i.e., the image has been successfully purged) */
+int resourcemanager_purge_image(const char *key)
+{
+    if(is_valid && resourcemanager_find_image(key) != NULL) {
+        int refs = hashtable_image_t_refcount(images, key);
+
+        /* sanity check */
+        if(refs > 0) {
+            /* won't purge if there are active references */
+            return FALSE;
+        }
+
+        /* purge the image */
+        logfile_message("resourcemanager_purge_image('%s')...", key);
+        hashtable_image_t_remove(images, key);
+    }
+
+    /* done */
+    return TRUE;
+}
 
 /* -------- musics --------- */
 void resourcemanager_add_music(const char *key, music_t *data)
@@ -101,7 +127,7 @@ int resourcemanager_ref_music(const char *key)
 
 int resourcemanager_unref_music(const char *key)
 {
-    return hashtable_music_t_unref(musics, key);
+    return is_valid ? hashtable_music_t_unref(musics, key) : 0;
 }
 
 /* ------- samples ------- */
@@ -122,5 +148,5 @@ int resourcemanager_ref_sample(const char *key)
 
 int resourcemanager_unref_sample(const char *key)
 {
-    return hashtable_sound_t_unref(samples, key);
+    return is_valid ? hashtable_sound_t_unref(samples, key) : 0;
 }

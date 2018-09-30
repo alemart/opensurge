@@ -478,7 +478,7 @@ void video_display_loading_screen()
 {
     image_t *img = image_load(LOADINGSCREEN_FILE);
     image_blit(img, video_get_backbuffer(), 0, 0, (VIDEO_SCREEN_W - image_width(img))/2, (VIDEO_SCREEN_H - image_height(img))/2, image_width(img), image_height(img));
-    image_unref(LOADINGSCREEN_FILE);
+    image_unload(img);
     video_render();
 }
 

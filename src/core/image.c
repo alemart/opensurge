@@ -38,6 +38,7 @@
 struct image_t {
     BITMAP *data; /* this must be the first field */
     int w, h;
+    char *path;
 };
 
 /* useful stuff */
@@ -89,8 +90,9 @@ image_t *image_load(const char *path)
         maskcolor_bugfix(img);
 
         /* adding it to the resource manager */
-        resourcemanager_add_image(path, img);
-        resourcemanager_ref_image(path);
+        img->path = str_dup(path);
+        resourcemanager_add_image(img->path, img);
+        resourcemanager_ref_image(img->path);
 
         /* done! */
         logfile_message("image_load() ok");
@@ -99,27 +101,6 @@ image_t *image_load(const char *path)
         resourcemanager_ref_image(path);
 
     return img;
-}
-
-
-
-/*
- * image_unref()
- * Will try to release the resource from
- * the memory. You will call this if, and
- * only if, you are sure you don't need the
- * resource anymore (i.e., you're not holding
- * any pointers to it)
- *
- * Used for reference counting. Normally you
- * don't need to bother with this, unless
- * you care about reducing memory usage.
- * Note that 'image_ref()' must not exist.
- * Returns the no. of references to the image
- */
-int image_unref(const char *path)
-{
-    return resourcemanager_unref_image(path);
 }
 
 
@@ -176,6 +157,7 @@ image_t *image_create(int width, int height)
     img->data = create_bitmap(width, height);
     img->w = width;
     img->h = height;
+    img->path = NULL;
 
     if(img->data != NULL)
         image_clear(img, image_rgb(0,0,0));
@@ -195,7 +177,10 @@ void image_destroy(image_t *img)
 {
     if(img->data != NULL) {
         destroy_bitmap(img->data);
-        img->data = NULL;
+        if(img->path != NULL) {
+            resourcemanager_unref_image(img->path);
+            free(img->path);
+        }
     }
 
     free(img);
@@ -230,8 +215,40 @@ image_t *image_create_shared(const image_t *parent, int x, int y, int width, int
     if(NULL == (img->data = create_sub_bitmap(parent->data, x, y, width, height)))
         fatal_error("ERROR - image_create_shared(0x%p,%d,%d,%d,%d): couldn't create shared image", parent, x, y, width, height);
 
+    if(parent->path != NULL) {
+        img->path = str_dup(parent->path);
+        resourcemanager_ref_image(img->path);
+    }
+    else
+        img->path = NULL;
+
     return img;
 }
+
+
+/*
+ * image_unload()
+ * Will try to release the resource from
+ * the memory. You will call this if you
+ * don't need the resource anymore.
+ *
+ * Used for reference counting. Normally you
+ * don't need to bother with this, unless
+ * you care about reducing memory usage.
+ *
+ * Returns the no. of references to the image
+ */
+int image_unload(image_t *img)
+{
+    if(img->path != NULL)
+       return resourcemanager_unref_image(img->path);
+    else
+        return -1; /* error; the image was not loaded from a file */
+}
+
+
+
+
 
 /*
  * image_width()

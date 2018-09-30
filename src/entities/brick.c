@@ -146,13 +146,15 @@ void brickset_load(const char *filename)
         if(brickdata[i] != NULL && brickdata[i]->type != BRK_PASSABLE && brickdata[i]->mask == NULL) {
             const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
             spriteinfo_t* sprite = brickdata[i]->data;
+            image_t* maskimg = image_load(maskfile);
             brickdata[i]->mask = collisionmask_create(
-                image_load(maskfile),
+                maskimg,
                 sprite->rect_x,
                 sprite->rect_y,
                 sprite->frame_w,
                 sprite->frame_h
             );
+            image_unload(maskimg);
         }
     }
 
@@ -956,7 +958,7 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         }
     }
     else if(str_icmp(identifier, "angle") == 0) {
-        /* brick angle is obsolete, but this section has been kept for compatibility */
+        /* brick angle is obsolete, but this section has been kept for compatibility purposes */
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "Can't read brick attributes: must specify brick angle, a number between 0 and 359");
     }
@@ -1032,10 +1034,15 @@ int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskdetails)
 collisionmask_t *read_collisionmask(const parsetree_program_t *block)
 {
     maskdetails_t s = { NULL, 0, 0, 0, 0 };
+    collisionmask_t* mask = NULL;
+    image_t* maskimg = NULL;
 
     nanoparser_traverse_program_ex(block, (void*)(&s), traverse_collisionmask);
     if(s.source_file == NULL)
         fatal_error("collision_mask: a source_file must be specified");
 
-    return collisionmask_create(image_load(s.source_file), s.x, s.y, s.w, s.h);
+    maskimg = image_load(s.source_file);
+    mask = collisionmask_create(maskimg, s.x, s.y, s.w, s.h);
+    image_unload(maskimg);
+    return mask;
 }

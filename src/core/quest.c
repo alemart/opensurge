@@ -125,7 +125,7 @@ image_t *load_quest_image(const char *file)
 
     ret = image_create(QUESTIMAGE_WIDTH, QUESTIMAGE_HEIGHT);
     image_blit(img, ret, 0, 0, 0, 0, image_width(ret), image_height(ret));
-    image_unref(s);
+    image_unload(img);
 
     return ret;
 }
