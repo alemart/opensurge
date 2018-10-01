@@ -48,6 +48,7 @@ extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
+extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
 extern void scripting_register_input(surgescript_vm_t* vm);
 extern void scripting_register_level(surgescript_vm_t* vm);
@@ -78,6 +79,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
     scripting_register_camera(vm);
+    scripting_register_collisions(vm);
     scripting_register_console(vm);
     scripting_register_input(vm);
     scripting_register_level(vm);
@@ -170,11 +172,15 @@ v2d_t world_position(const surgescript_object_t* object)
 /* compute the proper camera position for an object (will check if it's detached or not) */
 v2d_t object_camera(const surgescript_object_t* object)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    bool is_detached = surgescript_object_has_tag(parent, "detached");
+    bool is_detached = surgescript_object_has_tag(object, "detached");
     return !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
+}
+
+/* checks if the object is inside the visible part of the screen */
+int object_inside_screen(const surgescript_object_t* object)
+{
+    v2d_t v = world_position(object);
+    return level_inside_screen(v.x, v.y, 1, 1);
 }
 
 /* get the zindex of an object */

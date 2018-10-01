@@ -265,6 +265,7 @@ SET(
   src/scripting/surgeengine.c
   src/scripting/actor.c
   src/scripting/camera.c
+  src/scripting/collisions.c
   src/scripting/console.c
   src/scripting/input.c
   src/scripting/level.c
