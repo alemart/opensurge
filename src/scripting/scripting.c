@@ -159,6 +159,7 @@ surgescript_objecthandle_t require_component(const surgescript_object_t* object,
 }
 
 /* compute the world position of an object */
+#if 0
 v2d_t world_position(const surgescript_object_t* object)
 {
     surgescript_transform_t transform;
@@ -169,6 +170,32 @@ v2d_t world_position(const surgescript_object_t* object)
     surgescript_transform_apply2d(&transform, &parent_origin.x, &parent_origin.y);
     return parent_origin;
 }
+#else
+v2d_t world_position(const surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
+    surgescript_objecthandle_t handle = surgescript_object_handle(object);
+    surgescript_transform_t transform;
+    v2d_t world_position;
+
+    /* get local position */
+    surgescript_object_peek_transform(object, &transform);
+    world_position.x = transform.position.x;
+    world_position.y = transform.position.y;
+
+    /* compute world position */
+    while(handle != root) {
+        handle = surgescript_object_parent(object);
+        object = surgescript_objectmanager_get(manager, handle);
+        surgescript_object_peek_transform(object, &transform);
+        surgescript_transform_apply2d(&transform, &world_position.x, &world_position.y);
+    }
+
+    /* done! */
+    return world_position;
+}
+#endif
 
 /* compute the proper camera position for an object (will check if it's detached or not) */
 v2d_t object_camera(const surgescript_object_t* object)
