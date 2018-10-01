@@ -24,15 +24,14 @@ object "CollisionManager"
     state "main"
     {
         // check for collisions
-        foreach(collider in colliders) {
+        while(collider = colliders.pop()) {
             foreach(c in colliders) {
-                if(c != collider && collider.overlaps(c))
+                if(collider.collidesWith(c)) {
                     collider.__notify(c);
+                    c.__notify(collider);
+                }
             }
         }
-
-        // clear the current colliders
-        while(colliders.pop());
     }
 
     fun __notify(collider)
@@ -46,16 +45,24 @@ object "CollisionManager"
 object "CollisionBox" is "Collider"
 {
     manager = null;
+    debug = false;
     width = 1;
     height = 1;
     transform = spawn("Transform2D");
     collisionFlags = 0;
-    debug = false;
+    entity = null;
+    prevCollisions = [];
+    currCollisions = [];
 
     state "main"
     {
         // I will notify the manager only if I'm active
         manager.__notify(this);
+
+        // update collisions
+        while(prevCollisions.pop());
+        while(collider = currCollisions.pop())
+            prevCollisions.push(collider);
     }
 
     fun get_width()
@@ -106,7 +113,7 @@ object "CollisionBox" is "Collider"
     // the entity associated with this collider
     fun get_entity()
     {
-        return parent;
+        return entity;
     }
 
     // setAnchor(x, y)
@@ -120,14 +127,26 @@ object "CollisionBox" is "Collider"
         transform.ypos = (0.5 - y) * height;
     }
 
-    // overlaps()
-    // Returns true if this collider overlaps with the given collider
-    fun overlaps(collider)
+    // collidesWith()
+    // Returns true if this collider collides with the given collider
+    fun collidesWith(collider)
     {
         return
             (this.left < collider.right && this.right > collider.left) && 
             (this.top < collider.bottom && this.bottom > collider.top)
         ;
+    }
+
+    fun constructor()
+    {
+        collisionFlags = 0;
+        entity = parent;
+
+        // entity validation
+        if(!entity.hasTag("entity"))
+            Application.crash("Object \"" + entity.__name + "\" (parent of " + __name + ") must be an entity.");
+        if(entity.hasFunction("onCollision"))
+            collisionFlags += 1;
     }
 
     fun __init(mgr, w, h)
@@ -136,18 +155,23 @@ object "CollisionBox" is "Collider"
         manager = mgr;
         width = Math.max(w, 1); // read-only
         height = Math.max(h, 1);
+    }
 
-        // validation
-        if(!parent.hasTag("entity"))
-            Application.crash("Object \"" + parent.__name + "\" (parent of " + __name + ") must be an entity.");
-        if(parent.hasFunction("onCollision"))
-            collisionFlags = 1;
+    fun __bitflag(flag)
+    {
+        if(flag == 1) return Math.mod(collisionFlags, 2);
+        if(flag == 2) return Math.mod(Math.floor(collisionFlags / 2), 2);
+        if(flag == 4) return Math.mod(Math.floor(collisionFlags / 4), 2);
+        return 0;
     }
 
     // the manager is telling us about a collision somewhere
     fun __notify(otherCollider)
     {
-        if(collisionFlags > 0)
-            parent.onCollision(otherCollider);
+        if(collisionFlags > 0) {
+            if(prevCollisions.indexOf(otherCollider) < 0)
+                entity.onCollision(otherCollider);
+            currCollisions.push(otherCollider);
+        }
     }
 }
