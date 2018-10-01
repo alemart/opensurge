@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
 #include <surgescript.h>
 #include "../core/input.h"
 
@@ -29,7 +30,7 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static unsigned long hash(const char *str);
+static uint64_t hash(const char *str);
 
 /* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
 #define BUTTON_UP                       0x5979CA        /* hash("up") */
@@ -172,9 +173,9 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
 /* ----------------------- */
 
 /* djb2 hash function */
-unsigned long hash(const char *str)
+uint64_t hash(const char *str)
 {
-    int c; unsigned long hash = 5381;
+    int c; uint64_t hash = 5381;
 
     while((c = *str++))
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
