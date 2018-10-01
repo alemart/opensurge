@@ -28,6 +28,7 @@
 #include "../core/v2d.h"
 #include "../core/video.h"
 #include "../entities/camera.h"
+#include "../scenes/level.h"
 
 /* private area */
 static surgescript_vm_t* vm = NULL;
@@ -180,7 +181,7 @@ v2d_t object_camera(const surgescript_object_t* object)
 int object_inside_screen(const surgescript_object_t* object)
 {
     v2d_t v = world_position(object);
-    return level_inside_screen(v.x, v.y, 1, 1);
+    return level_inside_screen(v.x, v.y, 0, 0);
 }
 
 /* get the zindex of an object */
