@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorgrp.h - level editor: groups
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #define _EDITORGRP_H
 
 #include "../../core/v2d.h"
+#include "../../entities/brick.h"
 
 /* entity types */
 enum editorgrp_entity_type {
@@ -35,7 +36,8 @@ typedef struct {
     enum editorgrp_entity_type type; /* object type */
     int id; /* object id */
     v2d_t position; /* position */
-    int layer; /* layer */
+    bricklayer_t layer; /* layer */
+    brickflip_t flip; /* flip flags */
 } editorgrp_entity_t;
 
 /* linked list of entities */

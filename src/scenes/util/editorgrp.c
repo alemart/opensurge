@@ -31,7 +31,7 @@
 #include "../../core/nanoparser/nanoparser.h"
 
 /* internal data */
-#define EDITORGRP_MAX_GROUPS        501
+#define EDITORGRP_MAX_GROUPS        512
 static int group_count;
 static editorgrp_entity_list_t* group[EDITORGRP_MAX_GROUPS];
 static editorgrp_entity_list_t* delete_list(editorgrp_entity_list_t *list);
@@ -114,7 +114,7 @@ void read_from_file(const char *filename)
     parsetree_program_t *prog;
 
     resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
-    logfile_message("Reading group theme '%s'...", filename);
+    logfile_message("Loading group file '%s'...", filename);
 
     prog = nanoparser_construct_tree(abs_path);
     nanoparser_traverse_program(prog, traverse);
@@ -165,7 +165,7 @@ int traverse(const parsetree_statement_t *stmt)
             group[ group_count++ ] = list;
         }
         else
-            fatal_error("You can't have more than %d groups per level (group_count=%d)", EDITORGRP_MAX_GROUPS-1, group_count);
+            fatal_error("You can't have more than %d groups per level (group_count=%d)", EDITORGRP_MAX_GROUPS, group_count);
     }
     else
         fatal_error("Unexpected identifier: '%s' at the group file. Expected: 'group'", id);
@@ -178,7 +178,7 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1, *p2, *p3, *p4;
+    const parsetree_parameter_t *p1, *p2, *p3, *p4, *p5;
     editorgrp_entity_list_t **list = (editorgrp_entity_list_t**)entity_list;
     editorgrp_entity_t e;
 
@@ -188,26 +188,31 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
     if(str_icmp(identifier, "brick") == 0) {
         int id, x, y;
         bricklayer_t layer;
+        brickflip_t flip;
 
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         p2 = nanoparser_get_nth_parameter(param_list, 2);
         p3 = nanoparser_get_nth_parameter(param_list, 3);
         p4 = nanoparser_get_nth_parameter(param_list, 4);
+        p5 = nanoparser_get_nth_parameter(param_list, 5);
 
         nanoparser_expect_string(p1, "Brick id must be given");
         nanoparser_expect_string(p2, "Brick xpos must be given");
         nanoparser_expect_string(p3, "Brick ypos must be given");
         if(p4) nanoparser_expect_string(p4, "Brick layer is expected");
+        if(p5) nanoparser_expect_string(p5, "Brick flip flags is expected");
 
         id = atoi(nanoparser_get_string(p1));
         x = atoi(nanoparser_get_string(p2));
         y = atoi(nanoparser_get_string(p3));
         layer = p4 ? brick_util_layercode(nanoparser_get_string(p4)) : BRL_DEFAULT;
+        flip = p5 ? brick_util_flipcode(nanoparser_get_string(p5)) : BRF_NOFLIP;
 
         e.type = EDITORGRP_ENTITY_BRICK;
         e.id = id;
         e.position = v2d_new(x,y);
-        e.layer = (int)layer;
+        e.layer = layer;
+        e.flip = flip;
         if(brick_exists(e.id))
             *list = add_to_list(*list, e);
     }
@@ -231,6 +236,7 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
         e.id = clip(id, 0, ITEMDATA_MAX-1);
         e.position = v2d_new(x,y);
         e.layer = 0;
+        e.flip = 0;
         if(editor_is_valid_item(e.id)) /* valid item? */
             *list = add_to_list(*list, e);
     }
@@ -254,10 +260,11 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
         e.id = editor_enemy_name2key(name);
         e.position = v2d_new(x,y);
         e.layer = 0;
+        e.flip = 0;
         *list = add_to_list(*list, e);
     }
     else
-        fatal_error("Unexpected identifier '%s' at group definition. Valid keywords are: 'brick', 'item', 'object'", identifier);
+        fatal_error("Unexpected identifier '%s' at group definition. Valid keywords are: 'brick'", identifier);
 
     return 0;
 }
