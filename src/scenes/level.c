@@ -750,10 +750,8 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "grouptheme") == 0) {
         if(param_count == 1) {
-            if(editorgrp_group_count() == 0) {
+            if(editorgrp_group_count() == 0)
                 str_cpy(grouptheme, param[0], sizeof(grouptheme));
-                editorgrp_load_from_file(grouptheme);
-            }
         }
         else
             logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
@@ -2530,8 +2528,8 @@ void editor_init()
     while(editor_item_list[++editor_item_list_size] >= 0) { }
     editor_cursor_entity_type = EDT_BRICK;
     editor_cursor_entity_id = 0;
-    editor_previous_video_resolution = video_get_resolution();
-    editor_previous_video_smooth = video_is_smooth();
+    /*editor_previous_video_resolution = video_get_resolution();
+    editor_previous_video_smooth = video_is_smooth();*/
     editor_enemy_name = objects_get_list_of_names(&editor_enemy_name_length);
     editor_enemy_selected_category_id = 0;
     editor_enemy_category = objects_get_list_of_categories(&editor_enemy_category_length);
@@ -2552,7 +2550,7 @@ void editor_init()
     editor_brick_init();
 
     /* groups */
-    editorgrp_init();
+    editorgrp_init(grouptheme);
 
     /* SurgeScript entities */
     editor_ssobj_init();
@@ -2638,10 +2636,12 @@ void editor_update()
     }
 
     if(1 == confirmbox_selected_option()) {
-        editorgrp_release();
+        editor_disable();
+        editor_release();
         level_unload();
-        editorgrp_init();
         level_load(file);
+        editor_init();
+        editor_enable();
         level_cleared = FALSE;
         jump_to_next_stage = FALSE;
         spawn_players();
@@ -3336,6 +3336,8 @@ void editor_next_class()
 
     editor_cursor_entity_id = 0;
     editor_cursor_itemid = 0;
+
+    video_showmessage("%d %d : cnt %d", editor_cursor_entity_type, editor_cursor_entity_type == EDT_GROUP, editorgrp_group_count());
 
     if(editor_cursor_entity_type == EDT_GROUP && editorgrp_group_count() == 0)
         editor_next_class();

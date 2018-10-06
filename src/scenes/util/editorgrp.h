@@ -45,9 +45,8 @@ typedef struct editorgrp_entity_list_t {
 } editorgrp_entity_list_t;
 
 /* public methods */
-void editorgrp_init(); /* initializes this module */
+void editorgrp_init(const char* grpfile); /* initializes this module */
 void editorgrp_release(); /* releases this module */
-void editorgrp_load_from_file(const char *filename); /* reads a list of groups from a file */
 int editorgrp_group_count(); /* how many groups there are? */
 editorgrp_entity_list_t* editorgrp_get_group(int id); /* returns a group, where 0 <= id < editorgrp_group_count() */
 

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorgrp.c - level editor: groups
- * Copyright (C) 2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ static int group_count;
 static editorgrp_entity_list_t* group[EDITORGRP_MAX_GROUPS];
 static editorgrp_entity_list_t* delete_list(editorgrp_entity_list_t *list);
 static editorgrp_entity_list_t* add_to_list(editorgrp_entity_list_t *list, editorgrp_entity_t entity);
+static void read_from_file(const char *filename);
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_group(const parsetree_statement_t *stmt, void *entity_list);
 
@@ -49,13 +50,15 @@ extern const char* editor_enemy_key2name(int key);
  * editorgrp_init()
  * Initializes this module
  */
-void editorgrp_init()
+void editorgrp_init(const char* grpfile)
 {
     int i;
 
     group_count = 0;
     for(i=0; i<EDITORGRP_MAX_GROUPS; i++)
         group[i] = NULL;
+
+    read_from_file(grpfile);
 }
 
 
@@ -72,25 +75,6 @@ void editorgrp_release()
     group_count = 0;
 }
 
-
-/*
- * editorgrp_load_from_file()
- * Reads a list of groups from a file
- */
-void editorgrp_load_from_file(const char *filename)
-{
-    char abs_path[1024];
-    parsetree_program_t *prog;
-
-    resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
-    logfile_message("editorgrp_load_from_file('%s')", filename);
-
-    prog = nanoparser_construct_tree(abs_path);
-    nanoparser_traverse_program(prog, traverse);
-    prog = nanoparser_deconstruct_tree(prog);
-
-    logfile_message("editorgrp_load_from_file() loaded %d group(s)", group_count);
-}
 
 /*
  * editorgrp_group_count()
@@ -122,6 +106,23 @@ editorgrp_entity_list_t* editorgrp_get_group(int id)
 
 
 /* internal methods */
+
+/* reads a list of groups from a file */
+void read_from_file(const char *filename)
+{
+    char abs_path[1024];
+    parsetree_program_t *prog;
+
+    resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
+    logfile_message("Reading group theme '%s'...", filename);
+
+    prog = nanoparser_construct_tree(abs_path);
+    nanoparser_traverse_program(prog, traverse);
+    prog = nanoparser_deconstruct_tree(prog);
+
+    logfile_message("Loaded %d group%s", group_count, group_count != 1 ? "s" : "");
+}
+
 
 
 /* deletes the given linked list */
