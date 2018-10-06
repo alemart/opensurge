@@ -3337,8 +3337,6 @@ void editor_next_class()
     editor_cursor_entity_id = 0;
     editor_cursor_itemid = 0;
 
-    video_showmessage("%d %d : cnt %d", editor_cursor_entity_type, editor_cursor_entity_type == EDT_GROUP, editorgrp_group_count());
-
     if(editor_cursor_entity_type == EDT_GROUP && editorgrp_group_count() == 0)
         editor_next_class();
 
