@@ -550,7 +550,7 @@ float physicsactor_get_airdrag(const physicsactor_t *pa) { return pa->airdrag; }
 void physicsactor_set_airdrag(physicsactor_t *pa, float value)
 {
     pa->airdrag = max(0.0f, value);
-    pa->airdrag_exp = (pa->airdrag >= 0.00001f) ? -pa->airdrag * logf(pa->airdrag) : 0.0f;
+    pa->airdrag_exp = (pa->airdrag >= 0.001f) ? -pa->airdrag * logf(pa->airdrag) : 0.0f;
 }
 
 /* private stuff ;-) */

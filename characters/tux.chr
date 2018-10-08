@@ -21,6 +21,8 @@ character "Tux"
         gravity                     1.0
         slope                       1.0
         charge                      1.0
+        airacceleration             1.0
+        airdrag                     1.0
     }
     
     animations

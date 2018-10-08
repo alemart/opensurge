@@ -128,7 +128,7 @@ character_t *character_new(const char *name)
     c->sample.death = NULL;
     c->sample.charge = NULL;
     c->sample.release = NULL;
-    c->sample.charge_pitch = 2.0f;
+    c->sample.charge_pitch = 1.5f;
 
     c->ability.roll = TRUE;
     c->ability.charge = TRUE;
