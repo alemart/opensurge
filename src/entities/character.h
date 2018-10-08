@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * character.h - Character system: meta data about a playable character
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,8 @@ typedef struct {
         float slp; /* slope factor */
         float frc; /* friction */
         float chrg; /* charge speed */
+        float airacc; /* air acceleration */
+        float airdrag; /* air drag (friction) */
     } multiplier;
 
     struct {
@@ -69,6 +71,7 @@ typedef struct {
         struct sound_t *death;
         struct sound_t* charge;
         struct sound_t* release;
+        float charge_pitch;
     } sample;
 
     struct {

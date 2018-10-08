@@ -42,6 +42,7 @@ struct physicsactor_t
     float topspeed; /* top speed */
     float topyspeed; /* top y speed */
     float air; /* air acceleration */
+    float airdrag; /* air drag (friction) */
     float jmp; /* initial jump velocity */
     float jmprel; /* release jump velocity */
     float diejmp; /* death jump velocity */
@@ -49,13 +50,13 @@ struct physicsactor_t
     float grv; /* gravity */
     float slp; /* slope factor */
     float chrg; /* charge-and-release max speed */
-    float walkthreshold; /* walk threshold */
-    float unrollthreshold; /* unroll threshold */
-    float rollthreshold; /* roll threshold */
     float rollfrc; /* roll friction */
     float rolldec; /* roll deceleration */
     float rolluphillslp; /* roll uphill slope */
     float rolldownhillslp; /* roll downhill slope */
+    float rollthreshold; /* roll threshold */
+    float unrollthreshold; /* unroll threshold */
+    float walkthreshold; /* walk threshold */
     float falloffthreshold; /* fall off threshold */
     float brakingthreshold; /* braking animation treshold */
     float airdragthreshold; /* air drag threshold */
@@ -68,6 +69,7 @@ struct physicsactor_t
     float breathe_timer; /* if greater than zero, set animation to breathing */
     int sticky_lock; /* sticky physics lock */
     float charge_intensity; /* charge intensity */
+    float airdrag_exp; /* airdrag modifier */
     physicsactorstate_t state; /* state */
     movmode_t movmode; /* current movement mode, based on the angle */
     input_t *input; /* input device */
@@ -231,6 +233,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->breathe_timer = 0.0f;
     pa->sticky_lock = FALSE;
     pa->charge_intensity = 0.0f;
+    pa->airdrag_exp = 0.0f;
 
     /* initializing some constants ;-) */
 
@@ -245,6 +248,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
     pa->air =                   0.1f        * fpsmul * fpsmul ;
+    pa->airdrag =              (31.0f/32.0f)* 1.0f   * 1.0f   ;
     pa->jmp =                   -6.7f       * fpsmul * 1.0f   ;
     pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
     pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
@@ -437,6 +441,11 @@ int physicsactor_roll_delta(const physicsactor_t* pa)
     return sensor_get_y2(pa->A_normal) - sensor_get_y2(pa->A_jumproll);
 }
 
+float physicsactor_charge_intensity(const physicsactor_t* pa)
+{
+    return pa->charge_intensity;
+}
+
 void physicsactor_walk_right(physicsactor_t *pa)
 {
     input_simulate_button_down(pa->input, IB_RIGHT);
@@ -536,6 +545,13 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(rolluphillslp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rolldownhillslp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(falloffthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(brakingthreshold)
+
+float physicsactor_get_airdrag(const physicsactor_t *pa) { return pa->airdrag; }
+void physicsactor_set_airdrag(physicsactor_t *pa, float value)
+{
+    pa->airdrag = max(0.0f, value);
+    pa->airdrag_exp = (pa->airdrag >= 0.00001f) ? -pa->airdrag * logf(pa->airdrag) : 0.0f;
+}
 
 /* private stuff ;-) */
 
@@ -914,7 +930,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         /* air drag */
         if(pa->ysp < 0.0f && pa->ysp > pa->airdragthreshold) {
             /*pa->xsp *= powf(31.0f / 32.0f, 60.0f * dt);*/
-            pa->xsp *= 0.99955f - 1.84845f * dt;
+            if(pa->airdrag_exp > 0.0f)
+                pa->xsp *= (pa->airdrag + pa->airdrag_exp) - 60.0f * pa->airdrag_exp * dt;
         }
 
         /* jump sensitivity */

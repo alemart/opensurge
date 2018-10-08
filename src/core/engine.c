@@ -20,6 +20,7 @@
 
 #include <allegro.h>
 #include <string.h>
+#include <locale.h>
 #include "engine.h"
 #include "global.h"
 #include "scene.h"
@@ -207,6 +208,7 @@ void init_managers(commandline_t cmd)
  */
 void init_accessories(commandline_t cmd)
 {
+    setlocale(LC_NUMERIC, "C"); /* bugfix */
     video_display_loading_screen();
     sprite_init();
     font_init(cmd.allow_font_smoothing);

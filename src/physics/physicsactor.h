@@ -89,6 +89,7 @@ int physicsactor_is_in_the_air(const physicsactor_t *pa);
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(physicsactor_t *pa);
 int physicsactor_roll_delta(const physicsactor_t* pa); /* roll delta (sensors) */
+float physicsactor_charge_intensity(const physicsactor_t* pa); /* in [0,1] */
 
 void physicsactor_walk_right(physicsactor_t *pa); /* call before physicsactor_update() */
 void physicsactor_walk_left(physicsactor_t *pa);
@@ -122,6 +123,8 @@ float physicsactor_get_topyspeed(const physicsactor_t *pa); /* top y speed */
 void physicsactor_set_topyspeed(physicsactor_t *pa, float value);
 float physicsactor_get_air(const physicsactor_t *pa); /* air acceleration */
 void physicsactor_set_air(physicsactor_t *pa, float value);
+float physicsactor_get_airdrag(const physicsactor_t *pa); /* air drag */
+void physicsactor_set_airdrag(physicsactor_t *pa, float value);
 float physicsactor_get_airdragthreshold(const physicsactor_t *pa); /* air drag threshold */
 void physicsactor_set_airdragthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_jmp(const physicsactor_t *pa); /* initial jump speed */

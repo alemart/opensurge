@@ -21,6 +21,8 @@ character "Surge"
         gravity                     1.0
         slope                       1.0
         charge                      1.0
+        airacceleration             1.0
+        airdrag                     1.0
     }
     
     animations
@@ -60,7 +62,7 @@ character "Surge"
         roll                        "samples/roll.wav"
         death                       "samples/death.wav"
         brake                       "samples/brake.wav"
-        charge                      "samples/charge.wav"
+        charge                      "samples/charge.wav" 2.0
         release                     "samples/release.wav"
     }
 }

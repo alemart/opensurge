@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -422,7 +421,6 @@ void level_load(const char *filepath)
     char abs_path[1024], line[1024];
     FILE* fp;
 
-    setlocale(LC_NUMERIC, "C"); /* bugfix */
     logfile_message("level_load(\"%s\")", filepath);
     resource_filepath(abs_path, filepath, sizeof(abs_path), RESFP_READ);
 

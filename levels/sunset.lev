@@ -14,7 +14,8 @@ bgtheme "themes/sunset.bg"
 spawn_point 184 9976
 music "musics/sunshine.ogg"
 startup ".default_startup"
-players "Surge" "Neon"
+players "Surge"
+//"Neon"
 waterlevel 10944
 
 // dialog regions (xpos ypos width height title message)

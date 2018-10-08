@@ -99,6 +99,8 @@ character_t *character_new(const char *name)
     c->multiplier.slp = 1.0f;
     c->multiplier.frc = 1.0f;
     c->multiplier.chrg = 1.0f;
+    c->multiplier.airacc = 1.0f;
+    c->multiplier.airdrag = 1.0f;
     
     c->animation.sprite_name = str_dup("");
     c->animation.stopped = 0;
@@ -126,6 +128,7 @@ character_t *character_new(const char *name)
     c->sample.death = NULL;
     c->sample.charge = NULL;
     c->sample.release = NULL;
+    c->sample.charge_pitch = 2.0f;
 
     c->ability.roll = TRUE;
     c->ability.charge = TRUE;
@@ -293,6 +296,16 @@ int traverse_multipliers(const parsetree_statement_t *stmt, void *character)
         nanoparser_expect_string(p1, "charge must be a positive number");
         c->multiplier.chrg = max(0.0f, atof(nanoparser_get_string(p1)));
     }
+    else if(str_icmp(identifier, "airacceleration") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "airacceleration must be a positive number");
+        c->multiplier.airacc = max(0.0f, atof(nanoparser_get_string(p1)));
+    }
+    else if(str_icmp(identifier, "airdrag") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "airdrag must be a positive number");
+        c->multiplier.airdrag = max(0.0f, atof(nanoparser_get_string(p1)));
+    }
 
     /* the multipliers below have been deprecated, but their identifiers
        are still matched for compatibility purposes */
@@ -434,7 +447,7 @@ int traverse_samples(const parsetree_statement_t *stmt, void *character)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1;
+    const parsetree_parameter_t *p1, *p2;
     character_t *c = (character_t*)character;
 
     identifier = nanoparser_get_identifier(stmt);
@@ -442,32 +455,37 @@ int traverse_samples(const parsetree_statement_t *stmt, void *character)
 
     if(str_icmp(identifier, "jump") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "must specify the samples");
+        nanoparser_expect_string(p1, "must specify the samples: jump");
         c->sample.jump = soundfactory_get(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "roll") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "must specify the samples");
+        nanoparser_expect_string(p1, "must specify the samples: roll");
         c->sample.roll = soundfactory_get(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "brake") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "must specify the samples");
+        nanoparser_expect_string(p1, "must specify the samples: brake");
         c->sample.brake = soundfactory_get(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "death") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "must specify the samples");
+        nanoparser_expect_string(p1, "must specify the samples: death");
         c->sample.death = soundfactory_get(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "charge") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "must specify the samples");
+        nanoparser_expect_string(p1, "must specify the samples: charge");
         c->sample.charge = soundfactory_get(nanoparser_get_string(p1));
+        if(nanoparser_get_number_of_parameters(param_list) > 1) {
+            p2 = nanoparser_get_nth_parameter(param_list, 2);
+            nanoparser_expect_string(p2, "must specify the samples: charge pitch");
+            c->sample.charge_pitch = max(0.0f, atof(nanoparser_get_string(p2)));
+        }
     }
     else if(str_icmp(identifier, "release") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "must specify the samples");
+        nanoparser_expect_string(p1, "must specify the samples: release");
         c->sample.release = soundfactory_get(nanoparser_get_string(p1));
     }
     else
