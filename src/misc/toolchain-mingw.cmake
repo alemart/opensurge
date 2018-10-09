@@ -4,7 +4,7 @@
 # Use the commands below to build the Windows version of Open Surge with MinGW:
 #
 #     mkdir build && cd build
-#     cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-mingw.cmake
+#     cmake .. -DCMAKE_TOOLCHAIN_FILE=../src/misc/toolchain-mingw.cmake
 #     make
 #
 # This is for cross-compiling only.
