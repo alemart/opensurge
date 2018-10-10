@@ -119,6 +119,7 @@ Joao Victor
 --- src/misc/icon16.png
 --- src/misc/icon32.png
 --- src/misc/icon64.png
+--- surge.png
 
 Colin Beard
 --- images/charge.png
@@ -140,7 +141,7 @@ svgmovement
 --- images/levels/1/waterskimmer.png
 --- images/levels/1/bigwolf-bandage.png
 --- images/levels/1/boss2x.png
---- ./logo.png
+--- logo.png
 
 Brian Zablocky (Celdecea)
 --- images/blue_door.png
@@ -264,7 +265,6 @@ Andrew Pociask
 --- images/levels/1/mountains.png
 
 lainz
---- ./surge.png
 --- src/misc/icon128.png
 --- src/misc/icon256.png
 
