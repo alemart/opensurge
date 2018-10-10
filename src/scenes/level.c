@@ -747,10 +747,8 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
     }
     else if(str_icmp(identifier, "grouptheme") == 0) {
-        if(param_count == 1) {
-            if(*grouptheme == '\0')
-                str_cpy(grouptheme, param[0], sizeof(grouptheme));
-        }
+        if(param_count == 1)
+            str_cpy(grouptheme, param[0], sizeof(grouptheme));
         else
             logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
     }
