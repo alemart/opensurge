@@ -108,7 +108,7 @@ object ".default_startup.level_cleared.handle_music"
 
     state "end"
     {
-        play_music "samples/silence.ogg" -1
+        play_music "musics/silence.ogg" -1
         destroy
     }
 }

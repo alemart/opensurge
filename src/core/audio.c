@@ -103,6 +103,9 @@ music_t *music_load(const char *path)
     char abs_path[1024];
     music_t *m;
 
+    if(*path == '\0') /* empty path */
+        return NULL;
+
     if(NULL == (m = resourcemanager_find_music(path))) {
         resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
         logfile_message("music_load('%s')", abs_path);
@@ -138,6 +141,9 @@ music_t *music_load(const char *path)
 {
     char abs_path[1024];
     music_t *m;
+
+    if(*path == '\0') /* empty path */
+        return NULL;
 
     if(NULL == (m = resourcemanager_find_music(path))) {
         resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
