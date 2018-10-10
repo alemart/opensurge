@@ -748,7 +748,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "grouptheme") == 0) {
         if(param_count == 1) {
-            if(editorgrp_group_count() == 0)
+            if(*grouptheme == '\0')
                 str_cpy(grouptheme, param[0], sizeof(grouptheme));
         }
         else

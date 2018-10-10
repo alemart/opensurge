@@ -58,7 +58,8 @@ void editorgrp_init(const char* grpfile)
     for(i=0; i<EDITORGRP_MAX_GROUPS; i++)
         group[i] = NULL;
 
-    read_from_file(grpfile);
+    if(*grpfile != '\0') /* grpfile may be empty */
+        read_from_file(grpfile);
 }
 
 
