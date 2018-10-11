@@ -2626,16 +2626,17 @@ void editor_update()
     }
 
     if(1 == confirmbox_selected_option()) {
+        v2d_t cam = editor_camera;
         editor_disable();
         editor_release();
         level_unload();
         level_load(file);
         editor_init();
         editor_enable();
+        editor_camera = cam;
         level_cleared = FALSE;
         jump_to_next_stage = FALSE;
         spawn_players();
-        video_showmessage("The level has been reloaded.");
         return;
     }
 
@@ -2782,7 +2783,7 @@ void editor_update()
 
     /* pick or delete object */
     pick_object = input_button_pressed(editor_mouse, IB_FIRE3);
-    delete_object = editor_is_eraser_enabled();
+    delete_object = input_button_pressed(editor_mouse, IB_FIRE2) || editor_is_eraser_enabled();
     if(pick_object || delete_object) {
         brick_list_t *itb;
         item_list_t *iti;
@@ -3195,8 +3196,18 @@ int editor_is_eraser_enabled()
 
         return FALSE;
     }
-    else
-        return input_button_down(editor_mouse, IB_FIRE2);
+    else {
+        const static float hold_time = 0.57f; /* how many seconds? */
+        static float timer = 0.0f;
+        if(input_button_down(editor_mouse, IB_FIRE2)) {
+            timer += timer_get_delta();
+            return timer >= hold_time;
+        }
+        else {
+            timer = 0.0f;
+            return FALSE;
+        }
+    }
 }
 
 
