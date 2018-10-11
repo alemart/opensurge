@@ -30,7 +30,7 @@
 
 /* private data */
 #define BOX_WIDTH               615
-#define BOX_HEIGHT              360
+#define BOX_HEIGHT              350
 #define BOX_XPOS                ((VIDEO_SCREEN_W - BOX_WIDTH) / 2)
 #define BOX_YPOS                ((VIDEO_SCREEN_H - BOX_HEIGHT) / 2)
 #define BOX_PADDING             15
@@ -49,13 +49,12 @@ static const char text[] =
 "LCtrl + Z | LCtrl + Y              Undo | Redo\n"
 "F1                                 Show help\n"
 "G                                  Snap to grid\n"
-"P                                  Open the palette\n"
-"1 | 2                              Work with bricks | entities\n"
+"1 | 2                              Open palette: brick | entity\n"
 "\n\n"
 "<color=ff8060>Item placement</color>\n\n"
 "Left mouse button                  Create an item\n"
 "Middle mouse button                Pick an item\n"
-"Right mouse button                 Erase an item\n"
+"Right mouse button                 Erase an item (hold: eraser)\n"
 "Mouse wheel | B/N                  Change the current item\n"
 "LCtrl + Left mouse button          Change the spawn point\n"
 "L | LShift + L                     Change brick layer\n"

@@ -256,7 +256,6 @@ inputmap "editor2"
         fire1           KEY_Z
         fire2           KEY_Y
         fire3           KEY_G
-        fire4           KEY_P
     }
 }
 

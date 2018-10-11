@@ -2647,8 +2647,8 @@ void editor_update()
     }
 
     /* open palette */
-    if(input_button_pressed(editor_keyboard2, IB_FIRE4)) {
-        if(editor_cursor_entity_type == EDT_BRICK) {
+    if(input_button_pressed(editor_keyboard3, IB_FIRE5)) {
+        if(editor_brick_count > 0) {
             editorpal_config_t config = {
                 .type = EDITORPAL_BRICK,
                 .brick = {
@@ -2657,9 +2657,14 @@ void editor_update()
                 }
             };
             scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
+            editor_cursor_entity_type = EDT_BRICK; editor_next_entity();
             return;
         }
-        else if(editor_cursor_entity_type == EDT_SSOBJ) {
+        else
+            sound_play( soundfactory_get("deny") );
+    }
+    else if(input_button_pressed(editor_keyboard3, IB_FIRE6)) {
+        if(editor_ssobj_count > 0) {
             editorpal_config_t config = {
                 .type = EDITORPAL_SSOBJ,
                 .ssobj = {
@@ -2668,12 +2673,11 @@ void editor_update()
                 }
             };
             scenestack_push(storyboard_get_scene(SCENE_EDITORPAL), &config);
+            editor_cursor_entity_type = EDT_SSOBJ; editor_next_entity();
             return;           
         }
-        else {
-            video_showmessage("Palette available for bricks and SurgeScript entities.");
+        else
             sound_play( soundfactory_get("deny") );
-        }
     }
 
     if(-1 < (selected_item = editorpal_selected_item())) {
@@ -2696,18 +2700,6 @@ void editor_update()
     /* update items */
     for(it=major_items; it!=NULL; it=it->next)
         item_update(it->data, team, team_size, major_bricks, major_items, major_enemies);
-
-    /* work with bricks or entities */
-    if(input_button_pressed(editor_keyboard3, IB_FIRE5)) {
-        while(editor_cursor_entity_type != EDT_BRICK)
-            editor_next_class();
-    }
-    else if(input_button_pressed(editor_keyboard3, IB_FIRE6)) {
-        if(editor_ssobj_count > 0) {
-            while(editor_cursor_entity_type != EDT_SSOBJ)
-                editor_next_class();
-        }
-    }
 
     /* change class / entity / object category */
     if(input_button_down(editor_keyboard, IB_FIRE3)) {
@@ -2933,7 +2925,7 @@ void editor_update()
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
-    font_set_text(editor_help_font, "<color=ff8060>P</color>: palette   <color=ff8060>F1</color>: help");
+    font_set_text(editor_help_font, "<color=ff8060>F1</color>: help");
     font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 8, 8));
     font_set_visible(editor_help_font, video_get_window_size().x > 512);
 
@@ -3156,14 +3148,12 @@ void editor_save()
  */
 void editor_scroll()
 {
-    float camera_speed;
+    float camera_speed = 750.0f;
     float dt = timer_get_delta();
 
     /* camera speed */
     if(input_button_down(editor_keyboard3, IB_FIRE1))
-        camera_speed = 5 * 750;
-    else
-        camera_speed = 750;
+        camera_speed *= 5.0f;
 
     /* scrolling... */
     if(input_button_down(editor_keyboard, IB_UP) || input_button_down(editor_keyboard2, IB_UP))
@@ -3197,9 +3187,9 @@ int editor_is_eraser_enabled()
         return FALSE;
     }
     else {
-        const static float hold_time = 0.57f; /* how many seconds? */
         static float timer = 0.0f;
         if(input_button_down(editor_mouse, IB_FIRE2)) {
+            const float hold_time = 0.57f; /* how many seconds? */
             timer += timer_get_delta();
             return timer >= hold_time;
         }
