@@ -19,14 +19,13 @@
  */
 
 #include <surgescript.h>
+#include "scripting.h"
 #include "../core/image.h"
 #include "../core/video.h"
 
 /* private */
 static surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-extern v2d_t object_camera(const surgescript_object_t* object);
-extern int object_inside_screen(const surgescript_object_t* object);
 
 /*
  * scripting_register_collisions()
@@ -46,13 +45,13 @@ surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const s
     surgescript_var_t* debug = surgescript_var_create();
     surgescript_object_call_function(object, "get_debug", NULL, 0, debug);
 
-    if(surgescript_var_get_bool(debug) && object_inside_screen(object)) {
+    if(surgescript_var_get_bool(debug) && scripting_util_is_object_inside_screen(object)) {
         surgescript_var_t* left = surgescript_var_create();
         surgescript_var_t* right = surgescript_var_create();
         surgescript_var_t* top = surgescript_var_create();
         surgescript_var_t* bottom = surgescript_var_create();
         uint32_t color = image_rgb(255, 255, 0);
-        v2d_t camera = object_camera(object);
+        v2d_t camera = scripting_util_object_camera(object);
         int l, r, t, b;
 
         surgescript_object_call_function(object, "get_left", NULL, 0, left);

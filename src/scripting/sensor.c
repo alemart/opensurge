@@ -20,6 +20,7 @@
 
 #include <surgescript.h>
 #include <string.h>
+#include "scripting.h"
 #include "../core/v2d.h"
 #include "../core/util.h"
 #include "../core/image.h"
@@ -44,9 +45,6 @@ static inline const obstaclemap_t* get_obstaclemap(const surgescript_object_t* o
 static inline sensor_t* get_sensor(const surgescript_object_t* object);
 static inline void update(surgescript_object_t* object);
 static v2d_t parent_camera(const surgescript_object_t* object);
-extern v2d_t object_camera(const surgescript_object_t* object);
-extern v2d_t world_position(const surgescript_object_t* object);
-extern const char* parent_name(const surgescript_object_t* object);
 static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
@@ -88,7 +86,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 
     /* the parent object can't be detached */
     if(surgescript_object_has_tag(parent, "detached"))
-        fatal_error("Scripting Error: an object (\"%s\") that spawns a Sensor cannot be \"detached\".", parent_name(object));
+        fatal_error("Scripting Error: an object (\"%s\") that spawns a Sensor cannot be \"detached\".", scripting_util_parent_name(object));
 
     /* done! */
     return NULL;
@@ -141,7 +139,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         surgescript_object_set_userdata(object, sensor);
     }
     else
-        fatal_error("Scripting Error: object \"%s\" spawns a Sensor with invalid coordinates.", parent_name(object));
+        fatal_error("Scripting Error: object \"%s\" spawns a Sensor with invalid coordinates.", scripting_util_parent_name(object));
 
     /* initial configuration */
     ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));
@@ -169,7 +167,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
     if(visible) {
         sensor_t* sensor = get_sensor(object);
-        sensor_render(sensor, world_position(object), MM_FLOOR, parent_camera(object));
+        sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, parent_camera(object));
     }
 
     return NULL;
@@ -232,7 +230,7 @@ void update(surgescript_object_t* object)
 {
     sensor_t* sensor = get_sensor(object);
     const obstaclemap_t* obstaclemap = get_obstaclemap(object);
-    const obstacle_t* obstacle = sensor_check(sensor, world_position(object), MM_FLOOR, obstaclemap);
+    const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, obstaclemap);
     surgescript_heap_t* heap = surgescript_object_heap(object);
 
     if(obstacle != NULL) {
@@ -251,5 +249,5 @@ v2d_t parent_camera(const surgescript_object_t* object)
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    return object_camera(parent);
+    return scripting_util_object_camera(parent);
 }

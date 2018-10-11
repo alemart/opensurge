@@ -145,7 +145,7 @@ bool scripting_testmode()
 /* utilities */
 
 /* get a component of the parent object */
-surgescript_objecthandle_t require_component(const surgescript_object_t* object, const char* component_name)
+surgescript_objecthandle_t scripting_util_require_component(const surgescript_object_t* object, const char* component_name)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
@@ -159,20 +159,9 @@ surgescript_objecthandle_t require_component(const surgescript_object_t* object,
 }
 
 /* compute the world position of an object */
-#if 0
-v2d_t world_position(const surgescript_object_t* object)
+v2d_t scripting_util_world_position(const surgescript_object_t* object)
 {
-    surgescript_transform_t transform;
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
-    v2d_t parent_origin = (parent != object) ? world_position(parent) : v2d_new(0, 0);
-    surgescript_object_peek_transform(object, &transform);
-    surgescript_transform_apply2d(&transform, &parent_origin.x, &parent_origin.y);
-    return parent_origin;
-}
-#else
-v2d_t world_position(const surgescript_object_t* object)
-{
+    /* this gotta be fast */
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
@@ -188,31 +177,43 @@ v2d_t world_position(const surgescript_object_t* object)
     while(handle != root) {
         handle = surgescript_object_parent(object);
         object = surgescript_objectmanager_get(manager, handle);
-        surgescript_object_peek_transform(object, &transform);
-        surgescript_transform_apply2d(&transform, &world_position.x, &world_position.y);
+        if(surgescript_object_transform_changed(object)) {
+            surgescript_object_peek_transform(object, &transform);
+            surgescript_transform_apply2d(&transform, &world_position.x, &world_position.y);
+        }
     }
 
     /* done! */
     return world_position;
 }
-#endif
+
+/* compute the world angle of an object */
+float scripting_util_world_angle(const surgescript_object_t* object)
+{
+    surgescript_transform_t transform;
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
+    float parent_angle = (parent != object) ? scripting_util_world_angle(parent) : 0.0f;
+    surgescript_object_peek_transform(object, &transform);
+    return parent_angle + transform.rotation.z;
+}
 
 /* compute the proper camera position for an object (will check if it's detached or not) */
-v2d_t object_camera(const surgescript_object_t* object)
+v2d_t scripting_util_object_camera(const surgescript_object_t* object)
 {
     bool is_detached = surgescript_object_has_tag(object, "detached");
     return !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
 }
 
 /* checks if the object is inside the visible part of the screen */
-int object_inside_screen(const surgescript_object_t* object)
+int scripting_util_is_object_inside_screen(const surgescript_object_t* object)
 {
-    v2d_t v = world_position(object);
+    v2d_t v = scripting_util_world_position(object);
     return level_inside_screen(v.x, v.y, 0, 0);
 }
 
 /* get the zindex of an object */
-float object_zindex(surgescript_object_t* object)
+float scripting_util_object_zindex(surgescript_object_t* object)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
@@ -230,7 +231,7 @@ float object_zindex(surgescript_object_t* object)
 }
 
 /* the name of the parent object */
-const char* parent_name(const surgescript_object_t* object)
+const char* scripting_util_parent_name(const surgescript_object_t* object)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
@@ -239,7 +240,7 @@ const char* parent_name(const surgescript_object_t* object)
 }
 
 /* get the SurgeEngine object */
-surgescript_object_t* surgeengine_object(surgescript_vm_t* vm)
+surgescript_object_t* scripting_util_surgeengine_object(surgescript_vm_t* vm)
 {
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
     static surgescript_objecthandle_t cached_ref = 0;
@@ -251,14 +252,14 @@ surgescript_object_t* surgeengine_object(surgescript_vm_t* vm)
 }
 
 /* get a component of the SurgeEngine object */
-surgescript_object_t* surgeengine_component(surgescript_vm_t* vm, const char* component_name)
+surgescript_object_t* scripting_util_surgeengine_component(surgescript_vm_t* vm, const char* component_name)
 {
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
     char* accessor_fun = surgescript_util_accessorfun("get", component_name);
     surgescript_var_t* ret = surgescript_var_create();
     surgescript_objecthandle_t handle;
 
-    surgescript_object_call_function(surgeengine_object(vm), accessor_fun, NULL, 0, ret);
+    surgescript_object_call_function(scripting_util_surgeengine_object(vm), accessor_fun, NULL, 0, ret);
     handle = surgescript_var_get_objecthandle(ret);
     surgescript_var_destroy(ret);
     ssfree(accessor_fun);

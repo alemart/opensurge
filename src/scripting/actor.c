@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include <math.h>
+#include "scripting.h"
 #include "../core/v2d.h"
 #include "../core/video.h"
 #include "../core/image.h"
@@ -54,9 +55,6 @@ static surgescript_var_t* fun_getentity(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_animfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_animrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_animfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-extern surgescript_objecthandle_t require_component(const surgescript_object_t* object, const char* component_name);
-extern v2d_t world_position(const surgescript_object_t* object);
-static float world_angle(const surgescript_object_t* object);
 static v2d_t world_lossyscale(const surgescript_object_t* object);
 static const surgescript_heapptr_t ZINDEX_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
@@ -113,7 +111,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t transform = require_component(object, "Transform2D");
+    surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform2D");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     bool is_detached = surgescript_object_has_tag(parent, "detached");
@@ -135,7 +133,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* initial configuration */
     surgescript_object_set_userdata(object, actor);
     actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
-    actor->spawn_point = world_position(object);
+    actor->spawn_point = scripting_util_world_position(object);
 
     /* sanity check */
     if(!surgescript_object_has_tag(parent, "entity")) {
@@ -163,8 +161,8 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
     actor_t* actor = (actor_t*)surgescript_object_userdata(object);
 
-    actor->position = world_position(object);
-    actor->angle = world_angle(object) * -DEG2RAD; /* flip y-axis */
+    actor->position = scripting_util_world_position(object);
+    actor->angle = scripting_util_world_angle(object) * -DEG2RAD; /* flip y-axis */
     actor->scale = world_lossyscale(object);
 
     actor_render(actor, camera);
@@ -351,17 +349,6 @@ surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript
 
 
 /* --- helpers --- */
-
-/* compute the world angle of an object */
-float world_angle(const surgescript_object_t* object)
-{
-    surgescript_transform_t transform;
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
-    float parent_angle = (parent != object) ? world_angle(parent) : 0.0f;
-    surgescript_object_peek_transform(object, &transform);
-    return parent_angle + transform.rotation.z;
-}
 
 /* computes the approximate scale (not very accurate; does not account for shearing) */
 v2d_t world_lossyscale(const surgescript_object_t* object)

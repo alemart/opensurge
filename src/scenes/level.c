@@ -310,12 +310,6 @@ static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
 static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
 static v2d_t editor_get_ssobj_spawnpoint(const surgescript_object_t* object);
 static int editor_is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
-
-extern v2d_t world_position(const surgescript_object_t* object);
-extern float object_zindex(surgescript_object_t* object);
-extern surgescript_object_t* surgeengine_object(surgescript_vm_t* vm);
-extern surgescript_object_t* surgeengine_component(surgescript_vm_t* vm, const char* component_name);
-
 typedef struct ssobj_editordata_t ssobj_editordata_t;
 static ssobj_editordata_t* editor_get_ssobj_editordata(const surgescript_object_t* object);
 static void editor_set_ssobj_editordata(const surgescript_object_t* object, ssobj_editordata_t editordata);
@@ -445,7 +439,7 @@ void level_load(const char *filepath)
 
     /* scripting: preparing a new Level... */
     cached_level_ssobject = NULL;
-    surgescript_object_call_function(surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
+    surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
 
     /* entity manager */
     entitymanager_init();
@@ -517,7 +511,7 @@ void level_unload()
     entitymanager_release();
 
     /* scripting */
-    surgescript_object_call_function(surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
+    surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
     cached_level_ssobject = NULL;
 
     /* unloading the brickset */
@@ -2413,7 +2407,7 @@ bool ssobject_exists(const char* object_name)
 surgescript_object_t* level_ssobject()
 {
     if(cached_level_ssobject == NULL)
-        cached_level_ssobject = surgeengine_component(surgescript_vm(), "Level");
+        cached_level_ssobject = scripting_util_surgeengine_component(surgescript_vm(), "Level");
     return cached_level_ssobject;
 }
 
@@ -2902,7 +2896,7 @@ void editor_update()
                 if(ssobject != NULL) {
                     int ssobj_id = editor_ssobj_id(surgescript_object_name(ssobject));
                     if(!pick_object) {
-                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, ssobj_id, world_position(ssobject));
+                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, ssobj_id, scripting_util_world_position(ssobject));
                         editor_action_commit(eda);
                         editor_action_register(eda);
                     }
@@ -4102,7 +4096,7 @@ bool editor_remove_ssobj(surgescript_object_t* object, void* data)
             const char* object_name = surgescript_object_name(object);
             editor_action_t *action = (editor_action_t*)data;
             if(editor_ssobj_id(object_name) == action->obj_id) {
-                v2d_t delta = v2d_subtract(world_position(object), action->obj_position);
+                v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
                 if(v2d_magnitude(delta) < EPSILON)
                     surgescript_object_kill(object);
             }
@@ -4123,7 +4117,7 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
             float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x + 1 , editor_cursor.y + topleft.y + 1 };
 
             /* find the bounding box of the entity */
-            v2d_t worldpos = world_position(object);
+            v2d_t worldpos = scripting_util_world_position(object);
             const char* object_name = surgescript_object_name(object);
             a[0] = worldpos.x - 32; a[1] = worldpos.y - 32;
             a[2] = worldpos.x + 32; a[3] = worldpos.y + 32;
@@ -4141,7 +4135,7 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
             /* got collision between the cursor and the entity */
             if(bounding_box(a, b)) {
                 surgescript_object_t** result = (surgescript_object_t**)data;
-                if(NULL == *result || object_zindex(object) >= object_zindex(*result))
+                if(NULL == *result || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*result))
                     *result = object;
             }
         }

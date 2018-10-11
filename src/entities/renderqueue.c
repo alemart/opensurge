@@ -20,7 +20,6 @@
 
 #include <surgescript.h>
 #include <math.h>
-#include "../core/util.h"
 #include "renderqueue.h"
 #include "particle.h"
 #include "player.h"
@@ -28,6 +27,8 @@
 #include "item.h"
 #include "enemy.h"
 #include "actor.h"
+#include "../core/util.h"
+#include "../scripting/scripting.h"
 
 /* private stuff ;) */
 typedef union renderable_t renderable_t;
@@ -95,15 +96,13 @@ static float brick_zindex_offset(const brick_t *b)
     return s;
 }
 
-extern float object_zindex(surgescript_object_t*);
-
 /* private strategies */
 static float zindex_particles(renderable_t r) { return 1.0f; }
 static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 1.0f : 0.5f; }
 static float zindex_item(renderable_t r) { return 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
-static float zindex_ssobject(renderable_t r) { return object_zindex(r.ssobject); }
+static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
 
 static void render_particles(renderable_t r, v2d_t camera_position) { particle_render_all(camera_position); }
 static void render_player(renderable_t r, v2d_t camera_position) { player_render(r.player, camera_position); }
