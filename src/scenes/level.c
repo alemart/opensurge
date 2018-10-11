@@ -419,6 +419,7 @@ void level_load(const char *filepath)
     resource_filepath(abs_path, filepath, sizeof(abs_path), RESFP_READ);
 
     /* default values */
+    str_cpy(file, filepath, sizeof(file)); /* it's the relative filepath we want */
     strcpy(name, "Untitled");
     strcpy(musicfile, "");
     strcpy(theme, "");
@@ -426,7 +427,6 @@ void level_load(const char *filepath)
     strcpy(author, "");
     strcpy(version, "");
     strcpy(grouptheme, "");
-    str_cpy(file, filepath, sizeof(file)); /* it's the relative filepath we want */
     spawn_point = v2d_new(0,0);
     dialogregion_size = 0;
     act = 0;
@@ -463,7 +463,7 @@ void level_load(const char *filepath)
     /* players */
     if(team_size == 0) {
         /* default players */
-        logfile_message("loading the default players...");
+        logfile_message("Loading the default players...");
         team[team_size++] = player_create("Surge");
         team[team_size++] = player_create("Neon");
         team[team_size++] = player_create("Charge");
@@ -515,15 +515,15 @@ void level_unload()
     cached_level_ssobject = NULL;
 
     /* unloading the brickset */
-    logfile_message("unloading the brickset...");
+    logfile_message("Unloading the brickset...");
     brickset_unload();
 
     /* unloading the background */
-    logfile_message("unloading the background...");
+    logfile_message("Unloading the background...");
     backgroundtheme = background_unload(backgroundtheme);
 
     /* destroying the players */
-    logfile_message("unloading the players...");
+    logfile_message("Unloading the players...");
     for(i=0; i<team_size; i++)
         player_destroy(team[i]);
     team_size = 0;
@@ -563,7 +563,7 @@ int level_save(const char *filepath)
         return FALSE;
     }
 
-    /* meta information */
+    /* level header */
     fprintf(fp,
     "// ------------------------------------------------------------\n"
     "// %s %d.%d.%d level\n"
@@ -620,7 +620,7 @@ int level_save(const char *filepath)
     /* dialog regions */
     fprintf(fp, "\n// dialog regions (xpos ypos width height title message)\n");
     for(i=0; i<dialogregion_size; i++) {
-        char title[1024], message[1024];
+        char title[256], message[1024];
         str_cpy(title, str_addslashes(dialogregion[i].title), sizeof(title));
         str_cpy(message, str_addslashes(dialogregion[i].message), sizeof(message));
         fprintf(fp, "dialogbox %d %d %d %d \"%s\" \"%s\"\n", dialogregion[i].rect_x, dialogregion[i].rect_y, dialogregion[i].rect_w, dialogregion[i].rect_h, title, message);
@@ -642,16 +642,16 @@ int level_save(const char *filepath)
         }
     }
 
+    /* SurgeScript entity list */
+    fprintf(fp, "\n// entities\n");
+    surgescript_object_traverse_tree_ex(level_ssobject(), fp, save_ssobject);
+
     /* item list */
-    fprintf(fp, "\n// items\n");
+    fprintf(fp, "\n// legacy items\n");
     for(iti=item_list; iti; iti=iti->next) {
         if(iti->data->state != IS_DEAD)
            fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
     }
-
-    /* object list */
-    fprintf(fp, "\n// objects\n");
-    surgescript_object_traverse_tree_ex(level_ssobject(), fp, save_ssobject);
 
     /* legacy object list */
     fprintf(fp, "\n// legacy objects\n");
@@ -679,7 +679,7 @@ int level_save(const char *filepath)
 void level_interpret_line(const char *filename, int fileline, const char *line)
 {
     int param_count;
-    char *param[1024], *identifier;
+    char *param[32], *identifier;
     char tmp[1024], *p, *q;
     int i;
 
@@ -699,7 +699,7 @@ void level_interpret_line(const char *filename, int fileline, const char *line)
     param_count = 0;
     if(0 != *p) {
         int quotes;
-        while(*p && param_count<1024) {
+        while(*p && param_count<32) {
             quotes = (*p == '"') && !!(p++); /* short-circuit AND */
             for(q=tmp; *p && ((!quotes && !isspace(*p)) || (quotes && !(*p == '"' && *(p-1) != '\\'))) && q<tmp+1023; *q++ = *p++); *q=0;
             quotes = (*p == '"') && !!(p++);
@@ -869,7 +869,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
     }
-    else if(str_icmp(identifier, "enemy") == 0) {
+    else if(str_icmp(identifier, "enemy") == 0 || str_icmp(identifier, "object") == 0) {
         if(param_count == 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -878,9 +878,9 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 level_create_enemy(name, v2d_new(x, y)); /* old API */
         }
         else
-            logfile_message("Level loader - command 'enemy' expects three parameters: name, xpos, ypos");
+            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
     }
-    else if(str_icmp(identifier, "object") == 0) {
+    else if(str_icmp(identifier, "entity") == 0) {
         if(param_count == 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -888,18 +888,15 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             if(!is_startup_object(name)) {
                 surgescript_object_t* obj = level_create_ssobject(name, v2d_new(x, y));
                 if(obj != NULL) {
-                    /* new API */
                     if(!surgescript_object_has_tag(obj, "entity"))
-                        fatal_error("Can't spawn level object \"%s\": object is not an entity.", name);
+                        fatal_error("Can't spawn entity \"%s\": object is not tagged as 'entity'", name);
                 }
-                else {
-                    /* old API */
-                    level_create_enemy(name, v2d_new(x, y));
-                }
+                else
+                    fatal_error("Can't spawn entity \"%s\": object does not exist", name);
             }
         }
         else
-            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
+            logfile_message("Level loader - command 'entity' expects three parameters: name, xpos, ypos");
     }
     else if(str_icmp(identifier, "startup") == 0) {
         if(param_count > 0) {
@@ -914,15 +911,15 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             for(int i = 0; i < param_count; i++) {
                 if(team_size < TEAM_MAX) {
                     for(int j = 0; j < team_size; j++) {
-                        if(str_icmp(team[j]->name, param[i]) == 0)
-                            fatal_error("Level loader - duplicate entry of player '%s'\nin '%s' near line %d", param[i], filename, fileline);
+                        if(strcmp(team[j]->name, param[i]) == 0)
+                            fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filename, fileline);
                     }
 
-                    logfile_message("loading player '%s'...", param[i]);
+                    logfile_message("Loading player '%s'...", param[i]);
                     team[team_size++] = player_create(param[i]);
                 }
                 else
-                    fatal_error("Level loader - can't have more than %d players per level\nin '%s' near line %d", TEAM_MAX, filename, fileline);
+                    fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filename, fileline);
             }
         }
         else
@@ -949,7 +946,6 @@ void level_init(void *path_to_lev_file)
     video_display_loading_screen();
 
     /* main init */
-    str_cpy(file, filepath, sizeof(file));
     gravity = 787.5;
     level_width = level_height = 0;
     level_timer = 0;
@@ -1499,6 +1495,36 @@ void level_change_player(player_t *new_player)
 }
 
 /*
+ * level_get_player_by_name()
+ * Get a player by its name
+ * Returns NULL if there is no such player
+ */
+player_t* level_get_player_by_name(const char* name)
+{
+    /* simple search */
+    for(int i = 0; i < team_size; i++) {
+        if(strcmp(team[i]->name, name) == 0)
+            return team[i];
+    }
+
+    /* not found */
+    return NULL;
+}
+
+/*
+ * level_get_player_by_id()
+ * Get a player by its ID (index on team[] array)
+ * Returns NULL if there is no such player
+ */
+player_t* level_get_player_by_id(int id)
+{
+    if(id >= 0 && id < team_size)
+        return team[id];
+    else
+        return NULL;
+}
+
+/*
  * level_create_brick()
  * Creates and adds a brick to the level. This function
  * returns a pointer to the created brick.
@@ -2031,12 +2057,12 @@ void update_music()
 /* puts the players at the spawn point */
 void spawn_players()
 {
-    int i, v;
+    int i, j;
 
-    for(i=0; i<team_size; i++) {
-        v = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
+    for(i = 0; i < team_size; i++) {
+        j = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
         team[i]->actor->mirror = ((int)spawn_point.x <= level_width/2) ? IF_NONE : IF_HFLIP;
-        team[i]->actor->spawn_point.x = team[i]->actor->position.x = spawn_point.x + 15*v;
+        team[i]->actor->spawn_point.x = team[i]->actor->position.x = spawn_point.x + 15 * j;
         team[i]->actor->spawn_point.y = team[i]->actor->position.y = spawn_point.y;
     }
 }
@@ -2459,7 +2485,7 @@ bool save_ssobject(surgescript_object_t* object, void* param)
             FILE* fp = (FILE*)param;
             const char* object_name = surgescript_object_name(object);
             v2d_t spawn_point = editor_get_ssobj_spawnpoint(object);
-            fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
+            fprintf(fp, "entity \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
             return true;
         }
     }

@@ -57,19 +57,21 @@ const char* level_author();
 void level_change(const char* path_to_lev_file); /* change the stage. Useful if the .lev is active. */
 int level_persist(); /* persists (saves) the current level */
 
-/* cooperative play */
+/* players */
 void level_change_player(struct player_t *new_player); /* character switching */
-struct player_t* level_player(); /* active player */
 void level_set_spawn_point(v2d_t newpos);
+struct player_t* level_player(); /* active player */
+struct player_t* level_get_player_by_name(const char* name);
+struct player_t* level_get_player_by_id(int id);
 
 /* entities */
-void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
 struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip);
 struct item_t* level_create_item(int id, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
+surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position);
+void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
 void level_add_to_score(int score);
 struct item_t* level_create_animal(v2d_t position);
-surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position);
 
 /* camera */
 void level_set_camera_focus(struct actor_t *act);
