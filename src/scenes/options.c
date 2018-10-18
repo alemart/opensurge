@@ -23,7 +23,6 @@
 #include "util/grouptree.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
-#include "../core/preferences.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/fadefx.h"
@@ -35,6 +34,8 @@
 #include "../core/logfile.h"
 #include "../core/soundfactory.h"
 #include "../core/font.h"
+#include "../core/prefs.h"
+#include "../core/modmanager.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "stageselect.h"
@@ -229,11 +230,12 @@ void options_render()
 /* saves the user preferences */
 void save_preferences()
 {
-    preferences_set_videoresolution( video_get_resolution() );
-    preferences_set_fullscreen( video_is_fullscreen() );
-    preferences_set_smooth( video_is_smooth() );
-    preferences_set_showfps( video_is_fps_visible() );
-    preferences_set_usegamepad( !input_is_joystick_ignored() );
+    prefs_t* prefs = modmanager_prefs();
+    prefs_set_int(prefs, ".resolution", video_get_resolution());
+    prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
+    prefs_set_bool(prefs, ".smoothgfx", video_is_smooth());
+    prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
+    prefs_set_bool(prefs, ".gamepad", !input_is_joystick_ignored());
 }
 
 

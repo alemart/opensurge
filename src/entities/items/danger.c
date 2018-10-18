@@ -120,7 +120,7 @@ void danger_update(item_t* item, player_t** team, int team_size, brick_list_t* b
         player_t *player = team[i];
         if(!player_is_dying(player) && !player->blinking && !player->invincible && actor_collision(act, player->actor)) {
             if(me->player_is_vulnerable(player))
-                player_hit(player, act);
+                player_hit_ex(player, act);
         }
     }
 

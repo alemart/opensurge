@@ -23,7 +23,6 @@
 #include "langselect.h"
 #include "options.h"
 #include "../core/scene.h"
-#include "../core/preferences.h"
 #include "../core/osspec.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
@@ -35,6 +34,8 @@
 #include "../core/timer.h"
 #include "../core/soundfactory.h"
 #include "../core/font.h"
+#include "../core/prefs.h"
+#include "../core/modmanager.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 
@@ -80,10 +81,12 @@ static int sort_cmp(const void *a, const void *b);
  */
 void langselect_init(void *foo)
 {
+    prefs_t* prefs = modmanager_prefs();
+
     option = 0;
     quit = FALSE;
     scene_time = 0;
-    before_the_intro_screen = !preferences_file_exists();
+    before_the_intro_screen = !prefs_has_item(prefs, ".langpath");
     input = input_create_user(NULL);
 
     page_label = font_create("menu.text");
@@ -165,7 +168,7 @@ void langselect_update()
             sound_play( soundfactory_get("select") );
             quit = TRUE;
         }
-        if(input_button_pressed(input, IB_FIRE4) && !before_the_intro_screen) {
+        if(input_button_pressed(input, IB_FIRE4)) {
             sound_play( soundfactory_get("return") );
             quit = TRUE;
         }
@@ -240,7 +243,8 @@ void langselect_render()
 /* saves the user preferences */
 void save_preferences(const char *filepath)
 {
-    preferences_set_languagepath(filepath);
+    prefs_t* prefs = modmanager_prefs();
+    prefs_set_string(prefs, ".langpath", filepath);
 }
 
 /* reads the language list from the languages/ folder */

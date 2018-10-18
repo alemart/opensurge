@@ -191,96 +191,96 @@ prefs_t* prefs_destroy(prefs_t* prefs)
 }
 
 /*
- * prefs_setnull()
+ * prefs_set_null()
  * Sets an entry to null
  */
-void prefs_setnull(prefs_t* prefs, const char* key)
+void prefs_set_null(prefs_t* prefs, const char* key)
 {
     prefs_add_entry(prefs, new_null_entry(key));
 }
 
 /*
- * prefs_getstring()
+ * prefs_get_string()
  * Gets a string from the prefs
  */
-const char* prefs_getstring(prefs_t* prefs, const char* key)
+const char* prefs_get_string(prefs_t* prefs, const char* key)
 {
     prefsentry_t* entry = prefs_find_entry(prefs, key);
     return entry && entry->type == PREFS_STRING ? entry->value.text : "";
 }
 
 /*
- * prefs_setstirng()
+ * prefs_set_string()
  * Sets a string to the prefs
  */
-void prefs_setstring(prefs_t* prefs, const char* key, const char* value)
+void prefs_set_string(prefs_t* prefs, const char* key, const char* value)
 {
     prefs_add_entry(prefs, new_string_entry(key, value));
 }
 
 /*
- * prefs_getint()
+ * prefs_get_int()
  * Gets an integer from the prefs
  */
-int prefs_getint(prefs_t* prefs, const char* key)
+int prefs_get_int(prefs_t* prefs, const char* key)
 {
     prefsentry_t* entry = prefs_find_entry(prefs, key);
     return entry && entry->type == PREFS_INT32 ? entry->value.integer : 0;
 }
 
 /*
- * prefs_setint()
+ * prefs_set_int()
  * Sets an integer to the prefs
  */
-void prefs_setint(prefs_t* prefs, const char* key, int value)
+void prefs_set_int(prefs_t* prefs, const char* key, int value)
 {
     prefs_add_entry(prefs, new_int_entry(key, value));
 }
 
 /*
- * prefs_getdouble()
+ * prefs_get_double()
  * Gets a double from the prefs
  */
-double prefs_getdouble(prefs_t* prefs, const char* key)
+double prefs_get_double(prefs_t* prefs, const char* key)
 {
     prefsentry_t* entry = prefs_find_entry(prefs, key);
     return entry && entry->type == PREFS_FLOAT64 ? entry->value.real : 0.0;
 }
 
 /*
- * prefs_setdouble()
+ * prefs_set_double()
  * Sets a double to the prefs
  */
-void prefs_setdouble(prefs_t* prefs, const char* key, double value)
+void prefs_set_double(prefs_t* prefs, const char* key, double value)
 {
     prefs_add_entry(prefs, new_double_entry(key, value));
 }
 
 /*
- * prefs_getbool()
+ * prefs_get_bool()
  * Gets a boolean from the prefs
  */
-bool prefs_getbool(prefs_t* prefs, const char* key)
+bool prefs_get_bool(prefs_t* prefs, const char* key)
 {
     prefsentry_t* entry = prefs_find_entry(prefs, key);
     return entry && entry->type == PREFS_BOOL ? entry->value.boolean != 0 : false;
 }
 
 /*
- * prefs_setbool()
+ * prefs_set_bool()
  * Sets a boolean to the prefs
  */
-void prefs_setbool(prefs_t* prefs, const char* key, bool value)
+void prefs_set_bool(prefs_t* prefs, const char* key, bool value)
 {
     prefs_add_entry(prefs, new_bool_entry(key, value ? 1 : 0));
 }
 
 /*
- * prefs_itemtype()
+ * prefs_item_type()
  * Checks the type of an entry. Returns:
  * '\0' (null), 's' (string), 'i' (int), 'f' (double), 'b' (bool), '?' (unknown), '-' (not found)
  */
-char prefs_itemtype(prefs_t* prefs, const char* key)
+char prefs_item_type(prefs_t* prefs, const char* key)
 {
     prefsentry_t* entry = prefs_find_entry(prefs, key);
 
@@ -301,21 +301,21 @@ char prefs_itemtype(prefs_t* prefs, const char* key)
 }
 
 /*
- * prefs_hasitem()
+ * prefs_has_item()
  * Checks if the given item exists
  */
-int prefs_hasitem(prefs_t* prefs, const char* key)
+bool prefs_has_item(prefs_t* prefs, const char* key)
 {
     return prefs_find_entry(prefs, key) != NULL;
 }
 
 /*
- * prefs_deleteitem()
+ * prefs_delete_item()
  * Deletes an item. Returns true on success
  */
-int prefs_deleteitem(prefs_t* prefs, const char* key)
+bool prefs_delete_item(prefs_t* prefs, const char* key)
 {
-    return prefs_remove_entry(prefs, key);
+    return prefs_remove_entry(prefs, key) != 0;
 }
 
 /*

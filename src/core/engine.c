@@ -39,7 +39,8 @@
 #include "soundfactory.h"
 #include "lang.h"
 #include "screenshot.h"
-#include "preferences.h"
+#include "modmanager.h"
+#include "prefs.h"
 #include "commandline.h"
 #include "font.h"
 #include "fontext.h"
@@ -75,9 +76,10 @@ static void init_nanocalc();
 static void release_nanocalc();
 static const char* find_basedir(int argc, char *argv[]);
 static const char* fullpath_of(const char* relative_path);
-static int display_langselect_screen = FALSE;
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
+static const char* copyright =  "Open Surge Engine " GAME_VERSION_STRING "\n"
+                                "Copyright (C) 2008-2018 Alexandre Martins";
 
 
 
@@ -148,6 +150,15 @@ void engine_release()
 }
 
 
+/*
+ * engine_copyright()
+ * Copyright data
+ */
+const char* engine_copyright()
+{
+    return copyright;
+}
+
 
 
 /* private functions */
@@ -182,7 +193,7 @@ void init_basic_stuff(const char *basedir) /* basedir may be NULL */
     logfile_init();
     init_nanoparser();
     init_nanocalc();
-    display_langselect_screen = !preferences_init();
+    modmanager_init();
 }
 
 
@@ -252,12 +263,12 @@ void push_initial_scene(commandline_t cmd)
     }
     else if(scripting_testmode()) {
         scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)fullpath_of(SSAPP_LEVEL));
-        scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);       
+        /*scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);*/
     }
     else {
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)fullpath_of(INTRO_QUEST));
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
-        if(display_langselect_screen)
+        if(!prefs_has_item(modmanager_prefs(), ".langpath"))
             scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
     }
 }
@@ -303,6 +314,7 @@ void release_managers()
  */
 void release_basic_stuff()
 {
+    modmanager_release();
     release_nanocalc();
     release_nanoparser();
     logfile_release();

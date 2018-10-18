@@ -29,7 +29,9 @@
 #include "osspec.h"
 #include "video.h"
 #include "lang.h"
-#include "preferences.h"
+#include "prefs.h"
+#include "engine.h"
+#include "modmanager.h"
 
 #ifdef __WIN32__
 #include <allegro.h>
@@ -50,20 +52,21 @@ commandline_t commandline_parse(int argc, char **argv)
 {
     int i;
     commandline_t cmd;
+    prefs_t* prefs = modmanager_prefs();
 
     /* default values */
-    cmd.video_resolution = preferences_get_videoresolution();
-    cmd.smooth_graphics = preferences_get_smooth();
-    cmd.fullscreen = preferences_get_fullscreen();
+    cmd.video_resolution = prefs_has_item(prefs, ".resolution") ? prefs_get_int(prefs, ".resolution") : VIDEORESOLUTION_2X;
+    cmd.smooth_graphics = prefs_get_bool(prefs, ".smoothgfx");
+    cmd.fullscreen = prefs_get_bool(prefs, ".fullscreen");
     cmd.color_depth = max(16, video_get_desktop_color_depth());
-    cmd.show_fps = preferences_get_showfps();
+    cmd.show_fps = prefs_get_bool(prefs, ".showfps");
     cmd.custom_level = FALSE;
     str_cpy(cmd.custom_level_path, "", sizeof(cmd.custom_level_path));
     cmd.custom_quest = FALSE;
     str_cpy(cmd.custom_quest_path, "", sizeof(cmd.custom_quest_path));
-    str_cpy(cmd.language_filepath, preferences_get_languagepath(), sizeof(cmd.language_filepath));
+    str_cpy(cmd.language_filepath, prefs_get_string(prefs, ".langpath"), sizeof(cmd.language_filepath));
     str_cpy(cmd.basedir, "", sizeof(cmd.basedir));
-    cmd.use_gamepad = preferences_get_usegamepad();
+    cmd.use_gamepad = prefs_get_bool(prefs, ".gamepad");
     cmd.optimize_cpu_usage = TRUE;
     cmd.allow_font_smoothing = TRUE;
     cmd.user_argv = NULL;
@@ -79,7 +82,8 @@ commandline_t commandline_parse(int argc, char **argv)
 
         if(str_icmp(argv[i], "--help") == 0) {
             display_message(
-                "%s usage:\n"
+                "%s\n%s\n\n"
+                "usage:\n"
                 "    %s [options ...]\n"
                 "\n"
                 "where options include:\n"
@@ -101,25 +105,22 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --no-font-smoothing       disable antialiased fonts (improves the speed **)\n"
                 "    -- -arg1 -arg2 -arg3...   user-defined arguments (useful for scripting)\n"
                 "\n"
-                "(*) This option may be used to improve the graphic quality using a special algorithm.\n"
-                "    You should NOT use this option on slow computers, since it may imply a severe performance hit.\n"
+                "(*) Not recommended for slow computers.\n"
                 "\n"
-                "(**) These options should be used on slow computers.\n"
+                "(**) Recommended for slow computers.\n"
                 "\n"
                 "(***) Please provide an absolute path. If this option is not specified, then the data files will be loaded\n"
-                "      from the installation folder (and also from $HOME/.%s, if applicable).\n"
-                "\n"
-                "Visit %s at <%s>",
-            GAME_TITLE, basename(argv[0]),
+                "      from the installation folder (and also from $HOME/.%s, if applicable).",
+            engine_copyright(), GAME_WEBSITE,
+            basename(argv[0]),
             VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
             VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4,
-            DEFAULT_LANGUAGE_FILEPATH, GAME_UNIXNAME,
-            GAME_TITLE, GAME_WEBSITE);
+            DEFAULT_LANGUAGE_FILEPATH, GAME_UNIXNAME);
             exit(0);
         }
 
         else if(str_icmp(argv[i], "--version") == 0) {
-            display_message("%s %d.%d.%d", GAME_TITLE, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+            display_message("%d.%d.%d", GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
             exit(0);
         }
 

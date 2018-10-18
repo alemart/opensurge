@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Edits by Dalton Sterritt (all edits released under same license, copyright given to Alexandre):
+ * Edits by Dalton Sterritt (copyright given to Alexandre):
  * player_enable_roll, player_disable_roll
  */
 
@@ -100,8 +100,9 @@ player_t* player_destroy(player_t *player);
 void player_update(player_t *player, struct player_t **team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list);
 void player_render(player_t *player, v2d_t camera_position);
 
-void player_hit(player_t *player, struct actor_t *hazard);
-void player_bounce(player_t *player, struct actor_t *hazard, int is_heavy_object);
+void player_hit(player_t *player, float direction);
+void player_hit_ex(player_t *player, const struct actor_t *hazard);
+void player_bounce(player_t *player, const struct actor_t *hazard, int is_heavy_object);
 void player_kill(player_t *player);
 void player_spring(player_t *player);
 void player_roll(player_t *player);
@@ -137,7 +138,7 @@ int player_is_at_ledge(const player_t *player);
 int player_is_drowning(const player_t *player);
 int player_is_breathing(const player_t *player);
 int player_is_ducking(const player_t *player);
-int player_is_lookingup(const player_t *player);
+int player_is_looking_up(const player_t *player);
 int player_is_waiting(const player_t *player);
 int player_is_winning(const player_t *player);
 

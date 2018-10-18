@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * object_compiler.h - compiles legacy object scripts
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * modmanager.h - MOD Manager
+ * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,11 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _OBJECT_COMPILER_H
-#define _OBJECT_COMPILER_H
+#ifndef _MODMANAGER_H
+#define _MODMANAGER_H
 
-#include "object_vm.h"
+struct prefs_t;
 
-void objectcompiler_compile(object_t *obj, const parsetree_program_t *script);
+/* init & release */
+void modmanager_init();
+void modmanager_release();
+
+/* utilities */
+const char* modmanager_gameid();
+struct prefs_t* modmanager_prefs();
 
 #endif

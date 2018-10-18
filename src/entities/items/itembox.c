@@ -210,7 +210,7 @@ void windshieldbox_strategy(item_t *item, player_t *player)
 
 void trapbox_strategy(item_t *item, player_t *player)
 {
-    player_hit(player, item->actor);
+    player_hit_ex(player, item->actor);
 }
 
 void emptybox_strategy(item_t *item, player_t *player)

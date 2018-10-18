@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Edits by Dalton Sterritt (all edits released under same license, copyright given to Alexandre):
+ * Edits by Dalton Sterritt (copyright given to Alexandre):
  * player_enable_roll, player_disable_roll
  */
 
@@ -391,7 +391,7 @@ void player_render(player_t *player, v2d_t camera_position)
  * player_bounce()
  * Rebound
  */
-void player_bounce(player_t *player, actor_t *hazard, int is_heavy_object)
+void player_bounce(player_t *player, const actor_t *hazard, int is_heavy_object)
 {
     if(physicsactor_is_in_the_air(player->pa)) {
         actor_t *act = player->actor;
@@ -416,19 +416,16 @@ void player_bounce(player_t *player, actor_t *hazard, int is_heavy_object)
 
 /*
  * player_hit()
- * Hits a player. If it has no collectibles, then
- * it must die
+ * Hits a player. If it has no collectibles, then it must die.
+ * tip: direction +1 is right, -1 is left
  */
-void player_hit(player_t *player, actor_t *hazard)
+void player_hit(player_t *player, float direction)
 {
-    int w = image_width(actor_image(hazard))/2, h = image_height(actor_image(hazard))/2;
-    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(w/2, h/2));
-
     if(player->invincible || physicsactor_get_state(player->pa) == PAS_GETTINGHIT || player->blinking || player_is_dying(player))
         return;
 
     if(player_get_collectibles() > 0 || player->shield_type != SH_NONE) {
-        player->actor->speed.x = (physicsactor_get_hitjmp(player->pa) * -0.5f) * sign(player->actor->position.x - hazard_centre.x);
+        player->actor->speed.x = (physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
         player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
         player->actor->position.y -= 2; /* bugfix */
 
@@ -463,6 +460,17 @@ void player_hit(player_t *player, actor_t *hazard)
     }
     else
         player_kill(player);
+}
+
+/*
+ * player_hit_ex()
+ * The same as player_hit(), but you give an actor as a hazard
+ */
+void player_hit_ex(player_t *player, const actor_t *hazard)
+{
+    int w = image_width(actor_image(hazard))/2, h = image_height(actor_image(hazard))/2;
+    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(w/2, h/2));
+    player_hit(player, player->actor->position.x - hazard_centre.x);
 }
 
 
@@ -502,7 +510,7 @@ void player_roll(player_t *player)
 
 /*
  * player_enable_roll()
- * disables player rolling
+ * enables player rolling
  */
 void player_enable_roll(player_t *player)
 {
@@ -821,10 +829,10 @@ int player_is_ducking(const player_t *player)
 }
 
 /*
- * player_is_lookingup()
+ * player_is_looking_up()
  * TRUE iff the player is looking up
  */
-int player_is_lookingup(const player_t *player)
+int player_is_looking_up(const player_t *player)
 {
     return physicsactor_get_state(player->pa) == PAS_LOOKINGUP;
 }
@@ -1159,7 +1167,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     /* smoothing the angle */
     if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
         player_is_stopped(player) || player_is_waiting(player) ||
-        player_is_ducking(player) || player_is_lookingup(player) ||
+        player_is_ducking(player) || player_is_looking_up(player) ||
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
     ))) {

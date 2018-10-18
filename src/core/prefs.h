@@ -22,7 +22,6 @@
 #define _PREFS_H
 
 #include <stdbool.h>
-
 typedef struct prefs_t prefs_t;
 
 /* create & destroy */
@@ -30,22 +29,22 @@ prefs_t* prefs_create(const char* prefsid); /* prefsid is a non-empty string com
 prefs_t* prefs_destroy(prefs_t* prefs);
 
 /* load & store */
-void prefs_setnull(prefs_t* prefs, const char* key);
-const char* prefs_getstring(prefs_t* prefs, const char* key);
-void prefs_setstring(prefs_t* prefs, const char* key, const char* value);
-int prefs_getint(prefs_t* prefs, const char* key);
-void prefs_setint(prefs_t* prefs, const char* key, int value);
-double prefs_getdouble(prefs_t* prefs, const char* key);
-void prefs_setdouble(prefs_t* prefs, const char* key, double value);
-bool prefs_getbool(prefs_t* prefs, const char* key);
-void prefs_setbool(prefs_t* prefs, const char* key, bool value);
+void prefs_set_null(prefs_t* prefs, const char* key);
+const char* prefs_get_string(prefs_t* prefs, const char* key);
+void prefs_set_string(prefs_t* prefs, const char* key, const char* value);
+int prefs_get_int(prefs_t* prefs, const char* key);
+void prefs_set_int(prefs_t* prefs, const char* key, int value);
+double prefs_get_double(prefs_t* prefs, const char* key);
+void prefs_set_double(prefs_t* prefs, const char* key, double value);
+bool prefs_get_bool(prefs_t* prefs, const char* key);
+void prefs_set_bool(prefs_t* prefs, const char* key, bool value);
 
 /* utilities */
 const char* prefs_id(const prefs_t* prefs);
 void prefs_save(const prefs_t* prefs); /* persist the data */
-char prefs_itemtype(prefs_t* prefs, const char* key); /* '\0', 's', 'i', 'f', 'b', '?' (unknown), '-' (not found) */
-int prefs_hasitem(prefs_t* prefs, const char* key);
-int prefs_deleteitem(prefs_t* prefs, const char* key);
+char prefs_item_type(prefs_t* prefs, const char* key); /* '\0', 's', 'i', 'f', 'b', '?' (unknown), '-' (not found) */
+bool prefs_has_item(prefs_t* prefs, const char* key);
+bool prefs_delete_item(prefs_t* prefs, const char* key);
 void prefs_clear(prefs_t* prefs); /* clears all data */
 
 #endif

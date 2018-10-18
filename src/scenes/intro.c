@@ -47,7 +47,7 @@ static const char *text =
  "<color=" COLOR_1 ">"
  GAME_TITLE " " GAME_VERSION_STRING
  "</color>\n"
- "<color=" COLOR_2 ">http://"
+ "<color=" COLOR_2 ">"
  GAME_WEBSITE
  "</color>\n"
  "\n"

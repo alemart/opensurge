@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * engine.h - game engine facade
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,8 @@
 void engine_init(int argc, char **argv);
 void engine_mainloop();
 void engine_release();
+
+const char* engine_copyright();
 
 #endif
 

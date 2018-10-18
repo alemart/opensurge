@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * object_compiler.c - compiles object scripts
+ * object_compiler.c - compiles legacy object scripts
  * Copyright (C) 2010-2013  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Edits by Dalton Sterritt (all edits released under same license, copyright given to Alexandre):
+ * Edits by Dalton Sterritt (copyright given to Alexandre):
  * enable_player_roll, disable_player_roll
  */
 

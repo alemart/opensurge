@@ -1985,7 +1985,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
             }
             else {
                 /* The player has been hit by me */
-                player_hit(player, object->actor);
+                player_hit_ex(player, object->actor);
             }
         }
     }
@@ -2640,7 +2640,7 @@ void hitplayer_update(objectmachine_t *obj, player_t **team, int team_size, bric
     player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
 
     if(!player->invincible && me->should_hit_the_player(player))
-        player_hit(player, object->actor);
+        player_hit_ex(player, object->actor);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
@@ -3997,7 +3997,7 @@ static eventstrategy_t* onplayerledge_new() { return onplayerevent_new(player_is
 static eventstrategy_t* onplayerdrown_new() { return onplayerevent_new(player_is_drowning); }
 static eventstrategy_t* onplayerbreathe_new() { return onplayerevent_new(player_is_breathing); }
 static eventstrategy_t* onplayerduck_new() { return onplayerevent_new(player_is_ducking); }
-static eventstrategy_t* onplayerlookup_new() { return onplayerevent_new(player_is_lookingup); }
+static eventstrategy_t* onplayerlookup_new() { return onplayerevent_new(player_is_looking_up); }
 static eventstrategy_t* onplayerwait_new() { return onplayerevent_new(player_is_waiting); }
 static eventstrategy_t* onplayerwin_new() { return onplayerevent_new(player_is_winning); }
 static eventstrategy_t* onplayerintheair_new() { return onplayerevent_new(player_is_in_the_air); }

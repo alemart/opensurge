@@ -47,6 +47,8 @@
 #include "../core/soundfactory.h"
 #include "../core/nanoparser/nanoparser.h"
 #include "../core/font.h"
+#include "../core/prefs.h"
+#include "../core/modmanager.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
 #include "../entities/player.h"
@@ -939,8 +941,8 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
  */
 void level_init(void *path_to_lev_file)
 {
-    int i;
     const char *filepath = (const char*)path_to_lev_file;
+    int i;
 
     logfile_message("level_init('%s')", filepath);
     video_display_loading_screen();
@@ -971,7 +973,7 @@ void level_init(void *path_to_lev_file)
     particle_init();
 
     /* level init */
-    level_load(file);
+    level_load(filepath);
     spawn_players();
 
     /* dialog box */
@@ -1090,6 +1092,7 @@ void level_update()
         music_resume();
 
     if(quit_level) {
+        music_stop();
         if(fadefx_over()) {
             scenestack_pop();
             quest_abort();
@@ -1384,6 +1387,7 @@ void level_release()
     level_unload();
     camera_release();
     editor_release();
+    prefs_save(modmanager_prefs());
 
     font_destroy(dlgbox_title);
     font_destroy(dlgbox_message);

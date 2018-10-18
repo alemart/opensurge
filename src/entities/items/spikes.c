@@ -170,7 +170,7 @@ void spikes_update(item_t* item, player_t** team, int team_size, brick_list_t* b
                     sound_t *s = soundfactory_get("spikes hit");
                     if(!sound_is_playing(s))
                         sound_play(s);
-                    player_hit(player, item->actor);
+                    player_hit_ex(player, item->actor);
                 }
             }
         }
