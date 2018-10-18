@@ -228,6 +228,7 @@ SET(
   src/core/logfile.c
   src/core/osspec.c
   src/core/preferences.c
+  src/core/prefs.c
   src/core/quest.c
   src/core/resourcemanager.c
   src/core/scene.c
@@ -368,6 +369,7 @@ IF(WIN32)
       src/core/logfile.h
       src/core/osspec.h
       src/core/preferences.h
+      src/core/prefs.h
       src/core/quest.h
       src/core/resourcemanager.h
       src/core/scene.h
