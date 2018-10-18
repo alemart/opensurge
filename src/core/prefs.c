@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <errno.h>
 #include <math.h>
 #include "darray.h"
 #include "prefs.h"
@@ -1051,6 +1052,32 @@ int save(const prefs_t* prefs)
     return success;
 }
 
+#if !defined(_WIN32)
+/* recursive mkdir(): give the absolute path of a file
+   this will create the filepath for you */
+static int mkpath(char* path, mode_t mode)
+{
+    char* p;
+
+    if(path == NULL || *path == '\0')
+        return 0;
+
+    for(p = strchr(path+1, '/'); p != NULL; p = strchr(p + 1, '/')) {
+        *p = '\0';
+        if(mkdir(path, mode) != 0) {
+            if(errno != EEXIST) {
+                *p = '/';
+                prefs_warning("Can't mkpath \"%s\": %s", path, strerror(errno));
+                return -1;
+            }
+        }
+        *p = '/';
+    }
+
+    return 0;
+}
+#endif
+
 /* returns the absolute filepath for a given configuration filename (relative path).
  * You must free() the returned string afterwards */
 char* config_fullpath(const char* filename)
@@ -1070,7 +1097,7 @@ char* config_fullpath(const char* filename)
             for(p = path; *p; p++)
                 darray_push(buf, *p);
             for(p = (char*)filename; *p; p++)
-                darray_push(buf, *p);
+                darray_push(buf, *p != '/' ? *p : '\\');
 
             darray_push(buf, '\0');
             result = clone_str((const char*)buf);
@@ -1087,13 +1114,11 @@ char* config_fullpath(const char* filename)
                 darray_push(buf, *p);
             for(p = path; *p; p++)
                 darray_push(buf, *p);
-            darray_push(buf, '\0');
-            mkdir((const char*)buf, 0755);
-            darray_remove(buf, darray_length(buf) - 1);
             for(p = filename; *p; p++)
                 darray_push(buf, *p);
-
             darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
             result = clone_str((const char*)buf);
             darray_release(buf);
         }
@@ -1118,13 +1143,11 @@ char* config_fullpath(const char* filename)
                 darray_push(buf, *p);
             for(p = path; *p; p++)
                 darray_push(buf, *p);
-            darray_push(buf, '\0');
-            mkdir((const char*)buf, 0755);
-            darray_remove(buf, darray_length(buf) - 1);
             for(p = filename; *p; p++)
-                darray_push(buf, *p);           
-
+                darray_push(buf, *p);
             darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
             result = clone_str((const char*)buf);
             darray_release(buf);
         }
@@ -1150,6 +1173,7 @@ char* config_fullpath(const char* filename)
  * You must free() the returned string after use */
 char* prefs_fullpath(const prefs_t* prefs)
 {
+    const char* folder = prefs->prefsid;
     const char* base = prefs->prefsid;
     const char* ext = ".prefs";
     char* filename, *fullpath;
@@ -1159,8 +1183,10 @@ char* prefs_fullpath(const prefs_t* prefs)
         prefs_fatal("Can't determine prefs_fullpath(): unspecified prefsid");
     }
 
-    filename = mallocx((1 + strlen(base) + strlen(ext)) * sizeof(char));
-    strcpy(filename, base);
+    filename = mallocx((2 + strlen(folder) + strlen(base) + strlen(ext)) * sizeof(char));
+    strcpy(filename, folder);
+    strcat(filename, "/");
+    strcat(filename, base);
     strcat(filename, ext);
     fullpath = config_fullpath(filename);
     free(filename);
