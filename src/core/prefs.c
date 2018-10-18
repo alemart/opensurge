@@ -1173,7 +1173,12 @@ char* config_fullpath(const char* filename)
  * You must free() the returned string after use */
 char* prefs_fullpath(const prefs_t* prefs)
 {
-    const char* folder = prefs->prefsid;
+    #if !defined(_WIN32)
+    const char* folder = prefs->prefsid; /* mod directory */
+    #else
+    const char* folder = "."; /* exe directory */
+    #endif
+
     const char* base = prefs->prefsid;
     const char* ext = ".prefs";
     char* filename, *fullpath;

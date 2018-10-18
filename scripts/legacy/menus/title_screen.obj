@@ -149,7 +149,7 @@ object ".title_screen.version"
 
     state "display"
     {
-        textout "menu.main" 0 0 "$ENGINE_VERSION"
+        textout "menu.text" 0 0 "$ENGINE_WEBSITE"
     }
 }
 
@@ -172,7 +172,7 @@ object ".title_screen.website"
 
     state "display"
     {
-        textout_right "menu.main" 0 0 "$ENGINE_WEBSITE"
+        textout_right "menu.text" 0 0 "v$ENGINE_VERSION"
     }
 }
 
