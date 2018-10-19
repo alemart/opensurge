@@ -53,6 +53,7 @@ object "SurgeEngine"
     camera = spawn("Camera");
     mouse = spawn("Mouse");
     collisions = spawn("CollisionSystem");
+    prefs = spawn("Prefs");
 
     fun get_Actor()
     {
@@ -92,6 +93,11 @@ object "SurgeEngine"
     fun get_Collisions()
     {
         return collisions;
+    }
+
+    fun get_Prefs()
+    {
+        return prefs;
     }
 }
 
