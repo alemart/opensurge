@@ -236,8 +236,8 @@ inputmap "editorcmd2"
         fire2           KEY_2
         fire3           KEY_3
         fire4           KEY_G
-        fire5           KEY_F
-        fire6           KEY_L
+        fire5           KEY_L
+        fire6           KEY_F
         fire7           KEY_Z
         fire8           KEY_Y
     }
@@ -268,48 +268,3 @@ inputmap "editorpal"
         fire1           KEY_ESC
     }
 }
-
-/*
-inputmap "editor1"
-{
-    keyboard
-    {
-        up              KEY_UP
-        right           KEY_RIGHT
-        down            KEY_DOWN
-        left            KEY_LEFT
-        fire1           KEY_N
-        fire2           KEY_B
-        fire3           KEY_LCONTROL
-        fire4           KEY_F12
-    }
-}
-
-inputmap "editor2"
-{
-    keyboard
-    {
-        up              KEY_W
-        right           KEY_D
-        down            KEY_S
-        left            KEY_A
-        fire1           KEY_Z
-        fire2           KEY_Y
-        fire3           KEY_G
-    }
-}
-
-inputmap "editor3"
-{
-    keyboard
-    {
-        fire1           KEY_LSHIFT
-        fire2           KEY_R
-        fire3           KEY_L
-        fire4           KEY_F
-        fire5           KEY_1
-        fire6           KEY_2
-        fire8           KEY_F1
-    }
-}
-*/

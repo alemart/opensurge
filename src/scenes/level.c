@@ -30,6 +30,7 @@
 #include "pause.h"
 #include "quest.h"
 #include "util/editorgrp.h"
+#include "util/editorcmd.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/global.h"
@@ -248,8 +249,7 @@ enum editor_entity_type {
 static int editor_enabled; /* is the level editor enabled? */
 static int editor_previous_video_resolution;
 static int editor_previous_video_smooth;
-static input_t *editor_mouse;
-static input_t *editor_keyboard, *editor_keyboard2, *editor_keyboard3;
+static editorcmd_t* editor_cmd;
 static v2d_t editor_camera, editor_cursor;
 static enum editor_entity_type editor_cursor_entity_type;
 static int editor_cursor_entity_id, editor_cursor_itemid;
@@ -2555,10 +2555,7 @@ void editor_init()
     editor_enemy_category = objects_get_list_of_categories(&editor_enemy_category_length);
 
     /* creating objects */
-    editor_keyboard = input_create_user("editor1");
-    editor_keyboard2 = input_create_user("editor2");
-    editor_keyboard3 = input_create_user("editor3");
-    editor_mouse = input_create_mouse();
+    editor_cmd = editorcmd_create();
     editor_cursor_font = font_create("default");
     editor_properties_font = font_create("default");
     editor_help_font = font_create("default");
@@ -2601,10 +2598,7 @@ void editor_release()
     editor_ssobj_release();
 
     /* destroying objects */
-    input_destroy(editor_keyboard3);
-    input_destroy(editor_keyboard2);
-    input_destroy(editor_keyboard);
-    input_destroy(editor_mouse);
+    editorcmd_destroy(editor_cmd);
     font_destroy(editor_properties_font);
     font_destroy(editor_cursor_font);
     font_destroy(editor_help_font);
@@ -2621,38 +2615,34 @@ void editor_release()
  */
 void editor_update()
 {
+    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     item_list_t *it, *major_items;
     brick_list_t *major_bricks;
     enemy_list_t *major_enemies;
-    image_t *cursor_arrow = sprite_get_image(sprite_get_animation("SD_ARROW", 0), 0);
     int pick_object, delete_object = FALSE;
     int selected_item;
-    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     v2d_t pos;
 
+    /* mouse cursor */
+    editor_cursor = editorcmd_mousepos(editor_cmd);
+
     /* disable the level editor */
-    if(!input_button_down(editor_keyboard, IB_FIRE3) && !input_button_down(editor_keyboard3, IB_FIRE1)) {
-        if(input_button_pressed(editor_keyboard, IB_FIRE4)) {
-            editor_disable();
-            return;
-        }
+    if(editorcmd_is_triggered(editor_cmd, "quit")) {
+        editor_disable();
+        return;
     }
 
     /* save the level */
-    if(input_button_down(editor_keyboard, IB_FIRE3)) {
-        if(input_button_pressed(editor_keyboard, IB_FIRE4)) {
-            editor_save();
-            return;
-        }
+    if(editorcmd_is_triggered(editor_cmd, "save")) {
+        editor_save();
+        return;
     }
 
     /* reload level */
-    if(input_button_down(editor_keyboard3, IB_FIRE1)) {
-        if(input_button_pressed(editor_keyboard, IB_FIRE4)) {
-            confirmboxdata_t cbd = { "Reload the level?", "YES", "NO" };
-            scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
-            return;
-        }
+    if(editorcmd_is_triggered(editor_cmd, "reload")) {
+        confirmboxdata_t cbd = { "Reload the level?", "YES", "NO" };
+        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+        return;
     }
 
     if(1 == confirmbox_selected_option()) {
@@ -2671,13 +2661,13 @@ void editor_update()
     }
 
     /* help */
-    if(input_button_pressed(editor_keyboard3, IB_FIRE8)) {
+    if(editorcmd_is_triggered(editor_cmd, "help")) {
         scenestack_push(storyboard_get_scene(SCENE_EDITORHELP), NULL);
         return;
     }
 
     /* open palette */
-    if(input_button_pressed(editor_keyboard3, IB_FIRE5)) {
+    if(editorcmd_is_triggered(editor_cmd, "open-brick-palette")) {
         if(editor_brick_count > 0) {
             editorpal_config_t config = {
                 .type = EDITORPAL_BRICK,
@@ -2693,7 +2683,7 @@ void editor_update()
         else
             sound_play( soundfactory_get("deny") );
     }
-    else if(input_button_pressed(editor_keyboard3, IB_FIRE6)) {
+    else if(editorcmd_is_triggered(editor_cmd, "open-entity-palette")) {
         if(editor_ssobj_count > 0) {
             editorpal_config_t config = {
                 .type = EDITORPAL_SSOBJ,
@@ -2732,80 +2722,73 @@ void editor_update()
         item_update(it->data, team, team_size, major_bricks, major_items, major_enemies);
 
     /* change class / entity / object category */
-    if(input_button_down(editor_keyboard, IB_FIRE3)) {
-        /* change object category - TODO: remove? */
-        if(editor_cursor_entity_type == EDT_ENEMY) {
-            if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
-                editor_next_object_category();
-            else if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
-                editor_previous_object_category();
-        }
+    if(editorcmd_is_triggered(editor_cmd, "next-category")) {
+        if(editor_cursor_entity_type == EDT_ENEMY) /* change category: legacy objects */
+            editor_next_object_category();
     }
-    else if(input_button_down(editor_keyboard3, IB_FIRE1)) {
-        /* change class */
-        if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
-            editor_next_class();
-        else if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
-            editor_previous_class();
+    else if(editorcmd_is_triggered(editor_cmd, "previous-category")) {
+        if(editor_cursor_entity_type == EDT_ENEMY)
+            editor_previous_object_category();
     }
-    else {
-        /* change entity */
-        if(input_button_pressed(editor_keyboard, IB_FIRE1) || input_button_pressed(editor_mouse, IB_DOWN))
-            editor_next_entity();
-        else if(input_button_pressed(editor_keyboard, IB_FIRE2) || input_button_pressed(editor_mouse, IB_UP))
-            editor_previous_entity();
-    }
+    else if(editorcmd_is_triggered(editor_cmd, "next-class"))
+        editor_next_class();
+    else if(editorcmd_is_triggered(editor_cmd, "previous-class"))
+        editor_previous_class();
+    else if(editorcmd_is_triggered(editor_cmd, "next-item"))
+        editor_next_entity();
+    else if(editorcmd_is_triggered(editor_cmd, "previous-item"))
+        editor_previous_entity();
 
     /* change brick layer */
-    if(input_button_pressed(editor_keyboard3, IB_FIRE3)) {
-        if(editor_cursor_entity_type == EDT_BRICK) {
-            if(!input_button_down(editor_keyboard3, IB_FIRE1))
-                editor_layer = (editor_layer + 1) % 3;
-            else
-                editor_layer = (editor_layer + 2) % 3;
-        }
+    if(editorcmd_is_triggered(editor_cmd, "layer-next")) {
+        if(editor_cursor_entity_type == EDT_BRICK)
+            editor_layer = (editor_layer + 1) % 3;
+        else
+            sound_play( soundfactory_get("deny") );
+    }
+    else if(editorcmd_is_triggered(editor_cmd, "layer-previous")) {
+        if(editor_cursor_entity_type == EDT_BRICK)
+            editor_layer = (editor_layer + 2) % 3;
         else
             sound_play( soundfactory_get("deny") );
     }
 
     /* change brick flip mode */
-    if(input_button_pressed(editor_keyboard3, IB_FIRE4)) {
+    if(editorcmd_is_triggered(editor_cmd, "flip-next")) {
         if(editor_cursor_entity_type == EDT_BRICK) {
-            if(!input_button_down(editor_keyboard3, IB_FIRE1)) {
-                int delta = (3 + editor_flip) / 2;
-                editor_flip = (editor_flip + delta) & BRF_VHFLIP;
-            }
-            else {
-                int delta = 2 + editor_flip + editor_flip / 2;
-                editor_flip = (editor_flip + delta) & BRF_VHFLIP;
-            }
+            int delta = (3 + editor_flip) / 2;
+            editor_flip = (editor_flip + delta) & BRF_VHFLIP;
+        }
+        else
+            sound_play( soundfactory_get("deny") );
+    }
+    else if(editorcmd_is_triggered(editor_cmd, "flip-previous")) {
+        if(editor_cursor_entity_type == EDT_BRICK) {
+            int delta = 2 + editor_flip + editor_flip / 2;
+            editor_flip = (editor_flip + delta) & BRF_VHFLIP;
         }
         else
             sound_play( soundfactory_get("deny") );
     }
 
-    /* mouse cursor. note: editor_mouse is a input_t*, but also a inputmouse_t*, so it's safe to cast it */
-    editor_cursor.x = clip(input_get_xy((inputmouse_t*)editor_mouse).x, 0, VIDEO_SCREEN_W - image_width(cursor_arrow)/2);
-    editor_cursor.y = clip(input_get_xy((inputmouse_t*)editor_mouse).y, 0, VIDEO_SCREEN_H - image_height(cursor_arrow)/2);
-
     /* new spawn point */
-    if(input_button_pressed(editor_mouse, IB_FIRE1) && input_button_down(editor_keyboard, IB_FIRE3)) {
+    if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
         editor_action_t eda = editor_action_spawnpoint_new(TRUE, nsp, spawn_point);
         editor_action_commit(eda);
         editor_action_register(eda);
     }
 
-    /* new object */
-    if(input_button_pressed(editor_mouse, IB_FIRE1) && !input_button_down(editor_keyboard, IB_FIRE3)) {
+    /* put item */
+    if(editorcmd_is_triggered(editor_cmd, "put-item")) {
         editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, editor_grid_snap(editor_cursor));
         editor_action_commit(eda);
         editor_action_register(eda);
     }
 
-    /* pick or delete object */
-    pick_object = input_button_pressed(editor_mouse, IB_FIRE3);
-    delete_object = input_button_pressed(editor_mouse, IB_FIRE2) || editor_is_eraser_enabled();
+    /* pick or delete item */
+    pick_object = editorcmd_is_triggered(editor_cmd, "pick-item");
+    delete_object = editorcmd_is_triggered(editor_cmd, "delete-item") || editor_is_eraser_enabled();
     if(pick_object || delete_object) {
         brick_list_t *itb;
         item_list_t *iti;
@@ -2932,12 +2915,10 @@ void editor_update()
     }
 
     /* undo & redo */
-    if(input_button_down(editor_keyboard, IB_FIRE3)) {
-        if(input_button_pressed(editor_keyboard2, IB_FIRE1))
-            editor_action_undo();
-        else if(input_button_pressed(editor_keyboard2, IB_FIRE2))
-            editor_action_redo();
-    }
+    if(editorcmd_is_triggered(editor_cmd, "undo"))
+        editor_action_undo();
+    else if(editorcmd_is_triggered(editor_cmd, "redo"))
+        editor_action_redo();
 
     /* background */
     editor_update_background();
@@ -2950,8 +2931,8 @@ void editor_update()
 
     /* cursor coordinates */
     font_set_text(editor_cursor_font, "%d,%d", (int)editor_grid_snap(editor_cursor).x, (int)editor_grid_snap(editor_cursor).y);
-    pos.x = clip((int)editor_cursor.x, 10, VIDEO_SCREEN_W-font_get_textsize(editor_cursor_font).x-10);
-    pos.y = clip((int)editor_cursor.y-3*font_get_textsize(editor_cursor_font).y, 10, VIDEO_SCREEN_H-10);
+    pos.x = clip((int)editor_grid_snap(editor_cursor).x - (editor_camera.x - VIDEO_SCREEN_W/2), 10, VIDEO_SCREEN_W-font_get_textsize(editor_cursor_font).x-10);
+    pos.y = clip((int)editor_grid_snap(editor_cursor).y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y, 10, VIDEO_SCREEN_H-10);
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
@@ -3104,7 +3085,7 @@ int editor_is_enabled()
  */
 int editor_want_to_activate()
 {
-    return input_button_pressed(editor_keyboard, IB_FIRE4);
+    return editorcmd_is_triggered(editor_cmd, "enter");
 }
 
 /*
@@ -3178,27 +3159,33 @@ void editor_save()
  */
 void editor_scroll()
 {
+    v2d_t camera_direction = v2d_new(0, 0);
     float camera_speed = 750.0f;
     float dt = timer_get_delta();
 
-    /* camera speed */
-    if(input_button_down(editor_keyboard3, IB_FIRE1))
-        camera_speed *= 5.0f;
+    /* input */
+    if(editorcmd_is_triggered(editor_cmd, "UP"))
+        camera_direction.y -= 5.0f;
+    if(editorcmd_is_triggered(editor_cmd, "RIGHT"))
+        camera_direction.x += 5.0f;
+    if(editorcmd_is_triggered(editor_cmd, "DOWN"))
+        camera_direction.y += 5.0f;
+    if(editorcmd_is_triggered(editor_cmd, "LEFT"))
+        camera_direction.x -= 5.0f;
+    if(editorcmd_is_triggered(editor_cmd, "up"))
+        camera_direction.y -= 1.0f;
+    if(editorcmd_is_triggered(editor_cmd, "right"))
+        camera_direction.x += 1.0f;
+    if(editorcmd_is_triggered(editor_cmd, "down"))
+        camera_direction.y += 1.0f;
+    if(editorcmd_is_triggered(editor_cmd, "left"))
+        camera_direction.x -= 1.0f;
 
-    /* scrolling... */
-    if(input_button_down(editor_keyboard, IB_UP) || input_button_down(editor_keyboard2, IB_UP))
-        editor_camera.y -= camera_speed*dt;
+    /* scroll */
+    if(v2d_magnitude(camera_direction) > EPSILON)
+        editor_camera = v2d_add(v2d_multiply(camera_direction, camera_speed * dt), editor_camera);
 
-    if(input_button_down(editor_keyboard, IB_DOWN) || input_button_down(editor_keyboard2, IB_DOWN))
-        editor_camera.y += camera_speed*dt;
-
-    if(input_button_down(editor_keyboard, IB_LEFT) || input_button_down(editor_keyboard2, IB_LEFT))
-        editor_camera.x-= camera_speed*dt;
-
-    if(input_button_down(editor_keyboard, IB_RIGHT) || input_button_down(editor_keyboard2, IB_RIGHT))
-        editor_camera.x += camera_speed*dt;
-
-    /* make sure it doesn't go off the bounds */
+    /* the camera mustn't go off the bounds */
     editor_camera.x = (int)max(editor_camera.x, VIDEO_SCREEN_W/2);
     editor_camera.y = (int)max(editor_camera.y, VIDEO_SCREEN_H/2);
     camera_set_position(editor_camera);
@@ -3210,23 +3197,25 @@ void editor_scroll()
  */
 int editor_is_eraser_enabled()
 {
-    if(editor_cursor_entity_type == EDT_GROUP) {
-        if(input_button_pressed(editor_mouse, IB_FIRE2))
-            sound_play( soundfactory_get("deny") );
+    const float hold_time = 0.57f; /* the eraser is activated after this amount of seconds */
+    static float timer = 0.0f;
 
-        return FALSE;
+    /* group mode? will erase bricks */
+    if(editor_cursor_entity_type == EDT_GROUP) {
+        if(editorcmd_is_triggered(editor_cmd, "erase-area")) {
+            while(editor_cursor_entity_type != EDT_BRICK)
+                editor_next_class();
+        }
+    }
+
+    /* check if the eraser is enabled */
+    if(editorcmd_is_triggered(editor_cmd, "erase-area")) {
+        timer += timer_get_delta();
+        return timer >= hold_time;
     }
     else {
-        static float timer = 0.0f;
-        if(input_button_down(editor_mouse, IB_FIRE2)) {
-            const float hold_time = 0.57f; /* how many seconds? */
-            timer += timer_get_delta();
-            return timer >= hold_time;
-        }
-        else {
-            timer = 0.0f;
-            return FALSE;
-        }
+        timer = 0.0f;
+        return FALSE;
     }
 }
 
@@ -3770,7 +3759,7 @@ void editor_grid_release()
 /* updates the grid module */
 void editor_grid_update()
 {
-    if(input_button_pressed(editor_keyboard2, IB_FIRE3)) {
+    if(editorcmd_is_triggered(editor_cmd, "snap-to-grid")) {
         editor_grid_enabled = !editor_grid_enabled;
         video_showmessage("Snap to grid: %s", editor_grid_enabled ? "ON" : "OFF");
     }

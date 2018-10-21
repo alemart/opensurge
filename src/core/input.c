@@ -511,7 +511,7 @@ void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
     if(mickey_z != NULL) {
         static int mz, first = TRUE;
         if(first) { mz = mouse_z; first = FALSE; }
-        *mickey_z = mouse_z - mz;
+        *mickey_z = mz - mouse_z;
         mz = mouse_z;
     }
 }

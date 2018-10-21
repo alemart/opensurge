@@ -28,7 +28,7 @@ typedef struct editorcmd_t editorcmd_t;
 
 editorcmd_t* editorcmd_create();
 editorcmd_t* editorcmd_destroy(editorcmd_t* cmd);
-bool editorcmd_is_triggered(const editorcmd_t* cmd, const char* name);
+bool editorcmd_is_triggered(const editorcmd_t* cmd, const char* command_name);
 v2d_t editorcmd_mousepos(const editorcmd_t* cmd);
 
 #endif

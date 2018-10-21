@@ -29,7 +29,7 @@ struct command_t {
     const char* name;
     const char* hotkey;
 };
-static command_t command[] = {
+static const command_t command[] = {
     { "up", "Up" },
     { "up", "W" },
     { "right", "Right" },
@@ -53,22 +53,24 @@ static command_t command[] = {
     { "put-item", "LeftClick" },
     { "pick-item", "MiddleClick" },
     { "delete-item", "RightClick" },
-    { "delete-area", "HoldRightClick" },
-    { "change-spawn", "Ctrl+LeftClick" },
-    { "next", "WheelUp" },
-    { "next", "N" },
-    { "previous", "WheelDown" },
-    { "previous", "B" },
+    { "next-item", "WheelUp" },
+    { "previous-item", "WheelDown" },
+    { "next-class", "Shift+WheelUp" },
+    { "previous-class", "Shift+WheelDown" },
+    { "next-category", "Ctrl+WheelUp" },
+    { "previous-category", "Ctrl+WheelDown" },
+    { "change-spawnpoint", "Ctrl+LeftClick" },
+    { "erase-area", "HoldRightClick" },
     { "undo", "Ctrl+Z" },
     { "redo", "Ctrl+Y" },
     { "help", "F1" },
-    { "grid", "G" },
-    { "palette-brick", "1" },
-    { "palette-entity", "2" },
+    { "snap-to-grid", "G" },
+    { "open-brick-palette", "1" },
+    { "open-entity-palette", "2" },
     { "flip-next", "F" },
     { "flip-previous", "Shift+F" },
-    { "layer-next", "F" },
-    { "layer-previous", "Shift+F" }
+    { "layer-next", "L" },
+    { "layer-previous", "Shift+L" }
 };
 static const int command_count = sizeof(command) / sizeof(command_t);
 static bool hotkey_is_triggered(const editorcmd_t* cmd, const char* hotkey);
@@ -114,10 +116,10 @@ editorcmd_t* editorcmd_destroy(editorcmd_t* cmd)
  * editorcmd_is_triggered()
  * Checks if a certain command (hotkey) is triggered
  */
-bool editorcmd_is_triggered(const editorcmd_t* cmd, const char* name)
+bool editorcmd_is_triggered(const editorcmd_t* cmd, const char* command_name)
 {
     for(int i = 0; i < command_count; i++) {
-        if(0 == strcmp(name, command[i].name)) {
+        if(*command_name == *(command[i].name) && 0 == strcmp(command_name, command[i].name)) {
             if(hotkey_is_triggered(cmd, command[i].hotkey))
                 return true;
         }
@@ -155,6 +157,11 @@ bool hotkey_is_triggered(const editorcmd_t* cmd, const char* hotkey)
                 return false;           
         }
         hotkey = p + 1; /* okay, the modifier is checked */
+    }
+    else {
+        if(input_button_down(cmd->keyboard[0], IB_FIRE1) || input_button_down(cmd->keyboard[0], IB_FIRE2) ||
+        input_button_down(cmd->keyboard[0], IB_FIRE3) || input_button_down(cmd->keyboard[0], IB_FIRE4))
+            return false;
     }
 
     /* check key */
