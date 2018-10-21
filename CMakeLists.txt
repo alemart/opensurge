@@ -244,6 +244,7 @@ SET(
   src/core/video.c
   src/core/hqx.c
 
+  src/scenes/util/editorcmd.c
   src/scenes/util/editorgrp.c
   src/scenes/util/grouptree.c
   src/scenes/confirmbox.c
@@ -387,6 +388,7 @@ IF(WIN32)
       src/core/v2d.h
       src/core/hqx.h
 
+      src/scenes/util/editorcmd.h
       src/scenes/util/editorgrp.h
       src/scenes/util/grouptree.h
       src/scenes/confirmbox.h

@@ -204,6 +204,45 @@ inputmap "backup"
     }
 }
 
+// level editor
+inputmap "editorcmd1"
+{
+    keyboard
+    {
+        up              KEY_UP
+        right           KEY_RIGHT
+        down            KEY_DOWN
+        left            KEY_LEFT
+        fire1           KEY_LCONTROL
+        fire2           KEY_RCONTROL
+        fire3           KEY_LSHIFT
+        fire4           KEY_RSHIFT
+        fire5           KEY_S
+        fire6           KEY_R
+        fire7           KEY_F1
+        fire8           KEY_F12
+    }
+}
+
+inputmap "editorcmd2"
+{
+    keyboard
+    {
+        up              KEY_W
+        right           KEY_D
+        down            KEY_S
+        left            KEY_A
+        fire1           KEY_1
+        fire2           KEY_2
+        fire3           KEY_3
+        fire4           KEY_G
+        fire5           KEY_F
+        fire6           KEY_L
+        fire7           KEY_Z
+        fire8           KEY_Y
+    }
+}
+
 // internals
 inputmap "screenshots"
 {
@@ -230,6 +269,7 @@ inputmap "editorpal"
     }
 }
 
+/*
 inputmap "editor1"
 {
     keyboard
@@ -264,7 +304,7 @@ inputmap "editor3"
     keyboard
     {
         fire1           KEY_LSHIFT
-        fire2           KEY_DEL
+        fire2           KEY_R
         fire3           KEY_L
         fire4           KEY_F
         fire5           KEY_1
@@ -272,3 +312,4 @@ inputmap "editor3"
         fire8           KEY_F1
     }
 }
+*/
