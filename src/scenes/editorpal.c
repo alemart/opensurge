@@ -176,9 +176,9 @@ void editorpal_update()
     if(scroll_max > 0) {
         /* handling the mouse wheel */
         if(input_button_pressed(cursor_input, IB_UP))
-            scroll_y = min(scroll_y + ITEM_BOX_SIZE, scroll_max);
-        else if(input_button_pressed(cursor_input, IB_DOWN))
             scroll_y = max(scroll_y - ITEM_BOX_SIZE, 0);
+        else if(input_button_pressed(cursor_input, IB_DOWN))
+            scroll_y = min(scroll_y + ITEM_BOX_SIZE, scroll_max);
 
         /* handling clicks */
         if(cursor_position.x >= VIDEO_SCREEN_W - SCROLLBAR_WIDTH) {
