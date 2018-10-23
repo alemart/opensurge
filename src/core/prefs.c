@@ -40,13 +40,13 @@
 #include <unistd.h>
 #endif
 
-/* FIXME */
+/* macros */
 #define prefs_fatal fatal_error
 #define prefs_warning logfile_message
 #define prefs_version() (GAME_VERSION_CODE)
 
 /* Where are the prefs stored? */
-#define PREFS_UNIXNAME "opensurge"
+#define PREFS_UNIXNAME GAME_UNIXNAME
 
 /* prefs structure */
 typedef enum prefstype_t prefstype_t;
