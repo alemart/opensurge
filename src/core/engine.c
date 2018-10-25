@@ -78,9 +78,6 @@ static const char* find_basedir(int argc, char *argv[]);
 static const char* fullpath_of(const char* relative_path);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
-static const char* copyright =  "Open Surge Engine " GAME_VERSION_STRING "\n"
-                                "Copyright (C) 2008-2018 Alexandre Martins";
-
 
 
 
@@ -147,16 +144,6 @@ void engine_release()
     release_accessories();
     release_managers();
     release_basic_stuff();
-}
-
-
-/*
- * engine_copyright()
- * Copyright data
- */
-const char* engine_copyright()
-{
-    return copyright;
 }
 
 

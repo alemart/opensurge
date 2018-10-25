@@ -21,33 +21,41 @@
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
 
-/* if this is defined, set it to the bleeding edge release */
-/* otherwise, then we assume we're compiling the stable release */
-/*#define GAME_BUILD_VERSION      1337*/
-
 /* Game data */
 #define GAME_UNIXNAME           "opensurge"
 #define GAME_TITLE              "Open Surge Engine"
 #define GAME_VERSION            0
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        0
-#define GAME_VERSION_CODE       ((GAME_VERSION) * 10000 + (GAME_SUB_VERSION) * 100 + (GAME_WIP_VERSION))
 #define GAME_WEBSITE            "http://opensurge2d.org"
 #define GAME_YEAR               "2008-2018"
 
-/* Cute stuff */
+/* if the following is defined, this is a development build */
+/*#define GAME_BUILD_VERSION      1337*/
+
+/* Data folder (game assets) */
+#ifndef GAME_DATADIR
+#define GAME_DATADIR            "/usr/local/share/games/" GAME_UNIXNAME
+#endif
+
+/* Magic ;) */
+#define _STRINGIFY(x)           #x
+#define STRINGIFY(x)            _STRINGIFY(x)
+
+/* Version code */
+#define GAME_VERSION_CODE       ((GAME_VERSION) * 10000 + (GAME_SUB_VERSION) * 100 + (GAME_WIP_VERSION))
+#ifndef GAME_BUILD_VERSION
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION)
+#else
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION) " build " STRINGIFY(GAME_BUILD_VERSION)
+#endif
+
+/* Deprecated stuff */
 #ifndef GAME_UNIX_INSTALLDIR
 #define GAME_UNIX_INSTALLDIR    "/usr/share/opensurge"
 #endif
-
 #ifndef GAME_UNIX_EXECDIR
 #define GAME_UNIX_EXECDIR       "/usr/bin"
-#endif
-
-#ifndef GAME_BUILD_VERSION
-#define GAME_VERSION_STRING     STRVALUE(GAME_VERSION) "." STRVALUE(GAME_SUB_VERSION) "." STRVALUE(GAME_WIP_VERSION)
-#else
-#define GAME_VERSION_STRING     STRVALUE(GAME_VERSION) "." STRVALUE(GAME_SUB_VERSION) "." STRVALUE(GAME_WIP_VERSION) " build " STRVALUE(GAME_BUILD_VERSION)
 #endif
 
 /* Global definitions and constants */
@@ -78,7 +86,7 @@
 #define TRUE                    1
 #define FALSE                   0
 #define EPSILON                 1e-5
-#define PI                      3.14159265
+#define PI                      3.1415926535
 #define INFINITY                (1<<30)
 
 #ifdef __MSVC__
@@ -88,11 +96,6 @@ static const float ZERO_FLT = 0.0;
 #define INFINITY_FLT            (1.0/0.0)
 #endif
 
-/* Macro hacks ;) */
-#define QUOTEME(x)              #x
-#define STRVALUE(x)             QUOTEME(x)
-
-/* Exact-width integer types */
 #include <stdint.h>
 typedef int8_t int8;
 typedef int16_t int16;

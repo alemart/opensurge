@@ -41,6 +41,10 @@
 
 /* private stuff ;) */
 static void display_message(char *fmt, ...);
+static const char* copyright =  "Open Surge Engine version " GAME_VERSION_STRING "\n"
+                                "Copyright (C) " GAME_YEAR " Alexandre Martins";
+
+
 
 
 
@@ -100,22 +104,19 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --level \"FILEPATH\"        runs the level located at FILEPATH\n"
                 "    --quest \"FILEPATH\"        runs the quest located at FILEPATH\n"
                 "    --language \"FILEPATH\"     sets the language file to FILEPATH (for example, %s)\n"
-                "    --basedir \"/path/to/data\" pretends that all data files are located in the provided folder (***)\n"
+                "    --basedir \"/path/to/data\" loads the game assets from the specified folder (***)\n"
                 "    --full-cpu-usage          uses 100%% of the CPU (**)\n"
                 "    --no-font-smoothing       disable antialiased fonts (improves the speed **)\n"
                 "    -- -arg1 -arg2 -arg3...   user-defined arguments (useful for scripting)\n"
                 "\n"
                 "(*) Not recommended for slow computers.\n"
-                "\n"
                 "(**) Recommended for slow computers.\n"
-                "\n"
-                "(***) Please provide an absolute path. If this option is not specified, then the data files will be loaded\n"
-                "      from the installation folder (and also from $HOME/.%s, if applicable).",
-            engine_copyright(), GAME_WEBSITE,
+                "(***) Please provide an absolute path.",
+            copyright, GAME_WEBSITE,
             basename(argv[0]),
             VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
             VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4,
-            DEFAULT_LANGUAGE_FILEPATH, GAME_UNIXNAME);
+            DEFAULT_LANGUAGE_FILEPATH);
             exit(0);
         }
 
@@ -217,7 +218,8 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else { /* unknown option */
-            display_message("%s: bad command line option \"%s\".\nRun %s --help to get more information.", GAME_UNIXNAME, argv[i], GAME_UNIXNAME);
+            const char* prog = basename(argv[0]);
+            display_message("%s: bad command line option \"%s\".\nRun %s --help to get more information.", prog, argv[i], prog);
             exit(0);
         }
 

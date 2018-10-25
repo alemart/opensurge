@@ -29,11 +29,10 @@
 #include "util.h"
 #include "logfile.h"
 #include "global.h"
+#include "whereami/whereami.h"
 
 /* OS-specific includes */
-#if defined(_WIN32)
-#include <windows.h>
-#else
+#if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -46,7 +45,7 @@
 #define prefs_version() (GAME_VERSION_CODE)
 
 /* Where are the prefs stored? */
-#define PREFS_UNIXNAME GAME_UNIXNAME
+#define PREFS_BASEDIR "opensurge2d"
 
 /* prefs structure */
 typedef enum prefstype_t prefstype_t;
@@ -1062,7 +1061,7 @@ static int mkpath(char* path, mode_t mode)
     if(path == NULL || *path == '\0')
         return 0;
 
-    for(p = strchr(path+1, '/'); p != NULL; p = strchr(p + 1, '/')) {
+    for(p = strchr(path+1, '/'); p != NULL; p = strchr(p+1, '/')) {
         *p = '\0';
         if(mkdir(path, mode) != 0) {
             if(errno != EEXIST) {
@@ -1087,26 +1086,30 @@ char* config_fullpath(const char* filename)
     /* OS-specific routines */
     if(filename != NULL) {
 #if defined(_WIN32)
-        char path[MAX_PATH] = "", *p;
-        if(GetModuleFileNameA(NULL, path, sizeof(path)) != 0) {
+        int len, dirlen = 0;
+        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+            char* path = mallocx((1 + len) * sizeof(*path));
+            const char* p;
             DARRAY(char, buf);
             darray_init(buf);
 
-            if(NULL != (p = strrchr(path, '\\')))
-                p[1] = '\0';
+            wai_getExecutablePath(path, len, &dirlen);
+            path[dirlen] = '\0';
             for(p = path; *p; p++)
                 darray_push(buf, *p);
-            for(p = (char*)filename; *p; p++)
+            darray_push(buf, '\\');
+            for(p = filename; *p; p++)
                 darray_push(buf, *p != '/' ? *p : '\\');
-
             darray_push(buf, '\0');
+
             result = clone_str((const char*)buf);
             darray_release(buf);
+            free(path);
         }
 #elif defined(__APPLE__) && defined(__MACH__)
         struct passwd* userinfo = NULL;
         if(NULL != (userinfo = getpwuid(getuid()))) {
-            const char* path = "/Library/Application Support/" PREFS_UNIXNAME "/", *p;
+            const char* path = "/Library/Application Support/" PREFS_BASEDIR "/", *p;
             DARRAY(char, buf);
             darray_init(buf);
 
@@ -1128,11 +1131,11 @@ char* config_fullpath(const char* filename)
             struct passwd* userinfo = NULL;
             if(NULL != (userinfo = getpwuid(getuid()))) {
                 home = userinfo->pw_dir;
-                path = "/.config/" PREFS_UNIXNAME "/";
+                path = "/.config/" PREFS_BASEDIR "/";
             }
         }
         else
-            path = "/" PREFS_UNIXNAME "/";
+            path = "/" PREFS_BASEDIR "/";
 
         if(home != NULL && path != NULL) {
             const char* p;
@@ -1173,11 +1176,11 @@ char* config_fullpath(const char* filename)
  * You must free() the returned string after use */
 char* prefs_fullpath(const prefs_t* prefs)
 {
-    #if !defined(_WIN32)
-    const char* folder = prefs->prefsid; /* mod directory */
-    #else
-    const char* folder = "."; /* exe directory */
-    #endif
+#if !defined(_WIN32)
+    const char* folder = prefs->prefsid; /* relative path: mod directory */
+#else
+    const char* folder = "."; /* relative path: exe directory */
+#endif
 
     const char* base = prefs->prefsid;
     const char* ext = ".prefs";

@@ -25,7 +25,5 @@ void engine_init(int argc, char **argv);
 void engine_mainloop();
 void engine_release();
 
-const char* engine_copyright();
-
 #endif
 
