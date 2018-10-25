@@ -58,7 +58,7 @@
 
 /* private stuff ;) */
 static void clean_garbage();
-static void init_basic_stuff(const char *basedir);
+static void init_basic_stuff();
 static void init_managers(commandline_t cmd);
 static void init_accessories(commandline_t cmd);
 static void init_game_data();
@@ -74,10 +74,11 @@ static void release_nanoparser();
 static void calc_error(const char *msg);
 static void init_nanocalc();
 static void release_nanocalc();
-static const char* find_basedir(int argc, char *argv[]);
+static const char* find_datadir(int argc, char *argv[]);
 static const char* fullpath_of(const char* relative_path);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
+static const char* datadir = NULL;
 
 
 
@@ -92,9 +93,10 @@ void engine_init(int argc, char **argv)
 {
     commandline_t cmd;
 
-    init_basic_stuff(find_basedir(argc, argv));
-    cmd = commandline_parse(argc, argv);
+    datadir = find_datadir(argc, argv);
+    init_basic_stuff();
 
+    cmd = commandline_parse(argc, argv);
     init_managers(cmd);
     init_accessories(cmd);
     init_game_data();
@@ -171,12 +173,12 @@ void clean_garbage()
  * Initializes the basic stuff, such as Allegro.
  * Call this before anything else.
  */
-void init_basic_stuff(const char *basedir) /* basedir may be NULL */
+void init_basic_stuff()
 {
     set_uformat(U_UTF8);
     allegro_init();
     randomize();
-    osspec_init(basedir);
+    osspec_init(datadir);
     logfile_init();
     init_nanoparser();
     init_nanocalc();
@@ -388,16 +390,16 @@ void release_nanocalc()
 }
 
 /*
- * find_basedir()
- * Parses the command line and tries to find the value of --basedir
+ * find_datadir()
+ * Parses the command line and tries to find the value of --data-dir
  * Returns NULL if there is no such value
  */
-const char* find_basedir(int argc, char *argv[])
+const char* find_datadir(int argc, char *argv[])
 {
     int i;
 
     for(i=0; i<argc; i++) {
-        if(str_icmp(argv[i], "--basedir") == 0) {
+        if(str_icmp(argv[i], "--data-dir") == 0) {
             if(++i < argc)
                 return argv[i];
         }

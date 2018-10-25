@@ -69,7 +69,7 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.custom_quest = FALSE;
     str_cpy(cmd.custom_quest_path, "", sizeof(cmd.custom_quest_path));
     str_cpy(cmd.language_filepath, prefs_get_string(prefs, ".langpath"), sizeof(cmd.language_filepath));
-    str_cpy(cmd.basedir, "", sizeof(cmd.basedir));
+    str_cpy(cmd.datadir, "", sizeof(cmd.datadir));
     cmd.use_gamepad = prefs_get_bool(prefs, ".gamepad");
     cmd.optimize_cpu_usage = TRUE;
     cmd.allow_font_smoothing = TRUE;
@@ -84,30 +84,30 @@ commandline_t commandline_parse(int argc, char **argv)
     /* reading data... */
     for(i=1; i<argc; i++) {
 
-        if(str_icmp(argv[i], "--help") == 0) {
+        if(str_icmp(argv[i], "--help") == 0 || str_icmp(argv[i], "-h") == 0) {
             display_message(
-                "%s\n%s\n\n"
+                "%s\n<%s>\n\n"
                 "usage:\n"
                 "    %s [options ...]\n"
                 "\n"
                 "where options include:\n"
-                "    --help                    displays this message\n"
-                "    --version                 shows the version of this program\n"
-                "    --fullscreen              fullscreen mode\n"
-                "    --windowed                windowed mode\n"
-                "    --resolution X            sets the window size, where X = 1 (%dx%d), 2 (%dx%d), 3 (%dx%d) or 4 (%dx%d)\n"
-                "    --smooth                  improves the graphic quality (*)\n"
-                "    --tiny                    small game window (improves the speed **). This is the same as --resolution 1\n"
-                "    --color-depth X           sets the color depth to X bits/pixel, where X = 16, 24 or 32\n"
-                "    --show-fps                shows the FPS (frames per second) counter\n"
-                "    --use-gamepad             play using a gamepad\n"
-                "    --level \"FILEPATH\"        runs the level located at FILEPATH\n"
-                "    --quest \"FILEPATH\"        runs the quest located at FILEPATH\n"
-                "    --language \"FILEPATH\"     sets the language file to FILEPATH (for example, %s)\n"
-                "    --basedir \"/path/to/data\" loads the game assets from the specified folder (***)\n"
-                "    --full-cpu-usage          uses 100%% of the CPU (**)\n"
-                "    --no-font-smoothing       disable antialiased fonts (improves the speed **)\n"
-                "    -- -arg1 -arg2 -arg3...   user-defined arguments (useful for scripting)\n"
+                "    --help                       displays this message\n"
+                "    --version                    shows the version of this program\n"
+                "    --fullscreen                 fullscreen mode\n"
+                "    --windowed                   windowed mode\n"
+                "    --resolution X               sets the window size, where X = 1 (%dx%d), 2 (%dx%d), 3 (%dx%d) or 4 (%dx%d)\n"
+                "    --smooth                     smooth graphics (*)\n"
+                "    --tiny                       small game window (**). The same as --resolution 1\n"
+                "    --color-depth X              sets the color depth to X bits/pixel, where X = 16, 24 or 32\n"
+                "    --show-fps                   shows the FPS (frames per second) counter\n"
+                "    --use-gamepad                play using a gamepad\n"
+                "    --level \"FILEPATH\"           runs the level located at FILEPATH (e.g., levels/my_level.lev)\n"
+                "    --quest \"FILEPATH\"           runs the quest located at FILEPATH (e.g., quests/my_quest.qst)\n"
+                "    --language \"FILEPATH\"        sets the language file to FILEPATH (e.g., %s)\n"
+                "    --data-dir \"/path/to/data\"   loads the game assets from the specified folder (***)\n"
+                "    --full-cpu-usage             uses 100%% of the CPU (**)\n"
+                "    --no-font-smoothing          disable antialiased fonts (**)\n"
+                "    -- -arg1 -arg2 -arg3...      user-defined arguments (useful for scripting)\n"
                 "\n"
                 "(*) Not recommended for slow computers.\n"
                 "(**) Recommended for slow computers.\n"
@@ -159,9 +159,8 @@ commandline_t commandline_parse(int argc, char **argv)
             if(++i < argc) {
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
-                    int d = 16;
-                    display_message("WARNING: invalid color depth (%d). Changing to %d...", cmd.color_depth, d);
-                    cmd.color_depth = d;
+                    display_message("WARNING: invalid color depth (%d).", cmd.color_depth);
+                    cmd.color_depth = 32;
                 }
             }
         }
@@ -204,9 +203,9 @@ commandline_t commandline_parse(int argc, char **argv)
             }
         }
 
-        else if(str_icmp(argv[i], "--basedir") == 0) {
+        else if(str_icmp(argv[i], "--data-dir") == 0) {
             if(++i < argc)
-                str_cpy(cmd.basedir, argv[i], sizeof(cmd.basedir));
+                str_cpy(cmd.datadir, argv[i], sizeof(cmd.datadir));
         }
 
         else if(str_icmp(argv[i], "--") == 0) {

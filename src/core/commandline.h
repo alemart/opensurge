@@ -40,7 +40,7 @@ typedef struct commandline_t {
 
     /* other */
     char language_filepath[1024];
-    char basedir[1024];
+    char datadir[1024];
     int use_gamepad;
     int optimize_cpu_usage;
     int allow_font_smoothing;
