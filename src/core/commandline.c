@@ -19,6 +19,7 @@
  */
 
 #include <stdarg.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "commandline.h"
@@ -84,100 +85,99 @@ commandline_t commandline_parse(int argc, char **argv)
     /* reading data... */
     for(i=1; i<argc; i++) {
 
-        if(str_icmp(argv[i], "--help") == 0 || str_icmp(argv[i], "-h") == 0) {
+        if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             display_message(
                 "%s\n<%s>\n\n"
                 "usage:\n"
                 "    %s [options ...]\n"
                 "\n"
                 "where options include:\n"
-                "    --help                       displays this message\n"
+                "    --help -h                    displays this message\n"
                 "    --version                    shows the version of this program\n"
                 "    --fullscreen                 fullscreen mode\n"
                 "    --windowed                   windowed mode\n"
                 "    --resolution X               sets the window size, where X = 1 (%dx%d), 2 (%dx%d), 3 (%dx%d) or 4 (%dx%d)\n"
-                "    --smooth                     smooth graphics (*)\n"
-                "    --tiny                       small game window (**). The same as --resolution 1\n"
+                "    --smooth                     display smooth graphics (intensive task)\n"
+                "    --tiny                       the same as --resolution 1 (*)\n"
                 "    --color-depth X              sets the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                   shows the FPS (frames per second) counter\n"
                 "    --use-gamepad                play using a gamepad\n"
-                "    --level \"FILEPATH\"           runs the level located at FILEPATH (e.g., levels/my_level.lev)\n"
-                "    --quest \"FILEPATH\"           runs the quest located at FILEPATH (e.g., quests/my_quest.qst)\n"
-                "    --language \"FILEPATH\"        sets the language file to FILEPATH (e.g., %s)\n"
-                "    --data-dir \"/path/to/data\"   loads the game assets from the specified folder (***)\n"
-                "    --full-cpu-usage             uses 100%% of the CPU (**)\n"
-                "    --no-font-smoothing          disable antialiased fonts (**)\n"
+                "    --level \"filepath\"           runs the level located at filepath (e.g., levels/my_level.lev)\n"
+                "    --quest \"filepath\"           runs the quest located at filepath (e.g., quests/my_quest.qst)\n"
+                "    --language \"filepath\"        sets the language file to filepath (e.g., languages/lang.lng)\n"
+                "    --data-dir \"/path/to/data\"   loads the game assets from the specified folder (**)\n"
+                "    --full-cpu-usage             uses 100%% of the CPU (*)\n"
+                "    --no-font-smoothing          disable antialiased fonts (*)\n"
                 "    -- -arg1 -arg2 -arg3...      user-defined arguments (useful for scripting)\n"
                 "\n"
-                "(*) Not recommended for slow computers.\n"
-                "(**) Recommended for slow computers.\n"
-                "(***) Please provide an absolute path.",
-            copyright, GAME_WEBSITE,
-            basename(argv[0]),
-            VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
-            VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4,
-            DEFAULT_LANGUAGE_FILEPATH);
+                "(*) Recommended for slow computers.\n"
+                "(**) Please provide an absolute path.",
+                copyright, GAME_WEBSITE,
+                basename(argv[0]),
+                VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
+                VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4
+            );
             exit(0);
         }
 
-        else if(str_icmp(argv[i], "--version") == 0) {
-            display_message("%d.%d.%d", GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+        else if(strcmp(argv[i], "--version") == 0) {
+            printf("%d.%d.%d\n", GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
             exit(0);
         }
 
-        else if(str_icmp(argv[i], "--resolution") == 0) {
+        else if(strcmp(argv[i], "--resolution") == 0) {
             if(++i < argc) {
-                if(str_icmp(argv[i], "1") == 0)
+                if(strcmp(argv[i], "1") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_1X;
-                else if(str_icmp(argv[i], "2") == 0)
+                else if(strcmp(argv[i], "2") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_2X;
-                else if(str_icmp(argv[i], "3") == 0)
+                else if(strcmp(argv[i], "3") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_3X;
-                else if(str_icmp(argv[i], "4") == 0)
+                else if(strcmp(argv[i], "4") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_4X;
                 else
                     display_message("WARNING: invalid resolution (%s).", argv[i]);
             }
         }
 
-        else if(str_icmp(argv[i], "--smooth") == 0) {
+        else if(strcmp(argv[i], "--smooth") == 0) {
             cmd.smooth_graphics = TRUE;
             if(cmd.video_resolution == VIDEORESOLUTION_1X)
                 cmd.video_resolution = VIDEORESOLUTION_2X;
         }
 
-        else if(str_icmp(argv[i], "--tiny") == 0)
+        else if(strcmp(argv[i], "--tiny") == 0)
             cmd.video_resolution = VIDEORESOLUTION_1X;
 
-        else if(str_icmp(argv[i], "--fullscreen") == 0)
+        else if(strcmp(argv[i], "--fullscreen") == 0)
             cmd.fullscreen = TRUE;
 
-        else if(str_icmp(argv[i], "--windowed") == 0)
+        else if(strcmp(argv[i], "--windowed") == 0)
             cmd.fullscreen = FALSE;
 
-        else if(str_icmp(argv[i], "--color-depth") == 0) {
+        else if(strcmp(argv[i], "--color-depth") == 0) {
             if(++i < argc) {
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
                     display_message("WARNING: invalid color depth (%d).", cmd.color_depth);
-                    cmd.color_depth = 32;
+                    cmd.color_depth = video_get_desktop_color_depth();
                 }
             }
         }
 
-        else if(str_icmp(argv[i], "--show-fps") == 0)
+        else if(strcmp(argv[i], "--show-fps") == 0)
             cmd.show_fps = TRUE;
 
-        else if(str_icmp(argv[i], "--use-gamepad") == 0)
+        else if(strcmp(argv[i], "--use-gamepad") == 0)
             cmd.use_gamepad = TRUE;
 
-        else if(str_icmp(argv[i], "--full-cpu-usage") == 0)
+        else if(strcmp(argv[i], "--full-cpu-usage") == 0)
             cmd.optimize_cpu_usage = FALSE;
 
-        else if(str_icmp(argv[i], "--no-font-smoothing") == 0)
+        else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;
 
-        else if(str_icmp(argv[i], "--level") == 0) {
+        else if(strcmp(argv[i], "--level") == 0) {
             if(++i < argc) {
                 cmd.custom_level = TRUE;
                 resource_filepath(cmd.custom_level_path, argv[i], sizeof(cmd.custom_level_path), RESFP_READ);
@@ -186,7 +186,7 @@ commandline_t commandline_parse(int argc, char **argv)
             }
         }
 
-        else if(str_icmp(argv[i], "--quest") == 0) {
+        else if(strcmp(argv[i], "--quest") == 0) {
             if(++i < argc) {
                 cmd.custom_quest = TRUE;
                 resource_filepath(cmd.custom_quest_path, argv[i], sizeof(cmd.custom_quest_path), RESFP_READ);
@@ -195,7 +195,7 @@ commandline_t commandline_parse(int argc, char **argv)
             }
         }
 
-        else if(str_icmp(argv[i], "--language") == 0) {
+        else if(strcmp(argv[i], "--language") == 0) {
             if(++i < argc) {
                 resource_filepath(cmd.language_filepath, argv[i], sizeof(cmd.language_filepath), RESFP_READ);
                 if(!filepath_exists(cmd.language_filepath))
@@ -203,12 +203,12 @@ commandline_t commandline_parse(int argc, char **argv)
             }
         }
 
-        else if(str_icmp(argv[i], "--data-dir") == 0) {
+        else if(strcmp(argv[i], "--data-dir") == 0) {
             if(++i < argc)
                 str_cpy(cmd.datadir, argv[i], sizeof(cmd.datadir));
         }
 
-        else if(str_icmp(argv[i], "--") == 0) {
+        else if(strcmp(argv[i], "--") == 0) {
             if(++i < argc) {
                 cmd.user_argv = (const char**)(argv + i);
                 cmd.user_argc = argc - i;
@@ -239,11 +239,11 @@ commandline_t commandline_parse(int argc, char **argv)
  */
 void display_message(char *fmt, ...)
 {
-    char buf[5120];
+    char buf[4096];
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(buf, fmt, args);
+    vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
 #ifdef __WIN32__
