@@ -86,6 +86,7 @@ static inline int vpathncmp(const char* vp1, const char* vp2, int n);
 static inline int vpc(int c) { return (c == '\\') ? '/' : tolower(c); }
 static bool is_asset_folder(const char* path);
 static void scan_default_folders(const char* gameid);
+static bool scan_exedir(assetdir_t* dir);
 static void scan_folder(assetdir_t* dir, const char* abspath);
 static int dircmp(const void* a, const void* b);
 static int filecmp(const void* a, const void* b);
@@ -494,19 +495,10 @@ bool is_asset_folder(const char* path)
 void scan_default_folders(const char* gameid)
 {
 #if defined(_WIN32)
-    int len, dirlen = 0;
     assetfs_log("Scanning assets...");
 
     /* scan asset folder: <exedir> */
-    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-        char* path = mallocx((1 + len) * sizeof(*path));    
-        wai_getExecutablePath(path, len, &dirlen);
-        path[dirlen] = '\0';
-        if(is_asset_folder(path))
-            scan_folder(root, path);
-        free(path);
-    }
-    else {
+    if(!scan_exedir(root)) {
         const char* path = ".";
         assetfs_log("Can't find the application folder: scanning the working dir");
         if(is_asset_folder(path))
@@ -514,25 +506,14 @@ void scan_default_folders(const char* gameid)
     }
 #elif defined(__APPLE__) && defined(__MACH__)
     /* FIXME: untested */
-    int len, dirlen = 0;
     struct passwd* userinfo = NULL;
+    bool must_scan_unixdir = true;
     assetfs_log("Scanning assets...");
 
     /* scan primary asset folder: <exedir>/../Resources */
     if(strcmp(gameid, GAME_UNIXNAME) == 0) {
-        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-            char* data_path = NULL;
-            char* path = mallocx((1 + len) * sizeof(*path));    
-            wai_getExecutablePath(path, len, &dirlen);
-            path[dirlen] = '\0';
-            data_path = join_path(path, "../Resources"); /* use realpath() */
-            if(is_asset_folder(data_path))
-                scan_folder(root, data_path);
-            free(path);
-            free(data_path);
-        }
-        else
-            assetfs_log("Can't find the application folder: game assets may not be loaded");
+        if(scan_exedir(root))
+            must_scan_unixdir = false;
     }
 
     /* scan additional asset folder: ~/Library/<basedir>/<gameid> */
@@ -556,29 +537,30 @@ void scan_default_folders(const char* gameid)
     }
     else
         assetfs_log("Can't find home directory: additional game assets may not be loaded");
+
+    /* fill-in any missing files (if custom gameid) for compatibility purposes */
+    if(strcmp(gameid, GAME_UNIXNAME) != 0) {
+        if(scan_exedir(root))
+            must_scan_unixdir = false;
+    }
+
+    /* scan <unixdir> */
+    if(must_scan_unixdir) {
+        if(is_asset_folder(GAME_DATADIR))
+            scan_folder(root, GAME_DATADIR);
+        else
+            assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
+    }
 #elif defined(__unix__) || defined(__unix)
     const char *home = NULL, *path = NULL;
-    bool must_scan_installdir = true;
-    int len, dirlen = 0;
+    bool must_scan_unixdir = true;
     assetfs_log("Scanning assets...");
 
     /* scan primary asset folder: <exedir> */
     if(strcmp(gameid, GAME_UNIXNAME) == 0) { /* gameid is provisory (should come from the command-line) */
-        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-            char* exedir = mallocx((1 + len) * sizeof(*exedir));
-            wai_getExecutablePath(exedir, len, &dirlen);
-            exedir[dirlen] = '\0';
-            if(is_asset_folder(exedir)) {
-                must_scan_installdir = false;
-                scan_folder(root, exedir);
-            }
-            free(exedir);
-        }
-        else
-            assetfs_log("Can't find the application folder: game assets may not be loaded");
+        if(scan_exedir(root))
+            must_scan_unixdir = false;
     }
-    else
-        must_scan_installdir = false; /* a custom gameid has been specified */
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
     if(NULL == (home = getenv("XDG_DATA_HOME"))) {
@@ -610,8 +592,14 @@ void scan_default_folders(const char* gameid)
         darray_release(buf);
     }
 
-    /* scan primary non-local asset folder: <installdir> */
-    if(must_scan_installdir) { /* skip if local install */
+    /* fill-in any missing files (if custom gameid) for compatibility purposes */
+    if(strcmp(gameid, GAME_UNIXNAME) != 0) {
+        if(scan_exedir(root))
+            must_scan_unixdir = false;
+    }
+
+    /* scan <unixdir> */
+    if(must_scan_unixdir) {
         if(is_asset_folder(GAME_DATADIR))
             scan_folder(root, GAME_DATADIR);
         else
@@ -619,6 +607,51 @@ void scan_default_folders(const char* gameid)
     }
 #else
 #error "Unsupported operating system."
+#endif
+}
+
+/* scan the <exedir>; returns true if it's an asset folder */
+bool scan_exedir(assetdir_t* dir)
+{
+#if defined(__APPLE__) && defined(__MACH__)
+    int len, dirlen = 0;
+    bool success = false;
+
+    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+        char* data_path = NULL;
+        char* exedir = mallocx((1 + len) * sizeof(*exedir));
+        wai_getExecutablePath(exedir, len, &dirlen);
+        exedir[dirlen] = '\0';
+        data_path = join_path(exedir, "../Resources"); /* use realpath() */
+        if(is_asset_folder(data_path)) {
+            success = true;
+            scan_folder(dir, data_path);
+        }
+        free(exedir);
+        free(data_path);
+    }
+    else
+        assetfs_log("Can't find the application folder: game assets may not be loaded");
+
+    return success;
+#else
+    int len, dirlen = 0;
+    bool success = false;
+
+    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+        char* exedir = mallocx((1 + len) * sizeof(*exedir));
+        wai_getExecutablePath(exedir, len, &dirlen);
+        exedir[dirlen] = '\0';
+        if(is_asset_folder(exedir)) {
+            success = true;
+            scan_folder(dir, exedir);
+        }
+        free(exedir);
+    }
+    else
+        assetfs_log("Can't find the application folder: game assets may not be loaded");
+
+    return success;
 #endif
 }
 
