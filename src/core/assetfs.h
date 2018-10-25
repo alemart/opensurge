@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * assetfs.c - assetfs virtual file system
+ * assetfs.c - assetfs virtual filesystem
  * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *

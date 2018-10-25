@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * assetfs.c - assetfs virtual file system
+ * assetfs.c - assetfs virtual filesystem
  * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -32,10 +32,6 @@
 #include "logfile.h"
 #include "global.h"
 
-#ifndef _DEFAULT_SOURCE
-#define _DEFAULT_SOURCE 1
-#endif
-
 /* OS-specific includes */
 #if defined(_WIN32)
 #include <windows.h>
@@ -49,11 +45,11 @@
 #endif
 
 /* Base folder */
-#define ASSETS_BASEDIR "opensurge2d"
+#define ASSETS_BASEDIR    "opensurge2d"
 
 /* aliases */
-#define assetfs_fatal fatal_error
-#define assetfs_warning logfile_message
+#define assetfs_log       logfile_message
+#define assetfs_fatal     fatal_error
 
 /* Defining the filesystem */
 typedef struct assetfile_t assetfile_t;
@@ -82,7 +78,7 @@ static assetdir_t* root = NULL;
 
 /* internal functions */
 static bool is_valid_id(const char* str);
-static char* clone_str(const char* str);
+static inline char* clone_str(const char* str);
 static inline char* join_path(const char* path, const char* basename);
 static inline char* pathify(const char* path);
 static inline int vpathcmp(const char* vp1, const char* vp2);
@@ -122,10 +118,10 @@ void assetfs_init(const char* gameid, const char* datadir)
 
     /* scan the assets */
     if(is_valid_id(gameid)) {
-        assetfs_warning("Loading assets for %s...", gameid);
+        assetfs_log("Loading assets for %s...", gameid);
         if(datadir && *datadir) {
             if(!is_asset_folder(datadir))
-                assetfs_warning("Custom asset folder \"%s\" is either invalid or obsolete.", datadir);
+                assetfs_log("Custom asset folder \"%s\" is either invalid or obsolete.", datadir);
             scan_folder(root, datadir);
         }
         else
@@ -452,7 +448,7 @@ static int mkpath(char* path, mode_t mode)
         if(mkdir(path, mode) != 0) {
             if(errno != EEXIST) {
                 *p = '/';
-                assetfs_warning("Can't mkpath \"%s\": %s", path, strerror(errno));
+                assetfs_log("Can't mkpath \"%s\": %s", path, strerror(errno));
                 return -1;
             }
         }
@@ -481,7 +477,7 @@ bool is_asset_folder(const char* path)
     }
 #endif
     if(!valid)
-        assetfs_warning("Not an asset folder: \"%s\"", path);
+        assetfs_log("Not an asset folder: \"%s\"", path);
     free(fpath);
     return valid;
 }
@@ -493,7 +489,7 @@ void scan_default_folders(const char* gameid)
 {
 #if defined(_WIN32)
     int len, dirlen = 0;
-    assetfs_warning("Scanning assets...");
+    assetfs_log("Scanning assets...");
 
     /* scan asset folder: <exedir> */
     if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
@@ -508,7 +504,7 @@ void scan_default_folders(const char* gameid)
     }
     else {
         const char* path = ".";
-        assetfs_warning("Can't find the application folder: scanning the working dir");
+        assetfs_log("Can't find the application folder: scanning the working dir");
         if(is_asset_folder(path))
             scan_folder(root, path);
         else
@@ -518,7 +514,7 @@ void scan_default_folders(const char* gameid)
     /* FIXME: untested */
     int len, dirlen = 0;
     struct passwd* userinfo = NULL;
-    assetfs_warning("Scanning assets...");
+    assetfs_log("Scanning assets...");
 
     /* scan primary asset folder: <exedir>/../Resources */
     if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
@@ -535,7 +531,7 @@ void scan_default_folders(const char* gameid)
         free(data_path);
     }
     else
-        assetfs_warning("Can't find the application folder: game assets may not be loaded");
+        assetfs_log("Can't find the application folder: game assets may not be loaded");
 
     /* scan additional asset folder: ~/Library/<basedir>/<gameid> */
     if(NULL != (userinfo = getpwuid(getuid()))) {
@@ -557,12 +553,12 @@ void scan_default_folders(const char* gameid)
         darray_release(buf);
     }
     else
-        assetfs_warning("Can't find home directory: additional game assets may not be loaded");
+        assetfs_log("Can't find home directory: additional game assets may not be loaded");
 #elif defined(__unix__) || defined(__unix)
     const char *home = NULL, *path = NULL;
     bool is_local = false;
     int len, dirlen = 0;
-    assetfs_warning("Scanning assets...");
+    assetfs_log("Scanning assets...");
 
     /* scan primary asset folder: <exedir> */
     if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
@@ -576,7 +572,7 @@ void scan_default_folders(const char* gameid)
         free(exedir);
     }
     else
-        assetfs_warning("Can't find the application folder: game assets may not be loaded");
+        assetfs_log("Can't find the application folder: game assets may not be loaded");
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
     if(NULL == (home = getenv("XDG_DATA_HOME"))) {
@@ -625,7 +621,7 @@ void scan_folder(assetdir_t* folder, const char* abspath)
 {
     /* for debugging purposes */
     if(folder == root)
-        assetfs_warning("Scanning \"%s\"...", abspath);
+        assetfs_log("Scanning \"%s\"...", abspath);
 
     do {
 #if defined(_WIN32)
@@ -662,14 +658,14 @@ void scan_folder(assetdir_t* folder, const char* abspath)
                 }
             } while(FindNextFileW(h, &fd));
             if(!FindClose(h))
-                assetfs_warning("Can't close \"%s\": error code %d", abspath, GetLastError());
+                assetfs_log("Can't close \"%s\": error code %d", abspath, GetLastError());
         }
         else
-            assetfs_warning("Can't scan \"%s\": error code %d", abspath, GetLastError());
+            assetfs_log("Can't scan \"%s\": error code %d", abspath, GetLastError());
         free(dirpathw);
     }
     else
-        assetfs_warning("Can't scan \"%s\": MultiByteToWideChar error (%d)", abspath, GetLastError());
+        assetfs_log("Can't scan \"%s\": MultiByteToWideChar error (%d)", abspath, GetLastError());
     free(dirpath);
 #else
     DIR* dir = opendir(abspath);
@@ -718,10 +714,10 @@ void scan_folder(assetdir_t* folder, const char* abspath)
             }
         }
         if(closedir(dir))
-            assetfs_warning("Can't close \"%s\": %s", abspath, strerror(errno));
+            assetfs_log("Can't close \"%s\": %s", abspath, strerror(errno));
     }
     else
-        assetfs_warning("Can't scan \"%s\": %s", abspath, strerror(errno));
+        assetfs_log("Can't scan \"%s\": %s", abspath, strerror(errno));
 #endif
     } while(0);
 }
