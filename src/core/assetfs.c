@@ -100,6 +100,7 @@ static void afs_storefile(assetdir_t* dir, assetfile_t* file);
 static assetfile_t* afs_findfile(assetdir_t* dir, const char* vpath);
 static int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(const char* fullpath, void* param), void* param, bool recursive, bool* stop);
 static void afs_sort(assetdir_t* base);
+static bool afs_empty(assetdir_t* base);
 
 
 
@@ -108,7 +109,7 @@ static void afs_sort(assetdir_t* base);
 /*
  * assetfs_init()
  * Initializes the asset filesystem
- * gameid: a string (lowercase letters, numbers)
+ * gameid: a string (lowercase letters, numbers), or NULL if we have specified no custom gameid
  * datadir: an absolute filepath, or NULL to look for the assets in default places
  */
 void assetfs_init(const char* gameid, const char* datadir)
@@ -117,6 +118,7 @@ void assetfs_init(const char* gameid, const char* datadir)
     root = afs_mkdir(NULL, ".");
 
     /* scan the assets */
+    gameid = gameid && *gameid ? gameid : GAME_UNIXNAME;
     if(is_valid_id(gameid)) {
         assetfs_log("Loading assets for %s...", gameid);
         if(datadir && *datadir) {
@@ -129,6 +131,10 @@ void assetfs_init(const char* gameid, const char* datadir)
     }
     else
         assetfs_fatal("Can't scan assets: invalid gameid \"%s\". Please use only lowercase letters / digits.", gameid);
+
+    /* validate */
+    if(afs_empty(root))
+        assetfs_fatal("Can't load %s: assets not found.", gameid);
 
     /* sort the entries */
     afs_sort(root);
@@ -498,8 +504,6 @@ void scan_default_folders(const char* gameid)
         path[dirlen] = '\0';
         if(is_asset_folder(path))
             scan_folder(root, path);
-        else
-            assetfs_fatal("Can't load %s: assets not found", gameid);
         free(path);
     }
     else {
@@ -507,8 +511,6 @@ void scan_default_folders(const char* gameid)
         assetfs_log("Can't find the application folder: scanning the working dir");
         if(is_asset_folder(path))
             scan_folder(root, path);
-        else
-            assetfs_fatal("Can't load %s: assets not found", gameid);
     }
 #elif defined(__APPLE__) && defined(__MACH__)
     /* FIXME: untested */
@@ -517,21 +519,21 @@ void scan_default_folders(const char* gameid)
     assetfs_log("Scanning assets...");
 
     /* scan primary asset folder: <exedir>/../Resources */
-    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-        char* data_path = NULL;
-        char* path = mallocx((1 + len) * sizeof(*path));    
-        wai_getExecutablePath(path, len, &dirlen);
-        path[dirlen] = '\0';
-        data_path = join_path(path, "../Resources"); /* use realpath() */
-        if(is_asset_folder(data_path))
-            scan_folder(root, data_path);
+    if(strcmp(gameid, GAME_UNIXNAME) == 0) {
+        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+            char* data_path = NULL;
+            char* path = mallocx((1 + len) * sizeof(*path));    
+            wai_getExecutablePath(path, len, &dirlen);
+            path[dirlen] = '\0';
+            data_path = join_path(path, "../Resources"); /* use realpath() */
+            if(is_asset_folder(data_path))
+                scan_folder(root, data_path);
+            free(path);
+            free(data_path);
+        }
         else
-            assetfs_fatal("Can't load %s: assets not found", gameid);
-        free(path);
-        free(data_path);
+            assetfs_log("Can't find the application folder: game assets may not be loaded");
     }
-    else
-        assetfs_log("Can't find the application folder: game assets may not be loaded");
 
     /* scan additional asset folder: ~/Library/<basedir>/<gameid> */
     if(NULL != (userinfo = getpwuid(getuid()))) {
@@ -556,23 +558,27 @@ void scan_default_folders(const char* gameid)
         assetfs_log("Can't find home directory: additional game assets may not be loaded");
 #elif defined(__unix__) || defined(__unix)
     const char *home = NULL, *path = NULL;
-    bool is_local = false;
+    bool must_scan_installdir = true;
     int len, dirlen = 0;
     assetfs_log("Scanning assets...");
 
     /* scan primary asset folder: <exedir> */
-    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-        char* exedir = mallocx((1 + len) * sizeof(*exedir));
-        wai_getExecutablePath(exedir, len, &dirlen);
-        exedir[dirlen] = '\0';
-        if(is_asset_folder(exedir)) {
-            is_local = true;
-            scan_folder(root, exedir);
+    if(strcmp(gameid, GAME_UNIXNAME) == 0) { /* gameid is provisory (should come from the command-line) */
+        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+            char* exedir = mallocx((1 + len) * sizeof(*exedir));
+            wai_getExecutablePath(exedir, len, &dirlen);
+            exedir[dirlen] = '\0';
+            if(is_asset_folder(exedir)) {
+                must_scan_installdir = false;
+                scan_folder(root, exedir);
+            }
+            free(exedir);
         }
-        free(exedir);
+        else
+            assetfs_log("Can't find the application folder: game assets may not be loaded");
     }
     else
-        assetfs_log("Can't find the application folder: game assets may not be loaded");
+        must_scan_installdir = false; /* a custom gameid has been specified */
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
     if(NULL == (home = getenv("XDG_DATA_HOME"))) {
@@ -605,7 +611,7 @@ void scan_default_folders(const char* gameid)
     }
 
     /* scan primary non-local asset folder: <installdir> */
-    if(!is_local) { /* skip if local install */
+    if(must_scan_installdir) { /* skip if local install */
         if(is_asset_folder(GAME_DATADIR))
             scan_folder(root, GAME_DATADIR);
         else
@@ -720,6 +726,25 @@ void scan_folder(assetdir_t* folder, const char* abspath)
         assetfs_log("Can't scan \"%s\": %s", abspath, strerror(errno));
 #endif
     } while(0);
+}
+
+/* checks if a directory is empty */
+bool afs_empty(assetdir_t* base)
+{
+    int i;
+
+    if(darray_length(base->file) > 0)
+        return false;
+
+    if(darray_length(base->dir) > 2) /* skip "." and ".." */
+        return false;
+
+    for(i = 0; i < darray_length(base->dir); i++) { /* just in case... */
+        if(0 != strcmp(base->dir[i].name, ".") && 0 != strcmp(base->dir[i].name, ".."))
+            return false;
+    }
+
+    return true;
 }
 
 /* sort the entries of the directory, recursively */
