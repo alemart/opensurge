@@ -499,11 +499,15 @@ static int mkpath(char* path)
     if(p == NULL) {
         if(strncmp(path, "\\\\", 2) == 0 && isalnum(path[2])) {
             p = strchr(path+2, '\\');
-            if(p == NULL)
+            if(p == NULL) {
                 assetfs_fatal("Can't mkpath \"%s\": invalid path", path);
+                return -1;
+            }
         }
-        else
+        else {
             assetfs_fatal("Can't mkpath \"%s\": not an absolute path", path);
+            return -1;
+        }
     }
     else
         p = p+1;
@@ -511,7 +515,7 @@ static int mkpath(char* path)
     /* make path */
     for(p = strchr(p+1, '\\'); p != NULL; p = strchr(p+1, '\\')) {
         *p = '\0';
-        if(*path && _mkdir(path) != 0) {
+        if(_mkdir(path) != 0) {
             if(errno != EEXIST) {
                 *p = '\\';
                 assetfs_log("Can't mkpath \"%s\": %s", path, strerror(errno));
@@ -877,10 +881,6 @@ char* build_config_fullpath(const char* gameid, const char* vpath)
         assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
         return NULL;
     }
-    else if(!is_valid_id(gameid)) {
-        assetfs_fatal("Can't build path for \"%s\": invalid gameid (%s)", gameid);
-        return NULL;
-    }
 
     /* OS-specific routines */
     if(vpath != NULL) {
@@ -998,10 +998,6 @@ char* build_userdata_fullpath(const char* gameid, const char* vpath)
         assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
         return NULL;
     }
-    else if(!is_valid_id(gameid)) {
-        assetfs_fatal("Can't build path for \"%s\": invalid gameid (%s)", gameid);
-        return NULL;
-    }
 
     /* OS-specific routines */
     if(vpath != NULL) {
@@ -1117,10 +1113,6 @@ char* build_cache_fullpath(const char* gameid, const char* vpath)
     /* sanity check */
     if(!is_valid_writable_vpath(vpath)) {
         assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
-        return NULL;
-    }
-    else if(!is_valid_id(gameid)) {
-        assetfs_fatal("Can't build path for \"%s\": invalid gameid (%s)", gameid);
         return NULL;
     }
 
