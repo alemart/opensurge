@@ -36,6 +36,7 @@
 #if defined(_WIN32)
 #include <windows.h>
 #include <wchar.h>
+#include <direct.h>
 #else
 #include <pwd.h>
 #include <sys/types.h>
@@ -215,6 +216,7 @@ bool is_valid_id(const char* str)
 /* checks the validity of a writable virtual path */
 bool is_valid_writable_vpath(const char* vpath)
 {
+    /* sanity */
     if(strstr(vpath, "../") != NULL || strstr(vpath, "/..") != NULL ||
     strstr(vpath, "..\\") != NULL || strstr(vpath, "\\..") != NULL ||
     strstr(vpath, "//") != NULL || strstr(vpath, "\\\\") != NULL ||
@@ -505,12 +507,9 @@ static int mkpath(char* path)
     }
     else
         p = p+1;
-/*
-puts(path);
-*/
 
     /* make path */
-    for(p = strchr(path+1, '\\'); p != NULL; p = strchr(p+1, '\\')) {
+    for(p = strchr(p+1, '\\'); p != NULL; p = strchr(p+1, '\\')) {
         *p = '\0';
         if(*path && _mkdir(path) != 0) {
             if(errno != EEXIST) {
