@@ -78,6 +78,7 @@ static assetdir_t* root = NULL;
 
 /* internal functions */
 static bool is_valid_id(const char* str);
+static bool is_valid_writable_vpath(const char* vpath);
 static inline char* clone_str(const char* str);
 static inline char* join_path(const char* path, const char* basename);
 static inline char* pathify(const char* path);
@@ -91,6 +92,9 @@ static void scan_folder(assetdir_t* dir, const char* abspath);
 static int dircmp(const void* a, const void* b);
 static int filecmp(const void* a, const void* b);
 static int filematch(const void* key, const void* f);
+static char* build_config_fullpath(const char* gameid, const char* vpath);
+static char* build_userdata_fullpath(const char* gameid, const char* vpath);
+static char* build_cache_fullpath(const char* gameid, const char* vpath);
 
 static assetdir_t* afs_mkdir(assetdir_t* parent, const char* dirname);
 static assetdir_t* afs_rmdir(assetdir_t* base);
@@ -206,6 +210,18 @@ bool is_valid_id(const char* str)
     }
 
     return false;
+}
+
+/* checks the validity of a writable virtual path */
+bool is_valid_writable_vpath(const char* vpath)
+{
+    if(strstr(vpath, "../") != NULL || strstr(vpath, "/..") != NULL ||
+    strstr(vpath, "..\\") != NULL || strstr(vpath, "\\..") != NULL ||
+    strstr(vpath, "//") != NULL || strstr(vpath, "\\\\") != NULL ||
+    strstr(vpath, "~") != NULL || strstr(vpath, ":\\") != NULL)
+        return false;
+
+    return true;
 }
 
 /* duplicates a string */
@@ -440,16 +456,19 @@ int vpathncmp(const char* vp1, const char* vp2, int n)
 
 
 /* OS-specific functions */
-#if !defined(_WIN32)
-/* recursive mkdir(): give the absolute path of a file
+
+/* mkpath(): give the absolute path of a file
    this will create the filepath for you */
+#if !defined(_WIN32)
 static int mkpath(char* path, mode_t mode)
-{   
+{
     char* p;
 
+    /* sanity check */
     if(path == NULL || *path == '\0')
         return 0;
 
+    /* make path */
     for(p = strchr(path+1, '/'); p != NULL; p = strchr(p+1, '/')) {
         *p = '\0';
         if(mkdir(path, mode) != 0) {
@@ -464,7 +483,50 @@ static int mkpath(char* path, mode_t mode)
 
     return 0;
 }
+#else
+static int mkpath(char* path)
+{
+    char* p;
+
+    /* sanity check */
+    if(path == NULL || *path == '\0')
+        return 0;
+
+    /* skip volume; begin as \folder1\folder2\file... */
+    p = strstr(path, ":\\");
+    if(p == NULL) {
+        if(strncmp(path, "\\\\", 2) == 0 && isalnum(path[2])) {
+            p = strchr(path+2, '\\');
+            if(p == NULL)
+                assetfs_fatal("Can't mkpath \"%s\": invalid path", path);
+        }
+        else
+            assetfs_fatal("Can't mkpath \"%s\": not an absolute path", path);
+    }
+    else
+        p = p+1;
+/*
+puts(path);
+*/
+
+    /* make path */
+    for(p = strchr(path+1, '\\'); p != NULL; p = strchr(p+1, '\\')) {
+        *p = '\0';
+        if(*path && _mkdir(path) != 0) {
+            if(errno != EEXIST) {
+                *p = '\\';
+                assetfs_log("Can't mkpath \"%s\": %s", path, strerror(errno));
+                return -1;
+            }
+        }
+        *p = '\\';
+    }
+
+    return 0;
+}
 #endif
+
+
 
 
 /* checks if a certain folder (given its absolute path) is a valid
@@ -506,9 +568,23 @@ void scan_default_folders(const char* gameid)
     }
 #elif defined(__APPLE__) && defined(__MACH__)
     /* FIXME: untested */
-    struct passwd* userinfo = NULL;
+    char* userdatadir = build_userdata_fullpath(gameid, "");
+    char* configdir = build_config_fullpath(gameid, "");
+    char* cachedir = build_cache_fullpath(gameid, "");
     bool must_scan_unixdir = true;
     assetfs_log("Scanning assets...");
+
+    /* scan user-specific config & cache files (must come 1st) */
+    if(configdir != NULL) {
+        mkpath(configdir, 0755);
+        scan_folder(root, configdir);
+        free(configdir);
+    }
+    if(cachedir != NULL) {
+        mkpath(cachedir, 0755);
+        scan_folder(root, cachedir);
+        free(cachedir);
+    }
 
     /* scan primary asset folder: <exedir>/../Resources */
     if(strcmp(gameid, GAME_UNIXNAME) == 0) {
@@ -517,26 +593,13 @@ void scan_default_folders(const char* gameid)
     }
 
     /* scan additional asset folder: ~/Library/<basedir>/<gameid> */
-    if(NULL != (userinfo = getpwuid(getuid()))) {
-        const char* path = "/Library/" ASSETS_BASEDIR "/", *p;
-        DARRAY(char, buf);
-        darray_init(buf);
-
-        for(p = userinfo->pw_dir; *p; p++)
-            darray_push(buf, *p);
-        for(p = path; *p; p++)
-            darray_push(buf, *p);
-        for(p = gameid; *p; p++)
-            darray_push(buf, *p);
-        darray_push(buf, '/'); /* used by mkpath() */
-        darray_push(buf, '\0');
-
-        mkpath((char*)buf, 0755);
-        scan_folder(root, (const char*)buf);
-        darray_release(buf);
+    if(userdatadir != NULL) {
+        mkpath(userdatadir, 0755); /* userdatadir ends with '/' */
+        scan_folder(root, userdatadir);
+        free(userdatadir);
     }
     else
-        assetfs_log("Can't find home directory: additional game assets may not be loaded");
+        assetfs_log("Can't find the userdata directory: additional game assets may not be loaded");
 
     /* fill-in any missing files (if custom gameid) for compatibility purposes */
     if(strcmp(gameid, GAME_UNIXNAME) != 0) {
@@ -552,9 +615,23 @@ void scan_default_folders(const char* gameid)
             assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
     }
 #elif defined(__unix__) || defined(__unix)
-    const char *home = NULL, *path = NULL;
+    char* userdatadir = build_userdata_fullpath(gameid, "");
+    char* configdir = build_config_fullpath(gameid, "");
+    char* cachedir = build_cache_fullpath(gameid, "");
     bool must_scan_unixdir = true;
     assetfs_log("Scanning assets...");
+
+    /* scan user-specific config & cache files (must come 1st) */
+    if(configdir != NULL) {
+        mkpath(configdir, 0755);
+        scan_folder(root, configdir);
+        free(configdir);
+    }
+    if(cachedir != NULL) {
+        mkpath(cachedir, 0755);
+        scan_folder(root, cachedir);
+        free(cachedir);
+    }
 
     /* scan primary asset folder: <exedir> */
     if(strcmp(gameid, GAME_UNIXNAME) == 0) { /* gameid is provisory (should come from the command-line) */
@@ -563,34 +640,13 @@ void scan_default_folders(const char* gameid)
     }
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
-    if(NULL == (home = getenv("XDG_DATA_HOME"))) {
-        struct passwd* userinfo = NULL;
-        if(NULL != (userinfo = getpwuid(getuid()))) {
-            home = userinfo->pw_dir;
-            path = "/.local/share/" ASSETS_BASEDIR "/";
-        }
+    if(userdatadir != NULL) {
+        mkpath(userdatadir, 0755); /* userdatadir ends with '/' */
+        scan_folder(root, userdatadir);
+        free(userdatadir);
     }
     else
-        path = "/" ASSETS_BASEDIR "/";
-
-    if(home != NULL && path != NULL) {
-        const char* p;
-        DARRAY(char, buf);
-        darray_init(buf);
-
-        for(p = home; *p; p++)
-            darray_push(buf, *p);
-        for(p = path; *p; p++)
-            darray_push(buf, *p);
-        for(p = gameid; *p; p++)
-            darray_push(buf, *p);
-        darray_push(buf, '/'); /* used by mkpath() */
-        darray_push(buf, '\0');
-
-        mkpath((char*)buf, 0755);
-        scan_folder(root, (const char*)buf);
-        darray_release(buf);
-    }
+        assetfs_log("Can't find the userdata directory: additional game assets may not be loaded");
 
     /* fill-in any missing files (if custom gameid) for compatibility purposes */
     if(strcmp(gameid, GAME_UNIXNAME) != 0) {
@@ -810,3 +866,370 @@ int filematch(const void* key, const void* f)
 {
     return vpathcmp((const char*)key, (*((assetfile_t**)f))->name);
 }
+
+/* The absolute filepath of a configuration file
+   You'll have to free() this. Returns NULL on error */
+char* build_config_fullpath(const char* gameid, const char* vpath)
+{
+    char* result = NULL;
+
+    /* sanity check */
+    if(!is_valid_writable_vpath(vpath)) {
+        assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
+        return NULL;
+    }
+    else if(!is_valid_id(gameid)) {
+        assetfs_fatal("Can't build path for \"%s\": invalid gameid (%s)", gameid);
+        return NULL;
+    }
+
+    /* OS-specific routines */
+    if(vpath != NULL) {
+#if defined(_WIN32)
+        /* return <exedir>\<vpath> */
+        int len, dirlen = 0;
+        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+            char* path = mallocx((1 + len) * sizeof(*path));
+            const char* p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            wai_getExecutablePath(path, len, &dirlen);
+            path[dirlen] = '\0';
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '\\');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '/' ? *p : '\\');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+            free(path);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find exedir", vpath);
+#elif defined(__APPLE__) && defined(__MACH__)
+        /* return ~/Library/Application Support/<basedir>/<gameid>/<vpath> */
+        struct passwd* userinfo = NULL;
+        if(NULL != (userinfo = getpwuid(getuid()))) {
+            const char* path = "/Library/Application Support/" ASSETS_BASEDIR "/", *p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            for(p = userinfo->pw_dir; *p; p++)
+                darray_push(buf, *p);
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            for(p = gameid; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '/');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '\\' ? *p : '/');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find home directory", vpath);
+#elif defined(__unix__) || defined(__unix)
+        /* return $XDG_CONFIG_HOME/<basedir>/<gameid>/<vpath> */
+        const char *home = NULL, *path = NULL;
+        if(NULL == (home = getenv("XDG_CONFIG_HOME"))) {
+            struct passwd* userinfo = NULL;
+            if(NULL != (userinfo = getpwuid(getuid()))) {
+                home = userinfo->pw_dir;
+                path = "/.config/" ASSETS_BASEDIR "/";
+            }
+        }
+        else
+            path = "/" ASSETS_BASEDIR "/";
+
+        if(home != NULL && path != NULL) {
+            const char* p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            for(p = home; *p; p++)
+                darray_push(buf, *p);
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            for(p = gameid; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '/');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '\\' ? *p : '/');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find the config directory", vpath);
+#else
+        /* Unknown system */
+        ;
+#endif
+
+        /* error? */
+        if(result == NULL) {
+            assetfs_log("Can't find the config directory");
+            return NULL;
+        }
+    }
+    else
+        result = build_config_fullpath(gameid, "");
+
+    /* done! */
+    return result;
+}
+
+/* The absolute filepath of a user-specific (readonly) data file
+   You'll have to free() this. Returns NULL on error */
+char* build_userdata_fullpath(const char* gameid, const char* vpath)
+{
+    char* result = NULL;
+
+    /* sanity check */
+    if(!is_valid_writable_vpath(vpath)) {
+        assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
+        return NULL;
+    }
+    else if(!is_valid_id(gameid)) {
+        assetfs_fatal("Can't build path for \"%s\": invalid gameid (%s)", gameid);
+        return NULL;
+    }
+
+    /* OS-specific routines */
+    if(vpath != NULL) {
+#if defined(_WIN32)
+        /* return <exedir>\<vpath> */
+        int len, dirlen = 0;
+        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+            char* path = mallocx((1 + len) * sizeof(*path));
+            const char* p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            wai_getExecutablePath(path, len, &dirlen);
+            path[dirlen] = '\0';
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '\\');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '/' ? *p : '\\');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+            free(path);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find exedir", vpath);
+#elif defined(__APPLE__) && defined(__MACH__)
+        /* return ~/Library/<basedir>/<gameid>/<vpath> */
+        struct passwd* userinfo = NULL;
+        if(NULL != (userinfo = getpwuid(getuid()))) {
+            const char* path = "/Library/" ASSETS_BASEDIR "/", *p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            for(p = userinfo->pw_dir; *p; p++)
+                darray_push(buf, *p);
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            for(p = gameid; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '/');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '\\' ? *p : '/');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find home directory", vpath);
+#elif defined(__unix__) || defined(__unix)
+        /* return $XDG_DATA_HOME/<basedir>/<gameid>/<vpath> */
+        const char *home = NULL, *path = NULL;
+        if(NULL == (home = getenv("XDG_DATA_HOME"))) {
+            struct passwd* userinfo = NULL;
+            if(NULL != (userinfo = getpwuid(getuid()))) {
+                home = userinfo->pw_dir;
+                path = "/.local/share/" ASSETS_BASEDIR "/";
+            }
+        }
+        else
+            path = "/" ASSETS_BASEDIR "/";
+
+        if(home != NULL && path != NULL) {
+            const char* p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            for(p = home; *p; p++)
+                darray_push(buf, *p);
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            for(p = gameid; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '/');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '\\' ? *p : '/');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find the userdata directory", vpath);
+#else
+        /* Unknown system */
+        ;
+#endif
+
+        /* error? */
+        if(result == NULL) {
+            assetfs_log("Can't find the userdata directory");
+            return NULL;
+        }
+    }
+    else
+        result = build_userdata_fullpath(gameid, "");
+
+    /* done! */
+    return result;
+}
+
+/* The absolute filepath of a user-specific (non-essential, cached and writable) data file
+   You'll have to free() this. Returns NULL on error */
+char* build_cache_fullpath(const char* gameid, const char* vpath)
+{
+    char* result = NULL;
+
+    /* sanity check */
+    if(!is_valid_writable_vpath(vpath)) {
+        assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
+        return NULL;
+    }
+    else if(!is_valid_id(gameid)) {
+        assetfs_fatal("Can't build path for \"%s\": invalid gameid (%s)", gameid);
+        return NULL;
+    }
+
+    /* OS-specific routines */
+    if(vpath != NULL) {
+#if defined(_WIN32)
+        /* return <exedir>\<vpath> */
+        int len, dirlen = 0;
+        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+            char* path = mallocx((1 + len) * sizeof(*path));
+            const char* p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            wai_getExecutablePath(path, len, &dirlen);
+            path[dirlen] = '\0';
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '\\');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '/' ? *p : '\\');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+            free(path);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find exedir", vpath);
+#elif defined(__APPLE__) && defined(__MACH__)
+        /* return ~/Library/Caches/<basedir>/<gameid>/<vpath> */
+        struct passwd* userinfo = NULL;
+        if(NULL != (userinfo = getpwuid(getuid()))) {
+            const char* path = "/Library/Caches/" ASSETS_BASEDIR "/", *p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            for(p = userinfo->pw_dir; *p; p++)
+                darray_push(buf, *p);
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            for(p = gameid; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '/');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '\\' ? *p : '/');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find home directory", vpath);
+#elif defined(__unix__) || defined(__unix)
+        /* return $XDG_CACHE_HOME/<basedir>/<gameid>/<vpath> */
+        const char *home = NULL, *path = NULL;
+        if(NULL == (home = getenv("XDG_CACHE_HOME"))) {
+            struct passwd* userinfo = NULL;
+            if(NULL != (userinfo = getpwuid(getuid()))) {
+                home = userinfo->pw_dir;
+                path = "/.cache/" ASSETS_BASEDIR "/";
+            }
+        }
+        else
+            path = "/" ASSETS_BASEDIR "/";
+
+        if(home != NULL && path != NULL) {
+            const char* p;
+            DARRAY(char, buf);
+            darray_init(buf);
+
+            for(p = home; *p; p++)
+                darray_push(buf, *p);
+            for(p = path; *p; p++)
+                darray_push(buf, *p);
+            for(p = gameid; *p; p++)
+                darray_push(buf, *p);
+            darray_push(buf, '/');
+            for(p = vpath; *p; p++)
+                darray_push(buf, *p != '\\' ? *p : '/');
+            darray_push(buf, '\0');
+
+            mkpath((char*)buf, 0755);
+            result = clone_str((const char*)buf);
+            darray_release(buf);
+        }
+        else
+            assetfs_log("Can't build path for \"%s\": can't find the cache directory", vpath);
+
+#else
+        /* Unknown system */
+        ;
+#endif
+
+        /* error? */
+        if(result == NULL) {
+            assetfs_log("Can't find the cache directory");
+            return NULL;
+        }
+    }
+    else
+        result = build_cache_fullpath(gameid, "");
+
+    /* done! */
+    return result;
+
+}
+
+
