@@ -27,6 +27,7 @@
 #include "storyboard.h"
 #include "util.h"
 #include "osspec.h"
+#include "assetfs.h"
 #include "resourcemanager.h"
 #include "stringutil.h"
 #include "logfile.h"
@@ -182,7 +183,7 @@ void init_basic_stuff()
     logfile_init();
     init_nanoparser();
     init_nanocalc();
-    modmanager_init();
+    modmanager_init(); /* FIXME */
 }
 
 
@@ -192,6 +193,7 @@ void init_basic_stuff()
  */
 void init_managers(commandline_t cmd)
 {
+    assetfs_init(NULL, datadir);
     timer_init(cmd.optimize_cpu_usage);
     video_init(get_window_title(), cmd.video_resolution, cmd.smooth_graphics, cmd.fullscreen, cmd.color_depth);
     video_show_fps(cmd.show_fps);
@@ -288,11 +290,13 @@ void release_accessories()
  */
 void release_managers()
 {
+    modmanager_release();
     input_release();
     video_release();
     resourcemanager_release();
     audio_release();
     timer_release();
+    assetfs_release();
 }
 
 
@@ -303,7 +307,6 @@ void release_managers()
  */
 void release_basic_stuff()
 {
-    modmanager_release();
     release_nanocalc();
     release_nanoparser();
     logfile_release();

@@ -23,10 +23,16 @@
 
 #include <stdbool.h>
 
+/* assetfs virtual filesystem */
 void assetfs_init(const char* gameid, const char* datadir); /* datadir may be NULL (for default locations) */
 void assetfs_release(); /* release the assetfs */
 const char* assetfs_fullpath(const char* vpath); /* give the (absolute) fullpath of a (relative) virtual path */
 bool assetfs_exists(const char* vpath); /* does the given file exist? */
 int assetfs_foreach_file(const char* vpath_of_dir, const char* extension_filter, int (*callback)(const char* fullpath, void* param), void* param, bool recursive); /* foreach file in vpath_of_dir */
+
+/* the following are useful when writing to files */
+const char* assetfs_create_config_file(const char* vpath); /* the fullpath of a user-specific config file */
+const char* assetfs_create_cache_file(const char* vpath); /* user-specific non-essential (cached) data */
+const char* assetfs_create_data_file(const char* vpath); /* game data */
 
 #endif

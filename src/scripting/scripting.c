@@ -295,7 +295,7 @@ void err_fun(const char* message)
 /* compiles a script */
 int compile_script(const char* filepath, void* param)
 {
-    logfile_message("Compiling '%s'...", filepath);
+    /*logfile_message("Compiling '%s'...", filepath);*/
     if(surgescript_vm_compile(vm, filepath))
         return 0;
     else
