@@ -42,8 +42,9 @@
 /* private stuff ;) */
 static const char* basename(const char* path);
 static void display_message(char *fmt, ...);
-static const char* copyright =  "Open Surge Engine version " GAME_VERSION_STRING "\n"
-                                "Copyright (C) " GAME_YEAR " Alexandre Martins";
+static const char* COPYRIGHT = "Open Surge Engine version " GAME_VERSION_STRING "\n"
+                               "Copyright (C) " GAME_YEAR " Alexandre Martins";
+static int COMMANDLINE_UNDEFINED = -1;
 
 
 
@@ -57,9 +58,10 @@ commandline_t commandline_parse(int argc, char **argv)
 {
     int i;
     commandline_t cmd;
-    prefs_t* prefs = modmanager_prefs();
 
-    /* default values */
+    /* initializing values */
+    /*
+    prefs_t* prefs = modmanager_prefs();
     cmd.video_resolution = prefs_has_item(prefs, ".resolution") ? prefs_get_int(prefs, ".resolution") : VIDEORESOLUTION_2X;
     cmd.smooth_graphics = prefs_get_bool(prefs, ".smoothgfx");
     cmd.fullscreen = prefs_get_bool(prefs, ".fullscreen");
@@ -74,6 +76,19 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.use_gamepad = prefs_get_bool(prefs, ".gamepad");
     cmd.optimize_cpu_usage = TRUE;
     cmd.allow_font_smoothing = TRUE;
+    */
+    cmd.video_resolution = COMMANDLINE_UNDEFINED;
+    cmd.smooth_graphics = COMMANDLINE_UNDEFINED;
+    cmd.fullscreen = COMMANDLINE_UNDEFINED;
+    cmd.color_depth = COMMANDLINE_UNDEFINED;
+    cmd.show_fps = COMMANDLINE_UNDEFINED;
+    cmd.custom_level_path[0] = '\0';
+    cmd.custom_quest_path[0] = '\0';
+    cmd.language_filepath[0] = '\0';
+    cmd.datadir[0] = '\0';
+    cmd.use_gamepad = COMMANDLINE_UNDEFINED;
+    cmd.optimize_cpu_usage = COMMANDLINE_UNDEFINED;
+    cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
     cmd.user_argv = NULL;
     cmd.user_argc = 0;
 
@@ -92,27 +107,26 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    %s [options ...]\n"
                 "\n"
                 "where options include:\n"
-                "    --help -h                    displays this message\n"
-                "    --version                    shows the version of this program\n"
+                "    --help -h                    display this message\n"
+                "    --version                    show the version of this program\n"
                 "    --fullscreen                 fullscreen mode\n"
                 "    --windowed                   windowed mode\n"
-                "    --resolution X               sets the window size, where X = 1 (%dx%d), 2 (%dx%d), 3 (%dx%d) or 4 (%dx%d)\n"
+                "    --resolution X               set the window size, where X = 1 (%dx%d), 2 (%dx%d), 3 (%dx%d) or 4 (%dx%d)\n"
                 "    --smooth                     display smooth graphics (intensive task)\n"
-                "    --tiny                       the same as --resolution 1 (*)\n"
-                "    --color-depth X              sets the color depth to X bits/pixel, where X = 16, 24 or 32\n"
-                "    --show-fps                   shows the FPS (frames per second) counter\n"
+                "    --color-depth X              set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
+                "    --show-fps                   show the FPS (frames per second) counter\n"
                 "    --use-gamepad                play using a gamepad\n"
-                "    --level \"filepath\"           runs the specified level (e.g., levels/my_level.lev)\n"
-                "    --quest \"filepath\"           runs the specified quest (e.g., quests/my_quest.qst)\n"
+                "    --level \"filepath\"           run the specified level (e.g., levels/my_level.lev)\n"
+                "    --quest \"filepath\"           run the specified quest (e.g., quests/my_quest.qst)\n"
                 "    --language \"filepath\"        use the specified language (e.g., languages/lang.lng)\n"
-                "    --data-dir \"/path/to/data\"   loads the game assets from the specified folder (**)\n"
-                "    --full-cpu-usage             uses 100%% of the CPU (*)\n"
+                "    --data-dir \"/path/to/data\"   load the game assets from the specified folder (**)\n"
+                "    --full-cpu-usage             use 100%% of the CPU (*)\n"
                 "    --no-font-smoothing          disable antialiased fonts (*)\n"
                 "    -- -arg1 -arg2 -arg3...      user-defined arguments (useful for scripting)\n"
                 "\n"
                 "(*) Recommended for slow computers.\n"
                 "(**) Please provide an absolute path.",
-                copyright, GAME_WEBSITE,
+                COPYRIGHT, GAME_WEBSITE,
                 basename(argv[0]),
                 VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
                 VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4
@@ -146,7 +160,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 cmd.video_resolution = VIDEORESOLUTION_2X;
         }
 
-        else if(strcmp(argv[i], "--tiny") == 0)
+        else if(strcmp(argv[i], "--tiny") == 0) /* obsolete */
             cmd.video_resolution = VIDEORESOLUTION_1X;
 
         else if(strcmp(argv[i], "--fullscreen") == 0)
@@ -160,7 +174,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
                     display_message("WARNING: invalid color depth (%d).", cmd.color_depth);
-                    cmd.color_depth = video_get_desktop_color_depth();
+                    cmd.color_depth = COMMANDLINE_UNDEFINED;
                 }
             }
         }
@@ -178,17 +192,13 @@ commandline_t commandline_parse(int argc, char **argv)
             cmd.allow_font_smoothing = FALSE;
 
         else if(strcmp(argv[i], "--level") == 0) {
-            if(++i < argc) {
-                cmd.custom_level = TRUE;
+            if(++i < argc)
                 str_cpy(cmd.custom_level_path, argv[i], sizeof(cmd.custom_level_path));
-            }
         }
 
         else if(strcmp(argv[i], "--quest") == 0) {
-            if(++i < argc) {
-                cmd.custom_quest = TRUE;
+            if(++i < argc)
                 str_cpy(cmd.custom_quest_path, argv[i], sizeof(cmd.custom_quest_path));
-            }
         }
 
         else if(strcmp(argv[i], "--language") == 0) {
@@ -221,6 +231,25 @@ commandline_t commandline_parse(int argc, char **argv)
     return cmd;
 }
 
+/*
+ * commandline_getint()
+ * Gets an integer from the command line, or use a
+ * default value if it hasn't been specified explicitly
+ */
+int commandline_getint(int value, int default_value)
+{
+    return (value != COMMANDLINE_UNDEFINED) ? value : default_value;
+}
+
+/*
+ * commandline_getstring()
+ * Gets a string from the command line, or use
+ * a default string if it hasn't been specified explicitly
+ */
+const char* commandline_getstring(const char* value, const char* default_string)
+{
+    return (value && *value) ? value : default_string;
+}
 
 
 /* private functions */

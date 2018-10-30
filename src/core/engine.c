@@ -59,11 +59,11 @@
 
 /* private stuff ;) */
 static void clean_garbage();
-static void init_basic_stuff();
-static void init_managers(commandline_t cmd);
-static void init_accessories(commandline_t cmd);
+static void init_basic_stuff(const commandline_t* cmd);
+static void init_managers(const commandline_t* cmd);
+static void init_accessories(const commandline_t* cmd);
 static void init_game_data();
-static void push_initial_scene(commandline_t cmd);
+static void push_initial_scene(const commandline_t* cmd);
 static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
@@ -75,10 +75,8 @@ static void release_nanoparser();
 static void calc_error(const char *msg);
 static void init_nanocalc();
 static void release_nanocalc();
-static const char* find_datadir(int argc, char *argv[]);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
-static const char* datadir = NULL;
 
 
 
@@ -91,17 +89,12 @@ static const char* datadir = NULL;
  */
 void engine_init(int argc, char **argv)
 {
-    commandline_t cmd;
-
-    datadir = find_datadir(argc, argv);
-    init_basic_stuff();
-
-    cmd = commandline_parse(argc, argv);
-    init_managers(cmd);
-    init_accessories(cmd);
+    commandline_t cmd = commandline_parse(argc, argv);
+    init_basic_stuff(&cmd);
+    init_managers(&cmd);
+    init_accessories(&cmd);
     init_game_data();
-
-    push_initial_scene(cmd);
+    push_initial_scene(&cmd);
 }
 
 
@@ -173,12 +166,12 @@ void clean_garbage()
  * Initializes the basic stuff, such as Allegro.
  * Call this before anything else.
  */
-void init_basic_stuff()
+void init_basic_stuff(const commandline_t* cmd)
 {
+    const char* datadir = commandline_getstring(cmd->datadir, NULL);
     set_uformat(U_UTF8);
     allegro_init();
     randomize();
-    osspec_init(datadir);
     assetfs_init(NULL, datadir);
     logfile_init();
     init_nanoparser();
@@ -191,14 +184,31 @@ void init_basic_stuff()
  * init_managers()
  * Initializes the managers
  */
-void init_managers(commandline_t cmd)
+void init_managers(const commandline_t* cmd)
 {
-    timer_init(cmd.optimize_cpu_usage);
-    video_init(get_window_title(), cmd.video_resolution, cmd.smooth_graphics, cmd.fullscreen, cmd.color_depth);
-    video_show_fps(cmd.show_fps);
+    prefs_t* prefs = modmanager_prefs();
+
+    timer_init(
+        commandline_getint(cmd->optimize_cpu_usage, TRUE)
+    );
+    video_init(
+        get_window_title(),
+        commandline_getint(
+            cmd->video_resolution,
+            prefs_has_item(prefs, ".resolution") ? prefs_get_int(prefs, ".resolution") : VIDEORESOLUTION_2X
+        ),
+        commandline_getint(cmd->smooth_graphics, prefs_get_bool(prefs, ".smoothgfx")),
+        commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen")),
+        commandline_getint(cmd->color_depth, video_get_desktop_color_depth())
+    );
+    video_show_fps(
+        commandline_getint(cmd->show_fps, prefs_get_bool(prefs, ".showfps"))
+    );
     audio_init();
     input_init();
-    input_ignore_joystick(!cmd.use_gamepad);
+    input_ignore_joystick(
+        !commandline_getint(cmd->use_gamepad, prefs_get_bool(prefs, ".gamepad"))
+    );
     resourcemanager_init();
 }
 
@@ -207,23 +217,27 @@ void init_managers(commandline_t cmd)
  * init_accessories()
  * Initializes the accessories
  */
-void init_accessories(commandline_t cmd)
+void init_accessories(const commandline_t* cmd)
 {
+    prefs_t* prefs = modmanager_prefs();
+    const char* custom_lang = commandline_getstring(cmd->language_filepath, prefs_get_string(prefs, ".langpath"));
+
     setlocale(LC_NUMERIC, "C"); /* bugfix */
     video_display_loading_screen();
     sprite_init();
-    font_init(cmd.allow_font_smoothing);
+    font_init(commandline_getint(cmd->allow_font_smoothing, TRUE));
     fontext_register_variables();
     soundfactory_init();
     charactersystem_init();
     objects_init();
-    scripting_init(cmd.user_argc, cmd.user_argv);
+    scripting_init(cmd->user_argc, cmd->user_argv);
     storyboard_init();
     screenshot_init();
     fadefx_init();
     lang_init();
-    if(strcmp(cmd.language_filepath, "") != 0)
-        lang_loadfile(cmd.language_filepath);
+    if(*custom_lang)
+        lang_loadfile(custom_lang);
+    
     scenestack_init();
 }
 
@@ -242,13 +256,16 @@ void init_game_data()
  * push_initial_scene()
  * Decides which scene should be pushed into the scene stack
  */
-void push_initial_scene(commandline_t cmd)
+void push_initial_scene(const commandline_t* cmd)
 {
-    if(cmd.custom_level) {
-        scenestack_push(storyboard_get_scene(SCENE_LEVEL), cmd.custom_level_path);
+    int custom_level = *(commandline_getstring(cmd->custom_level_path, "")) != '\0';
+    int custom_quest = *(commandline_getstring(cmd->custom_quest_path, "")) != '\0';
+
+    if(custom_level) {
+        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)(commandline_getstring(cmd->custom_level_path, "")));
     }
-    else if(cmd.custom_quest) {
-        scenestack_push(storyboard_get_scene(SCENE_QUEST), cmd.custom_quest_path);
+    else if(custom_quest) {
+        scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)(commandline_getstring(cmd->custom_quest_path, "")));
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
     }
     else if(scripting_testmode()) {
@@ -309,7 +326,6 @@ void release_basic_stuff()
     release_nanocalc();
     release_nanoparser();
     logfile_release();
-    osspec_release();
     allegro_exit();
 }
 
@@ -389,25 +405,4 @@ void release_nanocalc()
 {
     nanocalc_addons_release();
     nanocalc_release();
-}
-
-/*
- * find_datadir()
- * Parses the command line and tries to find the value of --data-dir
- * Returns NULL if there is no such value
- */
-const char* find_datadir(int argc, char *argv[])
-{
-    int i;
-
-    for(i=0; i<argc; i++) {
-        if(str_icmp(argv[i], "--data-dir") == 0) {
-            if(++i < argc)
-                return argv[i];
-        }
-        else if(str_icmp(argv[i], "--") == 0)
-            return NULL;
-    }
-
-    return NULL;
 }

@@ -30,25 +30,25 @@ typedef struct commandline_t {
     int color_depth; /* bits per pixel */
     int show_fps;
 
-    /* run custom level */
-    int custom_level; /* user needs to run a custom level? */
+    /* run custom level / quest */
     char custom_level_path[1024]; /* filepath */
-
-    /* run custom quest */
-    int custom_quest; /* user needs to run a custom quest? */
     char custom_quest_path[1024]; /* filepath */
 
-    /* other */
+    /* other options */
     char language_filepath[1024];
     char datadir[1024];
     int use_gamepad;
     int optimize_cpu_usage;
     int allow_font_smoothing;
-    const char** user_argv; /* user arguments: what comes after "--" */
+
+    /* user arguments: what comes after "--" */
+    const char** user_argv;
     int user_argc;
 } commandline_t;
 
 /* command line interface */
 commandline_t commandline_parse(int argc, char **argv);
+int commandline_getint(int value, int default_value);
+const char* commandline_getstring(const char* value, const char* default_string);
 
 #endif
