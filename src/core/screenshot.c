@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * screenshot.c - screenshots module
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,8 @@
 /* private data */
 #define MAX_SCREENSHOTS     (1 << 30)
 static input_t *in;
-static const char *next_available_filename();
+static const char* screenshot_filename(int screenshot_id);
+static int next_screenshot_id = 0;
 
 /*
  * screenshot_init()
@@ -36,7 +37,12 @@ static const char *next_available_filename();
  */
 void screenshot_init()
 {
+    /* Create the input object */
     in = input_create_user("screenshots");
+
+    /* What's the next screenshot? */
+    while(assetfs_exists(screenshot_filename(next_screenshot_id)) &&
+    ++next_screenshot_id < MAX_SCREENSHOTS);
 }
 
 
@@ -49,9 +55,9 @@ void screenshot_update()
 {
     /* take the snapshot! (press the '=' key or the 'printscreen' key) */
     if(input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE2)) {
-        const char *filename = next_available_filename();
+        const char *filename = screenshot_filename(next_screenshot_id++);
         image_save(video_get_window_surface(), filename);
-        video_showmessage("\"%s\" saved", filename);
+        video_showmessage("New screenshot: %s", filename);
         logfile_message("New screenshot: \"%s\"", filename);
     }
 }
@@ -63,6 +69,7 @@ void screenshot_update()
  */
 void screenshot_release()
 {
+    /* We're done with the input object */
     input_destroy(in);
 }
 
@@ -72,15 +79,9 @@ void screenshot_release()
 
 
 /* misc */
-const char *next_available_filename()
+const char* screenshot_filename(int screenshot_id)
 {
     static char filename[32];
-
-    for(int i = 0; i < MAX_SCREENSHOTS; i++) {
-        snprintf(filename, sizeof(filename), "screenshots/s%03d.png", i);
-        if(!assetfs_exists(filename))
-            return filename;
-    }
-
+    snprintf(filename, sizeof(filename), "screenshots/s%03d.png", screenshot_id);
     return filename;
 }

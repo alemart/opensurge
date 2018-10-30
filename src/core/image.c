@@ -111,7 +111,7 @@ image_t *image_load(const char *path)
 void image_save(const image_t *img, const char *path)
 {
     int i, j, c, bpp = video_get_color_depth();
-    const char* fullpath = assetfs_create_data_file(path);
+    const char* fullpath = assetfs_create_cache_file(path);
 
     logfile_message("image_save(\"%s\")", fullpath);
 
