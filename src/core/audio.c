@@ -21,7 +21,7 @@
 #include <allegro.h>
 #include <stdlib.h>
 #include "audio.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "stringutil.h"
 #include "resourcemanager.h"
 #include "logfile.h"
@@ -100,15 +100,14 @@ static music_t *current_music; /* music being played at the moment (NULL if none
 #ifndef __USE_OPENAL__
 music_t *music_load(const char *path)
 {
-    char abs_path[1024];
     music_t *m;
 
     if(*path == '\0') /* empty path */
         return NULL;
 
     if(NULL == (m = resourcemanager_find_music(path))) {
-        resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
-        logfile_message("music_load('%s')", abs_path);
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("music_load('%s')", fullpath);
 
         /* build the music object */
         m = mallocx(sizeof *m);
@@ -117,7 +116,7 @@ music_t *music_load(const char *path)
         m->elapsed_time = 0.0f;
 
         /* load the ogg stream */
-        m->stream = logg_get_stream(abs_path, 255, 128, 0);
+        m->stream = logg_get_stream(fullpath, 255, 128, 0);
         if(m->stream == NULL) {
             logfile_message("music_load() error: can't get ogg stream");
             free(m);
@@ -139,15 +138,14 @@ music_t *music_load(const char *path)
 #else
 music_t *music_load(const char *path)
 {
-    char abs_path[1024];
     music_t *m;
 
     if(*path == '\0') /* empty path */
         return NULL;
 
     if(NULL == (m = resourcemanager_find_music(path))) {
-        resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
-        logfile_message("music_load('%s')", abs_path);
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("music_load('%s')", fullpath);
 
         /* build the music object */
         m = mallocx(sizeof *m);
@@ -155,7 +153,7 @@ music_t *music_load(const char *path)
         m->is_paused = FALSE;
 
         /* load the stream */
-        if(!(IS_VALID_FORMAT(path) && (m->stream = alureCreateStreamFromFile(abs_path, 250000, 0, NULL)))) {
+        if(!(IS_VALID_FORMAT(path) && (m->stream = alureCreateStreamFromFile(fullpath, 250000, 0, NULL)))) {
 
             if(!IS_VALID_FORMAT(path)) {
                 logfile_message("music_load() invalid file format");
@@ -487,19 +485,18 @@ float music_duration()
 #ifndef __USE_OPENAL__
 sound_t *sound_load(const char *path)
 {
-    char abs_path[1024];
     sound_t *s;
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
-        resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
-        logfile_message("sound_load('%s')", abs_path);
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("sound_load('%s')", fullpath);
 
         /* build the sound object */
         s = mallocx(sizeof *s);
         s->voice_id = SOUND_INVALID_VOICE;
 
         /* loading the sample */
-        if(NULL == (s->data = IS_OGG(path) ? logg_load(abs_path) : load_sample(abs_path))) {
+        if(NULL == (s->data = IS_OGG(path) ? logg_load(fullpath) : load_sample(fullpath))) {
             logfile_message("sound_load() error: %s", allegro_error);
             free(s);
             return NULL;
@@ -520,15 +517,14 @@ sound_t *sound_load(const char *path)
 #else
 sound_t *sound_load(const char *path)
 {
-    char abs_path[1024];
     sound_t *s;
 
     if(quiet)
         return NULL;
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
-        resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
-        logfile_message("sound_load('%s')", abs_path);
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("sound_load('%s')", fullpath);
 
         /* build the sound object */
         s = mallocx(sizeof *s);
@@ -537,7 +533,7 @@ sound_t *sound_load(const char *path)
         s->src = NULL;
 
         /* loading the sample */
-        if(!(IS_VALID_FORMAT(path) && (s->buf = alureCreateBufferFromFile(abs_path)))) {
+        if(!(IS_VALID_FORMAT(path) && (s->buf = alureCreateBufferFromFile(fullpath)))) {
             
             if(!IS_VALID_FORMAT(path)) {
                 logfile_message("sound_load() error: invalid file format");

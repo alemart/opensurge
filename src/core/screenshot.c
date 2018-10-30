@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include "screenshot.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "logfile.h"
 #include "video.h"
 #include "input.h"
@@ -28,7 +28,7 @@
 /* private data */
 #define MAX_SCREENSHOTS     (1 << 30)
 static input_t *in;
-static char *next_available_filename();
+static const char *next_available_filename();
 
 /*
  * screenshot_init()
@@ -49,10 +49,10 @@ void screenshot_update()
 {
     /* take the snapshot! (press the '=' key or the 'printscreen' key) */
     if(input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE2)) {
-        char *file = next_available_filename();
-        image_save(video_get_window_surface(), file);
-        video_showmessage("'screenshots/%s' saved", basename(file));
-        logfile_message("New screenshot: %s", file);
+        const char *filename = next_available_filename();
+        image_save(video_get_window_surface(), filename);
+        video_showmessage("\"%s\" saved", filename);
+        logfile_message("New screenshot: \"%s\"", filename);
     }
 }
 
@@ -72,17 +72,15 @@ void screenshot_release()
 
 
 /* misc */
-char *next_available_filename()
+const char *next_available_filename()
 {
-    static char f[64], abs_path[1024];
-    int i;
+    static char filename[32];
 
-    for(i=0; i<MAX_SCREENSHOTS; i++) {
-        sprintf(f, "screenshots/s%03d.png", i);
-        resource_filepath(abs_path, f, sizeof(abs_path), RESFP_WRITE);
-        if(!filepath_exists(abs_path))
-            return abs_path;
+    for(int i = 0; i < MAX_SCREENSHOTS; i++) {
+        snprintf(filename, sizeof(filename), "screenshots/s%03d.png", i);
+        if(!assetfs_exists(filename))
+            return filename;
     }
 
-    return abs_path;
+    return filename;
 }

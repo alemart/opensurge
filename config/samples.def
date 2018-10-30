@@ -275,7 +275,7 @@ sample "1up"
 
 sample "goal"
 {
-    source_file         "samples/goal.ogg"
+    source_file         "musics/goal.ogg"
 }
 
 sample "break"

@@ -24,7 +24,7 @@
 #include "util.h"
 #include "logfile.h"
 #include "resourcemanager.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
 
@@ -562,12 +562,11 @@ int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmap
 void load_inputmap_table()
 {
     parsetree_program_t *s = NULL;
-    char abs_path[1024];
+    const char* fullpath = assetfs_fullpath(INPUTMAP_FILE);
 
     logfile_message("inputmap: loading the input mappings...");
-    resource_filepath(abs_path, INPUTMAP_FILE, sizeof(abs_path), RESFP_READ);
 
-    s = nanoparser_construct_tree(abs_path);
+    s = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(s, traverse);
     s = nanoparser_deconstruct_tree(s);
 }

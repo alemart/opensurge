@@ -24,7 +24,7 @@
 #include "util.h"
 #include "logfile.h"
 #include "resourcemanager.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
 
@@ -42,6 +42,9 @@ static void factorysound_destroy(factorysound_t *f);
 static void load_samples_table();
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_sound(const parsetree_statement_t *stmt, void *factorysound);
+
+/* config file */
+#define SAMPLES_FILE "config/samples.def"
 
 
 
@@ -68,8 +71,6 @@ sound_t *soundfactory_get(const char *sound_name)
 
     if(f == NULL) {
         /* if no sound is found, consider sound_name as a file path */
-        char abs_path[1024];
-        resource_filepath(abs_path, sound_name, sizeof(abs_path), RESFP_READ);
         return sound_load(sound_name);
     }
     else
@@ -147,12 +148,11 @@ int traverse_sound(const parsetree_statement_t *stmt, void *factorysound)
 void load_samples_table()
 {
     parsetree_program_t *s = NULL;
-    char abs_path[1024];
+    const char* fullpath = assetfs_fullpath(SAMPLES_FILE);
 
     logfile_message("soundfactory: loading the samples table...");
-    resource_filepath(abs_path, "config/samples.def", sizeof(abs_path), RESFP_READ);
 
-    s = nanoparser_construct_tree(abs_path);
+    s = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(s, traverse);
     s = nanoparser_deconstruct_tree(s);
 }

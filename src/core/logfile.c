@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * logfile.c - logfile module
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,12 +22,12 @@
 #include <stdarg.h>
 #include "logfile.h"
 #include "global.h"
-#include "osspec.h"
+#include "assetfs.h"
 
 
 /* private stuff ;) */
 #define LOGFILE_PATH        "logfile.txt" /* default log file */
-static FILE *logfile;
+static FILE *logfile = NULL;
 
 
 /*
@@ -36,35 +36,34 @@ static FILE *logfile;
  */
 void logfile_init()
 {
-    char abs_path[1024];
-
-    resource_filepath(abs_path, LOGFILE_PATH, sizeof(abs_path), RESFP_WRITE);
-
-    if(NULL == (logfile = fopen(abs_path, "w")))
-        logfile_message("WARNING: couldn't open %s for writing.\n", LOGFILE_PATH);
-    else {
+    const char* fullpath = assetfs_create_cache_file(LOGFILE_PATH);
+    if(NULL != (logfile = fopen(fullpath, "w"))) {
         logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
         logfile_message("logfile_init()");
+    }
+    else {
+        logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
+        logfile_message("logfile_init(): couldn't open \"%s\" for writing.", LOGFILE_PATH);
     }
 }
 
 
 /*
  * logfile_message()
- * Prints a message on the logfile
- * (printf() format)
+ * Prints a message to the logfile (printf format)
  */
 void logfile_message(const char *fmt, ...)
 {
-    char buf[2048];
-    va_list args;
+    if(logfile != NULL) {
+        va_list args;
 
-    va_start(args, fmt);
-    vsprintf(buf, fmt, args);
-    va_end(args);
+        va_start(args, fmt);
+        vfprintf(logfile, fmt, args);
+        va_end(args);
 
-    fprintf(logfile ? logfile : stderr, "%s\n", buf);
-    fflush(logfile ? logfile : stderr);
+        fputc('\n', logfile);
+        fflush(logfile);
+    }
 }
 
 
@@ -75,8 +74,9 @@ void logfile_message(const char *fmt, ...)
  */
 void logfile_release()
 {
-    logfile_message("logfile_release()\ntchau!");
-    if(logfile)
+    logfile_message("logfile_release()");
+    logfile_message("tchau!");
+    if(logfile != NULL)
         fclose(logfile);
 }
 

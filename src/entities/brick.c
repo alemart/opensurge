@@ -32,7 +32,7 @@
 #include "../core/video.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/util.h"
 #include "../core/timer.h"
 #include "../core/audio.h"
@@ -119,7 +119,7 @@ static inline int get_image_flags(const brick_t* brick);
 void brickset_load(const char *filename)
 {
     int i;
-    char abs_path[1024];
+    const char* fullpath;
     parsetree_program_t *tree;
 
     if(brickset_loaded()) {
@@ -128,13 +128,13 @@ void brickset_load(const char *filename)
     }
 
     logfile_message("brickset_load(\"%s\")", filename);
-    resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
+    fullpath = assetfs_fullpath(filename);
 
     brickdata_count = 0;
     for(i=0; i<BRKDATA_MAX; i++) 
         brickdata[i] = NULL;
 
-    tree = nanoparser_construct_tree(abs_path);
+    tree = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(tree, traverse);
     tree = nanoparser_deconstruct_tree(tree);
 

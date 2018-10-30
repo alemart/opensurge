@@ -27,7 +27,6 @@
 #include "logfile.h"
 #include "stringutil.h"
 #include "util.h"
-#include "osspec.h"
 #include "video.h"
 #include "lang.h"
 #include "prefs.h"
@@ -41,6 +40,7 @@
 
 
 /* private stuff ;) */
+static const char* basename(const char* path);
 static void display_message(char *fmt, ...);
 static const char* copyright =  "Open Surge Engine version " GAME_VERSION_STRING "\n"
                                 "Copyright (C) " GAME_YEAR " Alexandre Martins";
@@ -102,9 +102,9 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --color-depth X              sets the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                   shows the FPS (frames per second) counter\n"
                 "    --use-gamepad                play using a gamepad\n"
-                "    --level \"filepath\"           runs the level located at filepath (e.g., levels/my_level.lev)\n"
-                "    --quest \"filepath\"           runs the quest located at filepath (e.g., quests/my_quest.qst)\n"
-                "    --language \"filepath\"        sets the language file to filepath (e.g., languages/lang.lng)\n"
+                "    --level \"filepath\"           runs the specified level (e.g., levels/my_level.lev)\n"
+                "    --quest \"filepath\"           runs the specified quest (e.g., quests/my_quest.qst)\n"
+                "    --language \"filepath\"        use the specified language (e.g., languages/lang.lng)\n"
                 "    --data-dir \"/path/to/data\"   loads the game assets from the specified folder (**)\n"
                 "    --full-cpu-usage             uses 100%% of the CPU (*)\n"
                 "    --no-font-smoothing          disable antialiased fonts (*)\n"
@@ -121,7 +121,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--version") == 0) {
-            printf("%d.%d.%d\n", GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+            puts(GAME_VERSION_STRING);
             exit(0);
         }
 
@@ -180,27 +180,20 @@ commandline_t commandline_parse(int argc, char **argv)
         else if(strcmp(argv[i], "--level") == 0) {
             if(++i < argc) {
                 cmd.custom_level = TRUE;
-                resource_filepath(cmd.custom_level_path, argv[i], sizeof(cmd.custom_level_path), RESFP_READ);
-                if(!filepath_exists(cmd.custom_level_path))
-                    fatal_error("FATAL ERROR: file '%s' does not exist!\n", cmd.custom_level_path);
+                str_cpy(cmd.custom_level_path, argv[i], sizeof(cmd.custom_level_path));
             }
         }
 
         else if(strcmp(argv[i], "--quest") == 0) {
             if(++i < argc) {
                 cmd.custom_quest = TRUE;
-                resource_filepath(cmd.custom_quest_path, argv[i], sizeof(cmd.custom_quest_path), RESFP_READ);
-                if(!filepath_exists(cmd.custom_quest_path))
-                    fatal_error("FATAL ERROR: file '%s' does not exist!\n", cmd.custom_quest_path);
+                str_cpy(cmd.custom_quest_path, argv[i], sizeof(cmd.custom_quest_path));
             }
         }
 
         else if(strcmp(argv[i], "--language") == 0) {
-            if(++i < argc) {
-                resource_filepath(cmd.language_filepath, argv[i], sizeof(cmd.language_filepath), RESFP_READ);
-                if(!filepath_exists(cmd.language_filepath))
-                    fatal_error("FATAL ERROR: file '%s' does not exist!\n", cmd.language_filepath);
-            }
+            if(++i < argc)
+                str_cpy(cmd.language_filepath, argv[i], sizeof(cmd.language_filepath));
         }
 
         else if(strcmp(argv[i], "--data-dir") == 0) {
@@ -233,10 +226,7 @@ commandline_t commandline_parse(int argc, char **argv)
 /* private functions */
 
 
-/*
- * display_message()
- * Displays a message (printf format)
- */
+/* Displays a message to the user (printf format) */
 void display_message(char *fmt, ...)
 {
     char buf[4096];
@@ -254,3 +244,14 @@ void display_message(char *fmt, ...)
 }
 
 
+
+/* the filename of a path */
+const char* basename(const char* path)
+{
+    const char* p = strpbrk(path, "\\/");
+    while(p != NULL) {
+        path = p+1;
+        p = strpbrk(path, "\\/");
+    }
+    return path;
+}

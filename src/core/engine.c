@@ -76,7 +76,6 @@ static void calc_error(const char *msg);
 static void init_nanocalc();
 static void release_nanocalc();
 static const char* find_datadir(int argc, char *argv[]);
-static const char* fullpath_of(const char* relative_path);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const char* datadir = NULL;
@@ -180,6 +179,7 @@ void init_basic_stuff()
     allegro_init();
     randomize();
     osspec_init(datadir);
+    assetfs_init(NULL, datadir);
     logfile_init();
     init_nanoparser();
     init_nanocalc();
@@ -193,7 +193,6 @@ void init_basic_stuff()
  */
 void init_managers(commandline_t cmd)
 {
-    assetfs_init(NULL, datadir);
     timer_init(cmd.optimize_cpu_usage);
     video_init(get_window_title(), cmd.video_resolution, cmd.smooth_graphics, cmd.fullscreen, cmd.color_depth);
     video_show_fps(cmd.show_fps);
@@ -253,11 +252,11 @@ void push_initial_scene(commandline_t cmd)
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
     }
     else if(scripting_testmode()) {
-        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)fullpath_of(SSAPP_LEVEL));
+        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)(SSAPP_LEVEL));
         /*scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);*/
     }
     else {
-        scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)fullpath_of(INTRO_QUEST));
+        scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)(INTRO_QUEST));
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
         if(!prefs_has_item(modmanager_prefs(), ".langpath"))
             scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
@@ -411,15 +410,4 @@ const char* find_datadir(int argc, char *argv[])
     }
 
     return NULL;
-}
-
-/*
- * fullpath_of()
- * Returns the absolute filepath of the parameter
- */
-const char* fullpath_of(const char* relative_path)
-{
-    static char abs_path[1024] = "";
-    resource_filepath(abs_path, relative_path, sizeof(abs_path), RESFP_READ);
-    return abs_path;
 }

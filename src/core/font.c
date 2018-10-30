@@ -27,7 +27,7 @@
 #include "font.h"
 #include "video.h"
 #include "stringutil.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "lang.h"
 #include "logfile.h"
 #include "hashtable.h"
@@ -121,7 +121,7 @@ struct font_t {
 #define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
 #define FONT_STACKCAPACITY  32
 #define FONT_TEXTMAXLENGTH  20480
-static int dirfill(const char *filename, void *param);
+static int dirfill(const char *vpath, void *param);
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_block(const parsetree_statement_t *stmt, void *data);
 static int traverse_bmp(const parsetree_statement_t *stmt, void *data);
@@ -163,7 +163,6 @@ struct fontscript_t {
  */
 void font_init(int allow_font_smoothing)
 {
-    const char *path = "fonts/*.fnt";
     parsetree_program_t *fonts = NULL;
 
     allow_ttf_aa = allow_font_smoothing; /* this comes first */
@@ -175,7 +174,7 @@ void font_init(int allow_font_smoothing)
     fontdata_list_init();
 
     /* reading the parse tree */
-    foreach_resource(path, dirfill, (void*)&fonts, TRUE);
+    assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
 
     /* loading the fontdata list */
     nanoparser_traverse_program(fonts, traverse);
@@ -653,10 +652,11 @@ char* remove_tags(const char *str)
 }
 
 /* dirfill() */
-int dirfill(const char *filename, void *param)
+int dirfill(const char *vpath, void *param)
 {
+    const char* fullpath = assetfs_fullpath(vpath);
     parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(filename));
+    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
     return 0;
 }
 
@@ -1039,7 +1039,8 @@ v2d_t fontdata_bmp_textsize(fontdata_t *fnt, const char *string)
 
 fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, int shadow)
 {
-    char abs_path[1024], buf[16];
+    const char* fullpath;
+    char buf[16];
     int ch, w, h;
     fontdata_ttf_t *f = mallocx(sizeof *f);
 
@@ -1048,10 +1049,10 @@ fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, i
     ((fontdata_t*)f)->charspacing = fontdata_ttf_charspacing;
     ((fontdata_t*)f)->textsize = fontdata_ttf_textsize;
 
-    resource_filepath(abs_path, source_file, sizeof(abs_path), RESFP_READ);
-    logfile_message("Loading TrueType font '%s'...", abs_path);
+    fullpath = assetfs_fullpath(source_file);
+    logfile_message("Loading TrueType font '%s'...", fullpath);
 
-    f->ttf = alfont_load_font(abs_path);
+    f->ttf = alfont_load_font(fullpath);
     if(NULL != f->ttf) {
         /* configuring */
         alfont_set_font_size(f->ttf, size);

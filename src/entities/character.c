@@ -21,7 +21,7 @@
 #include "character.h"
 #include "../core/hashtable.h"
 #include "../core/nanoparser/nanoparser.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/soundfactory.h"
@@ -33,7 +33,7 @@ static hashtable_character_t* characters;
 static character_t *character_new(const char *name); /* creates a new character_t instance */
 static void character_delete(character_t* c); /* deletes c */
 
-static int dirfill(const char *filename, void *param); /* file system callback */
+static int dirfill(const char *vpath, void *param); /* file system callback */
 static void register_character(character_t *c); /* adds c to the hash table */
 static void validate_character(character_t *c); /* validates c */
 
@@ -48,14 +48,13 @@ static int traverse_abilities(const parsetree_statement_t *stmt, void *character
 /* public */
 void charactersystem_init()
 {
-    const char *path = "characters/*.chr";
     parsetree_program_t *prog = NULL;
 
     logfile_message("Loading characters...");
     characters = hashtable_character_t_create(character_delete);
 
     /* Reading the parse tree */
-    foreach_resource(path, dirfill, (void*)(&prog), TRUE);
+    assetfs_foreach_file("characters", ".chr", dirfill, (void*)(&prog), true);
     if(prog == NULL)
         fatal_error("FATAL ERROR: no characters have been found. Please reinstall the game.");
 
@@ -145,10 +144,11 @@ void character_delete(character_t* c)
     free(c);
 }
 
-int dirfill(const char *filename, void *param)
+int dirfill(const char *vpath, void *param)
 {
+    const char* fullpath = assetfs_fullpath(vpath);
     parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(filename));
+    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
     return 0;
 }
 

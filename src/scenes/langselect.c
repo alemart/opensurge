@@ -23,7 +23,7 @@
 #include "langselect.h"
 #include "options.h"
 #include "../core/scene.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
@@ -251,21 +251,22 @@ void save_preferences(const char *filepath)
 void load_lang_list()
 {
     int i, c = 0;
-    char path[] = "languages/*.lng";
     logfile_message("load_lang_list()");
 
     /* loading language data */
     lngcount = 0;
-    foreach_resource(path, dircount, NULL, TRUE);
-    lngdata = mallocx(lngcount * sizeof(lngdata_t));
-    foreach_resource(path, dirfill, (void*)&c, TRUE);
-    qsort(lngdata, lngcount, sizeof(lngdata_t), sort_cmp);
+    assetfs_foreach_file("languages", ".lng", dircount, NULL, true);
 
     /* fatal error */
     if(lngcount == 0)
         fatal_error("FATAL ERROR: no language files were found! Please reinstall the game.");
     else
         logfile_message("%d languages found.", lngcount);
+
+    /* grabbing language data */
+    lngdata = mallocx(lngcount * sizeof(lngdata_t));
+    assetfs_foreach_file("languages", ".lng", dirfill, (void*)&c, true);
+    qsort(lngdata, lngcount, sizeof(lngdata_t), sort_cmp);
 
     /* other stuff */
     lngfnt[0] = mallocx(lngcount * sizeof(font_t*));
@@ -286,8 +287,8 @@ int dirfill(const char *filename, void *param)
     int ver, subver, wipver;
 
     lang_readcompatibility(filename, &ver, &subver, &wipver);
-    if(ver == GAME_VERSION && subver == GAME_SUB_VERSION && wipver == GAME_WIP_VERSION) {
-        sprintf(lngdata[*c].filepath, "languages/%s", basename(filename));
+    if(game_version_compare(ver, subver, wipver) == 0) {
+        str_cpy(lngdata[*c].filepath, filename, sizeof(lngdata[*c].filepath));
         lang_readstring(filename, "LANG_LANGUAGE", lngdata[*c].title, sizeof( lngdata[*c].title ));
         lang_readstring(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
         (*c)++;
@@ -302,7 +303,7 @@ int dircount(const char *filename, void *param)
 {
     int ver, subver, wipver;
     lang_readcompatibility(filename, &ver, &subver, &wipver);
-    if(ver == GAME_VERSION && subver == GAME_SUB_VERSION && wipver == GAME_WIP_VERSION)
+    if(game_version_compare(ver, subver, wipver) == 0)
         lngcount++;
 
     return 0;

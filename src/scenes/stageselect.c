@@ -28,7 +28,7 @@
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/v2d.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
@@ -50,7 +50,7 @@
 
 /* stage data */
 typedef struct {
-    char filepath[1024]; /* absolute filepath */
+    char* filepath; /* absolute filepath */
     char name[128]; /* stage name */
     int act; /* act number */
     int requires[3]; /* required version */
@@ -78,15 +78,15 @@ static stagedata_t *stage_data[STAGE_MAX]; /* vector of stagedata_t* */
 static int stage_count; /* length of stage_data[] */
 static int option; /* current option: 0 .. stage_count - 1 */
 static font_t **stage_label; /* vector */
-static int enable_debug = FALSE; /* debug mode????????? must start out as false. */
-static char level_to_be_loaded[1024] = "";
+static int enable_debug = FALSE; /* debug mode? must start out as false. */
+static char* level_to_be_loaded;
 
 
 
 /* private functions */
 static void load_stage_list();
 static void unload_stage_list();
-static int dirfill(const char *filename, void *param);
+static int dirfill(const char *vpath, void *param);
 static int sort_cmp(const void *a, const void *b);
 
 
@@ -108,6 +108,7 @@ void stageselect_init(void *should_enable_debug)
     scene_time = 0;
     state = STAGESTATE_NORMAL;
     input = input_create_user(NULL);
+    level_to_be_loaded = NULL;
 
     title = font_create("menu.title");
     font_set_text(title, "%s", "$STAGESELECT_TITLE");
@@ -139,6 +140,11 @@ void stageselect_init(void *should_enable_debug)
 void stageselect_release()
 {
     enable_debug = FALSE;
+
+    if(level_to_be_loaded != NULL) {
+        free(level_to_be_loaded);
+        level_to_be_loaded = NULL;
+    }
 
     bgtheme = background_unload(bgtheme);
     unload_stage_list();
@@ -204,8 +210,10 @@ void stageselect_update()
                     sound_play( soundfactory_get("choose") );
                 }
                 if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                    logfile_message("Loading level \"%s\", \"%s\"", stage_data[option]->name, stage_data[option]->filepath);
-                    str_cpy(level_to_be_loaded, stage_data[option]->filepath, sizeof(level_to_be_loaded));
+                    logfile_message("Loading level \"%s\" (\"%s\")...", stage_data[option]->name, stage_data[option]->filepath);
+                    if(level_to_be_loaded != NULL)
+                        free(level_to_be_loaded);
+                    level_to_be_loaded = str_dup(stage_data[option]->filepath);
                     sound_play( soundfactory_get("select") );
                     state = STAGESTATE_PLAY;
                 }
@@ -296,14 +304,13 @@ void stageselect_render()
 void load_stage_list()
 {
     int i;
-    const char path[] = "levels/*.lev";
 
     video_display_loading_screen();
     logfile_message("load_stage_list()");
 
     /* loading data */
     stage_count = 0;
-    foreach_resource(path, dirfill, NULL, enable_debug ? TRUE : FALSE);
+    assetfs_foreach_file("levels", ".lev", dirfill, NULL, enable_debug);
     qsort(stage_data, stage_count, sizeof(stagedata_t*), sort_cmp);
 
     /* fatal error */
@@ -340,7 +347,7 @@ void unload_stage_list()
 
 
 /* callback that fills stage_data[] */
-int dirfill(const char *filename, void *param)
+int dirfill(const char *vpath, void *param)
 {
     int ver, subver, wipver;
     stagedata_t *s;
@@ -349,7 +356,7 @@ int dirfill(const char *filename, void *param)
     if(stage_count >= STAGE_MAX)
         return 0;
 
-    s = stagedata_load(filename);
+    s = stagedata_load(vpath);
     if(s != NULL) {
         ver = s->requires[0];
         subver = s->requires[1];
@@ -371,7 +378,7 @@ int dirfill(const char *filename, void *param)
             }
         }
         else {
-            logfile_message("Warning: level file \"%s\" (requires: %d.%d.%d) isn't compatible with this version of the game (%d.%d.%d)", filename, ver, subver, wipver, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+            logfile_message("Warning: level \"%s\" isn't compatible with this version of the game (requires: %d.%d.%d).", vpath, ver, subver, wipver);
             stagedata_unload(s);
         }
     }
@@ -393,24 +400,18 @@ stagedata_t* stagedata_load(const char *filename)
 {
     parsetree_program_t *prog;
     stagedata_t* s = mallocx(sizeof *s);
+    const char* fullpath = assetfs_fullpath(filename);
 
-    resource_filepath(s->filepath, (char*)filename, sizeof(s->filepath), RESFP_READ);
-    strcpy(s->name, "Untitled");
+    s->filepath = str_dup(filename);
+    str_cpy(s->name, "Untitled", sizeof(s->name));
     s->act = 1;
     s->requires[0] = 0;
     s->requires[1] = 0;
     s->requires[2] = 0;
 
-    prog = nanoparser_construct_tree(s->filepath);
+    prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(prog, (void*)s, traverse);
     prog = nanoparser_deconstruct_tree(prog);
-
-    /* invalid level! */
-    if(s->requires[0] <= 0 && s->requires[1] <= 0 && s->requires[2] <= 0) {
-        logfile_message("Warning: load_stage_data(\"%s\") - invalid level. filepath: \"%s\"", filename, s->filepath);
-        free(s);
-        s = NULL;
-    }
 
     return s;
 }
@@ -418,6 +419,7 @@ stagedata_t* stagedata_load(const char *filename)
 /* stagedata_t destructor */
 void stagedata_unload(stagedata_t *s)
 {
+    free(s->filepath);
     free(s);
 }
 

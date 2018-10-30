@@ -31,7 +31,7 @@
 #include "../core/scene.h"
 #include "../core/soundfactory.h"
 #include "../core/font.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/logfile.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
@@ -185,13 +185,14 @@ void credits2_render()
 /* reads the contents of CREDITS2_FILE */
 char* read_credits2_file()
 {
-    char *buf, filename[1024];
+    const char* fullpath;
+    char *buf;
     FILE* fp;
     long size;
 
-    resource_filepath(filename, CREDITS2_FILE, sizeof filename, RESFP_READ);
-    if(NULL == (fp = fopen(filename, "r"))) {
-        fatal_error("Can't open '%s' for reading.", CREDITS2_FILE);
+    fullpath = assetfs_fullpath(CREDITS2_FILE);
+    if(NULL == (fp = fopen(fullpath, "r"))) {
+        fatal_error("Can't open \"%s\" for reading.", CREDITS2_FILE);
         return NULL;
     }
 
@@ -199,10 +200,10 @@ char* read_credits2_file()
     size = ftell(fp);
     rewind(fp);
 
-    buf = mallocx(1 + size);
-    buf[size] = 0;
+    buf = mallocx((1 + size) * sizeof(*buf));
+    buf[size] = '\0';
     if(fread(buf, 1, size, fp) != size)
-        logfile_message("Warning: invalid return value of fread() when reading '%s'", CREDITS2_FILE);
+        logfile_message("Warning: invalid return value of fread() when reading \"%s\"", CREDITS2_FILE);
 
     fclose(fp);
     return buf;

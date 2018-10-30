@@ -40,7 +40,7 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/sprite.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/hashtable.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
@@ -414,11 +414,12 @@ static editor_action_list_t* editor_action_delete_list(editor_action_list_t *lis
  */
 void level_load(const char *filepath)
 {
-    char abs_path[1024], line[1024];
+    char line[1024];
+    const char* fullpath;
     FILE* fp;
 
     logfile_message("level_load(\"%s\")", filepath);
-    resource_filepath(abs_path, filepath, sizeof(abs_path), RESFP_READ);
+    fullpath = assetfs_fullpath(filepath);
 
     /* default values */
     str_cpy(file, filepath, sizeof(file)); /* it's the relative filepath we want */
@@ -450,17 +451,17 @@ void level_load(const char *filepath)
     init_startup_object_list();
 
     /* traversing the level file */
-    fp = fopen(abs_path, "r");
+    fp = fopen(fullpath, "r");
     if(fp != NULL) {
         int ln = 0;
         while(fgets(line, sizeof(line) / sizeof(char), fp)) {
             line[strlen(line)-1] = 0; /* no newlines, please! */
-            level_interpret_line(abs_path, ++ln, line);
+            level_interpret_line(fullpath, ++ln, line);
         }
         fclose(fp);
     }
     else
-        fatal_error("Can\'t open level file \"%s\".", abs_path);
+        fatal_error("Can\'t open level file \"%s\".", fullpath);
 
     /* players */
     if(team_size == 0) {
@@ -545,7 +546,7 @@ int level_save(const char *filepath)
 {
     int i;
     FILE *fp;
-    char abs_path[1024];
+    const char* fullpath;
     brick_list_t *itb, *brick_list;
     item_list_t *iti, *item_list;
     enemy_list_t *ite, *object_list;
@@ -555,13 +556,13 @@ int level_save(const char *filepath)
     item_list = entitymanager_retrieve_all_items();
     object_list = entitymanager_retrieve_all_objects();
 
-    resource_filepath(abs_path, filepath, sizeof(abs_path), RESFP_WRITE);
+    fullpath = assetfs_create_data_file(filepath);
 
     /* open for writing */
-    logfile_message("level_save(\"%s\")", abs_path);
-    if(NULL == (fp=fopen(abs_path, "w"))) {
-        logfile_message("Warning: could not open \"%s\" for writing.", abs_path);
-        video_showmessage("Could not open \"%s\" for writing.", abs_path);
+    logfile_message("level_save(\"%s\")", fullpath);
+    if(NULL == (fp=fopen(fullpath, "w"))) {
+        logfile_message("Warning: could not open \"%s\" for writing.", fullpath);
+        video_showmessage("Could not open \"%s\" for writing.", fullpath);
         return FALSE;
     }
 

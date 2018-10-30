@@ -27,7 +27,7 @@
 #include "../core/quest.h"
 #include "../core/logfile.h"
 #include "../core/storyboard.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 
 /* private data */
 #define STACK_MAX 32 /* maximum number of simultaneous quests */
@@ -50,17 +50,16 @@ static void push_appropriate_scene(const char *str);
  */
 void quest_init(void *path_to_qst_file)
 {
-    char filepath[1024] = "";
-    resource_filepath(filepath, path_to_qst_file, sizeof(filepath), RESFP_READ);
+    const char* fullpath = assetfs_fullpath(path_to_qst_file);
 
     if(++top >= STACK_MAX)
         fatal_error("The quest stack can't hold more than %d quests.", STACK_MAX);
 
-    stack[top].current_quest = load_quest(filepath);
+    stack[top].current_quest = load_quest(fullpath);
     stack[top].current_level = 0;
     stack[top].abort_quest = FALSE;
 
-    logfile_message("Pushed quest '%s' (\"%s\") onto the quest stack...", stack[top].current_quest->file, stack[top].current_quest->name);
+    logfile_message("Pushed quest \"%s\" (\"%s\") onto the quest stack...", stack[top].current_quest->file, stack[top].current_quest->name);
 }
 
 

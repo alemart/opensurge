@@ -28,7 +28,7 @@
 #include "../core/input.h"
 #include "../core/logfile.h"
 #include "../core/stringutil.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/video.h"
 #include "../core/hashtable.h"
 #include "../scenes/level.h"
@@ -73,7 +73,7 @@ static int fill_object_names(const parsetree_statement_t *stmt, void *object_nam
 static int fill_object_categories(const parsetree_statement_t *stmt, void *object_category_data);
 static int fill_lookup_table(const parsetree_statement_t *stmt, void *lookup_table);
 static int prepare_to_fill_object_categories(const parsetree_statement_t *stmt, void *object_category_data);
-static int dirfill(const char *filename, void *param); /* file system callback */
+static int dirfill(const char *vpath, void *param); /* file system callback */
 static int is_hidden_object(const char *name);
 static int category_exists(const char *category);
 
@@ -91,13 +91,11 @@ static hashtable_objectcode_t* lookup_table;
  */
 void objects_init()
 {
-    const char *path = "scripts/legacy/*.obj";
-
     logfile_message("Loading legacy scripts...");
     objects = NULL;
 
     /* reading the parse tree */
-    foreach_resource(path, dirfill, (void*)(&objects), TRUE);
+    assetfs_foreach_file("scripts/legacy", ".obj", dirfill, (void*)(&objects), true);
 
     /* creating the name table */
     name_table.length = 0;
@@ -540,10 +538,11 @@ int object_category_table_cmp(const void *a, const void *b)
     return str_icmp(i, j);
 }
 
-int dirfill(const char *filename, void *param)
+int dirfill(const char *vpath, void *param)
 {
+    const char* fullpath = assetfs_fullpath(vpath);
     parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(filename));
+    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
     return 0;
 }
 

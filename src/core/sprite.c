@@ -24,7 +24,7 @@
 #include "stringutil.h"
 #include "image.h"
 #include "logfile.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "hashtable.h"
 #include "resourcemanager.h"
 #include "nanoparser/nanoparser.h"
@@ -35,7 +35,7 @@ HASHTABLE_GENERATE_CODE(spriteinfo_t)
 static hashtable_spriteinfo_t* sprites;
 
 /* private functions */
-static int dirfill(const char *filename, void *param); /* file system callback */
+static int dirfill(const char *vpath, void *param); /* file system callback */
 static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
 static void validate_animation(animation_t *anim); /* validates the animation */
 static void register_sprite(const char *sprite_name, spriteinfo_t *spr); /* adds spr to the hash table */
@@ -58,14 +58,13 @@ static int traverse_animation_attributes(const parsetree_statement_t *stmt, void
  */
 void sprite_init()
 {
-    const char *path = "sprites/*.spr";
     parsetree_program_t *prog = NULL;
 
     logfile_message("Loading sprites...");
     sprites = hashtable_spriteinfo_t_create(spriteinfo_destroy);
 
     /* reading the parse tree */
-    foreach_resource(path, dirfill, (void*)(&prog), TRUE);
+    assetfs_foreach_file("sprites", ".spr", dirfill, (void*)(&prog), true);
     if(prog == NULL)
         fatal_error("FATAL ERROR: no sprites have been found. Please reinstall the game.");
 
@@ -205,10 +204,11 @@ void spriteinfo_destroy(spriteinfo_t *info)
  * dirfill()
  * File system callback
  */
-int dirfill(const char *filename, void *param)
+int dirfill(const char *vpath, void *param)
 {
+    const char* fullpath = assetfs_fullpath(vpath);
     parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(filename));
+    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
     return 0;
 }
 

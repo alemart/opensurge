@@ -25,7 +25,7 @@
 #include "../../entities/item.h"
 #include "../../entities/enemy.h"
 #include "../../core/logfile.h"
-#include "../../core/osspec.h"
+#include "../../core/assetfs.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
 #include "../../core/nanoparser/nanoparser.h"
@@ -111,13 +111,12 @@ editorgrp_entity_list_t* editorgrp_get_group(int id)
 /* reads a list of groups from a file */
 void read_from_file(const char *filename)
 {
-    char abs_path[1024];
     parsetree_program_t *prog;
+    const char* fullpath = assetfs_fullpath(filename);
 
-    resource_filepath(abs_path, filename, sizeof(abs_path), RESFP_READ);
-    logfile_message("Loading group file '%s'...", filename);
+    logfile_message("Loading group file \"%s\"...", filename);
 
-    prog = nanoparser_construct_tree(abs_path);
+    prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(prog, traverse);
     prog = nanoparser_deconstruct_tree(prog);
 

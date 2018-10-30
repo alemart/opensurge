@@ -28,7 +28,7 @@
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/v2d.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
@@ -74,8 +74,8 @@ static font_t **quest_label; /* vector of font_t* */
 /* private functions */
 static void load_quest_list();
 static void unload_quest_list();
-static int dirfill(const char *filename, void *param);
-static int dircount(const char *filename, void *param);
+static int dirfill(const char *vpath, void *param);
+static int dircount(const char *vpath, void *param);
 static int sort_cmp(const void *a, const void *b);
 
 
@@ -291,16 +291,15 @@ void questselect_render()
 void load_quest_list()
 {
     int i, c = 0;
-    char path[] = "quests/*.qst";
 
     video_display_loading_screen();
     logfile_message("load_quest_list()");
 
     /* loading data */
     quest_count = 0;
-    foreach_resource(path, dircount, NULL, TRUE);
+    assetfs_foreach_file("quests", ".qst", dircount, NULL, true);
     quest_data = mallocx(quest_count * sizeof(quest_t*));
-    foreach_resource(path, dirfill, (void*)&c, TRUE);
+    assetfs_foreach_file("quests", ".qst", dirfill, (void*)(&c), true);
     qsort(quest_data, quest_count, sizeof(quest_t*), sort_cmp);
 
     /* fatal error */
@@ -337,12 +336,12 @@ void unload_quest_list()
 
 
 /* callback that fills quest_data[] */
-int dirfill(const char *filename, void *param)
+int dirfill(const char *vpath, void *param)
 {
+    const char* fullpath = assetfs_fullpath(vpath);
+    quest_t* s = load_quest(fullpath);
     int *c = (int*)param;
-    quest_t *s;
 
-    s = load_quest(filename);
     if(s != NULL) {
         if(!s->is_hidden && s->level_count > 0)
             quest_data[ (*c)++ ] = s;
@@ -354,15 +353,14 @@ int dirfill(const char *filename, void *param)
 }
 
 /* callback that counts how many levels are installed */
-int dircount(const char *filename, void *param)
+int dircount(const char *vpath, void *param)
 {
-    quest_t *s;
+    const char* fullpath = assetfs_fullpath(vpath);
+    quest_t* s = load_quest(fullpath);
 
-    s = load_quest(filename);
     if(s != NULL) {
         if(!s->is_hidden && s->level_count > 0)
             quest_count++;
-
         s = unload_quest(s);
     }
 

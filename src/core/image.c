@@ -30,7 +30,7 @@
 #include "video.h"
 #include "stringutil.h"
 #include "logfile.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "resourcemanager.h"
 #include "util.h"
 
@@ -66,18 +66,17 @@ static fast_getb_funptr fast_getb_fun(); /* returns a function */
  */
 image_t *image_load(const char *path)
 {
-    char abs_path[1024];
     image_t *img;
 
     if(NULL == (img = resourcemanager_find_image(path))) {
-        resource_filepath(abs_path, path, sizeof(abs_path), RESFP_READ);
-        logfile_message("image_load('%s')", abs_path);
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("image_load('%s')", fullpath);
 
         /* build the image object */
         img = mallocx(sizeof *img);
 
         /* loading the image */
-        img->data = load_bitmap(abs_path, NULL);
+        img->data = load_bitmap(fullpath, NULL);
         if(img->data == NULL) {
             logfile_message("image_load() error: %s", allegro_error);
             free(img);
@@ -111,20 +110,19 @@ image_t *image_load(const char *path)
  */
 void image_save(const image_t *img, const char *path)
 {
-    char abs_path[1024];
     int i, j, c, bpp = video_get_color_depth();
+    const char* fullpath = assetfs_create_data_file(path);
 
-    resource_filepath(abs_path, path, sizeof(abs_path), RESFP_WRITE);
-    logfile_message("image_save(%p,'%s')", img, abs_path);
+    logfile_message("image_save(\"%s\")", fullpath);
 
     switch(bpp) {
         case 16:
         case 24:
-            save_bitmap(abs_path, img->data, NULL);
+            save_bitmap(fullpath, img->data, NULL);
             break;
 
         case 32:
-            if(IS_PNG(abs_path)) {
+            if(IS_PNG(fullpath)) {
                 /* we must do this to make loadpng save the 32-bit image properly */
                 BITMAP *tmp;
                 if(NULL != (tmp = create_bitmap(img->w, img->h))) {
@@ -134,12 +132,12 @@ void image_save(const image_t *img, const char *path)
                             putpixel(tmp, i, j, makeacol(getr(c), getg(c), getb(c), 255));
                         }
                     }
-                    save_bitmap(abs_path, tmp, NULL);
+                    save_bitmap(fullpath, tmp, NULL);
                     destroy_bitmap(tmp);
                 }
             }
             else
-                save_bitmap(abs_path, img->data, NULL);
+                save_bitmap(fullpath, img->data, NULL);
             break;
     }
 }

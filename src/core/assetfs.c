@@ -90,13 +90,14 @@ static char* afs_gameid = NULL;
 /* internal functions */
 static bool is_valid_id(const char* str);
 static bool is_valid_writable_vpath(const char* vpath);
+static bool is_asset_folder(const char* fullpath);
+static bool is_writable_file(const char* fullpath);
 static inline char* clone_str(const char* str);
 static inline char* join_path(const char* path, const char* basename);
 static inline char* pathify(const char* path);
 static inline int vpathcmp(const char* vp1, const char* vp2);
 static inline int vpathncmp(const char* vp1, const char* vp2, int n);
 static inline int vpc(int c) { return (c == '\\') ? '/' : tolower(c); }
-static bool is_asset_folder(const char* path);
 static void scan_default_folders(const char* gameid);
 static bool scan_exedir(assetdir_t* dir);
 static void scan_folder(assetdir_t* dir, const char* abspath, assetfiletype_t type);
@@ -104,6 +105,7 @@ static int dircmp(const void* a, const void* b);
 static int filecmp(const void* a, const void* b);
 static int filematch(const void* key, const void* f);
 static const char* vpathbasename(const char* vpath, int* dirname_length);
+static char* dir2vpath(assetdir_t* dir);
 static char* build_config_fullpath(const char* gameid, const char* vpath);
 static char* build_userdata_fullpath(const char* gameid, const char* vpath);
 static char* build_cache_fullpath(const char* gameid, const char* vpath);
@@ -119,6 +121,7 @@ static assetdir_t* afs_finddir(assetdir_t* base, const char* dirpath);
 static assetfile_t* afs_mkfile(const char* filename, const char* fullpath, assetfiletype_t type);
 static assetfile_t* afs_rmfile(assetfile_t* file);
 static void afs_storefile(assetdir_t* dir, assetfile_t* file);
+static void afs_updatefile(assetfile_t* file, const char* fullpath);
 static assetfile_t* afs_findfile(assetdir_t* dir, const char* vpath);
 static int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(const char* fullpath, void* param), void* param, bool recursive, bool* stop);
 static void afs_sort(assetdir_t* base);
@@ -208,7 +211,7 @@ bool assetfs_exists(const char* vpath)
  * 1. extension filter may be NULL or ".png", ".ss", and so on...
  * 2. callback must return 0 to let the enumeration proceed, or non-zero to stop it
  */
-int assetfs_foreach_file(const char* vpath_of_dir, const char* extension_filter, int (*callback)(const char* fullpath, void* param), void* param, bool recursive)
+int assetfs_foreach_file(const char* vpath_of_dir, const char* extension_filter, int (*callback)(const char* vpath, void* param), void* param, bool recursive)
 {
     assetdir_t* dir = afs_finddir(root, vpath_of_dir);
     return (dir != NULL) ? afs_foreach(dir, extension_filter, callback, param, recursive, NULL) : 0;
@@ -258,6 +261,18 @@ const char* assetfs_create_config_file(const char* vpath)
             assetfs_log("assetfs warning: expected a config file - \"%s\"", vpath);
             file->type = ASSET_CONFIG;
         }
+        if(!is_writable_file(file->fullpath)) {
+            /* not a writable file. Replace path */
+            char* path = pathify(vpath), *fullpath;
+            if((fullpath = build_config_fullpath(afs_gameid, path)) != NULL) {
+                assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
+                afs_updatefile(file, fullpath);
+                free(fullpath);
+            }
+            else
+                assetfs_log("assetfs warning: not a writable file - \"%s\"", file->fullpath);
+            free(path);
+        }
         return file->fullpath;
     }
 }
@@ -303,6 +318,18 @@ const char* assetfs_create_cache_file(const char* vpath)
             /* preserve paths. Do nothing. */
             assetfs_log("assetfs warning: expected a cache file - \"%s\"", vpath);
             file->type = ASSET_CACHE;
+        }
+        if(!is_writable_file(file->fullpath)) {
+            /* not a writable file. Replace path */
+            char* path = pathify(vpath), *fullpath;
+            if((fullpath = build_cache_fullpath(afs_gameid, path)) != NULL) {
+                assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
+                afs_updatefile(file, fullpath);
+                free(fullpath);
+            }
+            else
+                assetfs_log("assetfs warning: not a writable file - \"%s\"", file->fullpath);
+            free(path);
         }
         return file->fullpath;
     }
@@ -350,6 +377,18 @@ const char* assetfs_create_data_file(const char* vpath)
             /* preserve paths. Do nothing. */
             assetfs_log("assetfs warning: expected a data file - \"%s\"", vpath);
             file->type = ASSET_DATA;
+        }
+        if(!is_writable_file(file->fullpath)) {
+            /* not a writable file. Replace path */
+            char* path = pathify(vpath), *fullpath;
+            if((fullpath = build_userdata_fullpath(afs_gameid, path)) != NULL) {
+                assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
+                afs_updatefile(file, fullpath);
+                free(fullpath);
+            }
+            else
+                assetfs_log("assetfs warning: not a writable file - \"%s\"", file->fullpath);
+            free(path);
         }
         return file->fullpath;
     }
@@ -518,21 +557,26 @@ assetfile_t* afs_findfile(assetdir_t* dir, const char* vpath)
 }
 
 /* list files */
-int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(const char* fullpath, void* param), void* param, bool recursive, bool* stop)
+int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(const char* vpath, void* param), void* param, bool recursive, bool* stop)
 {
+    char* dirpath = dir2vpath(dir);
     int count = 0;
     const char* q;
 
     /* foreach file */
     for(int i = 0; i < darray_length(dir->file); i++) {
         if(!extension_filter || ((q = strrchr(dir->file[i]->name, '.')) && 0 == vpathcmp(q, extension_filter))) {
+            char* vpath = join_path(dirpath, dir->file[i]->name);
             count++;
-            if(0 != callback(dir->file[i]->fullpath, param)) {
+            if(0 != callback(vpath, param)) {
                 /* stop the enumeration */
                 if(stop != NULL)
                     *stop = true;
+                free(vpath);
+                free(dirpath);
                 return count;
             }
+            free(vpath);
         }
     }
 
@@ -546,6 +590,7 @@ int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(c
                     /* stop the enumeration */
                     if(stop != NULL)
                         *stop = true;
+                    free(dirpath);
                     return count;
                 }
             }
@@ -553,6 +598,7 @@ int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(c
     }
 
     /* done! */
+    free(dirpath);
     return count;
 }
 
@@ -581,6 +627,13 @@ assetfile_t* afs_rmfile(assetfile_t* file)
 void afs_storefile(assetdir_t* dir, assetfile_t* file)
 {
     darray_push(dir->file, file);
+}
+
+/* updates the fullpath of a virtual file */
+void afs_updatefile(assetfile_t* file, const char* fullpath)
+{
+    free(file->fullpath);
+    file->fullpath = clone_str(fullpath);
 }
 
 /* replace backslashes by slashes; you'll have to free this string afterwards */
@@ -697,9 +750,9 @@ static int mkpath(char* path)
 
 /* checks if a certain folder (given its absolute path) is a valid
  * opensurge asset folder */
-bool is_asset_folder(const char* path)
+bool is_asset_folder(const char* fullpath)
 {
-    char* fpath = join_path(path, "surge.rocks");
+    char* fpath = join_path(fullpath, "surge.rocks");
     bool valid = false;
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
     struct stat st;
@@ -712,9 +765,21 @@ bool is_asset_folder(const char* path)
     }
 #endif
     if(!valid)
-        assetfs_log("Not an asset folder: \"%s\"", path);
+        assetfs_log("Not an asset folder: \"%s\"", fullpath);
     free(fpath);
     return valid;
+}
+
+/* checks if a certain file (given its absolute path) is writable */
+bool is_writable_file(const char* fullpath)
+{
+    FILE* fp = fopen(fullpath, "wb");
+    bool writable = false;
+    if(fp != NULL) {
+        writable = true;
+        fclose(fp);
+    }
+    return writable;
 }
 
 
@@ -1067,6 +1132,41 @@ const char* vpathbasename(const char* vpath, int* dirname_length)
             *dirname_length = -1;
         return vpath;
     }
+}
+
+/* get the vpath of a given directory; you'll need to free() the returned string */
+char* dir2vpath(assetdir_t* dir)
+{
+    if(dir != root) {
+        assetdir_t* parent = afs_finddir(dir, "..");
+        if(parent != NULL) {
+            const char* dirname = "";
+            char* parent_path, *path;
+
+            /* find dirname */
+            for(int i = 0; i < darray_length(parent->dir); i++) {
+                if(parent->dir[i].contents == dir) {
+                    dirname = parent->dir[i].name;
+                    break;
+                }
+            }
+
+            /* build path */
+            parent_path = dir2vpath(parent);
+            if(*parent_path != '\0')
+                path = join_path(parent_path, dirname);
+            else
+                path = clone_str(dirname);
+            free(parent_path);
+
+            /* done */
+            return path;
+        }
+        else
+            return pathify(""); /* this shouldn't happen */
+    }
+    else
+        return pathify("");
 }
 
 /* The absolute filepath of a configuration file

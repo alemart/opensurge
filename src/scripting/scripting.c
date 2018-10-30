@@ -20,7 +20,7 @@
 
 #include "scripting.h"
 #include "../core/logfile.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 
@@ -67,7 +67,6 @@ extern void scripting_register_time(surgescript_vm_t* vm);
 void scripting_init(int argc, const char** argv)
 {
     /* create VM */
-    const char* path = "scripts/*.ss";
     surgescript_util_set_error_functions(log_fun, err_fun);
     check_if_compatible();
     vm = surgescript_vm_create();
@@ -93,7 +92,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_time(vm);
 
     /* compile scripts */
-    foreach_resource(path, compile_script, NULL, TRUE);
+    assetfs_foreach_file("scripts", ".ss", compile_script, NULL, true);
 
     /* if no test script is present... */
     if(found_test_script(vm)) {
@@ -295,8 +294,10 @@ void err_fun(const char* message)
 /* compiles a script */
 int compile_script(const char* filepath, void* param)
 {
+    const char* fullpath = assetfs_fullpath(filepath);
+
     /*logfile_message("Compiling '%s'...", filepath);*/
-    if(surgescript_vm_compile(vm, filepath))
+    if(surgescript_vm_compile(vm, fullpath))
         return 0;
     else
         return -1; /* error */

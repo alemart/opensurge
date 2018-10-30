@@ -107,8 +107,8 @@ int game_is_over()
  */
 int game_version_compare(int version, int sub_version, int wip_version)
 {
-    int game_version = (GAME_VERSION*10000 + GAME_SUB_VERSION*100 + GAME_WIP_VERSION);
-    int other_version = (version*10000 + sub_version*100 + wip_version);
+    int game_version = (GAME_VERSION * 10000 + GAME_SUB_VERSION * 100 + GAME_WIP_VERSION);
+    int other_version = (max(0, version) * 10000 + max(0, sub_version) * 100 + max(0, wip_version));
 
     return game_version - other_version;
 }

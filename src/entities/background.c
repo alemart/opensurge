@@ -24,7 +24,7 @@
 #include "actor.h"
 #include "../core/sprite.h"
 #include "../core/video.h"
-#include "../core/osspec.h"
+#include "../core/assetfs.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
@@ -112,16 +112,16 @@ bgtheme_t* background_load(const char *file)
 {
     bgtheme_t *bgtheme;
     parsetree_program_t *tree;
-    char abs_path[1024];
+    const char* fullpath;
 
-    logfile_message("background_load('%s')", file);
-    resource_filepath(abs_path, file, sizeof(abs_path), RESFP_READ);
+    logfile_message("background_load(\"%s\")", file);
+    fullpath = assetfs_fullpath(file);
 
     bgtheme = mallocx(sizeof *bgtheme);
     bgtheme->data = NULL;
     bgtheme->length = 0;
 
-    tree = nanoparser_construct_tree(abs_path);
+    tree = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(tree, (void*)bgtheme, traverse);
     tree = nanoparser_deconstruct_tree(tree);
 

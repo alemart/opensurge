@@ -22,7 +22,7 @@
 #include <ctype.h>
 #include "lang.h"
 #include "util.h"
-#include "osspec.h"
+#include "assetfs.h"
 #include "stringutil.h"
 #include "logfile.h"
 #include "hashtable.h"
@@ -43,9 +43,6 @@ static hashtable_stringadapter_t* strings;
 typedef struct { const char *key; const char *value; } inout_t;
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
-
-/* comparable game versions */
-#define VER(major, minor, wip)          ((major)*(1000*1000) + (minor)*(1000) + (wip))
 
 
 /*
@@ -78,18 +75,18 @@ void lang_release()
  */
 void lang_loadfile(const char *filepath)
 {
+    const char* fullpath;
     int ver, subver, wipver;
-    char abs_path[1024];
     parsetree_program_t *prog;
 
     logfile_message("lang_loadfile(\"%s\")...", filepath);
 
     lang_readcompatibility(filepath, &ver, &subver, &wipver);
-    if(!(VER(GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) >= VER(ver, subver, wipver))) /* backwards compatibility */
+    if(game_version_compare(ver, subver, wipver) < 0) /* backwards compatibility */
         fatal_error("\"%s\" (version %d.%d.%d) is not compatible with version %d.%d.%d of the engine", filepath, ver, subver, wipver, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
 
-    resource_filepath(abs_path, filepath, sizeof(abs_path), RESFP_READ);
-    prog = nanoparser_construct_tree(abs_path);
+    fullpath = assetfs_fullpath(filepath);
+    prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(prog, traverse);
     prog = nanoparser_deconstruct_tree(prog);
 }
@@ -102,15 +99,15 @@ void lang_loadfile(const char *filepath)
  */
 void lang_readstring(const char *filepath, const char *desired_key, char *str, int str_size)
 {
-    char abs_path[1024];
     inout_t param;
     parsetree_program_t *prog;
+    const char* fullpath;
 
-    resource_filepath(abs_path, filepath, sizeof(abs_path), RESFP_READ);
+    fullpath = assetfs_fullpath(filepath);
     param.key = desired_key;
     param.value = NULL;
 
-    prog = nanoparser_construct_tree(abs_path);
+    prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(prog, (void*)(&param), traverse_inout);
 
     if(param.value == NULL)
