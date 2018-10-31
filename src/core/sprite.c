@@ -30,7 +30,7 @@
 #include "nanoparser/nanoparser.h"
 
 /* private stuff ;) */
-#define SPRITE_MAX_ANIM         1000 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
+#define SPRITE_MAX_ANIM         1024 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
 HASHTABLE_GENERATE_CODE(spriteinfo_t)
 static hashtable_spriteinfo_t* sprites;
 
@@ -40,7 +40,7 @@ static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
 static void validate_animation(animation_t *anim); /* validates the animation */
 static void register_sprite(const char *sprite_name, spriteinfo_t *spr); /* adds spr to the hash table */
 static spriteinfo_t *spriteinfo_new(); /* creates a new spriteinfo_t instance */
-static animation_t *animation_new(int anim_id); /* creates a new animation_t instance */
+static animation_t *animation_new(int anim_id, v2d_t hot_spot); /* creates a new animation_t instance */
 static animation_t *animation_delete(animation_t *anim); /* deletes anim */
 static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by reading the spritesheet */
 static void fix_sprite_animations(spriteinfo_t *spr); /* fixes the animations of the given sprite */
@@ -239,7 +239,7 @@ spriteinfo_t *spriteinfo_new()
  * animation_new()
  * Creates a new empty animation_t instance
  */
-animation_t *animation_new(int anim_id)
+animation_t *animation_new(int anim_id, v2d_t hot_spot)
 {
     animation_t *anim = mallocx(sizeof *anim);
 
@@ -248,7 +248,7 @@ animation_t *animation_new(int anim_id)
     anim->fps = 8.0f;
     anim->frame_count = 0;
     anim->data = NULL; /* this will be malloc'd later */
-    anim->hot_spot = v2d_new(0,0);
+    anim->hot_spot = hot_spot; /* default hot spot */
     anim->repeat_from = 0;
     anim->frame_data = NULL;
 
@@ -372,12 +372,8 @@ void load_sprite_images(spriteinfo_t *spr)
  */
 void fix_sprite_animations(spriteinfo_t *spr)
 {
-    int i;
-
-    for(i=0; i<spr->animation_count; i++) {
+    for(int i=0; i<spr->animation_count; i++)
         spr->animation_data[i]->frame_data = spr->frame_data;
-        spr->animation_data[i]->hot_spot = spr->hot_spot;
-    }
 }
 
 
@@ -408,12 +404,12 @@ int traverse(const parsetree_statement_t *stmt)
         if(NULL == hashtable_spriteinfo_t_find(sprites, s))
             register_sprite(s, spriteinfo_create(nanoparser_get_program(p2)));
         else
-            fatal_error("Can't redefine sprite '%s'\nin\"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            fatal_error("Can't redefine sprite '%s'\nin \"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
         logfile_message("Loaded sprite '%s'", s);
     }
     else
-        fatal_error("Can't load sprites. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        fatal_error("Can't load sprites. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }
@@ -434,11 +430,14 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
 
+    /* sanity check */
+    if(s->animation_data != NULL && str_icmp(identifier, "animation") != 0)
+        fatal_error("Can't load sprite. Animations must be declared after the other parameters\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    /* read parameters */
     if(str_icmp(identifier, "source_file") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-
         nanoparser_expect_string(p1, "Must provide path to the source_file");
-
         if(s->source_file != NULL)
             free(s->source_file);
         s->source_file = str_dup(nanoparser_get_string(p1));
@@ -448,12 +447,10 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         p2 = nanoparser_get_nth_parameter(param_list, 2);
         p3 = nanoparser_get_nth_parameter(param_list, 3);
         p4 = nanoparser_get_nth_parameter(param_list, 4);
-
         nanoparser_expect_string(p1, "Must provide four numbers to source_rect: xpos, ypos, width, height");
         nanoparser_expect_string(p2, "Must provide four numbers to source_rect: xpos, ypos, width, height");
         nanoparser_expect_string(p3, "Must provide four numbers to source_rect: xpos, ypos, width, height");
         nanoparser_expect_string(p4, "Must provide four numbers to source_rect: xpos, ypos, width, height");
-
         s->rect_x = max(0, atoi(nanoparser_get_string(p1)));
         s->rect_y = max(0, atoi(nanoparser_get_string(p2)));
         s->rect_w = max(1, atoi(nanoparser_get_string(p3)));
@@ -462,20 +459,16 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
     else if(str_icmp(identifier, "frame_size") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         p2 = nanoparser_get_nth_parameter(param_list, 2);
-
         nanoparser_expect_string(p1, "Must provide two numbers to frame_size: width, height");
         nanoparser_expect_string(p2, "Must provide two numbers to frame_size: width, height");
-
         s->frame_w = max(1, atoi(nanoparser_get_string(p1)));
         s->frame_h = max(1, atoi(nanoparser_get_string(p2)));
     }
     else if(str_icmp(identifier, "hot_spot") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         p2 = nanoparser_get_nth_parameter(param_list, 2);
-
         nanoparser_expect_string(p1, "Must provide two numbers to hot_spot: xpos, ypos");
         nanoparser_expect_string(p2, "Must provide two numbers to hot_spot: xpos, ypos");
-
         s->hot_spot.x = (float)atoi(nanoparser_get_string(p1));
         s->hot_spot.y = (float)atoi(nanoparser_get_string(p2));
     }
@@ -488,7 +481,7 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
             nanoparser_expect_program(p2, "Must provide animation attributes");
             anim_id = atoi(nanoparser_get_string(p1));
             if(anim_id < 0 || anim_id >= SPRITE_MAX_ANIM)
-                fatal_error("Can't load sprites. Animation number must be in range 0..%d\nin\"%s\" near line %d", SPRITE_MAX_ANIM-1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                fatal_error("Can't load sprites. Animation number must be in range 0..%d\nin \"%s\" near line %d", SPRITE_MAX_ANIM-1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         }
         else if(p1) {
             nanoparser_expect_program(p1, "Must provide animation attributes");
@@ -496,19 +489,21 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
             p2 = p1;
         }
         else
-            fatal_error("No attributes provided to 'animation' block\nin\"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            fatal_error("No attributes provided to 'animation' block\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
         if(anim_id < s->animation_count && NULL != s->animation_data[anim_id])
             s->animation_data[anim_id] = animation_delete(s->animation_data[anim_id]);
 
         s->animation_count = max(s->animation_count, anim_id+1);
-        s->animation_data = reallocx(s->animation_data, sizeof(animation_t*) * s->animation_count); /* TODO: watch this! It may generate garbage in the middle. */
-        s->animation_data[anim_id] = animation_new(anim_id);
+        if(s->animation_count > SPRITE_MAX_ANIM) /* sanity check */
+            fatal_error("Can't exceed %d animations\nin \"%s\" near line %d", SPRITE_MAX_ANIM, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        s->animation_data = reallocx(s->animation_data, sizeof(animation_t*) * s->animation_count); /* watch this! It may generate garbage in the middle. */
+        s->animation_data[anim_id] = animation_new(anim_id, s->hot_spot);
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), s->animation_data[anim_id], traverse_animation_attributes);
         validate_animation(s->animation_data[anim_id]);
     }
     else
-        fatal_error("Can't load sprites. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        fatal_error("Can't load sprites. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }
@@ -521,7 +516,7 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1, *pj;
+    const parsetree_parameter_t *p1, *p2, *pj;
     animation_t *anim = (animation_t*)animation;
     int j;
 
@@ -543,10 +538,18 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
         nanoparser_expect_string(p1, "repeat_from must be a non-negative number");
         anim->repeat_from = atoi(nanoparser_get_string(p1));
     }
+    else if(str_icmp(identifier, "hot_spot") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "hot_spot receives two numbers: xpos, ypos");
+        nanoparser_expect_string(p2, "hot_spot receives two numbers: xpos, ypos");
+        anim->hot_spot.x = (float)atoi(nanoparser_get_string(p1));
+        anim->hot_spot.y = (float)atoi(nanoparser_get_string(p2));
+    }
     else if(str_icmp(identifier, "data") == 0) {
         anim->frame_count = nanoparser_get_number_of_parameters(param_list);
         if(anim->frame_count < 1)
-            fatal_error("Can't load sprites. Animation 'data' field is missing\nin\"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            fatal_error("Can't load sprites. Animation 'data' field is missing\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         
         anim->data = mallocx(anim->frame_count * sizeof(*(anim->data)));
         for(j=1; j<=anim->frame_count; j++) {
