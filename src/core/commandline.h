@@ -21,8 +21,12 @@
 #ifndef _COMMANDLINE_H
 #define _COMMANDLINE_H
 
+/* command line */
+#define COMMANDLINE_PATHMAX 4096
+typedef struct commandline_t commandline_t;
+
 /* command line structure */
-typedef struct commandline_t {
+struct commandline_t {
     /* video stuff */
     int video_resolution;
     int smooth_graphics;
@@ -31,12 +35,12 @@ typedef struct commandline_t {
     int show_fps;
 
     /* run custom level / quest */
-    char custom_level_path[1024]; /* filepath */
-    char custom_quest_path[1024]; /* filepath */
+    char custom_level_path[COMMANDLINE_PATHMAX]; /* filepath */
+    char custom_quest_path[COMMANDLINE_PATHMAX]; /* filepath */
 
     /* other options */
-    char language_filepath[1024];
-    char datadir[1024];
+    char language_filepath[COMMANDLINE_PATHMAX];
+    char datadir[COMMANDLINE_PATHMAX];
     int use_gamepad;
     int optimize_cpu_usage;
     int allow_font_smoothing;
@@ -44,7 +48,7 @@ typedef struct commandline_t {
     /* user arguments: what comes after "--" */
     const char** user_argv;
     int user_argc;
-} commandline_t;
+};
 
 /* command line interface */
 commandline_t commandline_parse(int argc, char **argv);

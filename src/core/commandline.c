@@ -41,7 +41,7 @@
 
 /* private stuff ;) */
 static const char* basename(const char* path);
-static void display_message(char *fmt, ...);
+static void alert(char *fmt, ...);
 static const char* COPYRIGHT = "Open Surge Engine version " GAME_VERSION_STRING "\n"
                                "Copyright (C) " GAME_YEAR " Alexandre Martins";
 static int COMMANDLINE_UNDEFINED = -1;
@@ -84,7 +84,7 @@ commandline_t commandline_parse(int argc, char **argv)
     for(i=1; i<argc; i++) {
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            display_message(
+            printf(
                 "%s\n<%s>\n\n"
                 "usage:\n"
                 "    %s [options ...]\n"
@@ -108,7 +108,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    -- -arg1 -arg2 -arg3...      user-defined arguments (useful for scripting)\n"
                 "\n"
                 "(*) Recommended for slow computers.\n"
-                "(**) Please provide an absolute path.",
+                "(**) Please provide an absolute path.\n",
                 COPYRIGHT, GAME_WEBSITE,
                 basename(argv[0]),
                 VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
@@ -133,7 +133,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 else if(strcmp(argv[i], "4") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_4X;
                 else
-                    display_message("WARNING: invalid resolution (%s).", argv[i]);
+                    alert("WARNING: invalid resolution (%s).", argv[i]);
             }
         }
 
@@ -156,7 +156,7 @@ commandline_t commandline_parse(int argc, char **argv)
             if(++i < argc) {
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
-                    display_message("WARNING: invalid color depth (%d).", cmd.color_depth);
+                    alert("WARNING: invalid color depth (%d).", cmd.color_depth);
                     cmd.color_depth = COMMANDLINE_UNDEFINED;
                 }
             }
@@ -204,7 +204,7 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else { /* unknown option */
             const char* prog = basename(argv[0]);
-            display_message("%s: bad command line option \"%s\".\nRun %s --help to get more information.", prog, argv[i], prog);
+            alert("%s: bad command line option \"%s\".\nRun %s --help to get more information.", prog, argv[i], prog);
             exit(0);
         }
 
@@ -239,7 +239,7 @@ const char* commandline_getstring(const char* value, const char* default_string)
 
 
 /* Displays a message to the user (printf format) */
-void display_message(char *fmt, ...)
+void alert(char *fmt, ...)
 {
     char buf[4096];
     va_list args;
