@@ -189,13 +189,13 @@ object ".title_screen.development"
     {
         hide
         set_zindex 1
-        set_absolute_position screen_width()/2 83
+        set_absolute_position screen_width()/2 80
         change_state "display"
     }
 
     state "display"
     {
-        textout_centre "menu.main" 0 0 "$TITLE_DEVELOPMENT"
+        textout_centre "menu.text" 0 0 "$TITLE_DEVELOPMENT"
     }
 }
 

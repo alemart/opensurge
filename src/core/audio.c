@@ -793,7 +793,7 @@ void audio_init()
         else
             voices /= 2;
     }
-    logfile_message("Warning: unable to reserve voices.\n%s\n", allegro_error);
+    logfile_message("Warning: unable to reserve voices - %s", allegro_error);
 }
 #else
 void audio_init()

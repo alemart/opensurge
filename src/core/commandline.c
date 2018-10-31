@@ -60,23 +60,6 @@ commandline_t commandline_parse(int argc, char **argv)
     commandline_t cmd;
 
     /* initializing values */
-    /*
-    prefs_t* prefs = modmanager_prefs();
-    cmd.video_resolution = prefs_has_item(prefs, ".resolution") ? prefs_get_int(prefs, ".resolution") : VIDEORESOLUTION_2X;
-    cmd.smooth_graphics = prefs_get_bool(prefs, ".smoothgfx");
-    cmd.fullscreen = prefs_get_bool(prefs, ".fullscreen");
-    cmd.color_depth = max(16, video_get_desktop_color_depth());
-    cmd.show_fps = prefs_get_bool(prefs, ".showfps");
-    cmd.custom_level = FALSE;
-    str_cpy(cmd.custom_level_path, "", sizeof(cmd.custom_level_path));
-    cmd.custom_quest = FALSE;
-    str_cpy(cmd.custom_quest_path, "", sizeof(cmd.custom_quest_path));
-    str_cpy(cmd.language_filepath, prefs_get_string(prefs, ".langpath"), sizeof(cmd.language_filepath));
-    str_cpy(cmd.datadir, "", sizeof(cmd.datadir));
-    cmd.use_gamepad = prefs_get_bool(prefs, ".gamepad");
-    cmd.optimize_cpu_usage = TRUE;
-    cmd.allow_font_smoothing = TRUE;
-    */
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
     cmd.smooth_graphics = COMMANDLINE_UNDEFINED;
     cmd.fullscreen = COMMANDLINE_UNDEFINED;

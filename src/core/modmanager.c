@@ -21,10 +21,9 @@
 #include <stdlib.h>
 #include "modmanager.h"
 #include "prefs.h"
+#include "global.h"
 
 /* private stuff */
-#define GAMEID_MAXLEN 80
-static char gameid[1 + GAMEID_MAXLEN] = "opensurge"; /* only lowercase letters and/or numbers */
 static prefs_t* prefs = NULL;
 
 
@@ -35,7 +34,7 @@ static prefs_t* prefs = NULL;
  */
 void modmanager_init()
 {
-    prefs = prefs_create(gameid);
+    prefs = prefs_create(NULL);
 }
 
 /*
@@ -53,7 +52,7 @@ void modmanager_release()
  */
 const char* modmanager_gameid()
 {
-    return gameid;
+    return GAME_UNIXNAME;
 }
 
 /*

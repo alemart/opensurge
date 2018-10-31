@@ -29,6 +29,7 @@
 #include "util.h"
 #include "logfile.h"
 #include "global.h"
+#include "assetfs.h"
 #include "whereami/whereami.h"
 
 /* OS-specific includes */
@@ -41,11 +42,11 @@
 
 /* macros */
 #define prefs_fatal fatal_error
-#define prefs_warning logfile_message
+#define prefs_log logfile_message
 #define prefs_version() (GAME_VERSION_CODE)
 
 /* Where are the prefs stored? */
-#define PREFS_BASEDIR "opensurge2d"
+#define PREFS_FILE "surge.prefs"
 
 /* prefs structure */
 typedef enum prefstype_t prefstype_t;
@@ -108,7 +109,7 @@ struct pfentry_t
     /* data: [ key | \0 | value ] */
 };
 
-/* private functions */
+/* private stuff */
 static int load(prefs_t* prefs);
 static int save(const prefs_t* prefs);
 static uint32_t hash(const char* str);
@@ -141,8 +142,6 @@ static int write_entry(FILE* fp, const prefsentry_t* entry);
 static prefsentry_t* read_entry(FILE* fp);
 static int read_header(FILE* fp, pfheader_t* header);
 static int validate_header(FILE* fp, const prefs_t* prefs, const pfheader_t* header);
-static char* config_fullpath(const char* filename);
-static char* prefs_fullpath(const prefs_t* prefs);
 
 
 
@@ -151,7 +150,7 @@ static char* prefs_fullpath(const prefs_t* prefs);
 
 /*
  * prefs_create()
- * Creates a new prefs, with the associated prefsid
+ * Creates a new prefs, with the associated prefsid (may be NULL)
  */
 prefs_t* prefs_create(const char* prefsid)
 {
@@ -159,6 +158,7 @@ prefs_t* prefs_create(const char* prefsid)
     int i;
 
     /* Validate */
+    prefsid = prefsid && *prefsid ? prefsid : GAME_UNIXNAME;
     if(!is_valid_id(prefsid))
         prefs_fatal("Can't create Prefs: invalid id \"%s\". Please use only lowercase letters / digits.", prefsid);
 
@@ -445,7 +445,7 @@ prefslist_t* delete_list(prefslist_t* list)
 /* prefs: CRUD operations */
 prefsentry_t* prefs_find_entry(prefs_t* prefs, const char* key)
 {
-    /* returns NULL if the key is not found */
+    /* returns NULL if the key has not been found */
     uint32_t h = hash(key);
     prefslist_t* prev = NULL;
 
@@ -799,7 +799,7 @@ prefsentry_t* read_entry(FILE* fp)
 
     /* error? */
     if(ferror(fp) != 0 || entry == NULL) {
-        prefs_warning("Prefs reading error (%d) near byte %ld", ferror(fp), ftell(fp));
+        prefs_log("Prefs reading error (%d) near byte %ld", ferror(fp), ftell(fp));
         clearerr(fp);
     }
 
@@ -813,33 +813,33 @@ int read_header(FILE* fp, pfheader_t* header)
 
     /* read file signature */
     if(1 != fread(header->magic, sizeof(header->magic), 1, fp)) {
-        prefs_warning("Can't read prefs file signature");
+        prefs_log("Can't read prefs file signature");
         return 0;
     }
 
     /* discard unused bytes */
     if(1 != fread(header->unused, sizeof(header->unused), 1, fp)) {
-        prefs_warning("Can't read prefs file header: invalid format");
+        prefs_log("Can't read prefs file header: invalid format");
         return 0;
     }
 
     /* read version code */
     if(1 != fread(buf32, sizeof(buf32), 1, fp)) {
-        prefs_warning("Can't read prefs file header: expected version code");
+        prefs_log("Can't read prefs file header: expected version code");
         return 0;
     }
     header->version_code = le32_to_cpu(buf32);
 
     /* read prefsid hash */
     if(1 != fread(buf32, sizeof(buf32), 1, fp)) {
-        prefs_warning("Can't read prefs file header: expected prefs hash");
+        prefs_log("Can't read prefs file header: expected prefs hash");
         return 0;
     }
     header->prefsid_hash = le32_to_cpu(buf32);
 
     /* read entry count */
     if(1 != fread(buf32, sizeof(buf32), 1, fp)) {
-        prefs_warning("Can't read prefs file header: expected entry count");
+        prefs_log("Can't read prefs file header: expected entry count");
         return 0;
     }
     header->entry_count = le32_to_cpu(buf32);
@@ -852,17 +852,17 @@ int validate_header(FILE* fp, const prefs_t* prefs, const pfheader_t* header)
 {
     /* check magic */
     if(0 != memcmp(header->magic, PREFS_MAGIC, sizeof(header->magic))) {
-        prefs_warning("Invalid prefs file signature");
+        prefs_log("Invalid prefs file signature");
         return 0;
     }
 
     /* validate version */
     if(header->version_code > prefs_version())
-        prefs_warning("Found newer version of prefs file: engine upgrade is advised");
+        prefs_log("Found newer version of prefs file: engine upgrade is advised");
 
     /* verify hash */
     if(hash(prefs->prefsid) != header->prefsid_hash) {
-        prefs_warning("Invalid prefs file hash");
+        prefs_log("Invalid prefs file hash");
         return 0;
     }
 
@@ -942,7 +942,7 @@ int write_entry(FILE* fp, const prefsentry_t* entry)
 
     /* error? */
     if(ferror(fp) != 0 || !success) {
-        prefs_warning("Prefs writing error (%d) near byte %ld", ferror(fp), ftell(fp));
+        prefs_log("Prefs writing error (%d) near byte %ld", ferror(fp), ftell(fp));
         clearerr(fp);
     }
 
@@ -975,7 +975,7 @@ int write_header(FILE* fp, const prefs_t* prefs)
 
     /* error? */
     if(ferror(fp) != 0 || !success) {
-        prefs_warning("Prefs header writing error (%d) near byte %ld", ferror(fp), ftell(fp));
+        prefs_log("Prefs header writing error (%d) near byte %ld", ferror(fp), ftell(fp));
         clearerr(fp);
     }
 
@@ -986,11 +986,11 @@ int write_header(FILE* fp, const prefs_t* prefs)
 /* load prefs from the disk */
 int load(prefs_t* prefs)
 {
-    char* filename = prefs_fullpath(prefs);
+    const char* filename = assetfs_create_config_file(PREFS_FILE);
     FILE* fp = fopen(filename, "rb");
     int success = 0;
 
-    prefs_warning("Loading prefs from file \"%s\"...", filename);
+    prefs_log("Loading prefs from file \"%s\"...", filename);
 
     /* load file */
     if(fp != NULL) {
@@ -1013,23 +1013,22 @@ int load(prefs_t* prefs)
 
     /* error? */
     if(!success) {
-        prefs_warning(!fp ? "Can't read prefs file!" : "Prefs file is corrupt.");
+        prefs_log(!fp ? "Can't read prefs file!" : "Prefs file is corrupt.");
         prefs_clear(prefs);
     }
 
     /* done */
-    free(filename);
     return success;
 }
 
 /* save prefs to the disk */
 int save(const prefs_t* prefs)
 {
-    char* filename = prefs_fullpath(prefs);
+    const char* filename = assetfs_create_config_file(PREFS_FILE);
     FILE* fp = fopen(filename, "wb");
     int success = 0;
 
-    prefs_warning("Saving prefs to file \"%s\"...", filename);
+    prefs_log("Saving prefs to file \"%s\"...", filename);
 
     /* save file */
     if(fp != NULL) {
@@ -1044,160 +1043,12 @@ int save(const prefs_t* prefs)
         fclose(fp);
     }
     else
-        prefs_warning("Can't open prefs file for writing!");
+        prefs_log("Can't open prefs file for writing!");
+
+    /* error? */
+    if(!success)
+        prefs_log("Can't save prefs to file.");
 
     /* done */
-    free(filename);
     return success;
-}
-
-#if !defined(_WIN32)
-/* recursive mkdir(): give the absolute path of a file
-   this will create the filepath for you */
-static int mkpath(char* path, mode_t mode)
-{
-    char* p;
-
-    if(path == NULL || *path == '\0')
-        return 0;
-
-    for(p = strchr(path+1, '/'); p != NULL; p = strchr(p+1, '/')) {
-        *p = '\0';
-        if(mkdir(path, mode) != 0) {
-            if(errno != EEXIST) {
-                *p = '/';
-                prefs_warning("Can't mkpath \"%s\": %s", path, strerror(errno));
-                return -1;
-            }
-        }
-        *p = '/';
-    }
-
-    return 0;
-}
-#endif
-
-/* returns the absolute filepath for a given configuration filename (relative path).
- * You must free() the returned string afterwards */
-char* config_fullpath(const char* filename)
-{
-    char* result = NULL;
-
-    /* OS-specific routines */
-    if(filename != NULL) {
-#if defined(_WIN32)
-        int len, dirlen = 0;
-        if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-            char* path = mallocx((1 + len) * sizeof(*path));
-            const char* p;
-            DARRAY(char, buf);
-            darray_init(buf);
-
-            wai_getExecutablePath(path, len, &dirlen);
-            path[dirlen] = '\0';
-            for(p = path; *p; p++)
-                darray_push(buf, *p);
-            darray_push(buf, '\\');
-            for(p = filename; *p; p++)
-                darray_push(buf, *p != '/' ? *p : '\\');
-            darray_push(buf, '\0');
-
-            result = clone_str((const char*)buf);
-            darray_release(buf);
-            free(path);
-        }
-#elif defined(__APPLE__) && defined(__MACH__)
-        struct passwd* userinfo = NULL;
-        if(NULL != (userinfo = getpwuid(getuid()))) {
-            const char* path = "/Library/Application Support/" PREFS_BASEDIR "/", *p;
-            DARRAY(char, buf);
-            darray_init(buf);
-
-            for(p = userinfo->pw_dir; *p; p++)
-                darray_push(buf, *p);
-            for(p = path; *p; p++)
-                darray_push(buf, *p);
-            for(p = filename; *p; p++)
-                darray_push(buf, *p);
-            darray_push(buf, '\0');
-
-            mkpath((char*)buf, 0755);
-            result = clone_str((const char*)buf);
-            darray_release(buf);
-        }
-#elif defined(__unix__) || defined(__unix)
-        const char *home = NULL, *path = NULL;
-        if(NULL == (home = getenv("XDG_CONFIG_HOME"))) {
-            struct passwd* userinfo = NULL;
-            if(NULL != (userinfo = getpwuid(getuid()))) {
-                home = userinfo->pw_dir;
-                path = "/.config/" PREFS_BASEDIR "/";
-            }
-        }
-        else
-            path = "/" PREFS_BASEDIR "/";
-
-        if(home != NULL && path != NULL) {
-            const char* p;
-            DARRAY(char, buf);
-            darray_init(buf);
-
-            for(p = home; *p; p++)
-                darray_push(buf, *p);
-            for(p = path; *p; p++)
-                darray_push(buf, *p);
-            for(p = filename; *p; p++)
-                darray_push(buf, *p);
-            darray_push(buf, '\0');
-
-            mkpath((char*)buf, 0755);
-            result = clone_str((const char*)buf);
-            darray_release(buf);
-        }
-#else
-        /* Unknown system */
-        ;
-#endif
-
-        /* error? */
-        if(result == NULL) {
-            prefs_warning("config_fullpath(): can't find config directory");
-            result = clone_str(filename);
-        }
-    }
-    else
-        result = config_fullpath("");
-
-    /* done! */
-    return result;
-}
-
-/* the absolute path of a prefs file
- * You must free() the returned string after use */
-char* prefs_fullpath(const prefs_t* prefs)
-{
-#if !defined(_WIN32)
-    const char* folder = prefs->prefsid; /* relative path: mod directory */
-#else
-    const char* folder = "."; /* relative path: exe directory */
-#endif
-
-    const char* base = prefs->prefsid;
-    const char* ext = ".prefs";
-    char* filename, *fullpath;
-
-    if(base == NULL) {
-        base = "";
-        prefs_fatal("Can't determine prefs_fullpath(): unspecified prefsid");
-    }
-
-    filename = mallocx((2 + strlen(folder) + strlen(base) + strlen(ext)) * sizeof(char));
-    strcpy(filename, folder);
-    strcat(filename, "/");
-    strcat(filename, base);
-    strcat(filename, ext);
-    fullpath = config_fullpath(filename);
-    free(filename);
-
-    return fullpath;
 }

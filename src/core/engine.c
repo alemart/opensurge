@@ -68,13 +68,11 @@ static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
 static const char* get_window_title();
-static void parser_error(const char *msg);
-static void parser_warning(const char *msg);
 static void init_nanoparser();
 static void release_nanoparser();
+static void parser_error(const char *msg);
+static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
-static void init_nanocalc();
-static void release_nanocalc();
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 
@@ -164,19 +162,19 @@ void clean_garbage()
 /*
  * init_basic_stuff()
  * Initializes the basic stuff, such as Allegro.
- * Call this before anything else.
+ * Call this before everything else.
  */
 void init_basic_stuff(const commandline_t* cmd)
 {
+    const char* gameid = NULL;
     const char* datadir = commandline_getstring(cmd->datadir, NULL);
+
     set_uformat(U_UTF8);
     allegro_init();
     randomize();
-    assetfs_init(NULL, datadir);
+    assetfs_init(gameid, datadir);
     logfile_init();
     init_nanoparser();
-    init_nanocalc();
-    modmanager_init(); /* FIXME */
 }
 
 
@@ -186,7 +184,10 @@ void init_basic_stuff(const commandline_t* cmd)
  */
 void init_managers(const commandline_t* cmd)
 {
-    prefs_t* prefs = modmanager_prefs();
+    prefs_t* prefs;
+
+    modmanager_init();
+    prefs = modmanager_prefs();
 
     timer_init(
         commandline_getint(cmd->optimize_cpu_usage, TRUE)
@@ -220,7 +221,9 @@ void init_managers(const commandline_t* cmd)
 void init_accessories(const commandline_t* cmd)
 {
     prefs_t* prefs = modmanager_prefs();
-    const char* custom_lang = commandline_getstring(cmd->language_filepath, prefs_get_string(prefs, ".langpath"));
+    const char* custom_lang = commandline_getstring(cmd->language_filepath,
+        prefs_has_item(prefs, ".langpath") ? prefs_get_string(prefs, ".langpath") : NULL
+    );
 
     setlocale(LC_NUMERIC, "C"); /* bugfix */
     video_display_loading_screen();
@@ -235,7 +238,7 @@ void init_accessories(const commandline_t* cmd)
     screenshot_init();
     fadefx_init();
     lang_init();
-    if(*custom_lang)
+    if(custom_lang && *custom_lang)
         lang_loadfile(custom_lang);
     
     scenestack_init();
@@ -258,8 +261,8 @@ void init_game_data()
  */
 void push_initial_scene(const commandline_t* cmd)
 {
-    int custom_level = *(commandline_getstring(cmd->custom_level_path, "")) != '\0';
-    int custom_quest = *(commandline_getstring(cmd->custom_quest_path, "")) != '\0';
+    int custom_level = (commandline_getstring(cmd->custom_level_path, NULL) != NULL);
+    int custom_quest = (commandline_getstring(cmd->custom_quest_path, NULL) != NULL);
 
     if(custom_level) {
         scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)(commandline_getstring(cmd->custom_level_path, "")));
@@ -312,7 +315,6 @@ void release_managers()
     resourcemanager_release();
     audio_release();
     timer_release();
-    assetfs_release();
 }
 
 
@@ -323,9 +325,9 @@ void release_managers()
  */
 void release_basic_stuff()
 {
-    release_nanocalc();
     release_nanoparser();
     logfile_release();
+    assetfs_release();
     allegro_exit();
 }
 
@@ -337,6 +339,37 @@ void release_basic_stuff()
 const char* get_window_title()
 {
     return GAME_TITLE " " GAME_VERSION_STRING;
+}
+
+/*
+ * init_nanoparser()
+ * Initializes nanoparser
+ */
+void init_nanoparser()
+{
+    /* nanoparser */
+    nanoparser_set_error_function(parser_error);
+    nanoparser_set_warning_function(parser_warning);
+
+    /* nanocalc */
+    nanocalc_init(); /* initializes a basic nanocalc */
+    nanocalc_set_error_function(calc_error); /* error callback */
+    nanocalc_addons_init(); /* adds some mathematical functions to nanocalc */
+    nanocalcext_register_bifs(); /* more bindings */
+}
+
+/*
+ * release_nanoparser()
+ * Releases nanoparser
+ */
+void release_nanoparser()
+{
+    /* nanoparser */
+    ; /* empty */
+
+    /* nanocalc */
+    nanocalc_addons_release();
+    nanocalc_release();
 }
 
 /*
@@ -358,51 +391,10 @@ void parser_warning(const char *msg)
 }
 
 /*
- * init_nanoparser()
- * Initializes nanoparser
- */
-void init_nanoparser()
-{
-    nanoparser_set_error_function(parser_error);
-    nanoparser_set_warning_function(parser_warning);
-}
-
-/*
- * release_nanoparser()
- * Releases nanoparser
- */
-void release_nanoparser()
-{
-    ; /* empty */
-}
-
-/*
  * calc_error()
  * This is called by nanocalc when an error is raised
  */
 void calc_error(const char *msg)
 {
     fatal_error("%s", msg);
-}
-
-/*
- * init_nanocalc()
- * Initializes nanocalc
- */
-void init_nanocalc()
-{
-    nanocalc_init(); /* initializes a basic nanocalc */
-    nanocalc_set_error_function(calc_error); /* error callback */
-    nanocalc_addons_init(); /* adds some mathematical functions to nanocalc */
-    nanocalcext_register_bifs(); /* more bindings */
-}
-
-/*
- * release_nanocalc()
- * Releases nanocalc
- */
-void release_nanocalc()
-{
-    nanocalc_addons_release();
-    nanocalc_release();
 }

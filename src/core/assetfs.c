@@ -773,7 +773,7 @@ bool is_asset_folder(const char* fullpath)
 /* checks if a certain file (given its absolute path) is writable */
 bool is_writable_file(const char* fullpath)
 {
-    FILE* fp = fopen(fullpath, "wb");
+    FILE* fp = fopen(fullpath, "r+b");
     bool writable = false;
     if(fp != NULL) {
         writable = true;

@@ -293,7 +293,8 @@ input_t *input_create_user(const char* inputmap_name)
         in->state[i] = in->oldstate[i] = FALSE;
 
     /* if there isn't such a inputmap_name, the game will exit beautifully */
-    me->inputmap = inputmap_get(inputmap_name ? inputmap_name : DEFAULT_INPUTMAP_NAME);
+    inputmap_name = inputmap_name ? inputmap_name : DEFAULT_INPUTMAP_NAME;
+    me->inputmap = inputmap_get(inputmap_name);
 
     /* check joystick stuff */
     if(me->inputmap->joystick.enabled && (!input_joystick_available() || me->inputmap->joystick.id >= input_number_of_plugged_joysticks())) {
