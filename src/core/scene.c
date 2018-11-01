@@ -24,7 +24,7 @@
 
 
 /* constants */
-#define SCENESTACK_CAPACITY         16      /* up to 16 scenes running simultanely */
+#define SCENESTACK_CAPACITY         16      /* up to 16 scenes running simultaneously */
 
 
 /* private stuff */

@@ -29,7 +29,7 @@
 #include "nanoparser/nanoparser.h"
 
 #define INPUTMAP_FILE           "config/input.def"
-#define NULL_INPUTMAP           "<null>"
+#define NULL_INPUTMAP           "null"
 
 /* storage */
 typedef struct inputmapnode_t inputmapnode_t;
