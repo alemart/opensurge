@@ -54,6 +54,7 @@ void logfile_init()
  */
 void logfile_message(const char *fmt, ...)
 {
+    if(logfile == NULL) logfile = stderr;
     if(logfile != NULL) {
         va_list args;
 

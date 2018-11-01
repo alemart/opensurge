@@ -383,7 +383,7 @@ int write_to_zip(const char* vpath, void* param)
    you'll have to free() this */
 char* guess_gameid(const char* zip_fullpath)
 {
-    char gameid[16] = { 0 };
+    char gameid[32] = { 0 };
     const char* p = basename(zip_fullpath);
     int i, maxlen = sizeof(gameid) - 1;
 

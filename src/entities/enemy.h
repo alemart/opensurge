@@ -152,4 +152,7 @@ int enemy_belongs_to_category(enemy_t *enemy, const char *category);
 /* checks if an object exists */
 int enemy_exists(const char* object_name);
 
+/* retro compatibility: allow duplicate scripts */
+void enemy_allow_duplicates(int allow_duplicates);
+
 #endif

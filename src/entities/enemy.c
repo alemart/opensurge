@@ -74,6 +74,7 @@ static int fill_object_categories(const parsetree_statement_t *stmt, void *objec
 static int fill_lookup_table(const parsetree_statement_t *stmt, void *lookup_table);
 static int prepare_to_fill_object_categories(const parsetree_statement_t *stmt, void *object_category_data);
 static int dirfill(const char *vpath, void *param); /* file system callback */
+static int compat_dirfill(const char *vpath, void *param); /* retro-compatibility */
 static int is_hidden_object(const char *name);
 static int category_exists(const char *category);
 
@@ -81,6 +82,7 @@ static parsetree_program_t *objects;
 static object_name_data_t name_table;
 static object_category_data_t category_table;
 static hashtable_objectcode_t* lookup_table;
+static int allow_duplicate_scripts = FALSE;
 
 
 /* ------ public class methods ---------- */
@@ -95,9 +97,8 @@ void objects_init()
     objects = NULL;
 
     /* reading the parse tree */
-    assetfs_foreach_file("objects", ".obj", dirfill, (void*)(&objects), true);
-    if(objects == NULL)
-        assetfs_foreach_file("scripts/legacy", ".obj", dirfill, (void*)(&objects), true);
+    assetfs_foreach_file("objects", ".obj", compat_dirfill, (void*)(&objects), true);
+    assetfs_foreach_file("scripts/legacy", ".obj", dirfill, (void*)(&objects), true);
 
     /* creating the name table */
     name_table.length = 0;
@@ -355,6 +356,14 @@ int enemy_exists(const char* object_name)
     return NULL != hashtable_objectcode_t_find(lookup_table, object_name);
 }
 
+/*
+ * enemy_allow_duplicates()
+ * Allow duplicate definition of objects (scripts)
+ */
+void enemy_allow_duplicates(int allow_duplicates)
+{
+    allow_duplicate_scripts = allow_duplicates;
+}
 
 
 /* ----------- private functions ----------- */
@@ -517,12 +526,15 @@ int fill_lookup_table(const parsetree_statement_t *stmt, void *lookup_table)
 
         if(hashtable_objectcode_t_find(table, object_name) == NULL)
             hashtable_objectcode_t_add(table, object_name, (objectcode_t*)object_code);
+        else if(allow_duplicate_scripts)
+            logfile_message("Object script warning: duplicate definition of the object \"%s\"\nin \"%s\" near line %d", object_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         else
             fatal_error("Object script error: duplicate definition of the object \"%s\"\nin \"%s\" near line %d", object_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
 
     return 0;
 }
+
 
 
 int object_name_table_cmp(const void *a, const void *b)
@@ -546,6 +558,12 @@ int dirfill(const char *vpath, void *param)
     parsetree_program_t** p = (parsetree_program_t**)param;
     *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
     return 0;
+}
+
+int compat_dirfill(const char *vpath, void *param)
+{
+    enemy_allow_duplicates(TRUE);
+    return dirfill(vpath, param);
 }
 
 

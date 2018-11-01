@@ -680,10 +680,16 @@ int traverse(const parsetree_statement_t *stmt)
         /* read the data */
         nanoparser_expect_string(p1, "Font script error: font name is expected");
         name = nanoparser_get_string(p1);
-        logfile_message("Loading font '%s'...", name);
-
+        logfile_message("Loading font \"%s\"...", name);
         nanoparser_expect_program(p2, "Font script error: font block is expected after the font name");
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)(&header), traverse_block);
+
+        /* duplicate font? */
+        if(NULL != fontdata_list_find(name)) {
+            /* fail silently */
+            logfile_message("Font script error: can't redefine font \"%s\"\nin \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            return 0;
+        }
 
         /* create the fontdata_t */
         switch(header.type) {
@@ -716,9 +722,10 @@ int traverse(const parsetree_statement_t *stmt)
 
         /* register the fontdata_t */
         fontdata_list_add(name, data);
+
     }
     else
-        fatal_error("Font script error: unknown keyword '%s'", id);
+        fatal_error("Font script error: unknown identifier \"%s\"\nin \"%s\" near line %d", id, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }
@@ -887,12 +894,7 @@ void fontdata_list_init()
 
 void fontdata_list_add(const char *name, fontdata_t *data)
 {
-    fontdata_list_t *x;
-
-    if(NULL != fontdata_list_find(name))
-        fatal_error("Font script error: can't redefine font \"%s\"", name);
-
-    x = mallocx(sizeof *x);
+    fontdata_list_t *x = mallocx(sizeof *x);
     x->name = str_dup(name);
     x->data = data;
     x->next = fontdata_list;

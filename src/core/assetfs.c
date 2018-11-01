@@ -199,10 +199,29 @@ const char* assetfs_fullpath(const char* vpath)
     if(file == NULL) {
 #if 0
         assetfs_fatal("Can't find asset \"%s\"", vpath);
-        return "";
+        return "invalid-asset"; /* never vpath */
 #else
         assetfs_log("Can't find asset \"%s\"", vpath);
-        return "invalid-asset";
+        if(is_valid_writable_vpath(vpath)) {
+            /* Create an invalid file in the filesystem */
+            int dirlen = -1;
+            char* sanitized_vpath = pathify(vpath);
+            char* imaginary_fullpath = join_path("invalid-asset", sanitized_vpath);
+            assetfile_t* file = afs_mkfile(vpathbasename(sanitized_vpath, &dirlen), imaginary_fullpath, ASSET_DATA);
+            if(dirlen >= 0) {
+                sanitized_vpath[dirlen] = '\0';
+                afs_storefile(afs_mkpath(root, sanitized_vpath), file);
+            }
+            else
+                afs_storefile(root, file);
+            free(imaginary_fullpath);
+            free(sanitized_vpath);
+            return file->fullpath;
+        }
+        else {
+            /* never vpath */
+            return "invalid-asset";
+        }
 #endif
     }
 
@@ -348,21 +367,27 @@ const char* assetfs_create_cache_file(const char* vpath)
         return file ? file->fullpath : "";
     }
     else {
+        bool prefer_user_space = false;
         if(file->type != ASSET_CACHE) {
-            /* preserve paths. Do nothing. */
+            /* wrong file type. Replace path. */
             assetfs_log("assetfs warning: expected a cache file - \"%s\"", vpath);
             file->type = ASSET_CACHE;
+            prefer_user_space = true;
         }
         if(!is_writable_file(file->fullpath)) {
             /* not a writable file. Replace path. */
+            assetfs_log("assetfs warning: not a writable file - \"%s\". Using user space.", file->fullpath);
+            prefer_user_space = true;
+        }
+        if(prefer_user_space) {
+            /* prefer user space. Replace path. */
             char* path = pathify(vpath), *fullpath;
             if((fullpath = build_cache_fullpath(afs_gameid, path)) != NULL) {
-                assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
                 afs_updatefile(file, fullpath);
                 free(fullpath);
             }
             else
-                assetfs_log("assetfs warning: not a writable file - \"%s\"", file->fullpath);
+                assetfs_log("assetfs warning: can't create file \"%s\" in user space - \"%s\"", vpath, file->fullpath);
             free(path);
         }
         return file->fullpath;
