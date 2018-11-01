@@ -28,7 +28,6 @@
 #include "../core/video.h"
 #include "../core/audio.h"
 #include "../core/input.h"
-#include "../core/osspec.h"
 #include "../core/font.h"
 #include "../entities/background.h"
 

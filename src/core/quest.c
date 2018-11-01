@@ -28,7 +28,6 @@
 #include "stringutil.h"
 #include "logfile.h"
 #include "quest.h"
-#include "osspec.h"
 #include "nanoparser/nanoparser.h"
 
 

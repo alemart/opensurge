@@ -26,7 +26,6 @@
 #include "scene.h"
 #include "storyboard.h"
 #include "util.h"
-#include "osspec.h"
 #include "assetfs.h"
 #include "resourcemanager.h"
 #include "stringutil.h"

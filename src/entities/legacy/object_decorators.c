@@ -32,7 +32,7 @@
 #include "../../core/audio.h"
 #include "../../core/soundfactory.h"
 #include "../../core/timer.h"
-#include "../../core/osspec.h"
+#include "../../core/web.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
 #include "../../core/font.h"

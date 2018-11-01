@@ -223,7 +223,7 @@ SET(
   src/core/lang.c
   src/core/logfile.c
   src/core/modmanager.c
-  src/core/osspec.c
+  src/core/web.c
   src/core/prefs.c
   src/core/quest.c
   src/core/resourcemanager.c
@@ -370,7 +370,7 @@ IF(WIN32)
       src/core/lang.h
       src/core/logfile.h
       src/core/modmanager.h
-      src/core/osspec.h
+      src/core/web.h
       src/core/prefs.h
       src/core/quest.h
       src/core/resourcemanager.h

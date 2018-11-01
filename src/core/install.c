@@ -425,8 +425,7 @@ bool console_ask(const char* fmt, ...)
         fflush(stdout);
 
         if(fgets(buf, sizeof(buf), stdin) != NULL) {
-            if(strlen(buf) > 0)
-                buf[strlen(buf)-1] = '\0';
+            buf[max(0, strlen(buf)-1)] = '\0';
             c = tolower(buf[0]);
             if((c == 'y' || c == 'n') && buf[1] == '\0')
                 return (c == 'y');
