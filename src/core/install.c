@@ -115,7 +115,7 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
                     {
                         const char* path = zip_entry_name(zip);
                         if(is_prefix(path, root_folder)) {
-                            const char* fullpath = assetfs_create_data_file(path + r); /* will create all the subfolders */
+                            const char* fullpath = assetfs_create_data_file(path + r, true); /* will create all the subfolders */
                             if(!zip_entry_isdir(zip))
                                 zip_entry_fread(zip, fullpath);
                         }
@@ -161,7 +161,7 @@ int foreach_installed_game(int (*callback)(const char*,void*), void* data)
 {
 #if !defined(_WIN32)
     if(assetfs_initialized()) {
-        const char* tmp = assetfs_create_data_file(""); /* path to userdata space */
+        const char* tmp = assetfs_create_data_file("", true); /* path to userdata space */
         char* games_folder = strcat(strcpy(mallocx((5 + strlen(tmp)) * sizeof(*games_folder)), tmp), "/../");
         int num_games = 0;
         DIR* dir = opendir(games_folder);
@@ -290,16 +290,19 @@ char* guess_root_folder(const char* zip_fullpath)
     char* root_folder = NULL;
 
     if(zip != NULL) {
-        const char* key = "levels/";
-        const char* entry_name = NULL;
+        const char* dir = "levels/";
+        const char* ext = ".lev";
         int i, n = zip_total_entries(zip);
         for(i = 0; i < n && !root_folder; i++) {
             zip_entry_openbyindex(zip, i);
-            if(zip_entry_isdir(zip) && is_suffix((entry_name = zip_entry_name(zip)), key)) {
-                int len = strlen(entry_name) - strlen(key);
-                root_folder = mallocx((1 + len) * sizeof(*root_folder));
-                strncpy(root_folder, entry_name, len);
-                root_folder[len] = '\0';
+            if(!zip_entry_isdir(zip)) {
+                const char* entry_name = zip_entry_name(zip), *p;
+                if((p = strstr(entry_name, dir)) != NULL && is_suffix(entry_name, ext)) {
+                    int len = p - entry_name;
+                    root_folder = mallocx((1 + len) * sizeof(*root_folder));
+                    strncpy(root_folder, entry_name, len);
+                    root_folder[len] = '\0';
+                }
             }
             zip_entry_close(zip);
         }

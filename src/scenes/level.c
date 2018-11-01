@@ -556,7 +556,7 @@ int level_save(const char *filepath)
     item_list = entitymanager_retrieve_all_items();
     object_list = entitymanager_retrieve_all_objects();
 
-    fullpath = assetfs_create_data_file(filepath);
+    fullpath = assetfs_create_data_file(filepath, false);
 
     /* open for writing */
     logfile_message("level_save(\"%s\")", fullpath);

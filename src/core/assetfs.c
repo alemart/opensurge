@@ -289,7 +289,7 @@ const char* assetfs_create_config_file(const char* vpath)
             file->type = ASSET_CONFIG;
         }
         if(!is_writable_file(file->fullpath)) {
-            /* not a writable file. Replace path */
+            /* not a writable file. Replace path. */
             char* path = pathify(vpath), *fullpath;
             if((fullpath = build_config_fullpath(afs_gameid, path)) != NULL) {
                 assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
@@ -347,7 +347,7 @@ const char* assetfs_create_cache_file(const char* vpath)
             file->type = ASSET_CACHE;
         }
         if(!is_writable_file(file->fullpath)) {
-            /* not a writable file. Replace path */
+            /* not a writable file. Replace path. */
             char* path = pathify(vpath), *fullpath;
             if((fullpath = build_cache_fullpath(afs_gameid, path)) != NULL) {
                 assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
@@ -364,10 +364,10 @@ const char* assetfs_create_cache_file(const char* vpath)
 
 /*
  * assetfs_create_data_file()
- * Creates a data file. This shouldn't be used often
- * (usually, data files should be readonly)
+ * Creates a data file. This shouldn't be used often (usually, data files should be readonly)
+ * Note: prefer_user_space should be true if you don't want to mess with the local folder
  */
-const char* assetfs_create_data_file(const char* vpath)
+const char* assetfs_create_data_file(const char* vpath, bool prefer_user_space)
 {
     assetfile_t* file = afs_findfile(root, vpath);
 
@@ -406,15 +406,19 @@ const char* assetfs_create_data_file(const char* vpath)
             file->type = ASSET_DATA;
         }
         if(!is_writable_file(file->fullpath)) {
-            /* not a writable file. Replace path */
+            /* not a writable file. Replace path. */
+            assetfs_log("assetfs warning: not a writable file - \"%s\". Using user space.", file->fullpath);
+            prefer_user_space = true;
+        }
+        if(prefer_user_space) {
+            /* prefer user space. Replace path. */
             char* path = pathify(vpath), *fullpath;
             if((fullpath = build_userdata_fullpath(afs_gameid, path)) != NULL) {
-                assetfs_log("assetfs warning: not a writable file - \"%s\". Using \"%s\"", file->fullpath, fullpath);
                 afs_updatefile(file, fullpath);
                 free(fullpath);
             }
             else
-                assetfs_log("assetfs warning: not a writable file - \"%s\"", file->fullpath);
+                assetfs_log("assetfs warning: can't create file \"%s\" in user space - \"%s\"", vpath, file->fullpath);
             free(path);
         }
         return file->fullpath;

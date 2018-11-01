@@ -35,7 +35,7 @@ bool assetfs_use_strict(bool strict); /* use strict mode (defaults to true) */
 /* the following are useful when writing to files */
 const char* assetfs_create_config_file(const char* vpath); /* the fullpath of a user-specific config file */
 const char* assetfs_create_cache_file(const char* vpath); /* user-specific non-essential (cached) data */
-const char* assetfs_create_data_file(const char* vpath); /* game data */
+const char* assetfs_create_data_file(const char* vpath, bool prefer_user_space); /* create game data */
 bool assetfs_is_config_file(const char* vpath);
 bool assetfs_is_cache_file(const char* vpath);
 bool assetfs_is_data_file(const char* vpath);
