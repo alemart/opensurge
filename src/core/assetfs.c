@@ -421,6 +421,38 @@ const char* assetfs_create_data_file(const char* vpath)
     }
 }
 
+/*
+ * assetfs_is_config_file()
+ * Checks if the given file is a config file
+ */
+bool assetfs_is_config_file(const char* vpath)
+{
+    assetfile_t* file = afs_findfile(root, vpath);
+    return file != NULL && file->type == ASSET_CONFIG;
+}
+
+/*
+ * assetfs_is_cache_file()
+ * Checks if the given file is a cache file
+ */
+bool assetfs_is_cache_file(const char* vpath)
+{
+    assetfile_t* file = afs_findfile(root, vpath);
+    return file != NULL && file->type == ASSET_CACHE;
+}
+
+/*
+ * assetfs_is_data_file()
+ * Checks if the given file is a data file
+ */
+bool assetfs_is_data_file(const char* vpath)
+{
+    assetfile_t* file = afs_findfile(root, vpath);
+    return file != NULL && file->type == ASSET_DATA;
+}
+
+
+
 
 /* internals */
 

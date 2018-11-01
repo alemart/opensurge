@@ -225,7 +225,6 @@ bool build_game(const char* gameid)
 
     /* Starting... */
     gameid = gameid && *gameid ? gameid : GAME_UNIXNAME;
-    print("Building %s...", gameid);
 
     /* Sanity check */
     if(assetfs_initialized()) {
@@ -237,6 +236,8 @@ bool build_game(const char* gameid)
     if(is_game_installed(gameid)) {
         struct zip_t* zip;
         char* zip_path = strcat(strcpy(mallocx((5 + strlen(gameid)) * sizeof(*gameid)), gameid), ".zip");
+
+        print("Building %s...", gameid);
         assetfs_init(gameid, NULL);
 
         if((zip = zip_open(zip_path, ZIP_DEFAULT_COMPRESSION_LEVEL, 'w')) != NULL) {
@@ -362,11 +363,17 @@ int list_installed_games(const char* gameid, void* data)
 /* helper for build game: write a file to the zip */
 int write_to_zip(const char* vpath, void* param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
     struct zip_t* zip = (struct zip_t*)param;
-    zip_entry_open(zip, vpath);
-    zip_entry_fwrite(zip, fullpath);
-    zip_entry_close(zip);
+    if(vpath[0] != '.' && strstr(vpath, "/.") == NULL) { /* skip files */
+        if(assetfs_is_data_file(vpath) && !is_suffix(vpath, ".zip")) { /* very important to skip the .zip */
+            if(!(is_prefix(vpath, "screenshots/") && is_suffix(vpath, ".png"))) {
+                zip_entry_open(zip, vpath);
+                if(0 != zip_entry_fwrite(zip, assetfs_fullpath(vpath)))
+                    print("Can't pack \"%s\"", vpath);
+                zip_entry_close(zip);
+            }
+        }
+    }
     return 0;
 }
 

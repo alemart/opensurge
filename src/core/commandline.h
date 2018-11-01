@@ -30,17 +30,19 @@ struct commandline_t {
     /* video stuff */
     int video_resolution;
     int smooth_graphics;
-    int fullscreen; /* fullscreen mode? */
-    int color_depth; /* bits per pixel */
+    int fullscreen;
+    int color_depth;
     int show_fps;
 
-    /* run custom level / quest */
-    char custom_level_path[COMMANDLINE_PATHMAX]; /* filepath */
-    char custom_quest_path[COMMANDLINE_PATHMAX]; /* filepath */
+    /* filepaths */
+    char custom_level_path[COMMANDLINE_PATHMAX];
+    char custom_quest_path[COMMANDLINE_PATHMAX];
+    char language_filepath[COMMANDLINE_PATHMAX];
+    char install_game_path[COMMANDLINE_PATHMAX];
+    char datadir[COMMANDLINE_PATHMAX];
 
     /* other options */
-    char language_filepath[COMMANDLINE_PATHMAX];
-    char datadir[COMMANDLINE_PATHMAX];
+    char gameid[128];
     int use_gamepad;
     int optimize_cpu_usage;
     int allow_font_smoothing;

@@ -166,7 +166,7 @@ void clean_garbage()
  */
 void init_basic_stuff(const commandline_t* cmd)
 {
-    const char* gameid = NULL;
+    const char* gameid = commandline_getstring(cmd->gameid, NULL);
     const char* datadir = commandline_getstring(cmd->datadir, NULL);
 
     set_uformat(U_UTF8);

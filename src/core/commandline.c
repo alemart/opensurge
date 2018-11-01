@@ -26,12 +26,8 @@
 #include "global.h"
 #include "logfile.h"
 #include "stringutil.h"
-#include "util.h"
 #include "video.h"
-#include "lang.h"
-#include "prefs.h"
-#include "engine.h"
-#include "modmanager.h"
+#include "install.h"
 
 #ifdef __WIN32__
 #include <allegro.h>
@@ -41,7 +37,8 @@
 
 /* private stuff ;) */
 static const char* basename(const char* path);
-static void alert(char *fmt, ...);
+static void crash(char *fmt, ...);
+static int print_gameid(const char* gameid, void* data);
 static const char* COPYRIGHT = "Open Surge Engine version " GAME_VERSION_STRING "\n"
                                "Copyright (C) " GAME_YEAR " Alexandre Martins";
 static int COMMANDLINE_UNDEFINED = -1;
@@ -56,8 +53,9 @@ static int COMMANDLINE_UNDEFINED = -1;
  */
 commandline_t commandline_parse(int argc, char **argv)
 {
-    int i;
+    const char* program = basename(argv[0]);
     commandline_t cmd;
+    int i;
 
     /* initializing values */
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
@@ -68,7 +66,9 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.custom_level_path[0] = '\0';
     cmd.custom_quest_path[0] = '\0';
     cmd.language_filepath[0] = '\0';
+    cmd.install_game_path[0] = '\0';
     cmd.datadir[0] = '\0';
+    cmd.gameid[0] = '\0';
     cmd.use_gamepad = COMMANDLINE_UNDEFINED;
     cmd.optimize_cpu_usage = COMMANDLINE_UNDEFINED;
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
@@ -90,29 +90,30 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    %s [options ...]\n"
                 "\n"
                 "where options include:\n"
-                "    --help -h                    display this message\n"
-                "    --version                    show the version of this program\n"
-                "    --fullscreen                 fullscreen mode\n"
-                "    --windowed                   windowed mode\n"
-                "    --resolution X               set the window size, where X = 1 (%dx%d), 2 (%dx%d), 3 (%dx%d) or 4 (%dx%d)\n"
-                "    --smooth                     display smooth graphics (intensive task)\n"
-                "    --color-depth X              set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
-                "    --show-fps                   show the FPS (frames per second) counter\n"
-                "    --use-gamepad                play using a gamepad\n"
-                "    --level \"filepath\"           run the specified level (e.g., levels/my_level.lev)\n"
-                "    --quest \"filepath\"           run the specified quest (e.g., quests/my_quest.qst)\n"
-                "    --language \"filepath\"        use the specified language (e.g., languages/lang.lng)\n"
-                "    --data-dir \"/path/to/data\"   load the game assets from the specified folder (**)\n"
-                "    --full-cpu-usage             use 100%% of the CPU (*)\n"
-                "    --no-font-smoothing          disable antialiased fonts (*)\n"
-                "    -- -arg1 -arg2 -arg3...      user-defined arguments (useful for scripting)\n"
+                "    --help -h                        display this message\n"
+                "    --version                        show the version of this program\n"
+                "    --fullscreen                     fullscreen mode\n"
+                "    --windowed                       windowed mode\n"
+                "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
+                "    --smooth                         display smooth graphics (intensive task)\n"
+                "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
+                "    --show-fps                       show the FPS (frames per second) counter\n"
+                "    --use-gamepad                    play using a gamepad\n"
+                "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
+                "    --quest \"filepath\"               run the specified quest (e.g., quests/my_quest.qst)\n"
+                "    --language \"filepath\"            use the specified language (e.g., languages/lang.lng)\n"
+                "    --games                          list the installed Open Surge games\n"
+                "    --game \"gameid\"                  run the specified Open Surge game (e.g., opensurge)\n"
+                "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
+                "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
+                "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
+                "    --full-cpu-usage                 use 100%% of the CPU (*)\n"
+                "    --no-font-smoothing              disable antialiased fonts (*)\n"
+                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n"
                 "\n"
-                "(*) Recommended for slow computers.\n"
-                "(**) Please provide an absolute path.\n",
+                "(*) May improve performance.\n",
                 COPYRIGHT, GAME_WEBSITE,
-                basename(argv[0]),
-                VIDEO_SCREEN_W, VIDEO_SCREEN_H, VIDEO_SCREEN_W*2, VIDEO_SCREEN_H*2,
-                VIDEO_SCREEN_W*3, VIDEO_SCREEN_H*3, VIDEO_SCREEN_W*4, VIDEO_SCREEN_H*4
+                program
             );
             exit(0);
         }
@@ -133,7 +134,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 else if(strcmp(argv[i], "4") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_4X;
                 else
-                    alert("WARNING: invalid resolution (%s).", argv[i]);
+                    crash("Invalid resolution: %s", argv[i]);
             }
         }
 
@@ -156,7 +157,7 @@ commandline_t commandline_parse(int argc, char **argv)
             if(++i < argc) {
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
-                    alert("WARNING: invalid color depth (%d).", cmd.color_depth);
+                    crash("Invalid color depth: %d", cmd.color_depth);
                     cmd.color_depth = COMMANDLINE_UNDEFINED;
                 }
             }
@@ -175,23 +176,63 @@ commandline_t commandline_parse(int argc, char **argv)
             cmd.allow_font_smoothing = FALSE;
 
         else if(strcmp(argv[i], "--level") == 0) {
-            if(++i < argc)
+            if(++i < argc && *(argv[i]) != '-')
                 str_cpy(cmd.custom_level_path, argv[i], sizeof(cmd.custom_level_path));
+            else
+                crash("%s: missing --level parameter", program);
         }
 
         else if(strcmp(argv[i], "--quest") == 0) {
-            if(++i < argc)
+            if(++i < argc && *(argv[i]) != '-')
                 str_cpy(cmd.custom_quest_path, argv[i], sizeof(cmd.custom_quest_path));
+            else
+                crash("%s: missing --quest parameter", program);
         }
 
         else if(strcmp(argv[i], "--language") == 0) {
-            if(++i < argc)
+            if(++i < argc && *(argv[i]) != '-')
                 str_cpy(cmd.language_filepath, argv[i], sizeof(cmd.language_filepath));
+            else
+                crash("%s: missing --language parameter", program);
         }
 
         else if(strcmp(argv[i], "--data-dir") == 0) {
-            if(++i < argc)
+            if(++i < argc && *(argv[i]) != '-')
                 str_cpy(cmd.datadir, argv[i], sizeof(cmd.datadir));
+            else
+                crash("%s: missing --data-dir parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--games") == 0) {
+            foreach_installed_game(print_gameid, NULL);
+            exit(0);
+        }
+
+        else if(strcmp(argv[i], "--game") == 0) {
+            if(++i < argc && *(argv[i]) != '-') {
+                str_cpy(cmd.gameid, argv[i], sizeof(cmd.gameid));
+                if(!is_game_installed(cmd.gameid))
+                    crash("%s: game \"%s\" is not installed\nRun %s --games to see the installed games", program, cmd.gameid, program);
+            }
+            else
+                crash("%s: missing --game parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--install") == 0) {
+            if(++i < argc && *(argv[i]) != '-') {
+                str_cpy(cmd.install_game_path, argv[i], sizeof(cmd.install_game_path));
+                if(!install_game(cmd.install_game_path, cmd.gameid, sizeof(cmd.gameid), true))
+                    exit(0);
+            }
+            else
+                crash("%s: missing --install parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--build") == 0) {
+            if(++i < argc && *(argv[i]) != '-')
+                str_cpy(cmd.gameid, argv[i], sizeof(cmd.gameid));
+            build_game((cmd.gameid[0] != '\0') ? cmd.gameid : NULL);
+            exit(0);
         }
 
         else if(strcmp(argv[i], "--") == 0) {
@@ -203,9 +244,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else { /* unknown option */
-            const char* prog = basename(argv[0]);
-            alert("%s: bad command line option \"%s\".\nRun %s --help to get more information.", prog, argv[i], prog);
-            exit(0);
+            crash("%s: bad command line option \"%s\"\nRun %s --help to get more information", program, argv[i], program);
         }
 
     }
@@ -238,8 +277,8 @@ const char* commandline_getstring(const char* value, const char* default_string)
 /* private functions */
 
 
-/* Displays a message to the user (printf format) */
-void alert(char *fmt, ...)
+/* Displays a message to the user (printf format) and exists */
+void crash(char *fmt, ...)
 {
     char buf[4096];
     va_list args;
@@ -253,6 +292,8 @@ void alert(char *fmt, ...)
 #else
     puts(buf);
 #endif
+
+    exit(1);
 }
 
 
@@ -266,4 +307,11 @@ const char* basename(const char* path)
         p = strpbrk(path, "\\/");
     }
     return path;
+}
+
+/* prints gameid */
+int print_gameid(const char* gameid, void* data)
+{
+    printf("- %s\n", gameid);
+    return 0;
 }
