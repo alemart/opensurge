@@ -127,6 +127,7 @@ static int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*call
 static void afs_sort(assetdir_t* base);
 static bool afs_empty(assetdir_t* base);
 static assetdir_t* afs_mkpath(assetdir_t* base, const char* vpath);
+static bool afs_strict = true;
 
 
 
@@ -140,6 +141,12 @@ static assetdir_t* afs_mkpath(assetdir_t* base, const char* vpath);
  */
 void assetfs_init(const char* gameid, const char* datadir)
 {
+    /* error? */
+    if(assetfs_initialized()) {
+        assetfs_fatal("assetfs_init() error: already initialized");
+        return;
+    }
+
     /* create the root */
     root = afs_mkdir(NULL, ".");
 
@@ -176,7 +183,7 @@ void assetfs_init(const char* gameid, const char* datadir)
 void assetfs_release()
 {
     free(afs_gameid);
-    afs_rmdir(root);
+    root = afs_rmdir(root);
 }
 
 /*
@@ -207,7 +214,7 @@ bool assetfs_exists(const char* vpath)
 
 /*
  * assetfs_foreach_file()
- * Executes a callback for each file in a virtual folder (path)
+ * Executes a callback for each file in a virtual folder; returns the number of counted files
  * 1. extension filter may be NULL or ".png", ".ss", and so on...
  * 2. callback must return 0 to let the enumeration proceed, or non-zero to stop it
  */
@@ -217,6 +224,26 @@ int assetfs_foreach_file(const char* vpath_of_dir, const char* extension_filter,
     return (dir != NULL) ? afs_foreach(dir, extension_filter, callback, param, recursive, NULL) : 0;
 }
 
+/*
+ * assetfs_initialized()
+ * checks if this subsystem has been initialized
+ */
+bool assetfs_initialized()
+{
+    return (root != NULL);
+}
+
+/*
+ * assetfs_use_strict()
+ * Use strict mode? (default: true)
+ * Non-strict mode allows empty file systems
+ */
+bool assetfs_use_strict(bool strict)
+{
+    bool old_value = afs_strict;
+    afs_strict = strict;
+    return old_value;
+}
 
 /*
  * assetfs_create_config_file()
@@ -842,7 +869,7 @@ void scan_default_folders(const char* gameid)
     if(must_scan_unixdir) {
         if(is_asset_folder(GAME_DATADIR))
             scan_folder(root, GAME_DATADIR, ASSET_DATA);
-        else
+        else if(afs_strict)
             assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
     }
 #elif defined(__unix__) || defined(__unix)
@@ -889,7 +916,7 @@ void scan_default_folders(const char* gameid)
     if(must_scan_unixdir) {
         if(is_asset_folder(GAME_DATADIR))
             scan_folder(root, GAME_DATADIR, ASSET_DATA);
-        else
+        else if(afs_strict)
             assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
     }
 #else

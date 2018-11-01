@@ -29,6 +29,8 @@ void assetfs_release(); /* release the assetfs */
 const char* assetfs_fullpath(const char* vpath); /* give the (absolute) fullpath of a (relative) virtual path */
 bool assetfs_exists(const char* vpath); /* does the given file exist? */
 int assetfs_foreach_file(const char* vpath_of_dir, const char* extension_filter, int (*callback)(const char* vpath, void* param), void* param, bool recursive); /* foreach file in vpath_of_dir */
+bool assetfs_initialized(); /* checks if this subsystem has been initialized */
+bool assetfs_use_strict(bool strict); /* use strict mode (defaults to true) */
 
 /* the following are useful when writing to files */
 const char* assetfs_create_config_file(const char* vpath); /* the fullpath of a user-specific config file */

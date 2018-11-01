@@ -209,6 +209,7 @@ SET(
 
   src/core/nanoparser/nanoparser.c
   src/core/whereami/whereami.c
+  src/core/zip/zip.c
   src/core/assetfs.c
   src/core/audio.c
   src/core/commandline.c
@@ -218,6 +219,7 @@ SET(
   src/core/image.c
   src/core/input.c
   src/core/inputmap.c
+  src/core/install.c
   src/core/lang.c
   src/core/logfile.c
   src/core/modmanager.c
@@ -352,6 +354,7 @@ IF(WIN32)
 
       src/core/nanoparser/nanoparser.h
       src/core/whereami/whereami.h
+      src/core/zip/zip.c
       src/core/assetfs.h
       src/core/audio.h
       src/core/commandline.h
@@ -363,6 +366,7 @@ IF(WIN32)
       src/core/image.h
       src/core/input.h
       src/core/inputmap.h
+      src/core/install.h
       src/core/lang.h
       src/core/logfile.h
       src/core/modmanager.h
