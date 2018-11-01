@@ -210,9 +210,18 @@ int foreach_installed_game(int (*callback)(const char*,void*), void* data)
  */
 bool is_game_installed(const char* gameid)
 {
-    int n = foreach_installed_game(compare_gameid, (void*)gameid);
-    int m = foreach_installed_game(compare_gameid, (void*)".");
-    return n != m;
+    if(assetfs_initialized()) {
+        int n = foreach_installed_game(compare_gameid, (void*)gameid);
+        int m = foreach_installed_game(compare_gameid, (void*)".");
+        return n != m;
+    }
+    else {
+        bool result = false;
+        assetfs_init(NULL, NULL);
+        result = is_game_installed(gameid);
+        assetfs_release();
+        return result;
+    }
 }
 
 /*

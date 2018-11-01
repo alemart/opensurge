@@ -182,8 +182,9 @@ void assetfs_init(const char* gameid, const char* datadir)
  */
 void assetfs_release()
 {
-    free(afs_gameid);
     root = afs_rmdir(root);
+    free(afs_gameid);
+    afs_gameid = NULL;
 }
 
 /*
@@ -365,7 +366,7 @@ const char* assetfs_create_cache_file(const char* vpath)
 /*
  * assetfs_create_data_file()
  * Creates a data file. This shouldn't be used often (usually, data files should be readonly)
- * Note: prefer_user_space should be true if you don't want to mess with the local folder
+ * Note: prefer_user_space should be true only if you don't want to mess with the local folder
  */
 const char* assetfs_create_data_file(const char* vpath, bool prefer_user_space)
 {
@@ -610,6 +611,10 @@ assetfile_t* afs_findfile(assetdir_t* dir, const char* vpath)
 
     /* locate the file */
     if(filedir != NULL) {
+        /*for(int i = 0; i < darray_length(filedir->file) && !file; i++) {
+            if(vpathcmp(filedir->file[i]->name, filename) == 0)
+                file = filedir->file[i];
+        }*/
         assetfile_t** entry = bsearch(filename, filedir->file, darray_length(filedir->file), sizeof(assetfile_t*), filematch);
         file = (entry != NULL) ? *entry : NULL;
     }
@@ -1109,6 +1114,9 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type)
         assetfs_log("Can't scan \"%s\": %s", abspath, strerror(errno));
 #endif
     } while(0);
+
+    /* for bsearch() */
+    afs_sort(folder);
 }
 
 /* checks if a directory is empty */
