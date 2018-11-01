@@ -277,7 +277,6 @@ animation_t* animation_delete(animation_t *anim)
  */
 void register_sprite(const char *sprite_name, spriteinfo_t *spr)
 {
-    logfile_message("Registering sprite '%s'...", sprite_name);
     hashtable_spriteinfo_t_add(sprites, sprite_name, spr);
 }
 
@@ -404,12 +403,10 @@ int traverse(const parsetree_statement_t *stmt)
         if(NULL == hashtable_spriteinfo_t_find(sprites, s))
             register_sprite(s, spriteinfo_create(nanoparser_get_program(p2)));
         else
-            fatal_error("Can't redefine sprite '%s'\nin \"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-
-        logfile_message("Loaded sprite '%s'", s);
+            logfile_message("Can't redefine sprite '%s'\nin \"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
-        fatal_error("Can't load sprites. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        fatal_error("Can't load sprite. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }
@@ -561,4 +558,3 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
 
     return 0;
 }
-

@@ -693,6 +693,7 @@ void level_interpret_line(const char *filename, int fileline, const char *line)
     /* reading the identifier */
     for(q=tmp; *p && !isspace(*p) && q<tmp+1023; *q++ = *p++); *q=0;
     if(tmp[0] == '/' && tmp[1] == '/') return; /* comment */
+    if(tmp[0] == '#' && isspace(tmp[1])) return; /* comment */
     identifier = str_dup(tmp);
 
     /* skip spaces */

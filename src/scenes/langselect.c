@@ -255,7 +255,7 @@ void load_lang_list()
 
     /* loading language data */
     lngcount = 0;
-    assetfs_foreach_file("languages", ".lng", dircount, NULL, true);
+    assetfs_foreach_file("languages", ".lng", dircount, (void*)&lngcount, true);
 
     /* fatal error */
     if(lngcount == 0)
@@ -287,24 +287,26 @@ int dirfill(const char *filename, void *param)
     int ver, subver, wipver;
 
     lang_readcompatibility(filename, &ver, &subver, &wipver);
-    if(game_version_compare(ver, subver, wipver) == 0) {
+    if(game_version_compare(ver, subver, wipver) >= 0) {
         str_cpy(lngdata[*c].filepath, filename, sizeof(lngdata[*c].filepath));
         lang_readstring(filename, "LANG_LANGUAGE", lngdata[*c].title, sizeof( lngdata[*c].title ));
         lang_readstring(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
         (*c)++;
     }
-    else
-        logfile_message("Warning: language file \"%s\" (compatibility: %d.%d.%d) isn't compatible with this version of the game (%d.%d.%d)", filename, ver, subver, wipver, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+    if(game_version_compare(ver, subver, wipver) != 0)
+        logfile_message("Warning: language file \"%s\" (compatibility: %d.%d.%d) may not be fully compatible with this version of the engine (%s)", filename, ver, subver, wipver, GAME_VERSION_STRING);
 
     return 0;
 }
 
 int dircount(const char *filename, void *param)
 {
+    int *lngcount = (int*)param;
     int ver, subver, wipver;
+
     lang_readcompatibility(filename, &ver, &subver, &wipver);
-    if(game_version_compare(ver, subver, wipver) == 0)
-        lngcount++;
+    if(game_version_compare(ver, subver, wipver) >= 0)
+        (*lngcount)++;
 
     return 0;
 }

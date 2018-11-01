@@ -95,7 +95,9 @@ void objects_init()
     objects = NULL;
 
     /* reading the parse tree */
-    assetfs_foreach_file("scripts/legacy", ".obj", dirfill, (void*)(&objects), true);
+    assetfs_foreach_file("objects", ".obj", dirfill, (void*)(&objects), true);
+    if(objects == NULL)
+        assetfs_foreach_file("scripts/legacy", ".obj", dirfill, (void*)(&objects), true);
 
     /* creating the name table */
     name_table.length = 0;

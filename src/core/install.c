@@ -50,7 +50,8 @@ static int list_installed_games(const char* gameid, void* data);
 static int write_to_zip(const char* vpath, void* param);
 static bool is_valid_id(const char* str);
 static const char* basename(const char* path);
-static void print(const char* fmt, ...);
+static void console_print(const char* fmt, ...);
+static bool console_ask(const char* fmt, ...);
 
 
 
@@ -62,55 +63,43 @@ static void print(const char* fmt, ...);
  */
 bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_size, bool interactive_mode)
 {
-    if(is_game_package(zip_fullpath)) {
+    if(is_game_package(zip_fullpath) && !assetfs_initialized()) {
         char* root_folder = guess_root_folder(zip_fullpath); /* ends with a '/', or is empty ("") */
         char* gameid = guess_gameid(zip_fullpath);
         bool success = true;
 
         /* Are we overwriting something? */
-#if !defined(_WIN32)
-        if(interactive_mode && is_game_installed(gameid)) {
-#else
         if(interactive_mode) {
-#endif
-            char buf[8] = { 0 };
-            for(;;) {
 #if !defined(_WIN32)
-                fprintf(stdout, "It seems that %s is already installed. Overwrite? (y/n) ", gameid);
+            if(is_game_installed(gameid))
+                success = console_ask("It seems that %s is already installed. Overwrite?", gameid);
 #else
-                fprintf(stdout, "Files will be overwritten to install %s. Proceed? (y/n) ", gameid);
+            success = console_ask("Files will be overwritten to install %s. Proceed?", gameid);
 #endif
-                fflush(stdout);
-                if(fgets(buf, sizeof(buf), stdin) != NULL) {
-                    char c = tolower(buf[0]);
-                    if(c == 'y' || c == 'n') {
-                        success = (c == 'y');
-                        break;
-                    }
-                }
-                else {
-                    success = false;
-                    break;
-                }
-            }
-        }
-
-        /* Sanity check */
-        if(assetfs_initialized()) {
-            print("Can't install %s: assetfs is initialized", gameid);
-            success = false;
         }
 
         /* Install the game */
         if(success) {
-            bool strict = assetfs_use_strict(false);
             struct zip_t* zip;
-            print("Installing %s...", gameid);
-            assetfs_init(gameid, NULL);
             if((zip = zip_open(zip_fullpath, 0, 'r')) != NULL) {
+                int i, n = zip_total_entries(zip), r = strlen(root_folder);
+                const char* destdir;
+                bool use_strict;
+
+                /* Init assetfs */
+                use_strict = assetfs_use_strict(false);
+                assetfs_init(gameid, NULL);
+                destdir = assetfs_create_data_file("", true);
+                console_print("Installing %s to \"%s\"...", gameid, destdir);
+
+                /* Inform the gameid */
+                if(out_gameid != NULL) {
+                    strncpy(out_gameid, gameid, out_gameid_size);
+                    out_gameid[out_gameid_size] = '\0';
+                }
+
                 /* Unpack the game */
-                int n = zip_total_entries(zip), r = strlen(root_folder);
-                for(int i = 0; i < n; i++) {
+                for(i = 0; i < n; i++) {
                     zip_entry_openbyindex(zip, i);
                     {
                         const char* path = zip_entry_name(zip);
@@ -123,30 +112,31 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
                     zip_entry_close(zip);
                 }
                 zip_close(zip);
-                print("Success.");
+                console_print("Success.");
 
-                /* Inform the gameid */
-                if(out_gameid != NULL) {
-                    strncpy(out_gameid, gameid, out_gameid_size);
-                    out_gameid[out_gameid_size] = '\0';
-                }
+                /* Release assetfs */
+                assetfs_release();
+                assetfs_use_strict(use_strict);
             }
             else {
-                print("Can't open \"%s\".", basename(zip_fullpath)); /* shouldn't happen */
+                console_print("Can't open \"%s\".", basename(zip_fullpath)); /* shouldn't happen */
                 success = false;
             }
-            assetfs_release();
-            assetfs_use_strict(strict);
         }
         else
-            print("Won't install.");
-        
+            console_print("Won't install.");
+
+        /* done */
         free(gameid);
         free(root_folder);
         return success;
     }
+    else if(assetfs_initialized()) {
+        console_print("Can't install \"%s\": assetfs is initialized.", basename(zip_fullpath));
+        return false;
+    }
     else {
-        print("Not a game package: \"%s\".", basename(zip_fullpath));
+        console_print("Not a game package: \"%s\".", basename(zip_fullpath));
         return false;
     }
 }
@@ -237,7 +227,7 @@ bool build_game(const char* gameid)
 
     /* Sanity check */
     if(assetfs_initialized()) {
-        print("Can't build %s: assetfs is initialized", gameid);
+        console_print("Can't build %s: assetfs is initialized", gameid);
         return false;
     }
 
@@ -246,18 +236,18 @@ bool build_game(const char* gameid)
         struct zip_t* zip;
         char* zip_path = strcat(strcpy(mallocx((5 + strlen(gameid)) * sizeof(*gameid)), gameid), ".zip");
 
-        print("Building %s...", gameid);
+        console_print("Building %s...", gameid);
         assetfs_init(gameid, NULL);
 
         if((zip = zip_open(zip_path, ZIP_DEFAULT_COMPRESSION_LEVEL, 'w')) != NULL) {
             assetfs_foreach_file("/", NULL, write_to_zip, zip, true);
             zip_close(zip);
-            print("Saved to \"%s\".", zip_path);
+            console_print("Saved to \"%s\".", zip_path);
             if(0 == strcmp(gameid, GAME_UNIXNAME))
-                print("You may rename the file.");
+                console_print("You may rename the file.");
         }
         else {
-            print("Can't open \"%s\" for writing.", zip_path);
+            console_print("Can't open \"%s\" for writing.", zip_path);
             success = false;
         }
 
@@ -265,8 +255,8 @@ bool build_game(const char* gameid)
         free(zip_path);
     }
     else {
-        print("Can't build %s: game doesn't exist.", gameid);
-        print("Existing games:");
+        console_print("Can't build %s: game doesn't exist.", gameid);
+        console_print("Existing games:");
         foreach_installed_game(list_installed_games, NULL);
         success = false;
     }
@@ -368,7 +358,7 @@ int compare_gameid(const char* gameid, void* data)
 /* helper for build game */
 int list_installed_games(const char* gameid, void* data)
 {
-    print("- %s", gameid);
+    console_print("- %s", gameid);
     return 0;
 }
 
@@ -381,7 +371,7 @@ int write_to_zip(const char* vpath, void* param)
             if(!(is_prefix(vpath, "screenshots/") && is_suffix(vpath, ".png"))) {
                 zip_entry_open(zip, vpath);
                 if(0 != zip_entry_fwrite(zip, assetfs_fullpath(vpath)))
-                    print("Can't pack \"%s\"", vpath);
+                    console_print("Can't pack \"%s\"", vpath);
                 zip_entry_close(zip);
             }
         }
@@ -412,11 +402,36 @@ char* guess_gameid(const char* zip_fullpath)
 }
 
 /* prints a formatted message (with a newline at the end) */
-void print(const char* fmt, ...)
+void console_print(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
     vfprintf(stdout, fmt, args);
     va_end(args);
     fprintf(stdout, "\n");
+}
+
+/* asks a y/n question on the console */
+bool console_ask(const char* fmt, ...)
+{
+    va_list args;
+    char c, buf[80] = { 0 };
+
+    for(;;) {
+        va_start(args, fmt);
+        vfprintf(stdout, fmt, args);
+        va_end(args);
+        fprintf(stdout, " (y/n) ");
+        fflush(stdout);
+
+        if(fgets(buf, sizeof(buf), stdin) != NULL) {
+            if(strlen(buf) > 0)
+                buf[strlen(buf)-1] = '\0';
+            c = tolower(buf[0]);
+            if((c == 'y' || c == 'n') && buf[1] == '\0')
+                return (c == 'y');
+        }
+        else
+            return false;
+    }
 }

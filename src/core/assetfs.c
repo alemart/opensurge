@@ -151,6 +151,7 @@ void assetfs_init(const char* gameid, const char* datadir)
     root = afs_mkdir(NULL, ".");
 
     /* get the gameid */
+    gameid = !gameid && datadir && *datadir ? "unknown" : gameid; /* FIXME */
     gameid = gameid && *gameid ? gameid : GAME_UNIXNAME;
     afs_gameid = clone_str(gameid);
 
@@ -196,8 +197,13 @@ const char* assetfs_fullpath(const char* vpath)
     assetfile_t* file = afs_findfile(root, vpath);
 
     if(file == NULL) {
+#if 0
         assetfs_fatal("Can't find asset \"%s\"", vpath);
-        return NULL;
+        return "";
+#else
+        assetfs_log("Can't find asset \"%s\"", vpath);
+        return "invalid-asset";
+#endif
     }
 
     return file->fullpath;
@@ -611,12 +617,15 @@ assetfile_t* afs_findfile(assetdir_t* dir, const char* vpath)
 
     /* locate the file */
     if(filedir != NULL) {
-        /*for(int i = 0; i < darray_length(filedir->file) && !file; i++) {
+#if 0
+        for(int i = 0; i < darray_length(filedir->file) && !file; i++) {
             if(vpathcmp(filedir->file[i]->name, filename) == 0)
                 file = filedir->file[i];
-        }*/
+        }
+#else
         assetfile_t** entry = bsearch(filename, filedir->file, darray_length(filedir->file), sizeof(assetfile_t*), filematch);
         file = (entry != NULL) ? *entry : NULL;
+#endif
     }
 
     /* done */

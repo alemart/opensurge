@@ -1046,6 +1046,10 @@ void preprocessor_run(FILE *in, int depth)
                     );
                 }
             }
+            else if(strcmp(key, "#") == 0) {
+                /* ignore comments */
+                ;
+            }
             else {
                 /* we'll consider unknown pre-processor commands as being comments */
                 warning(

@@ -29,6 +29,7 @@
 #include "nanoparser/nanoparser.h"
 
 #define INPUTMAP_FILE           "config/input.def"
+#define NULL_INPUTMAP           "<null>"
 
 /* storage */
 typedef struct inputmapnode_t inputmapnode_t;
@@ -353,8 +354,11 @@ const inputmap_t *inputmap_get(const char *name)
     inputmapnode_t *f = hashtable_inputmapnode_t_find(mappings, name);
 
     if(f == NULL) {
-        fatal_error("Can't find inputmap '%s' in '%s'", name, INPUTMAP_FILE);
-        return NULL;
+        logfile_message("Can't find inputmap '%s' in '%s'", name, INPUTMAP_FILE);
+        if((f = hashtable_inputmapnode_t_find(mappings, NULL_INPUTMAP)) == NULL) { /* fail silently */
+            fatal_error("Can't find inputmap '%s' in '%s'", name, INPUTMAP_FILE);
+            return NULL;
+        }
     }
 
     return f->data;
@@ -565,6 +569,7 @@ void load_inputmap_table()
     const char* fullpath = assetfs_fullpath(INPUTMAP_FILE);
 
     logfile_message("inputmap: loading the input mappings...");
+    hashtable_inputmapnode_t_add(mappings, NULL_INPUTMAP, inputmapnode_create(NULL_INPUTMAP));
 
     s = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(s, traverse);
