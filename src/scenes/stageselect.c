@@ -65,7 +65,7 @@ static int traverse(const parsetree_statement_t *stmt, void *stagedata);
 /* private data */
 #define STAGE_BGFILE             "themes/menus/levelselect.bg"
 #define STAGE_MAXPERPAGE         (VIDEO_SCREEN_H / 30)
-#define STAGE_MAX                1024 /* can't have more than STAGE_MAX levels installed */
+#define STAGE_MAX                2048 /* can't have more than STAGE_MAX levels installed */
 static font_t *title; /* title */
 static font_t *msg; /* message */
 static font_t *page; /* page number */
@@ -79,6 +79,7 @@ static int stage_count; /* length of stage_data[] */
 static int option; /* current option: 0 .. stage_count - 1 */
 static font_t **stage_label; /* vector */
 static int enable_debug = FALSE; /* debug mode? must start out as false. */
+static int can_play_music = FALSE; /* can play music? */
 static char* level_to_be_loaded;
 
 
@@ -103,6 +104,7 @@ static int sort_cmp(const void *a, const void *b);
 void stageselect_init(void *should_enable_debug)
 {
     enable_debug = *((int*)should_enable_debug) ? TRUE : FALSE;
+    can_play_music = (!enable_debug || timer_get_ticks() >= 10000) && !can_play_music;
 
     option = 0;
     scene_time = 0;
@@ -192,8 +194,10 @@ void stageselect_update()
         }
     }
     else if(!music_is_playing()) {
-        music_t *m = music_load(OPTIONS_MUSICFILE);
-        music_play(m, INFINITY);
+        if(can_play_music) {
+            music_t *m = music_load(OPTIONS_MUSICFILE);
+            music_play(m, INFINITY);
+        }
     }
 
     /* finite state machine */

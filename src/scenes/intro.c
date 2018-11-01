@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * intro.c - introduction scene
- * Copyright (C) 2008-2011, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2011, 2013, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include "intro.h"
 #include "quest.h"
 #include "../core/v2d.h"
@@ -29,13 +30,15 @@
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
+#include "../core/soundfactory.h"
 #include "../entities/background.h"
 
 
 /* private data */
 #define INTRO_TIMEOUT       5.0f
 static float elapsed_time;
-static int must_fadein;
+static bool must_fadein;
+static bool debug_mode;
 static image_t* bg;
 static input_t* in;
 
@@ -77,7 +80,8 @@ static image_t* create_background();
 void intro_init(void *foo)
 {
     elapsed_time = 0.0f;
-    must_fadein = TRUE;
+    must_fadein = true;
+    debug_mode = false;
     music_stop();
     bg = create_background();
     in = input_create_user(NULL);
@@ -107,11 +111,15 @@ void intro_update()
 
     if(must_fadein) {
         fadefx_in(image_rgb(0,0,0), 1.0f);
-        must_fadein = FALSE;
+        must_fadein = false;
     }
     else if(elapsed_time >= INTRO_TIMEOUT) {
         if(fadefx_over()) {
             scenestack_pop();
+            if(debug_mode) {
+                int d = debug_mode ? TRUE : FALSE;
+                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &d);
+            }
             return;
         }
         fadefx_out(image_rgb(0,0,0), 1.0f);
@@ -119,6 +127,15 @@ void intro_update()
 
     if(music_is_playing())
         music_stop();
+
+    if(input_button_pressed(in, IB_RIGHT)) {
+        static int cnt = 0;
+        if(!debug_mode && ++cnt == 3) {
+            sound_play( soundfactory_get("secret") );
+            debug_mode = true;
+            cnt = 0;
+        }
+    }
 }
 
 
@@ -140,13 +157,14 @@ void intro_render()
 image_t* create_background()
 {
     image_t* img = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-    font_t *fnt = font_create("disclaimer");
     v2d_t camera = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
+    font_t *fnt = font_create("disclaimer");
+    int padding = 5;
 
     image_clear(video_get_backbuffer(), image_hex2rgb(BGCOLOR));
-    font_set_width(fnt, VIDEO_SCREEN_W - 5);
+    font_set_width(fnt, VIDEO_SCREEN_W - 2 * padding);
     font_set_text(fnt, "%s", text);
-    font_set_position(fnt, v2d_new(5, 5));
+    font_set_position(fnt, v2d_new(padding, padding));
     font_render(fnt, camera);
     image_blit(video_get_backbuffer(), img, 0, 0, 0, 0, image_width(img), image_height(img));
 
