@@ -197,32 +197,19 @@ const char* assetfs_fullpath(const char* vpath)
     assetfile_t* file = afs_findfile(root, vpath);
 
     if(file == NULL) {
-#if 0
-        assetfs_fatal("Can't find asset \"%s\"", vpath);
-        return "invalid-asset"; /* never vpath */
-#else
         assetfs_log("Can't find asset \"%s\"", vpath);
         if(is_valid_writable_vpath(vpath)) {
-            /* Create an invalid file in the filesystem */
-            int dirlen = -1;
+            /* return an invalid path to the program */
+            static char path[1024] = { 0 };
             char* sanitized_vpath = pathify(vpath);
-            char* imaginary_fullpath = join_path("invalid-asset", sanitized_vpath);
-            assetfile_t* file = afs_mkfile(vpathbasename(sanitized_vpath, &dirlen), imaginary_fullpath, ASSET_DATA);
-            if(dirlen >= 0) {
-                sanitized_vpath[dirlen] = '\0';
-                afs_storefile(afs_mkpath(root, sanitized_vpath), file);
-            }
-            else
-                afs_storefile(root, file);
-            free(imaginary_fullpath);
+            snprintf(path, sizeof(path), "invalid-asset/%s", sanitized_vpath);
             free(sanitized_vpath);
-            return file->fullpath;
+            return path;
         }
         else {
-            /* never vpath */
+            /* vpath is not 'safe' */
             return "invalid-asset";
         }
-#endif
     }
 
     return file->fullpath;

@@ -80,18 +80,18 @@ inputmap "default"
 {
     keyboard
     {
-        up              KEY_UP         // up arrow key
-        right           KEY_RIGHT      // right arrow key
-        down            KEY_DOWN       // down arrow key
-        left            KEY_LEFT       // left arrow key
-        fire1           KEY_SPACE      // space bar (jump)
-        fire2           KEY_LCONTROL   // left ctrl (switch character)
-        fire3           KEY_ENTER      // enter (pause game)
-        fire4           KEY_ESC        // escape (leave game)
-        fire5           KEY_W          // w
-        fire6           KEY_A          // a
-        fire7           KEY_S          // s
-        fire8           KEY_D          // d
+        up              KEY_UP         // up
+        right           KEY_RIGHT      // right
+        down            KEY_DOWN       // down
+        left            KEY_LEFT       // left
+        fire1           KEY_SPACE      // jump
+        fire2           KEY_LCONTROL   // switch character
+        fire3           KEY_ENTER      // pause, confirm
+        fire4           KEY_ESC        // quit, cancel
+        fire5           KEY_NONE       // available
+        fire6           KEY_NONE       // available
+        fire7           KEY_NONE       // available
+        fire8           KEY_NONE       // available
     }
 
     joystick 0
@@ -177,18 +177,18 @@ inputmap "backup"
 {
     keyboard
     {
-        up              KEY_UP         // up arrow key
-        right           KEY_RIGHT      // right arrow key
-        down            KEY_DOWN       // down arrow key
-        left            KEY_LEFT       // left arrow key
-        fire1           KEY_SPACE      // space bar (jump)
-        fire2           KEY_LCONTROL   // left ctrl (switch character)
-        fire3           KEY_ENTER      // enter (pause game)
-        fire4           KEY_ESC        // escape (leave game)
-        fire5           KEY_W          // w
-        fire6           KEY_A          // a
-        fire7           KEY_S          // s
-        fire8           KEY_D          // d
+        up              KEY_UP         // up
+        right           KEY_RIGHT      // right
+        down            KEY_DOWN       // down
+        left            KEY_LEFT       // left
+        fire1           KEY_SPACE      // jump
+        fire2           KEY_LCONTROL   // switch character
+        fire3           KEY_ENTER      // pause, confirm
+        fire4           KEY_ESC        // quit, cancel
+        fire5           KEY_NONE       // available
+        fire6           KEY_NONE       // available
+        fire7           KEY_NONE       // available
+        fire8           KEY_NONE       // available
     }
 
     joystick 0
