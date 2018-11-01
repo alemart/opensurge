@@ -47,11 +47,12 @@ struct enemy_t;
 struct enemy_list_t;
 struct sound_t;
 
-/* read-only information */
+/* read-only data */
 const char* level_name();
 int level_act();
 const char* level_version();
 const char* level_author();
+const char* level_license();
 
 /* load & save */
 void level_change(const char* path_to_lev_file); /* change the stage. Useful if the .lev is active. */
