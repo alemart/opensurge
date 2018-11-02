@@ -405,8 +405,12 @@ stagedata_t* stagedata_load(const char *filename)
     parsetree_program_t *prog;
     stagedata_t* s = mallocx(sizeof *s);
     const char* fullpath = assetfs_fullpath(filename);
+    char* p;
 
     s->filepath = str_dup(filename);
+    while((p = strchr(s->filepath, '\\')))
+        *p = '/'; /* replace '\\' by '/' */
+
     str_cpy(s->name, "Untitled", sizeof(s->name));
     s->act = 1;
     s->requires[0] = 0;
@@ -441,7 +445,7 @@ int traverse(const parsetree_statement_t *stmt, void *stagedata)
         s->act = atoi(val);
     else if(str_icmp(id, "requires") == 0)
         sscanf(val, "%d.%d.%d", &(s->requires[0]), &(s->requires[1]), &(s->requires[2]));
-    else if(str_icmp(id, "brick") == 0 || str_icmp(id, "item") == 0 || str_icmp(id, "enemy") == 0 || str_icmp(id, "object") == 0) /* optimization */
+    else if(str_icmp(id, "brick") == 0) /* optimization */
         return 1; /* stop the enumeration */
 
     return 0;
