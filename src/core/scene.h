@@ -30,7 +30,7 @@ typedef struct scene_t {
 } scene_t;
 
 scene_t *scene_create(void (*init_func)(void*), void (*update_func)(), void (*render_func)(), void (*release_func)());
-void scene_destroy(scene_t *scn);
+scene_t *scene_destroy(scene_t *scn);
 
 
 

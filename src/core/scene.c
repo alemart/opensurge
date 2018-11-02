@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * scene.c - scene management
- * Copyright (C) 2008-2010, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2013, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,12 +24,12 @@
 
 
 /* constants */
-#define SCENESTACK_CAPACITY         16      /* up to 16 scenes running simultaneously */
+#define SCENESTACK_CAPACITY         16      /* up to SCENESTACK_CAPACITY scenes running simultaneously */
 
 
 /* private stuff */
 static scene_t* scenestack[SCENESTACK_CAPACITY];
-static int scenestack_size;
+static int scenestack_size = 0;
 
 
 
@@ -45,7 +45,7 @@ void scenestack_init()
     int i;
 
     scenestack_size = 0;
-    for(i=0; i<SCENESTACK_CAPACITY; i++)
+    for(i = 0; i < SCENESTACK_CAPACITY; i++)
         scenestack[i] = NULL;
 }
 
@@ -69,10 +69,22 @@ void scenestack_release()
  */
 void scenestack_push(scene_t *scn, void *data)
 {
-    logfile_message("scenestack_push(%p)", scn);
+    int i;
+
+    logfile_message("scenestack_push()", scn);
+    if(scenestack_size >= SCENESTACK_CAPACITY) {
+        fatal_error("scenestack_push(): stack overflow");
+        return;
+    }
+    for(i = 0; i < scenestack_size; i++) {
+        if(scenestack[i] == scn) {
+            fatal_error("scenestack_push(): duplicate scene");
+            return;
+        }
+    }
     scenestack[scenestack_size++] = scn;
     scn->init(data);
-    logfile_message("scenestack_push() ok");
+    logfile_message("scenestack_push(): success");
 }
 
 
@@ -87,10 +99,14 @@ void scenestack_push(scene_t *scn, void *data)
 void scenestack_pop()
 {
     logfile_message("scenestack_pop()");
-    scenestack[scenestack_size-1]->release();
-    scenestack[scenestack_size-1] = NULL;
-    scenestack_size--;
-    logfile_message("scenestack_pop() ok");
+    if(!scenestack_empty()) {
+        scenestack[scenestack_size - 1]->release();
+        scenestack[scenestack_size - 1] = NULL;
+        scenestack_size--;
+        logfile_message("scenestack_pop(): success");
+    }
+    else
+        logfile_message("scenestack_pop(): empty stack");
 }
 
 
@@ -101,7 +117,10 @@ void scenestack_pop()
  */
 scene_t *scenestack_top()
 {
-    return scenestack[scenestack_size-1];
+    if(!scenestack_empty())
+        return scenestack[scenestack_size - 1];
+    else
+        return NULL;
 }
 
 
@@ -111,7 +130,7 @@ scene_t *scenestack_top()
  */
 int scenestack_empty()
 {
-    return (scenestack_size==0);
+    return (scenestack_size == 0);
 }
 
 
@@ -140,8 +159,9 @@ scene_t *scene_create(void (*init_func)(void*), void (*update_func)(), void (*re
  * scene_destroy()
  * Destroys an existing scene
  */
-void scene_destroy(scene_t *scn)
+scene_t *scene_destroy(scene_t *scn)
 {
     free(scn);
+    return NULL;
 }
 
