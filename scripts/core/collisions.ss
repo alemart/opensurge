@@ -157,12 +157,15 @@ object "CollisionBox" is "collider"
     // Object constructor
     fun constructor()
     {
-        collisionFlags = 0;
-        entity = parent;
-
         // entity validation
+        entity = parent;
         if(!entity.hasTag("entity"))
-            Application.crash("Object \"" + entity.__name + "\" (parent of " + __name + ") must be an entity.");
+            Application.crash(__name + " requires object \"" + entity.__name + "\" to be an entity.");
+        else if(entity.hasTag("detached"))
+            Application.crash(__name + " won't work with detached entities like \"" + entity.__name + "\".");
+
+        // collision flags
+        collisionFlags = 0;
         if(entity.hasFunction("onCollision"))
             collisionFlags += 1;
     }
