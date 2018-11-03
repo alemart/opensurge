@@ -32,16 +32,18 @@
 #define PLAYER_MAX_SPEEDSHOES       23.0 /* speed shoes timer */
 #define PLAYER_MAX_INVSTAR          5    /* how many invincibility stars */
 
-/* shield list */
-#define SH_NONE                     0 /* no shield */
-#define SH_SHIELD                   1 /* regular shield */
-#define SH_FIRESHIELD               2 /* fire shield */
-#define SH_THUNDERSHIELD            3 /* thunder shield */
-#define SH_WATERSHIELD              4 /* water shield */
-#define SH_ACIDSHIELD               5 /* acid shield */
-#define SH_WINDSHIELD               6 /* wind shield */
+/* shield types */
+enum playershield_t {
+    SH_NONE,            /* no shield */
+    SH_SHIELD,          /* regular shield */
+    SH_FIRESHIELD,      /* fire shield */
+    SH_THUNDERSHIELD,   /* thunder shield */
+    SH_WATERSHIELD,     /* water shield */
+    SH_ACIDSHIELD,      /* acid shield */
+    SH_WINDSHIELD       /* wind shield */
+};
 
-/* forward declarations */
+/* types & structs */
 struct actor_t;
 struct brick_list_t;
 struct item_list_t;
@@ -49,6 +51,7 @@ struct enemy_list_t;
 struct physicsactor_t;
 struct obstaclemap_t;
 typedef struct player_t player_t;
+typedef enum playershield_t playershield_t;
 
 /* player structure */
 struct player_t {
@@ -67,7 +70,7 @@ struct player_t {
     int got_glasses;
 
     /* shields */
-    int shield_type;
+    playershield_t shield_type;
     struct actor_t *shield;
 
     /* invincibility */
@@ -121,7 +124,11 @@ float player_seconds_remaining_to_drown(const player_t *player);
 int player_is_in_the_air(const player_t *player);
 int player_is_attacking(const player_t *player);
 int player_is_ultrafast(const player_t *player); /* wearing faster shoes? */
+void player_set_ultrafast(player_t* player, int turbo);
 int player_is_invincible(const player_t *player);
+void player_set_invincible(player_t* player, int invincible);
+playershield_t player_shield_type(const player_t* player);
+void player_grant_shield(player_t* player, playershield_t shield_type);
 
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);

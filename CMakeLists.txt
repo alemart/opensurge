@@ -270,6 +270,7 @@ SET(
   src/scripting/levelmanager.c
   src/scripting/mouse.c
   src/scripting/obstaclemap.c
+  src/scripting/player.c
   src/scripting/prefs.c
   src/scripting/sensor.c
   src/scripting/time.c

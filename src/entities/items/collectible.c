@@ -124,7 +124,7 @@ void collectible_update(item_t* item, player_t** team, int team_size, brick_list
 
         for(i=0; i<team_size; i++) {
             player_t *player = team[i];
-            if(player->shield_type == SH_THUNDERSHIELD) {
+            if(player_shield_type(player) == SH_THUNDERSHIELD) {
                 float d = v2d_magnitude(v2d_subtract(act->position, player->actor->position));
                 if(d < mindist) {
                     attracted_by = player;

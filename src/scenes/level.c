@@ -2079,7 +2079,7 @@ void update_music()
 
         if(override_music && !sound_is_playing(override_music)) {
             override_music = NULL;
-            if(!player->invincible && !player->got_speedshoes)
+            if(!player_is_invincible(player) && !player_is_ultrafast(player))
                 music_play(music, INFINITY);
         }
 
@@ -2328,29 +2328,31 @@ void render_powerups()
         if(player->got_glasses)
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 6) , 0 );
 
-        switch (player->shield_type)
+        switch (player_shield_type(player))
         {
-        case SH_SHIELD:
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 7) , 0 );
-            break;
-        case SH_FIRESHIELD:
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 11) , 0 );
-            break;
-        case SH_THUNDERSHIELD:
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 12) , 0 );
-            break;
-        case SH_WATERSHIELD:
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 13) , 0 );
-            break;
-        case SH_ACIDSHIELD:
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 14) , 0 );
-            break;
-        case SH_WINDSHIELD:
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 15) , 0 );
-            break;
+            case SH_SHIELD:
+                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 7) , 0 );
+                break;
+            case SH_FIRESHIELD:
+                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 11) , 0 );
+                break;
+            case SH_THUNDERSHIELD:
+                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 12) , 0 );
+                break;
+            case SH_WATERSHIELD:
+                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 13) , 0 );
+                break;
+            case SH_ACIDSHIELD:
+                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 14) , 0 );
+                break;
+            case SH_WINDSHIELD:
+                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 15) , 0 );
+                break;
+            case SH_NONE:
+                break;
         }
 
-        if(player->invincible) {
+        if(player_is_invincible(player)) {
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 4) , 0 );
             if(player->invtimer >= PLAYER_MAX_INVINCIBILITY*0.75) { /* it blinks */
                 /* we want something that blinks faster as player->invtimer tends to PLAYER_MAX_INVINCIBLITY */
@@ -2359,7 +2361,7 @@ void render_powerups()
             }
         }
 
-        if(player->got_speedshoes) {
+        if(player_is_ultrafast(player)) {
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 5) , 0 );
             if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES*0.75) { /* it blinks */
                 /* we want something that blinks faster as player->speedshoes_timer tends to PLAYER_MAX_SPEEDSHOES */

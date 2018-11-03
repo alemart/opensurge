@@ -1974,7 +1974,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
         if(actor_collision(object->actor, player->actor)) {
-            if(player_is_attacking(player) || player->invincible) {
+            if(player_is_attacking(player) || player_is_invincible(player)) {
                 /* I've been defeated */
                 player_bounce(player, object->actor, FALSE);
                 level_add_to_score(score);
@@ -2639,7 +2639,7 @@ void hitplayer_update(objectmachine_t *obj, player_t **team, int team_size, bric
     object_t *object = obj->get_object_instance(obj);
     player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
 
-    if(!player->invincible && me->should_hit_the_player(player))
+    if(!player_is_invincible(player) && me->should_hit_the_player(player))
         player_hit_ex(player, object->actor);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
@@ -2663,17 +2663,17 @@ int hit_strategy(player_t *p)
 
 int burn_strategy(player_t *p)
 {
-    return p->shield_type != SH_FIRESHIELD && p->shield_type != SH_WATERSHIELD;
+    return player_shield_type(p) != SH_FIRESHIELD && player_shield_type(p) != SH_WATERSHIELD;
 }
 
 int shock_strategy(player_t *p)
 {
-    return p->shield_type != SH_THUNDERSHIELD;
+    return player_shield_type(p) != SH_THUNDERSHIELD;
 }
 
 int acid_strategy(player_t *p)
 {
-    return p->shield_type != SH_ACIDSHIELD;
+    return player_shield_type(p) != SH_ACIDSHIELD;
 }
 
 /* objectdecorator_jump_t class */
@@ -4008,9 +4008,9 @@ static eventstrategy_t* onplayerinvincible_new() { return onplayerevent_new(play
 /* onplayershield_t concrete strategy */
 struct onplayershield_t {
     eventstrategy_t base; /* implements eventstrategy_t */
-    int shield_type; /* a SH_* constant defined at player.h */
+    playershield_t shield_type; /* a SH_* constant defined at player.h */
 };
-static eventstrategy_t* onplayershield_new(int shield_type);
+static eventstrategy_t* onplayershield_new(playershield_t shield_type);
 static void onplayershield_init(eventstrategy_t *event);
 static void onplayershield_release(eventstrategy_t *event);
 static int onplayershield_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
@@ -4847,7 +4847,7 @@ int onplayerevent_should_trigger_event(eventstrategy_t *event, object_t *object,
 
 
 /* onplayershield_t strategy */
-eventstrategy_t* onplayershield_new(int shield_type)
+eventstrategy_t* onplayershield_new(playershield_t shield_type)
 {
     onplayershield_t *x = mallocx(sizeof *x);
     eventstrategy_t *e = (eventstrategy_t*)x;
@@ -4875,7 +4875,7 @@ int onplayershield_should_trigger_event(eventstrategy_t *event, object_t *object
     onplayershield_t *me = (onplayershield_t*)event;
     player_t *player = enemy_get_observed_player(object);
 
-    return player->shield_type == me->shield_type;
+    return player_shield_type(player) == me->shield_type;
 }
 
 

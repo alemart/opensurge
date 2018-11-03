@@ -874,6 +874,22 @@ int player_is_ultrafast(const player_t* player)
 }
 
 /*
+ * player_set_ultrafast()
+ * Enable (or disable) turbo mode
+ */
+void player_set_ultrafast(player_t* player, int turbo)
+{
+    if(player_is_dying(player))
+        return;
+
+    if((!player_is_ultrafast(player) && turbo) || (player_is_ultrafast(player) && !turbo)) {
+        player->got_speedshoes = turbo;
+        if(player->got_speedshoes)
+            player->speedshoes_timer = 0.0f;
+    }
+}
+
+/*
  * player_is_invincible()
  * TRUE iff the player is invincible
  */
@@ -882,7 +898,39 @@ int player_is_invincible(const player_t* player)
     return player->invincible;
 }
 
+/*
+ * player_set_invincible()
+ * Make the player invincible (or not invincible)
+ */
+void player_set_invincible(player_t* player, int invincible)
+{
+    if(player_is_dying(player))
+        return;
 
+    if((!player_is_invincible(player) && invincible) || (player_is_invincible(player) && !invincible)) {
+        player->invincible = invincible;
+        if(player->invincible)
+            player->invtimer = 0.0f;
+    }
+}
+
+/*
+ * player_shield_type()
+ * Returns the current shield type of the player
+ */
+playershield_t player_shield_type(const player_t* player)
+{
+    return player->shield_type;
+}
+
+/*
+ * player_grant_shield()
+ * Grants the player a shield
+ */
+void player_grant_shield(player_t* player, playershield_t shield_type)
+{
+    player->shield_type = shield_type;
+}
 
 
 
@@ -980,29 +1028,25 @@ void update_shield(player_t *p)
     sh->position = v2d_add(act->position, v2d_rotate(off, -act->angle));
 
     switch(p->shield_type) {
-
         case SH_SHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_SHIELD", 0));
             break;
-
         case SH_FIRESHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_FIRESHIELD", 0));
             break;
-
         case SH_THUNDERSHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_THUNDERSHIELD", 0));
             break;
-
         case SH_WATERSHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_WATERSHIELD", 0));
             break;
-
         case SH_ACIDSHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_ACIDSHIELD", 0));
             break;
-
         case SH_WINDSHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_WINDSHIELD", 0));
+            break;
+        case SH_NONE:
             break;
     }
 }

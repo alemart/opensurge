@@ -147,16 +147,14 @@ void collectiblebox_strategy(item_t *item, player_t *player)
 void starbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->invincible = TRUE;
-    player->invtimer = 0;
+    player_set_invincible(player, TRUE);
     music_play( music_load("musics/invincible.ogg"), 0 );
 }
 
 void speedbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->got_speedshoes = TRUE;
-    player->speedshoes_timer = 0;
+    player_set_ultrafast(player, TRUE);
     music_play( music_load("musics/speed.ogg"), 0 );
 }
 
@@ -169,42 +167,42 @@ void glassesbox_strategy(item_t *item, player_t *player)
 void shieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->shield_type = SH_SHIELD;
+    player_grant_shield(player, SH_SHIELD);
     sound_play( soundfactory_get("shield") );
 }
 
 void fireshieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->shield_type = SH_FIRESHIELD;
+    player_grant_shield(player, SH_FIRESHIELD);
     sound_play( soundfactory_get("fire shield") );
 }
 
 void thundershieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->shield_type = SH_THUNDERSHIELD;
+    player_grant_shield(player, SH_THUNDERSHIELD);
     sound_play( soundfactory_get("thunder shield") );
 }
 
 void watershieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->shield_type = SH_WATERSHIELD;
+    player_grant_shield(player, SH_WATERSHIELD);
     sound_play( soundfactory_get("water shield") );
 }
 
 void acidshieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->shield_type = SH_ACIDSHIELD;
+    player_grant_shield(player, SH_ACIDSHIELD);
     sound_play( soundfactory_get("acid shield") );
 }
 
 void windshieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player->shield_type = SH_WINDSHIELD;
+    player_grant_shield(player, SH_WINDSHIELD);
     sound_play( soundfactory_get("wind shield") );
 }
 
