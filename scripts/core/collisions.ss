@@ -42,12 +42,14 @@ object "CollisionManager"
 
 // Axis-aligned collision box
 // To be spawned as a child of an entity
-object "CollisionBox" is "Collider"
+object "CollisionBox" is "collider"
 {
     manager = null;
     debug = false;
     width = 1;
     height = 1;
+    worldX = 0;
+    worldY = 0;
     transform = spawn("Transform2D");
     collisionFlags = 0;
     entity = null;
@@ -56,13 +58,16 @@ object "CollisionBox" is "Collider"
 
     state "main"
     {
-        // I will notify the manager only if I'm active
-        manager.__notify(this);
+        // update world coordinates
+        __updateWorldCoordinates();
 
         // update collisions
         while(prevCollisions.pop());
         while(collider = currCollisions.pop())
             prevCollisions.push(collider);
+
+        // I will notify the manager only if I'm active
+        manager.__notify(this);
     }
 
     fun get_width()
@@ -70,29 +75,39 @@ object "CollisionBox" is "Collider"
         return width;
     }
 
+    fun set_width(w)
+    {
+        width = Math.max(1, w);
+    }
+
     fun get_height()
     {
         return height;
     }
 
+    fun set_height(h)
+    {
+        height = Math.max(1, h);
+    }
+
     fun get_left()
     {
-        return transform.worldX - width / 2;
+        return worldX - width / 2;
     }
 
     fun get_right()
     {
-        return transform.worldX + width / 2;
+        return worldX + width / 2;
     }
 
     fun get_top()
     {
-        return transform.worldY - height / 2;
+        return worldY - height / 2;
     }
 
     fun get_bottom()
     {
-        return transform.worldY + height / 2;
+        return worldY + height / 2;
     }
 
     // get_debug()
@@ -118,13 +133,14 @@ object "CollisionBox" is "Collider"
 
     // setAnchor(x, y)
     // sets the anchor of the collider to a certain position (x,y),
-    // where 0 <= x, y <= 1. Defaults to (0.5, 0.5), the center
-    // of the collider
+    // where 0 <= x, y <= 1. Defaults to (0.5, 0.5), the center of
+    // the collider. (0,0) is the top-left; (1,1), the bottom-right
     // Note: the anchor will be aligned to the hot_spot of the entity
     fun setAnchor(x, y)
     {
         transform.xpos = (0.5 - x) * width;
         transform.ypos = (0.5 - y) * height;
+        __updateWorldCoordinates();
     }
 
     // collidesWith()
@@ -137,6 +153,8 @@ object "CollisionBox" is "Collider"
         ;
     }
 
+    // constructor()
+    // Object constructor
     fun constructor()
     {
         collisionFlags = 0;
@@ -149,14 +167,15 @@ object "CollisionBox" is "Collider"
             collisionFlags += 1;
     }
 
+    // initialization
     fun __init(mgr, w, h)
     {
-        // initialization
         manager = mgr;
-        width = Math.max(w, 1); // read-only
-        height = Math.max(h, 1);
+        set_width(w);
+        set_height(h);
     }
 
+    // check collision flags
     fun __bitflag(flag)
     {
         if(flag == 1) return Math.mod(collisionFlags, 2);
@@ -168,10 +187,17 @@ object "CollisionBox" is "Collider"
     // the manager is telling us about a collision somewhere
     fun __notify(otherCollider)
     {
+        currCollisions.push(otherCollider);
         if(collisionFlags > 0) {
             if(prevCollisions.indexOf(otherCollider) < 0)
                 entity.onCollision(otherCollider);
-            currCollisions.push(otherCollider);
         }
+    }
+
+    // cache the world coordinates (save some time)
+    fun __updateWorldCoordinates()
+    {
+        worldX = transform.worldX;
+        worldY = transform.worldY;
     }
 }
