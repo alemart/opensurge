@@ -3666,10 +3666,14 @@ void editor_ssobj_init()
 
 void editor_ssobj_register(const char* entity_name, void* data)
 {
-    int *counter = (int*)data;
-    if(editor_ssobj != NULL)
-        editor_ssobj[*counter] = str_dup(entity_name);
-    (*counter)++;
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+    if(!surgescript_tagsystem_has_tag(tag_system, entity_name, "private")) {
+        int *counter = (int*)data;
+        if(editor_ssobj != NULL)
+            editor_ssobj[*counter] = str_dup(entity_name);
+        (*counter)++;
+    }
 }
 
 void editor_ssobj_release()
