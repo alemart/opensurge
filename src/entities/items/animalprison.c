@@ -219,7 +219,7 @@ void state_idle_handle(state_t *state, item_t *item, player_t **team, int team_s
             s->being_hit = TRUE;
             actor_change_animation(act, sprite_get_animation("SD_ENDLEVEL", 1));
             sound_play( soundfactory_get("boss hit") );
-            player_bounce(player, act, FALSE);
+            player_bounce_ex(player, act, FALSE);
             player->actor->speed.x *= -0.5;
 
             if(++(s->hit_count) >= 3) /* 3 hits and you're done */

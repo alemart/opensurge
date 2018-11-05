@@ -36,7 +36,7 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 
 /* read-only properties */
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getcurrentstate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getattacking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -60,19 +60,21 @@ static surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgesc
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_drown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_springfy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* internals */
 static const surgescript_heapptr_t NAME_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
-static void update_player(surgescript_object_t* object);
 static inline player_t* get_player(const surgescript_object_t* object);
+static void update_player(surgescript_object_t* object);
 static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
+extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
 static const double RAD2DEG = 57.2957795131;
 
 
@@ -90,11 +92,43 @@ void scripting_register_player(surgescript_vm_t* vm)
 
     /* read-only properties */
     surgescript_vm_bind(vm, "Player", "get_name", fun_getname, 0);
+    surgescript_vm_bind(vm, "Player", "get_activity", fun_getactivity, 0);
+    surgescript_vm_bind(vm, "Player", "get_attacking", fun_getattacking, 0);
+    surgescript_vm_bind(vm, "Player", "get_midair", fun_getmidair, 0);
+    surgescript_vm_bind(vm, "Player", "get_secondsToDrown", fun_getsecondstodrown, 0);
     surgescript_vm_bind(vm, "Player", "get_transform", fun_gettransform, 0);
 
     /* read-write properties */
+    surgescript_vm_bind(vm, "Player", "get_shield", fun_getshield, 0);
+    surgescript_vm_bind(vm, "Player", "set_shield", fun_setshield, 1);
+    surgescript_vm_bind(vm, "Player", "get_invincible", fun_getinvincible, 0);
+    surgescript_vm_bind(vm, "Player", "set_invincible", fun_setinvincible, 1);
+    surgescript_vm_bind(vm, "Player", "get_turbo", fun_getturbo, 0);
+    surgescript_vm_bind(vm, "Player", "set_turbo", fun_setturbo, 1);
+    surgescript_vm_bind(vm, "Player", "get_underwater", fun_getunderwater, 0);
+    surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1);
+    surgescript_vm_bind(vm, "Player", "get_gsp", fun_getgsp, 0);
+    surgescript_vm_bind(vm, "Player", "set_gsp", fun_setgsp, 1);
+    surgescript_vm_bind(vm, "Player", "get_xsp", fun_getxsp, 0);
+    surgescript_vm_bind(vm, "Player", "set_xsp", fun_setxsp, 1);
+    surgescript_vm_bind(vm, "Player", "get_ysp", fun_getysp, 0);
+    surgescript_vm_bind(vm, "Player", "set_ysp", fun_setysp, 1);
 
-    /* methods */
+    /* player-specific methods */
+    surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
+    surgescript_vm_bind(vm, "Player", "bounceBack", fun_bounceback, 1);
+    surgescript_vm_bind(vm, "Player", "hit", fun_hit, 1);
+    surgescript_vm_bind(vm, "Player", "kill", fun_kill, 0);
+    surgescript_vm_bind(vm, "Player", "drown", fun_drown, 0);
+    surgescript_vm_bind(vm, "Player", "breathe", fun_breathe, 0);
+    surgescript_vm_bind(vm, "Player", "springify", fun_springify, 0);
+    surgescript_vm_bind(vm, "Player", "roll", fun_roll, 0);
+    
+    /* general-purpose methods */
+    surgescript_vm_bind(vm, "Player", "constructor", fun_constructor, 0);
+    surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
+    surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
 }
 
 /* Player routines */
@@ -182,7 +216,7 @@ surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_v
 }
 
 /* get a string representing the state of the player */
-surgescript_var_t* fun_getcurrentstate(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
     if(player != NULL) {
@@ -433,14 +467,118 @@ surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgesc
     return NULL;
 }
 
-/* bounce takes 1 parameter: bounce_direction ("up", "down") */
-static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_drown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_springfy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+/* rebound: bounce(hazard) - will bounce upwards */
+surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        if(!surgescript_var_is_null(param[0])) {
+            surgescript_objecthandle_t hazard_handle = surgescript_var_get_objecthandle(param[0]);
+            surgescript_object_t* hazard = surgescript_objectmanager_get(manager, hazard_handle);
+            if(strcmp(surgescript_object_name(hazard), "Actor") == 0) {
+                actor_t* hazard_actor = scripting_actor_ptr(hazard);
+                player_bounce_ex(player, hazard_actor, FALSE);
+            }
+            else
+                fatal_error("Scripting Error: %s.bounce(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+        }
+        else
+            player_bounce(player, -1.0f, FALSE);
+    }
+    return NULL;
+}
+
+/* rebound: bounceBack(hazard) - will bounce upwards if the player is coming from above the hazard, or downwards if coming from below */
+surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        if(!surgescript_var_is_null(param[0])) {
+            surgescript_objecthandle_t hazard_handle = surgescript_var_get_objecthandle(param[0]);
+            surgescript_object_t* hazard = surgescript_objectmanager_get(manager, hazard_handle);
+            if(strcmp(surgescript_object_name(hazard), "Actor") == 0) {
+                actor_t* hazard_actor = scripting_actor_ptr(hazard);
+                player_bounce_ex(player, hazard_actor, TRUE);
+            }
+            else
+                fatal_error("Scripting Error: %s.bounceBack(hazard) requires hazard to be an Actor, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+        }
+        else
+            fatal_error("Scripting Error: %s.bounceBack(hazard) requires hazard to be an Actor, but hazard is null.", surgescript_object_name(object));
+    }
+    return NULL;
+}
+
+/* get hit: hit(hazard), where hazard: Actor | null */
+surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        if(!surgescript_var_is_null(param[0])) {
+            surgescript_objecthandle_t hazard_handle = surgescript_var_get_objecthandle(param[0]);
+            surgescript_object_t* hazard = surgescript_objectmanager_get(manager, hazard_handle);
+            if(strcmp(surgescript_object_name(hazard), "Actor") == 0) {
+                actor_t* hazard_actor = scripting_actor_ptr(hazard);
+                player_hit_ex(player, hazard_actor);
+            }
+            else
+                fatal_error("Scripting Error: %s.hit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+        }
+        else {
+            float direction = physicsactor_is_facing_right(player->pa) ? -1.0f : 1.0f;
+            player_hit(player, direction);
+        }
+    }
+    return NULL;
+}
+
+/* kill the player */
+surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player_kill(player);
+    return NULL;
+}
+
+/* drown the player */
+surgescript_var_t* fun_drown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player_drown(player);
+    return NULL;
+}
+
+/* breathe (underwater) */
+surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player_breathe(player);
+    return NULL;
+}
+
+/* springify */
+surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player_spring(player);
+    return NULL;
+}
+
+/* roll */
+surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player_roll(player);
+    return NULL;
+}
 
 
 /* internals */

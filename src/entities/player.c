@@ -390,17 +390,14 @@ void player_render(player_t *player, v2d_t camera_position)
 /*
  * player_bounce()
  * Rebound
+ * tip: direction < 0 - the player is above the hazard, > 0 - the player is below
  */
-void player_bounce(player_t *player, const actor_t *hazard, int is_heavy_object)
+void player_bounce(player_t *player, float direction, int is_heavy_object)
 {
     if(physicsactor_is_in_the_air(player->pa)) {
         actor_t *act = player->actor;
-        int hw = image_width(actor_image(hazard))/2, hh = image_height(actor_image(hazard))/2;
-        int pw = image_width(actor_image(act))/2, ph = image_height(actor_image(act))/2;
-        v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(hw/2, hh/2));
-        v2d_t player_centre = v2d_add(v2d_subtract(act->position, act->hot_spot), v2d_new(pw/2, ph/2));
-
-        if(player_centre.y <= hazard_centre.y && act->speed.y >= 0.0f)
+        
+        if(direction <= 0.0f && act->speed.y >= 0.0f)
             act->speed.y = -fabs(act->speed.y);
         else if(is_heavy_object)
             act->speed.y = fabs(act->speed.y) / 2.0f;
@@ -413,11 +410,24 @@ void player_bounce(player_t *player, const actor_t *hazard, int is_heavy_object)
 }
 
 
+/*
+ * player_bounce_ex()
+ * The same as player_bounce(), but you provide an actor as a hazard
+ */
+void player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_object)
+{
+    int hw = image_width(actor_image(hazard))/2, hh = image_height(actor_image(hazard))/2;
+    int pw = image_width(actor_image(player->actor))/2, ph = image_height(actor_image(player->actor))/2;
+    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(hw/2, hh/2));
+    v2d_t player_centre = v2d_add(v2d_subtract(player->actor->position, player->actor->hot_spot), v2d_new(pw/2, ph/2));
+    player_bounce(player, player_centre.y - hazard_centre.y, is_heavy_object);
+}
+
 
 /*
  * player_hit()
  * Hits a player. If it has no collectibles, then it must die.
- * tip: direction +1 is right, -1 is left
+ * tip: direction > 0 is right, < 0 is left
  */
 void player_hit(player_t *player, float direction)
 {
@@ -468,9 +478,11 @@ void player_hit(player_t *player, float direction)
  */
 void player_hit_ex(player_t *player, const actor_t *hazard)
 {
-    int w = image_width(actor_image(hazard))/2, h = image_height(actor_image(hazard))/2;
-    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(w/2, h/2));
-    player_hit(player, player->actor->position.x - hazard_centre.x);
+    int hw = image_width(actor_image(hazard))/2, hh = image_height(actor_image(hazard))/2;
+    int pw = image_width(actor_image(player->actor))/2, ph = image_height(actor_image(player->actor))/2;
+    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(hw/2, hh/2));
+    v2d_t player_centre = v2d_add(v2d_subtract(player->actor->position, player->actor->hot_spot), v2d_new(pw/2, ph/2));
+    player_hit(player, player_centre.x - hazard_centre.x);
 }
 
 

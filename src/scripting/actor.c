@@ -99,6 +99,15 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "animFPS", fun_animfps, 0);
 }
 
+/*
+ * scripting_actor_ptr()
+ * Returns a built-in actor_t*, given an Actor SurgeScript object
+ */
+actor_t* scripting_actor_ptr(const surgescript_object_t* object)
+{
+    return (actor_t*)surgescript_object_userdata(object);
+}
+
 /* private */
 
 /* main state */

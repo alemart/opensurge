@@ -36,7 +36,7 @@ struct obstaclemap_t;
 enum movmode_t;
 
 /* create and destroy */
-sensor_t* sensor_create_horizontal(int x1, int y, int x2, uint32 color); /* factory method: new horizontal sensor */
+sensor_t* sensor_create_horizontal(int y, int x1, int x2, uint32 color); /* factory method: new horizontal sensor */
 sensor_t* sensor_create_vertical(int x, int y1, int y2, uint32 color); /* factory method: new vertical sensor */
 sensor_t* sensor_destroy(sensor_t *sensor);
 
