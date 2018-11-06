@@ -34,6 +34,7 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-only properties */
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -82,8 +83,9 @@ static const surgescript_heapptr_t COLLIDER_ADDR = 2;
 static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static void update_player(surgescript_object_t* object);
-static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
 static void update_collider(surgescript_object_t* object, int width, int height);
+static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
+static void read_transform(surgescript_object_t* object, v2d_t* world_position);
 extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
 static const double RAD2DEG = 57.2957795131;
 
@@ -141,6 +143,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
 
     /* misc */
     surgescript_vm_bind(vm, "PlayerManager", "__spawnPlayers", fun_spawnplayers, 0);
@@ -229,6 +232,20 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* can't destroy the player controller */
 surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    return NULL;
+}
+
+/* onTransformChange(transform): the player transform was changed somewhere in the script */
+surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* we'll tell the engine about the new position of the player;
+       other parameters (angle, scale) will be ignored */
+    v2d_t world_position;
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        read_transform(object, &world_position);
+        player->actor->position = world_position;
+    }
     return NULL;
 }
 
@@ -680,10 +697,18 @@ void update_transform(surgescript_object_t* object, v2d_t world_position, float 
     call set_worldX, set_worldY*/
     surgescript_transform_t transform;
     surgescript_transform_reset(&transform);
-    surgescript_transform_setposition2d(&transform, world_position.x, world_position.y); /* this assumes local position = world position */
+    surgescript_transform_setposition2d(&transform, world_position.x, world_position.y); /* this assumes local position == world position */
     surgescript_transform_setrotation2d(&transform, -rotation_degrees);
     surgescript_transform_setscale2d(&transform, 1.0f, 1.0f);
     surgescript_object_poke_transform(object, &transform);
+}
+
+/* read the player transform */
+void read_transform(surgescript_object_t* object, v2d_t* world_position)
+{
+    surgescript_transform_t transform;
+    surgescript_object_peek_transform(object, &transform);
+    *world_position = v2d_new(transform.position.x, transform.position.y); /* assuming local position == world position */
 }
 
 /* update the collider */
