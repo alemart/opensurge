@@ -150,12 +150,16 @@ int player_is_looking_up(const player_t *player);
 int player_is_waiting(const player_t *player);
 int player_is_winning(const player_t *player);
 
+const char* player_name(const player_t* player);
+int player_anim(const player_t* player);
+void player_override_anim(player_t* player, int anim);
+const char* player_sprite_name(const player_t* player);
+
 int player_get_collectibles();
 void player_set_collectibles(int c);
 int player_get_lives();
 void player_set_lives(int l);
 int player_get_score();
 void player_set_score(int s);
-const char* player_name(const player_t* player);
 
 #endif

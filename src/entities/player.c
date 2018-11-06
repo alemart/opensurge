@@ -1037,6 +1037,34 @@ const char* player_name(const player_t* player)
     return player->name;
 }
 
+/*
+ * player_anim()
+ * The ID of the current animation of the player
+ */
+int player_anim(const player_t* player)
+{
+    return player->actor->animation->id;
+}
+
+/*
+ * player_override_anim()
+ * Overrides the animation ID of the player
+ */
+void player_override_anim(player_t* player, int anim)
+{
+    animation_t *animation = sprite_get_animation(player_sprite_name(player), anim);
+    actor_change_animation(player->actor, animation);
+    player->disable_animation_control = TRUE;
+}
+
+/*
+ * player_sprite_name()
+ * The sprite name associated with the player
+ */
+const char* player_sprite_name(const player_t* player)
+{
+    return charactersystem_get(player->name)->animation.sprite_name;
+}
 
 
 /* private functions */
