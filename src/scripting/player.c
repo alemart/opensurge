@@ -20,6 +20,7 @@
 
 #include <surgescript.h>
 #include <string.h>
+#include "scripting.h"
 #include "../core/util.h"
 #include "../scenes/level.h"
 #include "../entities/actor.h"
@@ -41,6 +42,7 @@ static surgescript_var_t* fun_getattacking(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -71,9 +73,12 @@ static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescri
 /* internals */
 static const surgescript_heapptr_t NAME_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
+static const surgescript_heapptr_t COLLIDER_ADDR = 2;
 static inline player_t* get_player(const surgescript_object_t* object);
+static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static void update_player(surgescript_object_t* object);
 static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
+static void update_collider(surgescript_object_t* object, int width, int height);
 extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
 static const double RAD2DEG = 57.2957795131;
 
@@ -89,6 +94,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_tagsystem_add_tag(tag_system, "Player", "entity");
     surgescript_tagsystem_add_tag(tag_system, "Player", "private");
     surgescript_tagsystem_add_tag(tag_system, "Player", "awake");
+    surgescript_tagsystem_add_tag(tag_system, "Player", "player");
 
     /* read-only properties */
     surgescript_vm_bind(vm, "Player", "get_name", fun_getname, 0);
@@ -97,6 +103,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_midair", fun_getmidair, 0);
     surgescript_vm_bind(vm, "Player", "get_secondsToDrown", fun_getsecondstodrown, 0);
     surgescript_vm_bind(vm, "Player", "get_transform", fun_gettransform, 0);
+    surgescript_vm_bind(vm, "Player", "get_collider", fun_getcollider, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_shield", fun_getshield, 0);
@@ -142,18 +149,43 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t transform = surgescript_objectmanager_spawn(manager, me, "Transform2D", NULL);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    surgescript_var_t* tmp[5] = {
+        surgescript_var_set_objecthandle(surgescript_var_create(), me),
+        surgescript_var_set_number(surgescript_var_create(), 1.0f),
+        surgescript_var_set_number(surgescript_var_create(), 1.0f),
+        surgescript_var_set_number(surgescript_var_create(), 0.0f),
+        surgescript_var_set_number(surgescript_var_create(), 0.0f)
+    };
 
     ssassert(NAME_ADDR == surgescript_heap_malloc(heap));
     ssassert(TRANSFORM_ADDR == surgescript_heap_malloc(heap));
+    ssassert(COLLIDER_ADDR == surgescript_heap_malloc(heap));
 
     surgescript_var_set_null(surgescript_heap_at(heap, NAME_ADDR));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
     surgescript_object_set_userdata(object, NULL);
 
+    /* spawn the collider */
+    surgescript_object_call_function(
+        scripting_util_surgeengine_component(surgescript_vm(), "Collisions"),
+        "get_CollisionBox", NULL, 0, tmp[4]
+    );
+    surgescript_object_call_function(
+        surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(tmp[4])),
+        "__create", (const surgescript_var_t**)tmp, 3, tmp[3]
+    );
+    surgescript_var_copy(surgescript_heap_at(heap, COLLIDER_ADDR), tmp[3]);
+
     /* Player must be a child of Level */
     if(strcmp(surgescript_object_name(parent), "Level") != 0)
         fatal_error("Scripting Error: object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
 
+    /* done */
+    surgescript_var_destroy(tmp[4]);
+    surgescript_var_destroy(tmp[3]);
+    surgescript_var_destroy(tmp[2]);
+    surgescript_var_destroy(tmp[1]);
+    surgescript_var_destroy(tmp[0]);
     return NULL;
 }
 
@@ -210,7 +242,7 @@ surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_v
 {
     player_t* player = get_player(object);
     if(player != NULL)
-        return surgescript_var_set_string(surgescript_var_create(), player->name);
+        return surgescript_var_set_string(surgescript_var_create(), player_name(player));
     else
         return NULL;
 }
@@ -291,6 +323,13 @@ surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescr
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     return surgescript_var_clone(surgescript_heap_at(heap, TRANSFORM_ADDR));
+}
+
+/* the collider */
+surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, COLLIDER_ADDR));
 }
 
 /* ground speed, in px/s */
@@ -592,6 +631,15 @@ player_t* get_player(const surgescript_object_t* object)
     return (player_t*)surgescript_object_userdata(object);
 }
 
+/* returns the collider of the player */
+surgescript_object_t* get_collider(surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* col = surgescript_heap_at(heap, COLLIDER_ADDR);
+    return surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(col));
+}
+
 /* updates the player pointer */
 void update_player(surgescript_object_t* object)
 {
@@ -616,6 +664,15 @@ void update_player(surgescript_object_t* object)
     else
         update_transform(object, v2d_new(0.0f, 0.0f), 0.0f);
 
+    /* update the collider */
+    if(player != NULL) {
+        int width = 1, height = 1;
+        physicsactor_bounding_box(player->pa, &width, &height, NULL);
+        update_collider(object, width, height);
+    }
+    else
+        update_collider(object, 1, 1);
+
     /* update player pointer */
     surgescript_object_set_userdata(object, player);
 }
@@ -632,4 +689,17 @@ void update_transform(surgescript_object_t* object, v2d_t world_position, float 
     surgescript_transform_setrotation2d(&transform, rotation_degrees);
     surgescript_transform_setscale2d(&transform, 1.0f, 1.0f);
     surgescript_object_poke_transform(object, &transform);
+}
+
+/* update the collider */
+void update_collider(surgescript_object_t* object, int width, int height)
+{
+    surgescript_object_t* collider = get_collider(object);
+    surgescript_var_t* w = surgescript_var_set_number(surgescript_var_create(), width);
+    surgescript_var_t* h = surgescript_var_set_number(surgescript_var_create(), height);
+    const surgescript_var_t* tmp[2] = { w, h };
+    surgescript_object_call_function(collider, "set_width", tmp+0, 1, NULL);
+    surgescript_object_call_function(collider, "set_height", tmp+1, 1, NULL);
+    surgescript_var_destroy(h);
+    surgescript_var_destroy(w);
 }

@@ -90,6 +90,7 @@ void physicsactor_enable_winning_pose(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(physicsactor_t *pa);
 int physicsactor_roll_delta(const physicsactor_t* pa); /* roll delta (sensors) */
 float physicsactor_charge_intensity(const physicsactor_t* pa); /* in [0,1] */
+void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height, v2d_t *center); /* center may be NULL */
 
 void physicsactor_walk_right(physicsactor_t *pa); /* call before physicsactor_update() */
 void physicsactor_walk_left(physicsactor_t *pa);

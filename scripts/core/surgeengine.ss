@@ -150,7 +150,12 @@ object "CollisionBoxFactory"
 
     fun call(width, height)
     {
-        collider = caller.spawn("CollisionBox");
+        return __create(caller, width, height);
+    }
+
+    fun __create(parnt, width, height)
+    {
+        collider = parnt.spawn("CollisionBox");
         collider.__init(manager, width, height);
         return collider;
     }

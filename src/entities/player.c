@@ -1028,6 +1028,15 @@ void player_set_score(int s)
 }
 
 
+/*
+ * player_name()
+ * The name of the (character associated with the) player
+ */
+const char* player_name(const player_t* player)
+{
+    return player->name;
+}
+
 
 
 /* private functions */

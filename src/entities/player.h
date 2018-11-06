@@ -156,6 +156,6 @@ int player_get_lives();
 void player_set_lives(int l);
 int player_get_score();
 void player_set_score(int s);
-const char *player_get_sprite_name(const player_t *player);
+const char* player_name(const player_t* player);
 
 #endif

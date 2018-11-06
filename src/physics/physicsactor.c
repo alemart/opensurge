@@ -553,7 +553,6 @@ void physicsactor_set_airdrag(physicsactor_t *pa, float value)
     pa->airdrag_exp = (pa->airdrag >= 0.001f) ? -pa->airdrag * logf(pa->airdrag) : 0.0f;
 }
 
-/* private stuff ;-) */
 
 /* sensors */
 #define GENERATE_SENSOR_ACCESSOR(x) \
@@ -573,6 +572,43 @@ GENERATE_SENSOR_ACCESSOR(C)
 GENERATE_SENSOR_ACCESSOR(D)
 GENERATE_SENSOR_ACCESSOR(M)
 GENERATE_SENSOR_ACCESSOR(U)
+
+
+/* get bounding box */
+void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height, v2d_t *center)
+{
+    int x, y, xa, ya, xd, yd, xm, ym;
+    const sensor_t *a = sensor_A(pa);
+    const sensor_t *d = sensor_D(pa);
+    const sensor_t *m = sensor_M(pa);
+    v2d_t origin = v2d_new(0, 0);
+
+    sensor_worldpos(a, origin, pa->movmode, &x, &y, &xa, &ya);
+    sensor_worldpos(d, origin, pa->movmode, &xd, &yd, &x, &y);
+    sensor_worldpos(m, origin, pa->movmode, &x, &y, &xm, &ym);
+
+    if(center != NULL)
+        *center = pa->position;
+
+    switch(pa->movmode) {
+        case MM_FLOOR:
+            *width = xm - x + 1;
+            *height = ya - yd + 1;
+            break;
+        case MM_CEILING:
+            *width = x - xm + 1;
+            *height = yd - ya + 1;
+            break;
+        case MM_RIGHTWALL:
+            *width = xa - xd + 1;
+            *height = y - ym + 1;
+            break;
+        case MM_LEFTWALL:
+            *width = xd - xa + 1;
+            *height = ym - y + 1;
+            break;
+    }
+}
 
 
 
