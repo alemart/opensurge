@@ -478,6 +478,7 @@ void level_load(const char *filepath)
     camera_init();
     camera_set_position(player->actor->position);
     player_set_collectibles(0);
+    surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
 
     /* startup objects (2) */
     spawn_startup_objects();

@@ -164,7 +164,6 @@ object "CollisionBox" is "collider"
         manager = mgr;
         set_width(w);
         set_height(h);
-        setAnchor(0.5, 0.5);
     }
 
     // check collision flags

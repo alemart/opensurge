@@ -1302,7 +1302,7 @@ void hotspot_magic(player_t* player)
         }
     }
     else if(player_is_rolling(player)) {
-        const int roll_delta = physicsactor_roll_delta(pa);
+        int roll_delta = physicsactor_roll_delta(pa);
 
         /* adjust hot spot */
         switch(physicsactor_get_movmode(pa)) {
@@ -1335,6 +1335,7 @@ void hotspot_magic(player_t* player)
                 break;
 
             case MM_CEILING:
+                roll_delta = max(roll_delta, 2);
                 act->hot_spot.x -= (6 - roll_delta) * sinf(act->angle);
                 act->hot_spot.y += 4 - roll_delta - 6 * cosf(act->angle);
                 break;

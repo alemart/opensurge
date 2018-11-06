@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include "../core/util.h"
 #include "../scenes/level.h"
+#include "../entities/player.h"
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -53,6 +54,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(IDX_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), IDX_ADDR);
 
+    /* done */
     return NULL;
 }
 

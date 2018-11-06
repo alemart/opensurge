@@ -70,7 +70,12 @@ static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
+/* PlayerManager */
+static surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getactiveplayername(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
 /* internals */
+#define SHOW_COLLIDERS 1 /* set it to 1 to display the colliders */
 static const surgescript_heapptr_t NAME_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
@@ -136,6 +141,10 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
+
+    /* misc */
+    surgescript_vm_bind(vm, "PlayerManager", "__spawnPlayers", fun_spawnplayers, 0);
+    surgescript_vm_bind(vm, "PlayerManager", "get___activePlayerName", fun_getactiveplayername, 0);
 }
 
 /* Player routines */
@@ -176,8 +185,17 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     );
     surgescript_var_copy(surgescript_heap_at(heap, COLLIDER_ADDR), tmp[3]);
 
-    /* Player must be a child of Level */
-    if(strcmp(surgescript_object_name(parent), "Level") != 0)
+    /* enable collider debug mode? */
+    #if SHOW_COLLIDERS == 1
+    surgescript_var_set_bool(tmp[1], true);
+    surgescript_object_call_function(
+        surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, COLLIDER_ADDR))),
+        "set_debug", (const surgescript_var_t**)tmp+1, 1, NULL
+    );
+    #endif
+
+    /* Player must be a child of PlayerManager */
+    if(strcmp(surgescript_object_name(parent), "PlayerManager") != 0)
         fatal_error("Scripting Error: object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
 
     /* done */
@@ -189,39 +207,16 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     return NULL;
 }
 
-/* init: pass a character name, a player ID or null (active player)
-   returns true on success */
+/* __init: pass a character name */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* name = surgescript_heap_at(heap, NAME_ADDR);
 
-    if(surgescript_var_is_null(param[0])) {
-        /* grab active player */
-        surgescript_var_set_null(name);
-        update_player(object);
-        return surgescript_var_set_bool(surgescript_var_create(), true);
-    }
-    else if(0 == surgescript_var_typecheck(param[0], surgescript_var_type2code("number"))) {
-        /* grab player by ID */
-        int id = (int)surgescript_var_get_number(param[0]);
-        if(level_get_player_by_id(id) != NULL) {
-            surgescript_var_set_string(name, level_get_player_by_id(id)->name);
-            update_player(object);
-            return surgescript_var_set_bool(surgescript_var_create(), true);
-        }
-    }
-    else if(0 == surgescript_var_typecheck(param[0], surgescript_var_type2code("string"))) {
-        /* grab player by name */
-        surgescript_var_set_string(name, surgescript_var_fast_get_string(param[0]));
-        update_player(object);
-        return surgescript_var_set_bool(surgescript_var_create(), true);
-    }
-
-    /* error */
-    surgescript_var_set_string(name, "");
+    /* grab player by name */
+    surgescript_var_set_string(name, surgescript_var_fast_get_string(param[0]));
     update_player(object);
-    return surgescript_var_set_bool(surgescript_var_create(), false);
+    return surgescript_var_set_bool(surgescript_var_create(), true);
 }
 
 /* main state */
@@ -686,7 +681,7 @@ void update_transform(surgescript_object_t* object, v2d_t world_position, float 
     surgescript_transform_t transform;
     surgescript_transform_reset(&transform);
     surgescript_transform_setposition2d(&transform, world_position.x, world_position.y); /* this assumes local position = world position */
-    surgescript_transform_setrotation2d(&transform, rotation_degrees);
+    surgescript_transform_setrotation2d(&transform, -rotation_degrees);
     surgescript_transform_setscale2d(&transform, 1.0f, 1.0f);
     surgescript_object_poke_transform(object, &transform);
 }
@@ -702,4 +697,39 @@ void update_collider(surgescript_object_t* object, int width, int height)
     surgescript_object_call_function(collider, "set_height", tmp+1, 1, NULL);
     surgescript_var_destroy(h);
     surgescript_var_destroy(w);
+}
+
+/* PlayerManager: spawn Player objects */
+surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_var_t* player_handle = surgescript_var_create();
+    surgescript_var_t* my_param = surgescript_var_create();
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    player_t* player;
+
+    /* spawn player i = 0, 1, ... */
+    for(int i = 0; (player = level_get_player_by_id(i)) != NULL; i++) {
+        const surgescript_var_t* p[] = { my_param };
+        surgescript_var_set_string(my_param, "Player");
+        surgescript_object_call_function(object, "spawn", p, 1, player_handle);
+        surgescript_var_copy(surgescript_heap_at(heap, surgescript_heap_malloc(heap)), player_handle); /* heap_malloc */
+        surgescript_var_set_string(my_param, player_name(player));
+        surgescript_object_call_function(
+            surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(player_handle)),
+            "__init", p, 1, NULL
+        );
+    }
+
+    /* done */
+    surgescript_var_destroy(my_param);
+    surgescript_var_destroy(player_handle);
+    return NULL;
+}
+
+/* PlayerManager: the name of the currently active player */
+surgescript_var_t* fun_getactiveplayername(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = level_player();
+    return player != NULL ? surgescript_var_set_string(surgescript_var_create(), player_name(player)) : NULL;
 }

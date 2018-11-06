@@ -88,6 +88,11 @@ object "SurgeEngine"
     {
         return prefs;
     }
+
+    fun get_Player()
+    {
+        return levelManager.playerManager;
+    }
 }
 
 object "ActorFactory"
@@ -127,6 +132,63 @@ object "InputFactory"
         input.__init(inputMap);
         return input;
     }
+}
+
+object "PlayerManager"
+{
+    children = null; // cached value: this.__children
+
+    // get player by name
+    // just an alias
+    fun call(name)
+    {
+        return getByName(name);
+    }
+
+    // get the active player
+    fun get_active()
+    {
+        return getByName(__activePlayerName);
+    }
+
+    // get player by name
+    // will crash if not found
+    fun getByName(name)
+    {
+        cnt = this.count;
+        for(i = 0; i < cnt; i++) {
+            player = getById(i);
+            if(player.name == name)
+                return player;
+        }
+        Application.crash("Can't find Player \"" + name + "\": no such character.");
+        return null;
+    }
+
+    // get player by id
+    // will crash if not found
+    fun getById(playerID)
+    {
+        id = Number(playerID);
+        if(id.isInteger()) {
+            if(id >= 0 && id < this.__childCount) {
+                if(children == null)
+                    children = this.__children;
+                return children[id];
+            }
+        }
+        Application.crash("Can't find Player " + playerID + ": invalid id.");
+        return null;
+    }
+
+    // the number of players
+    fun get_count()
+    {
+        return this.__childCount;
+    }
+
+    // fun __spawnPlayers() { [builtin] }
+    // fun get___activePlayerName() { [builtin] }
 }
 
 object "CollisionSystem"

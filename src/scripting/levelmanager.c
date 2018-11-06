@@ -30,7 +30,9 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_onlevelload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onlevelunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcurrentlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getplayermanager(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t LEVEL_ADDR = 0; /* address of the "Level" instance */
+static const surgescript_heapptr_t PLAYERMANAGER_ADDR = 1;
 
 /*
  * scripting_register_levelmanager()
@@ -45,14 +47,16 @@ void scripting_register_levelmanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "LevelManager", "onLevelLoad", fun_onlevelload, 0);
     surgescript_vm_bind(vm, "LevelManager", "onLevelUnload", fun_onlevelunload, 0);
     surgescript_vm_bind(vm, "LevelManager", "get_currentLevel", fun_getcurrentlevel, 0);
+    surgescript_vm_bind(vm, "LevelManager", "get_playerManager", fun_getplayermanager, 0);
 }
 
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* allocate space for storing a reference to the Level object */
+    /* allocate space for storing references to child objects */
     surgescript_heap_t* heap = surgescript_object_heap(object);
     ssassert(LEVEL_ADDR == surgescript_heap_malloc(heap));
+    ssassert(PLAYERMANAGER_ADDR == surgescript_heap_malloc(heap));
     return NULL;
 }
 
@@ -84,8 +88,14 @@ surgescript_var_t* fun_onlevelload(surgescript_object_t* object, const surgescri
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t child = surgescript_objectmanager_spawn(manager, me, "Level", NULL);
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, LEVEL_ADDR), child);
+    surgescript_var_set_objecthandle(
+        surgescript_heap_at(heap, PLAYERMANAGER_ADDR),
+        surgescript_objectmanager_spawn(manager, me, "PlayerManager", NULL)
+    );
+    surgescript_var_set_objecthandle(
+        surgescript_heap_at(heap, LEVEL_ADDR),
+        surgescript_objectmanager_spawn(manager, me, "Level", NULL)
+    );
     return NULL;
 }
 
@@ -95,10 +105,12 @@ surgescript_var_t* fun_onlevelunload(surgescript_object_t* object, const surgesc
     /* destroy the "Level" instance */
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t child = surgescript_var_get_objecthandle(surgescript_heap_at(heap, LEVEL_ADDR));
-    surgescript_object_t* level = surgescript_objectmanager_get(manager, child);
+    surgescript_object_t* level = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, LEVEL_ADDR)));
+    surgescript_object_t* playermanager = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, PLAYERMANAGER_ADDR)));
     surgescript_object_kill(level); /* destroy the Level, as well as its objects */
     surgescript_var_set_null(surgescript_heap_at(heap, LEVEL_ADDR)); /* nobody can access the Level now */
+    surgescript_object_kill(playermanager);
+    surgescript_var_set_null(surgescript_heap_at(heap, PLAYERMANAGER_ADDR));
     return NULL;
 }
 
@@ -107,4 +119,11 @@ surgescript_var_t* fun_getcurrentlevel(surgescript_object_t* object, const surge
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     return surgescript_var_clone(surgescript_heap_at(heap, LEVEL_ADDR));
+}
+
+/* get the PlayerManager instance */
+surgescript_var_t* fun_getplayermanager(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, PLAYERMANAGER_ADDR));
 }

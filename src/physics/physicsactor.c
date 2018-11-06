@@ -578,17 +578,13 @@ GENERATE_SENSOR_ACCESSOR(U)
 void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height, v2d_t *center)
 {
     int x, y, xa, ya, xd, yd, xm, ym;
-    const sensor_t *a = sensor_A(pa);
+    const sensor_t *a = pa->A_normal; /*sensor_A(pa);*/
     const sensor_t *d = sensor_D(pa);
     const sensor_t *m = sensor_M(pa);
-    v2d_t origin = v2d_new(0, 0);
 
-    sensor_worldpos(a, origin, pa->movmode, &x, &y, &xa, &ya);
-    sensor_worldpos(d, origin, pa->movmode, &xd, &yd, &x, &y);
-    sensor_worldpos(m, origin, pa->movmode, &x, &y, &xm, &ym);
-
-    if(center != NULL)
-        *center = pa->position;
+    sensor_worldpos(a, pa->position, pa->movmode, &x, &y, &xa, &ya);
+    sensor_worldpos(d, pa->position, pa->movmode, &xd, &yd, &x, &y);
+    sensor_worldpos(m, pa->position, pa->movmode, &x, &y, &xm, &ym);
 
     switch(pa->movmode) {
         case MM_FLOOR:
@@ -608,6 +604,9 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
             *height = ym - y + 1;
             break;
     }
+
+    if(center != NULL)
+        *center = pa->position;
 }
 
 
