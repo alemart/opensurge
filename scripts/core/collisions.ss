@@ -105,7 +105,7 @@ object "CollisionBox" is "collider"
         return visible;
     }
 
-    // set_debug()
+    // set_visible()
     // Display the collider for debugging purposes
     fun set_visible(v)
     {

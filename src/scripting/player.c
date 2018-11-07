@@ -820,7 +820,7 @@ void update_player(surgescript_object_t* object)
 
     /* update the transform */
     if(player != NULL)
-        update_transform(object, player->actor->position, player->actor->angle * RAD2DEG);
+        update_transform(object, player->actor->position, -player->actor->angle * RAD2DEG);
     else
         update_transform(object, v2d_new(0.0f, 0.0f), 0.0f);
 
@@ -846,7 +846,7 @@ void update_transform(surgescript_object_t* object, v2d_t world_position, float 
     surgescript_transform_t transform;
     surgescript_transform_reset(&transform);
     surgescript_transform_setposition2d(&transform, world_position.x, world_position.y); /* this assumes local position == world position */
-    surgescript_transform_setrotation2d(&transform, -rotation_degrees);
+    surgescript_transform_setrotation2d(&transform, rotation_degrees);
     surgescript_transform_setscale2d(&transform, 1.0f, 1.0f);
     surgescript_object_poke_transform(object, &transform);
 }
