@@ -45,6 +45,8 @@ static surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, co
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -71,6 +73,8 @@ static surgescript_var_t* fun_getlives(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_setlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -125,6 +129,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Player", "get_collider", fun_getcollider, 0);
     surgescript_vm_bind(vm, "Player", "get_direction", fun_getdirection, 0);
+    surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
+    surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -139,6 +145,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1);
     surgescript_vm_bind(vm, "Player", "get_frozen", fun_getfrozen, 0);
     surgescript_vm_bind(vm, "Player", "set_frozen", fun_setfrozen, 1);
+    surgescript_vm_bind(vm, "Player", "get_visible", fun_getvisible, 0);
+    surgescript_vm_bind(vm, "Player", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Player", "get_gsp", fun_getgsp, 0);
     surgescript_vm_bind(vm, "Player", "set_gsp", fun_setgsp, 1);
     surgescript_vm_bind(vm, "Player", "get_xsp", fun_getxsp, 0);
@@ -310,13 +318,13 @@ surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescri
             case PAS_GETTINGHIT:
                 return surgescript_var_set_string(surgescript_var_create(), "gettinghit");
             case PAS_DEAD:
-                return surgescript_var_set_string(surgescript_var_create(), "dead");
+                return surgescript_var_set_string(surgescript_var_create(), "dying");
             case PAS_BRAKING:
                 return surgescript_var_set_string(surgescript_var_create(), "braking");
             case PAS_LEDGE:
                 return surgescript_var_set_string(surgescript_var_create(), "ledge");
             case PAS_DROWNED:
-                return surgescript_var_set_string(surgescript_var_create(), "drowned");
+                return surgescript_var_set_string(surgescript_var_create(), "drowning");
             case PAS_BREATHING:
                 return surgescript_var_set_string(surgescript_var_create(), "breathing");
             case PAS_DUCKING:
@@ -377,6 +385,20 @@ surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescr
     return surgescript_var_set_number(surgescript_var_create(), player == NULL || physicsactor_is_facing_right(player->pa) ? 1.0f : -1.0f);
 }
 
+/* sprite width */
+surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_width(actor_image(player->actor)) : 0.0f);
+}
+
+/* sprite height */
+surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_height(actor_image(player->actor)) : 0.0f);
+}
+
 /* ground speed, in px/s */
 surgescript_var_t* fun_getgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -423,7 +445,7 @@ surgescript_var_t* fun_getysp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL && player_is_in_the_air(player)) ? player->actor->speed.y : 0.0f
+        (player != NULL) ? player->actor->speed.y : 0.0f
     );
 }
 
@@ -432,7 +454,7 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
 {
     /* TODO: fix adapter */
     player_t* player = get_player(object);
-    if(player != NULL && player_is_in_the_air(player))
+    if(player != NULL)
         player->actor->speed.y = surgescript_var_get_number(param[0]);
     return NULL;
 }
@@ -494,6 +516,24 @@ surgescript_var_t* fun_setscore(surgescript_object_t* object, const surgescript_
 {
     int score = (int)surgescript_var_get_number(param[0]);
     player_set_score(max(score, 0));
+    return NULL;
+}
+
+/* is the player visible? */
+surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL && player_is_visible(player));
+}
+
+/* set the visibility of the player */
+surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool visible = surgescript_var_get_bool(param[0]);
+        player_set_visible(player, visible);
+    }
     return NULL;
 }
 

@@ -110,6 +110,7 @@ player_t *player_create(const char *character_name)
     p->disable_collectible_loss = FALSE;
     p->disable_animation_control = FALSE;
     p->attacking = FALSE;
+    p->visible = TRUE;
     p->actor = actor_create();
     p->actor->input = input_create_user(NULL);
     CHANGE_ANIM(stopped);
@@ -352,6 +353,10 @@ void player_render(player_t *player, v2d_t camera_position)
     actor_t *act = player->actor;
     v2d_t hot_spot = act->hot_spot;
     int i, behind_player[PLAYER_MAX_INVSTAR];
+
+    /* invisible player? */
+    if(!player->visible)
+        return;
 
     /* invincibility stars I */
     for(i=0; i<PLAYER_MAX_INVSTAR && player->invincible; i++) {
@@ -962,7 +967,23 @@ void player_set_frozen(player_t* player, int frozen)
     player->disable_movement = frozen;
 }
 
+/*
+ * player_is_visible()
+ * Is the player visible? (should it be rendered?)
+ */
+int player_is_visible(const player_t* player)
+{
+    return player->visible;
+}
 
+/*
+ * player_set_visible()
+ * Change the visibility of the player
+ */
+void player_set_visible(player_t* player, int visible)
+{
+    player->visible = visible;
+}
 
 
 

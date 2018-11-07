@@ -94,6 +94,7 @@ struct player_t {
     float blink_timer;
     float blink_visibility_timer;
     int thrown_while_rolling;
+    int visible;
     struct obstaclemap_t* obstaclemap;
 };
 
@@ -132,6 +133,8 @@ playershield_t player_shield_type(const player_t* player);
 void player_grant_shield(player_t* player, playershield_t shield_type);
 int player_is_frozen(const player_t* player);
 void player_set_frozen(player_t* player, int frozen);
+int player_is_visible(const player_t* player);
+void player_set_visible(player_t* player, int visible);
 
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);
