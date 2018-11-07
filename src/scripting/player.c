@@ -44,6 +44,7 @@ static surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -56,12 +57,20 @@ static surgescript_var_t* fun_getinvincible(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setinvincible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getxsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setxsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getysp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -72,13 +81,15 @@ static surgescript_var_t* fun_drown(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* PlayerManager */
 static surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactiveplayername(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* internals */
-#define SHOW_COLLIDERS 1 /* set it to 1 to display the colliders */
+#define SHOW_COLLIDERS 0 /* set it to 1 to display the colliders */
 static const surgescript_heapptr_t NAME_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
@@ -113,6 +124,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_secondsToDrown", fun_getsecondstodrown, 0);
     surgescript_vm_bind(vm, "Player", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Player", "get_collider", fun_getcollider, 0);
+    surgescript_vm_bind(vm, "Player", "get_direction", fun_getdirection, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -125,12 +137,20 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_turbo", fun_setturbo, 1);
     surgescript_vm_bind(vm, "Player", "get_underwater", fun_getunderwater, 0);
     surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1);
+    surgescript_vm_bind(vm, "Player", "get_frozen", fun_getfrozen, 0);
+    surgescript_vm_bind(vm, "Player", "set_frozen", fun_setfrozen, 1);
     surgescript_vm_bind(vm, "Player", "get_gsp", fun_getgsp, 0);
     surgescript_vm_bind(vm, "Player", "set_gsp", fun_setgsp, 1);
     surgescript_vm_bind(vm, "Player", "get_xsp", fun_getxsp, 0);
     surgescript_vm_bind(vm, "Player", "set_xsp", fun_setxsp, 1);
     surgescript_vm_bind(vm, "Player", "get_ysp", fun_getysp, 0);
     surgescript_vm_bind(vm, "Player", "set_ysp", fun_setysp, 1);
+    surgescript_vm_bind(vm, "Player", "get_collectibles", fun_getcollectibles, 0);
+    surgescript_vm_bind(vm, "Player", "set_collectibles", fun_setcollectibles, 1);
+    surgescript_vm_bind(vm, "Player", "get_lives", fun_getlives, 0);
+    surgescript_vm_bind(vm, "Player", "set_lives", fun_setlives, 1);
+    surgescript_vm_bind(vm, "Player", "get_score", fun_getscore, 0);
+    surgescript_vm_bind(vm, "Player", "set_score", fun_setscore, 1);
 
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
@@ -141,6 +161,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "breathe", fun_breathe, 0);
     surgescript_vm_bind(vm, "Player", "springify", fun_springify, 0);
     surgescript_vm_bind(vm, "Player", "roll", fun_roll, 0);
+    surgescript_vm_bind(vm, "Player", "focus", fun_focus, 0);
+    surgescript_vm_bind(vm, "Player", "hasFocus", fun_hasfocus, 0);
     
     /* general-purpose methods */
     surgescript_vm_bind(vm, "Player", "constructor", fun_constructor, 0);
@@ -192,12 +214,12 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     );
     surgescript_var_copy(surgescript_heap_at(heap, COLLIDER_ADDR), tmp[3]);
 
-    /* enable collider debug mode? */
+    /* show the colliders? */
     #if SHOW_COLLIDERS == 1
     surgescript_var_set_bool(tmp[1], true);
     surgescript_object_call_function(
         surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, COLLIDER_ADDR))),
-        "set_debug", (const surgescript_var_t**)tmp+1, 1, NULL
+        "set_visible", (const surgescript_var_t**)tmp+1, 1, NULL
     );
     #endif
 
@@ -348,6 +370,13 @@ surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescri
     return surgescript_var_clone(surgescript_heap_at(heap, COLLIDER_ADDR));
 }
 
+/* direction is +1 if the player is facing right; -1 if facing left */
+surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player == NULL || physicsactor_is_facing_right(player->pa) ? 1.0f : -1.0f);
+}
+
 /* ground speed, in px/s */
 surgescript_var_t* fun_getgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -423,6 +452,48 @@ surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_v
         int anim_id = (int)surgescript_var_get_number(param[0]);
         player_override_anim(player, anim_id);
     }
+    return NULL;
+}
+
+/* get the number of collectibles (shared between all players) */
+surgescript_var_t* fun_getcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), player_get_collectibles());
+}
+
+/* set the number of collectibles (shared between all players) */
+surgescript_var_t* fun_setcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int collectibles = (int)surgescript_var_get_number(param[0]);
+    player_set_collectibles(max(collectibles, 0));
+    return NULL;
+}
+
+/* get the number of lives (shared between all players) */
+surgescript_var_t* fun_getlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), player_get_lives());
+}
+
+/* set the number of lives (shared between all players) */
+surgescript_var_t* fun_setlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int lives = (int)surgescript_var_get_number(param[0]);
+    player_set_lives(max(lives, 0));
+    return NULL;
+}
+
+/* get the score (shared between all players) */
+surgescript_var_t* fun_getscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), player_get_score());
+}
+
+/* set the score (shared between all players) */
+surgescript_var_t* fun_setscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int score = (int)surgescript_var_get_number(param[0]);
+    player_set_score(max(score, 0));
     return NULL;
 }
 
@@ -540,6 +611,24 @@ surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgesc
     return NULL;
 }
 
+/* is the player frozen (i.e., with its movement disabled)? */
+surgescript_var_t* fun_getfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_frozen(player));
+}
+
+/* enable/disable the movement of the player */
+surgescript_var_t* fun_setfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool frozen = surgescript_var_get_bool(param[0]);
+        player_set_frozen(player, frozen);
+    }
+    return NULL;
+}
+
 /* rebound: bounce(hazard) - will bounce upwards */
 surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -651,6 +740,43 @@ surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_
     if(player != NULL)
         player_roll(player);
     return NULL;
+}
+
+/* bring the focus to this player: returns true on success */
+surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        player_t* p;
+
+        /* error if player is dying */
+        for(int i = 0; (p = level_get_player_by_id(i)) != NULL; i++) {
+            if(player_is_dying(p))
+                return surgescript_var_set_bool(surgescript_var_create(), false);
+        }
+
+        /* error if player is in the air, etc. */
+        if(player_is_in_the_air(player) || player_is_frozen(player) || player->in_locked_area || player->on_movable_platform)
+            return surgescript_var_set_bool(surgescript_var_create(), false);
+
+        /* error if level cleared */
+        if(level_has_been_cleared())
+            return surgescript_var_set_bool(surgescript_var_create(), false);
+
+        /* success */
+        level_change_player(player);
+        return surgescript_var_set_bool(surgescript_var_create(), true);
+    }
+
+    /* error */
+    return surgescript_var_set_bool(surgescript_var_create(), false);
+}
+
+/* checks if this player has focus */
+surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && level_player() == player);
 }
 
 

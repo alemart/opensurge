@@ -43,7 +43,7 @@ void scripting_register_collisions(surgescript_vm_t* vm)
 surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_var_t* debug = surgescript_var_create();
-    surgescript_object_call_function(object, "get_debug", NULL, 0, debug);
+    surgescript_object_call_function(object, "get_visible", NULL, 0, debug);
 
     if(surgescript_var_get_bool(debug) && scripting_util_is_object_inside_screen(object)) {
         surgescript_var_t* left = surgescript_var_create();

@@ -944,6 +944,23 @@ void player_grant_shield(player_t* player, playershield_t shield_type)
     player->shield_type = shield_type;
 }
 
+/*
+ * player_is_frozen()
+ * Is the player frozen (i.e., without movement)?
+ */
+int player_is_frozen(const player_t* player)
+{
+    return player->disable_movement;
+}
+
+/*
+ * player_set_frozen()
+ * Enable/disable movement
+ */
+void player_set_frozen(player_t* player, int frozen)
+{
+    player->disable_movement = frozen;
+}
 
 
 

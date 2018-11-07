@@ -33,7 +33,7 @@ object "CollisionManager"
 object "CollisionBox" is "collider"
 {
     manager = null;
-    debug = false;
+    visible = false;
     width = 1;
     height = 1;
     worldX = 0;
@@ -98,18 +98,18 @@ object "CollisionBox" is "collider"
         return worldY + height / 2;
     }
 
-    // get_debug()
-    // Is debugging enabled?
-    fun get_debug()
+    // get_visible()
+    // Is the collider visible? Useful for debugging.
+    fun get_visible()
     {
-        return debug;
+        return visible;
     }
 
     // set_debug()
     // Display the collider for debugging purposes
-    fun set_debug(dbg)
+    fun set_visible(v)
     {
-        debug = dbg;
+        visible = v;
     }
 
     // get_entity()

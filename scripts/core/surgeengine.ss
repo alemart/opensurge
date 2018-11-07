@@ -138,11 +138,16 @@ object "PlayerManager"
 {
     children = null; // cached value: this.__children
 
-    // get player by name
+    // get player by name or id
     // just an alias
-    fun call(name)
+    fun call(nameOrId)
     {
-        return getByName(name);
+        if(typeof(nameOrId) == "string")
+            return getByName(nameOrId);
+        else if(typeof(nameOrId) == "number")
+            return getById(nameOrId);
+        else
+            return _error("Can't find Player \"" + nameOrId + "\": invalid identifier.");
     }
 
     // get the active player
@@ -161,8 +166,7 @@ object "PlayerManager"
             if(player.name == name)
                 return player;
         }
-        Application.crash("Can't find Player \"" + name + "\": no such character.");
-        return null;
+        return _error("Can't find Player \"" + name + "\": no such character.");
     }
 
     // get player by id
@@ -177,14 +181,20 @@ object "PlayerManager"
                 return children[id];
             }
         }
-        Application.crash("Can't find Player " + playerID + ": invalid id.");
-        return null;
+        return _error("Can't find Player " + playerID + ": invalid id.");
     }
 
     // the number of players
     fun get_count()
     {
         return this.__childCount;
+    }
+
+    // error message
+    fun __error(message)
+    {
+        Application.crash(message);
+        return null;
     }
 
     // fun __spawnPlayers() { [builtin] }

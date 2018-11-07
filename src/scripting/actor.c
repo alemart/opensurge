@@ -203,7 +203,10 @@ surgescript_var_t* fun_setsprite(surgescript_object_t* object, const surgescript
     if(strcmp(sprite_name, prev_sprite_name) != 0) {
         int anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIM_ADDR));
         surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), sprite_name);
-        actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
+        if(sprite_animation_exists(sprite_name, anim_id))
+            actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
+        else
+            actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
     }
     ssfree(sprite_name);
     return NULL;

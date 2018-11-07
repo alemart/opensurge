@@ -5595,7 +5595,7 @@ void playermovement_update(objectmachine_t *obj, player_t **team, int team_size,
     objectdecorator_playermovement_t *me = (objectdecorator_playermovement_t*)obj;
     player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
 
-    player->disable_movement = !me->enable;
+    player_set_frozen(player, !me->enable);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
@@ -7602,7 +7602,7 @@ void switchcharacter_update(objectmachine_t *obj, player_t **team, int team_size
         for(i=0; i<team_size && !got_dying_player; i++)
             got_dying_player = player_is_dying(team[i]);
 
-        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_movable_platform && !player->disable_movement && !player->in_locked_area;
+        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_movable_platform && !player_is_frozen(player) && !player->in_locked_area;
 
         if(allow_switching || me->force_switch)
             level_change_player(new_player);
