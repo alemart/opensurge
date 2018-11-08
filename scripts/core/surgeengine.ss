@@ -418,8 +418,8 @@ object "CollisionBox" is "collider"
             cx = collider.centerX;
             cy = collider.centerY;
             r = collider.radius;
-            dx = cx - Math.Clamp(cx, this.left, this.right);
-            dy = cy - Math.Clamp(cy, this.top, this.bottom);
+            dx = cx - Math.clamp(cx, this.left, this.right);
+            dy = cy - Math.clamp(cy, this.top, this.bottom);
             return dx * dx + dy * dy < r * r;
         }
     }
@@ -585,8 +585,8 @@ object "CollisionBall" is "collider"
     fun collidesWith(collider)
     {
         if(collider.__type == 1) {
-            dx = worldX - Math.Clamp(worldX, collider.left, collider.right);
-            dy = worldY - Math.Clamp(worldY, collider.top, collider.bottom);
+            dx = worldX - Math.clamp(worldX, collider.left, collider.right);
+            dy = worldY - Math.clamp(worldY, collider.top, collider.bottom);
             return dx * dx + dy * dy < radius * radius;
         }
         else if(collider.__type == 2) {
@@ -611,8 +611,9 @@ object "CollisionBall" is "collider"
     // where 0 <= x, y <= 1.
     fun setAnchor(x, y)
     {
-        transform.xpos = (0.5 - x) * width;
-        transform.ypos = (0.5 - y) * height;
+        size = radius * 2;
+        transform.xpos = (0.5 - x) * size;
+        transform.ypos = (0.5 - y) * size;
         __updateWorldCoordinates();
     }
 
