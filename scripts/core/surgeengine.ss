@@ -202,42 +202,56 @@ object "CollisionBallFactory"
 
 object "PlayerManager"
 {
-    children = null; // cached value: this.__children
+    children = null; // cached value
 
     // get player by name or id
     // just an alias
     fun call(nameOrId)
     {
         if(typeof(nameOrId) == "string")
-            return getByName(nameOrId);
+            return __getByName(nameOrId);
         else if(typeof(nameOrId) == "number")
-            return getById(nameOrId);
+            return __getById(nameOrId);
         else
-            return _error("Can't find Player \"" + nameOrId + "\": invalid identifier.");
+            return __error("Can't find Player \"" + nameOrId + "\": invalid identifier.");
     }
 
     // get the active player
     fun get_active()
     {
-        return getByName(__activePlayerName);
+        return __getByName(__activePlayerName);
     }
 
-    // get player by name
-    // will crash if not found
-    fun getByName(name)
+    // the number of players
+    fun get_count()
+    {
+        return this.__childCount;
+    }
+
+    // __error()
+    // display error message
+    fun __error(message)
+    {
+        Application.crash(message);
+        return null;
+    }
+
+    // __getByName()
+    // get player by name; will crash if not found
+    fun __getByName(name)
     {
         cnt = this.count;
         for(i = 0; i < cnt; i++) {
-            player = getById(i);
+            player = __getById(i);
             if(player.name == name)
                 return player;
         }
-        return _error("Can't find Player \"" + name + "\": no such character.");
+        return __error("Can't find Player \"" + name + "\": no such character.");
     }
 
-    // get player by id
-    // will crash if not found
-    fun getById(playerID)
+    // __getById()
+    // get player by id; will crash if not found
+    fun __getById(playerID)
     {
         id = Number(playerID);
         if(id.isInteger()) {
@@ -247,20 +261,7 @@ object "PlayerManager"
                 return children[id];
             }
         }
-        return _error("Can't find Player " + playerID + ": invalid id.");
-    }
-
-    // the number of players
-    fun get_count()
-    {
-        return this.__childCount;
-    }
-
-    // error message
-    fun __error(message)
-    {
-        Application.crash(message);
-        return null;
+        return __error("Can't find Player " + playerID + ": invalid id.");
     }
 
     // fun __spawnPlayers() { [builtin] }
