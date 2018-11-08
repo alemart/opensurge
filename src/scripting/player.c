@@ -81,7 +81,6 @@ static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_drown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -165,7 +164,6 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "bounceBack", fun_bounceback, 1);
     surgescript_vm_bind(vm, "Player", "hit", fun_hit, 1);
     surgescript_vm_bind(vm, "Player", "kill", fun_kill, 0);
-    surgescript_vm_bind(vm, "Player", "drown", fun_drown, 0);
     surgescript_vm_bind(vm, "Player", "breathe", fun_breathe, 0);
     surgescript_vm_bind(vm, "Player", "springify", fun_springify, 0);
     surgescript_vm_bind(vm, "Player", "roll", fun_roll, 0);
@@ -322,7 +320,7 @@ surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescri
             case PAS_BRAKING:
                 return surgescript_var_set_string(surgescript_var_create(), "braking");
             case PAS_LEDGE:
-                return surgescript_var_set_string(surgescript_var_create(), "ledge");
+                return surgescript_var_set_string(surgescript_var_create(), "balancing");
             case PAS_DROWNED:
                 return surgescript_var_set_string(surgescript_var_create(), "drowning");
             case PAS_BREATHING:
@@ -741,17 +739,12 @@ surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t
 surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
-    if(player != NULL)
-        player_kill(player);
-    return NULL;
-}
-
-/* drown the player */
-surgescript_var_t* fun_drown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    player_t* player = get_player(object);
-    if(player != NULL)
-        player_drown(player);
+    if(player != NULL) {
+        if(!player_is_underwater(player))
+            player_kill(player);
+        else
+            player_drown(player);
+    }
     return NULL;
 }
 

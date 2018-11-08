@@ -29,8 +29,8 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_get(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_set(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_hasitem(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_deleteitem(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_has(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_delete(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_save(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
@@ -46,8 +46,8 @@ void scripting_register_prefs(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Prefs", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Prefs", "get", fun_get, 1);
     surgescript_vm_bind(vm, "Prefs", "set", fun_set, 2);
-    surgescript_vm_bind(vm, "Prefs", "hasItem", fun_hasitem, 1);
-    surgescript_vm_bind(vm, "Prefs", "deleteItem", fun_deleteitem, 1);
+    surgescript_vm_bind(vm, "Prefs", "has", fun_has, 1);
+    surgescript_vm_bind(vm, "Prefs", "delete", fun_delete, 1);
     surgescript_vm_bind(vm, "Prefs", "save", fun_save, 0);
     surgescript_vm_bind(vm, "Prefs", "clear", fun_clear, 0);
 }
@@ -154,8 +154,8 @@ surgescript_var_t* fun_set(surgescript_object_t* object, const surgescript_var_t
     return NULL;
 }
 
-/* hasItem */
-surgescript_var_t* fun_hasitem(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* has */
+surgescript_var_t* fun_has(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     prefs_t* prefs = (prefs_t*)surgescript_object_userdata(object);
@@ -166,8 +166,8 @@ surgescript_var_t* fun_hasitem(surgescript_object_t* object, const surgescript_v
     return value;
 }
 
-/* deleteItem */
-surgescript_var_t* fun_deleteitem(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* delete */
+surgescript_var_t* fun_delete(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     prefs_t* prefs = (prefs_t*)surgescript_object_userdata(object);
