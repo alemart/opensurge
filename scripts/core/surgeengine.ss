@@ -450,7 +450,7 @@ object "CollisionBox" is "collider"
     {
         // entity validation
         entity = parent;
-        if(!entity.hasTag("entity"))
+        if(!entity.hasTag("entity") && !parent.hasTag("collider"))
             Application.crash(__name + " requires object \"" + entity.__name + "\" to be an entity.");
         else if(entity.hasTag("detached"))
             Application.crash(__name + " won't work with detached entities like \"" + entity.__name + "\".");
@@ -624,7 +624,7 @@ object "CollisionBall" is "collider"
     {
         // entity validation
         entity = parent;
-        if(!entity.hasTag("entity"))
+        if(!entity.hasTag("entity") && !parent.hasTag("collider"))
             Application.crash(__name + " requires object \"" + entity.__name + "\" to be an entity.");
         else if(entity.hasTag("detached"))
             Application.crash(__name + " won't work with detached entities like \"" + entity.__name + "\".");
