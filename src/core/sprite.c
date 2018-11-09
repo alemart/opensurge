@@ -33,6 +33,8 @@
 #define SPRITE_MAX_ANIM         1024 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
 HASHTABLE_GENERATE_CODE(spriteinfo_t)
 static hashtable_spriteinfo_t* sprites;
+static const char* DEFAULT_SPRITE = "SD_QUESTIONMARK";
+static const int DEFAULT_ANIM = 0;
 
 /* private functions */
 static int dirfill(const char *vpath, void *param); /* file system callback */
@@ -44,7 +46,6 @@ static animation_t *animation_new(int anim_id, v2d_t hot_spot); /* creates a new
 static animation_t *animation_delete(animation_t *anim); /* deletes anim */
 static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by reading the spritesheet */
 static void fix_sprite_animations(spriteinfo_t *spr); /* fixes the animations of the given sprite */
-
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo);
 static int traverse_animation_attributes(const parsetree_statement_t *stmt, void *animation);
@@ -91,12 +92,17 @@ void sprite_release()
 
 /*
  * sprite_get_animation()
- * Receives the sprite name and the desired animation number.
- * Returns a pointer to an animation object.
+ * Returns a pointer to an animation corresponding to the
+ * specified sprite name and animation number.
+ * Tip: to use a default sprite, set sprite_name to NULL
  */
 animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
 {
     spriteinfo_t *info;
+
+    /* default sprite? */
+    if(sprite_name == NULL)
+        return sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM);
 
     /* find the corresponding spriteinfo_t* instance */
     info = hashtable_spriteinfo_t_find(sprites, sprite_name);

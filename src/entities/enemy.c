@@ -383,7 +383,7 @@ enemy_t* create_from_script(const char *object_name)
     e->zindex = 0.5f;
     e->actor = actor_create();
     e->actor->input = input_create_computer();
-    actor_change_animation(e->actor, sprite_get_animation("SD_QUESTIONMARK", 0));
+    actor_change_animation(e->actor, sprite_get_animation(NULL, 0));
     e->preserve = TRUE;
     e->obstacle = FALSE;
     e->always_active = FALSE;

@@ -80,7 +80,7 @@ void flyingtext_init(item_t *item)
     me->font = font_create("default");
     flyingtext_set_text(item, "0");
 
-    actor_change_animation(item->actor, sprite_get_animation("SD_QUESTIONMARK", 0));
+    actor_change_animation(item->actor, sprite_get_animation(NULL, 0));
     item->actor->visible = FALSE;
 }
 

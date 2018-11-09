@@ -28,6 +28,8 @@
 #include "enemy.h"
 #include "actor.h"
 #include "../core/util.h"
+#include "../core/video.h"
+#include "../core/image.h"
 #include "../scripting/scripting.h"
 
 /* private stuff ;) */
@@ -36,7 +38,7 @@ union renderable_t {
     player_t *player;
     brick_t *brick;
     item_t *item;
-    object_t *object;
+    object_t *object; /* legacy object */
     surgescript_object_t* ssobject;
 };
 
@@ -103,6 +105,7 @@ static float zindex_item(renderable_t r) { return 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
 static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
+static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
 
 static void render_particles(renderable_t r, v2d_t camera_position) { particle_render_all(camera_position); }
 static void render_player(renderable_t r, v2d_t camera_position) { player_render(r.player, camera_position); }
@@ -110,6 +113,16 @@ static void render_item(renderable_t r, v2d_t camera_position) { item_render(r.i
 static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(r.object, camera_position); }
 static void render_brick(renderable_t r, v2d_t camera_position) { brick_render(r.brick, camera_position); }
 static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "render", NULL, 0, NULL); }
+static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
+{
+    const char* name = surgescript_object_name(r.ssobject);
+    const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
+    const image_t* img = sprite_get_image(anim, 0);
+    v2d_t hot_spot = anim->hot_spot;
+    v2d_t position = scripting_util_world_position(r.ssobject);
+    v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+    image_draw(img, video_get_backbuffer(), position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
+}
 
 static int ypos_particles(renderable_t r) { return 0; }
 static int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
@@ -241,6 +254,19 @@ void renderqueue_enqueue_ssobject(surgescript_object_t* object)
     node->cell.entity.ssobject = object;
     node->cell.zindex = zindex_ssobject;
     node->cell.render = render_ssobject;
+    node->cell.ypos = ypos_ssobject;
+    node->cell.type = type_ssobject;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.entity.ssobject = object;
+    node->cell.zindex = zindex_ssobject_debug;
+    node->cell.render = render_ssobject_debug;
     node->cell.ypos = ypos_ssobject;
     node->cell.type = type_ssobject;
     node->next = queue;

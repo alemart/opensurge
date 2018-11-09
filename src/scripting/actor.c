@@ -62,8 +62,6 @@ static const surgescript_heapptr_t DETACHED_ADDR = 2;
 static const surgescript_heapptr_t SPRITE_ADDR = 3;
 static const surgescript_heapptr_t ANIM_ADDR = 4;
 static const float DEFAULT_ZINDEX = 0.5f;
-static const char* DEFAULT_SPRITE = "SD_QUESTIONMARK";
-static const int DEFAULT_ANIM = 0;
 static const double DEG2RAD = 0.01745329251994329576;
 
 /*
@@ -136,12 +134,12 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_number(surgescript_heap_at(heap, ZINDEX_ADDR), DEFAULT_ZINDEX);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
     surgescript_var_set_bool(surgescript_heap_at(heap, DETACHED_ADDR), is_detached);
-    surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), DEFAULT_SPRITE);
-    surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), DEFAULT_ANIM);
+    surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), "");
+    surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), 0);
 
     /* initial configuration */
     surgescript_object_set_userdata(object, actor);
-    actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
+    actor_change_animation(actor, sprite_get_animation(NULL, 0));
     actor->spawn_point = scripting_util_world_position(object);
 
     /* sanity check */
@@ -206,7 +204,7 @@ surgescript_var_t* fun_setsprite(surgescript_object_t* object, const surgescript
         if(sprite_animation_exists(sprite_name, anim_id))
             actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
         else
-            actor_change_animation(actor, sprite_get_animation(DEFAULT_SPRITE, DEFAULT_ANIM));
+            actor_change_animation(actor, sprite_get_animation(NULL, 0));
     }
     ssfree(sprite_name);
     return NULL;

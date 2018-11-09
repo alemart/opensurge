@@ -51,5 +51,6 @@ void renderqueue_enqueue_object(struct enemy_t *object);
 void renderqueue_enqueue_player(struct player_t *player);
 void renderqueue_enqueue_particles(); /* enqueues the whole particle system defined in particle.h */
 void renderqueue_enqueue_ssobject(struct surgescript_object_t* object);
+void renderqueue_enqueue_ssobject_debug(struct surgescript_object_t* object);
 
 #endif

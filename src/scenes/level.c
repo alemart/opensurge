@@ -2449,9 +2449,17 @@ bool render_ssobject(surgescript_object_t* object, void* param)
 {
     surgescript_programpool_t* pool = (surgescript_programpool_t*)param;
     if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
-        if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render"))
+        if(editor_is_enabled() && surgescript_object_has_tag(object, "entity")) {
+            if(!surgescript_object_has_tag(object, "private"))
+                renderqueue_enqueue_ssobject_debug(object);
+            return false;
+        }
+        else if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render")) {
             renderqueue_enqueue_ssobject(object);
-        return true;
+            return true;
+        }
+        else
+            return true;
     }
     else
         return false;
@@ -3613,7 +3621,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
             if(sprite_animation_exists(object_name, 0))
                 anim = sprite_get_animation(object_name, 0);
             else
-                anim = sprite_get_animation("SD_QUESTIONMARK", 0);
+                anim = sprite_get_animation(NULL, 0);
             cursor = sprite_get_image(anim, 0);
             offset = anim->hot_spot;
             break;
@@ -4176,20 +4184,15 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
             float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x + 1 , editor_cursor.y + topleft.y + 1 };
 
             /* find the bounding box of the entity */
+            const char* name = surgescript_object_name(object);
+            const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
+            const image_t* img = sprite_get_image(anim, 0);
+            v2d_t hot_spot = anim->hot_spot;
             v2d_t worldpos = scripting_util_world_position(object);
-            const char* object_name = surgescript_object_name(object);
-            a[0] = worldpos.x - 32; a[1] = worldpos.y - 32;
-            a[2] = worldpos.x + 32; a[3] = worldpos.y + 32;
-            if(sprite_animation_exists(object_name, 0)) { /* use the object name as the reference sprite */
-                const animation_t* anim = sprite_get_animation(object_name, 0);
-                const image_t* img = sprite_get_image(anim, 0);
-                v2d_t hot_spot = anim->hot_spot;
-                v2d_t size = v2d_new(image_width(img), image_height(img));
-                a[0] = worldpos.x - hot_spot.x;
-                a[1] = worldpos.y - hot_spot.y;
-                a[2] = a[0] + size.x;
-                a[3] = a[1] + size.y;
-            }
+            a[0] = worldpos.x - hot_spot.x;
+            a[1] = worldpos.y - hot_spot.y;
+            a[2] = a[0] + image_width(img);
+            a[3] = a[1] + image_height(img);
 
             /* got collision between the cursor and the entity */
             if(bounding_box(a, b)) {

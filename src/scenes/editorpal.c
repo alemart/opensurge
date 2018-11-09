@@ -32,7 +32,6 @@
 
 
 /* private data */
-#define DEFAULT_ITEM_SPRITE         "SD_QUESTIONMARK"
 #define CURSOR_SPRITE               "SD_ARROW"
 #define ITEM_SPRITE_MAXSIZE         128
 #define ITEM_BOX_SIZE               160 /* sprite size + padding */
@@ -76,7 +75,7 @@ void editorpal_init(void *config_ptr)
             if(sprite_animation_exists(config.ssobj.name[i], 0))
                 item[i] = sprite_get_image(sprite_get_animation(config.ssobj.name[i], 0), 0);
             else
-                item[i] = sprite_get_image(sprite_get_animation(DEFAULT_ITEM_SPRITE, 0), 0);
+                item[i] = sprite_get_image(sprite_get_animation(NULL, 0), 0);
         }
     }
     else if(config.type == EDITORPAL_BRICK) {
@@ -86,7 +85,7 @@ void editorpal_init(void *config_ptr)
             if(brick_exists(config.brick.id[i]))
                 item[i] = brick_image_preview(config.brick.id[i]);
             else
-                item[i] = sprite_get_image(sprite_get_animation(DEFAULT_ITEM_SPRITE, 0), 0); /* shouldn't happen */
+                item[i] = sprite_get_image(sprite_get_animation(NULL, 0), 0); /* shouldn't happen */
         }
     }
     else {
