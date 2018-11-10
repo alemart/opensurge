@@ -262,6 +262,7 @@ SET(
   src/scripting/application.c
   src/scripting/surgeengine.c
   src/scripting/actor.c
+  src/scripting/animation.c
   src/scripting/camera.c
   src/scripting/collisions.c
   src/scripting/console.c

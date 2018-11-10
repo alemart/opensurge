@@ -48,6 +48,7 @@ static const char* min_surgescript_version = "0.5.3";
 extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
+extern void scripting_register_animation(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
@@ -80,6 +81,7 @@ void scripting_init(int argc, const char** argv)
     /* register SurgeEngine builtins */
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
+    scripting_register_animation(vm);
     scripting_register_camera(vm);
     scripting_register_collisions(vm);
     scripting_register_console(vm);
