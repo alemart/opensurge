@@ -148,7 +148,7 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
             if(act->animation->repeat)
                 act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
             else
-                act->animation_frame = act->animation->frame_count-1;
+                act->animation_frame = act->animation->frame_count - 1;
         }
 
         /* render */
@@ -319,13 +319,13 @@ int actor_brick_collision(actor_t *act, brick_t *brk)
  * actor_change_animation()
  * Changes the animation of an actor
  */
-void actor_change_animation(actor_t *act, animation_t *anim)
+void actor_change_animation(actor_t *act, const animation_t *anim)
 {
     if(act->animation != anim) {
         act->animation = anim;
         act->hot_spot = anim->hot_spot;
-        act->animation_frame = 0;
-        act->animation_speed_factor = 1.0;
+        act->animation_frame = 0.0f;
+        act->animation_speed_factor = 1.0f;
     }
 }
 
@@ -350,7 +350,7 @@ void actor_change_animation_frame(actor_t *act, int frame)
  */
 void actor_change_animation_speed_factor(actor_t *act, float factor)
 {
-    act->animation_speed_factor = max(0.0, factor);
+    act->animation_speed_factor = max(0.0f, factor);
 }
 
 
@@ -359,7 +359,7 @@ void actor_change_animation_speed_factor(actor_t *act, float factor)
  * actor_animation_finished()
  * Returns true if the current animation has finished
  */
-int actor_animation_finished(actor_t *act)
+int actor_animation_finished(const actor_t *act)
 {
     float frame = act->animation_frame + (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
     return (!act->animation->repeat && (int)frame >= act->animation->frame_count);
@@ -378,13 +378,23 @@ void actor_synchronize_animation(actor_t *act, int sync)
 
 
 /*
+ * actor_animation_frame()
+ * The current frame of the animation, in [0, frame_count - 1]
+ */
+int actor_animation_frame(const actor_t* act)
+{
+    return (int)(act->animation_frame);
+}
+
+
+/*
  * actor_image()
  * Returns the current image of the
  * animation of this actor
  */
 image_t* actor_image(const actor_t *act)
 {
-    return sprite_get_image(act->animation, (int)act->animation_frame);
+    return sprite_get_image(act->animation, (int)(act->animation_frame));
 }
 
 

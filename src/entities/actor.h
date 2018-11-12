@@ -40,7 +40,7 @@ typedef struct actor_t {
     input_t *input; /* NULL by default (no input) */
 
     /* animation */
-    animation_t *animation;
+    const animation_t *animation;
     float animation_frame; /* controlled by a timer */
     float animation_speed_factor; /* default value: 1.0 */
     int synchronized_animation; /* synchronized animation? */
@@ -63,9 +63,10 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
 image_t* actor_image(const actor_t *act);
 void actor_change_animation_frame(actor_t *act, int frame);
 void actor_change_animation_speed_factor(actor_t *act, float factor); /* default factor: 1.0 */
-void actor_change_animation(actor_t *act, animation_t *anim);
-int actor_animation_finished(actor_t *act); /* true if the current animation has finished */
+void actor_change_animation(actor_t *act, const animation_t *anim);
+int actor_animation_finished(const actor_t *act); /* true if the current animation has finished */
 void actor_synchronize_animation(actor_t *act, int sync); /* should I use a shared animation frame? */
+int actor_animation_frame(const actor_t* act);
 
 /* collision detection */
 int actor_collision(const actor_t *a, const actor_t *b); /* tests bounding-box collision between a and b */

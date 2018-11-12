@@ -6808,10 +6808,7 @@ void setplayeranimation_update(objectmachine_t *obj, player_t **team, int team_s
     player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
     int animation_id = (int)expression_evaluate(me->animation_id);
 
-    player_override_anim(player, animation_id);
-    actor_change_animation(player->actor,
-        sprite_get_animation(me->sprite_name, animation_id)
-    ); /* we need this additional step due to the custom sprite_name */
+    player_override_animation(player, sprite_get_animation(me->sprite_name, animation_id));
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }

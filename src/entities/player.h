@@ -45,6 +45,7 @@ enum playershield_t {
 
 /* types & structs */
 struct actor_t;
+struct animation_t;
 struct brick_list_t;
 struct item_list_t;
 struct enemy_list_t;
@@ -156,8 +157,8 @@ int player_is_waiting(const player_t *player);
 int player_is_winning(const player_t *player);
 
 const char* player_name(const player_t* player);
-int player_anim(const player_t* player);
-void player_override_anim(player_t* player, int anim);
+const struct animation_t* player_animation(const player_t* player);
+void player_override_animation(player_t* player, const struct animation_t* animation);
 const char* player_sprite_name(const player_t* player);
 
 int player_get_collectibles();

@@ -24,6 +24,7 @@
 #include "../core/util.h"
 #include "../core/sprite.h"
 #include "../entities/actor.h"
+#include "../entities/player.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -39,9 +40,15 @@ static surgescript_var_t* fun_getrepeats(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_gethotspotx(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gethotspoty(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getspritename(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static const surgescript_heapptr_t SPRITENAME_ADDR = 0;
-static const surgescript_heapptr_t ANIMID_ADDR = 1;
+static surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static const surgescript_heapptr_t ANIMID_ADDR = 0;
+static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
+static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
+static void notify_change(const surgescript_object_t* object);
+static const actor_t* get_animation_actor(const surgescript_object_t* object);
 extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
+extern player_t* scripting_player_ptr(const surgescript_object_t* object);
 
 /*
  * scripting_register_animation()
@@ -62,6 +69,8 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_hotspotX", fun_gethotspotx, 0);
     surgescript_vm_bind(vm, "Animation", "get_hotspotY", fun_gethotspoty, 0);
     surgescript_vm_bind(vm, "Animation", "get_spriteName", fun_getspritename, 0);
+    surgescript_vm_bind(vm, "Animation", "get_frame", fun_getframe, 0);
+    surgescript_vm_bind(vm, "Animation", "get_frameCount", fun_getframecount, 0);
 }
 
 /*
@@ -70,7 +79,18 @@ void scripting_register_animation(surgescript_vm_t* vm)
  */
 const animation_t* scripting_animation_ptr(const surgescript_object_t* object)
 {
+    /* must always return a valid animation_t* */
     return (const animation_t*)surgescript_object_userdata(object);
+}
+
+/*
+ * scripting_animation_overwrite_id()
+ * Forces a new animation id without notifying changes
+ */
+void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), anim_id);
 }
 
 /* private */
@@ -89,14 +109,14 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     animation_t* animation = sprite_get_animation(NULL, 0);
 
     /* internal data */
-    ssassert(SPRITENAME_ADDR == surgescript_heap_malloc(heap));
     ssassert(ANIMID_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), "");
+    ssassert(SPRITENAME_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), 0);
+    surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), "");
     surgescript_object_set_userdata(object, animation);
 
     /* sanity check */
-    if(strcmp(parent_name, "Actor") != 0) {
+    if(strcmp(parent_name, "Actor") != 0 && strcmp(parent_name, "Player") != 0) {
         fatal_error("Scripting Error: object \"%s\" can't spawn an Animation object.", parent_name);
         /* note: Animation.finished depends on the parent */
     }
@@ -141,6 +161,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
     /* done! */
     ssfree(sprite_name);
+    notify_change(object);
     return NULL;
 }
 
@@ -164,6 +185,7 @@ surgescript_var_t* fun_setid(surgescript_object_t* object, const surgescript_var
     }
 
     /* done! */
+    notify_change(object);
     return NULL;
 }
 
@@ -191,11 +213,8 @@ surgescript_var_t* fun_getfps(surgescript_object_t* object, const surgescript_va
 /* animation finished? */
 surgescript_var_t* fun_getfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    actor_t* actor = scripting_actor_ptr(parent);
-    return surgescript_var_set_bool(surgescript_var_create(), actor_animation_finished(actor));
+    const actor_t* actor = get_animation_actor(object);
+    return surgescript_var_set_bool(surgescript_var_create(), actor != NULL ? actor_animation_finished(actor) : true);
 }
 
 /* does the animation repeat? */
@@ -217,4 +236,50 @@ surgescript_var_t* fun_gethotspoty(surgescript_object_t* object, const surgescri
 {
     const animation_t* animation = scripting_animation_ptr(object);
     return surgescript_var_set_number(surgescript_var_create(), animation->hot_spot.y);
+}
+
+/* current frame, a number in [0, frameCount - 1] */
+surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = get_animation_actor(object);
+    return surgescript_var_set_number(surgescript_var_create(), actor != NULL ? actor_animation_frame(actor) : 0);
+}
+
+/* the number of frames in the animation */
+surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const animation_t* animation = scripting_animation_ptr(object);
+    return surgescript_var_set_number(surgescript_var_create(), animation->frame_count);
+}
+
+
+/* --- misc --- */
+
+/* given an Animation object, return its corresponding actor_t* */
+const actor_t* get_animation_actor(const surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    const char* parent_name = surgescript_object_name(object);
+
+    if(strcmp(parent_name, "Actor") == 0)
+        return scripting_actor_ptr(parent);
+    else if(strcmp(parent_name, "Player") == 0)
+        return scripting_player_ptr(parent)->actor;
+    else
+        return NULL; /* this shouldn't happen */
+}
+
+/* notify the parent object about a change in the Animation */
+void notify_change(const surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t me = surgescript_object_handle(object);
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    surgescript_var_t* self = surgescript_var_set_objecthandle(surgescript_var_create(), me);
+    const surgescript_var_t* p[] = { self };
+    surgescript_object_call_function(parent, ONCHANGE, p, 1, NULL);
+    surgescript_var_destroy(self);
 }

@@ -35,9 +35,12 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
 
 /* read-only properties */
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getattacking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -96,13 +99,18 @@ static surgescript_var_t* fun_getactiveplayername(surgescript_object_t* object, 
 static const surgescript_heapptr_t NAME_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
+static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
+static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 static void update_player(surgescript_object_t* object);
 static void update_collider(surgescript_object_t* object, int width, int height);
 static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
+static void update_animation(surgescript_object_t* object, int anim_id);
 static void read_transform(surgescript_object_t* object, v2d_t* world_position);
 extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
+extern animation_t* scripting_animation_ptr(const surgescript_object_t* object);
+extern void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id);
 static const double RAD2DEG = 57.2957795131;
 
 
@@ -130,6 +138,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_direction", fun_getdirection, 0);
     surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
+    surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -176,10 +185,29 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
+    surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
 
     /* misc */
     surgescript_vm_bind(vm, "PlayerManager", "__spawnPlayers", fun_spawnplayers, 0);
     surgescript_vm_bind(vm, "PlayerManager", "get___activePlayerName", fun_getactiveplayername, 0);
+}
+
+/*
+ * scripting_player_ptr()
+ * Returns a built-in player_t*, given a SurgeScript Player object
+ * This will fail if no player_t* has been associated to the object
+ */
+player_t* scripting_player_ptr(const surgescript_object_t* object)
+{
+    player_t* player = get_player(object);
+
+    if(player == NULL) {
+        surgescript_heap_t* heap = surgescript_object_heap(object);
+        const char* name = surgescript_var_fast_get_string(surgescript_heap_at(heap, NAME_ADDR));
+        fatal_error("Scripting Error: player not found - \"%s\"", name);
+    }
+
+    return player;
 }
 
 /* Player routines */
@@ -191,6 +219,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t transform = surgescript_objectmanager_spawn(manager, me, "Transform2D", NULL);
+    surgescript_objecthandle_t animation = surgescript_objectmanager_spawn(manager, me, "Animation", NULL);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     surgescript_var_t* tmp[5] = {
@@ -204,9 +233,11 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(NAME_ADDR == surgescript_heap_malloc(heap));
     ssassert(TRANSFORM_ADDR == surgescript_heap_malloc(heap));
     ssassert(COLLIDER_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ANIMATION_ADDR == surgescript_heap_malloc(heap));
 
     surgescript_var_set_null(surgescript_heap_at(heap, NAME_ADDR));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR), animation);
     surgescript_object_set_userdata(object, NULL);
 
     /* spawn the collider */
@@ -221,7 +252,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_copy(surgescript_heap_at(heap, COLLIDER_ADDR), tmp[3]);
 
     /* show the colliders? */
-    #if SHOW_COLLIDERS == 1
+    #if SHOW_COLLIDERS != 0
     surgescript_var_set_bool(tmp[1], true);
     surgescript_object_call_function(
         surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, COLLIDER_ADDR))),
@@ -247,10 +278,24 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* name = surgescript_heap_at(heap, NAME_ADDR);
+    player_t* player = NULL;
 
     /* grab player by name */
     surgescript_var_set_string(name, surgescript_var_fast_get_string(param[0]));
     update_player(object);
+
+    /* initialize the Animation */
+    if((player = get_player(object)) != NULL) {
+        surgescript_var_t* sprite_name = surgescript_var_set_string(surgescript_var_create(), player_sprite_name(player));
+        surgescript_object_t* animation = get_animation(object);
+        const surgescript_var_t* p[] = { sprite_name };
+        surgescript_object_call_function(animation, "__init", p, 1, NULL);
+        surgescript_var_destroy(sprite_name);
+    }
+    else
+        fatal_error("Player.__init(): Animation error");
+
+    /* done! */
     return surgescript_var_set_bool(surgescript_var_create(), true);
 }
 
@@ -457,21 +502,42 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
     return NULL;
 }
 
-/* get the animation number */
-surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    player_t* player = get_player(object);
-    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? player_anim(player) : -1);
-}
-
-/* set the animation number (override the engine default) */
+/* set animation number */
 surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* call animation.set_id */
+    surgescript_object_t* animation = get_animation(object);
+    const surgescript_var_t* p[] = { param[0] };
+    surgescript_object_call_function(animation, "set_id", p, 1, NULL);
+    return NULL;
+}
+
+/* get animation number */
+surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_id */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* anim_id = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_id", NULL, 0, anim_id);
+    return anim_id;
+}
+
+/* get animation object */
+surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, ANIMATION_ADDR));
+}
+
+/* animation change callback */
+surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t animation_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* animation = surgescript_objectmanager_get(manager, animation_handle);
     player_t* player = get_player(object);
-    if(player != NULL) {
-        int anim_id = (int)surgescript_var_get_number(param[0]);
-        player_override_anim(player, anim_id);
-    }
+    if(player != NULL)
+        player_override_animation(player, scripting_animation_ptr(animation));
     return NULL;
 }
 
@@ -824,6 +890,16 @@ player_t* get_player(const surgescript_object_t* object)
     return (player_t*)surgescript_object_userdata(object);
 }
 
+/* get the Animation SurgeScript object (child object) */
+surgescript_object_t* get_animation(surgescript_object_t* object)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t animation_handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR));
+    surgescript_object_t* animation = surgescript_objectmanager_get(manager, animation_handle);
+    return animation;
+}
+
 /* returns the collider of the player */
 surgescript_object_t* get_collider(surgescript_object_t* object)
 {
@@ -866,6 +942,12 @@ void update_player(surgescript_object_t* object)
     else
         update_collider(object, 1, 1);
 
+    /* update the animation */
+    if(player != NULL)
+        update_animation(object, player_animation(player)->id);
+    else
+        update_animation(object, 0);
+
     /* update player pointer */
     surgescript_object_set_userdata(object, player);
 }
@@ -903,6 +985,13 @@ void update_collider(surgescript_object_t* object, int width, int height)
     surgescript_object_call_function(collider, "set_height", tmp+1, 1, NULL);
     surgescript_var_destroy(h);
     surgescript_var_destroy(w);
+}
+
+/* update the animation */
+void update_animation(surgescript_object_t* object, int anim_id)
+{
+    surgescript_object_t* animation = get_animation(object);
+    scripting_animation_overwrite_id(animation, anim_id);
 }
 
 /* PlayerManager: spawn Player objects */

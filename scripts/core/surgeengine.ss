@@ -108,7 +108,7 @@ object "ActorFactory"
     fun call(spriteName)
     {
         actor = caller.spawn("Actor");
-        actor.__sprite = spriteName;
+        actor.__init(spriteName);
         return actor;
     }
 }

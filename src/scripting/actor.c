@@ -34,6 +34,7 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_sethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -46,23 +47,21 @@ static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_setsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_animfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_animrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_animfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static v2d_t world_lossyscale(const surgescript_object_t* object);
 static const surgescript_heapptr_t ZINDEX_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t DETACHED_ADDR = 2;
-static const surgescript_heapptr_t SPRITE_ADDR = 3;
-static const surgescript_heapptr_t ANIM_ADDR = 4;
+static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static const float DEFAULT_ZINDEX = 0.5f;
 static const double DEG2RAD = 0.01745329251994329576;
+static inline surgescript_object_t* get_animation(surgescript_object_t* object);
+extern const animation_t* scripting_animation_ptr(const surgescript_object_t* object);
 
 /*
  * scripting_register_actor()
@@ -74,6 +73,7 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Actor", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Actor", "render", fun_render, 0);
+    surgescript_vm_bind(vm, "Actor", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Actor", "set_zindex", fun_setzindex, 1);
     surgescript_vm_bind(vm, "Actor", "get_zindex", fun_getzindex, 0);
     surgescript_vm_bind(vm, "Actor", "get_hflip", fun_gethflip, 0);
@@ -86,20 +86,17 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Actor", "set_anim", fun_setanim, 1);
     surgescript_vm_bind(vm, "Actor", "get_anim", fun_getanim, 0);
-    surgescript_vm_bind(vm, "Actor", "set___sprite", fun_setsprite, 1);
-    surgescript_vm_bind(vm, "Actor", "get___sprite", fun_getsprite, 0);
+    surgescript_vm_bind(vm, "Actor", "get_animation", fun_getanimation, 0);
     surgescript_vm_bind(vm, "Actor", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Actor", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Actor", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
-    surgescript_vm_bind(vm, "Actor", "animFinished", fun_animfinished, 0);
-    surgescript_vm_bind(vm, "Actor", "animRepeats", fun_animrepeats, 0);
-    surgescript_vm_bind(vm, "Actor", "animFPS", fun_animfps, 0);
+    surgescript_vm_bind(vm, "Actor", "onAnimationChange", fun_onanimationchange, 1);
 }
 
 /*
  * scripting_actor_ptr()
- * Returns a built-in actor_t*, given an Actor SurgeScript object
+ * Returns a built-in actor_t*, given a SurgeScript Actor object
  */
 actor_t* scripting_actor_ptr(const surgescript_object_t* object)
 {
@@ -118,6 +115,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform2D");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
@@ -129,13 +127,13 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(ZINDEX_ADDR == surgescript_heap_malloc(heap));
     ssassert(TRANSFORM_ADDR == surgescript_heap_malloc(heap));
     ssassert(DETACHED_ADDR == surgescript_heap_malloc(heap));
-    ssassert(SPRITE_ADDR == surgescript_heap_malloc(heap));
-    ssassert(ANIM_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ANIMATION_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, ZINDEX_ADDR), DEFAULT_ZINDEX);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
     surgescript_var_set_bool(surgescript_heap_at(heap, DETACHED_ADDR), is_detached);
-    surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), "");
-    surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), 0);
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR),
+        surgescript_objectmanager_spawn(manager, me, "Animation", NULL)
+    );
 
     /* initial configuration */
     surgescript_object_set_userdata(object, actor);
@@ -155,7 +153,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 /* destructor */
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     actor_destroy(actor);
     return NULL;
 }
@@ -166,13 +164,22 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
     v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
 
     actor->position = scripting_util_world_position(object);
     actor->angle = scripting_util_world_angle(object) * -DEG2RAD; /* flip y-axis */
     actor->scale = world_lossyscale(object);
 
     actor_render(actor, camera);
+    return NULL;
+}
+
+/* __init: set sprite name */
+surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_object_t* animation = get_animation(object);
+    const surgescript_var_t* p[] = { param[0] };
+    surgescript_object_call_function(animation, "__init", p, 1, NULL);
     return NULL;
 }
 
@@ -191,88 +198,55 @@ surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript
     return surgescript_var_clone(surgescript_heap_at(heap, ZINDEX_ADDR));
 }
 
-/* set sprite name */
-surgescript_var_t* fun_setsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    const char* prev_sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITE_ADDR));
-    char* sprite_name = surgescript_var_get_string(param[0], surgescript_object_manager(object));
-    if(strcmp(sprite_name, prev_sprite_name) != 0) {
-        int anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIM_ADDR));
-        surgescript_var_set_string(surgescript_heap_at(heap, SPRITE_ADDR), sprite_name);
-        if(sprite_animation_exists(sprite_name, anim_id))
-            actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
-        else
-            actor_change_animation(actor, sprite_get_animation(NULL, 0));
-    }
-    ssfree(sprite_name);
-    return NULL;
-}
-
-/* get sprite name */
-surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    return surgescript_var_clone(surgescript_heap_at(heap, SPRITE_ADDR));
-}
-
 /* set animation number */
 surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    int anim_id = (int)surgescript_var_get_number(param[0]);
-    int prev_anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIM_ADDR));
-    if(prev_anim_id != anim_id) {
-        const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITE_ADDR));
-        surgescript_var_set_number(surgescript_heap_at(heap, ANIM_ADDR), anim_id);
-        actor_change_animation(actor, sprite_get_animation(sprite_name, anim_id));
-    }
+    /* call animation.set_id */
+    surgescript_object_t* animation = get_animation(object);
+    const surgescript_var_t* p[] = { param[0] };
+    surgescript_object_call_function(animation, "set_id", p, 1, NULL);
     return NULL;
 }
 
 /* get animation number */
 surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* call animation.get_id */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* anim_id = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_id", NULL, 0, anim_id);
+    return anim_id;
+}
+
+/* get animation object */
+surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    return surgescript_var_clone(surgescript_heap_at(heap, ANIM_ADDR));
+    return surgescript_var_clone(surgescript_heap_at(heap, ANIMATION_ADDR));
 }
 
-/* has the animation finished playing? */
-surgescript_var_t* fun_animfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* animation change callback */
+surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_bool(surgescript_var_create(), actor_animation_finished(actor));
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t animation_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* animation = surgescript_objectmanager_get(manager, animation_handle);
+    actor_t* actor = scripting_actor_ptr(object);
+    actor_change_animation(actor, scripting_animation_ptr(animation));
+    return NULL;
 }
-
-/* does the animation repeat itself? */
-surgescript_var_t* fun_animrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_bool(surgescript_var_create(), actor->animation->repeat);
-}
-
-/* animation fps */
-surgescript_var_t* fun_animfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_number(surgescript_var_create(), actor->animation->fps);
-}
-
-
 
 /* get horizontal flip */
 surgescript_var_t* fun_gethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     return surgescript_var_set_bool(surgescript_var_create(), actor->mirror & IF_HFLIP);
 }
 
 /* set horizontal flip */
 surgescript_var_t* fun_sethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     bool hflip = surgescript_var_get_bool(param[0]);
     actor->mirror = hflip ? (actor->mirror | IF_HFLIP) : (actor->mirror & ~IF_HFLIP);
     return NULL;
@@ -281,14 +255,14 @@ surgescript_var_t* fun_sethflip(surgescript_object_t* object, const surgescript_
 /* get vertical flip */
 surgescript_var_t* fun_getvflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     return surgescript_var_set_bool(surgescript_var_create(), actor->mirror & IF_VFLIP);
 }
 
 /* set vertical flip */
 surgescript_var_t* fun_setvflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     bool vflip = surgescript_var_get_bool(param[0]);
     actor->mirror = vflip ? (actor->mirror | IF_VFLIP) : (actor->mirror & ~IF_VFLIP);
     return NULL;
@@ -297,14 +271,14 @@ surgescript_var_t* fun_setvflip(surgescript_object_t* object, const surgescript_
 /* get 0.0 (invisible) <= alpha <= 1.0 (opaque) */
 surgescript_var_t* fun_getalpha(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     return surgescript_var_set_number(surgescript_var_create(), actor->alpha);
 }
 
 /* set alpha */
 surgescript_var_t* fun_setalpha(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     float alpha = surgescript_var_get_number(param[0]);
     actor->alpha = clip(alpha, 0.0f, 1.0f);
     return NULL;
@@ -313,14 +287,14 @@ surgescript_var_t* fun_setalpha(surgescript_object_t* object, const surgescript_
 /* is this actor visible? */
 surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     return surgescript_var_set_bool(surgescript_var_create(), actor->visible);
 }
 
 /* set actor visibility */
 surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     actor->visible = surgescript_var_get_bool(param[0]);
     return NULL;
 }
@@ -328,14 +302,14 @@ surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescrip
 /* actor frame width */
 surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     return surgescript_var_set_number(surgescript_var_create(), image_width(actor_image(actor)));
 }
 
 /* actor frame height */
 surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    actor_t* actor = (actor_t*)surgescript_object_userdata(object);
+    actor_t* actor = scripting_actor_ptr(object);
     return surgescript_var_set_number(surgescript_var_create(), image_height(actor_image(actor)));
 }
 
@@ -376,4 +350,14 @@ v2d_t world_lossyscale(const surgescript_object_t* object)
     scale.x *= transform.scale.x;
     scale.y *= transform.scale.y;
     return v2d_new(ssmax(scale.x, 0), ssmax(scale.y, 0));
+}
+
+/* get the Animation SurgeScript object (child object) */
+surgescript_object_t* get_animation(surgescript_object_t* object)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t animation_handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR));
+    surgescript_object_t* animation = surgescript_objectmanager_get(manager, animation_handle);
+    return animation;
 }
