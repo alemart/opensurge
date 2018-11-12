@@ -39,7 +39,7 @@ static surgescript_var_t* fun_getfinished(surgescript_object_t* object, const su
 static surgescript_var_t* fun_getrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gethotspotx(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gethotspoty(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getspritename(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ANIMID_ADDR = 0;
@@ -68,7 +68,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_repeats", fun_getrepeats, 0);
     surgescript_vm_bind(vm, "Animation", "get_hotspotX", fun_gethotspotx, 0);
     surgescript_vm_bind(vm, "Animation", "get_hotspotY", fun_gethotspoty, 0);
-    surgescript_vm_bind(vm, "Animation", "get_spriteName", fun_getspritename, 0);
+    surgescript_vm_bind(vm, "Animation", "get_sprite", fun_getsprite, 0);
     surgescript_vm_bind(vm, "Animation", "get_frame", fun_getframe, 0);
     surgescript_vm_bind(vm, "Animation", "get_frameCount", fun_getframecount, 0);
 }
@@ -197,7 +197,7 @@ surgescript_var_t* fun_getid(surgescript_object_t* object, const surgescript_var
 }
 
 /* get sprite name */
-surgescript_var_t* fun_getspritename(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     return surgescript_var_clone(surgescript_heap_at(heap, SPRITENAME_ADDR));
