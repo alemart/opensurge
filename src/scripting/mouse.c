@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include <stdint.h>
 #include <math.h>
 #include "../core/video.h"
 #include "../core/input.h"
@@ -34,6 +35,12 @@ static surgescript_var_t* fun_getypos(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static uint64_t hash(const char *str);
+
+/* button hashes: "left", "right", "middle" */
+#define BUTTON_LEFT         0x17C9A03B0
+#define BUTTON_RIGHT        0x3110494163
+#define BUTTON_MIDDLE       0x6530DC5EBD4
 
 /*
  * scripting_register_mouse()
@@ -109,40 +116,61 @@ surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_v
 }
 
 /* buttonDown(button): is the given button being held down?
- * valid button values are: 0 (left-button), 1 (right-button) or 2 (middle-button) */
+ * valid button values are: "left", "right", "middle"
+ * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
-    switch((int)surgescript_var_get_number(param[0])) {
-        case 0:  return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE1));
-        case 1:  return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE2));
-        case 2:  return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE3));
-        default: return surgescript_var_set_bool(surgescript_var_create(), false);
+    const char* button = surgescript_var_fast_get_string(param[0]);
+    switch(hash(button)) {
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE1));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE2));
+        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE3));
+        default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }
 
 /* buttonPressed(button): has the given button just been pressed?
- * valid button values are: 0 (left-button), 1 (right-button) or 2 (middle-button) */
+ * valid button values are: "left", "right", "middle"
+ * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
-    switch((int)surgescript_var_get_number(param[0])) {
-        case 0:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
-        case 1:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
-        case 2:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
-        default: return surgescript_var_set_bool(surgescript_var_create(), false);
+    const char* button = surgescript_var_fast_get_string(param[0]);
+    switch(hash(button)) {
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
+        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
+        default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }
 
 /* buttonReleased(button): has the given button just been released?
- * valid button values are: 0 (left-button), 1 (right-button) or 2 (middle-button) */
+ * valid button values are: "left", "right", "middle"
+ * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
-    switch((int)surgescript_var_get_number(param[0])) {
-        case 0:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE1));
-        case 1:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE2));
-        case 2:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE3));
-        default: return surgescript_var_set_bool(surgescript_var_create(), false);
+    const char* button = surgescript_var_fast_get_string(param[0]);
+    switch(hash(button)) {
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE1));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE2));
+        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE3));
+        default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
+}
+
+
+
+/* -- private -- */
+
+/* djb2 hash function */
+uint64_t hash(const char *str)
+{
+    int c; uint64_t hash = 5381;
+
+    while((c = *((unsigned char*)(str++))))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
 }

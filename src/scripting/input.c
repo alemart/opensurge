@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
 #include <surgescript.h>
+#include <stdint.h>
 #include "../core/input.h"
 
 /* private */
@@ -33,18 +33,18 @@ static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const
 static uint64_t hash(const char *str);
 
 /* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
-#define BUTTON_UP                       0x5979CA        /* hash("up") */
-#define BUTTON_DOWN                     0x17C95CD5D     /* hash("down") */
-#define BUTTON_LEFT                     0x17C9A03B0     /* and so on... */
-#define BUTTON_RIGHT                    0x3110494163
-#define BUTTON_FIRE1                    0x310F70497C
-#define BUTTON_FIRE2                    0x310F70497D
-#define BUTTON_FIRE3                    0x310F70497E
-#define BUTTON_FIRE4                    0x310F70497F
-#define BUTTON_FIRE5                    0x310F704980
-#define BUTTON_FIRE6                    0x310F704981
-#define BUTTON_FIRE7                    0x310F704982
-#define BUTTON_FIRE8                    0x310F704983
+#define BUTTON_UP             0x5979CA        /* hash("up") */
+#define BUTTON_DOWN           0x17C95CD5D     /* hash("down") */
+#define BUTTON_LEFT           0x17C9A03B0     /* and so on... */
+#define BUTTON_RIGHT          0x3110494163
+#define BUTTON_FIRE1          0x310F70497C
+#define BUTTON_FIRE2          0x310F70497D
+#define BUTTON_FIRE3          0x310F70497E
+#define BUTTON_FIRE4          0x310F70497F
+#define BUTTON_FIRE5          0x310F704980
+#define BUTTON_FIRE6          0x310F704981
+#define BUTTON_FIRE7          0x310F704982
+#define BUTTON_FIRE8          0x310F704983
 
 
 /*
@@ -89,10 +89,12 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* __init(inputMap): set an input map */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    input_t* input = (input_t*)surgescript_object_userdata(object);
-    const char* inputmap = surgescript_var_fast_get_string(param[0]);
-    if(*inputmap != 0)
-        input_change_mapping((inputuserdefined_t*)input, inputmap);
+    if(!surgescript_var_is_null(param[0])) {
+        input_t* input = (input_t*)surgescript_object_userdata(object);
+        const char* inputmap = surgescript_var_fast_get_string(param[0]);
+        if(*inputmap != 0)
+            input_change_mapping((inputuserdefined_t*)input, inputmap);
+    }
     return NULL;
 }
 
@@ -170,14 +172,14 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
 
 
 
-/* ----------------------- */
+/* -- private -- */
 
 /* djb2 hash function */
 uint64_t hash(const char *str)
 {
     int c; uint64_t hash = 5381;
 
-    while((c = *str++))
+    while((c = *((unsigned char*)(str++))))
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
     return hash;

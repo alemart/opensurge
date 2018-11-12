@@ -37,21 +37,14 @@ object "SurgeEngine"
 {
     actorFactory = spawn("ActorFactory");
     inputFactory = spawn("InputFactory");
-    sensorFactory = spawn("SensorFactory");
     levelManager = spawn("LevelManager");
     camera = spawn("Camera");
-    mouse = spawn("Mouse");
-    collisions = spawn("CollisionFactory");
+    collisions = spawn("CollisionPackage");
     prefs = spawn("Prefs");
 
     fun get_Actor()
     {
         return actorFactory;
-    }
-
-    fun get_Sensor()
-    {
-        return sensorFactory;
     }
 
     fun get_Input()
@@ -72,11 +65,6 @@ object "SurgeEngine"
     fun get_Camera()
     {
         return camera;
-    }
-
-    fun get_Mouse()
-    {
-        return mouse;
     }
 
     fun get_Collisions()
@@ -134,19 +122,27 @@ object "SensorFactory"
 
 object "InputFactory"
 {
+    mouse = spawn("Mouse");
+
     fun call(inputMap)
     {
         input = caller.spawn("Input");
         input.__init(inputMap);
         return input;
     }
+
+    fun get_Mouse()
+    {
+        return mouse;
+    }
 }
 
-object "CollisionFactory"
+object "CollisionPackage"
 {
     manager = spawn("CollisionManager");
     box = spawn("CollisionBoxFactory");
     ball = spawn("CollisionBallFactory");
+    sensor = spawn("SensorFactory");
 
     state "main"
     {
@@ -160,6 +156,11 @@ object "CollisionFactory"
     fun get_CollisionBall()
     {
         return ball;
+    }
+
+    fun get_Sensor()
+    {
+        return sensor;
     }
 }
 
