@@ -23,8 +23,10 @@
 
 #include "util.h"
 
-/* font class */
+/* font type */
 typedef struct font_t font_t;
+typedef enum fontalign_t fontalign_t;
+enum fontalign_t { FONTALIGN_LEFT, FONTALIGN_CENTER, FONTALIGN_RIGHT };
 
 /* public functions */
 font_t *font_create(const char *font_name); /* creates a new font instance. font_name is a font in the *.fnt scripts */
@@ -41,6 +43,7 @@ void font_set_width(font_t *f, int w); /* wordwrap (w is given in pixels) */
 int font_is_visible(const font_t *f); /* is the font visible? */
 void font_set_visible(font_t *f, int is_visible); /* show/hide font */
 void font_use_substring(font_t *f, int index_of_first_char, int length); /* since fonts may have color tags, variables, etc. , use this to display a substring of the font (not the whole text) */
+void font_set_align(font_t* f, fontalign_t align); /* set the align */
 
 /* misc */
 void font_init(int allow_font_smoothing); /* initializes the font module */

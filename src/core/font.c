@@ -113,6 +113,7 @@ struct font_t {
     int visible; /* is this font visible? */
     int index_of_first_char, length; /* substring */
     fontargs_t argument; /* text arguments: $1, $2 ... $<FONTARGS_MAX> */
+    fontalign_t align; /* alignment */
 };
 
 /* ------------------------------- */
@@ -232,6 +233,7 @@ font_t *font_create(const char *font_name)
     f->position = v2d_new(0, 0);
     f->index_of_first_char = 0;
     f->length = INFINITY;
+    f->align = FONTALIGN_LEFT;
 
     f->my_class = fontdata_list_find(font_name);
     if(f->my_class == NULL)
@@ -368,7 +370,7 @@ void font_render(const font_t *f, v2d_t camera_position)
        
        ...but it works and I'm lazy ;) */
 
-    int offx = 0, offy = 0;
+    int offx = 0, offy = 0, alignoffx = 0;
     char *p, s[8];
     uint32 color[FONT_STACKCAPACITY];
     int i, top = 0, w = 0, h = 0;
@@ -378,6 +380,12 @@ void font_render(const font_t *f, v2d_t camera_position)
     char *text = f->text;
     int wide_char = 0;
     int idx = 0;
+
+    switch(f->align) {
+        case FONTALIGN_LEFT:   alignoffx = 0; break;
+        case FONTALIGN_CENTER: alignoffx = -font_get_textsize(f).x / 2; break;
+        case FONTALIGN_RIGHT:  alignoffx = -font_get_textsize(f).x; break;
+    }
 
     color[top++] = image_rgb(255,255,255);
     if(f->visible && text) {
@@ -454,7 +462,7 @@ void font_render(const font_t *f, v2d_t camera_position)
             if(wordwrap) { offx = 0; offy += h + vspace; }
             if(*p != '\n') {
                 p += uoffset(p, 1) - 1; /* ugly hack */
-                f->my_class->renderchar(f->my_class, video_get_backbuffer(), wide_char, (int)(f->position.x+offx-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(f->position.y+offy-(camera_position.y-VIDEO_SCREEN_H/2)), color[top-1]);
+                f->my_class->renderchar(f->my_class, video_get_backbuffer(), wide_char, (int)(f->position.x+alignoffx+offx-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(f->position.y+offy-(camera_position.y-VIDEO_SCREEN_H/2)), color[top-1]);
                 offx += w + hspace;
 
                 /* gulp... o_o' */
@@ -540,6 +548,16 @@ void font_use_substring(font_t *f, int index_of_first_char, int length)
 {
     f->index_of_first_char = max(0, index_of_first_char);
     f->length = max(0, length);
+}
+
+
+/*
+ * font_set_align()
+ * Set the alignment of the font
+ */
+void font_set_align(font_t* f, fontalign_t align)
+{
+    f->align = align;
 }
 
 

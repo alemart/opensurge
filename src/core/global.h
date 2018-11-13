@@ -90,8 +90,8 @@
 #define INFINITY                (1<<30)
 
 #ifdef __MSVC__
-static const float ZERO_FLT = 0.0;
-#define INFINITY_FLT            (1.0/ZERO_FLT)
+static const double __ZERO = 0.0;
+#define INFINITY_FLT            (1.0/__ZERO)
 #else
 #define INFINITY_FLT            (1.0/0.0)
 #endif

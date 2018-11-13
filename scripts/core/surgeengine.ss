@@ -40,6 +40,7 @@ object "SurgeEngine"
     levelManager = spawn("LevelManager");
     camera = spawn("Camera");
     collisions = spawn("CollisionPackage");
+    userInterface = spawn("UIPackage");
     prefs = spawn("Prefs");
 
     fun get_Actor()
@@ -80,6 +81,11 @@ object "SurgeEngine"
     fun get_Player()
     {
         return levelManager.playerManager;
+    }
+
+    fun get_UI()
+    {
+        return userInterface;
     }
 }
 
@@ -144,10 +150,6 @@ object "CollisionPackage"
     ball = spawn("CollisionBallFactory");
     sensor = spawn("SensorFactory");
 
-    state "main"
-    {
-    }
-
     fun get_CollisionBox()
     {
         return box;
@@ -193,6 +195,25 @@ object "CollisionBallFactory"
     }
 }
 
+object "UIPackage"
+{
+    text = spawn("TextFactory");
+
+    fun get_Text()
+    {
+        return text;
+    }
+}
+
+object "TextFactory"
+{
+    fun call(fontName)
+    {
+        text = caller.spawn("Text");
+        text.__init(fontName);
+        return text;
+    }
+}
 
 
 

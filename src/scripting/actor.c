@@ -58,7 +58,7 @@ static const surgescript_heapptr_t ZINDEX_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t DETACHED_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
-static const float DEFAULT_ZINDEX = 0.5f;
+static const double DEFAULT_ZINDEX = 0.5;
 static const double DEG2RAD = 0.01745329251994329576;
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 extern const animation_t* scripting_animation_ptr(const surgescript_object_t* object);
@@ -187,7 +187,8 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_copy(surgescript_heap_at(heap, ZINDEX_ADDR), param[0]);
+    double zindex = surgescript_var_get_number(param[0]);
+    surgescript_var_set_number(surgescript_heap_at(heap, ZINDEX_ADDR), zindex);
     return NULL;
 }
 

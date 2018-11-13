@@ -7706,7 +7706,6 @@ void textout_update(objectmachine_t *obj, player_t **team, int team_size, brick_
     symboltable_t *st = objectvm_get_symbol_table(object->vm);
     char *processed_text;
     int start, length;
-    float wpx;
     v2d_t pos;
 
     /* calculate the range of the string (no need to clip() it) */
@@ -7727,11 +7726,15 @@ void textout_update(objectmachine_t *obj, player_t **team, int team_size, brick_
 
     /* font position */
     pos = v2d_new(expression_evaluate(me->xpos), expression_evaluate(me->ypos));
-    wpx = font_get_textsize(me->fnt).x;
-    switch(me->style) {
+    /*switch(me->style) {
     case TEXTOUT_LEFT: break;
-    case TEXTOUT_CENTRE: pos.x -= wpx/2; break;
-    case TEXTOUT_RIGHT: pos.x -= wpx; break;
+    case TEXTOUT_CENTRE: pos.x -= font_get_textsize(me->fnt).x/2; break;
+    case TEXTOUT_RIGHT: pos.x -= font_get_textsize(me->fnt).x; break;
+    }*/
+    switch(me->style) {
+    case TEXTOUT_LEFT: font_set_align(me->fnt, FONTALIGN_LEFT); break;
+    case TEXTOUT_CENTRE: font_set_align(me->fnt, FONTALIGN_CENTER); break;
+    case TEXTOUT_RIGHT: font_set_align(me->fnt, FONTALIGN_RIGHT); break;
     }
     font_set_position(me->fnt, v2d_add(object->actor->position, pos));
 
