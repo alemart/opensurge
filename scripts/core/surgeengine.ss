@@ -42,6 +42,7 @@ object "SurgeEngine"
     collisions = spawn("CollisionPackage");
     userInterface = spawn("UIPackage");
     prefs = spawn("Prefs");
+    transformFactory = spawn("TransformFactory");
 
     fun get_Actor()
     {
@@ -86,6 +87,11 @@ object "SurgeEngine"
     fun get_UI()
     {
         return userInterface;
+    }
+
+    fun get_Transform()
+    {
+        return transformFactory;
     }
 }
 
@@ -215,6 +221,14 @@ object "TextFactory"
     }
 }
 
+object "TransformFactory"
+{
+    fun call()
+    {
+        t2 = caller.child("Transform2D");
+        return t2 != null ? t2 : caller.spawn("Transform2D");
+    }
+}
 
 
 
