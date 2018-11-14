@@ -23,6 +23,8 @@
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -35,6 +37,8 @@ static surgescript_var_t* fun_setypos(surgescript_object_t* object, const surges
 void scripting_register_camera(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "Camera", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Camera", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Camera", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Camera", "get_xpos", fun_getxpos, 0);
     surgescript_vm_bind(vm, "Camera", "get_ypos", fun_getypos, 0);
     surgescript_vm_bind(vm, "Camera", "set_xpos", fun_setxpos, 1);
@@ -44,6 +48,21 @@ void scripting_register_camera(surgescript_vm_t* vm)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* do nothing */
+    return NULL;
+}
+
+/* destroy */
+surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* not allowed */
+    return NULL;
+}
+
+/* spawn */
+surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* not allowed */
     return NULL;
 }
 

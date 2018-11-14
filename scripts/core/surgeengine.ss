@@ -111,6 +111,9 @@ object "ActorFactory"
         actor.__init(spriteName);
         return actor;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "SensorFactory"
@@ -130,6 +133,9 @@ object "SensorFactory"
             return null;
         }
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "InputFactory"
@@ -147,6 +153,9 @@ object "InputFactory"
     {
         return mouse;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "CollisionPackage"
@@ -170,6 +179,9 @@ object "CollisionPackage"
     {
         return sensor;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "CollisionBoxFactory"
@@ -187,6 +199,9 @@ object "CollisionBoxFactory"
         collider.__init(manager, width, height);
         return collider;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "CollisionBallFactory"
@@ -199,6 +214,9 @@ object "CollisionBallFactory"
         collider.__init(manager, radius);
         return collider;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "UIPackage"
@@ -209,6 +227,9 @@ object "UIPackage"
     {
         return text;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "TextFactory"
@@ -219,6 +240,9 @@ object "TextFactory"
         text.__init(fontName);
         return text;
     }
+
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 object "TransformFactory"
@@ -228,6 +252,9 @@ object "TransformFactory"
         t2 = caller.child("Transform2D");
         return t2 != null ? t2 : caller.spawn("Transform2D");
     }
+    
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 
@@ -302,6 +329,10 @@ object "PlayerManager"
 
     // fun __spawnPlayers() { [builtin] }
     // fun get___activePlayerName() { [builtin] }
+
+    // manager overrides
+    fun spawn(x) { return null; }
+    fun destroy() { }
 }
 
 
@@ -329,6 +360,7 @@ object "CollisionManager"
         }
     }
 
+    // a collider is available in this frame
     fun __notify(collider)
     {
         colliders.push(collider);

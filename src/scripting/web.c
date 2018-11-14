@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include <string.h>
 #include "../core/web.h"
 
 /* private */
@@ -64,7 +65,14 @@ surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* url = surgescript_var_get_string(param[0], manager);
-    launch_url(url);
+    if(!(strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0 || strncmp(url, "mailto:", 7) == 0)) {
+        if(strstr(url, "://") != NULL)
+            fatal_error("Scripting Error: can't launch URL - unsupported protocol - %s", url);
+        else
+            fatal_error("Scripting Error: can't launch URL - please specify a protocol - %s", url);
+    }
+    else
+        launch_url(url);
     ssfree(url);
     return NULL;
 }
