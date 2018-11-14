@@ -276,6 +276,7 @@ SET(
   src/scripting/sensor.c
   src/scripting/text.c
   src/scripting/time.c
+  src/scripting/web.c
 
   src/entities/items/util/itemutil.c
   src/entities/items/animal.c

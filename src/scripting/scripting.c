@@ -62,6 +62,7 @@ extern void scripting_register_prefs(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
 extern void scripting_register_text(surgescript_vm_t* vm);
 extern void scripting_register_time(surgescript_vm_t* vm);
+extern void scripting_register_web(surgescript_vm_t* vm);
 
 /*
  * scripting_init()
@@ -96,6 +97,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_sensor(vm);
     scripting_register_text(vm);
     scripting_register_time(vm);
+    scripting_register_web(vm);
 
     /* compile scripts */
     assetfs_foreach_file("scripts", ".ss", compile_script, NULL, true);
