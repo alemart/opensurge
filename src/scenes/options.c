@@ -51,6 +51,7 @@ static scene_t *jump_to;
 static float scene_time;
 static bgtheme_t *bgtheme;
 static int stageselect_enable_debug;
+static music_t* music;
 static const int OFFSET_X = 60;
 
 /* private methods */
@@ -80,6 +81,7 @@ void options_init(void *foo)
     input = input_create_user(NULL);
     jump_to = NULL;
     fadein = TRUE;
+    music = music_load(OPTIONS_MUSICFILE);
 
     stageselect_enable_debug = FALSE;
 
@@ -112,6 +114,7 @@ void options_release()
     actor_destroy(icon);
     font_destroy(title);
     input_destroy(input);
+    music_unref(music);
 }
 
 
@@ -162,15 +165,11 @@ void options_update()
 
     /* music */
     if(quit) {
-        if(!fadefx_is_fading()) {
+        if(!fadefx_is_fading())
             music_stop();
-            music_unref(OPTIONS_MUSICFILE);
-        }
     }
-    else if(!music_is_playing() && scene_time >= 0.2) {
-        music_t *m = music_load(OPTIONS_MUSICFILE);
-        music_play(m, INFINITY);
-    }
+    else if(!music_is_playing() && scene_time >= 0.2)
+        music_play(music, INFINITY);
 
     /* quit */
     if(quit) {

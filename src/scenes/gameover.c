@@ -34,6 +34,7 @@
 static font_t *gameover_fnt[2];
 static image_t *gameover_buf;
 static float gameover_timer;
+static music_t* music;
 
 
 /*
@@ -55,7 +56,8 @@ void gameover_init(void *foo)
     gameover_buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
     image_blit(video_get_backbuffer(), gameover_buf, 0, 0, 0, 0, image_width(gameover_buf), image_height(gameover_buf));
 
-    music_play(music_load("musics/gameover.ogg"), 0);
+    music = music_load("musics/gameover.ogg");
+    music_play(music, 0);
 }
 
 
@@ -116,7 +118,7 @@ void gameover_render()
 void gameover_release()
 {
     music_stop();
-    music_unref("musics/gameover.ogg");
+    music_unref(music);
     image_destroy(gameover_buf);
     font_destroy(gameover_fnt[1]);
     font_destroy(gameover_fnt[0]);

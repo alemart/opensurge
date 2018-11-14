@@ -485,7 +485,7 @@ void level_load(const char *filepath)
 
     /* load the music */
     block_music = FALSE;
-    music = music_load(musicfile);
+    music = *musicfile ? music_load(musicfile) : NULL;
 
     /* misc */
     update_level_size();
@@ -506,9 +506,10 @@ void level_unload()
 
     logfile_message("level_unload()");
     music_stop();
-    music_unref(musicfile);
-    music_unref("musics/invincible.ogg");
-    music_unref("musics/speed.ogg");
+    if(music != NULL)
+        music_unref(music);
+    /*music_unref("musics/invincible.ogg");
+    music_unref("musics/speed.ogg");*/
 
     /* releases the startup object list */
     release_startup_object_list();

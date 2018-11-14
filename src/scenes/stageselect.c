@@ -80,6 +80,7 @@ static int option; /* current option: 0 .. stage_count - 1 */
 static font_t **stage_label; /* vector */
 static int enable_debug = FALSE; /* debug mode? must start out as false. */
 static int can_play_music = FALSE; /* can play music? */
+static music_t* music = NULL; /* background music */
 static char* level_to_be_loaded;
 
 
@@ -111,6 +112,7 @@ void stageselect_init(void *should_enable_debug)
     state = STAGESTATE_NORMAL;
     input = input_create_user(NULL);
     level_to_be_loaded = NULL;
+    music = music_load(OPTIONS_MUSICFILE);
 
     title = font_create("menu.title");
     font_set_text(title, "%s", "$STAGESELECT_TITLE");
@@ -156,6 +158,7 @@ void stageselect_release()
     font_destroy(msg);
     font_destroy(page);
     input_destroy(input);
+    music_unref(music);
 }
 
 
@@ -188,16 +191,12 @@ void stageselect_update()
 
     /* music */
     if(state == STAGESTATE_PLAY) {
-        if(!fadefx_is_fading()) {
+        if(!fadefx_is_fading())
             music_stop();
-            music_unref(OPTIONS_MUSICFILE);
-        }
     }
     else if(!music_is_playing()) {
-        if(can_play_music) {
-            music_t *m = music_load(OPTIONS_MUSICFILE);
-            music_play(m, INFINITY);
-        }
+        if(can_play_music)
+            music_play(music, INFINITY);
     }
 
     /* finite state machine */

@@ -42,7 +42,7 @@ void music_resume();
 void music_set_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
 float music_get_volume();
 int music_is_playing();
-int music_unref(const char *path); /* returns the number of active references */
+int music_unref(music_t *music); /* returns the number of active references */
 float music_duration(); /* in seconds */
 
 
@@ -53,6 +53,6 @@ void sound_play(sound_t *sample);
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop); /* 0.0<=volume<=1.0; (left) -1.0<=pan<=1.0 (right); 1.0 = default frequency; 0 = no loops */
 void sound_stop(sound_t *sample);
 int sound_is_playing(sound_t *sample);
-int sound_unref(const char *path); /* returns the number of active references */
+int sound_unref(sound_t *sample); /* returns the number of active references */
 
 #endif

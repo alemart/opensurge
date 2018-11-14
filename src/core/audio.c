@@ -48,11 +48,13 @@ struct music_t {
     int loops_left;
     int is_paused;
     float elapsed_time;
+    char *filepath; /* relative */
 };
 
 struct sound_t {
     SAMPLE *data;
     int voice_id;
+    char *filepath; /* relative */
 };
 
 #define MUSIC_DURATION(m)           ((float)(m->stream->len) / (float)(m->stream->freq))
@@ -61,6 +63,7 @@ struct music_t {
     alureStream *stream;
     volatile int is_paused;
     volatile int is_playing;
+    char *filepath; /* relative */
 };
 
 struct sound_t {
@@ -69,6 +72,7 @@ struct sound_t {
     volatile int loops_left;
     volatile int is_playing;
     volatile float vol, pan, freq;
+    char *filepath; /* relative */
 };
 
 static int quiet;
@@ -114,11 +118,13 @@ music_t *music_load(const char *path)
         m->loops_left = 0;
         m->is_paused = FALSE;
         m->elapsed_time = 0.0f;
+        m->filepath = str_dup(path);
 
         /* load the ogg stream */
         m->stream = logg_get_stream(fullpath, 255, 128, 0);
         if(m->stream == NULL) {
             logfile_message("music_load() error: can't get ogg stream");
+            free(m->filepath);
             free(m);
             return NULL;
         }
@@ -151,6 +157,7 @@ music_t *music_load(const char *path)
         m = mallocx(sizeof *m);
         m->is_playing = FALSE;
         m->is_paused = FALSE;
+        m->filepath = str_dup(path);
 
         /* load the stream */
         if(!(IS_VALID_FORMAT(path) && (m->stream = alureCreateStreamFromFile(fullpath, 250000, 0, NULL)))) {
@@ -162,6 +169,7 @@ music_t *music_load(const char *path)
             else
                 logfile_message("music_load() error: %s", alureGetErrorString());
 
+            free(m->filepath);
             free(m);
             return NULL;
         }
@@ -197,14 +205,14 @@ music_t *music_load(const char *path)
  * Returns the no. of references to the music
  */
 #ifndef __USE_OPENAL__
-int music_unref(const char *path)
+int music_unref(music_t *music)
 {
-    return resourcemanager_unref_music(path);
+    return resourcemanager_unref_music(music->filepath);
 }
 #else
-int music_unref(const char *path)
+int music_unref(music_t *music)
 {
-    return resourcemanager_unref_music(path);
+    return resourcemanager_unref_music(music->filepath);
 }
 #endif
 
@@ -223,6 +231,7 @@ void music_destroy(music_t *music)
             music_stop();
 
         logg_destroy_stream(music->stream);
+        free(music->filepath);
         free(music);
     }
 }
@@ -234,6 +243,7 @@ void music_destroy(music_t *music)
             music_stop();
 
         alureDestroyStream(music->stream, 0, NULL);
+        free(music->filepath);
         free(music);
     }
 }
@@ -493,11 +503,13 @@ sound_t *sound_load(const char *path)
 
         /* build the sound object */
         s = mallocx(sizeof *s);
+        s->filepath = str_dup(path);
         s->voice_id = SOUND_INVALID_VOICE;
 
         /* loading the sample */
         if(NULL == (s->data = IS_OGG(path) ? logg_load(fullpath) : load_sample(fullpath))) {
             logfile_message("sound_load() error: %s", allegro_error);
+            free(s->filepath);
             free(s);
             return NULL;
         }
@@ -531,6 +543,7 @@ sound_t *sound_load(const char *path)
         s->loops_left = 0;
         s->is_playing = FALSE;
         s->src = NULL;
+        s->filepath = str_dup(path);
 
         /* loading the sample */
         if(!(IS_VALID_FORMAT(path) && (s->buf = alureCreateBufferFromFile(fullpath)))) {
@@ -542,6 +555,7 @@ sound_t *sound_load(const char *path)
             else
                 logfile_message("sound_load() error: %s", alureGetErrorString());
 
+            free(s->filepath);
             free(s);
             return NULL;
         }
@@ -583,14 +597,14 @@ sound_t *sound_load(const char *path)
  * Returns the no. of references to the sample
  */
 #ifndef __USE_OPENAL__
-int sound_unref(const char *path)
+int sound_unref(sound_t* sample)
 {
-    return resourcemanager_unref_sample(path);
+    return resourcemanager_unref_sample(sample->filepath);
 }
 #else
-int sound_unref(const char *path)
+int sound_unref(sound_t* sample)
 {
-    return resourcemanager_unref_sample(path);
+    return resourcemanager_unref_sample(sample->filepath);
 }
 #endif
 
@@ -598,7 +612,7 @@ int sound_unref(const char *path)
 /*
  * sound_destroy()
  * Releases the given sample. This is called
- * automatically while releasing the main hash
+ * automatically when releasing the main hash
  */
 #ifndef __USE_OPENAL__
 void sound_destroy(sound_t *sample)
@@ -606,6 +620,7 @@ void sound_destroy(sound_t *sample)
     if(sample != NULL) {
         sound_stop(sample);
         destroy_sample(sample->data);
+        free(sample->filepath);
         free(sample);
     }
 }
@@ -615,6 +630,7 @@ void sound_destroy(sound_t *sample)
     if(sample != NULL) {
         sound_stop(sample);
         /* the buffers will be deleted later, in audio_release() */
+        free(sample->filepath);
         free(sample);
     }
 }
