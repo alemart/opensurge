@@ -505,9 +505,10 @@ void level_unload()
     int i;
 
     logfile_message("level_unload()");
-    music_stop();
-    if(music != NULL)
+    if(music != NULL) {
+        music_stop();
         music_unref(music);
+    }
     /*music_unref("musics/invincible.ogg");
     music_unref("musics/speed.ogg");*/
 
@@ -989,6 +990,7 @@ void level_init(void *path_to_lev_file)
     for(i=0; i<TEAM_MAX; i++)
         team[i] = NULL;
     player = NULL;
+    music = NULL;
 
     /* scripting controlled variables */
     level_cleared = FALSE;

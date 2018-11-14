@@ -31,6 +31,7 @@
 
 /* private data */
 #define GAMEOVER_TIMEOUT        6.0f
+#define GAMEOVER_MUSICFILE      "musics/gameover.ogg"
 static font_t *gameover_fnt[2];
 static image_t *gameover_buf;
 static float gameover_timer;
@@ -56,7 +57,7 @@ void gameover_init(void *foo)
     gameover_buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
     image_blit(video_get_backbuffer(), gameover_buf, 0, 0, 0, 0, image_width(gameover_buf), image_height(gameover_buf));
 
-    music = music_load("musics/gameover.ogg");
+    music = music_load(GAMEOVER_MUSICFILE);
     music_play(music, 0);
 }
 
