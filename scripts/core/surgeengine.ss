@@ -134,7 +134,6 @@ object "SensorFactory"
         }
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -154,7 +153,6 @@ object "InputFactory"
         return mouse;
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -180,7 +178,6 @@ object "CollisionPackage"
         return sensor;
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -200,7 +197,6 @@ object "CollisionBoxFactory"
         return collider;
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -215,7 +211,6 @@ object "CollisionBallFactory"
         return collider;
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -228,7 +223,6 @@ object "UIPackage"
         return text;
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -241,7 +235,6 @@ object "TextFactory"
         return text;
     }
 
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -253,7 +246,6 @@ object "TransformFactory"
         return t2 != null ? t2 : caller.spawn("Transform2D");
     }
     
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -331,7 +323,6 @@ object "PlayerManager"
     // fun get___activePlayerName() { [builtin] }
 
     // manager overrides
-    fun spawn(x) { return null; }
     fun destroy() { }
 }
 
@@ -365,6 +356,9 @@ object "CollisionManager"
     {
         colliders.push(collider);
     }
+
+    // can't destroy this
+    fun destroy() { }
 }
 
 // Axis-aligned collision box

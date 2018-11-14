@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include "../core/web.h"
+#include "../core/util.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

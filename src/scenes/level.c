@@ -968,7 +968,7 @@ void level_init(void *path_to_lev_file)
     const char *filepath = (const char*)path_to_lev_file;
     int i;
 
-    logfile_message("level_init('%s')", filepath);
+    logfile_message("level_init()");
     video_display_loading_screen();
 
     /* main init */
