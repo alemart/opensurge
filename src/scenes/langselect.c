@@ -58,6 +58,7 @@ static actor_t *arrow;
 static input_t *input;
 static float scene_time;
 static bgtheme_t *bgtheme;
+static music_t *music;
 static int before_the_intro_screen;
 
 /* private functions */
@@ -88,6 +89,7 @@ void langselect_init(void *foo)
     scene_time = 0;
     before_the_intro_screen = !prefs_has_item(prefs, ".langpath");
     input = input_create_user(NULL);
+    music = music_load(OPTIONS_MUSICFILE);
 
     page_label = font_create("menu.text");
     author_label = font_create("menu.text");
@@ -129,6 +131,7 @@ void langselect_release()
     font_destroy(author_label);
     font_destroy(page_label);
     input_destroy(input);
+    music_unref(music);
 }
 
 
@@ -191,10 +194,8 @@ void langselect_update()
     font_set_position(author_label, pos);
 
     /* music */
-    if(!music_is_playing() && !before_the_intro_screen) {
-        music_t *m = music_load(OPTIONS_MUSICFILE);
-        music_play(m, INFINITY);
-    }
+    if(!music_is_playing() && !before_the_intro_screen)
+        music_play(music, INFINITY);
 
     /* quit */
     if(quit) {

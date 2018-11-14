@@ -46,6 +46,7 @@ static font_t *title, *text, *back;
 static input_t *input;
 static int line_count;
 static bgtheme_t *bgtheme;
+static music_t *music;
 
 static char* read_credits2_file();
 
@@ -66,6 +67,7 @@ void credits2_init(void *foo)
     /* initializing stuff... */
     quit = FALSE;
     input = input_create_user(NULL);
+    music = music_load(OPTIONS_MUSICFILE);
 
     title = font_create("menu.title");
     font_set_text(title, "%s", lang_get("CREDITS2_TITLE"));
@@ -108,6 +110,7 @@ void credits2_release()
     font_destroy(back);
 
     input_destroy(input);
+    music_unref(music);
 }
 
 
@@ -139,10 +142,8 @@ void credits2_update()
     }
 
     /* music */
-    if(!music_is_playing()) {
-        music_t *m = music_load(OPTIONS_MUSICFILE);
-        music_play(m, INFINITY);
-    }
+    if(!music_is_playing())
+        music_play(music, INFINITY);
 
     /* fade-out */
     if(quit) {

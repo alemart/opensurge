@@ -728,6 +728,7 @@ void playmusicstrategy_release(audiostrategy_t *s)
 {
     playmusicstrategy_t *me = (playmusicstrategy_t*)s;
     expression_destroy(me->loop);
+    music_unref(me->mus);
 }
 
 /* ------------------------ */

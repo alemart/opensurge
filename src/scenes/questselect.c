@@ -60,6 +60,7 @@ static actor_t *icon; /* cursor icon */
 static input_t *input; /* input device */
 static float scene_time; /* scene time, in seconds */
 static bgtheme_t *bgtheme; /* background */
+static music_t *music; /* background music */
 
 static enum { QUESTSTATE_NORMAL, QUESTSTATE_QUIT, QUESTSTATE_PLAY, QUESTSTATE_FADEIN } state; /* finite state machine */
 char quest_to_be_loaded[1024] = "";
@@ -95,6 +96,7 @@ void questselect_init(void *foo)
     scene_time = 0;
     state = QUESTSTATE_NORMAL;
     input = input_create_user(NULL);
+    music = music_load(OPTIONS_MUSICFILE);
 
     title = font_create("menu.title");
     font_set_text(title, "%s", "$QUESTSELECT_TITLE");
@@ -140,6 +142,7 @@ void questselect_release()
     font_destroy(title);
 
     input_destroy(input);
+    music_unref(music);
 }
 
 
@@ -176,10 +179,8 @@ void questselect_update()
     font_set_position(info, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(info).y * 5.0f));
 
     /* music */
-    if(!music_is_playing() && state != QUESTSTATE_PLAY) {
-        music_t *m = music_load(OPTIONS_MUSICFILE);
-        music_play(m, INFINITY);
-    }
+    if(!music_is_playing() && state != QUESTSTATE_PLAY)
+        music_play(music, INFINITY);
 
     /* finite state machine */
     switch(state) {

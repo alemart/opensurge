@@ -207,12 +207,16 @@ music_t *music_load(const char *path)
 #ifndef __USE_OPENAL__
 int music_unref(music_t *music)
 {
-    return resourcemanager_unref_music(music->filepath);
+    if(music != NULL)
+        return resourcemanager_unref_music(music->filepath);
+    return 0;
 }
 #else
 int music_unref(music_t *music)
 {
-    return resourcemanager_unref_music(music->filepath);
+    if(music != NULL)
+        return resourcemanager_unref_music(music->filepath);
+    return 0;
 }
 #endif
 
