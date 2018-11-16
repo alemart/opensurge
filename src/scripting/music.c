@@ -31,7 +31,6 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_play(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_stop(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_resume(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvolume(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvolume(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getplaying(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -53,7 +52,6 @@ void scripting_register_music(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Music", "play", fun_play, 0);
     surgescript_vm_bind(vm, "Music", "stop", fun_stop, 0);
     surgescript_vm_bind(vm, "Music", "pause", fun_pause, 0);
-    surgescript_vm_bind(vm, "Music", "resume", fun_resume, 0);
     surgescript_vm_bind(vm, "Music", "set_volume", fun_setvolume, 1);
     surgescript_vm_bind(vm, "Music", "get_volume", fun_getvolume, 0);
     surgescript_vm_bind(vm, "Music", "get_playing", fun_getplaying, 0);
@@ -134,7 +132,10 @@ surgescript_var_t* fun_play(surgescript_object_t* object, const surgescript_var_
     double volume = get_volume(object);
 
     if(music != NULL) {
-        music_play(music, 0);
+        if(music_current() == music && music_is_paused())
+            music_resume(music);
+        else
+            music_play(music, 0);
         music_set_volume(volume);
     }
 
@@ -149,20 +150,6 @@ surgescript_var_t* fun_stop(surgescript_object_t* object, const surgescript_var_
     if(music != NULL && music_current() == music)
         music_stop();
     
-    return NULL;
-}
-
-/* resumes the music */
-surgescript_var_t* fun_resume(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    music_t* music = get_music(object);
-    double volume = get_volume(object);
-
-    if(music != NULL && music_current() == music) {
-        music_resume();
-        music_set_volume(volume);
-    }
-
     return NULL;
 }
 

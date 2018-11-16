@@ -54,6 +54,7 @@ struct music_t {
 struct sound_t {
     SAMPLE *data;
     int voice_id;
+    float vol;
     char *filepath; /* relative */
 };
 
@@ -536,6 +537,7 @@ sound_t *sound_load(const char *path)
         s = mallocx(sizeof *s);
         s->filepath = str_dup(path);
         s->voice_id = SOUND_INVALID_VOICE;
+        s->vol = 1.0f;
 
         /* loading the sample */
         if(NULL == (s->data = IS_OGG(path) ? logg_load(fullpath) : load_sample(fullpath))) {
@@ -675,7 +677,7 @@ void sound_destroy(sound_t *sample)
 #ifndef __USE_OPENAL__
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, 1.0, 0.0, 1.0, 0);
+    sound_play_ex(sample, sample->vol, 0.0, 1.0, 0);
 }
 #else
 void sound_play(sound_t *sample)
@@ -807,7 +809,48 @@ int sound_is_playing(sound_t *sample)
 }
 #endif
 
+/*
+ * sound_get_volume()
+ * Gets the volume of a sound.
+ * The volume is a number in the [0,1] range
+ */
+#ifndef __USE_OPENAL__
+float sound_get_volume(sound_t *sample)
+{
+    if(sample != NULL)
+        return sample->vol;
+    else
+        return 1.0f;
+}
+#else
+float sound_get_volume(sound_t *sample)
+{
+    /* not implemented */
+    return 1.0f;
+}
+#endif
 
+
+/*
+ * sound_set_volume()
+ * Sets the volume of a sound.
+ * The volume is a number in the [0,1] range
+ */
+#ifndef __USE_OPENAL__
+void sound_set_volume(sound_t *sample, float volume)
+{
+    if(sample != NULL) {
+        sample->vol = clip(volume, 0.0f, 1.0f);
+        if(sample->voice_id != SOUND_INVALID_VOICE)
+            voice_set_volume(sample->voice_id, (int)(sample->vol * 255));
+    }
+}
+#else
+void sound_set_volume(sound_t *sample, float volume)
+{
+    /* not implemented */
+}
+#endif
 
 
 

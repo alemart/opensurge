@@ -57,5 +57,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop);
 void sound_stop(sound_t *sample);
 int sound_is_playing(sound_t *sample);
 int sound_unref(sound_t *sample); /* returns the number of active references */
+float sound_get_volume(sound_t *sample);
+void sound_set_volume(sound_t *sample, float volume); /* volume is in the [0,1] range */
 
 #endif
