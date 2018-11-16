@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * camera.c - scripting system: web routines
+ * video.c - scripting system: video routines
  * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -20,25 +20,27 @@
 
 #include <surgescript.h>
 #include <string.h>
-#include "../core/web.h"
 #include "../core/util.h"
+#include "../core/video.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getscreenwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getscreenheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
- * scripting_register_web()
- * Register the Web object
+ * scripting_register_video()
+ * Register the Video object
  */
-void scripting_register_web(surgescript_vm_t* vm)
+void scripting_register_video(surgescript_vm_t* vm)
 {
-    surgescript_vm_bind(vm, "Camera", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "Camera", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "Camera", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Camera", "launchURL", fun_launchurl, 1);
+    surgescript_vm_bind(vm, "Video", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Video", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Video", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "Video", "get_screenWidth", fun_getscreenwidth, 0);
+    surgescript_vm_bind(vm, "Video", "get_screenHeight", fun_getscreenheight, 0);
 }
 
 /* main state */
@@ -62,19 +64,14 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     return NULL;
 }
 
-/* launch URL: give a URL */
-surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* the width of the screen, in pixels */
+surgescript_var_t* fun_getscreenwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    char* url = surgescript_var_get_string(param[0], manager);
-    if(!(strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0 || strncmp(url, "mailto:", 7) == 0)) {
-        if(strstr(url, "://") != NULL)
-            fatal_error("Scripting Error: can't launch URL - unsupported protocol - %s", url);
-        else
-            fatal_error("Scripting Error: can't launch URL - please specify a protocol - %s", url);
-    }
-    else
-        launch_url(url);
-    ssfree(url);
-    return NULL;
+    return surgescript_var_set_number(surgescript_var_create(), VIDEO_SCREEN_W);
+}
+
+/* the height of the screen, in pixels */
+surgescript_var_t* fun_getscreenheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), VIDEO_SCREEN_H);
 }

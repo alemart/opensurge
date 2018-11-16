@@ -44,6 +44,7 @@ object "SurgeEngine"
     audio = spawn("AudioPackage");
     prefs = spawn("Prefs");
     transformFactory = spawn("TransformFactory");
+    video = spawn("Video");
 
     fun get_Actor()
     {
@@ -88,6 +89,11 @@ object "SurgeEngine"
     fun get_Prefs()
     {
         return prefs;
+    }
+
+    fun get_Video()
+    {
+        return video;
     }
 
     fun get_Player()
