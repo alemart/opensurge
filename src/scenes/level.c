@@ -1725,6 +1725,15 @@ void level_override_music(sound_t *sample)
     sound_play(override_music);
 }
 
+/*
+ * level_music()
+ * The music of the level (may be NULL)
+ */
+music_t* level_music()
+{
+    return music;
+}
+
 
 
 /*
@@ -2195,18 +2204,6 @@ int level_is_camera_locked()
 {
     return camera_is_locked();
 }
-
-
-
-/* music */
-void level_restore_music()
-{
-    if(music != NULL)
-        music_stop();
-
-    /* update_music will do the rest */
-}
-
 
 
 

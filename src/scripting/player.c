@@ -247,7 +247,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     );
     surgescript_object_call_function(
         surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(tmp[4])),
-        "__create", (const surgescript_var_t**)tmp, 3, tmp[3]
+        "__spawn", (const surgescript_var_t**)tmp, 3, tmp[3]
     );
     surgescript_var_copy(surgescript_heap_at(heap, COLLIDER_ADDR), tmp[3]);
 

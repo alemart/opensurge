@@ -19,7 +19,9 @@
  */
 
 #include <surgescript.h>
+#include "scripting.h"
 #include "../core/util.h"
+#include "../core/audio.h"
 #include "../scenes/level.h"
 #include "../entities/player.h"
 
@@ -28,7 +30,11 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static const surgescript_heapptr_t IDX_ADDR = 0;
+static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static const surgescript_heapptr_t MUSIC_ADDR = 0;
+static const surgescript_heapptr_t IDX_ADDR = 1; /* must be the last address */
+static void update_music(surgescript_object_t* object);
+extern music_t* scripting_music_ptr(const surgescript_object_t* object);
 
 /*
  * scripting_register_level()
@@ -40,19 +46,26 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Level", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
+puts("aaaaaaaaa");
 }
 
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
+puts("hasjah");
+    /* Level music */
+    ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, MUSIC_ADDR));
 
     /*
      * Memory layout:
-     * [ IDX | obj_1 | obj_2 | ... ]
+     * [ ... | IDX | obj_1 | obj_2 | ... | obj_N ]
+     * only Level-spawned() objects come after IDX
      */
     ssassert(IDX_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), IDX_ADDR);
+    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), 1 + IDX_ADDR);
 
     /* done */
     return NULL;
@@ -66,7 +79,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     size_t heap_size = surgescript_heap_size(heap);
 
     /* scan the memory continuously for broken references */
-    if(idx > IDX_ADDR) {
+    if(idx > IDX_ADDR && idx < heap_size) {
         surgescript_objectmanager_t* manager = surgescript_object_manager(object);
 
         /* an object stored in heap[idx] has been destroyed */
@@ -75,15 +88,17 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
             !surgescript_objectmanager_exists(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, idx)))
         ))
             surgescript_heap_free(heap, idx); /* release the memory, so it can be reused */
-
-        /* keep scanning */
-        if(++idx >= heap_size)
-            idx = 1 + IDX_ADDR;
-
-        /* update the scan index on the object memory */
-        surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
     }
 
+    /* update the scan index on the object memory */
+    idx = max(1 + IDX_ADDR, (idx + 1) % heap_size);
+    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
+    
+    /* misc */
+    if(level_music() != NULL)
+        update_music(object);
+
+    /* done */
     return NULL;
 }
 
@@ -115,4 +130,48 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return NULL;
+}
+
+/* the music of the level */
+surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, MUSIC_ADDR));
+}
+
+
+
+/* -- utils -- */
+
+/* updates the reference to Level.music */
+void update_music(surgescript_object_t* object)
+{
+    music_t* music = level_music(); /* assumed to be not-NULL <-- important! */
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+
+    if(surgescript_var_is_null(surgescript_heap_at(heap, MUSIC_ADDR)) ||
+        music != scripting_music_ptr(
+            surgescript_objectmanager_get(surgescript_object_manager(object),
+                surgescript_var_get_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR))
+            )
+        )
+    ) {
+        surgescript_object_t* music_component = scripting_util_get_component(
+            scripting_util_surgeengine_component(surgescript_vm(), "Audio"), "Music"
+        );
+        surgescript_var_t* tmp[] = {
+            surgescript_var_create(), surgescript_var_create(), surgescript_var_create()
+        };
+
+        surgescript_var_set_objecthandle(tmp[0], surgescript_object_handle(object));
+        surgescript_var_set_string(tmp[1], music_path(music));
+        surgescript_object_call_function(music_component, "__spawn", (const surgescript_var_t**)tmp, 2, tmp[2]);
+        surgescript_var_set_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR), surgescript_var_get_objecthandle(tmp[2]));
+        printf("= %x\n", surgescript_var_get_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR)));
+        fflush(stdout);
+
+        surgescript_var_destroy(tmp[2]);
+        surgescript_var_destroy(tmp[1]);
+        surgescript_var_destroy(tmp[0]);
+    }
 }

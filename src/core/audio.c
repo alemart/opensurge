@@ -487,6 +487,25 @@ float music_duration()
 #endif
 
 
+/*
+ * music_current()
+ * The currently playing music.
+ * May be NULL
+ */
+music_t *music_current()
+{
+    return current_music;
+}
+
+/*
+ * music_path()
+ * Returns the filepath of the specified music
+ */
+const char *music_path(const music_t *music)
+{
+    return (music != NULL) ? music->filepath : "";
+}
+
 
 
 /* sound management */

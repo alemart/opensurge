@@ -46,6 +46,7 @@ struct item_list_t;
 struct enemy_t;
 struct enemy_list_t;
 struct sound_t;
+struct music_t;
 
 /* read-only data */
 const char* level_name();
@@ -91,7 +92,7 @@ void level_hide_dialogbox();
 
 /* music */
 void level_override_music(struct sound_t *sample);
-void level_restore_music();
+struct music_t* level_music();
 
 /* management */
 void level_clear(struct actor_t *end_sign);

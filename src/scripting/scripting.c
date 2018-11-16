@@ -56,6 +56,7 @@ extern void scripting_register_input(surgescript_vm_t* vm);
 extern void scripting_register_level(surgescript_vm_t* vm);
 extern void scripting_register_levelmanager(surgescript_vm_t* vm);
 extern void scripting_register_mouse(surgescript_vm_t* vm);
+extern void scripting_register_music(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_player(surgescript_vm_t* vm);
 extern void scripting_register_prefs(surgescript_vm_t* vm);
@@ -91,6 +92,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_level(vm);
     scripting_register_levelmanager(vm);
     scripting_register_mouse(vm);
+    scripting_register_music(vm);
     scripting_register_obstaclemap(vm);
     scripting_register_player(vm);
     scripting_register_prefs(vm);
@@ -263,16 +265,22 @@ surgescript_object_t* scripting_util_surgeengine_object(surgescript_vm_t* vm)
 /* get a component of the SurgeEngine object */
 surgescript_object_t* scripting_util_surgeengine_component(surgescript_vm_t* vm, const char* component_name)
 {
-    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    return scripting_util_get_component(scripting_util_surgeengine_object(vm), component_name);
+}
+
+/* get a component of an object (returns object.get_component()) */
+surgescript_object_t* scripting_util_get_component(const surgescript_object_t* object, const char* component_name)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* accessor_fun = surgescript_util_accessorfun("get", component_name);
     surgescript_var_t* ret = surgescript_var_create();
-    surgescript_objecthandle_t handle;
+    surgescript_objecthandle_t handle = 0;
 
-    surgescript_object_call_function(scripting_util_surgeengine_object(vm), accessor_fun, NULL, 0, ret);
+    surgescript_object_call_function(object, accessor_fun, NULL, 0, ret);
     handle = surgescript_var_get_objecthandle(ret);
+
     surgescript_var_destroy(ret);
     ssfree(accessor_fun);
-
     return surgescript_objectmanager_get(manager, handle);
 }
 

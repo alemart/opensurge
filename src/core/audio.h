@@ -44,6 +44,8 @@ float music_get_volume();
 int music_is_playing();
 int music_unref(music_t *music); /* returns the number of active references */
 float music_duration(); /* in seconds */
+music_t *music_current(); /* currently playing music. May be NULL */
+const char *music_path(const music_t *music); /* the filepath of the specified music */
 
 
 /* sample management */

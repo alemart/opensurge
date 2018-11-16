@@ -744,7 +744,7 @@ audiostrategy_t* playlevelmusicstrategy_new()
 
 void playlevelmusicstrategy_update(audiostrategy_t *s)
 {
-    level_restore_music();
+    music_stop();
 }
 
 void playlevelmusicstrategy_release(audiostrategy_t *s)

@@ -41,6 +41,7 @@ object "SurgeEngine"
     camera = spawn("Camera");
     collisions = spawn("CollisionPackage");
     userInterface = spawn("UIPackage");
+    audio = spawn("AudioPackage");
     prefs = spawn("Prefs");
     transformFactory = spawn("TransformFactory");
 
@@ -49,9 +50,19 @@ object "SurgeEngine"
         return actorFactory;
     }
 
+    fun Actor(spriteName)
+    {
+        return get_Actor().call(spriteName);
+    }
+
     fun get_Input()
     {
         return inputFactory;
+    }
+
+    fun Input(inputMap)
+    {
+        return get_Input().call(inputMap);
     }
 
     fun get_LevelManager()
@@ -84,14 +95,29 @@ object "SurgeEngine"
         return levelManager.playerManager;
     }
 
+    fun Player(playerNameOrId)
+    {
+        return get_Player().call(playerNameOrId);
+    }
+
     fun get_UI()
     {
         return userInterface;
     }
 
+    fun get_Audio()
+    {
+        return audio;
+    }
+
     fun get_Transform()
     {
         return transformFactory;
+    }
+
+    fun Transform()
+    {
+        return get_Transform().call();
     }
 }
 
@@ -178,6 +204,21 @@ object "CollisionPackage"
         return sensor;
     }
 
+    fun CollisionBox(width, height)
+    {
+        return box(width, height);
+    }
+
+    fun CollisionBall(radius)
+    {
+        return ball(radius);
+    }
+
+    fun Sensor(x, y, w, h)
+    {
+        return sensor(x, y, w, h);
+    }
+
     fun destroy() { }
 }
 
@@ -187,10 +228,10 @@ object "CollisionBoxFactory"
 
     fun call(width, height)
     {
-        return __create(caller, width, height);
+        return __spawn(caller, width, height);
     }
 
-    fun __create(parnt, width, height) // called by Player
+    fun __spawn(parnt, width, height) // called by Player
     {
         collider = parnt.spawn("CollisionBox");
         collider.__init(manager, width, height);
@@ -223,6 +264,11 @@ object "UIPackage"
         return text;
     }
 
+    fun Text(fontName)
+    {
+        return text(fontName);
+    }
+
     fun destroy() { }
 }
 
@@ -246,6 +292,63 @@ object "TransformFactory"
         return t2 != null ? t2 : caller.spawn("Transform2D");
     }
     
+    fun destroy() { }
+}
+
+object "AudioPackage"
+{
+    music = spawn("MusicFactory");
+    sound = spawn("SoundFactory");
+
+    fun get_Music()
+    {
+        return music;
+    }
+
+    fun Music(pathToMusic)
+    {
+        return get_Music().call(pathToMusic);
+    }
+
+    fun get_Sound()
+    {
+        return sound;
+    }
+
+    fun Sound(pathToSound)
+    {
+        return get_Sound().call(pathToSound);
+    }
+
+    fun destroy() { }
+}
+
+object "MusicFactory"
+{
+    fun call(pathToMusic)
+    {
+        return __spawn(caller, pathToMusic);
+    }
+
+    fun __spawn(parnt, pathToMusic) // called by Level
+    {
+        music = parnt.spawn("Music");
+        music.__init(pathToMusic);
+        return music;
+    }
+
+    fun destroy() { }
+}
+
+object "SoundFactory"
+{
+    fun call(pathToSound)
+    {
+        sound = caller.spawn("Sound");
+        sound.__init(pathToSound);
+        return sound;
+    }
+
     fun destroy() { }
 }
 
