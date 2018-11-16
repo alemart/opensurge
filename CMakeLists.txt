@@ -275,6 +275,7 @@ SET(
   src/scripting/player.c
   src/scripting/prefs.c
   src/scripting/sensor.c
+  src/scripting/sound.c
   src/scripting/text.c
   src/scripting/time.c
   src/scripting/web.c

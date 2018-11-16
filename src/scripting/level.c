@@ -47,14 +47,13 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
-puts("aaaaaaaaa");
 }
 
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
-puts("hasjah");
+
     /* Level music */
     ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_null(surgescript_heap_at(heap, MUSIC_ADDR));
@@ -167,8 +166,6 @@ void update_music(surgescript_object_t* object)
         surgescript_var_set_string(tmp[1], music_path(music));
         surgescript_object_call_function(music_component, "__spawn", (const surgescript_var_t**)tmp, 2, tmp[2]);
         surgescript_var_set_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR), surgescript_var_get_objecthandle(tmp[2]));
-        printf("= %x\n", surgescript_var_get_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR)));
-        fflush(stdout);
 
         surgescript_var_destroy(tmp[2]);
         surgescript_var_destroy(tmp[1]);

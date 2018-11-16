@@ -40,6 +40,6 @@ float scripting_util_object_zindex(surgescript_object_t* object);
 const char* scripting_util_parent_name(const surgescript_object_t* object);
 surgescript_object_t* scripting_util_surgeengine_object(surgescript_vm_t* vm);
 surgescript_object_t* scripting_util_surgeengine_component(surgescript_vm_t* vm, const char* component_name);
-surgescript_object_t* scripting_util_get_component(const surgescript_object_t* object, const char* component_name);
+surgescript_object_t* scripting_util_get_component(surgescript_object_t* object, const char* component_name);
 
 #endif

@@ -62,6 +62,7 @@ void scripting_register_music(surgescript_vm_t* vm)
 /*
  * scripting_music_ptr()
  * Returns the built-in music_t* associated to the given SurgeScript Music object
+ * May be NULL
  */
 music_t* scripting_music_ptr(const surgescript_object_t* object)
 {
@@ -117,9 +118,11 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 {
     music_t* music = get_music(object);
 
-    if(music_current() == music && music_is_playing())
-        music_stop();
-    music_unref(music);
+    if(music != NULL) {
+        if(music_current() == music && music_is_playing())
+            music_stop();
+        music_unref(music);
+    }
 
     return NULL;
 }
@@ -206,7 +209,7 @@ surgescript_var_t* fun_setvolume(surgescript_object_t* object, const surgescript
 }
 
 
-/* --- private --- */
+/* --- utilities --- */
 
 /* gets the music_t* pointer: may be NULL */
 music_t* get_music(const surgescript_object_t* object)

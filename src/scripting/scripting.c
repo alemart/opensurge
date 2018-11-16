@@ -61,6 +61,7 @@ extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_player(surgescript_vm_t* vm);
 extern void scripting_register_prefs(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
+extern void scripting_register_sound(surgescript_vm_t* vm);
 extern void scripting_register_text(surgescript_vm_t* vm);
 extern void scripting_register_time(surgescript_vm_t* vm);
 extern void scripting_register_web(surgescript_vm_t* vm);
@@ -97,6 +98,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_player(vm);
     scripting_register_prefs(vm);
     scripting_register_sensor(vm);
+    scripting_register_sound(vm);
     scripting_register_text(vm);
     scripting_register_time(vm);
     scripting_register_web(vm);
@@ -269,7 +271,7 @@ surgescript_object_t* scripting_util_surgeengine_component(surgescript_vm_t* vm,
 }
 
 /* get a component of an object (returns object.get_component()) */
-surgescript_object_t* scripting_util_get_component(const surgescript_object_t* object, const char* component_name)
+surgescript_object_t* scripting_util_get_component(surgescript_object_t* object, const char* component_name)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* accessor_fun = surgescript_util_accessorfun("get", component_name);
