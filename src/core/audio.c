@@ -322,7 +322,7 @@ void music_stop()
         free(filename);
     }
 
-    current_music = NULL;
+    current_music = NULL; /* important */
 }
 #else
 void music_stop()
@@ -506,6 +506,14 @@ const char *music_path(const music_t *music)
     return (music != NULL) ? music->filepath : "";
 }
 
+/*
+ * music_is_paused()
+ * Checks if the currently playing music is paused
+ */
+int music_is_paused()
+{
+    return (current_music != NULL) && (current_music->is_paused);
+}
 
 
 /* sound management */

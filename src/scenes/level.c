@@ -998,6 +998,7 @@ void level_init(void *path_to_lev_file)
 
     /* helpers */
     particle_init();
+    music_stop();
 
     /* level init */
     level_load(filepath);
@@ -1720,7 +1721,7 @@ v2d_t level_size()
  */
 void level_override_music(sound_t *sample)
 {
-    if(music) music_stop();
+    music_stop();
     override_music = sample;
     sound_play(override_music);
 }
@@ -2088,17 +2089,14 @@ void render_players(int bring_to_back)
 /* updates the music */
 void update_music()
 {
-    if(music != NULL && !block_music) {
+    if(override_music && !sound_is_playing(override_music))
+        override_music = NULL;
 
-        if(override_music && !sound_is_playing(override_music)) {
-            override_music = NULL;
-            if(!player_is_invincible(player) && !player_is_ultrafast(player))
+    if(music != NULL && !block_music) {
+        if(!override_music && !music_is_playing()) {
+            if(music_current() == NULL || (music_current() == music && !music_is_paused()))
                 music_play(music, INFINITY);
         }
-
-        if(!override_music && !music_is_playing())
-            music_play(music, INFINITY);
-
     }
 }
 
