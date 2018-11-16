@@ -100,9 +100,14 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
     char* path = surgescript_var_get_string(param[0], manager);
     music_t* music = music_load(path);
+
     surgescript_object_set_userdata(object, music);
+    if(music != NULL && music_current() == music)
+        surgescript_var_set_number(surgescript_heap_at(heap, VOLUME_ADDR), music_get_volume());
+
     ssfree(path);
     return NULL;
 }
