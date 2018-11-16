@@ -6709,10 +6709,7 @@ void setobstacle_update(objectmachine_t *obj, player_t **team, int team_size, br
         if(object->mask != NULL)
             object->mask = collisionmask_destroy(object->mask);
         if(me->is_obstacle)
-            object->mask = collisionmask_create(
-                actor_image(object->actor),
-                0,
-                0,
+            object->mask = collisionmask_create_box(
                 image_width(actor_image(object->actor)),
                 image_height(actor_image(object->actor))
             );

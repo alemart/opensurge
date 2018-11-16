@@ -27,6 +27,7 @@ typedef struct collisionmask_t collisionmask_t;
 
 /* create and destroy a collision mask */
 collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height);
+collisionmask_t *collisionmask_create_box(int width, int height);
 collisionmask_t *collisionmask_destroy(collisionmask_t *mask);
 
 /* retrieve dimensions */

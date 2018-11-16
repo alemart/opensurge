@@ -44,10 +44,18 @@ static uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_
 static inline uint16* destroy_groundmap(uint16* gmap);
 
 /* public methods */
+
+/*
+ * collisionmask_create()
+ * Creates a new collision mask using the rectangle
+ * [ x, x + width - 1 ] x [ y, y + height - 1 ]
+ * of the given image
+ */
 collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int width, int height)
 {
     collisionmask_t *mask = mallocx(sizeof *mask);
     uint32 maskcolor = video_get_maskcolor();
+    int i, j;
 
     /* basic params */
     mask->width = clip(width, 1, image_width(image));
@@ -63,8 +71,8 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
 
     /* create the collision mask */
     mask->mask = mallocx((mask->pitch * mask->height) * sizeof(*(mask->mask)));
-    for(int j = 0; j < mask->height; j++) {
-        for(int i = 0; i < mask->width; i++)
+    for(j = 0; j < mask->height; j++) {
+        for(i = 0; i < mask->width; i++)
             mask->mask[j * mask->pitch + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
     }
 
@@ -78,6 +86,42 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
     return mask;
 }
 
+/*
+ * collisionmask_create_box()
+ * Creates a new, solid, filled collision mask with the
+ * specified dimensions
+ */
+collisionmask_t *collisionmask_create_box(int width, int height)
+{
+    collisionmask_t *mask = mallocx(sizeof *mask);
+    int i, j;
+
+    /* basic params */
+    mask->width = clip(width, 1, MASK_MAXSIZE);
+    mask->height = clip(height, 1, MASK_MAXSIZE);
+    mask->pitch = MASK_ALIGN(mask->width);
+
+    /* create the collision mask */
+    mask->mask = mallocx((mask->pitch * mask->height) * sizeof(*(mask->mask)));
+    for(j = 0; j < mask->height; j++) {
+        for(i = 0; i < mask->width; i++)
+            mask->mask[j * mask->pitch + i] = 1;
+    }
+
+    /* create the ground maps */
+    mask->gmap[0] = create_groundmap(mask, GD_DOWN);
+    mask->gmap[1] = create_groundmap(mask, GD_LEFT);
+    mask->gmap[2] = create_groundmap(mask, GD_UP);
+    mask->gmap[3] = create_groundmap(mask, GD_RIGHT);
+
+    /* done! */
+    return mask;
+}
+
+/*
+ * collisionmask_destroy()
+ * Destroys an existing collision mask
+ */
 collisionmask_t *collisionmask_destroy(collisionmask_t *mask)
 {
     if(mask != NULL) {
@@ -91,21 +135,37 @@ collisionmask_t *collisionmask_destroy(collisionmask_t *mask)
     return NULL;
 }
 
+/*
+ * collisionmask_width()
+ * Width of the mask
+ */
 int collisionmask_width(const collisionmask_t* mask)
 {
     return mask ? mask->width : 0;
 }
 
+/*
+ * collisionmask_height()
+ * Height of the mask
+ */
 int collisionmask_height(const collisionmask_t* mask)
 {
     return mask ? mask->height : 0;
 }
 
+/*
+ * collisionmask_pitch()
+ * Pitch value
+ */
 int collisionmask_pitch(const collisionmask_t* mask)
 {
     return mask ? mask->pitch : 0;
 }
 
+/*
+ * collisionmask_peek()
+ * Checks if a pixel is solid, with boundary checking
+ */
 int collisionmask_peek(const collisionmask_t* mask, int x, int y)
 {
     if(mask && x >= 0 && x < mask->width && y >= 0 && y < mask->height)
@@ -114,6 +174,10 @@ int collisionmask_peek(const collisionmask_t* mask, int x, int y)
         return 0;
 }
 
+/*
+ * collisionmask_locate_ground()
+ * Locates the ground, given pixel (x, y) in the collision mask
+ */
 int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, grounddir_t ground_direction)
 {
     int p;

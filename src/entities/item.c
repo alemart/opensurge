@@ -396,10 +396,7 @@ item_t *item_create(int type)
         item->type = type;
         item->state = IS_IDLE;
         item->init(item);
-        item->mask = item->obstacle ? collisionmask_create(
-            actor_image(item->actor),
-            0,
-            0,
+        item->mask = item->obstacle ? collisionmask_create_box(
             image_width(actor_image(item->actor)),
             image_height(actor_image(item->actor))
         ) : NULL;
