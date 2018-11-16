@@ -49,8 +49,8 @@ void scripting_register_sound(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sound", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Sound", "play", fun_play, 0);
     surgescript_vm_bind(vm, "Sound", "stop", fun_stop, 0);
-    surgescript_vm_bind(vm, "Music", "set_volume", fun_setvolume, 1);
-    surgescript_vm_bind(vm, "Music", "get_volume", fun_getvolume, 0);
+    surgescript_vm_bind(vm, "Sound", "set_volume", fun_setvolume, 1);
+    surgescript_vm_bind(vm, "Sound", "get_volume", fun_getvolume, 0);
     surgescript_vm_bind(vm, "Sound", "get_playing", fun_getplaying, 0);
 }
 
