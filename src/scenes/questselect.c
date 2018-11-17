@@ -327,7 +327,7 @@ void unload_quest_list()
 
     for(i=0; i<quest_count; i++) {
         font_destroy(quest_label[i]);
-        quest_data[i] = unload_quest(quest_data[i]);
+        quest_data[i] = quest_unload(quest_data[i]);
     }
 
     free(quest_label);
@@ -339,15 +339,14 @@ void unload_quest_list()
 /* callback that fills quest_data[] */
 int dirfill(const char *vpath, void *param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
-    quest_t* s = load_quest(fullpath);
+    quest_t* s = quest_load(vpath);
     int *c = (int*)param;
 
     if(s != NULL) {
         if(!s->is_hidden && s->level_count > 0)
             quest_data[ (*c)++ ] = s;
         else
-            s = unload_quest(s);
+            quest_unload(s);
     }
 
     return 0;
@@ -356,13 +355,12 @@ int dirfill(const char *vpath, void *param)
 /* callback that counts how many levels are installed */
 int dircount(const char *vpath, void *param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
-    quest_t* s = load_quest(fullpath);
+    quest_t* s = quest_load(vpath);
 
     if(s != NULL) {
         if(!s->is_hidden && s->level_count > 0)
             quest_count++;
-        s = unload_quest(s);
+        quest_unload(s);
     }
 
     return 0;
