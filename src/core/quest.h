@@ -38,7 +38,7 @@ struct image_t;
 typedef struct quest_t quest_t;
 struct quest_t {
     /* meta data */
-    char *file; /* file (absolute path) */
+    char *file; /* quest file */
     char *name; /* quest name */
     char *author; /* author */
     char *version; /* version string */
@@ -51,7 +51,7 @@ struct quest_t {
     char *level_path[QUEST_MAXLEVELS]; /* relative paths of the levels */
 };
 
-quest_t *load_quest(const char *abs_path);
-quest_t *unload_quest(quest_t *qst);
+quest_t *quest_load(const char *filepath); /* relative filepath */
+quest_t *quest_unload(quest_t *qst);
 
 #endif

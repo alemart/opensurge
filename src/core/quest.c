@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * quest.c - quest module
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,54 +28,50 @@
 #include "stringutil.h"
 #include "logfile.h"
 #include "quest.h"
+#include "assetfs.h"
 #include "nanoparser/nanoparser.h"
 
 
 
-/* private data */
-#define QUESTIMAGE_WIDTH 100
-#define QUESTIMAGE_HEIGHT 75
-
-
-/* private functions */
-static image_t *load_quest_image(const char *file);
+/* private stuff */
+static image_t *load_quest_image(const char *image_file);
 static int traverse_quest(const parsetree_statement_t* stmt, void *quest);
+static const char* DEFAULT_QUEST_IMAGE = "images/null.png";
+static const int QUEST_IMAGE_WIDTH = 100;
+static const int QUEST_IMAGE_HEIGHT = 75;
 
 
 
 /*
- * load_quest()
- * Loads and returns a quest from a file
- * (abs_path must be an ABSOLUTE path)
+ * quest_load()
+ * Loads the quest data from a file
  */
-quest_t *load_quest(const char *abs_path)
+quest_t *quest_load(const char *filepath)
 {
     quest_t *q = mallocx(sizeof *q);
     parsetree_program_t *prog;
+    const char* fullpath;
 
-    logfile_message("load_quest('%s')", abs_path);
+    logfile_message("Loading quest \"%s\"...", filepath);
+    fullpath = assetfs_fullpath(filepath);
 
     /* default values */
-    q->file = str_dup(abs_path);
+    q->file = str_dup(filepath);
     q->name = str_dup("null");
     q->author = str_dup("null");
     q->version = str_dup("null");
     q->description = str_dup("null");
-    q->image = NULL;
+    q->image = load_quest_image(NULL);
     q->level_count = 0;
     q->is_hidden = FALSE;
 
     /* reading the quest */
-    prog = nanoparser_construct_tree(abs_path);
+    prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(prog, (void*)q, traverse_quest);
     prog = nanoparser_deconstruct_tree(prog);
 
-    /* no image given? */
-    if(q->image == NULL)
-        q->image = load_quest_image(NULL);
-
     /* success! */
-    logfile_message("load_quest() ok!");
+    logfile_message("Quest \"%s\" has been loaded successfully!", q->name);
     return q;
 }
 
@@ -83,10 +79,10 @@ quest_t *load_quest(const char *abs_path)
 
 
 /*
- * unload_quest()
- * Unloads a quest
+ * quest_unload()
+ * Unload quest data
  */
-quest_t *unload_quest(quest_t *qst)
+quest_t *quest_unload(quest_t *qst)
 {
     int i;
 
@@ -110,19 +106,16 @@ quest_t *unload_quest(quest_t *qst)
 /* private functions */
 
 /* returns the quest image */
-image_t *load_quest_image(const char *file)
+image_t *load_quest_image(const char *image_file)
 {
-    char no_image[] = "images/null.png";
-    const char *s = file ? file : no_image;
+    const char *src = image_file ? image_file : DEFAULT_QUEST_IMAGE;
     image_t *ret, *img;
 
-    img = image_load(s);
-    if(img == NULL) {
-        s = no_image;
-        img = image_load(s);
-    }
+    img = image_load(src);
+    if(img == NULL)
+        img = image_load(DEFAULT_QUEST_IMAGE);
 
-    ret = image_create(QUESTIMAGE_WIDTH, QUESTIMAGE_HEIGHT);
+    ret = image_create(QUEST_IMAGE_WIDTH, QUEST_IMAGE_HEIGHT);
     image_blit(img, ret, 0, 0, 0, 0, image_width(ret), image_height(ret));
     image_unload(img);
 
@@ -176,7 +169,7 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         if(q->level_count < QUEST_MAXLEVELS)
             q->level_path[q->level_count++] = str_dup(id);
         else
-            fatal_error("Quest loader: q->level_count >= (QUEST_MAXLEVELS = %d)", QUEST_MAXLEVELS);
+            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
     }
 
     return 0;
