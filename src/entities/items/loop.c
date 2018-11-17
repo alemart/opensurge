@@ -115,7 +115,7 @@ void loop_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
 
     if(team_size != me->team_size) {
         me->team_size = team_size;
-        me->player_was_touching_me = realloc(me->player_was_touching_me, team_size * sizeof(int));
+        me->player_was_touching_me = reallocx(me->player_was_touching_me, team_size * sizeof(int));
         for(i=0; i<team_size; i++)
             me->player_was_touching_me[i] = actor_pixelperfect_collision(team[i]->actor, act);
     }
