@@ -102,7 +102,7 @@ void dnadoor_init(item_t *item)
     int anim_id = 0;
 
     item->always_active = FALSE;
-    item->obstacle = FALSE;
+    item->obstacle = TRUE;
     item->bring_to_back = FALSE;
     item->preserve = TRUE;
     item->actor = actor_create();
@@ -136,7 +136,7 @@ void dnadoor_update(item_t* item, player_t** team, int team_size, brick_list_t* 
     actor_t *act = item->actor;
     item_list_t *it;
     int block_anyway = FALSE;
-    int perfect_collision = FALSE;
+    int collision = FALSE;
     float dt = timer_get_delta();
     float a[4], b[4], diff=5;
     int i;
@@ -148,7 +148,7 @@ void dnadoor_update(item_t* item, player_t** team, int team_size, brick_list_t* 
         if(!player_is_dying(player) && hittest(player, item)) {
             if(str_icmp(player->name, me->authorized_player_name) == 0) {
                 item->obstacle = FALSE;
-                perfect_collision = actor_pixelperfect_collision(act, player->actor);
+                collision = actor_collision(act, player->actor);
             }
             else
                 block_anyway = TRUE;
@@ -160,11 +160,11 @@ void dnadoor_update(item_t* item, player_t** team, int team_size, brick_list_t* 
     /* cute effect */
     if(item->obstacle)
         act->alpha = min(1.0f, act->alpha + 2.0f * dt);
-    else if(perfect_collision)
+    else if(collision)
         act->alpha = max(0.4f, act->alpha - 2.0f * dt);
 
     /* cute effect propagation */
-    if(perfect_collision) {
+    if(collision) {
         a[0] = act->position.x - act->hot_spot.x - diff;
         a[1] = act->position.y - act->hot_spot.y - diff;
         a[2] = a[0] + image_width(actor_image(act)) + 2*diff;
