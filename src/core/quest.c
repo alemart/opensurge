@@ -152,7 +152,7 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
     }
     else if(str_icmp(id, "image") == 0) {
         nanoparser_expect_string(p, "Quest loader: quest image is expected");
-        if(q->image) image_destroy(q->image);
+        image_destroy(q->image);
         q->image = load_quest_image(nanoparser_get_string(p));
     }
     else if(str_icmp(id, "hidden") == 0) {
