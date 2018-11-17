@@ -48,16 +48,12 @@ struct enemy_list_t;
 struct sound_t;
 struct music_t;
 
-/* read-only data */
+/* level data */
 const char* level_name();
 int level_act();
 const char* level_version();
 const char* level_author();
 const char* level_license();
-
-/* load & save */
-void level_change(const char* path_to_lev_file); /* change the stage. Useful if the .lev is active. */
-int level_persist(); /* persists (saves) the current level */
 
 /* players */
 void level_change_player(struct player_t *new_player); /* character switching */
@@ -66,7 +62,7 @@ struct player_t* level_player(); /* active player */
 struct player_t* level_get_player_by_name(const char* name);
 struct player_t* level_get_player_by_id(int id);
 
-/* entities */
+/* level objects */
 struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip);
 struct item_t* level_create_item(int id, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
@@ -86,21 +82,21 @@ int level_inside_screen(int x, int y, int w, int h);
 /* editor */
 int level_editmode();
 
-/* dialogbox */
-void level_call_dialogbox(const char *title, const char *message);
-void level_hide_dialogbox();
-
 /* music */
 void level_override_music(struct sound_t *sample);
 struct music_t* level_music();
 
 /* management */
+void level_change(const char* path_to_lev_file); /* change the level */
+int level_persist(); /* persists (saves) the current level */
 void level_clear(struct actor_t *end_sign);
 int level_has_been_cleared();
 void level_jump_to_next_stage();
 void level_ask_to_leave();
 void level_pause();
 void level_restart();
+void level_abort();
+void level_push_quest(const char* path_to_qst_file);
 
 /* water */
 int level_waterlevel();
@@ -111,9 +107,7 @@ void level_set_watercolor(uint32 color);
 /* misc */
 v2d_t level_size();
 float level_gravity();
-
-/* quest stack (scripting) */
-void level_push_quest(const char* path_to_qst_file);
-void level_pop_quest();
+void level_call_dialogbox(const char *title, const char *message);
+void level_hide_dialogbox();
 
 #endif

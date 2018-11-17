@@ -1506,14 +1506,14 @@ int level_persist()
 
 /*
  * level_change()
- * Changes the stage. Useful if the .lev
- * is active
+ * Changes the level.
+ * Make sure that 'level' is the current scene.
  */
 void level_change(const char* path_to_lev_file)
 {
     str_cpy(file, path_to_lev_file, sizeof(file));
     must_load_another_level = TRUE;
-    logfile_message("changing level: opening '%s'...", path_to_lev_file);
+    logfile_message("Changing level to '%s'...", path_to_lev_file);
 }
 
 
@@ -1750,6 +1750,7 @@ void level_set_spawn_point(v2d_t newpos)
 /*
  * level_clear()
  * Call this when the player clears this level
+ * If end_sign is NULL, the camera will be focused on the active player
  */
 void level_clear(actor_t *end_sign)
 {
@@ -1765,8 +1766,13 @@ void level_clear(actor_t *end_sign)
     /* block music */
     block_music = TRUE;
 
+    /* set the focus */
+    if(end_sign != NULL)
+        level_set_camera_focus(end_sign);
+    else
+        level_set_camera_focus(player->actor);
+
     /* success! */
-    level_set_camera_focus(end_sign);
     level_hide_dialogbox();
     level_cleared = TRUE;
 }
@@ -1908,14 +1914,10 @@ void level_push_quest(const char* path_to_qst_file)
 }
 
 /*
- * level_pop_quest()
+ * level_abort()
  * Pops this level, and also pops the current quest (if any)
- * The scene stack is this:
- *      [bottom] ??..?? ---> current quest --> current level [top]
- * After this command, it will be:
- *      [bottom] ??..?? [top]
  */
-void level_pop_quest()
+void level_abort()
 {
     /* schedules a quest pop */
     quest_abort();

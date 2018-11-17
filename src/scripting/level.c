@@ -19,9 +19,11 @@
  */
 
 #include <surgescript.h>
+#include <string.h>
 #include "scripting.h"
 #include "../core/util.h"
 #include "../core/audio.h"
+#include "../core/stringutil.h"
 #include "../scenes/level.h"
 #include "../entities/player.h"
 
@@ -31,6 +33,21 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getact(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t IDX_ADDR = 1; /* must be the last address */
 static void update_music(surgescript_object_t* object);
@@ -46,7 +63,22 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Level", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Level", "get_name", fun_getname, 0);
+    surgescript_vm_bind(vm, "Level", "get_act", fun_getact, 0);
+    surgescript_vm_bind(vm, "Level", "get_version", fun_getversion, 0);
+    surgescript_vm_bind(vm, "Level", "get_author", fun_getauthor, 0);
+    surgescript_vm_bind(vm, "Level", "get_license", fun_getlicense, 0);
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
+    surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
+    surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
+    surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
+    surgescript_vm_bind(vm, "Level", "clear", fun_clear, 0);
+    surgescript_vm_bind(vm, "Level", "restart", fun_restart, 0);
+    surgescript_vm_bind(vm, "Level", "quit", fun_quit, 0);
+    surgescript_vm_bind(vm, "Level", "abort", fun_abort, 0);
+    surgescript_vm_bind(vm, "Level", "pause", fun_pause, 0);
+    surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
+    surgescript_vm_bind(vm, "Level", "loadNext", fun_loadnext, 0);
 }
 
 /* constructor */
@@ -136,6 +168,117 @@ surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     return surgescript_var_clone(surgescript_heap_at(heap, MUSIC_ADDR));
+}
+
+/* the y-coordinate of the water, in pixels */
+surgescript_var_t* fun_getwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), level_waterlevel());
+}
+
+/* set the y-coordinate of the water, in pixels */
+surgescript_var_t* fun_setwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int waterlevel = (int)surgescript_var_get_number(param[0]);
+    level_set_waterlevel(waterlevel);
+    return NULL;
+}
+
+/* will be true if the level has been cleared (will show the cleared animation) */
+surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_bool(surgescript_var_create(), level_has_been_cleared());
+}
+
+/* the name of the level */
+surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), level_name());
+}
+
+/* the act of the level, like 1, 2, 3... */
+surgescript_var_t* fun_getact(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), level_act());
+}
+
+/* the version of the level, defined in the .lev file */
+surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), level_version());
+}
+
+/* the author of the level, defined in the .lev file */
+surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), level_author());
+}
+
+/* the license of the level, defined in the .lev file */
+surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), level_license());
+}
+
+/* clears the level (will show the level cleared animation) */
+surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_clear(NULL);
+    return NULL;
+}
+
+/* restarts the current level */
+surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_restart();
+    return NULL;
+}
+
+/* prompts the user to see if he/she wants to quit the level */
+surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_ask_to_leave();
+    return NULL;
+}
+
+/* quit the level, without prompting the user */
+surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_abort();
+    return NULL;
+}
+
+/* pauses the game. Note: the game will not be paused if one of the players is dying */
+surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_pause();
+    return NULL;
+}
+
+/* loads the specified level.
+   You may also pass the path to a quest; then the specified quest will be loaded, and
+   when it's completed, the system will make you go back to the level you were before. */
+surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    char* filepath = surgescript_var_get_string(param[0], manager);
+    const char* ext = strrchr(filepath, '.');
+    bool is_quest = (ext != NULL && str_icmp(ext, ".qst") == 0);
+
+    if(!is_quest)
+        level_change(filepath);
+    else
+        level_push_quest(filepath);
+
+    ssfree(filepath);
+    return NULL;
+}
+
+/* loads the next level in the quest */
+surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_jump_to_next_stage();
+    return NULL;
 }
 
 

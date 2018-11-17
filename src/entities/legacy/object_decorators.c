@@ -5735,7 +5735,7 @@ void pushquest(objectdecorator_quest_t *q)
 
 void popquest(objectdecorator_quest_t *q)
 {
-    level_pop_quest();
+    level_abort();
 }
 
 /* objectdecorator_resetglobals_t class */
