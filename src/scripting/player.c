@@ -64,6 +64,8 @@ static surgescript_var_t* fun_getunderwater(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getxsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -153,6 +155,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1);
     surgescript_vm_bind(vm, "Player", "get_frozen", fun_getfrozen, 0);
     surgescript_vm_bind(vm, "Player", "set_frozen", fun_setfrozen, 1);
+    surgescript_vm_bind(vm, "Player", "get_layer", fun_getlayer, 0);
+    surgescript_vm_bind(vm, "Player", "set_layer", fun_setlayer, 1);
     surgescript_vm_bind(vm, "Player", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Player", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Player", "get_gsp", fun_getgsp, 0);
@@ -729,6 +733,44 @@ surgescript_var_t* fun_setfrozen(surgescript_object_t* object, const surgescript
     if(player != NULL) {
         bool frozen = surgescript_var_get_bool(param[0]);
         player_set_frozen(player, frozen);
+    }
+    return NULL;
+}
+
+/* the current layer of the player. One of the following: "green", "yellow", "default" */
+surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    const char* layer = "default";
+    if(player != NULL) {
+        switch(player_layer(player)) {
+            case BRL_GREEN:
+                layer = "green";
+                break;
+            case BRL_YELLOW:
+                layer = "yellow";
+                break;
+            default:
+                break;
+        }
+    }
+    return surgescript_var_set_string(surgescript_var_create(), layer);
+}
+
+/* set the current layer of the player to one of the following: "green", "yellow", "default" */
+surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        char* layer = surgescript_var_get_string(param[0], manager);
+        if(strcmp(layer, "green") == 0)
+            player_set_layer(player, BRL_GREEN);
+        else if(strcmp(layer, "yellow") == 0)
+            player_set_layer(player, BRL_YELLOW);
+        else
+            player_set_layer(player, BRL_DEFAULT);
+        ssfree(layer);
     }
     return NULL;
 }
