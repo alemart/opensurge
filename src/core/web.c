@@ -66,6 +66,7 @@ bool launch_url(const char *url)
     if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "ftp://", 6) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
 #if defined(_WIN32)
         ShellExecute(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
+        (void)file_exists;
 #elif defined(__APPLE__) && defined(__MACH__)
         char *safe_cmd = mallocx(sizeof(char) * (strlen(safe_url) + 32));
         sprintf(safe_cmd, "open \"%s\"", safe_url);
