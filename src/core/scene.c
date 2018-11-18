@@ -69,19 +69,17 @@ void scenestack_release()
  */
 void scenestack_push(scene_t *scn, void *data)
 {
-    int i;
-
-    logfile_message("scenestack_push()", scn);
+    logfile_message("scenestack_push()");
     if(scenestack_size >= SCENESTACK_CAPACITY) {
         fatal_error("scenestack_push(): stack overflow");
         return;
     }
-    for(i = 0; i < scenestack_size; i++) {
+    /*for(int i = 0; i < scenestack_size; i++) { // FIXME
         if(scenestack[i] == scn) {
             fatal_error("scenestack_push(): duplicate scene");
             return;
         }
-    }
+    }*/
     scenestack[scenestack_size++] = scn;
     scn->init(data);
     logfile_message("scenestack_push(): success");
