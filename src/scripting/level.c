@@ -48,7 +48,7 @@ static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t IDX_ADDR = 1; /* must be the last address */
 static void update_music(surgescript_object_t* object);
@@ -80,7 +80,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "abort", fun_abort, 0);
     surgescript_vm_bind(vm, "Level", "pause", fun_pause, 0);
     surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
-    surgescript_vm_bind(vm, "Level", "loadNext", fun_loadnext, 0);
+    surgescript_vm_bind(vm, "Level", "finish", fun_finish, 0);
 }
 
 /* constructor */
@@ -283,7 +283,7 @@ surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_
 }
 
 /* loads the next level in the quest */
-surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     level_jump_to_next_stage();
     return NULL;
