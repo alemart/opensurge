@@ -82,8 +82,8 @@ static void play_sounds(player_t *p);
 static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
 static obstacle_t* item2obstacle(const item_t *item);
 static obstacle_t* object2obstacle(const object_t *object);
-static int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer);
-static float ang_diff(float alpha, float beta);
+static inline int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer);
+static inline float ang_diff(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static int fixangle(int degrees, int threshold);
 
