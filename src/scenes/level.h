@@ -49,6 +49,7 @@ struct sound_t;
 struct music_t;
 
 /* level data */
+const char* level_file();
 const char* level_name();
 int level_act();
 const char* level_version();

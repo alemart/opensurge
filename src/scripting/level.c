@@ -41,6 +41,7 @@ static surgescript_var_t* fun_getact(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -68,6 +69,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_version", fun_getversion, 0);
     surgescript_vm_bind(vm, "Level", "get_author", fun_getauthor, 0);
     surgescript_vm_bind(vm, "Level", "get_license", fun_getlicense, 0);
+    surgescript_vm_bind(vm, "Level", "get_file", fun_getfile, 0);
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
@@ -218,6 +220,12 @@ surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript
 surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_string(surgescript_var_create(), level_license());
+}
+
+/* the relative filepath of the level */
+surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), level_file());
 }
 
 /* clears the level (will show the level cleared animation) */

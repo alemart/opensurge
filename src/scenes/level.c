@@ -424,7 +424,7 @@ void level_load(const char *filepath)
 
     /* default values */
     str_cpy(file, filepath, sizeof(file)); /* it's the relative filepath we want */
-    strcpy(name, "Untitled");
+    str_cpy(name, "Untitled", sizeof(name));
     strcpy(musicfile, "");
     strcpy(theme, "");
     strcpy(bgtheme, "");
@@ -1438,6 +1438,15 @@ void level_create_particle(image_t *image, v2d_t position, v2d_t speed, int dest
     }
     else
         particle_add(image, position, speed, destroy_on_brick);
+}
+
+/*
+ * level_file()
+ * Returns the relative path of the level file
+ */
+const char* level_file()
+{
+    return file;
 }
 
 /*
