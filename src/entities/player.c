@@ -968,6 +968,24 @@ void player_set_frozen(player_t* player, int frozen)
 }
 
 /*
+ * player_layer()
+ * The current layer of the player (loop system)
+ */
+bricklayer_t player_layer(const player_t* player)
+{
+    return player->layer;
+}
+
+/*
+ * player_set_layer()
+ * Sets the current layer of the player (useful for the loop system)
+ */
+void player_set_layer(player_t* player, bricklayer_t layer)
+{
+    player->layer = layer;
+}
+
+/*
  * player_is_visible()
  * Is the player visible? (should it be rendered?)
  */

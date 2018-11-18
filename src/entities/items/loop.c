@@ -124,7 +124,7 @@ void loop_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
         player_t *player = team[i];
         if(actor_pixelperfect_collision(player->actor, act)) {
             if(!me->player_was_touching_me[i]) {
-                player->layer = me->layer_to_be_activated;
+                player_set_layer(player, me->layer_to_be_activated);
                 me->player_was_touching_me[i] = TRUE;
             }
         }

@@ -25,6 +25,7 @@
 #define _PLAYER_H
 
 #include "../core/v2d.h"
+#include "brick.h"
 
 /* constants */
 #define PLAYER_INITIAL_LIVES        5    /* initial lives */
@@ -84,7 +85,7 @@ struct player_t {
     float speedshoes_timer;
 
     /* loop system */
-    int layer;
+    bricklayer_t layer;
 
     /* private */
     struct physicsactor_t *pa;
@@ -134,6 +135,8 @@ playershield_t player_shield_type(const player_t* player);
 void player_grant_shield(player_t* player, playershield_t shield_type);
 int player_is_frozen(const player_t* player);
 void player_set_frozen(player_t* player, int frozen);
+bricklayer_t player_layer(const player_t* player);
+void player_set_layer(player_t* player, bricklayer_t layer);
 int player_is_visible(const player_t* player);
 void player_set_visible(player_t* player, int visible);
 
