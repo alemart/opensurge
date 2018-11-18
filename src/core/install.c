@@ -188,7 +188,8 @@ int foreach_installed_game(int (*callback)(const char*,void*), void* data)
         return value;
     }
 #else
-    if(0 != callback(GAME_UNIXNAME, data))
+    const char* gameid = GAME_UNIXNAME;
+    if(!is_valid_id(gameid) || 0 != callback(gameid, data))
         return 0;
     return 1;
 #endif
