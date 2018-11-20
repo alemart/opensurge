@@ -44,6 +44,7 @@ object "SurgeEngine"
     audio = spawn("AudioPackage");
     prefs = spawn("Prefs");
     transformFactory = spawn("TransformFactory");
+    vectorFactory = spawn("VectorFactory");
     video = spawn("Video");
 
     fun get_Actor()
@@ -119,6 +120,11 @@ object "SurgeEngine"
     fun get_Transform()
     {
         return transformFactory;
+    }
+
+    fun get_Vector2()
+    {
+        return vectorFactory;
     }
 
     fun Transform()
@@ -296,6 +302,59 @@ object "TransformFactory"
     {
         t2 = caller.child("Transform2D");
         return t2 != null ? t2 : caller.spawn("Transform2D");
+    }
+    
+    fun destroy() { }
+}
+
+object "VectorFactory"
+{
+    temp = System.child("__Temp");
+    up = spawn("Vector2");
+    right = spawn("Vector2");
+    down = spawn("Vector2");
+    left = spawn("Vector2");
+    zero = spawn("Vector2");
+
+    fun call(x, y)
+    {
+        v = temp.spawn("Vector2");
+        v.__init(x, y);
+        return v;
+    }
+
+    fun constructor()
+    {
+        up.__init(0, -1);
+        right.__init(1, 0);
+        down.__init(0, 1);
+        left.__init(-1, 0);
+        zero.__init(0, 0);
+    }
+
+    fun get_up()
+    {
+        return up;
+    }
+
+    fun get_right()
+    {
+        return right;
+    }
+
+    fun get_down()
+    {
+        return down;
+    }
+
+    fun get_left()
+    {
+        return left;
+    }
+
+    fun get_zero()
+    {
+        return zero;
     }
     
     fun destroy() { }
