@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 #include <math.h>
 #include "../core/util.h"
 
@@ -44,6 +45,7 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_getx(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gety(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_plus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_minus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_dot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -59,6 +61,7 @@ static inline const surgescript_vector2_t* safe_get_vector(const surgescript_obj
 static inline surgescript_objecthandle_t spawn_vector(surgescript_objectmanager_t* manager, double x, double y);
 static const surgescript_vector2_t ZERO = { 0.0, 0.0 };
 static const double RAD2DEG = 57.2957795131;
+static const double _PI = 3.14159265359;
 
 /*
  * scripting_register_vector2()
@@ -72,11 +75,12 @@ void scripting_register_vector2(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Vector2", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Vector2", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Vector2", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Vector2", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Vector2", "destroy2", fun_destroy, 0);
     surgescript_vm_bind(vm, "Vector2", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "Vector2", "get_x", fun_getx, 0);
     surgescript_vm_bind(vm, "Vector2", "get_y", fun_gety, 0);
     surgescript_vm_bind(vm, "Vector2", "get_length", fun_getlength, 0);
+    surgescript_vm_bind(vm, "Vector2", "get_angle", fun_getangle, 0);
     surgescript_vm_bind(vm, "Vector2", "plus", fun_plus, 1);
     surgescript_vm_bind(vm, "Vector2", "minus", fun_minus, 1);
     surgescript_vm_bind(vm, "Vector2", "dot", fun_dot, 1);
@@ -89,13 +93,37 @@ void scripting_register_vector2(surgescript_vm_t* vm)
 }
 
 /*
- * scripting_vector2_of()
- * Returns a built-in v2d_t associated to the given SurgeScript Vector2 object
+ * scripting_vector2_safe_read()
+ * Reads the contents of a SurgeScript Vector2 object
+ * If the given object is not a Vector2 object, then (0,0) is returned
  */
-v2d_t scripting_vector2_of(const surgescript_object_t* object)
+void scripting_vector2_safe_read(const surgescript_object_t* object, double* x, double* y)
 {
     const surgescript_vector2_t* v = safe_get_vector(object);
-    return v2d_new(v->x, v->y);
+    *x = v->x;
+    *y = v->y;
+}
+
+/*
+ * scripting_vector2_read()
+ * Reads the contents of a SurgeScript Vector2 object
+ */
+void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y)
+{
+    const surgescript_vector2_t* v = get_vector(object);
+    *x = v->x;
+    *y = v->y;
+}
+
+/*
+ * scripting_vector2_update()
+ * Updates the contents of a SurgeScript Vector2 object (useful for engine functions / performance)
+ */
+void scripting_vector2_update(surgescript_object_t* object, double x, double y)
+{
+    surgescript_vector2_t* v = get_vector(object);
+    v->x = x;
+    v->y = y;
 }
 
 
@@ -104,7 +132,7 @@ v2d_t scripting_vector2_of(const surgescript_object_t* object)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_object_set_active(object, false);
+    //surgescript_object_set_active(object, false); /* FIXME: GC error (spawn on state) */
     return NULL;
 }
 
@@ -177,6 +205,16 @@ surgescript_var_t* fun_getlength(surgescript_object_t* object, const surgescript
     const surgescript_vector2_t* me = get_vector(object);
     double length = sqrt(me->x * me->x + me->y * me->y);
     return surgescript_var_set_number(surgescript_var_create(), length);
+}
+
+/* get the angle, in degrees, between the vector and the positive x-axis as in polar coordinates */
+surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_vector2_t* me = get_vector(object);
+    double degrees = 0.0;
+    errno = 0;
+    degrees = (atan2(me->y, me->x) + _PI) * RAD2DEG;
+    return surgescript_var_set_number(surgescript_var_create(), (errno == 0) ? degrees : 0.0);
 }
 
 /* '+' operator */
@@ -302,7 +340,7 @@ surgescript_vector2_t* get_vector(const surgescript_object_t* object)
     return (surgescript_vector2_t*)(surgescript_object_userdata(object));
 }
 
-/* gets the Vector2 structure IF the object is a Vector2 */
+/* returns the Vector2 structure if the object is a Vector2, or ZERO otherwise */
 const surgescript_vector2_t* safe_get_vector(const surgescript_object_t* object)
 {
     if(strcmp(surgescript_object_name(object), "Vector2") == 0)

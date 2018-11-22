@@ -510,10 +510,12 @@ object "CollisionManager"
     {
         // check for collisions
         while(collider = colliders.pop()) {
-            foreach(c in colliders) {
-                if(collider.collidesWith(c)) {
-                    collider.__notify(c);
-                    c.__notify(collider);
+            length = colliders.length;
+            for(i = 0; i < length; i++) {
+                otherCollider = colliders[i];
+                if(collider.collidesWith(otherCollider)) {
+                    collider.__notify(otherCollider);
+                    otherCollider.__notify(collider);
                 }
             }
         }

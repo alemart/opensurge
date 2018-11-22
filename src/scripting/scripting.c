@@ -64,6 +64,7 @@ extern void scripting_register_sensor(surgescript_vm_t* vm);
 extern void scripting_register_sound(surgescript_vm_t* vm);
 extern void scripting_register_text(surgescript_vm_t* vm);
 extern void scripting_register_time(surgescript_vm_t* vm);
+extern void scripting_register_transform(surgescript_vm_t* vm);
 extern void scripting_register_vector2(surgescript_vm_t* vm);
 extern void scripting_register_video(surgescript_vm_t* vm);
 extern void scripting_register_web(surgescript_vm_t* vm);
@@ -103,6 +104,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_sound(vm);
     scripting_register_text(vm);
     scripting_register_time(vm);
+    scripting_register_transform(vm);
     scripting_register_vector2(vm);
     scripting_register_video(vm);
     scripting_register_web(vm);
