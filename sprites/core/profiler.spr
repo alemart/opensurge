@@ -1,0 +1,21 @@
+// -----------------------------------------------------------------------------
+// File: profiler.spr
+// Description: sprite script of the SurgeScript profiler
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Profiler"
+{
+    source_file     "images/core.png"
+    source_rect     64 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
