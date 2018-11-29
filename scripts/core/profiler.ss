@@ -23,12 +23,12 @@ object "Profiler" is "entity", "awake"
         stats.refresh();
 
         // update stats
-        uiDescendants.updateUI("Density tree", stats.descendants, sortByDesc.with(stats.descendants));
         uiTimes.updateUI("Time spent (ms)", stats.timespent, sortByDesc.with(stats.timespent));
         uiStats.updateUI("Profiler", stats.generic, null);
-        uiStats.transform.position = Vector2(320, 0);
-        uiTimes.transform.position = Vector2(160, 0);
-        uiDescendants.transform.position = Vector2(0, 0);
+        uiDescendants.updateUI("Density tree", stats.descendants, sortByDesc.with(stats.descendants));
+        uiTimes.transform.position = Vector2(0, 0);
+        uiStats.transform.position = Vector2(160, 0);
+        uiDescendants.transform.position = Vector2(320, 0);
 
         // done
         state = "wait";
@@ -50,6 +50,8 @@ object "Profiler.Stats"
     lastRefresh = 0;
     avgObjectCount = 0;
     prevObjectCount = 0;
+    maxDepth = 32;
+    minDensity = 5;
 
     state "main"
     {
@@ -121,28 +123,30 @@ object "Profiler.Stats"
 
     fun computeDescendants(obj, tree, id, depth)
     {
-        if(depth > 16) return 0; // limit size
+        if(depth > maxDepth) return 0; // limit size
         if(obj.__name == "Profiler") return 0;
-        key = hash(obj, id);
+        key = obj.__name; //hash(obj, id);
         descendantCount = 1;
         count = obj.childCount;
         for(i = 0; i < count; i++)
             descendantCount += computeDescendants(obj.child(i), tree, ++id, 1+depth);
-        tree[key] = descendantCount;
+        if(descendantCount >= minDensity)
+            tree[key] = Math.max(tree[key], descendantCount);
         return descendantCount;
     }
 
     fun computeTimespent(obj, tree, id, depth)
     {
-        if(depth > 16) return 0; // limit size
+        if(depth > maxDepth) return 0; // limit size
         if(obj.__name == "Profiler") return 0;
-        key = hash(obj, id);
+        key = obj.__name; //hash(obj, id);
         totalTime = 0;
         count = obj.childCount;
         for(i = 0; i < count; i++)
             totalTime += computeTimespent(obj.child(i), tree, ++id, 1+depth);
-        tree[key] = 1000 * this.__timespent + totalTime;
-        return tree[key];
+        ms = 1000 * this.__timespent;
+        tree[key] += ms + totalTime;
+        return ms + totalTime;
     }
 
     fun hash(obj, uid)
