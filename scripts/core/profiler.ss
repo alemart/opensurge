@@ -8,7 +8,6 @@ using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.UI.Text;
 
-//object "Application" { profiler = spawn("Profiler"); state "main" {} }
 object "Profiler" is "entity", "awake"
 {
     uiStats = spawn("Profiler.UI.Tree");
@@ -24,11 +23,10 @@ object "Profiler" is "entity", "awake"
         stats.refresh();
 
         // update stats
-        uiDescendants.updateUI("Hierarchy", stats.descendants, sortByDesc.with(stats.descendants));
-        uiTimes.updateUI("Time spent", stats.timespent, sortByDesc.with(stats.timespent));
+        uiDescendants.updateUI("Density tree", stats.descendants, sortByDesc.with(stats.descendants));
+        uiTimes.updateUI("Time spent (ms)", stats.timespent, sortByDesc.with(stats.timespent));
         uiStats.updateUI("Profiler", stats.generic, null);
-        Console.print(System.objectCount);
-        uiStats.transform.position = Vector2(311, 0);
+        uiStats.transform.position = Vector2(320, 0);
         uiTimes.transform.position = Vector2(160, 0);
         uiDescendants.transform.position = Vector2(0, 0);
 
@@ -40,13 +38,6 @@ object "Profiler" is "entity", "awake"
     {
         if(timeout(refreshTime))
             state = "main";
-    }
-
-    fun constructor()
-    {
-        uiStats.transform.position = Vector2(311, 0);
-        uiTimes.transform.position = Vector2(160, 0);
-        uiDescendants.transform.position = Vector2(0, 0);
     }
 }
 
@@ -70,7 +61,6 @@ object "Profiler.Stats"
         generic = {};
         descendants = {};
         timespent = {};
-        Console.print(System.__timespent);
     }
 
     fun get_descendants()
@@ -116,9 +106,9 @@ object "Profiler.Stats"
         stats["Spawn rate"] = formatDecimal(spawnRate) + "%";
         prevObjectCount = objectCount;
 
-        // profiler overhead
-        objectDelta = System.objectCount - objectCount;
-        stats["Overhead"] = objectDelta + " (" + Math.floor(100 * objectDelta / objectCount) + "%)";
+        // profiler object overhead
+        //objectDelta = System.objectCount - objectCount;
+        //stats["Overhead"] = objectDelta + " (" + Math.floor(100 * objectDelta / objectCount) + "%)";
 
         // fps rate
         fps = frames / timeInterval;
@@ -131,7 +121,7 @@ object "Profiler.Stats"
 
     fun computeDescendants(obj, tree, id, depth)
     {
-        //if(depth > 10) return 0; // stack overflow?
+        if(depth > 16) return 0; // limit size
         if(obj.__name == "Profiler") return 0;
         key = hash(obj, id);
         descendantCount = 1;
@@ -144,20 +134,19 @@ object "Profiler.Stats"
 
     fun computeTimespent(obj, tree, id, depth)
     {
-        //if(depth > 10) return 0; // stack overflow?
+        if(depth > 16) return 0; // limit size
         if(obj.__name == "Profiler") return 0;
         key = hash(obj, id);
-        totalTime = 0;;
+        totalTime = 0;
         count = obj.childCount;
         for(i = 0; i < count; i++)
             totalTime += computeTimespent(obj.child(i), tree, ++id, 1+depth);
-        tree[key] = this.__timespent + totalTime;
+        tree[key] = 1000 * this.__timespent + totalTime;
         return tree[key];
     }
 
     fun hash(obj, uid)
     {
-        //return String.concat(obj.__name, uid.toString());//obj.__name + "/" + uid;
         return obj.__name + "/" + uid;
     }
 
@@ -188,7 +177,6 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
         for(i = 0; i < length; i++) {
             key = keys[i];
             str += key + ": " + tree[key] + "\n";
-            //Console.print(key + ": " + tree[key]);
         }
         text.text = str;
         keys.destroy();
