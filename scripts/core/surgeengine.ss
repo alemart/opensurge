@@ -545,7 +545,7 @@ object "CollisionBox" is "collider"
     worldX = 0;
     worldY = 0;
     //center = Vector2.zero;
-    transform = SurgeEngine.Transform();
+    transform = Transform();
     collisionFlags = 0;
     entity = null;
     prevCollisions = [];
@@ -742,7 +742,7 @@ object "CollisionBall" is "collider"
     worldX = 0;
     worldY = 0;
     center = Vector2.zero;
-    transform = SurgeEngine.Transform();
+    transform = Transform();
     collisionFlags = 0;
     entity = null;
     prevCollisions = [];
