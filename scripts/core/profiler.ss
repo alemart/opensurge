@@ -7,11 +7,12 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.UI.Text;
+using SurgeEngine.Level;
 
 object "Profiler" is "entity", "awake"
 {
     uiStats = spawn("Profiler.UI.Tree");
-    uiDescendants = spawn("Profiler.UI.Tree");
+    uiDensity = spawn("Profiler.UI.Tree");
     uiTimes = spawn("Profiler.UI.Tree");
     stats = spawn("Profiler.Stats");
     refreshTime = 2.0;
@@ -25,10 +26,10 @@ object "Profiler" is "entity", "awake"
         // update stats
         uiTimes.updateUI("Time spent (ms)", stats.timespent, sortByDesc.with(stats.timespent));
         uiStats.updateUI("Profiler", stats.generic, null);
-        uiDescendants.updateUI("Density tree", stats.descendants, sortByDesc.with(stats.descendants));
+        uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
         uiTimes.transform.position = Vector2(0, 0);
         uiStats.transform.position = Vector2(160, 0);
-        uiDescendants.transform.position = Vector2(320, 0);
+        uiDensity.transform.position = Vector2(320, 0);
 
         // done
         state = "wait";
@@ -44,30 +45,27 @@ object "Profiler" is "entity", "awake"
 object "Profiler.Stats"
 {
     generic = {};
-    descendants = {};
+    density = {};
     timespent = {};
     frames = 0;
     lastRefresh = 0;
-    avgObjectCount = 0;
     prevObjectCount = 0;
-    maxDepth = 32;
-    minDensity = 5;
+    maxDepth = 3;
 
     state "main"
     {
         frames++;
-        avgObjectCount += System.objectCount;
         generic.destroy();
-        descendants.destroy();
+        density.destroy();
         timespent.destroy();
         generic = {};
-        descendants = {};
+        density = {};
         timespent = {};
     }
 
-    fun get_descendants()
+    fun get_density()
     {
-        return descendants;
+        return density;
     }
 
     fun get_timespent()
@@ -85,11 +83,11 @@ object "Profiler.Stats"
         timeInterval = Math.max(Time.time - lastRefresh, 0.0001);
         objectCount = System.objectCount;
 
-        descendants.destroy();
+        density.destroy();
         timespent.destroy();
         generic.destroy();
-        computeDescendants(System, descendants = {}, 1, 1);
-        computeTimespent(System, timespent = {}, 1, 1);
+        computeDensity(Level, density = {}, 1, 1);
+        computeTimespent(Level, timespent = {}, 1, 1);
         computeGeneric(generic = {}, objectCount, timeInterval);
 
         lastRefresh = Time.time;
@@ -98,10 +96,7 @@ object "Profiler.Stats"
     fun computeGeneric(stats, objectCount, timeInterval)
     {
         // object count
-        avgObjectCount = avgObjectCount / frames;
         stats["Objects"] = objectCount;
-        //stats["Objects"] = Math.round(avgObjectCount);
-        avgObjectCount = 0;
 
         // spawn rate
         spawnRate = 100 * (objectCount - prevObjectCount) / prevObjectCount;
@@ -109,8 +104,8 @@ object "Profiler.Stats"
         prevObjectCount = objectCount;
 
         // profiler object overhead
-        //objectDelta = System.objectCount - objectCount;
-        //stats["Overhead"] = objectDelta + " (" + Math.floor(100 * objectDelta / objectCount) + "%)";
+        objectDelta = System.objectCount - objectCount;
+        stats["Overhead"] = objectDelta + " (" + Math.floor(100 * objectDelta / objectCount) + "%)";
 
         // fps rate
         fps = frames / timeInterval;
@@ -121,32 +116,37 @@ object "Profiler.Stats"
         stats["Time"] = Math.floor(Time.time) + "s";
     }
 
-    fun computeDescendants(obj, tree, id, depth)
+    fun computeDensity(obj, tree, id, depth)
     {
-        if(depth > maxDepth) return 0; // limit size
         if(obj.__name == "Profiler") return 0;
         key = obj.__name; //hash(obj, id);
-        descendantCount = 1;
+        result = 1;
         count = obj.childCount;
-        for(i = 0; i < count; i++)
-            descendantCount += computeDescendants(obj.child(i), tree, ++id, 1+depth);
-        if(descendantCount >= minDensity)
-            tree[key] = Math.max(tree[key], descendantCount);
-        return descendantCount;
+        for(i = 0; i < count; i++) {
+            child = obj.child(i);
+            if(child.__active)
+                result += computeDensity(child, tree, ++id, 1+depth);
+        }
+        if(depth <= maxDepth)
+            tree[key] = Math.max(tree[key], result);
+        return result;
     }
 
     fun computeTimespent(obj, tree, id, depth)
     {
-        if(depth > maxDepth) return 0; // limit size
         if(obj.__name == "Profiler") return 0;
         key = obj.__name; //hash(obj, id);
         totalTime = 0;
         count = obj.childCount;
-        for(i = 0; i < count; i++)
-            totalTime += computeTimespent(obj.child(i), tree, ++id, 1+depth);
-        ms = 1000 * this.__timespent;
-        tree[key] += ms + totalTime;
-        return ms + totalTime;
+        for(i = 0; i < count; i++) {
+            child = obj.child(i);
+            if(child.__active)
+                totalTime += computeTimespent(child, tree, ++id, 1+depth);
+        }
+        totalTime += 1000 * this.__timespent;
+        if(depth <= maxDepth)
+            tree[key] += totalTime;
+        return totalTime;
     }
 
     fun hash(obj, uid)
