@@ -278,7 +278,7 @@ SET(
   src/scripting/sound.c
   src/scripting/text.c
   src/scripting/time.c
-  src/scripting/transform2d.c
+  src/scripting/transform.c
   src/scripting/vector2.c
   src/scripting/video.c
   src/scripting/web.c

@@ -31,6 +31,9 @@
 //                      DO NOT MODIFY THE CODE BELOW!!!
 //                   unless you know what you are doing ;)
 //
+using SurgeEngine;
+using SurgeEngine.Vector2;
+using SurgeEngine.Transform;
 
 @Plugin
 object "SurgeEngine"
@@ -448,7 +451,7 @@ object "PlayerManager"
     // the number of players
     fun get_count()
     {
-        return this.__childCount;
+        return this.childCount;
     }
 
     // __error()
@@ -478,7 +481,7 @@ object "PlayerManager"
     {
         id = Number(playerID);
         if(id.isInteger()) {
-            if(id >= 0 && id < this.__childCount) {
+            if(id >= 0 && id < this.childCount) {
                 if(children == null)
                     children = this.__children;
                 return children[id];
@@ -541,7 +544,8 @@ object "CollisionBox" is "collider"
     height = 1;
     worldX = 0;
     worldY = 0;
-    transform = spawn("Transform2D");
+    //center = Vector2.zero;
+    transform = SurgeEngine.Transform();
     collisionFlags = 0;
     entity = null;
     prevCollisions = [];
@@ -648,8 +652,8 @@ object "CollisionBox" is "collider"
             ;
         }
         else if(collider.__type == 2) {
-            cx = collider.centerX;
-            cy = collider.centerY;
+            cx = collider.center.x;
+            cy = collider.center.y;
             r = collider.radius;
             dx = cx - Math.clamp(cx, this.left, this.right);
             dy = cy - Math.clamp(cy, this.top, this.bottom);
@@ -671,8 +675,7 @@ object "CollisionBox" is "collider"
     // Note: the anchor will be aligned to the hot_spot of the entity
     fun setAnchor(x, y)
     {
-        transform.xpos = (0.5 - x) * width;
-        transform.ypos = (0.5 - y) * height;
+        transform.position = Vector2((0.5 - x) * width, (0.5 - y) * height);
         __updateWorldCoordinates();
     }
 
@@ -723,8 +726,9 @@ object "CollisionBox" is "collider"
     // cache the world coordinates (save some time)
     fun __updateWorldCoordinates()
     {
-        worldX = transform.worldX;
-        worldY = transform.worldY;
+        center = transform.position;
+        worldX = center.x;
+        worldY = center.y;
     }
 }
 
@@ -737,7 +741,8 @@ object "CollisionBall" is "collider"
     radius = 1;
     worldX = 0;
     worldY = 0;
-    transform = spawn("Transform2D");
+    center = Vector2.zero;
+    transform = SurgeEngine.Transform();
     collisionFlags = 0;
     entity = null;
     prevCollisions = [];
@@ -757,18 +762,11 @@ object "CollisionBall" is "collider"
         manager.__notify(this);
     }
 
-    // get_centerX()
-    // The x-coordinate of the center of the collider
-    fun get_centerX()
+    // get_center()
+    // The center of the collider
+    fun get_center()
     {
-        return worldX;
-    }
-
-    // get_centerY()
-    // The y-coordinate of the center of the collider
-    fun get_centerY()
-    {
-        return worldY;
+        return center;
     }
 
     // get_radius()
@@ -823,8 +821,8 @@ object "CollisionBall" is "collider"
             return dx * dx + dy * dy < radius * radius;
         }
         else if(collider.__type == 2) {
-            dx = worldX - collider.centerX;
-            dy = worldY - collider.centerY;
+            dx = worldX - collider.center.x;
+            dy = worldY - collider.center.y;
             rr = radius + collider.radius;
             return dx * dx + dy * dy < rr * rr;
         }
@@ -845,8 +843,7 @@ object "CollisionBall" is "collider"
     fun setAnchor(x, y)
     {
         size = radius * 2;
-        transform.xpos = (0.5 - x) * size;
-        transform.ypos = (0.5 - y) * size;
+        transform.position = Vector2((0.5 - x) * size, (0.5 - y) * size);
         __updateWorldCoordinates();
     }
 
@@ -890,7 +887,8 @@ object "CollisionBall" is "collider"
     // cache the world coordinates (save some time)
     fun __updateWorldCoordinates()
     {
-        worldX = transform.worldX;
-        worldY = transform.worldY;
+        center = transform.position;
+        worldX = center.x;
+        worldY = center.y;
     }
 }

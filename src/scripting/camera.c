@@ -22,13 +22,15 @@
 #include "../entities/camera.h"
 
 /* private */
+static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_setxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_setypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static const surgescript_heapptr_t POSITION_ADDR = 0;
+extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
+extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /*
  * scripting_register_camera()
@@ -37,12 +39,25 @@ static surgescript_var_t* fun_setypos(surgescript_object_t* object, const surges
 void scripting_register_camera(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "Camera", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Camera", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Camera", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Camera", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Camera", "get_xpos", fun_getxpos, 0);
-    surgescript_vm_bind(vm, "Camera", "get_ypos", fun_getypos, 0);
-    surgescript_vm_bind(vm, "Camera", "set_xpos", fun_setxpos, 1);
-    surgescript_vm_bind(vm, "Camera", "set_ypos", fun_setypos, 1);
+    surgescript_vm_bind(vm, "Camera", "get_position", fun_getposition, 0);
+    surgescript_vm_bind(vm, "Camera", "set_position", fun_setposition, 1);
+}
+
+/* constructor */
+surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t me = surgescript_object_handle(object);
+    surgescript_objecthandle_t position = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+
+    ssassert(POSITION_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, POSITION_ADDR), position);
+
+    return NULL;
 }
 
 /* main state */
@@ -66,30 +81,30 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     return NULL;
 }
 
-/* get camera xpos */
-surgescript_var_t* fun_getxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* get camera position, in world coordinates */
+surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return surgescript_var_set_number(surgescript_var_create(), camera_get_position().x);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, POSITION_ADDR));
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    v2d_t cam = camera_get_position();
+
+    scripting_vector2_update(v2, cam.x, cam.y);
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
-/* get camera ypos */
-surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* set camera position, in world coordinates */
+surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return surgescript_var_set_number(surgescript_var_create(), camera_get_position().y);
-}
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    double x = 0.0, y = 0.0;
 
-/* set camera xpos */
-surgescript_var_t* fun_setxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    float value = surgescript_var_get_number(param[0]);
-    camera_set_position(v2d_new(value, camera_get_position().y));
-    return NULL;
-}
+    scripting_vector2_read(v2, &x, &y);
+    camera_set_position(v2d_new(x, y));
 
-/* set camera ypos */
-surgescript_var_t* fun_setypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    float value = surgescript_var_get_number(param[0]);
-    camera_set_position(v2d_new(camera_get_position().x, value));
     return NULL;
 }

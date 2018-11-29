@@ -30,12 +30,13 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static uint64_t hash(const char *str);
+static const surgescript_heapptr_t POSITION_ADDR = 0;
+extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /* button hashes: "left", "right", "middle" */
 #define BUTTON_LEFT         0x17C9A03B0
@@ -53,8 +54,7 @@ void scripting_register_mouse(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Mouse", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Mouse", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Mouse", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "Mouse", "get_xpos", fun_getxpos, 0);
-    surgescript_vm_bind(vm, "Mouse", "get_ypos", fun_getypos, 0);
+    surgescript_vm_bind(vm, "Mouse", "get_position", fun_getposition, 0);
     surgescript_vm_bind(vm, "Mouse", "buttonDown", fun_buttondown, 1);
     surgescript_vm_bind(vm, "Mouse", "buttonPressed", fun_buttonpressed, 1);
     surgescript_vm_bind(vm, "Mouse", "buttonReleased", fun_buttonreleased, 1);
@@ -72,8 +72,16 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t me = surgescript_object_handle(object);
+    surgescript_objecthandle_t position = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     input_t* input = input_create_mouse();
+
+    ssassert(POSITION_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, POSITION_ADDR), position);
     surgescript_object_set_userdata(object, input);
+
     return NULL;
 }
 
@@ -99,20 +107,21 @@ surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_v
     return NULL;
 }
 
-/* get x-position (in screen coordinates) */
-surgescript_var_t* fun_getxpos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* get cursor position (in screen coordinates) */
+surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    input_t* input = (input_t*)surgescript_object_userdata(object);
-    float mul = video_get_screen_size().x / video_get_window_size().x;
-    return surgescript_var_set_number(surgescript_var_create(), floor(input_get_xy((inputmouse_t*)input).x * mul));
-}
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, POSITION_ADDR));
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    v2d_t screen_size = video_get_screen_size();
+    v2d_t window_size = video_get_window_size();
+    v2d_t m = v2d_new(screen_size.x / window_size.x, screen_size.y / window_size.y);
+    v2d_t pos = input_get_xy((inputmouse_t*)surgescript_object_userdata(object));
 
-/* get y-position (in screen coordinates) */
-surgescript_var_t* fun_getypos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    input_t* input = (input_t*)surgescript_object_userdata(object);
-    float mul = video_get_screen_size().y / video_get_window_size().y;
-    return surgescript_var_set_number(surgescript_var_create(), floor(input_get_xy((inputmouse_t*)input).y * mul));
+    scripting_vector2_update(v2, floor(pos.x * m.x), floor(pos.y * m.y));
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
 /* buttonDown(button): is the given button being held down?

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <float.h>
 #include <math.h>
 #include "../core/util.h"
 
@@ -49,19 +50,21 @@ static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_plus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_minus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_dot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_scaledby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_translatedby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_rotatedby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_scaledby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_normalized(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_directionto(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_distanceto(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_squareddistanceto(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_projectedon(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_tostring(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static inline surgescript_vector2_t* get_vector(const surgescript_object_t* object);
 static inline const surgescript_vector2_t* safe_get_vector(const surgescript_object_t* object);
 static inline surgescript_objecthandle_t spawn_vector(surgescript_objectmanager_t* manager, double x, double y);
 static const surgescript_vector2_t ZERO = { 0.0, 0.0 };
 static const double RAD2DEG = 57.2957795131;
-static const double _PI = 3.14159265359;
+static const double EPS = DBL_EPSILON;
 
 /*
  * scripting_register_vector2()
@@ -75,7 +78,7 @@ void scripting_register_vector2(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Vector2", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Vector2", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Vector2", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Vector2", "destroy2", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Vector2", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Vector2", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "Vector2", "get_x", fun_getx, 0);
     surgescript_vm_bind(vm, "Vector2", "get_y", fun_gety, 0);
@@ -84,20 +87,22 @@ void scripting_register_vector2(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Vector2", "plus", fun_plus, 1);
     surgescript_vm_bind(vm, "Vector2", "minus", fun_minus, 1);
     surgescript_vm_bind(vm, "Vector2", "dot", fun_dot, 1);
-    surgescript_vm_bind(vm, "Vector2", "scaledBy", fun_scaledby, 1);
+    surgescript_vm_bind(vm, "Vector2", "translatedBy", fun_translatedby, 2);
     surgescript_vm_bind(vm, "Vector2", "rotatedBy", fun_rotatedby, 1);
+    surgescript_vm_bind(vm, "Vector2", "scaledBy", fun_scaledby, 1);
     surgescript_vm_bind(vm, "Vector2", "normalized", fun_normalized, 0);
     surgescript_vm_bind(vm, "Vector2", "directionTo", fun_directionto, 1);
     surgescript_vm_bind(vm, "Vector2", "distanceTo", fun_distanceto, 1);
     surgescript_vm_bind(vm, "Vector2", "squaredDistanceTo", fun_squareddistanceto, 1);
+    surgescript_vm_bind(vm, "Vector2", "projectedOn", fun_projectedon, 1);
 }
 
 /*
- * scripting_vector2_safe_read()
+ * scripting_vector2_read()
  * Reads the contents of a SurgeScript Vector2 object
  * If the given object is not a Vector2 object, then (0,0) is returned
  */
-void scripting_vector2_safe_read(const surgescript_object_t* object, double* x, double* y)
+void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y)
 {
     const surgescript_vector2_t* v = safe_get_vector(object);
     *x = v->x;
@@ -105,19 +110,9 @@ void scripting_vector2_safe_read(const surgescript_object_t* object, double* x, 
 }
 
 /*
- * scripting_vector2_read()
- * Reads the contents of a SurgeScript Vector2 object
- */
-void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y)
-{
-    const surgescript_vector2_t* v = get_vector(object);
-    *x = v->x;
-    *y = v->y;
-}
-
-/*
  * scripting_vector2_update()
  * Updates the contents of a SurgeScript Vector2 object (useful for engine functions / performance)
+ * WARNING: Be sure that the referenced object is a Vector2. This function won't check it.
  */
 void scripting_vector2_update(surgescript_object_t* object, double x, double y)
 {
@@ -213,7 +208,9 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
     const surgescript_vector2_t* me = get_vector(object);
     double degrees = 0.0;
     errno = 0;
-    degrees = (atan2(me->y, me->x) + _PI) * RAD2DEG;
+    degrees = atan2(me->y, me->x)  * RAD2DEG;
+    if(degrees < 0.0)
+        degrees += 360.0f;
     return surgescript_var_set_number(surgescript_var_create(), (errno == 0) ? degrees : 0.0);
 }
 
@@ -266,6 +263,20 @@ surgescript_var_t* fun_scaledby(surgescript_object_t* object, const surgescript_
     return surgescript_var_set_objecthandle(surgescript_var_create(), result);
 }
 
+/* returns the vector translated by (dx,dy) */
+surgescript_var_t* fun_translatedby(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_vector2_t* me = get_vector(object);
+    double dx = surgescript_var_get_number(param[0]);
+    double dy = surgescript_var_get_number(param[1]);
+    surgescript_objecthandle_t result = spawn_vector(manager,
+        me->x + dx,
+        me->y + dy
+    );
+    return surgescript_var_set_objecthandle(surgescript_var_create(), result);
+}
+
 /* returns the vector rotated by a number of degrees */
 surgescript_var_t* fun_rotatedby(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -286,6 +297,7 @@ surgescript_var_t* fun_normalized(surgescript_object_t* object, const surgescrip
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_vector2_t* me = get_vector(object);
     double length = sqrt(me->x * me->x + me->y * me->y);
+    length = max(length, EPS);
     surgescript_objecthandle_t result = spawn_vector(manager,
         me->x / length,
         me->y / length
@@ -302,6 +314,7 @@ surgescript_var_t* fun_directionto(surgescript_object_t* object, const surgescri
     double dx = other->x - me->x;
     double dy = other->y - me->y;
     double length = sqrt(dx * dx + dy * dy);
+    length = max(length, EPS);
     surgescript_objecthandle_t result = spawn_vector(manager,
         dx / length,
         dy / length
@@ -329,6 +342,22 @@ surgescript_var_t* fun_squareddistanceto(surgescript_object_t* object, const sur
     double dx = me->x - other->x;
     double dy = me->y - other->y;
     return surgescript_var_set_number(surgescript_var_create(), dx * dx + dy * dy);
+}
+
+/* the vector projected onto another */
+surgescript_var_t* fun_projectedon(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_vector2_t* me = get_vector(object);
+    const surgescript_vector2_t* other = safe_get_vector(surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(param[0])));
+    double dot = me->x * other->x + me->y * other->y;
+    double length = other->x * other->x + other->y * other->y;
+    length = max(length, EPS);
+    surgescript_objecthandle_t result = spawn_vector(manager,
+        (dot / length) * other->x,
+        (dot / length) * other->y
+    );
+    return surgescript_var_set_objecthandle(surgescript_var_create(), result);
 }
 
 

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * transform2d.c - scripting system: Transform2D
+ * transform.c - scripting system: Transform2D
  * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -59,7 +59,6 @@ static const char* ONCHANGE = "onTransformChange"; /* fun onTransformChange(tran
 static const surgescript_heapptr_t WORLDPOSITION_ADDR = 0;
 static const surgescript_heapptr_t LOCALPOSITION_ADDR = 1;
 static const surgescript_heapptr_t LOCALSCALE_ADDR = 2;
-extern void scripting_vector2_safe_read(const surgescript_object_t* object, double* x, double* y);
 extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
 extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
@@ -159,7 +158,7 @@ surgescript_var_t* fun_translate(surgescript_object_t* object, const surgescript
     surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
     double x = 0.0, y = 0.0;
 
-    scripting_vector2_safe_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
     surgescript_transform_translate2d(transform, x, y);
 
     notify_change(object);
@@ -221,7 +220,7 @@ surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
     double x = 0.0, y = 0.0;
 
-    scripting_vector2_safe_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
     setworldposition2d(target(object), x, y);
 
     notify_change(object);
@@ -262,7 +261,7 @@ surgescript_var_t* fun_setlocalposition(surgescript_object_t* object, const surg
     surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
     double x = 0.0, y = 0.0;
 
-    scripting_vector2_safe_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
     transform->position.x = x;
     transform->position.y = y;
 
@@ -305,7 +304,7 @@ surgescript_var_t* fun_setlocalscale(surgescript_object_t* object, const surgesc
     surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
     double x = 0.0, y = 0.0;
 
-    scripting_vector2_safe_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
     transform->scale.x = x;
     transform->scale.y = y;
 

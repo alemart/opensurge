@@ -197,6 +197,7 @@ static void reconfigure_players_input_devices();
 static void render_water();
 
 /* Scripting */
+#define TRANSFORM_MAX_DEPTH 64
 static surgescript_object_t* cached_level_ssobject = NULL;
 static void update_ssobjects();
 static void update_ssobject(surgescript_object_t* object, void* param);
@@ -2389,58 +2390,57 @@ void render_powerups()
 
 
 /* scripting */
-#define TRANSFORM_MAX_DEPTH 32
-struct ssaux_t { int origin_top; v2d_t origin[TRANSFORM_MAX_DEPTH]; }; /* auxiliary stack for surgescript update */
 
 /* update surgescript */
 void update_ssobjects()
 {
     surgescript_vm_t* vm = surgescript_vm();
     if(surgescript_vm_is_active(vm)) {
-        struct ssaux_t ssaux = { .origin_top = 0, .origin = { [0] = v2d_new(0, 0) } };
-        surgescript_vm_update_ex(vm, &ssaux, update_ssobject, late_update_ssobject);
+        v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
+        surgescript_vm_update_ex(vm, origin, update_ssobject, late_update_ssobject);
     }
 }
 
 void update_ssobject(surgescript_object_t* object, void* param)
 {
     /* initialization */
-    struct ssaux_t* ssaux = (struct ssaux_t*)param;
-    if(ssaux->origin_top >= TRANSFORM_MAX_DEPTH) {
-        fatal_error("TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
-        return;
-    }
+    int depth = surgescript_object_depth(object);
+    if(depth < TRANSFORM_MAX_DEPTH) {
+        /* get the transform origin */
+        v2d_t origin = ((v2d_t*)param)[depth];
 
-    /* get the transform origin */
-    v2d_t origin = ssaux->origin[ssaux->origin_top];
-    if(surgescript_object_transform_changed(object)) {
-        surgescript_transform_t transform;
-        surgescript_object_peek_transform(object, &transform);
-        surgescript_transform_apply2d(&transform, &origin.x, &origin.y);
-        if(++ssaux->origin_top < TRANSFORM_MAX_DEPTH)
-            ssaux->origin[ssaux->origin_top] = origin;
-    }
+        /* are we dealing with a level entity? */
+        if(surgescript_object_has_tag(object, "entity")) {
+            surgescript_transform_t transform;
+            surgescript_object_peek_transform(object, &transform);
+            surgescript_transform_apply2d(&transform, &origin.x, &origin.y);
 
-    /* are we dealing with a level entity? */
-    if(surgescript_object_has_tag(object, "entity")) {
-        if(
-            level_inside_screen(origin.x, origin.y, 1, 1) ||
-            surgescript_object_has_tag(object, "awake") ||
-            surgescript_object_has_tag(object, "detached")
-        )
-            surgescript_object_set_active(object, true);
-        else if(!surgescript_object_has_tag(object, "disposable"))
-            surgescript_object_set_active(object, false);
-        else
-            surgescript_object_kill(object);
+            /* check whether the entity should be updated, disposed or what */
+            if(
+                level_inside_screen(origin.x, origin.y, 1, 1) ||
+                surgescript_object_has_tag(object, "awake") ||
+                surgescript_object_has_tag(object, "detached")
+            )
+                surgescript_object_set_active(object, true);
+            else if(!surgescript_object_has_tag(object, "disposable"))
+                surgescript_object_set_active(object, false);
+            else
+                surgescript_object_kill(object);
+        }
+
+        /* set the transform origin for the next depth level */
+        if(1 + depth < TRANSFORM_MAX_DEPTH)
+            ((v2d_t*)param)[1 + depth] = origin;
     }
+    else
+        fatal_error("Scripting Error: TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
 }
 
 void late_update_ssobject(surgescript_object_t* object, void* param)
 {
-    struct ssaux_t* ssaux = (struct ssaux_t*)param;
-    if(surgescript_object_transform_changed(object))
-        --ssaux->origin_top;
+    //struct ssaux_t* ssaux = (struct ssaux_t*)param;
+    //if(surgescript_object_transform_changed(object)
+        //--ssaux->origin_top;
     if(!surgescript_object_is_active(object) && surgescript_object_has_tag(object, "entity"))
         surgescript_object_set_active(object, true); /* the object may reawaken in the future */
 }
