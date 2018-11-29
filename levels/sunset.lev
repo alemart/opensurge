@@ -19,7 +19,7 @@ startup ".default_startup"
 players "Surge" "Neon"
 waterlevel 10944
 
-// dialog regions (xpos ypos width height title message)
+// dialogs
 dialogbox 320 9000 512 1024 "$SUNSETPAR_MESSAGE_10" "$SUNSETPAR_MESSAGE_20"
 
 // bricks
