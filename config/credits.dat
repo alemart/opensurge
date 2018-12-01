@@ -96,13 +96,9 @@ Joao Victor
 --- images/title.png
 --- images/goal.png
 --- images/heroes.png
---- images/happyaprilfoolsday.png
---- images/gimacian_and_the_ring.png
 --- images/easterneon.png
 --- images/heroes.png
 --- images/levels/1/boss.png
---- images/levels/1/_example1.png
---- images/levels/1/_example2.png
 --- images/levels/1/fish.png
 --- images/levels/1/mosquito.png
 --- images/levels/1/nonsolids0.png
@@ -110,7 +106,7 @@ Joao Victor
 --- images/levels/1/nonsolids2.png
 --- images/levels/1/wolfredo.png
 --- images/extra/big_waterfall.png
---- images/extra/surge_sigh.png
+--- images/extra/surge_talk.png
 --- images/extra/neon_talk.png
 --- images/extra/neon_talk_big.png
 --- images/extra/surge_artwork.png
@@ -126,8 +122,7 @@ Colin Beard
 --- images/even_more_shields.png
 --- images/more_shields.png
 --- images/pause.png
---- images/template.png
---- images/scepter.png
+--- images/eraser.png
 
 svgmovement & Colin Beard
 --- images/levels/1/springfling.png
@@ -147,7 +142,6 @@ Brian Zablocky (Celdecea)
 --- images/blue_door.png
 --- images/bumper.png
 --- images/checkpoint_orb.png
---- images/desert1.png
 --- images/grassland_template.png
 --- images/item_boxes.png (battery icons by svgmovement)
 --- images/lady_bugsy.png
@@ -159,25 +153,17 @@ Brian Zablocky (Celdecea) & Alex V. (squirrel)
 --- images/spring_pads.png
 
 Alexandre Martins
---- images/arrow_right.png
---- images/blackscreen.png
---- images/cutscene.png
---- images/editorbg.png
+--- images/core.png
 --- images/fade_effect.png
 --- images/hud.png
 --- images/intro.png
 --- images/loop.png
---- images/none.png
 --- images/null.png
---- images/quest_tutorial.png
 --- images/special.png
 --- images/stars.png
---- images/whitebg.png
---- images/rain.png
 --- images/squarebg2.png
 --- images/pixel.png
 --- images/impact.png
---- images/shoutpanic.png
 --- fonts/upper.png
 --- images/dialogbox.png
 
@@ -223,6 +209,9 @@ Constantin (supertuxkart-team)
 Daniel Cook (lostgarden.com)
 --- images/explosion.png
 
+qubodup (opengameart.org)
+--- images/cursor.png
+
 Christopher Martinus & Colin Beard
 --- images/dnadoors.png
 
@@ -230,12 +219,7 @@ Colin Beard & Mateus Reis
 --- images/animalprison.png
 
 Alexandre Martins & Brian Zablocky
---- images/quest_extra.png
---- images/sir_bugsy.png
 --- images/squarebg.png
-
-Alexandre Martins & Colin Beard & qubodup (opengameart.org)
---- images/editor.png
 
 Alexandre Martins & Gaivota
 --- images/rings.png
@@ -248,18 +232,8 @@ Joao Victor & Alexandre Martins
 --- images/title.png
 --- images/dialogs.png
 
-Redshrike (opengameart.org)
---- images/redshrike_tiles1.png
---- images/redshrike_tiles2.png
---- images/introplat.png
---- images/awop.png
-
 treeform (opengameart.org)
 --- images/violet.png
-
-LFA (opengameart.org)
---- images/fog.jpg
---- images/fog2.jpg (edit by Alexandre)
 
 Andrew Pociask
 --- images/levels/1/mountains.png
@@ -268,8 +242,8 @@ lainz
 --- src/misc/icon128.png
 --- src/misc/icon256.png
 
-Allegro Demo Game, by Shawn Hargreaves
---- images/allegro.png (gift-ware)
+Shawn Hargreaves
+--- images/allegro.png (giftware)
 
 creative commons (creativecommons.org)
 --- images/creativecommons.png
@@ -292,7 +266,6 @@ Di Rodrigues
 --- musics/gameover.ogg
 --- musics/waterworks.ogg
 --- musics/goal.ogg
---- musics/calm.ogg
 --- musics/drowning.ogg
 --- musics/we_will_never_fight_alone_1.ogg
 --- musics/we_will_never_fight_alone_2.ogg
@@ -301,23 +274,18 @@ Colin Beard & Joepotato28
 --- musics/miniboss.ogg
 
 Colin Beard
---- musics/puzzling.ogg
 --- musics/boss.ogg
---- musics/gimacianstheme.ogg
+--- musics/gimacian.ogg
 
 Mateus Reis
 --- musics/citychill.ogg
---- musics/intro_cutscene/intro[1-9].ogg
 
 Johan Brodd
---- musics/theme_song.ogg (public domain)
+--- musics/theme.ogg (public domain)
 --- musics/template.ogg (public domain)
 --- musics/silence.ogg (public domain)
---- musics/intro_cutscene/Jobromedia-Intro.ogg (public domain)
+--- musics/intro.ogg (public domain)
 --- musics/sharp.ogg (public domain)
-
-Philippe Groarke (opengameart.org)
---- musics/darkambiance.ogg (cut from 1:45 to 2:45)
 
 <color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_SAMPLES</color>
 

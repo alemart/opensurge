@@ -5,7 +5,7 @@
 // ------------------------------------------------------------
 
 // header
-name "Sunset Paradise"
+name "Demo Level"
 author "Alexandre Martins"
 license "CC-BY 3.0"
 version "1.0"
@@ -14,7 +14,7 @@ act 1
 theme "themes/template.brk"
 bgtheme "themes/sunset.bg"
 spawn_point 184 9976
-music "musics/sunshine.ogg"
+music "musics/template.ogg"
 startup ".default_startup"
 players "Surge" "Neon"
 waterlevel 10944

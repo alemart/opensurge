@@ -17,7 +17,7 @@ sprite SD_LOGO
 
 sprite SD_SURGEENTRANCE
 {
-    source_file     images/extra/surge_entrance.png
+    source_file     images/surge_entrance.png
     source_rect     0 0 414 276
     frame_size      138 138
     hot_spot        0 0

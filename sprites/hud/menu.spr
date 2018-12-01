@@ -3,8 +3,8 @@
 // GUI Arrow
 sprite SD_GUIARROW
 {
-    source_file     images/arrow_right.png
-    source_rect     0 0 7 8
+    source_file     images/core.png
+    source_rect     236 12 7 8
     frame_size      7 8
     hot_spot        -5 -2
 

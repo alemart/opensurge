@@ -4,29 +4,23 @@
 sprite SD_FADEEFFECT
 {
     source_file     "images/fade_effect.png"
-    source_rect     0 0 426 240
+    source_rect     0 0 426 480
     frame_size      426 240
     hot_spot        0 0
 
+    // black
     animation 0
     {
-        repeat      FALSE
+        repeat      TRUE
         fps         8
         data        0
     }
-}
 
-sprite SD_FADEEFFECT_WHITE
-{
-    source_file     "images/fade_effect_white.png"
-    source_rect     0 0 426 240
-    frame_size      426 240
-    hot_spot        0 0
-
-    animation 0
+    // white
+    animation 1
     {
-        repeat      FALSE
+        repeat      TRUE
         fps         8
-        data        0
+        data        1
     }
 }

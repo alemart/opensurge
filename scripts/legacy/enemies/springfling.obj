@@ -53,7 +53,7 @@ object "Springfling"
     {
         let "$volume = 1 - abs(player_xpos() - xpos()) / 640"
         let "$pan = (xpos() - player_xpos()) / 160"
-        play_sample "samples/levels/1/springfling.wav" "$volume" "$pan"
+        play_sample "samples/springfling.wav" "$volume" "$pan"
         change_state "in the air"
     }
 

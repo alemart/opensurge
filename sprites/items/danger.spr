@@ -5,7 +5,7 @@
 sprite SD_DANGER
 {
     source_file     images/special.png
-    source_rect     128 16 32 16
+    source_rect     0 0 32 16
     frame_size      32 16
     hot_spot        0 0
 
@@ -22,7 +22,7 @@ sprite SD_DANGER
 sprite SD_VERTICALDANGER
 {
     source_file     images/special.png
-    source_rect     160 16 16 32
+    source_rect     32 16 16 32
     frame_size      16 32
     hot_spot        0 0
 
@@ -39,7 +39,7 @@ sprite SD_VERTICALDANGER
 sprite SD_FIREDANGER
 {
     source_file     images/special.png
-    source_rect     128 32 32 16
+    source_rect     0 16 32 16
     frame_size      32 16
     hot_spot        0 0
 
@@ -56,7 +56,7 @@ sprite SD_FIREDANGER
 sprite SD_VERTICALFIREDANGER
 {
     source_file     images/special.png
-    source_rect     176 16 16 32
+    source_rect     48 0 16 32
     frame_size      16 32
     hot_spot        0 0
 

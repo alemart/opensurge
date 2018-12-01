@@ -17,7 +17,6 @@
 #include "switch_character.inc"
 #include "pause.inc"
 #include "quit.inc"
-#include "camera.inc"
 #include "water.inc"
 
 // ----------------------------------------------
@@ -37,7 +36,6 @@ object ".default_startup"
         create_child ".default_startup.opening_animation"
         create_child ".default_startup.level_cleared"
         create_child ".default_startup.switch_character"
-        create_child ".default_startup.camera"
         create_child ".default_startup.water"
 
         change_state "cooldown"

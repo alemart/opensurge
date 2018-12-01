@@ -125,7 +125,7 @@ sprite SD_HUDHEAD
 // Black screen
 sprite SD_HUDBLACKSCREEN
 {
-    source_file     images/blackscreen.png
+    source_file     images/fade_effect.png
     source_rect     0 0 426 240
     frame_size      426 240
     hot_spot        0 0

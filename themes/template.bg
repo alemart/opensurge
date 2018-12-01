@@ -2,8 +2,8 @@
 // Open Surge Engine
 // http://opensurge2d.org
 //
-// File:   themes/template.bg
-// Desc:   template background
+// File:   themes/options.bg
+// Desc:   this background is displayed on the options screen
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
@@ -11,15 +11,15 @@ background
 {
     initial_position    0 0
     scroll_speed        0 0
-    behavior            DEFAULT
+    behavior            LINEAR -30 -30
     repeat_x            TRUE
     repeat_y            TRUE
 
     sprite
     {
-        source_file     images/editorbg.png
-        source_rect     0 0 640 480
-        frame_size      640 480
+        source_file     images/squarebg.png
+        source_rect     0 0 48 48
+        frame_size      48 48
 
         animation
         {
@@ -29,3 +29,4 @@ background
         }
     }
 }
+

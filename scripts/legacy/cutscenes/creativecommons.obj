@@ -11,7 +11,7 @@ object ".creativecommons_startup"
     {
         create_child .cutscene_skipper[pedantic]
         set_zindex 0
-        set_animation SD_FADEEFFECT_WHITE 0
+        set_animation SD_FADEEFFECT 1
 
         let $_fade_in=1
         let $_fade_duration=0.5
@@ -128,7 +128,7 @@ object ".creativecommons_startup.logo.aux"
 
     state main
     {
-        set_animation SD_FADEEFFECT_WHITE 0
+        set_animation SD_FADEEFFECT 1
         set_zindex 1.0
         change_state loop
     }

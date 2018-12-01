@@ -18,7 +18,7 @@ music "musics/template.ogg"
 startup ".default_startup"
 players "Surge" "Neon" "Charge"
 
-// dialog regions (xpos ypos width height title message)
+// dialogs
 
 // bricks
 brick 0 0 10000

@@ -14,5 +14,5 @@ bgtheme "themes/menus/levelselect.bg"
 spawn_point 0 0
 startup ".title_screen"
 players "none"
-music "musics/we_will_never_fight_alone_2.ogg"
+music "musics/theme.ogg"
 readonly
