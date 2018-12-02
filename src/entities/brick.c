@@ -287,8 +287,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                         }
                     }
 
-                    /* bye bye, brick! */
-                    sound_play( soundfactory_get("break") );
+                    /* destroy brick */
+                    sound_play(SFX_BREAK);
                     brk->state = BRS_DEAD;
                 }
             }
@@ -333,8 +333,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     }
                 }
 
-                /* bye, brick! :] */
-                sound_play( soundfactory_get("break") );
+                /* destroy brick */
+                sound_play(SFX_BREAK);
                 brk->state = BRS_DEAD;
             }
             break;

@@ -192,14 +192,14 @@ void editorpal_update()
     if(input_button_pressed(cursor_input, IB_FIRE1)) {
         if(0 <= (selected_item = item_at(cursor_position))) {
             scenestack_pop();
-            return;       
+            return;
         }
     }
 
     /* go back */
     if(input_button_pressed(pal_input, IB_FIRE1)) {
         selected_item = NO_ITEM;
-        sound_play( soundfactory_get("return") );
+        sound_play(SFX_BACK);
         scenestack_pop();
         return;
     }

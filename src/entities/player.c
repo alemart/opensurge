@@ -449,7 +449,7 @@ void player_hit(player_t *player, float direction)
 
         if(player->shield_type != SH_NONE) {
             player->shield_type = SH_NONE;
-            sound_play( soundfactory_get("damaged") );
+            sound_play(SFX_DAMAGE);
         }
         else if(!player->disable_collectible_loss) {
             float a = 101.25f, spd = 240.0f;
@@ -468,10 +468,10 @@ void player_hit(player_t *player, float direction)
             }
 
             player_set_collectibles(0);
-            sound_play( soundfactory_get("collectible loss") );
+            sound_play(SFX_GETHIT);
         }
         else
-            sound_play( soundfactory_get("damaged") );
+            sound_play(SFX_DAMAGE);
     }
     else
         player_kill(player);
@@ -572,7 +572,7 @@ void player_drown(player_t *player)
         player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_drown(player->pa);
-        sound_play( soundfactory_get("drown") );
+        sound_play(SFX_DROWN);
     }
 }
 
@@ -588,7 +588,7 @@ void player_breathe(player_t *player)
         player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_breathe(player->pa);
-        sound_play( soundfactory_get("breathing") );
+        sound_play(SFX_BREATHE);
     }
 }
 
@@ -620,7 +620,7 @@ void player_enter_water(player_t *player)
         physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) / 2.0f);
         physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) / 2.0f);
 
-        sound_play( soundfactory_get("enter water") );
+        sound_play(SFX_WATERIN);
         player->underwater_timer = 0.0f;
         player->underwater = TRUE;
     }
@@ -651,7 +651,7 @@ void player_leave_water(player_t *player)
         physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) * 2.0f);
         physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) * 2.0f);
 
-        sound_play( soundfactory_get("leave water") );
+        sound_play(SFX_WATEROUT);
         player->underwater = FALSE;
     }
 }
@@ -1035,7 +1035,7 @@ void player_set_collectibles(int c)
     if(c/100 > hundred_collectibles) {
         hundred_collectibles = c/100;
         player_set_lives( player_get_lives()+1 );
-        level_override_music( soundfactory_get("1up") );
+        level_override_music(SFX_1UP);
     }
 }
 

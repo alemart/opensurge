@@ -67,7 +67,7 @@ object ".title_screen"
 
     state "done"
     {
-        play_sample "select"
+        play_sample "samples/select.wav"
 
         change_child_state message @freeze
 

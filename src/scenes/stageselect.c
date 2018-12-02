@@ -206,22 +206,22 @@ void stageselect_update()
             if(!fadefx_is_fading()) {
                 if(input_button_pressed(input, IB_DOWN)) {
                     option = (option+1) % stage_count;
-                    sound_play( soundfactory_get("choose") );
+                    sound_play(SFX_CHOOSE);
                 }
                 if(input_button_pressed(input, IB_UP)) {
                     option = (((option-1) % stage_count) + stage_count) % stage_count;
-                    sound_play( soundfactory_get("choose") );
+                    sound_play(SFX_CHOOSE);
                 }
                 if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                     logfile_message("Loading level \"%s\" (\"%s\")...", stage_data[option]->name, stage_data[option]->filepath);
                     if(level_to_be_loaded != NULL)
                         free(level_to_be_loaded);
                     level_to_be_loaded = str_dup(stage_data[option]->filepath);
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     state = STAGESTATE_PLAY;
                 }
                 if(input_button_pressed(input, IB_FIRE4)) {
-                    sound_play( soundfactory_get("return") );
+                    sound_play(SFX_BACK);
                     state = STAGESTATE_QUIT;
                 }
             }

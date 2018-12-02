@@ -24,7 +24,7 @@
 #include "../core/assetfs.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
-#include "../core/soundfactory.h"
+#include "../core/audio.h"
 
 HASHTABLE_GENERATE_CODE(character_t)
 static hashtable_character_t* characters;
@@ -456,27 +456,27 @@ int traverse_samples(const parsetree_statement_t *stmt, void *character)
     if(str_icmp(identifier, "jump") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples: jump");
-        c->sample.jump = soundfactory_get(nanoparser_get_string(p1));
+        c->sample.jump = sound_load(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "roll") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples: roll");
-        c->sample.roll = soundfactory_get(nanoparser_get_string(p1));
+        c->sample.roll = sound_load(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "brake") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples: brake");
-        c->sample.brake = soundfactory_get(nanoparser_get_string(p1));
+        c->sample.brake = sound_load(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "death") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples: death");
-        c->sample.death = soundfactory_get(nanoparser_get_string(p1));
+        c->sample.death = sound_load(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "charge") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples: charge");
-        c->sample.charge = soundfactory_get(nanoparser_get_string(p1));
+        c->sample.charge = sound_load(nanoparser_get_string(p1));
         if(nanoparser_get_number_of_parameters(param_list) > 1) {
             p2 = nanoparser_get_nth_parameter(param_list, 2);
             nanoparser_expect_string(p2, "must specify the samples: charge pitch");
@@ -486,7 +486,7 @@ int traverse_samples(const parsetree_statement_t *stmt, void *character)
     else if(str_icmp(identifier, "release") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "must specify the samples: release");
-        c->sample.release = soundfactory_get(nanoparser_get_string(p1));
+        c->sample.release = sound_load(nanoparser_get_string(p1));
     }
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));

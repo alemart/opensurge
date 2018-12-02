@@ -32,4 +32,28 @@ void soundfactory_release();
 /* given a sound name, returns the corresponding sound effect */
 sound_t *soundfactory_get(const char *sound_name);
 
+#define SFX_JUMP                sound_load("samples/jump.wav")
+#define SFX_BRAKE               sound_load("samples/brake.wav")
+#define SFX_DEATH               sound_load("samples/death.wav")
+#define SFX_DAMAGE              sound_load("samples/damaged.wav")
+#define SFX_GETHIT              sound_load("samples/collectible_loss.wav")
+#define SFX_DROWN               sound_load("samples/drown.wav")
+#define SFX_BREATHE             sound_load("samples/bubbleget.wav")
+#define SFX_CHARGE              sound_load("samples/charge.wav")
+#define SFX_RELEASE             sound_load("samples/release.wav")
+#define SFX_ROLL                sound_load("samples/roll.wav")
+#define SFX_WATERIN             sound_load("samples/water_in.wav")
+#define SFX_WATEROUT            sound_load("samples/water_out.wav")
+#define SFX_COLLECTIBLE         sound_load("samples/collectible.wav")
+#define SFX_1UP                 sound_load("samples/1up.ogg")
+#define SFX_DESTROY             sound_load("samples/destroypop.wav")
+#define SFX_BREAK               sound_load("samples/break.wav")
+#define SFX_CHOOSE              sound_load("samples/choose.wav")
+#define SFX_DENY                sound_load("samples/deny.wav")
+#define SFX_BACK                sound_load("samples/return.wav")
+#define SFX_CONFIRM             sound_load("samples/select.wav")
+#define SFX_SAVE                sound_load("samples/glasses.wav")
+#define SFX_PAUSE               sound_load("samples/select_2.wav")
+#define SFX_SECRET              sound_load("samples/secret.wav")
+
 #endif

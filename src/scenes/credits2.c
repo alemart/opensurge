@@ -136,7 +136,7 @@ void credits2_update()
     /* quit */
     if(!quit && !fadefx_is_fading()) {
         if(input_button_pressed(input, IB_FIRE4)) {
-            sound_play( soundfactory_get("return") );
+            sound_play(SFX_BACK);
             quit = TRUE;
         }
     }

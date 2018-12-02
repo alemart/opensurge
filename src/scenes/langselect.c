@@ -156,11 +156,11 @@ void langselect_update()
     if(!quit && !fadefx_is_fading()) {
         if(input_button_pressed(input, IB_DOWN)) {
             option = (option+1)%lngcount;
-            sound_play( soundfactory_get("choose") );
+            sound_play(SFX_CHOOSE);
         }
         if(input_button_pressed(input, IB_UP)) {
             option = (((option-1)%lngcount)+lngcount)%lngcount;
-            sound_play( soundfactory_get("choose") );
+            sound_play(SFX_CHOOSE);
         }
         if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
             char *filepath = lngdata[option].filepath;
@@ -168,11 +168,11 @@ void langselect_update()
             lang_loadfile(DEFAULT_LANGUAGE_FILEPATH); /* just in case of missing strings... */
             lang_loadfile(filepath);
             save_preferences(filepath);
-            sound_play( soundfactory_get("select") );
+            sound_play(SFX_CONFIRM);
             quit = TRUE;
         }
         if(input_button_pressed(input, IB_FIRE4)) {
-            sound_play( soundfactory_get("return") );
+            sound_play(SFX_BACK);
             quit = TRUE;
         }
     }

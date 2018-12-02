@@ -144,18 +144,18 @@ void options_update()
         /* select next option */
         if(input_button_pressed(input, IB_DOWN)) {
             option = (option+1)%OPTIONS_MAX;
-            sound_play( soundfactory_get("choose") );
+            sound_play(SFX_CHOOSE);
         }
 
         /* select previous option */
         if(input_button_pressed(input, IB_UP)) {
             option = (((option-1)%OPTIONS_MAX)+OPTIONS_MAX)%OPTIONS_MAX;
-            sound_play( soundfactory_get("choose") );
+            sound_play(SFX_CHOOSE);
         }
 
         /* go back... */
         if(input_button_pressed(input, IB_FIRE4)) {
-            sound_play( soundfactory_get("return") );
+            sound_play(SFX_BACK);
             quit = TRUE;
         }
     }
@@ -406,18 +406,18 @@ static void group_fullscreen_update(group_t *g)
     if(group_fullscreen_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 video_changemode(video_get_resolution(), video_is_smooth(), !video_is_fullscreen());
             }
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_fullscreen()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     video_changemode(video_get_resolution(), video_is_smooth(), FALSE);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_fullscreen()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     video_changemode(video_get_resolution(), video_is_smooth(), TRUE);
                 }
             }
@@ -482,18 +482,18 @@ static void group_smooth_update(group_t *g)
     if(group_smooth_is_highlighted(g) && video_get_color_depth() == 32) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 video_changemode(resolution, !video_is_smooth(), video_is_fullscreen());
             }
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_smooth()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     video_changemode(resolution, FALSE, video_is_fullscreen());
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_smooth()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     video_changemode(resolution, TRUE, video_is_fullscreen());
                 }
             }
@@ -560,18 +560,18 @@ static void group_fps_update(group_t *g)
     if(group_fps_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 video_show_fps(!video_is_fps_visible());
             }
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_fps_visible()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     video_show_fps(FALSE);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_fps_visible()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     video_show_fps(TRUE);
                 }
             }
@@ -637,19 +637,19 @@ static void group_resolution_update(group_t *g)
                 switch(video_get_resolution()) {
                     case VIDEORESOLUTION_1X:
                         video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_2X:
                         video_changemode(VIDEORESOLUTION_3X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_3X:
                         video_changemode(VIDEORESOLUTION_4X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_4X:
                         video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                 }
             }
@@ -657,15 +657,15 @@ static void group_resolution_update(group_t *g)
                 switch(video_get_resolution()) {
                     case VIDEORESOLUTION_1X:
                         video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_2X:
                         video_changemode(VIDEORESOLUTION_3X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_3X:
                         video_changemode(VIDEORESOLUTION_4X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                 }
             }
@@ -673,15 +673,15 @@ static void group_resolution_update(group_t *g)
                 switch(video_get_resolution()) {
                     case VIDEORESOLUTION_4X:
                         video_changemode(VIDEORESOLUTION_3X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_3X:
                         video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                     case VIDEORESOLUTION_2X:
                         video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
-                        sound_play( soundfactory_get("select") );
+                        sound_play(SFX_CONFIRM);
                         break;
                 }
             }
@@ -784,7 +784,7 @@ static void group_changelanguage_update(group_t *g)
     if(group_changelanguage_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 jump_to = storyboard_get_scene(SCENE_LANGSELECT);
             }
         }
@@ -826,7 +826,7 @@ static void group_credits_update(group_t *g)
     if(group_credits_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 jump_to = storyboard_get_scene(SCENE_CREDITS);
             }
         }
@@ -871,14 +871,14 @@ static void group_stageselect_update(group_t *g)
     if(group_stageselect_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 jump_to = storyboard_get_scene(scn);
                 cnt = cnt2 = 0;
                 scn = SCENE_STAGESELECT;
             }
             else if(input_button_pressed(input, IB_RIGHT)) { /* stage select: debug mode trick */
                 if(cnt >= 0 && ++cnt == 3) {
-                    sound_play( soundfactory_get("secret") );
+                    sound_play(SFX_SECRET);
                     scn = SCENE_STAGESELECT;
                     stageselect_enable_debug = TRUE;
                     cnt = -1;
@@ -886,7 +886,7 @@ static void group_stageselect_update(group_t *g)
             }
             else if(input_button_pressed(input, IB_LEFT)) { /* stage select: quest select trick */
                 if(cnt2 >= 0 && ++cnt2 == 3) {
-                    sound_play( soundfactory_get("secret") );
+                    sound_play(SFX_SECRET);
                     scn = SCENE_QUESTSELECT;
                     cnt2 = -1;
                 }
@@ -935,7 +935,7 @@ static void group_back_update(group_t *g)
     if(group_back_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 quit = TRUE;
             }
         }
@@ -978,18 +978,18 @@ static void group_gamepad_update(group_t *g)
     if(group_gamepad_is_highlighted(g)) {
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play( soundfactory_get("select") );
+                sound_play(SFX_CONFIRM);
                 input_ignore_joystick(!input_is_joystick_ignored());
             }
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(!input_is_joystick_ignored()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     input_ignore_joystick(TRUE);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(input_is_joystick_ignored()) {
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     input_ignore_joystick(FALSE);
                 }
             }

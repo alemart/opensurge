@@ -131,7 +131,7 @@ void intro_update()
     if(input_button_pressed(in, IB_RIGHT)) {
         static int cnt = 0;
         if(!debug_mode && ++cnt == 3) {
-            sound_play( soundfactory_get("secret") );
+            sound_play(SFX_SECRET);
             debug_mode = true;
             cnt = 0;
         }

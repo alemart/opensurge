@@ -1138,7 +1138,7 @@ void level_update()
 
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
-        sound_play( soundfactory_get("pause") );
+        sound_play(SFX_PAUSE);
         scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
         return;
     }
@@ -1147,7 +1147,7 @@ void level_update()
     if(editor_want_to_activate()) {
         if(readonly) {
             video_showmessage("No way!");
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
         }
         else {
             editor_enable();
@@ -2734,7 +2734,7 @@ void editor_update()
             return;
         }
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
     else if(editorcmd_is_triggered(editor_cmd, "open-entity-palette")) {
         if(editor_ssobj_count > 0) {
@@ -2750,7 +2750,7 @@ void editor_update()
             return;           
         }
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
 
     if(-1 < (selected_item = editorpal_selected_item())) {
@@ -2797,13 +2797,13 @@ void editor_update()
         if(editor_cursor_entity_type == EDT_BRICK)
             editor_layer = (editor_layer + 1) % 3;
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
     else if(editorcmd_is_triggered(editor_cmd, "layer-previous")) {
         if(editor_cursor_entity_type == EDT_BRICK)
             editor_layer = (editor_layer + 2) % 3;
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
 
     /* change brick flip mode */
@@ -2813,7 +2813,7 @@ void editor_update()
             editor_flip = (editor_flip + delta) & BRF_VHFLIP;
         }
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
     else if(editorcmd_is_triggered(editor_cmd, "flip-previous")) {
         if(editor_cursor_entity_type == EDT_BRICK) {
@@ -2821,7 +2821,7 @@ void editor_update()
             editor_flip = (editor_flip + delta) & BRF_VHFLIP;
         }
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
 
     /* new spawn point */
@@ -3196,11 +3196,11 @@ void editor_waterline_render(int ycoord, uint32 color)
 void editor_save()
 {
     if(level_save(file)) {
-        sound_play( soundfactory_get("level saved") );
+        sound_play(SFX_SAVE);
         video_showmessage("Level saved.");
     }
     else {
-        sound_play( soundfactory_get("deny") );
+        sound_play(SFX_DENY);
         video_showmessage("Can't save the level. Please check the logs...");
     }
 }
@@ -4220,10 +4220,10 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 const char* hash_of_ssobj(const surgescript_object_t* object)
 {
     /* TODO: use a faster key type */
-    static char buf[24];
-    char* p = buf + 24;
+    static char buf[24] = { [23] = 0 };
+    char* p = buf + 23;
     surgescript_objecthandle_t h = surgescript_object_handle(object);
-    *--p = 0; do { *--p = "0123456789abcdef"[h & 0xF]; } while(h /= 16);
+    do { *--p = "0123456789abcdef"[h & 0xF]; } while(h /= 16);
     return p;
 }
 

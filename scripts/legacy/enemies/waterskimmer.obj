@@ -44,7 +44,7 @@ object "Water Skimmer"
         execute _disable
         let $speed_x=300
         let $speed_y=-200
-        play_sample jump
+        play_sample "samples/jump.wav"
         change_state jump
     }
 

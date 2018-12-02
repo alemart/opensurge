@@ -154,17 +154,17 @@ void confirmbox_update()
     if(!fxfade_in && !fxfade_out) {
         if(input_button_pressed(input, IB_LEFT)) {
             /* left */
-            sound_play( soundfactory_get("choose") );
+            sound_play(SFX_CHOOSE);
             current_option = ( ((current_option-1)%option_count) + option_count )%option_count;
         }
         else if(input_button_pressed(input, IB_RIGHT)) {
             /* right */
-            sound_play( soundfactory_get("choose") );
+            sound_play(SFX_CHOOSE);
             current_option = (current_option+1)%option_count;
         }
         else if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
             /* confirm */
-            sound_play( soundfactory_get("select") );
+            sound_play(SFX_CONFIRM);
             fxfade_out = TRUE;
         }
     }

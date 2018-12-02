@@ -189,20 +189,20 @@ void questselect_update()
             if(!fadefx_is_fading()) {
                 if(input_button_pressed(input, IB_DOWN)) {
                     option = (option+1) % quest_count;
-                    sound_play( soundfactory_get("choose") );
+                    sound_play(SFX_CHOOSE);
                 }
                 if(input_button_pressed(input, IB_UP)) {
                     option = (((option-1) % quest_count) + quest_count) % quest_count;
-                    sound_play( soundfactory_get("choose") );
+                    sound_play(SFX_CHOOSE);
                 }
                 if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                     str_cpy(quest_to_be_loaded, quest_data[option]->file, sizeof(quest_to_be_loaded));
-                    sound_play( soundfactory_get("select") );
+                    sound_play(SFX_CONFIRM);
                     state = QUESTSTATE_PLAY;
                     music_stop();
                 }
                 if(input_button_pressed(input, IB_FIRE4)) {
-                    sound_play( soundfactory_get("return") );
+                    sound_play(SFX_BACK);
                     state = QUESTSTATE_QUIT;
                 }
             }

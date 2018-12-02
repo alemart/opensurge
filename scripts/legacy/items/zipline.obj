@@ -32,7 +32,7 @@ object "Zipline.Grabber"
         let "$sy = 0"
         let "$dx = 0"
         let "$dy = 0"
-        play_sample samples/zipline.wav
+        play_sample "samples/zipline.wav"
         strong_player
         disable_player_movement
         create_child .Zipline.GrabberPlayerAnim 0 0 anim
@@ -129,7 +129,7 @@ object "Zipline.Grabber"
 
     state jump
     {
-        play_sample jump
+        play_sample "samples/jump.wav"
         execute deactivate
         set_player_yspeed -300
         simulate_button_down fire1
@@ -282,7 +282,7 @@ object ".Zipline.GrabberSound"
 
     state play
     {
-        play_sample samples/zipline2.wav $t*0.25*($dy/$dx)
+        play_sample "samples/zipline2.wav" $t*0.25*($dy/$dx)
         change_state wait
     }
 

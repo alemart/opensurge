@@ -169,7 +169,7 @@ object ".default_startup.level_cleared.handle_bonus"
 
     state "count"
     {
-        play_sample "bonus count"
+        play_sample "samples/collectible_count.wav"
         let "$d = 100"
 
         let "$_ds_levelcleared_totalbonus += min($d, $_ds_levelcleared_ringbonus)"
@@ -191,7 +191,7 @@ object ".default_startup.level_cleared.handle_bonus"
 
     state "cash"
     {
-        play_sample "cash"
+        play_sample "samples/cash.wav"
         add_to_score "$_ds_levelcleared_totalbonus"
         change_state "wait a bit"
     }

@@ -100,7 +100,7 @@ void editorhelp_init(void *foo)
     image_draw_trans(video_get_backbuffer(), buf, 0, 0, 0.15f, IF_NONE);
 
     in = input_create_user("editorhelp");
-    sound_play( soundfactory_get("select") );
+    sound_play(SFX_CONFIRM);
 }
 
 
@@ -141,7 +141,7 @@ void editorhelp_render()
  */
 void editorhelp_release()
 {
-    sound_play( soundfactory_get("return") );
+    sound_play(SFX_BACK);
 
     input_destroy(in);
     image_destroy(buf);

@@ -669,7 +669,7 @@ audiostrategy_t* playsamplestrategy_new(const char *sample_name, expression_t *v
     ((audiostrategy_t*)s)->update = playsamplestrategy_update;
     ((audiostrategy_t*)s)->release = playsamplestrategy_release;
 
-    s->sfx = soundfactory_get(sample_name);
+    s->sfx = sound_load(sample_name);
     s->vol = vol;
     s->pan = pan;
     s->freq = freq;
@@ -1982,7 +1982,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
                 level_add_to_score(score);
                 level_create_item(IT_EXPLOSION, v2d_add(object->actor->position, v2d_new(0,-15)));
                 level_create_animal(object->actor->position);
-                sound_play( soundfactory_get("destroy") );
+                sound_play(SFX_DESTROY);
                 object->state = ES_DEAD;
             }
             else {
@@ -7603,7 +7603,7 @@ void switchcharacter_update(objectmachine_t *obj, player_t **team, int team_size
         if(allow_switching || me->force_switch)
             level_change_player(new_player);
         else
-            sound_play( soundfactory_get("deny") );
+            sound_play(SFX_DENY);
     }
     else
         fatal_error("Can't switch character: player '%s' does not exist!", me->name);
