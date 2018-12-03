@@ -99,14 +99,14 @@ object "DefaultCamera.UpDownLogic"
     state "move up"
     {
         offset = Math.max(-96, offset - speed * Time.delta);
-        if(player.activity != "lookingup")
+        if(Player.active != player || player.activity != "lookingup")
             state = "main";
     }
 
     state "move down"
     {
         offset = Math.min(92, offset + speed * Time.delta);
-        if(player.activity != "ducking")
+        if(Player.active != player || player.activity != "ducking")
             state = "main";
     }
 
