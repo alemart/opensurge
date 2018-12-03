@@ -50,6 +50,7 @@ static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const su
 static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -114,6 +115,7 @@ extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
 extern animation_t* scripting_animation_ptr(const surgescript_object_t* object);
 extern void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id);
 static const double RAD2DEG = 57.2957795131;
+#define FIXANG(rad) ((rad) >= 0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 
 
 /*
@@ -141,6 +143,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
+    surgescript_vm_bind(vm, "Player", "get_angle", fun_getangle, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -446,13 +449,22 @@ surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript
     return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_height(actor_image(player->actor)) : 0.0f);
 }
 
+/* player angle, in degrees */
+surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(),
+        (player != NULL) ? FIXANG(player->actor->angle) : 0.0f
+    );
+}
+
 /* ground speed, in px/s */
 surgescript_var_t* fun_getgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL && !player_is_in_the_air(player)) ? player->actor->speed.y : 0.0f
+        (player != NULL) ? physicsactor_get_gsp(player->pa) : 0.0f
     );
 }
 
@@ -472,7 +484,7 @@ surgescript_var_t* fun_getxsp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL && player_is_in_the_air(player)) ? player->actor->speed.x : 0.0f
+        (player != NULL) ? physicsactor_get_xsp(player->pa) : 0.0f
     );
 }
 
@@ -492,7 +504,7 @@ surgescript_var_t* fun_getysp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL) ? player->actor->speed.y : 0.0f
+        (player != NULL) ? physicsactor_get_ysp(player->pa) : 0.0f
     );
 }
 
@@ -971,7 +983,7 @@ void update_player(surgescript_object_t* object)
 
     /* update the transform */
     if(player != NULL)
-        update_transform(object, player->actor->position, -player->actor->angle * RAD2DEG);
+        update_transform(object, player->actor->position, FIXANG(player->actor->angle));
     else
         update_transform(object, v2d_new(0.0f, 0.0f), 0.0f);
 
