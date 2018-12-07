@@ -73,27 +73,27 @@ object "DefaultCamera.UpDownLogic"
         else if(player.activity == "ducking")
             state = "wait down";
         else
-            offset = (offset > 0) ? Math.max(0, offset - speed * Time.delta) : Math.min(0, offset + speed * Time.delta);
+            moveBackToZero();
     }
 
     state "wait up"
     {
-        if(Player.active != player || player.activity != "lookingup")
-            state = "main";
-        else if(timeout(2.0))
+        if(timeout(2.0))
             state = "move up";
+        else if(Player.active != player || player.activity != "lookingup")
+            state = "main";
         else
-            offset = (offset > 0) ? Math.max(0, offset - speed * Time.delta) : Math.min(0, offset + speed * Time.delta);
+            moveBackToZero();
     }
 
     state "wait down"
     {
-        if(Player.active != player || player.activity != "ducking")
-            state = "main";
-        else if(timeout(2.0))
+        if(timeout(2.0))
             state = "move down";
+        else if(Player.active != player || player.activity != "ducking")
+            state = "main";
         else
-            offset = (offset > 0) ? Math.max(0, offset - speed * Time.delta) : Math.min(0, offset + speed * Time.delta);
+            moveBackToZero();
     }
 
     state "move up"
@@ -108,6 +108,14 @@ object "DefaultCamera.UpDownLogic"
         offset = Math.min(92, offset + speed * Time.delta);
         if(Player.active != player || player.activity != "ducking")
             state = "main";
+    }
+
+    fun moveBackToZero()
+    {
+        if(offset > 0)
+            offset = Math.max(0, offset - speed * Time.delta);
+        else
+            offset = Math.min(0, offset + speed * Time.delta);
     }
 
     fun get_offset()
