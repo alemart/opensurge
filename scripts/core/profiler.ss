@@ -165,7 +165,7 @@ object "Profiler.Stats"
 object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
 {
     transform = Transform();
-    text = Text("default_ttf");
+    text = Text("sans");
 
     fun constructor()
     {

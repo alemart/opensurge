@@ -469,6 +469,7 @@ void font_render(const font_t *f, v2d_t camera_position)
             uszprintf(s, sizeof(s), "%lc", wide_char);
             textsize = f->my_class->textsize(f->my_class, s);
             w = (int)textsize.x; h = (int)textsize.y;
+            if(*s == '\n' && !s[1]) h /= 2;
 
             /* printing text */
             if(wordwrap) { offx = 0; offy += h + vspace; }

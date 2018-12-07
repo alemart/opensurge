@@ -1011,8 +1011,8 @@ void level_init(void *path_to_lev_file)
     dlgbox = actor_create();
     dlgbox->position.y = VIDEO_SCREEN_H;
     actor_change_animation(dlgbox, sprite_get_animation("SD_DIALOGBOX", 0));
-    dlgbox_title = font_create("default_ttf");
-    dlgbox_message = font_create("default_ttf");
+    dlgbox_title = font_create("sans");
+    dlgbox_message = font_create("sans");
 
     /* editor */
     editor_init();

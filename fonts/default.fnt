@@ -14,6 +14,23 @@ font "default"
 }
 
 // general purpose truetype font
+font "sans"
+{
+    truetype
+    {
+        source_file             "fonts/DejaVuSans.ttf"
+        size                    13
+        shadow
+    }
+}
+
+
+
+//
+// The fonts below are declared for retrocompatibility
+//
+
+// general purpose truetype font
 font "default_ttf"
 {
     truetype
