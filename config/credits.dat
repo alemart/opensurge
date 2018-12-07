@@ -164,12 +164,7 @@ Alexandre Martins
 --- images/squarebg2.png
 --- images/pixel.png
 --- images/impact.png
---- fonts/upper.png
 --- images/dialogbox.png
-
-Ramon
---- images/dimensional_gate.png
---- images/dimensionalring.png
 
 Matwek (edits by Alexandre, svgmovement)
 --- images/levels/1/sunshine_solids.png
@@ -256,6 +251,9 @@ Alex V.
 
 Alexandre, Andrew Pociask, KZR
 --- images/extra/big_sunshine.png
+
+thekingphoenix
+--- images/explode.png
 
 <color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_MUSICS</color>
 
