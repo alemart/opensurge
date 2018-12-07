@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * font.c - font module
- * Copyright (C) 2008-2011, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2011, 2013, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@
 #define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
 static int allow_ttf_aa = TRUE; /* allow antialiasing for all TTF fonts? */
 
+/* ------------------------------- */
 
 /* callback table: used for variable/text interpolation */
 typedef const char* (*fontcallback_t)();
@@ -47,6 +48,51 @@ static void callbacktable_release();
 static void callbacktable_add(const char *variable_name, fontcallback_t callback);
 static fontcallback_t callbacktable_find(const char *variable_name);
 
+/* ------------------------------- */
+
+/* font scripts (nanoparser) */
+#define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
+#define FONT_STACKCAPACITY  32
+#define FONT_TEXTMAXLENGTH  20480
+static int dirfill(const char *vpath, void *param);
+static int traverse(const parsetree_statement_t *stmt);
+static int traverse_block(const parsetree_statement_t *stmt, void *data);
+static int traverse_bmp(const parsetree_statement_t *stmt, void *data);
+static int traverse_bmp_char(const parsetree_statement_t *stmt, void *data);
+static int traverse_ttf(const parsetree_statement_t *stmt, void *data);
+
+typedef struct charproperties_t charproperties_t;
+struct charproperties_t {
+    uint8 valid; /* whether this character is valid (exists) */
+    struct { /* spritesheet info */
+        int x, y, width, height;
+    } source_rect;
+    int index; /* index is such that keymap[index] == this_character (if this_character is not in keymap, index is -1) */
+};
+
+typedef struct fontscript_t fontscript_t;
+struct fontscript_t {
+    enum { FONTSCRIPTTYPE_TTF, FONTSCRIPTTYPE_BMP } type;
+    union {
+        /* bitmap */
+        struct {
+            char source_file[1024]; /* source file (relative file path) */
+            int source_rect[4]; /* spritesheet rect: x, y, width, height */
+            charproperties_t chr[256]; /* properties of char x (0..255) */
+        } bmp;
+
+        /* true-type */
+        struct {
+            char source_file[1024]; /* source file (relative file path) */
+            int size; /* font size */
+            int antialias; /* enable antialiasing? */
+            int shadow; /* enable shadow? */
+        } ttf;
+    } data;
+};
+
+/* ------------------------------- */
+
 /* fontdata_t: stores the attributes of each font class (set of fonts with the same name) */
 typedef struct fontdata_t fontdata_t;
 struct fontdata_t { /* abstract font: base class */
@@ -55,14 +101,14 @@ struct fontdata_t { /* abstract font: base class */
     v2d_t (*charspacing)(fontdata_t*); /* a pair (hspace, vspace) */
     v2d_t (*textsize)(fontdata_t*,const char*); /* text size, in pixels */
 };
-static fontdata_t* fontdata_bmp_new(const char *source_file, const char *keymap, int sheet_source_x, int sheet_source_y, int sheet_width, int sheet_height, int char_width, int char_height);
+static fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[]);
 static fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, int shadow);
 
 typedef struct fontdata_bmp_t fontdata_bmp_t;
 struct fontdata_bmp_t { /* bitmap font */
     fontdata_t base;
     image_t *bmp[256]; /* bitmap char indexed by ascii code */
-    v2d_t charsize;
+    int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
 };
 static void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color);
 static void fontdata_bmp_release(fontdata_t *fnt);
@@ -73,7 +119,7 @@ typedef struct fontdata_ttf_t fontdata_ttf_t;
 struct fontdata_ttf_t { /* truetype font */
     fontdata_t base;
     ALFONT_FONT *ttf;
-    image_t *cached_character[96]; /* store characters 0..127 in a table */
+    image_t *cached_character[96]; /* store characters 32..127 in a table */
     int antialias; /* enable antialiasing? */
     int shadow; /* enable shadow? */
 };
@@ -103,6 +149,12 @@ static fontdata_t* fontdata_list_find(const char *name);
 /* font arguments: for a safe printf-like alternative (when dealing with user-provided format strings) */
 #define FONTARGS_MAX 3
 typedef char* fontargs_t[FONTARGS_MAX];
+static const char* get_variable(const char *key);
+static int has_variables_to_expand(const char *str);
+static void expand_variables(char *str, fontargs_t args);
+static uint8 hex2dec(char digit);
+static char* remove_tags(const char *str);
+static int length_without_tags(const char* str);
 
 /* font struct: this struct is used by the external world */
 struct font_t {
@@ -114,47 +166,6 @@ struct font_t {
     int index_of_first_char, length; /* substring */
     fontargs_t argument; /* text arguments: $1, $2 ... $<FONTARGS_MAX> */
     fontalign_t align; /* alignment */
-};
-
-/* ------------------------------- */
-
-/* private data */
-#define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
-#define FONT_STACKCAPACITY  32
-#define FONT_TEXTMAXLENGTH  20480
-static int dirfill(const char *vpath, void *param);
-static int traverse(const parsetree_statement_t *stmt);
-static int traverse_block(const parsetree_statement_t *stmt, void *data);
-static int traverse_bmp(const parsetree_statement_t *stmt, void *data);
-static int traverse_ttf(const parsetree_statement_t *stmt, void *data);
-static const char* get_variable(const char *key);
-static int has_variables_to_expand(const char *str);
-static void expand_variables(char *str, fontargs_t args);
-static uint8 hex2dec(char digit);
-static char* remove_tags(const char *str);
-
-typedef struct fontscript_t fontscript_t;
-struct fontscript_t {
-    enum { FONTSCRIPTTYPE_TTF, FONTSCRIPTTYPE_BMP } type;
-    union {
-
-        /* bitmap */
-        struct {
-            char source_file[1024]; /* source file (relative file path) */
-            char keymap[10240]; /* character-image mapping */
-            int source_rect[4]; /* x, y, width, height */
-            int char_size[2]; /* width, height */
-        } bmp;
-
-        /* true-type */
-        struct {
-            char source_file[1024]; /* source file (relative file path) */
-            int size; /* font size */
-            int antialias; /* enable antialiasing? */
-            int shadow; /* enable shadow? */
-        } ttf;
-
-    } data;
 };
 
 
@@ -176,9 +187,8 @@ void font_init(int allow_font_smoothing)
 
     /* reading the parse tree */
     assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
-
-    /* loading the fontdata list */
     nanoparser_traverse_program(fonts, traverse);
+    logfile_message("All fonts have been loaded.");
 
     /* initializing the font callback table */
     callbacktable_init();
@@ -648,25 +658,35 @@ uint8 hex2dec(char digit)
 /* example: <color=ff0000>hi</color> becomes hi */
 char* remove_tags(const char *str)
 {
+    int j, tag;
+    const char *p;
+    char* s;
+
+    s = mallocx((1 + length_without_tags(str)) * sizeof(*s));
+    for(j=0,tag=FALSE,p=str; *p; p++) {
+        if(tag && (*p == '>')) tag = FALSE;
+        else if(!tag && (*p == '<')) tag = TRUE;
+        else if(!tag) s[j++] = *p;
+    }
+    s[j] = '\0';
+
+    return s;
+}
+
+
+/* the length of the text, removing all tags */
+int length_without_tags(const char* str)
+{
     int len, tag;
-    char *s;
     const char *p;
 
     for(len=0,tag=FALSE,p=str; *p; p++) {
         if(tag && (*p == '>')) tag = FALSE;
         else if(!tag && (*p == '<')) tag = TRUE;
-        else if(!tag && (*p != '<')) len++;
+        else if(!tag) len++;
     }
 
-    s = mallocx((1+len) * sizeof(*s));
-    for(len=0,tag=FALSE,p=str; *p; p++) {
-        if(tag && (*p == '>')) tag = FALSE;
-        else if(!tag && (*p == '<')) tag = TRUE;
-        else if(!tag && (*p != '<')) s[len++] = *p;
-    }
-    s[len] = '\0';
-
-    return s;
+    return len;
 }
 
 /* dirfill() */
@@ -723,13 +743,7 @@ int traverse(const parsetree_statement_t *stmt)
         case FONTSCRIPTTYPE_BMP:
             data = fontdata_bmp_new(
                 header.data.bmp.source_file,
-                header.data.bmp.keymap,
-                header.data.bmp.source_rect[0],
-                header.data.bmp.source_rect[1],
-                header.data.bmp.source_rect[2],
-                header.data.bmp.source_rect[3],
-                header.data.bmp.char_size[0],
-                header.data.bmp.char_size[1]
+                header.data.bmp.chr
             );
             break;
 
@@ -769,17 +783,35 @@ int traverse_block(const parsetree_statement_t *stmt, void *data)
     }
     else if(str_icmp(id, "bitmap") == 0) {
         /* default configuration */
+        int i, n = sizeof(header->data.bmp.chr) / sizeof(charproperties_t);
+
         header->type = FONTSCRIPTTYPE_BMP;
         strcpy(header->data.bmp.source_file, "");
-        strcpy(header->data.bmp.keymap, " ");
-        header->data.bmp.source_rect[0] = 0;
-        header->data.bmp.source_rect[1] = 0;
-        header->data.bmp.source_rect[2] = 1;
-        header->data.bmp.source_rect[3] = 1;
-        header->data.bmp.char_size[0] = 1;
-        header->data.bmp.char_size[1] = 1;
+        for(i = 0; i < n; i++) {
+            /* initialize all characters to: unspecified */
+            header->data.bmp.chr[i].valid = 0;
+            header->data.bmp.chr[i].index = -1;
+            header->data.bmp.chr[i].source_rect.x = 0;
+            header->data.bmp.chr[i].source_rect.y = 0;
+            header->data.bmp.chr[i].source_rect.width = 0;
+            header->data.bmp.chr[i].source_rect.height = 0;
+        }
 
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), data, traverse_bmp);
+
+        for(i = 0; i < n; i++) {
+            /* has the user declared a keymap? (monospaced bitmap font) */
+            if(header->data.bmp.chr[i].index >= 0 && header->data.bmp.chr[i].source_rect.width > 0) {
+                /* find the source_rect of individual characters (keymap) */
+                int index = header->data.bmp.chr[i].index;
+                int char_width = header->data.bmp.chr[i].source_rect.width;
+                int char_height = header->data.bmp.chr[i].source_rect.height;
+                int chars_in_row = header->data.bmp.source_rect[2] / char_width;
+                int src_x = header->data.bmp.source_rect[0], src_y = header->data.bmp.source_rect[1];
+                header->data.bmp.chr[i].source_rect.x = src_x + (index % chars_in_row) * char_width;
+                header->data.bmp.chr[i].source_rect.y = src_y + (index / chars_in_row) * char_height;
+            }
+        }
     }
     else
         fatal_error("Font script error: unknown font type '%s'", id);
@@ -811,27 +843,80 @@ int traverse_bmp(const parsetree_statement_t *stmt, void *data)
         nanoparser_expect_string(p3, "Font script error: source_rect expects four parameters: source_x, source_y, width, height");
         nanoparser_expect_string(p4, "Font script error: source_rect expects four parameters: source_x, source_y, width, height");
 
-        header->data.bmp.source_rect[0] = atoi(nanoparser_get_string(p1));
-        header->data.bmp.source_rect[1] = atoi(nanoparser_get_string(p2));
-        header->data.bmp.source_rect[2] = atoi(nanoparser_get_string(p3));
-        header->data.bmp.source_rect[3] = atoi(nanoparser_get_string(p4));
+        header->data.bmp.source_rect[0] = max(0, atoi(nanoparser_get_string(p1)));
+        header->data.bmp.source_rect[1] = max(0, atoi(nanoparser_get_string(p2)));
+        header->data.bmp.source_rect[2] = max(1, atoi(nanoparser_get_string(p3)));
+        header->data.bmp.source_rect[3] = max(1, atoi(nanoparser_get_string(p4)));
     }
     else if(str_icmp(id, "frame_size") == 0) {
         const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
         const parsetree_parameter_t *p2 = nanoparser_get_nth_parameter(param_list, 2);
+        int i, n = sizeof(header->data.bmp.chr) / sizeof(charproperties_t);
+        int width, height;
 
         nanoparser_expect_string(p1, "Font script error: frame_size expects two parameters: char_width, char_height");
         nanoparser_expect_string(p2, "Font script error: frame_size expects two parameters: char_width, char_height");
 
-        header->data.bmp.char_size[0] = atoi(nanoparser_get_string(p1));
-        header->data.bmp.char_size[1] = atoi(nanoparser_get_string(p2));
+        width = max(0, atoi(nanoparser_get_string(p1)));
+        height = max(0, atoi(nanoparser_get_string(p2)));
+        for(i = 0; i < n; i++) {
+            if(header->data.bmp.chr[i].source_rect.width <= 0) {
+                header->data.bmp.chr[i].source_rect.width = width;
+                header->data.bmp.chr[i].source_rect.height = height;
+            }
+        }
     }
     else if(str_icmp(id, "keymap") == 0) {
         const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
+        const char *keymap, *p;
 
         nanoparser_expect_string(p1, "Font script error: a sequence of characters is expected in keymap");
 
-        str_cpy(header->data.bmp.keymap, nanoparser_get_string(p1), sizeof(header->data.bmp.keymap));
+        keymap = nanoparser_get_string(p1);
+        for(p = keymap; *p; p++) {
+            header->data.bmp.chr[(int)(*p) & 0xFF].index = p - keymap;
+            header->data.bmp.chr[(int)(*p) & 0xFF].valid = 1;
+        }
+    }
+    else if(str_icmp(id, "char") == 0) {
+        const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
+        const parsetree_parameter_t *p2 = nanoparser_get_nth_parameter(param_list, 2);
+        int c;
+
+        nanoparser_expect_string(p1, "Font script error: a character is expected in char");
+        c = *(nanoparser_get_string(p1));
+
+        nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)(header->data.bmp.chr + c), traverse_bmp_char);
+    }
+    else
+        fatal_error("Font script error: unknown keyword '%s' in bitmap font", id);
+
+    return 0;
+}
+
+int traverse_bmp_char(const parsetree_statement_t *stmt, void *data)
+{
+    charproperties_t *chr = (charproperties_t*)data;
+    const char *id = nanoparser_get_identifier(stmt);
+    const parsetree_parameter_t *param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(id, "source_rect") == 0) {
+        const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
+        const parsetree_parameter_t *p2 = nanoparser_get_nth_parameter(param_list, 2);
+        const parsetree_parameter_t *p3 = nanoparser_get_nth_parameter(param_list, 3);
+        const parsetree_parameter_t *p4 = nanoparser_get_nth_parameter(param_list, 4);
+
+        nanoparser_expect_string(p1, "Font script error: source_rect expects four parameters: source_x, source_y, width, height");
+        nanoparser_expect_string(p2, "Font script error: source_rect expects four parameters: source_x, source_y, width, height");
+        nanoparser_expect_string(p3, "Font script error: source_rect expects four parameters: source_x, source_y, width, height");
+        nanoparser_expect_string(p4, "Font script error: source_rect expects four parameters: source_x, source_y, width, height");
+
+        chr->source_rect.x = max(0, atoi(nanoparser_get_string(p1)));
+        chr->source_rect.y = max(0, atoi(nanoparser_get_string(p2)));
+        chr->source_rect.width = max(0, atoi(nanoparser_get_string(p3)));
+        chr->source_rect.height = max(0, atoi(nanoparser_get_string(p4)));
+        chr->index = -1;
+        chr->valid = 1;
     }
     else
         fatal_error("Font script error: unknown keyword '%s' in bitmap font", id);
@@ -948,52 +1033,34 @@ fontdata_t* fontdata_list_find(const char *name)
 /* bitmap fonts */
 /* ------------------------------------------------- */
 
-fontdata_t* fontdata_bmp_new(const char *source_file, const char *keymap, int sheet_source_x, int sheet_source_y, int sheet_width, int sheet_height, int char_width, int char_height)
+fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[])
 {
-    int i, len;
-    const char *p;
     fontdata_bmp_t *f = mallocx(sizeof *f);
     image_t *img = image_load(source_file);
+    int j, n = sizeof(f->bmp) / sizeof(image_t*);
 
     ((fontdata_t*)f)->renderchar = fontdata_bmp_renderchar;
     ((fontdata_t*)f)->release = fontdata_bmp_release;
     ((fontdata_t*)f)->charspacing = fontdata_bmp_charspacing;
     ((fontdata_t*)f)->textsize = fontdata_bmp_textsize;
 
-    /* validating */
-    if(sheet_source_x < 0 || sheet_source_y < 0)
-        fatal_error("Font script error: invalid (sheet_source_x,sheet_source_y) = (%d,%d) in '%s'. Both must be non-negative integers.", sheet_source_x, sheet_source_y, source_file);
-
-    if(sheet_width <= 0 || sheet_height <= 0)
-        fatal_error("Font script error: invalid (sheet_width,sheet_height) = (%d,%d) in '%s'. Both must be positive integers.", sheet_width, sheet_height, source_file);
-
-    if(char_width <= 0 || char_height <= 0)
-        fatal_error("Font script error: invalid (char_width, char_height) = (%d,%d) in '%s'. Both must be positive integers.", char_width, char_height, source_file);
-
-    if(sheet_width % char_width != 0 || sheet_height % char_height != 0)
-        fatal_error("Font script error: in '%s', sheet_width (%d) must be divisible by char_width (%d) and sheet_height (%d) must be divisible by char_height (%d).", source_file, sheet_width, char_width, sheet_height, char_height);
-
-    /* initializing */
-    f->charsize = v2d_new(char_width, char_height);
-    for(i=0; i<256; i++)
-        f->bmp[i] = NULL;
-
-    /* creating the spritesheet */
-    len = sheet_width / char_width;
-    for(i=0,p=keymap; *p; p++,i++) {
-        int x = i % len;
-        int y = i / len;
-        int c = (*p) & 0xFF;
-
-        if(NULL == f->bmp[c])
-            f->bmp[c] = image_create_shared(img, sheet_source_x + x*char_width, sheet_source_y + y*char_height, char_width, char_height);
+    /* configure the spritesheet */
+    f->line_height = 0;
+    for(j = 0; j < n; j++) {
+        f->bmp[j] = NULL;
+        if(chr[j].valid) {
+            f->bmp[j] = image_create_shared(img, chr[j].source_rect.x, chr[j].source_rect.y, chr[j].source_rect.width, chr[j].source_rect.height);
+            f->line_height = max(f->line_height, chr[j].source_rect.height);
+        }
     }
 
+    /* validation */
+    if(f->line_height == 0)
+        fatal_error("Font script error: font \"%s\" has got no valid characters.", source_file);
+
     /* done! ;) */
-    image_unload(img);
     return (fontdata_t*)f;
 }
-
 
 void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color)
 {
@@ -1001,24 +1068,8 @@ void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
     image_t *char_image = f->bmp[ch & 0xFF];
 
     if(char_image != NULL) {
-        if(color != image_rgb(255,255,255)) {
-            int l, c;
-            uint8 r, g, b;
-            uint8 cr, cg, cb;
-            uint32 px, mask = video_get_maskcolor();
-
-            image_color2rgb(color, &cr, &cg, &cb);
-            for(l=0; l<image_height(char_image); l++) {
-                for(c=0; c<image_width(char_image); c++) {
-                    px = image_getpixel(char_image, c, l);
-                    if(px != mask) {
-                        image_color2rgb(px, &r, &g, &b);
-                        r &= cr; g &= cg; b &= cb;
-                        image_putpixel(img, x+c, y+l, image_rgb(r,g,b));
-                    }
-                }
-            }
-        }
+        if(color != image_rgb(255,255,255))
+            image_draw_multiply(char_image, img, x, y + f->line_height - image_height(char_image), color, 1.0f, IF_NONE);
         else
             image_draw(char_image, img, x, y, IF_NONE);
     }
@@ -1027,9 +1078,9 @@ void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
 void fontdata_bmp_release(fontdata_t *fnt)
 {
     fontdata_bmp_t *f = (fontdata_bmp_t*)fnt;
-    int i;
+    int i, n = sizeof(f->bmp) / sizeof(image_t*);
 
-    for(i=0; i<256; i++) {
+    for(i=0; i<n; i++) {
         if(f->bmp[i] != NULL)
             image_destroy(f->bmp[i]);
     }
@@ -1045,12 +1096,32 @@ v2d_t fontdata_bmp_charspacing(fontdata_t *fnt)
 v2d_t fontdata_bmp_textsize(fontdata_t *fnt, const char *string)
 {
     fontdata_bmp_t *f = (fontdata_bmp_t*)fnt;
-    int cw = fnt->charspacing(fnt).x;
-    char *s = remove_tags(string);
-    int len = strlen(s);
+    v2d_t sp = fnt->charspacing(fnt);
+    int width = 0, line_width = 0;
+    int height = f->line_height;
+    int tag = FALSE;
+    const char* p;
 
-    free(s);
-    return v2d_new((f->charsize.x+cw) * len - cw, f->charsize.y);
+    for(p = string; *p; p++) {
+        if(!tag && *p == '<')
+            tag = TRUE;
+        else if(tag && *p == '>')
+            tag = FALSE;
+        else if(tag)
+            continue;
+        else if(*p == '\n') {
+            height += f->line_height + (int)sp.y;
+            line_width = 0;
+        }
+        else if(f->bmp[(int)(*p) & 0xFF] != NULL) {
+            line_width += image_width(f->bmp[(int)(*p) & 0xFF]);
+            if(p[1])
+                line_width += (int)sp.x;
+        }
+        width = max(width, line_width);
+    }
+
+    return v2d_new(width, height);
 }
 
 /* ------------------------------------------------- */
@@ -1082,7 +1153,7 @@ fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, i
         /* caching commonly used characters */
         if(!(f->antialias)) {
             for(ch=32; ch<=127; ch++) {
-                uszprintf(buf, sizeof(buf), "%c", ch); /* UTF-8 / ASCII compatibility */
+                uszprintf(buf, sizeof(buf), "%c", ch);
                 w = alfont_text_length(f->ttf, buf);
                 h = alfont_text_height(f->ttf);
                 f->cached_character[ch-32] = image_create(w, h);
@@ -1116,24 +1187,8 @@ void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
     if(!aa && (ch >= 32 && ch <= 127)) {
         /* this character is in cache */
         image_t *char_image = f->cached_character[ch-32];
-        if(color != image_rgb(255,255,255)) {
-            int l, c;
-            uint8 r, g, b;
-            uint8 cr, cg, cb;
-            uint32 px, mask = video_get_maskcolor();
-
-            image_color2rgb(color, &cr, &cg, &cb);
-            for(l=0; l<image_height(char_image); l++) {
-                for(c=0; c<image_width(char_image); c++) {
-                    px = image_getpixel(char_image, c, l);
-                    if(px != mask) {
-                        image_color2rgb(px, &r, &g, &b);
-                        r &= cr; g &= cg; b &= cb;
-                        image_putpixel(img, x+c, y+l, image_rgb(r,g,b));
-                    }
-                }
-            }
-        }
+        if(color != image_rgb(255,255,255))
+            image_draw_multiply(char_image, img, x, y, color, 1.0f, IF_NONE);
         else
             image_draw(char_image, img, x, y, IF_NONE);
     }
