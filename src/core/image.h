@@ -62,7 +62,8 @@ void image_draw(const image_t *src, image_t *dest, int x, int y, uint32 flags);
 void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, uint32 flags);
 void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, uint32 flags);
 void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, uint32 flags);
-void image_draw_lit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
+void image_draw_translit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
+void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
 void image_draw_waterfx(image_t *img, int y, uint32 color); /* pixels below y will have a water effect */
 
 #endif

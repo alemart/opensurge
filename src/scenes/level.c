@@ -3056,7 +3056,7 @@ void editor_render()
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
-            image_draw_lit(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), 0.5f, IF_NONE);
+            image_draw_translit(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), 0.5f, IF_NONE);
 
         /* cursor coordinates */
         font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));

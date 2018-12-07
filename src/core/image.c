@@ -470,11 +470,16 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
         a = (int)(255 * alpha);
         set_trans_blender(a, a, a, a);
 
-        tmp = image_create(src->w, src->h);
-        image_clear(tmp, video_get_maskcolor());
-        image_draw(src, tmp, 0, 0, flags);
-        draw_trans_sprite(dest->data, tmp->data, x, y);
-        image_destroy(tmp);
+        if(flags != IF_NONE) {
+            tmp = image_create(src->w, src->h);
+            image_clear(tmp, video_get_maskcolor());
+            image_draw(src, tmp, 0, 0, flags);
+            draw_trans_sprite(dest->data, tmp->data, x, y);
+            image_destroy(tmp);
+        }
+        else
+            draw_trans_sprite(dest->data, src->data, x, y);
+
     }
     else
         image_draw(src, dest, x, y, flags);
@@ -482,12 +487,11 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
 
 
 /*
- * image_draw_lit()
+ * image_draw_translit()
  * Draws an image tinted with a specific color
- *
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_lit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags)
+void image_draw_translit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags)
 {
     image_t *tmp;
     uint8 r, g, b;
@@ -499,16 +503,50 @@ void image_draw_lit(const image_t *src, image_t *dest, int x, int y, uint32 colo
         a = (int)(255 * alpha);
         set_trans_blender(r, g, b, a);
 
-        tmp = image_create(src->w, src->h);
-        image_clear(tmp, video_get_maskcolor());
-        image_draw(src, tmp, 0, 0, flags);
-        draw_lit_sprite(dest->data, tmp->data, x, y, a);
-        image_destroy(tmp);
+        if(flags != IF_NONE) {
+            tmp = image_create(src->w, src->h);
+            image_clear(tmp, video_get_maskcolor());
+            image_draw(src, tmp, 0, 0, flags);
+            draw_lit_sprite(dest->data, tmp->data, x, y, a);
+            image_destroy(tmp);
+        }
+        else
+            draw_lit_sprite(dest->data, src->data, x, y, a);
     }
     else
         image_draw(src, dest, x, y, flags);
 }
 
+/*
+ * image_draw_multiply()
+ * Image blending: multiplication mode
+ * 0.0 <= alpha <= 1.0
+ */
+void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags)
+{
+    image_t *tmp;
+    uint8 r, g, b;
+    int a;
+
+    if(video_get_color_depth() > 8) {
+        alpha = clip(alpha, 0.0, 1.0);
+        image_color2rgb(color, &r, &g, &b);
+        a = (int)(255 * alpha);
+        set_multiply_blender(r, g, b, a);
+
+        if(flags != IF_NONE) {
+            tmp = image_create(src->w, src->h);
+            image_clear(tmp, video_get_maskcolor());
+            image_draw(src, tmp, 0, 0, flags);
+            draw_lit_sprite(dest->data, tmp->data, x, y, a);
+            image_destroy(tmp);
+        }
+        else
+            draw_lit_sprite(dest->data, src->data, x, y, a);
+    }
+    else
+        image_draw(src, dest, x, y, flags);
+}
 
 /*
  * image_pixelperfect_collision()

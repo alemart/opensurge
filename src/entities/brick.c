@@ -409,7 +409,7 @@ void brick_render(brick_t *brk, v2d_t camera_position)
     if(brk->layer == BRL_DEFAULT || !level_editmode())
         image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
     else
-        image_draw_lit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), 0.5f, get_image_flags(brk));
+        image_draw_translit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), 0.5f, get_image_flags(brk));
 }
 
 
