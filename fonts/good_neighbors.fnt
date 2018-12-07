@@ -1,15 +1,17 @@
 // -----------------------------------------------------------------------------
-// File: good_neighbors.ss
+// File: good_neighbors.fnt
 // Description: script for the Good Neighbors font by Clint Bellanger
 // Author: script by Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 
-font "good neighbors"
+font "GoodNeighbors"
 {
     bitmap
     {
         source_file             "fonts/good_neighbors.png"
+        spacing                 -1 1
+
         char " " {
             source_rect         1 1 8 16
         }

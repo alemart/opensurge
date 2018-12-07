@@ -78,6 +78,7 @@ struct fontscript_t {
         struct {
             char source_file[1024]; /* source file (relative file path) */
             int source_rect[4]; /* spritesheet rect: x, y, width, height */
+            int spacing[2]; /* character spacing: x, y */
             charproperties_t chr[256]; /* properties of char x (0..255) */
         } bmp;
 
@@ -101,13 +102,14 @@ struct fontdata_t { /* abstract font: base class */
     v2d_t (*charspacing)(fontdata_t*); /* a pair (hspace, vspace) */
     v2d_t (*textsize)(fontdata_t*,const char*); /* text size, in pixels */
 };
-static fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[]);
+static fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[], int spacing[2]);
 static fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, int shadow);
 
 typedef struct fontdata_bmp_t fontdata_bmp_t;
 struct fontdata_bmp_t { /* bitmap font */
     fontdata_t base;
     image_t *bmp[256]; /* bitmap char indexed by ascii code */
+    v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
 };
 static void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color);
@@ -743,7 +745,8 @@ int traverse(const parsetree_statement_t *stmt)
         case FONTSCRIPTTYPE_BMP:
             data = fontdata_bmp_new(
                 header.data.bmp.source_file,
-                header.data.bmp.chr
+                header.data.bmp.chr,
+                header.data.bmp.spacing
             );
             break;
 
@@ -787,6 +790,8 @@ int traverse_block(const parsetree_statement_t *stmt, void *data)
 
         header->type = FONTSCRIPTTYPE_BMP;
         strcpy(header->data.bmp.source_file, "");
+        header->data.bmp.spacing[0] = 1; /* default spacing */
+        header->data.bmp.spacing[1] = 1;
         for(i = 0; i < n; i++) {
             /* initialize all characters to: unspecified */
             header->data.bmp.chr[i].valid = 0;
@@ -877,6 +882,16 @@ int traverse_bmp(const parsetree_statement_t *stmt, void *data)
             header->data.bmp.chr[(int)(*p) & 0xFF].index = p - keymap;
             header->data.bmp.chr[(int)(*p) & 0xFF].valid = 1;
         }
+    }
+    else if(str_icmp(id, "spacing") == 0) {
+        const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
+        const parsetree_parameter_t *p2 = nanoparser_get_nth_parameter(param_list, 2);
+
+        nanoparser_expect_string(p1, "Font script error: spacing expects two parameters: x, y");
+        nanoparser_expect_string(p2, "Font script error: spacing expects two parameters: x, y");
+
+        header->data.bmp.spacing[0] = atoi(nanoparser_get_string(p1));
+        header->data.bmp.spacing[1] = atoi(nanoparser_get_string(p2));
     }
     else if(str_icmp(id, "char") == 0) {
         const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
@@ -1033,7 +1048,7 @@ fontdata_t* fontdata_list_find(const char *name)
 /* bitmap fonts */
 /* ------------------------------------------------- */
 
-fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[])
+fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[], int spacing[2])
 {
     fontdata_bmp_t *f = mallocx(sizeof *f);
     image_t *img = image_load(source_file);
@@ -1053,6 +1068,7 @@ fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[])
             f->line_height = max(f->line_height, chr[j].source_rect.height);
         }
     }
+    f->spacing = v2d_new(spacing[0], spacing[1]);
 
     /* validation */
     if(f->line_height == 0)
@@ -1090,7 +1106,8 @@ void fontdata_bmp_release(fontdata_t *fnt)
 
 v2d_t fontdata_bmp_charspacing(fontdata_t *fnt)
 {
-    return v2d_new(1,1);
+    fontdata_bmp_t *f = (fontdata_bmp_t*)fnt;
+    return f->spacing;
 }
 
 v2d_t fontdata_bmp_textsize(fontdata_t *fnt, const char *string)
