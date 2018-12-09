@@ -1,0 +1,36 @@
+// -----------------------------------------------------------------------------
+// File: kenney.fnt
+// Description: script for the KenVector Future Thin by Kenney <http://www.kenney.nl>
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Kenney"
+{
+    truetype
+    {
+        source_file             "fonts/kenney.ttf"
+        size                    13
+        shadow
+    }
+}
+
+font "KenneyLarge"
+{
+    truetype
+    {
+        source_file             "fonts/kenney.ttf"
+        size                    18
+        shadow
+    }
+}
+
+font "KenneyLarger"
+{
+    truetype
+    {
+        source_file             "fonts/kenney.ttf"
+        size                    26
+        shadow
+    }
+}
