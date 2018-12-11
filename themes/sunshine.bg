@@ -5,18 +5,43 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
+// sky
 background
 {
     initial_position    0 0
-    scroll_speed        -0.05 0
+    scroll_speed        0 0
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            TRUE
 
     sprite
     {
-        source_file     images/country-platform-back.png
-        source_rect     0 0 384 224
+        source_file     images/sunshine_bg.png
+        source_rect     1024 32 384 32
+        frame_size      384 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// sky
+background
+{
+    initial_position    0 32
+    scroll_speed        -0.02 0
+    behavior            LINEAR -15 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     1024 32 384 224
         frame_size      384 224
 
         animation
@@ -28,348 +53,330 @@ background
     }
 }
 
+// islands
+background
+{
+    initial_position    0 96
+    scroll_speed        -0.05 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
 
-// =================================================
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     192 96 384 160
+        frame_size      384 160
 
-// river shore
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// trees
+background
+{
+    initial_position    0 672
+    scroll_speed        -0.45 -0.05
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex              0.25
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     0 128 160 128
+        frame_size      160 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// ------------------------------
+// water layers
+// ------------------------------
+background
+{
+    initial_position    0 128
+    scroll_speed        -0.125 0
+    behavior            LINEAR -16 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 128 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 132
+    scroll_speed        -0.15 0
+    behavior            LINEAR -16.5 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 132 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 136
+    scroll_speed        -0.175 0
+    behavior            LINEAR -17 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 136 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 140
+    scroll_speed        -0.2 0
+    behavior            LINEAR -17.5 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 140 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 144
+    scroll_speed        -0.225 0
+    behavior            LINEAR -18 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 144 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 148
+    scroll_speed        -0.25 0
+    behavior            LINEAR -18.5 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 148 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 152
+    scroll_speed        -0.275 0
+    behavior            LINEAR -19 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 152 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 156
+    scroll_speed        -0.3 0
+    behavior            LINEAR -19.5 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 156 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
 background
 {
     initial_position    0 160
-    scroll_speed        -0.3 0
-    behavior            DEFAULT
+    scroll_speed        -0.325 0
+    behavior            LINEAR -20 0
     repeat_x            TRUE
-    repeat_y            false
-	zindex				0.04
+    repeat_y            FALSE
 
     sprite
     {
-        source_file     images/sea.png
-        source_rect     0 165 256 16
-        frame_size      64 16
+        source_file     images/sunshine_bg.png
+        source_rect     608 160 384 4
+        frame_size      48 4
 
         animation
         {
             repeat      TRUE
             fps         8
-            data        0 1 2 3
+            data        7 6 5 4 3 2 1 0
         }
     }
 }
 
-// river surface 1
+background
+{
+    initial_position    0 164
+    scroll_speed        -0.35 0
+    behavior            LINEAR -20.5 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 164 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
 background
 {
     initial_position    0 168
+    scroll_speed        -0.375 0
+    behavior            LINEAR -21 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     608 168 384 4
+        frame_size      48 4
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        7 6 5 4 3 2 1 0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 172
     scroll_speed        -0.4 0
-    behavior            linear -8 0
+    behavior            LINEAR -21.5 0
     repeat_x            TRUE
-    repeat_y            false
-	zindex				0.21
+    repeat_y            FALSE
 
     sprite
     {
-        source_file     images/sea.png
-        source_rect     0 256 272 8
-        frame_size      16 8
+        source_file     images/sunshine_bg.png
+        source_rect     608 172 384 84
+        frame_size      48 84
 
         animation
         {
             repeat      TRUE
             fps         8
-            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-        }
-    }
-}
-
-// river surface 2
-background
-{
-    initial_position    0 176
-    scroll_speed        -0.5 0
-    behavior            linear -16 0
-    repeat_x            TRUE
-    repeat_y            false
-	zindex				0.22
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 272 272 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-        }
-    }
-}
-
-// river surface 3
-background
-{
-    initial_position    0 192
-    scroll_speed        -0.6 0
-    behavior            linear -24 0
-    repeat_x            TRUE
-    repeat_y            false
-	zindex				0.23
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 272 272 16 //0 240 272 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-        }
-    }
-}
-
-// river surface 4
-background
-{
-    initial_position    0 208
-    scroll_speed        -0.7 0
-    behavior            linear -32 0
-    repeat_x            TRUE
-    repeat_y            false
-	zindex				0.23
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 272 272 16 //0 240 272 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-        }
-    }
-}
-
-// river surface 5
-background
-{
-    initial_position    0 224
-    scroll_speed        -0.8 0
-    behavior            linear -40 0
-    repeat_x            TRUE
-    repeat_y            false
-	zindex				0.23
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 272 272 16 //0 240 272 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-        }
-    }
-}
-
-// river (light)
-background
-{
-    initial_position    9 160
-    scroll_speed        -0.45 0
-    behavior            linear -4.5 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 174 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         8
-            data        1 2 3 0
-        }
-    }
-}
-
-background
-{
-    initial_position    18 176
-    scroll_speed        -0.5 0
-    behavior            linear -5 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         9
-            data        2 3 0 1
-        }
-    }
-}
-
-background
-{
-    initial_position    27 178
-    scroll_speed        -0.55 0
-    behavior            linear -5.5 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         10
-            data        3 0 1 2
-        }
-    }
-}
-
-background
-{
-    initial_position    36 188
-    scroll_speed        -0.6 0
-    behavior            linear -6 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         11
-            data        0 1 2 3
-        }
-    }
-}
-
-background
-{
-    initial_position    45 198
-    scroll_speed        -0.65 0
-    behavior            linear -6.5 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         12
-            data        1 2 3 0
-        }
-    }
-}
-
-background
-{
-    initial_position    54 208
-    scroll_speed        -0.7 0
-    behavior            linear -7 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         13
-            data        2 3 0 1
-        }
-    }
-}
-
-background
-{
-    initial_position    63 218
-    scroll_speed        -0.75 0
-    behavior            linear -7.5 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         14
-            data        3 0 1 2
-        }
-    }
-}
-
-background
-{
-    initial_position    72 228
-    scroll_speed        -0.8 0
-    behavior            linear -8 0
-    repeat_x            true
-    repeat_y            false
-	zindex				0.2
-
-    sprite
-    {
-        source_file     images/sea.png
-        source_rect     0 192 272 16
-        frame_size      68 16
-
-        animation
-        {
-            repeat      true
-            fps         15
-            data        0 1 2 3
+            data        7 6 5 4 3 2 1 0
         }
     }
 }
