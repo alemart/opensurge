@@ -70,7 +70,7 @@ image_t *image_load(const char *path)
 
     if(NULL == (img = resourcemanager_find_image(path))) {
         const char* fullpath = assetfs_fullpath(path);
-        logfile_message("image_load('%s')", fullpath);
+        logfile_message("image_load(\"%s\")", fullpath);
 
         /* build the image object */
         img = mallocx(sizeof *img);
@@ -78,7 +78,7 @@ image_t *image_load(const char *path)
         /* loading the image */
         img->data = load_bitmap(fullpath, NULL);
         if(img->data == NULL) {
-            logfile_message("image_load() error: %s", allegro_error);
+            fatal_error("image_load(\"%s\") error: %s", fullpath, allegro_error);
             free(img);
             return NULL;
         }
