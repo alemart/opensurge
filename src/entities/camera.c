@@ -182,8 +182,12 @@ v2d_t camera_get_position()
  */
 void camera_set_position(v2d_t position)
 {
-    camera.position.x = clip(position.x, VIDEO_SCREEN_W/2, level_size().x - VIDEO_SCREEN_W/2);
-    camera.position.y = clip(position.y, VIDEO_SCREEN_H/2, level_size().y - VIDEO_SCREEN_H/2);
+    if(!level_editmode()) {
+        camera.position.x = clip(position.x, VIDEO_SCREEN_W/2, level_size().x - VIDEO_SCREEN_W/2);
+        camera.position.y = clip(position.y, VIDEO_SCREEN_H/2, level_size().y - VIDEO_SCREEN_H/2);
+    }
+    else
+        camera.position = position;
     camera.dest = camera.position;
 }
 

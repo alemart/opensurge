@@ -122,7 +122,6 @@ static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
     v2d_t position = scripting_util_world_position(r.ssobject);
     v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     image_draw(img, video_get_backbuffer(), position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
-    /* TODO: what about detached objects? */
 }
 
 static int ypos_particles(renderable_t r) { return 0; }

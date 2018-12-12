@@ -2460,8 +2460,9 @@ bool render_ssobject(surgescript_object_t* object, void* param)
 {
     surgescript_programpool_t* pool = (surgescript_programpool_t*)param;
     if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
-        if(editor_is_enabled() && surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private")) {
-            renderqueue_enqueue_ssobject_debug(object);
+        if(editor_is_enabled()) {
+            if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
+                renderqueue_enqueue_ssobject_debug(object);
             return false;
         }
         else if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render")) {
