@@ -36,7 +36,7 @@ sprite SD_ERASER
 sprite SD_QUESTIONMARK
 {
     source_file     images/core.png
-    source_rect     0 0 32 32
+    source_rect     96 0 32 32
     frame_size      32 32
     hot_spot        16 16
 

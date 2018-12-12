@@ -5,7 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// sky
+// clear screen
 background
 {
     initial_position    0 0
@@ -13,6 +13,30 @@ background
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            TRUE
+
+    sprite
+    {
+        source_file     images/sunshine_bg.png
+        source_rect     768 192 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// sky
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
 
     sprite
     {
@@ -29,7 +53,7 @@ background
     }
 }
 
-// sky
+// clouds
 background
 {
     initial_position    0 32
@@ -80,7 +104,7 @@ background
 // trees
 background
 {
-    initial_position    0 672
+    initial_position    0 680
     scroll_speed        -0.45 -0.05
     behavior            DEFAULT
     repeat_x            TRUE
@@ -109,7 +133,7 @@ background
 {
     initial_position    0 128
     scroll_speed        -0.125 0
-    behavior            LINEAR -16 0
+    behavior            LINEAR -8 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -132,7 +156,7 @@ background
 {
     initial_position    0 132
     scroll_speed        -0.15 0
-    behavior            LINEAR -16.5 0
+    behavior            LINEAR -8.5 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -155,7 +179,7 @@ background
 {
     initial_position    0 136
     scroll_speed        -0.175 0
-    behavior            LINEAR -17 0
+    behavior            LINEAR -9 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -178,7 +202,7 @@ background
 {
     initial_position    0 140
     scroll_speed        -0.2 0
-    behavior            LINEAR -17.5 0
+    behavior            LINEAR -9.5 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -201,7 +225,7 @@ background
 {
     initial_position    0 144
     scroll_speed        -0.225 0
-    behavior            LINEAR -18 0
+    behavior            LINEAR -10 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -224,7 +248,7 @@ background
 {
     initial_position    0 148
     scroll_speed        -0.25 0
-    behavior            LINEAR -18.5 0
+    behavior            LINEAR -10.5 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -247,7 +271,7 @@ background
 {
     initial_position    0 152
     scroll_speed        -0.275 0
-    behavior            LINEAR -19 0
+    behavior            LINEAR -11 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -270,7 +294,7 @@ background
 {
     initial_position    0 156
     scroll_speed        -0.3 0
-    behavior            LINEAR -19.5 0
+    behavior            LINEAR -11.5 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -293,7 +317,7 @@ background
 {
     initial_position    0 160
     scroll_speed        -0.325 0
-    behavior            LINEAR -20 0
+    behavior            LINEAR -12 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -316,7 +340,7 @@ background
 {
     initial_position    0 164
     scroll_speed        -0.35 0
-    behavior            LINEAR -20.5 0
+    behavior            LINEAR -12.5 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -339,7 +363,7 @@ background
 {
     initial_position    0 168
     scroll_speed        -0.375 0
-    behavior            LINEAR -21 0
+    behavior            LINEAR -13 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -362,7 +386,7 @@ background
 {
     initial_position    0 172
     scroll_speed        -0.4 0
-    behavior            LINEAR -21.5 0
+    behavior            LINEAR -13.5 0
     repeat_x            TRUE
     repeat_y            FALSE
 

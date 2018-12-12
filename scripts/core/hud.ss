@@ -12,7 +12,6 @@ using SurgeEngine.Video;
 using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 
-object "Application" { x = spawn("DefaultHUD"); state "main" { } }
 object "DefaultHUD" is "entity", "detached", "awake", "private"
 {
     score = spawn("DefaultHUD.Score");
@@ -128,7 +127,7 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
-    icon = Actor("SD_HUDHEAD");
+    icon = Actor("LifeCounter");
     lives = Text("GoodNeighbors");
 
     state "main"

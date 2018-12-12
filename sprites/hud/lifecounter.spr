@@ -1,0 +1,45 @@
+// -----------------------------------------------------------------------------
+// File: lifecounter.ss
+// Description: sprite script for the Life Counter
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "LifeCounter"
+{
+    source_file     "images/hud.png"
+    source_rect     801 0 51 36
+    frame_size      17 18
+
+    // Surge
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // Neon
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // Charge
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // Tux
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+}
