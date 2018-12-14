@@ -168,13 +168,11 @@ INPUT_JOY_FIRE8         "BUTTON 8"
 
 // ------- Note to translators: -------
 //
-// since the game sometimes uses bitmap fonts,
-// some parts of the translation can't handle
-// special characters.
+// Since the game may use bitmap fonts, parts of
+// the translation don't accept special characters.
 //
-// This section does not allow language-specific
-// special characters. All other areas do allow
-// them, though.
+// This section does not accept language-specific
+// special characters. All other areas do.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.
@@ -195,6 +193,15 @@ HUD_SCORE                   "Score " // === translation notes: ===
 HUD_TIME                    "Time  " // the same amount of characters as HUD_SCORE
 HUD_COLLECTIBLES            "Power " // the same amount of characters as HUD_SCORE
 HUD_SPACES                  "      " // the same amount of characters as HUD_SCORE
+
+// Level Cleared animation
+CLEARED_LINE1               "YOU HAVE"
+CLEARED_LINE2               "CLEARED ZONE"
+CLEARED_POWER               "Power Bonus"
+CLEARED_TIME                "Time Bonus"
+CLEARED_SCORE               "Score"
+
+// obsolete
 HUD_CLEARED_LINE1           "YOU HAVE"
 HUD_CLEARED_LINE2           "PASSED"
 HUD_CLEARED_LINE2_ACT       "ACT"

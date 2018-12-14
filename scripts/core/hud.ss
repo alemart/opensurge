@@ -6,10 +6,10 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
-using SurgeEngine.Camera;
 using SurgeEngine.Vector2;
 using SurgeEngine.Video;
 using SurgeEngine.Actor;
+using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
 
 object "DefaultHUD" is "entity", "detached", "awake", "private"
@@ -22,6 +22,13 @@ object "DefaultHUD" is "entity", "detached", "awake", "private"
 
     state "main"
     {
+        if(Level.cleared)
+            state = "cleared";
+    }
+
+    state "cleared"
+    {
+        transform.move(-Video.screenWidth * Time.delta, 0);
     }
 
     fun constructor()
