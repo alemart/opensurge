@@ -102,8 +102,8 @@ object "DefaultClearedAnimation" is "entity", "awake", "detached", "private"
 
     state "fadeout"
     {
-        // TODO: fade out
         if(timeout(1.0)) {
+            // TODO: fade out
             state = "done";
         }
     }
