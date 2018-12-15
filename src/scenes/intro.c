@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * intro.c - introduction scene
+ * intro.c - introduction screen
  * Copyright (C) 2008-2011, 2013, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -18,9 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdbool.h>
 #include "intro.h"
-#include "quest.h"
 #include "../core/v2d.h"
 #include "../core/timer.h"
 #include "../core/scene.h"
@@ -31,45 +29,19 @@
 #include "../core/input.h"
 #include "../core/font.h"
 #include "../core/soundfactory.h"
-#include "../entities/background.h"
 
 
 /* private data */
-#define INTRO_TIMEOUT       5.0f
+#define INTRO_TIMEOUT       3.0f
+#define INTRO_FADETIME      0.5f
+#define INTRO_BGCOLOR       image_hex2rgb("0a0a0a")
+#define INTRO_FONT          "GoodNeighbors"
+#define INTRO_NUMFONTS      (sizeof(text) / sizeof(const char*))
+static const char *text[] = { "powered by", "Open Surge Engine" };
 static float elapsed_time;
-static bool must_fadein;
-static bool debug_mode;
-static image_t* bg;
+static int debug_mode;
+static font_t* fnt[INTRO_NUMFONTS];
 static input_t* in;
-
-#define COLOR_1            "ffe13e"
-#define COLOR_2            "ed8217"
-#define BGCOLOR            "0a0a0a"
-static const char *text = 
- "<color=" COLOR_1 ">"
- GAME_TITLE " " GAME_VERSION_STRING
- "</color>\n"
- "<color=" COLOR_2 ">"
- GAME_WEBSITE
- "</color>\n"
- "\n"
- "This program is free software; you can redistribute it and/or modify "
- "it under the terms of the GNU General Public License as published by "
- "the Free Software Foundation; either version 3 of the License, or "
- "(at your option) any later version.\n"
- "\n"
- "This program is distributed in the hope that it will be useful, "
- "but WITHOUT ANY WARRANTY; without even the implied warranty of "
- "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
- "GNU General Public License for more details.\n"
- "\n"
- "You should have received a copy of the GNU General Public License "
- "along with this program.  If not, see http://www.gnu.org/licenses/"
-;
-
-static image_t* create_background();
-
-
 
 /* public functions */
 
@@ -79,14 +51,31 @@ static image_t* create_background();
  */
 void intro_init(void *foo)
 {
-    elapsed_time = 0.0f;
-    must_fadein = true;
-    debug_mode = false;
-    music_stop();
-    bg = create_background();
-    in = input_create_user(NULL);
-}
+    int h, i;
 
+    /* initialize variables */
+    elapsed_time = 0.0f;
+    debug_mode = FALSE;
+    in = input_create_user(NULL);
+
+    /* create fonts */
+    for(i = 0; i < INTRO_NUMFONTS; i++) {
+        fnt[i] = font_create(INTRO_FONT);
+        font_set_text(fnt[i], text[i]);
+        font_set_align(fnt[i], FONTALIGN_CENTER);
+    }
+    
+    /* position fonts */
+    h = -font_get_textsize(fnt[0]).y * INTRO_NUMFONTS / 2;
+    for(i = 0; i < INTRO_NUMFONTS; i++) {
+        font_set_position(fnt[i], v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2 + h));
+        h += font_get_textsize(fnt[i]).y + font_get_charspacing(fnt[i]).y;
+    }
+
+    /* misc */
+    fadefx_in(image_rgb(0,0,0), INTRO_FADETIME);
+    music_stop();
+}
 
 /*
  * intro_release()
@@ -94,10 +83,10 @@ void intro_init(void *foo)
  */
 void intro_release()
 {
+    for(int i = 0; i < INTRO_NUMFONTS; i++)
+        font_destroy(fnt[i]);
     input_destroy(in);
-    image_destroy(bg);
 }
-
 
 /*
  * intro_update()
@@ -105,40 +94,32 @@ void intro_release()
  */
 void intro_update()
 {
+    /* elapsed time */
     elapsed_time += timer_get_delta();
-    if(!fadefx_is_fading() && !must_fadein && (input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE3) || input_button_pressed(in, IB_FIRE4)))
+    if(!fadefx_is_fading() && (input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE3) || input_button_pressed(in, IB_FIRE4)))
         elapsed_time += INTRO_TIMEOUT;
 
-    if(must_fadein) {
-        fadefx_in(image_rgb(0,0,0), 1.0f);
-        must_fadein = false;
-    }
-    else if(elapsed_time >= INTRO_TIMEOUT) {
+    /* done */
+    if(elapsed_time >= INTRO_TIMEOUT) {
         if(fadefx_over()) {
             scenestack_pop();
-            if(debug_mode) {
-                int d = debug_mode ? TRUE : FALSE;
-                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &d);
-            }
+            if(debug_mode)
+                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &debug_mode);
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0f);
+        fadefx_out(image_rgb(0,0,0), INTRO_FADETIME);
     }
 
-    if(music_is_playing())
-        music_stop();
-
+    /* secret */
     if(input_button_pressed(in, IB_RIGHT)) {
         static int cnt = 0;
         if(!debug_mode && ++cnt == 3) {
             sound_play(SFX_SECRET);
-            debug_mode = true;
+            debug_mode = TRUE;
             cnt = 0;
         }
     }
 }
-
-
 
 /*
  * intro_render()
@@ -146,28 +127,10 @@ void intro_update()
  */
 void intro_render()
 {
-    image_blit(bg, video_get_backbuffer(), 0, 0, (VIDEO_SCREEN_W - image_width(bg))/2, (VIDEO_SCREEN_H - image_height(bg))/2, image_width(bg), image_height(bg));
-}
-
-
-
-
-
-/* creates the background */
-image_t* create_background()
-{
-    image_t* img = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
+    int i;
     v2d_t camera = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-    font_t *fnt = font_create("disclaimer");
-    int padding = 5;
 
-    image_clear(video_get_backbuffer(), image_hex2rgb(BGCOLOR));
-    font_set_width(fnt, VIDEO_SCREEN_W - 2 * padding);
-    font_set_text(fnt, "%s", text);
-    font_set_position(fnt, v2d_new(padding, padding));
-    font_render(fnt, camera);
-    image_blit(video_get_backbuffer(), img, 0, 0, 0, 0, image_width(img), image_height(img));
-
-    font_destroy(fnt);
-    return img;
+    image_clear(video_get_backbuffer(), INTRO_BGCOLOR);
+    for(i = 0; i < INTRO_NUMFONTS; i++)
+        font_render(fnt[i], camera);
 }

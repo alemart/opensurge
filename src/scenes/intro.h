@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * intro.h - introduction scene
+ * intro.h - introduction screen
  * Copyright (C) 2008-2009  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
