@@ -44,6 +44,10 @@ object "DefaultCamera" is "entity", "awake", "private"
             centerCamera(player.transform.position);
         }
 
+        // stop camera
+        if(player.activity == "dying" || player.activity == "drowning")
+            return;
+
         // update camera
         Camera.position = transform.position.translatedBy(0, upDown.offset);
     }
@@ -72,6 +76,8 @@ object "DefaultCamera.UpDownLogic"
             state = "wait up";
         else if(player.activity == "ducking")
             state = "wait down";
+        else if(player.activity == "winning")
+            state = "move up";
         else
             moveBackToZero();
     }

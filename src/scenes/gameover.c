@@ -48,10 +48,12 @@ void gameover_init(void *foo)
 
     gameover_fnt[0] = font_create("gameover");
     font_set_position(gameover_fnt[0], v2d_new(-64, 112));
+    font_set_align(gameover_fnt[0], FONTALIGN_RIGHT);
     font_set_text(gameover_fnt[0], "GAME");
 
     gameover_fnt[1] = font_create("gameover");
     font_set_position(gameover_fnt[1], v2d_new(VIDEO_SCREEN_W+64, 112));
+    font_set_align(gameover_fnt[1], FONTALIGN_LEFT);
     font_set_text(gameover_fnt[1], "OVER");
 
     gameover_buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
@@ -76,7 +78,7 @@ void gameover_update()
 
     /* timer */
     gameover_timer += dt;
-    if(gameover_timer > GAMEOVER_TIMEOUT) {
+    if(gameover_timer >= GAMEOVER_TIMEOUT) {
         if(fadefx_over()) {
             quest_abort();
             scenestack_pop();
@@ -87,11 +89,11 @@ void gameover_update()
 
     /* "game over" text */
     pos = font_get_position(gameover_fnt[0]);
-    pos.x = min(pos.x + speed * dt, (VIDEO_SCREEN_W - font_get_textsize(gameover_fnt[0]).x - distance) / 2.0f);
+    pos.x = min(pos.x + speed * dt, (VIDEO_SCREEN_W - distance) / 2.0f);
     font_set_position(gameover_fnt[0], pos);
 
     pos = font_get_position(gameover_fnt[1]);
-    pos.x = max(pos.x - speed * dt, (VIDEO_SCREEN_W + font_get_textsize(gameover_fnt[1]).x + distance) / 2.0f);
+    pos.x = max(pos.x - speed * dt, (VIDEO_SCREEN_W + distance) / 2.0f);
     font_set_position(gameover_fnt[1], pos);
 }
 

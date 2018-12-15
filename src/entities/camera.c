@@ -74,7 +74,7 @@ void camera_init()
  */
 void camera_update()
 {
-    const float threshold = 10;
+    const float threshold = 10.0f;
     float dt = timer_get_delta();
     v2d_t ds;
 
@@ -141,7 +141,7 @@ void camera_move_to(v2d_t position, float seconds)
     camera.dest = position;
 
     /* hey, don't move too fast! */
-    if(seconds > EPSILON)
+    if(seconds > 0.016f)
         camera.speed = v2d_magnitude( v2d_subtract(camera.position, camera.dest) ) / seconds;
     else
         camera.position = camera.dest;
@@ -183,12 +183,12 @@ v2d_t camera_get_position()
 void camera_set_position(v2d_t position)
 {
     if(!level_editmode()) {
-        camera.position.x = clip(position.x, VIDEO_SCREEN_W/2, level_size().x - VIDEO_SCREEN_W/2);
-        camera.position.y = clip(position.y, VIDEO_SCREEN_H/2, level_size().y - VIDEO_SCREEN_H/2);
+        camera.dest.x = clip(position.x, VIDEO_SCREEN_W/2, level_size().x - VIDEO_SCREEN_W/2);
+        camera.dest.y = clip(position.y, VIDEO_SCREEN_H/2, level_size().y - VIDEO_SCREEN_H/2);
+        camera.position = camera.dest;
     }
     else
-        camera.position = position;
-    camera.dest = camera.position;
+        camera.position = camera.dest = position;
 }
 
 /*

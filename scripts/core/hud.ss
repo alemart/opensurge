@@ -56,8 +56,8 @@ object "DefaultHUD.Score" is "entity", "detached", "awake", "private"
     fun constructor()
     {
         label.zindex = value.zindex = 1000.0;
-        label.transform.localPosition = Vector2(0, 0);
-        value.transform.localPosition = Vector2(56, 0);
+        label.offset = Vector2(0, 0);
+        value.offset = Vector2(56, 0);
     }
 }
 
@@ -93,8 +93,8 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
     fun constructor()
     {
         label.zindex = value.zindex = 1000.0;
-        label.transform.localPosition = Vector2(0, 0);
-        value.transform.localPosition = Vector2(56, 0);
+        label.offset = Vector2(0, 0);
+        value.offset = Vector2(56, 0);
     }
 }
 
@@ -126,8 +126,8 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
     fun constructor()
     {
         label.zindex = value.zindex = 1000.0;
-        label.transform.localPosition = Vector2(0, 0);
-        value.transform.localPosition = Vector2(56, 0);
+        label.offset = Vector2(0, 0);
+        value.offset = Vector2(56, 0);
     }
 }
 
@@ -135,11 +135,11 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
     icon = Actor("LifeCounter");
-    lives = Text("GoodNeighbors");
+    value = Text("GoodNeighbors");
 
     state "main"
     {
-        lives.text = Player.active.lives;
+        value.text = Player.active.lives;
         icon.anim = iconId(Player.active.name);
     }
 
@@ -159,7 +159,7 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 
     fun constructor()
     {
-        icon.zindex = lives.zindex = 1000.0;
-        lives.transform.localPosition = Vector2(24, 5);
+        icon.zindex = value.zindex = 1000.0;
+        value.offset = Vector2(24, 5);
     }
 }

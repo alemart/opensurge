@@ -15,8 +15,7 @@ theme "themes/template.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 184 9976
 music "musics/template.ogg"
-//startup ".default_startup"
-startup "LevelClearedAnimation" "DefaultHUD"
+startup "DefaultClearedAnimation" "DefaultHUD" "SwitchController" "DefaultCamera"
 players "Surge" "Neon"
 waterlevel 10944
 
@@ -2094,6 +2093,7 @@ item 0 432 9984
 item 0 384 9984
 item 0 336 9984
 item 31 80 10000
+item 38 288 10000
 
 // legacy objects
 

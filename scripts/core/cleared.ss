@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: cleared.ss
-// Description: Level Cleared animation
+// Description: default Level Cleared Animation
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -13,16 +13,16 @@ using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.UI.Text;
 
-object "LevelClearedAnimation" is "entity", "awake", "detached", "private"
+object "DefaultClearedAnimation" is "entity", "awake", "detached", "private"
 {
     title = [
-        spawn("LevelClearedAnimation.Title").init(0),
-        spawn("LevelClearedAnimation.Title").init(1)
+        spawn("DefaultClearedAnimation.Title").init(0),
+        spawn("DefaultClearedAnimation.Title").init(1)
     ];
     counter = [
-        spawn("LevelClearedAnimation.Counter").init("score"),
-        spawn("LevelClearedAnimation.Counter").init("power"),
-        spawn("LevelClearedAnimation.Counter").init("time")
+        spawn("DefaultClearedAnimation.Counter").init("score"),
+        spawn("DefaultClearedAnimation.Counter").init("power"),
+        spawn("DefaultClearedAnimation.Counter").init("time")
     ];
     jingle = [
         Music("musics/winning.ogg"),
@@ -120,7 +120,7 @@ object "LevelClearedAnimation" is "entity", "awake", "detached", "private"
     }
 }
 
-object "LevelClearedAnimation.Title" is "entity", "awake", "detached", "private"
+object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
     text = Text("GoodNeighborsLarge");
@@ -190,10 +190,11 @@ object "LevelClearedAnimation.Title" is "entity", "awake", "detached", "private"
     fun constructor()
     {
         text.align = "center";
+        text.zindex = 1000;
     }
 }
 
-object "LevelClearedAnimation.Counter" is "entity", "awake", "detached", "private"
+object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
     text = Text("GoodNeighbors");
@@ -284,7 +285,7 @@ object "LevelClearedAnimation.Counter" is "entity", "awake", "detached", "privat
     {
         if(counterName == "score") {
             text.text = "<color=ffee55>$CLEARED_SCORE</color>";
-            counter = spawn("LevelClearedAnimation.Counter.Score");
+            counter = spawn("DefaultClearedAnimation.Counter.Score");
             transform.localPosition = Vector2(-0.5 * Video.screenWidth, 112);
             appearSpeed *= 1.0;
             isMaster = true;
@@ -293,13 +294,13 @@ object "LevelClearedAnimation.Counter" is "entity", "awake", "detached", "privat
         }
         else if(counterName == "time") {
             text.text = "<color=ffee55>$CLEARED_TIME</color>";
-            counter = spawn("LevelClearedAnimation.Counter.Time");
+            counter = spawn("DefaultClearedAnimation.Counter.Time");
             transform.localPosition = Vector2(-1.0 * Video.screenWidth, 128);
             appearSpeed *= 1.25;
         }
         else if(counterName == "power") {
             text.text = "<color=ffee55>$CLEARED_POWER</color>";
-            counter = spawn("LevelClearedAnimation.Counter.Power");
+            counter = spawn("DefaultClearedAnimation.Counter.Power");
             transform.localPosition = Vector2(-1.5 * Video.screenWidth, 144);
             appearSpeed *= 1.5;
         }
@@ -315,8 +316,8 @@ object "LevelClearedAnimation.Counter" is "entity", "awake", "detached", "privat
         text.align = "left";
         value.align = "right";
         text.zindex = value.zindex = 1000;
-        text.transform.localPosition = Vector2(Video.screenWidth * -0.23, 0);
-        value.transform.localPosition = Vector2(Video.screenWidth * 0.23, 0);
+        text.offset = Vector2(Video.screenWidth * -0.23, 0);
+        value.offset = Vector2(Video.screenWidth * 0.23, 0);
     }
 }
 
@@ -325,7 +326,7 @@ object "LevelClearedAnimation.Counter" is "entity", "awake", "detached", "privat
 // -----------------------------------------------------------------------------
 
 // Logic for counting the score
-object "LevelClearedAnimation.Counter.Score"
+object "DefaultClearedAnimation.Counter.Score"
 {
     score = -1;
     powerBonus = -1;
@@ -368,7 +369,7 @@ object "LevelClearedAnimation.Counter.Score"
 }
 
 // Logic for counting the Power Bonus
-object "LevelClearedAnimation.Counter.Power"
+object "DefaultClearedAnimation.Counter.Power"
 {
     powerBonus = -1;
 
@@ -391,7 +392,7 @@ object "LevelClearedAnimation.Counter.Power"
 }
 
 // Logic for counting the Time Bonus
-object "LevelClearedAnimation.Counter.Time"
+object "DefaultClearedAnimation.Counter.Time"
 {
     timeBonus = -1;
     seconds = 0;

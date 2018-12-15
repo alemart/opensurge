@@ -147,7 +147,8 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     surgescript_objecthandle_t child = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
 
     /* is the new object an entity? */
-    if(surgescript_tagsystem_has_tag(tag_system, child_name, "entity")) {
+    /* exception: startup objects may not be entities */
+    if(1 || surgescript_tagsystem_has_tag(tag_system, child_name, "entity")) {
         /* store its reference, so it won't be Garbage Collected */
         surgescript_heap_t* heap = surgescript_object_heap(object);
         surgescript_heapptr_t ptr = surgescript_heap_malloc(heap);
