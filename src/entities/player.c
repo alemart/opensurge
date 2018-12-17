@@ -106,7 +106,6 @@ player_t *player_create(const char *character_name)
     p->disable_roll = FALSE;
     p->in_locked_area = FALSE;
     p->at_some_border = FALSE;
-    p->bring_to_back = FALSE;
     p->disable_collectible_loss = FALSE;
     p->disable_animation_control = FALSE;
     p->attacking = FALSE;
@@ -272,6 +271,9 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         else
             player->underwater_timer = 0.0f;
 
+        if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD)
+            player_hit(player, 0.0f);
+
         if(player_seconds_remaining_to_drown(player) <= 0.0f)
             player_drown(player);
     }
@@ -432,7 +434,7 @@ void player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_obje
 /*
  * player_hit()
  * Hits a player. If it has no collectibles, then it must die.
- * tip: direction > 0 is right, < 0 is left
+ * tip: direction > 0 is right, < 0 is left, 0 is neutral
  */
 void player_hit(player_t *player, float direction)
 {
@@ -440,9 +442,11 @@ void player_hit(player_t *player, float direction)
         return;
 
     if(player_get_collectibles() > 0 || player->shield_type != SH_NONE) {
-        player->actor->speed.x = (physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
-        player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
-        player->actor->position.y -= 2; /* bugfix */
+        if(direction != 0.0f) {
+            player->actor->speed.x = (physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
+            player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
+            player->actor->position.y -= 2; /* bugfix */
+        }
 
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_hit(player->pa);

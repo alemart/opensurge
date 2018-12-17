@@ -95,7 +95,7 @@ static surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surge
 
 /* PlayerManager */
 static surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getactiveplayername(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getactive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* internals */
 #define SHOW_COLLIDERS 0 /* set it to 1 to display the colliders */
@@ -196,7 +196,7 @@ void scripting_register_player(surgescript_vm_t* vm)
 
     /* misc */
     surgescript_vm_bind(vm, "PlayerManager", "__spawnPlayers", fun_spawnplayers, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "get___activePlayerName", fun_getactiveplayername, 0);
+    surgescript_vm_bind(vm, "PlayerManager", "get_active", fun_getactive, 0);
 }
 
 /*
@@ -1076,9 +1076,15 @@ surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescr
     return NULL;
 }
 
-/* PlayerManager: the name of the currently active player */
-surgescript_var_t* fun_getactiveplayername(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* get the active player (i-th child) */
+surgescript_var_t* fun_getactive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    player_t* player = level_player();
-    return player != NULL ? surgescript_var_set_string(surgescript_var_create(), player_name(player)) : NULL;
+    player_t* current_player = level_player(), *player;
+    for(int i = 0; (player = level_get_player_by_id(i)) != NULL; i++) {
+        if(player == current_player) {
+            surgescript_objecthandle_t handle = surgescript_object_nth_child(object, i);
+            return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+        }
+    }
+    return NULL;
 }

@@ -27,9 +27,11 @@
 #include "item.h"
 #include "enemy.h"
 #include "actor.h"
+#include "background.h"
 #include "../core/util.h"
 #include "../core/video.h"
 #include "../core/image.h"
+#include "../scenes/level.h"
 #include "../scripting/scripting.h"
 
 /* private stuff ;) */
@@ -39,7 +41,8 @@ union renderable_t {
     brick_t *brick;
     item_t *item;
     object_t *object; /* legacy object */
-    surgescript_object_t* ssobject;
+    surgescript_object_t *ssobject;
+    bgtheme_t *theme;
 };
 
 typedef struct renderqueue_cell_t renderqueue_cell_t;
@@ -100,12 +103,15 @@ static float brick_zindex_offset(const brick_t *b)
 
 /* private strategies */
 static float zindex_particles(renderable_t r) { return 1.0f; }
-static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 1.0f : 0.5f; }
-static float zindex_item(renderable_t r) { return 0.5f; }
+static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 0.99999f : 0.5f; }
+static float zindex_item(renderable_t r) { return r.item->bring_to_back ? 0.49999f : 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
 static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
 static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
+static float zindex_background(renderable_t r) { return 0.0f; }
+static float zindex_foreground(renderable_t r) { return 1.0f; }
+static float zindex_water(renderable_t r) { return 1.0f; }
 
 static void render_particles(renderable_t r, v2d_t camera_position) { particle_render_all(camera_position); }
 static void render_player(renderable_t r, v2d_t camera_position) { player_render(r.player, camera_position); }
@@ -123,6 +129,14 @@ static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
     v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     image_draw(img, video_get_backbuffer(), position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
 }
+static void render_background(renderable_t r, v2d_t camera_position) { background_render_bg(r.theme, camera_position); }
+static void render_foreground(renderable_t r, v2d_t camera_position) { background_render_fg(r.theme, camera_position); }
+static void render_water(renderable_t r, v2d_t camera_position)
+{
+    int y = level_waterlevel() - ((int)camera_position.y - VIDEO_SCREEN_H/2);
+    if(y < VIDEO_SCREEN_H)
+        image_draw_waterfx(video_get_backbuffer(), y, level_watercolor());
+}
 
 static int ypos_particles(renderable_t r) { return 0; }
 static int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
@@ -130,6 +144,9 @@ static int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); 
 static int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
 static int ypos_brick(renderable_t r) { return brick_position(r.brick).y; }
 static int ypos_ssobject(renderable_t r) { return 0; } /* TODO (not needed?) */
+static int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes */
+static int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
+static int ypos_water(renderable_t r) { return 0; } /* not needed */
 
 static int type_particles(renderable_t r) { return 0; }
 static int type_player(renderable_t r) { return 1; }
@@ -137,6 +154,9 @@ static int type_item(renderable_t r) { return 2; }
 static int type_object(renderable_t r) { return 3; }
 static int type_brick(renderable_t r) { return 4; }
 static int type_ssobject(renderable_t r) { return 5; }
+static int type_background(renderable_t r) { return 5; }
+static int type_foreground(renderable_t r) { return 6; }
+static int type_water(renderable_t r) { return 7; }
 
 
 
@@ -269,6 +289,44 @@ void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
     node->cell.render = render_ssobject_debug;
     node->cell.ypos = ypos_ssobject;
     node->cell.type = type_ssobject;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_background(bgtheme_t* background)
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.entity.theme = background;
+    node->cell.zindex = zindex_background;
+    node->cell.render = render_background;
+    node->cell.ypos = ypos_background;
+    node->cell.type = type_background;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_foreground(bgtheme_t* foreground)
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.entity.theme = foreground;
+    node->cell.zindex = zindex_foreground;
+    node->cell.render = render_foreground;
+    node->cell.ypos = ypos_foreground;
+    node->cell.type = type_foreground;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_water()
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.zindex = zindex_water;
+    node->cell.render = render_water;
+    node->cell.ypos = ypos_water;
+    node->cell.type = type_water;
     node->next = queue;
     queue = node;
     size++;

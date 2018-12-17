@@ -64,7 +64,6 @@ struct player_t {
     int disable_roll;
     int in_locked_area;
     int at_some_border;
-    int bring_to_back;
     int on_movable_platform;
     int disable_collectible_loss;
     int disable_animation_control;

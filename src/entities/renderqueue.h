@@ -36,6 +36,7 @@ struct brick_t;
 struct item_t;
 struct enemy_t;
 struct player_t;
+struct bgtheme_t;
 struct surgescript_object_t;
 
 /* starts a new rendering process */
@@ -52,5 +53,8 @@ void renderqueue_enqueue_player(struct player_t *player);
 void renderqueue_enqueue_particles(); /* enqueues the whole particle system defined in particle.h */
 void renderqueue_enqueue_ssobject(struct surgescript_object_t* object);
 void renderqueue_enqueue_ssobject_debug(struct surgescript_object_t* object);
+void renderqueue_enqueue_background(struct bgtheme_t* background);
+void renderqueue_enqueue_foreground(struct bgtheme_t* foreground);
+void renderqueue_enqueue_water();
 
 #endif

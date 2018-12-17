@@ -185,16 +185,15 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
 static void restart(int preserve_current_spawnpoint);
-static void render_players(int bring_to_back);
+static void render_players();
 static void update_music();
 static void spawn_players();
-static void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
+static void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
 static void render_hud(enemy_list_t *major_enemies); /* gui / hud related */
 static void render_powerups(); /* gui / hud related */
 static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
-static void render_water();
 
 /* Scripting */
 #define TRANSFORM_MAX_DEPTH 64
@@ -1242,11 +1241,8 @@ void level_update()
 
         /* somebody is hurt! show it to the user */
         if(team[i] != player) {
-            if(player_is_getting_hit(team[i]) || player_is_dying(team[i])) {
+            if(player_is_getting_hit(team[i]) || player_is_dying(team[i]))
                 level_change_player(team[i]);
-                if(camera_focus != team[i]->actor)
-                    camera_move_to(team[i]->actor->position, 0.0);
-            }
         }
 
         /* updating... */
@@ -1374,24 +1370,11 @@ void level_render()
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
 
+    /* render level */
+    render_level(major_bricks, major_items, major_enemies);
 
-
-    /* background */
-    background_render_bg(backgroundtheme, camera_get_position());
-
-    /* entities */
-    render_entities(major_bricks, major_items, major_enemies);
-
-    /* water */
-    render_water();
-
-    /* foreground */
-    background_render_fg(backgroundtheme, camera_get_position());
-
-    /* hud */
+    /* render the built-in HUD */
     render_hud(major_enemies);
-
-
 
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);
@@ -1945,7 +1928,7 @@ void level_abort()
 
 /* renders the entities of the level: bricks,
  * enemies, items, players, etc. */
-void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies)
+void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies)
 {
     brick_list_t *bnode;
     item_list_t *inode;
@@ -1954,53 +1937,35 @@ void render_entities(brick_list_t *major_bricks, item_list_t *major_items, enemy
     /* starting up the render queue... */
     renderqueue_begin( camera_get_position() );
 
-        /* render bricks - background */
-        for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            if(brick_zindex(bnode->data) < 0.5f)
-                renderqueue_enqueue_brick(bnode->data);
-        }
+        /* render background */
+        renderqueue_enqueue_background(backgroundtheme);
 
-        /* render players (bring to back?) */
-        render_players(TRUE);
+        /* render bricks */
+        for(bnode=major_bricks; bnode; bnode=bnode->next)
+            renderqueue_enqueue_brick(bnode->data);
 
-        /* render bricks - platform level */
-        for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            if(fabs(brick_zindex(bnode->data) - 0.5f) < EPSILON)
-                renderqueue_enqueue_brick(bnode->data);
-        }
+        /* render items */
+        for(inode=major_items; inode; inode=inode->next)
+            renderqueue_enqueue_item(inode->data);
 
-        /* render items (bring to back) */
-        for(inode=major_items; inode; inode=inode->next) {
-            if(inode->data->bring_to_back)
-                renderqueue_enqueue_item(inode->data);
-        }
+        /* render legacy objects */
+        for(enode=major_enemies; enode; enode=enode->next)
+            renderqueue_enqueue_object(enode->data);
 
-        /* render non-HUD objects */
-        for(enode=major_enemies; enode; enode=enode->next) {
-            if(enode->data->zindex <= 1.0f)
-                renderqueue_enqueue_object(enode->data);
-        }
-
-        /* render non-HUD objects (surgescript) */
+        /* render surgescript objects */
         render_ssobjects();
-
-        /* render players (bring to front?) */
-        render_players(FALSE);
-
-        /* render items (bring to front) */
-        for(inode=major_items; inode; inode=inode->next) {
-            if(!inode->data->bring_to_back)
-                renderqueue_enqueue_item(inode->data);
-        }
 
         /* render particles */
         renderqueue_enqueue_particles();
 
-        /* render bricks - foreground */
-        for(bnode=major_bricks; bnode; bnode=bnode->next) {
-            if(brick_zindex(bnode->data) > 0.5f)
-                renderqueue_enqueue_brick(bnode->data);
-        }
+        /* render the players */
+        render_players();
+
+        /* render the water */
+        renderqueue_enqueue_water();
+
+        /* render foreground */
+        renderqueue_enqueue_foreground(backgroundtheme);
 
     /* okay, enough! let's render */
     renderqueue_end();
@@ -2081,17 +2046,13 @@ void reconfigure_players_input_devices()
 
 
 /* renders the players */
-void render_players(int bring_to_back)
+void render_players()
 {
-    int i;
-
-    for(i=team_size-1; i>=0; i--) {
-        if(team[i] != player && (team[i]->bring_to_back?TRUE:FALSE) == bring_to_back)
+    for(int i=team_size-1; i>=0; i--) {
+        if(team[i] != player)
             renderqueue_enqueue_player(team[i]);
     }
-
-    if((player->bring_to_back?TRUE:FALSE) == bring_to_back) /* comparing two booleans */
-        renderqueue_enqueue_player(player);
+    renderqueue_enqueue_player(player);
 }
 
 
@@ -2124,19 +2085,10 @@ void spawn_players()
 }
 
 
-/* renders the hud */
+/* renders the built-in hud */
 void render_hud(enemy_list_t *major_enemies)
 {
-    enemy_list_t *enode;
     v2d_t fixedcam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-
-    /* render objects with zindex > 1.0 (HUD) */
-    renderqueue_begin( camera_get_position() );
-        for(enode=major_enemies; enode; enode=enode->next) {
-            if(enode->data->zindex > 1.0f)
-                renderqueue_enqueue_object(enode->data);
-        }
-    renderqueue_end();
 
     /* powerups */
     if(!level_cleared)
@@ -2147,20 +2099,18 @@ void render_hud(enemy_list_t *major_enemies)
 }
 
 
-/* renders water */
-void render_water()
+/* renders the dialog box */
+void render_dlgbox(v2d_t camera_position)
 {
-    int y = waterlevel - ( (int)camera_get_position().y - VIDEO_SCREEN_H/2 );
-    if(y < VIDEO_SCREEN_H)
-        image_draw_waterfx(video_get_backbuffer(), y, watercolor);
+    actor_render(dlgbox, camera_position);
+    font_render(dlgbox_title, camera_position);
+    font_render(dlgbox_message, camera_position);
 }
-
-
 
 /* updates the dialog box */
 void update_dlgbox()
 {
-    float speed = 100.0; /* y speed */
+    float speed = VIDEO_SCREEN_H / 2; /* y speed */
     float dt = timer_get_delta();
     uint32 t = timer_get_ticks();
 
@@ -2170,7 +2120,7 @@ void update_dlgbox()
             return;
         }
         dlgbox->position.x = (VIDEO_SCREEN_W - image_width(actor_image(dlgbox)))/2;
-        dlgbox->position.y = max(dlgbox->position.y - speed*dt, VIDEO_SCREEN_H - image_height(actor_image(dlgbox))*1.3);
+        dlgbox->position.y = max(dlgbox->position.y - speed*dt, VIDEO_SCREEN_H - image_height(actor_image(dlgbox))*1.3f);
 
     }
     else {
@@ -2181,14 +2131,6 @@ void update_dlgbox()
     font_set_position(dlgbox_message, v2d_add(dlgbox->position, v2d_new(7, 20)));
 }
 
-
-/* renders the dialog box */
-void render_dlgbox(v2d_t camera_position)
-{
-    actor_render(dlgbox, camera_position);
-    font_render(dlgbox_title, camera_position);
-    font_render(dlgbox_message, camera_position);
-}
 
 
 
@@ -3033,8 +2975,8 @@ void editor_render()
     /* path of the movable platforms */
     editor_movable_platforms_path_render(major_bricks);
 
-    /* entities */
-    render_entities(major_bricks, major_items, major_enemies);
+    /* render level */
+    render_level(major_bricks, major_items, major_enemies);
 
     /* draw editor water line */
     editor_waterline_render((int)(waterlevel - topleft.y), image_rgb(255, 255, 255));
