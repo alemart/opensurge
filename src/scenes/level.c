@@ -1938,7 +1938,8 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
     renderqueue_begin( camera_get_position() );
 
         /* render background */
-        renderqueue_enqueue_background(backgroundtheme);
+        if(!editor_is_enabled())
+            renderqueue_enqueue_background(backgroundtheme);
 
         /* render bricks */
         for(bnode=major_bricks; bnode; bnode=bnode->next)
@@ -1962,10 +1963,12 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
         render_players();
 
         /* render the water */
-        renderqueue_enqueue_water();
+        if(!editor_is_enabled())
+            renderqueue_enqueue_water();
 
         /* render foreground */
-        renderqueue_enqueue_foreground(backgroundtheme);
+        if(!editor_is_enabled())
+            renderqueue_enqueue_foreground(backgroundtheme);
 
     /* okay, enough! let's render */
     renderqueue_end();
@@ -2402,7 +2405,7 @@ bool render_ssobject(surgescript_object_t* object, void* param)
         if(editor_is_enabled()) {
             if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
                 renderqueue_enqueue_ssobject_debug(object);
-            return false;
+            return true;
         }
         else if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render")) {
             renderqueue_enqueue_ssobject(object);
