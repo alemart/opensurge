@@ -33,16 +33,23 @@ sprite SD_WATERCOUNTER
 
 sprite SD_WATERSPLASH
 {
-    source_file     "images/water.png"
-    source_rect     0 64 210 32
-    frame_size      70 32
-    hot_spot        35 26
+    source_file     "images/watersplash.png"
+    source_rect     0 0 256 64
+    frame_size      64 64
+    hot_spot        32 64
 
     animation 0
     {
         repeat      FALSE
         fps         12
-        data        0 1 2
+        data        0 1 2 3
+    }
+
+    animation 1
+    {
+        repeat      FALSE
+        fps         12
+        data        0 1 2 3
     }
 }
 
@@ -106,5 +113,20 @@ sprite SD_WATERAIRBUBBLE
         repeat      TRUE
         fps         8
         data        0
+    }
+}
+
+sprite "Bubbles"
+{
+    source_file     "images/water.png"
+    source_rect     0 96 96 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1 2
     }
 }

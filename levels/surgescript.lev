@@ -10,6 +10,6 @@ act 1
 theme "themes/template.brk"
 bgtheme "themes/template.bg"
 spawn_point 0 0
-startup "SurgeScriptMOTD" ".default_startup.quit"
+startup "SurgeScriptMOTD" "DefaultSwitchController"
 players "none"
 readonly

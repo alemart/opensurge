@@ -9,7 +9,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Audio.Sound;
 
-object "SwitchController"
+object "DefaultSwitchController"
 {
     public enabled = true; // enable character switching?
     input = Input(null);

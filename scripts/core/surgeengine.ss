@@ -442,12 +442,6 @@ object "PlayerManager"
             return __error("Can't find Player \"" + nameOrId + "\": invalid identifier.");
     }
 
-    // get the active player
-    fun get_active()
-    {
-        return __getByName(__activePlayerName);
-    }
-
     // the number of players
     fun get_count()
     {
@@ -491,7 +485,7 @@ object "PlayerManager"
     }
 
     // fun __spawnPlayers() { [builtin] }
-    // fun get___activePlayerName() { [builtin] }
+    // fun get_active() { [builtin] }
 
     // manager overrides
     fun destroy() { }
