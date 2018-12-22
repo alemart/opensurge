@@ -35,7 +35,7 @@
 #define INTRO_TIMEOUT       3.0f
 #define INTRO_FADETIME      0.5f
 #define INTRO_BGCOLOR       image_hex2rgb("0a0a0a")
-#define INTRO_FONT          "GoodNeighbors"
+#define INTRO_FONT          "GoodNeighborsLarge"
 #define INTRO_NUMFONTS      (sizeof(text) / sizeof(const char*))
 static const char *text[] = { "powered by", "Open Surge Engine" };
 static float elapsed_time;
