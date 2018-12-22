@@ -1,0 +1,97 @@
+-----------------------------------------------------------------
+// File: opening.spr
+// Description: default Level Opening Animation sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "OpeningAnimation.LeftHalf"
+{
+    source_file     "images/opening.png"
+    source_rect     0 32 426 240
+    frame_size      426 240
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "OpeningAnimation.RightHalf"
+{
+    source_file     "images/opening.png"
+    source_rect     0 272 426 240
+    frame_size      426 240
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "OpeningAnimation.Void"
+{
+    source_file     "images/opening.png"
+    source_rect     0 512 426 240
+    frame_size      426 240
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "OpeningAnimation.Formula"
+{
+    source_file     "images/opening.png"
+    source_rect     0 800 384 192
+    frame_size      96 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+}

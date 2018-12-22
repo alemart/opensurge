@@ -5,13 +5,13 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Transform;
-using SurgeEngine.Player;
 using SurgeEngine.Vector2;
+using SurgeEngine.Player;
 using SurgeEngine.Level;
+using SurgeEngine.UI.Text;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
-using SurgeEngine.UI.Text;
 
 object "DefaultClearedAnimation" is "entity", "awake", "detached", "private"
 {
