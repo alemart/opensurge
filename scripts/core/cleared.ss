@@ -7,10 +7,10 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
-using SurgeEngine.Video;
 using SurgeEngine.Level;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
+using SurgeEngine.Video.Screen;
 using SurgeEngine.UI.Text;
 
 object "DefaultClearedAnimation" is "entity", "awake", "detached", "private"
@@ -124,7 +124,7 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 {
     transform = Transform();
     text = Text("GoodNeighborsLarge");
-    appearSpeed = 3 * Video.screenWidth; // in px/s
+    appearSpeed = 3 * Screen.width; // in px/s
 
     state "main"
     {
@@ -134,14 +134,14 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
     {
         transform.move(appearSpeed * Time.delta, 0);
         if(appearSpeed > 0) {
-            if(transform.localPosition.x >= Video.screenWidth / 2) {
-                transform.localPosition = Vector2(Video.screenWidth / 2, transform.localPosition.y);
+            if(transform.localPosition.x >= Screen.width / 2) {
+                transform.localPosition = Vector2(Screen.width / 2, transform.localPosition.y);
                 state = "done";
             }
         }
         else {
-            if(transform.localPosition.x <= Video.screenWidth / 2) {
-                transform.localPosition = Vector2(Video.screenWidth / 2, transform.localPosition.y);
+            if(transform.localPosition.x <= Screen.width / 2) {
+                transform.localPosition = Vector2(Screen.width / 2, transform.localPosition.y);
                 state = "done";
             }
         }
@@ -172,12 +172,12 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
         // configure the text according to lineId
         if(lineId == 0) {
             text.text = "$CLEARED_LINE1";
-            transform.localPosition = Vector2(3 * Video.screenWidth / 2, 48);
+            transform.localPosition = Vector2(3 * Screen.width / 2, 48);
             appearSpeed *= -1.0;
         }
         else if(lineId == 1) {
             text.text = "$CLEARED_LINE2 " + Level.act;
-            transform.localPosition = Vector2(-Video.screenWidth / 2, 76);
+            transform.localPosition = Vector2(-Screen.width / 2, 76);
             appearSpeed *= 1.0;
         }
         else
@@ -200,7 +200,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
     text = Text("GoodNeighbors");
     value = Text("GoodNeighbors");
     counter = null;
-    appearSpeed = 3 * Video.screenWidth; // in px/s
+    appearSpeed = 3 * Screen.width; // in px/s
     isMaster = false;
     countfx = null;
     donefx = null;
@@ -212,8 +212,8 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
     state "appearing"
     {
         transform.move(appearSpeed * Time.delta, 0);
-        if(transform.localPosition.x >= Video.screenWidth / 2) {
-            transform.localPosition = Vector2(Video.screenWidth / 2, transform.localPosition.y);
+        if(transform.localPosition.x >= Screen.width / 2) {
+            transform.localPosition = Vector2(Screen.width / 2, transform.localPosition.y);
             state = "wait";
         }
     }
@@ -286,7 +286,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
         if(counterName == "score") {
             text.text = "<color=ffee55>$CLEARED_SCORE</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Score");
-            transform.localPosition = Vector2(-0.5 * Video.screenWidth, 112);
+            transform.localPosition = Vector2(-0.5 * Screen.width, 112);
             appearSpeed *= 1.0;
             isMaster = true;
             countfx = Sound("samples/collectible_count.wav");
@@ -295,13 +295,13 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
         else if(counterName == "time") {
             text.text = "<color=ffee55>$CLEARED_TIME</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Time");
-            transform.localPosition = Vector2(-1.0 * Video.screenWidth, 128);
+            transform.localPosition = Vector2(-1.0 * Screen.width, 128);
             appearSpeed *= 1.25;
         }
         else if(counterName == "power") {
             text.text = "<color=ffee55>$CLEARED_POWER</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Power");
-            transform.localPosition = Vector2(-1.5 * Video.screenWidth, 144);
+            transform.localPosition = Vector2(-1.5 * Screen.width, 144);
             appearSpeed *= 1.5;
         }
         else
@@ -316,8 +316,8 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
         text.align = "left";
         value.align = "right";
         text.zindex = value.zindex = 1000;
-        text.offset = Vector2(Video.screenWidth * -0.23, 0);
-        value.offset = Vector2(Video.screenWidth * 0.23, 0);
+        text.offset = Vector2(Screen.width * -0.23, 0);
+        value.offset = Vector2(Screen.width * 0.23, 0);
     }
 }
 

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * video.c - scripting system: video routines
+ * screen.c - scripting system: screen routines
  * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
@@ -27,20 +27,20 @@
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getscreenwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getscreenheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
- * scripting_register_video()
- * Register the Video object
+ * scripting_register_screen()
+ * Register the Screen object
  */
-void scripting_register_video(surgescript_vm_t* vm)
+void scripting_register_screen(surgescript_vm_t* vm)
 {
-    surgescript_vm_bind(vm, "Video", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "Video", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "Video", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Video", "get_screenWidth", fun_getscreenwidth, 0);
-    surgescript_vm_bind(vm, "Video", "get_screenHeight", fun_getscreenheight, 0);
+    surgescript_vm_bind(vm, "Screen", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Screen", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Screen", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "Screen", "get_width", fun_getwidth, 0);
+    surgescript_vm_bind(vm, "Screen", "get_height", fun_getheight, 0);
 }
 
 /* main state */
@@ -65,13 +65,13 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 }
 
 /* the width of the screen, in pixels */
-surgescript_var_t* fun_getscreenwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_number(surgescript_var_create(), VIDEO_SCREEN_W);
 }
 
 /* the height of the screen, in pixels */
-surgescript_var_t* fun_getscreenheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_number(surgescript_var_create(), VIDEO_SCREEN_H);
 }

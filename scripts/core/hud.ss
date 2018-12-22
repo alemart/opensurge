@@ -7,10 +7,10 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
-using SurgeEngine.Video;
 using SurgeEngine.Actor;
 using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
+using SurgeEngine.Video.Screen;
 
 object "DefaultHUD" is "entity", "detached", "awake", "private"
 {
@@ -28,7 +28,7 @@ object "DefaultHUD" is "entity", "detached", "awake", "private"
 
     state "cleared"
     {
-        transform.move(-Video.screenWidth * Time.delta, 0);
+        transform.move(-Screen.width * Time.delta, 0);
     }
 
     fun constructor()
@@ -37,7 +37,7 @@ object "DefaultHUD" is "entity", "detached", "awake", "private"
         score.transform.localPosition = Vector2.zero;
         timer.transform.localPosition = Vector2(0, 16);
         collectibles.transform.localPosition = Vector2(0, 32);
-        lives.transform.localPosition = Vector2(0, Video.screenHeight - 34);
+        lives.transform.localPosition = Vector2(0, Screen.height - 34);
     }
 }
 
@@ -49,7 +49,7 @@ object "DefaultHUD.Score" is "entity", "detached", "awake", "private"
 
     state "main"
     {
-        label.text = "<color=ffee55>$HUD_SCORE</color>";
+        label.text = "<color=ffee11>$HUD_SCORE</color>";
         value.text = Player.active.score;
     }
 
@@ -79,7 +79,7 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
         sec = Math.mod(seconds, 60);
         dsec = Math.floor((timer - seconds) * 100);
         value.text = minutes + "' " + pad(sec) + "\" " + pad(dsec);
-        label.text = "<color=ffee55>$HUD_TIME</color>";
+        label.text = "<color=ffee11>$HUD_TIME</color>";
     }
 
     fun pad(x)
@@ -107,7 +107,7 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 
     state "main"
     {
-        label.text = "<color=ffee55>$HUD_COLLECTIBLES</color>";
+        label.text = "<color=ffee11>$HUD_COLLECTIBLES</color>";
         value.text = Player.active.collectibles;
         if(Player.active.collectibles == 0) {
             if(timeout(blinkTime))

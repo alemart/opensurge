@@ -274,13 +274,13 @@ SET(
   src/scripting/obstaclemap.c
   src/scripting/player.c
   src/scripting/prefs.c
+  src/scripting/screen.c
   src/scripting/sensor.c
   src/scripting/sound.c
   src/scripting/text.c
   src/scripting/time.c
   src/scripting/transform.c
   src/scripting/vector2.c
-  src/scripting/video.c
   src/scripting/web.c
 
   src/entities/items/util/itemutil.c

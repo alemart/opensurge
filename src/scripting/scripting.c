@@ -60,13 +60,13 @@ extern void scripting_register_music(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_player(surgescript_vm_t* vm);
 extern void scripting_register_prefs(surgescript_vm_t* vm);
+extern void scripting_register_screen(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
 extern void scripting_register_sound(surgescript_vm_t* vm);
 extern void scripting_register_text(surgescript_vm_t* vm);
 extern void scripting_register_time(surgescript_vm_t* vm);
 extern void scripting_register_transform(surgescript_vm_t* vm);
 extern void scripting_register_vector2(surgescript_vm_t* vm);
-extern void scripting_register_video(surgescript_vm_t* vm);
 extern void scripting_register_web(surgescript_vm_t* vm);
 
 /*
@@ -100,13 +100,13 @@ void scripting_init(int argc, const char** argv)
     scripting_register_obstaclemap(vm);
     scripting_register_player(vm);
     scripting_register_prefs(vm);
+    scripting_register_screen(vm);
     scripting_register_sensor(vm);
     scripting_register_sound(vm);
     scripting_register_text(vm);
     scripting_register_time(vm);
     scripting_register_transform(vm);
     scripting_register_vector2(vm);
-    scripting_register_video(vm);
     scripting_register_web(vm);
 
     /* compile scripts */

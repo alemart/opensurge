@@ -42,32 +42,22 @@ object "SurgeEngine"
     inputFactory = spawn("InputFactory");
     levelManager = spawn("LevelManager");
     camera = spawn("Camera");
-    collisions = spawn("CollisionPackage");
-    userInterface = spawn("UIPackage");
-    audio = spawn("AudioPackage");
+    collisions = spawn("Collision");
+    userInterface = spawn("UI");
+    audio = spawn("Audio");
+    video = spawn("Video");
     prefs = spawn("Prefs");
     transformFactory = spawn("TransformFactory");
     vectorFactory = spawn("VectorFactory");
-    video = spawn("Video");
 
     fun get_Actor()
     {
         return actorFactory;
     }
 
-    fun Actor(spriteName)
-    {
-        return get_Actor().call(spriteName);
-    }
-
     fun get_Input()
     {
         return inputFactory;
-    }
-
-    fun Input(inputMap)
-    {
-        return get_Input().call(inputMap);
     }
 
     fun get_LevelManager()
@@ -105,11 +95,6 @@ object "SurgeEngine"
         return levelManager.playerManager;
     }
 
-    fun Player(playerNameOrId)
-    {
-        return get_Player().call(playerNameOrId);
-    }
-
     fun get_UI()
     {
         return userInterface;
@@ -128,11 +113,6 @@ object "SurgeEngine"
     fun get_Vector2()
     {
         return vectorFactory;
-    }
-
-    fun Transform()
-    {
-        return get_Transform().call();
     }
 }
 
@@ -197,7 +177,7 @@ object "InputFactory"
     fun destroy() { }
 }
 
-object "CollisionPackage"
+object "Collision"
 {
     manager = spawn("CollisionManager");
     box = spawn("CollisionBoxFactory");
@@ -270,7 +250,7 @@ object "CollisionBallFactory"
     fun destroy() { }
 }
 
-object "UIPackage"
+object "UI"
 {
     text = spawn("TextFactory");
 
@@ -363,7 +343,7 @@ object "VectorFactory"
     fun destroy() { }
 }
 
-object "AudioPackage"
+object "Audio"
 {
     music = spawn("MusicFactory");
     sound = spawn("SoundFactory");
@@ -373,19 +353,9 @@ object "AudioPackage"
         return music;
     }
 
-    fun Music(pathToMusic)
-    {
-        return get_Music().call(pathToMusic);
-    }
-
     fun get_Sound()
     {
         return sound;
-    }
-
-    fun Sound(pathToSound)
-    {
-        return get_Sound().call(pathToSound);
     }
 
     fun destroy() { }
@@ -415,6 +385,18 @@ object "SoundFactory"
         sound = caller.spawn("Sound");
         sound.__init(pathToSound);
         return sound;
+    }
+
+    fun destroy() { }
+}
+
+object "Video"
+{
+    screen = spawn("Screen");
+
+    fun get_Screen()
+    {
+        return screen;
     }
 
     fun destroy() { }

@@ -9,11 +9,11 @@ using SurgeEngine.Actor;
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
-using SurgeEngine.Video;
-using SurgeEngine.Camera;
+using SurgeEngine.UI.Text;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
-using SurgeEngine.UI.Text;
+using SurgeEngine.Video.Screen;
+using SurgeEngine.Camera;
 
 // how to spawn a WaterBubble:
 // bubble = Level.spawn("WaterBubble").at(x, y).sized("xs" | "sm" | "md" | "lg");
@@ -100,6 +100,7 @@ object "WaterSplash" is "entity", "private", "disposable"
     fun constructor()
     {
         splash.zindex = 0.99;
+        splash.alpha = 0.7;
     }
 }
 
@@ -182,7 +183,7 @@ object "DefaultWaterController.UnderwaterTimer" is "entity", "private", "detache
 
     fun constructor()
     {
-        transform.position = Vector2(Video.screenWidth / 2, Video.screenHeight / 2 - 16);
+        transform.position = Vector2(Screen.width / 2, Screen.height / 2 - 16);
         counter.align = "center";
         counter.visible = false;
         counter.zindex = 1000.0;
