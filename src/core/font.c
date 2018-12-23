@@ -469,7 +469,7 @@ void font_render(const font_t *f, v2d_t camera_position)
             uszprintf(s, sizeof(s), "%lc", wide_char);
             textsize = f->my_class->textsize(f->my_class, s);
             w = (int)textsize.x; h = (int)textsize.y;
-            if(*s == '\n' && !s[1]) h /= 2;
+            if(*s == '\n' && !s[1] && f->my_class->renderchar == fontdata_bmp_renderchar) h /= 2;
 
             /* printing text */
             if(wordwrap) { offx = 0; offy += h + vspace; }
@@ -1203,7 +1203,7 @@ void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
 
     /* renderchar */
     if(!aa && (ch >= 32 && ch <= 127)) {
-        /* this character is in cache */
+        /* this character is cached */
         image_t *char_image = f->cached_character[ch-32];
         if(color != image_rgb(255,255,255))
             image_draw_multiply(char_image, img, x, y, color, 1.0f, IF_NONE);
@@ -1211,7 +1211,7 @@ void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
             image_draw(char_image, img, x, y, IF_NONE);
     }
     else {
-        /* this character is not in cache */
+        /* this character is not cached */
         char buf[16];
         uszprintf(buf, sizeof(buf), "%lc", ch);
         (aa ? alfont_textout_aa_ex : alfont_textout_ex)(IMAGE2BITMAP(img), f->ttf, buf, x, y, (int)color, -1);
