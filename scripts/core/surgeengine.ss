@@ -830,7 +830,7 @@ object "CollisionBall" is "collider"
         // entity validation
         entity = parent;
         if(!entity.hasTag("entity") && !parent.hasTag("collider"))
-            Application.crash(__name + " requires object \"" + entity.__name + "\" to be an entity.");
+            Application.crash(__name + " requires object \"" + entity.__name + "\" to be an entity | collider.");
         else if(entity.hasTag("detached"))
             Application.crash(__name + " won't work with detached entities like \"" + entity.__name + "\".");
 

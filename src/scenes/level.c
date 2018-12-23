@@ -902,8 +902,15 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             const char* name = param[0];
             int x = atoi(param[1]);
             int y = atoi(param[2]);
-            if(!is_startup_object(name))
-                level_create_enemy(name, v2d_new(x, y)); /* old API */
+            if(!is_startup_object(name)) {
+                surgescript_object_t* obj = level_create_ssobject(name, v2d_new(x, y));
+                if(obj != NULL) {
+                    if(!surgescript_object_has_tag(obj, "entity"))
+                        fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
+                }
+                else
+                    level_create_enemy(name, v2d_new(x, y)); /* old API */
+            }
         }
         else
             logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);

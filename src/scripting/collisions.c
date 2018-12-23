@@ -101,26 +101,21 @@ surgescript_var_t* fun_collisionball_render(surgescript_object_t* object, const 
     surgescript_object_call_function(object, "get_visible", NULL, 0, debug);
 
     if(surgescript_var_get_bool(debug) && scripting_util_is_object_inside_screen(object)) {
-        surgescript_var_t* center_x = surgescript_var_create();
-        surgescript_var_t* center_y = surgescript_var_create();
         surgescript_var_t* radius = surgescript_var_create();
         uint32_t color = COLLIDER_COLOR;
         v2d_t camera = scripting_util_object_camera(object);
         v2d_t center; float r;
 
-        surgescript_object_call_function(object, "get_centerX", NULL, 0, center_x);
-        surgescript_object_call_function(object, "get_centerY", NULL, 0, center_y);
         surgescript_object_call_function(object, "get_radius", NULL, 0, radius);
 
-        center.x = surgescript_var_get_number(center_x) - (camera.x - VIDEO_SCREEN_W/2);
-        center.y = surgescript_var_get_number(center_y) - (camera.y - VIDEO_SCREEN_H/2);
+        center = scripting_util_world_position(object);
+        center.x -= (camera.x - VIDEO_SCREEN_W/2);
+        center.y -= (camera.y - VIDEO_SCREEN_H/2);
         r = surgescript_var_get_number(radius);
 
         image_ellipse(video_get_backbuffer(), center.x, center.y, r, r, color);
 
         surgescript_var_destroy(radius);
-        surgescript_var_destroy(center_y);
-        surgescript_var_destroy(center_x);
     }
 
     surgescript_var_destroy(debug);

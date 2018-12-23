@@ -24,16 +24,22 @@ object "WaterBubble" is "entity", "private", "disposable"
     transform = Transform();
     amplitude = 2 + Math.random() * 2;
     bubble = Actor("SD_WATERAIRBUBBLE");
-    hsy = 16; t = 0;
+    hy = 16; t = 0;
+    components = null;
 
     state "main"
     {
-        // move
+        state = "move";
+    }
+
+    state "move"
+    {
+        // move upwards
         dt = Time.delta; t += dt;
         transform.move((amplitude * 6.2832) * Math.cos(6.2832 * t) * dt, -30 * dt); // chain rule
 
         // got out of water?
-        if(transform.position.y - hsy * 0.5 < Level.waterlevel)
+        if(transform.position.y - hy < Level.waterlevel)
             destroy();
     }
 
@@ -48,12 +54,12 @@ object "WaterBubble" is "entity", "private", "disposable"
         bubble.alpha = 0.5;
         bubble.zindex = 0.99;
         bubble.anim = 0;
-        hsy = bubble.animation.hotspot.y;
+        hy = bubble.animation.hotspot.y / 2;
     }
 
     fun at(x, y)
     {
-        transform.localPosition = Vector2(x, y);
+        transform.position = Vector2(x, y);
         return this;
     }
 
@@ -67,7 +73,16 @@ object "WaterBubble" is "entity", "private", "disposable"
             bubble.anim = 3;
         else if(size == "lg")
             bubble.anim = 1;
-        hsy = bubble.animation.hotspot.y;
+        hy = bubble.animation.hotspot.y / 2;
+        return this;
+    }
+
+    fun withComponent(componentName)
+    {
+        newComponent = spawn(componentName);
+        if(components == null)
+            components = [];
+        components.push(newComponent);
         return this;
     }
 
@@ -93,7 +108,7 @@ object "WaterSplash" is "entity", "private", "disposable"
 
     fun at(x, y)
     {
-        transform.localPosition = Vector2(x, y);
+        transform.position = Vector2(x, y);
         return this;
     }
 
