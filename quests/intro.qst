@@ -11,6 +11,5 @@ name            "Introduction cutscene"
 hidden
 
 // level list (in order of appearance)
-level           "levels/cutscenes/allegro.lev"
-level           "levels/cutscenes/creativecommons.lev"
+level           "levels/scenes/allegro.lev"
 level           "levels/menus/title.lev"
