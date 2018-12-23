@@ -12,14 +12,23 @@
 // give it a different name and change the 'startup' parameter on the .lev file.
 object "DefaultStartup"
 {
-    hud = spawn("DefaultHUD");
+    hud = null;
     cam = spawn("DefaultCamera");
     switchController = spawn("DefaultSwitchController");
     waterController = spawn("DefaultWaterController");
     clearedAnim = spawn("DefaultClearedAnimation");
-    //openingAnim = spawn("DefaultOpeningAnimation");
+    openingAnim = spawn("DefaultOpeningAnimation");
 
     state "main"
+    {
+        // wait for the completion of the opening animation
+        if(timeout(3.0)) {
+            hud = spawn("DefaultHUD");
+            state = "done";
+        }
+    }
+
+    state "done"
     {
     }
 }

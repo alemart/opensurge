@@ -5,11 +5,12 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-sprite "OpeningAnimation.LeftHalf"
+sprite "DefaultOpeningAnimation.LeftHalf"
 {
     source_file     "images/opening.png"
     source_rect     0 32 426 240
     frame_size      426 240
+    hot_spot        426 0
 
     animation 0
     {
@@ -19,11 +20,12 @@ sprite "OpeningAnimation.LeftHalf"
     }
 }
 
-sprite "OpeningAnimation.RightHalf"
+sprite "DefaultOpeningAnimation.RightHalf"
 {
     source_file     "images/opening.png"
     source_rect     0 272 426 240
     frame_size      426 240
+    hot_spot        0 0
 
     animation 0
     {
@@ -33,7 +35,7 @@ sprite "OpeningAnimation.RightHalf"
     }
 }
 
-sprite "OpeningAnimation.Void"
+sprite "DefaultOpeningAnimation.Void"
 {
     source_file     "images/opening.png"
     source_rect     0 512 426 240
@@ -47,11 +49,11 @@ sprite "OpeningAnimation.Void"
     }
 }
 
-sprite "OpeningAnimation.Formula"
+sprite "DefaultOpeningAnimation.Formula"
 {
     source_file     "images/opening.png"
-    source_rect     0 800 384 192
-    frame_size      96 32
+    source_rect     0 800 320 224
+    frame_size      320 224
 
     animation 0
     {
@@ -59,44 +61,9 @@ sprite "OpeningAnimation.Formula"
         fps         8
         data        0
     }
-
-    animation 1
-    {
-        repeat      TRUE
-        fps         8
-        data        1
-    }
-
-    animation 2
-    {
-        repeat      TRUE
-        fps         8
-        data        2
-    }
-
-    animation 3
-    {
-        repeat      TRUE
-        fps         8
-        data        3
-    }
-
-    animation 4
-    {
-        repeat      TRUE
-        fps         8
-        data        4
-    }
-
-    animation 5
-    {
-        repeat      TRUE
-        fps         8
-        data        5
-    }
 }
 
-sprite "OpeningAnimation.Lighting"
+sprite "DefaultOpeningAnimation.Lighting"
 {
     source_file     "images/opening.png"
     source_rect     448 32 64 64
@@ -111,7 +78,7 @@ sprite "OpeningAnimation.Lighting"
     }
 }
 
-sprite "OpeningAnimation.Wheel"
+sprite "DefaultOpeningAnimation.Wheel"
 {
     source_file     "images/opening.png"
     source_rect     448 96 64 64
@@ -126,10 +93,10 @@ sprite "OpeningAnimation.Wheel"
     }
 }
 
-sprite "OpeningAnimation.Arrow"
+sprite "DefaultOpeningAnimation.Arrow"
 {
     source_file     "images/opening.png"
-    source_rect     448 160 64 32
+    source_rect     448 160 64 64
     frame_size      64 32
 
     animation 0
@@ -137,7 +104,7 @@ sprite "OpeningAnimation.Arrow"
         repeat      TRUE
         fps         8
         data        0
-        hot_spot    32 32
+        hot_spot    0 32
     }
 
     animation 1

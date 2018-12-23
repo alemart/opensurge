@@ -57,26 +57,42 @@ object "WaterBubble" is "entity", "private", "disposable"
         hy = bubble.animation.hotspot.y / 2;
     }
 
+    fun burst()
+    {
+        bubble.anim = 2;
+        state = "burst";
+    }
+
+    // set world position
     fun at(x, y)
     {
         transform.position = Vector2(x, y);
         return this;
     }
 
+    // set size
     fun sized(size)
     {
-        if(size == "xs")
+        if(size == "xs") {
             bubble.anim = 4;
-        else if(size == "sm")
+            hy = bubble.animation.hotspot.y / 2;
+        }
+        else if(size == "sm") {
             bubble.anim = 0;
-        else if(size == "md")
+            hy = bubble.animation.hotspot.y / 2;
+        }
+        else if(size == "md") {
             bubble.anim = 3;
-        else if(size == "lg")
+            hy = bubble.animation.hotspot.y / 2;
+        }
+        else if(size == "lg") {
             bubble.anim = 1;
-        hy = bubble.animation.hotspot.y / 2;
+            hy = bubble.animation.hotspot.y;
+        }
         return this;
     }
 
+    // dynamically add components
     fun withComponent(componentName)
     {
         newComponent = spawn(componentName);
@@ -84,12 +100,6 @@ object "WaterBubble" is "entity", "private", "disposable"
             components = [];
         components.push(newComponent);
         return this;
-    }
-
-    fun burst()
-    {
-        bubble.anim = 2;
-        state = "burst";
     }
 }
 
