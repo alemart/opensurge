@@ -173,6 +173,8 @@ object "DefaultWaterController.UnderwaterTimer" is "entity", "private", "detache
     state "main"
     {
         player = Player.active;
+        if(player.shield == "water")
+            return;
         if(player.underwater) {
             t = player.secondsToDrown;
             if(t > 0 && t <= seconds) {
