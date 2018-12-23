@@ -80,6 +80,8 @@ object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
 
     state "done"
     {
+        if(timeout(1.0))
+            destroy();
     }
 }
 
