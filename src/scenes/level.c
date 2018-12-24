@@ -94,7 +94,7 @@ static void update_dialogregions();
 /* ------------------------
  * Startup objects
  * ------------------------ */
-#define DEFAULT_STARTUP_OBJECT ".default_startup"
+#define DEFAULT_STARTUP_OBJECT "DefaultStartup"
 typedef struct startupobject_list_t startupobject_list_t;
 struct startupobject_list_t {
     char *object_name;
