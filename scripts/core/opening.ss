@@ -22,7 +22,7 @@ object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
     title = spawn("DefaultOpeningAnimation.Title");
     game = spawn("DefaultOpeningAnimation.Game");
     lighting = spawn("DefaultOpeningAnimation.Lighting");
-    formula = [
+    formulas = [
         spawn("DefaultOpeningAnimation.Formula").atColumn(0),
         spawn("DefaultOpeningAnimation.Formula").atColumn(1),
         spawn("DefaultOpeningAnimation.Formula").atColumn(2)
@@ -51,8 +51,8 @@ object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
             title.appear();
             act.appear();
             lighting.appear();
-            foreach(f in formula)
-                f.appear();
+            foreach(formula in formulas)
+                formula.appear();
             state = "displaying info";
         }
     }
@@ -63,8 +63,8 @@ object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
             theVoid.disappear();
             leftHalf.disappear();
             rightHalf.disappear();
-            foreach(f in formula)
-                f.disappear();
+            foreach(formula in formulas)
+                formula.disappear();
             lighting.disappear();
             act.disappear();
             title.disappear();
@@ -243,9 +243,6 @@ object "DefaultOpeningAnimation.Formula" is "entity", "awake", "detached", "priv
 
     state "visible"
     {
-        //transform.localScale = Vector2(0.5, 0.5);
-        //actor.visible = false;
-
         transform.move(speed * Time.delta, 0);
         if(transform.position.x >= Screen.width)
             transform.position = Vector2(-actor.width, transform.position.y);

@@ -23,7 +23,7 @@ object "Splash"
     state "fade out" { if(timeout(fadeTime)) state = "done"; }
     state "done"     { Level.finish(); }
 
-    fun skip() { return input.buttonPressed("fire1") || input.buttonPressed("fire3"); }
+    fun skip() { return input.buttonPressed("fire1") || input.buttonPressed("fire3") || input.buttonPressed("fire4"); }
 }
 
 // TODO: fader object
