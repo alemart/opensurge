@@ -114,8 +114,8 @@ object "DefaultOpeningAnimation.LeftHalf" is "entity", "awake", "detached", "pri
     state "appearing"
     {
         transform.move(speed * Time.delta, 0);
-        if(transform.localPosition.x >= Screen.width) {
-            transform.localPosition = Vector2(Screen.width, 0);
+        if(transform.position.x >= Screen.width) {
+            transform.position = Vector2(Screen.width, 0);
             state = "main";
         }
     }
@@ -123,7 +123,7 @@ object "DefaultOpeningAnimation.LeftHalf" is "entity", "awake", "detached", "pri
     state "disappearing"
     {
         transform.move(-speed * Time.delta, 0);
-        if(transform.localPosition.x < 0)
+        if(transform.position.x < 0)
             destroy();
     }
 
@@ -157,8 +157,8 @@ object "DefaultOpeningAnimation.RightHalf" is "entity", "awake", "detached", "pr
     state "appearing"
     {
         transform.move(-speed * Time.delta, 0);
-        if(transform.localPosition.x < 0) {
-            transform.localPosition = Vector2.zero;
+        if(transform.position.x < 0) {
+            transform.position = Vector2.zero;
             state = "main";
         }
     }
@@ -166,7 +166,7 @@ object "DefaultOpeningAnimation.RightHalf" is "entity", "awake", "detached", "pr
     state "disappearing"
     {
         transform.move(speed * Time.delta, 0);
-        if(transform.localPosition.x >= Screen.width)
+        if(transform.position.x >= Screen.width)
             destroy();
     }
 
