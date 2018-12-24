@@ -284,7 +284,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
     fun init(counterName)
     {
         if(counterName == "score") {
-            text.text = "<color=ffee55>$CLEARED_SCORE</color>";
+            text.text = "<color=ffee11>$CLEARED_SCORE</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Score");
             transform.localPosition = Vector2(-0.5 * Screen.width, 112);
             appearSpeed *= 1.0;
@@ -293,13 +293,13 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
             donefx = Sound("samples/cash.wav");
         }
         else if(counterName == "time") {
-            text.text = "<color=ffee55>$CLEARED_TIME</color>";
+            text.text = "<color=ffee11>$CLEARED_TIME</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Time");
             transform.localPosition = Vector2(-1.0 * Screen.width, 128);
             appearSpeed *= 1.25;
         }
         else if(counterName == "power") {
-            text.text = "<color=ffee55>$CLEARED_POWER</color>";
+            text.text = "<color=ffee11>$CLEARED_POWER</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Power");
             transform.localPosition = Vector2(-1.5 * Screen.width, 144);
             appearSpeed *= 1.5;
