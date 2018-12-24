@@ -30,32 +30,30 @@ object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
 
     state "main"
     {
-        state = "appearing arrows";
         leftArrow.appear();
         rightArrow.appear();
+        state = "appearing arrows";
     }
 
     state "appearing arrows"
     {
         if(timeout(0.3)) {
-            state = "appearing halfs";
             leftHalf.appear();
             rightHalf.appear();
-            completed = false;
+            state = "appearing halfs";
         }
     }
 
     state "appearing halfs"
     {
         if(timeout(0.2)) {
-            state = "displaying info";
             game.appear();
             title.appear();
             act.appear();
             lighting.appear();
             foreach(f in formula)
                 f.appear();
-            completed = false;
+            state = "displaying info";
         }
     }
 
