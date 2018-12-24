@@ -13,6 +13,7 @@ act 1
 theme "themes/none.brk"
 startup "Splash"
 players "None"
+readonly
 
 // Tip for modders: to make a splash
 // screen, copy this file and change

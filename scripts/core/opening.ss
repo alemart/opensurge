@@ -6,17 +6,14 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
-using SurgeEngine.Player;
 using SurgeEngine.Level;
 using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
-using SurgeEngine.Audio.Music;
-using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
 
 object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
 {
-    voidscr = spawn("DefaultOpeningAnimation.Void");
+    theVoid = spawn("DefaultOpeningAnimation.Void");
     leftHalf = spawn("DefaultOpeningAnimation.LeftHalf");
     rightHalf = spawn("DefaultOpeningAnimation.RightHalf");
     leftArrow = spawn("DefaultOpeningAnimation.Arrow").pointingTo("left");
@@ -65,7 +62,7 @@ object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
     state "displaying info"
     {
         if(timeout(2.7)) {
-            voidscr.disappear();
+            theVoid.disappear();
             leftHalf.disappear();
             rightHalf.disappear();
             foreach(f in formula)
