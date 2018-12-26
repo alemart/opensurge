@@ -266,7 +266,7 @@ const actor_t* get_animation_actor(const surgescript_object_t* object)
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    const char* parent_name = surgescript_object_name(object);
+    const char* parent_name = surgescript_object_name(parent);
 
     if(strcmp(parent_name, "Actor") == 0)
         return scripting_actor_ptr(parent);
