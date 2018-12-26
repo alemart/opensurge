@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// File: collectible.spr
+// Description: collectible sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Collectible"
+{
+    source_file     "images/collectibles.png"
+    source_rect     0 0 304 16
+    frame_size      16 16
+    hot_spot        8 8
+
+    // spinning
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+    }
+
+    // disappearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        16 17 18
+    }
+}

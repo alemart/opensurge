@@ -1130,6 +1130,5 @@ surgescript_var_t* fun_getbyname(surgescript_object_t* object, const surgescript
         }
     }
 
-    fatal_error("Scripting Error: can't find player \"%s\" - no such character.", name);
     return NULL;
 }
