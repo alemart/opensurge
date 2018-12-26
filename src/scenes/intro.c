@@ -35,7 +35,7 @@
 #define INTRO_TIMEOUT       3.0f
 #define INTRO_FADETIME      0.5f
 #define INTRO_BGCOLOR       image_hex2rgb("0a0a0a")
-#define INTRO_FONT          "GoodNeighborsLarge"
+#define INTRO_FONT          "GoodNeighbors"
 #define INTRO_NUMFONTS      (sizeof(text) / sizeof(const char*))
 static const char *text[] = { "powered by", "Open Surge Engine" };
 static float elapsed_time;
@@ -96,6 +96,8 @@ void intro_update()
 {
     /* elapsed time */
     elapsed_time += timer_get_delta();
+
+    /* skip scene */
     if(!fadefx_is_fading() && (input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE3) || input_button_pressed(in, IB_FIRE4)))
         elapsed_time += INTRO_TIMEOUT;
 
