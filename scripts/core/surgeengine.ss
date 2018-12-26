@@ -410,10 +410,8 @@ object "Video"
 
 object "PlayerManager"
 {
-    children = null; // cached value
-
     // get player by name or id
-    // just an alias
+    // this is just an alias
     fun call(nameOrId)
     {
         if(typeof(nameOrId) == "string")
@@ -424,50 +422,11 @@ object "PlayerManager"
             return __error("Can't find Player \"" + nameOrId + "\": invalid identifier.");
     }
 
-    // the number of players
-    fun get_count()
-    {
-        return this.childCount;
-    }
-
-    // __error()
-    // display error message
-    fun __error(message)
-    {
-        Application.crash(message);
-        return null;
-    }
-
-    // __getByName()
-    // get player by name; will crash if not found
-    fun __getByName(name)
-    {
-        cnt = this.count;
-        for(i = 0; i < cnt; i++) {
-            player = __getById(i);
-            if(player.name == name)
-                return player;
-        }
-        return __error("Can't find Player \"" + name + "\": no such character.");
-    }
-
-    // __getById()
-    // get player by id; will crash if not found
-    fun __getById(playerID)
-    {
-        id = Number(playerID);
-        if(id.isInteger()) {
-            if(id >= 0 && id < this.childCount) {
-                if(children == null)
-                    children = this.__children;
-                return children[id];
-            }
-        }
-        return __error("Can't find Player " + playerID + ": invalid id.");
-    }
-
     // fun __spawnPlayers() { [builtin] }
+    // fun __getById(id) { [builtin] }
+    // fun __getByName(name) { [builtin] }
     // fun get_active() { [builtin] }
+    // fun get_count() { [builtin] }
 
     // manager overrides
     fun destroy() { }
