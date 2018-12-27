@@ -132,13 +132,14 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
     int o_y1 = obstacle->ypos;
     int o_x2 = o_x1 + obstacle->width;
     int o_y2 = o_y1 + obstacle->height;
-    int pitch = collisionmask_pitch(mask);
-    int px, py;
 
     /* assert: x1 == x2 or y1 == y2 */
 
     /* bounding box collision check */
     if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1) {
+        int px, py;
+        int pitch = collisionmask_pitch(mask);
+
         /* pixel perfect collision check */
         if(x1 != x2) {
             /* horizontal sensor */
