@@ -135,7 +135,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         surgescript_object_set_userdata(object, sensor);
     }
     else if(y1 == y2) {
-        sensor = sensor_create_horizontal(x1, y1, x2, SENSOR_COLOR);
+        sensor = sensor_create_horizontal(y1, x1, x2, SENSOR_COLOR);
         surgescript_object_set_userdata(object, sensor);
     }
     else
