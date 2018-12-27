@@ -411,15 +411,34 @@ object "Video"
 object "PlayerManager"
 {
     // get player by name or id
-    // this is just an alias
+    // display an error if not found
     fun call(nameOrId)
     {
-        if(typeof(nameOrId) == "string")
-            return __getByName(nameOrId);
-        else if(typeof(nameOrId) == "number")
-            return __getById(nameOrId);
-        else
-            return __error("Can't find Player \"" + nameOrId + "\": invalid identifier.");
+        if(typeof(nameOrId) == "string") {
+            if((player = __getByName(nameOrId)) != null)
+                return player;
+        }
+        else if(typeof(nameOrId) == "number") {
+            if((player = __getById(nameOrId)) != null)
+                return player;
+        }
+
+        // error
+        Application.crash("Can't find Player \"" + nameOrId + "\": no such player in the scene.");
+        return null;
+    }
+
+    // get player by id
+    // returns null if not found
+    fun get(playerId)
+    {
+        return __getById(playerId);
+    }
+
+    // does the given player exist in the current scene?
+    fun exists(playerName)
+    {
+        return __getByName(playerName) != null;
     }
 
     // fun __spawnPlayers() { [builtin] }
@@ -427,6 +446,13 @@ object "PlayerManager"
     // fun __getByName(name) { [builtin] }
     // fun get_active() { [builtin] }
     // fun get_count() { [builtin] }
+
+    // misc
+    fun __error(message)
+    {
+        Application.crash(message);
+        return null;
+    }
 
     // manager overrides
     fun destroy() { }
