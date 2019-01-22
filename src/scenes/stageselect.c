@@ -115,7 +115,7 @@ void stageselect_init(void *should_enable_debug)
     music = music_load(OPTIONS_MUSICFILE);
 
     title = font_create("menu.title");
-    font_set_text(title, "%s", "$STAGESELECT_TITLE");
+    font_set_text(title, "%s", !enable_debug ? "$STAGESELECT_TITLE" : "$STAGESELECT_DEBUG");
     font_set_position(title, v2d_new((VIDEO_SCREEN_W - font_get_textsize(title).x)/2, 10));
 
     msg = font_create("menu.text");
@@ -393,7 +393,8 @@ int dirfill(const char *vpath, void *param)
 int sort_cmp(const void *a, const void *b)
 {
     stagedata_t *s[2] = { *((stagedata_t**)a), *((stagedata_t**)b) };
-    int r = str_icmp(s[0]->name, s[1]->name);
+    const char *p = strchr(s[0]->name, '/'), *q = strchr(s[1]->name, '/');
+    int r = ((!p && !q) || (p && q)) ? str_icmp(s[0]->name, s[1]->name) : (!p && q ? -1 : 1);
     return (r == 0) ? (s[0]->act - s[1]->act) : r;
 }
 

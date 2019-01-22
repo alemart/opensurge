@@ -70,7 +70,8 @@ OPTIONS_BACK                "BACK"
 
 // stage select
 STAGESELECT_TITLE           "<color=$COLOR_MENUTITLE>STAGE SELECT</color>"
-STAGESELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to cancel"
+STAGESELECT_DEBUG           "<color=$COLOR_MENUTITLE>DEBUG MODE</color>"
+STAGESELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
 STAGESELECT_ACT             "Act"
 

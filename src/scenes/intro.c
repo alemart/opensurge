@@ -117,6 +117,7 @@ void intro_update()
         static int cnt = 0;
         if(!debug_mode && ++cnt == 3) {
             sound_play(SFX_SECRET);
+            elapsed_time += INTRO_TIMEOUT;
             debug_mode = TRUE;
             cnt = 0;
         }
