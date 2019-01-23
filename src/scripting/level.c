@@ -128,8 +128,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
     
     /* misc */
-    if(level_music() != NULL)
-        update_music(object);
+    update_music(object);
 
     /* done */
     return NULL;
@@ -297,15 +296,15 @@ surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_va
 /* updates the reference to Level.music */
 void update_music(surgescript_object_t* object)
 {
-    music_t* music = level_music(); /* assumed to be not-NULL <-- important! */
+    music_t* music = level_music(); /* we'd like this to be not-NULL, but it may not be the case (i.e., no level music specified) */
     surgescript_heap_t* heap = surgescript_object_heap(object);
 
     if(surgescript_var_is_null(surgescript_heap_at(heap, MUSIC_ADDR)) ||
-        music != scripting_music_ptr(
+        (music != NULL && music != scripting_music_ptr(
             surgescript_objectmanager_get(surgescript_object_manager(object),
                 surgescript_var_get_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR))
             )
-        )
+        ))
     ) {
         surgescript_object_t* music_component = scripting_util_get_component(
             scripting_util_surgeengine_component(surgescript_vm(), "Audio"), "Music"
@@ -315,7 +314,7 @@ void update_music(surgescript_object_t* object)
         };
 
         surgescript_var_set_objecthandle(tmp[0], surgescript_object_handle(object));
-        surgescript_var_set_string(tmp[1], music_path(music));
+        surgescript_var_set_string(tmp[1], music != NULL ? music_path(music) : "");
         surgescript_object_call_function(music_component, "__spawn", (const surgescript_var_t**)tmp, 2, tmp[2]);
         surgescript_var_set_objecthandle(surgescript_heap_at(heap, MUSIC_ADDR), surgescript_var_get_objecthandle(tmp[2]));
 

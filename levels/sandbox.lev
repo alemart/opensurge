@@ -44,6 +44,7 @@ brick 0 832 10000
 brick 0 384 1000
 
 // entities
+entity "My Spring" 352 10000
 
 // legacy items
 item 31 904 10000
