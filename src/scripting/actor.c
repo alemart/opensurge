@@ -52,16 +52,21 @@ static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static v2d_t world_lossyscale(const surgescript_object_t* object);
 static const surgescript_heapptr_t ZINDEX_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t DETACHED_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
+static const surgescript_heapptr_t OFFSET_ADDR = 4;
 static const double DEFAULT_ZINDEX = 0.5;
 static const double DEG2RAD = 0.01745329251994329576;
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 extern const animation_t* scripting_animation_ptr(const surgescript_object_t* object);
+extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
+extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /*
  * scripting_register_actor()
@@ -91,6 +96,8 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Actor", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
+    surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
+    surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Actor", "onAnimationChange", fun_onanimationchange, 1);
 }
 
@@ -116,6 +123,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
+    surgescript_objecthandle_t offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform2D");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
@@ -128,12 +136,14 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(TRANSFORM_ADDR == surgescript_heap_malloc(heap));
     ssassert(DETACHED_ADDR == surgescript_heap_malloc(heap));
     ssassert(ANIMATION_ADDR == surgescript_heap_malloc(heap));
+    ssassert(OFFSET_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, ZINDEX_ADDR), DEFAULT_ZINDEX);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
     surgescript_var_set_bool(surgescript_heap_at(heap, DETACHED_ADDR), is_detached);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR),
         surgescript_objectmanager_spawn(manager, me, "Animation", NULL)
     );
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR), offset);
 
     /* initial configuration */
     surgescript_object_set_userdata(object, actor);
@@ -326,6 +336,35 @@ surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript
 {
     surgescript_objecthandle_t parent = surgescript_object_parent(object);
     return surgescript_var_set_objecthandle(surgescript_var_create(), parent);
+}
+
+/* get offset */
+surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR));
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+
+    scripting_vector2_update(v2, transform->position.x, transform->position.y);
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+}
+
+/* set offset */
+surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
+    double x = 0.0, y = 0.0;
+
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    transform->position.x = x;
+    transform->position.y = y;
+
+    return NULL;
 }
 
 
