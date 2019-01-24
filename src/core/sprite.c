@@ -314,6 +314,7 @@ void validate_sprite(spriteinfo_t *spr)
 
     n = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
     for(i=0; i<spr->animation_count; i++) {
+        if(spr->animation_data[i] == NULL) continue;
         for(j=0; j<spr->animation_data[i]->frame_count; j++) {
             if(!(spr->animation_data[i]->data[j] >= 0 && spr->animation_data[i]->data[j] < n)) {
                 logfile_message("Sprite error: invalid frame '%d' of animation %d. Animation frames must be in range %d..%d", spr->animation_data[i]->data[j], i, 0, n-1);
@@ -377,8 +378,10 @@ void load_sprite_images(spriteinfo_t *spr)
  */
 void fix_sprite_animations(spriteinfo_t *spr)
 {
-    for(int i=0; i<spr->animation_count; i++)
-        spr->animation_data[i]->frame_data = spr->frame_data;
+    for(int i=0; i<spr->animation_count; i++) {
+        if(spr->animation_data[i] != NULL)
+            spr->animation_data[i]->frame_data = spr->frame_data;
+    }
 }
 
 
@@ -476,6 +479,7 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         s->hot_spot.y = (float)atoi(nanoparser_get_string(p2));
     }
     else if(str_icmp(identifier, "animation") == 0) {
+        int i, old_count = 0;
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         p2 = nanoparser_get_nth_parameter(param_list, 2);
 
@@ -497,10 +501,13 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         if(anim_id < s->animation_count && NULL != s->animation_data[anim_id])
             s->animation_data[anim_id] = animation_delete(s->animation_data[anim_id]);
 
+        old_count = s->animation_count;
         s->animation_count = max(s->animation_count, anim_id+1);
         if(s->animation_count > SPRITE_MAX_ANIM) /* sanity check */
             fatal_error("Can't exceed %d animations\nin \"%s\" near line %d", SPRITE_MAX_ANIM, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         s->animation_data = reallocx(s->animation_data, sizeof(animation_t*) * s->animation_count); /* watch this! It may generate garbage in the middle. */
+        for(i = old_count; i < s->animation_count; i++)
+            s->animation_data[i] = NULL;
         s->animation_data[anim_id] = animation_new(anim_id, s->hot_spot);
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), s->animation_data[anim_id], traverse_animation_attributes);
         validate_animation(s->animation_data[anim_id]);
