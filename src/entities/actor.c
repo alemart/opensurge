@@ -321,7 +321,7 @@ int actor_brick_collision(actor_t *act, brick_t *brk)
  */
 void actor_change_animation(actor_t *act, const animation_t *anim)
 {
-    if(act->animation != anim) {
+    if(act->animation != anim && anim != NULL) {
         act->animation = anim;
         act->hot_spot = anim->hot_spot;
         act->animation_frame = 0.0f;
