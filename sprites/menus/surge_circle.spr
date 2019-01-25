@@ -1,0 +1,37 @@
+// -----------------------------------------------------------------------------
+// File: surge_circle.spr
+// Description: Open Surge Circle sprite
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "SurgeCircle"
+{
+    source_file     "images/menu.png"
+    source_rect     0 32 512 512
+    frame_size      512 512
+    hot_spot        256 256
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "MenuCircle"
+{
+    source_file     "images/menu.png"
+    source_rect     0 544 1024 1024
+    frame_size      1024 1024
+    hot_spot        512 512
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+

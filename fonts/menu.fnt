@@ -43,7 +43,6 @@ font "menu.small"
     {
         source_file             "fonts/DejaVuSans.ttf"
         size                    12
-        antialias
         shadow
     }
 }

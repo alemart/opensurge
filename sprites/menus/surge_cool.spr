@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------------
+// File: surge_cool.spr
+// Description: Surge Cool sprite definition file
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by KZR
+sprite "SurgeCool"
+{
+    source_file     "images/surge_cool.png"
+    source_rect     0 0 127 139
+    frame_size      127 139
+    hot_spot        64 139
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

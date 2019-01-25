@@ -1,0 +1,63 @@
+// -----------------------------------------------------------------------------
+// File: hand.spr
+// Description: Menu Button sprite definition file
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by thekingphoenix
+sprite "SelectHand"
+{
+    source_file     "images/hand.png"
+    source_rect     0 0 224 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    // moving
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2 3 4 5 6 5 4 3 2 1
+    }
+
+    // stopped
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "SelectHand64"
+{
+    source_file     "images/hand.png"
+    source_rect     0 32 448 64
+    frame_size      64 64
+    hot_spot        32 32
+
+    // moving
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2 3 4 5 6 5 4 3 2 1
+    }
+
+    // stopped
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // clicking
+    animation 2
+    {
+        repeat      FALSE
+        fps         32
+        data        0 1 2 3 4 5 6 6 6 5 4 3 2 1 0
+    }
+}
