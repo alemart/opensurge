@@ -41,6 +41,8 @@ static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ANIMID_ADDR = 0;
 static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
 static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
@@ -71,6 +73,8 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_sprite", fun_getsprite, 0);
     surgescript_vm_bind(vm, "Animation", "get_frame", fun_getframe, 0);
     surgescript_vm_bind(vm, "Animation", "get_frameCount", fun_getframecount, 0);
+    surgescript_vm_bind(vm, "Animation", "get_speedFactor", fun_getspeedfactor, 0);
+    surgescript_vm_bind(vm, "Animation", "set_speedFactor", fun_setspeedfactor, 1);
 }
 
 /*
@@ -257,6 +261,25 @@ surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgesc
     return surgescript_var_set_number(surgescript_var_create(), animation->frame_count);
 }
 
+/* animation speed factor (multiplier, defaults to 1.0) */
+surgescript_var_t* fun_getspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = get_animation_actor(object);
+    return surgescript_var_set_number(surgescript_var_create(), actor != NULL ? actor->animation_speed_factor : 1.0);
+}
+
+/* set animation speed factor (no need to notify the parent) */
+surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = get_animation_actor(object);
+    double factor = surgescript_var_get_number(param[0]);
+
+    if(actor != NULL)
+        actor_change_animation_speed_factor(actor, factor);
+    
+    return NULL;
+}
+
 
 /* --- misc --- */
 
@@ -276,7 +299,7 @@ const actor_t* get_animation_actor(const surgescript_object_t* object)
         return NULL; /* this shouldn't happen */
 }
 
-/* notify the parent object about a change in the Animation */
+/* notify the parent object about a change in the Animation (use when changing the animation to another one) */
 void notify_change(const surgescript_object_t* object)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
