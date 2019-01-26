@@ -24,15 +24,22 @@ object "MainMenu"
     circle = spawn("SurgeCircle");
     circle2 = spawn("MenuCircle");
     version = spawn("MainMenuGameVersion");
-    buttonList = spawn("MainMenuButtonList")
-    .withTitle("$MAINMENU_TITLE") // will use the appropriate translation
-    .withButtons([
-        "$MAINMENU_PLAY",
-        "$MAINMENU_CREATE",
-        "$MAINMENU_SHARE",
-        "$MAINMENU_OPTIONS",
-        "$MAINMENU_QUIT"
-    ]);
+    menu = spawn("MenuBuilder")
+        .withTitle("$MAINMENU_TITLE")
+        .withButtons([
+            "$MAINMENU_PLAY",
+            "$MAINMENU_CREATE",
+            "$MAINMENU_SHARE",
+            "$MAINMENU_OPTIONS",
+            "$MAINMENU_QUIT"
+        ])
+        .withSpacing(132)
+        .withAxisAngle(37.3)
+        .at(
+            Screen.width * 0.68,
+            Screen.height / 2 - 9
+        )
+        .build();
     nextState = "";
     fadeTime = 0.5;
     shareURL = "http://opensurge2d.org/share";
@@ -40,11 +47,11 @@ object "MainMenu"
     state "main"
     {
         if(input.buttonPressed("fire1") || input.buttonPressed("fire3"))
-            buttonList.confirm();
+            menu.select();
         else if(input.buttonDown("up") || input.buttonDown("left"))
-            buttonList.scrollDown();
+            menu.movePrevious();
         else if(input.buttonDown("down") || input.buttonDown("right"))
-            buttonList.scrollUp();
+            menu.moveNext();
     }
 
     state "waitToFade"
@@ -81,7 +88,7 @@ object "MainMenu"
         Level.abort();
     }
 
-    fun onMainMenuButton(buttonIndex)
+    fun onMenuSelected(buttonIndex)
     {
         if(buttonIndex == 0) {
             // play
@@ -133,6 +140,7 @@ object "SurgeCircle" is "private", "entity"
     fun constructor()
     {
         transform.position = Vector2(-12, Screen.height + 12);
+        actor.zindex = 0;
     }
 }
 
@@ -151,6 +159,7 @@ object "MenuCircle" is "private", "entity"
     {
         transform.position = Vector2(-16, Screen.height + 16);
         transform.angle = -30;
+        actor.zindex = 0;
     }
 }
 
@@ -203,137 +212,5 @@ object "MainMenuGameVersion" is "private", "detached", "entity"
             text[0].text = "ver. " + SurgeEngine.version;
             text[1].visible = false;
         }
-    }
-}
-
-object "MainMenuButtonList"
-{
-    buttons = [];
-    currentButtonIndex = 0;
-    oldButtonIndex = 0;
-    totalMoveTime = 0.3; // transition time, in seconds
-    currentMoveTime = 0.0;
-    buttonSpacing = Vector2(105, 80);
-    basePosition = Vector2(Screen.width * 0.68, Screen.height / 2 - 9);
-    transform = Transform();
-    slide = Sound("samples/slide.wav");
-    select = Sound("samples/select.wav");
-    title = spawn("MenuTitle");
-
-    state "main"
-    {
-    }
-
-    state "moving"
-    {
-        if(currentMoveTime < totalMoveTime) {
-            currentMoveTime += Time.delta;
-            x = Math.smoothstep(buttonSpacing.x * oldButtonIndex, buttonSpacing.x * currentButtonIndex, currentMoveTime / totalMoveTime);
-            y = Math.smoothstep(buttonSpacing.y * oldButtonIndex, buttonSpacing.y * currentButtonIndex, currentMoveTime / totalMoveTime);
-            transform.localPosition = Vector2(-x, -y).plus(basePosition);
-        }
-        else {
-            currentMoveTime = 0.0;
-            transform.localPosition = buttonSpacing.scaledBy(-currentButtonIndex).plus(basePosition);
-            oldButtonIndex = currentButtonIndex;
-            state = "main";
-        }
-    }
-
-    state "pressing"
-    {
-        if(buttons[currentButtonIndex].pressed) {
-            parent.onMainMenuButton(currentButtonIndex);
-            state = "disappearing";
-        }
-    }
-
-    state "disappearing"
-    {
-        transform.move(2.5 * Screen.width * Time.delta, 0);
-    }
-
-    fun confirm()
-    {
-        if(state == "main") {
-            buttons[currentButtonIndex].press();
-            state = "pressing";
-        }
-    }
-
-    fun scrollDown()
-    {
-        if(state == "main") {
-            if(currentButtonIndex > 0) {
-                // update indexes
-                oldButtonIndex = currentButtonIndex;
-                currentButtonIndex--;
-
-                // focus on the proper button
-                for(j = 0; j < buttons.length; j++)
-                    buttons[j].blur();
-                buttons[currentButtonIndex].focus();
-
-                // move
-                slide.play();
-                state = "moving";
-            }
-        }
-    }
-
-    fun scrollUp()
-    {
-        if(state == "main") {
-            if(currentButtonIndex < buttons.length - 1) {
-                // update indexes
-                oldButtonIndex = currentButtonIndex;
-                currentButtonIndex++;
-
-                // focus on the proper button
-                for(j = 0; j < buttons.length; j++)
-                    buttons[j].blur();
-                buttons[currentButtonIndex].focus();
-
-                // move
-                slide.play();
-                state = "moving";
-            }
-        }
-    }
-
-    fun withButtons(buttonArray)
-    {
-        for(j = 0; j < buttonArray.length; j++)
-            buttons.push(spawnButton(buttonArray[j]));
-        init();
-        return this;
-    }
-
-    fun withTitle(text)
-    {
-        title.text = text;
-        return this;
-    }
-
-
-    // ---------------------------------------------
-    // internal stuff
-    // ---------------------------------------------
-
-    fun spawnButton(label)
-    {
-        btn = spawn("MenuButton");
-        btn.text = label;
-        btn.sound = select;
-        return btn;
-    }
-
-    fun init()
-    {
-        buttons[currentButtonIndex].focus();
-        for(j = 0; j < buttons.length; j++)
-            buttons[j].transform.localPosition = buttonSpacing.scaledBy(j);
-        title.transform.localPosition = buttonSpacing.scaledBy(-1);//.15);
-        state = "moving";
     }
 }

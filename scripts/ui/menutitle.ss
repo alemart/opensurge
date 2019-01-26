@@ -41,6 +41,19 @@ object "MenuTitle" is "private", "entity", "awake"
         label.text = text;
     }
 
+    //
+    // Property: visible
+    //
+    fun get_visible()
+    {
+        return actor.visible;
+    }
+
+    fun set_visible(visible)
+    {
+        actor.visible = label.visible = visible;
+    }
+
     // ---------- internal ----------
 
     fun constructor()

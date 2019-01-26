@@ -12,7 +12,7 @@ using SurgeEngine.Audio.Sound;
 
 //
 // MenuButton
-// A button that you can use for your purposes
+// A button that you can use for your own purposes
 //
 // How to use:
 //
@@ -48,7 +48,7 @@ using SurgeEngine.Audio.Sound;
 //
 object "MenuButton" is "private", "entity", "awake"
 {
-    public sound = null;
+    public sound = Sound("sounds/select.wav"); // may be changed
     transform = Transform();
     actor = Actor("MenuButton");
     hand = Actor("SelectHand64");
@@ -66,11 +66,11 @@ object "MenuButton" is "private", "entity", "awake"
         f = actor.animation.frame;
         j = f < c/2 ? f : c - f - 1;
         label.offset = Vector2(j, j-16);
-        hand.offset = Vector2(-96+j, j-24);
+        hand.offset = Vector2(5 - actor.width/2 + j, 20 - actor.height + j);
         if(actor.animation.finished) {
             actor.anim = 0;
             label.offset = Vector2(0, -16);
-            hand.offset = Vector2(-96, -24);
+            hand.offset = Vector2(5 - actor.width/2, 20 - actor.height);
             state = "pressed";
         }
     }
@@ -155,7 +155,7 @@ object "MenuButton" is "private", "entity", "awake"
         hand.anim = 0;
         hand.visible = false;
         hand.zindex = 0.51;
-        hand.offset = Vector2(-96, -24);
+        hand.offset = Vector2(5 - actor.width/2, 20 - actor.height);
         label.align = "center";
         label.offset = Vector2(0, -16);
     }
