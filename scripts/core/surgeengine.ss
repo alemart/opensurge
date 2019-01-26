@@ -47,6 +47,7 @@ object "SurgeEngine"
     audio = spawn("Audio");
     video = spawn("Video");
     prefs = spawn("Prefs");
+    web = spawn("Web");
     transformFactory = spawn("TransformFactory");
     vectorFactory = spawn("VectorFactory");
 
@@ -83,6 +84,11 @@ object "SurgeEngine"
     fun get_Prefs()
     {
         return prefs;
+    }
+
+    fun get_Web()
+    {
+        return web;
     }
 
     fun get_Video()
