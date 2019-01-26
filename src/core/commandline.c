@@ -36,7 +36,6 @@
 
 
 /* private stuff ;) */
-static const char* basename(const char* path);
 static void crash(char *fmt, ...);
 static int print_gameid(const char* gameid, void* data);
 static const char* COPYRIGHT = "Open Surge Engine version " GAME_VERSION_STRING "\n"
@@ -53,7 +52,7 @@ static int COMMANDLINE_UNDEFINED = -1;
  */
 commandline_t commandline_parse(int argc, char **argv)
 {
-    const char* program = basename(argv[0]);
+    const char* program = str_basename(argv[0]);
     commandline_t cmd;
     int i;
 
@@ -297,17 +296,6 @@ void crash(char *fmt, ...)
 }
 
 
-
-/* the filename of a path */
-const char* basename(const char* path)
-{
-    const char* p = strpbrk(path, "\\/");
-    while(p != NULL) {
-        path = p+1;
-        p = strpbrk(path, "\\/");
-    }
-    return path;
-}
 
 /* prints gameid */
 int print_gameid(const char* gameid, void* data)

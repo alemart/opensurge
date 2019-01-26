@@ -29,6 +29,7 @@
 #include "install.h"
 #include "assetfs.h"
 #include "global.h"
+#include "stringutil.h"
 #include "util.h"
 
 #if !defined(_WIN32)
@@ -49,7 +50,6 @@ static int compare_gameid(const char* gameid, void* data);
 static int list_installed_games(const char* gameid, void* data);
 static int write_to_zip(const char* vpath, void* param);
 static bool is_valid_id(const char* str);
-static const char* basename(const char* path);
 static void console_print(const char* fmt, ...);
 static bool console_ask(const char* fmt, ...);
 
@@ -119,7 +119,7 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
                 assetfs_use_strict(use_strict);
             }
             else {
-                console_print("Can't open \"%s\".", basename(zip_fullpath)); /* shouldn't happen */
+                console_print("Can't open \"%s\".", str_basename(zip_fullpath)); /* shouldn't happen */
                 success = false;
             }
         }
@@ -132,11 +132,11 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
         return success;
     }
     else if(assetfs_initialized()) {
-        console_print("Can't install \"%s\": assetfs is initialized.", basename(zip_fullpath));
+        console_print("Can't install \"%s\": assetfs is initialized.", str_basename(zip_fullpath));
         return false;
     }
     else {
-        console_print("Not a game package: \"%s\".", basename(zip_fullpath));
+        console_print("Not a game package: \"%s\".", str_basename(zip_fullpath));
         return false;
     }
 }
@@ -322,17 +322,6 @@ bool is_game_package(const char* zip_fullpath)
     return valid_package;
 }
 
-/* the filename of a path */
-const char* basename(const char* path)
-{
-    const char* p = strpbrk(path, "\\/");
-    while(p != NULL) {
-        path = p+1;
-        p = strpbrk(path, "\\/");
-    }
-    return path;
-}
-
 /* validates an ID: only lowercase alphanumeric characters are accepted */
 bool is_valid_id(const char* str)
 {
@@ -385,7 +374,7 @@ int write_to_zip(const char* vpath, void* param)
 char* guess_gameid(const char* zip_fullpath)
 {
     char gameid[32] = { 0 };
-    const char* p = basename(zip_fullpath);
+    const char* p = str_basename(zip_fullpath);
     int i, maxlen = sizeof(gameid) - 1;
 
     for(i = 0; i < maxlen && *p; p++) {

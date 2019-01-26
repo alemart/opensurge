@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * stringutil.h - string utilities
- * Copyright (C) 2010, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2013, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ char *str_dup(const char *str); /* duplicates a string - strdup() isn't ANSI C *
 const char* str_addslashes(const char *str); /* replaces " by \\", returning a static char* */
 char* str_rstr(char *haystack, const char *needle); /* reverse strstr() */
 const char* str_from_int(int integer); /* converts integer to string, returning a static char* */
+const char* str_basename(const char *path); /* the filename of the path */
 
 #endif
 

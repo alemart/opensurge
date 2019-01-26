@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * stringutil.c - string utilities
- * Copyright (C) 2010, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2013, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -201,4 +201,19 @@ const char* str_from_int(int integer)
     static char buf[64];
     sprintf(buf, "%d", integer);
     return buf;
+}
+
+
+/*
+ * str_basename()
+ * returns the filename of the path 
+ */
+const char* str_basename(const char *path)
+{
+    const char *p = strpbrk(path, "\\/");
+    while(p != NULL) {
+        path = p+1;
+        p = strpbrk(path, "\\/");
+    }
+    return path;
 }
