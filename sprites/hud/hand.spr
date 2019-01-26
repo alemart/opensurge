@@ -53,7 +53,7 @@ sprite "SelectHand64"
         data        0
     }
 
-    // clicking
+    // pressing
     animation 2
     {
         repeat      FALSE

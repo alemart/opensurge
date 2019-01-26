@@ -3,7 +3,7 @@
 // http://opensurge2d.org
 //
 // File:   quests/intro.qst
-// Desc:   this is the introduction cutscene, displayed before the menu
+// Desc:   this is the introduction cutscene, the first one to be opened
 // ---------------------------------------------------------------------------
 
 // quest properties
@@ -12,4 +12,4 @@ hidden
 
 // level list (in order of appearance)
 level           "levels/scenes/allegro.lev"
-level           "levels/menus/title.lev"
+level           "levels/menus/mainmenu.lev"

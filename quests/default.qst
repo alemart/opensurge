@@ -11,5 +11,4 @@ name            "Default quest"
 hidden
 
 // level list (in order of appearance)
-<options>
 level           "levels/demo.lev"

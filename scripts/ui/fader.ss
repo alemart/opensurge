@@ -16,7 +16,7 @@ using SurgeEngine.Video.Screen;
 //     fader = spawn("Fader");
 //
 //     state "main" {
-//         if(timeout(5.0))
+//         if(timeout(2.0))
 //             fader.fadeOut(1.0); // fade out - duration: 1 second
 //     }
 //

@@ -38,7 +38,7 @@ GAME_YEAR                   "$ENGINE_YEAR"
 
 
 
-// ============== MENUS ==========================
+// ========== MENUS ==========
 
 // Languages (please do not translate these sentences!)
 LANGSELECT_TITLE1           "<color=$COLOR_MENUTITLE>SELECT YOUR</color>"
@@ -46,8 +46,17 @@ LANGSELECT_TITLE2           "<color=$COLOR_MENUTITLE>LANGUAGE</color>"
 LANGSELECT_AUTHOR           "<color=$COLOR_MENUSELECTEDOPTION>Translation by:</color> $1"
 LANGSELECT_PAGE             "page $1/$2"
 
+// Main Menu (from now on, you may translate)
+// Note: this block use bitmapped fonts and
+// doesn't support special characters
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "PLAY"
+MAINMENU_CREATE             "CREATE"
+MAINMENU_SHARE              "SHARE"
+MAINMENU_OPTIONS            "OPTIONS"
+MAINMENU_QUIT               "QUIT"
 
-// Options (from now on, you may translate)
+// Options
 OPTIONS_TITLE               "<color=$COLOR_MENUTITLE>OPTIONS</color>"
 OPTIONS_YES                 "YES"
 OPTIONS_NO                  "NO"
@@ -125,7 +134,7 @@ CREDITS2_TITLE              "<color=$COLOR_MENUTITLE>CREDITS</color>"
 CREDITS2_KEY                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
 
 // Creative Commons screen
-CC_DISCLAIMER               "Game assets under the CC-BY"
+CC_DISCLAIMER               "Game assets under the CC"
 
 // ======================= INPUT DEVICES ====================
 

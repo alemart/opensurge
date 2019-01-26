@@ -8,7 +8,7 @@
 sprite "MenuButton"
 {
     source_file     "images/menu.png"
-    source_rect     512 32 200 352
+    source_rect     512 32 200 440
     frame_size      200 44
     hot_spot        96 18
 
@@ -20,11 +20,27 @@ sprite "MenuButton"
         data        0
     }
 
+    // disabled
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        9
+    }
+
     // pressed
     animation 2
     {
         repeat      FALSE
         fps         32
         data        0 1 2 3 4 5 6 7 6 5 4 3 2 1 0
+    }
+
+    // highlighted
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        8
     }
 }

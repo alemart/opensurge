@@ -46,7 +46,7 @@ using SurgeEngine.Audio.Sound;
 // focus(): enable focus
 // blur(): disable focus
 //
-object "MenuButton" is "private", "entity"
+object "MenuButton" is "private", "entity", "awake"
 {
     public sound = null;
     transform = Transform();
@@ -88,6 +88,7 @@ object "MenuButton" is "private", "entity"
     {
         if(state == "main") {
             actor.anim = 2;
+            hand.animation.speedFactor = 0;
             if(sound != null)
                 sound.play();
             state = "pressing";
@@ -134,6 +135,7 @@ object "MenuButton" is "private", "entity"
     fun set_focus(focus)
     {
         hand.visible = focus;
+        hand.animation.speedFactor = 1.0;
     }
 
     fun focus()
@@ -146,12 +148,13 @@ object "MenuButton" is "private", "entity"
         this.focus = false;
     }
 
-    // -----------------------------
+    // ---------- internal ----------
 
     fun constructor()
     {
-        hand.anim = 1;
+        hand.anim = 0;
         hand.visible = false;
+        hand.zindex = 0.51;
         hand.offset = Vector2(-96, -24);
         label.align = "center";
         label.offset = Vector2(0, -16);
