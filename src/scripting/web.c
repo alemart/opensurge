@@ -35,10 +35,10 @@ static surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surg
  */
 void scripting_register_web(surgescript_vm_t* vm)
 {
-    surgescript_vm_bind(vm, "Camera", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "Camera", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "Camera", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Camera", "launchURL", fun_launchurl, 1);
+    surgescript_vm_bind(vm, "Web", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Web", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Web", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "Web", "launchURL", fun_launchurl, 1);
 }
 
 /* main state */
