@@ -8,7 +8,6 @@
 
 // quest properties
 name            "Default quest"
-hidden
 
 // level list (in order of appearance)
 level           "levels/demo.lev"

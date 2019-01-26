@@ -48,7 +48,7 @@ using SurgeEngine.Audio.Sound;
 //
 object "MenuButton" is "private", "entity", "awake"
 {
-    public sound = Sound("sounds/select.wav"); // may be changed
+    public sound = Sound("samples/select.wav"); // may be changed
     transform = Transform();
     actor = Actor("MenuButton");
     hand = Actor("SelectHand64");

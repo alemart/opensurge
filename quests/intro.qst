@@ -8,8 +8,7 @@
 
 // quest properties
 name            "Introduction cutscene"
-hidden
 
 // level list (in order of appearance)
 level           "levels/scenes/allegro.lev"
-level           "levels/menus/mainmenu.lev"
+level           "levels/scenes/mainmenu.lev"

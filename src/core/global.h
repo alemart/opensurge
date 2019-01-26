@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * global.h - global definitions
- * Copyright (C) 2008-2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,10 +28,10 @@
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        0
 #define GAME_WEBSITE            "http://opensurge2d.org"
-#define GAME_YEAR               "2008-2018"
+#define GAME_YEAR               "2008-2019"
 
 /* if the following is defined, this is a development build */
-/*#define GAME_BUILD_VERSION      1337*/
+/*#define GAME_BUILD_VERSION      1337-dev*/
 
 /* Data folder (game assets) */
 #ifndef GAME_DATADIR

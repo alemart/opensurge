@@ -40,9 +40,9 @@ object "MainMenu"
             Screen.height / 2 - 9
         )
         .build();
+    shareURL = "http://opensurge2d.org/share";
     nextState = "";
     fadeTime = 0.5;
-    shareURL = "http://opensurge2d.org/share";
 
     state "main"
     {

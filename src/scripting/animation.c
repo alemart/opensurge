@@ -48,7 +48,7 @@ static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
 static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
 static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
 static void notify_change(const surgescript_object_t* object);
-static const actor_t* get_animation_actor(const surgescript_object_t* object);
+static actor_t* get_animation_actor(const surgescript_object_t* object);
 extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
 extern player_t* scripting_player_ptr(const surgescript_object_t* object);
 extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
@@ -271,7 +271,7 @@ surgescript_var_t* fun_getspeedfactor(surgescript_object_t* object, const surges
 /* set animation speed factor (no need to notify the parent) */
 surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    const actor_t* actor = get_animation_actor(object);
+    actor_t* actor = get_animation_actor(object);
     double factor = surgescript_var_get_number(param[0]);
 
     if(actor != NULL)
@@ -284,7 +284,7 @@ surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surges
 /* --- misc --- */
 
 /* given an Animation object, return its corresponding actor_t* */
-const actor_t* get_animation_actor(const surgescript_object_t* object)
+actor_t* get_animation_actor(const surgescript_object_t* object)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
