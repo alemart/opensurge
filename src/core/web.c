@@ -65,28 +65,44 @@ bool launch_url(const char *url)
 
     if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "ftp://", 6) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
 #if defined(_WIN32)
-        ShellExecute(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
+        ShellExecuteA(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
         (void)file_exists;
 #elif defined(__APPLE__) && defined(__MACH__)
-        char *safe_cmd = mallocx(sizeof(char) * (strlen(safe_url) + 32));
-        sprintf(safe_cmd, "open \"%s\"", safe_url);
-        success = (system(safe_cmd) >= 0);
-        free(safe_cmd);
+        if(file_exists("/usr/bin/open")) {
+            char* argv[] = { "/usr/bin/open", safe_url, NULL };
+            if(fork() == 0) {
+                execv(argv[0], argv);
+                exit(0);
+            }
+        }
+        else 
+            success = false;
 #elif defined(__unix__) || defined(__unix)
-        char *safe_cmd = mallocx(sizeof(char) * (strlen(safe_url) + 32));
-        *safe_cmd = 0;
+        char* argv[5] = { 0 };
 
-        if(file_exists("/usr/bin/xdg-open"))
-            sprintf(safe_cmd, "xdg-open \"%s\"", safe_url);
-        else if(file_exists("/usr/bin/firefox"))
-            sprintf(safe_cmd, "firefox \"%s\"", safe_url);
+        if(file_exists("/usr/bin/xdg-open")) {
+            argv[0] = "/usr/bin/xdg-open";
+            argv[1] = safe_url;
+        }
+        else if(file_exists("/usr/bin/firefox")) {
+            argv[0] = "/usr/bin/firefox";
+            argv[1] = safe_url;
+        }
+        else if(file_exists("/usr/bin/python")) {
+            argv[0] = "/usr/bin/python";
+            argv[1] = "-m";
+            argv[2] = "webbrowser";
+            argv[3] = safe_url;
+        }
         else 
             success = false;
 
-        if(*safe_cmd)
-            success = (system(safe_cmd) >= 0);
-
-        free(safe_cmd);
+        if(argv[0]) {
+            if(fork() == 0) {
+                execv(argv[0], argv);
+                exit(0);
+            }
+        }
 #else
 #error "Unsupported operating system."
 #endif
@@ -98,6 +114,8 @@ bool launch_url(const char *url)
 
     if(!success)
         logfile_message("Can't launch url: \"%s\"", safe_url);
+    else
+        logfile_message("Launching url: \"%s\"...", safe_url);
 
     free(safe_url);
     return success;
