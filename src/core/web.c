@@ -22,10 +22,12 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "web.h"
 #include "util.h"
 #include "video.h"
 #include "logfile.h"
+#include "stringutil.h"
 
 #if !defined(_WIN32)
 #include <unistd.h>
@@ -70,9 +72,15 @@ bool launch_url(const char *url)
 #elif defined(__APPLE__) && defined(__MACH__)
         if(file_exists("/usr/bin/open")) {
             char* argv[] = { "/usr/bin/open", safe_url, NULL };
-            if(fork() == 0) {
+            pid_t child = fork();
+
+            if(child == 0) {
                 execv(argv[0], argv);
                 exit(0);
+            }
+            else if(child < 0) {
+                logfile_message("Can't fork process [%s]: %s", str_basename(argv[0]), strerror(errno));
+                success = false;
             }
         }
         else 
@@ -94,13 +102,19 @@ bool launch_url(const char *url)
             argv[2] = "webbrowser";
             argv[3] = safe_url;
         }
-        else 
+        else
             success = false;
 
         if(argv[0]) {
-            if(fork() == 0) {
+            pid_t child = fork();
+
+            if(child == 0) {
                 execv(argv[0], argv);
                 exit(0);
+            }
+            else if(child < 0) {
+                logfile_message("Can't fork process [%s]: %s", str_basename(argv[0]), strerror(errno));
+                success = false;
             }
         }
 #else
@@ -109,13 +123,13 @@ bool launch_url(const char *url)
     }
     else {
         success = false;
-        fatal_error("Can't launch url: invalid protocol (the valid ones are: http, https, ftp, mailto).\n%s", safe_url);
+        fatal_error("Can't launch URL: invalid protocol (the valid ones are: http, https, ftp, mailto).\n%s", safe_url);
     }
 
     if(!success)
-        logfile_message("Can't launch url: \"%s\"", safe_url);
+        logfile_message("Can't launch URL: \"%s\"", safe_url);
     else
-        logfile_message("Launching url: \"%s\"...", safe_url);
+        logfile_message("Launching URL: \"%s\"...", safe_url);
 
     free(safe_url);
     return success;
