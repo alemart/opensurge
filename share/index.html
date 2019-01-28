@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Share Open Surge</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="/script.js"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'UA-120511928-1');
+        </script>
+        <style>
+        body {
+            color: #ff8800;
+            background: #ffee11;
+            background: #ffa136;
+            font-family: 'Catamaran', 'Helvetica', 'Arial', 'sans-serif';
+        }
+        a, a:visited, a:hover, a:focus, a:active, a:link {
+            color: #fff;
+        }
+        .content {
+            display: flex;
+            align-items: center;
+            height: 100vh;
+        }
+        .btn-go {
+            background: #f55044;
+            color: #fff !important;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-go:hover, .btn-go:focus {
+            background: #e14034;
+        }
+        .container {
+            /*width: 100%;*/
+            max-width: 480px;
+        }
+        .panel {
+            background: #fff;
+            color: #606060;
+            padding: 5px;
+            position: relative;
+            border: none;
+        }
+        .icon {
+            width: 256px;
+        }
+        .btn img {
+            width: 64px;
+            height: 64px;
+            border-radius: 4px;
+        }
+        h3 {
+            margin-top: 7px;
+            font-size: 22px;
+        }
+        footer {
+            padding: 5px 10px;
+            text-align: center;
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100vw;
+            font-size: 12px;
+        }
+        progress {
+            width: 100%;
+            height: 4px;
+            display: inline-block;
+            position: absolute;
+            left: 0; bottom: 0;
+            border: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #777;
+            color: #ff1010;
+        }
+        progress::-moz-progress-bar { background: #ff1010 !important; }
+        progress::-webkit-progress-value { background: #ff1010 !important; }
+        progress::-webkit-progress-bar { background: #777 !important; }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <div class="container text-center">
+                <div class="panel">
+                    <img class="icon" src="icon.png" alt="Open Surge">
+                    <h3>Like the game?<br>Share it with your friends!</h3>
+                    <h5 class="hidden">(opens in a new window)</h5>
+                    <div>
+                        <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'facebook')" class="btn"><img src="facebook.png" alt="Facebook"></a>
+                        <a href="http://twitter.com/share?text=Open%20Surge%3A%202D%20game%20engine%20for%20retro%20platformers&url=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'twitter')" class="btn"><img src="twitter.png" alt="Twitter"></a>
+                    </div>
+                    <h4 class="text-center">You will be redirected shortly...</h4>
+                    <progress id="progressbar" value="0" max="1000"></progress>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <script>
+        (function($) {
+            $.fn.progress = function(totalTime, onComplete) {
+                var max = this.attr('max');
+                var tmr = window.setInterval(function() {
+                    var inc = max / (1000 * totalTime / 50);
+                    var val = Number(this.attr('value'));
+                    if((val += inc) >= max) {
+                        onComplete.call(this);
+                        this.stop();
+                    }
+                    this.attr('value', Math.min(val, max));
+                }.bind(this), 50);
+                this.stop = function() { window.clearInterval(tmr); };
+                return this;
+            };
+        })(jQuery);
+        </script>
+
+        <!-- Sharing Code -->
+        <script>
+        $(document).ready(function() {
+            var redirect = function() { window.location = 'http://opensurge2d.org'; }
+            var progress = $('#progressbar').progress(10.0, redirect);
+            window.share = function(link, on) {
+                var win = window.open(link.href, 'Social ' + on, 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes'); //width=657,height=487
+                var tmr = window.setInterval(function() {
+                    try {
+                        if(!win || win.closed) {
+                            window.clearInterval(tmr);
+                            redirect();
+                        }
+                    }
+                    catch(e) { ; }
+                }, 500);
+                progress.stop();
+                return false;
+            }
+        });
+        </script>
+    </body>
+</html>
