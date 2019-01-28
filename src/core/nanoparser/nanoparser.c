@@ -160,8 +160,7 @@ pre-processing phase:
         return array->_size;                                                                    \
     }                                                                                           \
                                                                                                 \
-    expandable_array_##T *expandable_array_##T##_new()                                         
-
+    
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -448,12 +447,11 @@ void getsym()
     }
     else if(c >= 0x20) {
         sym = SYM_STRING;
-
 #ifndef NANOPARSER_DISABLE_DOUBLE_QUOTES
         if(c != '"') {
 #endif
             /* non-quoted string */
-            while(c >= 0x20 && !isspace(c) && c != '{' && c != '}' && ++i <= SYMBOL_MAXLENGTH) { /* printable character */
+            while(c >= 0x20 && c != EOF && !isspace(c) && c != '{' && c != '}' && ++i <= SYMBOL_MAXLENGTH) { /* printable character */
                 *(p++) = (char)c;
                 c = vfile_getc();
             }
@@ -463,7 +461,7 @@ void getsym()
         else {
             /* double-quoted string */
             c = vfile_getc(); /* discard '"' */
-            while(c >= 0x20 && c != '"' && ++i <= SYMBOL_MAXLENGTH) {
+            while(c >= 0x20 && c != '"' && c != EOF && ++i <= SYMBOL_MAXLENGTH) {
                 if(c == '\n') {
                     error(
                         "Unexpected end of string in \"%s\" on line %d.",
@@ -498,7 +496,6 @@ void getsym()
                 vfile_ungetc(c);
         }
 #endif
-
     }
     else {
         error(
@@ -1005,6 +1002,15 @@ void preprocessor_run(FILE *in, int depth)
                 strcpy(fullpath, dir);
                 strcat(fullpath, value);
 
+                if(strstr(value, "..") != NULL) {
+                    error(
+                        "Preprocessor error in \"%s\" on line %d: couldn't include file \"%s\".",
+                        errorcontext_detect_file_name(preprocessor_line),
+                        errorcontext_detect_file_line(preprocessor_line),
+                        fullpath
+                    );
+                }
+
                 if(!preprocessor_has_file_been_included(fullpath)) {
                     FILE *fp = fopen(fullpath, "r");
                     preprocessor_add_to_include_table(fullpath);
@@ -1349,7 +1355,7 @@ void error(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(buf+len, fmt, args);
+    vsnprintf(buf+len, sizeof(buf), fmt, args);
     va_end(args);
 
     if(error_fun)
@@ -1367,7 +1373,7 @@ void warning(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(buf+len, fmt, args);
+    vsnprintf(buf+len, sizeof(buf), fmt, args);
     va_end(args);
 
     if(warning_fun)
