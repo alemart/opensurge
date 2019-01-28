@@ -84,7 +84,7 @@ object ".default_startup.hud.time"
     state "main"
     {
         hide
-        set_zindex "$_ds_hud_zindex"
+        set_zindex "$_ds_hud_zindex+0.01"
 
         let "$time = 0"
         let "$_ds_hud_time_minutes = 0"
@@ -168,7 +168,7 @@ object ".default_startup.hud.time.minutes"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         let "$xrel = -8 * floor(log10(max(1,$_ds_hud_time_minutes)))"
-        textout "hud" $xrel 0 "$HUD_SPACES $_ds_hud_time_minutes'"
+        textout "hud" $xrel 0 "$HUD_TIME $_ds_hud_time_minutes'"
     }
 
     state "hidden"
@@ -196,7 +196,7 @@ object ".default_startup.hud.time.seconds"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_seconds >= 10" "without_leading_zero"
-        textout "hud" 0 0 "$HUD_SPACES   0$_ds_hud_time_seconds\""
+        textout "hud" 0 0 "$HUD_TIME   0$_ds_hud_time_seconds\""
     }
 
     state "without_leading_zero"
@@ -204,7 +204,7 @@ object ".default_startup.hud.time.seconds"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_seconds < 10" "with_leading_zero"
-        textout "hud" 0 0 "$HUD_SPACES   $_ds_hud_time_seconds\""
+        textout "hud" 0 0 "$HUD_TIME   $_ds_hud_time_seconds\""
     }
 
     state "hidden"
@@ -232,7 +232,7 @@ object ".default_startup.hud.time.tenths"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_tenths >= 10" "without_leading_zero"
-        textout "hud" 0 0 "$HUD_SPACES      0$_ds_hud_time_tenths"
+        textout "hud" 0 0 "$HUD_TIME      0$_ds_hud_time_tenths"
     }
 
     state "without_leading_zero"
@@ -240,7 +240,7 @@ object ".default_startup.hud.time.tenths"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_tenths < 10" "with_leading_zero"
-        textout "hud" 0 0 "$HUD_SPACES      $_ds_hud_time_tenths"
+        textout "hud" 0 0 "$HUD_TIME      $_ds_hud_time_tenths"
     }
 
     state "hidden"

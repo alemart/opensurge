@@ -1,11 +1,9 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensurge2d.org
-//
-// File:   languages/english.lng
-// Desc:   English translation (encoding: utf-8)
-// Author: Alexandre
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// File: languages/english.lng
+// Description: english translation (encoding: utf-8)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
 
 // =============== GENERIC ======================
 
@@ -19,11 +17,15 @@ LANG_COMPATIBILITY          "0.5.0" // required engine version
 COLOR_SURGE                 "ff8000"
 COLOR_NEON                  "bf7a0d"
 COLOR_CHARGE                "aca5a5"
-COLOR_INPUT                 "e99f42"
-COLOR_MENUSELECTEDOPTION    "ffe13e"
-COLOR_MENUTITLE             "e99f42"
-COLOR_HIGHLIGHT             "e99f42"
-COLOR_SUBHIGHLIGHT          "ffe13e"
+COLOR_INPUT                 "ff8800"
+COLOR_MENUSELECTEDOPTION    "ffee11"
+COLOR_MENUTITLE             "ff8800"
+COLOR_HIGHLIGHT             "ff8800"
+COLOR_SUBHIGHLIGHT          "ffee11"
+//COLOR_MENUSELECTEDOPTION    "ffe13e"
+//COLOR_MENUTITLE             "e99f42"
+//COLOR_HIGHLIGHT             "e99f42"
+//COLOR_SUBHIGHLIGHT          "ffe13e"
 COLOR_SUBSUBHIGHLIGHT       "cdc3b6"
 COLOR_DANGER                "ff7777"
 COLOR_HUD                   "ffff00"
@@ -55,6 +57,17 @@ MAINMENU_CREATE             "CREATE"
 MAINMENU_SHARE              "SHARE"
 MAINMENU_OPTIONS            "OPTIONS"
 MAINMENU_QUIT               "QUIT"
+
+// Create Menu
+// all entries - except CREATEMENU_TEXT - use
+// bitmapped fonts (so no special characters)
+CREATEMENU_TITLE            "CREATE"
+CREATEMENU_PLAY             "PLAY DEMO"
+CREATEMENU_LEARN            "LEARN"
+CREATEMENU_BACK             "BACK"
+CREATEMENU_TEXT             "Open Surge lets you create your own games with ease and power! Unleash your creativity! Let your creative juices flow!\n\nReady to become a creator? Build your own levels, items, bosses, characters and more! Get a taste of the level editor, learn the game engine and dive into SurgeScript for maximum power!"
+
+// note: when translating CREATEMENU_TEXT, please make sure the text fits inside the screen!
 
 // Options
 OPTIONS_TITLE               "<color=$COLOR_MENUTITLE>OPTIONS</color>"
@@ -89,11 +102,6 @@ QUESTSELECT_TITLE           "<color=$COLOR_MENUTITLE>QUEST SELECT</color>"
 QUESTSELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to cancel"
 QUESTSELECT_PAGE            "page $1/$2"
 QUESTSELECT_INFO            "<color=$COLOR_MENUSELECTEDOPTION>Version:</color> $1\n<color=$COLOR_MENUSELECTEDOPTION>Author:</color> $2\n<color=$COLOR_MENUSELECTEDOPTION>Description:</color> $3"
-
-CQ_DEFAULT_NAME             "Default quest"
-CQ_DEFAULT_DESC             "The default quest"
-CQ_EXTRA_NAME               "Extra levels"
-CQ_EXTRA_DESC               "Some extra levels"
 
 // Credits
 CREDITS_TITLE               "<color=$COLOR_MENUTITLE>CREDITS</color>"
@@ -132,9 +140,6 @@ CREDITS_RAXILLAN            "Russian translation"
 // Second credits screen
 CREDITS2_TITLE              "<color=$COLOR_MENUTITLE>CREDITS</color>"
 CREDITS2_KEY                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
-
-// Creative Commons screen
-CC_DISCLAIMER               "Game assets under the CC"
 
 // ======================= INPUT DEVICES ====================
 
@@ -182,7 +187,7 @@ INPUT_JOY_FIRE8         "BUTTON 8"
 // the translation don't accept special characters.
 //
 // This section does not accept language-specific
-// special characters. All other areas do.
+// special characters.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.
@@ -198,11 +203,10 @@ MENU_OPTIONS                "OPTIONS"
 MENU_DONATE                 "DONATE"
 MENU_EXIT                   "EXIT"
 
-// HUD (Heads-Up Display)
-HUD_SCORE                   "Score " // === translation notes: ===
-HUD_TIME                    "Time  " // the same amount of characters as HUD_SCORE
-HUD_COLLECTIBLES            "Power " // the same amount of characters as HUD_SCORE
-HUD_SPACES                  "      " // the same amount of characters as HUD_SCORE
+// Heads-Up Display
+HUD_SCORE                   "Score"
+HUD_TIME                    "Time"
+HUD_COLLECTIBLES            "Power"
 
 // Level Cleared animation
 CLEARED_LINE1               "YOU HAVE"

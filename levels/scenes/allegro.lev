@@ -1,9 +1,4 @@
-// -----------------------------------------------------------------------------
-// File: allegro.lev
-// Description: a Splash Screen displaying the Allegro image
-// Author: Alexandre Martins <http://opensurge2d.org>
-// License: MIT
-// -----------------------------------------------------------------------------
+// Splash screen
 name "Allegro Splash"
 author "Alexandre Martins"
 license "CC-0"

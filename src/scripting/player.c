@@ -51,6 +51,7 @@ static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -203,6 +204,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "PlayerManager", "get_active", fun_getactive, 0);
     surgescript_vm_bind(vm, "PlayerManager", "__getById", fun_getbyid, 1);
     surgescript_vm_bind(vm, "PlayerManager", "__getByName", fun_getbyname, 1);
+    surgescript_vm_bind(vm, "PlayerManager", "get_initialLives", fun_getinitiallives, 0);
 }
 
 /*
@@ -462,6 +464,12 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
     return surgescript_var_set_number(surgescript_var_create(),
         (player != NULL) ? FIXANG(player->actor->angle) : 0.0f
     );
+}
+
+/* the initial number of lives */
+surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), PLAYER_INITIAL_LIVES);
 }
 
 /* ground speed, in px/s */

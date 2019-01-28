@@ -9,6 +9,7 @@ using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Level;
 using SurgeEngine.Actor;
+using SurgeEngine.Player;
 using SurgeEngine.Input;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
@@ -78,6 +79,11 @@ object "MainMenu"
         Level.restart();
     }
 
+    state "create"
+    {
+        Level.load("quests/create.qst");
+    }
+
     state "options"
     {
         Level.load("quests/options.qst");
@@ -96,8 +102,7 @@ object "MainMenu"
         }
         else if(buttonIndex == 1) {
             // create
-            Console.print("Coming soon!");
-            fadeTo("restart");
+            fadeTo("create");
         }
         else if(buttonIndex == 2) {
             // share
@@ -120,13 +125,21 @@ object "MainMenu"
         state = "waitToFade";
     }
 
+    fun resetPlayerData()
+    {
+        player = Player.active;
+        player.lives = Player.initialLives;
+        player.score = 0;
+    }
+
     fun constructor()
     {
+        resetPlayerData();
         fader.fadeIn(fadeTime);
     }
 }
 
-object "SurgeCircle" is "private", "entity"
+object "SurgeCircle" is "private", "entity", "awake"
 {
     transform = Transform();
     actor = Actor("SurgeCircle");
@@ -144,7 +157,7 @@ object "SurgeCircle" is "private", "entity"
     }
 }
 
-object "MenuCircle" is "private", "entity"
+object "MenuCircle" is "private", "entity", "awake"
 {
     transform = Transform();
     actor = Actor("MenuCircle");

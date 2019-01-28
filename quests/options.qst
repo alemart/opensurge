@@ -1,14 +1,15 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensurge2d.org
-//
-// File:   quests/options.qst
-// Desc:   calls the options screen
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// File: options.qst
+// Description: this quest loads the built-in options screen of the engine
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// modders: generally, you don't need to modify this file.
 
 // quest properties
 name            "Options screen"
 hidden
 
-// level list (in order of appearance)
+// level list
 <options>

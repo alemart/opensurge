@@ -80,7 +80,7 @@ void credits_init(void *foo)
     font_set_text(back, "%s", lang_get("CREDITS_KEY"));
     font_set_position(back, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(back).y - 5));
 
-    text = font_create("menu.credits");
+    text = font_create("menu.text");
     font_set_text(text, "\n%s", credits_text);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));

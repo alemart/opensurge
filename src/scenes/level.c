@@ -458,7 +458,6 @@ void level_load(const char *filepath)
         while(fgets(line, sizeof(line) / sizeof(char), fp)) {
             char *q = line + strlen(line) - 1;
             if(*q == '\n') *q = '\0'; /* no newlines, please! */
-            puts(line);
             level_interpret_line(fullpath, ++ln, line);
         }
         fclose(fp);
@@ -1019,8 +1018,8 @@ void level_init(void *path_to_lev_file)
     dlgbox = actor_create();
     dlgbox->position.y = VIDEO_SCREEN_H;
     actor_change_animation(dlgbox, sprite_get_animation("SD_DIALOGBOX", 0));
-    dlgbox_title = font_create("sans");
-    dlgbox_message = font_create("sans");
+    dlgbox_title = font_create("dialogbox");
+    dlgbox_message = font_create("dialogbox");
 
     /* editor */
     editor_init();

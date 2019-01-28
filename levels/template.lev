@@ -27,7 +27,7 @@ brick 0 128 10000
 brick 0 192 10000
 brick 0 256 10000
 brick 0 320 10000
-brick 0 384 1000
+brick 0 384 10000
 
 // entities
 

@@ -1,11 +1,12 @@
 // Open Surge Engine
 // http://opensurge2d.org
+// HUD fonts for retrocompatibility
 
 font "hud_title"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
         size                    24
         antialias
     }
@@ -15,7 +16,7 @@ font "hud_subtext"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
         size                    13
     }
 }

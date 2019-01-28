@@ -85,9 +85,11 @@ object "MenuButtonList"
                 currentButtonIndex++;
 
                 // focus on the proper button
-                for(j = 0; j < buttons.length; j++)
-                    buttons[j].blur();
-                buttons[currentButtonIndex].focus();
+                if(buttons.length > 0) {
+                    for(j = 0; j < buttons.length; j++)
+                        buttons[j].blur();
+                    buttons[currentButtonIndex].focus();
+                }
 
                 // move
                 slide.play();
@@ -109,9 +111,11 @@ object "MenuButtonList"
                 currentButtonIndex--;
 
                 // focus on the proper button
-                for(j = 0; j < buttons.length; j++)
-                    buttons[j].blur();
-                buttons[currentButtonIndex].focus();
+                if(buttons.length > 0) {
+                    for(j = 0; j < buttons.length; j++)
+                        buttons[j].blur();
+                    buttons[currentButtonIndex].focus();
+                }
 
                 // move
                 slide.play();
@@ -248,11 +252,13 @@ object "MenuButtonList"
 
     fun init()
     {
-        buttons[currentButtonIndex].focus();
-        for(j = 0; j < buttons.length; j++)
-            buttons[j].transform.localPosition = buttonSpacing.scaledBy(j);
         title.transform.localPosition = buttonSpacing.scaledBy(-1);//-1.15
         title.visible = !String.isNullOrEmpty(title.text);
+        if(buttons.length > 0) {
+            buttons[currentButtonIndex].focus();
+            for(j = 0; j < buttons.length; j++)
+                buttons[j].transform.localPosition = buttonSpacing.scaledBy(j);
+        }
         state = "moving";
     }
 }

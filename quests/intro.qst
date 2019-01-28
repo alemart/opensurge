@@ -1,13 +1,16 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensurge2d.org
-//
-// File:   quests/intro.qst
-// Desc:   this is the introduction cutscene, the first one to be opened
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// File: intro.qst
+// Description: this is the Introduction quest, the first one to be opened
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
 
-// quest properties
-name            "Introduction cutscene"
+// if you want to hack the game and change the screens that are loaded
+// when the engine is run, you may change the fields below
+
+// quest metadata
+name            "Introduction quest"
+author          "Alexandre Martins"
 
 // level list (in order of appearance)
 level           "levels/scenes/allegro.lev"

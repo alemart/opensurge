@@ -6,7 +6,7 @@ font "menu.title"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
         size                    24
         antialias
         shadow
@@ -18,7 +18,7 @@ font "menu.text"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
         size                    13
         shadow
     }
@@ -41,8 +41,19 @@ font "menu.small"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
         size                    12
+        shadow
+    }
+}
+
+// menu: bold
+font "menu.bold"
+{
+    truetype
+    {
+        source_file             "fonts/Ubuntu-M.ttf"
+        size                    16
         shadow
     }
 }
@@ -52,18 +63,7 @@ font "menu.footer"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
-        size                    13
-    }
-}
-
-
-// menu: credits
-font "menu.credits"
-{
-    truetype
-    {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
         size                    13
     }
 }

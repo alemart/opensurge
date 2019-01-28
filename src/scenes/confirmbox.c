@@ -77,13 +77,13 @@ void confirmbox_init(void *text_and_options)
     arrow = actor_create();
     actor_change_animation(arrow, sprite_get_animation("SD_GUIARROW", 0));
 
-    textfnt = font_create("sans");
+    textfnt = font_create("dialogbox");
     font_set_text(textfnt, "%s", text);
     font_set_width(textfnt, 164);
 
     for(i=0; i<option_count; i++) {
-        optionfnt[i][0] = font_create("sans");
-        optionfnt[i][1] = font_create("sans");
+        optionfnt[i][0] = font_create("dialogbox");
+        optionfnt[i][1] = font_create("dialogbox");
         font_set_text(optionfnt[i][0], "%s", option[i]);
         font_set_text(optionfnt[i][1], "<color=$COLOR_MENUSELECTEDOPTION>%s</color>", option[i]);
     }

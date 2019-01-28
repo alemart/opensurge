@@ -18,7 +18,7 @@ font "sans"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
         size                    13
         shadow
     }
@@ -35,7 +35,7 @@ font "default_ttf"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
         size                    13
     }
 }
@@ -45,7 +45,7 @@ font "default_ttf_aa"
 {
     truetype
     {
-        source_file             "fonts/DejaVuSans.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
         size                    13
         antialias
         shadow
