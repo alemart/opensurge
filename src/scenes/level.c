@@ -456,7 +456,9 @@ void level_load(const char *filepath)
     if(fp != NULL) {
         int ln = 0;
         while(fgets(line, sizeof(line) / sizeof(char), fp)) {
-            line[strlen(line)-1] = 0; /* no newlines, please! */
+            char *q = line + strlen(line) - 1;
+            if(*q == '\n') *q = '\0'; /* no newlines, please! */
+            puts(line);
             level_interpret_line(fullpath, ++ln, line);
         }
         fclose(fp);
