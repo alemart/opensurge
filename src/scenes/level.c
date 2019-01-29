@@ -1789,7 +1789,7 @@ void level_call_dialogbox(const char *title, const char *message)
     dlgbox_starttime = timer_get_ticks();
     font_set_text(dlgbox_title, "%s", title);
     font_set_text(dlgbox_message, "%s", message);
-    font_set_width(dlgbox_message, 260);
+    font_set_width(dlgbox_message, image_width(actor_image(dlgbox)) - 14);
 }
 
 
@@ -2113,9 +2113,11 @@ void render_hud(enemy_list_t *major_enemies)
 /* renders the dialog box */
 void render_dlgbox(v2d_t camera_position)
 {
-    actor_render(dlgbox, camera_position);
-    font_render(dlgbox_title, camera_position);
-    font_render(dlgbox_message, camera_position);
+    if(dlgbox->position.y < VIDEO_SCREEN_H) {
+        actor_render(dlgbox, camera_position);
+        font_render(dlgbox_title, camera_position);
+        font_render(dlgbox_message, camera_position);
+    }
 }
 
 /* updates the dialog box */
