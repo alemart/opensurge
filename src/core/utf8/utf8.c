@@ -20,7 +20,7 @@
 #include <wchar.h>
 #include <wctype.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <malloc.h>
 #define snprintf _snprintf
 #else
