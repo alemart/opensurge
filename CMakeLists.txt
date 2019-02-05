@@ -209,6 +209,8 @@ SET(
 
   src/core/nanoparser/nanoparser.c
   src/core/whereami/whereami.c
+  src/core/utf8/utf8.c
+  src/core/hqx/hqx.c
   src/core/zip/zip.c
   src/core/assetfs.c
   src/core/audio.c
@@ -238,7 +240,6 @@ SET(
   src/core/util.c
   src/core/v2d.c
   src/core/video.c
-  src/core/hqx.c
 
   src/scenes/util/editorcmd.c
   src/scenes/util/editorgrp.c
@@ -363,6 +364,8 @@ IF(WIN32)
 
       src/core/nanoparser/nanoparser.h
       src/core/whereami/whereami.h
+      src/core/utf8/utf8.h
+      src/core/hqx/hqx.h
       src/core/zip/zip.c
       src/core/assetfs.h
       src/core/audio.h
@@ -395,7 +398,6 @@ IF(WIN32)
       src/core/util.h
       src/core/video.h
       src/core/v2d.h
-      src/core/hqx.h
 
       src/scenes/util/editorcmd.h
       src/scenes/util/editorgrp.h
