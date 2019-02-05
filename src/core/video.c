@@ -25,7 +25,7 @@
 #include <allegro.h>
 #include <loadpng.h>
 #include <jpgalleg.h>
-#include "hqx.h"
+#include "hqx/hqx.h"
 #include "video.h"
 #include "timer.h"
 #include "logfile.h"
