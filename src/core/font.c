@@ -55,12 +55,12 @@ static fontcallback_t callbacktable_find(const char *variable_name);
 #define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
 #define FONT_STACKCAPACITY  8
 #define FONT_TEXTMAXLENGTH  8192
-static int dirfill(const char *vpath, void *param);
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_block(const parsetree_statement_t *stmt, void *data);
 static int traverse_bmp(const parsetree_statement_t *stmt, void *data);
 static int traverse_bmp_char(const parsetree_statement_t *stmt, void *data);
 static int traverse_ttf(const parsetree_statement_t *stmt, void *data);
+static int dirfill(const char *vpath, void *param);
 
 typedef struct charproperties_t charproperties_t;
 struct charproperties_t {
@@ -166,13 +166,11 @@ struct font_t {
 };
 
 /* misc */
-#define MAX_PASSES 3 /* won't expand variables more than this amount of times */
 static const char* get_variable(const char *key);
 static inline int has_variables_to_expand(const char *str, int *passes);
 static void expand_variables(char *str, fontargs_t args, size_t size);
 static uint8 hex2dec(char digit);
 static void convert_to_ascii(char* str);
-/*static int length_without_tags(const char* str);*/
 
 /*
  * font_init()
@@ -291,7 +289,6 @@ void font_set_text(font_t *f, const char *fmt, ...)
 {
     static char buf[FONT_TEXTMAXLENGTH];
     va_list args;
-    char *p, *q;
     int passes = 0;
 
     /* printf */
@@ -310,32 +307,7 @@ void font_set_text(font_t *f, const char *fmt, ...)
     /* allocate text */
     if(f->text != NULL)
         free(f->text);
-    f->text = mallocx(sizeof(char) * (strlen(buf) + 1));
-
-    /* parse newlines */
-    for(p=buf,q=f->text; *p; p++,q++) {
-        if(*p == '\\') {
-            switch( *(p+1) ) {
-                case 'n':
-                    *q = '\n';
-                    p++;
-                    break;
-
-                case '\\':
-                    *q = '\\';
-                    p++;
-                    break;
-
-                default:
-                    *q = *p;
-                    break;
-            }
-        }
-        else
-            *q = *p;
-    }
-
-    *q = 0;
+    f->text = str_dup(buf);
 }
 
 
@@ -603,8 +575,11 @@ const char* get_variable(const char *key)
 
 
 /* expands the variables, e.g.,
- * 1) Please press the $INPUT_LEFT to go left
- * 2) Please press the LEFT CTRL KEY to go left */
+
+   "Please press the $INPUT_LEFT to go left"
+            ... becomes ...
+   "Please press the LEFT CTRL KEY to go left"
+*/
 void expand_variables(char *str, fontargs_t args, size_t size)
 {
     static char buf[FONT_TEXTMAXLENGTH];
@@ -658,6 +633,7 @@ void expand_variables(char *str, fontargs_t args, size_t size)
 /* has_variables_to_expand() */
 int has_variables_to_expand(const char *str, int *passes)
 {
+    static const int MAX_PASSES = 3; /* won't expand more than this */
     if(++(*passes) > MAX_PASSES)
         return FALSE;
 
@@ -694,32 +670,6 @@ void convert_to_ascii(char* str)
     }
 
     *q = 0;
-}
-
-/* the length of the text, removing all tags */
-/*
-int length_without_tags(const char* str)
-{
-    int len, tag;
-    const char *p;
-
-    for(len=0,tag=FALSE,p=str; *p; p++) {
-        if(tag && (*p == '>')) tag = FALSE;
-        else if(!tag && (*p == '<')) tag = TRUE;
-        else if(!tag) len++;
-    }
-
-    return len;
-}
-*/
-
-/* dirfill() */
-int dirfill(const char *vpath, void *param)
-{
-    const char* fullpath = assetfs_fullpath(vpath);
-    parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
-    return 0;
 }
 
 
@@ -996,6 +946,13 @@ int traverse_ttf(const parsetree_statement_t *stmt, void *data)
     return 0;
 }
 
+int dirfill(const char *vpath, void *param)
+{
+    const char* fullpath = assetfs_fullpath(vpath);
+    parsetree_program_t** p = (parsetree_program_t**)param;
+    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
+    return 0;
+}
 
 
 /* ------------------------------------------------- */
@@ -1240,9 +1197,9 @@ void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
         char buf[5] = { 0 };
         u8_toutf8(buf, sizeof(buf), (uint32_t*)&ch, 1);
         if(f->antialias)
-            alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, (int)color, -1);
+            alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, *((int*)&color), -1);
         else
-            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, (int)color, -1);
+            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, *((int*)&color), -1);
     }
 }
 
