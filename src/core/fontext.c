@@ -25,8 +25,9 @@
 #include "../scenes/level.h"
 
 static const char* f_dollar() { return "$"; }
-static const char* f_lowethan() { return "<"; }
+static const char* f_lowerthan() { return "<"; }
 static const char* f_greaterthan() { return ">"; }
+static const char* f_empty() { return ""; }
 static const char* f_level_name() { return level_name(); }
 static const char* f_level_version() { return level_version(); }
 static const char* f_level_author() { return level_author(); }
@@ -58,8 +59,10 @@ void fontext_register_variables()
 {
     font_register_variable("$", f_dollar);
     font_register_variable("$$", f_dollar);
-    font_register_variable("$LT", f_lowethan);
+    font_register_variable("$DOLLAR", f_dollar);
+    font_register_variable("$LT", f_lowerthan);
     font_register_variable("$GT", f_greaterthan);
+    font_register_variable("$EMPTY", f_empty);
     font_register_variable("$LEVEL_NAME", f_level_name);
     font_register_variable("$LEVEL_VERSION", f_level_version);
     font_register_variable("$LEVEL_AUTHOR", f_level_author);

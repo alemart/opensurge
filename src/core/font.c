@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * font.c - font module
- * Copyright (C) 2008-2011, 2013, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2011, 2013, 2018-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,9 +32,10 @@
 #include "logfile.h"
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
+#include "utf8/utf8.h"
 
 /* private stuff */
-#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
+#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* crazy stuff */
 static int allow_ttf_aa = TRUE; /* allow antialiasing for all TTF fonts? */
 
 /* ------------------------------- */
@@ -52,8 +53,8 @@ static fontcallback_t callbacktable_find(const char *variable_name);
 
 /* font scripts (nanoparser) */
 #define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
-#define FONT_STACKCAPACITY  32
-#define FONT_TEXTMAXLENGTH  20480
+#define FONT_STACKCAPACITY  8
+#define FONT_TEXTMAXLENGTH  8192
 static int dirfill(const char *vpath, void *param);
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_block(const parsetree_statement_t *stmt, void *data);
@@ -149,14 +150,8 @@ static fontdata_t* fontdata_list_find(const char *name);
 /* ------------------------------- */
 
 /* font arguments: for a safe printf-like alternative (when dealing with user-provided format strings) */
-#define FONTARGS_MAX 3
+#define FONTARGS_MAX 3 /* can go up to 9 in the current expand algorithm */
 typedef char* fontargs_t[FONTARGS_MAX];
-static const char* get_variable(const char *key);
-static int has_variables_to_expand(const char *str);
-static void expand_variables(char *str, fontargs_t args);
-static uint8 hex2dec(char digit);
-static char* remove_tags(const char *str);
-static int length_without_tags(const char* str);
 
 /* font struct: this struct is used by the external world */
 struct font_t {
@@ -170,6 +165,14 @@ struct font_t {
     fontalign_t align; /* alignment */
 };
 
+/* misc */
+#define MAX_PASSES 3 /* won't expand variables more than this amount of times */
+static const char* get_variable(const char *key);
+static inline int has_variables_to_expand(const char *str, int *passes);
+static void expand_variables(char *str, fontargs_t args, size_t size);
+static uint8 hex2dec(char digit);
+static void convert_to_ascii(char* str);
+/*static int length_without_tags(const char* str);*/
 
 /*
  * font_init()
@@ -289,17 +292,27 @@ void font_set_text(font_t *f, const char *fmt, ...)
     static char buf[FONT_TEXTMAXLENGTH];
     va_list args;
     char *p, *q;
+    int passes = 0;
 
+    /* printf */
     va_start(args, fmt);
-    vsnprintf(buf, (FONT_TEXTMAXLENGTH*2)/3, fmt, args);
+    vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    while(has_variables_to_expand(buf))
-        expand_variables(buf, f->argument);
+    /* expand variables */
+    while(has_variables_to_expand(buf, &passes))
+        expand_variables(buf, f->argument, sizeof(buf));
 
-    if(f->text) free(f->text);
+    /* utf8 check */
+    if(!u8_isvalid(buf, strlen(buf)))
+        convert_to_ascii(buf);
+
+    /* allocate text */
+    if(f->text != NULL)
+        free(f->text);
     f->text = mallocx(sizeof(char) * (strlen(buf) + 1));
 
+    /* parse newlines */
     for(p=buf,q=f->text; *p; p++,q++) {
         if(*p == '\\') {
             switch( *(p+1) ) {
@@ -592,53 +605,66 @@ const char* get_variable(const char *key)
 /* expands the variables, e.g.,
  * 1) Please press the $INPUT_LEFT to go left
  * 2) Please press the LEFT CTRL KEY to go left */
-void expand_variables(char *str, fontargs_t args)
+void expand_variables(char *str, fontargs_t args, size_t size)
 {
     static char buf[FONT_TEXTMAXLENGTH];
-    static char varname[FONT_TEXTMAXLENGTH];
-    char *p=str, *q=buf, *r;
-    const char *u;
-    const char *varcontent;
+    char *p = str, *q = buf;
 
+    /* expand into buf */
     while(*p) {
-        /* looking for variables... */
-        while(*p && *p != '$' && (q-buf < FONT_TEXTMAXLENGTH))
+        /* scanning... */
+        while(*p && *p != '$' && (q - buf < sizeof(buf) - 1))
             *(q++) = *(p++);
 
-        /* I found a variable! */
+        /* found a variable! */
         if(*p == '$') {
+            char varname[64], *r;
+            const char *value = NULL, *u;
+
             /* detect the name of this variable */
             r = varname;
             do {
                 *(r++) = *(p++);
-            } while(IS_IDENTIFIER_CHAR(*p));
+            } while(IS_IDENTIFIER_CHAR(*p) && (r - varname < sizeof(varname) - 1));
             *r = 0;
 
             /* get the contents of varname */
-            if(varname[1] >= '1' && varname[1] <= ('0' + FONTARGS_MAX) && varname[2] == '\0')
-                varcontent = args[ varname[1] - '1' ]; /* may be NULL */
-            else
-                varcontent = get_variable(varname);
+            if(isdigit(varname[1]) && varname[2] == 0) {
+                /* match $1, $2, ... */
+                if(varname[1] >= '1' && varname[1] <= '0' + FONTARGS_MAX)
+                    value = args[ varname[1] - '1' ]; /* may be NULL */
+                if(value == NULL)
+                    value = varname; /* get the digit */
+            }
+            else {
+                /* match other variables */
+                value = get_variable(varname);
+            }
 
             /* put it into buf */
-            for(u = varcontent; u && *u && (q-buf < FONT_TEXTMAXLENGTH); u++, q++)
-                *q = *u;
+            if((u = value) != NULL) {
+                while(*u && (q - buf < sizeof(buf) - 1))
+                    *(q++) = *(u++);
+            }
         }
     }
     *q = 0;
 
-    strcpy(str, buf);
+    /* copy back into str */
+    str_cpy(str, buf, size);
 }
 
 
 /* has_variables_to_expand() */
-int has_variables_to_expand(const char *str)
+int has_variables_to_expand(const char *str, int *passes)
 {
-    const char *p;
+    if(++(*passes) > MAX_PASSES)
+        return FALSE;
 
-    for(p=str; *p; p++) {
-        if(*p == '$' && IS_IDENTIFIER_CHAR(*(p+1)))
+    while(*str) {
+        if(*str == '$' && IS_IDENTIFIER_CHAR(str[1]))
             return TRUE;
+        str++;
     }
 
     return FALSE;
@@ -657,27 +683,21 @@ uint8 hex2dec(char digit)
         return 255; /* error */
 }
 
-/* returns a copy of str without things between < and > */
-/* example: <color=ff0000>hi</color> becomes hi */
-char* remove_tags(const char *str)
+/* convert to ascii */
+void convert_to_ascii(char* str)
 {
-    int j, tag;
-    const char *p;
-    char* s;
+    char *p, *q;
 
-    s = mallocx((1 + length_without_tags(str)) * sizeof(*s));
-    for(j=0,tag=FALSE,p=str; *p; p++) {
-        if(tag && (*p == '>')) tag = FALSE;
-        else if(!tag && (*p == '<')) tag = TRUE;
-        else if(!tag) s[j++] = *p;
+    for(q = p = str; *p; p++) {
+        if(!(*p & 0x80))
+            *(q++) = *p;
     }
-    s[j] = '\0';
 
-    return s;
+    *q = 0;
 }
 
-
 /* the length of the text, removing all tags */
+/*
 int length_without_tags(const char* str)
 {
     int len, tag;
@@ -691,6 +711,7 @@ int length_without_tags(const char* str)
 
     return len;
 }
+*/
 
 /* dirfill() */
 int dirfill(const char *vpath, void *param)
@@ -1088,7 +1109,7 @@ void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
         if(color != image_rgb(255,255,255))
             image_draw_multiply(char_image, img, x, y + f->line_height - image_height(char_image), color, 1.0f, IF_NONE);
         else
-            image_draw(char_image, img, x, y, IF_NONE);
+            image_draw(char_image, img, x, y + f->line_height - image_height(char_image), IF_NONE);
     }
 }
 
@@ -1149,8 +1170,6 @@ v2d_t fontdata_bmp_textsize(fontdata_t *fnt, const char *string)
 fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, int shadow)
 {
     const char* fullpath;
-    char buf[16];
-    int ch, w, h;
     fontdata_ttf_t *f = mallocx(sizeof *f);
 
     ((fontdata_t*)f)->renderchar = fontdata_ttf_renderchar;
@@ -1170,14 +1189,21 @@ fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, i
 
         /* caching commonly used characters */
         if(!(f->antialias)) {
+            char buf[2] = { 0, 0 };
+            int ch, w, h = alfont_text_height(f->ttf);
+            uint32 white = image_rgb(255, 255, 255);
             for(ch=32; ch<=127; ch++) {
-                uszprintf(buf, sizeof(buf), "%c", ch);
+                buf[0] = ch;
                 w = alfont_text_length(f->ttf, buf);
-                h = alfont_text_height(f->ttf);
                 f->cached_character[ch-32] = image_create(w, h);
                 image_clear(f->cached_character[ch-32], video_get_maskcolor());
-                alfont_textout_ex(IMAGE2BITMAP(f->cached_character[ch-32]), f->ttf, buf, 0, 0, image_rgb(255,255,255), -1);
+                alfont_textout_ex(IMAGE2BITMAP(f->cached_character[ch-32]), f->ttf, buf, 0, 0, white, -1);
             }
+        }
+        else {
+            int i = 0, n = sizeof(f->cached_character) / sizeof(image_t*);
+            for(i = 0; i < n; i++)
+                f->cached_character[i] = NULL;
         }
     }
     else
@@ -1189,21 +1215,20 @@ fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, i
 void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color)
 {
     fontdata_ttf_t *f = (fontdata_ttf_t*)fnt;
-    int aa = f->antialias;
-    uint32 black = image_rgb(0,0,0);
-    static int sh = 0;
 
-    /* sh effect */
-    if(f->shadow && !sh++) {
+    /* draw shadow */
+    if(f->shadow) {
+        uint32 black = image_rgb(0, 0, 0);
+        f->shadow = FALSE;
         fontdata_ttf_renderchar(fnt, img, ch, 1+x, 1+y, black);
         fontdata_ttf_renderchar(fnt, img, ch, 0+x, 1+y, black);
         fontdata_ttf_renderchar(fnt, img, ch, 1+x, 0+y, black);
-        sh = 0;
+        f->shadow = TRUE;
     }
 
     /* renderchar */
-    if(!aa && (ch >= 32 && ch <= 127)) {
-        /* this character is cached */
+    if(!(f->antialias) && (ch >= 32 && ch <= 127)) {
+        /* use cached character */
         image_t *char_image = f->cached_character[ch-32];
         if(color != image_rgb(255,255,255))
             image_draw_multiply(char_image, img, x, y, color, 1.0f, IF_NONE);
@@ -1211,22 +1236,24 @@ void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
             image_draw(char_image, img, x, y, IF_NONE);
     }
     else {
-        /* this character is not cached */
-        char buf[16];
-        uszprintf(buf, sizeof(buf), "%lc", ch);
-        (aa ? alfont_textout_aa_ex : alfont_textout_ex)(IMAGE2BITMAP(img), f->ttf, buf, x, y, (int)color, -1);
+        /* don't use cached character */
+        char buf[5] = { 0 };
+        u8_toutf8(buf, sizeof(buf), (uint32_t*)&ch, 1);
+        if(f->antialias)
+            alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, (int)color, -1);
+        else
+            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, (int)color, -1);
     }
 }
 
 void fontdata_ttf_release(fontdata_t *fnt)
 {
-    int ch;
     fontdata_ttf_t *f = (fontdata_ttf_t*)fnt;
-    int aa = f->antialias;
+    int i = 0, n = sizeof(f->cached_character) / sizeof(image_t*);
 
-    if(!aa) {
-        for(ch=32; ch<=127; ch++)
-            image_destroy(f->cached_character[ch-32]);
+    for(i = 0; i < n; i++) {
+        if(f->cached_character[i] != NULL)
+            image_destroy(f->cached_character[i]);
     }
 
     alfont_destroy_font(f->ttf);
@@ -1242,24 +1269,41 @@ v2d_t fontdata_ttf_charspacing(fontdata_t *fnt)
 v2d_t fontdata_ttf_textsize(fontdata_t *fnt, const char *string)
 {
     fontdata_ttf_t *f = (fontdata_ttf_t*)fnt;
-    v2d_t v = v2d_new(0,0);
-    int aa = f->antialias;
-    char *p, *s = remove_tags(string);
+    v2d_t sp = fnt->charspacing(fnt);
+    int width = 0, line_width = 0;
+    int line_height = alfont_text_height(f->ttf);
+    int height = line_height;
+    int tag = FALSE;
+    size_t i = 0;
+    uint32 ch;
 
-    /* if all characters in the string are cached, don't call alfont */
-    for(p=s; *p; p++) {
-        if(!aa && (*p >= 32/* && *p <= 127*/)) {
-            image_t *char_image = f->cached_character[(int)(*p)-32];
-            v.x += image_width(char_image);
-            v.y = max(v.y, image_height(char_image));
+    while(string[i]) {
+        ch = u8_nextchar(string, &i);
+        if(!tag && ch == '<')
+            tag = TRUE;
+        else if(tag && ch == '>')
+            tag = FALSE;
+        else if(tag)
+            continue;
+        else if(ch == '\n') {
+            height += line_height + (int)sp.y;
+            line_width = 0;
+        }
+        else if(!(f->antialias) && (ch >= 32 && ch <= 127)) {
+            line_width += image_width(f->cached_character[(int)ch - 32]);
+            if(string[i])
+                line_width += (int)sp.x;
         }
         else {
-            v = v2d_new(alfont_text_length(f->ttf, s), alfont_text_height(f->ttf));
-            break;
+            char buf[5] = { 0 };
+            u8_toutf8(buf, sizeof(buf), (uint32_t*)&ch, 1);
+            line_width += alfont_text_length(f->ttf, buf);
+            if(string[i])
+                line_width += (int)sp.x;
         }
+        width = max(width, line_width);
     }
 
-    free(s);
-    return v;
+    return v2d_new(width, height);
 }
 
