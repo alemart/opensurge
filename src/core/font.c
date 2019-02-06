@@ -1195,7 +1195,7 @@ void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y
     else {
         /* don't use cached character */
         char buf[5] = { 0 };
-        u8_toutf8(buf, sizeof(buf), (uint32_t*)&ch, 1);
+        u8_wc_toutf8(buf, ch);
         if(f->antialias)
             alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, buf, x, y, *((int*)&color), -1);
         else
@@ -1253,7 +1253,7 @@ v2d_t fontdata_ttf_textsize(fontdata_t *fnt, const char *string)
         }
         else {
             char buf[5] = { 0 };
-            u8_toutf8(buf, sizeof(buf), (uint32_t*)&ch, 1);
+            u8_wc_toutf8(buf, ch);
             line_width += alfont_text_length(f->ttf, buf);
             if(string[i])
                 line_width += (int)sp.x;
