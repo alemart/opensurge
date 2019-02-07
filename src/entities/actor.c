@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include <limits.h>
+#include <limits.h>
 #include <math.h>
 #include "actor.h"
 #include "brick.h"
