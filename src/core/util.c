@@ -33,7 +33,7 @@
 /* private stuff */
 static volatile int game_over = FALSE;
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
-static void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
+static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
 
 
 
@@ -244,7 +244,10 @@ void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*
 
 void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m)
 {
-    uint8 *arr = mallocx((q-p+1) * size);
+    /* due to the static array declared as an optimization below,
+       merge_sort() won't work on multiple threads */
+    static uint8 tmp[16384]; size_t bytes = (q-p+1) * size;
+    uint8 *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
     uint8 *i = arr;
     uint8 *j = arr + (m+1-p) * size;
     int k = p;
@@ -272,6 +275,7 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
         j += size;
     }
 
-    free(arr);
+    if(bytes > sizeof(tmp))
+        free(arr);
 }
 
