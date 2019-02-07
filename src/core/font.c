@@ -35,7 +35,9 @@
 #include "utf8/utf8.h"
 
 /* private stuff */
-#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* crazy stuff */
+#define IMAGE2BITMAP(img)          (*((BITMAP**)(img)))   /* crazy stuff */
+#define FONT_TEXTMAXLENGTH         8192     /* maximum length for texts */
+#define FONT_STACKCAPACITY         8        /* color stack capacity */
 static int allow_ttf_aa = TRUE; /* allow antialiasing for all TTF fonts? */
 
 /* ------------------------------- */
@@ -53,8 +55,6 @@ static fontcallback_t callbacktable_find(const char *variable_name);
 
 /* font scripts (nanoparser) */
 #define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
-#define FONT_STACKCAPACITY  8
-#define FONT_TEXTMAXLENGTH  8192
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_block(const parsetree_statement_t *stmt, void *data);
 static int traverse_bmp(const parsetree_statement_t *stmt, void *data);
@@ -98,10 +98,10 @@ struct fontscript_t {
 /* fontdata_t: stores the attributes of each font class (set of fonts with the same name) */
 typedef struct fontdata_t fontdata_t;
 struct fontdata_t { /* abstract font: base class */
-    void (*renderchar)(fontdata_t*,image_t*,int,int,int,uint32); /* renders a character */
+    void (*renderchar)(const fontdata_t*,image_t*,uint32,int,int,uint32); /* renders a character */
     void (*release)(fontdata_t*); /* release the fontdata_t */
-    v2d_t (*charspacing)(fontdata_t*); /* a pair (hspace, vspace) */
-    v2d_t (*textsize)(fontdata_t*,const char*); /* text size, in pixels */
+    v2d_t (*charspacing)(const fontdata_t*); /* a pair (hspace, vspace) */
+    v2d_t (*textsize)(const fontdata_t*,const char*); /* text size, in pixels */
 };
 static fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[], int spacing[2]);
 static fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, int shadow);
@@ -113,10 +113,10 @@ struct fontdata_bmp_t { /* bitmap font */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
 };
-static void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color);
+static void fontdata_bmp_renderchar(const fontdata_t *fnt, image_t *img, uint32 ch, int x, int y, uint32 color);
 static void fontdata_bmp_release(fontdata_t *fnt);
-static v2d_t fontdata_bmp_charspacing(fontdata_t *fnt);
-static v2d_t fontdata_bmp_textsize(fontdata_t *fnt, const char *string);
+static v2d_t fontdata_bmp_charspacing(const fontdata_t *fnt);
+static v2d_t fontdata_bmp_textsize(const fontdata_t *fnt, const char *string);
 
 typedef struct fontdata_ttf_t fontdata_ttf_t;
 struct fontdata_ttf_t { /* truetype font */
@@ -126,10 +126,10 @@ struct fontdata_ttf_t { /* truetype font */
     int antialias; /* enable antialiasing? */
     int shadow; /* enable shadow? */
 };
-static void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color);
+static void fontdata_ttf_renderchar(const fontdata_t *fnt, image_t *img, uint32 ch, int x, int y, uint32 color);
 static void fontdata_ttf_release(fontdata_t *fnt);
-static v2d_t fontdata_ttf_charspacing(fontdata_t *fnt);
-static v2d_t fontdata_ttf_textsize(fontdata_t *fnt, const char *string);
+static v2d_t fontdata_ttf_charspacing(const fontdata_t *fnt);
+static v2d_t fontdata_ttf_textsize(const fontdata_t *fnt, const char *string);
 
 /* ------------------------------- */
 
@@ -170,7 +170,8 @@ static const char* get_variable(const char *key);
 static inline int has_variables_to_expand(const char *str, int *passes);
 static void expand_variables(char *str, fontargs_t args, size_t size);
 static uint8 hex2dec(char digit);
-static void convert_to_ascii(char* str);
+static void convert_to_ascii(char *str);
+static void print_line(const fontdata_t *drv, const char* text, int x, int y, uint32 color_stack[], int* stack_top);
 
 /*
  * font_init()
@@ -360,6 +361,18 @@ void font_set_width(font_t *f, int w)
  * font_render()
  * Renders the text
  */
+#if 1
+void font_render(const font_t *f, v2d_t camera_position)
+{
+    uint32 stack[FONT_STACKCAPACITY] = { image_rgb(255, 255, 255) }; /* color stack */
+    int stack_top = 0;
+    v2d_t pos = v2d_add(f->position, v2d_subtract(camera_position,
+        v2d_multiply(video_get_screen_size(), 0.5f)
+    ));
+
+    print_line(f->my_class, f->text, pos.x, pos.y, stack, &stack_top);
+}
+#else
 void font_render(const font_t *f, v2d_t camera_position)
 {
     /* this routine is horrible (it has suffered too many mutations through time).
@@ -474,6 +487,7 @@ void font_render(const font_t *f, v2d_t camera_position)
         }
     }
 }
+#endif
 
 
 
@@ -670,6 +684,69 @@ void convert_to_ascii(char* str)
     }
 
     *q = 0;
+}
+
+/* will print a single line of text with the specified font */
+void print_line(const fontdata_t *drv, const char* text, int x, int y, uint32 color_stack[], int* stack_top)
+{
+    size_t j = 0, prev_j = 0;
+    uint32_t chr, tag = 0;
+
+    while((chr = u8_nextchar(text, &j)) != 0) {
+        if(!tag && chr == '<') {
+            /* read tag */
+            const char* tag_name = text + prev_j + 1;
+            if(isalpha(tag_name[0])) {
+                if(tag_name[0] != '/') {
+                    /* open tag */
+                    if(strncmp(tag_name, "color=", 6) == 0) {
+                        /* color tag */
+                        char hex_code[6] = { 0 }; int i = 0;
+                        const char* color_code = tag_name + 6;
+                        if(*color_code == '#') /* skip '#', if any */
+                            ++color_code;
+                        while(*color_code && *color_code != '>' && i < sizeof(hex_code)) /* read color */
+                            hex_code[i++] = *(color_code++);
+                        if(i == 3) { /* accept short color notation (e.g., fff, eee, etc.) */
+                            hex_code[5] = hex_code[4] = hex_code[2];
+                            hex_code[3] = hex_code[2] = hex_code[1];
+                            hex_code[1] = hex_code[0];
+                        }
+                        else if(i != 6) /* invalid color code length */
+                            ; /* do nothing? */
+                        if(*stack_top + 1 < FONT_STACKCAPACITY) { /* push color */
+                            uint8 r, g, b;
+                            r = (hex2dec(hex_code[0]) << 4) | hex2dec(hex_code[1]);
+                            g = (hex2dec(hex_code[2]) << 4) | hex2dec(hex_code[3]);
+                            b = (hex2dec(hex_code[4]) << 4) | hex2dec(hex_code[5]);
+                            color_stack[++(*stack_top)] = image_rgb(r, g, b);
+                        }
+                    }
+                }
+                else {
+                    /* close tag */
+                    if(strncmp(tag_name, "/color>", 7) == 0) {
+                        if(*stack_top > 0)
+                            --(*stack_top);
+                    }
+                }
+                tag = 1;
+            }
+        }
+        else if(tag) {
+            /* skip tag */
+            if(chr == '>')
+                tag = 0;
+        }
+        else {
+            /* print char */
+            char buf[5] = { 0 };
+            drv->renderchar(drv, video_get_backbuffer(), chr, x, y, color_stack[*stack_top]);
+            u8_wc_toutf8(buf, chr);
+            x += drv->textsize(drv, buf).x + drv->charspacing(drv).x;
+        }
+        prev_j = j;
+    }
 }
 
 
@@ -1057,9 +1134,9 @@ fontdata_t* fontdata_bmp_new(const char *source_file, charproperties_t chr[], in
     return (fontdata_t*)f;
 }
 
-void fontdata_bmp_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color)
+void fontdata_bmp_renderchar(const fontdata_t *fnt, image_t *img, uint32 ch, int x, int y, uint32 color)
 {
-    fontdata_bmp_t *f = (fontdata_bmp_t*)fnt;
+    const fontdata_bmp_t *f = (const fontdata_bmp_t*)fnt;
     image_t *char_image = f->bmp[ch & 0xFF];
 
     if(char_image != NULL) {
@@ -1083,15 +1160,14 @@ void fontdata_bmp_release(fontdata_t *fnt)
     free(f);
 }
 
-v2d_t fontdata_bmp_charspacing(fontdata_t *fnt)
+v2d_t fontdata_bmp_charspacing(const fontdata_t *fnt)
 {
-    fontdata_bmp_t *f = (fontdata_bmp_t*)fnt;
-    return f->spacing;
+    return ((const fontdata_bmp_t*)fnt)->spacing;
 }
 
-v2d_t fontdata_bmp_textsize(fontdata_t *fnt, const char *string)
+v2d_t fontdata_bmp_textsize(const fontdata_t *fnt, const char *string)
 {
-    fontdata_bmp_t *f = (fontdata_bmp_t*)fnt;
+    const fontdata_bmp_t *f = (const fontdata_bmp_t*)fnt;
     v2d_t sp = fnt->charspacing(fnt);
     int width = 0, line_width = 0;
     int height = f->line_height;
@@ -1169,18 +1245,18 @@ fontdata_t* fontdata_ttf_new(const char *source_file, int size, int antialias, i
     return (fontdata_t*)f;
 }
 
-void fontdata_ttf_renderchar(fontdata_t *fnt, image_t *img, int ch, int x, int y, uint32 color)
+void fontdata_ttf_renderchar(const fontdata_t *fnt, image_t *img, uint32 ch, int x, int y, uint32 color)
 {
-    fontdata_ttf_t *f = (fontdata_ttf_t*)fnt;
+    const fontdata_ttf_t *f = (const fontdata_ttf_t*)fnt;
 
     /* draw shadow */
     if(f->shadow) {
         uint32 black = image_rgb(0, 0, 0);
-        f->shadow = FALSE;
+        ((fontdata_ttf_t*)f)->shadow = FALSE; /* hack */
         fontdata_ttf_renderchar(fnt, img, ch, 1+x, 1+y, black);
         fontdata_ttf_renderchar(fnt, img, ch, 0+x, 1+y, black);
         fontdata_ttf_renderchar(fnt, img, ch, 1+x, 0+y, black);
-        f->shadow = TRUE;
+        ((fontdata_ttf_t*)f)->shadow = TRUE;
     }
 
     /* renderchar */
@@ -1217,15 +1293,15 @@ void fontdata_ttf_release(fontdata_t *fnt)
     free(f);
 }
 
-v2d_t fontdata_ttf_charspacing(fontdata_t *fnt)
+v2d_t fontdata_ttf_charspacing(const fontdata_t *fnt)
 {
-    fontdata_ttf_t *f = (fontdata_ttf_t*)fnt;
+    const fontdata_ttf_t *f = (const fontdata_ttf_t*)fnt;
     return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
 }
 
-v2d_t fontdata_ttf_textsize(fontdata_t *fnt, const char *string)
+v2d_t fontdata_ttf_textsize(const fontdata_t *fnt, const char *string)
 {
-    fontdata_ttf_t *f = (fontdata_ttf_t*)fnt;
+    const fontdata_ttf_t *f = (const fontdata_ttf_t*)fnt;
     v2d_t sp = fnt->charspacing(fnt);
     int width = 0, line_width = 0;
     int line_height = alfont_text_height(f->ttf);
@@ -1263,4 +1339,3 @@ v2d_t fontdata_ttf_textsize(fontdata_t *fnt, const char *string)
 
     return v2d_new(width, height);
 }
-
