@@ -224,7 +224,8 @@ void init_accessories(const commandline_t* cmd)
         prefs_has_item(prefs, ".langpath") ? prefs_get_string(prefs, ".langpath") : NULL
     );
 
-    setlocale(LC_NUMERIC, "C"); /* bugfix */
+    setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
+    setlocale(LC_NUMERIC, "C"); /* use '.' as the decimal separator on atof() */
     video_display_loading_screen();
     sprite_init();
     font_init(commandline_getint(cmd->allow_font_smoothing, TRUE));

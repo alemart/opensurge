@@ -34,8 +34,11 @@
 
 /* private stuff */
 #define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
+#define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
+#define LOADING_SCREEN_FILE     "images/loading.png"
 
 /* video manager */
+static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
 static image_t *video_buffer;
 static image_t *window_surface, *window_surface_half;
 static int video_smooth;
@@ -52,12 +55,8 @@ static int window_active = TRUE;
 static void draw_to_screen(image_t *img);
 static void setup_color_depth(int bpp);
 
-/* screen size */
-static const v2d_t default_screen_size = { 426, 240 }; /* this is set on stone! Picked a 16:9 resolution */
-static v2d_t screen_size = { 0, 0 }; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
-
 /* Video Message */
-#define VIDEOMSG_TIMEOUT        5000
+#define VIDEOMSG_TIMEOUT        5000 /* in ms */
 #define VIDEOMSG_MAXLINES       30
 typedef struct videomsg_t videomsg_t;
 struct videomsg_t {
@@ -69,9 +68,6 @@ static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
 static videomsg_t* videomsg_delete(videomsg_t* videomsg);
 static videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line);
 static videomsg_t* videomsg = NULL;
-
-/* Loading screen */
-#define LOADINGSCREEN_FILE     "images/loading.png"
 
 
 
@@ -130,7 +126,7 @@ void video_changemode(int resolution, int smooth, int fullscreen)
     logfile_message("video_changemode(%d,%d,%d)", resolution, smooth, fullscreen);
 
     /* resolution */
-    screen_size = (resolution == VIDEORESOLUTION_EDT) ? video_get_window_size() : default_screen_size;
+    screen_size = (resolution == VIDEORESOLUTION_EDT) ? video_get_window_size() : DEFAULT_SCREEN_SIZE;
     video_resolution = resolution;
 
     /* fullscreen */
@@ -227,10 +223,7 @@ int video_is_fullscreen()
  */
 v2d_t video_get_screen_size()
 {
-    if(screen_size.x < 1) /* gotta be fast here */
-        return default_screen_size;
-    else
-        return screen_size;
+    return screen_size;
 }
 
 
@@ -476,7 +469,7 @@ int video_is_fps_visible()
  */
 void video_display_loading_screen()
 {
-    image_t *img = image_load(LOADINGSCREEN_FILE);
+    image_t *img = image_load(LOADING_SCREEN_FILE);
     image_blit(img, video_get_backbuffer(), 0, 0, (VIDEO_SCREEN_W - image_width(img))/2, (VIDEO_SCREEN_H - image_height(img))/2, image_width(img), image_height(img));
     image_unload(img);
     video_render();
@@ -518,23 +511,28 @@ void fast2x_blit(image_t *src, image_t *dest)
 
     switch(video_get_color_depth())
     {
-        case 16:
-            for(j=0; j<image_height(dest); j++) {
-                for(i=0; i<image_width(dest); i++)
+        case 16: {
+            int w = image_width(dest), h = image_height(dest);
+            for(j=0; j<h; j++) {
+                for(i=0; i<w; i++)
                     ((uint16*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint16*)IMAGE2BITMAP(src)->line[j/2])[i/2];
             }
             break;
+        }
 
-        case 24:
+        case 24: {
             stretch_blit(IMAGE2BITMAP(src), IMAGE2BITMAP(dest), 0, 0, image_width(src), image_height(src), 0, 0, image_width(dest), image_height(dest));
             break;
+        }
 
-        case 32:
-            for(j=0; j<image_height(dest); j++) {
-                for(i=0; i<image_width(dest); i++)
+        case 32: {
+            int w = image_width(dest), h = image_height(dest);
+            for(j=0; j<h; j++) {
+                for(i=0; i<w; i++)
                     ((uint32*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint32*)IMAGE2BITMAP(src)->line[j/2])[i/2];
             }
             break;
+        }
 
         default:
             break;
