@@ -21,6 +21,7 @@
 #include <allegro.h>
 #include <string.h>
 #include <locale.h>
+#include <time.h>
 #include "engine.h"
 #include "global.h"
 #include "scene.h"
@@ -170,7 +171,7 @@ void init_basic_stuff(const commandline_t* cmd)
 
     set_uformat(U_UTF8);
     allegro_init();
-    randomize();
+    srand(time(NULL));
     assetfs_init(gameid, datadir);
     logfile_init();
     init_nanoparser();

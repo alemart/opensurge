@@ -2937,8 +2937,9 @@ void editor_update()
 
     /* cursor coordinates */
     font_set_text(editor_cursor_font, "%d,%d", (int)editor_grid_snap(editor_cursor).x, (int)editor_grid_snap(editor_cursor).y);
-    pos.x = clip((int)editor_grid_snap(editor_cursor).x - (editor_camera.x - VIDEO_SCREEN_W/2), 10, VIDEO_SCREEN_W-font_get_textsize(editor_cursor_font).x-10);
-    pos.y = clip((int)editor_grid_snap(editor_cursor).y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y, 10, VIDEO_SCREEN_H-10);
+    pos.x = (int)editor_grid_snap(editor_cursor).x - (editor_camera.x - VIDEO_SCREEN_W/2);
+    pos.y = (int)editor_grid_snap(editor_cursor).y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y;
+    pos.y = clip(pos.y, 10, VIDEO_SCREEN_H-10);
     font_set_position(editor_cursor_font, pos);
 
     /* help label */

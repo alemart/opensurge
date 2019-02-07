@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * util.h - utilities
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2018-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,12 +21,8 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
-#include <time.h>
 #include <stdlib.h>
 #include "global.h"
-#include "v2d.h"
-
-
 
 /* redefinitions */
 #ifdef min
@@ -41,47 +37,33 @@
 #undef round
 #endif
 
-#ifdef swap
-#undef swap
-#endif
-
-
 /* Useful macros */
-#define randomize()             (srand(time(NULL)))
-#define random(n)               ((int)(((float)rand() / ((float)(RAND_MAX)+(float)(1)))*(n)))
+#define __tostr(x)              #x
+#define tostr(x)                __tostr((x)
+#define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define min(a,b)                ((a)<(b)?(a):(b))
 #define max(a,b)                ((a)>(b)?(a):(b))
-#define sign(x)                 (((x)>=0.0f)?(1.0f):(-1.0f))
+#define sign(x)                 (((x)>=0.0f)?1.0f:-1.0f)
 #define round(x)                ((int)(((x)>0.0f)?((x)+0.5f):((x)-0.5f)))
-#define clip(val,a,b)           ( ((val)<(a) && (val)<(b)) ? min((a),(b)) : ( ((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)  ) )
-#define swap(a,b)               swap_ex(&(a), &(b), sizeof(a))
-#define atob(str)               ((str_icmp(str, "true") == 0) || (str_icmp(str, "yes") == 0))
-#define rad2deg(x)              ((x) * 57.2957795147f)
-#define deg2rad(x)              ((x) / 57.2957795147f)
-
+#define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
+#define atob(str)               ((str_icmp((str), "true") == 0) || (str_icmp((str), "yes") == 0))
+#define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
+#define mallocx(bytes)          (__mallocx((bytes), __FILE ":" tostr(__LINE__)))
+#define reallocx(ptr,bytes)     (__reallocx((ptr), (bytes), __FILE ":" tostr(__LINE__)))
 
 /* Game routines */
 void game_quit(void); /* quit */
 int game_is_over(); /* game over? */
 int game_version_compare(int version, int sub_version, int wip_version); /* compare to this version of the game */
 
-
-
 /* Memory management */
-void* mallocx(size_t bytes);
-void* reallocx(void *ptr, size_t bytes);
+void* __mallocx(size_t bytes, const char* location);
+void* __reallocx(void *ptr, size_t bytes, const char* location);
 
-
-
-
-/* Misc */
-int bounding_box(float a[4], float b[4]); /* rect[4] = x1, y1, x2(=x1+w), y2(=y1+h) */
-int circular_collision(v2d_t a, float r_a, v2d_t b, float r_b);
-void swap_ex(void *a, void *b, size_t size);
+/* Misc utilities */
 void fatal_error(const char *fmt, ...);
 void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
-
 
 #endif

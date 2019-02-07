@@ -67,6 +67,9 @@
 #define ANIM_SPEED_FACTOR(k, spd) \
     1.5f * min(1, (max((spd), 100)) / (k)) /* 24 / 16 */
 
+#define DEG2RAD(x) \
+    ((x) / 57.2957795131f)
+
 /* private data */
 #define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player blink if he/she gets hurt? */
 #define PLAYER_UNDERWATER_BREATH    30.0 /* how many seconds can the player stay underwater before drowning? */
@@ -75,7 +78,7 @@ static int collectibles;                 /* shared collectibles */
 static int lives;                        /* shared lives */
 static int score;                        /* shared score */
 
-
+/* misc */
 static void update_shield(player_t *p);
 static void update_animation(player_t *p);
 static void play_sounds(player_t *p);
@@ -462,7 +465,7 @@ void player_hit(player_t *player, float direction)
             /* create collectibles */
             for(int i = 0; i < r; i++) {
                 item_t* b = level_create_item(IT_BOUNCINGRING, player->actor->position);
-                bouncingcollectible_set_speed(b, v2d_new(-sinf(deg2rad(a)) * spd * (1-2*(i%2)), cosf(deg2rad(a)) * spd));
+                bouncingcollectible_set_speed(b, v2d_new(-sinf(DEG2RAD(a)) * spd * (1-2*(i%2)), cosf(DEG2RAD(a)) * spd));
                 a += 22.5f * (i % 2);
 
                 if(i == 16) {
@@ -1323,7 +1326,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
     ))) {
-        float new_angle = deg2rad(fixangle(physicsactor_get_angle(pa), 15));
+        float new_angle = DEG2RAD(fixangle(physicsactor_get_angle(pa), 15));
         if(ang_diff(new_angle, act->angle) < 1.6f) {
             float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
             act->angle = lerp_angle(act->angle, new_angle, t);
@@ -1368,7 +1371,7 @@ void hotspot_magic(player_t* player)
     int angle = physicsactor_get_angle(pa);
 
     if(!player_is_rolling(player) && !player_is_charging(player)) {
-        const float angthr = sinf(deg2rad(11.25f));
+        const float angthr = sinf(DEG2RAD(11.25f));
         if(angle % 90 == 0 || player_is_at_ledge(player) || fabs(sinf(act->angle)) < angthr) {
             switch(physicsactor_get_movmode(pa)) {
                 case MM_FLOOR: act->hot_spot.y += 1; break;

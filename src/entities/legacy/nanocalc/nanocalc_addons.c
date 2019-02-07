@@ -55,7 +55,7 @@ static float f_cond(float cond, float t, float f) { return fabs(cond)>EPS ? t : 
 static float f_clamp(float val, float lo, float hi) { return lo > hi ? f_clamp(val,hi,lo) : (val>lo ? (val<hi ? val : hi) : lo); }
 
 /* linear interpolation */
-static float f_lerp(float a, float b, float t) { return t * a + (1.0f - t) * b; }
+static float f_lerp(float a, float b, float t) { return a + (b - a) * t; }
 
 /* returns the maximum between a and b */
 static float f_max(float a, float b) { return a>b?a:b; }
@@ -125,10 +125,10 @@ static float f_cosh(float x) { return cosh(x); }
 static float f_tanh(float x) { return tanh(x); }
 
 /* convert radians to degrees */
-static float f_rad2deg(float x) { return x * 57.2957795147f; }
+static float f_rad2deg(float x) { return x * 57.2957795131f; }
 
 /* convert degrees to radians */
-static float f_deg2rad(float x) { return x / 57.2957795147f; }
+static float f_deg2rad(float x) { return x / 57.2957795131f; }
 
 /* easter egg ;) */
 static float f_leet() { return 1337; }

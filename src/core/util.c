@@ -46,32 +46,32 @@ static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(con
 
 
 /*
- * mallocx()
+ * __mallocx()
  * Similar to malloc(), but aborts the
  * program if it does not succeed.
  */
-void *mallocx(size_t bytes)
+void *__mallocx(size_t bytes, const char* location)
 {
     void *p = malloc(bytes);
 
     if(!p)
-        fatal_error("FATAL ERROR: mallocx(%u) failed.\n", bytes);
+        fatal_error("Out of memory in mallocx(%u) at %s", bytes, location);
 
     return p;
 }
 
 
 /*
- * relloacx()
+ * __relloacx()
  * Similar to realloc(), but abots the
  * program if it does not succeed.
  */
-void* reallocx(void *ptr, size_t bytes)
+void* __reallocx(void *ptr, size_t bytes, const char* location)
 {
     void *p = realloc(ptr, bytes);
 
     if(!p)
-        fatal_error("FATAL ERROR: reallocx() failed.\n");
+        fatal_error("Out of memory in reallocx(%u) at %s", bytes, location);
 
     return p;
 }
@@ -113,60 +113,11 @@ int game_version_compare(int version, int sub_version, int wip_version)
 {
     int game_version = (GAME_VERSION * 10000 + GAME_SUB_VERSION * 100 + GAME_WIP_VERSION);
     int other_version = (max(0, version) * 10000 + max(0, sub_version) * 100 + max(0, wip_version));
-
     return game_version - other_version;
 }
 
 
-/* Other */
-
-
-/*
- * bounding_box()
- * bounding box collision method
- * r[4] = x1, y1, x2(=x1+w), y2(=y1+h)
- */
-int bounding_box(float a[4], float b[4])
-{
-    return (a[0]<b[2] && a[2]>b[0] && a[1]<b[3] && a[3]>b[1]);
-}
-
-
-
-/*
- * circular_collision()
- * Circular collision method
- * a, b = points to test
- * r_a = radius of a
- * r_b = radius of b
- */
-int circular_collision(v2d_t a, float r_a, v2d_t b, float r_b)
-{
-    return ( v2d_magnitude(v2d_subtract(a,b)) <= r_a + r_b );
-}
-
-
-
-/*
- * swap_ex()
- * Swaps two variables. Use the
- * swap() macro instead of this.
- */
-void swap_ex(void *a, void *b, size_t size)
-{
-    uint8 *sa=a, *sb=b, c;
-    size_t i;
-
-    for(i=0; i<size; i++) {
-        c = sa[i];
-        sa[i] = sb[i];
-        sb[i] = c;
-    }
-}
-
-
-
-
+/* Misc */
 
 /*
  * fatal_error()
@@ -175,7 +126,7 @@ void swap_ex(void *a, void *b, size_t size)
  */
 void fatal_error(const char *fmt, ...)
 {
-    char buf[4096];
+    char buf[1024];
     va_list args;
 
     va_start(args, fmt);
@@ -188,7 +139,6 @@ void fatal_error(const char *fmt, ...)
 #ifdef _WIN32
     MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONERROR);
 #else
-    fprintf(stderr, "%s", buf);
     allegro_message("%s", buf);
 #endif
 
@@ -256,7 +206,7 @@ void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*
 void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m)
 {
     /* due to the static array declared as an optimization below,
-       merge_sort() won't work on multiple threads */
+       merge_sort() isn't thread-safe */
     static uint8 tmp[16384]; size_t bytes = (q-p+1) * size;
     uint8 *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
     uint8 *i = arr;
