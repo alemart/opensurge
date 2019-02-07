@@ -68,15 +68,11 @@ int actor_animation_finished(const actor_t *act); /* true if the current animati
 void actor_synchronize_animation(actor_t *act, int sync); /* should I use a shared animation frame? */
 int actor_animation_frame(const actor_t* act);
 
-/* collision detection */
+/* legacy */
 int actor_collision(const actor_t *a, const actor_t *b); /* tests bounding-box collision between a and b */
-int actor_orientedbox_collision(const actor_t *a, const actor_t *b); /* oriented bounding-box collision */
 int actor_pixelperfect_collision(const actor_t *a, const actor_t *b); /* tests pixel-perfect collision between a and b */
-int actor_brick_collision(actor_t *act, struct brick_t *brk); /* bounding-box collision detection */
-
-/* sensors */
+int actor_brick_collision(const actor_t *act, const struct brick_t *brk); /* tests bounding-box collision with a brick */
 void actor_sensors(actor_t *act, struct brick_list_t *brick_list, struct brick_t **up, struct brick_t **upright, struct brick_t **right, struct brick_t **downright, struct brick_t **down, struct brick_t **downleft, struct brick_t **left, struct brick_t **upleft); /* get obstacle bricks around the actor */
-void actor_sensors_ex(actor_t *act, v2d_t vup, v2d_t vupright, v2d_t vright, v2d_t vdownright, v2d_t vdown, v2d_t vdownleft, v2d_t vleft, v2d_t vupleft, struct brick_list_t *brick_list, struct brick_t **up, struct brick_t **upright, struct brick_t **right, struct brick_t **downright, struct brick_t **down, struct brick_t **downleft, struct brick_t **left, struct brick_t **upleft);
 const struct brick_t* actor_brick_at(actor_t *act, const struct brick_list_t *brick_list, v2d_t offset);
 
 
