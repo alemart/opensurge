@@ -39,7 +39,7 @@
 
 /* Useful macros */
 #define __tostr(x)              #x
-#define tostr(x)                __tostr((x)
+#define tostr(x)                __tostr((x))
 #define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define min(a,b)                ((a)<(b)?(a):(b))
 #define max(a,b)                ((a)>(b)?(a):(b))
@@ -48,8 +48,8 @@
 #define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
 #define atob(str)               ((str_icmp((str), "true") == 0) || (str_icmp((str), "yes") == 0))
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
-#define mallocx(bytes)          (__mallocx((bytes), __FILE ":" tostr(__LINE__)))
-#define reallocx(ptr,bytes)     (__reallocx((ptr), (bytes), __FILE ":" tostr(__LINE__)))
+#define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" tostr(__LINE__))
+#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" tostr(__LINE__))
 
 /* Game routines */
 void game_quit(void); /* quit */
