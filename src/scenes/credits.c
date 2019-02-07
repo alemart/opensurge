@@ -45,7 +45,6 @@ static image_t *box;
 static int quit;
 static font_t *title, *text, *back;
 static input_t *input;
-static int line_count;
 static bgtheme_t *bgtheme;
 static music_t *music;
 
@@ -63,7 +62,6 @@ static char* read_credits_file();
  */
 void credits_init(void *foo)
 {
-    const char *p;
     char *credits_text = read_credits_file();
 
     /* initializing stuff... */
@@ -84,8 +82,6 @@ void credits_init(void *foo)
     font_set_text(text, "\n%s", credits_text);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
-    for(line_count=1,p=font_get_text(text); *p; p++)
-        line_count += (*p == '\n') ? 1 : 0;
 
     box = image_create(VIDEO_SCREEN_W, 30);
     image_clear(box, image_rgb(0,0,0));
@@ -131,8 +127,8 @@ void credits_update()
 
     /* text movement */
     textpos = font_get_position(text);
-    textpos.y -= (3*font_get_textsize(text).y) * dt;
-    if(textpos.y < -(line_count * (font_get_textsize(text).y + font_get_charspacing(text).y)))
+    textpos.y -= (VIDEO_SCREEN_H/7) * dt;
+    if(textpos.y < -(font_get_textsize(text).y + font_get_charspacing(text).y))
         textpos.y = VIDEO_SCREEN_H;
     font_set_position(text, textpos);
 
@@ -141,11 +137,6 @@ void credits_update()
         if(input_button_pressed(input, IB_FIRE4)) {
             sound_play(SFX_BACK);
             next_scene = NULL;
-            quit = TRUE;
-        }
-        else if(input_button_pressed(input, IB_FIRE2)) {
-            sound_play(SFX_CONFIRM);
-            next_scene = storyboard_get_scene(SCENE_CREDITS2);
             quit = TRUE;
         }
     }
