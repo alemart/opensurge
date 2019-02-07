@@ -21,7 +21,7 @@
 #ifndef _FONT_H
 #define _FONT_H
 
-#include "util.h"
+#include "v2d.h"
 
 /* font type */
 typedef struct font_t font_t;

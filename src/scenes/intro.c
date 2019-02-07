@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include "intro.h"
 #include "../core/v2d.h"
 #include "../core/timer.h"

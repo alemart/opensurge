@@ -23,6 +23,7 @@
 #include <math.h>
 #include "scripting.h"
 #include "../core/font.h"
+#include "../core/util.h"
 #include "../core/video.h"
 #include "../core/stringutil.h"
 #include "../entities/camera.h"

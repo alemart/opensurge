@@ -22,7 +22,7 @@
 #define _SCRIPTING_H
 
 #include <surgescript.h>
-#include "../core/util.h"
+#include "../core/v2d.h"
 
 /* scripting API */
 void scripting_init(int argc, const char** argv);

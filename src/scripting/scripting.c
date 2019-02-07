@@ -21,8 +21,8 @@
 #include "scripting.h"
 #include "../core/logfile.h"
 #include "../core/assetfs.h"
-#include "../core/util.h"
 #include "../core/stringutil.h"
+#include "../core/util.h"
 
 /* utilities */
 #include "../core/v2d.h"

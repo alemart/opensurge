@@ -22,6 +22,7 @@
 #include <math.h>
 #include "langselect.h"
 #include "options.h"
+#include "../core/util.h"
 #include "../core/scene.h"
 #include "../core/assetfs.h"
 #include "../core/stringutil.h"
