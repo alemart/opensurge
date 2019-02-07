@@ -26,7 +26,7 @@
 #include "util.h"
 #include "logfile.h"
 
-#ifndef __WIN32__
+#ifndef _WIN32
 #include <sys/time.h>
 #else
 #include <winalleg.h>
@@ -73,7 +73,7 @@ void timer_init(int optimize_cpu_usage)
     partial_fps = 0;
     fps_accum = 0;
     fps = 0;
-    delta = 0.0;
+    delta = 0.0f;
     start_time = get_tick_count();
 
     /* done! */
@@ -108,7 +108,7 @@ void timer_update()
             break;
     }
     delta_time = min(delta_time, MAX_FRAME_INTERVAL);
-    delta = (float)delta_time * 0.001;
+    delta = (float)delta_time * 0.001f;
 
     /* FPS (frames per second) */
     partial_fps++; /* 1 render per cycle */
@@ -195,13 +195,13 @@ void timer_optimize_cpu_usage(int optimize)
 
 /* platform-specific code */
 
-#ifndef __WIN32__
+#ifndef _WIN32
 
 uint32 get_tick_count()
 {
-    static struct timeval now;
+    struct timeval now;
     gettimeofday(&now, NULL);
-    return (now.tv_sec*1000) + (now.tv_usec/1000);
+    return (now.tv_sec * 1000) + (now.tv_usec / 1000);
 }
 
 

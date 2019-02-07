@@ -1355,7 +1355,7 @@ void error(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(buf+len, sizeof(buf), fmt, args);
+    vsnprintf(buf+len, sizeof(buf)-len, fmt, args);
     va_end(args);
 
     if(error_fun)
@@ -1373,7 +1373,7 @@ void warning(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(buf+len, sizeof(buf), fmt, args);
+    vsnprintf(buf+len, sizeof(buf)-len, fmt, args);
     va_end(args);
 
     if(warning_fun)

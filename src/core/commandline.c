@@ -29,7 +29,7 @@
 #include "video.h"
 #include "install.h"
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #include <allegro.h>
 #include <winalleg.h>
 #endif
@@ -286,8 +286,8 @@ void crash(char *fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-#ifdef __WIN32__
-    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONINFORMATION);
+#ifdef _WIN32
+    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONEXCLAMATION);
 #else
     puts(buf);
 #endif

@@ -109,7 +109,7 @@ static char* dir2vpath(assetdir_t* dir);
 static char* build_config_fullpath(const char* gameid, const char* vpath);
 static char* build_userdata_fullpath(const char* gameid, const char* vpath);
 static char* build_cache_fullpath(const char* gameid, const char* vpath);
-#if !defined(WIN32)
+#if !defined(_WIN32)
 static int mkpath(char* path, mode_t mode);
 #else
 static int mkpath(char* path);
@@ -283,7 +283,7 @@ const char* assetfs_create_config_file(const char* vpath)
             free(fullpath);
 
             /* Create the path in the actual filesystem */
-            #if !defined(WIN32)
+            #if !defined(_WIN32)
             mkpath(file->fullpath, 0755);
             #else
             mkpath(file->fullpath);
@@ -341,7 +341,7 @@ const char* assetfs_create_cache_file(const char* vpath)
             free(fullpath);
 
             /* Create the path in the actual filesystem */
-            #if !defined(WIN32)
+            #if !defined(_WIN32)
             mkpath(file->fullpath, 0755);
             #else
             mkpath(file->fullpath);
@@ -406,7 +406,7 @@ const char* assetfs_create_data_file(const char* vpath, bool prefer_user_space)
             free(fullpath);
 
             /* Create the path in the actual filesystem */
-            #if !defined(WIN32)
+            #if !defined(_WIN32)
             mkpath(file->fullpath, 0755);
             #else
             mkpath(file->fullpath);

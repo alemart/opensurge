@@ -28,6 +28,10 @@
 #include "timer.h"
 #include "logfile.h"
 
+#ifdef _WIN32
+#include <winalleg.h>
+#endif
+
 
 
 /* private stuff */
@@ -171,16 +175,23 @@ void swap_ex(void *a, void *b, size_t size)
  */
 void fatal_error(const char *fmt, ...)
 {
-    char buf[2048];
+    char buf[4096];
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(buf, fmt, args);
+    vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    logfile_message(buf);
+    logfile_message("%s", buf);
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+
+#ifdef _WIN32
+    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONERROR);
+#else
+    fprintf(stderr, "%s", buf);
     allegro_message("%s", buf);
+#endif
+
     exit(1);
 }
 

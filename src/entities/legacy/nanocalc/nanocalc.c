@@ -1413,7 +1413,7 @@ void nanocalc_error(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(buf+len, fmt, args);
+    vsnprintf(buf+len, sizeof(buf)-len, fmt, args);
     va_end(args);
 
     if(error_fun)

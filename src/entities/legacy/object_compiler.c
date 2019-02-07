@@ -607,11 +607,11 @@ void compile_command(objectmachine_t** machine_ref, const char *command, int n, 
 
 void compile_error(const parsetree_statement_t *stmt, const char *format, ...)
 {
-    static char buf[1024];
+    char buf[1024];
     va_list args;
 
     va_start(args, format);
-    vsprintf(buf, format, args);
+    vsnprintf(buf, sizeof(buf), format, args);
     va_end(args);
 
     fatal_error("%s\nin \"%s\" near line %d", buf, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
