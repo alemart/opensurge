@@ -55,12 +55,12 @@ void intro_init(void *foo)
     debug_mode = FALSE;
     in = input_create_user(NULL);
 
-    /* create fonts */
+    /* create font */
     fnt = font_create(INTRO_FONT);
     font_set_text(fnt, INTRO_TEXT);
     font_set_align(fnt, FONTALIGN_CENTER);
     
-    /* position fonts */
+    /* position font */
     font_set_position(fnt, v2d_add(
         v2d_multiply(video_get_screen_size(), 0.5f),
         v2d_new(0, -font_get_textsize(fnt).y * 0.5f)

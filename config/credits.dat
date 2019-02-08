@@ -87,6 +87,37 @@ S32X
 
 $CREDITS_RES_TEXT
 
+<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_MUSICS</color>
+
+Di Rodrigues
+--- musics/options.ogg
+--- musics/speed.ogg
+--- musics/invincible.ogg
+--- musics/gameover.ogg
+--- musics/waterworks.ogg
+--- musics/goal.ogg
+--- musics/drowning.ogg
+--- musics/we_will_never_fight_alone_1.ogg
+--- musics/we_will_never_fight_alone_2.ogg
+
+Colin Beard
+--- musics/boss.ogg
+--- musics/gimacian.ogg
+
+Mateus Reis
+--- musics/citychill.ogg
+
+Johan Brodd (jobromedia)
+--- musics/theme.ogg (public domain)
+--- musics/template.ogg (public domain)
+--- musics/silence.ogg (public domain)
+--- musics/intro.ogg (public domain)
+--- musics/sharp.ogg (public domain)
+--- musics/winning.ogg
+--- musics/winning_plus.ogg
+--- musics/winning_plusplus.ogg
+--- musics/option.ogg
+
 <color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_IMAGES</color>
 
 Joao Victor
@@ -265,37 +296,6 @@ thekingphoenix
 
 Luis Zuno (ansimus)
 --- images/sunshine_bg.png
-
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_MUSICS</color>
-
-Di Rodrigues
---- musics/options.ogg
---- musics/speed.ogg
---- musics/invincible.ogg
---- musics/gameover.ogg
---- musics/waterworks.ogg
---- musics/goal.ogg
---- musics/drowning.ogg
---- musics/we_will_never_fight_alone_1.ogg
---- musics/we_will_never_fight_alone_2.ogg
-
-Colin Beard
---- musics/boss.ogg
---- musics/gimacian.ogg
-
-Mateus Reis
---- musics/citychill.ogg
-
-Johan Brodd (jobromedia)
---- musics/theme.ogg (public domain)
---- musics/template.ogg (public domain)
---- musics/silence.ogg (public domain)
---- musics/intro.ogg (public domain)
---- musics/sharp.ogg (public domain)
---- musics/winning.ogg
---- musics/winning_plus.ogg
---- musics/winning_plusplus.ogg
---- musics/option.ogg
 
 <color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_SAMPLES</color>
 
