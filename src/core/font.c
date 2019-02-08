@@ -715,15 +715,17 @@ int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align
 char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
 {
     if(max_width > 0) {
-        static int blank[128];
+        static int blank[384];
         int blanks = find_blanks(blank, sizeof(blank), text);
         int m, l = 0, r = blanks - 1;
         int best_m = 0, width;
         char *wordwrap, chr;
 
-        /* no blanks? */
+        /* there's no wordwrap if... */
         if(blanks == 0)
-            return NULL; /* no wordwrap */
+            return NULL; /* no blanks */
+        else if((int)drv->textsize(drv, text).x <= max_width)
+            return NULL; /* wordwrap is not needed */
 
         /*
             the wordwrap problem:
@@ -753,10 +755,6 @@ char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
                 l = m+1;
             }
         }
-
-        /* no wordwrap needed */
-        if(r == blanks - 1)
-            return NULL;
 
         /* skip spaces */
         for(wordwrap = text + blank[best_m] + 1; *wordwrap && isspace(*wordwrap); wordwrap++);

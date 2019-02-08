@@ -79,7 +79,7 @@ void confirmbox_init(void *text_and_options)
 
     textfnt = font_create("dialogbox");
     font_set_text(textfnt, "%s", text);
-    font_set_width(textfnt, 164);
+    font_set_width(textfnt, image_width(box) - 20);
 
     for(i=0; i<option_count; i++) {
         optionfnt[i][0] = font_create("dialogbox");
