@@ -173,7 +173,7 @@ void video_changemode(int resolution, int smooth, int fullscreen)
     logfile_message("setting up the window...");
     mode = video_fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED;
     #ifdef _WIN32
-    width = (int)(video_get_window_size().x) + (int)(video_get_window_size().x) % 4; /* A4 bug? let width be a multiple of 4 */
+    width = (int)(video_get_window_size().x) - (int)(video_get_window_size().x) % 4; /* A4 bug? let width be a multiple of 4 */
     #else
     width = (int)(video_get_window_size().x);
     #endif
@@ -234,36 +234,31 @@ v2d_t video_get_screen_size()
  */
 v2d_t video_get_window_size()
 {
-    int width=VIDEO_SCREEN_W, height=VIDEO_SCREEN_H;
+    int width = DEFAULT_SCREEN_SIZE.x;
+    int height = DEFAULT_SCREEN_SIZE.y;
 
     switch(video_resolution) {
         case VIDEORESOLUTION_1X:
-            width = VIDEO_SCREEN_W;
-            height = VIDEO_SCREEN_H;
             break;
 
         case VIDEORESOLUTION_2X:
-            width = 2*VIDEO_SCREEN_W;
-            height = 2*VIDEO_SCREEN_H;
+            width *= 2;
+            height *= 2;
             break;
 
         case VIDEORESOLUTION_3X:
-            width = 3*VIDEO_SCREEN_W;
-            height = 3*VIDEO_SCREEN_H;
+            width *= 3;
+            height *= 3;
             break;
 
         case VIDEORESOLUTION_4X:
-            width = 4*VIDEO_SCREEN_W;
-            height = 4*VIDEO_SCREEN_H;
+            width *= 4;
+            height *= 4;
             break;
 
         case VIDEORESOLUTION_EDT:
             width = VIDEO_SCREEN_W;
             height = VIDEO_SCREEN_H;
-            break;
-
-        default:
-            fatal_error("video_get_window_size(): unknown resolution!");
             break;
     }
 
