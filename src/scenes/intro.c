@@ -31,17 +31,15 @@
 #include "../core/font.h"
 #include "../core/soundfactory.h"
 
-
 /* private data */
 #define INTRO_TIMEOUT       3.0f
 #define INTRO_FADETIME      0.5f
 #define INTRO_BGCOLOR       image_hex2rgb("0a0a0a")
 #define INTRO_FONT          "GoodNeighbors"
-#define INTRO_NUMFONTS      (sizeof(text) / sizeof(const char*))
-static const char *text[] = { "powered by", "Open Surge Engine" };
+#define INTRO_TEXT          "powered by\nOpen Surge Engine"
 static float elapsed_time;
 static int debug_mode;
-static font_t* fnt[INTRO_NUMFONTS];
+static font_t* fnt;
 static input_t* in;
 
 /* public functions */
@@ -52,26 +50,21 @@ static input_t* in;
  */
 void intro_init(void *foo)
 {
-    int h, i;
-
     /* initialize variables */
     elapsed_time = 0.0f;
     debug_mode = FALSE;
     in = input_create_user(NULL);
 
     /* create fonts */
-    for(i = 0; i < INTRO_NUMFONTS; i++) {
-        fnt[i] = font_create(INTRO_FONT);
-        font_set_text(fnt[i], text[i]);
-        font_set_align(fnt[i], FONTALIGN_CENTER);
-    }
+    fnt = font_create(INTRO_FONT);
+    font_set_text(fnt, INTRO_TEXT);
+    font_set_align(fnt, FONTALIGN_CENTER);
     
     /* position fonts */
-    h = -font_get_textsize(fnt[0]).y * INTRO_NUMFONTS / 2;
-    for(i = 0; i < INTRO_NUMFONTS; i++) {
-        font_set_position(fnt[i], v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2 + h));
-        h += font_get_textsize(fnt[i]).y + font_get_charspacing(fnt[i]).y;
-    }
+    font_set_position(fnt, v2d_add(
+        v2d_multiply(video_get_screen_size(), 0.5f),
+        v2d_new(0, -font_get_textsize(fnt).y * 0.5f)
+    ));
 
     /* misc */
     fadefx_in(image_rgb(0,0,0), INTRO_FADETIME);
@@ -84,8 +77,7 @@ void intro_init(void *foo)
  */
 void intro_release()
 {
-    for(int i = 0; i < INTRO_NUMFONTS; i++)
-        font_destroy(fnt[i]);
+    font_destroy(fnt);
     input_destroy(in);
 }
 
@@ -131,10 +123,7 @@ void intro_update()
  */
 void intro_render()
 {
-    int i;
-    v2d_t camera = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-
+    v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
     image_clear(video_get_backbuffer(), INTRO_BGCOLOR);
-    for(i = 0; i < INTRO_NUMFONTS; i++)
-        font_render(fnt[i], camera);
+    font_render(fnt, camera);
 }

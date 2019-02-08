@@ -128,7 +128,7 @@ void credits_update()
     /* text movement */
     textpos = font_get_position(text);
     textpos.y -= (VIDEO_SCREEN_H/7) * dt;
-    if(textpos.y < -(font_get_textsize(text).y + font_get_charspacing(text).y))
+    if(textpos.y < -font_get_textsize(text).y)
         textpos.y = VIDEO_SCREEN_H;
     font_set_position(text, textpos);
 
