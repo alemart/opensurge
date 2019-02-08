@@ -137,10 +137,6 @@ CREDITS_FRANCESCO           "Italian translation"
 CREDITS_SANTIAGO            "Spanish translation"
 CREDITS_RAXILLAN            "Russian translation"
 
-// Second credits screen
-CREDITS2_TITLE              "<color=$COLOR_MENUTITLE>CREDITS</color>"
-CREDITS2_KEY                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
-
 // ======================= INPUT DEVICES ====================
 
 // keyboard
