@@ -11,6 +11,7 @@ using SurgeEngine.Player;
 using SurgeEngine.Input;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
+using SurgeEngine.Camera;
 using SurgeEngine.Web;
 
 object "CreateMenu"
@@ -112,8 +113,8 @@ object "CreateMenuText" is "private", "entity"
 
     fun constructor()
     {
-        transform.position = Vector2(4, 55);
-        text.maxWidth = Screen.width - 8;
+        transform.position = Vector2(7, 55);
+        text.maxWidth = Screen.width - 14;
         text.text = "$CREATEMENU_TEXT";
         shadow.maxWidth = text.maxWidth;
         shadow.text = "<color=000000>$CREATEMENU_TEXT</color>";

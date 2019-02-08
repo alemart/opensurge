@@ -393,7 +393,7 @@ void font_render(const font_t *f, v2d_t camera_position)
     }
 
     /* compute screen position */
-    pos = v2d_add(f->position, v2d_subtract(camera_position,
+    pos = v2d_subtract(f->position, v2d_subtract(camera_position,
         v2d_multiply(video_get_screen_size(), 0.5f)
     ));
 
