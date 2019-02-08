@@ -364,7 +364,6 @@ void font_set_width(font_t *f, int w)
  * font_render()
  * Renders the text
  */
-#if 1
 void font_render(const font_t *f, v2d_t camera_position)
 {
     uint32 stack[FONT_STACKCAPACITY] = { image_rgb(255, 255, 255) }; /* color stack */
@@ -413,122 +412,6 @@ void font_render(const font_t *f, v2d_t camera_position)
     if(f->length < length)
         text[offset] = t;
 }
-#else
-void font_render(const font_t *f, v2d_t camera_position)
-{
-    /* this routine is horrible (it has suffered too many mutations through time).
-       it should be rewritten some time... :(
-       
-       ...but it works and I'm lazy ;) */
-
-    int offx = 0, offy = 0, alignoffx = 0;
-    char *p, s[8];
-    uint32 color[FONT_STACKCAPACITY];
-    int i, top = 0, w = 0, h = 0;
-    int wordwrap;
-    v2d_t textsize, charspacing = font_get_charspacing(f);
-    int hspace = charspacing.x, vspace = charspacing.y;
-    char *text = f->text;
-    int wide_char = 0;
-    int idx = 0;
-
-    switch(f->align) {
-        case FONTALIGN_LEFT:   alignoffx = 0; break;
-        case FONTALIGN_CENTER: alignoffx = -font_get_textsize(f).x / 2; break;
-        case FONTALIGN_RIGHT:  alignoffx = -font_get_textsize(f).x; break;
-    }
-
-    color[top++] = image_rgb(255,255,255);
-    if(f->visible && text) {
-        for(p=text; *p; p++) {
-            /* wordwrap */
-            wordwrap = FALSE;
-            if(p == text || (p != text && isspace((unsigned char)*(p-1)))) {
-                char *q;
-                int tag = FALSE;
-                int line_width = 0;
-
-                for(q=p; !(*q=='\0' || isspace((unsigned char)*q)); q++) {
-                    if(*q == '<') tag = TRUE;
-                    if(!tag) {
-                        uszprintf(s, sizeof(s), "%lc", ugetat(q, 0));
-                        line_width += (int)(f->drv->textsize(f->drv, s).x) + hspace;
-                    }
-                    if(*q == '>') tag = FALSE;
-                }
-
-                wordwrap = ((f->width > 0) && ((offx + line_width - hspace) > f->width));
-            }
-
-            /* tags */
-            if(*p == '<') {
-
-                if(strncmp(p+1, "color=", 6) == 0) {
-                    char *orig = p;
-                    uint8 r, g, b;
-                    char tc;
-                    int valid = TRUE;
-
-                    p += 7;
-                    for(i=0; i<6 && valid; i++) {
-                        tc = tolower( *(p+i) );
-                        valid = ((tc >= '0' && tc <= '9') || (tc >= 'a' && tc <= 'f'));
-                    }
-                    valid = valid && (*(p+6) == '>');
-
-                    if(valid) {
-                        r = (hex2dec(*(p+0)) << 4) | hex2dec(*(p+1));
-                        g = (hex2dec(*(p+2)) << 4) | hex2dec(*(p+3));
-                        b = (hex2dec(*(p+4)) << 4) | hex2dec(*(p+5));
-                        p += 7;
-                        if(top < FONT_STACKCAPACITY)
-                            color[top++] = image_rgb(r,g,b);
-                    }
-                    else
-                        p = orig;
-                }
-
-                if(strncmp(p+1, "/color>", 7) == 0) {
-                    p += 8;
-                    if(top >= 2) /* we must not clear the color stack */
-                        top--;
-                }
-
-                if(!*p)
-                    break;
-            }
-
-            /* skip it! */
-            if(idx < f->index_of_first_char) { idx++; continue; }
-            if(idx >= f->index_of_first_char + f->length) { break; }
-            idx++;
-
-            /* character size */
-            wide_char = ugetat(p, 0);
-            uszprintf(s, sizeof(s), "%lc", wide_char);
-            textsize = f->drv->textsize(f->drv, s);
-            w = (int)textsize.x; h = (int)textsize.y;
-            if(*s == '\n' && !s[1] && f->drv->renderchar == fontdrv_bmp_renderchar) h /= 2;
-
-            /* printing text */
-            if(wordwrap) { offx = 0; offy += h + vspace; }
-            if(*p != '\n') {
-                p += uoffset(p, 1) - 1; /* ugly hack */
-                f->drv->renderchar(f->drv, video_get_backbuffer(), wide_char, (int)(f->position.x+alignoffx+offx-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(f->position.y+offy-(camera_position.y-VIDEO_SCREEN_H/2)), color[top-1]);
-                offx += w + hspace;
-
-                /* gulp... o_o' */
-                if(wide_char >= 0x80 && f->drv->renderchar == fontdrv_bmp_renderchar)
-                    offx += -w + (w>>1);
-            }
-            else {
-                offx = 0;
-                offy += h + vspace;
-            }
-        }
-    }
-}
-#endif
 
 
 
