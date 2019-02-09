@@ -36,7 +36,7 @@
 
 /* private stuff */
 #define IMAGE2BITMAP(img)          (*((BITMAP**)(img)))   /* crazy stuff */
-#define FONT_TEXTMAXLENGTH         16384    /* maximum length for texts */
+#define FONT_TEXTMAXSIZE           16384    /* maximum size for texts */
 #define FONT_STACKCAPACITY         8        /* color stack capacity */
 static int allow_ttf_aa = TRUE; /* allow antialiasing for all TTF fonts? */
 
@@ -175,6 +175,7 @@ static int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint
 static int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align, int x, int y, uint32 color_stack[], int* stack_top);
 static char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width);
 static int find_blanks(int blank[], size_t size, const char* text);
+static char* tagged_text_offset(char* txt, int charnum);
 
 /*
  * font_init()
@@ -249,7 +250,7 @@ font_t *font_create(const char *font_name)
     f->visible = TRUE;
     f->position = v2d_new(0, 0);
     f->index_of_first_char = 0;
-    f->length = INFINITY;
+    f->length = FONT_TEXTMAXSIZE - 1;
     f->align = FONTALIGN_LEFT;
 
     f->drv = fontdrv_list_find(font_name);
@@ -291,7 +292,7 @@ void font_destroy(font_t *f)
  */
 void font_set_text(font_t *f, const char *fmt, ...)
 {
-    static char buf[FONT_TEXTMAXLENGTH];
+    static char buf[FONT_TEXTMAXSIZE];
     va_list args;
     int passes = 0;
 
@@ -367,28 +368,28 @@ void font_set_width(font_t *f, int w)
 void font_render(const font_t *f, v2d_t camera_position)
 {
     uint32 stack[FONT_STACKCAPACITY] = { image_rgb(255, 255, 255) }; /* color stack */
-    int stack_top = 0, length = 0;
+    int stack_top = 0, offset = -1;
     char *p, *q, *s, *w, r = 0, t = 0;
     char *text = f->text;
-    size_t offset = 0;
     v2d_t pos;
 
     /* not visible? */
     if(!f->visible)
         return;
 
-    /* use substring? FIXME: <color=...> */
+    /* use substring? */
     if(f->index_of_first_char > 0) {
-        length = u8_strlen(text);
-        if(f->index_of_first_char < length)
-            text += u8_offset(text, f->index_of_first_char);
-        else
+        text = tagged_text_offset(text, f->index_of_first_char);
+        if(text == NULL)
             return;
     }
-    if(f->length < (length = u8_strlen(text))) {
-        offset = u8_offset(text, f->length);
-        t = text[offset];
-        text[offset] = 0;
+    if(f->length < FONT_TEXTMAXSIZE - 1) {
+        char* x = tagged_text_offset(text, f->length);
+        if(x != NULL) {
+            offset = x - text;
+            t = text[offset];
+            text[offset] = 0;
+        }
     }
 
     /* compute screen position */
@@ -409,7 +410,7 @@ void font_render(const font_t *f, v2d_t camera_position)
     }
 
     /* undo substring */
-    if(f->length < length)
+    if(offset >= 0)
         text[offset] = t;
 }
 
@@ -487,12 +488,39 @@ void font_use_substring(font_t *f, int index_of_first_char, int length)
 
 
 /*
+ * font_get_align()
+ * Get the current alignment of the text
+ */
+fontalign_t font_get_align(const font_t* f)
+{
+    return f->align;
+}
+
+/*
  * font_set_align()
  * Set the alignment of the font
  */
 void font_set_align(font_t* f, fontalign_t align)
 {
     f->align = align;
+}
+
+/*
+ * font_get_maxlength()
+ * Get the maximum number of characters that can be printed, ignoring color tags and blanks
+ */
+int font_get_maxlength(const font_t* f)
+{
+    return f->length;
+}
+
+/*
+ * font_set_maxlength()
+ * Set the maximum number of characters that can be printed, ignoring color tags and blanks
+ */
+void font_set_maxlength(font_t* f, int maxlength)
+{
+    f->length = clip(maxlength, 0, FONT_TEXTMAXSIZE - 1);
 }
 
 
@@ -519,7 +547,7 @@ const char* get_variable(const char *key)
 */
 void expand_variables(char *str, fontargs_t args, size_t size)
 {
-    static char buf[FONT_TEXTMAXLENGTH];
+    static char buf[FONT_TEXTMAXSIZE];
     char *p = str, *q = buf;
 
     /* expand into buf */
@@ -613,7 +641,7 @@ void convert_to_ascii(char* str)
    returning its height */
 int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 color_stack[], int* stack_top)
 {
-    static char linebuf[FONT_TEXTMAXLENGTH];
+    static char linebuf[FONT_TEXTMAXSIZE];
     char *p, *q;
     size_t j = 0, prev_j = 0;
     uint32_t chr, tag = 0;
@@ -721,11 +749,9 @@ char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
         int best_m = 0, width;
         char *wordwrap, chr;
 
-        /* there's no wordwrap if... */
-        if(blanks == 0)
-            return NULL; /* no blanks */
-        else if((int)drv->textsize(drv, text).x <= max_width)
-            return NULL; /* wordwrap is not needed */
+        /* check if there is no wordwrap */
+        if(blanks == 0 || (int)drv->textsize(drv, text).x <= max_width)
+            return NULL;
 
         /*
             the wordwrap problem:
@@ -782,6 +808,29 @@ int find_blanks(int blank[], size_t size, const char* text)
     }
 
     return n; /* returns the number of blank spaces */
+}
+
+
+/* character number to byte offset in a tagged text
+   returns NULL if there is no such character */
+static char* tagged_text_offset(char* txt, int charnum)
+{
+    uint32_t chr;
+    size_t i, prev_i;
+    int tag = 0;
+
+    /* lookup */
+    for(prev_i = i = 0; (chr = u8_nextchar(txt, &i)) != 0; prev_i = i) {
+        if(!tag && chr == '<' && (isalpha(txt[i]) || txt[i] == '/'))
+            tag = 1;
+        else if(tag && chr == '>')
+            tag = 0;
+        else if(!tag && !isspace(chr) && charnum-- == 0)
+            return txt + prev_i;
+    }
+
+    /* character not found */
+    return NULL;
 }
 
 
@@ -1339,7 +1388,7 @@ v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt)
 
 v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
 {
-    static char linebuf[FONT_TEXTMAXLENGTH]; char *p, *q;
+    static char linebuf[FONT_TEXTMAXSIZE]; char *p, *q;
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     v2d_t sp = v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
     int width = 0, line_width = 0;
