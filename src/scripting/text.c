@@ -39,6 +39,8 @@ static surgescript_var_t* fun_gettext(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_settext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmaxwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setmaxwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getmaxlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setmaxlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getalign(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -89,6 +91,8 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Text", "set_maxWidth", fun_setmaxwidth, 1);
     surgescript_vm_bind(vm, "Text", "get_maxWidth", fun_getmaxwidth, 0);
+    surgescript_vm_bind(vm, "Text", "set_maxlength", fun_setmaxlength, 1);
+    surgescript_vm_bind(vm, "Text", "get_maxlength", fun_getmaxlength, 0);
     surgescript_vm_bind(vm, "Text", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
 }
@@ -337,6 +341,22 @@ surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript
     transform->position.x = x;
     transform->position.y = y;
 
+    return NULL;
+}
+
+surgescript_var_t* fun_getmaxlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    font_t* font = get_font(object);
+    return surgescript_var_set_number(surgescript_var_create(), font != NULL ? font_get_maxlength(font) : 0);
+}
+
+surgescript_var_t* fun_setmaxlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    font_t* font = get_font(object);
+    if(font != NULL) {
+        int maxlength = max(0, surgescript_var_get_number(param[0]));
+        font_set_maxlength(font, maxlength);
+    }
     return NULL;
 }
 
