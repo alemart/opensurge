@@ -241,41 +241,6 @@ size_t u8_strlen(const char *s)
     return count;
 }
 
-int wcwidth(wchar_t c);
-
-size_t u8_strwidth(const char *s)
-{
-    uint32_t ch;
-    size_t nb, tot=0;
-    int w;
-    signed char sc;
-
-    while ((sc = (signed char)*s) != 0) {
-        if (sc >= 0) {
-            s++;
-            if (sc) tot++;
-        }
-        else {
-            if (!isutf(sc)) { tot++; s++; continue; }
-            nb = trailingBytesForUTF8[(unsigned char)sc];
-            ch = 0;
-            switch (nb) {
-                /* these fall through deliberately */
-            case 5: ch += (unsigned char)*s++; ch <<= 6;
-            case 4: ch += (unsigned char)*s++; ch <<= 6;
-            case 3: ch += (unsigned char)*s++; ch <<= 6;
-            case 2: ch += (unsigned char)*s++; ch <<= 6;
-            case 1: ch += (unsigned char)*s++; ch <<= 6;
-            case 0: ch += (unsigned char)*s++;
-            }
-            ch -= offsetsFromUTF8[nb];
-            w = wcwidth(ch);  // might return -1
-            if (w > 0) tot += w;
-        }
-    }
-    return tot;
-}
-
 /* reads the next utf-8 sequence out of a string, updating an index */
 uint32_t u8_nextchar(const char *s, size_t *i)
 {

@@ -99,9 +99,6 @@ char *u8_memrchr(const char *s, uint32_t ch, size_t sz);
 /* count the number of characters in a UTF-8 string */
 size_t u8_strlen(const char *s);
 
-/* number of columns occupied by a string */
-size_t u8_strwidth(const char *s);
-
 int u8_is_locale_utf8(const char *locale);
 
 /* printf where the format string and arguments may be in UTF-8.
