@@ -648,7 +648,6 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 colo
     #define _print_linebuf() \
         do { \
             if(*linebuf) { \
-                /*printf("|%s|\n",linebuf);*/\
                 drv->textout(drv, video_get_backbuffer(), linebuf, x, y, color_stack[*stack_top]); \
                 x += drv->textsize(drv, linebuf).x + drv->charspacing(drv).x; \
             } \
@@ -1414,7 +1413,7 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
             line_width = 0;
             height += line_height + (int)sp.y;
         }
-        else if(/*!(f->antialias) &&*/ (ch >= 32 && ch <= 127)) {
+        else if((ch >= 32 && ch <= 127) && (f->cached_character[(int)ch - 32] != NULL)) {
             line_width += image_width(f->cached_character[(int)ch - 32]);
             if(string[i])
                 line_width += (int)sp.x;
