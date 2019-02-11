@@ -39,7 +39,6 @@ II)  Usage
 III) "my text file.txt" example:
 
         // hello, this is a comment!
-        #include "config.cfg" // you may include other files too!
 
         resource "skybox"
         {
@@ -77,11 +76,6 @@ where:
             http://en.wikipedia.org/wiki/ASCII
 
     EMPTY is a zero-length symbol
-
-pre-processing phase:
-
-    1. clears all comments
-    2. processes all #include directives
 
 */
 
@@ -994,11 +988,24 @@ void preprocessor_run(FILE *in, int depth)
             *p = 0;
             r_trim(value);
 
-            /* processing... */
+            /* #include has been deprecated */
             if(strcmp(key, "#include") == 0) {
-                char *dir = dirpath(vfile_name);
-                char *fullpath = malloc_x((1+strlen(value)+strlen(dir)) * sizeof(*fullpath));
+                char *dir, *fullpath;
+                const char *ext = strrchr(value, '.');
+                const char *vfile_ext = strrchr(vfile_name, '.');
+                void (*deprecated_error)(const char*, ...) = error;
 
+                if(vfile_ext != NULL && ext != NULL && strcmp(vfile_ext, ".obj") == 0 && strcmp(ext, ".inc") == 0)
+                    deprecated_error = warning; /* soft error (legacy) */
+
+                deprecated_error(
+                    "The #include directive has been deprecated and must no longer be used (see %s:%d)",
+                    errorcontext_detect_file_name(preprocessor_line),
+                    errorcontext_detect_file_line(preprocessor_line)
+                );
+
+                dir = dirpath(vfile_name);
+                fullpath = malloc_x((1+strlen(value)+strlen(dir)) * sizeof(*fullpath));
                 strcpy(fullpath, dir);
                 strcat(fullpath, value);
 
