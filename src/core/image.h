@@ -46,7 +46,6 @@ int image_height(const image_t *img);
 uint32 image_rgb(uint8 r, uint8 g, uint8 b);
 void image_color2rgb(uint32 color, uint8 *r, uint8 *g, uint8 *b);
 uint32 image_hex2rgb(const char* hex);
-int image_pixelperfect_collision(const image_t *img1, const image_t *img2, int x1, int y1, int x2, int y2);
 uint32 image_getpixel(const image_t *img, int x, int y);
 
 /* drawing primitives */

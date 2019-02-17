@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * spring.c - spring
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include "spring.h"
 #include "../../core/util.h"
 #include "../../core/audio.h"
+#include "../../core/video.h"
 #include "../../core/timer.h"
 #include "../../core/stringutil.h"
 #include "../../core/soundfactory.h"
@@ -33,12 +34,15 @@
 
 /* constants */
 #define SPRING_BANG_TIMER           0.2 /* sfx control */
+/*#define SHOW_COLLIDER*/
 
 /* spring class */
 typedef struct spring_t spring_t;
 struct spring_t {
     item_t item; /* base class */
     v2d_t strength;
+    v2d_t box_size;
+    v2d_t box_offset;
     char *sprite_name;
     float bang_timer;
     int is_bumping;
@@ -56,6 +60,7 @@ static void volatilespring_strategy(item_t *item, player_t *player); /* activate
 
 static void springfy_player(player_t *player, v2d_t strength);
 static void activate_spring(spring_t *spring, player_t *player);
+static int spring_collision(item_t *item, player_t *player);
 
 
 
@@ -219,6 +224,8 @@ item_t* spring_create(void (*strategy)(item_t*,player_t*), const char *sprite_na
 void spring_init(item_t *item)
 {
     spring_t *me = (spring_t*)item;
+    image_t* img;
+    v2d_t v;
 
     item->always_active = FALSE;
     item->obstacle = FALSE;
@@ -229,6 +236,21 @@ void spring_init(item_t *item)
     me->is_bumping = FALSE;
     me->bang_timer = 0.0f;
     actor_change_animation(item->actor, sprite_get_animation(me->sprite_name, 0));
+
+    /* initialize the coordinates of the collider */
+    img = actor_image(item->actor);
+    v = v2d_new(sign(me->strength.x) * (me->strength.x != 0), sign(me->strength.y) * (me->strength.y != 0));
+    if(fabs(v.x) + fabs(v.y) <= 1.0f) {
+        me->box_offset = v2d_new(image_width(img) * 0.25f * v.x, image_height(img) * 0.25f * v.y);
+        if(fabs(v.x) < fabs(v.y))
+            me->box_size = v2d_new(image_width(img), image_height(img)/2);
+        else
+            me->box_size = v2d_new(image_width(img)/2, image_height(img));
+    }
+    else {
+        me->box_size = v2d_new(image_width(img) * 0.67f, image_height(img) * 0.67f);
+        me->box_offset = v2d_new(image_width(img) * 0.34f * v.x, image_height(img) * 0.34f * v.y);
+    }
 }
 
 
@@ -253,7 +275,7 @@ void spring_update(item_t* item, player_t** team, int team_size, brick_list_t* b
     me->bang_timer += dt;
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
-        if(!player_is_dying(player) && actor_pixelperfect_collision(player->actor, item->actor))
+        if(!player_is_dying(player) && spring_collision(item, player))
             me->on_bump(item, player);
     }
 
@@ -269,6 +291,17 @@ void spring_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
 void spring_render(item_t* item, v2d_t camera_position)
 {
+#ifdef SHOW_COLLIDER
+    spring_t *me = (spring_t*)item;
+    int x1 = (item->actor->position.x) + (me->box_offset.x - me->box_size.x/2.0f) - (camera_position.x - (VIDEO_SCREEN_W / 2));
+    int y1 = (item->actor->position.y) + (me->box_offset.y - me->box_size.y/2.0f) - (camera_position.y - (VIDEO_SCREEN_H / 2));
+    int x2 = (item->actor->position.x) + (me->box_offset.x + me->box_size.x/2.0f) - (camera_position.x - (VIDEO_SCREEN_W / 2));
+    int y2 = (item->actor->position.y) + (me->box_offset.y + me->box_size.y/2.0f) - (camera_position.y - (VIDEO_SCREEN_H / 2));
+    image_line(video_get_backbuffer(), x1, y1, x2, y1, image_rgb(255,255,0));
+    image_line(video_get_backbuffer(), x2, y1, x2, y2, image_rgb(255,255,0));
+    image_line(video_get_backbuffer(), x2, y2, x1, y2, image_rgb(255,255,0));
+    image_line(video_get_backbuffer(), x1, y2, x1, y1, image_rgb(255,255,0));
+#endif
     actor_render(item->actor, camera_position);
 }
 
@@ -315,3 +348,21 @@ void activate_spring(spring_t *spring, player_t *player)
     }
 }
 
+/* returns true if the player is colliding with the spring */
+int spring_collision(item_t *item, player_t *player)
+{
+    spring_t *me = (spring_t*)item;
+    float a[4], b[4];
+
+    a[0] = item->actor->position.x + me->box_offset.x - me->box_size.x / 2.0f;
+    a[1] = item->actor->position.y + me->box_offset.y - me->box_size.y / 2.0f;
+    a[2] = item->actor->position.x + me->box_offset.x + me->box_size.x / 2.0f;
+    a[3] = item->actor->position.y + me->box_offset.y + me->box_size.y / 2.0f;
+
+    b[0] = player->actor->position.x - player->actor->hot_spot.x + image_width(actor_image(player->actor)) * 0.3;
+    b[1] = player->actor->position.y - player->actor->hot_spot.y + image_height(actor_image(player->actor)) * 0.5;
+    b[2] = b[0] + image_width(actor_image(player->actor)) * 0.4;
+    b[3] = b[1] + image_height(actor_image(player->actor)) * 0.5;
+
+    return (!player_is_dying(player) && bounding_box(a,b));
+}

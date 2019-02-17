@@ -70,7 +70,6 @@ int actor_animation_frame(const actor_t* act);
 
 /* legacy */
 int actor_collision(const actor_t *a, const actor_t *b); /* tests bounding-box collision between a and b */
-int actor_pixelperfect_collision(const actor_t *a, const actor_t *b); /* tests pixel-perfect collision between a and b */
 int actor_brick_collision(const actor_t *act, const struct brick_t *brk); /* tests bounding-box collision with a brick */
 void actor_sensors(actor_t *act, struct brick_list_t *brick_list, struct brick_t **up, struct brick_t **upright, struct brick_t **right, struct brick_t **downright, struct brick_t **down, struct brick_t **downleft, struct brick_t **left, struct brick_t **upleft); /* get obstacle bricks around the actor */
 const struct brick_t* actor_brick_at(actor_t *act, const struct brick_list_t *brick_list, v2d_t offset);

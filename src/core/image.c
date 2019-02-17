@@ -549,37 +549,6 @@ void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32
 }
 
 /*
- * image_pixelperfect_collision()
- * Pixel perfect collision detection
- */
-int image_pixelperfect_collision(const image_t *img1, const image_t *img2, int x1, int y1, int x2, int y2)
-{
-    int i, j;
-    uint32 mask = video_get_maskcolor();
-    int (*fast_getpixel)(BITMAP*,int,int) = fast_getpixel_fun();
-
-    /* optimizing */
-    if(img1->w * img1->h > img2->w * img2->h)
-        return image_pixelperfect_collision(img2, img1, x2, y2, x1, y1);
-
-    /* loop */
-    for(i=0; i<img1->h; i++) { /* i-th row */
-        for(j=0; j<img1->w; j++) { /* j-th col */
-            if(fast_getpixel(img1->data, j, i) != mask) {
-                /* pixel position: (x1+j, y1+i) */
-                if(x1+j >= x2 && x1+j < x2+img2->w && y1+i >= y2 && y1+i < y2+img2->h) {
-                    if(fast_getpixel(img2->data, x1+j-x2, y1+i-y2) != mask)
-                        return TRUE;
-                }
-            }
-        }
-    }
-
-    /* fail :( */
-    return FALSE;
-}
-
-/*
  * image_draw_waterfx()
  * pixels below y will have a water effect
  */

@@ -92,7 +92,7 @@ void endsign_update(item_t* item, player_t** team, int team_size, brick_list_t* 
 
         for(i=0; i<team_size; i++) {
             player_t *player = team[i];
-            if(!player_is_dying(player) && actor_pixelperfect_collision(player->actor, act)) {
+            if(!player_is_dying(player) && actor_collision(player->actor, act)) {
                 me->who = player; /* I have just been touched by 'player' */
                 sound_play( soundfactory_get("end sign") );
                 actor_change_animation(act, sprite_get_animation("SD_ENDSIGN", 1));

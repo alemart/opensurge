@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * animal.c - little animal
- * Copyright (C) 2010, 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2011, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@
 #include "../item.h"
 #include "../enemy.h"
 #include "../actor.h"
+#include "../../physics/obstacle.h"
 
 
 #define MAX_ANIMALS                 12
@@ -44,9 +45,6 @@ static void animal_init(item_t *item);
 static void animal_release(item_t* item);
 static void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* brick_list, item_list_t* item_list, enemy_list_t* enemy_list);
 static void animal_render(item_t* item, v2d_t camera_position);
-
-static int hit_test(int x, int y, const image_t *brk_image, int brk_x, int brk_y);
-
 
 /* public methods */
 item_t* animal_create()
@@ -98,9 +96,10 @@ void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* b
     /* in order to avoid too much processor load,
        we adopt this simplified platform system */
     int rx, ry, rw, rh, bx, by, bw, bh, j;
-    const image_t *ri, *bi;
+    const image_t *ri;
     brick_list_t *it;
     enum { NONE, FLOOR, RIGHTWALL, CEILING, LEFTWALL } bounce = NONE;
+    const obstacle_t* bo;
 
     ri = actor_image(act);
     rx = (int)(act->position.x - act->hot_spot.x);
@@ -110,53 +109,51 @@ void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
     /* check for collisions */
     for(it = brick_list; it != NULL && bounce == NONE; it = it->next) {
-        if(brick_type(it->data) != BRK_PASSABLE) {
-            bi = brick_image(it->data);
+        bo = brick_obstacle(it->data);
+        if(bo && brick_type(it->data) != BRK_PASSABLE) {
             bx = brick_position(it->data).x;
             by = brick_position(it->data).y;
             bw = brick_size(it->data).x;
             bh = brick_size(it->data).y;
 
             if(rx<bx+bw && rx+rw>bx && ry<by+bh && ry+rh>by) {
-                if(image_pixelperfect_collision(ri, bi, rx, ry, bx, by)) {
-                    if(hit_test(rx, ry+rh/2, bi, bx, by)) {
-                        /* left wall */
-                        bounce = LEFTWALL;
-                        for(j=1; j<=bw; j++) {
-                            if(!image_pixelperfect_collision(ri, bi, rx+j, ry, bx, by)) {
-                                act->position.x += j-1;
-                                break;
-                            }
+                if(obstacle_got_collision(bo, rx, ry+rh/2, rx, ry+rh/2)) {
+                    /* left wall */
+                    bounce = LEFTWALL;
+                    for(j=1; j<=bw; j++) {
+                        if(!obstacle_got_collision(bo, rx+j, ry, rx+j, ry)) {
+                            act->position.x += j-1;
+                            break;
                         }
                     }
-                    else if(hit_test(rx+rw-1, ry+rh/2, bi, bx, by)) {
-                        /* right wall */
-                        bounce = RIGHTWALL;
-                        for(j=1; j<=bw; j++) {
-                            if(!image_pixelperfect_collision(ri, bi, rx-j, ry, bx, by)) {
-                                act->position.x -= j-1;
-                                break;
-                            }
+                }
+                else if(obstacle_got_collision(bo, rx+rw-1, ry+rh/2, rx+rw-1, ry+rh/2)) {
+                    /* right wall */
+                    bounce = RIGHTWALL;
+                    for(j=1; j<=bw; j++) {
+                        if(!obstacle_got_collision(bo, rx-j, ry, rx-j, ry)) {
+                            act->position.x -= j-1;
+                            break;
                         }
                     }
-                    else if(hit_test(rx+rw/2, ry, bi, bx, by)) {
-                        /* ceiling */
-                        bounce = CEILING;
-                        for(j=1; j<=bh; j++) {
-                            if(!image_pixelperfect_collision(ri, bi, rx, ry+j, bx, by)) {
-                                act->position.y += j-1;
-                                break;
-                            }
+                }
+                else if(obstacle_got_collision(bo, rx+rw/2, ry, rx+rw/2, ry)) {
+                    /* ceiling */
+                    bounce = CEILING;
+                    for(j=1; j<=bh; j++) {
+                        if(!obstacle_got_collision(bo, rx, ry+j, rx, ry+j)) {
+                            act->position.y += j-1;
+                            break;
                         }
                     }
-                    else if(hit_test(rx+rw/2, ry+rh-1, bi, bx, by)) {
-                        /* floor */
-                        bounce = FLOOR;
-                        for(j=1; j<=bh; j++) {
-                            if(!image_pixelperfect_collision(ri, bi, rx, ry-j, bx, by)) {
-                                act->position.y -= j-1;
-                                break;
-                            }
+                }
+                else if(obstacle_got_collision(bo, rx+rw/2, ry+rh-1, rx+rw/2, ry+rh-1)) {
+                    /* floor */
+                    bounce = FLOOR;
+                    for(j=1; j<=bh; j++) {
+                        if(!obstacle_got_collision(bo, rx, ry-j, rx, ry-j)) {
+                            act->position.y -= j-1;
+                            break;
                         }
                     }
                 }
@@ -206,15 +203,4 @@ void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 void animal_render(item_t* item, v2d_t camera_position)
 {
     actor_render(item->actor, camera_position);
-}
-
-
-
-/* (x,y) collides with the brick */
-int hit_test(int x, int y, const image_t *brk_image, int brk_x, int brk_y)
-{
-    if(x >= brk_x && x < brk_x + image_width(brk_image) && y >= brk_y && y < brk_y + image_height(brk_image))
-        return image_getpixel(brk_image, x - brk_x, y - brk_y) != video_get_maskcolor();
-
-    return FALSE;
 }

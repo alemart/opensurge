@@ -2421,6 +2421,7 @@ void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_
     brick_list_t *it;
     enum { NONE, FLOOR, CEILING } collided = NONE;
     int i, j, sticky_max_offset = 3;
+    const obstacle_t* bo;
 
     ri = actor_image(act);
     rx = (int)(act->position.x - act->hot_spot.x);
@@ -2430,30 +2431,32 @@ void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_
 
     /* check for collisions */
     for(it = brick_list; it != NULL && collided == NONE; it = it->next) {
-        if(brick_type(it->data) != BRK_PASSABLE) {
+        bo = brick_obstacle(it->data);
+        if(bo && brick_type(it->data) != BRK_PASSABLE) {
             bx = brick_position(it->data).x;
             by = brick_position(it->data).y;
             bw = brick_size(it->data).x;
             bh = brick_size(it->data).y;
 
             if(rx<bx+bw && rx+rw>bx && ry<by+bh && ry+rh>by) {
-                if(1) { /*if(image_pixelperfect_collision(ri, bi, rx, ry, bx, by)) {*/
-                    if(hit_test(it->data, rx+rw/2, ry)) {
-                        /* ceiling */
-                        collided = CEILING;
-                        /*for(j=1; j<=bh; j++) {
-                            if(!image_pixelperfect_collision(ri, bi, rx, ry+j, bx, by)) {
-                                act->position.y += j-1;
-                                break;
-                            }
-                        }*/
+                if(obstacle_got_collision(bo, rx+rw/2, ry, rx+rw/2, ry)) {
+                    /* ceiling */
+                    collided = CEILING;
+                    for(j=1; j<=bh; j++) {
+                        if(!obstacle_got_collision(bo, rx, ry+j, rx, ry+j)) {
+                            act->position.y += j-1;
+                            break;
+                        }
                     }
-                    else if(hit_test(it->data, rx+rw/2, ry+rh-1)) {
-                        /* floor */
-                        collided = FLOOR;
-                        for(j=1; j<=bh && hit_test(it->data, rx+rw/2, ry+rh-j); j++)
-                            act->position.y -= 1;
-                        if(j > 1) act->position.y += 1;
+                }
+                else if(obstacle_got_collision(bo, rx+rw/2, ry+rh-1, rx+rw/2, ry+rh-1)) {
+                    /* floor */
+                    collided = FLOOR;
+                    for(j=1; j<=bh; j++) {
+                        if(!obstacle_got_collision(bo, rx, ry-j, rx, ry-j)) {
+                            act->position.y -= j-1;
+                            break;
+                        }
                     }
                 }
             }
