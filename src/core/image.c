@@ -295,7 +295,23 @@ image_t *image_clone_region(const image_t *src, int x, int y, int width, int hei
     return img;
 }
 
+/*
+ * image_lock()
+ * Locks the image
+ */
+void image_lock(image_t *img)
+{
+    ;
+}
 
+/*
+ * image_unlock()
+ * Unlocks the image
+ */
+void image_unlock(image_t *img)
+{
+    ;
+}
 
 
 /*
@@ -554,6 +570,23 @@ void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx,
         pivot_sprite(dest->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
     else
         pivot_sprite(dest->data, src->data, x, y, cx, cy, ftofix(conv));
+}
+
+
+/*
+ * image_draw_scaled_rotated()
+ * Draw scaled and rotated ;)
+ */
+void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, uint32 flags)
+{
+    image_t *tmp;
+    int w = (int)(scale.x * src->w);
+    int h = (int)(scale.y * src->h);
+
+    tmp = image_create(w, h);
+    stretch_blit(src->data, tmp->data, 0, 0, src->w, src->h, 0, 0, w, h);
+    image_draw_rotated(tmp, dest, x, y, cx, cy, ang, flags);
+    image_destroy(tmp);
 }
 
  

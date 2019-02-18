@@ -100,14 +100,18 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
         /* render */
         img = actor_image(act);
-        if(fabs(act->angle) > EPSILON)
-           image_draw_rotated(img, video_get_backbuffer(), (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
-        else if(fabs(act->alpha - 1.0f) > EPSILON)
-           image_draw_trans(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->alpha, act->mirror);
+        if(fabs(act->angle) > EPSILON) {
+            if(fabs(act->scale.x - 1.0f) > EPSILON || fabs(act->scale.y - 1.0f) > EPSILON)
+                image_draw_scaled_rotated(img, video_get_backbuffer(), (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
+            else
+                image_draw_rotated(img, video_get_backbuffer(), (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
+        }
         else if(fabs(act->scale.x - 1.0f) > EPSILON || fabs(act->scale.y - 1.0f) > EPSILON)
-           image_draw_scaled(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x*act->scale.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y*act->scale.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->scale, act->mirror);
+            image_draw_scaled(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x*act->scale.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y*act->scale.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->scale, act->mirror);
+        else if(fabs(act->alpha - 1.0f) > EPSILON)
+            image_draw_trans(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->alpha, act->mirror);
         else
-           image_draw(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->mirror);
+            image_draw(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->mirror);
     }
 }
 

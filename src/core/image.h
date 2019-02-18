@@ -41,6 +41,8 @@ void image_save(const image_t *img, const char *path); /* saves the image to a f
 int image_unload(image_t *img); /* use if you want to save memory... */
 image_t *image_clone(const image_t *src); /* clones an image */
 image_t *image_clone_region(const image_t *src, int x, int y, int width, int height); /* clones a region */
+void image_lock(image_t *img);
+void image_unlock(image_t *img);
 
 /* properties */
 int image_width(const image_t *img);
@@ -64,6 +66,7 @@ void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, i
 void image_draw(const image_t *src, image_t *dest, int x, int y, uint32 flags);
 void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, uint32 flags);
 void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, uint32 flags);
+void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, uint32 flags);
 void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, uint32 flags);
 void image_draw_translit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
 void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
