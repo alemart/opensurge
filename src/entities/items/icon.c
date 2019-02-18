@@ -98,6 +98,9 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
     }
     else if(me->elapsed_time >= 2.5f) {
         /* death */
+#if 1
+        item->state = IS_DEAD;
+#else
         int i, j;
         int x = (int)(act->position.x-act->hot_spot.x);
         int y = (int)(act->position.y-act->hot_spot.y);
@@ -113,6 +116,7 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
         }
 
         item->state = IS_DEAD;
+#endif
     }
 }
 

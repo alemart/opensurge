@@ -988,7 +988,7 @@ void level_init(void *path_to_lev_file)
     dialogregion_size = 0;
     override_music = NULL;
     quit_level = FALSE;
-    quit_level_img = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
+    quit_level_img = NULL;
     backgroundtheme = NULL;
     must_load_another_level = FALSE;
     must_restart_this_level = FALSE;
@@ -1109,9 +1109,12 @@ void level_update()
         char op[3][512];
         confirmboxdata_t cbd = { op[0], op[1], op[2] };
 
-        wants_to_leave = FALSE;
-        image_blit(video_get_backbuffer(), quit_level_img, 0, 0, 0, 0, image_width(quit_level_img), image_height(quit_level_img));
         music_pause();
+        wants_to_leave = FALSE;
+
+        if(quit_level_img != NULL)
+            image_destroy(quit_level_img);
+        quit_level_img = image_clone(video_get_backbuffer());
 
         lang_getstring("CBOX_QUIT_QUESTION", op[0], sizeof(op[0]));
         lang_getstring("CBOX_QUIT_OPTION1", op[1], sizeof(op[1]));
@@ -1399,7 +1402,6 @@ void level_release()
 {
     logfile_message("level_release()");
 
-    image_destroy(quit_level_img);
     particle_release();
     level_unload();
     camera_release();
@@ -1409,6 +1411,8 @@ void level_release()
     font_destroy(dlgbox_title);
     font_destroy(dlgbox_message);
     actor_destroy(dlgbox);
+    if(quit_level_img != NULL)
+        image_destroy(quit_level_img);
 
     logfile_message("level_release() ok");
 }

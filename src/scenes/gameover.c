@@ -56,8 +56,7 @@ void gameover_init(void *foo)
     font_set_align(gameover_fnt[1], FONTALIGN_LEFT);
     font_set_text(gameover_fnt[1], "OVER");
 
-    gameover_buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
-    image_blit(video_get_backbuffer(), gameover_buf, 0, 0, 0, 0, image_width(gameover_buf), image_height(gameover_buf));
+    gameover_buf = image_clone(video_get_backbuffer());
 
     music = music_load(GAMEOVER_MUSICFILE);
     music_play(music, 0);

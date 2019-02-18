@@ -200,8 +200,8 @@ image_t *image_create_shared(const image_t *parent, int x, int y, int width, int
     if(width <= 0 || height <= 0)
         fatal_error("Can't create shared image of size %d x %d", width, height);
 
-    pw = image_width(parent);
-    ph = image_height(parent);
+    pw = parent->w;
+    ph = parent->h;
     x = clip(x, 0, pw-1);
     y = clip(y, 0, ph-1);
     width = clip(width, 0, pw-x);
@@ -244,6 +244,56 @@ int image_unload(image_t *img)
         return -1; /* error; the image was not loaded from a file */
 }
 
+/*
+ * image_clone()
+ * Clones an existing image; make sure you
+ * call image_destroy() after usage
+ */
+image_t *image_clone(const image_t *src)
+{
+    image_t *img = mallocx(sizeof *img);
+    img->w = src->w;
+    img->h = src->h;
+    img->path = NULL;
+
+    if(NULL == (img->data = create_bitmap(img->w, img->h)))
+        fatal_error("ERROR - image_clone(0x%p) sized %dx%d", src, img->w, img->h);
+    blit(src->data, img->data, 0, 0, 0, 0, src->w, src->h);
+
+    return img;
+}
+
+/*
+ * image_clone_region()
+ * Clones a region of an image; make sure you
+ * call image_destroy() after usage
+ */
+image_t *image_clone_region(const image_t *src, int x, int y, int width, int height)
+{
+    image_t *img;
+    int sw, sh;
+
+    if(width <= 0 || height <= 0)
+        fatal_error("Can't create cloned image of size %d x %d", width, height);
+
+    sw = src->w;
+    sh = src->h;
+    x = clip(x, 0, sw-1);
+    y = clip(y, 0, sh-1);
+    width = clip(width, 0, sw-x);
+    height = clip(height, 0, sh-y);
+
+    img = mallocx(sizeof *img);
+    img->w = width;
+    img->h = height;
+    img->path = NULL;
+    
+    if(NULL == (img->data = create_bitmap(img->w, img->h)))
+        fatal_error("ERROR - image_clone_region(0x%p,%d,%d,%d,%d): couldn't create cloned image", src, x, y, width, height);
+    blit(src->data, img->data, x, y, 0, 0, width, height);
+
+    return img;
+}
 
 
 

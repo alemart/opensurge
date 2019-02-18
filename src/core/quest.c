@@ -115,10 +115,8 @@ image_t *load_quest_image(const char *image_file)
     if(img == NULL)
         img = image_load(DEFAULT_QUEST_IMAGE);
 
-    ret = image_create(QUEST_IMAGE_WIDTH, QUEST_IMAGE_HEIGHT);
-    image_blit(img, ret, 0, 0, 0, 0, image_width(ret), image_height(ret));
+    ret = image_clone_region(img, 0, 0, QUEST_IMAGE_WIDTH, QUEST_IMAGE_HEIGHT);
     image_unload(img);
-
     return ret;
 }
 

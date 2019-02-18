@@ -271,18 +271,17 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 if((team[i]->attacking || player_is_rolling(team[i])) && bounding_box(a,b)) {
                     /* particles */
                     int bi, bj, bh, bw;
-                    bw = max(brk->brick_ref->behavior_arg[0], 1);
-                    bh = max(brk->brick_ref->behavior_arg[1], 1);
+                    bw = clip(brk->brick_ref->behavior_arg[0], 1, brkw);
+                    bh = clip(brk->brick_ref->behavior_arg[1], 1, brkh);
                     for(bi=0; bi<bw; bi++) {
                         for(bj=0; bj<bh; bj++) {
                             v2d_t brkpos = v2d_new(brk->x + (bi*brkw)/bw, brk->y + (bj*brkh)/bh);
                             v2d_t brkspeed = v2d_new(-team[i]->actor->speed.x*0.3, -100-random(50));
-                            image_t *brkimg = image_create(brkw/bw, brkh/bh);
+                            image_t *brkimg = image_clone_region(brk->brick_ref->image, (bi * brkw) / bw, (bj * brkh) / bh, brkw / bw, brkh / bh);
 
                             if(fabs(brkspeed.x) > EPSILON)
                                 brkspeed.x += (brkspeed.x>0?1:-1) * random(50);
 
-                            image_blit(brk->brick_ref->image, brkimg, (bi*brkw)/bw, (bj*brkh)/bh, 0, 0, brkw/bw, brkh/bh);
                             level_create_particle(brkimg, brkpos, brkspeed, FALSE);
                         }
                     }
@@ -318,17 +317,17 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 int bi, bj, bw, bh;
                 int right_oriented = ((int)brk->brick_ref->behavior_arg[2] != 0);
                 image_t *brkimg = brk->brick_ref->image;
+                int brkw = image_width(brkimg);
+                int brkh = image_height(brkimg);
 
                 /* particles */
-                bw = max(brk->brick_ref->behavior_arg[0], 1);
-                bh = max(brk->brick_ref->behavior_arg[1], 1);
+                bw = clip(brk->brick_ref->behavior_arg[0], 1, brkw);
+                bh = clip(brk->brick_ref->behavior_arg[1], 1, brkh);
                 for(bi=0; bi<bw; bi++) {
                     for(bj=0; bj<bh; bj++) {
-                        v2d_t piecepos = v2d_new(brk->x + (bi*image_width(brkimg))/bw, brk->y + (bj*image_height(brkimg))/bh);
+                        v2d_t piecepos = v2d_new(brk->x + (bi*brkw)/bw, brk->y + (bj*brkh)/bh);
                         v2d_t piecespeed = v2d_new(0, 20+bj*20+ (right_oriented?bi:bw-bi)*20);
-                        image_t *piece = image_create(image_width(brkimg)/bw, image_height(brkimg)/bh);
-
-                        image_blit(brkimg, piece, (bi*image_width(brkimg))/bw, (bj*image_height(brkimg))/bh, 0, 0, image_width(piece), image_height(piece));
+                        image_t *piece = image_clone_region(brk->brick_ref->image, (bi * brkw) / bw, (bj * brkh) / bh, brkw / bw, brkh / bh);
                         level_create_particle(piece, piecepos, piecespeed, FALSE);
                     }
                 }

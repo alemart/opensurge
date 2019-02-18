@@ -48,11 +48,10 @@ static float pause_timer;
 void pause_init(void *foo)
 {
     pause_input = input_create_user(NULL);
-    pause_buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
+    pause_buf = image_clone(video_get_backbuffer());
     pause_ready = FALSE;
     pause_quit = FALSE;
     pause_timer = 0;
-    image_blit(video_get_backbuffer(), pause_buf, 0, 0, 0, 0, image_width(pause_buf), image_height(pause_buf));
 
     music_pause();
 }
