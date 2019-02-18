@@ -98,7 +98,7 @@ struct fontscript_t {
 /* fontdrv_t: a font driver stores the attributes the font class (bmp, ttf) */
 typedef struct fontdrv_t fontdrv_t;
 struct fontdrv_t { /* abstract font: base class */
-    void (*textout)(const fontdrv_t*,image_t*,const char*,int,int,uint32); /* prints a string */
+    void (*textout)(const fontdrv_t*,const char*,int,int,uint32); /* prints a string */
     v2d_t (*textsize)(const fontdrv_t*,const char*); /* text size, in pixels */
     v2d_t (*charspacing)(const fontdrv_t*); /* a pair (hspace, vspace) */
     void (*release)(fontdrv_t*); /* release the fontdrv_t */
@@ -113,7 +113,7 @@ struct fontdrv_bmp_t { /* bitmap font */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
 };
-static void fontdrv_bmp_textout(const fontdrv_t *fnt, image_t *img, const char* text, int x, int y, uint32 color);
+static void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color);
 static v2d_t fontdrv_bmp_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_bmp_charspacing(const fontdrv_t *fnt);
 static void fontdrv_bmp_release(fontdrv_t *fnt);
@@ -125,7 +125,7 @@ struct fontdrv_ttf_t { /* truetype font */
     int antialias; /* enable antialiasing? */
     int shadow; /* enable shadow? */
 };
-static void fontdrv_ttf_textout(const fontdrv_t *fnt, image_t *img, const char* text, int x, int y, uint32 color);
+static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt);
 static void fontdrv_ttf_release(fontdrv_t *fnt);
@@ -647,7 +647,7 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 colo
     #define _print_linebuf() \
         do { \
             if(*linebuf) { \
-                drv->textout(drv, video_get_backbuffer(), linebuf, x, y, color_stack[*stack_top]); \
+                drv->textout(drv, linebuf, x, y, color_stack[*stack_top]); \
                 x += drv->textsize(drv, linebuf).x + drv->charspacing(drv).x; \
             } \
             *(p = linebuf) = 0; \
@@ -1222,12 +1222,12 @@ fontdrv_t* fontdrv_bmp_new(const char *source_file, charproperties_t chr[], int 
     return (fontdrv_t*)f;
 }
 
-void fontdrv_bmp_textout(const fontdrv_t *fnt, image_t *img, const char* text, int x, int y, uint32 color)
+void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color)
 {
     const fontdrv_bmp_t *f = (const fontdrv_bmp_t*)fnt;
     uint32 chr, n = sizeof(f->bmp) / sizeof(image_t*);
     uint32 white = image_rgb(255, 255, 255);
-    image_t* chimg;
+    image_t *chimg, *img = video_get_backbuffer();
 
     /* currently, bitmap fonts only support the
        first 256 Unicode characters, though that
@@ -1323,9 +1323,10 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int
     return (fontdrv_t*)f;
 }
 
-void fontdrv_ttf_textout(const fontdrv_t *fnt, image_t *img, const char* text, int x, int y, uint32 color)
+void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color)
 {
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
+    image_t *img = video_get_backbuffer();
 
     /* draw shadow */
     if(f->shadow) {
