@@ -112,9 +112,9 @@ void questselect_init(void *foo)
     font_set_position(page, v2d_new(VIDEO_SCREEN_W - font_get_textsize(page).x - 10, VIDEO_SCREEN_H - font_get_textsize(page).y * 1.5f));
 
     info = font_create("menu.text");
+    font_set_position(info, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(info).y * 5.0f));
     font_set_textarguments(info, 3, "null", "null", "null");
     font_set_text(info, "%s", "$QUESTSELECT_INFO");
-    font_set_position(info, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(info).y * 5.0f));
 
     bgtheme = background_load(QUEST_BGFILE);
 
@@ -176,7 +176,6 @@ void questselect_update()
     /* quest information */
     font_set_textarguments(info, 3, quest_data[option]->version, quest_data[option]->author, quest_data[option]->description);
     font_set_text(info, "%s", "$QUESTSELECT_INFO");
-    font_set_position(info, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(info).y * 5.0f));
 
     /* music */
     if(!music_is_playing() && state != QUESTSTATE_PLAY)
