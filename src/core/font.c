@@ -122,7 +122,6 @@ typedef struct fontdrv_ttf_t fontdrv_ttf_t;
 struct fontdrv_ttf_t { /* truetype font */
     fontdrv_t base;
     ALFONT_FONT *ttf;
-    image_t *cached_character[96]; /* store characters 32..127 in a table */
     int antialias; /* enable antialiasing? */
     int shadow; /* enable shadow? */
 };
@@ -1317,25 +1316,6 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int
         alfont_set_font_size(f->ttf, size);
         f->antialias = allow_ttf_aa ? antialias : FALSE;
         f->shadow = shadow;
-
-        /* caching commonly used characters */
-        if(1 || !(f->antialias)) {
-            char buf[2] = { 0, 0 };
-            int ch, w, h = alfont_text_height(f->ttf);
-            uint32 white = image_rgb(255, 255, 255);
-            for(ch=32; ch<=127; ch++) {
-                buf[0] = ch;
-                w = alfont_text_length(f->ttf, buf);
-                f->cached_character[ch-32] = image_create(w, h);
-                image_clear(f->cached_character[ch-32], video_get_maskcolor());
-                alfont_textout_ex(IMAGE2BITMAP(f->cached_character[ch-32]), f->ttf, buf, 0, 0, white, -1);
-            }
-        }
-        else {
-            int i = 0, n = sizeof(f->cached_character) / sizeof(image_t*);
-            for(i = 0; i < n; i++)
-                f->cached_character[i] = NULL;
-        }
     }
     else
         fatal_error("Couldn't load TrueType font '%s'", source_file);
@@ -1368,13 +1348,6 @@ void fontdrv_ttf_textout(const fontdrv_t *fnt, image_t *img, const char* text, i
 void fontdrv_ttf_release(fontdrv_t *fnt)
 {
     fontdrv_ttf_t *f = (fontdrv_ttf_t*)fnt;
-    int i = 0, n = sizeof(f->cached_character) / sizeof(image_t*);
-
-    for(i = 0; i < n; i++) {
-        if(f->cached_character[i] != NULL)
-            image_destroy(f->cached_character[i]);
-    }
-
     alfont_destroy_font(f->ttf);
     free(f);
 }
@@ -1412,11 +1385,6 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
             *(p = linebuf) = 0;
             line_width = 0;
             height += line_height + (int)sp.y;
-        }
-        else if((ch >= 32 && ch <= 127) && (f->cached_character[(int)ch - 32] != NULL)) {
-            line_width += image_width(f->cached_character[(int)ch - 32]);
-            if(string[i])
-                line_width += (int)sp.x;
         }
         else {
             char buf[5] = { 0 };
