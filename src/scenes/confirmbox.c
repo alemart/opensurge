@@ -67,8 +67,7 @@ void confirmbox_init(void *text_and_options)
 
     setup((*p)[0], (*p)[1], (*p)[2]);
 
-    background = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
-    image_blit(video_get_backbuffer(), background, 0, 0, 0, 0, image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
+    background = image_clone(video_get_backbuffer());
 
     box = sprite_get_image(sprite_get_animation("SD_CONFIRMBOX", 0), 0);
     boxpos = v2d_new( (VIDEO_SCREEN_W - image_width(box))/2 , VIDEO_SCREEN_H );

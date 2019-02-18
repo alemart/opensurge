@@ -84,7 +84,6 @@ void credits_init(void *foo)
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
 
     box = image_create(VIDEO_SCREEN_W, 30);
-    image_clear(box, image_rgb(0,0,0));
 
     bgtheme = background_load(CREDITS_BGFILE);
 

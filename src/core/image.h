@@ -56,6 +56,8 @@ void image_putpixel(image_t *img, int x, int y, uint32 color);
 void image_line(image_t *img, int x1, int y1, int x2, int y2, uint32 color);
 void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, uint32 color);
 void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, uint32 color);
+void image_rect(image_t *img, int x1, int y1, int x2, int y2, uint32 color);
+void image_waterfx(image_t *img, int y, uint32 color); /* pixels below y will have a water effect */
 
 /* rendering */
 void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
@@ -65,6 +67,5 @@ void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx,
 void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, uint32 flags);
 void image_draw_translit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
 void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags);
-void image_draw_waterfx(image_t *img, int y, uint32 color); /* pixels below y will have a water effect */
 
 #endif

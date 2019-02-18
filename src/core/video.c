@@ -40,7 +40,7 @@
 /* video manager */
 static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
 static image_t *video_buffer;
-static image_t *window_surface, *window_surface_half;
+static image_t *window_surface;
 static int video_smooth;
 static int video_resolution;
 static int video_fullscreen;
@@ -90,7 +90,7 @@ void video_init(const char *window_title, int resolution, int smooth, int fullsc
 
     /* video init */
     video_buffer = NULL;
-    window_surface = window_surface_half = NULL;
+    window_surface = NULL;
     video_changemode(resolution, smooth, fullscreen);
 
     /* window properties */
@@ -154,20 +154,12 @@ void video_changemode(int resolution, int smooth, int fullscreen)
     if(video_buffer != NULL)
         image_destroy(video_buffer);
     video_buffer = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-    image_clear(video_buffer, image_rgb(0,0,0));
 
     /* creating the window surface... */
     logfile_message("creating the window surface...");
     if(window_surface != NULL)
         image_destroy(window_surface);
     window_surface = image_create((int)(video_get_window_size().x), (int)(video_get_window_size().y));
-    image_clear(window_surface, image_rgb(0,0,0));
-
-    logfile_message("creating the auxiliary window surface...");
-    if(window_surface_half != NULL)
-        image_destroy(window_surface_half);
-    window_surface_half = image_create(image_width(window_surface)/2, image_height(window_surface)/2);
-    image_clear(window_surface_half, image_rgb(0,0,0));
 
     /* setting up the window... */
     logfile_message("setting up the window...");
@@ -320,9 +312,8 @@ void video_render()
             image_t *tmp = window_surface;
 
             if(!video_is_smooth()) {
-                float sx = (float)image_width(tmp) / (float)image_width(video_get_backbuffer());
-                float sy = (float)image_height(tmp) / (float)image_height(video_get_backbuffer());
-                image_draw_scaled(video_get_backbuffer(), tmp, 0, 0, v2d_new(sx, sy), IF_NONE);
+                image_t *src = video_get_backbuffer();
+                stretch_blit(IMAGE2BITMAP(src), IMAGE2BITMAP(tmp), 0, 0, image_width(src), image_height(src), 0, 0, image_width(tmp), image_height(tmp));
             }
             else
                 smooth3x_blit(video_get_backbuffer(), tmp);
@@ -337,9 +328,8 @@ void video_render()
             image_t *tmp = window_surface;
 
             if(!video_is_smooth()) {
-                image_t *half = window_surface_half;
-                fast2x_blit(video_get_backbuffer(), half);
-                fast2x_blit(half, tmp);
+                image_t *src = video_get_backbuffer();
+                stretch_blit(IMAGE2BITMAP(src), IMAGE2BITMAP(tmp), 0, 0, image_width(src), image_height(src), 0, 0, image_width(tmp), image_height(tmp));
             }
             else
                 smooth4x_blit(video_get_backbuffer(), tmp);
@@ -371,9 +361,6 @@ void video_release()
 
     if(window_surface != NULL)
         image_destroy(window_surface);
-
-    if(window_surface_half != NULL)
-        image_destroy(window_surface_half);
 
     logfile_message("video_release() ok");
 }

@@ -158,7 +158,7 @@ image_t *image_create(int width, int height)
     img->path = NULL;
 
     if(img->data != NULL)
-        image_clear(img, image_rgb(0,0,0));
+        clear_to_color(img->data, makecol(0,0,0));
     else
         logfile_message("ERROR - image_create(%d,%d): couldn't create image", width, height);
 
@@ -367,6 +367,59 @@ void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
     rectfill(img->data, x1, y1, x2, y2, color);
 }
 
+
+/*
+ * image_rect()
+ * Draws a rectangle
+ */
+void image_rect(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
+{
+    rect(img->data, x1, y1, x2, y2, color);
+}
+
+
+/*
+ * image_waterfx()
+ * pixels below y will have a water effect
+ */
+void image_waterfx(image_t *img, int y, uint32 color)
+{
+    fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
+    fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
+    fast_makecol_funptr fast_makecol = fast_makecol_fun();
+    fast_getr_funptr fast_getr = fast_getr_fun();
+    fast_getg_funptr fast_getg = fast_getg_fun();
+    fast_getb_funptr fast_getb = fast_getb_fun();
+    int col, wr, wg, wb; /* don't use uint8 */
+    int i, j;
+
+    /* adjust y */
+    y = clip(y, 0, img->h);
+
+    /* water color */
+    wr = fast_getr(color);
+    wg = fast_getg(color);
+    wb = fast_getb(color);
+
+    /* water effect */
+    if(video_get_color_depth() > 16) {
+        /* fast blending algorithm (alpha = 0.5) */
+        for(j=y; j<img->h; j++) {
+            for(i=0; i<img->w; i++) {
+                col = fast_getpixel(img->data, i, j);
+                fast_putpixel(img->data, i, j, fast_makecol((fast_getr(col) + wr)/2, (fast_getg(col) + wg)/2, (fast_getb(col) + wb)/2));
+            }
+        }
+    }
+    else {
+        /* fast "dithered" water, when bpp is not greater than 16 (slow computers?) */
+        for(j=y; j<img->h; j++) {
+            for(i=j%2; i<img->w; i+=2) {
+                fast_putpixel(img->data, i, j, color);
+            }
+        }
+    }
+}
 
 /*
  * image_rgb()
@@ -598,48 +651,6 @@ void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32
         image_draw(src, dest, x, y, flags);
 }
 
-/*
- * image_draw_waterfx()
- * pixels below y will have a water effect
- */
-void image_draw_waterfx(image_t *img, int y, uint32 color)
-{
-    fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
-    fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
-    fast_makecol_funptr fast_makecol = fast_makecol_fun();
-    fast_getr_funptr fast_getr = fast_getr_fun();
-    fast_getg_funptr fast_getg = fast_getg_fun();
-    fast_getb_funptr fast_getb = fast_getb_fun();
-    int col, wr, wg, wb; /* don't use uint8 */
-    int i, j;
-
-    /* adjust y */
-    y = clip(y, 0, img->h);
-
-    /* water color */
-    wr = fast_getr(color);
-    wg = fast_getg(color);
-    wb = fast_getb(color);
-
-    /* water effect */
-    if(video_get_color_depth() > 16) {
-        /* fast blending algorithm (alpha = 0.5) */
-        for(j=y; j<img->h; j++) {
-            for(i=0; i<img->w; i++) {
-                col = fast_getpixel(img->data, i, j);
-                fast_putpixel(img->data, i, j, fast_makecol((fast_getr(col) + wr)>>1, (fast_getg(col) + wg)>>1, (fast_getb(col) + wb)>>1));
-            }
-        }
-    }
-    else {
-        /* fast "dithered" water, when bpp is not greater than 16 (slow computers?) */
-        for(j=y; j<img->h; j++) {
-            for(i=j%2; i<img->w; i+=2) {
-                fast_putpixel(img->data, i, j, color);
-            }
-        }
-    }
-}
 
 
 /* private methods */

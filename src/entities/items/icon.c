@@ -98,25 +98,22 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
     }
     else if(me->elapsed_time >= 2.5f) {
         /* death */
-#if 1
-        item->state = IS_DEAD;
-#else
         int i, j;
         int x = (int)(act->position.x-act->hot_spot.x);
         int y = (int)(act->position.y-act->hot_spot.y);
         image_t *img = actor_image(act), *particle;
+        int w = image_width(img), h = image_height(img);
 
         /* particle party! :) */
-        for(i=0; i<image_height(img); i++) {
-            for(j=0; j<image_width(img); j++) {
-                particle = image_create(1,1);
-                image_clear(particle, image_getpixel(img, j, i));
+        for(i=0; i<h; i++) {
+            for(j=0; j<w; j++) {
+                particle = image_clone_region(img, j, i, 1, 1);
                 level_create_particle(particle, v2d_new(x+j, y+i), v2d_new((j - image_width(img)/2) + (random(image_width(img)) - image_width(img)/2), i - random(image_height(img)/2)), FALSE);
             }
         }
 
+        /* done */
         item->state = IS_DEAD;
-#endif
     }
 }
 

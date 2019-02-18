@@ -36,7 +36,7 @@
 #define BOX_PADDING             15
 
 static font_t *title, *label, *quitlabel;
-static image_t *buf;
+static image_t *background;
 static input_t *in;
 
 static const char text[] = 
@@ -95,9 +95,7 @@ void editorhelp_init(void *foo)
     font_set_text(quitlabel, "[press <color=ff8060>ESC</color>]");
     font_set_position(quitlabel, v2d_new(BOX_XPOS + BOX_WIDTH - BOX_PADDING - font_get_textsize(quitlabel).x, BOX_YPOS + BOX_PADDING));
 
-    buf = image_create(image_width(video_get_backbuffer()), image_height(video_get_backbuffer()));
-    image_clear(buf, image_rgb(18, 18, 18));
-    image_draw_trans(video_get_backbuffer(), buf, 0, 0, 0.15f, IF_NONE);
+    background = image_clone(video_get_backbuffer());
 
     in = input_create_user("editorhelp");
     sound_play(SFX_CONFIRM);
@@ -126,7 +124,8 @@ void editorhelp_update()
 void editorhelp_render()
 {
     v2d_t v = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-    image_blit(buf, video_get_backbuffer(), 0, 0, 0, 0, image_width(buf), image_height(buf));
+    image_clear(video_get_backbuffer(), image_rgb(18, 18, 18));
+    image_draw_trans(background, video_get_backbuffer(), 0, 0, 0.15f, IF_NONE);
     image_rectfill(video_get_backbuffer(), BOX_XPOS, BOX_YPOS, BOX_XPOS + BOX_WIDTH - 1, BOX_YPOS + BOX_HEIGHT - 1, image_rgb(40, 44, 52));
     font_render(title, v);
     font_render(label, v);
@@ -144,7 +143,7 @@ void editorhelp_release()
     sound_play(SFX_BACK);
 
     input_destroy(in);
-    image_destroy(buf);
+    image_destroy(background);
     font_destroy(quitlabel);
     font_destroy(label);
     font_destroy(title);

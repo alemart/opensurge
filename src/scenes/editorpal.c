@@ -52,7 +52,7 @@ static int selected_item;
 static int scroll_y = 0; /* initial value */
 static int scroll_max;
 static int item_at(v2d_t position);
-static void draw_item(image_t* dest, int item_number, v2d_t center);
+static void draw_item(int item_number, v2d_t center);
 
 
 
@@ -100,9 +100,7 @@ void editorpal_init(void *config_ptr)
     cursor_position = v2d_new(0, 0);
 
     /* configure the background */
-    background = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-    image_clear(background, image_rgb(18, 18, 18));
-    image_draw_trans(video_get_backbuffer(), background, 0, 0, 0.15f, IF_NONE);
+    background = image_clone(video_get_backbuffer());
 
     /* misc */
     selected_item = NO_ITEM;
@@ -219,7 +217,8 @@ void editorpal_render()
     int i, x, y, active_item = NO_ITEM;
 
     /* render the background */
-    image_blit(background, video_get_backbuffer(), 0, 0, 0, 0, image_width(background), image_height(background));
+    image_clear(video_get_backbuffer(), image_rgb(18, 18, 18));
+    image_draw_trans(background, video_get_backbuffer(), 0, 0, 0.15f, IF_NONE);
 
     /* render the active item background */
     active_item = item_at(cursor_position);
@@ -233,7 +232,7 @@ void editorpal_render()
     for(i = 0; i < item_count; i++) {
         x = ((i - base) % w) * ITEM_BOX_SIZE + ITEM_BOX_SIZE / 2;
         y = ((i - base) / w) * ITEM_BOX_SIZE + ITEM_BOX_SIZE / 2;
-        draw_item(video_get_backbuffer(), i, v2d_new(x, y));
+        draw_item(i, v2d_new(x, y));
     }
 
     /* render the scrollbar */
@@ -287,7 +286,7 @@ int item_at(v2d_t position)
 }
 
 /* draws the given item centered at the specified position */
-void draw_item(image_t* dest, int item_number, v2d_t center)
+void draw_item(int item_number, v2d_t center)
 {
     if(item_number >= 0 && item_number < item_count) {
         const image_t* image = item[item_number];
@@ -295,6 +294,6 @@ void draw_item(image_t* dest, int item_number, v2d_t center)
         int height = image_height(image);
         float factor = min((float)ITEM_SPRITE_MAXSIZE / max(width, height), ITEM_MAX_ZOOM);
         v2d_t scale = v2d_new(factor, factor);
-        image_draw_scaled(image, dest, center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
+        image_draw_scaled(image, video_get_backbuffer(), center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
     }
 }

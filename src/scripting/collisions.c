@@ -571,10 +571,7 @@ surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const s
         int t = top - (camera.y - VIDEO_SCREEN_H / 2);
         int b = bottom - (camera.y - VIDEO_SCREEN_H / 2) - 1;
         
-        image_line(video_get_backbuffer(), l, t, r, t, color);
-        image_line(video_get_backbuffer(), r, t, r, b, color);
-        image_line(video_get_backbuffer(), r, b, l, b, color);
-        image_line(video_get_backbuffer(), l, b, l, t, color);
+        image_rect(video_get_backbuffer(), l, t, r, b, color);
     }
 
     return NULL;
