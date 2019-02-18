@@ -213,9 +213,6 @@ int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_
                 img = actor_image(other);
                 if(p.x >= other->position.x - other->hot_spot.x && p.x < other->position.x - other->hot_spot.x + image_width(img)) {
                     if(p.y >= other->position.y - other->hot_spot.y && p.y < other->position.y - other->hot_spot.y + image_height(img)) {
-                        /*v2d_t q = v2d_subtract(p, v2d_subtract(other->position, other->hot_spot));
-                        if(image_getpixel(img, (int)q.x, (int)q.y) != video_get_maskcolor())
-                            return TRUE;*/
                         return TRUE;
                     }
                 }
@@ -228,9 +225,6 @@ int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_
                 img = actor_image(other);
                 if(p.x >= other->position.x - other->hot_spot.x && p.x < other->position.x - other->hot_spot.x + image_width(img)) {
                     if(p.y >= other->position.y - other->hot_spot.y && p.y < other->position.y - other->hot_spot.y + image_height(img)) {
-                        /*v2d_t q = v2d_subtract(p, v2d_subtract(other->position, other->hot_spot));
-                        if(image_getpixel(img, (int)q.x, (int)q.y) != video_get_maskcolor())
-                            return TRUE;*/
                         return TRUE;
                     }
                 }
