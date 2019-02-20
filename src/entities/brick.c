@@ -30,6 +30,7 @@
 #include "../scenes/level.h"
 #include "../core/global.h"
 #include "../core/video.h"
+#include "../core/image.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/assetfs.h"
@@ -408,7 +409,7 @@ void brick_render(brick_t *brk, v2d_t camera_position)
     if(brk->layer == BRL_DEFAULT || !level_editmode())
         image_draw(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
     else
-        image_draw_translit(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), 0.5f, get_image_flags(brk));
+        image_draw_tinted(brick_image(brk), video_get_backbuffer(), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), get_image_flags(brk));
 }
 
 
@@ -427,7 +428,7 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
     float rx, ry, sx, sy, ph, off;
     int w = brick_size(brk).x;
     int h = brick_size(brk).y;
-    uint32 color = image_rgb(255, 0, 0);
+    color_t color = color_rgb(255, 0, 0);
     v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
     switch(brk->brick_ref->behavior) {
@@ -680,12 +681,12 @@ const char* brick_util_behaviorname(brickbehavior_t behavior)
 }
 
 /* utilities */
-uint32 brick_util_layercolor(bricklayer_t layer)
+color_t brick_util_layercolor(bricklayer_t layer)
 {
     switch(layer) {
-        case BRL_GREEN:     return image_rgb(0,255,0);
-        case BRL_YELLOW:    return image_rgb(255,255,0);
-        default:            return image_rgb(255,255,255);
+        case BRL_GREEN:     return color_rgba(0, 255, 0, 128);
+        case BRL_YELLOW:    return color_rgba(255, 255, 0, 128);
+        default:            return color_rgba(255, 255, 255, 0);
     }
 }
 

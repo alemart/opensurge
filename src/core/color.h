@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * fadefx.h - fade effects
- * Copyright (C) 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * color.h - color utility
+ * Copyright (C) 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,20 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _FADEFX_H
-#define _FADEFX_H
+#ifndef _COLOR_H
+#define _COLOR_H
 
-#include "color.h"
+#include <stdbool.h>
+#include "global.h"
 
-/* easy-to-use interface */
-void fadefx_in(color_t color, float seconds); /* fade in */
-void fadefx_out(color_t color, float seconds); /* fade out */
-int fadefx_over(); /* end of fade effect? (only one action when this event loops) */
-int fadefx_is_fading(); /* is the fade effect ocurring? */
+/* color type */
+typedef struct color_t {
+    int _value;
+} color_t;
 
-/* engine routines */
-void fadefx_init();
-void fadefx_release();
-void fadefx_update();
+/* public API */
+color_t color_rgb(uint8 r, uint8 g, uint8 b);
+color_t color_rgba(uint8 r, uint8 g, uint8 b, uint8 a);
+color_t color_hex(const char* hex_string);
+void color_unmap(color_t color, uint8* r, uint8* g, uint8* b, uint8* a);
+bool color_equals(color_t a, color_t b);
+color_t color_mask();
 
 #endif

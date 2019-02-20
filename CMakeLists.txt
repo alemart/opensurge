@@ -214,6 +214,7 @@ SET(
   src/core/zip/zip.c
   src/core/assetfs.c
   src/core/audio.c
+  src/core/color.c
   src/core/commandline.c
   src/core/engine.c
   src/core/font.c
@@ -368,6 +369,7 @@ IF(WIN32)
       src/core/zip/zip.c
       src/core/assetfs.h
       src/core/audio.h
+      src/core/color.h
       src/core/commandline.h
       src/core/engine.h
       src/core/font.h

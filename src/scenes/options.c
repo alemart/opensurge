@@ -26,6 +26,7 @@
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/fadefx.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/audio.h"
 #include "../core/lang.h"
@@ -132,7 +133,7 @@ void options_update()
 
     /* fade in */
     if(fadein) {
-        fadefx_in(image_rgb(0,0,0), 1.0);
+        fadefx_in(color_rgb(0,0,0), 1.0);
         fadein = FALSE;
     }
 
@@ -178,7 +179,7 @@ void options_update()
             scenestack_pop();
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0);
     }
 
     /* pushing a scene into the stack */
@@ -197,7 +198,7 @@ void options_update()
             fadein = TRUE;
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0);
     }
 }
 

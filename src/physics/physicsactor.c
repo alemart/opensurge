@@ -25,6 +25,7 @@
 #include "obstacle.h"
 #include "../core/util.h"
 #include "../core/image.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/input.h"
 #include "../core/timer.h"
@@ -268,26 +269,26 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
     
     /* sensors */
-    pa->A_normal = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
-    pa->B_normal = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
-    pa->C_normal = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
-    pa->D_normal = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
-    pa->M_normal = sensor_create_horizontal(4, -10, 10, image_rgb(255,0,0)); /* use 9 (sensor A) + 1 */
-    pa->U_normal = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
+    pa->A_normal = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
+    pa->B_normal = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
+    pa->C_normal = sensor_create_vertical(-9, -24, 0, color_rgb(0,128,0));
+    pa->D_normal = sensor_create_vertical(9, -24, 0, color_rgb(128,128,0));
+    pa->M_normal = sensor_create_horizontal(4, -10, 10, color_rgb(255,0,0)); /* use 9 (sensor A) + 1 */
+    pa->U_normal = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
 
-    pa->A_intheair = sensor_create_vertical(-9, 0, 20, image_rgb(0,255,0));
-    pa->B_intheair = sensor_create_vertical(9, 0, 20, image_rgb(255,255,0));
-    pa->C_intheair = sensor_create_vertical(-9, -24, 0, image_rgb(0,128,0));
-    pa->D_intheair = sensor_create_vertical(9, -24, 0, image_rgb(128,128,0));
-    pa->M_intheair = sensor_create_horizontal(0, -11, 11, image_rgb(255,0,0)); /* use 10 (sensor M_normal) + 1 */
-    pa->U_intheair = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
+    pa->A_intheair = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
+    pa->B_intheair = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
+    pa->C_intheair = sensor_create_vertical(-9, -24, 0, color_rgb(0,128,0));
+    pa->D_intheair = sensor_create_vertical(9, -24, 0, color_rgb(128,128,0));
+    pa->M_intheair = sensor_create_horizontal(0, -11, 11, color_rgb(255,0,0)); /* use 10 (sensor M_normal) + 1 */
+    pa->U_intheair = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-4, 0, 18, image_rgb(0,255,0)); /* use 9 (sensor A) / 2 */
-    pa->B_jumproll = sensor_create_vertical(4, 0, 18, image_rgb(255,255,0)); /* use 20 (sensor A) - 2 */
-    pa->C_jumproll = sensor_create_vertical(-4, -10, 0, image_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(4, -10, 0, image_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -10, 10, image_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-24, -9, 9, image_rgb(255,255,255));
+    pa->A_jumproll = sensor_create_vertical(-4, 0, 18, color_rgb(0,255,0)); /* use 9 (sensor A) / 2 */
+    pa->B_jumproll = sensor_create_vertical(4, 0, 18, color_rgb(255,255,0)); /* use 20 (sensor A) - 2 */
+    pa->C_jumproll = sensor_create_vertical(-4, -10, 0, color_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(4, -10, 0, color_rgb(128,128,0));
+    pa->M_jumproll = sensor_create_horizontal(0, -10, 10, color_rgb(255,0,0));
+    pa->U_jumproll = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
 
     /* success!!! ;-) */
     return pa;

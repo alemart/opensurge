@@ -27,6 +27,7 @@
 #include <jpgalleg.h>
 #include "hqx/hqx.h"
 #include "video.h"
+#include "image.h"
 #include "timer.h"
 #include "logfile.h"
 #include "util.h"
@@ -413,16 +414,6 @@ int video_is_window_active()
     return window_active;
 }
 
-
-
-/*
- * video_get_maskcolor()
- * Returns the mask color
- */
-uint32 video_get_maskcolor()
-{
-    return makecol(255, 0, 255);
-}
 
 
 /*

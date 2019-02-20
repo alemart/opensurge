@@ -32,6 +32,7 @@
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/audio.h"
 #include "../core/lang.h"
@@ -133,7 +134,7 @@ void stageselect_init(void *should_enable_debug)
     load_stage_list();
     bgtheme = background_load(STAGE_BGFILE);
 
-    fadefx_in(image_rgb(0,0,0), 1.0);
+    fadefx_in(color_rgb(0,0,0), 1.0);
 }
 
 
@@ -234,7 +235,7 @@ void stageselect_update()
                 scenestack_pop();
                 return;
             }
-            fadefx_out(image_rgb(0,0,0), 1.0);
+            fadefx_out(color_rgb(0,0,0), 1.0);
             break;
         }
 
@@ -254,13 +255,13 @@ void stageselect_update()
                 state = STAGESTATE_FADEIN;
                 return;
             }
-            fadefx_out(image_rgb(0,0,0), 1.0);
+            fadefx_out(color_rgb(0,0,0), 1.0);
             break;
         }
 
         /* fade-in effect (after playing a level) */
         case STAGESTATE_FADEIN: {
-            fadefx_in(image_rgb(0,0,0), 1.0);
+            fadefx_in(color_rgb(0,0,0), 1.0);
             state = STAGESTATE_NORMAL;
             break;
         }

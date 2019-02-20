@@ -23,6 +23,7 @@
 #include "../../core/util.h"
 #include "../../core/audio.h"
 #include "../../core/video.h"
+#include "../../core/color.h"
 #include "../../core/timer.h"
 #include "../../core/stringutil.h"
 #include "../../core/soundfactory.h"
@@ -297,7 +298,7 @@ void spring_render(item_t* item, v2d_t camera_position)
     int y1 = (item->actor->position.y) + (me->box_offset.y - me->box_size.y/2.0f) - (camera_position.y - (VIDEO_SCREEN_H / 2));
     int x2 = (item->actor->position.x) + (me->box_offset.x + me->box_size.x/2.0f) - (camera_position.x - (VIDEO_SCREEN_W / 2));
     int y2 = (item->actor->position.y) + (me->box_offset.y + me->box_size.y/2.0f) - (camera_position.y - (VIDEO_SCREEN_H / 2));
-    image_rect(video_get_backbuffer(), x1, y1, x2, y2, image_rgb(255,255,0));
+    image_rect(video_get_backbuffer(), x1, y1, x2, y2, color_rgb(255,255,0));
 #endif
     actor_render(item->actor, camera_position);
 }

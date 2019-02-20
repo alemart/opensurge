@@ -338,9 +338,9 @@ int image_height(const image_t *img)
  * image_getpixel()
  * Returns the pixel at the given position on the image
  */
-uint32 image_getpixel(const image_t *img, int x, int y)
+color_t image_getpixel(const image_t *img, int x, int y)
 {
-    return getpixel(img->data, x, y);
+    return (color_t){ getpixel(img->data, x, y) };
 }
 
 
@@ -348,9 +348,9 @@ uint32 image_getpixel(const image_t *img, int x, int y)
  * image_putpixel()
  * Plots a pixel into the given image
  */
-void image_putpixel(image_t *img, int x, int y, uint32 color)
+void image_putpixel(image_t *img, int x, int y, color_t color)
 {
-    putpixel(img->data, x, y, color);
+    putpixel(img->data, x, y, color._value);
 }
 
 
@@ -358,9 +358,9 @@ void image_putpixel(image_t *img, int x, int y, uint32 color)
  * image_line()
  * Draws a line from (x1,y1) to (x2,y2) using the specified color
  */
-void image_line(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
+void image_line(image_t *img, int x1, int y1, int x2, int y2, color_t color)
 {
-    line(img->data, x1, y1, x2, y2, color);
+    line(img->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -368,9 +368,9 @@ void image_line(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
  * image_ellipse()
  * Draws an ellipse with the specified centre, radius and color
  */
-void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, uint32 color)
+void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, color_t color)
 {
-    ellipse(img->data, cx, cy, radius_x, radius_y, color);
+    ellipse(img->data, cx, cy, radius_x, radius_y, color._value);
 }
 
 
@@ -378,9 +378,9 @@ void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, uin
  * image_rectfill()
  * Draws a filled rectangle
  */
-void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
+void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, color_t color)
 {
-    rectfill(img->data, x1, y1, x2, y2, color);
+    rectfill(img->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -388,9 +388,9 @@ void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
  * image_rect()
  * Draws a rectangle
  */
-void image_rect(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
+void image_rect(image_t *img, int x1, int y1, int x2, int y2, color_t color)
 {
-    rect(img->data, x1, y1, x2, y2, color);
+    rect(img->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -398,7 +398,7 @@ void image_rect(image_t *img, int x1, int y1, int x2, int y2, uint32 color)
  * image_waterfx()
  * pixels below y will have a water effect
  */
-void image_waterfx(image_t *img, int y, uint32 color)
+void image_waterfx(image_t *img, int y, color_t color)
 {
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
     fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
@@ -413,9 +413,9 @@ void image_waterfx(image_t *img, int y, uint32 color)
     y = clip(y, 0, img->h);
 
     /* water color */
-    wr = fast_getr(color);
-    wg = fast_getg(color);
-    wb = fast_getb(color);
+    wr = fast_getr(color._value);
+    wg = fast_getg(color._value);
+    wb = fast_getb(color._value);
 
     /* water effect */
     if(video_get_color_depth() > 16) {
@@ -431,60 +431,10 @@ void image_waterfx(image_t *img, int y, uint32 color)
         /* fast "dithered" water, when bpp is not greater than 16 (slow computers?) */
         for(j=y; j<img->h; j++) {
             for(i=j%2; i<img->w; i+=2) {
-                fast_putpixel(img->data, i, j, color);
+                fast_putpixel(img->data, i, j, color._value);
             }
         }
     }
-}
-
-/*
- * image_rgb()
- * Generates a uint32 color
- */
-uint32 image_rgb(uint8 r, uint8 g, uint8 b)
-{
-    return makecol(r,g,b);
-}
-
-
-/*
- * image_color2rgb()
- * Converts a uint32 to a (r,g,b) triple
- */
-void image_color2rgb(uint32 color, uint8 *r, uint8 *g, uint8 *b)
-{
-    if(r) *r = getr(color);
-    if(g) *g = getg(color);
-    if(b) *b = getb(color);
-}
-
-
-/*
- * image_hex2rgb()
- * Converts a 6-character RGB hex string to a uint32 color
- * Example: "ffffff" becomes white
- */
-uint32 image_hex2rgb(const char* hex)
-{
-    char buf[7] = "000000", *p, c;
-    uint8 r, g, b;
-
-    /* sanitize hex RGB color */
-    for(p = buf; *p && *hex; p++) {
-        c = tolower(*hex++);
-        if(c >= 'a' && c <= 'f')
-            *p = c - 'a' + 10;
-        else if(c >= '0' && c <= '9')
-            *p = c - '0';
-    }
-
-    /* obtain colors */
-    r = buf[0] * 16 + buf[1];
-    g = buf[2] * 16 + buf[3];
-    b = buf[4] * 16 + buf[5];
-
-    /* done! */
-    return image_rgb(r, g, b);
 }
 
 
@@ -492,9 +442,9 @@ uint32 image_hex2rgb(const char* hex)
  * image_clear()
  * Clears an given image with some color
  */
-void image_clear(image_t *img, uint32 color)
+void image_clear(image_t *img, color_t color)
 {
-    clear_to_color(img->data, color);
+    clear_to_color(img->data, color._value);
 }
 
 
@@ -593,8 +543,7 @@ void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, 
 /*
  * image_draw_trans()
  * Draws a translucent image
- *
- * alpha: 0.0 (invisible) <= alpha <= 1.0 (opaque)
+ * 0.0 (invisible) <= alpha <= 1.0 (opaque)
  */
 void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, uint32 flags)
 {
@@ -602,13 +551,12 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
     int a;
 
     if(video_get_color_depth() > 8) {
-        alpha = clip(alpha, 0.0, 1.0);
-        a = (int)(255 * alpha);
+        a = 255 * clip(alpha, 0.0f, 1.0f);
         set_trans_blender(a, a, a, a);
 
         if(flags != IF_NONE) {
             tmp = image_create(src->w, src->h);
-            image_clear(tmp, video_get_maskcolor());
+            clear_to_color(tmp->data, color_mask()._value);
             image_draw(src, tmp, 0, 0, flags);
             draw_trans_sprite(dest->data, tmp->data, x, y);
             image_destroy(tmp);
@@ -623,25 +571,23 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
 
 
 /*
- * image_draw_translit()
+ * image_draw_tinted()
  * Draws an image tinted with a specific color
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_translit(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags)
+void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t color, uint32 flags)
 {
     image_t *tmp;
-    uint8 r, g, b;
-    int a;
+    uint8 r, g, b, a;
 
     if(video_get_color_depth() > 8) {
-        alpha = clip(alpha, 0.0, 1.0);
-        image_color2rgb(color, &r, &g, &b);
-        a = (int)(255 * alpha);
+        color_unmap(color, &r, &g, &b, &a);
         set_trans_blender(r, g, b, a);
+        a = video_get_color_depth() < 32 ? 128 : a;
 
         if(flags != IF_NONE) {
             tmp = image_create(src->w, src->h);
-            image_clear(tmp, video_get_maskcolor());
+            clear_to_color(tmp->data, color_mask()._value);
             image_draw(src, tmp, 0, 0, flags);
             draw_lit_sprite(dest->data, tmp->data, x, y, a);
             image_destroy(tmp);
@@ -658,27 +604,24 @@ void image_draw_translit(const image_t *src, image_t *dest, int x, int y, uint32
  * Image blending: multiplication mode
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, uint32 color, float alpha, uint32 flags)
+void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_t color, uint32 flags)
 {
     image_t *tmp;
-    uint8 r, g, b;
-    int a;
+    uint8 r, g, b, a;
 
     if(video_get_color_depth() > 8) {
-        alpha = clip(alpha, 0.0, 1.0);
-        image_color2rgb(color, &r, &g, &b);
-        a = (int)(255 * alpha);
+        color_unmap(color, &r, &g, &b, &a);
         set_multiply_blender(r, g, b, a);
 
         if(flags != IF_NONE) {
             tmp = image_create(src->w, src->h);
-            image_clear(tmp, video_get_maskcolor());
+            clear_to_color(tmp->data, color_mask()._value);
             image_draw(src, tmp, 0, 0, flags);
-            draw_lit_sprite(dest->data, tmp->data, x, y, a);
+            draw_lit_sprite(dest->data, tmp->data, x, y, 255);
             image_destroy(tmp);
         }
         else
-            draw_lit_sprite(dest->data, src->data, x, y, a);
+            draw_lit_sprite(dest->data, src->data, x, y, 255);
     }
     else
         image_draw(src, dest, x, y, flags);
@@ -698,19 +641,19 @@ void maskcolor_bugfix(image_t *img)
     int i, j;
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
     fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
-    uint32 mask = video_get_maskcolor();
-    uint8 pixel_r, pixel_g, pixel_b, mask_r, mask_g, mask_b;
-    image_color2rgb(mask, &mask_r, &mask_g, &mask_b);
+    uint8 pixel_r, pixel_g, pixel_b, pixel_a, mask_r, mask_g, mask_b;
+    color_t pixel, mask = color_mask();
 
+    color_unmap(mask, &mask_r, &mask_g, &mask_b, NULL);
     for(j=0; j<img->h; j++) {
         for(i=0; i<img->w; i++) {
-            image_color2rgb(fast_getpixel(img->data, i, j), &pixel_r, &pixel_g, &pixel_b);
+            pixel = (color_t){ fast_getpixel(img->data, i, j) };
+            color_unmap(pixel, &pixel_r, &pixel_g, &pixel_b, &pixel_a);
             if(pixel_r == mask_r && pixel_g == mask_g && pixel_b == mask_b)
-                fast_putpixel(img->data, i, j, mask);
+                fast_putpixel(img->data, i, j, mask._value);
         }
     }
 }
-
 
 /*
  * fast_getpixel_ptr()

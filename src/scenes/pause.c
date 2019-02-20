@@ -26,6 +26,7 @@
 #include "../core/storyboard.h"
 #include "../core/util.h"
 #include "../core/fadefx.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/input.h"
 #include "../core/lang.h"
@@ -99,7 +100,7 @@ void pause_update()
             quest_abort();
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0);
         return;
     }
 

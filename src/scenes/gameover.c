@@ -25,7 +25,9 @@
 #include "../core/audio.h"
 #include "../core/util.h"
 #include "../core/fadefx.h"
+#include "../core/color.h"
 #include "../core/video.h"
+#include "../core/image.h"
 #include "../core/timer.h"
 
 
@@ -83,7 +85,7 @@ void gameover_update()
             scenestack_pop();
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 2);
+        fadefx_out(color_rgb(0,0,0), 2);
     }
 
     /* "game over" text */

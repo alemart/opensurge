@@ -3201,7 +3201,7 @@ void lockcamera_render(objectmachine_t *obj, v2d_t camera_position)
     if(level_editmode()) {
         objectdecorator_lockcamera_t *me = (objectdecorator_lockcamera_t*)obj;
         actor_t *act = obj->get_object_instance(obj)->actor;
-        uint32 color = image_rgb(255, 0, 0);
+        color_t color = color_rgb(255, 0, 0);
         int x1, y1, x2, y2;
 
         x1 = (act->position.x + me->_x1) - (camera_position.x - VIDEO_SCREEN_W/2);

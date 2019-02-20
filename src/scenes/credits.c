@@ -23,6 +23,7 @@
 #include "options.h"
 #include "../core/util.h"
 #include "../core/fadefx.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/audio.h"
 #include "../core/lang.h"
@@ -87,7 +88,7 @@ void credits_init(void *foo)
 
     bgtheme = background_load(CREDITS_BGFILE);
 
-    fadefx_in(image_rgb(0,0,0), 1.0);
+    fadefx_in(color_rgb(0,0,0), 1.0);
 
     /* done! */
     free(credits_text);
@@ -152,7 +153,7 @@ void credits_update()
                 scenestack_push(next_scene, NULL);
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0);
     }
 }
 

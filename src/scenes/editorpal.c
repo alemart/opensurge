@@ -24,6 +24,7 @@
 #include "../core/audio.h"
 #include "../core/soundfactory.h"
 #include "../core/util.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/sprite.h"
@@ -217,7 +218,7 @@ void editorpal_render()
     int i, x, y, active_item = NO_ITEM;
 
     /* render the background */
-    image_clear(video_get_backbuffer(), image_rgb(18, 18, 18));
+    image_clear(video_get_backbuffer(), color_rgb(18, 18, 18));
     image_draw_trans(background, video_get_backbuffer(), 0, 0, 0.15f, IF_NONE);
 
     /* render the active item background */
@@ -225,7 +226,7 @@ void editorpal_render()
     if(active_item >= 0) {
         x = ((active_item - base) % w) * ITEM_BOX_SIZE;
         y = ((active_item - base) / w) * ITEM_BOX_SIZE;
-        image_rectfill(video_get_backbuffer(), x, y, x + ITEM_BOX_SIZE - 1, y + ITEM_BOX_SIZE - 1, image_rgb(72, 74, 79));
+        image_rectfill(video_get_backbuffer(), x, y, x + ITEM_BOX_SIZE - 1, y + ITEM_BOX_SIZE - 1, color_rgb(72, 74, 79));
     }
 
     /* render the items */
@@ -240,8 +241,8 @@ void editorpal_render()
         int num_steps = 1 + scroll_max / ITEM_BOX_SIZE;
         int curr_step = scroll_y / ITEM_BOX_SIZE;
         int ypos = VIDEO_SCREEN_H * curr_step / num_steps;
-        image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, image_rgb(40, 44, 52));
-        image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, ypos, VIDEO_SCREEN_W, ypos + VIDEO_SCREEN_H / num_steps, image_rgb(72, 74, 79));
+        image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(40, 44, 52));
+        image_rectfill(video_get_backbuffer(), VIDEO_SCREEN_W - SCROLLBAR_WIDTH, ypos, VIDEO_SCREEN_W, ypos + VIDEO_SCREEN_H / num_steps, color_rgb(72, 74, 79));
     }
 
     /* render the error message (if any) */

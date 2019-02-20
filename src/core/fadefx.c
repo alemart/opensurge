@@ -24,12 +24,10 @@
 #include "timer.h"
 #include "util.h"
 
-#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
-
 /* Fade-in & fade-out */
 static enum { FADEFX_NONE, FADEFX_IN, FADEFX_OUT } type;
 static int end;
-static uint32 fade_color;
+static color_t fade_color;
 static float elapsed_time;
 static float total_time;
 
@@ -81,18 +79,18 @@ void fadefx_update()
         n = (type == FADEFX_IN) ? (255 - n) : n;
         drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
         set_trans_blender(0, 0, 0, n);
-        rectfill(IMAGE2BITMAP(video_get_backbuffer()), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
+        image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
         solid_mode();
     }
     else if(end && gambiarra)
-        rectfill(IMAGE2BITMAP(video_get_backbuffer()), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
+        image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
 }
 
 /*
  * fadefx_in()
  * Fade-in effect
  */
-void fadefx_in(uint32 color, float seconds)
+void fadefx_in(color_t color, float seconds)
 {
     if(type == FADEFX_NONE) {
         type = FADEFX_IN;
@@ -107,7 +105,7 @@ void fadefx_in(uint32 color, float seconds)
  * fadefx_out()
  * Fade-out effect
  */
-void fadefx_out(uint32 color, float seconds)
+void fadefx_out(color_t color, float seconds)
 {
     if(type == FADEFX_NONE) {
         type = FADEFX_OUT;

@@ -30,7 +30,7 @@ struct sensor_t
 {
     /* a sensor is a segment (x1,y1)~(x2,y2) such that x1=x2 or y1=y2 */
     int x1, y1, x2, y2; /* coordinates relative to the physics actor */
-    uint32 color; /* color of the sensor (used for rendering) */
+    color_t color; /* color of the sensor (used for rendering) */
 
     sensorstate_t *floormode;
     sensorstate_t *rightwallmode;
@@ -42,7 +42,7 @@ struct sensor_t
 static sensorstate_t* get_active_state(const sensor_t *sensor, movmode_t mm);
 
 /* public methods */
-sensor_t* sensor_create_horizontal(int y, int x1, int x2, uint32 color)
+sensor_t* sensor_create_horizontal(int y, int x1, int x2, color_t color)
 {
     sensor_t *s = mallocx(sizeof *s);
 
@@ -60,7 +60,7 @@ sensor_t* sensor_create_horizontal(int y, int x1, int x2, uint32 color)
     return s;
 }
 
-sensor_t* sensor_create_vertical(int x, int y1, int y2, uint32 color)
+sensor_t* sensor_create_vertical(int x, int y1, int y2, color_t color)
 {
     sensor_t *s = mallocx(sizeof *s);
 
@@ -136,7 +136,7 @@ int sensor_get_y2(const sensor_t *sensor)
     return sensor->y2;
 }
 
-uint32 sensor_get_color(const sensor_t *sensor)
+color_t sensor_get_color(const sensor_t *sensor)
 {
     return sensor->color;
 }

@@ -22,7 +22,7 @@
 #define _BRICK_H
 
 #include "../core/v2d.h"
-#include "../core/image.h"
+#include "../core/color.h"
 
 /* brick type */
 enum bricktype_t
@@ -63,6 +63,7 @@ struct enemy_list_t;
 struct obstacle_t;
 struct brickdata_t;
 struct brick_t;
+struct image_t;
 
 /* typedefs */
 typedef struct brick_t brick_t;
@@ -96,7 +97,7 @@ bricktype_t brick_type(const brick_t* brk); /* brick type */
 brickbehavior_t brick_behavior(const brick_t* brk); /* brick behavior */
 bricklayer_t brick_layer(const brick_t* brk); /* brick layer */
 brickflip_t brick_flip(const brick_t* brk); /* brick flip status */
-const image_t* brick_image(const brick_t *brk); /* returns the image of the brick */
+const struct image_t* brick_image(const brick_t *brk); /* returns the image of the brick */
 const struct obstacle_t* brick_obstacle(const brick_t* brk); /* returns the obstacle associated with this brick (may be NULL) */
 float brick_zindex(const brick_t* brk); /* brick zindex */
 v2d_t brick_position(const brick_t* brk); /* brick position */
@@ -107,7 +108,7 @@ int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
 
 /* brick utilities */
 int brick_exists(int id); /* does a brick with the given id exist in the brickset? */
-uint32 brick_util_layercolor(bricklayer_t layer);
+color_t brick_util_layercolor(bricklayer_t layer);
 bricklayer_t brick_util_layercode(const char *name);
 brickflip_t brick_util_flipcode(const char* str);
 const char* brick_util_typename(bricktype_t type); /* type name */
@@ -116,7 +117,7 @@ const char* brick_util_layername(bricklayer_t layer); /* layer name */
 const char* brick_util_flipstr(brickflip_t flip); /* flip string */
 v2d_t brick_movable_platform_offset(const brick_t *brk); /* movable platforms must move actors on top of them. Returns a delta_space vector */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
-const image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
+const struct image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
 
 #endif

@@ -22,7 +22,7 @@
 #define _SENSOR_H
 
 #include "../core/v2d.h"
-#include "../core/global.h"
+#include "../core/color.h"
 
 /*
  * a sensor detects collisions between the
@@ -36,8 +36,8 @@ struct obstaclemap_t;
 enum movmode_t;
 
 /* create and destroy */
-sensor_t* sensor_create_horizontal(int y, int x1, int x2, uint32 color); /* factory method: new horizontal sensor */
-sensor_t* sensor_create_vertical(int x, int y1, int y2, uint32 color); /* factory method: new vertical sensor */
+sensor_t* sensor_create_horizontal(int y, int x1, int x2, color_t color); /* factory method: new horizontal sensor */
+sensor_t* sensor_create_vertical(int x, int y1, int y2, color_t color); /* factory method: new vertical sensor */
 sensor_t* sensor_destroy(sensor_t *sensor);
 
 /* public methods */
@@ -48,6 +48,6 @@ int sensor_get_x1(const sensor_t *sensor);
 int sensor_get_y1(const sensor_t *sensor);
 int sensor_get_x2(const sensor_t *sensor);
 int sensor_get_y2(const sensor_t *sensor);
-uint32 sensor_get_color(const sensor_t *sensor);
+color_t sensor_get_color(const sensor_t *sensor);
 
 #endif

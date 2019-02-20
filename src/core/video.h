@@ -21,8 +21,10 @@
 #ifndef _VIDEO_H
 #define _VIDEO_H
 
-#include "image.h"
 #include "v2d.h"
+#include "color.h"
+
+struct image_t;
 
 /* video modes */
 #define VIDEORESOLUTION_1X        0 /* original size */
@@ -38,19 +40,18 @@ void video_render();
 int video_get_desktop_color_depth();
 int video_get_color_depth();
 int video_is_window_active();
-uint32 video_get_maskcolor();
 void video_changemode(int resolution, int smooth, int fullscreen);
 int video_get_resolution();
 int video_is_smooth();
 int video_is_fullscreen();
 v2d_t video_get_screen_size(); /* usually, 426x240 */
 v2d_t video_get_window_size(); /* the real size of the window, in pixels */
-const image_t* video_get_window_surface();
+const struct image_t* video_get_window_surface();
 
 /* backbuffer */
 #define VIDEO_SCREEN_W            ((int)(video_get_screen_size().x))
 #define VIDEO_SCREEN_H            ((int)(video_get_screen_size().y))
-image_t *video_get_backbuffer();
+struct image_t *video_get_backbuffer();
 
 /* fps counter */
 void video_show_fps(int show);

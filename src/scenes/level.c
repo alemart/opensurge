@@ -118,7 +118,7 @@ static int is_startup_object(const char* object_name);
 #define DLGBOX_MAXTIME          7000
 #define TEAM_MAX                16
 #define DEFAULT_WATERLEVEL      INFINITY
-#define DEFAULT_WATERCOLOR      image_rgb(0,32,192)
+#define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)
 
 /* level attributes */
 static char file[1024];
@@ -152,7 +152,7 @@ static int must_push_a_quest;
 static char quest_to_be_pushed[1024];
 static float dead_player_timeout;
 static int waterlevel; /* in pixels */
-static uint32 watercolor;
+static color_t watercolor;
 
 /* player data */
 static player_t *team[TEAM_MAX]; /* players */
@@ -236,7 +236,7 @@ static int editor_want_to_activate();
 static void editor_update_background();
 static void editor_render_background();
 static void editor_movable_platforms_path_render(brick_list_t *major_bricks);
-static void editor_waterline_render(int ycoord, uint32 color);
+static void editor_waterline_render(int ycoord, color_t color);
 static void editor_save();
 static void editor_scroll();
 static int editor_is_eraser_enabled();
@@ -438,7 +438,7 @@ void level_load(const char *filepath)
     requires[2] = GAME_WIP_VERSION;
     readonly = FALSE;
     waterlevel = DEFAULT_WATERLEVEL;
-    watercolor = DEFAULT_WATERCOLOR;
+    watercolor = DEFAULT_WATERCOLOR();
 
     /* scripting: preparing a new Level... */
     cached_level_ssobject = NULL;
@@ -632,9 +632,9 @@ int level_save(const char *filepath)
     /* water */
     if(waterlevel != DEFAULT_WATERLEVEL)
         fprintf(fp, "waterlevel %d\n", waterlevel);
-    if(watercolor != DEFAULT_WATERCOLOR) {
+    if(!color_equals(watercolor, DEFAULT_WATERCOLOR())) {
         uint8 r, g, b;
-        image_color2rgb(watercolor, &r, &g, &b);
+        color_unmap(watercolor, &r, &g, &b, NULL);
         fprintf(fp, "watercolor %d %d %d\n", r, g, b);
     }
 
@@ -827,8 +827,13 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'waterlevel' expects one parameter: water level (y-coordinate, in pixels)");
     }
     else if(str_icmp(identifier, "watercolor") == 0) {
-        if(param_count == 3)
-            watercolor = image_rgb(atoi(param[0]), atoi(param[1]), atoi(param[2]));
+        if(param_count == 3) {
+            watercolor = color_rgb(
+                clip(atoi(param[0]), 0, 255),
+                clip(atoi(param[1]), 0, 255),
+                clip(atoi(param[2]), 0, 255)
+            );
+        }
         else
             logfile_message("Level loader - command 'watercolor' expects three parameters: red, green, blue");
     }
@@ -1137,7 +1142,7 @@ void level_update()
             quest_abort();
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0);
         return;
     }
 
@@ -1285,7 +1290,7 @@ void level_update()
                     restart(TRUE);
                     return;
                 }
-                fadefx_out(image_rgb(0,0,0), 1.0);
+                fadefx_out(color_rgb(0,0,0), 1.0);
             }
             else {
                 /* game over */
@@ -1888,7 +1893,7 @@ void level_set_waterlevel(int ycoord)
  * level_watercolor()
  * Returns the color of the water
  */
-uint32 level_watercolor()
+color_t level_watercolor()
 {
     return watercolor;
 }
@@ -1897,7 +1902,7 @@ uint32 level_watercolor()
  * level_set_watercolor()
  * Sets a new watercolor
  */
-void level_set_watercolor(uint32 color)
+void level_set_watercolor(color_t color)
 {
     watercolor = color;
 }
@@ -2997,10 +3002,10 @@ void editor_render()
     render_level(major_bricks, major_items, major_enemies);
 
     /* draw editor water line */
-    editor_waterline_render((int)(waterlevel - topleft.y), image_rgb(255, 255, 255));
+    editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
 
     /* top bar */
-    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, image_rgb(40, 44, 52));
+    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, color_rgb(40, 44, 52));
     font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
@@ -3014,7 +3019,7 @@ void editor_render()
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
-            image_draw_translit(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), 0.5f, IF_NONE);
+            image_draw_tinted(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
 
         /* cursor coordinates */
         font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
@@ -3114,7 +3119,7 @@ void editor_update_background()
  */
 void editor_render_background()
 {
-    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, image_rgb(40, 44, 52));
+    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(40, 44, 52));
     background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
 }
 
@@ -3137,7 +3142,7 @@ void editor_movable_platforms_path_render(brick_list_t *major_bricks)
  * editor_waterline_render()
  * Renders the line of the water
  */
-void editor_waterline_render(int ycoord, uint32 color)
+void editor_waterline_render(int ycoord, color_t color)
 {
     int x, x0 = 19 - (timer_get_ticks() / 25) % 20;
     image_t *buf = video_get_backbuffer();

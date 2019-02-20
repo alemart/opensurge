@@ -25,6 +25,7 @@
 #include "../../core/v2d.h"
 #include "../../core/util.h"
 #include "../../core/audio.h"
+#include "../../core/color.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
 #include "../../core/soundfactory.h"
@@ -135,7 +136,7 @@ void switch_render(item_t* item, v2d_t camera_position)
         offset = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
         p1 = v2d_subtract(item->actor->position, offset);
         p2 = v2d_subtract(me->partner->actor->position, offset);
-        image_line(video_get_backbuffer(), (int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, image_rgb(255, 0, 0));
+        image_line(video_get_backbuffer(), (int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, color_rgb(255, 0, 0));
     }
 
     actor_render(item->actor, camera_position);

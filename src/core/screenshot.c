@@ -22,6 +22,7 @@
 #include "screenshot.h"
 #include "assetfs.h"
 #include "logfile.h"
+#include "image.h"
 #include "video.h"
 #include "input.h"
 

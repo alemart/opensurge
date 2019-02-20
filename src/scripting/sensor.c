@@ -48,7 +48,7 @@ static v2d_t parent_camera(const surgescript_object_t* object);
 static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
-#define SENSOR_COLOR (image_hex2rgb("ffff00"))
+#define SENSOR_COLOR() (color_hex("ffff00"))
 static const int STATUS_NONE = 0;
 static const int STATUS_SOLID = 1;
 static const int STATUS_ONEWAY = 2;
@@ -131,11 +131,11 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
     /* create a new sensor */
     if(x1 == x2) {
-        sensor = sensor_create_vertical(x1, y1, y2, SENSOR_COLOR);
+        sensor = sensor_create_vertical(x1, y1, y2, SENSOR_COLOR());
         surgescript_object_set_userdata(object, sensor);
     }
     else if(y1 == y2) {
-        sensor = sensor_create_horizontal(y1, x1, x2, SENSOR_COLOR);
+        sensor = sensor_create_horizontal(y1, x1, x2, SENSOR_COLOR());
         surgescript_object_set_userdata(object, sensor);
     }
     else

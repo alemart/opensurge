@@ -28,6 +28,7 @@
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
+#include "../core/color.h"
 #include "../core/video.h"
 #include "../core/audio.h"
 #include "../core/lang.h"
@@ -113,7 +114,7 @@ void langselect_init(void *foo)
         return;
     }
 
-    fadefx_in(image_rgb(0,0,0), 1.0);
+    fadefx_in(color_rgb(0,0,0), 1.0);
 }
 
 
@@ -204,7 +205,7 @@ void langselect_update()
             scenestack_pop();
             return;
         }
-        fadefx_out(image_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0);
     }
 }
 

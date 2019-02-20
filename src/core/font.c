@@ -26,6 +26,8 @@
 #include <alfont.h>
 #include "font.h"
 #include "video.h"
+#include "image.h"
+#include "color.h"
 #include "stringutil.h"
 #include "assetfs.h"
 #include "lang.h"
@@ -98,7 +100,7 @@ struct fontscript_t {
 /* fontdrv_t: a font driver stores the attributes the font class (bmp, ttf) */
 typedef struct fontdrv_t fontdrv_t;
 struct fontdrv_t { /* abstract font: base class */
-    void (*textout)(const fontdrv_t*,const char*,int,int,uint32); /* prints a string */
+    void (*textout)(const fontdrv_t*,const char*,int,int,color_t); /* prints a string */
     v2d_t (*textsize)(const fontdrv_t*,const char*); /* text size, in pixels */
     v2d_t (*charspacing)(const fontdrv_t*); /* a pair (hspace, vspace) */
     void (*release)(fontdrv_t*); /* release the fontdrv_t */
@@ -113,7 +115,7 @@ struct fontdrv_bmp_t { /* bitmap font */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
 };
-static void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color);
+static void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_bmp_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_bmp_charspacing(const fontdrv_t *fnt);
 static void fontdrv_bmp_release(fontdrv_t *fnt);
@@ -125,7 +127,7 @@ struct fontdrv_ttf_t { /* truetype font */
     int antialias; /* enable antialiasing? */
     int shadow; /* enable shadow? */
 };
-static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color);
+static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt);
 static void fontdrv_ttf_release(fontdrv_t *fnt);
@@ -170,8 +172,8 @@ static inline int has_variables_to_expand(const char *str, int *passes);
 static void expand_variables(char *str, fontargs_t args, size_t size);
 static uint8 hex2dec(char digit);
 static void convert_to_ascii(char *str);
-static int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 color_stack[], int* stack_top);
-static int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align, int x, int y, uint32 color_stack[], int* stack_top);
+static int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t color_stack[], int* stack_top);
+static int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align, int x, int y, color_t color_stack[], int* stack_top);
 static char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width);
 static int find_blanks(int blank[], size_t size, const char* text);
 static char* tagged_text_offset(char* txt, int charnum);
@@ -366,7 +368,7 @@ void font_set_width(font_t *f, int w)
  */
 void font_render(const font_t *f, v2d_t camera_position)
 {
-    uint32 stack[FONT_STACKCAPACITY] = { image_rgb(255, 255, 255) }; /* color stack */
+    color_t stack[FONT_STACKCAPACITY] = { color_rgb(255, 255, 255) }; /* color stack */
     int stack_top = 0, offset = -1;
     char *p, *q, *s, *w, r = 0, t = 0;
     char *text = f->text;
@@ -638,7 +640,7 @@ void convert_to_ascii(char* str)
 
 /* will print a single line of text with the specified font,
    returning its height */
-int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 color_stack[], int* stack_top)
+int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t color_stack[], int* stack_top)
 {
     static char linebuf[FONT_TEXTMAXSIZE];
     char *p, *q;
@@ -680,7 +682,7 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 colo
                         uint8 g = (hex2dec(hex_code[2]) << 4) | hex2dec(hex_code[3]);
                         uint8 b = (hex2dec(hex_code[4]) << 4) | hex2dec(hex_code[5]);
                         _print_linebuf();
-                        color_stack[++(*stack_top)] = image_rgb(r, g, b);
+                        color_stack[++(*stack_top)] = color_rgb(r, g, b);
                     }
                 }
                 tag = 1;
@@ -717,7 +719,7 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, uint32 colo
 }
 
 /* print a line with a certain alignment, returning its height */
-int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align, int x, int y, uint32 color_stack[], int* stack_top)
+int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align, int x, int y, color_t color_stack[], int* stack_top)
 {
     int dx = 0;
 
@@ -1222,11 +1224,11 @@ fontdrv_t* fontdrv_bmp_new(const char *source_file, charproperties_t chr[], int 
     return (fontdrv_t*)f;
 }
 
-void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color)
+void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
     const fontdrv_bmp_t *f = (const fontdrv_bmp_t*)fnt;
     uint32 chr, n = sizeof(f->bmp) / sizeof(image_t*);
-    uint32 white = image_rgb(255, 255, 255);
+    color_t white = color_rgb(255, 255, 255);
     image_t *chimg, *img = video_get_backbuffer();
 
     /* currently, bitmap fonts only support the
@@ -1235,8 +1237,8 @@ void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, u
 
     for(size_t i = 0; (chr = u8_nextchar(text, &i)) != 0; ) {
         if(chr < n && (chimg = f->bmp[chr]) != NULL) {
-            if(color != white)
-                image_draw_multiply(chimg, img, x, y + f->line_height - image_height(chimg), color, 1.0f, IF_NONE);
+            if(!color_equals(color, white))
+                image_draw_multiply(chimg, img, x, y + f->line_height - image_height(chimg), color, IF_NONE);
             else
                 image_draw(chimg, img, x, y + f->line_height - image_height(chimg), IF_NONE);
             x += image_width(chimg) + (int)f->spacing.x;
@@ -1323,27 +1325,24 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int
     return (fontdrv_t*)f;
 }
 
-void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, uint32 color)
+void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     image_t *img = video_get_backbuffer();
 
     /* draw shadow */
     if(f->shadow) {
-        uint32 black = image_rgb(0, 0, 0);
-        /*alfont_set_font_outline_color(f->ttf, *((int*)&black));
-        alfont_set_font_outline_right(f->ttf, 1);*/
+        color_t black = color_rgb(0, 0, 0);
         alfont_set_font_style(f->ttf, STYLE_BOLD);
-        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y+1, *((int*)&black), -1);
+        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y+1, black._value, -1);
         alfont_set_font_style(f->ttf, STYLE_STANDARD);
-        /*alfont_set_font_outline_right(f->ttf, 0);*/
     }
 
     /* draw text */
     if(f->antialias)
-        alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, *((int*)&color), -1);
+        alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
     else
-        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, *((int*)&color), -1);
+        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
 }
 
 void fontdrv_ttf_release(fontdrv_t *fnt)

@@ -24,7 +24,9 @@
 #include "../core/audio.h"
 #include "../core/soundfactory.h"
 #include "../core/util.h"
+#include "../core/color.h"
 #include "../core/video.h"
+#include "../core/image.h"
 #include "../core/input.h"
 
 
@@ -124,9 +126,9 @@ void editorhelp_update()
 void editorhelp_render()
 {
     v2d_t v = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-    image_clear(video_get_backbuffer(), image_rgb(18, 18, 18));
+    image_clear(video_get_backbuffer(), color_rgb(18, 18, 18));
     image_draw_trans(background, video_get_backbuffer(), 0, 0, 0.15f, IF_NONE);
-    image_rectfill(video_get_backbuffer(), BOX_XPOS, BOX_YPOS, BOX_XPOS + BOX_WIDTH - 1, BOX_YPOS + BOX_HEIGHT - 1, image_rgb(40, 44, 52));
+    image_rectfill(video_get_backbuffer(), BOX_XPOS, BOX_YPOS, BOX_XPOS + BOX_WIDTH - 1, BOX_YPOS + BOX_HEIGHT - 1, color_rgb(40, 44, 52));
     font_render(title, v);
     font_render(label, v);
     font_render(quitlabel, v);

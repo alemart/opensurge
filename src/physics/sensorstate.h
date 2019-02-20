@@ -22,7 +22,7 @@
 #define _SENSORSTATE_H
 
 #include "../core/v2d.h"
-#include "../core/global.h"
+#include "../core/color.h"
 
 /*
  * there are four modes of movement:
@@ -46,7 +46,7 @@ sensorstate_t* sensorstate_destroy(sensorstate_t *sensorstate);
 
 /* public methods */
 const struct obstacle_t* sensorstate_check(const sensorstate_t *sensorstate, v2d_t actor_position, const struct obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2); /* x2 > x1 && y2 > y1 */
-void sensorstate_render(const sensorstate_t *sensorstate, v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, uint32 color);
+void sensorstate_render(const sensorstate_t *sensorstate, v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 void sensorstate_worldpos(const sensorstate_t *sensorstate, v2d_t actor_position, int *x1, int *y1, int *x2, int *y2);
 
 #endif

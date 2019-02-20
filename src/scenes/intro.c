@@ -25,7 +25,9 @@
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/fadefx.h"
+#include "../core/image.h"
 #include "../core/video.h"
+#include "../core/color.h"
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
@@ -34,7 +36,7 @@
 /* private data */
 #define INTRO_TIMEOUT       3.0f
 #define INTRO_FADETIME      0.5f
-#define INTRO_BGCOLOR       image_hex2rgb("0a0a0a")
+#define INTRO_BGCOLOR()     color_hex("0a0a0a")
 #define INTRO_FONT          "GoodNeighbors"
 #define INTRO_TEXT          "powered by\nOpen Surge Engine"
 static float elapsed_time;
@@ -67,7 +69,7 @@ void intro_init(void *foo)
     ));
 
     /* misc */
-    fadefx_in(image_rgb(0,0,0), INTRO_FADETIME);
+    fadefx_in(color_rgb(0,0,0), INTRO_FADETIME);
     music_stop();
 }
 
@@ -102,7 +104,7 @@ void intro_update()
                 scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &debug_mode);
             return;
         }
-        fadefx_out(image_rgb(0,0,0), INTRO_FADETIME);
+        fadefx_out(color_rgb(0,0,0), INTRO_FADETIME);
     }
 
     /* secret */
@@ -124,6 +126,6 @@ void intro_update()
 void intro_render()
 {
     v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
-    image_clear(video_get_backbuffer(), INTRO_BGCOLOR);
+    image_clear(video_get_backbuffer(), INTRO_BGCOLOR());
     font_render(fnt, camera);
 }

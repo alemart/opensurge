@@ -54,8 +54,10 @@ static inline uint16* destroy_groundmap(uint16* gmap);
 collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int width, int height)
 {
     collisionmask_t *mask = mallocx(sizeof *mask);
-    uint32 maskcolor = video_get_maskcolor();
+    color_t mask_color = color_mask();
+    color_t pixel;
     int i, j;
+    uint8 a;
 
     /* basic params */
     mask->width = clip(width, 1, image_width(image));
@@ -73,8 +75,10 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
     mask->mask = mallocx((mask->pitch * mask->height) * sizeof(*(mask->mask)));
     image_lock((image_t*)image);
     for(j = 0; j < mask->height; j++) {
-        for(i = 0; i < mask->width; i++)
-            mask->mask[j * mask->pitch + i] = (image_getpixel(image, x + i, y + j) != maskcolor);
+        for(i = 0; i < mask->width; i++) {
+            pixel = image_getpixel(image, x + i, y + j);
+            mask->mask[j * mask->pitch + i] = !color_equals(pixel, mask_color);
+        }
     }
     image_unlock((image_t*)image);
 
