@@ -297,7 +297,7 @@ image_t *image_clone_region(const image_t *src, int x, int y, int width, int hei
 
 /*
  * image_lock()
- * Locks the image
+ * Locks the image, enabling fast in-memory pixel access
  */
 void image_lock(image_t *img)
 {
@@ -345,16 +345,6 @@ color_t image_getpixel(const image_t *img, int x, int y)
 
 
 /*
- * image_putpixel()
- * Plots a pixel into the given image
- */
-void image_putpixel(image_t *img, int x, int y, color_t color)
-{
-    putpixel(img->data, x, y, color._value);
-}
-
-
-/*
  * image_line()
  * Draws a line from (x1,y1) to (x2,y2) using the specified color
  */
@@ -391,6 +381,16 @@ void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, color_t color)
 void image_rect(image_t *img, int x1, int y1, int x2, int y2, color_t color)
 {
     rect(img->data, x1, y1, x2, y2, color._value);
+}
+
+
+/*
+ * image_pixel()
+ * Draws a pixel
+ */
+void image_pixel(image_t *img, int x, int y, color_t color)
+{
+    putpixel(img->data, x, y, color._value);
 }
 
 

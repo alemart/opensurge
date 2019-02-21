@@ -38,25 +38,25 @@ image_t *image_load(const char *path); /* will be unloaded automatically */
 image_t *image_create(int width, int height); /* create a memory surface */
 image_t *image_create_shared(const image_t *parent, int x, int y, int width, int height); /* creates a shared sub-image */
 void image_destroy(image_t *img); /* call this after image_create() */
-void image_save(const image_t *img, const char *path); /* saves the image to a file */
 int image_unload(image_t *img); /* use if you want to save memory... */
+void image_save(const image_t *img, const char *path); /* saves the image to a file */
 image_t *image_clone(const image_t *src); /* clones an image */
 image_t *image_clone_region(const image_t *src, int x, int y, int width, int height); /* clones a region */
-void image_lock(image_t *img);
-void image_unlock(image_t *img);
-
-/* properties */
 int image_width(const image_t *img);
 int image_height(const image_t *img);
+
+/* pixel manipulation */
+void image_lock(image_t *img);
+void image_unlock(image_t *img);
 color_t image_getpixel(const image_t *img, int x, int y);
 
 /* drawing primitives */
 void image_clear(image_t *img, color_t color);
-void image_putpixel(image_t *img, int x, int y, color_t color);
 void image_line(image_t *img, int x1, int y1, int x2, int y2, color_t color);
 void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, color_t color);
 void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, color_t color);
 void image_rect(image_t *img, int x1, int y1, int x2, int y2, color_t color);
+void image_pixel(image_t *img, int x, int y, color_t color);
 void image_waterfx(image_t *img, int y, color_t color); /* pixels below y will have a water effect */
 
 /* rendering */
