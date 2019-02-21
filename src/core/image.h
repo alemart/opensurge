@@ -21,17 +21,18 @@
 #ifndef _IMAGE_H
 #define _IMAGE_H
 
-#include "global.h"
 #include "color.h"
 #include "v2d.h"
 
 /* opaque image type */
 typedef struct image_t image_t;
 
-/* image flags (bitwise OR) */
-#define IF_NONE                 0
-#define IF_HFLIP                1
-#define IF_VFLIP                2
+/* image flags (allows bitwise OR) */
+typedef enum imageflags_t {
+    IF_NONE = 0,
+    IF_HFLIP = 1,
+    IF_VFLIP = 2
+} imageflags_t;
 
 /* image management */
 image_t *image_load(const char *path); /* will be unloaded automatically */
@@ -50,6 +51,10 @@ void image_lock(image_t *img);
 void image_unlock(image_t *img);
 color_t image_getpixel(const image_t *img, int x, int y);
 
+/* drawing target */
+void image_set_drawing_target(image_t* new_target);
+image_t* image_drawing_target();
+
 /* drawing primitives */
 void image_clear(image_t *img, color_t color);
 void image_line(image_t *img, int x1, int y1, int x2, int y2, color_t color);
@@ -61,12 +66,12 @@ void image_waterfx(image_t *img, int y, color_t color); /* pixels below y will h
 
 /* rendering */
 void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
-void image_draw(const image_t *src, image_t *dest, int x, int y, uint32 flags);
-void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, uint32 flags);
-void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, uint32 flags);
-void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, uint32 flags);
-void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, uint32 flags);
-void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t color, uint32 flags);
-void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_t color, uint32 flags);
+void image_draw(const image_t *src, image_t *dest, int x, int y, imageflags_t flags);
+void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, imageflags_t flags);
+void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, imageflags_t flags);
+void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, imageflags_t flags);
+void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, imageflags_t flags);
+void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t color, imageflags_t flags);
+void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_t color, imageflags_t flags);
 
 #endif

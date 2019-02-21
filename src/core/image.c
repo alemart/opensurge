@@ -52,12 +52,17 @@ typedef int (*fast_getb_funptr)(int);
 
 /* private stuff */
 static void maskcolor_bugfix(image_t *img);
+static inline void draw_to(const image_t *src, image_t *dest, int x, int y, imageflags_t flags);
 static fast_getpixel_funptr fast_getpixel_fun(); /* returns a function. this won't do any clipping, so be careful. */
 static fast_putpixel_funptr fast_putpixel_fun(); /* returns a function. this won't do any clipping, so be careful. */
 static fast_makecol_funptr fast_makecol_fun(); /* returns a function */
 static fast_getr_funptr fast_getr_fun(); /* returns a function */
 static fast_getg_funptr fast_getg_fun(); /* returns a function */
 static fast_getb_funptr fast_getb_fun(); /* returns a function */
+
+/* drawing target */
+static image_t* _target = NULL;
+#define target (_target ? _target : video_get_backbuffer())
 
 /*
  * image_load()
@@ -465,16 +470,9 @@ void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, i
  *
  * flags: refer to the IF_* defines (Image Flags)
  */
-void image_draw(const image_t *src, image_t *dest, int x, int y, uint32 flags)
+void image_draw(const image_t *src, image_t *dest, int x, int y, imageflags_t flags)
 {
-    if((flags & IF_HFLIP) && !(flags & IF_VFLIP))
-        draw_sprite_h_flip(dest->data, src->data, x, y);
-    else if(!(flags & IF_HFLIP) && (flags & IF_VFLIP))
-        draw_sprite_v_flip(dest->data, src->data, x, y);
-    else if((flags & IF_HFLIP) && (flags & IF_VFLIP))
-        draw_sprite_vh_flip(dest->data, src->data, x, y);
-    else
-        draw_sprite(dest->data, src->data, x, y);
+    draw_to(src, dest, x, y, flags);
 }
 
 
@@ -488,7 +486,7 @@ void image_draw(const image_t *src, image_t *dest, int x, int y, uint32 flags)
  *        (2.0, 2.0) stands for a double-sized image
  *        (0.5, 0.5) stands for a smaller image
  */
-void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, uint32 flags)
+void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, imageflags_t flags)
 {
     image_t *tmp;
     int w = (int)(scale.x * src->w);
@@ -508,7 +506,7 @@ void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t sc
  * ang: angle given in radians
  * cx, cy: pivot positions
  */
-void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, uint32 flags)
+void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, imageflags_t flags)
 {
     float conv = (-ang * (180.0f/PI)) * (64.0f/90.0f);
 
@@ -527,7 +525,7 @@ void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx,
  * image_draw_scaled_rotated()
  * Draw scaled and rotated ;)
  */
-void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, uint32 flags)
+void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, imageflags_t flags)
 {
     image_t *tmp;
     int w = (int)(scale.x * src->w);
@@ -545,7 +543,7 @@ void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, 
  * Draws a translucent image
  * 0.0 (invisible) <= alpha <= 1.0 (opaque)
  */
-void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, uint32 flags)
+void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, imageflags_t flags)
 {
     image_t *tmp;
     int a;
@@ -557,7 +555,7 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
         if(flags != IF_NONE) {
             tmp = image_create(src->w, src->h);
             clear_to_color(tmp->data, color_mask()._value);
-            image_draw(src, tmp, 0, 0, flags);
+            draw_to(src, tmp, 0, 0, flags);
             draw_trans_sprite(dest->data, tmp->data, x, y);
             image_destroy(tmp);
         }
@@ -566,7 +564,7 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
 
     }
     else
-        image_draw(src, dest, x, y, flags);
+        draw_to(src, dest, x, y, flags);
 }
 
 
@@ -575,7 +573,7 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
  * Draws an image tinted with a specific color
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t color, uint32 flags)
+void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t color, imageflags_t flags)
 {
     image_t *tmp;
     uint8 r, g, b, a;
@@ -588,7 +586,7 @@ void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t 
         if(flags != IF_NONE) {
             tmp = image_create(src->w, src->h);
             clear_to_color(tmp->data, color_mask()._value);
-            image_draw(src, tmp, 0, 0, flags);
+            draw_to(src, tmp, 0, 0, flags);
             draw_lit_sprite(dest->data, tmp->data, x, y, a);
             image_destroy(tmp);
         }
@@ -596,7 +594,7 @@ void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t 
             draw_lit_sprite(dest->data, src->data, x, y, a);
     }
     else
-        image_draw(src, dest, x, y, flags);
+        draw_to(src, dest, x, y, flags);
 }
 
 /*
@@ -604,7 +602,7 @@ void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t 
  * Image blending: multiplication mode
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_t color, uint32 flags)
+void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_t color, imageflags_t flags)
 {
     image_t *tmp;
     uint8 r, g, b, a;
@@ -616,7 +614,7 @@ void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_
         if(flags != IF_NONE) {
             tmp = image_create(src->w, src->h);
             clear_to_color(tmp->data, color_mask()._value);
-            image_draw(src, tmp, 0, 0, flags);
+            draw_to(src, tmp, 0, 0, flags);
             draw_lit_sprite(dest->data, tmp->data, x, y, 255);
             image_destroy(tmp);
         }
@@ -624,7 +622,26 @@ void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_
             draw_lit_sprite(dest->data, src->data, x, y, 255);
     }
     else
-        image_draw(src, dest, x, y, flags);
+        draw_to(src, dest, x, y, flags);
+}
+
+/*
+ * image_set_drawing_target()
+ * Sets the drawing target
+ */
+void image_set_drawing_target(image_t* new_target)
+{
+    _target = new_target;
+}
+
+/*
+ * image_drawing_target()
+ * Returns the current drawing target, i.e., the
+ * image to which all drawing operations are applied
+ */
+image_t* image_drawing_target()
+{
+    return target;
 }
 
 
@@ -650,6 +667,22 @@ void maskcolor_bugfix(image_t *img)
                 fast_putpixel(img->data, i, j, mask._value);
         }
     }
+}
+
+/*
+ * draw_to()
+ * Draws an image into another using a set of flags
+ */
+void draw_to(const image_t *src, image_t *dest, int x, int y, imageflags_t flags)
+{
+    if(!(flags & IF_HFLIP) && !(flags & IF_VFLIP))
+        draw_sprite(dest->data, src->data, x, y);
+    else if((flags & IF_HFLIP) && !(flags & IF_VFLIP))
+        draw_sprite_h_flip(dest->data, src->data, x, y);
+    else if(!(flags & IF_HFLIP) && (flags & IF_VFLIP))
+        draw_sprite_v_flip(dest->data, src->data, x, y);
+    else
+        draw_sprite_vh_flip(dest->data, src->data, x, y);
 }
 
 /*
