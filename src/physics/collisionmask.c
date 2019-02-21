@@ -57,7 +57,6 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
     color_t mask_color = color_mask();
     color_t pixel;
     int i, j;
-    uint8 a;
 
     /* basic params */
     mask->width = clip(width, 1, image_width(image));

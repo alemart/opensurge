@@ -104,6 +104,7 @@ static int traverse(const parsetree_statement_t *stmt);
 static int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata);
 static int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskdetails);
 static collisionmask_t *read_collisionmask(const parsetree_program_t *block);
+static void create_collisionmasks();
 static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
@@ -117,11 +118,11 @@ static inline int get_image_flags(const brick_t* brick);
  * brickset_load()
  * Loads a brickset from a file
  */
-void brickset_load(const char *filename)
+void brickset_load(const char* filename)
 {
     int i;
     const char* fullpath;
-    parsetree_program_t *tree;
+    parsetree_program_t* tree;
 
     if(brickset_loaded()) {
         fatal_error("Can't load brickset \"%s\": another brickset is already loaded.", filename);
@@ -143,21 +144,7 @@ void brickset_load(const char *filename)
         fatal_error("FATAL ERROR: no bricks have been defined in \"%s\"", filename);
 
     logfile_message("Creating collision masks...");
-    for(i=0; i<brickdata_count; i++) {
-        if(brickdata[i] != NULL && brickdata[i]->type != BRK_PASSABLE && brickdata[i]->mask == NULL) {
-            const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
-            spriteinfo_t* sprite = brickdata[i]->data;
-            image_t* maskimg = image_load(maskfile);
-            brickdata[i]->mask = collisionmask_create(
-                maskimg,
-                sprite->rect_x,
-                sprite->rect_y,
-                sprite->frame_w,
-                sprite->frame_h
-            );
-            image_unload(maskimg);
-        }
-    }
+    create_collisionmasks();
 
     logfile_message("The brickset has been loaded.");
 }
@@ -975,8 +962,9 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
             free(dat->maskfile);
         dat->maskfile = str_dup(nanoparser_get_string(p1));
     }
-    else if(str_icmp(identifier, "collision_mask") == 0) {
+    else if(str_icmp(identifier, "collision_mask") == 0) { /* deprecated */
         p1 = nanoparser_get_nth_parameter(param_list, 1);
+        logfile_message("WARNING: brick parameter collision_mask is deprecated. Use mask instead.");
         nanoparser_expect_program(p1, "Can't read brick attributes: collision_mask expects a block");
         if(dat->mask != NULL)
             collisionmask_destroy(dat->mask);
@@ -1031,7 +1019,7 @@ int traverse_collisionmask(const parsetree_statement_t *stmt, void *maskdetails)
     return 0;
 }
 
-/* read a collision mask from a file */
+/* read a collision mask from a file (deprecated) */
 collisionmask_t *read_collisionmask(const parsetree_program_t *block)
 {
     maskdetails_t s = { NULL, 0, 0, 0, 0 };
@@ -1042,8 +1030,42 @@ collisionmask_t *read_collisionmask(const parsetree_program_t *block)
     if(s.source_file == NULL)
         fatal_error("collision_mask: a source_file must be specified");
 
+    /* specify a custom collision mask for this particular brick (deprecated) */
     maskimg = image_load(s.source_file);
     mask = collisionmask_create(maskimg, s.x, s.y, s.w, s.h);
     image_unload(maskimg);
     return mask;
+}
+
+/* creates the collision masks of all bricks */
+void create_collisionmasks()
+{
+    int i;
+    image_t* mask = NULL;
+    const char* prev_maskfile = "";
+
+    for(i = 0; i < brickdata_count; i++) {
+        if(brickdata[i] != NULL && brickdata[i]->type != BRK_PASSABLE && brickdata[i]->mask == NULL) {
+            const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
+            spriteinfo_t* sprite = brickdata[i]->data;
+
+            if(mask == NULL || 0 != str_icmp(prev_maskfile, maskfile)) {
+                if(mask != NULL)
+                    image_unload(mask);
+                mask = image_load(maskfile);
+                prev_maskfile = maskfile;
+            }
+
+            brickdata[i]->mask = collisionmask_create(
+                mask,
+                sprite->rect_x,
+                sprite->rect_y,
+                sprite->frame_w,
+                sprite->frame_h
+            );
+        }
+    }
+    
+    if(mask != NULL)
+        image_unload(mask);
 }
