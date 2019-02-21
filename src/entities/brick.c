@@ -1050,9 +1050,12 @@ void create_collisionmasks()
             spriteinfo_t* sprite = brickdata[i]->data;
 
             if(mask == NULL || 0 != str_icmp(prev_maskfile, maskfile)) {
-                if(mask != NULL)
+                if(mask != NULL) {
+                    image_unlock(mask);
                     image_unload(mask);
+                }
                 mask = image_load(maskfile);
+                image_lock(mask);
                 prev_maskfile = maskfile;
             }
 
@@ -1065,7 +1068,9 @@ void create_collisionmasks()
             );
         }
     }
-    
-    if(mask != NULL)
+
+    if(mask != NULL) {
+        image_unlock(mask);
         image_unload(mask);
+    }
 }

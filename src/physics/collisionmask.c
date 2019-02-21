@@ -72,14 +72,12 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
 
     /* create the collision mask */
     mask->mask = mallocx((mask->pitch * mask->height) * sizeof(*(mask->mask)));
-    image_lock((image_t*)image);
     for(j = 0; j < mask->height; j++) {
         for(i = 0; i < mask->width; i++) {
             pixel = image_getpixel(image, x + i, y + j);
             mask->mask[j * mask->pitch + i] = !color_equals(pixel, mask_color);
         }
     }
-    image_unlock((image_t*)image);
 
     /* create the ground maps */
     mask->gmap[0] = create_groundmap(mask, GD_DOWN);
