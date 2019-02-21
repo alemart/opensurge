@@ -639,17 +639,14 @@ void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_
 void maskcolor_bugfix(image_t *img)
 {
     int i, j;
+    color_t pixel, mask = color_mask();
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
     fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
-    uint8 pixel_r, pixel_g, pixel_b, pixel_a, mask_r, mask_g, mask_b;
-    color_t pixel, mask = color_mask();
 
-    color_unmap(mask, &mask_r, &mask_g, &mask_b, NULL);
     for(j=0; j<img->h; j++) {
         for(i=0; i<img->w; i++) {
             pixel = (color_t){ fast_getpixel(img->data, i, j) };
-            color_unmap(pixel, &pixel_r, &pixel_g, &pixel_b, &pixel_a);
-            if(pixel_r == mask_r && pixel_g == mask_g && pixel_b == mask_b)
+            if(color_is_mask(pixel))
                 fast_putpixel(img->data, i, j, mask._value);
         }
     }

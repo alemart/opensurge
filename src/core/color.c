@@ -104,6 +104,16 @@ bool color_equals(color_t a, color_t b)
 }
 
 /*
+ * color_is_mask()
+ * Is the given color the mask color?
+ */
+bool color_is_mask(color_t color)
+{
+    /* ignore alpha */
+    return (255 == getr(color._value) && 0 == getg(color._value) && 255 == getb(color._value));
+}
+
+/*
  * color_mask()
  * Mask color
  */

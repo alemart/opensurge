@@ -35,6 +35,7 @@ color_t color_rgba(uint8 r, uint8 g, uint8 b, uint8 a);
 color_t color_hex(const char* hex_string);
 void color_unmap(color_t color, uint8* r, uint8* g, uint8* b, uint8* a);
 bool color_equals(color_t a, color_t b);
+bool color_is_mask(color_t color);
 color_t color_mask();
 
 #endif

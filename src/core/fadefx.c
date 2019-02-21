@@ -21,6 +21,7 @@
 #include <allegro.h>
 #include "fadefx.h"
 #include "video.h"
+#include "image.h"
 #include "timer.h"
 #include "util.h"
 
