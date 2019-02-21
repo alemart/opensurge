@@ -3145,10 +3145,9 @@ void editor_movable_platforms_path_render(brick_list_t *major_bricks)
 void editor_waterline_render(int ycoord, color_t color)
 {
     int x, x0 = 19 - (timer_get_ticks() / 25) % 20;
-    image_t *buf = video_get_backbuffer();
 
     for(x=x0-10; x<VIDEO_SCREEN_W; x+=20)
-        image_line(buf, x, ycoord, x+10, ycoord, color);
+        image_line(video_get_backbuffer(), x, ycoord, x+10, ycoord, color);
 }
 
 

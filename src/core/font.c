@@ -1229,7 +1229,7 @@ void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, c
     const fontdrv_bmp_t *f = (const fontdrv_bmp_t*)fnt;
     uint32 chr, n = sizeof(f->bmp) / sizeof(image_t*);
     color_t white = color_rgb(255, 255, 255);
-    image_t *chimg, *img = video_get_backbuffer();
+    image_t *chimg;
 
     /* currently, bitmap fonts only support the
        first 256 Unicode characters, though that
@@ -1238,9 +1238,9 @@ void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, c
     for(size_t i = 0; (chr = u8_nextchar(text, &i)) != 0; ) {
         if(chr < n && (chimg = f->bmp[chr]) != NULL) {
             if(!color_equals(color, white))
-                image_draw_multiply(chimg, img, x, y + f->line_height - image_height(chimg), color, IF_NONE);
+                image_draw_multiply(chimg, video_get_backbuffer(), x, y + f->line_height - image_height(chimg), color, IF_NONE);
             else
-                image_draw(chimg, img, x, y + f->line_height - image_height(chimg), IF_NONE);
+                image_draw(chimg, video_get_backbuffer(), x, y + f->line_height - image_height(chimg), IF_NONE);
             x += image_width(chimg) + (int)f->spacing.x;
         }
     }
