@@ -691,7 +691,7 @@ void player_reset_underwater_timer(player_t *player)
  */
 float player_seconds_remaining_to_drown(const player_t *player)
 {
-    return player->underwater && player->shield_type != SH_WATERSHIELD ? max(0.0f, PLAYER_UNDERWATER_BREATH - player->underwater_timer) : INFINITY_FLT;
+    return player->underwater && player->shield_type != SH_WATERSHIELD ? max(0.0f, PLAYER_UNDERWATER_BREATH - player->underwater_timer) : INFINITY;
 }
 
 

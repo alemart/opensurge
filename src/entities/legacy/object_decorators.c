@@ -1181,7 +1181,7 @@ void changeclosestobjectstate_render(objectmachine_t *obj, v2d_t camera_position
 
 object_t *find_closest_object(object_t *me, object_list_t *list, const char* desired_name, float *distance)
 {
-    float min_dist = INFINITY_FLT;
+    float min_dist = INFINITY;
     object_list_t *it;
     object_t *ret = NULL;
     v2d_t v;

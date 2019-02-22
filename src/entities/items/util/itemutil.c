@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include <stdlib.h>
 #include "itemutil.h"
 #include "../../../core/v2d.h"
@@ -33,7 +34,7 @@
  */
 item_t *find_closest_item(item_t *me, item_list_t *list, int desired_type, float *distance)
 {
-    float min_dist = INFINITY_FLT;
+    float min_dist = INFINITY;
     item_list_t *it;
     item_t *ret = NULL;
     v2d_t v;

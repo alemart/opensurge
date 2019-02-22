@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include "spikes.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
@@ -59,22 +60,22 @@ static int rightwall_strategy(item_t *spikes, player_t *player);
 /* public methods */
 item_t* floorspikes_create()
 {
-    return spikes_create(floor_strategy, 0, INFINITY_FLT);
+    return spikes_create(floor_strategy, 0, INFINITY);
 }
 
 item_t* ceilingspikes_create()
 {
-    return spikes_create(ceiling_strategy, 2, INFINITY_FLT);
+    return spikes_create(ceiling_strategy, 2, INFINITY);
 }
 
 item_t* leftwallspikes_create()
 {
-    return spikes_create(leftwall_strategy, 1, INFINITY_FLT);
+    return spikes_create(leftwall_strategy, 1, INFINITY);
 }
 
 item_t* rightwallspikes_create()
 {
-    return spikes_create(rightwall_strategy, 3, INFINITY_FLT);
+    return spikes_create(rightwall_strategy, 3, INFINITY);
 }
 
 item_t* periodic_floorspikes_create()

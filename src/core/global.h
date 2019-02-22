@@ -51,10 +51,6 @@
 #endif
 
 /* Global definitions and constants */
-#ifdef INFINITY_FLT
-#undef INFINITY_FLT
-#endif
-
 #ifdef TRUE
 #undef TRUE
 #endif
@@ -76,12 +72,5 @@
 #define EPSILON                 1e-5
 #define PI                      3.1415926535
 #define LARGE_INT               (1 << 30)
-
-#ifdef __MSVC__
-static const double __ZERO = 0.0;
-#define INFINITY_FLT            (1.0/__ZERO)
-#else
-#define INFINITY_FLT            (1.0/0.0)
-#endif
 
 #endif

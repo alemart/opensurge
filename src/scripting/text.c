@@ -61,7 +61,7 @@ static const char* DEFAULT_TEXT = "";
 static const char* DEFAULT_FONT = "default";
 static const char* DEFAULT_ALIGN = "left";
 static const double DEFAULT_ZINDEX = 0.5;
-static const double DEFAULT_MAXWIDTH = INFINITY_FLT; /* no wordwrap */
+static const double DEFAULT_MAXWIDTH = INFINITY; /* no wordwrap */
 static const bool DEFAULT_VISIBILITY = true;
 static inline font_t* get_font(const surgescript_object_t* object);
 static inline fontalign_t str2align(const char* align);

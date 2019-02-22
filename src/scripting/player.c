@@ -20,6 +20,7 @@
 
 #include <surgescript.h>
 #include <string.h>
+#include <math.h>
 #include "scripting.h"
 #include "../core/util.h"
 #include "../scenes/level.h"
@@ -419,7 +420,7 @@ surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript
 surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
-    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? player_seconds_remaining_to_drown(player) : INFINITY_FLT);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? player_seconds_remaining_to_drown(player) : INFINITY);
 }
 
 /* Transform component */
