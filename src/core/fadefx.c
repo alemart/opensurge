@@ -59,30 +59,29 @@ void fadefx_release()
  */
 void fadefx_update()
 {
-    int n;
-
-    /* elapsed time */
     end = FALSE;
     if(type != FADEFX_NONE) {
+        BITMAP *backbuffer = *((BITMAP**)video_get_backbuffer());
+        int n;
+
+        /* elapsed time */
         elapsed_time += timer_get_delta();
         end = (elapsed_time >= total_time);
-    }
 
-    /* render */
-    if(type != FADEFX_NONE) {
+        /* render */
         n = (int)( 255.0f * ((elapsed_time * 1.25f) / total_time) );
         n = clip(n, 0, 255);
         n = (type == FADEFX_IN) ? (255 - n) : n;
         drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
         set_trans_blender(0, 0, 0, n);
-        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
+        rectfill(backbuffer, 0, 0, backbuffer->w, backbuffer->h, fade_color._value);
         drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
-    }
 
-    /* the fade effect is over */
-    if(end) {
-        total_time = elapsed_time = 0.0f;
-        type = FADEFX_NONE;
+        /* the fade effect is over */
+        if(end) {
+           total_time = elapsed_time = 0.0f;
+           type = FADEFX_NONE;
+        }
     }
 }
 
