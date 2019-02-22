@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
 #include "collisionmask.h"
 #include "../core/video.h"
 #include "../core/image.h"
@@ -31,7 +32,7 @@ struct collisionmask_t {
     int width;
     int height;
     int pitch;
-    uint16* gmap[4];
+    uint16_t* gmap[4];
 };
 
 /* is MEM_ALIGNMENT a power of two? */
@@ -40,8 +41,8 @@ typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ];
 
 /* utilities */
 static const int MASK_MAXSIZE = UINT16_MAX; /* masks cannot be larger than this */
-static uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
-static inline uint16* destroy_groundmap(uint16* gmap);
+static uint16_t* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
+static inline uint16_t* destroy_groundmap(uint16_t* gmap);
 
 /* public methods */
 
@@ -217,11 +218,11 @@ int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, groun
 /* --- private utilities --- */
 
 /* Creates a new ground map */
-uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction)
+uint16_t* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction)
 {
     int w = mask->width, h = mask->height;
     int pitch = mask->pitch;
-    uint16* gmap = NULL;
+    uint16_t* gmap = NULL;
     int x, y, p;
 
     /* compute the position of the ground */
@@ -337,7 +338,7 @@ uint16* create_groundmap(const collisionmask_t* mask, grounddir_t ground_directi
 }
 
 /* Destroys an existing ground map */
-uint16* destroy_groundmap(uint16* gmap)
+uint16_t* destroy_groundmap(uint16_t* gmap)
 {
     if(gmap != NULL)
         free(gmap);

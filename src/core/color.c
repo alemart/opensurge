@@ -27,7 +27,7 @@
  * Generates a color from its RGB components
  * 0 <= r, g, b <= 255
  */
-color_t color_rgb(uint8 r, uint8 g, uint8 b)
+color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
     return (color_t){ makeacol(r, g, b, 255) };
 }
@@ -37,20 +37,20 @@ color_t color_rgb(uint8 r, uint8 g, uint8 b)
  * Generates a color from its RGBA components
  * 0 <= r, g, b, a <= 255
  */
-color_t color_rgba(uint8 r, uint8 g, uint8 b, uint8 a)
+color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     return (color_t){ makeacol(r, g, b, a) };
 }
 
 /*
  * color_hex()
- * Converts a 3, 6 or 8-character RGB hex string to a uint32 color
- * Example: "ffffff" becomes white
+ * Converts a 3, 6 or 8-character RGB[A] hex string to a color
+ * Example: "fff" becomes white; "ff8800" becomes orange
  */
 color_t color_hex(const char* hex_string)
 {
     char buf[9] = "000000ff", *p, c;
-    uint8 r, g, b, a;
+    uint8_t r, g, b, a;
 
     /* sanitize hex RGB color */
     for(p = buf; *p && *hex_string; p++) {
@@ -86,7 +86,7 @@ color_t color_hex(const char* hex_string)
  * Gets the RGBA components of a color
  * 0 <= r, g, b, a <= 255
  */
-void color_unmap(color_t color, uint8* r, uint8* g, uint8* b, uint8* a)
+void color_unmap(color_t color, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a)
 {
     if(r) *r = getr(color._value);
     if(g) *g = getg(color._value);

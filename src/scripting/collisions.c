@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include <stdint.h>
 #include "scripting.h"
 #include "../core/v2d.h"
 #include "../core/darray.h"
@@ -37,7 +38,7 @@ struct collider_t
     DARRAY(surgescript_objecthandle_t, prev_collisions);
     DARRAY(surgescript_objecthandle_t, curr_collisions);
     v2d_t worldpos;
-    uint8 flags;
+    uint8_t flags;
 };
 
 typedef struct boxcollider_t boxcollider_t;

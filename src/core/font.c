@@ -20,6 +20,7 @@
 
 #include <allegro.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
@@ -66,7 +67,7 @@ static int dirfill(const char *vpath, void *param);
 
 typedef struct charproperties_t charproperties_t;
 struct charproperties_t {
-    uint8 valid; /* whether this character is valid (exists) */
+    uint8_t valid; /* whether this character is valid (exists) */
     struct { /* spritesheet info */
         int x, y, width, height;
     } source_rect;
@@ -170,7 +171,6 @@ struct font_t {
 static const char* get_variable(const char *key);
 static inline int has_variables_to_expand(const char *str, int *passes);
 static void expand_variables(char *str, fontargs_t args, size_t size);
-static uint8 hex2dec(char digit);
 static void convert_to_ascii(char *str);
 static int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t color_stack[], int* stack_top);
 static int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align, int x, int y, color_t color_stack[], int* stack_top);
@@ -613,18 +613,6 @@ int has_variables_to_expand(const char *str, int *passes)
 }
 
 
-/* hex2dec() */
-uint8 hex2dec(char digit)
-{
-    digit = tolower(digit);
-    if(digit >= '0' && digit <= '9')
-        return digit-'0';
-    else if(digit >= 'a' && digit <= 'f')
-        return (digit-'a')+10;
-    else
-        return 255; /* error */
-}
-
 /* convert to ascii */
 void convert_to_ascii(char* str)
 {
@@ -664,25 +652,15 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t col
                 /* open tag */
                 if(strncmp(tag_name, "color=", 6) == 0) {
                     /* color tag */
-                    char hex_code[6] = { 0 }; int i = 0;
+                    char hex_code[7] = { 0 }; int i = 0;
                     const char* color_code = tag_name + 6;
                     if(*color_code == '#') /* skip '#', if any */
                         ++color_code;
-                    while(*color_code && *color_code != '>' && i < sizeof(hex_code)) /* read color */
+                    while(*color_code && *color_code != '>' && i < sizeof(hex_code) - 1) /* read color */
                         hex_code[i++] = *(color_code++);
-                    if(i == 3) { /* accept short color notation (e.g., fff, eee, etc.) */
-                        hex_code[5] = hex_code[4] = hex_code[2];
-                        hex_code[3] = hex_code[2] = hex_code[1];
-                        hex_code[1] = hex_code[0];
-                    }
-                    else if(i != 6) /* invalid color code length */
-                        ; /* do nothing? */
                     if(*stack_top + 1 < FONT_STACKCAPACITY) { /* push color */
-                        uint8 r = (hex2dec(hex_code[0]) << 4) | hex2dec(hex_code[1]);
-                        uint8 g = (hex2dec(hex_code[2]) << 4) | hex2dec(hex_code[3]);
-                        uint8 b = (hex2dec(hex_code[4]) << 4) | hex2dec(hex_code[5]);
                         _print_linebuf();
-                        color_stack[++(*stack_top)] = color_rgb(r, g, b);
+                        color_stack[++(*stack_top)] = color_hex(hex_code);
                     }
                 }
                 tag = 1;
@@ -1227,7 +1205,7 @@ fontdrv_t* fontdrv_bmp_new(const char *source_file, charproperties_t chr[], int 
 void fontdrv_bmp_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
     const fontdrv_bmp_t *f = (const fontdrv_bmp_t*)fnt;
-    uint32 chr, n = sizeof(f->bmp) / sizeof(image_t*);
+    uint32_t chr, n = sizeof(f->bmp) / sizeof(image_t*);
     color_t white = color_rgb(255, 255, 255);
     image_t *chimg;
 
@@ -1368,7 +1346,7 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
     int height = line_height;
     int tag = FALSE;
     size_t i = 0;
-    uint32 ch;
+    uint32_t ch;
 
     *(p = linebuf) = 0;
     while(string[i]) {

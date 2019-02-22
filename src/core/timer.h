@@ -21,7 +21,7 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
-#include "global.h"
+#include <stdint.h>
 
 /* time handler */
 void timer_init(int optimize_cpu_usage); /* receives a boolean */
@@ -30,7 +30,7 @@ void timer_release();
 
 /* main utilities */
 float timer_get_delta();
-uint32 timer_get_ticks();
+uint32_t timer_get_ticks();
 int timer_get_fps();
 
 /* optimize cpu usage? */

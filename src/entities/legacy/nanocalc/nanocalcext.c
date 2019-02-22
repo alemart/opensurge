@@ -28,6 +28,7 @@
 #include "../../item.h"
 #include "../../brick.h"
 #include "../../camera.h"
+#include "../../../core/global.h"
 #include "../../../core/video.h"
 #include "../../../core/audio.h"
 #include "../../../core/timer.h"
@@ -60,7 +61,7 @@ static float f_ypos() { return target->actor->position.y; } /* x-position of the
 static float f_hotspot_x() { return target->actor->hot_spot.x; } /* x-position of the hotspot */
 static float f_hotspot_y() { return target->actor->hot_spot.y; } /* y-position of the hotspot */
 static float f_alpha() { return target->actor->alpha; } /* alpha of the target object */
-static float f_angle() { return target->actor->angle * 180.0f / PI; } /* angle of the target object */
+static float f_angle() { return target->actor->angle * 57.2957795131f; } /* angle of the target object */
 static float f_scale_x() { return target->actor->scale.x; } /* scale x */
 static float f_scale_y() { return target->actor->scale.y; } /* scale y */
 static float f_animation_frame() { return floor(target->actor->animation_frame); } /* animation frame */
@@ -83,7 +84,7 @@ static float f_player_spawnpoint_x() { return PLAYER->actor->spawn_point.x; }
 static float f_player_spawnpoint_y() { return PLAYER->actor->spawn_point.y; }
 static float f_player_xspeed() { return PLAYER->actor->speed.x; }
 static float f_player_yspeed() { return PLAYER->actor->speed.y; }
-static float f_player_angle() { return PLAYER->actor->angle * 180.0f / PI; }
+static float f_player_angle() { return PLAYER->actor->angle * 57.2957795131f; }
 static float f_player_direction() { return PLAYER->actor->mirror & IF_HFLIP ? -1.0f : 1.0f; }
 static float f_player_seconds_remaining_to_drown() { return player_seconds_remaining_to_drown(PLAYER); }
 static float f_music_volume() { return music_get_volume(); }

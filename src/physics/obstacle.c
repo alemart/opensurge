@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
 #include "obstacle.h"
 #include "collisionmask.h"
 #include "../core/util.h"
@@ -33,9 +34,9 @@ struct obstacle_t
 {
     int xpos;
     int ypos;
-    uint16 width;
-    uint16 height;
-    uint8 flags;
+    uint16_t width;
+    uint16_t height;
+    uint8_t flags;
     const collisionmask_t* mask;
 };
 

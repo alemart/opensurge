@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <limits.h>
 #include <string.h>
 #include <ctype.h>
@@ -170,7 +171,7 @@ static int wants_to_pause; /* wants to pause the level */
 
 /* dialog box */
 static int dlgbox_active;
-static uint32 dlgbox_starttime;
+static uint32_t dlgbox_starttime;
 static actor_t *dlgbox;
 static font_t *dlgbox_title, *dlgbox_message;
 
@@ -376,7 +377,7 @@ static editor_action_t editor_action_spawnpoint_new(int is_changing, v2d_t obj_p
 typedef struct editor_action_list_t {
     editor_action_t action; /* node data */
     int in_group; /* is this element part of a group? */
-    uint32 group_key; /* internal use (used only if in_group is true) */
+    uint32_t group_key; /* internal use (used only if in_group is true) */
     struct editor_action_list_t *prev, *next; /* linked list: pointers */
 } editor_action_list_t;
 
@@ -633,7 +634,7 @@ int level_save(const char *filepath)
     if(waterlevel != DEFAULT_WATERLEVEL)
         fprintf(fp, "waterlevel %d\n", waterlevel);
     if(!color_equals(watercolor, DEFAULT_WATERCOLOR())) {
-        uint8 r, g, b;
+        uint8_t r, g, b;
         color_unmap(watercolor, &r, &g, &b, NULL);
         fprintf(fp, "watercolor %d %d %d\n", r, g, b);
     }
@@ -2134,7 +2135,7 @@ void update_dlgbox()
 {
     float speed = VIDEO_SCREEN_H / 2; /* y speed */
     float dt = timer_get_delta();
-    uint32 t = timer_get_ticks();
+    uint32_t t = timer_get_ticks();
 
     if(dlgbox_active) {
         if(t >= dlgbox_starttime + DLGBOX_MAXTIME) {
@@ -3866,7 +3867,6 @@ void editor_action_init()
     editor_action_buffer_cursor = editor_action_buffer_head;
 }
 
-
 /* releases the editor_action module */
 void editor_action_release()
 {
@@ -3882,7 +3882,7 @@ void editor_action_register(editor_action_t action)
     /* ugly, but these fancy group stuff
      * shouldn't be availiable on the interface */
     static int registering_group = FALSE;
-    static uint32 group_key;
+    static uint32_t group_key;
 
     if(action.obj_type != EDT_GROUP) {
         editor_action_list_t *c, *it, *node;
@@ -3911,7 +3911,7 @@ void editor_action_register(editor_action_t action)
         editor_action_buffer_cursor = node;
     }
     else {
-        static uint32 auto_increment = 0xbeef; /* dummy value */
+        static uint32_t auto_increment = 0xbeef; /* dummy value */
         editorgrp_entity_list_t *list, *it;
 
         /* registering a group of objects */
@@ -3996,7 +3996,6 @@ void editor_action_redo()
     else
         video_showmessage("Already at newest change.");
 }
-
 
 /* commit action */
 void editor_action_commit(editor_action_t action)
@@ -4182,8 +4181,8 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 const char* hash_of_ssobj(const surgescript_object_t* object)
 {
     /* TODO: use a faster key type */
-    static char buf[24] = { [23] = 0 };
-    char* p = buf + 23;
+    static char buf[24] = { 0 };
+    char* p = buf + sizeof(buf) - 1;
     surgescript_objecthandle_t h = surgescript_object_handle(object);
     do { *--p = "0123456789abcdef"[h & 0xF]; } while(h /= 16);
     return p;

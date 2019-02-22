@@ -20,6 +20,7 @@
 
 #include <allegro.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
@@ -207,32 +208,32 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
 {
     /* due to the static array declared as an optimization below,
        merge_sort() isn't thread-safe */
-    static uint8 tmp[16384]; size_t bytes = (q-p+1) * size;
-    uint8 *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
-    uint8 *i = arr;
-    uint8 *j = arr + (m+1-p) * size;
+    static uint8_t tmp[16384]; size_t bytes = (q-p+1) * size;
+    uint8_t *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
+    uint8_t *i = arr;
+    uint8_t *j = arr + (m+1-p) * size;
     int k = p;
 
-    memcpy(arr, (uint8*)base + p * size, (q-p+1) * size);
+    memcpy(arr, (uint8_t*)base + p * size, (q-p+1) * size);
 
     while(i < arr + (m+1-p) * size && j <= arr + (q-p) * size) {
         if(comparator((const void*)i, (const void*)j) <= 0) {
-            memcpy((uint8*)base + (k++) * size, i, size);
+            memcpy((uint8_t*)base + (k++) * size, i, size);
             i += size;
         }
         else {
-            memcpy((uint8*)base + (k++) * size, j, size);
+            memcpy((uint8_t*)base + (k++) * size, j, size);
             j += size;
         }
     }
 
     while(i < arr + (m+1-p) * size) {
-        memcpy((uint8*)base + (k++) * size, i, size);
+        memcpy((uint8_t*)base + (k++) * size, i, size);
         i += size;
     }
 
     while(j <= arr + (q-p) * size) {
-        memcpy((uint8*)base + (k++) * size, j, size);
+        memcpy((uint8_t*)base + (k++) * size, j, size);
         j += size;
     }
 

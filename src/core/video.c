@@ -19,6 +19,7 @@
  */
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <png.h>
@@ -62,7 +63,7 @@ static void setup_color_depth(int bpp);
 typedef struct videomsg_t videomsg_t;
 struct videomsg_t {
     char* message;
-    uint32 endtime;
+    uint32_t endtime;
     videomsg_t* next;
 };
 static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
@@ -487,7 +488,7 @@ void fast2x_blit(image_t *src, image_t *dest)
             int w = image_width(dest), h = image_height(dest);
             for(j=0; j<h; j++) {
                 for(i=0; i<w; i++)
-                    ((uint16*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint16*)IMAGE2BITMAP(src)->line[j/2])[i/2];
+                    ((uint16_t*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint16_t*)IMAGE2BITMAP(src)->line[j/2])[i/2];
             }
             break;
         }
@@ -501,7 +502,7 @@ void fast2x_blit(image_t *src, image_t *dest)
             int w = image_width(dest), h = image_height(dest);
             for(j=0; j<h; j++) {
                 for(i=0; i<w; i++)
-                    ((uint32*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint32*)IMAGE2BITMAP(src)->line[j/2])[i/2];
+                    ((uint32_t*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint32_t*)IMAGE2BITMAP(src)->line[j/2])[i/2];
             }
             break;
         }
@@ -515,19 +516,19 @@ void fast2x_blit(image_t *src, image_t *dest)
 void smooth2x_blit(image_t *src, image_t *dest)
 {
     if(video_get_color_depth() == 32)
-        hq2x_32((uint32*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
+        hq2x_32((uint32_t*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32_t*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
 }
 
 void smooth3x_blit(image_t *src, image_t *dest)
 {
     if(video_get_color_depth() == 32)
-        hq3x_32((uint32*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
+        hq3x_32((uint32_t*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32_t*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
 }
 
 void smooth4x_blit(image_t *src, image_t *dest)
 {
     if(video_get_color_depth() == 32)
-        hq4x_32((uint32*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
+        hq4x_32((uint32_t*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32_t*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
 }
 
 

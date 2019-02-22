@@ -19,6 +19,7 @@
  */
 
 #include <allegro.h>
+#include <stdint.h>
 #include <string.h>
 #include <locale.h>
 #include <time.h>
@@ -149,8 +150,8 @@ void engine_release()
  */
 void clean_garbage()
 {
-    static uint32 last = 0;
-    uint32 t = timer_get_ticks();
+    static uint32_t last = 0;
+    uint32_t t = timer_get_ticks();
 
     if(t >= last + 2000) { /* every 2 seconds */
         last = t;

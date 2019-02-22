@@ -19,6 +19,7 @@
  */
 
 #include "fontext.h"
+#include "global.h"
 #include "font.h"
 #include "lang.h"
 #include "input.h"

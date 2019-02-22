@@ -42,14 +42,14 @@
 
 /* internal data */
 static int partial_fps, fps_accum, fps;
-static uint32 last_time;
+static uint32_t last_time;
 static float delta;
 static int must_yield_cpu;
-static volatile uint32 elapsed_time;
-static uint32 start_time;
+static volatile uint32_t elapsed_time;
+static uint32_t start_time;
 
 /* platform-specific code */
-static uint32 get_tick_count(); /* tell me the time */
+static uint32_t get_tick_count(); /* tell me the time */
 static void yield_cpu(); /* we don't like using 100% of the cpu */
 
 
@@ -89,7 +89,7 @@ void timer_init(int optimize_cpu_usage)
  */
 void timer_update()
 {
-    uint32 current_time, delta_time; /* both in milliseconds */
+    uint32_t current_time, delta_time; /* both in milliseconds */
 
     /* time control */
     for(delta_time = 0 ;;) {
@@ -151,9 +151,9 @@ float timer_get_delta()
  * Elapsed milliseconds since
  * the application has started
  */
-uint32 timer_get_ticks()
+uint32_t timer_get_ticks()
 {
-    uint32 ticks = get_tick_count();
+    uint32_t ticks = get_tick_count();
     if(ticks < start_time)
         start_time = ticks;
     return ticks - start_time;
@@ -197,7 +197,7 @@ void timer_optimize_cpu_usage(int optimize)
 
 #ifndef _WIN32
 
-uint32 get_tick_count()
+uint32_t get_tick_count()
 {
     struct timeval now;
     gettimeofday(&now, NULL);
@@ -212,7 +212,7 @@ void yield_cpu()
 
 #else
 
-uint32 get_tick_count()
+uint32_t get_tick_count()
 {
     return GetTickCount();
 }

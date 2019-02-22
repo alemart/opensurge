@@ -22,6 +22,7 @@
 #include <math.h>
 #include "confirmbox.h"
 #include "../entities/actor.h"
+#include "../core/global.h"
 #include "../core/font.h"
 #include "../core/fadefx.h"
 #include "../core/video.h"

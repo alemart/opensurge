@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include <png.h>
 #include <allegro.h>
 #include <loadpng.h>
@@ -409,7 +410,7 @@ void image_waterfx(int y, color_t color)
     fast_getr_funptr fast_getr = fast_getr_fun();
     fast_getg_funptr fast_getg = fast_getg_fun();
     fast_getb_funptr fast_getb = fast_getb_fun();
-    int col, wr, wg, wb; /* don't use uint8 */
+    int col, wr, wg, wb; /* don't use uint8  */
     int i, j;
 
     /* adjust y */
@@ -575,7 +576,7 @@ void image_draw_tinted(const image_t* src, int x, int y, color_t color, imagefla
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
-        uint8 r, g, b, a = 128;
+        uint8_t r, g, b, a = 128;
         color_unmap(color, &r, &g, &b, NULL);
         set_trans_blender(r, g, b, a);
 
@@ -603,7 +604,7 @@ void image_draw_multiply(const image_t* src, int x, int y, color_t color, imagef
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
-        uint8 r, g, b, a;
+        uint8_t r, g, b, a;
         color_unmap(color, &r, &g, &b, &a);
         set_multiply_blender(r, g, b, a);
 

@@ -50,14 +50,6 @@
 #define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION) " - " STRINGIFY(GAME_BUILD_VERSION)
 #endif
 
-/* Deprecated stuff */
-#ifndef GAME_UNIX_INSTALLDIR
-#define GAME_UNIX_INSTALLDIR    "/usr/share/opensurge"
-#endif
-#ifndef GAME_UNIX_EXECDIR
-#define GAME_UNIX_EXECDIR       "/usr/bin"
-#endif
-
 /* Global definitions and constants */
 #ifdef INFINITY
 #undef INFINITY
@@ -95,15 +87,5 @@ static const double __ZERO = 0.0;
 #else
 #define INFINITY_FLT            (1.0/0.0)
 #endif
-
-#include <stdint.h>
-typedef int8_t int8;
-typedef int16_t int16;
-typedef int32_t int32;
-typedef int64_t int64;
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
 
 #endif
