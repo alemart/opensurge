@@ -42,7 +42,6 @@ struct image_t {
 };
 
 /* useful stuff */
-#define IS_PNG(path) (str_icmp((path)+strlen(path)-4, ".png") == 0)
 typedef int (*fast_getpixel_funptr)(BITMAP*,int,int);
 typedef void (*fast_putpixel_funptr)(BITMAP*,int,int,int);
 typedef int (*fast_makecol_funptr)(int,int,int);
@@ -117,6 +116,7 @@ void image_save(const image_t *img, const char *path)
 {
     int i, j, c, bpp = video_get_color_depth();
     const char* fullpath = assetfs_create_cache_file(path);
+    const char* extension = strrchr(fullpath, '.');
 
     logfile_message("image_save(\"%s\")", fullpath);
 
@@ -127,7 +127,7 @@ void image_save(const image_t *img, const char *path)
             break;
 
         case 32:
-            if(IS_PNG(fullpath)) {
+            if(extension != NULL && str_icmp(extension, ".png") == 0) {
                 /* we must do this to make loadpng save the 32-bit image properly */
                 BITMAP *tmp;
                 if(NULL != (tmp = create_bitmap(img->w, img->h))) {

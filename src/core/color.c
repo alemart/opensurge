@@ -105,7 +105,7 @@ bool color_equals(color_t a, color_t b)
 
 /*
  * color_is_mask()
- * Is the given color the mask color?
+ * Is the given color a mask color?
  */
 bool color_is_mask(color_t color)
 {
