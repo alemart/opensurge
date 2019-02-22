@@ -59,18 +59,13 @@ void fadefx_release()
  */
 void fadefx_update()
 {
-    int n, gambiarra = FALSE;
+    int n;
 
-    /* logic */
+    /* elapsed time */
     end = FALSE;
     if(type != FADEFX_NONE) {
         elapsed_time += timer_get_delta();
-        if(elapsed_time >= total_time) { /* the fade effect is over */
-            end = TRUE;
-            gambiarra = (type == FADEFX_OUT);
-            type = FADEFX_NONE;
-            total_time = elapsed_time = 0.0f;
-        }
+        end = (elapsed_time >= total_time);
     }
 
     /* render */
@@ -81,10 +76,14 @@ void fadefx_update()
         drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
         set_trans_blender(0, 0, 0, n);
         image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
-        solid_mode();
+        drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
     }
-    else if(end && gambiarra)
-        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
+
+    /* the fade effect is over */
+    if(end) {
+        total_time = elapsed_time = 0.0f;
+        type = FADEFX_NONE;
+    }
 }
 
 /*
