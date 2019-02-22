@@ -197,7 +197,7 @@ void stageselect_update()
     }
     else if(!music_is_playing()) {
         if(can_play_music)
-            music_play(music, INFINITY);
+            music_play(music, LARGE_INT);
     }
 
     /* finite state machine */

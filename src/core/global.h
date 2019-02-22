@@ -51,10 +51,6 @@
 #endif
 
 /* Global definitions and constants */
-#ifdef INFINITY
-#undef INFINITY
-#endif
-
 #ifdef INFINITY_FLT
 #undef INFINITY_FLT
 #endif
@@ -79,7 +75,7 @@
 #define FALSE                   0
 #define EPSILON                 1e-5
 #define PI                      3.1415926535
-#define INFINITY                (1<<30)
+#define LARGE_INT               (1 << 30)
 
 #ifdef __MSVC__
 static const double __ZERO = 0.0;

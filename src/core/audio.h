@@ -35,7 +35,7 @@ void audio_release();
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */
 void music_destroy(music_t *music); /* you don't usually need to bother with this. */
-void music_play(music_t *music, int loop); /* plays and loops [loop] times the given music. Set loop to INFINITY to make it loop forever. */
+void music_play(music_t *music, int loop); /* plays and loops [loop] times the given music. Set loop to LARGE_INT to make it loop continuously. */
 void music_stop();
 void music_pause();
 void music_resume();

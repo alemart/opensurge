@@ -258,7 +258,7 @@ void music_destroy(music_t *music)
 /*
  * music_play()
  * Plays the given music and loops [loop] times.
- * Set loop equal to INFINITY to make it loop forever.
+ * Set loop equal to LARGE_INT to make it loop continuously.
  */
 #ifndef __USE_OPENAL__
 void music_play(music_t *music, int loop)
@@ -269,7 +269,7 @@ void music_play(music_t *music, int loop)
         music->loops_left = loop;
         music->is_paused = FALSE;
         music->elapsed_time = 0.0f;
-        music->stream->loop = (loop >= INFINITY); /* "gambiarra", because LOGG lacks features */
+        music->stream->loop = (loop >= LARGE_INT); /* "gambiarra", because LOGG lacks features */
     }
 
     current_music = music;

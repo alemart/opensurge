@@ -118,7 +118,7 @@ static int is_startup_object(const char* object_name);
 #define MAX_POWERUPS            10
 #define DLGBOX_MAXTIME          7000
 #define TEAM_MAX                16
-#define DEFAULT_WATERLEVEL      INFINITY
+#define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)
 
 /* level attributes */
@@ -2014,7 +2014,7 @@ void update_level_size()
     v2d_t bottomright;
     brick_list_t *p, *brick_list;
 
-    max_x = max_y = -INFINITY;
+    max_x = max_y = -LARGE_INT;
 
     brick_list = entitymanager_retrieve_all_bricks();
     for(p=brick_list; p; p=p->next) {
@@ -2086,7 +2086,7 @@ void update_music()
     if(music != NULL && !block_music) {
         if(!override_music && !music_is_playing()) {
             if(music_current() == NULL || (music_current() == music && !music_is_paused()))
-                music_play(music, INFINITY);
+                music_play(music, LARGE_INT);
         }
     }
 }

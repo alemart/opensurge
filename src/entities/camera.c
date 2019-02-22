@@ -222,5 +222,5 @@ void define_boundaries(int x1, int y1, int x2, int y2)
 void update_boundaries()
 {
     if(!camera.is_locked)
-        define_boundaries(-INFINITY, -INFINITY, INFINITY, INFINITY);
+        define_boundaries(-LARGE_INT, -LARGE_INT, LARGE_INT, LARGE_INT);
 }

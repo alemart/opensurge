@@ -579,6 +579,7 @@ void load_inputmap_table()
 /* creates a new inputmapnode object */
 inputmapnode_t* inputmapnode_create(const char* name)
 {
+    static const int NO_BUTTON = LARGE_INT;
     inputmapnode_t* f = mallocx(sizeof *f);
     f->data = mallocx(sizeof *(f->data));
     f->data->name = str_dup(name);
@@ -600,14 +601,14 @@ inputmapnode_t* inputmapnode_create(const char* name)
 
     f->data->joystick.enabled = FALSE;
     f->data->joystick.id = 0;
-    f->data->joystick.button[IB_FIRE1] = INFINITY;
-    f->data->joystick.button[IB_FIRE2] = INFINITY;
-    f->data->joystick.button[IB_FIRE3] = INFINITY;
-    f->data->joystick.button[IB_FIRE4] = INFINITY;
-    f->data->joystick.button[IB_FIRE5] = INFINITY;
-    f->data->joystick.button[IB_FIRE6] = INFINITY;
-    f->data->joystick.button[IB_FIRE7] = INFINITY;
-    f->data->joystick.button[IB_FIRE8] = INFINITY;
+    f->data->joystick.button[IB_FIRE1] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE2] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE3] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE4] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE5] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE6] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE7] = NO_BUTTON;
+    f->data->joystick.button[IB_FIRE8] = NO_BUTTON;
 
     return f;
 }

@@ -176,7 +176,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 /* get zindex */
 surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return surgescript_var_set_number(surgescript_var_create(), INFINITY);
+    return surgescript_var_set_number(surgescript_var_create(), LARGE_INT);
 }
 
 /* set visibility */

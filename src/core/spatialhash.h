@@ -307,7 +307,7 @@ void spatialhash_##T##_foreach(spatialhash_##T *sh, int rectangle_xpos, int rect
 /* similar to spatialhash_##T##_foreach, but this one retrieves all the elements stored in the spatial hash */ \
 void spatialhash_##T##_forall(spatialhash_##T *sh, void *some_user_data, int (*callback_function)(T*,void*)) \
 { \
-    spatialhash_##T##_foreach(sh, -INFINITY/2, -INFINITY/2, INFINITY, INFINITY, some_user_data, callback_function); \
+    spatialhash_##T##_foreach(sh, -LARGE_INT/2, -LARGE_INT/2, LARGE_INT, LARGE_INT, some_user_data, callback_function); \
 }
 
 #endif

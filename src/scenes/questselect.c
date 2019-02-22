@@ -180,7 +180,7 @@ void questselect_update()
 
     /* music */
     if(!music_is_playing() && state != QUESTSTATE_PLAY)
-        music_play(music, INFINITY);
+        music_play(music, LARGE_INT);
 
     /* finite state machine */
     switch(state) {

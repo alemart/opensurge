@@ -197,7 +197,7 @@ void langselect_update()
 
     /* music */
     if(!music_is_playing() && !before_the_intro_screen)
-        music_play(music, INFINITY);
+        music_play(music, LARGE_INT);
 
     /* quit */
     if(quit) {
