@@ -135,7 +135,7 @@ static void render_water(renderable_t r, v2d_t camera_position)
 {
     int y = level_waterlevel() - ((int)camera_position.y - VIDEO_SCREEN_H/2);
     if(y < VIDEO_SCREEN_H)
-        image_waterfx(video_get_backbuffer(), y, level_watercolor());
+        image_waterfx(y, level_watercolor());
 }
 
 static int ypos_particles(renderable_t r) { return 0; }

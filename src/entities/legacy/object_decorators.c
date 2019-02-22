@@ -3209,7 +3209,7 @@ void lockcamera_render(objectmachine_t *obj, v2d_t camera_position)
         x2 = (act->position.x + me->_x2) - (camera_position.x - VIDEO_SCREEN_W/2);
         y2 = (act->position.y + me->_y2) - (camera_position.y - VIDEO_SCREEN_H/2);
 
-        image_rect(video_get_backbuffer(), x1, y1, x2, y2, color);
+        image_rect(x1, y1, x2, y2, color);
     }
 
     decorated_machine->render(decorated_machine, camera_position);

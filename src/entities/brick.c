@@ -432,7 +432,7 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
                 y = brk->sy + round(ry*sin(sy*t+ph));
 
                 if(t > 0.0f)
-                    image_line(video_get_backbuffer(), (int)(oldx-topleft.x+w/2), (int)(oldy-topleft.y+h/2), (int)(x-topleft.x+w/2), (int)(y-topleft.y+h/2), color);
+                    image_line((int)(oldx-topleft.x+w/2), (int)(oldy-topleft.y+h/2), (int)(x-topleft.x+w/2), (int)(y-topleft.y+h/2), color);
 
                 oldx = x;
                 oldy = y;
@@ -442,7 +442,7 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
             t = 0.0f;
             x = brk->sx + round(rx*cos(sx*t+ph));
             y = brk->sy + round(ry*sin(sy*t+ph));
-            image_line(video_get_backbuffer(), (int)(oldx-topleft.x+w/2), (int)(oldy-topleft.y+h/2), (int)(x-topleft.x+w/2), (int)(y-topleft.y+h/2), color);
+            image_line((int)(oldx-topleft.x+w/2), (int)(oldy-topleft.y+h/2), (int)(x-topleft.x+w/2), (int)(y-topleft.y+h/2), color);
 
         default:
             break;

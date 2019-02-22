@@ -3005,7 +3005,7 @@ void editor_render()
     editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
 
     /* top bar */
-    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, 24, color_rgb(40, 44, 52));
+    image_rectfill(0, 0, VIDEO_SCREEN_W, 24, color_rgb(40, 44, 52));
     font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
@@ -3119,7 +3119,7 @@ void editor_update_background()
  */
 void editor_render_background()
 {
-    image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(40, 44, 52));
+    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(40, 44, 52));
     background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
 }
 
@@ -3147,7 +3147,7 @@ void editor_waterline_render(int ycoord, color_t color)
     int x, x0 = 19 - (timer_get_ticks() / 25) % 20;
 
     for(x=x0-10; x<VIDEO_SCREEN_W; x+=20)
-        image_line(video_get_backbuffer(), x, ycoord, x+10, ycoord, color);
+        image_line(x, ycoord, x+10, ycoord, color);
 }
 
 

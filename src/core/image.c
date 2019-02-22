@@ -61,7 +61,7 @@ static fast_getb_funptr fast_getb_fun(); /* returns a function */
 
 /* drawing target */
 static image_t* _target = NULL;
-#define target (_target ? _target : video_get_backbuffer())
+#define get_target() (_target ? _target : video_get_backbuffer())
 
 /*
  * image_load()
@@ -353,9 +353,10 @@ color_t image_getpixel(const image_t *img, int x, int y)
  * image_line()
  * Draws a line from (x1,y1) to (x2,y2) using the specified color
  */
-void image_line(image_t *img, int x1, int y1, int x2, int y2, color_t color)
+void image_line(int x1, int y1, int x2, int y2, color_t color)
 {
-    line(img->data, x1, y1, x2, y2, color._value);
+    image_t* target = get_target();
+    line(target->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -363,9 +364,10 @@ void image_line(image_t *img, int x1, int y1, int x2, int y2, color_t color)
  * image_ellipse()
  * Draws an ellipse with the specified centre, radius and color
  */
-void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, color_t color)
+void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
 {
-    ellipse(img->data, cx, cy, radius_x, radius_y, color._value);
+    image_t* target = get_target();
+    ellipse(target->data, cx, cy, radius_x, radius_y, color._value);
 }
 
 
@@ -373,9 +375,10 @@ void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, col
  * image_rectfill()
  * Draws a filled rectangle
  */
-void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, color_t color)
+void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 {
-    rectfill(img->data, x1, y1, x2, y2, color._value);
+    image_t* target = get_target();
+    rectfill(target->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -383,9 +386,10 @@ void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, color_t color)
  * image_rect()
  * Draws a rectangle
  */
-void image_rect(image_t *img, int x1, int y1, int x2, int y2, color_t color)
+void image_rect(int x1, int y1, int x2, int y2, color_t color)
 {
-    rect(img->data, x1, y1, x2, y2, color._value);
+    image_t* target = get_target();
+    rect(target->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -393,9 +397,10 @@ void image_rect(image_t *img, int x1, int y1, int x2, int y2, color_t color)
  * image_pixel()
  * Draws a pixel
  */
-void image_pixel(image_t *img, int x, int y, color_t color)
+void image_pixel(int x, int y, color_t color)
 {
-    putpixel(img->data, x, y, color._value);
+    image_t* target = get_target();
+    putpixel(target->data, x, y, color._value);
 }
 
 
@@ -403,8 +408,9 @@ void image_pixel(image_t *img, int x, int y, color_t color)
  * image_waterfx()
  * pixels below y will have a water effect
  */
-void image_waterfx(image_t *img, int y, color_t color)
+void image_waterfx(int y, color_t color)
 {
+    image_t* target = get_target();
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
     fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
     fast_makecol_funptr fast_makecol = fast_makecol_fun();
@@ -415,7 +421,7 @@ void image_waterfx(image_t *img, int y, color_t color)
     int i, j;
 
     /* adjust y */
-    y = clip(y, 0, img->h);
+    y = clip(y, 0, target->h);
 
     /* water color */
     wr = fast_getr(color._value);
@@ -425,18 +431,18 @@ void image_waterfx(image_t *img, int y, color_t color)
     /* water effect */
     if(video_get_color_depth() > 16) {
         /* fast blending algorithm (alpha = 0.5) */
-        for(j=y; j<img->h; j++) {
-            for(i=0; i<img->w; i++) {
-                col = fast_getpixel(img->data, i, j);
-                fast_putpixel(img->data, i, j, fast_makecol((fast_getr(col) + wr)/2, (fast_getg(col) + wg)/2, (fast_getb(col) + wb)/2));
+        for(j=y; j<target->h; j++) {
+            for(i=0; i<target->w; i++) {
+                col = fast_getpixel(target->data, i, j);
+                fast_putpixel(target->data, i, j, fast_makecol((fast_getr(col) + wr)/2, (fast_getg(col) + wg)/2, (fast_getb(col) + wb)/2));
             }
         }
     }
     else {
         /* fast "dithered" water, when bpp is not greater than 16 (slow computers?) */
-        for(j=y; j<img->h; j++) {
-            for(i=j%2; i<img->w; i+=2) {
-                fast_putpixel(img->data, i, j, color._value);
+        for(j=y; j<target->h; j++) {
+            for(i=j%2; i<target->w; i+=2) {
+                fast_putpixel(target->data, i, j, color._value);
             }
         }
     }
@@ -447,9 +453,10 @@ void image_waterfx(image_t *img, int y, color_t color)
  * image_clear()
  * Clears an given image with some color
  */
-void image_clear(image_t *img, color_t color)
+void image_clear(color_t color)
 {
-    clear_to_color(img->data, color._value);
+    image_t* target = get_target();
+    clear_to_color(target->data, color._value);
 }
 
 
@@ -641,7 +648,7 @@ void image_set_drawing_target(image_t* new_target)
  */
 image_t* image_drawing_target()
 {
-    return target;
+    return get_target();
 }
 
 

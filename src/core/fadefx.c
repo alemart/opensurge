@@ -80,11 +80,11 @@ void fadefx_update()
         n = (type == FADEFX_IN) ? (255 - n) : n;
         drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
         set_trans_blender(0, 0, 0, n);
-        image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
+        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
         solid_mode();
     }
     else if(end && gambiarra)
-        image_rectfill(video_get_backbuffer(), 0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
+        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, fade_color);
 }
 
 /*

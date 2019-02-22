@@ -56,13 +56,13 @@ void image_set_drawing_target(image_t* new_target);
 image_t* image_drawing_target();
 
 /* drawing primitives */
-void image_clear(image_t *img, color_t color);
-void image_line(image_t *img, int x1, int y1, int x2, int y2, color_t color);
-void image_ellipse(image_t *img, int cx, int cy, int radius_x, int radius_y, color_t color);
-void image_rectfill(image_t *img, int x1, int y1, int x2, int y2, color_t color);
-void image_rect(image_t *img, int x1, int y1, int x2, int y2, color_t color);
-void image_pixel(image_t *img, int x, int y, color_t color);
-void image_waterfx(image_t *img, int y, color_t color); /* pixels below y will have a water effect */
+void image_clear(color_t color);
+void image_line(int x1, int y1, int x2, int y2, color_t color);
+void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color);
+void image_rectfill(int x1, int y1, int x2, int y2, color_t color);
+void image_rect(int x1, int y1, int x2, int y2, color_t color);
+void image_pixel(int x, int y, color_t color);
+void image_waterfx(int y, color_t color); /* pixels below y will have a water effect */
 
 /* rendering */
 void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);

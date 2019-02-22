@@ -126,6 +126,6 @@ void intro_update()
 void intro_render()
 {
     v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
-    image_clear(video_get_backbuffer(), INTRO_BGCOLOR());
+    image_clear(INTRO_BGCOLOR());
     font_render(fnt, camera);
 }

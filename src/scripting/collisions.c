@@ -571,7 +571,7 @@ surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const s
         int t = top - (camera.y - VIDEO_SCREEN_H / 2);
         int b = bottom - (camera.y - VIDEO_SCREEN_H / 2) - 1;
         
-        image_rect(video_get_backbuffer(), l, t, r, b, color);
+        image_rect(l, t, r, b, color);
     }
 
     return NULL;
@@ -765,7 +765,7 @@ surgescript_var_t* fun_collisionball_render(surgescript_object_t* object, const 
         double r = collider->radius;
         center.x -= (camera.x - VIDEO_SCREEN_W / 2);
         center.y -= (camera.y - VIDEO_SCREEN_H / 2);
-        image_ellipse(video_get_backbuffer(), center.x, center.y, r, r, COLLIDER_COLOR());
+        image_ellipse(center.x, center.y, r, r, COLLIDER_COLOR());
     }
 
     return NULL;
