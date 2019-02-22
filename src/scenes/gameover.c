@@ -108,7 +108,7 @@ void gameover_render()
 {
     v2d_t v = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
-    image_blit(gameover_buf, video_get_backbuffer(), 0, 0, 0, 0, image_width(gameover_buf), image_height(gameover_buf));
+    image_blit(gameover_buf, 0, 0, 0, 0, image_width(gameover_buf), image_height(gameover_buf));
     font_render(gameover_fnt[0], v);
     font_render(gameover_fnt[1], v);
 }

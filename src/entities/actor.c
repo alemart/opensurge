@@ -102,16 +102,16 @@ void actor_render(actor_t *act, v2d_t camera_position)
         img = actor_image(act);
         if(fabs(act->angle) > EPSILON) {
             if(fabs(act->scale.x - 1.0f) > EPSILON || fabs(act->scale.y - 1.0f) > EPSILON)
-                image_draw_scaled_rotated(img, video_get_backbuffer(), (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
+                image_draw_scaled_rotated(img, (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
             else
-                image_draw_rotated(img, video_get_backbuffer(), (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
+                image_draw_rotated(img, (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
         }
         else if(fabs(act->scale.x - 1.0f) > EPSILON || fabs(act->scale.y - 1.0f) > EPSILON)
-            image_draw_scaled(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x*act->scale.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y*act->scale.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->scale, act->mirror);
+            image_draw_scaled(img, (int)(act->position.x-act->hot_spot.x*act->scale.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y*act->scale.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->scale, act->mirror);
         else if(fabs(act->alpha - 1.0f) > EPSILON)
-            image_draw_trans(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->alpha, act->mirror);
+            image_draw_trans(img, (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->alpha, act->mirror);
         else
-            image_draw(img, video_get_backbuffer(), (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->mirror);
+            image_draw(img, (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->mirror);
     }
 }
 
@@ -145,7 +145,7 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
         h = repeat_y ? (VIDEO_SCREEN_H/image_height(img) + 3) : 1;
         for(i=0; i<w; i++) {
             for(j=0; j<h; j++)
-                image_draw(img, video_get_backbuffer(), (int)final_pos.x + i*image_width(img), (int)final_pos.y + j*image_height(img), act->mirror);
+                image_draw(img, (int)final_pos.x + i*image_width(img), (int)final_pos.y + j*image_height(img), act->mirror);
         }
     }
 }

@@ -443,8 +443,7 @@ int video_is_fps_visible()
 void video_display_loading_screen()
 {
     image_t *img = image_load(LOADING_SCREEN_FILE);
-    image_blit(img, video_get_backbuffer(), 0, 0, (VIDEO_SCREEN_W - image_width(img))/2, (VIDEO_SCREEN_H - image_height(img))/2, image_width(img), image_height(img));
-    image_unload(img);
+    image_blit(img, 0, 0, (VIDEO_SCREEN_W - image_width(img))/2, (VIDEO_SCREEN_H - image_height(img))/2, image_width(img), image_height(img));
     video_render();
 }
 

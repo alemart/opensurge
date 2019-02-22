@@ -128,8 +128,8 @@ void pause_render()
     float scale = 1+0.5*fabs(cos(PI/2*pause_timer));
     v2d_t pos = v2d_new((VIDEO_SCREEN_W-image_width(p))/2 - (scale-1)*image_width(p)/2, (VIDEO_SCREEN_H-image_height(p))/2 - (scale-1)*image_height(p)/2);
 
-    image_blit(pause_buf, video_get_backbuffer(), 0, 0, 0, 0, image_width(pause_buf), image_height(pause_buf));
-    image_draw_scaled(p, video_get_backbuffer(), (int)pos.x, (int)pos.y, v2d_new(scale,scale), IF_NONE);
+    image_blit(pause_buf, 0, 0, 0, 0, image_width(pause_buf), image_height(pause_buf));
+    image_draw_scaled(p, (int)pos.x, (int)pos.y, v2d_new(scale,scale), IF_NONE);
 
     if(!pause_quit)
         pause_timer += timer_get_delta();

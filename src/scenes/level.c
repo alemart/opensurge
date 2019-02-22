@@ -1370,7 +1370,7 @@ void level_render()
 
     /* quit... */
     if(quit_level) {
-        image_blit(quit_level_img, video_get_backbuffer(), 0, 0, 0, 0, image_width(quit_level_img), image_height(quit_level_img));
+        image_blit(quit_level_img, 0, 0, 0, 0, image_width(quit_level_img), image_height(quit_level_img));
         return;
     }
 
@@ -2345,7 +2345,7 @@ void render_powerups()
 
     for(i=0; i<c; i++) {
         if(visible[i])
-            image_draw(icon[i], video_get_backbuffer(), VIDEO_SCREEN_W - image_width(icon[i]) * (i+1) - 5*i - 15, 10, IF_NONE);
+            image_draw(icon[i], VIDEO_SCREEN_W - image_width(icon[i]) * (i+1) - 5*i - 15, 10, IF_NONE);
     }
 }
 
@@ -3017,9 +3017,9 @@ void editor_render()
         /* drawing the cursor arrow */
         cursor = sprite_get_image(sprite_get_animation("SD_ARROW", 0), 0);
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
-            image_draw(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
+            image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
-            image_draw_tinted(cursor, video_get_backbuffer(), (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
+            image_draw_tinted(cursor, (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
 
         /* cursor coordinates */
         font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
@@ -3027,7 +3027,7 @@ void editor_render()
     else {
         /* drawing an eraser */
         cursor = sprite_get_image(sprite_get_animation("SD_ERASER", 0), 0);
-        image_draw(cursor, video_get_backbuffer(), (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
+        image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
 
 
@@ -3602,7 +3602,7 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
 
     /* drawing the object */
     if(cursor != NULL)
-        image_draw_trans(cursor, video_get_backbuffer(), (int)(position.x-offset.x), (int)(position.y-offset.y), alpha, flags);
+        image_draw_trans(cursor, (int)(position.x-offset.x), (int)(position.y-offset.y), alpha, flags);
 }
 
 

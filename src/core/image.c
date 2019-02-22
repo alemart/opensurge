@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * image.c - image implementation
- * Copyright (C) 2008-2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2010, 2012, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,10 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdarg.h>
 #include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <png.h>
 #include <allegro.h>
 #include <loadpng.h>
@@ -31,14 +28,14 @@
 #include "stringutil.h"
 #include "logfile.h"
 #include "assetfs.h"
-#include "resourcemanager.h"
 #include "util.h"
+#include "resourcemanager.h"
 
 /* image structure */
 struct image_t {
-    BITMAP *data; /* this must be the first field */
+    BITMAP* data; /* this must be the first field */
     int w, h;
-    char *path;
+    char* path;
 };
 
 /* useful stuff */
@@ -50,8 +47,8 @@ typedef int (*fast_getg_funptr)(int);
 typedef int (*fast_getb_funptr)(int);
 
 /* private stuff */
-static void maskcolor_bugfix(image_t *img);
-static inline void draw_to(const image_t *src, image_t *dest, int x, int y, imageflags_t flags);
+static void maskcolor_bugfix(image_t* img);
+static inline void draw_to(const image_t* src, image_t* dest, int x, int y, imageflags_t flags);
 static fast_getpixel_funptr fast_getpixel_fun(); /* returns a function. this won't do any clipping, so be careful. */
 static fast_putpixel_funptr fast_putpixel_fun(); /* returns a function. this won't do any clipping, so be careful. */
 static fast_makecol_funptr fast_makecol_fun(); /* returns a function */
@@ -68,9 +65,9 @@ static image_t* _target = NULL;
  * Loads a image from a file.
  * Supported types: PNG, JPG, BMP, PCX, TGA
  */
-image_t *image_load(const char *path)
+image_t* image_load(const char* path)
 {
-    image_t *img;
+    image_t* img;
 
     if(NULL == (img = resourcemanager_find_image(path))) {
         const char* fullpath = assetfs_fullpath(path);
@@ -112,7 +109,7 @@ image_t *image_load(const char *path)
  * image_save()
  * Saves a image to a file
  */
-void image_save(const image_t *img, const char *path)
+void image_save(const image_t* img, const char *path)
 {
     int i, j, c, bpp = video_get_color_depth();
     const char* fullpath = assetfs_create_cache_file(path);
@@ -153,9 +150,9 @@ void image_save(const image_t *img, const char *path)
  * image_create()
  * Creates a new image of a given size
  */
-image_t *image_create(int width, int height)
+image_t* image_create(int width, int height)
 {
-    image_t *img = mallocx(sizeof *img);
+    image_t* img = mallocx(sizeof *img);
 
     img->data = create_bitmap(width, height);
     img->w = width;
@@ -176,7 +173,7 @@ image_t *image_create(int width, int height)
  * Destroys an image. This is called automatically
  * while unloading the resource manager.
  */
-void image_destroy(image_t *img)
+void image_destroy(image_t* img)
 {
     if(img->data != NULL) {
         destroy_bitmap(img->data);
@@ -197,9 +194,9 @@ void image_destroy(image_t *img)
  * image to avoid memory leaks and potential crashes acessing
  * memory which has been freed.
  */
-image_t *image_create_shared(const image_t *parent, int x, int y, int width, int height)
+image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height)
 {
-    image_t *img;
+    image_t* img;
     int pw, ph;
 
     if(width <= 0 || height <= 0)
@@ -241,7 +238,7 @@ image_t *image_create_shared(const image_t *parent, int x, int y, int width, int
  *
  * Returns the no. of references to the image
  */
-int image_unload(image_t *img)
+int image_unload(image_t* img)
 {
     if(img->path != NULL)
        return resourcemanager_unref_image(img->path);
@@ -254,9 +251,9 @@ int image_unload(image_t *img)
  * Clones an existing image; make sure you
  * call image_destroy() after usage
  */
-image_t *image_clone(const image_t *src)
+image_t* image_clone(const image_t* src)
 {
-    image_t *img = mallocx(sizeof *img);
+    image_t* img = mallocx(sizeof *img);
     img->w = src->w;
     img->h = src->h;
     img->path = NULL;
@@ -273,9 +270,9 @@ image_t *image_clone(const image_t *src)
  * Clones a region of an image; make sure you
  * call image_destroy() after usage
  */
-image_t *image_clone_region(const image_t *src, int x, int y, int width, int height)
+image_t* image_clone_region(const image_t* src, int x, int y, int width, int height)
 {
-    image_t *img;
+    image_t* img;
     int sw, sh;
 
     if(width <= 0 || height <= 0)
@@ -304,7 +301,7 @@ image_t *image_clone_region(const image_t *src, int x, int y, int width, int hei
  * image_lock()
  * Locks the image, enabling fast in-memory pixel access
  */
-void image_lock(image_t *img)
+void image_lock(image_t* img)
 {
     ;
 }
@@ -313,7 +310,7 @@ void image_lock(image_t *img)
  * image_unlock()
  * Unlocks the image
  */
-void image_unlock(image_t *img)
+void image_unlock(image_t* img)
 {
     ;
 }
@@ -323,7 +320,7 @@ void image_unlock(image_t *img)
  * image_width()
  * The width of the image
  */
-int image_width(const image_t *img)
+int image_width(const image_t* img)
 {
     return img->w;
 }
@@ -333,7 +330,7 @@ int image_width(const image_t *img)
  * image_height()
  * The height of the image
  */
-int image_height(const image_t *img)
+int image_height(const image_t* img)
 {
     return img->h;
 }
@@ -343,7 +340,7 @@ int image_height(const image_t *img)
  * image_getpixel()
  * Returns the pixel at the given position on the image
  */
-color_t image_getpixel(const image_t *img, int x, int y)
+color_t image_getpixel(const image_t* img, int x, int y)
 {
     return (color_t){ getpixel(img->data, x, y) };
 }
@@ -355,8 +352,7 @@ color_t image_getpixel(const image_t *img, int x, int y)
  */
 void image_line(int x1, int y1, int x2, int y2, color_t color)
 {
-    image_t* target = get_target();
-    line(target->data, x1, y1, x2, y2, color._value);
+    line(get_target()->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -366,8 +362,7 @@ void image_line(int x1, int y1, int x2, int y2, color_t color)
  */
 void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
 {
-    image_t* target = get_target();
-    ellipse(target->data, cx, cy, radius_x, radius_y, color._value);
+    ellipse(get_target()->data, cx, cy, radius_x, radius_y, color._value);
 }
 
 
@@ -377,8 +372,7 @@ void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
  */
 void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 {
-    image_t* target = get_target();
-    rectfill(target->data, x1, y1, x2, y2, color._value);
+    rectfill(get_target()->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -388,8 +382,7 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
  */
 void image_rect(int x1, int y1, int x2, int y2, color_t color)
 {
-    image_t* target = get_target();
-    rect(target->data, x1, y1, x2, y2, color._value);
+    rect(get_target()->data, x1, y1, x2, y2, color._value);
 }
 
 
@@ -399,14 +392,13 @@ void image_rect(int x1, int y1, int x2, int y2, color_t color)
  */
 void image_pixel(int x, int y, color_t color)
 {
-    image_t* target = get_target();
-    putpixel(target->data, x, y, color._value);
+    putpixel(get_target()->data, x, y, color._value);
 }
 
 
 /*
  * image_waterfx()
- * pixels below y will have a water effect
+ * Pixels below y will have a water effect
  */
 void image_waterfx(int y, color_t color)
 {
@@ -455,8 +447,7 @@ void image_waterfx(int y, color_t color)
  */
 void image_clear(color_t color)
 {
-    image_t* target = get_target();
-    clear_to_color(target->data, color._value);
+    clear_to_color(get_target()->data, color._value);
 }
 
 
@@ -464,9 +455,9 @@ void image_clear(color_t color)
  * image_blit()
  * Blits a surface onto another
  */
-void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
+void image_blit(const image_t* src, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
 {
-    blit(src->data, dest->data, source_x, source_y, dest_x, dest_y, width, height);
+    blit(src->data, get_target()->data, source_x, source_y, dest_x, dest_y, width, height);
 }
 
 
@@ -477,9 +468,9 @@ void image_blit(const image_t *src, image_t *dest, int source_x, int source_y, i
  *
  * flags: refer to the IF_* defines (Image Flags)
  */
-void image_draw(const image_t *src, image_t *dest, int x, int y, imageflags_t flags)
+void image_draw(const image_t* src, int x, int y, imageflags_t flags)
 {
-    draw_to(src, dest, x, y, flags);
+    draw_to(src, get_target(), x, y, flags);
 }
 
 
@@ -493,15 +484,15 @@ void image_draw(const image_t *src, image_t *dest, int x, int y, imageflags_t fl
  *        (2.0, 2.0) stands for a double-sized image
  *        (0.5, 0.5) stands for a smaller image
  */
-void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t scale, imageflags_t flags)
-{
-    image_t *tmp;
+void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags_t flags)
+{ 
+    image_t* tmp;
     int w = (int)(scale.x * src->w);
     int h = (int)(scale.y * src->h);
 
     tmp = image_create(w, h);
     stretch_blit(src->data, tmp->data, 0, 0, src->w, src->h, 0, 0, w, h);
-    image_draw(tmp, dest, x, y, flags);
+    image_draw(tmp, x, y, flags);
     image_destroy(tmp);
 }
 
@@ -509,22 +500,22 @@ void image_draw_scaled(const image_t *src, image_t *dest, int x, int y, v2d_t sc
 /*
  * image_draw_rotated()
  * Draws a rotated image onto the destination bitmap at the specified position 
- *
  * ang: angle given in radians
  * cx, cy: pivot positions
  */
-void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, float ang, imageflags_t flags)
+void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float ang, imageflags_t flags)
 {
-    float conv = (-ang * (180.0f/PI)) * (64.0f/90.0f);
+    image_t* target = get_target();
+    float conv = ang * -40.7436654315f; /* -(180/pi)*(64/90) */
 
     if((flags & IF_HFLIP) && !(flags & IF_VFLIP))
-        pivot_sprite_v_flip(dest->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
+        pivot_sprite_v_flip(target->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
     else if(!(flags & IF_HFLIP) && (flags & IF_VFLIP))
-        pivot_sprite_v_flip(dest->data, src->data, x, y, cx, src->h - cy, ftofix(conv));
+        pivot_sprite_v_flip(target->data, src->data, x, y, cx, src->h - cy, ftofix(conv));
     else if((flags & IF_HFLIP) && (flags & IF_VFLIP))
-        pivot_sprite(dest->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
+        pivot_sprite(target->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
     else
-        pivot_sprite(dest->data, src->data, x, y, cx, cy, ftofix(conv));
+        pivot_sprite(target->data, src->data, x, y, cx, cy, ftofix(conv));
 }
 
 
@@ -532,15 +523,15 @@ void image_draw_rotated(const image_t *src, image_t *dest, int x, int y, int cx,
  * image_draw_scaled_rotated()
  * Draw scaled and rotated ;)
  */
-void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, int cx, int cy, v2d_t scale, float ang, imageflags_t flags)
+void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float ang, imageflags_t flags)
 {
-    image_t *tmp;
+    image_t* tmp;
     int w = (int)(scale.x * src->w);
     int h = (int)(scale.y * src->h);
 
     tmp = image_create(w, h);
     stretch_blit(src->data, tmp->data, 0, 0, src->w, src->h, 0, 0, w, h);
-    image_draw_rotated(tmp, dest, x, y, cx, cy, ang, flags);
+    image_draw_rotated(tmp, x, y, cx, cy, ang, flags);
     image_destroy(tmp);
 }
 
@@ -550,28 +541,27 @@ void image_draw_scaled_rotated(const image_t *src, image_t *dest, int x, int y, 
  * Draws a translucent image
  * 0.0 (invisible) <= alpha <= 1.0 (opaque)
  */
-void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alpha, imageflags_t flags)
+void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags)
 {
-    image_t *tmp;
-    int a;
+    image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
-        a = 255 * clip(alpha, 0.0f, 1.0f);
+        int a = 255 * clip(alpha, 0.0f, 1.0f);
         set_trans_blender(a, a, a, a);
 
         if(flags != IF_NONE) {
-            tmp = image_create(src->w, src->h);
+            image_t* tmp = image_create(src->w, src->h);
             clear_to_color(tmp->data, color_mask()._value);
             draw_to(src, tmp, 0, 0, flags);
-            draw_trans_sprite(dest->data, tmp->data, x, y);
+            draw_trans_sprite(target->data, tmp->data, x, y);
             image_destroy(tmp);
         }
         else
-            draw_trans_sprite(dest->data, src->data, x, y);
+            draw_trans_sprite(target->data, src->data, x, y);
 
     }
     else
-        draw_to(src, dest, x, y, flags);
+        draw_to(src, target, x, y, flags);
 }
 
 
@@ -580,28 +570,28 @@ void image_draw_trans(const image_t *src, image_t *dest, int x, int y, float alp
  * Draws an image tinted with a specific color
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t color, imageflags_t flags)
+void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
-    image_t *tmp;
-    uint8 r, g, b, a;
+    image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
+        uint8 r, g, b, a;
         color_unmap(color, &r, &g, &b, &a);
         set_trans_blender(r, g, b, a);
         a = video_get_color_depth() < 32 ? 128 : a;
 
         if(flags != IF_NONE) {
-            tmp = image_create(src->w, src->h);
+            image_t* tmp = image_create(src->w, src->h);
             clear_to_color(tmp->data, color_mask()._value);
             draw_to(src, tmp, 0, 0, flags);
-            draw_lit_sprite(dest->data, tmp->data, x, y, a);
+            draw_lit_sprite(target->data, tmp->data, x, y, a);
             image_destroy(tmp);
         }
         else
-            draw_lit_sprite(dest->data, src->data, x, y, a);
+            draw_lit_sprite(target->data, src->data, x, y, a);
     }
     else
-        draw_to(src, dest, x, y, flags);
+        draw_to(src, target, x, y, flags);
 }
 
 /*
@@ -609,27 +599,27 @@ void image_draw_tinted(const image_t *src, image_t *dest, int x, int y, color_t 
  * Image blending: multiplication mode
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_multiply(const image_t *src, image_t *dest, int x, int y, color_t color, imageflags_t flags)
+void image_draw_multiply(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
-    image_t *tmp;
-    uint8 r, g, b, a;
+    image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
+        uint8 r, g, b, a;
         color_unmap(color, &r, &g, &b, &a);
         set_multiply_blender(r, g, b, a);
 
         if(flags != IF_NONE) {
-            tmp = image_create(src->w, src->h);
+            image_t* tmp = image_create(src->w, src->h);
             clear_to_color(tmp->data, color_mask()._value);
             draw_to(src, tmp, 0, 0, flags);
-            draw_lit_sprite(dest->data, tmp->data, x, y, 255);
+            draw_lit_sprite(target->data, tmp->data, x, y, 255);
             image_destroy(tmp);
         }
         else
-            draw_lit_sprite(dest->data, src->data, x, y, 255);
+            draw_lit_sprite(target->data, src->data, x, y, 255);
     }
     else
-        draw_to(src, dest, x, y, flags);
+        draw_to(src, target, x, y, flags);
 }
 
 /*
@@ -660,7 +650,7 @@ image_t* image_drawing_target()
  * When loading certain PNGs, magenta (color key) is
  * not considered transparent. Let's fix this.
  */
-void maskcolor_bugfix(image_t *img)
+void maskcolor_bugfix(image_t* img)
 {
     int i, j;
     color_t pixel, mask = color_mask();
@@ -680,7 +670,7 @@ void maskcolor_bugfix(image_t *img)
  * draw_to()
  * Draws an image into another using a set of flags
  */
-void draw_to(const image_t *src, image_t *dest, int x, int y, imageflags_t flags)
+void draw_to(const image_t* src, image_t* dest, int x, int y, imageflags_t flags)
 {
     if(!(flags & IF_HFLIP) && !(flags & IF_VFLIP))
         draw_sprite(dest->data, src->data, x, y);

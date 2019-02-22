@@ -180,8 +180,8 @@ void confirmbox_render()
     int i, k;
     v2d_t cam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
-    image_blit(background, video_get_backbuffer(), 0, 0, 0, 0, image_width(background), image_height(background));
-    image_draw(box, video_get_backbuffer(), boxpos.x, boxpos.y, IF_NONE);
+    image_blit(background, 0, 0, 0, 0, image_width(background), image_height(background));
+    image_draw(box, boxpos.x, boxpos.y, IF_NONE);
     font_render(textfnt, cam);
 
     for(i=0; i<option_count; i++) {

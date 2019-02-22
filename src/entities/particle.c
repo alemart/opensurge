@@ -146,7 +146,7 @@ void particle_render_all(v2d_t camera_position)
 
     for(it=particle_list; it; it=it->next) {
         p = it->data;
-        image_draw(p->image, video_get_backbuffer(), (int)(p->position.x-topleft.x), (int)(p->position.y-topleft.y), IF_NONE);
+        image_draw(p->image, (int)(p->position.x-topleft.x), (int)(p->position.y-topleft.y), IF_NONE);
     }
 }
 

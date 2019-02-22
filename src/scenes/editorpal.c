@@ -219,7 +219,7 @@ void editorpal_render()
 
     /* render the background */
     image_clear(color_rgb(18, 18, 18));
-    image_draw_trans(background, video_get_backbuffer(), 0, 0, 0.15f, IF_NONE);
+    image_draw_trans(background, 0, 0, 0.15f, IF_NONE);
 
     /* render the active item background */
     active_item = item_at(cursor_position);
@@ -249,7 +249,7 @@ void editorpal_render()
     font_render(error_font, cam);
 
     /* render the cursor */
-    image_draw(cursor_image, video_get_backbuffer(), (int)cursor_position.x, (int)cursor_position.y, IF_NONE);
+    image_draw(cursor_image, (int)cursor_position.x, (int)cursor_position.y, IF_NONE);
     font_render(cursor_font, cam);
 }
 
@@ -295,6 +295,6 @@ void draw_item(int item_number, v2d_t center)
         int height = image_height(image);
         float factor = min((float)ITEM_SPRITE_MAXSIZE / max(width, height), ITEM_MAX_ZOOM);
         v2d_t scale = v2d_new(factor, factor);
-        image_draw_scaled(image, video_get_backbuffer(), center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
+        image_draw_scaled(image, center.x - width * scale.x / 2, center.y - height * scale.y / 2, scale, IF_NONE);
     }
 }

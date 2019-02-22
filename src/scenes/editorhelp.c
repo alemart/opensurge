@@ -127,7 +127,7 @@ void editorhelp_render()
 {
     v2d_t v = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
     image_clear(color_rgb(18, 18, 18));
-    image_draw_trans(background, video_get_backbuffer(), 0, 0, 0.15f, IF_NONE);
+    image_draw_trans(background, 0, 0, 0.15f, IF_NONE);
     image_rectfill(BOX_XPOS, BOX_YPOS, BOX_XPOS + BOX_WIDTH - 1, BOX_YPOS + BOX_HEIGHT - 1, color_rgb(40, 44, 52));
     font_render(title, v);
     font_render(label, v);
