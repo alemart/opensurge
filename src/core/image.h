@@ -65,11 +65,11 @@ void image_pixel(int x, int y, color_t color);
 void image_waterfx(int y, color_t color);
 
 /* rendering */
-void image_blit(const image_t* src, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
+void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y, int width, int height);
 void image_draw(const image_t* src, int x, int y, imageflags_t flags);
 void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags_t flags);
-void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float ang, imageflags_t flags);
-void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float ang, imageflags_t flags);
+void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, imageflags_t flags);
+void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags);
 void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags);
 void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags);
 void image_draw_multiply(const image_t* src, int x, int y, color_t color, imageflags_t flags);

@@ -455,9 +455,9 @@ void image_clear(color_t color)
  * image_blit()
  * Blits a surface onto another
  */
-void image_blit(const image_t* src, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
+void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y, int width, int height)
 {
-    blit(src->data, get_target()->data, source_x, source_y, dest_x, dest_y, width, height);
+    blit(src->data, get_target()->data, src_x, src_y, dest_x, dest_y, width, height);
 }
 
 
@@ -500,13 +500,13 @@ void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags
 /*
  * image_draw_rotated()
  * Draws a rotated image onto the destination bitmap at the specified position 
- * ang: angle given in radians
+ * radians: angle given in radians
  * cx, cy: pivot positions
  */
-void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float ang, imageflags_t flags)
+void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, imageflags_t flags)
 {
     image_t* target = get_target();
-    float conv = ang * -40.7436654315f; /* -(180/pi)*(64/90) */
+    float conv = radians * -40.7436654315f; /* -(180/pi)*(64/90) */
 
     if((flags & IF_HFLIP) && !(flags & IF_VFLIP))
         pivot_sprite_v_flip(target->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
@@ -523,7 +523,7 @@ void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float 
  * image_draw_scaled_rotated()
  * Draw scaled and rotated ;)
  */
-void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float ang, imageflags_t flags)
+void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags)
 {
     image_t* tmp;
     int w = (int)(scale.x * src->w);
@@ -531,7 +531,7 @@ void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy,
 
     tmp = image_create(w, h);
     stretch_blit(src->data, tmp->data, 0, 0, src->w, src->h, 0, 0, w, h);
-    image_draw_rotated(tmp, x, y, cx, cy, ang, flags);
+    image_draw_rotated(tmp, x, y, cx, cy, radians, flags);
     image_destroy(tmp);
 }
 
@@ -575,10 +575,9 @@ void image_draw_tinted(const image_t* src, int x, int y, color_t color, imagefla
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
-        uint8 r, g, b, a;
-        color_unmap(color, &r, &g, &b, &a);
+        uint8 r, g, b, a = 128;
+        color_unmap(color, &r, &g, &b, NULL);
         set_trans_blender(r, g, b, a);
-        a = video_get_color_depth() < 32 ? 128 : a;
 
         if(flags != IF_NONE) {
             image_t* tmp = image_create(src->w, src->h);
