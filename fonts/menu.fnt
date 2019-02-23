@@ -55,6 +55,7 @@ font "menu.bold"
         source_file             "fonts/Ubuntu-M.ttf"
         size                    16
         shadow
+        antialias
     }
 }
 

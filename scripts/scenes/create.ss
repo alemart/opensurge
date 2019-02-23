@@ -25,7 +25,7 @@ object "CreateMenu"
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
         ["$CREATEMENU_PLAY", "$CREATEMENU_LEARN", "$CREATEMENU_BACK" ]
     ).withSpacing(211).withAxisAngle(0).build();
-    learnURL = "http://opensurge2d.org/learn";
+    learnURL = "http://opensurge2d.org";
     nextState = "";
     fadeTime = 0.5;
 
