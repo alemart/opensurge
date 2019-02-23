@@ -39,7 +39,7 @@ extern "C" {
 static void (*error_fun)(const char*) = NULL;
 static void* malloc_x(size_t bytes); /* our version of malloc */
 static char* str_dup(const char *s); /* our version of strdup: duplicates s */
-static void float2string(char *s, float f);
+static void float2string(float f, char *buf, size_t buf_size);
 
 char* str_dup(const char *s)
 {
@@ -60,12 +60,12 @@ void* malloc_x(size_t bytes)
     return m;
 }
 
-void float2string(char *s, float f)
+void float2string(float f, char *buf, size_t buf_size)
 {
     if(fabs(f-floor(f)) < 1e-5)
-        sprintf(s, "%d", (int)f);
+        snprintf(buf, buf_size, "%d", (int)f);
     else
-        sprintf(s, "%.5f", f);
+        snprintf(buf, buf_size, "%.5f", f);
 }
 
 /* interpolates the given string, i.e., replaces all variables of the given string
@@ -91,7 +91,7 @@ char *nanocalc_interpolate_string(const char *str, symboltable_t *symbol_table)
                 varname[i] = 0;
 
                 if(symboltable_is_defined(symbol_table, varname)) {
-                    float2string(varvalue, symboltable_get(symbol_table, varname));
+                    float2string(symboltable_get(symbol_table, varname), varvalue, sizeof(varvalue));
                     for(q=varvalue; *q && j++<10240; )
                         *(r++) = *(q++);
                     p += strlen(varname);

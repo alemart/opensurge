@@ -23,17 +23,17 @@
 
 #include <stdlib.h>
 
-int str_to_hash(const char *str); /* generates a hash key */
-const char* str_to_upper(const char *str); /* returns a pointer to a static variable */
-const char* str_to_lower(const char *str); /* returns a pointer to a static variable */
-int str_icmp(const char *s1, const char *s2); /* case-insensitive compare function */
-char* str_cpy(char *dest, const char *src, size_t dest_size); /* safe version of strcpy() */
-void str_trim(char *dest, const char *src); /* trim */
-char *str_dup(const char *str); /* duplicates a string - strdup() isn't ANSI C */
-const char* str_addslashes(const char *str); /* replaces " by \\", returning a static char* */
-char* str_rstr(char *haystack, const char *needle); /* reverse strstr() */
-const char* str_from_int(int integer); /* converts integer to string, returning a static char* */
-const char* str_basename(const char *path); /* the filename of the path */
+int str_to_hash(const char* str); /* generates a hash key */
+const char* str_to_upper(const char* str); /* returns a pointer to a static variable */
+const char* str_to_lower(const char* str); /* returns a pointer to a static variable */
+int str_icmp(const char* s1, const char* s2); /* case-insensitive compare function */
+char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of strcpy() */
+void str_trim(char* dest, const char* src); /* trim */
+char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */
+const char* str_addslashes(const char* str); /* replaces " by \\", returning a static char* */
+char* str_rstr(char* haystack, const char* needle); /* reverse strstr() */
+const char* str_from_int(int integer, char* buffer, size_t buffer_size); /* converts integer to string; if no buffer is specified, returns a static char* */
+const char* str_basename(const char* path); /* the filename of the path */
 
 #endif
 

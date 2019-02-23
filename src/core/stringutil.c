@@ -48,9 +48,9 @@ const char *str_to_upper(const char *str)
 {
     static char buf[1024];
     char *p;
-    int i = 0;
+    int i;
 
-    for(p=buf; *str && i<1023; str++,p++,i++)
+    for(p=buf, i=0; *str && i<sizeof(buf)-1; str++,p++,i++)
         *p = toupper(*str);
     *p = '\0';
 
@@ -69,7 +69,7 @@ const char *str_to_lower(const char *str)
     char *p;
     int i = 0;
 
-    for(p=buf; *str && i<1023; str++,p++,i++)
+    for(p=buf; *str && i<sizeof(buf)-1; str++,p++,i++)
         *p = tolower(*str);
     *p = '\0';
 
@@ -80,20 +80,18 @@ const char *str_to_lower(const char *str)
 /*
  * str_icmp()
  * Case-insensitive compare function. Returns
- * 0 if s1==s2, -1 if s1<s2 or 1 if s1>s2.
+ * 0 if s1==s2, <0 if s1<s2 or >0 if s1>s2.
  */
-int str_icmp(const char *s1, const char *s2)
+int str_icmp(const char* s1, const char* s2)
 {
     const char *p, *q;
-    char a, b;
+    int a, b;
 
     for(p=s1,q=s2; *p && *q; p++,q++) {
         a = tolower(*p);
         b = tolower(*q);
-        if(a < b)
-            return -1;
-        else if(a > b)
-            return 1;
+        if(a != b)
+            return a - b;
     }
 
     if(!*p && *q)
@@ -110,12 +108,11 @@ int str_icmp(const char *s1, const char *s2)
  * str_cpy()
  * Safe version of strcpy(). Returns dest.
  * If we have something like char str[32], then
- * dest_size is 32, ie, sizeof(str)
+ * dest_size is 32, i.e., sizeof(str)
  */
-char* str_cpy(char *dest, const char *src, size_t dest_size)
+char* str_cpy(char* dest, const char* src, size_t dest_size)
 {
-    unsigned c;
-    for(c = 0; (c < dest_size) && (dest[c] = src[c]); c++);
+    for(size_t c = 0; (c < dest_size) && (dest[c] = src[c]); c++);
     dest[dest_size-1] = 0;
     return dest;
 }
@@ -142,7 +139,7 @@ void str_trim(char *dest, const char *src)
  * str_dup()
  * Duplicates a string
  */
-char *str_dup(const char *str)
+char* str_dup(const char* str)
 {
     char *p = mallocx((strlen(str)+1) * sizeof(char));
     strcpy(p, str);
@@ -159,10 +156,10 @@ const char* str_addslashes(const char *str)
     int i = 0;
     char *p;
 
-    for(p=buf; *str && i<1023; str++,p++,i++) {
+    for(p=buf; *str && i<sizeof(buf)-1; str++,p++,i++) {
         if(*str == '"') {
             *p = '\\';
-            if(++i<1023)
+            if(++i<sizeof(buf)-1)
                 *(++p) = *str;
         }
         else
@@ -194,13 +191,18 @@ char* str_rstr(char *haystack, const char *needle)
 
 /*
  * str_from_int()
- * converts integer to string, returning a static string
+ * converts an integer to a string
+ * If no buffer is supplied, returns a static string
  */
-const char* str_from_int(int integer)
+const char* str_from_int(int integer, char* buffer, size_t buffer_size)
 {
-    static char buf[64];
-    sprintf(buf, "%d", integer);
-    return buf;
+    static char buf[32];
+    if(buffer == NULL) {
+        buffer = buf;
+        buffer_size = sizeof(buf);
+    }
+    snprintf(buffer, buffer_size, "%d", integer);
+    return buffer;
 }
 
 

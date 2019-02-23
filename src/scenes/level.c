@@ -1659,12 +1659,12 @@ float level_gravity()
 void level_add_to_score(int score)
 {
     item_t *flyingtext;
-    char buf[80];
+    char buf[32];
     int h = image_height(actor_image(player->actor));
 
     player_set_score(player_get_score() + score);
 
-    sprintf(buf, "%d", score);
+    snprintf(buf, sizeof(buf), "%d", score);
     flyingtext = level_create_item(IT_FLYINGTEXT, v2d_add(player->actor->position, v2d_new(0,-h/2)));
     flyingtext_set_text(flyingtext, buf);
 }
@@ -3277,7 +3277,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
         case EDT_BRICK: {
             if(brick_exists(objid)) {
                 brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
-                sprintf(buf,
+                snprintf(buf, sizeof(buf),
                     "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s",
                     objid,
                     brick_util_behaviorname(brick_behavior(x)),
@@ -3295,14 +3295,14 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
         }
 
         case EDT_ITEM: {
-            sprintf(buf, "%2d", objid);
+            snprintf(buf, sizeof(buf), "%2d", objid);
             break;
         }
 
         case EDT_ENEMY: {
             int len = 0;
             if(strcmp(editor_enemy_selected_category(), "*") != 0) {
-                sprintf(buf, "[%s] ", editor_enemy_selected_category());
+                snprintf(buf, sizeof(buf), "[%s] ", editor_enemy_selected_category());
                 len = strlen(buf);
             }
             str_cpy(buf + len, editor_enemy_key2name(editor_cursor_entity_id), sizeof(buf) - len);

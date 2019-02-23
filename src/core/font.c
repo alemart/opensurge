@@ -311,9 +311,15 @@ void font_set_text(font_t *f, const char *fmt, ...)
         convert_to_ascii(buf);
 
     /* allocate text */
-    if(f->text != NULL)
-        free(f->text);
-    f->text = str_dup(buf);
+    if(f->text != NULL) {
+        /* skip if the text is the same */
+        if(strcmp(buf, f->text) != 0) {
+            free(f->text);
+            f->text = str_dup(buf);
+        }
+    }
+    else
+        f->text = str_dup(buf);
 }
 
 

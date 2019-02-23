@@ -57,10 +57,10 @@ quest_t *quest_load(const char *filepath)
 
     /* default values */
     q->file = str_dup(filepath);
-    q->name = str_dup("null");
-    q->author = str_dup("null");
-    q->version = str_dup("null");
-    q->description = str_dup("null");
+    q->name = str_dup("-");
+    q->author = str_dup("-");
+    q->version = str_dup("-");
+    q->description = str_dup("-");
     q->image = load_quest_image(NULL);
     q->level_count = 0;
     q->is_hidden = FALSE;

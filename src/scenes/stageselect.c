@@ -184,8 +184,8 @@ void stageselect_update()
     /* page number */
     pagenum = option/STAGE_MAXPERPAGE + 1;
     maxpages = stage_count/STAGE_MAXPERPAGE + ((stage_count%STAGE_MAXPERPAGE == 0) ? 0 : 1);
-    str_cpy(pagestr[0], str_from_int(pagenum), sizeof(pagestr[0]));
-    str_cpy(pagestr[1], str_from_int(maxpages), sizeof(pagestr[1]));
+    str_from_int(pagenum, pagestr[0], sizeof(pagestr[0]));
+    str_from_int(maxpages, pagestr[1], sizeof(pagestr[1]));
     font_set_textarguments(page, 2, pagestr[0], pagestr[1]);
     font_set_text(page, "%s", "$STAGESELECT_PAGE");
     font_set_position(page, v2d_new(VIDEO_SCREEN_W - font_get_textsize(page).x - 10, font_get_position(page).y));

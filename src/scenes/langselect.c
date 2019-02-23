@@ -180,8 +180,8 @@ void langselect_update()
     }
 
     /* page label */
-    str_cpy(page[0], str_from_int(1 + option/LANG_MAXPERPAGE), sizeof(page[0]));
-    str_cpy(page[1], str_from_int(1 + max(0, lngcount-1)/LANG_MAXPERPAGE), sizeof(page[1]));
+    str_from_int(1 + option/LANG_MAXPERPAGE, page[0], sizeof(page[0]));
+    str_from_int(1 + max(0, lngcount-1)/LANG_MAXPERPAGE, page[1], sizeof(page[1]));
     font_set_textarguments(page_label, 2, page[0], page[1]);
     font_set_text(page_label, "%s", "$LANGSELECT_PAGE");
     pos.x = VIDEO_SCREEN_W - font_get_textsize(page_label).x - 10;

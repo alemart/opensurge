@@ -13,7 +13,7 @@ requires "0.5.0"
 act 1
 theme "themes/template.brk"
 bgtheme "themes/sunshine.bg"
-spawn_point 210 9910
+spawn_point 112 9960
 startup "DefaultStartup"
 players "Surge"
 
@@ -22,6 +22,10 @@ players "Surge"
 // bricks
 brick 0 896 10000
 brick 0 960 10000
+brick 48 896 9872
+brick 48 896 9744
+brick 0 896 9744
+brick 0 960 9744
 brick 0 0 10000
 brick 0 64 10000
 brick 0 128 10000
@@ -35,18 +39,22 @@ brick 0 576 10000
 brick 0 640 10000
 brick 0 704 10000
 brick 0 768 10000
-brick 6 512 9936
-brick 6 544 9936
 brick 0 512 9872
 brick 0 512 9808
 brick 0 512 9744
 brick 0 832 10000
+brick 0 832 9744
+brick 48 832 9744
+brick 48 832 9872
+brick 6 544 9936
+brick 6 512 9936
 brick 0 384 1000
 
 // entities
 
 // legacy items
-item 31 904 10000
+item 31 928 10000
+item 21 472 10000
 
 // legacy objects
 

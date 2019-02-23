@@ -153,6 +153,7 @@ void questselect_release()
  */
 void questselect_update()
 {
+    int i, first, last;
     int pagenum, maxpages;
     float dt = timer_get_delta();
     char pagestr[2][33];
@@ -165,11 +166,21 @@ void questselect_update()
     icon->position = font_get_position(quest_label[option]);
     icon->position.x += -20 + 3*cos(2*PI * scene_time);
 
+    /* quest names */
+    first = option / QUEST_MAXPERPAGE;
+    last = min(option / QUEST_MAXPERPAGE + QUEST_MAXPERPAGE, quest_count) - 1;
+    for(i = first; i <= last; i++) {
+        if(option == i)
+            font_set_text(quest_label[i], "<color=$COLOR_MENUSELECTEDOPTION>%s</color>", quest_data[i]->name);
+        else
+            font_set_text(quest_label[i], "%s", quest_data[i]->name);
+    }
+
     /* page number */
     pagenum = option/QUEST_MAXPERPAGE + 1;
     maxpages = quest_count/QUEST_MAXPERPAGE + ((quest_count%QUEST_MAXPERPAGE == 0) ? 0 : 1);
-    str_cpy(pagestr[0], str_from_int(pagenum), sizeof(pagestr[0]));
-    str_cpy(pagestr[1], str_from_int(maxpages), sizeof(pagestr[1]));
+    str_from_int(pagenum, pagestr[0], sizeof(pagestr[0]));
+    str_from_int(maxpages, pagestr[1], sizeof(pagestr[1]));
     font_set_textarguments(page, 2, pagestr[0], pagestr[1]);
     font_set_text(page, "%s", "$QUESTSELECT_PAGE");
     font_set_position(page, v2d_new(VIDEO_SCREEN_W - font_get_textsize(page).x - 10, font_get_position(page).y));
@@ -256,7 +267,7 @@ void questselect_update()
  */
 void questselect_render()
 {
-    int i;
+    int i, first, last;
     image_t *thumbnail;
     v2d_t cam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
@@ -271,12 +282,10 @@ void questselect_render()
     font_render(page, cam);
     font_render(info, cam);
 
-    for(i=0; i<quest_count; i++) {
-        if(i/QUEST_MAXPERPAGE == option/QUEST_MAXPERPAGE) {
-            font_set_text(quest_label[i], (option==i) ? "<color=$COLOR_MENUSELECTEDOPTION>%s</color>" : "%s", quest_data[i]->name);
-            font_render(quest_label[i], cam);
-        }
-    }
+    first = option / QUEST_MAXPERPAGE;
+    last = min(option / QUEST_MAXPERPAGE + QUEST_MAXPERPAGE, quest_count) - 1;
+    for(i = first; i <= last; i++)
+        font_render(quest_label[i], cam);
 
     actor_render(icon, cam);
 }
