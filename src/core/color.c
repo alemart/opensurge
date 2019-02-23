@@ -52,7 +52,7 @@ color_t color_hex(const char* hex_string)
     char buf[9] = "000000ff", *p, c;
     uint8_t r, g, b, a;
 
-    /* sanitize hex RGB color */
+    /* sanitize hex color */
     for(p = buf; *p && *hex_string; p++) {
         c = *(hex_string++);
         if(c >= 'a' && c <= 'f')
@@ -104,20 +104,11 @@ bool color_equals(color_t a, color_t b)
 }
 
 /*
- * color_is_mask()
- * Is the given color a mask color?
+ * color_is_transparent()
+ * Is the given color transparent?
  */
-bool color_is_mask(color_t color)
+bool color_is_transparent(color_t color)
 {
-    /* ignore alpha */
+    /* mask color (bright pink); ignore alpha */
     return (255 == getr(color._value) && 0 == getg(color._value) && 255 == getb(color._value));
-}
-
-/*
- * color_mask()
- * Mask color
- */
-color_t color_mask()
-{
-    return color_rgba(255, 0, 255, 0);
 }

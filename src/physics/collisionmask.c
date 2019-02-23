@@ -75,7 +75,7 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
     for(j = 0; j < mask->height; j++) {
         for(i = 0; i < mask->width; i++) {
             pixel = image_getpixel(image, x + i, y + j);
-            mask->mask[j * mask->pitch + i] = !color_is_mask(pixel);
+            mask->mask[j * mask->pitch + i] = !color_is_transparent(pixel);
         }
     }
 

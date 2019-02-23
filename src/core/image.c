@@ -647,15 +647,16 @@ image_t* image_drawing_target()
 void maskcolor_bugfix(image_t* img)
 {
     int i, j;
-    color_t pixel, mask = color_mask();
+    color_t pixel;
+    int mask_color = bitmap_mask_color(img->data);
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
     fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
 
     for(j=0; j<img->h; j++) {
         for(i=0; i<img->w; i++) {
             pixel = (color_t){ fast_getpixel(img->data, i, j) };
-            if(color_is_mask(pixel))
-                fast_putpixel(img->data, i, j, mask._value);
+            if(color_is_transparent(pixel))
+                fast_putpixel(img->data, i, j, mask_color);
         }
     }
 }
