@@ -117,12 +117,12 @@ void loop_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
         me->team_size = team_size;
         me->player_was_touching_me = reallocx(me->player_was_touching_me, team_size * sizeof(int));
         for(i=0; i<team_size; i++)
-            me->player_was_touching_me[i] = actor_collision(team[i]->actor, act);
+            me->player_was_touching_me[i] = player_collision(team[i], act);
     }
 
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
-        if(actor_collision(player->actor, act)) {
+        if(player_collision(player, act)) {
             if(!me->player_was_touching_me[i]) {
                 player_set_layer(player, me->layer_to_be_activated);
                 me->player_was_touching_me[i] = TRUE;

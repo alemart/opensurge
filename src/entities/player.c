@@ -704,6 +704,32 @@ void player_lock_horizontally_for(player_t *player, float seconds)
     physicsactor_lock_horizontally_for(player->pa, seconds);
 }
 
+/*
+ * player_collision()
+ * Collision detection using axis-aligned bounding boxes
+ * Returns TRUE if the player is colliding with an actor
+ */
+int player_collision(const player_t *player, const actor_t *actor)
+{
+    int player_box_width, player_box_height;
+    v2d_t player_box_center, actor_box_topleft;
+    float player_box[4], actor_box[4];
+    image_t *img = actor_image(actor);
+
+    physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
+    player_box[0] = player_box_center.x - player_box_width / 2;
+    player_box[1] = player_box_center.y - player_box_height / 2;
+    player_box[2] = player_box_center.x + player_box_width / 2;
+    player_box[3] = player_box_center.y + player_box_height / 2;
+
+    actor_box_topleft = v2d_subtract(actor->position, actor->hot_spot);
+    actor_box[0] = actor_box_topleft.x;
+    actor_box[1] = actor_box_topleft.y;
+    actor_box[2] = actor_box_topleft.x + image_width(img);
+    actor_box[3] = actor_box_topleft.y + image_height(img);
+
+    return bounding_box(player_box, actor_box);
+}
 
 /*
  * player_is_attacking()

@@ -90,7 +90,7 @@ void checkpointorb_update(item_t* item, player_t** team, int team_size, brick_li
         /* activating the checkpoint orb... */
         for(i=0; i<team_size; i++) {
             player_t *player = team[i];
-            if(!player_is_dying(player) && actor_collision(player->actor, act)) {
+            if(!player_is_dying(player) && player_collision(player, act)) {
                 me->is_active = TRUE; /* I'm active! */
                 sound_play( soundfactory_get("checkpoint orb") );
                 level_set_spawn_point(act->position);

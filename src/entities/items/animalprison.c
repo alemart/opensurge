@@ -305,6 +305,6 @@ int animalprison_got_hit_by_player(item_t *item, player_t *player)
     b[2] = b[0] + image_width(actor_image(act)) - 10;
     b[3] = b[1] + image_height(actor_image(act))/2;
 
-    return (player_is_attacking(player) && bounding_box(a,b) && actor_collision(act,pl));
+    return (player_is_attacking(player) && bounding_box(a,b) && player_collision(player, act));
 }
 

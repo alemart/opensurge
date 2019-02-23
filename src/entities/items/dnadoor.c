@@ -148,7 +148,7 @@ void dnadoor_update(item_t* item, player_t** team, int team_size, brick_list_t* 
         if(!player_is_dying(player) && hittest(player, item)) {
             if(str_icmp(player->name, me->authorized_player_name) == 0) {
                 item->obstacle = FALSE;
-                collision = actor_collision(act, player->actor);
+                collision = player_collision(player, act);
             }
             else
                 block_anyway = TRUE;

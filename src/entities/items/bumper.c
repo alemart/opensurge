@@ -89,7 +89,7 @@ void bumper_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
-        if(!player_is_dying(player) && actor_collision(player->actor, act)) {
+        if(!player_is_dying(player) && player_collision(player, act)) {
             if(!me->getting_hit) {
                 me->getting_hit = TRUE;
                 actor_change_animation(act, sprite_get_animation("SD_BUMPER", 1));

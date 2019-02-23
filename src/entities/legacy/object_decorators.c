@@ -1974,7 +1974,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
     /* player x object collision */
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
-        if(actor_collision(object->actor, player->actor)) {
+        if(player_collision(player, object->actor)) {
             if(player_is_attacking(player) || player_is_invincible(player)) {
                 /* I've been defeated */
                 player_bounce_ex(player, object->actor, FALSE);
@@ -4684,7 +4684,7 @@ void onplayercollision_release(eventstrategy_t *event)
 int onplayercollision_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     player_t *player = enemy_get_observed_player(object);
-    return actor_collision(object->actor, player->actor);
+    return player_collision(player, object->actor);
 }
 
 
@@ -4714,7 +4714,7 @@ void onplayerattack_release(eventstrategy_t *event)
 int onplayerattack_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     player_t *player = enemy_get_observed_player(object);
-    return player_is_attacking(player) && actor_collision(object->actor, player->actor);
+    return player_is_attacking(player) && player_collision(player, object->actor);
 }
 
 

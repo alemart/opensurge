@@ -264,7 +264,7 @@ void itembox_update(item_t* item, player_t** team, int team_size, brick_list_t* 
         player_t *player = team[i];
 
         /* the player is about to crash this box... */
-        if(item->state == IS_IDLE && actor_collision(item->actor, player->actor) && player_is_attacking(player)) {
+        if(item->state == IS_IDLE && player_collision(player, item->actor) && player_is_attacking(player)) {
             item_t *icon = level_create_item(IT_ICON, v2d_add(act->position, v2d_new(0,-5)));
             icon_change_animation(icon, me->anim_id);
             level_create_item(IT_EXPLOSION, v2d_add(act->position, v2d_new(0,-20)));

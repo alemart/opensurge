@@ -99,7 +99,7 @@ void collectible_update(item_t* item, player_t** team, int team_size, brick_list
         if(
             !me->is_disappearing &&
             !player_is_dying(player) &&
-            actor_collision(act, player->actor)
+            player_collision(player, act)
         ) {
             player_set_collectibles(player_get_collectibles() + 1);
             me->is_disappearing = TRUE;

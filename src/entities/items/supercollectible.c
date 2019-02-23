@@ -90,7 +90,7 @@ void supercollectible_update(item_t* item, player_t** team, int team_size, brick
     act->visible = (player->got_glasses || level_editmode());
 
     if(!me->is_disappearing) {
-        if(!player_is_dying(player) && player->got_glasses && actor_collision(act, player->actor)) {
+        if(!player_is_dying(player) && player->got_glasses && player_collision(player, act)) {
             /* the player is capturing this ring */
             actor_change_animation(act, sprite_get_animation("SD_SUPERCOLLECTIBLE", 1));
             player_set_collectibles( player_get_collectibles() + 5 );

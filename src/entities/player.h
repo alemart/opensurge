@@ -115,6 +115,7 @@ void player_roll(player_t *player);
 void player_enable_roll(player_t *player);
 void player_disable_roll(player_t *player);
 void player_lock_horizontally_for(player_t *player, float seconds);
+int player_collision(const player_t *player, const struct actor_t *actor);
 
 void player_enter_water(player_t *player);
 void player_leave_water(player_t *player);
