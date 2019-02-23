@@ -61,7 +61,6 @@ void image_line(int x1, int y1, int x2, int y2, color_t color);
 void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color);
 void image_rectfill(int x1, int y1, int x2, int y2, color_t color);
 void image_rect(int x1, int y1, int x2, int y2, color_t color);
-void image_pixel(int x, int y, color_t color);
 void image_waterfx(int y, color_t color);
 
 /* rendering */

@@ -49,7 +49,7 @@ typedef int (*fast_getb_funptr)(int);
 
 /* private stuff */
 static void maskcolor_bugfix(image_t* img);
-static inline void draw_to(const image_t* src, image_t* dest, int x, int y, imageflags_t flags);
+static inline void draw_flipped_sprite(const image_t* src, image_t* dest, int x, int y, imageflags_t flags);
 static fast_getpixel_funptr fast_getpixel_fun(); /* returns a function. this won't do any clipping, so be careful. */
 static fast_putpixel_funptr fast_putpixel_fun(); /* returns a function. this won't do any clipping, so be careful. */
 static fast_makecol_funptr fast_makecol_fun(); /* returns a function */
@@ -176,13 +176,16 @@ image_t* image_create(int width, int height)
  */
 void image_destroy(image_t* img)
 {
-    if(img->data != NULL) {
+    if(img->data != NULL)
         destroy_bitmap(img->data);
-        if(img->path != NULL) {
-            resourcemanager_unref_image(img->path);
-            free(img->path);
-        }
+
+    if(img->path != NULL) {
+        resourcemanager_unref_image(img->path);
+        free(img->path);
     }
+
+    if(_target == img)
+        _target = NULL;
 
     free(img);
 }
@@ -387,15 +390,6 @@ void image_rect(int x1, int y1, int x2, int y2, color_t color)
 }
 
 
-/*
- * image_pixel()
- * Draws a pixel
- */
-void image_pixel(int x, int y, color_t color)
-{
-    putpixel(get_target()->data, x, y, color._value);
-}
-
 
 /*
  * image_waterfx()
@@ -471,7 +465,7 @@ void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y
  */
 void image_draw(const image_t* src, int x, int y, imageflags_t flags)
 {
-    draw_to(src, get_target(), x, y, flags);
+    draw_flipped_sprite(src, get_target(), x, y, flags);
 }
 
 
@@ -552,8 +546,8 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 
         if(flags != IF_NONE) {
             image_t* tmp = image_create(src->w, src->h);
-            clear_to_color(tmp->data, color_mask()._value);
-            draw_to(src, tmp, 0, 0, flags);
+            clear_to_color(tmp->data, bitmap_mask_color(tmp->data));
+            draw_flipped_sprite(src, tmp, 0, 0, flags);
             draw_trans_sprite(target->data, tmp->data, x, y);
             image_destroy(tmp);
         }
@@ -562,7 +556,7 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 
     }
     else
-        draw_to(src, target, x, y, flags);
+        draw_flipped_sprite(src, target, x, y, flags);
 }
 
 
@@ -582,8 +576,8 @@ void image_draw_tinted(const image_t* src, int x, int y, color_t color, imagefla
 
         if(flags != IF_NONE) {
             image_t* tmp = image_create(src->w, src->h);
-            clear_to_color(tmp->data, color_mask()._value);
-            draw_to(src, tmp, 0, 0, flags);
+            clear_to_color(tmp->data, bitmap_mask_color(tmp->data));
+            draw_flipped_sprite(src, tmp, 0, 0, flags);
             draw_lit_sprite(target->data, tmp->data, x, y, a);
             image_destroy(tmp);
         }
@@ -591,7 +585,7 @@ void image_draw_tinted(const image_t* src, int x, int y, color_t color, imagefla
             draw_lit_sprite(target->data, src->data, x, y, a);
     }
     else
-        draw_to(src, target, x, y, flags);
+        draw_flipped_sprite(src, target, x, y, flags);
 }
 
 /*
@@ -610,8 +604,8 @@ void image_draw_multiply(const image_t* src, int x, int y, color_t color, imagef
 
         if(flags != IF_NONE) {
             image_t* tmp = image_create(src->w, src->h);
-            clear_to_color(tmp->data, color_mask()._value);
-            draw_to(src, tmp, 0, 0, flags);
+            clear_to_color(tmp->data, bitmap_mask_color(tmp->data));
+            draw_flipped_sprite(src, tmp, 0, 0, flags);
             draw_lit_sprite(target->data, tmp->data, x, y, 255);
             image_destroy(tmp);
         }
@@ -619,7 +613,7 @@ void image_draw_multiply(const image_t* src, int x, int y, color_t color, imagef
             draw_lit_sprite(target->data, src->data, x, y, 255);
     }
     else
-        draw_to(src, target, x, y, flags);
+        draw_flipped_sprite(src, target, x, y, flags);
 }
 
 /*
@@ -628,7 +622,7 @@ void image_draw_multiply(const image_t* src, int x, int y, color_t color, imagef
  */
 void image_set_drawing_target(image_t* new_target)
 {
-    _target = new_target;
+    _target = (new_target != video_get_backbuffer()) ? new_target : NULL;
 }
 
 /*
@@ -667,10 +661,10 @@ void maskcolor_bugfix(image_t* img)
 }
 
 /*
- * draw_to()
+ * draw_flipped_sprite()
  * Draws an image into another using a set of flags
  */
-void draw_to(const image_t* src, image_t* dest, int x, int y, imageflags_t flags)
+void draw_flipped_sprite(const image_t* src, image_t* dest, int x, int y, imageflags_t flags)
 {
     if(!(flags & IF_HFLIP) && !(flags & IF_VFLIP))
         draw_sprite(dest->data, src->data, x, y);
