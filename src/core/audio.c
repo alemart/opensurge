@@ -35,8 +35,8 @@
 #endif
 
 /* private definitions */
-#define IS_WAV(path)                (str_icmp((path)+strlen(path)-4, ".wav") == 0)
-#define IS_OGG(path)                (str_icmp((path)+strlen(path)-4, ".ogg") == 0)
+#define IS_WAV(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".wav") == 0)
+#define IS_OGG(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".ogg") == 0)
 #define IS_VALID_FORMAT(path)       (IS_OGG(path) || IS_WAV(path))
 #define SOUND_INVALID_VOICE         -1
 #define PREFERRED_NUMBER_OF_VOICES  16
@@ -45,7 +45,6 @@
 #ifndef __USE_OPENAL__
 struct music_t {
     LOGG_Stream *stream;
-    int loops_left;
     int is_paused;
     float elapsed_time;
     char *filepath; /* relative */
@@ -70,7 +69,6 @@ struct music_t {
 struct sound_t {
     ALuint buf; /* sound buffer */
     volatile ALuint *src; /* points to an element of src[] */
-    volatile int loops_left;
     volatile int is_playing;
     volatile float vol, pan, freq;
     char *filepath; /* relative */
@@ -116,7 +114,6 @@ music_t *music_load(const char *path)
 
         /* build the music object */
         m = mallocx(sizeof *m);
-        m->loops_left = 0;
         m->is_paused = FALSE;
         m->elapsed_time = 0.0f;
         m->filepath = str_dup(path);
@@ -257,8 +254,8 @@ void music_destroy(music_t *music)
 
 /*
  * music_play()
- * Plays the given music and loops [loop] times.
- * Set loop equal to LARGE_INT to make it loop continuously.
+ * Plays a music.
+ * Set loop to TRUE to make it loop continuously.
  */
 #ifndef __USE_OPENAL__
 void music_play(music_t *music, int loop)
@@ -266,10 +263,9 @@ void music_play(music_t *music, int loop)
     music_stop();
 
     if(music != NULL) {
-        music->loops_left = loop;
         music->is_paused = FALSE;
         music->elapsed_time = 0.0f;
-        music->stream->loop = (loop >= LARGE_INT); /* "gambiarra", because LOGG lacks features */
+        music->stream->loop = loop;
     }
 
     current_music = music;
@@ -281,7 +277,7 @@ void music_play(music_t *music, int loop)
     music_stop();
 
     if(music != NULL) {
-        if(alurePlaySourceStream(srcmus, music->stream, NUM_BUFS, loop, eom_callback, (void*)music) == AL_FALSE) {
+        if(alurePlaySourceStream(srcmus, music->stream, NUM_BUFS, loop ? -1 : 0, eom_callback, (void*)music) == AL_FALSE) {
             current_music = NULL;
             return;
         }
@@ -445,7 +441,7 @@ float music_get_volume()
 #ifndef __USE_OPENAL__
 int music_is_playing()
 {
-    return (current_music != NULL) && !(current_music->is_paused) && (current_music->loops_left >= 0);
+    return (current_music != NULL) && !(current_music->is_paused);
 }
 #else
 int music_is_playing()
@@ -573,7 +569,6 @@ sound_t *sound_load(const char *path)
 
         /* build the sound object */
         s = mallocx(sizeof *s);
-        s->loops_left = 0;
         s->is_playing = FALSE;
         s->src = NULL;
         s->filepath = str_dup(path);
@@ -677,12 +672,12 @@ void sound_destroy(sound_t *sample)
 #ifndef __USE_OPENAL__
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, sample->vol, 0.0, 1.0, 0);
+    sound_play_ex(sample, sample->vol, 0.0, 1.0);
 }
 #else
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, 1.0, 0.0, 1.0, 0);
+    sound_play_ex(sample, 1.0, 0.0, 1.0);
 }
 #endif
 
@@ -694,10 +689,9 @@ void sound_play(sound_t *sample)
  * 0.0 <= volume <= 1.0
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
  * 1.0 = default frequency
- * 0 = no loops
  */
 #ifndef __USE_OPENAL__
-void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop)
+void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 {
     int id;
 
@@ -706,25 +700,22 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop)
         vol = clip(vol, 0.0f, 1.0f);
         pan = clip(pan, -1.0f, 1.0f);
         freq = max(freq, 0.0f);
-        loop = (loop < 0) ? -1 : loop;
 
         /* playing the sample */
-        id = play_sample(sample->data, (int)(255.0f * vol), min(255.0f, 128.0f + (int)(128.0f * pan)), (int)(1000.0f * freq), loop);
+        id = play_sample(sample->data, (int)(255.0f * vol), min(255.0f, 128.0f + (int)(128.0f * pan)), (int)(1000.0f * freq), 0);
         sample->voice_id = id < 0 ? SOUND_INVALID_VOICE : id;
     }
 }
 #else
-void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop)
+void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 {
     if(sample != NULL) { /* important to check for NULL */
         /* ajusting parameters */
         vol = clip(vol, 0.0f, 1.0f);
         pan = clip(pan, -1.0f, 1.0f);
         freq = max(freq, 0.0f);
-        loop = (loop < 0) ? -1 : loop;
 
         /* saving the parameters */
-        sample->loops_left = loop;
         sample->vol = vol;
         sample->pan = pan;
         sample->freq = freq;
@@ -753,12 +744,8 @@ void eos_callback(void *userdata, ALuint source)
 {
     sound_t *sample = (sound_t*)userdata;
 
-    if(sample != NULL) {
-        if(sample->loops_left > 0)
-            sound_play_ex(sample, sample->vol, sample->pan, sample->freq, sample->loops_left-1);
-        else
-            sample->is_playing = FALSE;
-    }
+    if(sample != NULL)
+        sample->is_playing = FALSE;
 
     (void)source;
 }
@@ -973,15 +960,10 @@ void audio_update()
     /* updating the music */
     if(current_music != NULL && !(current_music->is_paused)) {
         logg_update_stream(current_music->stream);
-
-        /* "gambiarra" (ugly hack), because LOGG lacks features */
         if(!(current_music->stream->loop)) {
             current_music->elapsed_time += timer_get_delta();
             if(current_music->elapsed_time >= MUSIC_DURATION(current_music) + 0.25f) {
-                if(--(current_music->loops_left) >= 0)
-                    music_play(current_music, current_music->loops_left);
-                else
-                    music_stop();
+                music_stop();
             }
         }
     }

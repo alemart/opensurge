@@ -143,7 +143,7 @@ void credits_update()
 
     /* music */
     if(!music_is_playing())
-        music_play(music, LARGE_INT);
+        music_play(music, TRUE);
 
     /* fade-out */
     if(quit) {

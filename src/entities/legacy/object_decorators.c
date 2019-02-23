@@ -682,14 +682,13 @@ void playsamplestrategy_update(audiostrategy_t *s)
 {
     playsamplestrategy_t *me = (playsamplestrategy_t*)s;
     float vol, pan, freq;
-    int loop;
 
     vol = clip(expression_evaluate(me->vol), 0.0f, 1.0f);
     pan = clip(expression_evaluate(me->pan), -1.0f, 1.0f);
     freq = expression_evaluate(me->freq);
-    loop = expression_evaluate(me->loop);
+    /*loop = expression_evaluate(me->loop);*/ /* deprecated */
 
-    sound_play_ex(me->sfx, vol, pan, freq, (loop >= 0) ? loop : LARGE_INT);
+    sound_play_ex(me->sfx, vol, pan, freq);
 }
 
 void playsamplestrategy_release(audiostrategy_t *s)
@@ -721,7 +720,7 @@ void playmusicstrategy_update(audiostrategy_t *s)
     playmusicstrategy_t *me = (playmusicstrategy_t*)s;
     int loop = expression_evaluate(me->loop);
 
-    music_play(me->mus, (loop >= 0) ? loop : LARGE_INT);
+    music_play(me->mus, (loop != 0));
 }
 
 void playmusicstrategy_release(audiostrategy_t *s)
@@ -745,7 +744,7 @@ audiostrategy_t* playlevelmusicstrategy_new()
 void playlevelmusicstrategy_update(audiostrategy_t *s)
 {
     if(level_music() != NULL)
-        music_play(level_music(), LARGE_INT);
+        music_play(level_music(), TRUE);
 }
 
 void playlevelmusicstrategy_release(audiostrategy_t *s)

@@ -35,7 +35,7 @@ void audio_release();
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */
 void music_destroy(music_t *music); /* you don't usually need to bother with this. */
-void music_play(music_t *music, int loop); /* plays and loops [loop] times the given music. Set loop to LARGE_INT to make it loop continuously. */
+void music_play(music_t *music, int loop); /* plays a music. Set loop to TRUE to make it loop continuously. */
 void music_stop();
 void music_pause();
 void music_resume();
@@ -53,7 +53,7 @@ const char *music_path(const music_t *music); /* the filepath of the specified m
 sound_t *sound_load(const char *path); /* will be unloaded automatically */
 void sound_destroy(sound_t *sample);
 void sound_play(sound_t *sample);
-void sound_play_ex(sound_t *sample, float vol, float pan, float freq, int loop); /* 0.0<=volume<=1.0; (left) -1.0<=pan<=1.0 (right); 1.0 = default frequency; 0 = no loops */
+void sound_play_ex(sound_t *sample, float vol, float pan, float freq); /* 0.0<=volume<=1.0; (left) -1.0<=pan<=1.0 (right); 1.0 = default frequency */
 void sound_stop(sound_t *sample);
 int sound_is_playing(sound_t *sample);
 int sound_unref(sound_t *sample); /* returns the number of active references */

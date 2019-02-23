@@ -170,7 +170,7 @@ void options_update()
             music_stop();
     }
     else if(!music_is_playing() && scene_time >= 0.2)
-        music_play(music, LARGE_INT);
+        music_play(music, TRUE);
 
     /* quit */
     if(quit) {

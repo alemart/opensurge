@@ -1232,7 +1232,7 @@ void play_sounds(player_t* p)
             sound_t* sample = charactersystem_get(p->name)->sample.charge;
             float max_pitch = charactersystem_get(p->name)->sample.charge_pitch;
             float freq = lerp(1.0f, max_pitch, physicsactor_charge_intensity(p->pa) - 0.25f);
-            sound_play_ex(sample, 1.0f, 0.0f, freq, 0);
+            sound_play_ex(sample, 1.0f, 0.0f, freq);
         }
     }
 }

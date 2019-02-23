@@ -117,7 +117,7 @@ surgescript_var_t* fun_play(surgescript_object_t* object, const surgescript_var_
     double volume = get_volume(object);
 
     if(sound != NULL)
-        sound_play_ex(sound, volume, 0.0f, 1.0f, 0);
+        sound_play_ex(sound, volume, 0.0f, 1.0f);
 
     return NULL;
 }

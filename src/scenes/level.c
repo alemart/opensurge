@@ -2086,7 +2086,7 @@ void update_music()
     if(music != NULL && !block_music) {
         if(!override_music && !music_is_playing()) {
             if(music_current() == NULL || (music_current() == music && !music_is_paused()))
-                music_play(music, LARGE_INT);
+                music_play(music, TRUE);
         }
     }
 }
