@@ -38,7 +38,6 @@ static const float minimum_delta = 0.016f;
 static const float maximum_delta = 0.033f;
 static float delta_time = 0.0f;
 static uint32_t start_time = 0; /* TODO: remove */
-static int fps_rate = 0;
 
 static inline float get_current_time(); /* given in seconds */
 static uint32_t get_tick_count();
@@ -51,7 +50,6 @@ static inline void yield_cpu();
 
 
 /* internal data */
-static int partial_fps, fps_accum, fps;
 static uint32_t last_time;
 static float delta;
 static int must_yield_cpu;
@@ -77,7 +75,6 @@ void timer_init(int optimize_cpu_usage)
     /* ignore optimize_cpu_usage (always TRUE) */
     start_time = get_tick_count();
     delta_time = 0.0f;
-    fps_rate = 0;
 #else
     /* installing Allegro stuff */
     logfile_message("Installing Allegro timers...");
@@ -88,11 +85,8 @@ void timer_init(int optimize_cpu_usage)
     must_yield_cpu = optimize_cpu_usage;
 
     /* initializing... */
-    partial_fps = 0;
-    fps_accum = 0;
-    fps = 0;
-    delta = 0.0f;
     start_time = get_tick_count();
+    delta = 0.0f;
 
     /* done! */
     last_time = timer_get_ticks();
@@ -109,8 +103,6 @@ void timer_init(int optimize_cpu_usage)
 void timer_update()
 {
 #ifdef A5BUILD
-    static int frame_count = 0;
-    static float fps_timer = 0.0f;
     static float old_time = INFINITY;
     float current_time = 0.0f;
 
@@ -130,14 +122,6 @@ void timer_update()
         delta_time = maximum_delta;
 
     old_time = current_time;
-
-    /* compute FPS */
-    frame_count++;
-    if(current_time >= fps_timer + 1.0f) {
-        fps_timer = current_time;
-        fps_rate = frame_count;
-        frame_count = 0;
-    }
 #else
     uint32_t current_time, delta_time; /* both in milliseconds */
 
@@ -159,15 +143,6 @@ void timer_update()
     }
     delta_time = min(delta_time, MAX_FRAME_INTERVAL);
     delta = (float)delta_time * 0.001f;
-
-    /* FPS (frames per second) */
-    partial_fps++; /* 1 render per cycle */
-    fps_accum += (int)delta_time;
-    if(fps_accum >= 1000) {
-        fps = partial_fps;
-        partial_fps = 0;
-        fps_accum = 0;
-    }
 
     /* done! */
     last_time = timer_get_ticks();
@@ -217,22 +192,6 @@ uint32_t timer_get_ticks()
     return ticks - start_time;
 #endif
 }
-
-
-/*
- * timer_get_fps()
- * Returns the FPS rate
- */
-int timer_get_fps()
-{
-#ifdef A5BUILD
-    return fps_rate;
-#else
-    return fps;
-#endif
-}
-
-
 
 
 /* -------- Utilities -------- */

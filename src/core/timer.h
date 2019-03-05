@@ -31,6 +31,5 @@ void timer_release();
 /* main utilities */
 float timer_get_delta();
 uint32_t timer_get_ticks();
-int timer_get_fps();
 
 #endif

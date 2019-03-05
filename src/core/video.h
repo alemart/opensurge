@@ -53,9 +53,10 @@ const struct image_t* video_get_window_surface();
 #define VIDEO_SCREEN_H            ((int)(video_get_screen_size().y))
 struct image_t *video_get_backbuffer();
 
-/* fps counter */
+/* FPS counter (frames per second) */
 void video_show_fps(int show);
 int video_is_fps_visible();
+int video_fps(); /* get FPS rate */
 
 /* video message */
 void video_showmessage(const char *fmt, ...);
