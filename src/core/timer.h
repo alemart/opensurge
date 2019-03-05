@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 /* time manager */
-void timer_init(int optimize_cpu_usage);
+void timer_init();
 void timer_update();
 void timer_release();
 

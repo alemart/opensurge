@@ -190,9 +190,7 @@ void init_managers(const commandline_t* cmd)
     modmanager_init();
     prefs = modmanager_prefs();
 
-    timer_init(
-        commandline_getint(cmd->optimize_cpu_usage, TRUE)
-    );
+    timer_init();
     video_init(
         get_window_title(),
         commandline_getint(
