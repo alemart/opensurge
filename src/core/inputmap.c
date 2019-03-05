@@ -18,7 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef A5BUILD
+/* TODO */
+#else
 #include <allegro.h>
+#endif
+
 #include "inputmap.h"
 #include "stringutil.h"
 #include "util.h"
@@ -192,6 +197,9 @@ static const char* key_names[] = {
 
 
 /* scancodes */
+#if defined(A5BUILD)
+static const int key_codes[1024] = { 0 }; /* FIXME */
+#else
 static const int key_codes[] = {
     0,
     KEY_A,
@@ -327,6 +335,7 @@ static const int key_codes[] = {
 
     0 /* end of list */
 };
+#endif
 
 
 

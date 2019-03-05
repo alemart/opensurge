@@ -18,15 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include <png.h>
-#include <allegro.h>
-#include <loadpng.h>
-#include <jpgalleg.h>
-#include "hqx/hqx.h"
 #include "video.h"
 #include "image.h"
 #include "timer.h"
@@ -34,19 +30,22 @@
 #include "util.h"
 #include "stringutil.h"
 
-/* private stuff */
-#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
-#define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
-#define LOADING_SCREEN_FILE     "images/loading.png"
+#if defined(A5BUILD)
 
-/* video manager */
-static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
+/* TODO */
+
+#else
+
+#include <png.h>
+#include <allegro.h>
+#include <loadpng.h>
+#include <jpgalleg.h>
+#include "hqx/hqx.h"
+
+#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
 static image_t *video_buffer;
 static image_t *window_surface;
-static int video_smooth;
-static int video_resolution;
-static int video_fullscreen;
-static int video_showfps;
+
 static void fast2x_blit(image_t *src, image_t *dest);
 static void smooth2x_blit(image_t *src, image_t *dest);
 static void smooth3x_blit(image_t *src, image_t *dest);
@@ -56,6 +55,19 @@ static void window_switch_out();
 static int window_active = TRUE;
 static void draw_to_screen(image_t *img);
 static void setup_color_depth(int bpp);
+
+#endif
+
+/* private stuff */
+#define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
+#define LOADING_SCREEN_FILE     "images/loading.png"
+
+/* video manager */
+static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
+static int video_resolution = VIDEORESOLUTION_1X;
+static int video_fullscreen = FALSE;
+static int video_showfps = FALSE;
+static int video_smooth = FALSE;
 
 /* Video Message */
 #define VIDEOMSG_TIMEOUT        5000 /* in ms */
@@ -81,6 +93,15 @@ static videomsg_t* videomsg = NULL;
  */
 void video_init(const char *window_title, int resolution, int smooth, int fullscreen, int bpp)
 {
+#if defined(A5BUILD)
+    logfile_message("video_init()");
+
+    /* video init */
+    video_changemode(resolution, smooth, fullscreen);
+
+    /* video message */
+    videomsg = NULL;
+#else
     logfile_message("video_init()");
     setup_color_depth(bpp);
 
@@ -114,6 +135,7 @@ void video_init(const char *window_title, int resolution, int smooth, int fullsc
 
     /* video message */
     videomsg = NULL;
+#endif
 }
 
 /*
@@ -122,6 +144,12 @@ void video_init(const char *window_title, int resolution, int smooth, int fullsc
  */
 void video_changemode(int resolution, int smooth, int fullscreen)
 {
+#if defined(A5BUILD)
+    logfile_message("video_changemode(%d,%d,%d)", resolution, smooth, fullscreen);
+    video_resolution = resolution;
+    video_fullscreen = fullscreen;
+    video_smooth = FALSE; /* not supported yet */
+#else
     int width, height;
     int mode;
 
@@ -177,6 +205,7 @@ void video_changemode(int resolution, int smooth, int fullscreen)
 
     /* done! */
     logfile_message("video_changemode() ok");
+#endif
 }
 
 
@@ -266,10 +295,14 @@ v2d_t video_get_window_size()
  */
 image_t* video_get_backbuffer()
 {
+#if defined(A5BUILD)
+    return NULL;
+#else
     if(video_buffer == NULL)
         fatal_error("FATAL ERROR: video_get_backbuffer() returned NULL!");
 
     return video_buffer;
+#endif
 }
 
 /*
@@ -278,6 +311,13 @@ image_t* video_get_backbuffer()
  */
 void video_render()
 {
+#if defined(A5BUILD)
+    /* video message */
+    videomsg = videomsg_render(videomsg, video_get_backbuffer(), 0);
+
+    if(video_is_fps_visible())
+        printf("%d\n", timer_get_fps());
+#else
     /* video message */
     videomsg = videomsg_render(videomsg, video_get_backbuffer(), 0);
 
@@ -347,6 +387,7 @@ void video_render()
             break;
         }
     }
+#endif
 }
 
 
@@ -356,6 +397,14 @@ void video_render()
  */
 void video_release()
 {
+#if defined(A5BUILD)
+    logfile_message("video_release()");
+
+    if(videomsg != NULL)
+        videomsg_delete(videomsg);
+
+    logfile_message("video_release() ok");
+#else
     logfile_message("video_release()");
 
     if(video_buffer != NULL)
@@ -364,7 +413,11 @@ void video_release()
     if(window_surface != NULL)
         image_destroy(window_surface);
 
+    if(videomsg != NULL)
+        videomsg_delete(videomsg);
+
     logfile_message("video_release() ok");
+#endif
 }
 
 
@@ -391,7 +444,11 @@ void video_showmessage(const char *fmt, ...)
  */
 int video_get_color_depth()
 {
+#if defined(A5BUILD)
+    return 32; /* FIXME */
+#else
     return get_color_depth();
+#endif
 }
 
 
@@ -401,7 +458,11 @@ int video_get_color_depth()
  */
 int video_get_desktop_color_depth()
 {
+#if defined(A5BUILD)
+    return 32; /* FIXME */
+#else
     return desktop_color_depth();
+#endif
 }
 
 
@@ -412,7 +473,11 @@ int video_get_desktop_color_depth()
  */
 int video_is_window_active()
 {
+#if defined(A5BUILD)
+    return TRUE; /* FIXME */
+#else
     return window_active;
+#endif
 }
 
 
@@ -455,6 +520,9 @@ void video_display_loading_screen()
  */
 const image_t* video_get_window_surface()
 {
+#if defined(A5BUILD)
+    return NULL; /* FIXME */
+#else
     switch(video_get_resolution()) {
         case VIDEORESOLUTION_1X:
         case VIDEORESOLUTION_EDT:
@@ -463,10 +531,16 @@ const image_t* video_get_window_surface()
         default:
             return window_surface;
     }
+#endif
 }
 
 
 /* private stuff */
+#if defined(A5BUILD)
+
+/* TODO */
+
+#else
 
 /* fast2x_blit resizes the src image by a
  * factor of 2. It assumes that:
@@ -566,6 +640,7 @@ void setup_color_depth(int bpp)
     set_color_depth(bpp);
     set_color_conversion(COLORCONV_TOTAL);
 }
+#endif
 
 /* creates a new videomsg_t node */
 videomsg_t* videomsg_new(const char* message, videomsg_t* next)
@@ -596,7 +671,11 @@ videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line)
             return videomsg_delete(videomsg);
 
         /* render current message */
+#if defined(A5BUILD)
+        ;
+#else
         textout_ex(IMAGE2BITMAP(dst), font, videomsg->message, 0, image_height(dst) - text_height(font) * (line + 1), makecol(255,255,255), makecol(0,0,0));
+#endif
 
         /* render next message */
         videomsg->next = videomsg_render(videomsg->next, dst, line + 1);

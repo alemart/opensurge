@@ -18,13 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(A5BUILD)
+/* TODO */
+#else
 #include <allegro.h>
+#include <alfont.h>
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
-#include <alfont.h>
 #include "font.h"
 #include "video.h"
 #include "image.h"
@@ -41,7 +46,7 @@
 #define IMAGE2BITMAP(img)          (*((BITMAP**)(img)))   /* crazy stuff */
 #define FONT_TEXTMAXSIZE           16384    /* maximum size for texts */
 #define FONT_STACKCAPACITY         8        /* color stack capacity */
-static int allow_ttf_aa = TRUE; /* allow antialiasing for all TTF fonts? */
+static int allow_antialias = TRUE; /* allow antialiasing for all TTF fonts? */
 
 /* ------------------------------- */
 
@@ -124,7 +129,10 @@ static void fontdrv_bmp_release(fontdrv_t *fnt);
 typedef struct fontdrv_ttf_t fontdrv_ttf_t;
 struct fontdrv_ttf_t { /* truetype font */
     fontdrv_t base;
+#if defined(A5BUILD)
+#else
     ALFONT_FONT *ttf;
+#endif
     int antialias; /* enable antialiasing? */
     int shadow; /* enable shadow? */
 };
@@ -184,9 +192,29 @@ static char* tagged_text_offset(char* txt, int charnum);
  */
 void font_init(int allow_font_smoothing)
 {
+#if defined(A5BUILD)
     parsetree_program_t *fonts = NULL;
 
-    allow_ttf_aa = allow_font_smoothing; /* this comes first */
+    allow_antialias = allow_font_smoothing; /* this comes first */
+    logfile_message("font_init()");
+
+    logfile_message("Loading font scripts...");
+    fontdrv_list_init();
+
+    /* reading the parse tree */
+    assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
+    nanoparser_traverse_program(fonts, traverse);
+    logfile_message("All fonts have been loaded.");
+
+    /* initializing the font callback table */
+    callbacktable_init();
+
+    /* done */
+    fonts = nanoparser_deconstruct_tree(fonts);
+#else
+    parsetree_program_t *fonts = NULL;
+
+    allow_antialias = allow_font_smoothing; /* this comes first */
     logfile_message("Initializing alfont...");
     if(0 != alfont_init())
         fatal_error("alfont_init() has failed. %s", allegro_error);
@@ -204,6 +232,7 @@ void font_init(int allow_font_smoothing)
 
     /* done */
     fonts = nanoparser_deconstruct_tree(fonts);
+#endif
 }
 
 
@@ -219,8 +248,10 @@ void font_release()
     logfile_message("Unloading font scripts...");
     fontdrv_list_release();
 
+#if !defined(A5BUILD)
     logfile_message("Unloading alfont...");
     alfont_exit();
+#endif
 }
 
 
@@ -727,7 +758,7 @@ int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align
 char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
 {
     if(max_width > 0) {
-        static int blank[384];
+        static int blank[1024];
         int blanks = find_blanks(blank, sizeof(blank), text);
         int m, l = 0, r = blanks - 1;
         int best_m = 0, width;
@@ -1296,21 +1327,28 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int
     fullpath = assetfs_fullpath(source_file);
     logfile_message("Loading TrueType font '%s'...", fullpath);
 
+#if defined(A5BUILD)
+    f->antialias = allow_antialias && antialias;
+    f->shadow = shadow;
+#else
     f->ttf = alfont_load_font(fullpath);
     if(NULL != f->ttf) {
         /* configuring */
         alfont_set_font_size(f->ttf, size);
-        f->antialias = allow_ttf_aa ? antialias : FALSE;
+        f->antialias = allow_antialias && antialias;
         f->shadow = shadow;
     }
     else
         fatal_error("Couldn't load TrueType font '%s'", source_file);
+#endif
 
     return (fontdrv_t*)f;
 }
 
 void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
+#if defined(A5BUILD)
+#else
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     image_t *img = video_get_backbuffer();
 
@@ -1327,23 +1365,36 @@ void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, c
         alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
     else
         alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
+#endif
 }
 
 void fontdrv_ttf_release(fontdrv_t *fnt)
 {
+#if defined(A5BUILD)
+    free(fnt); /* TODO */
+#else
     fontdrv_ttf_t *f = (fontdrv_ttf_t*)fnt;
     alfont_destroy_font(f->ttf);
     free(f);
+#endif
 }
 
 v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt)
 {
+#if defined(A5BUILD)
+    return v2d_new(0, 0);
+#else
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
+#endif
 }
 
 v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
 {
+#if defined(A5BUILD)
+    /* FIXME */
+    return v2d_new(8 * strlen(string), 8);
+#else
     static char linebuf[FONT_TEXTMAXSIZE]; char *p, *q;
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     v2d_t sp = v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
@@ -1381,4 +1432,5 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
     line_width += *linebuf ? alfont_text_length(f->ttf, linebuf) : 0;
     width = max(width, line_width);
     return v2d_new(width, height);
+#endif
 }

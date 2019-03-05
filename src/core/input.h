@@ -31,7 +31,6 @@ typedef struct inputcomputer_t inputcomputer_t;
 typedef struct inputuserdefined_t inputuserdefined_t;
 
 /* available buttons */
-#define IB_MAX              12   /* number of buttons */
 enum inputbutton_t {
     IB_UP,      /* up */
     IB_DOWN,    /* down */
@@ -44,7 +43,9 @@ enum inputbutton_t {
     IB_FIRE5,
     IB_FIRE6,
     IB_FIRE7,
-    IB_FIRE8
+    IB_FIRE8,
+    /* --- */
+    IB_MAX      /* number of buttons */
 };
 
 /* public methods */

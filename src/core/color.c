@@ -49,7 +49,7 @@ color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 #ifdef A5BUILD
-    return (color_t) { (r << 24) || (g << 16) || (b << 8) || a }; /* FIXME */
+    return (color_t) { (r << 16) || (g << 8) || (b >> 0) || (a << 24) }; /* FIXME */
 #else
     return (color_t){ makeacol(r, g, b, a) };
 #endif
@@ -102,10 +102,10 @@ color_t color_hex(const char* hex_string)
 void color_unmap(color_t color, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a)
 {
 #ifdef A5BUILD
-    if(r) *r = (color._value >> 24) & 255;
-    if(g) *g = (color._value >> 16) & 255;
-    if(b) *b = (color._value >> 8) & 255;
-    if(a) *a = color._value & 255;
+    if(r) *r = (color._value >> 16) & 255;
+    if(g) *g = (color._value >> 8) & 255;
+    if(b) *b = (color._value >> 0) & 255;
+    if(a) *a = (color._value >> 24) & 255;
 #else
     if(r) *r = getr(color._value);
     if(g) *g = getg(color._value);
@@ -130,6 +130,9 @@ bool color_equals(color_t a, color_t b)
 bool color_is_transparent(color_t color)
 {
 #ifdef A5BUILD
+    uint8_t r, g, b, a;
+    color_unmap(color, &r, &g, &b, &a);
+    return (r==255&&g==0&&b==255);
     return false;
 #else
     /* mask color (bright pink); ignore alpha */

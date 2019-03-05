@@ -18,7 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef A5BUILD
+/* TODO */
+#else
 #include <allegro.h>
+#endif
+
 #include "input.h"
 #include "util.h"
 #include "video.h"
@@ -93,6 +98,22 @@ static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
  */
 void input_init()
 {
+#ifdef A5BUILD
+    logfile_message("input_init()");
+
+    /* initializing the input list */
+    inlist = NULL;
+
+    /* joypad setup */
+    got_joystick = FALSE;
+    ignore_joystick = TRUE;
+    plugged_joysticks = 0;
+    /* TODO */
+    logfile_message("No joysticks have been installed.");
+
+    /* loading custom input mappings */
+    inputmap_init();
+#else
     logfile_message("input_init()");
 
     /* installing Allegro stuff */
@@ -130,6 +151,7 @@ void input_init()
 
     /* loading custom input mappings */
     inputmap_init();
+#endif
 }
 
 /*
@@ -138,7 +160,15 @@ void input_init()
  */
 void input_update()
 {
-    int i, lock_mouse = FALSE;
+#ifdef A5BUILD
+    /* updating the input objects */
+    for(input_list_t* it = inlist; it; it = it->next) {
+        for(int i = 0; i < IB_MAX; i++)
+            it->data->oldstate[i] = it->data->state[i];
+        it->data->update(it->data);
+    }
+#else
+    int i;
     static int old_f6 = 0;
     input_list_t *it;
 
@@ -164,10 +194,6 @@ void input_update()
 
     }
 
-    /* lock mouse? */
-    if(lock_mouse && video_is_window_active())
-        position_mouse(SCREEN_W/2, SCREEN_H/2);
-
     /* ignore/restore joystick */
     if(!old_f6 && key[KEY_F6]) {
         input_ignore_joystick(!input_is_joystick_ignored());
@@ -178,6 +204,7 @@ void input_update()
     /* quit game */
     if(key[KEY_ALT] && key[KEY_F4])
         game_quit();
+#endif
 }
 
 
@@ -361,8 +388,7 @@ int input_is_ignored(input_t *in)
  */
 void input_clear(input_t *in)
 {
-    int i;
-    for(i=0; i<IB_MAX; i++)
+    for(int i = 0; i < IB_MAX; i++)
         in->state[i] = in->oldstate[i] = FALSE;
 }
 
@@ -508,6 +534,9 @@ void input_unregister(input_t *in)
 /* get mouse mickeys (mouse wheel included) */
 void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
 {
+#ifdef A5BUILD
+    *mickey_x = *mickey_y = *mickey_z = 0;
+#else
     get_mouse_mickeys(mickey_x, mickey_y);
     if(mickey_z != NULL) {
         static int mz, first = TRUE;
@@ -515,11 +544,15 @@ void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
         *mickey_z = mz - mouse_z;
         mz = mouse_z;
     }
+#endif
 }
 
 /* check if all joysticks have at least 2 axis and 4 buttons */
 int are_all_joysticks_valid()
 {
+#ifdef A5BUILD
+    return TRUE;
+#else
     int i;
 
     for(i=0; i<num_joysticks; i++) {
@@ -528,11 +561,33 @@ int are_all_joysticks_valid()
     }
 
     return TRUE;
+#endif
 }
 
 /* update specific input devices */
 void inputmouse_update(input_t* in)
 {
+#ifdef A5BUILD
+    inputmouse_t *me = (inputmouse_t*)in;
+    const int mouse_x = 0, mouse_y = 0, mouse_z = 0, mouse_b = 0;
+
+    get_mouse_mickeys_ex(&me->dx, &me->dy, &me->dz);
+    me->x = mouse_x;
+    me->y = mouse_y;
+    me->z = mouse_z;
+    in->state[IB_UP] = (me->dz < 0);
+    in->state[IB_DOWN] = (me->dz > 0);
+    in->state[IB_LEFT] = FALSE;
+    in->state[IB_RIGHT] = FALSE;
+    in->state[IB_FIRE1] = (mouse_b & 1);
+    in->state[IB_FIRE2] = (mouse_b & 2);
+    in->state[IB_FIRE3] = (mouse_b & 4);
+    in->state[IB_FIRE4] = FALSE;
+    in->state[IB_FIRE5] = FALSE;
+    in->state[IB_FIRE6] = FALSE;
+    in->state[IB_FIRE7] = FALSE;
+    in->state[IB_FIRE8] = FALSE;
+#else
     inputmouse_t *me = (inputmouse_t*)in;
 
     get_mouse_mickeys_ex(&me->dx, &me->dy, &me->dz);
@@ -551,6 +606,7 @@ void inputmouse_update(input_t* in)
     in->state[IB_FIRE6] = FALSE;
     in->state[IB_FIRE7] = FALSE;
     in->state[IB_FIRE8] = FALSE;
+#endif
 }
 
 void inputcomputer_update(input_t* in)
@@ -560,6 +616,13 @@ void inputcomputer_update(input_t* in)
 
 void inputuserdefined_update(input_t* in)
 {
+#ifdef A5BUILD
+    inputuserdefined_t *me = (inputuserdefined_t*)in;
+
+    for(int i = 0; i < IB_MAX; i++)
+        in->state[i] = FALSE;
+    in->state[IB_RIGHT]=1;
+#else
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
     int i, k;
@@ -587,4 +650,5 @@ void inputuserdefined_update(input_t* in)
         in->state[IB_FIRE7] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE7]) ? joy[k].button[ im->joystick.button[IB_FIRE7] ].b : FALSE;
         in->state[IB_FIRE8] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE8]) ? joy[k].button[ im->joystick.button[IB_FIRE8] ].b : FALSE;
     }
+#endif
 }
