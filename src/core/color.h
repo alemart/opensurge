@@ -25,9 +25,15 @@
 #include <stdint.h>
 
 /* color type */
+#ifdef A5BUILD
 typedef struct color_t {
     int _value;
 } color_t;
+#else
+typedef struct color_t {
+    int _value;
+} color_t;
+#endif
 
 /* public API */
 color_t color_rgb(uint8_t r, uint8_t g, uint8_t b);

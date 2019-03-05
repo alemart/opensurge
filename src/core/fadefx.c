@@ -18,7 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef A5BUILD
+#else
 #include <allegro.h>
+#endif
 #include "fadefx.h"
 #include "video.h"
 #include "image.h"
@@ -59,6 +62,28 @@ void fadefx_release()
  */
 void fadefx_update()
 {
+#ifdef A5BUILD
+    end = FALSE;
+    if(type != FADEFX_NONE) {
+        int n;
+
+        /* elapsed time */
+        elapsed_time += timer_get_delta();
+        end = (elapsed_time >= total_time);
+
+        /* render */
+        n = (int)( 255.0f * ((elapsed_time * 1.25f) / total_time) );
+        n = clip(n, 0, 255);
+        n = (type == FADEFX_IN) ? (255 - n) : n;
+        /* TODO */
+        
+        /* the fade effect is over */
+        if(end) {
+           total_time = elapsed_time = 0.0f;
+           type = FADEFX_NONE;
+        }
+    }
+#else
     end = FALSE;
     if(type != FADEFX_NONE) {
         BITMAP *backbuffer = *((BITMAP**)video_get_backbuffer());
@@ -83,6 +108,7 @@ void fadefx_update()
            type = FADEFX_NONE;
         }
     }
+#endif
 }
 
 /*

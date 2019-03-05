@@ -18,25 +18,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <allegro.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include <math.h>
 #include "v2d.h"
 #include "util.h"
 #include "timer.h"
 #include "logfile.h"
 
+#ifdef A5BUILD
+/* TODO */
+#include <stdbool.h>
+#else
+#include <allegro.h>
 #ifdef _WIN32
 #include <winalleg.h>
+#endif
 #endif
 
 
 
 /* private stuff */
+#ifdef A5BUILD
+static bool game_over = false;
+#else
 static volatile int game_over = FALSE;
+#endif
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
 
@@ -85,11 +95,18 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
  * game_quit()
  * Quit game?
  */
+#ifdef A5BUILD
+void game_quit(void)
+{
+    game_over = true;
+}
+#else
 void game_quit(void)
 {
     game_over = TRUE;
 }
 END_OF_FUNCTION(game_quit)
+#endif
 
 
 /*
@@ -135,12 +152,15 @@ void fatal_error(const char *fmt, ...)
     va_end(args);
 
     logfile_message("%s", buf);
+#ifdef A5BUILD
+    puts(buf);
+#else
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-
 #ifdef _WIN32
     MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONERROR);
 #else
     allegro_message("%s", buf);
+#endif
 #endif
 
     exit(1);

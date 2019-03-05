@@ -18,22 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-#include <allegro.h>
-#include "global.h"
-#include "timer.h"
 #include "util.h"
+#include "timer.h"
 #include "logfile.h"
 
-#ifndef _WIN32
-#include <sys/time.h>
-#else
+#if defined(A5BUILD)
+#include <math.h>
+#include <sys/time.h> /* FIXME */
+#elif defined(_WIN32)
+#include <allegro.h>
 #include <winalleg.h>
+#else
+#include <allegro.h>
+#include <sys/time.h>
 #endif
 
+#ifdef A5BUILD
+static const float minimum_delta = 0.016f;
+static const float maximum_delta = 0.033f;
+static float delta_time = 0.0f;
+static uint32_t start_time = 0; /* TODO: remove */
+static int fps_rate = 0;
 
-
+static inline float get_current_time(); /* given in seconds */
+static uint32_t get_tick_count();
+static inline void yield_cpu();
+#else
 
 /* constants */
 #define MIN_FRAME_INTERVAL 15 /* (1/15) * 1000 ~ 67 fps max */
@@ -52,6 +62,8 @@ static uint32_t start_time;
 static uint32_t get_tick_count(); /* tell me the time */
 static void yield_cpu(); /* we don't like using 100% of the cpu */
 
+#endif
+
 
 /*
  * timer_init()
@@ -61,6 +73,12 @@ void timer_init(int optimize_cpu_usage)
 {
     logfile_message("timer_init()");
 
+#ifdef A5BUILD
+    /* ignore optimize_cpu_usage (always TRUE) */
+    start_time = get_tick_count();
+    delta_time = 0.0f;
+    fps_rate = 0;
+#else
     /* installing Allegro stuff */
     logfile_message("Installing Allegro timers...");
     if(install_timer() != 0)
@@ -78,6 +96,7 @@ void timer_init(int optimize_cpu_usage)
 
     /* done! */
     last_time = timer_get_ticks();
+#endif
 }
 
 
@@ -89,6 +108,37 @@ void timer_init(int optimize_cpu_usage)
  */
 void timer_update()
 {
+#ifdef A5BUILD
+    static int frame_count = 0;
+    static float fps_timer = 0.0f;
+    static float old_time = INFINITY;
+    float current_time = 0.0f;
+
+    /* compute delta time */
+    do {
+        current_time = get_current_time();
+        delta_time = current_time - old_time; 
+        if(current_time < old_time) { /* if time wrap */
+            old_time = current_time;
+            delta_time = 0.0f;
+        }
+        if(delta_time < minimum_delta)
+            yield_cpu();
+    } while(delta_time < minimum_delta);
+
+    if(delta_time > maximum_delta)
+        delta_time = maximum_delta;
+
+    old_time = current_time;
+
+    /* compute FPS */
+    frame_count++;
+    if(current_time >= fps_timer + 1.0f) {
+        fps_timer = current_time;
+        fps_rate = frame_count;
+        frame_count = 0;
+    }
+#else
     uint32_t current_time, delta_time; /* both in milliseconds */
 
     /* time control */
@@ -121,6 +171,7 @@ void timer_update()
 
     /* done! */
     last_time = timer_get_ticks();
+#endif
 }
 
 
@@ -142,7 +193,11 @@ void timer_release()
  */
 float timer_get_delta()
 {
+#ifdef A5BUILD
+    return delta_time;
+#else
     return delta;
+#endif
 }
 
 
@@ -153,10 +208,14 @@ float timer_get_delta()
  */
 uint32_t timer_get_ticks()
 {
+#ifdef A5BUILD
+    return 1000 * get_current_time();
+#else
     uint32_t ticks = get_tick_count();
     if(ticks < start_time)
         start_time = ticks;
     return ticks - start_time;
+#endif
 }
 
 
@@ -166,36 +225,39 @@ uint32_t timer_get_ticks()
  */
 int timer_get_fps()
 {
+#ifdef A5BUILD
+    return fps_rate;
+#else
     return fps;
+#endif
 }
 
-/*
- * timer_is_cpu_usage_optimized()
- * Is the CPU usage optimized?
- */
-int timer_is_cpu_usage_optimized()
+
+
+
+/* -------- Utilities -------- */
+#if defined(A5BUILD)
+
+float get_current_time()
 {
-    return must_yield_cpu;
+    /* FIXME FIXME FIXME */
+    return 0.001f * (get_tick_count() - start_time);
 }
 
-/*
- * timer_optimize_cpu_usage()
- * Optimize the CPU usage?
- */
-void timer_optimize_cpu_usage(int optimize)
+uint32_t get_tick_count()
 {
-    must_yield_cpu = optimize;
+    /* TODO: remove me */
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    return (now.tv_sec * 1000) + (now.tv_usec / 1000);
 }
 
+void yield_cpu()
+{
+    /* TODO */
+}
 
-
-
-
-
-
-/* platform-specific code */
-
-#ifndef _WIN32
+#elif !defined(_WIN32)
 
 uint32_t get_tick_count()
 {

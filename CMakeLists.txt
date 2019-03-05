@@ -39,6 +39,7 @@ MESSAGE("Using compiler: ${CMAKE_C_COMPILER}.")
 OPTION(A5BUILD "Use the Allegro 5 backend" ON)
 IF(A5BUILD)
   SET(DEFS ${DEFS} A5BUILD)
+  MESSAGE(STATUS "Building using the Allegro 5 backend...")
 ENDIF(A5BUILD)
 
 # Allegro libs on *nix: it requires some tweaking...
@@ -353,7 +354,9 @@ SET(
 
 # *nix executable
 IF(UNIX)
-  SET(GAME_SRCS ${GAME_SRCS} src/misc/iconlin.c)
+  IF(NOT A5BUILD)
+    SET(GAME_SRCS ${GAME_SRCS} src/misc/iconlin.c)
+  ENDIF(NOT A5BUILD)
   ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
   SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS ${ALLEGRO_UNIX_LIBS})
   TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${AUDIO_LIBS} ${LSURGESCRIPT} ${LJPGALLEG} ${LLOADPNG} ${LPNG} ${LZ} ${LALFONT} ${LALLEG})

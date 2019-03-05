@@ -23,8 +23,8 @@
 
 #include <stdint.h>
 
-/* time handler */
-void timer_init(int optimize_cpu_usage); /* receives a boolean */
+/* time manager */
+void timer_init(int optimize_cpu_usage);
 void timer_update();
 void timer_release();
 
@@ -32,9 +32,5 @@ void timer_release();
 float timer_get_delta();
 uint32_t timer_get_ticks();
 int timer_get_fps();
-
-/* optimize cpu usage? */
-int timer_is_cpu_usage_optimized();
-void timer_optimize_cpu_usage(int optimize);
 
 #endif

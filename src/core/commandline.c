@@ -29,12 +29,6 @@
 #include "video.h"
 #include "install.h"
 
-#ifdef _WIN32
-#include <allegro.h>
-#include <winalleg.h>
-#endif
-
-
 /* private stuff ;) */
 static void crash(char *fmt, ...);
 static int print_gameid(const char* gameid, void* data);
@@ -106,7 +100,9 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
+#ifndef A5BUILD
                 "    --full-cpu-usage                 use 100%% of the CPU (*)\n"
+#endif
                 "    --no-font-smoothing              disable antialiased fonts (*)\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n"
                 "\n"
@@ -138,9 +134,13 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--smooth") == 0) {
+#ifndef A5BUILD
             cmd.smooth_graphics = TRUE;
             if(cmd.video_resolution == VIDEORESOLUTION_1X)
                 cmd.video_resolution = VIDEORESOLUTION_2X;
+#else
+            crash("Smooth graphics: not yet implemented in the Allegro 5 backend");
+#endif
         }
 
         else if(strcmp(argv[i], "--tiny") == 0) /* obsolete */
@@ -168,8 +168,10 @@ commandline_t commandline_parse(int argc, char **argv)
         else if(strcmp(argv[i], "--use-gamepad") == 0)
             cmd.use_gamepad = TRUE;
 
+#ifndef A5BUILD
         else if(strcmp(argv[i], "--full-cpu-usage") == 0)
             cmd.optimize_cpu_usage = FALSE;
+#endif
 
         else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;
@@ -279,19 +281,14 @@ const char* commandline_getstring(const char* value, const char* default_string)
 /* Displays a message to the user (printf format) and exists */
 void crash(char *fmt, ...)
 {
-    char buf[4096];
+    char buf[1024];
     va_list args;
 
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-#ifdef _WIN32
-    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONEXCLAMATION);
-#else
     puts(buf);
-#endif
-
     exit(1);
 }
 

@@ -109,6 +109,7 @@ static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
+#define round(x)                (int)(((x)>=0.0f)?((x)+0.5f):((x)-0.5f))
 
 /* public functions */
 
