@@ -43,7 +43,6 @@
 /* internal data */
 static uint32_t last_time;
 static float delta;
-static int must_yield_cpu;
 static volatile uint32_t elapsed_time;
 static uint32_t start_time;
 
@@ -56,7 +55,7 @@ static void yield_cpu(); /* we don't like using 100% of the cpu */
  * timer_init()
  * Initializes the Time Handler
  */
-void timer_init(int optimize_cpu_usage)
+void timer_init()
 {
     logfile_message("timer_init()");
 
@@ -64,9 +63,6 @@ void timer_init(int optimize_cpu_usage)
     logfile_message("Installing Allegro timers...");
     if(install_timer() != 0)
         logfile_message("install_timer() failed: %s", allegro_error);
-
-    /* should we optimize the cpu usage? */
-    must_yield_cpu = optimize_cpu_usage;
 
     /* initializing... */
     start_time = get_tick_count();
@@ -94,11 +90,9 @@ void timer_update()
         last_time = (current_time >= last_time) ? last_time : current_time;
 
         if(delta_time < MIN_FRAME_INTERVAL) {
-            if(must_yield_cpu) {
-                /* we don't like having the cpu usage at 100%. */
-                /* will the OS make our process active again on time? */
-                yield_cpu();
-            }
+            /* we don't want the cpu usage at 100% */
+            /* will the OS make our process active again on time? */
+            yield_cpu();
         }
         else
             break;
@@ -145,27 +139,6 @@ uint32_t timer_get_ticks()
         start_time = ticks;
     return ticks - start_time;
 }
-
-
-/*
- * timer_is_cpu_usage_optimized()
- * Is the CPU usage optimized?
- */
-int timer_is_cpu_usage_optimized()
-{
-    return must_yield_cpu;
-}
-
-/*
- * timer_optimize_cpu_usage()
- * Optimize the CPU usage?
- */
-void timer_optimize_cpu_usage(int optimize)
-{
-    must_yield_cpu = optimize;
-}
-
-
 
 
 

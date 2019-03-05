@@ -24,16 +24,12 @@
 #include <stdint.h>
 
 /* time handler */
-void timer_init(int optimize_cpu_usage); /* receives a boolean */
+void timer_init();
 void timer_update();
 void timer_release();
 
 /* main utilities */
 float timer_get_delta();
 uint32_t timer_get_ticks();
-
-/* optimize cpu usage? */
-int timer_is_cpu_usage_optimized();
-void timer_optimize_cpu_usage(int optimize);
 
 #endif

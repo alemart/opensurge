@@ -69,7 +69,6 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.datadir[0] = '\0';
     cmd.gameid[0] = '\0';
     cmd.use_gamepad = COMMANDLINE_UNDEFINED;
-    cmd.optimize_cpu_usage = COMMANDLINE_UNDEFINED;
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
     cmd.user_argv = NULL;
     cmd.user_argc = 0;
@@ -106,7 +105,6 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
-                "    --full-cpu-usage                 use 100%% of the CPU (*)\n"
                 "    --no-font-smoothing              disable antialiased fonts (*)\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n"
                 "\n"
@@ -167,9 +165,6 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--use-gamepad") == 0)
             cmd.use_gamepad = TRUE;
-
-        else if(strcmp(argv[i], "--full-cpu-usage") == 0)
-            cmd.optimize_cpu_usage = FALSE;
 
         else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;

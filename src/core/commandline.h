@@ -44,7 +44,6 @@ struct commandline_t {
     /* other options */
     char gameid[128];
     int use_gamepad;
-    int optimize_cpu_usage;
     int allow_font_smoothing;
 
     /* user arguments: what comes after "--" */
