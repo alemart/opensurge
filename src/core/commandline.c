@@ -87,7 +87,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
-                "    --smooth                         display smooth graphics (intensive task)\n"
+                "    --smooth                         display smooth graphics (applicable when resolution > 1)\n"
                 "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                       show the FPS (frames per second) counter\n"
                 "    --use-gamepad                    play using a gamepad\n"
@@ -115,7 +115,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--resolution") == 0) {
-            if(++i < argc) {
+            if(++i < argc && *(argv[i]) != '-') {
                 if(strcmp(argv[i], "1") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_1X;
                 else if(strcmp(argv[i], "2") == 0)
@@ -149,7 +149,7 @@ commandline_t commandline_parse(int argc, char **argv)
             cmd.fullscreen = FALSE;
 
         else if(strcmp(argv[i], "--color-depth") == 0) {
-            if(++i < argc) {
+            if(++i < argc && *(argv[i]) != '-') {
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
                     crash("Invalid color depth: %d", cmd.color_depth);
