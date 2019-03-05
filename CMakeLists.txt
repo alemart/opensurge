@@ -35,8 +35,15 @@ SET(CFLAGS_EXTRA "") #SET(CFLAGS_EXTRA "-g")
 SET(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS}")
 MESSAGE("Using compiler: ${CMAKE_C_COMPILER}.")
 
+# Use Allegro 5 backend
+OPTION(A5BUILD "Use the Allegro 5 backend" ON)
+IF(A5BUILD)
+  SET(DEFS ${DEFS} A5BUILD)
+ENDIF(A5BUILD)
+
 # Allegro libs on *nix: it requires some tweaking...
 IF(UNIX)
+  # pkg-config allegro-5 allegro_main-5 allegro_image-5 allegro_primitives-5 allegro_font-5 allegro_ttf-5 allegro_acodec-5 allegro_audio-5 --libs
   EXECUTE_PROCESS(COMMAND allegro-config --libs OUTPUT_VARIABLE ALLEGRO_UNIX_LIBS)
   IF(ALLEGRO_UNIX_LIBS)
     STRING(REGEX REPLACE "[ \r\n\t]+$" "" ALLEGRO_UNIX_LIBS ${ALLEGRO_UNIX_LIBS})
@@ -47,12 +54,14 @@ ENDIF(UNIX)
 
 # extra options
 OPTION(USE_OPENAL "Will use OpenAL for audio playback" OFF)
+IF(A5BUILD)
+  SET(USE_OPENAL OFF)
+ENDIF(A5BUILD)
 
-# install options
+# data directory (assets folder)
 IF(UNIX)
   SET(GAME_DATADIR "/usr/local/share/games/${GAME_UNIXNAME}" CACHE PATH "The data folder is where the game assets are located.")
-  SET(GAME_INSTALLDIR "/usr/local/games" CACHE PATH "The ${GAME_UNIXNAME} executable will be installed here.")
-  SET(CFLAGS_EXTRA "${CFLAGS_EXTRA} -D'GAME_UNIX_INSTALLDIR=\"${GAME_DATADIR}\"' -D'GAME_UNIX_EXECDIR=\"${GAME_INSTALLDIR}\"' -D'GAME_DATADIR=\"${GAME_DATADIR}\"'")
+  SET(CFLAGS_EXTRA "${CFLAGS_EXTRA} -D'GAME_DATADIR=\"${GAME_DATADIR}\"'")
 ENDIF(UNIX)
 
 # prefer static libs
