@@ -376,6 +376,9 @@ void video_release()
     if(window_surface != NULL)
         image_destroy(window_surface);
 
+    if(videomsg != NULL)
+        videomsg_delete(videomsg);
+
     logfile_message("video_release() ok");
 }
 
