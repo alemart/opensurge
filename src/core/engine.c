@@ -18,7 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(A5BUILD)
+/* TODO */
+#else
 #include <allegro.h>
+#endif
+
 #include <stdint.h>
 #include <string.h>
 #include <locale.h>
@@ -170,8 +175,11 @@ void init_basic_stuff(const commandline_t* cmd)
     const char* gameid = commandline_getstring(cmd->gameid, NULL);
     const char* datadir = commandline_getstring(cmd->datadir, NULL);
 
+#if defined(A5BUILD)
+#else
     set_uformat(U_UTF8);
     allegro_init();
+#endif
     srand(time(NULL));
     assetfs_init(gameid, datadir);
     logfile_init();
@@ -328,7 +336,10 @@ void release_basic_stuff()
     release_nanoparser();
     logfile_release();
     assetfs_release();
+#if defined(A5BUILD)
+#else
     allegro_exit();
+#endif
 }
 
 
