@@ -49,7 +49,7 @@ static int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, objec
 /* BIFs */
 static float f_elapsed_time() { return 0.001f * timer_get_ticks(); } /* elapsed time, in seconds */
 static float f_dt() { return timer_get_delta(); } /* time difference between 2 consecutive frames */
-static float f_fps() { return (float)timer_get_fps(); } /* frames per second */
+static float f_fps() { return (float)video_fps(); } /* frames per second */
 static float f_collectibles() { return (float)player_get_collectibles(); } /* number of collectibles */
 static float f_lives() { return (float)player_get_lives(); } /* number of lives */
 static float f_initial_lives() { return (float)PLAYER_INITIAL_LIVES; } /* initial number of lives */

@@ -56,6 +56,7 @@ struct image_t *video_get_backbuffer();
 /* fps counter */
 void video_show_fps(int show);
 int video_is_fps_visible();
+int video_fps();
 
 /* video message */
 void video_showmessage(const char *fmt, ...);

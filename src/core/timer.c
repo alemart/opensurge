@@ -41,7 +41,6 @@
 
 
 /* internal data */
-static int partial_fps, fps_accum, fps;
 static uint32_t last_time;
 static float delta;
 static int must_yield_cpu;
@@ -70,11 +69,8 @@ void timer_init(int optimize_cpu_usage)
     must_yield_cpu = optimize_cpu_usage;
 
     /* initializing... */
-    partial_fps = 0;
-    fps_accum = 0;
-    fps = 0;
-    delta = 0.0f;
     start_time = get_tick_count();
+    delta = 0.0f;
 
     /* done! */
     last_time = timer_get_ticks();
@@ -109,15 +105,6 @@ void timer_update()
     }
     delta_time = min(delta_time, MAX_FRAME_INTERVAL);
     delta = (float)delta_time * 0.001f;
-
-    /* FPS (frames per second) */
-    partial_fps++; /* 1 render per cycle */
-    fps_accum += (int)delta_time;
-    if(fps_accum >= 1000) {
-        fps = partial_fps;
-        partial_fps = 0;
-        fps_accum = 0;
-    }
 
     /* done! */
     last_time = timer_get_ticks();
@@ -159,15 +146,6 @@ uint32_t timer_get_ticks()
     return ticks - start_time;
 }
 
-
-/*
- * timer_get_fps()
- * Returns the FPS rate
- */
-int timer_get_fps()
-{
-    return fps;
-}
 
 /*
  * timer_is_cpu_usage_optimized()

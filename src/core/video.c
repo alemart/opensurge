@@ -43,10 +43,11 @@
 static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
 static image_t *video_buffer;
 static image_t *window_surface;
-static int video_smooth;
-static int video_resolution;
-static int video_fullscreen;
-static int video_showfps;
+static int video_resolution = VIDEORESOLUTION_1X;
+static int video_fullscreen = FALSE;
+static int video_showfps = FALSE;
+static int video_smooth = FALSE;
+static int fps_rate = 0;
 static void fast2x_blit(image_t *src, image_t *dest);
 static void smooth2x_blit(image_t *src, image_t *dest);
 static void smooth3x_blit(image_t *src, image_t *dest);
@@ -278,12 +279,23 @@ image_t* video_get_backbuffer()
  */
 void video_render()
 {
+    static uint32_t fps_timer = 0, frame_count = 0;
+    uint32_t now;
+
     /* video message */
     videomsg = videomsg_render(videomsg, video_get_backbuffer(), 0);
 
+    /* compute fps rate */
+    ++frame_count;
+    if((now = timer_get_ticks()) >= fps_timer + 1000) {
+        fps_timer = now;
+        fps_rate = frame_count;
+        frame_count = 0;
+    }
+
     /* fps counter */
     if(video_is_fps_visible())
-        textprintf_right_ex(IMAGE2BITMAP(video_get_backbuffer()), font, VIDEO_SCREEN_W, 0, makecol(255,255,255), makecol(0,0,0),"FPS:%3d", timer_get_fps());
+        textprintf_right_ex(IMAGE2BITMAP(video_get_backbuffer()), font, VIDEO_SCREEN_W, 0, makecol(255,255,255), makecol(0,0,0), "FPS:%3d", video_fps());
 
     /* render */
     switch(video_get_resolution()) {
@@ -434,6 +446,15 @@ void video_show_fps(int show)
 int video_is_fps_visible()
 {
     return video_showfps;
+}
+
+/*
+ * video_fps()
+ * Get FPS rate
+ */
+int video_fps()
+{
+    return fps_rate;
 }
 
 
