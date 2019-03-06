@@ -52,7 +52,6 @@ static inline void yield_cpu();
 /* internal data */
 static uint32_t last_time;
 static float delta;
-static int must_yield_cpu;
 static volatile uint32_t elapsed_time;
 static uint32_t start_time;
 
