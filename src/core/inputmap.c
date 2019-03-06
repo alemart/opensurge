@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
 /* TODO */
 #else
 #include <allegro.h>

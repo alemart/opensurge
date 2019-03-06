@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 /* color type */
-#ifdef A5BUILD
+#if defined(A5BUILD)
 typedef struct color_t {
     int _value;
 } color_t;

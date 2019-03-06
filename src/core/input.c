@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
 /* TODO */
 #else
 #include <allegro.h>
@@ -98,7 +98,7 @@ static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
  */
 void input_init()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     logfile_message("input_init()");
 
     /* initializing the input list */
@@ -160,7 +160,7 @@ void input_init()
  */
 void input_update()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     /* updating the input objects */
     for(input_list_t* it = inlist; it; it = it->next) {
         for(int i = 0; i < IB_MAX; i++)
@@ -534,7 +534,7 @@ void input_unregister(input_t *in)
 /* get mouse mickeys (mouse wheel included) */
 void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     *mickey_x = *mickey_y = *mickey_z = 0;
 #else
     get_mouse_mickeys(mickey_x, mickey_y);
@@ -550,7 +550,7 @@ void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
 /* check if all joysticks have at least 2 axis and 4 buttons */
 int are_all_joysticks_valid()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     return TRUE;
 #else
     int i;
@@ -567,7 +567,7 @@ int are_all_joysticks_valid()
 /* update specific input devices */
 void inputmouse_update(input_t* in)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     inputmouse_t *me = (inputmouse_t*)in;
     const int mouse_x = 0, mouse_y = 0, mouse_z = 0, mouse_b = 0;
 
@@ -616,7 +616,7 @@ void inputcomputer_update(input_t* in)
 
 void inputuserdefined_update(input_t* in)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     inputuserdefined_t *me = (inputuserdefined_t*)in;
 
     for(int i = 0; i < IB_MAX; i++)

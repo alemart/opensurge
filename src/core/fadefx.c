@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
 #else
 #include <allegro.h>
 #endif
@@ -62,7 +62,7 @@ void fadefx_release()
  */
 void fadefx_update()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     end = FALSE;
     if(type != FADEFX_NONE) {
         int n;

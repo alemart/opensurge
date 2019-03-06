@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
 /* TODO */
 #else
 #include <allegro.h>
@@ -34,7 +34,7 @@
  */
 color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     return color_rgba(r, g, b, 255);
 #else
     return (color_t){ makeacol(r, g, b, 255) };
@@ -48,7 +48,7 @@ color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
  */
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     return (color_t) { (r << 16) || (g << 8) || (b >> 0) || (a << 24) }; /* FIXME */
 #else
     return (color_t){ makeacol(r, g, b, a) };
@@ -101,7 +101,7 @@ color_t color_hex(const char* hex_string)
  */
 void color_unmap(color_t color, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     if(r) *r = (color._value >> 16) & 255;
     if(g) *g = (color._value >> 8) & 255;
     if(b) *b = (color._value >> 0) & 255;
@@ -129,7 +129,7 @@ bool color_equals(color_t a, color_t b)
  */
 bool color_is_transparent(color_t color)
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     uint8_t r, g, b, a;
     color_unmap(color, &r, &g, &b, &a);
     return (r==255&&g==0&&b==255);

@@ -29,20 +29,20 @@
 #include "timer.h"
 #include "logfile.h"
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
 /* TODO */
 #include <stdbool.h>
+#elif defined(_WIN32)
+#include <allegro.h>
+#include <winalleg.h>
 #else
 #include <allegro.h>
-#ifdef _WIN32
-#include <winalleg.h>
-#endif
 #endif
 
 
 
 /* private stuff */
-#ifdef A5BUILD
+#if defined(A5BUILD)
 static bool game_over = false;
 #else
 static volatile int game_over = FALSE;
@@ -95,7 +95,7 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
  * game_quit()
  * Quit game?
  */
-#ifdef A5BUILD
+#if defined(A5BUILD)
 void game_quit(void)
 {
     game_over = true;
@@ -152,7 +152,7 @@ void fatal_error(const char *fmt, ...)
     va_end(args);
 
     logfile_message("%s", buf);
-#ifdef A5BUILD
+#if defined(A5BUILD)
     puts(buf);
 #else
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);

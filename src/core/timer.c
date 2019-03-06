@@ -33,7 +33,7 @@
 #include <sys/time.h>
 #endif
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
 static const float minimum_delta = 0.016f;
 static const float maximum_delta = 0.033f;
 static float delta_time = 0.0f;
@@ -71,7 +71,7 @@ void timer_init()
 {
     logfile_message("timer_init()");
 
-#ifdef A5BUILD
+#if defined(A5BUILD)
     /* ignore optimize_cpu_usage (always TRUE) */
     start_time = get_tick_count();
     delta_time = 0.0f;
@@ -99,7 +99,7 @@ void timer_init()
  */
 void timer_update()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     static float old_time = INFINITY;
     float current_time = 0.0f;
 
@@ -163,7 +163,7 @@ void timer_release()
  */
 float timer_get_delta()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     return delta_time;
 #else
     return delta;
@@ -178,7 +178,7 @@ float timer_get_delta()
  */
 uint32_t timer_get_ticks()
 {
-#ifdef A5BUILD
+#if defined(A5BUILD)
     return 1000 * get_current_time();
 #else
     uint32_t ticks = get_tick_count();
