@@ -19,7 +19,7 @@
  */
 
 #if defined(A5BUILD)
-/* TODO */
+#include <allegro5/allegro.h>
 #else
 #include <allegro.h>
 #endif
@@ -174,16 +174,28 @@ void init_basic_stuff(const commandline_t* cmd)
 {
     const char* gameid = commandline_getstring(cmd->gameid, NULL);
     const char* datadir = commandline_getstring(cmd->datadir, NULL);
+    ((5 << 24) | (2 << 16) | (0 << 8))
+    { 5, 2, 0 }
 
 #if defined(A5BUILD)
-#else
-    set_uformat(U_UTF8);
-    allegro_init();
-#endif
     srand(time(NULL));
     assetfs_init(gameid, datadir);
     logfile_init();
     init_nanoparser();
+
+    if(al_get_allegro_version() < ((ALLEGRO_MIN_MAJOR << 24) | (ALLEGRO_MIN_MINOR << 16) | (ALLEGRO_MIN_REVISION << 8)))
+        fatal_error("This build requires Allegro %d.%d.%d or newer", ALLEGRO_MIN_MAJOR, ALLEGRO_MIN_MINOR, ALLEGRO_MIN_REVISION);
+
+    if(!al_init())
+        fatal_error("Can't initialize Allegro");
+#else
+    set_uformat(U_UTF8);
+    allegro_init();
+    srand(time(NULL));
+    assetfs_init(gameid, datadir);
+    logfile_init();
+    init_nanoparser();
+#endif
 }
 
 

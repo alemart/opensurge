@@ -70,7 +70,14 @@
 #define TRUE                    1
 #define FALSE                   0
 #define EPSILON                 1e-5
-#define PI                      3.1415926535
+#define PI                      3.14159265358979323846
 #define LARGE_INT               (1 << 30)
+
+/* minimum Allegro version */
+#if defined(A5BUILD)
+#define ALLEGRO_MIN_MAJOR       5
+#define ALLEGRO_MIN_MINOR       2
+#define ALLEGRO_MIN_REVISION    0
+#endif
 
 #endif
