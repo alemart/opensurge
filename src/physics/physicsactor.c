@@ -819,15 +819,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* animation issues */
         if(fabs(pa->gsp) < pa->walkthreshold) {
-            if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_DOWN) && fabs(pa->gsp) < EPSILON)
+            if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_DOWN) && nearly_equal(pa->gsp, 0.0f))
                 pa->state = PAS_DUCKING;
-            else if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_UP) && fabs(pa->gsp) < EPSILON)
+            else if(pa->state != PAS_PUSHING && input_button_down(pa->input, IB_UP) && nearly_equal(pa->gsp, 0.0f))
                 pa->state = PAS_LOOKINGUP;
             else if(pa->state != PAS_PUSHING && (input_button_down(pa->input, IB_LEFT) || input_button_down(pa->input, IB_RIGHT)))
                 pa->state = input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT) ? PAS_STOPPED : PAS_WALKING;
             else if((pa->state != PAS_PUSHING && pa->state != PAS_WAITING) || (pa->state == PAS_PUSHING && !input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)))
                 pa->state = PAS_STOPPED;
-            else if((pa->state == PAS_STOPPED || pa->state == PAS_WAITING) && fabs(pa->gsp) > EPSILON)
+            else if((pa->state == PAS_STOPPED || pa->state == PAS_WAITING) && !nearly_equal(pa->gsp, 0.0f))
                 pa->state = PAS_WALKING;
         }
         else {
@@ -892,7 +892,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* begin to charge */
     if(pa->state == PAS_DUCKING) {
         if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1)) {
-            if(fabs(pa->chrg) > EPSILON) /* check if the player has the ability to charge */
+            if(!nearly_equal(pa->chrg, 0.0f)) /* check if the player has the ability to charge */
                 pa->state = PAS_CHARGING;
         }
     }
@@ -1319,7 +1319,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* I'm on the edge */
-    if(!pa->in_the_air && fabs(pa->gsp) < EPSILON && pa->state != PAS_PUSHING && pa->movmode == MM_FLOOR) {
+    if(!pa->in_the_air && nearly_equal(pa->gsp, 0.0f) && pa->state != PAS_PUSHING && pa->movmode == MM_FLOOR) {
         const sensor_t* s = at_A ? sensor_A(pa) : sensor_B(pa);
         int x = (int)pa->position.x;
         int y = (int)pa->position.y + sensor_get_y2(s) + (sensor_get_y2(s) - sensor_get_y1(s)) / 2;

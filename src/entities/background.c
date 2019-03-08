@@ -336,7 +336,7 @@ int sort_cmp(const void *a, const void *b)
     const background_t *i = *((const background_t**)a);
     const background_t *j = *((const background_t**)b);
 
-    if(fabs(i->zindex - j->zindex) < EPSILON)
+    if(nearly_equal(i->zindex, j->zindex))
         return 0;
     else if(i->zindex < j->zindex)
         return -1;

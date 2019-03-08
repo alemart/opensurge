@@ -268,7 +268,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                             v2d_t brkspeed = v2d_new(-team[i]->actor->speed.x*0.3, -100-random(50));
                             image_t *brkimg = image_clone_region(brk->brick_ref->image, (bi * brkw) / bw, (bj * brkh) / bh, brkw / bw, brkh / bh);
 
-                            if(fabs(brkspeed.x) > EPSILON)
+                            if(!nearly_equal(brkspeed.x, 0.0f))
                                 brkspeed.x += (brkspeed.x>0?1:-1) * random(50);
 
                             level_create_particle(brkimg, brkpos, brkspeed, FALSE);

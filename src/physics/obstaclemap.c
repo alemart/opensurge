@@ -101,7 +101,7 @@ const obstacle_t* obstaclemap_raycast(const obstaclemap_t* obstaclemap, v2d_t or
 
     /* sanity checks */
     max_distance = clip(max_distance, 0.0f, infty);
-    if(v2d_magnitude(direction) < EPSILON || max_distance < EPSILON)
+    if(nearly_equal(v2d_magnitude(direction), 0.0f) || nearly_equal(max_distance, 0.0f))
         return NULL;
 
     /* TODO */

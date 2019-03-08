@@ -198,7 +198,7 @@ void volatilespring_strategy(item_t *item, player_t *player)
 /* springs using the classic strategy are activated when you jump on them */
 void classicspring_strategy(item_t *item, player_t *player)
 {
-    if(player->actor->speed.y >= 1.0f || fabs(player->actor->angle) > EPSILON)
+    if(player->actor->speed.y >= 1.0f || !nearly_equal(player->actor->angle, 0.0f))
         activate_spring((spring_t*)item, player);
 }
 
@@ -309,11 +309,11 @@ void springfy_player(player_t *player, v2d_t strength)
 {
     actor_t *act = player->actor;
 
-    if(fabs(strength.y) > EPSILON && fabs(strength.x) > EPSILON)
+    if(!nearly_equal(strength.y, 0.0f) && !nearly_equal(strength.x, 0.0f))
         act->speed = strength;
-    else if(fabs(strength.y) > EPSILON)
+    else if(!nearly_equal(strength.y, 0.0f))
         act->speed.y = strength.y;
-    else if(fabs(strength.x) > EPSILON) {
+    else if(!nearly_equal(strength.x, 0.0f)) {
         act->speed.x = strength.x;
         player_lock_horizontally_for(player, 0.27f);
     }
@@ -333,10 +333,12 @@ void activate_spring(spring_t *spring, player_t *player)
         player_spring(player);
     }
 
-    if(spring->strength.x > EPSILON)
-        player->actor->mirror &= ~IF_HFLIP;
-    else if(spring->strength.x < -EPSILON)
-        player->actor->mirror |= IF_HFLIP;
+    if(!nearly_equal(spring->strength.x, 0.0f)) {
+        if(spring->strength.x > 0.0f)
+            player->actor->mirror &= ~IF_HFLIP;
+        else
+            player->actor->mirror |= IF_HFLIP;
+    }
     else
         player_spring(player);
 
