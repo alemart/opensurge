@@ -183,9 +183,6 @@ void init_basic_stuff(const commandline_t* cmd)
 
     if(!al_init())
         fatal_error("Can't initialize Allegro");
-        
-    if(al_get_allegro_version() < ((ALLEGRO_MIN_MAJOR << 24) | (ALLEGRO_MIN_MINOR << 16) | (ALLEGRO_MIN_REVISION << 8)))
-        fatal_error("This build requires Allegro %d.%d.%d or newer", ALLEGRO_MIN_MAJOR, ALLEGRO_MIN_MINOR, ALLEGRO_MIN_REVISION);
 #else
     set_uformat(U_UTF8);
     allegro_init();
