@@ -174,8 +174,6 @@ void init_basic_stuff(const commandline_t* cmd)
 {
     const char* gameid = commandline_getstring(cmd->gameid, NULL);
     const char* datadir = commandline_getstring(cmd->datadir, NULL);
-    ((5 << 24) | (2 << 16) | (0 << 8))
-    { 5, 2, 0 }
 
 #if defined(A5BUILD)
     srand(time(NULL));
