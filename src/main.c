@@ -28,7 +28,7 @@
  * main()
  * Entry point
  */
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     engine_init(argc, argv);
     engine_mainloop();

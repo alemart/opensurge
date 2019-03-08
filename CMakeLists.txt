@@ -99,13 +99,19 @@ ENDIF()
 IF(USE_A5)
 
   # Find Allegro 5 & addons
+  SET(REQUIRED_A5_LIBS
+    allegro
+    allegro_image
+    allegro_primitives
+    allegro_font
+    allegro_ttf
+    allegro_acodec
+    allegro_audio
+    allegro_main
+  )
+
+  # Write to LALLEGRO5
   SET(LALLEGRO5 "")
-
-  SET(REQUIRED_A5_LIBS allegro allegro_image allegro_primitives allegro_font allegro_ttf allegro_acodec allegro_audio)
-  IF(APPLE)
-    SET(REQUIRED_A5_LIBS "${REQUIRED_A5_LIBS}" allegro_main-5)
-  ENDIF()
-
   FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
     STRING(TOUPPER "L${A5_LIB}" _A5_LIB)
     FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATH "${PATH_ALLEGRO_LIB}")
@@ -118,7 +124,6 @@ IF(USE_A5)
   ENDFOREACH()
 
 ELSE()
-
   
   # Allegro 4: liballeg
   FIND_LIBRARY(LALLEG NAMES alleg PATH "${PATH_ALLEGRO_LIB}")
