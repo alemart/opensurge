@@ -35,18 +35,17 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-
-static ALLEGRO_DISPLAY* display = NULL;
-static image_t* backbuffer = NULL;
-static ALLEGRO_FONT* font = NULL;
 
 #define IMAGE2BITMAP(img) (*((ALLEGRO_BITMAP**)(img)))
 #define PRINT(x, y, flags, fmt, ...) do { \
     al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+    al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
     al_draw_textf(font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
 } while(0)
+
+static ALLEGRO_DISPLAY* display = NULL;
+static image_t* backbuffer = NULL;
+static ALLEGRO_FONT* font = NULL;
 
 static void setup_color_depth(int bpp);
 
@@ -87,14 +86,13 @@ static int video_smooth = FALSE;
 static int fps_rate = 0;
 
 /* Video Message */
-#define VIDEOMSG_TIMEOUT        5000 /* in ms */
-#define VIDEOMSG_MAXLINES       30
-typedef struct videomsg_t videomsg_t;
-struct videomsg_t {
+static const uint32_t VIDEOMSG_TIMEOUT = 5000; /* milliseconds */
+static const int VIDEOMSG_MAXLINES = 30;
+typedef struct videomsg_t {
     char* message;
     uint32_t endtime;
-    videomsg_t* next;
-};
+    struct videomsg_t* next;
+} videomsg_t;
 static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
 static videomsg_t* videomsg_delete(videomsg_t* videomsg);
 static videomsg_t* videomsg_render(videomsg_t* videomsg, int line);
@@ -210,7 +208,8 @@ void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP);
     if(NULL == (backbuffer = image_create(screen_size.x, screen_size.y)))
         fatal_error("Failed to create a %dx%d backbuffer", (int)screen_size.x, (int)screen_size.y);
-    //al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
 #else
     int width, height;
     int mode;
@@ -392,7 +391,24 @@ void video_render()
         PRINT(image_width(backbuffer), 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps_rate);
 
     /* render */
+    al_set_target_bitmap(al_get_backbuffer(display));
+    switch(video_get_resolution()) {
+        case VIDEORESOLUTION_1X:
+        case VIDEORESOLUTION_EDT:
+            al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
+            break;
+
+        default:
+            /* TODO: smooth gfx */
+            al_draw_scaled_bitmap(IMAGE2BITMAP(backbuffer),
+                0.0f, 0.0f, image_width(backbuffer), image_height(backbuffer),
+                0.0f, 0.0f, al_get_bitmap_width(al_get_target_bitmap()), al_get_bitmap_height(al_get_target_bitmap()),
+            0);
+            break;
+    }
     al_flip_display();
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
 #else
     static uint32_t fps_timer = 0, frame_count = 0;
     uint32_t current_time;

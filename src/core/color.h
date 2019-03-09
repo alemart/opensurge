@@ -26,8 +26,10 @@
 
 /* color type */
 #if defined(A5BUILD)
+#include <allegro5/allegro.h>
+
 typedef struct color_t {
-    int _value;
+    ALLEGRO_COLOR _color;
 } color_t;
 #else
 typedef struct color_t {
