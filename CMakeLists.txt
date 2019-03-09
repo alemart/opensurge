@@ -53,7 +53,7 @@ SET(HELP "You might get some luck by tweaking CMake options with ccmake | cmake-
 SET(DEFS "") # #define'd stuff
 
 # User options
-OPTION(USE_A5 "Use the Allegro 5 backend (WIP)" OFF)
+OPTION(USE_A5 "Use the Allegro 5 backend (WIP)" ON)
 OPTION(USE_STATIC "Use static libs whenever possible" ON)
 OPTION(USE_OPENAL "Use OpenAL for audio playback (Allegro 4 only)" OFF)
 SET(PATH_ALLEGRO_LIB "${CMAKE_SYSTEM_LIBRARY_PATH}" CACHE PATH "Where to look for the Allegro library & its dependencies")
@@ -259,7 +259,6 @@ SET(GAME_SRCS
   src/core/nanoparser/nanoparser.c
   src/core/whereami/whereami.c
   src/core/utf8/utf8.c
-  src/core/hqx/hqx.c
   src/core/zip/zip.c
   src/core/assetfs.c
   src/core/audio.c
@@ -389,17 +388,11 @@ SET(GAME_SRCS
   src/main.c
 )
 
-# A4 *nix icon
-IF(UNIX AND NOT USE_A5)
-  SET(GAME_SRCS ${GAME_SRCS} src/misc/iconlin.c)
-ENDIF()
-
 # adding headers
 SET(GAME_HEADERS
   src/core/nanoparser/nanoparser.h
   src/core/whereami/whereami.h
   src/core/utf8/utf8.h
-  src/core/hqx/hqx.h
   src/core/zip/zip.c
   src/core/assetfs.h
   src/core/audio.h
@@ -510,6 +503,15 @@ SET(GAME_HEADERS
 
   src/misc/iconwin.rc
 )
+
+# Allegro 4 specifics
+IF(NOT USE_A5)
+  IF(UNIX)
+    SET(GAME_SRCS ${GAME_SRCS} src/misc/iconlin.c)
+  ENDIF()
+  SET(GAME_SRCS ${GAME_SRCS} src/core/hqx/hqx.c src/misc/iconlin.c)
+  SET(GAME_HEADERS ${GAME_HEADERS} src/core/hqx/hqx.h)
+ENDIF()
 
 # ------------------------------------------
 # Creating the executable
