@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * fadefx.c - fade effects
- * Copyright (C) 2009, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2009, 2013, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(A5BUILD)
-#else
+#if !defined(A5BUILD)
 #include <allegro.h>
 #endif
 #include "fadefx.h"
@@ -30,7 +29,7 @@
 
 /* Fade-in & fade-out */
 static enum { FADEFX_NONE, FADEFX_IN, FADEFX_OUT } type;
-static int end;
+static bool just_ended;
 static color_t fade_color;
 static float elapsed_time;
 static float total_time;
@@ -42,7 +41,7 @@ static float total_time;
 void fadefx_init()
 {
     type = FADEFX_NONE;
-    end = FALSE;
+    just_ended = false;
     elapsed_time = 0.0f;
     total_time = 0.0f;
 }
@@ -63,35 +62,37 @@ void fadefx_release()
 void fadefx_update()
 {
 #if defined(A5BUILD)
-    end = FALSE;
+    just_ended = false;
     if(type != FADEFX_NONE) {
-        int n;
+        uint8_t r, g, b;
+        int alpha;
 
         /* elapsed time */
         elapsed_time += timer_get_delta();
-        end = (elapsed_time >= total_time);
+        just_ended = (elapsed_time >= total_time);
 
         /* render */
-        n = (int)( 255.0f * ((elapsed_time * 1.25f) / total_time) );
-        n = clip(n, 0, 255);
-        n = (type == FADEFX_IN) ? (255 - n) : n;
-        /* TODO */
+        alpha = (int)(255.0f * ((elapsed_time * 1.25f) / total_time));
+        alpha = clip(alpha, 0, 255);
+        alpha = (type == FADEFX_IN) ? (255 - alpha) : alpha;
+        color_unmap(fade_color, &r, &g, &b, NULL);
+        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgba(r, g, b, alpha));
         
         /* the fade effect is over */
-        if(end) {
+        if(just_ended) {
            total_time = elapsed_time = 0.0f;
            type = FADEFX_NONE;
         }
     }
 #else
-    end = FALSE;
+    just_ended = false;
     if(type != FADEFX_NONE) {
         BITMAP *backbuffer = *((BITMAP**)video_get_backbuffer());
         int n;
 
         /* elapsed time */
         elapsed_time += timer_get_delta();
-        end = (elapsed_time >= total_time);
+        just_ended = (elapsed_time >= total_time);
 
         /* render */
         n = (int)( 255.0f * ((elapsed_time * 1.25f) / total_time) );
@@ -103,7 +104,7 @@ void fadefx_update()
         drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
 
         /* the fade effect is over */
-        if(end) {
+        if(just_ended) {
            total_time = elapsed_time = 0.0f;
            type = FADEFX_NONE;
         }
@@ -119,9 +120,9 @@ void fadefx_in(color_t color, float seconds)
 {
     if(type == FADEFX_NONE) {
         type = FADEFX_IN;
-        end = FALSE;
+        just_ended = false;
         fade_color = color;
-        elapsed_time = 0;
+        elapsed_time = 0.0f;
         total_time = seconds;
     }
 }
@@ -134,28 +135,28 @@ void fadefx_out(color_t color, float seconds)
 {
     if(type == FADEFX_NONE) {
         type = FADEFX_OUT;
-        end = FALSE;
+        just_ended = false;
         fade_color = color;
-        elapsed_time = 0;
+        elapsed_time = 0.0f;
         total_time = seconds;
     }
 }
 
 /*
- * fadefx_over()
- * Asks if the fade effect has ended
+ * fadefx_is_over()
+ * Asks if the fade effect has just_ended
  * ("only one action when this event loops")
  */
-int fadefx_over()
+bool fadefx_is_over()
 {
-    return end;
+    return just_ended;
 }
 
 /*
  * fadefx_is_fading()
  * Is the fade effect ocurring?
  */
-int fadefx_is_fading()
+bool fadefx_is_fading()
 {
     return (type != FADEFX_NONE);
 }

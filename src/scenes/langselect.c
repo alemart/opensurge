@@ -201,7 +201,7 @@ void langselect_update()
 
     /* quit */
     if(quit) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             scenestack_pop();
             return;
         }

@@ -174,7 +174,7 @@ void options_update()
 
     /* quit */
     if(quit) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             save_preferences();
             scenestack_pop();
             return;
@@ -184,7 +184,7 @@ void options_update()
 
     /* pushing a scene into the stack */
     if(jump_to != NULL) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             save_preferences();
 
             if(jump_to == storyboard_get_scene(SCENE_STAGESELECT)) {

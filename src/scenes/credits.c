@@ -147,7 +147,7 @@ void credits_update()
 
     /* fade-out */
     if(quit) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             scenestack_pop();
             if(next_scene != NULL)
                 scenestack_push(next_scene, NULL);

@@ -1138,7 +1138,7 @@ void level_update()
 
     if(quit_level) {
         music_stop();
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             scenestack_pop();
             quest_abort();
             return;
@@ -1286,7 +1286,7 @@ void level_update()
         if(((dead_player_timeout += dt) >= 2.5f)) {
             if(player_get_lives() > 1) {
                 /* restart the level! */
-                if(fadefx_over()) {
+                if(fadefx_is_over()) {
                     player_set_lives(player_get_lives()-1);
                     restart(TRUE);
                     return;

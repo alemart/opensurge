@@ -551,6 +551,7 @@ color_t image_getpixel(const image_t* img, int x, int y)
 void image_line(int x1, int y1, int x2, int y2, color_t color)
 {
 #if defined(A5BUILD)
+    al_draw_line(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 1.0f);
 #else
     line(get_target()->data, x1, y1, x2, y2, color._value);
 #endif
@@ -564,6 +565,7 @@ void image_line(int x1, int y1, int x2, int y2, color_t color)
 void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
 {
 #if defined(A5BUILD)
+    al_draw_ellipse(cx + 0.5f, cy + 0.5f, radius_x, radius_y, color._color, 1.0f);
 #else
     ellipse(get_target()->data, cx, cy, radius_x, radius_y, color._value);
 #endif
@@ -577,6 +579,7 @@ void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
 void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 {
 #if defined(A5BUILD)
+    al_draw_filled_rectangle(x1, y1, x2 + 1.0f, y2 + 1.0f, color._color);
 #else
     rectfill(get_target()->data, x1, y1, x2, y2, color._value);
 #endif
@@ -590,6 +593,7 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 void image_rect(int x1, int y1, int x2, int y2, color_t color)
 {
 #if defined(A5BUILD)
+    al_draw_rectangle(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 1.0f);
 #else
     rect(get_target()->data, x1, y1, x2, y2, color._value);
 #endif
@@ -604,6 +608,17 @@ void image_rect(int x1, int y1, int x2, int y2, color_t color)
 void image_waterfx(int y, color_t color)
 {
 #if defined(A5BUILD)
+    image_t* target = image_drawing_target();
+
+    /* grab color components */
+    uint8_t r, g, b;
+    color_unmap(color, &r, &g, &b, NULL);
+
+    /* adjust y */
+    y = clip(y, 0, target->h);
+
+    /* draw water effect */
+    al_draw_filled_rectangle(0, y, target->w + 1.0f, target->h + 1.0f, color_rgba(r, g, b, 128)._color);
 #else
     image_t* target = get_target();
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();

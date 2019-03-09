@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * fadefx.h - fade effects
- * Copyright (C) 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2009, 2013, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,13 +21,14 @@
 #ifndef _FADEFX_H
 #define _FADEFX_H
 
+#include <stdbool.h>
 #include "color.h"
 
 /* easy-to-use interface */
 void fadefx_in(color_t color, float seconds); /* fade in */
 void fadefx_out(color_t color, float seconds); /* fade out */
-int fadefx_over(); /* end of fade effect? (only one action when this event loops) */
-int fadefx_is_fading(); /* is the fade effect ocurring? */
+bool fadefx_is_over(); /* end of fade effect? (only one action when this event loops) */
+bool fadefx_is_fading(); /* is the fade effect ocurring? */
 
 /* engine routines */
 void fadefx_init();

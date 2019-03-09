@@ -227,7 +227,6 @@ void clean_garbage()
     if(t >= last + 2000) { /* every 2 seconds */
         last = t;
         resourcemanager_release_unused_resources();
-        video_showmessage("adsa oi easdasd");
     }
 }
 

@@ -222,7 +222,7 @@ void questselect_update()
 
         /* fade-out effect (quit this screen) */
         case QUESTSTATE_QUIT: {
-            if(fadefx_over()) {
+            if(fadefx_is_over()) {
                 scenestack_pop();
                 return;
             }
@@ -232,7 +232,7 @@ void questselect_update()
 
         /* fade-out effect (play a level) */
         case QUESTSTATE_PLAY: {
-            if(fadefx_over()) {
+            if(fadefx_is_over()) {
                 /* scripting: reset global variables & arrays */
                 symboltable_clear(symboltable_get_global_table());
                 nanocalc_addons_resetarrays();
