@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * inputmap.c - custom input mapping
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  */
 
 #if defined(A5BUILD)
-/* TODO */
+#include <allegro5/allegro.h>
 #else
 #include <allegro.h>
 #endif
@@ -32,9 +32,6 @@
 #include "assetfs.h"
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
-
-#define INPUTMAP_FILE           "config/input.def"
-#define NULL_INPUTMAP           "null"
 
 /* storage */
 typedef struct inputmapnode_t inputmapnode_t;
@@ -54,9 +51,182 @@ static int traverse_inputmap_keyboard(const parsetree_statement_t *stmt, void *i
 static int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmapnode);
 
 /* misc */
+static const char* INPUTMAP_FILE = "config/input.def";
+static const char* NULL_INPUTMAP = "null";
 static int keycode_of(const char* key_name);
 static int joybtncode_of(const char* joybtn_name);
 
+#if defined(A5BUILD)
+
+/* listing all keys */
+#define FOREACH_KEY(K) \
+    /* empty entry */ \
+    K(0, "KEY_NONE") \
+    \
+    /* Valid keys */ \
+    K(ALLEGRO_KEY_A, "KEY_A") \
+    K(ALLEGRO_KEY_B, "KEY_B") \
+    K(ALLEGRO_KEY_C, "KEY_C") \
+    K(ALLEGRO_KEY_D, "KEY_D") \
+    K(ALLEGRO_KEY_E, "KEY_E") \
+    K(ALLEGRO_KEY_F, "KEY_F") \
+    K(ALLEGRO_KEY_G, "KEY_G") \
+    K(ALLEGRO_KEY_H, "KEY_H") \
+    K(ALLEGRO_KEY_I, "KEY_I") \
+    K(ALLEGRO_KEY_J, "KEY_J") \
+    K(ALLEGRO_KEY_K, "KEY_K") \
+    K(ALLEGRO_KEY_L, "KEY_L") \
+    K(ALLEGRO_KEY_M, "KEY_M") \
+    K(ALLEGRO_KEY_N, "KEY_N") \
+    K(ALLEGRO_KEY_O, "KEY_O") \
+    K(ALLEGRO_KEY_P, "KEY_P") \
+    K(ALLEGRO_KEY_Q, "KEY_Q") \
+    K(ALLEGRO_KEY_R, "KEY_R") \
+    K(ALLEGRO_KEY_S, "KEY_S") \
+    K(ALLEGRO_KEY_T, "KEY_T") \
+    K(ALLEGRO_KEY_U, "KEY_U") \
+    K(ALLEGRO_KEY_V, "KEY_V") \
+    K(ALLEGRO_KEY_W, "KEY_W") \
+    K(ALLEGRO_KEY_X, "KEY_X") \
+    K(ALLEGRO_KEY_Y, "KEY_Y") \
+    K(ALLEGRO_KEY_Z, "KEY_Z") \
+    K(ALLEGRO_KEY_0, "KEY_0") \
+    K(ALLEGRO_KEY_1, "KEY_1") \
+    K(ALLEGRO_KEY_2, "KEY_2") \
+    K(ALLEGRO_KEY_3, "KEY_3") \
+    K(ALLEGRO_KEY_4, "KEY_4") \
+    K(ALLEGRO_KEY_5, "KEY_5") \
+    K(ALLEGRO_KEY_6, "KEY_6") \
+    K(ALLEGRO_KEY_7, "KEY_7") \
+    K(ALLEGRO_KEY_8, "KEY_8") \
+    K(ALLEGRO_KEY_9, "KEY_9") \
+    K(ALLEGRO_KEY_PAD_0, "KEY_PAD_0", "KEY_0_PAD") \
+    K(ALLEGRO_KEY_PAD_1, "KEY_PAD_1", "KEY_1_PAD") \
+    K(ALLEGRO_KEY_PAD_2, "KEY_PAD_2", "KEY_2_PAD") \
+    K(ALLEGRO_KEY_PAD_3, "KEY_PAD_3", "KEY_3_PAD") \
+    K(ALLEGRO_KEY_PAD_4, "KEY_PAD_4", "KEY_4_PAD") \
+    K(ALLEGRO_KEY_PAD_5, "KEY_PAD_5", "KEY_5_PAD") \
+    K(ALLEGRO_KEY_PAD_6, "KEY_PAD_6", "KEY_6_PAD") \
+    K(ALLEGRO_KEY_PAD_7, "KEY_PAD_7", "KEY_7_PAD") \
+    K(ALLEGRO_KEY_PAD_8, "KEY_PAD_8", "KEY_8_PAD") \
+    K(ALLEGRO_KEY_PAD_9, "KEY_PAD_9", "KEY_9_PAD") \
+    K(ALLEGRO_KEY_F1, "KEY_F1") \
+    K(ALLEGRO_KEY_F2, "KEY_F2") \
+    K(ALLEGRO_KEY_F3, "KEY_F3") \
+    K(ALLEGRO_KEY_F4, "KEY_F4") \
+    K(ALLEGRO_KEY_F5, "KEY_F5") \
+    K(ALLEGRO_KEY_F6, "KEY_F6") \
+    K(ALLEGRO_KEY_F7, "KEY_F7") \
+    K(ALLEGRO_KEY_F8, "KEY_F8") \
+    K(ALLEGRO_KEY_F9, "KEY_F9") \
+    K(ALLEGRO_KEY_F10, "KEY_F10") \
+    K(ALLEGRO_KEY_F11, "KEY_F11") \
+    K(ALLEGRO_KEY_F12, "KEY_F12") \
+    K(ALLEGRO_KEY_ESCAPE, "KEY_ESCAPE") \
+    K(ALLEGRO_KEY_TILDE, "KEY_TILDE") \
+    K(ALLEGRO_KEY_MINUS, "KEY_MINUS") \
+    K(ALLEGRO_KEY_EQUALS, "KEY_EQUALS") \
+    K(ALLEGRO_KEY_BACKSPACE, "KEY_BACKSPACE") \
+    K(ALLEGRO_KEY_TAB, "KEY_TAB") \
+    K(ALLEGRO_KEY_OPENBRACE, "KEY_OPENBRACE") \
+    K(ALLEGRO_KEY_CLOSEBRACE, "KEY_CLOSEBRACE") \
+    K(ALLEGRO_KEY_ENTER, "KEY_ENTER") \
+    K(ALLEGRO_KEY_SEMICOLON, "KEY_SEMICOLON") \
+    K(ALLEGRO_KEY_QUOTE, "KEY_QUOTE") \
+    K(ALLEGRO_KEY_BACKSLASH, "KEY_BACKSLASH") \
+    K(ALLEGRO_KEY_BACKSLASH2, "KEY_BACKSLASH2") \
+    K(ALLEGRO_KEY_COMMA, "KEY_COMMA") \
+    K(ALLEGRO_KEY_FULLSTOP, "KEY_FULLSTOP") \
+    K(ALLEGRO_KEY_SLASH, "KEY_SLASH") \
+    K(ALLEGRO_KEY_SPACE, "KEY_SPACE") \
+    K(ALLEGRO_KEY_INSERT, "KEY_INSERT") \
+    K(ALLEGRO_KEY_DELETE, "KEY_DELETE", "KEY_DEL") \
+    K(ALLEGRO_KEY_HOME, "KEY_HOME") \
+    K(ALLEGRO_KEY_END, "KEY_END") \
+    K(ALLEGRO_KEY_PGUP, "KEY_PGUP", "KEY_PAGEUP") \
+    K(ALLEGRO_KEY_PGDN, "KEY_PGDN", "KEY_PAGEDOWN") \
+    K(ALLEGRO_KEY_LEFT, "KEY_LEFT") \
+    K(ALLEGRO_KEY_RIGHT, "KEY_RIGHT") \
+    K(ALLEGRO_KEY_UP, "KEY_UP") \
+    K(ALLEGRO_KEY_DOWN, "KEY_DOWN") \
+    K(ALLEGRO_KEY_PAD_SLASH, "KEY_PAD_SLASH", "KEY_SLASH_PAD") \
+    K(ALLEGRO_KEY_PAD_ASTERISK, "KEY_PAD_ASTERISK", "KEY_ASTERISK_PAD") \
+    K(ALLEGRO_KEY_PAD_MINUS, "KEY_PAD_MINUS", "KEY_MINUS_PAD") \
+    K(ALLEGRO_KEY_PAD_PLUS, "KEY_PAD_PLUS", "KEY_PLUS_PAD") \
+    K(ALLEGRO_KEY_PAD_DELETE, "KEY_PAD_DELETE", "KEY_PAD_DEL", "KEY_DEL_PAD") \
+    K(ALLEGRO_KEY_PAD_ENTER, "KEY_PAD_ENTER", "KEY_ENTER_PAD") \
+    K(ALLEGRO_KEY_PRINTSCREEN, "KEY_PRINTSCREEN", "KEY_PRTSCR") \
+    K(ALLEGRO_KEY_PAUSE, "KEY_PAUSE") \
+    K(ALLEGRO_KEY_ABNT_C1, "KEY_ABNT_C1") \
+    K(ALLEGRO_KEY_YEN, "KEY_YEN") \
+    K(ALLEGRO_KEY_KANA, "KEY_KANA") \
+    K(ALLEGRO_KEY_CONVERT, "KEY_CONVERT") \
+    K(ALLEGRO_KEY_NOCONVERT, "KEY_NOCONVERT") \
+    K(ALLEGRO_KEY_AT, "KEY_AT") \
+    K(ALLEGRO_KEY_CIRCUMFLEX, "KEY_CIRCUMFLEX") \
+    K(ALLEGRO_KEY_COLON2, "KEY_COLON2") \
+    K(ALLEGRO_KEY_KANJI, "KEY_KANJI") \
+    K(ALLEGRO_KEY_LSHIFT, "KEY_LSHIFT") \
+    K(ALLEGRO_KEY_RSHIFT, "KEY_RSHIFT") \
+    K(ALLEGRO_KEY_LCTRL, "KEY_LCTRL", "KEY_LCONTROL") \
+    K(ALLEGRO_KEY_RCTRL, "KEY_RCTRL", "KEY_RCONTROL") \
+    K(ALLEGRO_KEY_ALT, "KEY_ALT") \
+    K(ALLEGRO_KEY_ALTGR, "KEY_ALTGR") \
+    K(ALLEGRO_KEY_LWIN, "KEY_LWIN") \
+    K(ALLEGRO_KEY_RWIN, "KEY_RWIN") \
+    K(ALLEGRO_KEY_MENU, "KEY_MENU") \
+    K(ALLEGRO_KEY_SCROLLLOCK, "KEY_SCROLLLOCK", "KEY_SCRLOCK") \
+    K(ALLEGRO_KEY_NUMLOCK, "KEY_NUMLOCK") \
+    K(ALLEGRO_KEY_CAPSLOCK, "KEY_CAPSLOCK") \
+    K(ALLEGRO_KEY_PAD_EQUALS, "KEY_PAD_EQUALS", "KEY_EQUALS_PAD") \
+    K(ALLEGRO_KEY_BACKQUOTE, "KEY_BACKQUOTE") \
+    K(ALLEGRO_KEY_SEMICOLON2, "KEY_SEMICOLON2") \
+    K(ALLEGRO_KEY_COMMAND, "KEY_COMMAND") \
+    \
+    /* Mobile */ \
+    K(ALLEGRO_KEY_BACK, "KEY_BACK") \
+    K(ALLEGRO_KEY_VOLUME_UP, "KEY_VOLUME_UP") \
+    K(ALLEGRO_KEY_VOLUME_DOWN, "KEY_VOLUME_DOWN") \
+    \
+    /* Android game keys */ \
+    K(ALLEGRO_KEY_SEARCH, "KEY_SEARCH") \
+    K(ALLEGRO_KEY_DPAD_CENTER, "KEY_DPAD_CENTER") \
+    K(ALLEGRO_KEY_BUTTON_X, "KEY_BUTTON_X") \
+    K(ALLEGRO_KEY_BUTTON_Y, "KEY_BUTTON_Y") \
+    K(ALLEGRO_KEY_DPAD_UP, "KEY_DPAD_UP") \
+    K(ALLEGRO_KEY_DPAD_DOWN, "KEY_DPAD_DOWN") \
+    K(ALLEGRO_KEY_DPAD_LEFT, "KEY_DPAD_LEFT") \
+    K(ALLEGRO_KEY_DPAD_RIGHT, "KEY_DPAD_RIGHT") \
+    K(ALLEGRO_KEY_SELECT, "KEY_SELECT") \
+    K(ALLEGRO_KEY_START, "KEY_START") \
+    K(ALLEGRO_KEY_BUTTON_L1, "KEY_BUTTON_L1") \
+    K(ALLEGRO_KEY_BUTTON_R1, "KEY_BUTTON_R1") \
+    K(ALLEGRO_KEY_BUTTON_L2, "KEY_BUTTON_L2") \
+    K(ALLEGRO_KEY_BUTTON_R2, "KEY_BUTTON_R2") \
+    K(ALLEGRO_KEY_BUTTON_A, "KEY_BUTTON_A") \
+    K(ALLEGRO_KEY_BUTTON_B, "KEY_BUTTON_B") \
+    K(ALLEGRO_KEY_THUMBL, "KEY_THUMBL") \
+    K(ALLEGRO_KEY_THUMBR, "KEY_THUMBR") \
+    \
+    /* end of list */ \
+    K(0, NULL)
+
+/* helpers */
+#define __SELECT(_0, _1, _2, _3, X, ...) X
+#define EXPAND_KEY_NAME_3(k, a, b, c) a, b, c,
+#define EXPAND_KEY_NAME_2(k, a, b) a, b,
+#define EXPAND_KEY_NAME_1(k, a) a,
+#define EXPAND_KEY_CODE_3(k, a, b, c) k, k, k,
+#define EXPAND_KEY_CODE_2(k, a, b) k, k,
+#define EXPAND_KEY_CODE_1(k, a) k,
+#define EXPAND_KEY_NAME(...) __SELECT(__VA_ARGS__, EXPAND_KEY_NAME_3, EXPAND_KEY_NAME_2, EXPAND_KEY_NAME_1)(__VA_ARGS__)
+#define EXPAND_KEY_CODE(...) __SELECT(__VA_ARGS__, EXPAND_KEY_CODE_3, EXPAND_KEY_CODE_2, EXPAND_KEY_CODE_1)(__VA_ARGS__)
+
+/* key data */
+static const int key_codes[] = { FOREACH_KEY(EXPAND_KEY_CODE) };
+static const char* key_names[] = { FOREACH_KEY(EXPAND_KEY_NAME) };
+
+#else
 /* key names */
 static const char* key_names[] = {
     "KEY_NONE",
@@ -195,11 +365,7 @@ static const char* key_names[] = {
     NULL /* end of list */
 };
 
-
 /* scancodes */
-#if defined(A5BUILD)
-static const int key_codes[1024] = { 0 }; /* FIXME */
-#else
 static const int key_codes[] = {
     0,
     KEY_A,
@@ -435,7 +601,7 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
             if(f->data->keyboard.enabled)
                 fatal_error("inputmap: can't define multiple keyboard mappings for inputmap '%s'", f->data->name);
 
-            f->data->keyboard.enabled = TRUE;
+            f->data->keyboard.enabled = true;
             nanoparser_traverse_program_ex(nanoparser_get_program(p1), (void*)f, traverse_inputmap_keyboard);
         }
         else
@@ -452,7 +618,7 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
             if(f->data->joystick.enabled)
                 fatal_error("inputmap: can't define multiple joysticks for inputmap '%s'", f->data->name);
 
-            f->data->joystick.enabled = TRUE;
+            f->data->joystick.enabled = true;
             f->data->joystick.id = max(0, atoi(nanoparser_get_string(p1)));
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)f, traverse_inputmap_joystick);
         }
@@ -594,7 +760,7 @@ inputmapnode_t* inputmapnode_create(const char* name)
     f->data->name = str_dup(name);
 
     /* defaults */
-    f->data->keyboard.enabled = FALSE;
+    f->data->keyboard.enabled = false;
     f->data->keyboard.scancode[IB_UP] = keycode_of("KEY_NONE");
     f->data->keyboard.scancode[IB_RIGHT] = keycode_of("KEY_NONE");
     f->data->keyboard.scancode[IB_DOWN] = keycode_of("KEY_NONE");
@@ -608,7 +774,7 @@ inputmapnode_t* inputmapnode_create(const char* name)
     f->data->keyboard.scancode[IB_FIRE7] = keycode_of("KEY_NONE");
     f->data->keyboard.scancode[IB_FIRE8] = keycode_of("KEY_NONE");
 
-    f->data->joystick.enabled = FALSE;
+    f->data->joystick.enabled = false;
     f->data->joystick.id = 0;
     f->data->joystick.button[IB_FIRE1] = NO_BUTTON;
     f->data->joystick.button[IB_FIRE2] = NO_BUTTON;
@@ -633,9 +799,7 @@ void inputmapnode_destroy(inputmapnode_t *f)
 /* given a key name, return its scancode */
 int keycode_of(const char* key_name)
 {
-    int i;
-
-    for(i=0; key_names[i]; i++) {
+    for(int i = 0; key_names[i] != NULL; i++) {
         if(str_icmp(key_names[i], key_name) == 0)
             return key_codes[i];
     }

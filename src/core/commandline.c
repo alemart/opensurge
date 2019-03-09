@@ -99,10 +99,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
-                "    --no-font-smoothing              disable antialiased fonts (*)\n"
+                "    --no-font-smoothing              disable antialiased fonts\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n"
-                "\n"
-                "(*) May improve performance.\n",
                 COPYRIGHT, GAME_WEBSITE,
                 program
             );

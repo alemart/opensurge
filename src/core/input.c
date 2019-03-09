@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * input.c - input management
- * Copyright (C) 2008-2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2011, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  */
 
 #if defined(A5BUILD)
-/* TODO */
+#include <allegro5/allegro.h>
 #else
 #include <allegro.h>
 #endif
@@ -32,15 +32,14 @@
 #include "inputmap.h"
 #include "stringutil.h"
 
-/* input strcuture (private) */
-/* <base class> */
+/* <base class>: generic input */
 struct input_t {
     int enabled; /* enable input? */
     int state[IB_MAX], oldstate[IB_MAX]; /* states */
     void (*update)(input_t*); /* update method */
 };
 
-/* <derived class>: mouse */
+/* <derived class>: mouse input */
 struct inputmouse_t {
     input_t base;
     int x, y, z; /* cursor position */
@@ -48,37 +47,28 @@ struct inputmouse_t {
 };
 static void inputmouse_update(input_t* in);
 
-/* <derived class>: computer */
+/* <derived class>: computer-generated input */
 struct inputcomputer_t {
     input_t base;
 };
 static void inputcomputer_update(input_t* in);
 
-/* <derived class>: user-defined input (see config/input.def) */
+/* <derived class>: input with user-defined mapping */
 struct inputuserdefined_t {
     input_t base;
     const inputmap_t *inputmap; /* input mapping */
 };
 static void inputuserdefined_update(input_t* in);
 
-
-
-
-
-/* list of input structures */
+/* list of inputs */
 typedef struct input_list_t input_list_t;
 struct input_list_t {
     input_t *data;
     input_list_t *next;
 };
 
-
-
-
-
-
 /* private data */
-#define DEFAULT_INPUTMAP_NAME           "default"
+static const char* DEFAULT_INPUTMAP_NAME = "default";
 static input_list_t *inlist;
 static int got_joystick;
 static int ignore_joystick;
@@ -108,8 +98,7 @@ void input_init()
     got_joystick = FALSE;
     ignore_joystick = TRUE;
     plugged_joysticks = 0;
-    /* TODO */
-    logfile_message("No joysticks have been installed.");
+    logfile_message("No joysticks have been detected."); /* TODO */
 
     /* loading custom input mappings */
     inputmap_init();
@@ -569,7 +558,7 @@ void inputmouse_update(input_t* in)
 {
 #if defined(A5BUILD)
     inputmouse_t *me = (inputmouse_t*)in;
-    const int mouse_x = 0, mouse_y = 0, mouse_z = 0, mouse_b = 0;
+    const int mouse_x = 0, mouse_y = 0, mouse_z = 0, mouse_b = 0; /* FIXME */
 
     get_mouse_mickeys_ex(&me->dx, &me->dy, &me->dz);
     me->x = mouse_x;

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * inputmap.h - customized input mappings
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _INPUTMAP_H
 #define _INPUTMAP_H
 
+#include <stdbool.h>
 #include "input.h"
 
 /* public methods */
@@ -34,12 +35,12 @@ struct inputmap_t {
     char* name; /* controller name */
 
     struct inputmap_keyboard_t {
-        int enabled;
+        bool enabled;
         int scancode[IB_MAX]; /* scancode of button IB_* */
     } keyboard; /* keyboard mapping */
 
     struct inputmap_joystick_t {
-        int enabled;
+        bool enabled;
         int id;
         int button[IB_MAX];
     } joystick; /* joystick mapping */
