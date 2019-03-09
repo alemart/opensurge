@@ -608,10 +608,10 @@ void image_rect(int x1, int y1, int x2, int y2, color_t color)
 void image_waterfx(int y, color_t color)
 {
 #if defined(A5BUILD)
+    uint8_t r, g, b;
     image_t* target = image_drawing_target();
 
     /* grab color components */
-    uint8_t r, g, b;
     color_unmap(color, &r, &g, &b, NULL);
 
     /* adjust y */

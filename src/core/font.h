@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * font.h - font module
- * Copyright (C) 2008-2011, 2013  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2011, 2013, 2018-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _FONT_H
 #define _FONT_H
 
+#include <stdbool.h>
 #include "v2d.h"
 
 /* font type */
@@ -40,8 +41,8 @@ v2d_t font_get_position(const font_t *f); /* gets the position of the font in th
 v2d_t font_get_textsize(const font_t *f); /* returns the text size, in pixels, of the font */
 v2d_t font_get_charspacing(const font_t *f); /* character spacing */
 void font_set_width(font_t *f, int w); /* wordwrap (w is given in pixels) */
-int font_is_visible(const font_t *f); /* is the font visible? */
-void font_set_visible(font_t *f, int is_visible); /* show/hide font */
+bool font_is_visible(const font_t *f); /* is the font visible? */
+void font_set_visible(font_t *f, bool is_visible); /* show/hide font */
 void font_use_substring(font_t *f, int index_of_first_char, int length); /* since fonts may have color tags, variables, etc. , use this to display a substring of the font (not the whole text) */
 fontalign_t font_get_align(const font_t* f); /* get the current align */
 void font_set_align(font_t* f, fontalign_t align); /* set the align */
@@ -49,7 +50,7 @@ int font_get_maxlength(const font_t* f); /* get the maximum number of characters
 void font_set_maxlength(font_t* f, int maxlength); /* set the maximum number of characters, ignoring color tags and blanks */
 
 /* misc */
-void font_init(int allow_font_smoothing); /* initializes the font module */
+void font_init(bool allow_font_smoothing); /* initializes the font module */
 void font_release(); /* releases the font module */
 void font_register_variable(const char *variable_name, const char* (*callback)()); /* variable/text interpolation */
 

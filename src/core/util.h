@@ -38,6 +38,13 @@
 #undef round
 #endif
 
+#ifdef PI
+#undef PI
+#endif
+
+#define PI                      3.14159265358979323846
+#define LARGE_INT               (1 << 30)
+
 /* Useful macros */
 #define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define min(a,b)                ((a)<(b)?(a):(b))

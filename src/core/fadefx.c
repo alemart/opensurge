@@ -144,7 +144,7 @@ void fadefx_out(color_t color, float seconds)
 
 /*
  * fadefx_is_over()
- * Asks if the fade effect has just_ended
+ * Checks if the fade effect has just ended
  * ("only one action when this event loops")
  */
 bool fadefx_is_over()

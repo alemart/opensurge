@@ -17,16 +17,11 @@ LANG_COMPATIBILITY          "0.5.0" // required engine version
 COLOR_SURGE                 "ff8000"
 COLOR_NEON                  "bf7a0d"
 COLOR_CHARGE                "aca5a5"
-COLOR_INPUT                 "ff8800"
-COLOR_MENUSELECTEDOPTION    "ffee11"
-COLOR_MENUTITLE             "ff8800"
-COLOR_HIGHLIGHT             "ff8800"
-COLOR_SUBHIGHLIGHT          "ffee11"
-//COLOR_MENUSELECTEDOPTION    "ffe13e"
-//COLOR_MENUTITLE             "e99f42"
-//COLOR_HIGHLIGHT             "e99f42"
+COLOR_TITLE                 "ff8800"
+COLOR_HIGHLIGHT             "ffee11"
 //COLOR_SUBHIGHLIGHT          "ffe13e"
-COLOR_SUBSUBHIGHLIGHT       "cdc3b6"
+COLOR_SUBHIGHLIGHT          "cdc3b6"
+COLOR_INPUT                 "ff8800"
 COLOR_DANGER                "ff7777"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
@@ -43,9 +38,9 @@ GAME_YEAR                   "$ENGINE_YEAR"
 // ========== MENUS ==========
 
 // Languages (please do not translate these sentences!)
-LANGSELECT_TITLE1           "<color=$COLOR_MENUTITLE>SELECT YOUR</color>"
-LANGSELECT_TITLE2           "<color=$COLOR_MENUTITLE>LANGUAGE</color>"
-LANGSELECT_AUTHOR           "<color=$COLOR_MENUSELECTEDOPTION>Translation by:</color> $1"
+LANGSELECT_TITLE1           "<color=$COLOR_TITLE>SELECT YOUR</color>"
+LANGSELECT_TITLE2           "<color=$COLOR_TITLE>LANGUAGE</color>"
+LANGSELECT_AUTHOR           "<color=$COLOR_HIGHLIGHT>Translation by:</color> $1"
 LANGSELECT_PAGE             "page $1/$2"
 
 // Main Menu (from now on, you may translate)
@@ -70,7 +65,7 @@ CREATEMENU_TEXT             "Open Surge lets you create your own games with ease
 // note: when translating CREATEMENU_TEXT, please make sure the text fits inside the screen!
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_MENUTITLE>OPTIONS</color>"
+OPTIONS_TITLE               "<color=$COLOR_TITLE>OPTIONS</color>"
 OPTIONS_YES                 "YES"
 OPTIONS_NO                  "NO"
 OPTIONS_GRAPHICS            "GRAPHICS"
@@ -91,22 +86,22 @@ OPTIONS_CREDITS             "Credits"
 OPTIONS_BACK                "BACK"
 
 // stage select
-STAGESELECT_TITLE           "<color=$COLOR_MENUTITLE>STAGE SELECT</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_MENUTITLE>DEBUG MODE</color>"
+STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEBUG MODE</color>"
 STAGESELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
 STAGESELECT_ACT             "Act"
 
 // quest select
-QUESTSELECT_TITLE           "<color=$COLOR_MENUTITLE>QUEST SELECT</color>"
+QUESTSELECT_TITLE           "<color=$COLOR_TITLE>QUEST SELECT</color>"
 QUESTSELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to cancel"
 QUESTSELECT_PAGE            "page $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_MENUSELECTEDOPTION>Version:</color> $1\n<color=$COLOR_MENUSELECTEDOPTION>Author:</color> $2\n<color=$COLOR_MENUSELECTEDOPTION>Description:</color> $3"
+QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color=$COLOR_HIGHLIGHT>Author:</color> $2\n<color=$COLOR_HIGHLIGHT>Description:</color> $3"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_MENUTITLE>CREDITS</color>"
+CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
 CREDITS_KEY                 "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\n<color=$COLOR_SUBHIGHLIGHT>powered by $ENGINE_NAME version $ENGINE_VERSION</color>\n<color=$COLOR_SUBSUBHIGHLIGHT>$ENGINE_WEBSITE</color>"
+CREDITS_HEADER              "<color=$COLOR_TITLE>$GAME_NAME version $GAME_VERSION</color>\n<color=$COLOR_HIGHLIGHT>powered by $ENGINE_NAME version $ENGINE_VERSION</color>\n<color=$COLOR_SUBHIGHLIGHT>$ENGINE_WEBSITE</color>"
 CREDITS_ACTIVE              "Open Surge team"
 CREDITS_CONTRIB             "Special contributors"
 CREDITS_RETIRED             "Retired members"
@@ -235,8 +230,8 @@ CBOX_QUIT_OPTION2       "NO"
 // ===================== LEVELS ==============================
 
 // Sunset Paradise (Demo Level)
-SUNSETPAR_MESSAGE_10    "<color=$COLOR_HIGHLIGHT>How to play</color>"
-SUNSETPAR_MESSAGE_20    "Welcome to the new Open Surge Demo Level! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. Press F12 to see how it was made."
+SUNSETPAR_MESSAGE_10    "<color=$COLOR_TITLE>How to play</color>"
+SUNSETPAR_MESSAGE_20    "Welcome to the new Open Surge Demo Level! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. <color=$COLOR_HIGHLIGHT>Press F12</color> to open the editor."
 
 
 

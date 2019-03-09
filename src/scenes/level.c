@@ -116,7 +116,7 @@ static int is_startup_object(const char* object_name);
 /* constants */
 #define DEFAULT_MARGIN          (VIDEO_SCREEN_W/2)
 #define MAX_POWERUPS            10
-#define DLGBOX_MAXTIME          7000
+#define DLGBOX_MAXTIME          70000
 #define TEAM_MAX                16
 #define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)

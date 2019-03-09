@@ -52,7 +52,7 @@ font "menu.bold"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
         size                    16
         shadow
         antialias

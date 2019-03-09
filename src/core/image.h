@@ -29,8 +29,8 @@ typedef struct image_t image_t;
 
 /* image flags (allows bitwise OR) */
 typedef enum imageflags_t {
-    IF_NONE = 0,
-    IF_HFLIP = 1,
+    IF_NONE  = 0,
+    IF_HFLIP = 1, /* powers of 2 */
     IF_VFLIP = 2
 } imageflags_t;
 
@@ -43,8 +43,8 @@ int image_unload(image_t* img); /* use if you want to save memory... */
 void image_save(const image_t* img, const char *path); /* saves the image to a file */
 image_t* image_clone(const image_t* src); /* clones an image */
 image_t* image_clone_region(const image_t* src, int x, int y, int width, int height); /* clones a region */
-int image_width(const image_t* img);
-int image_height(const image_t* img);
+int image_width(const image_t* img); /* the width of the image */
+int image_height(const image_t* img); /* the height of the image */
 
 /* pixel manipulation */
 void image_lock(image_t* img);
