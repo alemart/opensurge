@@ -652,6 +652,8 @@ static void group_resolution_update(group_t *g)
                         video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
                         sound_play(SFX_CONFIRM);
                         break;
+                    default:
+                        break;
                 }
             }
             if(input_button_pressed(input, IB_RIGHT)) {
@@ -668,6 +670,8 @@ static void group_resolution_update(group_t *g)
                         video_changemode(VIDEORESOLUTION_4X, video_is_smooth(), video_is_fullscreen());
                         sound_play(SFX_CONFIRM);
                         break;
+                    default:
+                        break;
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
@@ -683,6 +687,8 @@ static void group_resolution_update(group_t *g)
                     case VIDEORESOLUTION_2X:
                         video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
                         sound_play(SFX_CONFIRM);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -722,6 +728,9 @@ static void group_resolution_render(group_t *g, v2d_t camera_position)
 
         case VIDEORESOLUTION_4X:
             font_set_text(f, "%s %s %s <color=$COLOR_MENUSELECTEDOPTION>%s</color>", v[0], v[1], v[2], v[3]);
+            break;
+            
+        default:
             break;
     }
 

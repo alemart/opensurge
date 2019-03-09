@@ -68,15 +68,4 @@
 #define PI                      3.14159265358979323846
 #define LARGE_INT               (1 << 30)
 
-/* minimum Allegro version */
-#if defined(A5BUILD)
-#include <allegro5/allegro.h>
-#define AL_MIN_MAJOR       5
-#define AL_MIN_MINOR       2
-#define AL_MIN_REVISION    0
-#if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
-#error "This build requires a newer version of Allegro"
-#endif
-#endif
-
 #endif

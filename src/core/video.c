@@ -28,11 +28,27 @@
 #include "timer.h"
 #include "logfile.h"
 #include "util.h"
+#include "global.h"
 #include "stringutil.h"
 
 #if defined(A5BUILD)
 
-/* TODO */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+
+static ALLEGRO_DISPLAY* display = NULL;
+static image_t* backbuffer = NULL;
+static ALLEGRO_FONT* font = NULL;
+
+#define IMAGE2BITMAP(img) (*((ALLEGRO_BITMAP**)(img)))
+#define PRINT(x, y, flags, fmt, ...) do { \
+    al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+    al_draw_textf(font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+} while(0)
+
+static void setup_color_depth(int bpp);
 
 #else
 
@@ -64,7 +80,7 @@ static void setup_color_depth(int bpp);
 
 /* video manager */
 static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
-static int video_resolution = VIDEORESOLUTION_1X;
+static videoresolution_t video_resolution = VIDEORESOLUTION_1X;
 static int video_fullscreen = FALSE;
 static int video_showfps = FALSE;
 static int video_smooth = FALSE;
@@ -81,7 +97,7 @@ struct videomsg_t {
 };
 static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
 static videomsg_t* videomsg_delete(videomsg_t* videomsg);
-static videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line);
+static videomsg_t* videomsg_render(videomsg_t* videomsg, int line);
 static videomsg_t* videomsg = NULL;
 
 
@@ -92,13 +108,19 @@ static videomsg_t* videomsg = NULL;
  * video_init()
  * Initializes the video manager
  */
-void video_init(const char *window_title, int resolution, int smooth, int fullscreen, int bpp)
+void video_init(videoresolution_t resolution, int smooth, int fullscreen, int bpp)
 {
 #if defined(A5BUILD)
-    logfile_message("video_init()");
+    logfile_message("Initializing the video...");
+    setup_color_depth(bpp);
 
     /* video init */
+    display = NULL;
+    backbuffer = NULL;
     video_changemode(resolution, smooth, fullscreen);
+
+    /* console font */
+    font = al_create_builtin_font();
 
     /* video message */
     videomsg = NULL;
@@ -120,7 +142,7 @@ void video_init(const char *window_title, int resolution, int smooth, int fullsc
     /* window properties */
     LOCK_FUNCTION(game_quit);
     set_close_button_callback(game_quit);
-    set_window_title(window_title);
+    set_window_title(GAME_TITLE " " GAME_VERSION_STRING);
 
     /* window callbacks */
     window_active = TRUE;
@@ -143,18 +165,57 @@ void video_init(const char *window_title, int resolution, int smooth, int fullsc
  * video_changemode()
  * Sets up the game window
  */
-void video_changemode(int resolution, int smooth, int fullscreen)
+void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
 {
 #if defined(A5BUILD)
-    logfile_message("video_changemode(%d,%d,%d)", resolution, smooth, fullscreen);
+    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
+    v2d_t window_size;
+
+    logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
     video_resolution = resolution;
-    video_fullscreen = fullscreen;
+    video_fullscreen = FALSE; /* TODO */
     video_smooth = FALSE; /* not supported yet */
+
+    /* Create a display */
+    window_size = video_get_window_size();
+    /*if(display != NULL) {
+        al_set_target_bitmap(NULL);
+        al_unregister_event_source(a5_event_queue, al_get_display_event_source(display));
+        al_destroy_display(display);
+    }*/
+    if(display == NULL) {
+        al_set_new_display_flags(ALLEGRO_OPENGL);
+        al_set_new_display_flags(ALLEGRO_PROGRAMMABLE_PIPELINE);
+        al_set_new_display_flags(video_fullscreen ? ALLEGRO_FULLSCREEN_WINDOW : ALLEGRO_WINDOWED);
+        if(window_size.x >= window_size.y)
+            al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_SUGGEST);
+        else
+            al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT, ALLEGRO_SUGGEST);
+        if(NULL == (display = al_create_display(window_size.x, window_size.y)))
+            fatal_error("Failed to create a %dx%d display", (int)window_size.x, (int)window_size.y);
+        al_register_event_source(a5_event_queue, al_get_display_event_source(display));
+        al_set_window_title(display, GAME_TITLE " " GAME_VERSION_STRING " [A5]");
+    }
+    else {
+        if(!al_resize_display(display, window_size.x, window_size.y))
+            logfile_message("Failed to resize the display to %dx%d", (int)window_size.x, (int)window_size.y);
+        if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, video_fullscreen))
+            logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
+    }
+
+    /* Create the backbuffer */
+    screen_size = (resolution == VIDEORESOLUTION_EDT) ? window_size : DEFAULT_SCREEN_SIZE;
+    if(backbuffer != NULL)
+        image_destroy(backbuffer);
+    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP);
+    if(NULL == (backbuffer = image_create(screen_size.x, screen_size.y)))
+        fatal_error("Failed to create a %dx%d backbuffer", (int)screen_size.x, (int)screen_size.y);
+    //al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
 #else
     int width, height;
     int mode;
 
-    logfile_message("video_changemode(%d,%d,%d)", resolution, smooth, fullscreen);
+    logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
 
     /* resolution */
     screen_size = (resolution == VIDEORESOLUTION_EDT) ? video_get_window_size() : DEFAULT_SCREEN_SIZE;
@@ -171,7 +232,7 @@ void video_changemode(int resolution, int smooth, int fullscreen)
             video_smooth = FALSE;
         }
         else if(video_resolution == VIDEORESOLUTION_1X || video_resolution == VIDEORESOLUTION_EDT) {
-            logfile_message("can't enable smooth graphics using resolution %d", video_resolution);
+            logfile_message("can't enable smooth graphics using resolution %d", (int)video_resolution);
             video_smooth = FALSE;
         }
         else {
@@ -212,10 +273,9 @@ void video_changemode(int resolution, int smooth, int fullscreen)
 
 /*
  * video_get_resolution()
- * Returns the current resolution value,
- * i.e., VIDEORESOLUTION_*
+ * Returns the current resolution
  */
-int video_get_resolution()
+videoresolution_t video_get_resolution()
 {
     return video_resolution;
 }
@@ -297,7 +357,7 @@ v2d_t video_get_window_size()
 image_t* video_get_backbuffer()
 {
 #if defined(A5BUILD)
-    return NULL;
+    return backbuffer;
 #else
     if(video_buffer == NULL)
         fatal_error("FATAL ERROR: video_get_backbuffer() returned NULL!");
@@ -317,7 +377,7 @@ void video_render()
     uint32_t current_time;
 
     /* video message */
-    videomsg = videomsg_render(videomsg, video_get_backbuffer(), 0);
+    videomsg = videomsg_render(videomsg, 0);
 
     /* compute fps rate */
     ++frame_count;
@@ -329,13 +389,16 @@ void video_render()
 
     /* show fps */
     if(video_is_fps_visible())
-        printf("%d\n", fps_rate);
+        PRINT(image_width(backbuffer), 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps_rate);
+
+    /* render */
+    al_flip_display();
 #else
     static uint32_t fps_timer = 0, frame_count = 0;
     uint32_t current_time;
 
     /* video message */
-    videomsg = videomsg_render(videomsg, video_get_backbuffer(), 0);
+    videomsg = videomsg_render(videomsg, 0);
 
     /* compute fps rate */
     ++frame_count;
@@ -422,23 +485,40 @@ void video_render()
 void video_release()
 {
 #if defined(A5BUILD)
-    logfile_message("video_release()");
+    logfile_message("Releasing the video...");
 
     if(videomsg != NULL)
-        videomsg_delete(videomsg);
+        videomsg = videomsg_delete(videomsg);
 
-    logfile_message("video_release() ok");
+    if(font != NULL) {
+        al_destroy_font(font);
+        font = NULL;
+    }
+
+    if(backbuffer != NULL) {
+        image_destroy(backbuffer);
+        backbuffer = NULL;
+    }
+
+    if(display != NULL) {
+        al_destroy_display(display);
+        display = NULL;
+    }
 #else
     logfile_message("video_release()");
 
-    if(video_buffer != NULL)
+    if(video_buffer != NULL) {
         image_destroy(video_buffer);
+        video_buffer = NULL;
+    }
 
-    if(window_surface != NULL)
+    if(window_surface != NULL) {
         image_destroy(window_surface);
+        window_surface = NULL;
+    }
 
     if(videomsg != NULL)
-        videomsg_delete(videomsg);
+        videomsg = videomsg_delete(videomsg);
 
     logfile_message("video_release() ok");
 #endif
@@ -469,7 +549,7 @@ void video_showmessage(const char *fmt, ...)
 int video_get_color_depth()
 {
 #if defined(A5BUILD)
-    return 32; /* FIXME */
+    return display ? al_get_display_option(display, ALLEGRO_COLOR_SIZE) : 0;
 #else
     return get_color_depth();
 #endif
@@ -477,15 +557,16 @@ int video_get_color_depth()
 
 
 /*
- * video_get_desktop_color_depth()
- * Returns the default color depth of the user
+ * video_get_preferred_color_depth()
+ * Returns the preferred color depth for the game
  */
-int video_get_desktop_color_depth()
+int video_get_preferred_color_depth()
 {
 #if defined(A5BUILD)
-    return 32; /* FIXME */
+    return 32;
 #else
-    return desktop_color_depth();
+    int depth = desktop_color_depth();
+    return depth != 0 ? depth : 32;
 #endif
 }
 
@@ -555,7 +636,7 @@ void video_display_loading_screen()
 const image_t* video_get_window_surface()
 {
 #if defined(A5BUILD)
-    return NULL; /* FIXME */
+    return backbuffer; /* FIXME */
 #else
     switch(video_get_resolution()) {
         case VIDEORESOLUTION_1X:
@@ -572,7 +653,14 @@ const image_t* video_get_window_surface()
 /* private stuff */
 #if defined(A5BUILD)
 
-/* TODO */
+/* configure the color depth: this must be set before creating the display */
+void setup_color_depth(int bpp)
+{
+    if(!(bpp == 16 || bpp == 24 || bpp == 32))
+        fatal_error("Invalid color depth: %d. Valid modes are: 16, 24, 32.", bpp);
+
+    al_set_new_display_option(ALLEGRO_COLOR_SIZE, bpp, ALLEGRO_SUGGEST);
+}
 
 #else
 
@@ -644,8 +732,8 @@ void smooth4x_blit(image_t *src, image_t *dest)
 void draw_to_screen(image_t *img)
 {
     if(IMAGE2BITMAP(img) == NULL) {
-        logfile_message("Can't use video resolution %d", video_get_resolution());
-        video_showmessage("Can't use video resolution %d", video_get_resolution());
+        logfile_message("Can't use video resolution %d", (int)video_get_resolution());
+        video_showmessage("Can't use video resolution %d", (int)video_get_resolution());
         video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
     }
     else
@@ -697,7 +785,7 @@ videomsg_t* videomsg_delete(videomsg_t* videomsg)
 }
 
 /* updates and renders a videomsg_t linked list; returns the updated list */
-videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line)
+videomsg_t* videomsg_render(videomsg_t* videomsg, int line)
 {
     if(videomsg != NULL) {
         /* got timeout? */
@@ -706,13 +794,13 @@ videomsg_t* videomsg_render(videomsg_t* videomsg, image_t* dst, int line)
 
         /* render current message */
 #if defined(A5BUILD)
-        ;
+        PRINT(0.0f, image_height(backbuffer) - al_get_font_line_height(font) * (line + 1), ALLEGRO_ALIGN_LEFT, "%s", videomsg->message);
 #else
-        textout_ex(IMAGE2BITMAP(dst), font, videomsg->message, 0, image_height(dst) - text_height(font) * (line + 1), makecol(255,255,255), makecol(0,0,0));
+        textout_ex(IMAGE2BITMAP(video_buffer), font, videomsg->message, 0, image_height(video_buffer) - text_height(font) * (line + 1), makecol(255,255,255), makecol(0,0,0));
 #endif
 
         /* render next message */
-        videomsg->next = videomsg_render(videomsg->next, dst, line + 1);
+        videomsg->next = videomsg_render(videomsg->next, line + 1);
     }
 
     /* done! */

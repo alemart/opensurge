@@ -20,6 +20,12 @@
 
 #if defined(A5BUILD)
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #else
 #include <allegro.h>
 #endif
@@ -73,7 +79,6 @@ static void push_initial_scene(const commandline_t* cmd);
 static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
-static const char* get_window_title();
 static void init_nanoparser();
 static void release_nanoparser();
 static void parser_error(const char *msg);
@@ -81,6 +86,20 @@ static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
+
+#if defined(A5BUILD)
+ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
+static ALLEGRO_TIMER* timer = NULL;
+
+/* minimum Allegro version */
+#define AL_MIN_MAJOR       5
+#define AL_MIN_MINOR       2
+#define AL_MIN_REVISION    0
+#if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
+#error "This build requires a newer version of Allegro"
+#endif
+
+#endif
 
 
 
@@ -108,6 +127,52 @@ void engine_init(int argc, char **argv)
  */
 void engine_mainloop()
 {
+#if defined(A5BUILD)
+    scene_t *current_scene = NULL;
+    bool redraw = false;
+
+    al_start_timer(timer);
+    while(!game_is_over() && !scenestack_empty()) {
+        ALLEGRO_EVENT event;
+        al_wait_for_event(a5_event_queue, &event);
+
+        /* handle events */
+        switch(event.type) {
+            case ALLEGRO_EVENT_TIMER: {
+                ALLEGRO_EVENT next_event;
+
+                /* updating the managers */
+                timer_update();
+                input_update();
+                audio_update();
+                clean_garbage();
+
+                /* updating the current scene */
+                current_scene = scenestack_top();
+                current_scene->update();
+                redraw = true;
+
+                /* prevent locking */
+                while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event.timer.source)
+                    al_drop_next_event(a5_event_queue);
+                break;
+            }
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                game_quit();
+                break;
+        }
+
+        /* render */
+        if(redraw && al_is_event_queue_empty(a5_event_queue)) {
+            if(current_scene && current_scene == scenestack_top())
+                current_scene->render(); /* render after update */
+            screenshot_update();
+            fadefx_update();
+            video_render();
+            redraw = false;
+        }
+    }
+#else
     scene_t *scn;
 
     while(!game_is_over() && !scenestack_empty()) {
@@ -130,6 +195,7 @@ void engine_mainloop()
         /* calling the garbage collector */
         clean_garbage();
     }
+#endif
 }
 
 
@@ -181,8 +247,52 @@ void init_basic_stuff(const commandline_t* cmd)
     logfile_init();
     init_nanoparser();
 
+    /* initialize Allegro */
+    logfile_message("Initializing Allegro 5...");
+    
     if(!al_init())
         fatal_error("Can't initialize Allegro");
+
+    if(NULL == (a5_event_queue = al_create_event_queue()))
+        fatal_error("Can't create Allegro's event queue");
+
+    if(NULL == (timer = al_create_timer(1.0 / 60.0)))
+        fatal_error("Can't create Allegro timer");
+    al_register_event_source(a5_event_queue, al_get_timer_event_source(timer));
+
+    /* --- */
+    if(!al_install_keyboard())
+        fatal_error("Can't initialize the keyboard");
+
+    if(!al_install_mouse())
+        fatal_error("Can't initialize the mouse");
+
+    if(!al_init_image_addon())
+        fatal_error("Can't initialize Allegro's image addon");
+
+    if(!al_init_primitives_addon())
+        fatal_error("Can't initialize Allegro's primitives addon");
+
+    if(!al_init_font_addon())
+        fatal_error("Can't initialize Allegro's font addon");
+
+    if(!al_init_ttf_addon())
+        fatal_error("Can't initialize Allegro's TTF addon");
+
+    if(!al_install_audio())
+        fatal_error("Can't initialize Allegro's audio addon");
+
+    if(!al_init_acodec_addon())
+        fatal_error("Can't initialize Allegro's acodec addon");
+
+    for(int samples = 8; samples > 0; samples /= 2) {
+        if(al_reserve_samples(samples)) {
+            logfile_message("Reserved %d samples", samples);
+            break;
+        }
+        else
+            logfile_message("Can't reserve %d samples", samples);
+    }
 #else
     set_uformat(U_UTF8);
     allegro_init();
@@ -207,14 +317,13 @@ void init_managers(const commandline_t* cmd)
 
     timer_init();
     video_init(
-        get_window_title(),
         commandline_getint(
             cmd->video_resolution,
             prefs_has_item(prefs, ".resolution") ? prefs_get_int(prefs, ".resolution") : VIDEORESOLUTION_2X
         ),
         commandline_getint(cmd->smooth_graphics, prefs_get_bool(prefs, ".smoothgfx")),
         commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen")),
-        commandline_getint(cmd->color_depth, video_get_desktop_color_depth())
+        commandline_getint(cmd->color_depth, video_get_preferred_color_depth())
     );
     video_show_fps(
         commandline_getint(cmd->show_fps, prefs_get_bool(prefs, ".showfps"))
@@ -344,19 +453,13 @@ void release_basic_stuff()
     logfile_release();
     assetfs_release();
 #if defined(A5BUILD)
+    /* Release Allegro */
+    al_destroy_timer(timer);
+    al_destroy_event_queue(a5_event_queue);
+    a5_event_queue = NULL;
 #else
     allegro_exit();
 #endif
-}
-
-
-/*
- * get_window_title()
- * Returns the title of the window
- */
-const char* get_window_title()
-{
-    return GAME_TITLE " " GAME_VERSION_STRING;
 }
 
 /*
