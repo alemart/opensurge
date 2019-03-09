@@ -54,7 +54,7 @@ opensurge --help
 
 ### Compiling Open Surge
 
-To compile Open Surge from the source code, you'll need [CMake](http://cmake.org) and a C compiler. Additionally, you'll need the following development libraries:
+To compile Open Surge from the source code, you'll need a C compiler, [CMake](http://cmake.org), and the following development libraries:
 
 * [Allegro 5.2](http://liballeg.org) (preferably 5.2.5 or higher)
 * [libsurgescript](http://github.com/alemart/surgescript)
@@ -73,6 +73,6 @@ You can perform a system-wide installation on Linux by running:
 sudo make install
 ```
 
-You may want to run `ccmake` or `cmake-gui` to know additional build options (e.g., change the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
+You may want to run `ccmake` or `cmake-gui` to know additional build options (e.g., to change the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
 
 **Linux users:** game assets (images, sounds, etc.) can be stored globally or in user-space. Assets located in user-space take precedence over assets located in system directories. Open Surge uses the XDG Base Directory specification; look for the *opensurge2d* directory.
