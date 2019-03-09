@@ -51,7 +51,6 @@ Advanced features are available via the command line. For more information, run:
 opensurge --help
 ```
 
-
 ### Compiling Open Surge
 
 To compile Open Surge from the source code, you'll need a C compiler, [CMake](http://cmake.org), and the following development libraries:
