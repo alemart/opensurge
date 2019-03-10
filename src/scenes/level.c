@@ -3023,7 +3023,7 @@ void editor_render()
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
-            image_draw_tinted(cursor, (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
+            image_draw_multiply(cursor, (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
 
         /* cursor coordinates */
         font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));

@@ -1760,6 +1760,9 @@ brick 51 224 9904
 brick 51 272 9872
 brick 66 320 9768 green
 brick 64 488 9680 yellow
+brick 66 136 9664 yellow
+brick 66 752 9696 green hflip
+brick 66 736 9512 hflip
 brick 7 3152 9744
 brick 7 3824 9808
 
