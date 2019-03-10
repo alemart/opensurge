@@ -80,7 +80,7 @@ void gameover_update()
     /* timer */
     gameover_timer += dt;
     if(gameover_timer >= GAMEOVER_TIMEOUT) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             quest_abort();
             scenestack_pop();
             return;

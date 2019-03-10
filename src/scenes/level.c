@@ -116,7 +116,7 @@ static int is_startup_object(const char* object_name);
 /* constants */
 #define DEFAULT_MARGIN          (VIDEO_SCREEN_W/2)
 #define MAX_POWERUPS            10
-#define DLGBOX_MAXTIME          7000
+#define DLGBOX_MAXTIME          10000
 #define TEAM_MAX                16
 #define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)
@@ -1138,7 +1138,7 @@ void level_update()
 
     if(quit_level) {
         music_stop();
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             scenestack_pop();
             quest_abort();
             return;
@@ -1151,6 +1151,9 @@ void level_update()
     block_pause = block_pause || (level_timer < 1.0f);
     for(i=0; i<team_size; i++)
         block_pause = block_pause || player_is_dying(team[i]);
+
+    /*if(!video_is_window_active())
+        wants_to_pause = TRUE;*/
 
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
@@ -1286,7 +1289,7 @@ void level_update()
         if(((dead_player_timeout += dt) >= 2.5f)) {
             if(player_get_lives() > 1) {
                 /* restart the level! */
-                if(fadefx_over()) {
+                if(fadefx_is_over()) {
                     player_set_lives(player_get_lives()-1);
                     restart(TRUE);
                     return;
@@ -3020,7 +3023,7 @@ void editor_render()
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
-            image_draw_tinted(cursor, (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
+            image_draw_multiply(cursor, (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
 
         /* cursor coordinates */
         font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
@@ -3198,7 +3201,7 @@ void editor_scroll()
         camera_direction.x -= 1.0f;
 
     /* scroll */
-    if(v2d_magnitude(camera_direction) > EPSILON)
+    if(!nearly_equal(v2d_magnitude(camera_direction), 0.0f))
         editor_camera = v2d_add(v2d_multiply(camera_direction, camera_speed * dt), editor_camera);
 
     /* the camera mustn't go off the bounds */
@@ -3829,7 +3832,7 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
         for(it=brick_list; it; it=it->next) {
             if(brick_id(it->data) == o.obj_id) {
                 float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), o.obj_position));
-                if(dist < EPSILON) {
+                if(nearly_equal(dist, 0.0f)) {
                     o.layer = brick_layer(it->data);
                     o.flip = brick_flip(it->data);
                     brick_kill(it->data);
@@ -4061,7 +4064,7 @@ void editor_action_commit(editor_action_t action)
                 for(brick_list_t *it = brick_list; it != NULL; it = it->next) {
                     if(brick_id(it->data) == action.obj_id) {
                         float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), action.obj_position));
-                        if(dist < EPSILON)
+                        if(nearly_equal(dist, 0.0f))
                             brick_kill(it->data);
                     }
                 }
@@ -4075,7 +4078,7 @@ void editor_action_commit(editor_action_t action)
                 for(item_list_t *it = item_list; it != NULL; it = it->next) {
                     if(it->data->type == action.obj_id) {
                         float dist = v2d_magnitude(v2d_subtract(it->data->actor->position, action.obj_position));
-                        if(dist < EPSILON)
+                        if(nearly_equal(dist, 0.0f))
                             it->data->state = IS_DEAD;
                     }
                 }
@@ -4089,7 +4092,7 @@ void editor_action_commit(editor_action_t action)
                 for(enemy_list_t *it = enemy_list; it != NULL; it = it->next) {
                     if(editor_enemy_name2key(it->data->name) == action.obj_id) {
                         float dist = v2d_magnitude(v2d_subtract(it->data->actor->position, action.obj_position));
-                        if(dist < EPSILON)
+                        if(nearly_equal(dist, 0.0f))
                             it->data->state = ES_DEAD;
                     }
                 }
@@ -4131,7 +4134,7 @@ bool editor_remove_ssobj(surgescript_object_t* object, void* data)
             editor_action_t *action = (editor_action_t*)data;
             if(editor_ssobj_id(object_name) == action->obj_id) {
                 v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
-                if(v2d_magnitude(delta) < EPSILON)
+                if(nearly_equal(v2d_magnitude(delta), 0.0f))
                     surgescript_object_kill(object);
             }
         }

@@ -50,7 +50,7 @@
 #define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION) " - " STRINGIFY(GAME_BUILD_VERSION)
 #endif
 
-/* Global definitions and constants */
+/* Legacy constants */
 #ifdef TRUE
 #undef TRUE
 #endif
@@ -59,18 +59,7 @@
 #undef FALSE
 #endif
 
-#ifdef PI
-#undef PI
-#endif
-
-#ifdef EPSILON
-#undef EPSILON
-#endif
-
 #define TRUE                    1
 #define FALSE                   0
-#define EPSILON                 1e-5
-#define PI                      3.1415926535
-#define LARGE_INT               (1 << 30)
 
 #endif

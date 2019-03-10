@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 
-/* time handler */
+/* time manager */
 void timer_init();
 void timer_update();
 void timer_release();

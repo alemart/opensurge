@@ -59,8 +59,8 @@ static const int OFFSET_X = 60;
 static void save_preferences();
 
 /* group tree */
-#define OPTIONS_MAX                     9
-static int option; /* this is the current option. It lies in the interval [ 0 .. OPTIONS_MAX-1 ] */
+static int option; /* current option: 0 <= option <= option_count - 1 */
+static int option_count;
 static group_t *root;
 static group_t *create_grouptree();
 
@@ -77,6 +77,7 @@ static group_t *create_grouptree();
 void options_init(void *foo)
 {
     option = 0;
+    option_count = 0;
     quit = FALSE;
     scene_time = 0;
     input = input_create_user(NULL);
@@ -144,13 +145,13 @@ void options_update()
     if(!quit && jump_to == NULL && !fadefx_is_fading()) {
         /* select next option */
         if(input_button_pressed(input, IB_DOWN)) {
-            option = (option+1)%OPTIONS_MAX;
+            option = (option + 1) % option_count;
             sound_play(SFX_CHOOSE);
         }
 
         /* select previous option */
         if(input_button_pressed(input, IB_UP)) {
-            option = (((option-1)%OPTIONS_MAX)+OPTIONS_MAX)%OPTIONS_MAX;
+            option = (option + (option_count - 1)) % option_count;
             sound_play(SFX_CHOOSE);
         }
 
@@ -174,7 +175,7 @@ void options_update()
 
     /* quit */
     if(quit) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             save_preferences();
             scenestack_pop();
             return;
@@ -184,7 +185,7 @@ void options_update()
 
     /* pushing a scene into the stack */
     if(jump_to != NULL) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             save_preferences();
 
             if(jump_to == storyboard_get_scene(SCENE_STAGESELECT)) {
@@ -312,7 +313,7 @@ static void group_highlightable_update(group_t *g)
     group_label_update(g);
     font_set_text(g->font, "%s", lang_get(data->lang_key));
     if(group_highlightable_is_highlighted(g)) {
-        font_set_text(g->font, "<color=$COLOR_MENUSELECTEDOPTION>%s</color>", lang_get(data->lang_key));
+        font_set_text(g->font, "<color=$COLOR_HIGHLIGHT>%s</color>", lang_get(data->lang_key));
         icon->position = v2d_add(font_get_position(g->font), v2d_new(-20+3*cos(2*PI*scene_time),0));
     }
 }
@@ -385,7 +386,7 @@ static group_t *group_graphics_create()
 /* "Fullscreen" label */
 static void group_fullscreen_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_FULLSCREEN", 1);
+    group_highlightable_init(g, "OPTIONS_FULLSCREEN", option_count++);
 }
 
 static void group_fullscreen_release(group_t *g)
@@ -442,9 +443,9 @@ static void group_fullscreen_render(group_t *g, v2d_t camera_position)
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
 
     if(video_is_fullscreen())
-        font_set_text(f, "<color=$COLOR_MENUSELECTEDOPTION>%s</color>  %s", v[0], v[1]);
+        font_set_text(f, "<color=$COLOR_HIGHLIGHT>%s</color>  %s", v[0], v[1]);
     else
-        font_set_text(f, "%s  <color=$COLOR_MENUSELECTEDOPTION>%s</color>", v[0], v[1]);
+        font_set_text(f, "%s  <color=$COLOR_HIGHLIGHT>%s</color>", v[0], v[1]);
 
     font_render(f, camera_position);
     font_destroy(f);
@@ -459,7 +460,7 @@ static group_t *group_fullscreen_create()
 /* "Smooth Graphics" label */
 static void group_smooth_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_SMOOTHGFX", 2);
+    group_highlightable_init(g, "OPTIONS_SMOOTHGFX", option_count++);
 }
 
 static void group_smooth_release(group_t *g)
@@ -519,9 +520,9 @@ static void group_smooth_render(group_t *g, v2d_t camera_position)
 
     if(video_get_color_depth() == 32) {
         if(video_is_smooth())
-            font_set_text(f, "<color=$COLOR_MENUSELECTEDOPTION>%s</color>  %s", v[0], v[1]);
+            font_set_text(f, "<color=$COLOR_HIGHLIGHT>%s</color>  %s", v[0], v[1]);
         else
-            font_set_text(f, "%s  <color=$COLOR_MENUSELECTEDOPTION>%s</color>", v[0], v[1]);
+            font_set_text(f, "%s  <color=$COLOR_HIGHLIGHT>%s</color>", v[0], v[1]);
     }
     else
         font_set_text(f, "<color=ff8888>%s</color>", lang_get("OPTIONS_SMOOTHGFX_ERROR"));
@@ -539,7 +540,7 @@ static group_t *group_smooth_create()
 /* "Show FPS" label */
 static void group_fps_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_FPS", 3);
+    group_highlightable_init(g, "OPTIONS_FPS", option_count++);
 }
 
 static void group_fps_release(group_t *g)
@@ -596,9 +597,9 @@ static void group_fps_render(group_t *g, v2d_t camera_position)
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
 
     if(video_is_fps_visible())
-        font_set_text(f, "<color=$COLOR_MENUSELECTEDOPTION>%s</color>  %s", v[0], v[1]);
+        font_set_text(f, "<color=$COLOR_HIGHLIGHT>%s</color>  %s", v[0], v[1]);
     else
-        font_set_text(f, "%s  <color=$COLOR_MENUSELECTEDOPTION>%s</color>", v[0], v[1]);
+        font_set_text(f, "%s  <color=$COLOR_HIGHLIGHT>%s</color>", v[0], v[1]);
 
     font_render(f, camera_position);
     font_destroy(f);
@@ -613,7 +614,7 @@ static group_t *group_fps_create()
 /* "Resolution" label */
 static void group_resolution_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_RESOLUTION", 0);
+    group_highlightable_init(g, "OPTIONS_RESOLUTION", option_count++);
 }
 
 static void group_resolution_release(group_t *g)
@@ -652,6 +653,8 @@ static void group_resolution_update(group_t *g)
                         video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
                         sound_play(SFX_CONFIRM);
                         break;
+                    default:
+                        break;
                 }
             }
             if(input_button_pressed(input, IB_RIGHT)) {
@@ -668,6 +671,8 @@ static void group_resolution_update(group_t *g)
                         video_changemode(VIDEORESOLUTION_4X, video_is_smooth(), video_is_fullscreen());
                         sound_play(SFX_CONFIRM);
                         break;
+                    default:
+                        break;
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
@@ -683,6 +688,8 @@ static void group_resolution_update(group_t *g)
                     case VIDEORESOLUTION_2X:
                         video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
                         sound_play(SFX_CONFIRM);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -709,19 +716,22 @@ static void group_resolution_render(group_t *g, v2d_t camera_position)
 
     switch(video_get_resolution()) {
         case VIDEORESOLUTION_1X:
-            font_set_text(f, "<color=$COLOR_MENUSELECTEDOPTION>%s</color> %s %s %s", v[0], v[1], v[2], v[3]);
+            font_set_text(f, "<color=$COLOR_HIGHLIGHT>%s</color> %s %s %s", v[0], v[1], v[2], v[3]);
             break;
 
         case VIDEORESOLUTION_2X:
-            font_set_text(f, "%s <color=$COLOR_MENUSELECTEDOPTION>%s</color> %s %s", v[0], v[1], v[2], v[3]);
+            font_set_text(f, "%s <color=$COLOR_HIGHLIGHT>%s</color> %s %s", v[0], v[1], v[2], v[3]);
             break;
 
         case VIDEORESOLUTION_3X:
-            font_set_text(f, "%s %s <color=$COLOR_MENUSELECTEDOPTION>%s</color> %s", v[0], v[1], v[2], v[3]);
+            font_set_text(f, "%s %s <color=$COLOR_HIGHLIGHT>%s</color> %s", v[0], v[1], v[2], v[3]);
             break;
 
         case VIDEORESOLUTION_4X:
-            font_set_text(f, "%s %s %s <color=$COLOR_MENUSELECTEDOPTION>%s</color>", v[0], v[1], v[2], v[3]);
+            font_set_text(f, "%s %s %s <color=$COLOR_HIGHLIGHT>%s</color>", v[0], v[1], v[2], v[3]);
+            break;
+            
+        default:
             break;
     }
 
@@ -763,7 +773,7 @@ static group_t *group_game_create()
 /* "Change Language" label */
 static void group_changelanguage_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_LANGUAGE", 4);
+    group_highlightable_init(g, "OPTIONS_LANGUAGE", option_count++);
 }
 
 static void group_changelanguage_release(group_t *g)
@@ -805,7 +815,7 @@ static group_t *group_changelanguage_create()
 /* "Credits" label */
 static void group_credits_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_CREDITS", 7);
+    group_highlightable_init(g, "OPTIONS_CREDITS", option_count++);
 }
 
 static void group_credits_release(group_t *g)
@@ -847,7 +857,7 @@ static group_t *group_credits_create()
 /* "Stage Select" label */
 static void group_stageselect_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_STAGESELECT", 6);
+    group_highlightable_init(g, "OPTIONS_STAGESELECT", option_count++);
 }
 
 static void group_stageselect_release(group_t *g)
@@ -914,7 +924,7 @@ static group_t *group_stageselect_create()
 /* "Back" label */
 static void group_back_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_BACK", 8);
+    group_highlightable_init(g, "OPTIONS_BACK", option_count++);
 }
 
 static void group_back_release(group_t *g)
@@ -957,7 +967,7 @@ static group_t *group_back_create()
 /* "Enable Gamepad" label */
 static void group_gamepad_init(group_t *g)
 {
-    group_highlightable_init(g, "OPTIONS_GAMEPAD", 5);
+    group_highlightable_init(g, "OPTIONS_GAMEPAD", option_count++);
 }
 
 static void group_gamepad_release(group_t *g)
@@ -985,13 +995,13 @@ static void group_gamepad_update(group_t *g)
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(!input_is_joystick_ignored()) {
                     sound_play(SFX_CONFIRM);
-                    input_ignore_joystick(TRUE);
+                    input_ignore_joystick(true);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(input_is_joystick_ignored()) {
                     sound_play(SFX_CONFIRM);
-                    input_ignore_joystick(FALSE);
+                    input_ignore_joystick(false);
                 }
             }
         }
@@ -1014,9 +1024,9 @@ static void group_gamepad_render(group_t *g, v2d_t camera_position)
     str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
 
     if(!input_is_joystick_ignored())
-        font_set_text(f, "<color=$COLOR_MENUSELECTEDOPTION>%s</color>  %s", v[0], v[1]);
+        font_set_text(f, "<color=$COLOR_HIGHLIGHT>%s</color>  %s", v[0], v[1]);
     else
-        font_set_text(f, "%s  <color=$COLOR_MENUSELECTEDOPTION>%s</color>", v[0], v[1]);
+        font_set_text(f, "%s  <color=$COLOR_HIGHLIGHT>%s</color>", v[0], v[1]);
 
     font_render(f, camera_position);
     font_destroy(f);
@@ -1038,41 +1048,31 @@ static group_t *group_gamepad_create()
 /* creates the group tree */
 group_t *create_grouptree()
 {
-    group_t *root;
-    group_t *graphics, *fullscreen, *resolution, *smooth, *fps;
-    group_t *game, *gamepad, *changelanguage, *credits, *stageselect;
-    group_t *back;
+    group_t *root, *graphics, *game;
 
     /* section: graphics */
-    resolution = group_resolution_create();
-    fullscreen = group_fullscreen_create();
-    smooth = group_smooth_create();
-    fps = group_fps_create();
     graphics = group_graphics_create();
-    group_addchild(graphics, resolution);
-    group_addchild(graphics, fullscreen);
-    group_addchild(graphics, smooth);
-    group_addchild(graphics, fps);
+    group_addchild(graphics, group_resolution_create());
+#if !defined(A5BUILD)
+    group_addchild(graphics, group_fullscreen_create());
+    group_addchild(graphics, group_smooth_create());
+#endif
+    group_addchild(graphics, group_fps_create());
 
     /* section: game */
-    gamepad = group_gamepad_create();
-    changelanguage = group_changelanguage_create();
-    credits = group_credits_create();
-    stageselect = group_stageselect_create();
     game = group_game_create();
-    group_addchild(game, changelanguage);
-    group_addchild(game, gamepad);
-    group_addchild(game, stageselect);
-    group_addchild(game, credits);
-
-    /* back */
-    back = group_back_create();
+    group_addchild(game, group_changelanguage_create());
+#if !defined(A5BUILD)
+    group_addchild(game, group_gamepad_create());
+#endif
+    group_addchild(game, group_stageselect_create());
+    group_addchild(game, group_credits_create());
 
     /* section: root */
     root = group_root_create();
     group_addchild(root, graphics);
     group_addchild(root, game);
-    group_addchild(root, back);
+    group_addchild(root, group_back_create());
 
     /* done! */
     return root;

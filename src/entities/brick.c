@@ -109,6 +109,7 @@ static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
+#define round(x)                (int)(((x)>=0.0f)?((x)+0.5f):((x)-0.5f))
 
 /* public functions */
 
@@ -267,7 +268,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                             v2d_t brkspeed = v2d_new(-team[i]->actor->speed.x*0.3, -100-random(50));
                             image_t *brkimg = image_clone_region(brk->brick_ref->image, (bi * brkw) / bw, (bj * brkh) / bh, brkw / bw, brkh / bh);
 
-                            if(fabs(brkspeed.x) > EPSILON)
+                            if(!nearly_equal(brkspeed.x, 0.0f))
                                 brkspeed.x += (brkspeed.x>0?1:-1) * random(50);
 
                             level_create_particle(brkimg, brkpos, brkspeed, FALSE);
@@ -396,7 +397,7 @@ void brick_render(brick_t *brk, v2d_t camera_position)
     if(brk->layer == BRL_DEFAULT || !level_editmode())
         image_draw(brick_image(brk), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
     else
-        image_draw_tinted(brick_image(brk), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), get_image_flags(brk));
+        image_draw_lit(brick_image(brk), brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), get_image_flags(brk));
 }
 
 

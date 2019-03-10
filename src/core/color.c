@@ -18,7 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined(A5BUILD)
 #include <allegro.h>
+#endif
+
 #include <string.h>
 #include "color.h"
 
@@ -29,7 +32,11 @@
  */
 color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
+#if defined(A5BUILD)
+    return (color_t){ al_map_rgb(r, g, b) };
+#else
     return (color_t){ makeacol(r, g, b, 255) };
+#endif
 }
 
 /*
@@ -39,7 +46,11 @@ color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
  */
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
+#if defined(A5BUILD)
+    return (color_t){ al_map_rgba(r, g, b, a) };
+#else
     return (color_t){ makeacol(r, g, b, a) };
+#endif
 }
 
 /*
@@ -88,10 +99,15 @@ color_t color_hex(const char* hex_string)
  */
 void color_unmap(color_t color, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a)
 {
+#if defined(A5BUILD)
+    unsigned char tmp = 0;
+    al_unmap_rgba(color._color, r ? (unsigned char*)r : &tmp, g ? (unsigned char*)g : &tmp, b ? (unsigned char*)b : &tmp, a ? (unsigned char*)a : &tmp);
+#else
     if(r) *r = getr(color._value);
     if(g) *g = getg(color._value);
     if(b) *b = getb(color._value);
     if(a) *a = geta(color._value);
+#endif
 }
 
 /*
@@ -109,6 +125,12 @@ bool color_equals(color_t a, color_t b)
  */
 bool color_is_transparent(color_t color)
 {
+#if defined(A5BUILD)
+    unsigned char r, g, b, a;
+    al_unmap_rgba(color._color, &r, &g, &b, &a);
+    return (a == 0) || (r == 255 && g == 0 && b == 255); /* bright pink is the mask color */
+#else
     /* mask color (bright pink); ignore alpha */
     return (255 == getr(color._value) && 0 == getg(color._value) && 255 == getb(color._value));
+#endif
 }

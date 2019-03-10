@@ -99,7 +99,7 @@ void intro_update()
 
     /* done */
     if(elapsed_time >= INTRO_TIMEOUT) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             scenestack_pop();
             if(debug_mode)
                 scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &debug_mode);

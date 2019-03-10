@@ -21,6 +21,7 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+#include <math.h>
 #include <stdlib.h>
 #include "global.h"
 
@@ -37,19 +38,24 @@
 #undef round
 #endif
 
+#ifdef PI
+#undef PI
+#endif
+
+#define PI                      3.14159265358979323846
+#define LARGE_INT               (1 << 30)
+
 /* Useful macros */
-#define __tostr(x)              #x
-#define tostr(x)                __tostr((x))
 #define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define min(a,b)                ((a)<(b)?(a):(b))
 #define max(a,b)                ((a)>(b)?(a):(b))
-#define sign(x)                 (((x)>=0.0f)?1.0f:-1.0f)
-#define round(x)                ((int)(((x)>0.0f)?((x)+0.5f):((x)-0.5f)))
+#define sign(x)                 (((x)>=0)?1.0f:-1.0f)
 #define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
 #define atob(str)               ((str_icmp((str), "true") == 0) || (str_icmp((str), "yes") == 0))
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
-#define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" tostr(__LINE__))
-#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" tostr(__LINE__))
+#define nearly_equal(a,b)       (((b)==0||(a)==0)?(fabs((a)+(b))<1e-5):(fabs((a)-(b))<=max(1e-5*max(fabs(a),fabs(b)),0)))
+#define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" STRINGIFY(__LINE__))
+#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" STRINGIFY(__LINE__))
 
 /* Game routines */
 void game_quit(void); /* quit */

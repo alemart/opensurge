@@ -20,10 +20,6 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <png.h>
-#include <allegro.h>
-#include <loadpng.h>
-#include <jpgalleg.h>
 #include "image.h"
 #include "video.h"
 #include "stringutil.h"
@@ -31,6 +27,32 @@
 #include "assetfs.h"
 #include "util.h"
 #include "resourcemanager.h"
+
+#if defined(A5BUILD)
+
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+
+/* convert imageflags_t to ALLEGRO_FLIP flags */
+#define FLIPPY(flags) ((((flags) & IF_HFLIP) ? ALLEGRO_FLIP_HORIZONTAL : 0) | (((flags) & IF_VFLIP) ? ALLEGRO_FLIP_VERTICAL : 0))
+
+/* image type */
+struct image_t {
+    ALLEGRO_BITMAP* data; /* this must be the first field */
+    int w, h;
+    char* path; /* relative path */
+};
+
+/* drawing target */
+static image_t* target = NULL;
+
+#else
+
+#include <png.h>
+#include <allegro.h>
+#include <loadpng.h>
+#include <jpgalleg.h>
 
 /* image structure */
 struct image_t {
@@ -61,6 +83,8 @@ static fast_getb_funptr fast_getb_fun(); /* returns a function */
 static image_t* _target = NULL;
 #define get_target() (_target ? _target : video_get_backbuffer())
 
+#endif
+
 /*
  * image_load()
  * Loads a image from a file.
@@ -68,6 +92,41 @@ static image_t* _target = NULL;
  */
 image_t* image_load(const char* path)
 {
+#if defined(A5BUILD)
+    image_t* img;
+
+    if(NULL == (img = resourcemanager_find_image(path))) {
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("image_load(\"%s\")", fullpath);
+
+        /* build the image object */
+        img = mallocx(sizeof *img);
+
+        /* loading the image */
+        if(NULL == (img->data = al_load_bitmap(fullpath))) {
+            fatal_error("Failed to load image \"%s\"", fullpath);
+            free(img);
+            return NULL;
+        }
+
+        /* configuring the image */
+        img->w = al_get_bitmap_width(img->data);
+        img->h = al_get_bitmap_height(img->data);
+        al_convert_mask_to_alpha(img->data, al_map_rgb(255, 0, 255));
+
+        /* adding it to the resource manager */
+        img->path = str_dup(path);
+        resourcemanager_add_image(img->path, img);
+        resourcemanager_ref_image(img->path);
+
+        /* done! */
+        logfile_message("image_load() ok");
+    }
+    else
+        resourcemanager_ref_image(path);
+
+    return img;
+#else
     image_t* img;
 
     if(NULL == (img = resourcemanager_find_image(path))) {
@@ -102,6 +161,7 @@ image_t* image_load(const char* path)
         resourcemanager_ref_image(path);
 
     return img;
+#endif
 }
 
 
@@ -112,6 +172,14 @@ image_t* image_load(const char* path)
  */
 void image_save(const image_t* img, const char *path)
 {
+#if defined(A5BUILD)
+    const char* fullpath = assetfs_create_cache_file(path);
+
+    if(al_save_bitmap(fullpath, img->data))
+        logfile_message("Saved image to \"%s\"", fullpath);
+    else
+        logfile_message("Failed to save image to \"%s\"", fullpath);
+#else
     int i, j, c, bpp = video_get_color_depth();
     const char* fullpath = assetfs_create_cache_file(path);
     const char* extension = strrchr(fullpath, '.');
@@ -143,6 +211,7 @@ void image_save(const image_t* img, const char *path)
                 save_bitmap(fullpath, img->data, NULL);
             break;
     }
+#endif
 }
 
 
@@ -153,6 +222,29 @@ void image_save(const image_t* img, const char *path)
  */
 image_t* image_create(int width, int height)
 {
+#if defined(A5BUILD)
+    image_t* img;
+
+    if(width <= 0 || height <= 0)
+        fatal_error("Can't create image of size %d x %d", width, height);
+
+    img = mallocx(sizeof *img);
+    img->w = width;
+    img->h = height;
+    img->path = NULL;
+    
+    if(NULL != (img->data = al_create_bitmap(img->w, img->h))) {
+        ALLEGRO_STATE state;
+        al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+        al_set_target_bitmap(img->data);
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        al_restore_state(&state);
+    }
+    else
+        logfile_message("ERROR - image_create(%d,%d) failed", img->w, img->h);
+
+    return img;
+#else
     image_t* img = mallocx(sizeof *img);
 
     img->data = create_bitmap(width, height);
@@ -166,6 +258,7 @@ image_t* image_create(int width, int height)
         logfile_message("ERROR - image_create(%d,%d): couldn't create image", width, height);
 
     return img;
+#endif
 }
 
 
@@ -176,6 +269,20 @@ image_t* image_create(int width, int height)
  */
 void image_destroy(image_t* img)
 {
+#if defined(A5BUILD)
+    if(img->data != NULL)
+        al_destroy_bitmap(img->data);
+
+    if(img->path != NULL) {
+        resourcemanager_unref_image(img->path);
+        free(img->path);
+    }
+
+    if(target == img)
+        target = NULL;
+
+    free(img);
+#else
     if(img->data != NULL)
         destroy_bitmap(img->data);
 
@@ -188,6 +295,7 @@ void image_destroy(image_t* img)
         _target = NULL;
 
     free(img);
+#endif
 }
 
 /*
@@ -200,6 +308,35 @@ void image_destroy(image_t* img)
  */
 image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height)
 {
+#if defined(A5BUILD)
+    image_t* img;
+    int pw, ph;
+
+    if(width <= 0 || height <= 0)
+        fatal_error("Can't create shared image of size %d x %d", width, height);
+
+    pw = parent->w;
+    ph = parent->h;
+    x = clip(x, 0, pw-1);
+    y = clip(y, 0, ph-1);
+    width = clip(width, 0, pw-x);
+    height = clip(height, 0, ph-y);
+
+    img = mallocx(sizeof *img);
+    img->w = width;
+    img->h = height;
+    if(NULL == (img->data = al_create_sub_bitmap(parent->data, x, y, width, height)))
+        fatal_error("Failed to create shared image of \"%s\": %d, %d, %d, %d", parent->path ? parent->path : "", x, y, width, height);
+
+    if(parent->path != NULL) {
+        img->path = str_dup(parent->path);
+        resourcemanager_ref_image(img->path); /* reference it, otherwise the parent may be destroyed */
+    }
+    else
+        img->path = NULL;
+
+    return img;
+#else
     image_t* img;
     int pw, ph;
 
@@ -227,6 +364,7 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
         img->path = NULL;
 
     return img;
+#endif
 }
 
 
@@ -257,6 +395,17 @@ int image_unload(image_t* img)
  */
 image_t* image_clone(const image_t* src)
 {
+#if defined(A5BUILD)
+    image_t* img = mallocx(sizeof *img);
+
+    img->w = src->w;
+    img->h = src->h;
+    img->path = NULL;
+    if(NULL == (img->data = al_clone_bitmap(src->data)))
+        fatal_error("Failed to clone image \"%s\" sized %dx%d", src->path ? src->path : "", src->w, src->h);
+
+    return img;
+#else
     image_t* img = mallocx(sizeof *img);
     img->w = src->w;
     img->h = src->h;
@@ -267,6 +416,7 @@ image_t* image_clone(const image_t* src)
     blit(src->data, img->data, 0, 0, 0, 0, src->w, src->h);
 
     return img;
+#endif
 }
 
 /*
@@ -276,6 +426,37 @@ image_t* image_clone(const image_t* src)
  */
 image_t* image_clone_region(const image_t* src, int x, int y, int width, int height)
 {
+#if defined(A5BUILD)
+    image_t* img;
+    int sw, sh;
+
+    if(width <= 0 || height <= 0)
+        fatal_error("Can't create cloned image of size %d x %d", width, height);
+
+    sw = src->w;
+    sh = src->h;
+    x = clip(x, 0, sw-1);
+    y = clip(y, 0, sh-1);
+    width = clip(width, 0, sw-x);
+    height = clip(height, 0, sh-y);
+
+    img = mallocx(sizeof *img);
+    img->w = width;
+    img->h = height;
+    img->path = NULL;
+    if(NULL != (img->data = al_create_bitmap(img->w, img->h))) {
+        ALLEGRO_STATE state;
+        al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+        al_set_target_bitmap(img->data);
+        al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+        al_draw_bitmap_region(src->data, x, y, width, height, 0.0f, 0.0f, 0);
+        al_restore_state(&state);
+    }
+    else
+        fatal_error("Failed to clone region of image \"%s\": %d, %d, %d, %d", src->path ? src->path : "", x, y, width, height);
+    
+    return img;
+#else
     image_t* img;
     int sw, sh;
 
@@ -299,6 +480,46 @@ image_t* image_clone_region(const image_t* src, int x, int y, int width, int hei
     blit(src->data, img->data, x, y, 0, 0, width, height);
 
     return img;
+#endif
+}
+
+/*
+ * image_snapshot()
+ * Take a snapshot of the game. Remember to
+ * destroy the created image after usage.
+ */
+image_t* image_snapshot()
+{
+#if defined(A5BUILD)
+    ALLEGRO_STATE state;
+    image_t* img = mallocx(sizeof *img);
+    ALLEGRO_BITMAP* screen = al_get_backbuffer(al_get_current_display());
+
+    img->w = al_get_bitmap_width(screen);
+    img->h = al_get_bitmap_height(screen);
+    img->path = NULL;
+    if(NULL == (img->data = al_create_bitmap(img->w, img->h)))
+        fatal_error("Failed to take snapshot");
+
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+    al_set_target_bitmap(img->data);
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_draw_bitmap(screen, 0.0f, 0.0f, 0);
+    al_restore_state(&state);
+
+    return img;
+#else
+    image_t* img = mallocx(sizeof *img);
+    img->w = screen->w;
+    img->h = screen->h;
+    img->path = NULL;
+
+    if(NULL == (img->data = create_bitmap(img->w, img->h)))
+        fatal_error("Failed to take snapshot");
+    blit(screen, img->data, 0, 0, 0, 0, screen->w, screen->h);
+
+    return img;
+#endif
 }
 
 /*
@@ -307,7 +528,11 @@ image_t* image_clone_region(const image_t* src, int x, int y, int width, int hei
  */
 void image_lock(image_t* img)
 {
+#if defined(A5BUILD)
+    al_lock_bitmap(img->data, al_get_bitmap_format(img->data), ALLEGRO_LOCK_READONLY);
+#else
     ;
+#endif
 }
 
 /*
@@ -316,7 +541,11 @@ void image_lock(image_t* img)
  */
 void image_unlock(image_t* img)
 {
+#if defined(A5BUILD)
+    al_unlock_bitmap(img->data);
+#else
     ;
+#endif
 }
 
 
@@ -346,7 +575,11 @@ int image_height(const image_t* img)
  */
 color_t image_getpixel(const image_t* img, int x, int y)
 {
+#if defined(A5BUILD)
+    return (color_t){ al_get_pixel(img->data, x, y) };
+#else
     return (color_t){ getpixel(img->data, x, y) };
+#endif
 }
 
 
@@ -356,7 +589,11 @@ color_t image_getpixel(const image_t* img, int x, int y)
  */
 void image_line(int x1, int y1, int x2, int y2, color_t color)
 {
+#if defined(A5BUILD)
+    al_draw_line(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 1.0f);
+#else
     line(get_target()->data, x1, y1, x2, y2, color._value);
+#endif
 }
 
 
@@ -366,7 +603,11 @@ void image_line(int x1, int y1, int x2, int y2, color_t color)
  */
 void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
 {
+#if defined(A5BUILD)
+    al_draw_ellipse(cx + 0.5f, cy + 0.5f, radius_x, radius_y, color._color, 1.0f);
+#else
     ellipse(get_target()->data, cx, cy, radius_x, radius_y, color._value);
+#endif
 }
 
 
@@ -376,7 +617,11 @@ void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
  */
 void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 {
+#if defined(A5BUILD)
+    al_draw_filled_rectangle(x1, y1, x2 + 1.0f, y2 + 1.0f, color._color);
+#else
     rectfill(get_target()->data, x1, y1, x2, y2, color._value);
+#endif
 }
 
 
@@ -386,7 +631,11 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
  */
 void image_rect(int x1, int y1, int x2, int y2, color_t color)
 {
+#if defined(A5BUILD)
+    al_draw_rectangle(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 1.0f);
+#else
     rect(get_target()->data, x1, y1, x2, y2, color._value);
+#endif
 }
 
 
@@ -397,6 +646,19 @@ void image_rect(int x1, int y1, int x2, int y2, color_t color)
  */
 void image_waterfx(int y, color_t color)
 {
+#if defined(A5BUILD)
+    uint8_t r, g, b;
+    image_t* target = image_drawing_target();
+
+    /* grab color components */
+    color_unmap(color, &r, &g, &b, NULL);
+
+    /* adjust y */
+    y = clip(y, 0, target->h);
+
+    /* draw water effect */
+    al_draw_filled_rectangle(0, y, target->w + 1.0f, target->h + 1.0f, color_rgba(r, g, b, 128)._color);
+#else
     image_t* target = get_target();
     fast_getpixel_funptr fast_getpixel = fast_getpixel_fun();
     fast_putpixel_funptr fast_putpixel = fast_putpixel_fun();
@@ -433,6 +695,7 @@ void image_waterfx(int y, color_t color)
             }
         }
     }
+#endif
 }
 
 
@@ -442,7 +705,11 @@ void image_waterfx(int y, color_t color)
  */
 void image_clear(color_t color)
 {
+#if defined(A5BUILD)
+    al_clear_to_color(color._color);
+#else
     clear_to_color(get_target()->data, color._value);
+#endif
 }
 
 
@@ -452,7 +719,11 @@ void image_clear(color_t color)
  */
 void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y, int width, int height)
 {
+#if defined(A5BUILD)
+    al_draw_bitmap_region(src->data, src_x, src_y, width, height, dest_x, dest_y, 0);
+#else
     blit(src->data, get_target()->data, src_x, src_y, dest_x, dest_y, width, height);
+#endif
 }
 
 
@@ -465,7 +736,11 @@ void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y
  */
 void image_draw(const image_t* src, int x, int y, imageflags_t flags)
 {
+#if defined(A5BUILD)
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+#else
     draw_flipped_sprite(src, get_target(), x, y, flags);
+#endif
 }
 
 
@@ -481,6 +756,12 @@ void image_draw(const image_t* src, int x, int y, imageflags_t flags)
  */
 void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags_t flags)
 { 
+#if defined(A5BUILD)
+    al_draw_scaled_bitmap(src->data,
+        0.0f, 0.0f, src->w, src->h,
+        x, y, scale.x * src->w, scale.y * src->h,
+    FLIPPY(flags));
+#else
     image_t* tmp;
     int w = (int)(scale.x * src->w);
     int h = (int)(scale.y * src->h);
@@ -489,17 +770,21 @@ void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags
     stretch_blit(src->data, tmp->data, 0, 0, src->w, src->h, 0, 0, w, h);
     image_draw(tmp, x, y, flags);
     image_destroy(tmp);
+#endif
 }
 
 
 /*
  * image_draw_rotated()
  * Draws a rotated image onto the destination bitmap at the specified position 
- * radians: angle given in radians
+ * radians: angle given in radians (counter-clockwise)
  * cx, cy: pivot positions
  */
 void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, imageflags_t flags)
 {
+#if defined(A5BUILD)
+    al_draw_rotated_bitmap(src->data, cx, cy, x, y, -radians, FLIPPY(flags));
+#else
     image_t* target = get_target();
     float conv = radians * -40.7436654315f; /* -(180/pi)*(64/90) */
 
@@ -511,6 +796,7 @@ void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float 
         pivot_sprite(target->data, src->data, x, y, src->w - cx, src->h - cy, ftofix(conv + 128.0f));
     else
         pivot_sprite(target->data, src->data, x, y, cx, cy, ftofix(conv));
+#endif
 }
 
 
@@ -520,6 +806,9 @@ void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float 
  */
 void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags)
 {
+#if defined(A5BUILD)
+    al_draw_scaled_rotated_bitmap(src->data, cx, cy, x, y, scale.x, scale.y, -radians, FLIPPY(flags));
+#else
     image_t* tmp;
     int w = (int)(scale.x * src->w);
     int h = (int)(scale.y * src->h);
@@ -528,6 +817,7 @@ void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy,
     stretch_blit(src->data, tmp->data, 0, 0, src->w, src->h, 0, 0, w, h);
     image_draw_rotated(tmp, x, y, cx, cy, radians, flags);
     image_destroy(tmp);
+#endif
 }
 
  
@@ -538,6 +828,10 @@ void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy,
  */
 void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags)
 {
+#if defined(A5BUILD)
+    float a = clip(alpha, 0.0f, 1.0f);
+    al_draw_tinted_bitmap(src->data, al_map_rgba_f(a, a, a, a), x, y, FLIPPY(flags));
+#else
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
@@ -557,16 +851,24 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
     }
     else
         draw_flipped_sprite(src, target, x, y, flags);
+#endif
 }
 
 
 /*
- * image_draw_tinted()
- * Draws an image tinted with a specific color
- * 0.0 <= alpha <= 1.0
+ * image_draw_lit()
+ * Draws an image with a specific color
  */
-void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags)
+void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
+#if defined(A5BUILD)
+    /* TODO */
+    uint8_t r, g, b;
+    color_unmap(color, &r, &g, &b, NULL);
+    al_draw_filled_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, al_map_rgba(r, g, b, 128));
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+    al_draw_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, al_map_rgba(r, g, b, 255), 2.0f);
+#else
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
@@ -586,6 +888,7 @@ void image_draw_tinted(const image_t* src, int x, int y, color_t color, imagefla
     }
     else
         draw_flipped_sprite(src, target, x, y, flags);
+#endif
 }
 
 /*
@@ -595,6 +898,9 @@ void image_draw_tinted(const image_t* src, int x, int y, color_t color, imagefla
  */
 void image_draw_multiply(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
+#if defined(A5BUILD)
+    al_draw_tinted_bitmap(src->data, color._color, x, y, FLIPPY(flags));
+#else
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
@@ -614,6 +920,7 @@ void image_draw_multiply(const image_t* src, int x, int y, color_t color, imagef
     }
     else
         draw_flipped_sprite(src, target, x, y, flags);
+#endif
 }
 
 /*
@@ -622,7 +929,12 @@ void image_draw_multiply(const image_t* src, int x, int y, color_t color, imagef
  */
 void image_set_drawing_target(image_t* new_target)
 {
+#if defined(A5BUILD)
+    target = (new_target != video_get_backbuffer()) ? new_target : NULL;
+    al_set_target_bitmap(image_drawing_target()->data);
+#else
     _target = (new_target != video_get_backbuffer()) ? new_target : NULL;
+#endif
 }
 
 /*
@@ -632,12 +944,17 @@ void image_set_drawing_target(image_t* new_target)
  */
 image_t* image_drawing_target()
 {
+#if defined(A5BUILD)
+    return target != NULL ? target : video_get_backbuffer();
+#else
     return get_target();
+#endif
 }
 
 
 
 /* private methods */
+#if !defined(A5BUILD)
 
 /*
  * maskcolor_bugfix()
@@ -748,3 +1065,5 @@ fast_getb_funptr fast_getb_fun()
         default: return getb;
     }
 }
+
+#endif

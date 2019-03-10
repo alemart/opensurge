@@ -202,7 +202,7 @@ const char* assetfs_fullpath(const char* vpath)
             /* return an invalid path to the program */
             static char path[1024] = { 0 };
             char* sanitized_vpath = pathify(vpath);
-            snprintf(path, sizeof(path), "invalid-asset/%s", sanitized_vpath);
+            snprintf(path, sizeof(path), "asset://%s", sanitized_vpath);
             free(sanitized_vpath);
             return path;
         }

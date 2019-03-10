@@ -29,12 +29,6 @@
 #include "video.h"
 #include "install.h"
 
-#ifdef _WIN32
-#include <allegro.h>
-#include <winalleg.h>
-#endif
-
-
 /* private stuff ;) */
 static void crash(char *fmt, ...);
 static int print_gameid(const char* gameid, void* data);
@@ -93,7 +87,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
-                "    --smooth                         display smooth graphics (intensive task)\n"
+                "    --smooth                         display smooth graphics (applicable when resolution > 1)\n"
                 "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                       show the FPS (frames per second) counter\n"
                 "    --use-gamepad                    play using a gamepad\n"
@@ -105,10 +99,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
-                "    --no-font-smoothing              disable antialiased fonts (*)\n"
-                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n"
-                "\n"
-                "(*) May improve performance.\n",
+                "    --no-font-smoothing              disable antialiased fonts\n"
+                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n",
                 COPYRIGHT, GAME_WEBSITE,
                 program
             );
@@ -121,7 +113,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--resolution") == 0) {
-            if(++i < argc) {
+            if(++i < argc && *(argv[i]) != '-') {
                 if(strcmp(argv[i], "1") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_1X;
                 else if(strcmp(argv[i], "2") == 0)
@@ -136,9 +128,13 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--smooth") == 0) {
+#ifndef A5BUILD
             cmd.smooth_graphics = TRUE;
             if(cmd.video_resolution == VIDEORESOLUTION_1X)
                 cmd.video_resolution = VIDEORESOLUTION_2X;
+#else
+            crash("Smooth graphics: not yet implemented in the Allegro 5 backend");
+#endif
         }
 
         else if(strcmp(argv[i], "--tiny") == 0) /* obsolete */
@@ -151,7 +147,7 @@ commandline_t commandline_parse(int argc, char **argv)
             cmd.fullscreen = FALSE;
 
         else if(strcmp(argv[i], "--color-depth") == 0) {
-            if(++i < argc) {
+            if(++i < argc && *(argv[i]) != '-') {
                 cmd.color_depth = atoi(argv[i]);
                 if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
                     crash("Invalid color depth: %d", cmd.color_depth);
@@ -274,19 +270,14 @@ const char* commandline_getstring(const char* value, const char* default_string)
 /* Displays a message to the user (printf format) and exists */
 void crash(char *fmt, ...)
 {
-    char buf[4096];
+    char buf[1024];
     va_list args;
 
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-#ifdef _WIN32
-    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONEXCLAMATION);
-#else
     puts(buf);
-#endif
-
     exit(1);
 }
 

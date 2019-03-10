@@ -26,8 +26,8 @@
 
 
 /* private stuff ;) */
-#define LOGFILE_PATH        "logfile.txt" /* default log file */
-static FILE *logfile = NULL;
+static const char* LOGFILE_PATH = "logfile.txt"; /* default log file */
+static FILE* logfile = NULL;
 
 
 /*
@@ -39,7 +39,6 @@ void logfile_init()
     const char* fullpath = assetfs_create_cache_file(LOGFILE_PATH);
     if(NULL != (logfile = fopen(fullpath, "w"))) {
         logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
-        logfile_message("logfile_init()");
     }
     else {
         logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
@@ -52,7 +51,7 @@ void logfile_init()
  * logfile_message()
  * Prints a message to the logfile (printf format)
  */
-void logfile_message(const char *fmt, ...)
+void logfile_message(const char* fmt, ...)
 {
     if(logfile != NULL) {
         va_list args;
@@ -74,8 +73,8 @@ void logfile_message(const char *fmt, ...)
  */
 void logfile_release()
 {
-    logfile_message("logfile_release()");
     logfile_message("tchau!");
+    
     if(logfile != NULL)
         fclose(logfile);
 }

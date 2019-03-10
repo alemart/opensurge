@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * input.h - input management
- * Copyright (C) 2008-2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2011, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _INPUT_H
 #define _INPUT_H
 
+#include <stdbool.h>
 #include "v2d.h"
 
 /* forward declarations */
@@ -31,7 +32,6 @@ typedef struct inputcomputer_t inputcomputer_t;
 typedef struct inputuserdefined_t inputuserdefined_t;
 
 /* available buttons */
-#define IB_MAX              12   /* number of buttons */
 enum inputbutton_t {
     IB_UP,      /* up */
     IB_DOWN,    /* down */
@@ -44,7 +44,9 @@ enum inputbutton_t {
     IB_FIRE5,
     IB_FIRE6,
     IB_FIRE7,
-    IB_FIRE8
+    IB_FIRE8,
+    /* --- */
+    IB_MAX      /* number of buttons */
 };
 
 /* public methods */
@@ -52,9 +54,9 @@ void input_init();
 void input_update();
 void input_release();
 
-int input_joystick_available(); /* a joystick is available AND the user wants to use it */
-void input_ignore_joystick(int ignore); /* ignores the input received from joysticks (if they're available) */
-int input_is_joystick_ignored();
+bool input_is_joystick_available(); /* a joystick is available AND the user wants to use it */
+bool input_is_joystick_ignored();
+void input_ignore_joystick(bool ignore); /* ignores the input received from joysticks (if they're available) */
 int input_number_of_plugged_joysticks();
 
 input_t *input_create_user(const char* inputmap_name); /* user's custom input device (set inputmap_name to NULL to use a default mapping) */
@@ -62,14 +64,14 @@ input_t *input_create_computer(); /* computer-controlled "input": will return an
 input_t *input_create_mouse(); /* mouse */
 void input_destroy(input_t *in);
 
-int input_button_down(input_t *in, inputbutton_t button);
-int input_button_pressed(input_t *in, inputbutton_t button);
-int input_button_up(input_t *in, inputbutton_t button);
+bool input_button_down(input_t *in, inputbutton_t button);
+bool input_button_pressed(input_t *in, inputbutton_t button);
+bool input_button_up(input_t *in, inputbutton_t button);
 void input_simulate_button_down(input_t *in, inputbutton_t button);
 void input_simulate_button_up(input_t *in, inputbutton_t button);
 void input_ignore(input_t *in);
 void input_restore(input_t *in);
-int input_is_ignored(input_t *in);
+bool input_is_ignored(input_t *in);
 void input_clear(input_t *in);
 
 /* these will only work for a mouse input device */

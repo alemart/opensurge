@@ -94,7 +94,7 @@ void pause_update()
         pause_quit = TRUE;
 
     if(pause_quit) {
-        if(fadefx_over()) {
+        if(fadefx_is_over()) {
             scenestack_pop();
             scenestack_pop();
             quest_abort();

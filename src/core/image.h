@@ -29,8 +29,8 @@ typedef struct image_t image_t;
 
 /* image flags (allows bitwise OR) */
 typedef enum imageflags_t {
-    IF_NONE = 0,
-    IF_HFLIP = 1,
+    IF_NONE  = 0,
+    IF_HFLIP = 1, /* powers of 2 */
     IF_VFLIP = 2
 } imageflags_t;
 
@@ -40,11 +40,14 @@ image_t* image_create(int width, int height); /* create a memory surface */
 image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* creates a shared sub-image */
 void image_destroy(image_t* img); /* call this after image_create() */
 int image_unload(image_t* img); /* use if you want to save memory... */
+
+/* utilities */
+int image_width(const image_t* img); /* the width of the image */
+int image_height(const image_t* img); /* the height of the image */
 void image_save(const image_t* img, const char *path); /* saves the image to a file */
 image_t* image_clone(const image_t* src); /* clones an image */
 image_t* image_clone_region(const image_t* src, int x, int y, int width, int height); /* clones a region */
-int image_width(const image_t* img);
-int image_height(const image_t* img);
+image_t* image_snapshot(); /* take a snapshot */
 
 /* pixel manipulation */
 void image_lock(image_t* img);
@@ -70,7 +73,7 @@ void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags
 void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, imageflags_t flags);
 void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags);
 void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags);
-void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags);
+void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags);
 void image_draw_multiply(const image_t* src, int x, int y, color_t color, imageflags_t flags);
 
 #endif

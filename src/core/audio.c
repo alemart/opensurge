@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <allegro.h>
 #include <stdlib.h>
 #include "audio.h"
 #include "assetfs.h"
@@ -28,9 +27,13 @@
 #include "timer.h"
 #include "util.h"
 
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+    /* TODO */
+#elif !defined(__USE_OPENAL__)
+#include <allegro.h>
 #include <logg.h>
 #else
+#include <allegro.h>
 #include <AL/alure.h> /* PulseAudio isn't Allegro-friendly */
 #endif
 
@@ -42,7 +45,18 @@
 #define PREFERRED_NUMBER_OF_VOICES  16
 
 /* private stuff */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+
+/* TODO */
+struct music_t {
+    char *filepath; /* relative path */
+};
+
+struct sound_t {
+    char *filepath; /* relative path */
+};
+
+#elif !defined(__USE_OPENAL__)
 struct music_t {
     LOGG_Stream *stream;
     int is_paused;
@@ -100,7 +114,38 @@ static music_t *current_music; /* music being played at the moment (NULL if none
  * music_load()
  * Loads a music from a file
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+music_t *music_load(const char *path)
+{
+    music_t *m;
+
+    if(*path == '\0') /* empty path */
+        return NULL;
+
+    if(NULL == (m = resourcemanager_find_music(path))) {
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("music_load('%s')", fullpath);
+
+        /* build the music object */
+        m = mallocx(sizeof *m);
+        m->filepath = str_dup(path);
+
+        /* load the audio stream */
+        /* TOOD */
+
+        /* adding it to the resource manager */
+        resourcemanager_add_music(path, m);
+        resourcemanager_ref_music(path);
+
+        /* done! */
+        logfile_message("music_load() ok");
+    }
+    else
+        resourcemanager_ref_music(path);
+
+    return m;
+}
+#elif !defined(__USE_OPENAL__)
 music_t *music_load(const char *path)
 {
     music_t *m;
@@ -202,7 +247,14 @@ music_t *music_load(const char *path)
  * Note that 'music_ref()' must not exist.
  * Returns the no. of references to the music
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+int music_unref(music_t *music)
+{
+    if(music != NULL)
+        return resourcemanager_unref_music(music->filepath);
+    return 0;
+}
+#elif !defined(__USE_OPENAL__)
 int music_unref(music_t *music)
 {
     if(music != NULL)
@@ -225,7 +277,19 @@ int music_unref(music_t *music)
  * Destroys a music. This is called automatically
  * while unloading the resource manager.
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void music_destroy(music_t *music)
+{
+    if(music != NULL) {
+        if(music == current_music)
+            music_stop();
+
+        /* TODO: free music stream */
+        free(music->filepath);
+        free(music);
+    }
+}
+#elif !defined(__USE_OPENAL__)
 void music_destroy(music_t *music)
 {
     if(music != NULL) {
@@ -257,7 +321,19 @@ void music_destroy(music_t *music)
  * Plays a music.
  * Set loop to TRUE to make it loop continuously.
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void music_play(music_t *music, int loop)
+{
+    music_stop();
+
+    if(music != NULL) {
+        /* TODO */
+    }
+
+    current_music = music;
+    music_set_volume(1.0f);
+}
+#elif !defined(__USE_OPENAL__)
 void music_play(music_t *music, int loop)
 {
     music_stop();
@@ -309,7 +385,15 @@ void eom_callback(void *userdata, ALuint source)
  * music_stop()
  * Stops the current music (if any)
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void music_stop()
+{
+    if(current_music != NULL)
+        ; /* TODO */
+
+    current_music = NULL;
+}
+#elif !defined(__USE_OPENAL__)
 void music_stop()
 {
     if(current_music != NULL) {
@@ -336,7 +420,12 @@ void music_stop()
  * music_pause()
  * Pauses the current music
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void music_pause()
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void music_pause()
 {
     if(current_music != NULL && !(current_music->is_paused)) {
@@ -360,7 +449,12 @@ void music_pause()
  * music_resume()
  * Resumes the current music
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void music_resume()
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void music_resume()
 {
     if(current_music != NULL && current_music->is_paused) {
@@ -385,7 +479,15 @@ void music_resume()
  * 0.0f (quiet) <= volume <= 1.0f (loud)
  * default = 1.0f
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void music_set_volume(float volume)
+{
+    if(current_music != NULL) {
+        volume = clip(volume, 0.0f, 1.0f);
+        /* TODO */
+    }
+}
+#elif !defined(__USE_OPENAL__)
 void music_set_volume(float volume)
 {
     if(current_music != NULL) {
@@ -410,7 +512,15 @@ void music_set_volume(float volume)
  * Returns the volume of the current music.
  * 0.0f <= volume <= 1.0f
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+float music_get_volume()
+{
+    if(current_music != NULL)
+        return 1.0f; /* TODO */
+    else
+        return 0.0f;
+}
+#elif !defined(__USE_OPENAL__)
 float music_get_volume()
 {
     if(current_music != NULL)
@@ -438,7 +548,12 @@ float music_get_volume()
  * Returns TRUE if a music is playing, FALSE
  * otherwise.
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+int music_is_playing()
+{
+    return 0;
+}
+#elif !defined(__USE_OPENAL__)
 int music_is_playing()
 {
     return (current_music != NULL) && !(current_music->is_paused);
@@ -455,7 +570,12 @@ int music_is_playing()
  * music_duration()
  * Music duration, in seconds (it's an approximation, in reality)
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+float music_duration()
+{
+    return 0.0f;
+}
+#elif !defined(__USE_OPENAL__)
 float music_duration()
 {
     return current_music ? MUSIC_DURATION(current_music) : 0.0f;
@@ -507,10 +627,17 @@ const char *music_path(const music_t *music)
  * music_is_paused()
  * Checks if the currently playing music is paused
  */
+#if defined(A5BUILD)
+int music_is_paused()
+{
+    return 1;
+}
+#else
 int music_is_paused()
 {
     return (current_music != NULL) && (current_music->is_paused);
 }
+#endif
 
 
 /* sound management */
@@ -520,7 +647,35 @@ int music_is_paused()
  * sound_load()
  * Loads a sample from a file
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+sound_t *sound_load(const char *path)
+{
+    sound_t *s;
+
+    if(NULL == (s = resourcemanager_find_sample(path))) {
+        const char* fullpath = assetfs_fullpath(path);
+        logfile_message("sound_load('%s')", fullpath);
+
+        /* build the sound object */
+        s = mallocx(sizeof *s);
+        s->filepath = str_dup(path);
+
+        /* loading the sample */
+        /* TODO */
+
+        /* adding it to the resource manager */
+        resourcemanager_add_sample(path, s);
+        resourcemanager_ref_sample(path);
+
+        /* done! */
+        logfile_message("sound_load() ok");
+    }
+    else
+        resourcemanager_ref_sample(path);
+
+    return s;
+}
+#elif !defined(__USE_OPENAL__)
 sound_t *sound_load(const char *path)
 {
     sound_t *s;
@@ -624,7 +779,12 @@ sound_t *sound_load(const char *path)
  * Note that 'sound_ref()' must not exist.
  * Returns the no. of references to the sample
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+int sound_unref(sound_t* sample)
+{
+    return resourcemanager_unref_sample(sample->filepath);
+}
+#elif !defined(__USE_OPENAL__)
 int sound_unref(sound_t* sample)
 {
     return resourcemanager_unref_sample(sample->filepath);
@@ -642,7 +802,16 @@ int sound_unref(sound_t* sample)
  * Releases the given sample. This is called
  * automatically when releasing the main hash
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void sound_destroy(sound_t *sample)
+{
+    if(sample != NULL) {
+        /* TODO: stop & destroy sample */
+        free(sample->filepath);
+        free(sample);
+    }
+}
+#elif !defined(__USE_OPENAL__)
 void sound_destroy(sound_t *sample)
 {
     if(sample != NULL) {
@@ -669,7 +838,12 @@ void sound_destroy(sound_t *sample)
  * sound_play()
  * Plays the given sample
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void sound_play(sound_t *sample)
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void sound_play(sound_t *sample)
 {
     sound_play_ex(sample, sample->vol, 0.0, 1.0);
@@ -690,7 +864,12 @@ void sound_play(sound_t *sample)
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
  * 1.0 = default frequency
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 {
     int id;
@@ -757,7 +936,12 @@ void eos_callback(void *userdata, ALuint source)
  * sound_stop()
  * Stops a sample
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void sound_stop(sound_t *sample)
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void sound_stop(sound_t *sample)
 {
     if(sample)
@@ -778,7 +962,12 @@ void sound_stop(sound_t *sample)
  * sound_is_playing()
  * Checks if a given sound is playing or not
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+int sound_is_playing(sound_t *sample)
+{
+    return 0;
+}
+#elif !defined(__USE_OPENAL__)
 int sound_is_playing(sound_t *sample)
 {
     if(sample && sample->voice_id != SOUND_INVALID_VOICE)
@@ -801,7 +990,12 @@ int sound_is_playing(sound_t *sample)
  * Gets the volume of a sound.
  * The volume is a number in the [0,1] range
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+float sound_get_volume(sound_t *sample)
+{
+    return 1.0f;
+}
+#elif !defined(__USE_OPENAL__)
 float sound_get_volume(sound_t *sample)
 {
     if(sample != NULL)
@@ -823,7 +1017,12 @@ float sound_get_volume(sound_t *sample)
  * Sets the volume of a sound.
  * The volume is a number in the [0,1] range
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void sound_set_volume(sound_t *sample, float volume)
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void sound_set_volume(sound_t *sample, float volume)
 {
     if(sample != NULL) {
@@ -850,7 +1049,15 @@ void sound_set_volume(sound_t *sample, float volume)
  * audio_init()
  * Initializes the Audio Manager
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void audio_init()
+{
+    logfile_message("audio_init(): using Allegro 5 backend for audio playback...");
+    current_music = NULL;
+
+    /* TODO */
+}
+#elif !defined(__USE_OPENAL__)
 void audio_init()
 {
     int voices;
@@ -924,7 +1131,13 @@ void audio_init()
  * audio_release()
  * Releases the audio manager
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void audio_release()
+{
+    logfile_message("audio_release()");
+    logfile_message("audio_release() ok");
+}
+#elif !defined(__USE_OPENAL__)
 void audio_release()
 {
     logfile_message("audio_release()");
@@ -954,7 +1167,12 @@ void audio_release()
  * audio_update()
  * Updates the audio manager
  */
-#ifndef __USE_OPENAL__
+#if defined(A5BUILD)
+void audio_update()
+{
+    ;
+}
+#elif !defined(__USE_OPENAL__)
 void audio_update()
 {
     /* updating the music */

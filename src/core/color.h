@@ -25,9 +25,17 @@
 #include <stdint.h>
 
 /* color type */
+#if defined(A5BUILD)
+#include <allegro5/allegro.h>
+
+typedef struct color_t {
+    ALLEGRO_COLOR _color;
+} color_t;
+#else
 typedef struct color_t {
     int _value;
 } color_t;
+#endif
 
 /* public API */
 color_t color_rgb(uint8_t r, uint8_t g, uint8_t b);

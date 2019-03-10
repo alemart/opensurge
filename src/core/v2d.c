@@ -73,7 +73,7 @@ v2d_t v2d_multiply(v2d_t u, float h)
  */
 float v2d_magnitude(v2d_t v)
 {
-    return sqrt( (v.x*v.x) + (v.y*v.y) );
+    return sqrt((v.x * v.x) + (v.y * v.y));
 }
 
 
@@ -83,7 +83,7 @@ float v2d_magnitude(v2d_t v)
  */
 float v2d_dotproduct(v2d_t u, v2d_t v)
 {
-    return (u.x*v.x + u.y*v.y);
+    return (u.x * v.x + u.y * v.y);
 }
 
 
@@ -108,9 +108,12 @@ v2d_t v2d_rotate(v2d_t v, float ang)
  */
 v2d_t v2d_normalize(v2d_t v)
 {
-    float m = v2d_magnitude(v);
-    v2d_t w = (m > EPSILON) ? v2d_new(v.x/m,v.y/m) : v2d_new(0,0);
-    return w;
+    float length = v2d_magnitude(v);
+
+    if(!nearly_equal(length, 0.0f))
+        return v2d_new(v.x / length, v.y / length);
+    else
+        return v2d_new(0, 0);
 }
 
 
@@ -124,7 +127,7 @@ v2d_t v2d_normalize(v2d_t v)
  */
 v2d_t v2d_lerp(v2d_t u, v2d_t v, float weight)
 {
-    float w = clip(weight, 0.0, 1.0);
+    float w = clip(weight, 0.0f, 1.0f);
     return v2d_new(u.x + (v.x - u.x) * w, u.y + (v.y - u.y) * w);
 }
 

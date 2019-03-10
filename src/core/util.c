@@ -18,25 +18,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <allegro.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include <math.h>
 #include "v2d.h"
 #include "util.h"
 #include "timer.h"
 #include "logfile.h"
 
-#ifdef _WIN32
+#if defined(A5BUILD)
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_native_dialog.h>
+#elif defined(_WIN32)
+#include <allegro.h>
 #include <winalleg.h>
+#else
+#include <allegro.h>
 #endif
 
 
 
 /* private stuff */
+#if defined(A5BUILD)
+static bool game_over = false;
+#else
 static volatile int game_over = FALSE;
+#endif
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
 
@@ -85,11 +95,18 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
  * game_quit()
  * Quit game?
  */
+#if defined(A5BUILD)
+void game_quit(void)
+{
+    game_over = true;
+}
+#else
 void game_quit(void)
 {
     game_over = TRUE;
 }
 END_OF_FUNCTION(game_quit)
+#endif
 
 
 /*
@@ -135,12 +152,19 @@ void fatal_error(const char *fmt, ...)
     va_end(args);
 
     logfile_message("%s", buf);
+#if defined(A5BUILD)
+    al_show_native_message_box(al_get_current_display(),
+        "Fatal error",
+        "An error has been encountered",
+        buf,
+    NULL, ALLEGRO_MESSAGEBOX_ERROR);
+#else
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-
 #ifdef _WIN32
     MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONERROR);
 #else
     allegro_message("%s", buf);
+#endif
 #endif
 
     exit(1);

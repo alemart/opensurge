@@ -18,13 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(A5BUILD)
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#else
 #include <allegro.h>
+#include <alfont.h>
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
-#include <alfont.h>
 #include "font.h"
 #include "video.h"
 #include "image.h"
@@ -38,10 +45,14 @@
 #include "utf8/utf8.h"
 
 /* private stuff */
+#if defined(A5BUILD)
+#define IMAGE2BITMAP(img)          (*((ALLEGRO_BITMAP**)(img)))
+#else
 #define IMAGE2BITMAP(img)          (*((BITMAP**)(img)))   /* crazy stuff */
+#endif
 #define FONT_TEXTMAXSIZE           16384    /* maximum size for texts */
 #define FONT_STACKCAPACITY         8        /* color stack capacity */
-static int allow_ttf_aa = TRUE; /* allow antialiasing for all TTF fonts? */
+static bool allow_antialias = true; /* allow antialiasing for all TTF fonts? */
 
 /* ------------------------------- */
 
@@ -67,7 +78,7 @@ static int dirfill(const char *vpath, void *param);
 
 typedef struct charproperties_t charproperties_t;
 struct charproperties_t {
-    uint8_t valid; /* whether this character is valid (exists) */
+    bool valid; /* whether this character is valid (exists) */
     struct { /* spritesheet info */
         int x, y, width, height;
     } source_rect;
@@ -90,8 +101,8 @@ struct fontscript_t {
         struct {
             char source_file[1024]; /* source file (relative file path) */
             int size; /* font size */
-            int antialias; /* enable antialiasing? */
-            int shadow; /* enable shadow? */
+            bool antialias; /* enable antialiasing? */
+            bool shadow; /* enable shadow? */
         } ttf;
     } data;
 };
@@ -107,7 +118,7 @@ struct fontdrv_t { /* abstract font: base class */
     void (*release)(fontdrv_t*); /* release the fontdrv_t */
 };
 static fontdrv_t* fontdrv_bmp_new(const char *source_file, charproperties_t chr[], int spacing[2]);
-static fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int shadow);
+static fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bool shadow);
 
 typedef struct fontdrv_bmp_t fontdrv_bmp_t;
 struct fontdrv_bmp_t { /* bitmap font */
@@ -124,9 +135,13 @@ static void fontdrv_bmp_release(fontdrv_t *fnt);
 typedef struct fontdrv_ttf_t fontdrv_ttf_t;
 struct fontdrv_ttf_t { /* truetype font */
     fontdrv_t base;
+#if defined(A5BUILD)
+    ALLEGRO_FONT *font;
+#else
     ALFONT_FONT *ttf;
-    int antialias; /* enable antialiasing? */
-    int shadow; /* enable shadow? */
+    bool antialias; /* enable antialiasing? */
+#endif
+    bool shadow; /* enable shadow? */
 };
 static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string);
@@ -161,7 +176,7 @@ struct font_t {
     char *text; /* text data */
     v2d_t position; /* position */
     int width; /* width (in pixels) for wordwrap */
-    int visible; /* is this font visible? */
+    bool visible; /* is this font visible? */
     int index_of_first_char, length; /* substring (deprecated) */
     fontargs_t argument; /* text arguments: $1, $2 ... $<FONTARGS_MAX> */
     fontalign_t align; /* alignment */
@@ -182,11 +197,29 @@ static char* tagged_text_offset(char* txt, int charnum);
  * font_init()
  * Initializes the font module
  */
-void font_init(int allow_font_smoothing)
+void font_init(bool allow_font_smoothing)
 {
+#if defined(A5BUILD)
     parsetree_program_t *fonts = NULL;
 
-    allow_ttf_aa = allow_font_smoothing; /* this comes first */
+    allow_antialias = allow_font_smoothing; /* this comes first */
+    logfile_message("Loading fonts...");
+    fontdrv_list_init();
+
+    /* reading the parse tree */
+    assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
+    nanoparser_traverse_program(fonts, traverse);
+    logfile_message("All fonts have been loaded.");
+
+    /* initializing the font callback table */
+    callbacktable_init();
+
+    /* done */
+    fonts = nanoparser_deconstruct_tree(fonts);
+#else
+    parsetree_program_t *fonts = NULL;
+
+    allow_antialias = allow_font_smoothing; /* this comes first */
     logfile_message("Initializing alfont...");
     if(0 != alfont_init())
         fatal_error("alfont_init() has failed. %s", allegro_error);
@@ -204,6 +237,7 @@ void font_init(int allow_font_smoothing)
 
     /* done */
     fonts = nanoparser_deconstruct_tree(fonts);
+#endif
 }
 
 
@@ -219,8 +253,10 @@ void font_release()
     logfile_message("Unloading font scripts...");
     fontdrv_list_release();
 
+#if !defined(A5BUILD)
     logfile_message("Unloading alfont...");
     alfont_exit();
+#endif
 }
 
 
@@ -248,7 +284,7 @@ font_t *font_create(const char *font_name)
 
     f->text = str_dup("");
     f->width = 0;
-    f->visible = TRUE;
+    f->visible = true;
     f->position = v2d_new(0, 0);
     f->index_of_first_char = 0;
     f->length = FONT_TEXTMAXSIZE - 1;
@@ -466,7 +502,7 @@ v2d_t font_get_position(const font_t *f)
  * font_is_visible()
  * Is the font visible?
  */
-int font_is_visible(const font_t *f)
+bool font_is_visible(const font_t *f)
 {
     return f->visible;
 }
@@ -476,7 +512,7 @@ int font_is_visible(const font_t *f)
  * font_set_visible()
  * Sets the visibility of the font
  */
-void font_set_visible(font_t *f, int is_visible)
+void font_set_visible(font_t *f, bool is_visible)
 {
     f->visible = is_visible;
 }
@@ -727,7 +763,7 @@ int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_t align
 char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
 {
     if(max_width > 0) {
-        static int blank[384];
+        static int blank[1024];
         int blanks = find_blanks(blank, sizeof(blank), text);
         int m, l = 0, r = blanks - 1;
         int best_m = 0, width;
@@ -896,8 +932,8 @@ int traverse_block(const parsetree_statement_t *stmt, void *data)
         header->type = FONTSCRIPTTYPE_TTF;
         strcpy(header->data.ttf.source_file, "");
         header->data.ttf.size = 12;
-        header->data.ttf.antialias = FALSE;
-        header->data.ttf.shadow = FALSE;
+        header->data.ttf.antialias = false;
+        header->data.ttf.shadow = false;
 
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), data, traverse_ttf);
     }
@@ -911,7 +947,7 @@ int traverse_block(const parsetree_statement_t *stmt, void *data)
         header->data.bmp.spacing[1] = 1;
         for(i = 0; i < n; i++) {
             /* initialize all characters to: unspecified */
-            header->data.bmp.chr[i].valid = 0;
+            header->data.bmp.chr[i].valid = false;
             header->data.bmp.chr[i].index = -1;
             header->data.bmp.chr[i].source_rect.x = 0;
             header->data.bmp.chr[i].source_rect.y = 0;
@@ -1001,7 +1037,7 @@ int traverse_bmp(const parsetree_statement_t *stmt, void *data)
             if(chr <= 0xFF) {
                 if(!header->data.bmp.chr[chr].valid) {
                     header->data.bmp.chr[chr].index = prev_i;
-                    header->data.bmp.chr[chr].valid = 1;
+                    header->data.bmp.chr[chr].valid = true;
                 }
             }
         }
@@ -1054,7 +1090,7 @@ int traverse_bmp_char(const parsetree_statement_t *stmt, void *data)
         chr->source_rect.width = max(0, atoi(nanoparser_get_string(p3)));
         chr->source_rect.height = max(0, atoi(nanoparser_get_string(p4)));
         chr->index = -1;
-        chr->valid = 1;
+        chr->valid = true;
     }
     else
         fatal_error("Font script error: unknown keyword '%s' in bitmap font", id);
@@ -1088,9 +1124,9 @@ int traverse_ttf(const parsetree_statement_t *stmt, void *data)
         header->data.ttf.size = n;
     }
     else if(str_icmp(id, "antialias") == 0)
-        header->data.ttf.antialias = TRUE;
+        header->data.ttf.antialias = true;
     else if(str_icmp(id, "shadow") == 0)
-        header->data.ttf.shadow = TRUE;
+        header->data.ttf.shadow = true;
     else
         fatal_error("Font script error: unknown keyword '%s' in ttf font", id);
 
@@ -1283,7 +1319,7 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t *fnt, const char *string)
 /* ttf fonts */
 /* ------------------------------------------------- */
 
-fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int shadow)
+fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bool shadow)
 {
     fontdrv_ttf_t *f = mallocx(sizeof *f);
     const char* fullpath;
@@ -1294,23 +1330,43 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, int antialias, int
     ((fontdrv_t*)f)->release = fontdrv_ttf_release;
 
     fullpath = assetfs_fullpath(source_file);
-    logfile_message("Loading TrueType font '%s'...", fullpath);
+    logfile_message("Loading TrueType font \"%s\"...", fullpath);
 
+#if defined(A5BUILD)
+    antialias = allow_antialias && antialias;
+    f->shadow = shadow;
+    if(NULL == (f->font = al_load_ttf_font(fullpath, -size, !antialias ? ALLEGRO_TTF_MONOCHROME : 0)))
+        fatal_error("Failed to load TrueType font \"%s\"", fullpath);
+#else
     f->ttf = alfont_load_font(fullpath);
     if(NULL != f->ttf) {
         /* configuring */
         alfont_set_font_size(f->ttf, size);
-        f->antialias = allow_ttf_aa ? antialias : FALSE;
+        f->antialias = allow_antialias && antialias;
         f->shadow = shadow;
     }
     else
-        fatal_error("Couldn't load TrueType font '%s'", source_file);
+        fatal_error("Couldn't load TrueType font \"%s\"", source_file);
+#endif
 
     return (fontdrv_t*)f;
 }
 
 void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
+#if defined(A5BUILD)
+    const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
+
+    /* draw shadow */
+    if(f->shadow) {
+        ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
+        al_draw_text(f->font, black, x, y + 1.0f, ALLEGRO_ALIGN_INTEGER, text);
+        al_draw_text(f->font, black, x + 1.0f, y + 1.0f, ALLEGRO_ALIGN_INTEGER, text);
+    }
+
+    /* draw text */
+    al_draw_text(f->font, color._color, x, y, ALLEGRO_ALIGN_INTEGER, text);
+#else
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     image_t *img = video_get_backbuffer();
 
@@ -1327,23 +1383,73 @@ void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, c
         alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
     else
         alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
+#endif
 }
 
 void fontdrv_ttf_release(fontdrv_t *fnt)
 {
+#if defined(A5BUILD)
+    fontdrv_ttf_t *f = (fontdrv_ttf_t*)fnt;
+    al_destroy_font(f->font);
+    free(fnt);
+#else
     fontdrv_ttf_t *f = (fontdrv_ttf_t*)fnt;
     alfont_destroy_font(f->ttf);
     free(f);
+#endif
 }
 
 v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt)
 {
+#if defined(A5BUILD)
+    /* FIXME: is this function still needed? */
+    return v2d_new(0, 0);
+#else
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
+#endif
 }
 
 v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
 {
+#if defined(A5BUILD)
+    static char linebuf[FONT_TEXTMAXSIZE]; char *p, *q;
+    const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
+    int width = 0, line_width = 0;
+    int line_height = al_get_font_line_height(f->font);
+    int height = line_height;
+    int tag = FALSE;
+    size_t i = 0;
+    uint32_t ch;
+
+    *(p = linebuf) = 0;
+    while(string[i]) {
+        ch = u8_nextchar(string, &i);
+        if(!tag && ch == '<' && (isalpha(string[i]) || string[i] == '/'))
+            tag = TRUE;
+        else if(tag && ch == '>')
+            tag = FALSE;
+        else if(tag)
+            continue;
+        else if(ch == '\n') {
+            line_width += *linebuf ? al_get_text_width(f->font, linebuf) : 0;
+            width = max(width, line_width);
+            *(p = linebuf) = 0;
+            line_width = 0;
+            height += line_height;
+        }
+        else {
+            char buf[5] = { 0 };
+            u8_wc_toutf8(buf, ch);
+            for(q = buf; *q && p - linebuf < sizeof(linebuf) - 1; *p = 0)
+                *(p++) = *(q++);
+        }
+    }
+
+    line_width += *linebuf ? al_get_text_width(f->font, linebuf) : 0;
+    width = max(width, line_width);
+    return v2d_new(width, height);
+#else
     static char linebuf[FONT_TEXTMAXSIZE]; char *p, *q;
     const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
     v2d_t sp = v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
@@ -1381,4 +1487,5 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
     line_width += *linebuf ? alfont_text_length(f->ttf, linebuf) : 0;
     width = max(width, line_width);
     return v2d_new(width, height);
+#endif
 }

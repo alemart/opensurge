@@ -4065,9 +4065,9 @@ static int onrightwallcollision_should_trigger_event(eventstrategy_t *event, obj
 struct onbutton_t {
     eventstrategy_t base; /* implements eventstrategy_t */
     inputbutton_t button;
-    int (*check)(input_t*,inputbutton_t);
+    bool (*check)(input_t*,inputbutton_t);
 };
-static eventstrategy_t* onbutton_new(const char *button_name, int (*check)(input_t*,inputbutton_t));
+static eventstrategy_t* onbutton_new(const char *button_name, bool (*check)(input_t*,inputbutton_t));
 static void onbutton_init(eventstrategy_t *event);
 static void onbutton_release(eventstrategy_t *event);
 static int onbutton_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
@@ -5069,7 +5069,7 @@ int onrightwallcollision_should_trigger_event(eventstrategy_t *event, object_t *
 }
 
 /* onbutton_t strategy */
-eventstrategy_t* onbutton_new(const char *button_name, int (*check)(input_t*,inputbutton_t))
+eventstrategy_t* onbutton_new(const char *button_name, bool (*check)(input_t*,inputbutton_t))
 {
     onbutton_t *x = mallocx(sizeof *x);
     eventstrategy_t *e = (eventstrategy_t*)x;

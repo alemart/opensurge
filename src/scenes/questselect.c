@@ -171,7 +171,7 @@ void questselect_update()
     last = min(option / QUEST_MAXPERPAGE + QUEST_MAXPERPAGE, quest_count) - 1;
     for(i = first; i <= last; i++) {
         if(option == i)
-            font_set_text(quest_label[i], "<color=$COLOR_MENUSELECTEDOPTION>%s</color>", quest_data[i]->name);
+            font_set_text(quest_label[i], "<color=$COLOR_HIGHLIGHT>%s</color>", quest_data[i]->name);
         else
             font_set_text(quest_label[i], "%s", quest_data[i]->name);
     }
@@ -222,7 +222,7 @@ void questselect_update()
 
         /* fade-out effect (quit this screen) */
         case QUESTSTATE_QUIT: {
-            if(fadefx_over()) {
+            if(fadefx_is_over()) {
                 scenestack_pop();
                 return;
             }
@@ -232,7 +232,7 @@ void questselect_update()
 
         /* fade-out effect (play a level) */
         case QUESTSTATE_PLAY: {
-            if(fadefx_over()) {
+            if(fadefx_is_over()) {
                 /* scripting: reset global variables & arrays */
                 symboltable_clear(symboltable_get_global_table());
                 nanocalc_addons_resetarrays();

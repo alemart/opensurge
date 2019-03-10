@@ -32,19 +32,19 @@ static const char* f_empty() { return ""; }
 static const char* f_level_name() { return level_name(); }
 static const char* f_level_version() { return level_version(); }
 static const char* f_level_author() { return level_author(); }
-static const char* f_input_directional() { return lang_get(input_joystick_available() ? "INPUT_JOY_DIRECTIONAL" : "INPUT_KEYB_DIRECTIONAL"); }
-static const char* f_input_left() { return lang_get(input_joystick_available() ? "INPUT_JOY_LEFT" : "INPUT_KEYB_LEFT"); }
-static const char* f_input_right() { return lang_get(input_joystick_available() ? "INPUT_JOY_RIGHT" : "INPUT_KEYB_RIGHT"); }
-static const char* f_input_up() { return lang_get(input_joystick_available() ? "INPUT_JOY_UP" : "INPUT_KEYB_UP"); }
-static const char* f_input_down() { return lang_get(input_joystick_available() ? "INPUT_JOY_DOWN" : "INPUT_KEYB_DOWN"); }
-static const char* f_input_fire1() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE1" : "INPUT_KEYB_FIRE1"); }
-static const char* f_input_fire2() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE2" : "INPUT_KEYB_FIRE2"); }
-static const char* f_input_fire3() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE3" : "INPUT_KEYB_FIRE3"); }
-static const char* f_input_fire4() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE4" : "INPUT_KEYB_FIRE4"); }
-static const char* f_input_fire5() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE5" : "INPUT_KEYB_FIRE5"); }
-static const char* f_input_fire6() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE6" : "INPUT_KEYB_FIRE6"); }
-static const char* f_input_fire7() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE7" : "INPUT_KEYB_FIRE7"); }
-static const char* f_input_fire8() { return lang_get(input_joystick_available() ? "INPUT_JOY_FIRE8" : "INPUT_KEYB_FIRE8"); }
+static const char* f_input_directional() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_DIRECTIONAL" : "INPUT_KEYB_DIRECTIONAL"); }
+static const char* f_input_left() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_LEFT" : "INPUT_KEYB_LEFT"); }
+static const char* f_input_right() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_RIGHT" : "INPUT_KEYB_RIGHT"); }
+static const char* f_input_up() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_UP" : "INPUT_KEYB_UP"); }
+static const char* f_input_down() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_DOWN" : "INPUT_KEYB_DOWN"); }
+static const char* f_input_fire1() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE1" : "INPUT_KEYB_FIRE1"); }
+static const char* f_input_fire2() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE2" : "INPUT_KEYB_FIRE2"); }
+static const char* f_input_fire3() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE3" : "INPUT_KEYB_FIRE3"); }
+static const char* f_input_fire4() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE4" : "INPUT_KEYB_FIRE4"); }
+static const char* f_input_fire5() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE5" : "INPUT_KEYB_FIRE5"); }
+static const char* f_input_fire6() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE6" : "INPUT_KEYB_FIRE6"); }
+static const char* f_input_fire7() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE7" : "INPUT_KEYB_FIRE7"); }
+static const char* f_input_fire8() { return lang_get(input_is_joystick_available() ? "INPUT_JOY_FIRE8" : "INPUT_KEYB_FIRE8"); }
 static const char* f_engine_name() { return GAME_TITLE; }
 static const char* f_engine_version() { return GAME_VERSION_STRING; }
 static const char* f_engine_website() { return GAME_WEBSITE; }
