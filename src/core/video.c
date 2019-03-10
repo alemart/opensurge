@@ -178,11 +178,6 @@ void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
         window_size = video_get_window_size();
 
     /* Create a display */
-    /*if(display != NULL) {
-        al_set_target_bitmap(NULL);
-        al_unregister_event_source(a5_event_queue, al_get_display_event_source(display));
-        al_destroy_display(display);
-    }*/
     if(display == NULL) {
         al_set_new_display_flags(ALLEGRO_OPENGL);
         al_set_new_display_flags(ALLEGRO_PROGRAMMABLE_PIPELINE);
@@ -410,7 +405,6 @@ void video_render()
     }
     al_flip_display();
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
 #else
     static uint32_t fps_timer = 0, frame_count = 0;
     uint32_t current_time;
