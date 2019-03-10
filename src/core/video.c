@@ -167,15 +167,17 @@ void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
 {
 #if defined(A5BUILD)
     extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
-    v2d_t window_size;
+    v2d_t window_size = video_get_window_size();
 
+    /* Change the video mode */
     logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
     video_resolution = resolution;
     video_fullscreen = FALSE; /* TODO */
     video_smooth = FALSE; /* not supported yet */
+    if(video_resolution != VIDEORESOLUTION_EDT)
+        window_size = video_get_window_size();
 
     /* Create a display */
-    window_size = video_get_window_size();
     /*if(display != NULL) {
         al_set_target_bitmap(NULL);
         al_unregister_event_source(a5_event_queue, al_get_display_event_source(display));
