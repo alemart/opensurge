@@ -101,7 +101,7 @@ static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 /* public variables */
 ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
 bool a5_key[ALLEGRO_KEY_MAX] = { false };
-int a5_mouse_b = 0, a5_mouse_x = 0, a5_mouse_y = 0, a5_mouse_dx = 0, a5_mouse_dy = 0, a5_mouse_dz = 0;
+int a5_mouse_b = 0;
 bool a5_display_active = true;
 #endif
 
@@ -175,14 +175,6 @@ void engine_mainloop()
 
             case ALLEGRO_EVENT_KEY_UP:
                 a5_key[event.keyboard.keycode] = false;
-                break;
-
-            case ALLEGRO_EVENT_MOUSE_AXES:
-                a5_mouse_x = event.mouse.x;
-                a5_mouse_y = event.mouse.y;
-                a5_mouse_dx = event.mouse.dx;
-                a5_mouse_dy = event.mouse.dy;
-                a5_mouse_dz = event.mouse.dz;
                 break;
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:

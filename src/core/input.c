@@ -74,6 +74,12 @@ static int got_joystick;
 static int ignore_joystick;
 static int plugged_joysticks;
 
+#if defined(A5BUILD)
+static struct {
+    int x, y, z, dx, dy, dz, b;
+} a5_mouse = { 0 };
+#endif
+
 /* private methods */
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
@@ -152,7 +158,18 @@ void input_init()
 void input_update()
 {
 #if defined(A5BUILD)
-    extern int a5_mouse_dz;
+    ALLEGRO_MOUSE_STATE state;
+    extern int a5_mouse_b;
+
+    /* updating the mouse */
+    al_get_mouse_state(&state);
+    a5_mouse.dx = state.x - a5_mouse.x;
+    a5_mouse.dy = state.y - a5_mouse.y;
+    a5_mouse.dz = state.z - a5_mouse.z;
+    a5_mouse.x = state.x;
+    a5_mouse.y = state.y;
+    a5_mouse.z = state.z;
+    a5_mouse.b = a5_mouse_b; /* received from the event queue */
 
     /* updating the input objects */
     for(input_list_t* it = inlist; it; it = it->next) {
@@ -160,9 +177,6 @@ void input_update()
             it->data->oldstate[i] = it->data->state[i];
         it->data->update(it->data);
     }
-
-    /* mouse wheel event fix */
-    a5_mouse_dz = 0;
 #else
     int i;
     static int old_f6 = 0;
@@ -558,22 +572,20 @@ void inputmouse_update(input_t* in)
 {
 #if defined(A5BUILD)
     inputmouse_t *mouse = (inputmouse_t*)in;
-    extern int a5_mouse_x, a5_mouse_y, a5_mouse_b;
-    extern int a5_mouse_dx, a5_mouse_dy, a5_mouse_dz;
 
-    mouse->x = a5_mouse_x;
-    mouse->y = a5_mouse_y;
-    mouse->dx = a5_mouse_dx;
-    mouse->dy = a5_mouse_dy;
-    mouse->dz = a5_mouse_dz;
+    mouse->x = a5_mouse.x;
+    mouse->y = a5_mouse.y;
+    mouse->dx = a5_mouse.dx;
+    mouse->dy = a5_mouse.dy;
+    mouse->dz = a5_mouse.dz;
 
     in->state[IB_UP] = (mouse->dz > 0);
     in->state[IB_DOWN] = (mouse->dz < 0);
     in->state[IB_LEFT] = FALSE;
     in->state[IB_RIGHT] = FALSE;
-    in->state[IB_FIRE1] = (a5_mouse_b & 1);
-    in->state[IB_FIRE2] = (a5_mouse_b & 2);
-    in->state[IB_FIRE3] = (a5_mouse_b & 4);
+    in->state[IB_FIRE1] = (a5_mouse.b & 1);
+    in->state[IB_FIRE2] = (a5_mouse.b & 2);
+    in->state[IB_FIRE3] = (a5_mouse.b & 4);
     in->state[IB_FIRE4] = FALSE;
     in->state[IB_FIRE5] = FALSE;
     in->state[IB_FIRE6] = FALSE;
