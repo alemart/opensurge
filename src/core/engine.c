@@ -145,67 +145,64 @@ void engine_mainloop()
 
     /* main loop */
     while(!game_is_over() && !scenestack_empty()) {
+        ALLEGRO_EVENT event;
+        al_wait_for_event(a5_event_queue, &event);
+
         /* handle events */
-        do {
-            ALLEGRO_EVENT event;
-            al_wait_for_event(a5_event_queue, &event);
+        switch(event.type) {
+            case ALLEGRO_EVENT_TIMER: {
+                /* update game logic */
+                ALLEGRO_EVENT next_event;
 
-            switch(event.type) {
-                case ALLEGRO_EVENT_TIMER: {
-                    /* update game logic */
-                    ALLEGRO_EVENT next_event;
+                /* updating the managers */
+                timer_update();
+                input_update();
+                audio_update();
+                clean_garbage();
 
-                    /* updating the managers */
-                    timer_update();
-                    input_update();
-                    audio_update();
-                    clean_garbage();
+                /* updating the current scene */
+                current_scene = scenestack_top();
+                current_scene->update();
+                redraw = (current_scene == scenestack_top()); /* same scene? */
 
-                    /* updating the current scene */
-                    current_scene = scenestack_top();
-                    current_scene->update();
-                    redraw = true;
-
-                    /* prevent locking */
-                    while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event.timer.source)
-                        al_drop_next_event(a5_event_queue);
-                    break;
-                }
-
-                case ALLEGRO_EVENT_KEY_DOWN:
-                    a5_key[event.keyboard.keycode] = true;
-                    break;
-
-                case ALLEGRO_EVENT_KEY_UP:
-                    a5_key[event.keyboard.keycode] = false;
-                    break;
-
-                case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                    a5_mouse_b |= 1 << (event.mouse.button - 1);
-                    break;
-
-                case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-                    a5_mouse_b &= ~(1 << (event.mouse.button - 1));
-                    break;
-
-                case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-                    a5_display_active = true;
-                    break;
-
-                case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
-                    a5_display_active = false;
-                    break;
-
-                case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                    game_quit();
-                    break;
+                /* prevent locking */
+                while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event.timer.source)
+                    al_drop_next_event(a5_event_queue);
+                break;
             }
-        } while(!al_is_event_queue_empty(a5_event_queue));
+
+            case ALLEGRO_EVENT_KEY_DOWN:
+                a5_key[event.keyboard.keycode] = true;
+                break;
+
+            case ALLEGRO_EVENT_KEY_UP:
+                a5_key[event.keyboard.keycode] = false;
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                a5_mouse_b |= 1 << (event.mouse.button - 1);
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                a5_mouse_b &= ~(1 << (event.mouse.button - 1));
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+                a5_display_active = true;
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+                a5_display_active = false;
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                game_quit();
+                break;
+        }
 
         /* render */
-        if(redraw) {
-            if(current_scene == scenestack_top())
-                current_scene->render(); /* render after update */
+        if(redraw && al_is_event_queue_empty(a5_event_queue)) {
+            current_scene->render();
             screenshot_update();
             fadefx_update();
             video_render();
