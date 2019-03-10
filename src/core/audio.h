@@ -21,16 +21,16 @@
 #ifndef _AUDIO_H
 #define _AUDIO_H
 
+#include <stdbool.h>
+
 /* forward declarations */
 typedef struct music_t music_t;
 typedef struct sound_t sound_t;
-
 
 /* audio manager */
 void audio_init();
 void audio_update();
 void audio_release();
-
 
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */
@@ -48,14 +48,13 @@ float music_duration(); /* in seconds */
 music_t *music_current(); /* currently playing music. May be NULL */
 const char *music_path(const music_t *music); /* the filepath of the specified music */
 
-
 /* sample management */
 sound_t *sound_load(const char *path); /* will be unloaded automatically */
 void sound_destroy(sound_t *sample);
 void sound_play(sound_t *sample);
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq); /* 0.0<=volume<=1.0; (left) -1.0<=pan<=1.0 (right); 1.0 = default frequency */
 void sound_stop(sound_t *sample);
-int sound_is_playing(sound_t *sample);
+bool sound_is_playing(sound_t *sample);
 int sound_unref(sound_t *sample); /* returns the number of active references */
 float sound_get_volume(sound_t *sample);
 void sound_set_volume(sound_t *sample, float volume); /* volume is in the [0,1] range */

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * audio.c - audio module
- * Copyright (C) 2008-2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2012, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,9 @@
 #include "util.h"
 
 #if defined(A5BUILD)
-    /* TODO */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #elif !defined(__USE_OPENAL__)
 #include <allegro.h>
 #include <logg.h>
@@ -49,11 +51,14 @@
 
 /* TODO */
 struct music_t {
-    char *filepath; /* relative path */
+    char* filepath; /* relative path */
 };
 
 struct sound_t {
-    char *filepath; /* relative path */
+    ALLEGRO_SAMPLE* sample;
+    ALLEGRO_SAMPLE_ID id;
+    bool valid_id;
+    char* filepath; /* relative path */
 };
 
 #elif !defined(__USE_OPENAL__)
@@ -654,21 +659,18 @@ sound_t *sound_load(const char *path)
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
         const char* fullpath = assetfs_fullpath(path);
-        logfile_message("sound_load('%s')", fullpath);
+        logfile_message("Loading sound \"%s\"...", fullpath);
 
         /* build the sound object */
         s = mallocx(sizeof *s);
+        s->valid_id = false;
         s->filepath = str_dup(path);
-
-        /* loading the sample */
-        /* TODO */
+        if(NULL == (s->sample = al_load_sample(fullpath)))
+            fatal_error("Can't load sound \"%s\"", path);
 
         /* adding it to the resource manager */
         resourcemanager_add_sample(path, s);
         resourcemanager_ref_sample(path);
-
-        /* done! */
-        logfile_message("sound_load() ok");
     }
     else
         resourcemanager_ref_sample(path);
@@ -806,7 +808,8 @@ int sound_unref(sound_t* sample)
 void sound_destroy(sound_t *sample)
 {
     if(sample != NULL) {
-        /* TODO: stop & destroy sample */
+        sound_stop(sample);
+        al_destroy_sample(sample->sample);
         free(sample->filepath);
         free(sample);
     }
@@ -841,7 +844,8 @@ void sound_destroy(sound_t *sample)
 #if defined(A5BUILD)
 void sound_play(sound_t *sample)
 {
-    ;
+    sound_play_ex(sample, 1.0f, 0.0f, 1.0f);
+
 }
 #elif !defined(__USE_OPENAL__)
 void sound_play(sound_t *sample)
@@ -860,14 +864,25 @@ void sound_play(sound_t *sample)
  * sound_play_ex()
  * Plays the given sample with extra options! :)
  *
- * 0.0 <= volume <= 1.0
+ * 0.0 <= volume (defaults to 1.0)
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
  * 1.0 = default frequency
  */
 #if defined(A5BUILD)
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 {
-    ;
+    if(sample != NULL) {
+        /* ajusting the parameters */
+        vol = max(vol, 0.0f);
+        pan = clip(pan, -1.0f, 1.0f);
+        freq = max(freq, 0.0f);
+
+        /* play the sample */
+        if(al_play_sample(sample->sample, 1.0f, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id))
+            sample->valid_id = true;
+        else
+            sample->valid_id = false;
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
@@ -939,7 +954,12 @@ void eos_callback(void *userdata, ALuint source)
 #if defined(A5BUILD)
 void sound_stop(sound_t *sample)
 {
-    ;
+    if(sample != NULL) {
+        if(sample->valid_id) {
+            al_stop_sample(&sample->id);
+            sample->valid_id = false; /* is this needed? */
+        }
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void sound_stop(sound_t *sample)
@@ -963,37 +983,59 @@ void sound_stop(sound_t *sample)
  * Checks if a given sound is playing or not
  */
 #if defined(A5BUILD)
-int sound_is_playing(sound_t *sample)
+bool sound_is_playing(sound_t *sample)
 {
-    return 0;
+    if(sample != NULL) {
+        if(sample->valid_id) {
+            ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
+            if(instance != NULL) {
+                bool is_playing = al_get_sample_instance_playing(instance);
+                al_unlock_sample_id(&sample->id);
+                return is_playing;
+            }
+            else
+                return false;
+        }
+    }
 }
 #elif !defined(__USE_OPENAL__)
-int sound_is_playing(sound_t *sample)
+bool sound_is_playing(sound_t *sample)
 {
     if(sample && sample->voice_id != SOUND_INVALID_VOICE)
         return (voice_check(sample->voice_id) == sample->data);
     else
-        return FALSE;
+        return false;
 }
 #else
-int sound_is_playing(sound_t *sample)
+bool sound_is_playing(sound_t *sample)
 {
     if(sample)
         return sample->is_playing;
     else
-        return FALSE;
+        return false;
 }
 #endif
 
 /*
  * sound_get_volume()
  * Gets the volume of a sound.
- * The volume is a number in the [0,1] range
+ * 0.0f means silence; 1.0f, the default volume
  */
 #if defined(A5BUILD)
 float sound_get_volume(sound_t *sample)
 {
-    return 1.0f;
+    if(sample != NULL) {
+        if(sample->valid_id) {
+            ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
+            if(instance != NULL) {
+                float gain = al_get_sample_instance_gain(instance);
+                al_unlock_sample_id(&sample->id);
+                return gain;
+            }
+            else
+                return false;
+        }
+    }
 }
 #elif !defined(__USE_OPENAL__)
 float sound_get_volume(sound_t *sample)
@@ -1015,12 +1057,19 @@ float sound_get_volume(sound_t *sample)
 /*
  * sound_set_volume()
  * Sets the volume of a sound.
- * The volume is a number in the [0,1] range
  */
 #if defined(A5BUILD)
 void sound_set_volume(sound_t *sample, float volume)
 {
-    ;
+    if(sample != NULL) {
+        if(sample->valid_id) {
+            ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
+            if(instance != NULL) {
+                al_set_sample_instance_gain(instance, max(0.0f, volume));
+                al_unlock_sample_id(&sample->id);
+            }
+        }
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void sound_set_volume(sound_t *sample, float volume)
