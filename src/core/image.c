@@ -484,6 +484,45 @@ image_t* image_clone_region(const image_t* src, int x, int y, int width, int hei
 }
 
 /*
+ * image_snapshot()
+ * Take a snapshot of the game. Remember to
+ * destroy the created image after usage.
+ */
+image_t* image_snapshot()
+{
+#if defined(A5BUILD)
+    ALLEGRO_STATE state;
+    image_t* img = mallocx(sizeof *img);
+    ALLEGRO_BITMAP* screen = al_get_backbuffer(al_get_current_display());
+
+    img->w = al_get_bitmap_width(screen);
+    img->h = al_get_bitmap_height(screen);
+    img->path = NULL;
+    if(NULL == (img->data = al_create_bitmap(img->w, img->h)))
+        fatal_error("Failed to take snapshot");
+
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+    al_set_target_bitmap(img->data);
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_draw_bitmap(screen, 0.0f, 0.0f, 0);
+    al_restore_state(&state);
+
+    return img;
+#else
+    image_t* img = mallocx(sizeof *img);
+    img->w = screen->w;
+    img->h = screen->h;
+    img->path = NULL;
+
+    if(NULL == (img->data = create_bitmap(img->w, img->h)))
+        fatal_error("Failed to take snapshot");
+    blit(screen, img->data, 0, 0, 0, 0, screen->w, screen->h);
+
+    return img;
+#endif
+}
+
+/*
  * image_lock()
  * Locks the image, enabling fast in-memory pixel access
  */

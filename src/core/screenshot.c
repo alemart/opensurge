@@ -54,12 +54,16 @@ void screenshot_init()
  */
 void screenshot_update()
 {
-    /* take the snapshot! (press the '=' key or the 'printscreen' key) */
+    image_t* snapshot;
+
+    /* take the snapshot */
     if(input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE2)) {
         const char *filename = screenshot_filename(next_screenshot_id++);
-        image_save(video_get_window_surface(), filename);
-        video_showmessage("New screenshot: %s", filename);
         logfile_message("New screenshot: \"%s\"", filename);
+        snapshot = image_snapshot();
+        image_save(snapshot, filename);
+        image_destroy(snapshot);
+        video_showmessage("New screenshot: %s", filename);
     }
 }
 

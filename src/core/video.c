@@ -641,26 +641,6 @@ void video_display_loading_screen()
 }
 
 
-/*
- * video_get_window_surface()
- * The window surface (read-only)
- */
-const image_t* video_get_window_surface()
-{
-#if defined(A5BUILD)
-    return backbuffer; /* FIXME */
-#else
-    switch(video_get_resolution()) {
-        case VIDEORESOLUTION_1X:
-        case VIDEORESOLUTION_EDT:
-            return video_get_backbuffer(); /* this "gambiarra" saves some processing... */
-
-        default:
-            return window_surface;
-    }
-#endif
-}
-
 
 /* private stuff */
 #if defined(A5BUILD)

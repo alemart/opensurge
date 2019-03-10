@@ -49,7 +49,6 @@ bool video_is_smooth();
 bool video_is_fullscreen();
 v2d_t video_get_screen_size(); /* usually, 426x240 */
 v2d_t video_get_window_size(); /* the real size of the window, in pixels */
-const struct image_t* video_get_window_surface();
 
 /* backbuffer */
 #define VIDEO_SCREEN_W            ((int)(video_get_screen_size().x))
