@@ -111,6 +111,15 @@ IF(USE_A5)
     allegro_main
   )
 
+  # Use static libs
+  IF(USE_STATIC)
+    SET(A5_LIBS "${REQUIRED_A5_LIBS}")
+    SET(REQUIRED_A5_LIBS "")
+    FOREACH(A5_LIB ${A5_LIBS})
+      LIST(APPEND REQUIRED_A5_LIBS "${A5_LIB}-static")
+    ENDFOREACH()
+  ENDIF()
+
   # Write to LALLEGRO5
   SET(LALLEGRO5 "")
   FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
