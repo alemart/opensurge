@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * timer.c - time handler
- * Copyright (C) 2010, 2012  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2012, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,8 +23,7 @@
 #include "logfile.h"
 
 #if defined(A5BUILD)
-#include <math.h>
-#include <sys/time.h> /* FIXME */
+#include <allegro5/allegro.h>
 #elif defined(_WIN32)
 #include <allegro.h>
 #include <winalleg.h>
@@ -34,14 +33,8 @@
 #endif
 
 #if defined(A5BUILD)
-static const float minimum_delta = 0.016f;
-static const float maximum_delta = 0.033f;
 static float delta_time = 0.0f;
-static uint32_t start_time = 0; /* TODO: remove */
-
-static inline float get_current_time(); /* given in seconds */
-static uint32_t get_tick_count();
-static inline void yield_cpu();
+static double current_time = 0.0;
 #else
 
 /* constants */
@@ -71,9 +64,7 @@ void timer_init()
     logfile_message("timer_init()");
 
 #if defined(A5BUILD)
-    /* ignore optimize_cpu_usage (always TRUE) */
-    start_time = get_tick_count();
-    delta_time = 0.0f;
+    /* do nothing */
 #else
     /* installing Allegro stuff */
     logfile_message("Installing Allegro timers...");
@@ -99,20 +90,16 @@ void timer_init()
 void timer_update()
 {
 #if defined(A5BUILD)
-    static float old_time = INFINITY;
-    float current_time = 0.0f;
+    static const float minimum_delta = 0.016f;
+    static const float maximum_delta = 0.033f;
+    static double old_time = 0.0;
 
     /* compute delta time */
-    do {
-        current_time = get_current_time();
-        delta_time = current_time - old_time; 
-        if(current_time < old_time) { /* if time wrap */
-            old_time = current_time;
-            delta_time = 0.0f;
-        }
-        if(delta_time < minimum_delta)
-            yield_cpu();
-    } while(delta_time < minimum_delta);
+    current_time = al_get_time();
+    delta_time = current_time - old_time;
+
+    if(delta_time < minimum_delta)
+        ; /* do nothing, since the framerate is controlled by Allegro */
 
     if(delta_time > maximum_delta)
         delta_time = maximum_delta;
@@ -178,7 +165,8 @@ float timer_get_delta()
 uint32_t timer_get_ticks()
 {
 #if defined(A5BUILD)
-    return 1000 * get_current_time();
+    /* FIXME: return in seconds */
+    return 1000 * current_time;
 #else
     uint32_t ticks = get_tick_count();
     if(ticks < start_time)
@@ -188,29 +176,10 @@ uint32_t timer_get_ticks()
 }
 
 
+#if !defined(A5BUILD)
+
 /* -------- Utilities -------- */
-#if defined(A5BUILD)
-
-float get_current_time()
-{
-    /* FIXME FIXME FIXME */
-    return 0.001f * (get_tick_count() - start_time);
-}
-
-uint32_t get_tick_count()
-{
-    /* TODO: remove me */
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec * 1000) + (now.tv_usec / 1000);
-}
-
-void yield_cpu()
-{
-    /* TODO */
-}
-
-#elif !defined(_WIN32)
+#if !defined(_WIN32)
 
 uint32_t get_tick_count()
 {
@@ -236,5 +205,7 @@ void yield_cpu()
 {
     Sleep(1);
 }
+
+#endif
 
 #endif

@@ -30,8 +30,8 @@
 #include "logfile.h"
 
 #if defined(A5BUILD)
-/* TODO */
-#include <stdbool.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_native_dialog.h>
 #elif defined(_WIN32)
 #include <allegro.h>
 #include <winalleg.h>
@@ -153,7 +153,11 @@ void fatal_error(const char *fmt, ...)
 
     logfile_message("%s", buf);
 #if defined(A5BUILD)
-    puts(buf);
+    al_show_native_message_box(al_get_current_display(),
+        "Fatal error",
+        "An error has been encountered:",
+        buf,
+    NULL, ALLEGRO_MESSAGEBOX_ERROR);
 #else
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
 #ifdef _WIN32

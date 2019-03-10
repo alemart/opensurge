@@ -107,6 +107,7 @@ IF(USE_A5)
     allegro_ttf
     allegro_acodec
     allegro_audio
+    allegro_dialog
     allegro_main
   )
 

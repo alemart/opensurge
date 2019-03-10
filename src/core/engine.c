@@ -26,6 +26,7 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_native_dialog.h>
 #else
 #include <allegro.h>
 #endif
@@ -306,6 +307,9 @@ void init_basic_stuff(const commandline_t* cmd)
     if(!al_install_mouse())
         fatal_error("Can't initialize the mouse");
     al_register_event_source(a5_event_queue, al_get_mouse_event_source());
+
+    if(!al_init_native_dialog_addon())
+        fatal_error("Can't initialize Allegro's native dialog addon");
 
     if(!al_init_image_addon())
         fatal_error("Can't initialize Allegro's image addon");

@@ -862,9 +862,38 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
 #if defined(A5BUILD)
+#if 0
     uint8_t r, g, b;
     color_unmap(color, &r, &g, &b, NULL);
-    al_draw_tinted_bitmap(src->data, color_rgba(r, g, b, 128)._color, x, y, FLIPPY(flags));
+    al_draw_tinted_bitmap(src->data, color_rgba(r, g, b, 255)._color, x, y, FLIPPY(flags));
+#elif 1
+    /* will work with aux bmps */
+    // https://github.com/kazzmir/allegro4-to-5/blob/master/allegro4/allegro.c draw_lit_sprite
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_BLENDER);
+
+    al_set_blend_color(color._color);
+    al_set_separate_blender(
+        ALLEGRO_ADD, ALLEGRO_CONST_COLOR, ALLEGRO_INVERSE_ALPHA,
+        //ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA
+        ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA
+    );
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+    
+    al_restore_state(&state);
+#else
+    uint8_t r, g, b;
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_BLENDER);
+
+    color_unmap(color, &r, &g, &b, NULL);
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+    al_set_blend_color(color_rgba(r, g, b, 128)._color);
+    al_set_blender(ALLEGRO_ADD, ALLEGRO_CONST_COLOR, ALLEGRO_INVERSE_ALPHA);
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+
+    al_restore_state(&state);
+#endif
 #else
     image_t* target = get_target();
 
