@@ -995,13 +995,13 @@ static void group_gamepad_update(group_t *g)
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(!input_is_joystick_ignored()) {
                     sound_play(SFX_CONFIRM);
-                    input_ignore_joystick(TRUE);
+                    input_ignore_joystick(true);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(input_is_joystick_ignored()) {
                     sound_play(SFX_CONFIRM);
-                    input_ignore_joystick(FALSE);
+                    input_ignore_joystick(false);
                 }
             }
         }

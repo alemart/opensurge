@@ -804,7 +804,7 @@ int keycode_of(const char* key_name)
             return key_codes[i];
     }
 
-    fatal_error("inputmap: invalid key name - '%s'", key_name);
+    fatal_error("Failed to setup inputmap: unrecognized key name \"%s\"", key_name);
     return 0;
 }
 
@@ -828,6 +828,6 @@ int joybtncode_of(const char* joybtn_name)
     else if(str_icmp(joybtn_name, "BUTTON_8") == 0)
         return 7;
 
-    fatal_error("inputmap: invalid joystick button name - '%s'", joybtn_name);
+    fatal_error("Failed to setup inputmap: unrecognized joystick button \"%s\"", joybtn_name);
     return 0;
 }

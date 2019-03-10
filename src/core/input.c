@@ -34,8 +34,8 @@
 
 /* <base class>: generic input */
 struct input_t {
-    int enabled; /* enable input? */
-    int state[IB_MAX], oldstate[IB_MAX]; /* states */
+    bool enabled; /* enable input? */
+    bool state[IB_MAX], oldstate[IB_MAX]; /* states */
     void (*update)(input_t*); /* update method */
 };
 
@@ -70,9 +70,9 @@ struct input_list_t {
 /* private data */
 static const char* DEFAULT_INPUTMAP_NAME = "default";
 static input_list_t *inlist;
-static int got_joystick;
-static int ignore_joystick;
-static int plugged_joysticks;
+static bool got_joystick;
+static bool ignore_joystick;
+static bool plugged_joysticks;
 
 #if defined(A5BUILD)
 static struct {
@@ -85,7 +85,7 @@ static void input_register(input_t *in);
 static void input_unregister(input_t *in);
 #if !defined(A5BUILD)
 static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
-static int are_all_joysticks_valid();
+static bool are_all_joysticks_valid();
 #endif
 
 
@@ -103,8 +103,8 @@ void input_init()
     inlist = NULL;
 
     /* joypad setup */
-    got_joystick = FALSE;
-    ignore_joystick = TRUE;
+    got_joystick = false;
+    ignore_joystick = true;
     plugged_joysticks = 0;
     logfile_message("No joysticks have been detected."); /* TODO */
 
@@ -124,12 +124,12 @@ void input_init()
     inlist = NULL;
 
     /* joystick */
-    got_joystick = FALSE;
-    ignore_joystick = TRUE;
+    got_joystick = false;
+    ignore_joystick = true;
     plugged_joysticks = 0;
     if(install_joystick(JOY_TYPE_AUTODETECT) == 0) {
         if(num_joysticks > 0 && are_all_joysticks_valid()) {
-            got_joystick = TRUE;
+            got_joystick = true;
             plugged_joysticks = num_joysticks;
             logfile_message("Joystick(s) installed successfully! Number of plugged joysticks: %d", plugged_joysticks);
         }
@@ -189,7 +189,7 @@ void input_update()
     if(mouse_needs_poll())
         poll_mouse();
 
-    if(input_joystick_available())
+    if(input_is_joystick_available())
         poll_joystick();
 
     /* updating input objects */
@@ -242,7 +242,7 @@ void input_release()
  * input_button_down()
  * Checks if a given button is down
  */
-int input_button_down(input_t *in, inputbutton_t button)
+bool input_button_down(input_t *in, inputbutton_t button)
 {
     return in->enabled && in->state[(int)button];
 }
@@ -252,7 +252,7 @@ int input_button_down(input_t *in, inputbutton_t button)
  * input_button_pressed()
  * Checks if a given button has just been pressed (not held down)
  */
-int input_button_pressed(input_t *in, inputbutton_t button)
+bool input_button_pressed(input_t *in, inputbutton_t button)
 {
     return in->enabled && (in->state[(int)button] && !in->oldstate[(int)button]);
 }
@@ -262,7 +262,7 @@ int input_button_pressed(input_t *in, inputbutton_t button)
  * input_button_up()
  * Checks if a given button has just been released
  */
-int input_button_up(input_t *in, inputbutton_t button)
+bool input_button_up(input_t *in, inputbutton_t button)
 {
     return in->enabled && (!in->state[(int)button] && in->oldstate[(int)button]);
 }
@@ -281,9 +281,9 @@ input_t *input_create_mouse()
     int i;
 
     in->update = inputmouse_update;
-    in->enabled = TRUE;
+    in->enabled = true;
     for(i=0; i<IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = FALSE;
+        in->state[i] = in->oldstate[i] = false;
 
     me->dx = me->dy = me->x = me->y = 0;
 
@@ -306,9 +306,9 @@ input_t *input_create_computer()
     int i;
 
     in->update = inputcomputer_update;
-    in->enabled = TRUE;
+    in->enabled = true;
     for(i=0; i<IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = FALSE;
+        in->state[i] = in->oldstate[i] = false;
 
     input_register(in);
     return in;
@@ -325,20 +325,20 @@ input_t *input_create_user(const char* inputmap_name)
     int i;
 
     in->update = inputuserdefined_update;
-    in->enabled = TRUE;
+    in->enabled = true;
     for(i=0; i<IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = FALSE;
+        in->state[i] = in->oldstate[i] = false;
 
     /* if there isn't such a inputmap_name, the game will exit beautifully */
     inputmap_name = inputmap_name ? inputmap_name : DEFAULT_INPUTMAP_NAME;
     me->inputmap = inputmap_get(inputmap_name);
 
     /* check joystick stuff */
-    if(me->inputmap->joystick.enabled && (!input_joystick_available() || me->inputmap->joystick.id >= input_number_of_plugged_joysticks())) {
+    if(me->inputmap->joystick.enabled && (!input_is_joystick_available() || me->inputmap->joystick.id >= input_number_of_plugged_joysticks())) {
         logfile_message(
             "WARNING: inputmap '%s' accepts a joystick (id: %d, plugged joysticks: %d), but %s.",
             inputmap_name, me->inputmap->joystick.id, input_number_of_plugged_joysticks(),
-            (input_joystick_available() ? "the joystick id is invalid" : "the user isn't using a joystick")
+            (input_is_joystick_available() ? "the joystick id is invalid" : "the user isn't using a joystick")
         );
     }
 
@@ -364,7 +364,7 @@ void input_destroy(input_t *in)
  */
 void input_ignore(input_t *in)
 {
-    in->enabled = FALSE;
+    in->enabled = false;
 }
 
 
@@ -374,17 +374,16 @@ void input_ignore(input_t *in)
  */
 void input_restore(input_t *in)
 {
-    in->enabled = TRUE;
+    in->enabled = true;
 }
 
 
 
 /*
  * input_is_ignored()
- * Returns TRUE if the input is ignored,
- * or FALSE otherwise
+ * Checks if the input device is ignored
  */
-int input_is_ignored(input_t *in)
+bool input_is_ignored(input_t *in)
 {
     return !in->enabled;
 }
@@ -399,7 +398,7 @@ int input_is_ignored(input_t *in)
 void input_clear(input_t *in)
 {
     for(int i = 0; i < IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = FALSE;
+        in->state[i] = in->oldstate[i] = false;
 }
 
 
@@ -410,7 +409,7 @@ void input_clear(input_t *in)
  */
 void input_simulate_button_down(input_t *in, inputbutton_t button)
 {
-    in->state[(int)button] = TRUE;
+    in->state[(int)button] = true;
 }
 
 
@@ -421,16 +420,16 @@ void input_simulate_button_down(input_t *in, inputbutton_t button)
  */
 void input_simulate_button_up(input_t *in, inputbutton_t button)
 {
-    in->state[(int)button] = FALSE;
+    in->state[(int)button] = false;
 }
 
 
 
 /*
- * input_joystick_available()
+ * input_is_joystick_available()
  * Is a joystick available?
  */
-int input_joystick_available()
+bool input_is_joystick_available()
 {
     return got_joystick && !ignore_joystick;
 }
@@ -440,7 +439,7 @@ int input_joystick_available()
  * input_ignore_joystick()
  * Ignores the input received from a joystick (if available)
  */
-void input_ignore_joystick(int ignore)
+void input_ignore_joystick(bool ignore)
 {
     ignore_joystick = ignore;
 }
@@ -450,7 +449,7 @@ void input_ignore_joystick(int ignore)
  * input_is_joystick_ignored()
  * Is the joystick input ignored?
  */
-int input_is_joystick_ignored()
+bool input_is_joystick_ignored()
 {
     return ignore_joystick;
 }
@@ -554,16 +553,16 @@ void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
 }
 
 /* check if all joysticks have at least 2 axis and 4 buttons */
-int are_all_joysticks_valid()
+bool are_all_joysticks_valid()
 {
     int i;
 
     for(i=0; i<num_joysticks; i++) {
         if( !(joy[i].num_sticks > 0 && joy[i].stick[0].num_axis >= 2 && joy[i].num_buttons >= 4) )
-            return FALSE;
+            return false;
     }
 
-    return TRUE;
+    return true;
 }
 #endif
 
@@ -581,16 +580,16 @@ void inputmouse_update(input_t* in)
 
     in->state[IB_UP] = (mouse->dz > 0);
     in->state[IB_DOWN] = (mouse->dz < 0);
-    in->state[IB_LEFT] = FALSE;
-    in->state[IB_RIGHT] = FALSE;
+    in->state[IB_LEFT] = false;
+    in->state[IB_RIGHT] = false;
     in->state[IB_FIRE1] = (a5_mouse.b & 1);
     in->state[IB_FIRE2] = (a5_mouse.b & 2);
     in->state[IB_FIRE3] = (a5_mouse.b & 4);
-    in->state[IB_FIRE4] = FALSE;
-    in->state[IB_FIRE5] = FALSE;
-    in->state[IB_FIRE6] = FALSE;
-    in->state[IB_FIRE7] = FALSE;
-    in->state[IB_FIRE8] = FALSE;
+    in->state[IB_FIRE4] = false;
+    in->state[IB_FIRE5] = false;
+    in->state[IB_FIRE6] = false;
+    in->state[IB_FIRE7] = false;
+    in->state[IB_FIRE8] = false;
 #else
     inputmouse_t *me = (inputmouse_t*)in;
 
@@ -599,16 +598,16 @@ void inputmouse_update(input_t* in)
     me->y = mouse_y;
     in->state[IB_UP] = (me->dz < 0);
     in->state[IB_DOWN] = (me->dz > 0);
-    in->state[IB_LEFT] = FALSE;
-    in->state[IB_RIGHT] = FALSE;
+    in->state[IB_LEFT] = false;
+    in->state[IB_RIGHT] = false;
     in->state[IB_FIRE1] = (mouse_b & 1);
     in->state[IB_FIRE2] = (mouse_b & 2);
     in->state[IB_FIRE3] = (mouse_b & 4);
-    in->state[IB_FIRE4] = FALSE;
-    in->state[IB_FIRE5] = FALSE;
-    in->state[IB_FIRE6] = FALSE;
-    in->state[IB_FIRE7] = FALSE;
-    in->state[IB_FIRE8] = FALSE;
+    in->state[IB_FIRE4] = false;
+    in->state[IB_FIRE5] = false;
+    in->state[IB_FIRE6] = false;
+    in->state[IB_FIRE7] = false;
+    in->state[IB_FIRE8] = false;
 #endif
 }
 
@@ -625,11 +624,11 @@ void inputuserdefined_update(input_t* in)
     extern bool a5_key[]; int i;
 
     for(i = 0; i < IB_MAX; i++)
-        in->state[i] = FALSE;
+        in->state[i] = false;
 
     if(im->keyboard.enabled) {
         for(i=0; i<IB_MAX; i++)
-            in->state[i] |= (im->keyboard.scancode[i] > 0) ? a5_key[ im->keyboard.scancode[i] ] : FALSE;
+            in->state[i] |= (im->keyboard.scancode[i] > 0) && a5_key[im->keyboard.scancode[i]];
     }
 #else
     inputuserdefined_t *me = (inputuserdefined_t*)in;
@@ -637,27 +636,27 @@ void inputuserdefined_update(input_t* in)
     int i, k;
 
     for(i=0; i<IB_MAX; i++)
-        in->state[i] = FALSE;
+        in->state[i] = false;
 
     if(im->keyboard.enabled) {
         for(i=0; i<IB_MAX; i++)
-            in->state[i] |= (im->keyboard.scancode[i] > 0) ? key[ im->keyboard.scancode[i] ] : FALSE;
+            in->state[i] |= (im->keyboard.scancode[i] > 0) && key[ im->keyboard.scancode[i] ];
     }
 
-    if(input_joystick_available() && im->joystick.enabled && im->joystick.id < input_number_of_plugged_joysticks()) {
+    if(input_is_joystick_available() && im->joystick.enabled && im->joystick.id < input_number_of_plugged_joysticks()) {
         k = im->joystick.id;
         in->state[IB_UP] |= joy[k].stick[0].axis[1].d1;
         in->state[IB_DOWN] |= joy[k].stick[0].axis[1].d2;
         in->state[IB_LEFT] |= joy[k].stick[0].axis[0].d1;
         in->state[IB_RIGHT] |= joy[k].stick[0].axis[0].d2;
-        in->state[IB_FIRE1] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE1]) ? joy[k].button[ im->joystick.button[IB_FIRE1] ].b : FALSE;
-        in->state[IB_FIRE2] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE2]) ? joy[k].button[ im->joystick.button[IB_FIRE2] ].b : FALSE;
-        in->state[IB_FIRE3] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE3]) ? joy[k].button[ im->joystick.button[IB_FIRE3] ].b : FALSE;
-        in->state[IB_FIRE4] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE4]) ? joy[k].button[ im->joystick.button[IB_FIRE4] ].b : FALSE;
-        in->state[IB_FIRE5] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE5]) ? joy[k].button[ im->joystick.button[IB_FIRE5] ].b : FALSE;
-        in->state[IB_FIRE6] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE6]) ? joy[k].button[ im->joystick.button[IB_FIRE6] ].b : FALSE;
-        in->state[IB_FIRE7] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE7]) ? joy[k].button[ im->joystick.button[IB_FIRE7] ].b : FALSE;
-        in->state[IB_FIRE8] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE8]) ? joy[k].button[ im->joystick.button[IB_FIRE8] ].b : FALSE;
+        in->state[IB_FIRE1] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE1]) ? joy[k].button[ im->joystick.button[IB_FIRE1] ].b : false;
+        in->state[IB_FIRE2] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE2]) ? joy[k].button[ im->joystick.button[IB_FIRE2] ].b : false;
+        in->state[IB_FIRE3] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE3]) ? joy[k].button[ im->joystick.button[IB_FIRE3] ].b : false;
+        in->state[IB_FIRE4] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE4]) ? joy[k].button[ im->joystick.button[IB_FIRE4] ].b : false;
+        in->state[IB_FIRE5] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE5]) ? joy[k].button[ im->joystick.button[IB_FIRE5] ].b : false;
+        in->state[IB_FIRE6] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE6]) ? joy[k].button[ im->joystick.button[IB_FIRE6] ].b : false;
+        in->state[IB_FIRE7] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE7]) ? joy[k].button[ im->joystick.button[IB_FIRE7] ].b : false;
+        in->state[IB_FIRE8] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE8]) ? joy[k].button[ im->joystick.button[IB_FIRE8] ].b : false;
     }
 #endif
 }
