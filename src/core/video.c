@@ -640,16 +640,6 @@ int video_fps()
 
 
 /*
- * video_fps()
- * Get FPS rate
- */
-int video_fps()
-{
-    return fps_rate;
-}
-
-
-/*
  * video_display_loading_screen()
  * Displays a loading screen
  */
