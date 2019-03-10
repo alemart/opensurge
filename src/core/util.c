@@ -155,7 +155,7 @@ void fatal_error(const char *fmt, ...)
 #if defined(A5BUILD)
     al_show_native_message_box(al_get_current_display(),
         "Fatal error",
-        "An error has been encountered:",
+        "An error has been encountered",
         buf,
     NULL, ALLEGRO_MESSAGEBOX_ERROR);
 #else
