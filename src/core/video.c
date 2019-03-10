@@ -420,14 +420,6 @@ void video_render()
         frame_count = 0;
     }
 
-    /* compute fps rate */
-    ++frame_count;
-    if((now = timer_get_ticks()) >= fps_timer + 1000) {
-        fps_timer = now;
-        fps_rate = frame_count;
-        frame_count = 0;
-    }
-
     /* fps counter */
     if(video_is_fps_visible())
         textprintf_right_ex(IMAGE2BITMAP(video_get_backbuffer()), font, VIDEO_SCREEN_W, 0, makecol(255,255,255), makecol(0,0,0),"FPS:%3d", fps_rate);
