@@ -67,7 +67,7 @@ static void smooth3x_blit(image_t *src, image_t *dest);
 static void smooth4x_blit(image_t *src, image_t *dest);
 static void window_switch_in();
 static void window_switch_out();
-static int window_active = TRUE;
+static bool window_active = true;
 static void draw_to_screen(image_t *img);
 static void setup_color_depth(int bpp);
 
@@ -80,9 +80,9 @@ static void setup_color_depth(int bpp);
 /* video manager */
 static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
 static videoresolution_t video_resolution = VIDEORESOLUTION_1X;
-static int video_fullscreen = FALSE;
-static int video_showfps = FALSE;
-static int video_smooth = FALSE;
+static bool video_fullscreen = false;
+static bool video_showfps = false;
+static bool video_smooth = false;
 static int fps_rate = 0;
 
 /* Video Message */
@@ -106,7 +106,7 @@ static videomsg_t* videomsg = NULL;
  * video_init()
  * Initializes the video manager
  */
-void video_init(videoresolution_t resolution, int smooth, int fullscreen, int bpp)
+void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int bpp)
 {
 #if defined(A5BUILD)
     logfile_message("Initializing the video...");
@@ -143,7 +143,7 @@ void video_init(videoresolution_t resolution, int smooth, int fullscreen, int bp
     set_window_title(GAME_TITLE " " GAME_VERSION_STRING);
 
     /* window callbacks */
-    window_active = TRUE;
+    window_active = true;
     if(set_display_switch_mode(SWITCH_BACKGROUND) == 0) {
         if(set_display_switch_callback(SWITCH_IN, window_switch_in) != 0)
             logfile_message("can't set_display_switch_callback(SWTICH_IN, window_switch_in)");
@@ -163,7 +163,7 @@ void video_init(videoresolution_t resolution, int smooth, int fullscreen, int bp
  * video_changemode()
  * Sets up the game window
  */
-void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
+void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen)
 {
 #if defined(A5BUILD)
     extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
@@ -172,8 +172,8 @@ void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
     /* Change the video mode */
     logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
     video_resolution = resolution;
-    video_fullscreen = FALSE; /* TODO */
-    video_smooth = FALSE; /* not supported yet */
+    video_fullscreen = false; /* TODO */
+    video_smooth = false; /* not supported yet */
     if(video_resolution != VIDEORESOLUTION_EDT)
         window_size = video_get_window_size();
 
@@ -225,11 +225,11 @@ void video_changemode(videoresolution_t resolution, int smooth, int fullscreen)
     if(video_smooth) {
         if(video_get_color_depth() != 32) {
             logfile_message("smooth graphics can only be enabled when using 32 bits per pixel (currently, we're using %d bpp)", video_get_color_depth());
-            video_smooth = FALSE;
+            video_smooth = false;
         }
         else if(video_resolution == VIDEORESOLUTION_1X || video_resolution == VIDEORESOLUTION_EDT) {
             logfile_message("can't enable smooth graphics using resolution %d", (int)video_resolution);
-            video_smooth = FALSE;
+            video_smooth = false;
         }
         else {
             logfile_message("initializing hqx...");
@@ -281,7 +281,7 @@ videoresolution_t video_get_resolution()
  * video_is_smooth()
  * Smooth graphics?
  */
-int video_is_smooth()
+bool video_is_smooth()
 {
     return video_smooth;
 }
@@ -291,7 +291,7 @@ int video_is_smooth()
  * video_is_fullscreen()
  * Fullscreen mode?
  */
-int video_is_fullscreen()
+bool video_is_fullscreen()
 {
     return video_fullscreen;
 }
@@ -585,10 +585,9 @@ int video_get_preferred_color_depth()
 
 /*
  * video_is_window_active()
- * Returns TRUE if the game window is active,
- * or FALSE otherwise
+ * Checks if the game window is active
  */
-int video_is_window_active()
+bool video_is_window_active()
 {
 #if defined(A5BUILD)
     extern bool a5_display_active;
@@ -604,7 +603,7 @@ int video_is_window_active()
  * video_show_fps()
  * Shows/hides the FPS counter
  */
-void video_show_fps(int show)
+void video_show_fps(bool show)
 {
     video_showfps = show;
 }
@@ -614,7 +613,7 @@ void video_show_fps(int show)
  * video_is_fps_visible()
  * Is the FPS counter visible?
  */
-int video_is_fps_visible()
+bool video_is_fps_visible()
 {
     return video_showfps;
 }
@@ -756,14 +755,14 @@ void draw_to_screen(image_t *img)
 /* this window is active */
 void window_switch_in()
 {
-    window_active = TRUE;
+    window_active = true;
 }
 
 
 /* this window is not active */
 void window_switch_out()
 {
-    window_active = FALSE;
+    window_active = false;
 }
 
 /* setups the color depth */

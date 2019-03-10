@@ -21,6 +21,7 @@
 #ifndef _VIDEO_H
 #define _VIDEO_H
 
+#include <stdbool.h>
 #include "v2d.h"
 #include "color.h"
 
@@ -36,16 +37,16 @@ typedef enum videoresolution_t {
 } videoresolution_t;
 
 /* video manager */
-void video_init(videoresolution_t resolution, int smooth, int fullscreen, int bpp);
+void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int bpp);
 void video_release();
 void video_render();
 int video_get_preferred_color_depth();
 int video_get_color_depth();
-int video_is_window_active();
-void video_changemode(videoresolution_t resolution, int smooth, int fullscreen);
+bool video_is_window_active();
+void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen);
 videoresolution_t video_get_resolution();
-int video_is_smooth();
-int video_is_fullscreen();
+bool video_is_smooth();
+bool video_is_fullscreen();
 v2d_t video_get_screen_size(); /* usually, 426x240 */
 v2d_t video_get_window_size(); /* the real size of the window, in pixels */
 const struct image_t* video_get_window_surface();
@@ -56,8 +57,8 @@ const struct image_t* video_get_window_surface();
 struct image_t *video_get_backbuffer();
 
 /* FPS counter (frames per second) */
-void video_show_fps(int show);
-int video_is_fps_visible();
+void video_show_fps(bool show);
+bool video_is_fps_visible();
 int video_fps(); /* get FPS rate */
 
 /* video message */
