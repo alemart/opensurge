@@ -42,7 +42,7 @@ struct input_t {
 /* <derived class>: mouse input */
 struct inputmouse_t {
     input_t base;
-    int x, y, z; /* cursor position */
+    int x, y; /* cursor position */
     int dx, dy, dz; /* delta-x, delta-y, delta-z (mouse mickeys) */
 };
 static void inputmouse_update(input_t* in);
@@ -75,10 +75,12 @@ static int ignore_joystick;
 static int plugged_joysticks;
 
 /* private methods */
-static int are_all_joysticks_valid();
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
+#if !defined(A5BUILD)
 static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
+static int are_all_joysticks_valid();
+#endif
 
 
 
@@ -150,12 +152,17 @@ void input_init()
 void input_update()
 {
 #if defined(A5BUILD)
+    extern int a5_mouse_dz;
+
     /* updating the input objects */
     for(input_list_t* it = inlist; it; it = it->next) {
         for(int i = 0; i < IB_MAX; i++)
             it->data->oldstate[i] = it->data->state[i];
         it->data->update(it->data);
     }
+
+    /* mouse wheel event fix */
+    a5_mouse_dz = 0;
 #else
     int i;
     static int old_f6 = 0;
@@ -519,13 +526,10 @@ void input_unregister(input_t *in)
     }
 }
 
-
+#if !defined(A5BUILD)
 /* get mouse mickeys (mouse wheel included) */
 void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
 {
-#if defined(A5BUILD)
-    *mickey_x = *mickey_y = *mickey_z = 0;
-#else
     get_mouse_mickeys(mickey_x, mickey_y);
     if(mickey_z != NULL) {
         static int mz, first = TRUE;
@@ -533,15 +537,11 @@ void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
         *mickey_z = mz - mouse_z;
         mz = mouse_z;
     }
-#endif
 }
 
 /* check if all joysticks have at least 2 axis and 4 buttons */
 int are_all_joysticks_valid()
 {
-#if defined(A5BUILD)
-    return TRUE;
-#else
     int i;
 
     for(i=0; i<num_joysticks; i++) {
@@ -550,27 +550,30 @@ int are_all_joysticks_valid()
     }
 
     return TRUE;
-#endif
 }
+#endif
 
 /* update specific input devices */
 void inputmouse_update(input_t* in)
 {
 #if defined(A5BUILD)
-    inputmouse_t *me = (inputmouse_t*)in;
-    const int mouse_x = 0, mouse_y = 0, mouse_z = 0, mouse_b = 0; /* FIXME */
+    inputmouse_t *mouse = (inputmouse_t*)in;
+    extern int a5_mouse_x, a5_mouse_y, a5_mouse_b;
+    extern int a5_mouse_dx, a5_mouse_dy, a5_mouse_dz;
 
-    get_mouse_mickeys_ex(&me->dx, &me->dy, &me->dz);
-    me->x = mouse_x;
-    me->y = mouse_y;
-    me->z = mouse_z;
-    in->state[IB_UP] = (me->dz < 0);
-    in->state[IB_DOWN] = (me->dz > 0);
+    mouse->x = a5_mouse_x;
+    mouse->y = a5_mouse_y;
+    mouse->dx = a5_mouse_dx;
+    mouse->dy = a5_mouse_dy;
+    mouse->dz = a5_mouse_dz;
+
+    in->state[IB_UP] = (mouse->dz > 0);
+    in->state[IB_DOWN] = (mouse->dz < 0);
     in->state[IB_LEFT] = FALSE;
     in->state[IB_RIGHT] = FALSE;
-    in->state[IB_FIRE1] = (mouse_b & 1);
-    in->state[IB_FIRE2] = (mouse_b & 2);
-    in->state[IB_FIRE3] = (mouse_b & 4);
+    in->state[IB_FIRE1] = (a5_mouse_b & 1);
+    in->state[IB_FIRE2] = (a5_mouse_b & 2);
+    in->state[IB_FIRE3] = (a5_mouse_b & 4);
     in->state[IB_FIRE4] = FALSE;
     in->state[IB_FIRE5] = FALSE;
     in->state[IB_FIRE6] = FALSE;
@@ -582,7 +585,6 @@ void inputmouse_update(input_t* in)
     get_mouse_mickeys_ex(&me->dx, &me->dy, &me->dz);
     me->x = mouse_x;
     me->y = mouse_y;
-    me->z = mouse_z;
     in->state[IB_UP] = (me->dz < 0);
     in->state[IB_DOWN] = (me->dz > 0);
     in->state[IB_LEFT] = FALSE;
@@ -607,10 +609,16 @@ void inputuserdefined_update(input_t* in)
 {
 #if defined(A5BUILD)
     inputuserdefined_t *me = (inputuserdefined_t*)in;
+    const inputmap_t *im = me->inputmap;
+    extern bool a5_key[]; int i;
 
-    for(int i = 0; i < IB_MAX; i++)
+    for(i = 0; i < IB_MAX; i++)
         in->state[i] = FALSE;
-    in->state[IB_RIGHT]=1;
+
+    if(im->keyboard.enabled) {
+        for(i=0; i<IB_MAX; i++)
+            in->state[i] |= (im->keyboard.scancode[i] > 0) ? a5_key[ im->keyboard.scancode[i] ] : FALSE;
+    }
 #else
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;

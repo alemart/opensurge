@@ -100,7 +100,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
-                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n"
+                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n",
                 COPYRIGHT, GAME_WEBSITE,
                 program
             );

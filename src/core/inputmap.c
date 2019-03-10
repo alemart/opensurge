@@ -122,7 +122,7 @@ static int joybtncode_of(const char* joybtn_name);
     K(ALLEGRO_KEY_F10, "KEY_F10") \
     K(ALLEGRO_KEY_F11, "KEY_F11") \
     K(ALLEGRO_KEY_F12, "KEY_F12") \
-    K(ALLEGRO_KEY_ESCAPE, "KEY_ESCAPE") \
+    K(ALLEGRO_KEY_ESCAPE, "KEY_ESCAPE", "KEY_ESC") \
     K(ALLEGRO_KEY_TILDE, "KEY_TILDE") \
     K(ALLEGRO_KEY_MINUS, "KEY_MINUS") \
     K(ALLEGRO_KEY_EQUALS, "KEY_EQUALS") \

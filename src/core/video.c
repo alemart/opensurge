@@ -595,7 +595,8 @@ int video_get_preferred_color_depth()
 int video_is_window_active()
 {
 #if defined(A5BUILD)
-    return TRUE; /* FIXME */
+    extern bool a5_display_active;
+    return a5_display_active;
 #else
     return window_active;
 #endif

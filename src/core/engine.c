@@ -69,6 +69,16 @@
 #include "../scenes/quest.h"
 #include "../scenes/level.h"
 
+#if defined(A5BUILD)
+/* minimum Allegro version */
+#define AL_MIN_MAJOR       5
+#define AL_MIN_MINOR       2
+#define AL_MIN_REVISION    0
+#if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
+#error "This build requires a newer version of Allegro"
+#endif
+#endif
+
 /* private stuff ;) */
 static void clean_garbage();
 static void init_basic_stuff(const commandline_t* cmd);
@@ -88,17 +98,11 @@ static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 
 #if defined(A5BUILD)
+/* public variables */
 ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
-static ALLEGRO_TIMER* timer = NULL;
-
-/* minimum Allegro version */
-#define AL_MIN_MAJOR       5
-#define AL_MIN_MINOR       2
-#define AL_MIN_REVISION    0
-#if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
-#error "This build requires a newer version of Allegro"
-#endif
-
+bool a5_key[ALLEGRO_KEY_MAX] = { false };
+int a5_mouse_b = 0, a5_mouse_x = 0, a5_mouse_y = 0, a5_mouse_dx = 0, a5_mouse_dy = 0, a5_mouse_dz = 0;
+bool a5_display_active = true;
 #endif
 
 
@@ -123,15 +127,22 @@ void engine_init(int argc, char **argv)
 
 /*
  * engine_mainloop()
- * A classic main loop
+ * Game loop
  */
 void engine_mainloop()
 {
 #if defined(A5BUILD)
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
     scene_t *current_scene = NULL;
     bool redraw = false;
 
+    /* configure the timer */
+    if(!timer)
+        fatal_error("Can't create Allegro timer");
+    al_register_event_source(a5_event_queue, al_get_timer_event_source(timer));
     al_start_timer(timer);
+
+    /* main loop */
     while(!game_is_over() && !scenestack_empty()) {
         ALLEGRO_EVENT event;
         al_wait_for_event(a5_event_queue, &event);
@@ -157,6 +168,39 @@ void engine_mainloop()
                     al_drop_next_event(a5_event_queue);
                 break;
             }
+
+            case ALLEGRO_EVENT_KEY_DOWN:
+                a5_key[event.keyboard.keycode] = true;
+                break;
+
+            case ALLEGRO_EVENT_KEY_UP:
+                a5_key[event.keyboard.keycode] = false;
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_AXES:
+                a5_mouse_x = event.mouse.x;
+                a5_mouse_y = event.mouse.y;
+                a5_mouse_dx = event.mouse.dx;
+                a5_mouse_dy = event.mouse.dy;
+                a5_mouse_dz = event.mouse.dz;
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                a5_mouse_b |= 1 << (event.mouse.button - 1);
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                a5_mouse_b &= ~(1 << (event.mouse.button - 1));
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+                a5_display_active = true;
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+                a5_display_active = false;
+                break;
+
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 game_quit();
                 break;
@@ -164,7 +208,7 @@ void engine_mainloop()
 
         /* render */
         if(redraw && al_is_event_queue_empty(a5_event_queue)) {
-            if(current_scene && current_scene == scenestack_top())
+            if(current_scene == scenestack_top())
                 current_scene->render(); /* render after update */
             screenshot_update();
             fadefx_update();
@@ -172,6 +216,9 @@ void engine_mainloop()
             redraw = false;
         }
     }
+
+    /* done */
+    al_destroy_timer(timer);
 #else
     scene_t *scn;
 
@@ -256,16 +303,14 @@ void init_basic_stuff(const commandline_t* cmd)
     if(NULL == (a5_event_queue = al_create_event_queue()))
         fatal_error("Can't create Allegro's event queue");
 
-    if(NULL == (timer = al_create_timer(1.0 / 60.0)))
-        fatal_error("Can't create Allegro timer");
-    al_register_event_source(a5_event_queue, al_get_timer_event_source(timer));
-
     /* --- */
     if(!al_install_keyboard())
         fatal_error("Can't initialize the keyboard");
+    al_register_event_source(a5_event_queue, al_get_keyboard_event_source());
 
     if(!al_install_mouse())
         fatal_error("Can't initialize the mouse");
+    al_register_event_source(a5_event_queue, al_get_mouse_event_source());
 
     if(!al_init_image_addon())
         fatal_error("Can't initialize Allegro's image addon");
@@ -454,7 +499,6 @@ void release_basic_stuff()
     assetfs_release();
 #if defined(A5BUILD)
     /* Release Allegro */
-    al_destroy_timer(timer);
     al_destroy_event_queue(a5_event_queue);
     a5_event_queue = NULL;
 #else
