@@ -28,7 +28,7 @@ You can play Open Surge with the keyboard or with a joystick.
 | Equals (=)    | Take snapshot    |
 | F12           | Open the editor  |
 
-You may change the controls by hacking file *config/input.def*
+You can change the controls by hacking file *config/input.def*
 
 ## Advanced users
 
