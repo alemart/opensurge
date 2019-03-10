@@ -289,9 +289,9 @@ void stageselect_render()
     for(i=0; i<stage_count; i++) {
         if(i/STAGE_MAXPERPAGE == option/STAGE_MAXPERPAGE) {
             if(stage_data[i]->act > 0 && !enable_debug)
-                font_set_text(stage_label[i], (option==i) ? "<color=$COLOR_MENUSELECTEDOPTION>%s - %s %d</color>" : "%s - %s %d", stage_data[i]->name, lang_get("STAGESELECT_ACT"), stage_data[i]->act);
+                font_set_text(stage_label[i], (option==i) ? "<color=$COLOR_HIGHLIGHT>%s - %s %d</color>" : "%s - %s %d", stage_data[i]->name, lang_get("STAGESELECT_ACT"), stage_data[i]->act);
             else
-                font_set_text(stage_label[i], (option==i) ? "<color=$COLOR_MENUSELECTEDOPTION>%s</color>" : "%s", stage_data[i]->name);
+                font_set_text(stage_label[i], (option==i) ? "<color=$COLOR_HIGHLIGHT>%s</color>" : "%s", stage_data[i]->name);
             font_render(stage_label[i], cam);
         }
     }

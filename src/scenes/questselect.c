@@ -171,7 +171,7 @@ void questselect_update()
     last = min(option / QUEST_MAXPERPAGE + QUEST_MAXPERPAGE, quest_count) - 1;
     for(i = first; i <= last; i++) {
         if(option == i)
-            font_set_text(quest_label[i], "<color=$COLOR_MENUSELECTEDOPTION>%s</color>", quest_data[i]->name);
+            font_set_text(quest_label[i], "<color=$COLOR_HIGHLIGHT>%s</color>", quest_data[i]->name);
         else
             font_set_text(quest_label[i], "%s", quest_data[i]->name);
     }

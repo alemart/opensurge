@@ -85,7 +85,7 @@ void confirmbox_init(void *text_and_options)
         optionfnt[i][0] = font_create("dialogbox");
         optionfnt[i][1] = font_create("dialogbox");
         font_set_text(optionfnt[i][0], "%s", option[i]);
-        font_set_text(optionfnt[i][1], "<color=$COLOR_MENUSELECTEDOPTION>%s</color>", option[i]);
+        font_set_text(optionfnt[i][1], "<color=$COLOR_HIGHLIGHT>%s</color>", option[i]);
     }
 
     current_option = 0;
