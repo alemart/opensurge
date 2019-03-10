@@ -190,6 +190,7 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
             fatal_error("Failed to create a %dx%d display", (int)window_size.x, (int)window_size.y);
         al_register_event_source(a5_event_queue, al_get_display_event_source(display));
         al_set_window_title(display, GAME_TITLE " " GAME_VERSION_STRING " [A5]");
+        al_hide_mouse_cursor(display);
     }
     else {
         if(!al_resize_display(display, window_size.x, window_size.y))
