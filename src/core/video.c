@@ -34,6 +34,8 @@
 #if defined(A5BUILD)
 
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 
 #define IMAGE2BITMAP(img) (*((ALLEGRO_BITMAP**)(img)))
@@ -46,8 +48,7 @@
 static ALLEGRO_DISPLAY* display = NULL;
 static image_t* backbuffer = NULL;
 static ALLEGRO_FONT* font = NULL;
-
-static void setup_color_depth(int bpp);
+static int suggested_bpp = 32;
 
 #else
 
@@ -109,7 +110,21 @@ void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int 
 {
 #if defined(A5BUILD)
     logfile_message("Initializing the video...");
-    setup_color_depth(bpp);
+
+    /* initializing Allegro */
+    if(!al_init_image_addon())
+        fatal_error("Can't initialize Allegro's image addon");
+
+    if(!al_init_primitives_addon())
+        fatal_error("Can't initialize Allegro's primitives addon");
+
+    if(!al_init_font_addon()) /* we need this here; see 'font' below */
+        fatal_error("Can't initialize Allegro's font addon");
+
+    /* setup color depth */
+    if(!(bpp == 16 || bpp == 24 || bpp == 32))
+        fatal_error("Invalid color depth: %d. Valid modes are: 16, 24, 32.", bpp);
+    suggested_bpp = bpp;
 
     /* video init */
     display = NULL;
@@ -181,6 +196,7 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
         al_set_new_display_flags(ALLEGRO_OPENGL);
         al_set_new_display_flags(ALLEGRO_PROGRAMMABLE_PIPELINE);
         al_set_new_display_flags(video_fullscreen ? ALLEGRO_FULLSCREEN_WINDOW : ALLEGRO_WINDOWED);
+        al_set_new_display_option(ALLEGRO_COLOR_SIZE, suggested_bpp, ALLEGRO_SUGGEST);
         if(window_size.x >= window_size.y)
             al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_SUGGEST);
         else
@@ -645,18 +661,7 @@ void video_display_loading_screen()
 
 
 /* private stuff */
-#if defined(A5BUILD)
-
-/* configure the color depth: this must be set before creating the display */
-void setup_color_depth(int bpp)
-{
-    if(!(bpp == 16 || bpp == 24 || bpp == 32))
-        fatal_error("Invalid color depth: %d. Valid modes are: 16, 24, 32.", bpp);
-
-    al_set_new_display_option(ALLEGRO_COLOR_SIZE, bpp, ALLEGRO_SUGGEST);
-}
-
-#else
+#if !defined(A5BUILD)
 
 /* fast2x_blit resizes the src image by a
  * factor of 2. It assumes that:
