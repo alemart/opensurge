@@ -202,11 +202,16 @@ void font_init(bool allow_font_smoothing)
 #if defined(A5BUILD)
     parsetree_program_t *fonts = NULL;
 
-    allow_antialias = allow_font_smoothing; /* this comes first */
-    logfile_message("Loading fonts...");
+    /* initializing Allegro's TTF addon */
+    if(!al_init_ttf_addon())
+        fatal_error("Can't initialize Allegro's TTF addon");
+
+    /* basic initialization */
+    allow_antialias = allow_font_smoothing;
     fontdrv_list_init();
 
     /* reading the parse tree */
+    logfile_message("Loading fonts...");
     assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
     nanoparser_traverse_program(fonts, traverse);
     logfile_message("All fonts have been loaded.");

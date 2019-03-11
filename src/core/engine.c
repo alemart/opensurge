@@ -307,9 +307,6 @@ void init_basic_stuff(const commandline_t* cmd)
 
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");
-
-    if(!al_init_ttf_addon())
-        fatal_error("Can't initialize Allegro's TTF addon");
 #else
     set_uformat(U_UTF8);
     allegro_init();
