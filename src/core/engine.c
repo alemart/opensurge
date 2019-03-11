@@ -320,20 +320,7 @@ void init_basic_stuff(const commandline_t* cmd)
     if(!al_init_ttf_addon())
         fatal_error("Can't initialize Allegro's TTF addon");
 
-    if(!al_install_audio())
-        fatal_error("Can't initialize Allegro's audio addon");
 
-    if(!al_init_acodec_addon())
-        fatal_error("Can't initialize Allegro's acodec addon");
-
-    for(int samples = 8; samples > 0; samples /= 2) {
-        if(al_reserve_samples(samples)) {
-            logfile_message("Reserved %d samples", samples);
-            break;
-        }
-        else
-            logfile_message("Can't reserve %d samples", samples);
-    }
 #else
     set_uformat(U_UTF8);
     allegro_init();

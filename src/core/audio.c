@@ -28,34 +28,19 @@
 #include "util.h"
 
 #if defined(A5BUILD)
+
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-#elif !defined(__USE_OPENAL__)
-#include <allegro.h>
-#include <logg.h>
-#else
-#include <allegro.h>
-#include <AL/alure.h> /* PulseAudio isn't Allegro-friendly */
-#endif
 
-/* private definitions */
-#define IS_WAV(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".wav") == 0)
-#define IS_OGG(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".ogg") == 0)
-#define IS_VALID_FORMAT(path)       (IS_OGG(path) || IS_WAV(path))
-#define SOUND_INVALID_VOICE         -1
-#define PREFERRED_NUMBER_OF_VOICES  16
-
-/* private stuff */
-#if defined(A5BUILD)
-
-/* TODO */
+/* music structure */
 struct music_t {
     ALLEGRO_AUDIO_STREAM* stream;
     bool is_paused;
     char* filepath; /* relative path */
 };
 
+/* sound structure */
 struct sound_t {
     ALLEGRO_SAMPLE* sample;
     ALLEGRO_SAMPLE_ID id;
@@ -65,7 +50,24 @@ struct sound_t {
     char* filepath; /* relative path */
 };
 
+/* private stuff */
+static const int PREFERRED_NUMBER_OF_SAMPLES = 8; /* how many samples can be played at the same time */
+static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
+
 #elif !defined(__USE_OPENAL__)
+
+#include <allegro.h>
+#include <logg.h>
+
+/* private definitions */
+#define IS_WAV(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".wav") == 0)
+#define IS_OGG(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".ogg") == 0)
+#define IS_VALID_FORMAT(path)       (IS_OGG(path) || IS_WAV(path))
+#define SOUND_INVALID_VOICE         -1
+#define PREFERRED_NUMBER_OF_VOICES  16
+#define MUSIC_DURATION(m)           ((float)(m->stream->len) / (float)(m->stream->freq))
+
+/* music structure */
 struct music_t {
     LOGG_Stream *stream;
     int is_paused;
@@ -73,6 +75,7 @@ struct music_t {
     char *filepath; /* relative */
 };
 
+/* sound structure */
 struct sound_t {
     SAMPLE *data;
     int voice_id;
@@ -80,8 +83,23 @@ struct sound_t {
     char *filepath; /* relative */
 };
 
-#define MUSIC_DURATION(m)           ((float)(m->stream->len) / (float)(m->stream->freq))
+/* private stuff */
+static music_t *current_music; /* music being played at the moment (NULL if none) */
+
 #else
+
+#include <allegro.h>
+#include <AL/alure.h> /* PulseAudio isn't Allegro-friendly */
+
+/* private definitions */
+#define IS_WAV(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".wav") == 0)
+#define IS_OGG(path)                (strchr((path), '.') && str_icmp(strrchr((path), '.'), ".ogg") == 0)
+#define IS_VALID_FORMAT(path)       (IS_OGG(path) || IS_WAV(path))
+#define SOUND_INVALID_VOICE         -1
+#define PREFERRED_NUMBER_OF_VOICES  16
+#define NUM_BUFS 3
+
+/* music structure */
 struct music_t {
     alureStream *stream;
     volatile int is_paused;
@@ -89,6 +107,7 @@ struct music_t {
     char *filepath; /* relative */
 };
 
+/* sound structure */
 struct sound_t {
     ALuint buf; /* sound buffer */
     volatile ALuint *src; /* points to an element of src[] */
@@ -96,6 +115,9 @@ struct sound_t {
     volatile float vol, pan, freq;
     char *filepath; /* relative */
 };
+
+/* private stuff */
+static music_t *current_music; /* music being played at the moment (NULL if none) */
 
 static int quiet;
 
@@ -111,12 +133,7 @@ static int sbuf_count; /* length of sbuf[] */
 static void eos_callback(void *userdata, ALuint source);
 static void eom_callback(void *userdata, ALuint source);
 
-#define NUM_BUFS 3
 #endif
-
-
-/* private stuff*/
-static music_t *current_music; /* music being played at the moment (NULL if none) */
 
 
 /*
@@ -1160,10 +1177,25 @@ void sound_set_volume(sound_t *sample, float volume)
 #if defined(A5BUILD)
 void audio_init()
 {
-    logfile_message("audio_init(): using Allegro 5 backend for audio playback...");
+    int samples;
+
+    logfile_message("Initializing the audio...");
     current_music = NULL;
 
-    /* TODO */
+    if(!al_install_audio())
+        fatal_error("Can't initialize Allegro's audio addon");
+
+    if(!al_init_acodec_addon())
+        fatal_error("Can't initialize Allegro's acodec addon");
+
+    for(samples = PREFERRED_NUMBER_OF_SAMPLES; samples > 0; samples /= 2) {
+        if(al_reserve_samples(samples)) {
+            logfile_message("Reserved %d samples", samples);
+            break;
+        }
+        else
+            logfile_message("Can't reserve %d samples", samples);
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void audio_init()
