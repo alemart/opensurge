@@ -114,7 +114,7 @@ object "CreateMenuText" is "private", "entity"
     fun constructor()
     {
         transform.position = Vector2(7, 55);
-        text.maxWidth = Screen.width - 14;
+        text.maxWidth = Screen.width - 28;
         text.text = "$CREATEMENU_TEXT";
         shadow.maxWidth = text.maxWidth;
         shadow.text = "<color=000000>$CREATEMENU_TEXT</color>";

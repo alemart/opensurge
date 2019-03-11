@@ -53,8 +53,8 @@ SET(HELP "You might get some luck by tweaking CMake options with ccmake | cmake-
 SET(DEFS "") # #define'd stuff
 
 # User options
-OPTION(USE_A5 "Use the Allegro 5 backend (WIP)" ON)
-OPTION(USE_STATIC "Use static libs whenever possible" ON)
+OPTION(USE_A5 "Use the Allegro 5 backend" ON)
+OPTION(USE_STATIC "Use static libs whenever possible (Allegro 4 only)" ON)
 OPTION(USE_OPENAL "Use OpenAL for audio playback (Allegro 4 only)" OFF)
 SET(PATH_ALLEGRO_LIB "${CMAKE_SYSTEM_LIBRARY_PATH}" CACHE PATH "Where to look for the Allegro library & its dependencies")
 SET(PATH_SURGESCRIPT_LIB "${CMAKE_SYSTEM_LIBRARY_PATH}" CACHE PATH "Where to look for libsurgescript")
@@ -80,12 +80,11 @@ IF(USE_A5)
   SET(DEFS ${DEFS} "A5BUILD")
   MESSAGE(STATUS "Building using the Allegro 5 backend...")
 ELSE()
-  SET(DEFS ${DEFS} "A4BUILD")
   MESSAGE(STATUS "Building using the legacy Allegro 4 backend...")
 ENDIF()
 
 # prefer static libs
-IF(USE_STATIC)
+IF(NOT USE_A5 AND USE_STATIC)
   IF(WIN32)
     SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
   ELSE()
@@ -108,25 +107,23 @@ IF(USE_A5)
     allegro_acodec
     allegro_audio
     allegro_dialog
-    allegro_main
   )
 
-  # Use static libs
-  IF(USE_STATIC)
-    SET(A5_LIBS "${REQUIRED_A5_LIBS}")
-    SET(REQUIRED_A5_LIBS "")
-    FOREACH(A5_LIB ${A5_LIBS})
-      LIST(APPEND REQUIRED_A5_LIBS "${A5_LIB}-static")
-    ENDFOREACH()
+  IF(APPLE)
+    LIST(APPEND REQUIRED_A5_LIBS allegro_main)
+  ENDIF()
+
+  IF(WIN32)
+    SET(REQUIRED_A5_LIBS allegro_monolith)
   ENDIF()
 
   # Write to LALLEGRO5
   SET(LALLEGRO5 "")
   FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
     STRING(TOUPPER "L${A5_LIB}" _A5_LIB)
-    FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATH "${PATH_ALLEGRO_LIB}")
+    FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATHS ${PATH_ALLEGRO_LIB})
     IF(NOT ${_A5_LIB})
-      MESSAGE(FATAL_ERROR "Can't find Allegro 5 lib (${A5_LIB}). ${HELP}")
+      MESSAGE(FATAL_ERROR "Can't find Allegro 5 lib (lib${A5_LIB}). ${HELP}")
     ELSE()
       MESSAGE(STATUS "Found ${A5_LIB} at ${${_A5_LIB}}...")
       SET(LALLEGRO5 "${LALLEGRO5}" "${${_A5_LIB}}")
@@ -136,7 +133,7 @@ IF(USE_A5)
 ELSE()
   
   # Allegro 4: liballeg
-  FIND_LIBRARY(LALLEG NAMES alleg PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LALLEG NAMES alleg PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LALLEG)
     MESSAGE(FATAL_ERROR "Fatal error: couldn't find the Allegro game programming library (liballeg)! ${HELP}")
   ELSE(NOT LALLEG)
@@ -153,39 +150,39 @@ ELSE()
   ENDIF(NOT LALLEG)
 
   # loadpng: libloadpng, libpng and zlib
-  FIND_LIBRARY(LLOADPNG NAMES loadpng PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LLOADPNG NAMES loadpng PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LLOADPNG)
     MESSAGE(FATAL_ERROR "Fatal error: libloadpng not found! ${HELP}")
   ENDIF(NOT LLOADPNG)
 
-  FIND_LIBRARY(LPNG NAMES png PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LPNG NAMES png PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LPNG)
     MESSAGE(FATAL_ERROR "Fatal error: libpng not found! ${HELP}")
   ENDIF(NOT LPNG)
 
-  FIND_LIBRARY(LZ NAMES z PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LZ NAMES z PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LZ)
     MESSAGE(FATAL_ERROR "Fatal error: zlib not found! ${HELP}")
   ENDIF(NOT LZ)
 
   # JPGalleg: libjpgalleg
-  FIND_LIBRARY(LJPGALLEG NAMES jpgalleg PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LJPGALLEG NAMES jpgalleg PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LJPGALLEG)
     MESSAGE(FATAL_ERROR "Fatal error: libjpgalleg not found! ${HELP}")
   ENDIF(NOT LJPGALLEG)
 
   # Ogg/Vorbis: libogg, libvorbis, libvorbisfile
-  FIND_LIBRARY(LOGG NAMES ogg PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LOGG NAMES ogg PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LOGG)
     MESSAGE(FATAL_ERROR "Fatal error: libogg not found! ${HELP}")
   ENDIF(NOT LOGG)
 
-  FIND_LIBRARY(LVORBIS NAMES vorbis PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LVORBIS NAMES vorbis PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LVORBIS)
     MESSAGE(FATAL_ERROR "Fatal error: libvorbis not found! ${HELP}")
   ENDIF(NOT LVORBIS)
 
-  FIND_LIBRARY(LVORBISFILE NAMES vorbisfile PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LVORBISFILE NAMES vorbisfile PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LVORBISFILE)
     MESSAGE(FATAL_ERROR "Fatal error: libvorbisfile not found! ${HELP}")
   ENDIF(NOT LVORBISFILE)
@@ -193,7 +190,7 @@ ELSE()
   # LOGG: liblogg
   IF(NOT USE_OPENAL)
     MESSAGE(STATUS "Building using Allegro for audio playback...")
-    FIND_LIBRARY(LLOGG NAMES logg PATH "${PATH_ALLEGRO_LIB}")
+    FIND_LIBRARY(LLOGG NAMES logg PATHS ${PATH_ALLEGRO_LIB})
     IF(NOT LLOGG)
       MESSAGE(FATAL_ERROR "Fatal error: liblogg not found! ${HELP}")
     ENDIF(NOT LLOGG)
@@ -203,25 +200,25 @@ ELSE()
   # OpenAL & ALURE
   IF(USE_OPENAL)
     MESSAGE(STATUS "Building using OpenAL for audio playback...")
-    FIND_LIBRARY(LOPENAL NAMES openal OpenAL OpenAL32 al PATH "${PATH_ALLEGRO_LIB}")
+    FIND_LIBRARY(LOPENAL NAMES openal OpenAL OpenAL32 al PATHS ${PATH_ALLEGRO_LIB})
     IF(NOT LOPENAL)
       MESSAGE(FATAL_ERROR "Fatal error: can't find OpenAL! ${HELP}")
     ENDIF(NOT LOPENAL)
-    FIND_LIBRARY(LALURE NAMES alure-static ALURE32-static PATH "${PATH_ALLEGRO_LIB}") # try the static version first
+    FIND_LIBRARY(LALURE NAMES alure-static ALURE32-static PATHS ${PATH_ALLEGRO_LIB}) # try the static version first
     IF(NOT LALURE)
-      FIND_LIBRARY(LALURE NAMES alure PATH "${PATH_ALLEGRO_LIB}")
+      FIND_LIBRARY(LALURE NAMES alure PATHS ${PATH_ALLEGRO_LIB})
       IF(NOT LALURE)
         MESSAGE(FATAL_ERROR "Fatal error: can't find ALURE! ${HELP}")
       ENDIF(NOT LALURE)
     ENDIF(NOT LALURE)
 
     IF(UNIX)
-      FIND_LIBRARY(LPTHREAD NAMES pthread PATH "${PATH_ALLEGRO_LIB}")
+      FIND_LIBRARY(LPTHREAD NAMES pthread PATHS ${PATH_ALLEGRO_LIB})
       IF(NOT LPTHREAD)
         MESSAGE(FATAL_ERROR "Fatal error: can't find libpthread! ${HELP}")
       ENDIF(NOT LPTHREAD)
       IF(NOT ${CMAKE_SYSTEM_NAME} MATCHES ".*BSD|DragonFly.*")
-        FIND_LIBRARY(LDL NAMES dl PATH "${PATH_ALLEGRO_LIB}")
+        FIND_LIBRARY(LDL NAMES dl PATHS ${PATH_ALLEGRO_LIB})
         IF(NOT LDL)
           MESSAGE(FATAL_ERROR "Fatal error: can't find libdl! ${HELP}")
         ENDIF(NOT LDL)
@@ -236,7 +233,7 @@ ELSE()
   ENDIF(USE_OPENAL)
 
   # Alfont: libalfont
-  FIND_LIBRARY(LALFONT NAMES alfont PATH "${PATH_ALLEGRO_LIB}")
+  FIND_LIBRARY(LALFONT NAMES alfont PATHS ${PATH_ALLEGRO_LIB})
   IF(NOT LALFONT)
     MESSAGE(FATAL_ERROR "Fatal error: modified alfont not found! ${HELP}")
   ENDIF(NOT LALFONT)
@@ -244,9 +241,11 @@ ELSE()
 ENDIF()
 
 # SurgeScript: libsurgescript
-FIND_LIBRARY(LSURGESCRIPT NAMES surgescript PATH "${PATH_SURGESCRIPT_LIB}")
+FIND_LIBRARY(LSURGESCRIPT NAMES surgescript PATHS ${PATH_SURGESCRIPT_LIB})
 IF(NOT LSURGESCRIPT)
   MESSAGE(FATAL_ERROR "Fatal error: can't find libsurgescript! ${HELP}")
+ELSE()
+  MESSAGE(STATUS "Found surgescript at ${LSURGESCRIPT}...")
 ENDIF()
 
 # setup preprocessor #define's
@@ -538,11 +537,11 @@ IF(USE_A5)
         SET(CMAKE_RC_COMPILER windres)
       ENDIF(NOT CMAKE_RC_COMPILER)
       ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
+      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5} -static-libgcc -static-libstdc++)
       TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${PATH_SURGESCRIPT_INC} ${PATH_ALLEGRO_INC})
       SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall -O2")
       EXECUTE_PROCESS(COMMAND ${CMAKE_RC_COMPILER} -O coff -o "${CMAKE_CURRENT_BINARY_DIR}/iconwin.res" -i "${CMAKE_SOURCE_DIR}/src/misc/iconwin.rc" -I "${CMAKE_SOURCE_DIR}")
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS "-static-libgcc \"${CMAKE_CURRENT_BINARY_DIR}/iconwin.res\"")
+      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS -static-libgcc -static-libstdc++ "${CMAKE_CURRENT_BINARY_DIR}/iconwin.res")
     ELSEIF(MSVC)
       ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS} ${GAME_HEADERS})
       TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LSURGESCRIPT} ${LALLEGRO5})

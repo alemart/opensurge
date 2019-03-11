@@ -60,7 +60,7 @@ CREATEMENU_TITLE            "CREATE"
 CREATEMENU_PLAY             "PLAY DEMO"
 CREATEMENU_LEARN            "LEARN"
 CREATEMENU_BACK             "BACK"
-CREATEMENU_TEXT             "Open Surge lets you create your own games with ease and power! Unleash your creativity! Let your creative juices flow!\n\nReady to become a creator? Build your own levels, items, bosses, characters and more! Get a taste of the level editor, learn the game engine and dive into SurgeScript for maximum power!"
+CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nReady to become a creator? Build your own levels, items, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
 
 // note: when translating CREATEMENU_TEXT, please make sure the text fits inside the screen!
 
