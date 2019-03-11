@@ -91,7 +91,7 @@ void timer_update()
 {
 #if defined(A5BUILD)
     static const float minimum_delta = 0.016f;
-    static const float maximum_delta = 0.033f;
+    static const float maximum_delta = 0.018f;
     static double old_time = 0.0;
 
     /* compute delta time */
