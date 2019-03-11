@@ -20,12 +20,6 @@
 
 #if defined(A5BUILD)
 #include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_native_dialog.h>
 #else
 #include <allegro.h>
@@ -295,15 +289,6 @@ void init_basic_stuff(const commandline_t* cmd)
 
     if(NULL == (a5_event_queue = al_create_event_queue()))
         fatal_error("Can't create Allegro's event queue");
-
-    /* --- */
-    if(!al_install_keyboard())
-        fatal_error("Can't initialize the keyboard");
-    al_register_event_source(a5_event_queue, al_get_keyboard_event_source());
-
-    if(!al_install_mouse())
-        fatal_error("Can't initialize the mouse");
-    al_register_event_source(a5_event_queue, al_get_mouse_event_source());
 
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");

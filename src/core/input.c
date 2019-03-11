@@ -97,7 +97,17 @@ static bool are_all_joysticks_valid();
 void input_init()
 {
 #if defined(A5BUILD)
-    logfile_message("input_init()");
+    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
+    logfile_message("Initializing the input system...");
+
+    /* initializing Allegro */
+    if(!al_install_keyboard())
+        fatal_error("Can't initialize the keyboard");
+    al_register_event_source(a5_event_queue, al_get_keyboard_event_source());
+
+    if(!al_install_mouse())
+        fatal_error("Can't initialize the mouse");
+    al_register_event_source(a5_event_queue, al_get_mouse_event_source());
 
     /* initializing the input list */
     inlist = NULL;
