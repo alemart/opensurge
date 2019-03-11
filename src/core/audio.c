@@ -60,6 +60,8 @@ struct sound_t {
     ALLEGRO_SAMPLE* sample;
     ALLEGRO_SAMPLE_ID id;
     bool valid_id;
+    float duration;
+    float end_time;
     char* filepath; /* relative path */
 };
 
@@ -405,6 +407,7 @@ void music_stop()
     if(current_music != NULL) {
         al_set_audio_stream_playing(current_music->stream, false);
         al_rewind_audio_stream(current_music->stream);
+        current_music->is_paused = false; /* it's stopped, not paused */
     }
 
     current_music = NULL;
@@ -678,15 +681,24 @@ sound_t *sound_load(const char *path)
     sound_t *s;
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
+        ALLEGRO_SAMPLE_INSTANCE* spl;
         const char* fullpath = assetfs_fullpath(path);
         logfile_message("Loading sound \"%s\"...", fullpath);
 
         /* build the sound object */
         s = mallocx(sizeof *s);
+        s->duration = 0.0f;
+        s->end_time = 0.0f;
         s->valid_id = false;
         s->filepath = str_dup(path);
         if(NULL == (s->sample = al_load_sample(fullpath)))
             fatal_error("Can't load sound \"%s\"", path);
+
+        /* compute its duration */
+        if(NULL != (spl = al_create_sample_instance(s->sample))) {
+            s->duration = al_get_sample_instance_time(spl);
+            al_destroy_sample_instance(spl);
+        }
 
         /* adding it to the resource manager */
         resourcemanager_add_sample(path, s);
@@ -865,7 +877,6 @@ void sound_destroy(sound_t *sample)
 void sound_play(sound_t *sample)
 {
     sound_play_ex(sample, 1.0f, 0.0f, 1.0f);
-
 }
 #elif !defined(__USE_OPENAL__)
 void sound_play(sound_t *sample)
@@ -898,10 +909,14 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
         freq = max(freq, 0.0f);
 
         /* play the sample */
-        if(al_play_sample(sample->sample, 1.0f, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id))
+        if(al_play_sample(sample->sample, 1.0f, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id)) {
+            sample->end_time = (0.001f * timer_get_ticks()) + sample->duration; /* when does it end? */
             sample->valid_id = true;
-        else
+        }
+        else {
+            sample->end_time = 0.0f;
             sample->valid_id = false;
+        }
     }
 }
 #elif !defined(__USE_OPENAL__)
@@ -1005,6 +1020,13 @@ void sound_stop(sound_t *sample)
 #if defined(A5BUILD)
 bool sound_is_playing(sound_t *sample)
 {
+    if(sample != NULL)
+        return (0.001f * timer_get_ticks()) < sample->end_time;
+    else
+        return false;
+
+#if 0
+    /* Unstable API (Allegro 5.2.3) */
     if(sample != NULL) {
         if(sample->valid_id) {
             ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
@@ -1019,6 +1041,7 @@ bool sound_is_playing(sound_t *sample)
     }
 
     return false;
+#endif
 }
 #elif !defined(__USE_OPENAL__)
 bool sound_is_playing(sound_t *sample)
@@ -1050,7 +1073,7 @@ float sound_get_volume(sound_t *sample)
     return 1.0f;
 
 #if 0
-    /* Unstable API */
+    /* Unstable API (Allegro 5.2.3) */
     if(sample != NULL) {
         if(sample->valid_id) {
             ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
@@ -1095,7 +1118,7 @@ void sound_set_volume(sound_t *sample, float volume)
     /* not yet implemented */
 
 #if 0
-    /* Unstable API */
+    /* Unstable API (Allegro 5.2.3) */
     if(sample != NULL) {
         if(sample->valid_id) {
             ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
