@@ -148,14 +148,14 @@ void starbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_set_invincible(player, TRUE);
-    music_play(music_load("musics/invincible.ogg"), FALSE);
+    music_play(music_load("musics/invincible.ogg"), false);
 }
 
 void speedbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_set_ultrafast(player, TRUE);
-    music_play(music_load("musics/speed.ogg"), FALSE);
+    music_play(music_load("musics/speed.ogg"), false);
 }
 
 void glassesbox_strategy(item_t *item, player_t *player)

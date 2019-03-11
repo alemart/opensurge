@@ -744,7 +744,7 @@ audiostrategy_t* playlevelmusicstrategy_new()
 void playlevelmusicstrategy_update(audiostrategy_t *s)
 {
     if(level_music() != NULL)
-        music_play(level_music(), TRUE);
+        music_play(level_music(), true);
 }
 
 void playlevelmusicstrategy_release(audiostrategy_t *s)

@@ -51,6 +51,8 @@
 
 /* TODO */
 struct music_t {
+    ALLEGRO_AUDIO_STREAM* stream;
+    bool is_paused;
     char* filepath; /* relative path */
 };
 
@@ -129,21 +131,23 @@ music_t *music_load(const char *path)
 
     if(NULL == (m = resourcemanager_find_music(path))) {
         const char* fullpath = assetfs_fullpath(path);
-        logfile_message("music_load('%s')", fullpath);
+        logfile_message("Loading music \"%s\"...", fullpath);
 
         /* build the music object */
         m = mallocx(sizeof *m);
+        m->is_paused = false;
         m->filepath = str_dup(path);
-
-        /* load the audio stream */
-        /* TOOD */
+        if(NULL == (m->stream = al_load_audio_stream(fullpath, 4, 1024)))
+            fatal_error("Can't load music \"%s\"", path);
+        
+        /* configure the audio stream */
+        al_attach_audio_stream_to_mixer(m->stream, al_get_default_mixer());
+        al_set_audio_stream_playmode(m->stream, ALLEGRO_PLAYMODE_LOOP);
+        al_set_audio_stream_playing(m->stream, false);
 
         /* adding it to the resource manager */
         resourcemanager_add_music(path, m);
         resourcemanager_ref_music(path);
-
-        /* done! */
-        logfile_message("music_load() ok");
     }
     else
         resourcemanager_ref_music(path);
@@ -286,10 +290,12 @@ int music_unref(music_t *music)
 void music_destroy(music_t *music)
 {
     if(music != NULL) {
-        if(music == current_music)
+        if(music == current_music) {
             music_stop();
+            current_music = NULL;
+        }
 
-        /* TODO: free music stream */
+        al_destroy_audio_stream(music->stream);
         free(music->filepath);
         free(music);
     }
@@ -327,19 +333,22 @@ void music_destroy(music_t *music)
  * Set loop to TRUE to make it loop continuously.
  */
 #if defined(A5BUILD)
-void music_play(music_t *music, int loop)
+void music_play(music_t *music, bool loop)
 {
     music_stop();
 
     if(music != NULL) {
-        /* TODO */
+        ALLEGRO_PLAYMODE mode = loop ? ALLEGRO_PLAYMODE_LOOP : ALLEGRO_PLAYMODE_ONCE;
+        al_set_audio_stream_playmode(music->stream, mode);
+        al_set_audio_stream_playing(music->stream, true);
+        music->is_paused = false;
     }
 
     current_music = music;
     music_set_volume(1.0f);
 }
 #elif !defined(__USE_OPENAL__)
-void music_play(music_t *music, int loop)
+void music_play(music_t *music, bool loop)
 {
     music_stop();
 
@@ -353,7 +362,7 @@ void music_play(music_t *music, int loop)
     music_set_volume(1.0f);
 }
 #else
-void music_play(music_t *music, int loop)
+void music_play(music_t *music, bool loop)
 {
     music_stop();
 
@@ -393,8 +402,10 @@ void eom_callback(void *userdata, ALuint source)
 #if defined(A5BUILD)
 void music_stop()
 {
-    if(current_music != NULL)
-        ; /* TODO */
+    if(current_music != NULL) {
+        al_set_audio_stream_playing(current_music->stream, false);
+        al_rewind_audio_stream(current_music->stream);
+    }
 
     current_music = NULL;
 }
@@ -428,7 +439,10 @@ void music_stop()
 #if defined(A5BUILD)
 void music_pause()
 {
-    ;
+    if(current_music != NULL && !(current_music->is_paused)) {
+        al_set_audio_stream_playing(current_music->stream, false);
+        current_music->is_paused = true;
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void music_pause()
@@ -457,7 +471,10 @@ void music_pause()
 #if defined(A5BUILD)
 void music_resume()
 {
-    ;
+    if(current_music != NULL && current_music->is_paused) {
+        al_set_audio_stream_playing(current_music->stream, true);
+        current_music->is_paused = false;
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void music_resume()
@@ -481,15 +498,14 @@ void music_resume()
 /*
  * music_set_volume()
  * Changes the volume of the current music.
- * 0.0f (quiet) <= volume <= 1.0f (loud)
- * default = 1.0f
+ * zero means silence; 1.0 means default volume
  */
 #if defined(A5BUILD)
 void music_set_volume(float volume)
 {
     if(current_music != NULL) {
-        volume = clip(volume, 0.0f, 1.0f);
-        /* TODO */
+        float gain = max(volume, 0.0f);
+        al_set_audio_stream_gain(current_music->stream, gain);
     }
 }
 #elif !defined(__USE_OPENAL__)
@@ -515,13 +531,12 @@ void music_set_volume(float volume)
 /*
  * music_get_volume()
  * Returns the volume of the current music.
- * 0.0f <= volume <= 1.0f
  */
 #if defined(A5BUILD)
 float music_get_volume()
 {
     if(current_music != NULL)
-        return 1.0f; /* TODO */
+        return al_get_audio_stream_gain(current_music->stream);
     else
         return 0.0f;
 }
@@ -550,21 +565,20 @@ float music_get_volume()
 
 /*
  * music_is_playing()
- * Returns TRUE if a music is playing, FALSE
- * otherwise.
+ * Checks if a music is playing
  */
 #if defined(A5BUILD)
-int music_is_playing()
+bool music_is_playing()
 {
-    return 0;
+    return (current_music != NULL) && al_get_audio_stream_playing(current_music->stream);
 }
 #elif !defined(__USE_OPENAL__)
-int music_is_playing()
+bool music_is_playing()
 {
     return (current_music != NULL) && !(current_music->is_paused);
 }
 #else
-int music_is_playing()
+bool music_is_playing()
 {
     return (current_music != NULL) && !(current_music->is_paused) && (current_music->is_playing);
 }
@@ -573,16 +587,22 @@ int music_is_playing()
 
 /*
  * music_duration()
- * Music duration, in seconds (it's an approximation, in reality)
+ * Music duration, in seconds
  */
 #if defined(A5BUILD)
 float music_duration()
 {
+    if(current_music != NULL) {
+        /* this may be zero if the length is unknown */
+        return al_get_audio_stream_length_secs(current_music->stream);
+    }
+
     return 0.0f;
 }
 #elif !defined(__USE_OPENAL__)
 float music_duration()
 {
+    /* returns an approximation */
     return current_music ? MUSIC_DURATION(current_music) : 0.0f;
 }
 #else
@@ -633,12 +653,12 @@ const char *music_path(const music_t *music)
  * Checks if the currently playing music is paused
  */
 #if defined(A5BUILD)
-int music_is_paused()
+bool music_is_paused()
 {
-    return 1;
+    return (current_music != NULL) && (current_music->is_paused);
 }
 #else
-int music_is_paused()
+bool music_is_paused()
 {
     return (current_music != NULL) && (current_music->is_paused);
 }
@@ -997,6 +1017,8 @@ bool sound_is_playing(sound_t *sample)
                 return false;
         }
     }
+
+    return false;
 }
 #elif !defined(__USE_OPENAL__)
 bool sound_is_playing(sound_t *sample)
@@ -1024,6 +1046,11 @@ bool sound_is_playing(sound_t *sample)
 #if defined(A5BUILD)
 float sound_get_volume(sound_t *sample)
 {
+    /* TODO */
+    return 1.0f;
+
+#if 0
+    /* Unstable API */
     if(sample != NULL) {
         if(sample->valid_id) {
             ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
@@ -1036,6 +1063,9 @@ float sound_get_volume(sound_t *sample)
                 return false;
         }
     }
+
+    return false;
+#endif
 }
 #elif !defined(__USE_OPENAL__)
 float sound_get_volume(sound_t *sample)
@@ -1061,6 +1091,11 @@ float sound_get_volume(sound_t *sample)
 #if defined(A5BUILD)
 void sound_set_volume(sound_t *sample, float volume)
 {
+    /* TODO */
+    /* not yet implemented */
+
+#if 0
+    /* Unstable API */
     if(sample != NULL) {
         if(sample->valid_id) {
             ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
@@ -1070,6 +1105,7 @@ void sound_set_volume(sound_t *sample, float volume)
             }
         }
     }
+#endif
 }
 #elif !defined(__USE_OPENAL__)
 void sound_set_volume(sound_t *sample, float volume)
@@ -1219,7 +1255,13 @@ void audio_release()
 #if defined(A5BUILD)
 void audio_update()
 {
-    ;
+    /* when the music finishes, set current_music to NULL */
+    if(current_music != NULL && !(current_music->is_paused)) {
+        if(!music_is_playing()) {
+            al_rewind_audio_stream(current_music->stream);
+            current_music = NULL;
+        }
+    }
 }
 #elif !defined(__USE_OPENAL__)
 void audio_update()

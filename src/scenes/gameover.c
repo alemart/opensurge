@@ -61,7 +61,7 @@ void gameover_init(void *foo)
     gameover_buf = image_clone(video_get_backbuffer());
 
     music = music_load(GAMEOVER_MUSICFILE);
-    music_play(music, FALSE);
+    music_play(music, false);
 }
 
 

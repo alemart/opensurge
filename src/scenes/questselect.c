@@ -191,7 +191,7 @@ void questselect_update()
 
     /* music */
     if(!music_is_playing() && state != QUESTSTATE_PLAY)
-        music_play(music, TRUE);
+        music_play(music, true);
 
     /* finite state machine */
     switch(state) {

@@ -35,16 +35,16 @@ void audio_release();
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */
 void music_destroy(music_t *music); /* you don't usually need to bother with this. */
-void music_play(music_t *music, int loop); /* plays a music. Set loop to TRUE to make it loop continuously. */
+void music_play(music_t *music, bool loop); /* plays a music. Set loop to TRUE to make it loop continuously. */
 void music_stop();
 void music_pause();
 void music_resume();
 void music_set_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
 float music_get_volume();
-int music_is_playing();
-int music_is_paused();
+bool music_is_playing();
+bool music_is_paused();
 int music_unref(music_t *music); /* returns the number of active references */
-float music_duration(); /* in seconds */
+float music_duration(); /* duration in seconds */
 music_t *music_current(); /* currently playing music. May be NULL */
 const char *music_path(const music_t *music); /* the filepath of the specified music */
 

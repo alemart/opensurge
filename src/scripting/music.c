@@ -135,7 +135,7 @@ surgescript_var_t* fun_play(surgescript_object_t* object, const surgescript_var_
         if(music_current() == music && music_is_paused())
             music_resume(music);
         else
-            music_play(music, FALSE);
+            music_play(music, false);
         music_set_volume(volume);
     }
 
