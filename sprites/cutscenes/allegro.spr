@@ -1,9 +1,9 @@
 // Allegro logo
 // script by Alexandre
-sprite SD_ALLEGRO
+sprite "SD_ALLEGRO"
 {
-    source_file     images/allegro.png
-    source_rect     0 0 16320 105
+    source_file     "images/allegro.png"
+    source_rect     0 0 1920 945
     frame_size      320 105
     hot_spot        160 52
 
