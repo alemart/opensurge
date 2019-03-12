@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * langselect.c - language selection screen
- * Copyright (C) 2009-2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2009-2010, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 #include "langselect.h"
@@ -51,7 +52,7 @@ typedef struct {
     char filepath[1024];
 } lngdata_t;
 
-static int quit;
+static bool quit;
 static int lngcount;
 static font_t *title[2], **lngfnt[2], *page_label, *author_label;
 static lngdata_t *lngdata;
@@ -61,7 +62,8 @@ static input_t *input;
 static float scene_time;
 static bgtheme_t *bgtheme;
 static music_t *music;
-static int before_the_intro_screen;
+static bool fresh_install;
+static bool came_from_options;
 
 /* private functions */
 static void save_preferences(const char *filepath);
@@ -82,14 +84,15 @@ static int sort_cmp(const void *a, const void *b);
  * langselect_init()
  * Initializes the scene
  */
-void langselect_init(void *foo)
+void langselect_init(void *param)
 {
     prefs_t* prefs = modmanager_prefs();
 
     option = 0;
-    quit = FALSE;
+    quit = false;
     scene_time = 0;
-    before_the_intro_screen = !prefs_has_item(prefs, ".langpath");
+    fresh_install = !prefs_has_item(prefs, ".langpath");
+    came_from_options = (param != NULL) && *((bool*)param);
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
 
@@ -109,7 +112,9 @@ void langselect_init(void *foo)
     actor_change_animation(arrow, sprite_get_animation("SD_GUIARROW", 0));
 
     load_lang_list();
-    if(before_the_intro_screen && lngcount <= 1) {
+    if(lngcount <= 1) {
+        if(came_from_options)
+            video_showmessage("No translations are available!");
         scenestack_pop();
         return;
     }
@@ -171,11 +176,11 @@ void langselect_update()
             lang_loadfile(filepath);
             save_preferences(filepath);
             sound_play(SFX_CONFIRM);
-            quit = TRUE;
+            quit = true;
         }
         if(input_button_pressed(input, IB_FIRE4)) {
             sound_play(SFX_BACK);
-            quit = TRUE;
+            quit = true;
         }
     }
 
@@ -196,7 +201,7 @@ void langselect_update()
     font_set_position(author_label, pos);
 
     /* music */
-    if(!music_is_playing() && !before_the_intro_screen)
+    if(!music_is_playing() && !fresh_install)
         music_play(music, true);
 
     /* quit */

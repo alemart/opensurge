@@ -19,6 +19,7 @@
  */
 
 #include <math.h>
+#include <stdbool.h>
 #include "options.h"
 #include "util/grouptree.h"
 #include "../core/scene.h"
@@ -44,14 +45,14 @@
 
 /* private data */
 #define OPTIONS_BGFILE                  "themes/menus/options.bg"
-static int quit, fadein;
+static bool quit, fadein;
 static font_t *title;
 static actor_t *icon;
 static input_t *input;
 static scene_t *jump_to;
 static float scene_time;
 static bgtheme_t *bgtheme;
-static int stageselect_enable_debug;
+static bool stageselect_enable_debug;
 static music_t* music;
 static const int OFFSET_X = 60;
 
@@ -78,14 +79,14 @@ void options_init(void *foo)
 {
     option = 0;
     option_count = 0;
-    quit = FALSE;
+    quit = false;
     scene_time = 0;
     input = input_create_user(NULL);
     jump_to = NULL;
-    fadein = TRUE;
+    fadein = true;
     music = music_load(OPTIONS_MUSICFILE);
 
-    stageselect_enable_debug = FALSE;
+    stageselect_enable_debug = false;
 
     title = font_create("menu.title");
     font_set_text(title, "%s", "$OPTIONS_TITLE");
@@ -135,7 +136,7 @@ void options_update()
     /* fade in */
     if(fadein) {
         fadefx_in(color_rgb(0,0,0), 1.0);
-        fadein = FALSE;
+        fadein = false;
     }
 
     /* background movement */
@@ -158,7 +159,7 @@ void options_update()
         /* go back... */
         if(input_button_pressed(input, IB_FIRE4)) {
             sound_play(SFX_BACK);
-            quit = TRUE;
+            quit = true;
         }
     }
 
@@ -190,13 +191,15 @@ void options_update()
 
             if(jump_to == storyboard_get_scene(SCENE_STAGESELECT)) {
                 scenestack_push(jump_to, &stageselect_enable_debug);
-                stageselect_enable_debug = FALSE;
+                stageselect_enable_debug = false;
             }
-            else
-                scenestack_push(jump_to, NULL);
+            else {
+                bool from_options_screen = true;
+                scenestack_push(jump_to, &from_options_screen);
+            }
 
             jump_to = NULL;
-            fadein = TRUE;
+            fadein = true;
             return;
         }
         fadefx_out(color_rgb(0,0,0), 1.0);
@@ -414,13 +417,13 @@ static void group_fullscreen_update(group_t *g)
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_fullscreen()) {
                     sound_play(SFX_CONFIRM);
-                    video_changemode(video_get_resolution(), video_is_smooth(), FALSE);
+                    video_changemode(video_get_resolution(), video_is_smooth(), false);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_fullscreen()) {
                     sound_play(SFX_CONFIRM);
-                    video_changemode(video_get_resolution(), video_is_smooth(), TRUE);
+                    video_changemode(video_get_resolution(), video_is_smooth(), true);
                 }
             }
         }
@@ -490,13 +493,13 @@ static void group_smooth_update(group_t *g)
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_smooth()) {
                     sound_play(SFX_CONFIRM);
-                    video_changemode(resolution, FALSE, video_is_fullscreen());
+                    video_changemode(resolution, false, video_is_fullscreen());
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_smooth()) {
                     sound_play(SFX_CONFIRM);
-                    video_changemode(resolution, TRUE, video_is_fullscreen());
+                    video_changemode(resolution, true, video_is_fullscreen());
                 }
             }
         }
@@ -568,13 +571,13 @@ static void group_fps_update(group_t *g)
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_fps_visible()) {
                     sound_play(SFX_CONFIRM);
-                    video_show_fps(FALSE);
+                    video_show_fps(false);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_fps_visible()) {
                     sound_play(SFX_CONFIRM);
-                    video_show_fps(TRUE);
+                    video_show_fps(true);
                 }
             }
         }
@@ -891,7 +894,7 @@ static void group_stageselect_update(group_t *g)
                 if(cnt >= 0 && ++cnt == 3) {
                     sound_play(SFX_SECRET);
                     scn = SCENE_STAGESELECT;
-                    stageselect_enable_debug = TRUE;
+                    stageselect_enable_debug = true;
                     cnt = -1;
                 }
             }
@@ -947,7 +950,7 @@ static void group_back_update(group_t *g)
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                 sound_play(SFX_CONFIRM);
-                quit = TRUE;
+                quit = true;
             }
         }
     }

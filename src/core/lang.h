@@ -21,8 +21,6 @@
 #ifndef _LANG_H
 #define _LANG_H
 
-#define DEFAULT_LANGUAGE_FILEPATH           "languages/english.lng"
-
 /* public functions */
 void lang_init();
 void lang_release();
@@ -31,5 +29,8 @@ void lang_loadfile(const char *filepath);
 void lang_getstring(const char *desired_key, char *str, int str_size);
 const char *lang_get(const char *desired_key);
 void lang_readcompatibility(const char *filename, int *ver, int *subver, int *wipver);
+
+/* public constants */
+extern const char* DEFAULT_LANGUAGE_FILEPATH;
 
 #endif

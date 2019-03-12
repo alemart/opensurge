@@ -28,6 +28,9 @@
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
 
+/* default language file */
+const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
+
 /* fake string type */
 typedef struct { char *data; } stringadapter_t;
 static stringadapter_t* stringadapter_create(const char *data);
