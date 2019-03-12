@@ -24,7 +24,7 @@ CMakeFiles/
 logfile.txt
 opensurge
 opensurge.exe
-preferences.dat
+surge.prefs
 *.dll
 !src/**
 screenshots/*.png
