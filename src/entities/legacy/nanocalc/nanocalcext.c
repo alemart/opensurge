@@ -98,7 +98,7 @@ static float f_date_year() { return (float)(timeinfo()->tm_year); } /* years sin
 static float f_date_wday() { return (float)(timeinfo()->tm_wday); } /* days since Sunday; range: 0-6 */
 static float f_date_yday() { return (float)(timeinfo()->tm_yday); } /* days since January 1st; range: 0-365 */
 static float f_music_duration() { return music_duration(); }
-static float f_number_of_joysticks() { return input_number_of_plugged_joysticks(); }
+static float f_number_of_joysticks() { return input_number_of_joysticks(); }
 static float f_camera_x() { return camera_get_position().x; }
 static float f_camera_y() { return camera_get_position().y; }
 static float f_waterlevel() { return (float)level_waterlevel(); }
