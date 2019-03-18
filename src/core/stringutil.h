@@ -28,7 +28,7 @@ const char* str_to_upper(const char* str); /* returns a pointer to a static vari
 const char* str_to_lower(const char* str); /* returns a pointer to a static variable */
 int str_icmp(const char* s1, const char* s2); /* case-insensitive compare function */
 char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of strcpy() */
-void str_trim(char* dest, const char* src); /* trim */
+char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */
 char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */
 const char* str_addslashes(const char* str); /* replaces " by \\", returning a static char* */
 char* str_rstr(char* haystack, const char* needle); /* reverse strstr() */

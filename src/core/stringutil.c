@@ -121,16 +121,21 @@ char* str_cpy(char* dest, const char* src, size_t dest_size)
 
 /*
  * str_trim()
- * Trim
+ * Trim string
  */
-void str_trim(char *dest, const char *src)
+char* str_trim(char* dest, const char* src, size_t dest_size)
 {
     const char *p, *q, *t;
+    char *d;
 
-    for(p=src; *p && isspace((unsigned char)*p); p++);
-    for(q=src+strlen(src)-1; q>p && isspace((unsigned char)*q); q--);
-    for(q++,t=p; t!=q; t++) *(dest++) = *t;
-    *dest = 0;
+    if(dest_size > 0) {
+        for(p = src; *p && isspace((unsigned char)*p); p++);
+        for(q = src + strlen(src) - 1; q != p && isspace((unsigned char)*q); q--);
+        for(++q, t = p, d = dest; --dest_size && t != q; ) *(d++) = *(t++);
+        *d = 0;
+    }
+
+    return dest;
 }
 
 
