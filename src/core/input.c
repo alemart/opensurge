@@ -67,26 +67,43 @@ struct input_list_t {
     input_list_t *next;
 };
 
-/* private data */
-static const char* DEFAULT_INPUTMAP_NAME = "default";
-static input_list_t *inlist;
-static bool got_joystick;
-static bool ignore_joystick;
-static bool plugged_joysticks;
-
 #if defined(A5BUILD)
+/* mouse struct */
 static struct {
     int x, y, z, dx, dy, dz, b;
 } a5_mouse = { 0 };
+
+/* joysticks */
+#define MAX_JOYS 8 /* maximum number of joysticks */
+#define MAX_AXIS 2 /* maximum number of axis */
+typedef char __joy_max[-(!(MAX_JOYS && !(MAX_JOYS & (MAX_JOYS-1))))]; /* MAX_JOYS must be a power of 2 */
+typedef char __joy_axis[-(MAX_AXIS < 2)]; /* MAX_AXIS must be at least 2 */
+static bool ignore_joystick = false;
+static struct {
+    float axis[MAX_AXIS]; /* -1.0 <= axis <= 1.0 */
+    uint32_t button; /* bit vector */
+} joy[MAX_JOYS];
+static ALLEGRO_JOYSTICK* joymap[MAX_JOYS] = { NULL };
+static int joy2id(ALLEGRO_JOYSTICK* joystick); /* convert ALLEGRO_JOYSTICK* to int */
+static inline void clear_joymap();
+#else
+/* joysticks */
+static bool got_joystick;
+static bool ignore_joystick;
+static bool plugged_joysticks;
+static bool are_all_joysticks_valid();
+
+/* misc */
+static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
 #endif
+
+/* private data */
+static const char* DEFAULT_INPUTMAP_NAME = "default";
+static input_list_t *inlist;
 
 /* private methods */
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
-#if !defined(A5BUILD)
-static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
-static bool are_all_joysticks_valid();
-#endif
 
 
 
@@ -109,14 +126,22 @@ void input_init()
         fatal_error("Can't initialize the mouse");
     al_register_event_source(a5_event_queue, al_get_mouse_event_source());
 
+    if(!al_install_joystick())
+        fatal_error("Can't initialize the joystick subsystem");
+    al_register_event_source(a5_event_queue, al_get_joystick_event_source());
+
+    /* joystick config */
+    if(input_is_joystick_available()) {
+        logfile_message("Found %d joystick(s)", input_number_of_joysticks());
+        ignore_joystick = false;
+    }
+    else {
+        logfile_message("No joysticks have been found");
+        ignore_joystick = true;
+    }
+
     /* initializing the input list */
     inlist = NULL;
-
-    /* joypad setup */
-    got_joystick = false;
-    ignore_joystick = true;
-    plugged_joysticks = 0;
-    logfile_message("No joysticks have been detected."); /* TODO */
 
     /* loading custom input mappings */
     inputmap_init();
@@ -140,6 +165,7 @@ void input_init()
     if(install_joystick(JOY_TYPE_AUTODETECT) == 0) {
         if(num_joysticks > 0 && are_all_joysticks_valid()) {
             got_joystick = true;
+            ignore_joystick = false;
             plugged_joysticks = num_joysticks;
             logfile_message("Joystick(s) installed successfully! Number of plugged joysticks: %d", plugged_joysticks);
         }
@@ -199,7 +225,7 @@ void input_update()
     if(mouse_needs_poll())
         poll_mouse();
 
-    if(input_is_joystick_available())
+    if(input_is_joystick_enabled())
         poll_joystick();
 
     /* updating input objects */
@@ -344,11 +370,11 @@ input_t *input_create_user(const char* inputmap_name)
     me->inputmap = inputmap_get(inputmap_name);
 
     /* check joystick stuff */
-    if(me->inputmap->joystick.enabled && (!input_is_joystick_available() || me->inputmap->joystick.id >= input_number_of_plugged_joysticks())) {
+    if(me->inputmap->joystick.enabled && (!input_is_joystick_enabled() || me->inputmap->joystick.id >= input_number_of_joysticks())) {
         logfile_message(
             "WARNING: inputmap '%s' accepts a joystick (id: %d, plugged joysticks: %d), but %s.",
-            inputmap_name, me->inputmap->joystick.id, input_number_of_plugged_joysticks(),
-            (input_is_joystick_available() ? "the joystick id is invalid" : "the user isn't using a joystick")
+            inputmap_name, me->inputmap->joystick.id, input_number_of_joysticks(),
+            (input_is_joystick_enabled() ? "the joystick id is invalid" : "the user isn't using a joystick")
         );
     }
 
@@ -434,14 +460,26 @@ void input_simulate_button_up(input_t *in, inputbutton_t button)
 }
 
 
-
 /*
  * input_is_joystick_available()
- * Is a joystick available?
+ * Checks if there is a plugged joystick
  */
 bool input_is_joystick_available()
 {
+    return input_number_of_joysticks() > 0;
+}
+
+/*
+ * input_is_joystick_enabled()
+ * Is the joystick input enabled?
+ */
+bool input_is_joystick_enabled()
+{
+#if defined(A5BUILD)
+    return !ignore_joystick && input_is_joystick_available();
+#else
     return got_joystick && !ignore_joystick;
+#endif
 }
 
 
@@ -452,6 +490,10 @@ bool input_is_joystick_available()
 void input_ignore_joystick(bool ignore)
 {
     ignore_joystick = ignore;
+    if(!ignore_joystick && input_number_of_joysticks() == 0) {
+        video_showmessage("No joysticks have been found!");
+        ignore_joystick = true;
+    }
 }
 
 
@@ -463,6 +505,21 @@ bool input_is_joystick_ignored()
 {
     return ignore_joystick;
 }
+
+
+/*
+ * input_number_of_joysticks()
+ * number of plugged joysticks
+ */
+int input_number_of_joysticks()
+{
+#if defined(A5BUILD)
+    return al_get_num_joysticks();
+#else
+    return plugged_joysticks;
+#endif
+}
+
 
 
 /*
@@ -495,16 +552,6 @@ const char* input_get_mapping_name(inputuserdefined_t *in)
 {
     return in->inputmap->name;
 }
-
-/*
- * input_number_of_plugged_joysticks()
- * number of plugged joysticks
- */
-int input_number_of_plugged_joysticks()
-{
-    return plugged_joysticks;
-}
-
 
 
 
@@ -548,33 +595,6 @@ void input_unregister(input_t *in)
         }
     }
 }
-
-#if !defined(A5BUILD)
-/* get mouse mickeys (mouse wheel included) */
-void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
-{
-    get_mouse_mickeys(mickey_x, mickey_y);
-    if(mickey_z != NULL) {
-        static int mz, first = TRUE;
-        if(first) { mz = mouse_z; first = FALSE; }
-        *mickey_z = mz - mouse_z;
-        mz = mouse_z;
-    }
-}
-
-/* check if all joysticks have at least 2 axis and 4 buttons */
-bool are_all_joysticks_valid()
-{
-    int i;
-
-    for(i=0; i<num_joysticks; i++) {
-        if( !(joy[i].num_sticks > 0 && joy[i].stick[0].num_axis >= 2 && joy[i].num_buttons >= 4) )
-            return false;
-    }
-
-    return true;
-}
-#endif
 
 /* update specific input devices */
 void inputmouse_update(input_t* in)
@@ -631,14 +651,27 @@ void inputuserdefined_update(input_t* in)
 #if defined(A5BUILD)
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
-    extern bool a5_key[]; int i;
+    const float joy_threshold = 0.2f;
+    extern bool a5_key[];
+    inputbutton_t button;
 
-    for(i = 0; i < IB_MAX; i++)
-        in->state[i] = false;
+    for(button = 0; button < IB_MAX; button++)
+        in->state[button] = false;
 
     if(im->keyboard.enabled) {
-        for(i=0; i<IB_MAX; i++)
-            in->state[i] |= (im->keyboard.scancode[i] > 0) && a5_key[im->keyboard.scancode[i]];
+        for(button = 0; button < IB_MAX; button++)
+            in->state[button] |= (im->keyboard.scancode[button] > 0) && a5_key[im->keyboard.scancode[button]];
+    }
+
+    if(im->joystick.enabled) {
+        if(input_is_joystick_enabled() && im->joystick.id < min(input_number_of_joysticks(), MAX_JOYS)) {
+            in->state[IB_UP] |= (joy[im->joystick.id].axis[1] <= -joy_threshold);
+            in->state[IB_DOWN] |= (joy[im->joystick.id].axis[1] >= joy_threshold);
+            in->state[IB_LEFT] |= (joy[im->joystick.id].axis[0] <= -joy_threshold);
+            in->state[IB_RIGHT] |= (joy[im->joystick.id].axis[0] >= joy_threshold);
+            for(button = IB_FIRE1; button <= IB_FIRE8; button++)
+                in->state[button] |= (joy[im->joystick.id].button >> (button - IB_FIRE1)) & 1;
+        }
     }
 #else
     inputuserdefined_t *me = (inputuserdefined_t*)in;
@@ -653,7 +686,7 @@ void inputuserdefined_update(input_t* in)
             in->state[i] |= (im->keyboard.scancode[i] > 0) && key[ im->keyboard.scancode[i] ];
     }
 
-    if(input_is_joystick_available() && im->joystick.enabled && im->joystick.id < input_number_of_plugged_joysticks()) {
+    if(input_is_joystick_enabled() && im->joystick.enabled && im->joystick.id < input_number_of_joysticks()) {
         k = im->joystick.id;
         in->state[IB_UP] |= joy[k].stick[0].axis[1].d1;
         in->state[IB_DOWN] |= joy[k].stick[0].axis[1].d2;
@@ -670,3 +703,91 @@ void inputuserdefined_update(input_t* in)
     }
 #endif
 }
+
+#if defined(A5BUILD)
+/* convert ALLEGRO_JOYSTICK* to an integer in 0, 1, ... MAX_JOYS - 1 */
+int joy2id(ALLEGRO_JOYSTICK* joystick)
+{
+    int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
+
+    /* find joystick id */
+    for(int i = 0; i < num_joys; i++) {
+        if(joymap[i] == joystick) {
+            return i;
+        }
+        else if(joymap[i] == NULL) {
+            joymap[i] = joystick;
+            video_showmessage("Using \"%s\" as joystick #%d", al_get_joystick_name(joystick), i+1);
+            return i;
+        }
+    }
+
+    /* not found */
+    return MAX_JOYS - 1;
+}
+
+/* clears the joymap */
+void clear_joymap()
+{
+    for(int i = 0; i < MAX_JOYS; i++)
+        joymap[i] = NULL;
+}
+
+/* handle an ALLEGRO_JOYSTICK_EVENT */
+void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
+{
+    switch(event->type) {
+        case ALLEGRO_EVENT_JOYSTICK_AXIS:
+            if(event->joystick.axis < MAX_AXIS)
+                joy[joy2id(event->joystick.id)].axis[event->joystick.axis] = event->joystick.pos;
+            break;
+
+        case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+            joy[joy2id(event->joystick.id)].button |= 1 << event->joystick.button;
+            break;
+
+        case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
+            joy[joy2id(event->joystick.id)].button &= ~(1 << event->joystick.button);
+            break;
+
+        case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
+            al_reconfigure_joysticks();
+            clear_joymap();
+            if(al_get_num_joysticks() > 0) {
+                video_showmessage("Found %d joystick%s", al_get_num_joysticks(), al_get_num_joysticks() == 1 ? "" : "s");
+                input_ignore_joystick(false); /* the user probably wants this (automatic joystick detection) */
+            }
+            else {
+                video_showmessage("The joystick has been unplugged");
+                input_ignore_joystick(true);
+            }
+            logfile_message("Found %d joystick(s)", al_get_num_joysticks());
+            break;
+    }
+}
+#else
+/* get mouse mickeys (mouse wheel included) */
+void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z)
+{
+    get_mouse_mickeys(mickey_x, mickey_y);
+    if(mickey_z != NULL) {
+        static int mz, first = TRUE;
+        if(first) { mz = mouse_z; first = FALSE; }
+        *mickey_z = mz - mouse_z;
+        mz = mouse_z;
+    }
+}
+
+/* check if all joysticks have at least 2 axis and 4 buttons */
+bool are_all_joysticks_valid()
+{
+    int i;
+
+    for(i=0; i<num_joysticks; i++) {
+        if( !(joy[i].num_sticks > 0 && joy[i].stick[0].num_axis >= 2 && joy[i].num_buttons >= 4) )
+            return false;
+    }
+
+    return true;
+}
+#endif

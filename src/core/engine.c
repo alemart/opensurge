@@ -98,6 +98,7 @@ ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
 bool a5_key[ALLEGRO_KEY_MAX] = { false };
 int a5_mouse_b = 0;
 bool a5_display_active = true;
+extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
 #endif
 
 
@@ -179,6 +180,13 @@ void engine_mainloop()
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
                 a5_mouse_b &= ~(1 << (event.mouse.button - 1));
+                break;
+
+            case ALLEGRO_EVENT_JOYSTICK_AXIS:
+            case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+            case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
+            case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
+                a5_handle_joystick_event(&event);
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
@@ -329,9 +337,6 @@ void init_managers(const commandline_t* cmd)
     );
     audio_init();
     input_init();
-    input_ignore_joystick(
-        !commandline_getint(cmd->use_gamepad, prefs_get_bool(prefs, ".gamepad"))
-    );
     resourcemanager_init();
 }
 

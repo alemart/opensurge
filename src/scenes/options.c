@@ -239,7 +239,6 @@ void save_preferences()
     prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
     prefs_set_bool(prefs, ".smoothgfx", video_is_smooth());
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
-    prefs_set_bool(prefs, ".gamepad", !input_is_joystick_ignored());
 }
 
 
@@ -1065,9 +1064,7 @@ group_t *create_grouptree()
     /* section: game */
     game = group_game_create();
     group_addchild(game, group_changelanguage_create());
-#if !defined(A5BUILD)
     group_addchild(game, group_gamepad_create());
-#endif
     group_addchild(game, group_stageselect_create());
     group_addchild(game, group_credits_create());
 

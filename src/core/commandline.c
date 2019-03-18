@@ -62,7 +62,6 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.install_game_path[0] = '\0';
     cmd.datadir[0] = '\0';
     cmd.gameid[0] = '\0';
-    cmd.use_gamepad = COMMANDLINE_UNDEFINED;
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
     cmd.user_argv = NULL;
     cmd.user_argc = 0;
@@ -90,7 +89,6 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --smooth                         display smooth graphics (applicable when resolution > 1)\n"
                 "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                       show the FPS (frames per second) counter\n"
-                "    --use-gamepad                    play using a gamepad\n"
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/my_quest.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/lang.lng)\n"
@@ -158,9 +156,6 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--show-fps") == 0)
             cmd.show_fps = TRUE;
-
-        else if(strcmp(argv[i], "--use-gamepad") == 0)
-            cmd.use_gamepad = TRUE;
 
         else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;
