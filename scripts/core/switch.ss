@@ -17,18 +17,21 @@ object "DefaultSwitchController"
 
     state "main"
     {
-        if(input.buttonPressed("fire3"))
-            Level.pause();
-        else if(input.buttonPressed("fire4"))
-            Level.quit();
-        else if(input.buttonPressed("fire2"))
-            switchCharacter();
+        if(!Level.cleared) {
+            if(input.buttonPressed("fire3"))
+                Level.pause();
+            else if(input.buttonPressed("fire4"))
+                Level.quit();
+            else if(input.buttonPressed("fire2"))
+                switchCharacter();
+        }
     }
 
     fun switchCharacter()
     {
         n = Player.count;
-        if(n == 1 || !enabled) return;
+        if(n == 1 || !enabled)
+            return;
         for(i = 0; i < n; i++) {
             p = Player(i);
             if(p.hasFocus()) {
