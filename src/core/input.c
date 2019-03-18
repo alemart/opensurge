@@ -494,7 +494,9 @@ void input_ignore_joystick(bool ignore)
         video_showmessage("No joysticks have been found!");
         ignore_joystick = true;
     }
+#if defined(A5BUILD)
     clear_joymap();
+#endif
 }
 
 
