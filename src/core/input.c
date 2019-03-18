@@ -720,6 +720,7 @@ int joy2id(ALLEGRO_JOYSTICK* joystick)
         }
         else if(joymap[i] == NULL) {
             if(input_is_joystick_enabled() && num_joys > 1) {
+                /* display nice message when using multiple joysticks */
                 static char buf[256];
                 video_showmessage("Using \"%s\" as joystick #%d", str_trim(buf, al_get_joystick_name(joystick), sizeof(buf)), i+1);
             }
