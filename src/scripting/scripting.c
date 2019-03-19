@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * surgescript.c - scripting system
- * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2018-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <surgescript/compiler/parser.h>
 #include "scripting.h"
 #include "../core/logfile.h"
 #include "../core/assetfs.h"
@@ -79,6 +80,7 @@ void scripting_init(int argc, const char** argv)
     surgescript_util_set_error_functions(log_fun, err_fun);
     check_if_compatible();
     vm = surgescript_vm_create();
+    surgescript_parser_set_flags(surgescript_vm_parser(vm), SSPARSER_ALLOW_DUPLICATES); /* for maximum compatibility */
 
     /* copy command line arguments */
     vm_argv = mallocx((vm_argc = argc) * sizeof(*vm_argv));
