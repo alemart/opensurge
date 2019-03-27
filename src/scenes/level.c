@@ -700,11 +700,10 @@ int level_save(const char *filepath)
  */
 void level_interpret_line(const char *filename, int fileline, const char *line)
 {
-    int param_count;
-    char *param[32], *identifier;
+    int param_count, i;
+    char *param[16], *identifier;
     char tmp[1024], *p, *q;
-    const int sz = sizeof(tmp)-1;
-    int i;
+    const int sz = (sizeof(tmp)/sizeof(*tmp))-1;
 
     /* skip spaces */
     for(p=(char*)line; isspace((int)*p); p++);
@@ -722,7 +721,7 @@ void level_interpret_line(const char *filename, int fileline, const char *line)
     param_count = 0;
     if(0 != *p) {
         int quotes;
-        while(*p && param_count<32) {
+        while(*p && param_count<sizeof(param)/sizeof(*param)) {
             quotes = (*p == '"') && !!(p++); /* short-circuit AND */
             for(q=tmp; *p && ((!quotes && !isspace(*p)) || (quotes && !(*p == '"' && *(p-1) != '\\'))) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
             quotes = (*p == '"') && !!(p++);
