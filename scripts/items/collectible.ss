@@ -96,6 +96,7 @@ object "Scattered Collectible" is "entity", "disposable", "private"
     hsensor = Sensor(-actor.width/2, 0, actor.width, 1);
     hlock = 0.0; vlock = 0.0;
     xsp = 0.0; ysp = 0.0;
+    startTime = Time.time;
 
     state "main"
     {
@@ -141,7 +142,7 @@ object "Scattered Collectible" is "entity", "disposable", "private"
 
     fun onCollision(otherCollider)
     {
-        if(timeout(1.0)) {
+        if(Time.time >= startTime + 1.0) {
             if(otherCollider.entity.hasTag("player"))
                 pickup(otherCollider.entity);
         }

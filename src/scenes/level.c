@@ -703,16 +703,16 @@ void level_interpret_line(const char *filename, int fileline, const char *line)
     int param_count;
     char *param[32], *identifier;
     char tmp[1024], *p, *q;
-    int i, sz = sizeof(tmp)-1;
+    const int sz = sizeof(tmp)-1;
+    int i;
 
     /* skip spaces */
     for(p=(char*)line; isspace((int)*p); p++);
     if(0 == *p) return;
 
     /* reading the identifier */
-    for(q=tmp; *p && !isspace(*p) && q<tmp+sz; *q++ = *p++); *q=0;
-    if(tmp[0] == '/' && tmp[1] == '/') return; /* comment */
-    if(tmp[0] == '#' && isspace(tmp[1])) return; /* comment */
+    for(q=tmp; *p && !isspace(*p) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
+    if(strncmp(tmp, "//", 2) == 0 || *tmp == '#') return; /* comment */
     identifier = str_dup(tmp);
 
     /* skip spaces */
@@ -724,7 +724,7 @@ void level_interpret_line(const char *filename, int fileline, const char *line)
         int quotes;
         while(*p && param_count<32) {
             quotes = (*p == '"') && !!(p++); /* short-circuit AND */
-            for(q=tmp; *p && ((!quotes && !isspace(*p)) || (quotes && !(*p == '"' && *(p-1) != '\\'))) && q<tmp+sz; *q++ = *p++); *q=0;
+            for(q=tmp; *p && ((!quotes && !isspace(*p)) || (quotes && !(*p == '"' && *(p-1) != '\\'))) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
             quotes = (*p == '"') && !!(p++);
             param[param_count++] = str_dup(tmp);
             for(; isspace((int)*p); p++); /* skip spaces */
