@@ -42,6 +42,7 @@ FUNCTION(READ_VERSION VERSION_STRING)
 ENDFUNCTION()
 READ_VERSION(GAME_VERSION)
 MESSAGE("${GAME_NAME} version ${GAME_VERSION}")
+SET(HELP "You might get some luck by tweaking CMake options with ccmake | cmake-gui, or you can get help at opensurge2d.org")
 
 # Default config
 SET(CMAKE_C_STANDARD 99)
@@ -49,17 +50,18 @@ IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug | Release | MinSizeRel | RelWithDebInfo" FORCE)
   SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF()
-SET(HELP "You might get some luck by tweaking CMake options with ccmake | cmake-gui, or you can get help at opensurge2d.org")
 SET(DEFS "") # #define'd stuff
 
 # User options
 OPTION(USE_A5 "Use the Allegro 5 backend" ON)
 OPTION(USE_STATIC "Use static libs whenever possible (Allegro 4 only)" ON)
 OPTION(USE_OPENAL "Use OpenAL for audio playback (Allegro 4 only)" OFF)
+OPTION(ALLEGRO_STATIC "Use the static version of Allegro 5 (Windows only)" OFF)
+OPTION(ALLEGRO_MONOLITH "Use the monolith version of Allegro 5" OFF)
 SET(PATH_ALLEGRO_LIB "${CMAKE_SYSTEM_LIBRARY_PATH}" CACHE PATH "Where to look for the Allegro library & its dependencies")
 SET(PATH_SURGESCRIPT_LIB "${CMAKE_SYSTEM_LIBRARY_PATH}" CACHE PATH "Where to look for libsurgescript")
-SET(PATH_SURGESCRIPT_INC "" CACHE PATH "Custom include directory for SurgeScript (where to look for header files)")
-SET(PATH_ALLEGRO_INC "" CACHE PATH "Custom include directory for Allegro (where to look for header files)")
+SET(PATH_SURGESCRIPT_INC "" CACHE PATH "Custom include directory for SurgeScript (where to look for the header files)")
+SET(PATH_ALLEGRO_INC "" CACHE PATH "Custom include directory for Allegro (where to look for the header files)")
 IF(UNIX)
   SET(GAME_DATADIR "/usr/local/share/games/${GAME_UNIXNAME}" CACHE PATH "The directory in which the game assets will be stored")
   IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -83,7 +85,7 @@ ELSE()
   MESSAGE(STATUS "Building using the legacy Allegro 4 backend...")
 ENDIF()
 
-# prefer static libs
+# legacy option: prefer static libs
 IF(NOT USE_A5 AND USE_STATIC)
   IF(WIN32)
     SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
@@ -109,12 +111,64 @@ IF(USE_A5)
     allegro_dialog
   )
 
+  # OSX requires allegro_main
   IF(APPLE)
     LIST(APPEND REQUIRED_A5_LIBS allegro_main)
   ENDIF()
 
-  IF(WIN32)
+  # Use the monolith version
+  IF(ALLEGRO_MONOLITH)
     SET(REQUIRED_A5_LIBS allegro_monolith)
+  ENDIF()
+
+  # Use static libs
+  IF(ALLEGRO_STATIC)
+    # add -static suffix
+    SET(A5_LIBS "")
+    FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
+      LIST(APPEND A5_LIBS "${A5_LIB}-static")
+    ENDFOREACH()
+    SET(REQUIRED_A5_LIBS ${A5_LIBS})
+
+    # define ALLEGRO_STATICLINK
+    LIST(APPEND DEFS "ALLEGRO_STATICLINK")
+
+    # require Win32 libs
+    IF(WIN32)
+      LIST(APPEND REQUIRED_A5_LIBS
+        mingw32
+        #dumb
+        #FLAC
+        vorbisfile
+        vorbis
+        freetype
+        ogg
+        #physfs
+        png16
+        zlibstatic
+        gdiplus
+        uuid
+        kernel32
+        winmm
+        psapi
+        opengl32
+        glu32
+        user32
+        comdlg32
+        gdi32
+        shell32
+        ole32
+        advapi32
+        ws2_32
+        shlwapi
+        dsound
+        jpeg
+        #opusfile
+        #opus
+      )
+    ELSE()
+      MESSAGE(FATAL_ERROR "Static linkage is currently unavailable for this platform.")
+    ENDIF()
   ENDIF()
 
   # Write to LALLEGRO5
