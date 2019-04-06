@@ -163,7 +163,7 @@ IF(USE_A5)
         ws2_32
         shlwapi
         dsound
-        d3dx9
+        #d3dx9 # needed?
         jpeg
         #opusfile
         #opus
