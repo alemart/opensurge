@@ -1,144 +1,60 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Open Surge: 2D game engine for retro platformers</title>
-        <meta name="robots" content="index, follow">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, hack, create worlds and unleash your creativity!">
-        <meta property="og:image" content="http://opensurge2d.org/pics/screen4.png">
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'UA-120511928-1');
-        </script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <link rel="shortcut icon" href="favicon.ico">
-        <style>
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body { color: #444; font-size: 14pt; }
-        .container { background-color: #fff; max-width: 768px; }
-        .btn-warning { background-color: #ff6716 !important; font-weight: bold; border: 0; border-radius: 15px; }
-        .bg-success { background-color: #fe1 !important; position: relative; border: 0; border-radius: 15px; }
-        .background {
-            background-image: url('pics/sky.png');
-            background-size: 100% 100%;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-        .download-background { box-shadow: 8px 8px #f80; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 0; border-radius: 15px; }
-        .bg-success .card-body { z-index: 2; }
-        a, a:hover, a:visited, a:active { color: #ff6716; font-weight: bold; }
-        a .success { color: #fff; }
-        .img-bullet { border-radius: 512px; max-width: 192px; height: auto; }
-        h3 { display: inline-block; background: #fe1; box-shadow: 8px 8px #f80; padding: 15px; border-radius: 15px; }
-        @media screen and (min-width: 700px) {
-            .img-bullet { transform: scale(1.25); max-width: 100%; }
-        }
-        </style>
-    </head>
-    <body class="background">
-        <div class="container my-0 py-2">
-            <img src="opensurge.png" class="mx-auto d-block mt-3 img-fluid" alt="Open Surge">
-            <div class="mx-auto" style="max-width:667px">
-                <div class="text-center">
-                    <p class="mx-auto">Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, hack, create worlds and unleash your creativity!<br>Currently <strong>under development</strong> &ndash; available for Windows and Linux.</p>
-                    <ul class="list-inline">
-                        <li class="list-inline-item px-2"><a href="http://opensnc.sf.net/forum" target="_blank">Forum</a></li>
-                        <li class="list-inline-item px-2"><a href="http://opensnc.sf.net/wiki" target="_blank">Wiki</a></li>
-                        <li class="list-inline-item px-2"><a href="#download">Download (dev-builds)</a></li>
-                        <li class="list-inline-item px-2"><a href="https://github.com/alemart/opensurge" target="_blank">Source Code</a></li>
-                    </ul>
-                    <img src="surge-demo.gif" alt="Engine demo" class="mb-4 img-fluid">
-                </div>
-                <div class="mx-auto" style="max-width:600px">
-                    <div class="row align-items-center">
-                        <div class="col text-right my-2 pt-3">
-                            <h3>Do you love retro platformers?</h3>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-sm-3 text-center">
-                            <img src="pics/surge_run2.png" class="img-bullet mb-3">
-                        </div>
-                        <div class="col-sm-9 text-right">
-                            <p class="lead">We do too! The 90's were awesome. But now we can go further. This is an age of creators, not just consumers.</p>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-5">
-                        <div class="col text-left my-2 pt-3">
-                            <h3>Unleash your creativity!</h3>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-sm-9 text-left">
-                            <p class="lead">Open Surge lets you <a href="#download">play creatively</a> and <a href="http://opensnc.sf.net/wiki" target="_blank">make your own games</a>. Forget about just consuming!</p>
-                        </div>
-                        <div class="col-sm-3 text-center">
-                            <img src="pics/neon_win2.png" class="img-bullet mb-3">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-5">
-                        <div class="col text-right my-2 pt-3">
-                            <h3>Explore, remix and create!</h3>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-sm-3 text-center">
-                            <img src="pics/surge_play.png" class="img-bullet mb-3">
-                        </div>
-                        <div class="col-sm-9 text-right">
-                            <p class="lead">Open Surge is absolutely fun! Join the remix culture and <a href="#download">become a creator</a> yourself!</p>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-5">
-                        <div class="col text-left my-2 pt-3">
-                            <h3>Learn how to code with SurgeScript<sup>&trade;</sup></h3>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-sm-9 text-left">
-                            <p class="lead">Coding can be really fun once you know what it can do. The sky is the limit with <a href="https://alemart.github.io/surgescript" target="_blank">SurgeScript</a>!</p>
-                        </div>
-                        <div class="col-sm-3 text-center">
-                            <img src="pics/neon_run.png" class="img-bullet mb-3">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-5">
-                        <div class="col text-right my-2 pt-3">
-                            <h3>Embrace software freedom</h3>
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-sm-3 text-center">
-                            <img src="pics/surge_win.png" class="img-bullet mb-3">
-                        </div>
-                        <div class="col-sm-9 text-right">
-                            <p class="lead">Open Surge promotes the <a href="https://en.wikipedia.org/wiki/Free_and_open-source_software" target="_blank">free and open-source software</a> culture. Use, study, hack and share!</p>
-                        </div>
-                    </div>
-                    <div class="row align-items-center my-4">
-                        <div class="col text-center">
-                            <div class="card bg-success px-3 py-5 my-4">
-                                <div class="download-background"></div>
-                                <div class="card-body">
-                                    <h2><a name="download"></a>Ready to start?</h2>
-                                    <a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank" role="button" class="btn btn-lg btn-warning my-4 p-4">
-                                        <span class="success">
-                                            Download now!<br>
-                                            <sub>for early adopters</sub>
-                                        </span>
-                                    </a>
-                                    <p class="lead mt-1">Follow the <a href="http://www.youtube.com/alemart88" target="_blank">developer's YouTube channel</a> for updates</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-right">Project founded by <a href="https://github.com/alemart" target="_blank">Alexandre Martins</a></p>
-                </div>
-            </div>
-        </div>
-    </body>
+  <head>
+    <meta charset="utf-8">
+    <title>Open Surge: 2D game engine for retro platformers</title>
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, become a creator and unleash your creativity!">
+    <meta property="og:image" content="http://opensurge2d.org/pics/screen4.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-120511928-1');
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="favicon.ico">
+    <style>
+      body { background: #ffee11; font-size: 14pt; color: #fff; text-shadow: 2px 2px #000; font-weight: bold; }
+      .btn { border: 0; border-radius: 0; text-transform: uppercase; letter-spacing: 1px; padding: 8px 24px; font-size: 20pt; font-weight: 900; }
+      .btn-primary, .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active { background: #ff8800 !important; color: #fff !important; }
+      .btn-primary { box-shadow: 8px 8px 0px 1px #4b4b4b !important; }
+      .strip { background: url('surge-strip.png') #4b4b4b; background-position: right; min-height: 384px; }
+      .box { max-width: 720px; margin-left: auto; margin-right: auto; background: rgba(0,0,0,0.0); font-size: 16pt; }
+      .cartoon {
+        text-shadow:
+          -1px -1px 0 rgba(0,0,0,0.8),
+          1px -1px 0 rgba(0,0,0,0.8),
+          -1px 2px 0 rgba(0,0,0,0.8),
+          1px 2px 0 rgba(0,0,0,0.8);
+      }
+      em { font-style: normal; color: #ffee11; }
+      footer { font-size: 14pt; }
+    </style>
+  </head>
+  <body>
+    <div class="strip d-flex flex-column justify-content-center py-4 mb-3 text-center"></div>
+    <div class="box cartoon text-center p-3">
+      <p>
+        Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, become a creator and unleash your creativity!
+        Currently <em>under development</em> &ndash; runs in Windows, Linux and OSX.
+      </p>
+    </div>
+    <nav class="d-flex flex-column flex-sm-row justify-content-center">
+      <a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank" class="btn btn-primary m-3">Play</a>
+      <a href="http://opensnc.sf.net/wiki" target="_blank" class="btn btn-primary m-3">Create</a>
+      <a href="http://youtube.com/alemart88" target="_blank" class="btn btn-primary m-3">Learn</a>
+    </nav>
+    <div class="mx-4 text-center py-3 my-3">
+      <img src="surge-demo.gif" alt="Demo" class="img-fluid">
+    </div>
+    <footer>
+      <p class="text-center cartoon mx-3">
+        Open Surge Engine by Alexandre Martins.<br>
+        Thanks to many contributors over the web.
+      </p>
+    </footer>
+  </body>
 </html>
