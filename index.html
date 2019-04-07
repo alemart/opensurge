@@ -16,20 +16,26 @@
     </script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="shortcut icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
     <style>
-      body { background: #ffee11; font-size: 14pt; color: #fff; text-shadow: 2px 2px #000; font-weight: bold; }
-      .btn { border: 0; border-radius: 0; text-transform: uppercase; letter-spacing: 1px; padding: 8px 24px; font-size: 20pt; font-weight: 900; }
-      .btn-primary, .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active { background: #ff8800 !important; color: #fff !important; }
-      .btn-primary { box-shadow: 8px 8px 0px 1px #4b4b4b !important; }
-      .strip { background: url('surge-strip.png') #4b4b4b; background-position: 57% center; min-height: 384px; }
-      .box { max-width: 720px; margin-left: auto; margin-right: auto; background: rgba(0,0,0,0.0); font-size: 16pt; }
-      .cartoon {
+      body {
+        background: #ffee11;
+        color: #fff;
+        font-size: 15pt;
+        font-weight: bold;
+        font-family: 'Luckiest Guy', sans-serif;
         text-shadow:
           -1px -1px 0 rgba(0,0,0,0.8),
           1px -1px 0 rgba(0,0,0,0.8),
           -1px 2px 0 rgba(0,0,0,0.8),
           1px 2px 0 rgba(0,0,0,0.8);
+        letter-spacing: 3px;
       }
+      .btn { border: 0; border-radius: 0; text-transform: uppercase; padding: 8px 24px; font-size: 20pt; font-weight: 900; }
+      .btn-primary, .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active { background: #ff8800 !important; color: #fff !important; }
+      .btn-primary { box-shadow: 8px 8px 0px 1px #4b4b4b !important; }
+      .strip { background: url('surge-strip.png') #4b4b4b; background-position: 57% center; min-height: 384px; }
+      .box { max-width: 720px; margin-left: auto; margin-right: auto; }
       em { font-style: normal; color: #ffee11; }
       footer { font-size: 14pt; }
     </style>
@@ -37,18 +43,16 @@
   <body>
     <div class="strip d-flex flex-column justify-content-center py-4 mb-3 text-center"></div>
     <div class="box cartoon text-center p-3">
-      <p>
-        Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, become a creator and unleash your creativity!
-        Currently <em>under development</em> &ndash; runs in Windows, Linux and OSX.
-      </p>
+      <p>Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, become a creator and unleash your creativity! Now <em>under development.</em></p>
     </div>
     <nav class="d-flex flex-column flex-sm-row justify-content-center">
       <a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank" class="btn btn-primary m-3">Play</a>
       <a href="http://opensnc.sf.net/wiki" target="_blank" class="btn btn-primary m-3">Create</a>
       <a href="http://youtube.com/alemart88" target="_blank" class="btn btn-primary m-3">Learn</a>
     </nav>
-    <div class="mx-4 text-center py-3 my-3">
+    <div class="mx-4 text-center py-3 my-3 cartoon">
       <img src="surge-demo.gif" alt="Demo" class="img-fluid">
+      <p class="mt-3">Runs in Windows, Linux and OSX.</p>
     </div>
     <footer>
       <p class="text-center cartoon mx-3">
