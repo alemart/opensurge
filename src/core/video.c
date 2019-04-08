@@ -49,6 +49,7 @@ static ALLEGRO_DISPLAY* display = NULL;
 static image_t* backbuffer = NULL;
 static ALLEGRO_FONT* font = NULL;
 static int suggested_bpp = 32;
+static void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer);
 
 #else
 
@@ -186,7 +187,7 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
     /* Change the video mode */
     logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
     video_resolution = resolution;
-    video_fullscreen = false; /* TODO */
+    video_fullscreen = fullscreen;
     video_smooth = false; /* not supported yet */
     if(video_resolution != VIDEORESOLUTION_EDT)
         window_size = video_get_window_size();
@@ -214,8 +215,13 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
             logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
     }
 
+    /* Compute the dimensions of the screen */
+    if(resolution == VIDEORESOLUTION_EDT)
+        screen_size = v2d_new(al_get_display_width(display), al_get_display_height(display)); /* different than window_size if using ALLEGRO_FULLSCREEN_WINDOWED */
+    else
+        screen_size = DEFAULT_SCREEN_SIZE;
+
     /* Create the backbuffer */
-    screen_size = (resolution == VIDEORESOLUTION_EDT) ? window_size : DEFAULT_SCREEN_SIZE;
     if(backbuffer != NULL)
         image_destroy(backbuffer);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP);
@@ -385,8 +391,9 @@ image_t* video_get_backbuffer()
 void video_render()
 {
 #if defined(A5BUILD)
-    static uint32_t fps_timer = 0, frame_count = 0;
+    ALLEGRO_STATE state;
     uint32_t current_time;
+    static uint32_t fps_timer = 0, frame_count = 0;
 
     /* video message */
     videomsg = videomsg_render(videomsg, 0);
@@ -404,23 +411,14 @@ void video_render()
         PRINT(image_width(backbuffer), 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps_rate);
 
     /* render */
+    al_store_state(&state, ALLEGRO_STATE_TRANSFORM | ALLEGRO_STATE_TARGET_BITMAP);
     al_set_target_bitmap(al_get_backbuffer(display));
-    switch(video_get_resolution()) {
-        case VIDEORESOLUTION_1X:
-        case VIDEORESOLUTION_EDT:
-            al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
-            break;
-
-        default:
-            /* TODO: smooth gfx */
-            al_draw_scaled_bitmap(IMAGE2BITMAP(backbuffer),
-                0.0f, 0.0f, image_width(backbuffer), image_height(backbuffer),
-                0.0f, 0.0f, al_get_bitmap_width(al_get_target_bitmap()), al_get_bitmap_height(al_get_target_bitmap()),
-            0);
-            break;
-    }
+    apply_display_transform(display, backbuffer);
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
     al_flip_display();
-    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+    al_restore_state(&state);
+    /*al_set_target_bitmap(IMAGE2BITMAP(backbuffer));*/
 #else
     static uint32_t fps_timer = 0, frame_count = 0;
     uint32_t current_time;
@@ -661,7 +659,31 @@ void video_display_loading_screen()
 
 
 /* private stuff */
-#if !defined(A5BUILD)
+#if defined(A5BUILD)
+
+/* apply a transform when rendering, so that we have a resized
+   screen that maintains the original aspect ratio of the game */
+void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer)
+{
+    ALLEGRO_TRANSFORM t;
+    v2d_t aspect_ratio, offset;
+
+    /* compute the aspect ratio */
+    aspect_ratio.x = (float)al_get_display_width(display) / (float)image_width(backbuffer);
+    aspect_ratio.y = (float)al_get_display_height(display) / (float)image_height(backbuffer);
+
+    /* compute the offset */
+    if(aspect_ratio.x < aspect_ratio.y)
+        offset = v2d_new(0.0f, (al_get_display_height(display) - aspect_ratio.x * image_height(backbuffer)) * 0.5f);
+    else
+        offset = v2d_new((al_get_display_width(display) - aspect_ratio.y * image_width(backbuffer)) * 0.5f, 0.0f);
+
+    /* compute the transform */
+    al_build_transform(&t, offset.x, offset.y, min(aspect_ratio.x, aspect_ratio.y), min(aspect_ratio.x, aspect_ratio.y), 0.0f);
+    al_use_transform(&t);
+}
+
+#else
 
 /* fast2x_blit resizes the src image by a
  * factor of 2. It assumes that:

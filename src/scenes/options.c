@@ -1055,8 +1055,8 @@ group_t *create_grouptree()
     /* section: graphics */
     graphics = group_graphics_create();
     group_addchild(graphics, group_resolution_create());
-#if !defined(A5BUILD)
     group_addchild(graphics, group_fullscreen_create());
+#if !defined(A5BUILD)
     group_addchild(graphics, group_smooth_create());
 #endif
     group_addchild(graphics, group_fps_create());
