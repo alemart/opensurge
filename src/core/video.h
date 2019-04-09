@@ -29,11 +29,11 @@ struct image_t;
 
 /* video modes */
 typedef enum videoresolution_t {
+    VIDEORESOLUTION_EDT, /* level editor */
     VIDEORESOLUTION_1X,  /* original size */
     VIDEORESOLUTION_2X,  /* double size */
     VIDEORESOLUTION_3X,  /* triple size */
     VIDEORESOLUTION_4X,  /* quadruple size */
-    VIDEORESOLUTION_EDT, /* level editor */
 } videoresolution_t;
 
 /* video manager */

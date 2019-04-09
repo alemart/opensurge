@@ -181,11 +181,23 @@ void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int 
 void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen)
 {
 #if defined(A5BUILD)
-    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
     v2d_t window_size = video_get_window_size();
+    bool old_fullscreen = video_fullscreen;
+    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
+    
+    /* a necessary evil :( */
+    if(video_resolution != resolution && fullscreen)
+        fullscreen = false;
+
+    /* Log the event */
+    logfile_message(
+        "Changing the video mode to 0x%x (%s, %s)",
+        (int)resolution,
+        fullscreen ? "fullscreen" : "windowed",
+        smooth ? "smooth" : "plain"
+    );
 
     /* Change the video mode */
-    logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
     video_resolution = resolution;
     video_fullscreen = fullscreen;
     video_smooth = false; /* not supported yet */
@@ -209,10 +221,12 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
         al_hide_mouse_cursor(display);
     }
     else {
+        if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, video_fullscreen)) {
+            logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
+            video_fullscreen = old_fullscreen;
+        }
         if(!al_resize_display(display, window_size.x, window_size.y))
             logfile_message("Failed to resize the display to %dx%d", (int)window_size.x, (int)window_size.y);
-        if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, video_fullscreen))
-            logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
     }
 
     /* Compute the dimensions of the screen */
@@ -666,20 +680,20 @@ void video_display_loading_screen()
 void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer)
 {
     ALLEGRO_TRANSFORM t;
-    v2d_t aspect_ratio, offset;
+    v2d_t scale, offset;
 
-    /* compute the aspect ratio */
-    aspect_ratio.x = (float)al_get_display_width(display) / (float)image_width(backbuffer);
-    aspect_ratio.y = (float)al_get_display_height(display) / (float)image_height(backbuffer);
+    /* compute the scale */
+    scale.x = (float)al_get_display_width(display) / (float)image_width(backbuffer);
+    scale.y = (float)al_get_display_height(display) / (float)image_height(backbuffer);
 
     /* compute the offset */
-    if(aspect_ratio.x < aspect_ratio.y)
-        offset = v2d_new(0.0f, (al_get_display_height(display) - aspect_ratio.x * image_height(backbuffer)) * 0.5f);
+    if(scale.x < scale.y)
+        offset = v2d_new(0.0f, (al_get_display_height(display) - scale.x * image_height(backbuffer)) * 0.5f);
     else
-        offset = v2d_new((al_get_display_width(display) - aspect_ratio.y * image_width(backbuffer)) * 0.5f, 0.0f);
+        offset = v2d_new((al_get_display_width(display) - scale.y * image_width(backbuffer)) * 0.5f, 0.0f);
 
     /* compute the transform */
-    al_build_transform(&t, offset.x, offset.y, min(aspect_ratio.x, aspect_ratio.y), min(aspect_ratio.x, aspect_ratio.y), 0.0f);
+    al_build_transform(&t, offset.x, offset.y, min(scale.x, scale.y), min(scale.x, scale.y), 0.0f);
     al_use_transform(&t);
 }
 
