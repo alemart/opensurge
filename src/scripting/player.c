@@ -53,6 +53,7 @@ static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -69,6 +70,8 @@ static surgescript_var_t* fun_getfrozen(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_setfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setgsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getxsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -149,6 +152,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
     surgescript_vm_bind(vm, "Player", "get_angle", fun_getangle, 0);
+    surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -167,6 +171,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_layer", fun_setlayer, 1);
     surgescript_vm_bind(vm, "Player", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Player", "set_visible", fun_setvisible, 1);
+    surgescript_vm_bind(vm, "Player", "get_speed", fun_getspeed, 0);
+    surgescript_vm_bind(vm, "Player", "set_speed", fun_setspeed, 1);
     surgescript_vm_bind(vm, "Player", "get_gsp", fun_getgsp, 0);
     surgescript_vm_bind(vm, "Player", "set_gsp", fun_setgsp, 1);
     surgescript_vm_bind(vm, "Player", "get_xsp", fun_getxsp, 0);
@@ -467,10 +473,42 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
     );
 }
 
+/* top speed, in px/s */
+surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(),
+        (player != NULL) ? physicsactor_get_topspeed(player->pa) : 0.0f
+    );
+}
+
 /* the initial number of lives */
 surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_number(surgescript_var_create(), PLAYER_INITIAL_LIVES);
+}
+
+/* player speed, in px/s (maps to either xsp or gsp, if the player is in the air or not) */
+surgescript_var_t* fun_getspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        if(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player))
+            return surgescript_var_set_number(surgescript_var_create(), physicsactor_get_xsp(player->pa));
+        else
+            return surgescript_var_set_number(surgescript_var_create(), physicsactor_get_gsp(player->pa));
+    }
+    else
+        return surgescript_var_set_number(surgescript_var_create(), 0.0f);
+}
+
+/* set player speed, in px/s */
+surgescript_var_t* fun_setspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player->actor->speed.x = surgescript_var_get_number(param[0]);
+    return NULL;
 }
 
 /* ground speed, in px/s */
@@ -488,8 +526,10 @@ surgescript_var_t* fun_setgsp(surgescript_object_t* object, const surgescript_va
 {
     /* TODO: fix adapter */
     player_t* player = get_player(object);
-    if(player != NULL && !player_is_in_the_air(player))
-        player->actor->speed.x = surgescript_var_get_number(param[0]);
+    if(player != NULL) {
+        if(!(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player)))
+            player->actor->speed.x = surgescript_var_get_number(param[0]);
+    }
     return NULL;
 }
 
@@ -508,8 +548,10 @@ surgescript_var_t* fun_setxsp(surgescript_object_t* object, const surgescript_va
 {
     /* TODO: fix adapter */
     player_t* player = get_player(object);
-    if(player != NULL && player_is_in_the_air(player))
-        player->actor->speed.x = surgescript_var_get_number(param[0]);
+    if(player != NULL) {
+        if(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player))
+            player->actor->speed.x = surgescript_var_get_number(param[0]);
+    }
     return NULL;
 }
 
