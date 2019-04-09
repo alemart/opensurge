@@ -12,11 +12,11 @@ using SurgeEngine.Audio.Sound;
 object "DefaultSwitchController"
 {
     public enabled = true; // enable character switching?
-    input = Input(null);
     deny = Sound("samples/deny.wav");
 
     state "main"
     {
+        input = Player.active.input;
         if(!Level.cleared) {
             if(input.buttonPressed("fire3"))
                 Level.pause();

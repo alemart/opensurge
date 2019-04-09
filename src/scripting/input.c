@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "../core/input.h"
 
-/* private */
+/* input API */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -30,7 +30,6 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static uint64_t hash(const char *str);
 
 /* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
 #define BUTTON_UP             0x5979CA        /* hash("up") */
@@ -45,6 +44,10 @@ static uint64_t hash(const char *str);
 #define BUTTON_FIRE6          0x310F704981
 #define BUTTON_FIRE7          0x310F704982
 #define BUTTON_FIRE8          0x310F704983
+
+/* misc */
+static uint64_t hash(const char *str);
+static const surgescript_heapptr_t IS_OWN_INPUT_POINTER = 0;
 
 
 /*
@@ -73,28 +76,49 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    input_t* input = input_create_user(NULL);
-    surgescript_object_set_userdata(object, input);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+
+    ssassert(IS_OWN_INPUT_POINTER == surgescript_heap_malloc(heap));
+    surgescript_var_set_bool(surgescript_heap_at(heap, IS_OWN_INPUT_POINTER), false);
+
+    /* We may accept an external an input_t* as this object's userdata */
+    if(surgescript_object_userdata(object) == NULL) {
+        input_t* input = input_create_user(NULL);
+        surgescript_object_set_userdata(object, input);
+        surgescript_var_set_bool(surgescript_heap_at(heap, IS_OWN_INPUT_POINTER), true);
+    }
+
     return NULL;
 }
 
 /* destructor */
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    input_t* input = (input_t*)surgescript_object_userdata(object);
-    input_destroy(input);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+
+    /* Will destroy the input_t* only if we created it ourselves */
+    if(surgescript_var_get_bool(surgescript_heap_at(heap, IS_OWN_INPUT_POINTER))) {
+        input_t* input = (input_t*)surgescript_object_userdata(object);
+        input_destroy(input);
+    }
+
     return NULL;
 }
 
 /* __init(inputMap): set an input map */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+
     if(!surgescript_var_is_null(param[0])) {
-        input_t* input = (input_t*)surgescript_object_userdata(object);
-        const char* inputmap = surgescript_var_fast_get_string(param[0]);
-        if(*inputmap != 0)
-            input_change_mapping((inputuserdefined_t*)input, inputmap);
+        if(surgescript_var_get_bool(surgescript_heap_at(heap, IS_OWN_INPUT_POINTER))) {
+            input_t* input = (input_t*)surgescript_object_userdata(object);
+            const char* inputmap = surgescript_var_fast_get_string(param[0]);
+            if(*inputmap != '\0')
+                input_change_mapping((inputuserdefined_t*)input, inputmap);
+        }
     }
+
     return NULL;
 }
 
