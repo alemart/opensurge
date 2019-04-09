@@ -44,8 +44,9 @@ struct image_t {
     char* path; /* relative path */
 };
 
-/* drawing target */
-static image_t* target = NULL;
+/* misc */
+static image_t* target = NULL; /* drawing target */
+static const int MAX_IMAGE_SIZE = 2048; /* maximum image size for broad compatibility with video cards */
 
 #else
 
@@ -109,12 +110,21 @@ image_t* image_load(const char* path)
             return NULL;
         }
 
-        /* configuring the image */
+        /* checking the size */
         img->w = al_get_bitmap_width(img->data);
         img->h = al_get_bitmap_height(img->data);
+        if(img->w > MAX_IMAGE_SIZE || img->h > MAX_IMAGE_SIZE) {
+            /* ensure broad compatibility with video cards */
+            fatal_error("Failed to load \"%s\": images can't be larger than %dx%d", path, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
+            al_destroy_bitmap(img->data);
+            free(img);
+            return NULL;
+        }
+
+        /* convert mask to alpha */
         al_convert_mask_to_alpha(img->data, al_map_rgb(255, 0, 255));
 
-        /* adding it to the resource manager */
+        /* adding the image to the resource manager */
         img->path = str_dup(path);
         resourcemanager_add_image(img->path, img);
         resourcemanager_ref_image(img->path);
@@ -225,13 +235,15 @@ image_t* image_create(int width, int height)
 #if defined(A5BUILD)
     image_t* img;
 
-    if(width <= 0 || height <= 0)
+    if(width <= 0 || height <= 0 || width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE) {
         fatal_error("Can't create image of size %d x %d", width, height);
+        return NULL;
+    }
 
     img = mallocx(sizeof *img);
+    img->path = NULL;
     img->w = width;
     img->h = height;
-    img->path = NULL;
     
     if(NULL != (img->data = al_create_bitmap(img->w, img->h))) {
         ALLEGRO_STATE state;
@@ -312,8 +324,10 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
     image_t* img;
     int pw, ph;
 
-    if(width <= 0 || height <= 0)
+    if(width <= 0 || height <= 0) {
         fatal_error("Can't create shared image of size %d x %d", width, height);
+        return NULL;
+    }
 
     pw = parent->w;
     ph = parent->h;
@@ -430,8 +444,10 @@ image_t* image_clone_region(const image_t* src, int x, int y, int width, int hei
     image_t* img;
     int sw, sh;
 
-    if(width <= 0 || height <= 0)
+    if(width <= 0 || height <= 0) {
         fatal_error("Can't create cloned image of size %d x %d", width, height);
+        return NULL;
+    }
 
     sw = src->w;
     sh = src->h;
@@ -494,19 +510,19 @@ image_t* image_snapshot()
     ALLEGRO_STATE state;
     image_t* img = mallocx(sizeof *img);
     ALLEGRO_BITMAP* screen = al_get_backbuffer(al_get_current_display());
+    al_store_state(&state, ALLEGRO_STATE_BITMAP);
 
+    /*al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);*/ /* doesn't work properly */
     img->w = al_get_bitmap_width(screen);
     img->h = al_get_bitmap_height(screen);
     img->path = NULL;
     if(NULL == (img->data = al_create_bitmap(img->w, img->h)))
         fatal_error("Failed to take snapshot");
-
-    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
     al_set_target_bitmap(img->data);
     al_clear_to_color(al_map_rgb(0, 0, 0));
     al_draw_bitmap(screen, 0.0f, 0.0f, 0);
-    al_restore_state(&state);
 
+    al_restore_state(&state);
     return img;
 #else
     image_t* img = mallocx(sizeof *img);
