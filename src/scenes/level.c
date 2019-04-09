@@ -520,7 +520,8 @@ void level_unload()
     entitymanager_release();
 
     /* scripting */
-    surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
+    if(surgescript_vm_is_active(surgescript_vm()))
+        surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
     ssobj_extradata = hashtable_ssobj_extradata_t_destroy(ssobj_extradata);
     cached_level_ssobject = NULL;
 
