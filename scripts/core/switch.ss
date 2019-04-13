@@ -4,7 +4,6 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
-using SurgeEngine.Input;
 using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Audio.Sound;
@@ -16,8 +15,8 @@ object "DefaultSwitchController"
 
     state "main"
     {
-        input = Player.active.input;
         if(!Level.cleared) {
+            input = Player.active.input;
             if(input.buttonPressed("fire3"))
                 Level.pause();
             else if(input.buttonPressed("fire4"))
