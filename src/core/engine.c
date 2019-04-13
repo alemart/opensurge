@@ -326,7 +326,8 @@ void init_managers(const commandline_t* cmd)
     video_init(
         commandline_getint(
             cmd->video_resolution,
-            prefs_has_item(prefs, ".resolution") ? prefs_get_int(prefs, ".resolution") : VIDEORESOLUTION_2X
+            prefs_has_item(prefs, ".resolution") ?
+                prefs_get_int(prefs, ".resolution") : video_initial_resolution()
         ),
         commandline_getint(cmd->smooth_graphics, prefs_get_bool(prefs, ".smoothgfx")),
         commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen")),

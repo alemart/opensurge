@@ -312,6 +312,32 @@ videoresolution_t video_get_resolution()
     return video_resolution;
 }
 
+/*
+ * video_initial_resolution()
+ * The initial video resolution (adopted when
+ * no resolution has been selected yet)
+ */
+videoresolution_t video_initial_resolution()
+{
+#if defined(A5BUILD)
+    ALLEGRO_MONITOR_INFO info;
+
+    if(al_get_monitor_info(0, &info)) {
+        v2d_t desktop = v2d_new(info.x2 - info.x1, info.y2 - info.y1);
+        v2d_t screen3 = v2d_multiply(DEFAULT_SCREEN_SIZE, 3);
+
+        if(desktop.x > screen3.x && desktop.y > screen3.y)
+            return VIDEORESOLUTION_3X;
+        else
+            return VIDEORESOLUTION_2X;
+    }
+    else
+        return VIDEORESOLUTION_2X;
+#else
+    return VIDEORESOLUTION_2X;
+#endif
+}
+
 
 /*
  * video_is_smooth()

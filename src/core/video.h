@@ -45,6 +45,7 @@ int video_get_color_depth();
 bool video_is_window_active();
 void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen);
 videoresolution_t video_get_resolution();
+videoresolution_t video_initial_resolution();
 bool video_is_smooth();
 bool video_is_fullscreen();
 v2d_t video_get_screen_size(); /* usually, 426x240 */
