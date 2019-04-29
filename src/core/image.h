@@ -74,6 +74,6 @@ void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float 
 void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags);
 void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags);
 void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags);
-void image_draw_multiply(const image_t* src, int x, int y, color_t color, imageflags_t flags);
+void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags);
 
 #endif

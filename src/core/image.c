@@ -908,11 +908,11 @@ void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_
 }
 
 /*
- * image_draw_multiply()
+ * image_draw_tinted()
  * Image blending: multiplication mode
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_multiply(const image_t* src, int x, int y, color_t color, imageflags_t flags)
+void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
 #if defined(A5BUILD)
     al_draw_tinted_bitmap(src->data, color._color, x, y, FLIPPY(flags));
