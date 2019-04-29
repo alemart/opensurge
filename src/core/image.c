@@ -870,6 +870,25 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 #endif
 }
 
+/* Creates a dithering pattern at (x,y) with the specified size and color.
+   Returns the number of points. */
+int create_dither(int x, int y, int width, int height, ALLEGRO_COLOR color, ALLEGRO_VERTEX dither[], size_t size)
+{
+    int r, c, j = 0;
+
+    for(r = 0; r < height && j < size; r++) {
+        for(c = r % 2; c < width && j < size; c += 2) {
+            dither[j++] = (ALLEGRO_VERTEX){
+                .x = x + c + 0.5f,
+                .y = y + r + 0.5f,
+                .z = 0.0f,
+                .color = color,
+            };
+        }
+    }
+
+    return j;
+}
 
 /*
  * image_draw_lit()
@@ -878,12 +897,18 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
 #if defined(A5BUILD)
-    /* TODO */
-    uint8_t r, g, b;
-    color_unmap(color, &r, &g, &b, NULL);
-    al_draw_filled_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, al_map_rgba(r, g, b, 128));
+    /* TODO: shader for specific contours */
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_BLENDER);
     al_draw_bitmap(src->data, x, y, FLIPPY(flags));
-    al_draw_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, al_map_rgba(r, g, b, 255), 2.0f);
+    al_set_separate_blender(
+        ALLEGRO_ADD, ALLEGRO_CONST_COLOR, ALLEGRO_INVERSE_CONST_COLOR,
+        ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO
+    );
+    al_set_blend_color(al_map_rgba_f(0.65f, 0.65f, 0.65f, 1.0f));
+    al_draw_filled_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, color._color);
+    al_restore_state(&state);
+    /*al_draw_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, color._color, 2.0f);*/
 #else
     image_t* target = get_target();
 
