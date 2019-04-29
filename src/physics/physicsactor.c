@@ -656,6 +656,8 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 /* call UPDATE_MOVMODE whenever you update pa->angle */
 #define UPDATE_MOVMODE() \
     do { \
+        movmode_t prev = pa->movmode; \
+        \
         if(pa->angle < 0x20 || pa->angle > 0xE0) \
             pa->movmode = MM_FLOOR; \
         else if(pa->angle > 0x20 && pa->angle < 0x60) \
@@ -664,6 +666,9 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
             pa->movmode = MM_CEILING; \
         else if(pa->angle > 0xA0 && pa->angle < 0xE0) \
             pa->movmode = MM_RIGHTWALL; \
+        \
+        if(prev == MM_CEILING && pa->movmode == MM_FLOOR) \
+            pa->gsp = -pa->gsp; \
     } while(0)
 
 /* compute the current pa->angle */
