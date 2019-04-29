@@ -870,26 +870,6 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 #endif
 }
 
-/* Creates a dithering pattern at (x,y) with the specified size and color.
-   Returns the number of points. */
-int create_dither(int x, int y, int width, int height, ALLEGRO_COLOR color, ALLEGRO_VERTEX dither[], size_t size)
-{
-    int r, c, j = 0;
-
-    for(r = 0; r < height && j < size; r++) {
-        for(c = r % 2; c < width && j < size; c += 2) {
-            dither[j++] = (ALLEGRO_VERTEX){
-                .x = x + c + 0.5f,
-                .y = y + r + 0.5f,
-                .z = 0.0f,
-                .color = color,
-            };
-        }
-    }
-
-    return j;
-}
-
 /*
  * image_draw_lit()
  * Draws an image with a specific color
