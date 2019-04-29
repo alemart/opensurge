@@ -471,7 +471,49 @@ brick 45
     sprite
     {
         source_file     "images/waterworks.png"
-        source_rect     210 224 16 32
+        source_rect     208 224 16 32
+        frame_size      16 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 46
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     224 224 16 32
+        frame_size      16 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 47
+{
+    type                OBSTACLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     240 224 16 32
         frame_size      16 32
 
         animation

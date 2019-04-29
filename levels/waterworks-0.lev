@@ -5,7 +5,7 @@
 // ------------------------------------------------------------
 
 // header
-name "Waterworks Beta"
+name "Waterworks Zone"
 author "Alexandre Martins"
 license "CC-0"
 version "0.5"
@@ -13,88 +13,128 @@ requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/template.bg"
-spawn_point 192 400
-music "musics/waterworks.ogg"
+spawn_point 144 4976
 startup "DefaultStartup"
 players "Surge"
 
 // dialogs
 
 // bricks
-brick 80 984 608
-brick 33 1112 688
-brick 1 1112 720
-brick 1 1176 720
-brick 1 984 480
-brick 100 1176 560 yellow
-brick 101 1304 560 green
-brick 98 1176 688
-brick 99 1304 688
-brick 1 1304 752
-brick 2 1432 720
-brick 2 1560 720
-brick 37 1432 688
-brick 36 1448 688
-brick 36 1512 688
-brick 36 1576 688
-brick 36 1624 688
-brick 103 1176 432
-brick 102 1304 432
-brick 48 280 432
-brick 48 344 432
-brick 48 408 432
-brick 36 472 432
-brick 36 536 432
-brick 36 600 432
-brick 1 472 464
-brick 1 600 464
-brick 36 664 432
-brick 146 608 496
-brick 145 544 496
-brick 147 608 528
-brick 252 280 448
-brick 252 344 448
-brick 252 408 448
-brick 148 544 528
-brick 162 680 464
-brick 163 680 480
-brick 164 680 512
-brick 85 856 480
-brick 84 856 608
-brick 1 728 480
-brick 1 728 608
-brick 151 576 496
-brick 153 576 544
-brick 180 560 496
-brick 36 216 432
-brick 36 152 432
-brick 2 152 464
-brick 1 984 352
-brick 220 176 368
-brick 220 232 368
-brick 223 480 304
-brick 222 592 368
-brick 201 704 400
-brick 80 728 352
-brick 81 856 352
-brick 216 624 416
-brick 215 680 416
+brick 1 1040 6136
+brick 1 1168 6136
+brick 1 1296 6136
+brick 1 1424 6136
+brick 1 1552 6136
+brick 1 912 6136
+brick 85 1296 5624
+brick 85 1296 5752
+brick 82 1296 6008
+brick 84 1168 6008
+brick 83 1168 5880
+brick 85 1296 5880 green
+brick 80 1296 5880 yellow
+brick 86 1296 5880
+brick 80 1424 5880
+brick 1 1424 6008
+brick 1 1424 5752
+brick 1 1424 5624
+brick 1 1168 5624
+brick 1 1168 5752
+brick 1 1040 5608
+brick 1 1040 5736
+brick 1 1040 5864
+brick 1 1040 5992
+brick 1 1040 6008
+brick 80 1552 5880
+brick 48 1680 5960
+brick 1 1552 5752
+brick 1 1552 5624
+brick 1 1552 6008
+brick 1 912 6008
+brick 1 912 5880
+brick 1 912 5752
+brick 1 896 5224
+brick 1 1024 5224
+brick 1 1040 5224
+brick 85 1296 5240
+brick 85 1296 5368
+brick 85 1296 5496
+brick 1 1424 5496
+brick 1 1424 5368
+brick 1 1424 5240
+brick 1 1168 5240
+brick 1 1168 5368
+brick 1 1168 5496
+brick 1 1040 5352
+brick 1 1040 5480
+brick 1 1552 5496
+brick 1 1552 5368
+brick 1 1552 5240
+brick 1 0 5160
+brick 1 128 5160
+brick 1 256 5160
+brick 1 384 5160
+brick 1 512 5160
+brick 1 640 5192
+brick 1 768 5192
+brick 36 912 5064
+brick 46 896 5064
+brick 36 976 5064
+brick 36 1040 5064
+brick 36 1104 5064
+brick 80 1168 4984
+brick 81 1296 4984
+brick 85 1296 5112
+brick 1 1424 5112
+brick 1 1424 4984
+brick 1 1168 4856
+brick 1 1296 4856
+brick 1 1424 4856
+brick 1 1168 5112
+brick 1 1552 5112
+brick 1 1552 4984
+brick 1 1552 4856
+brick 1 1040 5096
+brick 1 912 5096
+brick 36 0 5000
+brick 36 64 5000
+brick 36 128 5000
+brick 36 192 5000
+brick 36 256 5000
+brick 36 320 5000
+brick 36 384 5000
+brick 36 448 5000
+brick 65 640 4936 hflip
+brick 64 768 4936 hflip
+brick 1 640 5064
+brick 1 768 5064
+brick 36 512 5000
+brick 36 560 5000
+brick 47 624 5000
+brick 2 0 5032
+brick 2 128 5032
+brick 2 256 5032
+brick 2 384 5032
+brick 2 512 5032
+brick 1 784 5096
+brick 1 1168 4728
+brick 1 1296 4728
+brick 1 1424 4728
+brick 1 1552 4728
+brick 1 1168 4600
+brick 1 1296 4600
+brick 1 1424 4600
+brick 1 1552 4600
 
 // entities
 
 // legacy items
-item 82 1144 656
-item 82 1144 624
-item 82 1144 592
-item 82 1144 560
-item 83 1432 656
-item 83 1432 624
-item 83 1432 592
-item 83 1432 560
-item 83 1272 496
-item 83 1240 496
-item 82 1304 496
-item 82 1336 496
+item 82 1264 6056
+item 82 1296 6056
+item 82 1344 5792
+item 83 1216 5984
+item 83 1216 6016
+item 82 1344 5824
 
 // legacy objects
 
