@@ -52,6 +52,7 @@ static int item_count;
 static int selected_item;
 static int scroll_y = 0; /* initial value */
 static int scroll_max;
+static bool is_scrolling;
 static int item_at(v2d_t position);
 static void draw_item(int item_number, v2d_t center);
 
@@ -105,6 +106,7 @@ void editorpal_init(void *config_ptr)
 
     /* misc */
     selected_item = NO_ITEM;
+    is_scrolling = false;
     scroll_max = (int)((item_count - 1) / (int)((VIDEO_SCREEN_W - SCROLLBAR_WIDTH) / ITEM_BOX_SIZE)) * ITEM_BOX_SIZE - (int)(VIDEO_SCREEN_H / ITEM_BOX_SIZE) * ITEM_BOX_SIZE + ITEM_BOX_SIZE;
     scroll_y = clip(scroll_y, 0, scroll_max); /* preserve previous value */
     pal_input = input_create_user("editorpal");
@@ -179,11 +181,15 @@ void editorpal_update()
             scroll_y = min(scroll_y + ITEM_BOX_SIZE, scroll_max);
 
         /* handling clicks */
-        if(cursor_position.x >= VIDEO_SCREEN_W - SCROLLBAR_WIDTH) {
-            if(input_button_down(cursor_input, IB_FIRE1)) {
-                int yref = (scroll_max + ITEM_BOX_SIZE) * cursor_position.y / VIDEO_SCREEN_H;
-                scroll_y = (yref / ITEM_BOX_SIZE) * ITEM_BOX_SIZE;
-            }
+        if(input_button_down(cursor_input, IB_FIRE1) && cursor_position.x >= VIDEO_SCREEN_W - SCROLLBAR_WIDTH)
+            is_scrolling = true;
+        else if(!input_button_down(cursor_input, IB_FIRE1))
+            is_scrolling = false;
+
+        /* scrolling */
+        if(is_scrolling) {
+            int yref = (scroll_max + ITEM_BOX_SIZE) * cursor_position.y / VIDEO_SCREEN_H;
+            scroll_y = (yref / ITEM_BOX_SIZE) * ITEM_BOX_SIZE;
         }
     }
 
