@@ -1491,6 +1491,7 @@ brick 106
 {
     type                OBSTACLE
     behavior            DEFAULT
+    zindex              0.49
     mask                "images/waterworks_mask.png"
 
     sprite
