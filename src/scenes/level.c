@@ -2376,6 +2376,7 @@ void update_ssobject(surgescript_object_t* object, void* param)
 
         /* are we dealing with a level entity? */
         if(surgescript_object_has_tag(object, "entity")) {
+            /* get the position of the object */
             surgescript_transform_t transform;
             surgescript_object_peek_transform(object, &transform);
             surgescript_transform_apply2d(&transform, &origin.x, &origin.y);
@@ -2387,8 +2388,10 @@ void update_ssobject(surgescript_object_t* object, void* param)
                 surgescript_object_has_tag(object, "detached")
             )
                 surgescript_object_set_active(object, true);
-            else if(!surgescript_object_has_tag(object, "disposable"))
+            else if(!surgescript_object_has_tag(object, "disposable")) {
                 surgescript_object_set_active(object, false);
+                scripting_util_set_world_position(object, origin = get_ssobj_spawnpoint(object)); /* a bit heavy for every frame? */
+            }
             else
                 surgescript_object_kill(object);
         }
