@@ -25,22 +25,6 @@
 #include "util.h"
 
 /*
- * str_to_hash()
- * Generates a hash key
- */
-int str_to_hash(const char *str)
-{
-    int hash = 0;
-    const char *p;
-
-    for(p=str; *p; p++)
-        hash = tolower(*p) + (hash << 6) + (hash << 16) - hash; /* we need tolower: hash key must be case insensitive */
-
-    return hash;
-}
-
-
-/*
  * str_to_upper()
  * Upper-case convert
  */
@@ -100,6 +84,23 @@ int str_icmp(const char* s1, const char* s2)
         return 1;
     else
         return 0;
+}
+
+
+/*
+ * str_ihash()
+ * Generates a case-insensitive hash key
+ */
+uint32_t str_ihash(const char *str)
+{
+    uint32_t hash = 0;
+
+    while(*str) {
+        /* we need to use tolower, as the hash key must be case insensitive */
+        hash = tolower(*(str++)) + (hash << 6) + (hash << 16) - hash;
+    }
+
+    return hash;
 }
 
 

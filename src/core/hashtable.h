@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * hashtable.h - generic-type hash table
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,24 +24,30 @@
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "util.h"
 #include "stringutil.h"
 #include "logfile.h"
 
 /* utilities */
-#define HASHTABLE_TABLESIZE 97 /* prime number */
-#define HASHTABLE_HASHFUNCTION(x) (((str_to_hash(x)%HASHTABLE_TABLESIZE)+HASHTABLE_TABLESIZE)%HASHTABLE_TABLESIZE)
+#define TABLE_SIZE            97 /* prime number (must be a compile-time constant for compiler optimization) */
+#define HASH_FUNCTION(h, key) ((h)->hash_function(key) % TABLE_SIZE)
+#define CONST_PTR(KEY_TYPE)   const KEY_TYPE
 
 /* hashtable_<typename> class: pretty much like C++ templates */
-#define HASHTABLE_GENERATE_CODE(T) \
+/* currently, the KEY_TYPE should be a pointer; HASH_FN should be a uint32_t function */
+#define HASHTABLE_GENERATE_CODE(T) HASHTABLE_GENERATE_CODE_EX(T, char*, str_icmp, str_ihash) /* use strings as keys */
+#define HASHTABLE_GENERATE_CODE_EX(T, KEY_TYPE, KEY_EQUALS_FN, HASH_FN) \
 typedef struct hashtable_##T hashtable_##T; \
 typedef struct hashtable_list_##T hashtable_list_##T; \
 struct hashtable_##T { \
-    hashtable_list_##T *data[HASHTABLE_TABLESIZE]; \
+    hashtable_list_##T *data[TABLE_SIZE]; \
     void (*destroy_element)(T*); \
+    int (*keycmp)(CONST_PTR(KEY_TYPE),CONST_PTR(KEY_TYPE)); \
+    uint32_t (*hash_function)(CONST_PTR(KEY_TYPE)); \
 }; \
 struct hashtable_list_##T { \
-    char *key; \
+    KEY_TYPE key; \
     T *value;\
     int reference_count;\
     hashtable_list_##T *next; \
@@ -52,7 +58,9 @@ hashtable_##T* hashtable_##T##_create(void (*destroy_element_strategy)(T*)) /* d
     hashtable_##T *h = mallocx(sizeof *h); \
     logfile_message("hashtable_" #T "_create()"); \
     h->destroy_element = destroy_element_strategy; \
-    for(i=0; i<HASHTABLE_TABLESIZE; i++) \
+    h->keycmp = KEY_EQUALS_FN; \
+    h->hash_function = HASH_FN; \
+    for(i=0; i<TABLE_SIZE; i++) \
         h->data[i] = NULL; \
     return h; \
 } \
@@ -61,7 +69,7 @@ hashtable_##T* hashtable_##T##_destroy(hashtable_##T *h) \
     int i; \
     hashtable_list_##T *p, *q; \
     logfile_message("hashtable_" #T "_destroy()"); \
-    for(i=0; i<HASHTABLE_TABLESIZE; i++) { \
+    for(i=0; i<TABLE_SIZE; i++) { \
         p = h->data[i]; \
         while(p != NULL) { \
             q = p->next; \
@@ -73,27 +81,25 @@ hashtable_##T* hashtable_##T##_destroy(hashtable_##T *h) \
         } \
     } \
     free(h); \
-    logfile_message("hashtable_" #T "_destroy() - success!"); \
     return NULL; \
 } \
-T* hashtable_##T##_find(const hashtable_##T *h, const char *key) \
+T* hashtable_##T##_find(const hashtable_##T *h, CONST_PTR(KEY_TYPE) key) \
 { \
-    int k = HASHTABLE_HASHFUNCTION(key); \
+    int k = HASH_FUNCTION(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
-        if(str_icmp(q->key, key) == 0) \
+        if(h->keycmp(q->key, key) == 0) \
             return q->value; \
         else \
             q = q->next; \
     } \
     return NULL; \
 } \
-void hashtable_##T##_add(hashtable_##T *h, const char *key, T *value) \
+void hashtable_##T##_add(hashtable_##T *h, CONST_PTR(KEY_TYPE) key, T *value) \
 { \
     if(NULL == hashtable_##T##_find(h, key)) { \
-        int k = HASHTABLE_HASHFUNCTION(key); \
+        int k = HASH_FUNCTION(h, key); \
         hashtable_list_##T *q; \
-        logfile_message("hashtable_" #T "_add(): adding '%s'...", key); \
         q = mallocx(sizeof *q); \
         q->key = str_dup(key); \
         q->value = value; \
@@ -101,17 +107,14 @@ void hashtable_##T##_add(hashtable_##T *h, const char *key, T *value) \
         q->next = h->data[k]; \
         h->data[k] = q; \
     } \
-    else \
-        logfile_message("hashtable_" #T "_add(): item '%s' already exists! It won't be added.", key); \
 } \
-void hashtable_##T##_remove(hashtable_##T *h, const char *key) \
+void hashtable_##T##_remove(hashtable_##T *h, CONST_PTR(KEY_TYPE) key) \
 { \
-    int k = HASHTABLE_HASHFUNCTION(key); \
+    int k = HASH_FUNCTION(h, key); \
     hashtable_list_##T *p, *q; \
-    logfile_message("hashtable_" #T "_remove(): removing element '%s'...", key); \
     if(h->data[k] != NULL) { \
         p = h->data[k]; \
-        if(str_icmp(p->key, key) == 0) { \
+        if(h->keycmp(p->key, key) == 0) { \
             if(p->reference_count <= 0) { \
                 h->data[k] = p->next; \
                 if(h->destroy_element != NULL) \
@@ -120,12 +123,12 @@ void hashtable_##T##_remove(hashtable_##T *h, const char *key) \
                 free(p); \
             } \
             else \
-                logfile_message("hashtable_" #T "_remove(): element '%s' has %d active references. It won't be removed.", key, p->reference_count); \
+                logfile_message("hashtable_" #T "_remove(): can't remove element with %d active references.", p->reference_count); \
             return; \
         } \
         else { \
             while(p->next != NULL) { \
-                if(str_icmp(p->next->key, key) == 0) { \
+                if(h->keycmp(p->next->key, key) == 0) { \
                     if(p->next->reference_count <= 0) { \
                         q = p->next; \
                         p->next = q->next; \
@@ -135,49 +138,48 @@ void hashtable_##T##_remove(hashtable_##T *h, const char *key) \
                         free(q); \
                     } \
                     else \
-                        logfile_message("hashtable_" #T "_remove(): element '%s' has %d active references. It won't be removed.", key, p->next->reference_count); \
+                        logfile_message("hashtable_" #T "_remove(): can't remove element with %d active references.", p->next->reference_count); \
                     return; \
                 } \
                 p = p->next; \
             } \
         } \
     } \
-    logfile_message("hashtable_" #T "_remove(): element '%s' does not exist.", key); \
 } \
-int hashtable_##T##_ref(hashtable_##T *h, const char *key) \
+int hashtable_##T##_ref(hashtable_##T *h, CONST_PTR(KEY_TYPE) key) \
 { \
-    int k = HASHTABLE_HASHFUNCTION(key); \
+    int k = HASH_FUNCTION(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
-        if(str_icmp(q->key, key) == 0) \
+        if(h->keycmp(q->key, key) == 0) \
             return ++(q->reference_count); \
         else \
             q = q->next; \
     } \
-    logfile_message("hashtable_" #T "_ref(): element '%s' does not exist.", key); \
+    logfile_message("hashtable_" #T "_ref(): element does not exist."); \
     return 0; \
 } \
-int hashtable_##T##_unref(hashtable_##T *h, const char *key) \
+int hashtable_##T##_unref(hashtable_##T *h, CONST_PTR(KEY_TYPE) key) \
 { \
-    int k = HASHTABLE_HASHFUNCTION(key); \
+    int k = HASH_FUNCTION(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
-        if(str_icmp(q->key, key) == 0) { \
+        if(h->keycmp(q->key, key) == 0) { \
             q->reference_count = max(0, q->reference_count - 1); \
             return q->reference_count; \
         } \
         else \
             q = q->next; \
     } \
-    logfile_message("hashtable_" #T "_unref(): element '%s' does not exist.", key); \
+    logfile_message("hashtable_" #T "_unref(): element does not exist."); \
     return 0; \
 } \
-int hashtable_##T##_refcount(const hashtable_##T *h, const char *key) \
+int hashtable_##T##_refcount(const hashtable_##T *h, CONST_PTR(KEY_TYPE) key) \
 { \
-    int k = HASHTABLE_HASHFUNCTION(key); \
+    int k = HASH_FUNCTION(h, key); \
     const hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
-        if(str_icmp(q->key, key) == 0) \
+        if(h->keycmp(q->key, key) == 0) \
             return q->reference_count; \
         else \
             q = q->next; \
@@ -190,7 +192,7 @@ void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
              to store the unreferenced entries */ \
     int i; \
     hashtable_list_##T *q; \
-    for(i=0; i<HASHTABLE_TABLESIZE; i++) { \
+    for(i=0; i<TABLE_SIZE; i++) { \
         for(q=h->data[i]; q!=NULL; q=q->next) { \
             if(q->reference_count <= 0) { \
                 hashtable_##T##_remove(h, q->key); \
