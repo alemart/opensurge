@@ -2401,8 +2401,11 @@ void update_ssobject(surgescript_object_t* object, void* param)
             }
             else if(!surgescript_object_has_tag(object, "disposable")) {
                 surgescript_object_set_active(object, false);
-                if(is_ssobj_spawned_in_the_editor(object))
-                    scripting_util_set_world_position(object, origin = get_ssobj_spawnpoint(object)); /* a bit heavy for every frame? */
+                if(is_ssobj_spawned_in_the_editor(object)) {
+                    v2d_t spawn_point = get_ssobj_spawnpoint(object);
+                    if(!level_inside_screen(spawn_point.x, spawn_point.y, 1, 1))
+                        scripting_util_set_world_position(object, origin = spawn_point); /* a bit heavy for every frame? */
+                }
             }
             else
                 surgescript_object_kill(object);
@@ -2532,7 +2535,7 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point,
             if(surgescript_object_has_tag(object, "detached") && !surgescript_object_has_tag(object, "private")) {
                 surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
                 logfile_message("WARNING: object \"%s\" is tagged as detached, but not private. Fixing...");
-                surgescript_tagsystem_add_tag(tag_system, object, "private");
+                surgescript_tagsystem_add_tag(tag_system, object_name, "private");
             }
         }
 
