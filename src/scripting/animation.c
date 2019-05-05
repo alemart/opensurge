@@ -49,9 +49,6 @@ static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
 static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
 static void notify_change(const surgescript_object_t* object);
 static actor_t* get_animation_actor(const surgescript_object_t* object);
-extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
-extern player_t* scripting_player_ptr(const surgescript_object_t* object);
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /*
  * scripting_register_animation()

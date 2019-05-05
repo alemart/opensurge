@@ -378,6 +378,7 @@ SET(GAME_SRCS
   src/scripting/surgeengine.c
   src/scripting/actor.c
   src/scripting/animation.c
+  src/scripting/brick.c
   src/scripting/camera.c
   src/scripting/collisions.c
   src/scripting/console.c

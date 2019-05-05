@@ -69,7 +69,6 @@ struct item_t* level_create_item(int id, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
 surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position);
 void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
-void level_add_to_score(int score);
 struct item_t* level_create_animal(v2d_t position);
 
 /* camera */
@@ -108,6 +107,7 @@ void level_set_watercolor(color_t color);
 /* misc */
 v2d_t level_size();
 float level_gravity();
+void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);
 void level_hide_dialogbox();
 

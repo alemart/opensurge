@@ -66,7 +66,6 @@ struct collisionmanager_t
 #define COLLIDER_COLOR()                    (color_rgb(255, 255, 0))
 static const surgescript_heapptr_t BALL_CENTER_ADDR = 0;
 static inline collider_t* safe_get_collider(surgescript_object_t* object);
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

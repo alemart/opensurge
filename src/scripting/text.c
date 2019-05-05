@@ -66,8 +66,6 @@ static const bool DEFAULT_VISIBILITY = true;
 static inline font_t* get_font(const surgescript_object_t* object);
 static inline fontalign_t str2align(const char* align);
 static inline const char* align2str(fontalign_t align);
-extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /*
  * scripting_register_text()

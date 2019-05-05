@@ -198,6 +198,7 @@ static void reconfigure_players_input_devices();
 
 /* Scripting */
 #define TRANSFORM_MAX_DEPTH 64
+#define BRICKLIKE_MAX_COUNT 1024
 static surgescript_object_t* cached_level_ssobject = NULL;
 static void update_ssobjects();
 static void update_ssobject(surgescript_object_t* object, void* param);
@@ -218,6 +219,11 @@ static void set_ssobj_extradata(const surgescript_object_t* object, ssobj_extrad
 static void free_ssobj_extradata(ssobj_extradata_t* data);
 HASHTABLE_GENERATE_CODE(ssobj_extradata_t);
 static hashtable_ssobj_extradata_t* ssobj_extradata = NULL;
+static void add_bricklike_ssobject(surgescript_object_t* object);
+static inline surgescript_object_t* get_bricklike_ssobject(int index);
+static inline void clear_bricklike_ssobjects();
+static surgescript_object_t* bricklike_ssobject[BRICKLIKE_MAX_COUNT];
+static int bricklike_ssobject_count = 0;
 
 
 
@@ -1011,6 +1017,7 @@ void level_init(void *path_to_lev_file)
     jump_to_next_stage = FALSE;
 
     /* helpers */
+    clear_bricklike_ssobjects();
     particle_init();
     music_stop();
 
@@ -1269,7 +1276,7 @@ void level_update()
         if(entitymanager_get_number_of_bricks() > 0) {
             if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
-                    player_update(team[i], team, team_size, major_bricks, major_items, major_enemies);
+                    player_update(team[i], team, team_size, major_bricks, major_items, major_enemies, get_bricklike_ssobject);
             }
 
             /* pitfall */
@@ -1341,6 +1348,7 @@ void level_update()
         level_timer += timer_get_delta();
 
     /* update scripts */
+    clear_bricklike_ssobjects();
     update_ssobjects();
 
     /* update particles */
@@ -2386,11 +2394,15 @@ void update_ssobject(surgescript_object_t* object, void* param)
                 level_inside_screen(origin.x, origin.y, 1, 1) ||
                 surgescript_object_has_tag(object, "awake") ||
                 surgescript_object_has_tag(object, "detached")
-            )
+            ) {
                 surgescript_object_set_active(object, true);
+                if(strcmp(surgescript_object_name(object), "Brick") == 0)
+                    add_bricklike_ssobject(object);
+            }
             else if(!surgescript_object_has_tag(object, "disposable")) {
                 surgescript_object_set_active(object, false);
-                scripting_util_set_world_position(object, origin = get_ssobj_spawnpoint(object)); /* a bit heavy for every frame? */
+                if(is_ssobj_spawned_in_the_editor(object))
+                    scripting_util_set_world_position(object, origin = get_ssobj_spawnpoint(object)); /* a bit heavy for every frame? */
             }
             else
                 surgescript_object_kill(object);
@@ -2444,6 +2456,29 @@ bool render_ssobject(surgescript_object_t* object, void* param)
         return false;
 }
 
+/* brick-like objects */
+void add_bricklike_ssobject(surgescript_object_t* object)
+{
+    /* object is guaranteed to be named "Brick" */
+    /* add it to the bricklike_ssobject array */
+    if(bricklike_ssobject_count >= BRICKLIKE_MAX_COUNT)
+        return;
+    bricklike_ssobject[bricklike_ssobject_count++] = object;
+}
+
+surgescript_object_t* get_bricklike_ssobject(int index)
+{
+    if(index >= 0 && index < bricklike_ssobject_count)
+        return bricklike_ssobject[index];
+    else
+        return NULL;
+}
+
+inline void clear_bricklike_ssobjects()
+{
+    bricklike_ssobject_count = 0;
+}
+
 
 /* SurgeScript object utilities */
 
@@ -2492,6 +2527,13 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point,
                 .spawned_in_the_editor = spawned_in_the_editor
             };
             set_ssobj_extradata(object, extradata);
+
+            /* sanity check for entities */
+            if(surgescript_object_has_tag(object, "detached") && !surgescript_object_has_tag(object, "private")) {
+                surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+                logfile_message("WARNING: object \"%s\" is tagged as detached, but not private. Fixing...");
+                surgescript_tagsystem_add_tag(tag_system, object, "private");
+            }
         }
 
         /* done! */
@@ -2923,6 +2965,7 @@ void editor_update()
                 surgescript_object_traverse_tree_ex(root, &ssobject, editor_pick_ssobj);
                 if(ssobject != NULL) {
                     int ssobj_id = editor_ssobj_id(surgescript_object_name(ssobject));
+                    video_showmessage("Got %d", ssobj_id);
                     if(!pick_object) {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, ssobj_id, scripting_util_world_position(ssobject));
                         editor_action_commit(eda);
@@ -3676,6 +3719,7 @@ int editor_ssobj_id(const char* entity_name)
 {
     /* find i such that editor_ssobj[i] == entity_name */
     for(int i = 0; i < editor_ssobj_count; i++) {
+        video_showmessage("Check %s/%s : %d", entity_name,editor_ssobj[i], strcmp(entity_name, editor_ssobj[i]));
         if(strcmp(entity_name, editor_ssobj[i]) == 0)
             return i;
     }
@@ -4132,7 +4176,7 @@ void editor_action_commit(editor_action_t action)
 bool editor_remove_ssobj(surgescript_object_t* object, void* data)
 {
     if(surgescript_object_is_active(object)) {
-        if(surgescript_object_has_tag(object, "entity")) {
+        if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private")) {
             const char* object_name = surgescript_object_name(object);
             editor_action_t *action = (editor_action_t*)data;
             if(editor_ssobj_id(object_name) == action->obj_id) {
@@ -4151,7 +4195,7 @@ bool editor_remove_ssobj(surgescript_object_t* object, void* data)
 bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 {
     if(surgescript_object_is_active(object)) {
-        if(surgescript_object_has_tag(object, "entity")) {
+        if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private")) {
             v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
             float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
             float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x + 1 , editor_cursor.y + topleft.y + 1 };

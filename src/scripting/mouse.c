@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <stdint.h>
 #include <math.h>
+#include "scripting.h"
 #include "../core/video.h"
 #include "../core/input.h"
 
@@ -36,7 +37,6 @@ static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const 
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static uint64_t hash(const char *str);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /* button hashes: "left", "right", "middle" */
 #define BUTTON_LEFT         0x17C9A03B0

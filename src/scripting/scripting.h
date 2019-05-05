@@ -23,6 +23,7 @@
 
 #include <surgescript.h>
 #include "../core/v2d.h"
+#include "../entities/brick.h"
 
 /* scripting API */
 void scripting_init(int argc, const char** argv);
@@ -43,5 +44,28 @@ const char* scripting_util_parent_name(const surgescript_object_t* object);
 surgescript_object_t* scripting_util_surgeengine_object(surgescript_vm_t* vm);
 surgescript_object_t* scripting_util_surgeengine_component(surgescript_vm_t* vm, const char* component_name);
 surgescript_object_t* scripting_util_get_component(surgescript_object_t* object, const char* component_name);
+
+/* obtain data from objects */
+struct actor_t;
+struct animation_t;
+struct collisionmask_t;
+struct music_t;
+struct player_t;
+
+extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
+extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
+
+extern struct actor_t* scripting_actor_ptr(const surgescript_object_t* object);
+extern struct player_t* scripting_player_ptr(const surgescript_object_t* object);
+extern struct music_t* scripting_music_ptr(const surgescript_object_t* object);
+
+extern const struct animation_t* scripting_animation_ptr(const surgescript_object_t* object);
+extern void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id);
+
+extern bricktype_t scripting_brick_type(const surgescript_object_t* object);
+extern bricklayer_t scripting_brick_layer(const surgescript_object_t* object);
+extern bool scripting_brick_enabled(const surgescript_object_t* object);
+extern v2d_t scripting_brick_hotspot(const surgescript_object_t* object);
+extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* object);
 
 #endif

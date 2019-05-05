@@ -120,9 +120,6 @@ static void update_collider(surgescript_object_t* object, int width, int height)
 static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
 static void update_animation(surgescript_object_t* object, int anim_id);
 static void read_transform(surgescript_object_t* object, v2d_t* world_position);
-extern actor_t* scripting_actor_ptr(const surgescript_object_t* object);
-extern animation_t* scripting_animation_ptr(const surgescript_object_t* object);
-extern void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id);
 static const double RAD2DEG = 57.2957795131;
 #define FIXANG(rad) ((rad) >= 0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 

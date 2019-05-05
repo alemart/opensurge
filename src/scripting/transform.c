@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <math.h>
+#include "scripting.h"
 #include "../core/util.h"
 
 /* private stuff */
@@ -59,8 +60,6 @@ static const char* ONCHANGE = "onTransformChange"; /* fun onTransformChange(tran
 static const surgescript_heapptr_t WORLDPOSITION_ADDR = 0;
 static const surgescript_heapptr_t LOCALPOSITION_ADDR = 1;
 static const surgescript_heapptr_t LOCALSCALE_ADDR = 2;
-extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 
 

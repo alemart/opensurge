@@ -39,6 +39,7 @@ using SurgeEngine.Transform;
 object "SurgeEngine"
 {
     actorFactory = spawn("ActorFactory");
+    brickFactory = spawn("BrickFactory");
     inputFactory = spawn("InputFactory");
     levelManager = spawn("LevelManager");
     camera = spawn("Camera");
@@ -55,6 +56,11 @@ object "SurgeEngine"
     {
         return actorFactory;
     }
+
+    fun get_Brick()
+    {
+        return brickFactory;
+    }   
 
     fun get_Input()
     {
@@ -140,6 +146,18 @@ object "ActorFactory"
     }
 
     fun spawn(x) { return null; }
+    fun destroy() { }
+}
+
+object "BrickFactory"
+{
+    fun call(spriteName)
+    {
+        brick = caller.spawn("Brick");
+        brick.__init(spriteName);
+        return brick;
+    }
+
     fun destroy() { }
 }
 

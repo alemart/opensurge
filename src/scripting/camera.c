@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include "scripting.h"
 #include "../entities/camera.h"
 
 /* private */
@@ -29,8 +30,6 @@ static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
-extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /*
  * scripting_register_camera()

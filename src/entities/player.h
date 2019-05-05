@@ -52,6 +52,7 @@ struct item_list_t;
 struct enemy_list_t;
 struct physicsactor_t;
 struct obstaclemap_t;
+struct surgescript_object_t;
 typedef struct player_t player_t;
 typedef enum playershield_t playershield_t;
 
@@ -102,7 +103,7 @@ struct player_t {
 /* public functions */
 player_t* player_create(const char *character_name);
 player_t* player_destroy(player_t *player);
-void player_update(player_t *player, struct player_t **team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list);
+void player_update(player_t *player, struct player_t **team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list, struct surgescript_object_t* (*get_bricklike_object)(int));
 void player_render(player_t *player, v2d_t camera_position);
 
 void player_hit(player_t *player, float direction);

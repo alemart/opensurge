@@ -21,6 +21,7 @@
  * player_enable_roll, player_disable_roll
  */
 
+#include <surgescript.h>
 #include <math.h>
 #include "actor.h"
 #include "player.h"
@@ -45,6 +46,7 @@
 #include "../physics/obstaclemap.h"
 #include "../physics/obstacle.h"
 #include "../physics/collisionmask.h"
+#include "../scripting/scripting.h"
 
 
 /* Uncomment to render the sensors */
@@ -82,10 +84,11 @@ static int score;                        /* shared score */
 static void update_shield(player_t *p);
 static void update_animation(player_t *p);
 static void play_sounds(player_t *p);
-static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
-static obstacle_t* item2obstacle(const item_t *item);
-static obstacle_t* object2obstacle(const object_t *object);
-static inline int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer);
+static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list, surgescript_object_t* (*get_bricklike_object)(int));
+static obstacle_t* item2obstacle(const item_t* item);
+static obstacle_t* object2obstacle(const object_t* object);
+static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
+static inline int ignore_obstacle(const player_t* player, bricklayer_t brick_layer);
 static inline float ang_diff(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static int fixangle(int degrees, int threshold);
@@ -224,7 +227,7 @@ player_t* player_destroy(player_t *player)
  * player_update()
  * Updates the player
  */
-void player_update(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, enemy_list_t *enemy_list)
+void player_update(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, enemy_list_t *enemy_list, surgescript_object_t* (*get_bricklike_object)(int))
 {
     int i;
     actor_t *act = player->actor;
@@ -233,7 +236,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     /* physics */
     if(!player->disable_movement) {
         player->pa_old_state = physicsactor_get_state(player->pa);
-        physics_adapter(player, team, team_size, brick_list, item_list, enemy_list);
+        physics_adapter(player, team, team_size, brick_list, item_list, enemy_list, get_bricklike_object);
     }
 
     /* the player blinks */
@@ -1264,12 +1267,13 @@ void play_sounds(player_t* p)
 }
 
 /* the interface between player_t and physicsactor_t */
-void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
+void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list, surgescript_object_t* (*get_bricklike_object)(int))
 {
     DARRAY(obstacle_t*, tmp_obstacle);
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
     obstaclemap_t* obstaclemap = player->obstaclemap;
+    surgescript_object_t* bricklike_object = NULL;
     int i;
 
     /* converting variables */
@@ -1300,19 +1304,26 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* creating the obstacle map */
     for(; brick_list; brick_list = brick_list->next) {
-        if(brick_obstacle(brick_list->data) != NULL && !ignore_obstacle(brick_layer(brick_list->data), player->layer))
+        if(brick_obstacle(brick_list->data) != NULL && !ignore_obstacle(player, brick_layer(brick_list->data)))
             obstaclemap_add_obstacle(obstaclemap, brick_obstacle(brick_list->data));
     }
     for(; item_list; item_list = item_list->next) {
-        if(item_list->data->obstacle && item_list->data->mask && !ignore_obstacle(BRL_DEFAULT, player->layer)) {
+        if(item_list->data->obstacle && item_list->data->mask && !ignore_obstacle(player, BRL_DEFAULT)) {
             obstacle_t* obstacle = item2obstacle(item_list->data);
             obstaclemap_add_obstacle(obstaclemap, obstacle);
             darray_push(tmp_obstacle, obstacle);
         }
     }
     for(; object_list; object_list = object_list->next) {
-        if(object_list->data->obstacle && object_list->data->mask && !ignore_obstacle(BRL_DEFAULT, player->layer)) {
+        if(object_list->data->obstacle && object_list->data->mask && !ignore_obstacle(player, BRL_DEFAULT)) {
             obstacle_t* obstacle = object2obstacle(object_list->data);
+            obstaclemap_add_obstacle(obstaclemap, obstacle);
+            darray_push(tmp_obstacle, obstacle);
+        }
+    }
+    for(i = 0; (bricklike_object = get_bricklike_object(i)) != NULL; i++) {
+        if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object) && !ignore_obstacle(player, scripting_brick_layer(bricklike_object))) {
+            obstacle_t* obstacle = bricklike2obstacle(bricklike_object);
             obstaclemap_add_obstacle(obstaclemap, obstacle);
             darray_push(tmp_obstacle, obstacle);
         }
@@ -1368,25 +1379,34 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 }
 
 /* converts a built-in item to an obstacle */
-obstacle_t* item2obstacle(const item_t *item)
+obstacle_t* item2obstacle(const item_t* item)
 {
     const collisionmask_t* mask = item->mask;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
     return obstacle_create(mask, position.x, position.y, OF_SOLID);
 }
 
-/* converts a custom object to an obstacle */
-obstacle_t* object2obstacle(const object_t *object)
+/* converts a legacy object to an obstacle */
+obstacle_t* object2obstacle(const object_t* object)
 {
     const collisionmask_t* mask = object->mask;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
     return obstacle_create(mask, position.x, position.y, OF_SOLID);
 }
 
-/* ignore the obstacle? */
-int ignore_obstacle(bricklayer_t brick_layer, bricklayer_t player_layer)
+/* converts a brick-like SurgeScript object to an obstacle */
+obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
 {
-    return (brick_layer != BRL_DEFAULT && player_layer != brick_layer);
+    const collisionmask_t* mask = scripting_brick_mask(object); /* this is assumed to not be NULL */
+    v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
+    int flags = (scripting_brick_type(object) == BRK_OBSTACLE) ? OF_SOLID : OF_CLOUD;
+    return obstacle_create(mask, position.x, position.y, flags);
+}
+
+/* ignore the obstacle? */
+int ignore_obstacle(const player_t* player, bricklayer_t brick_layer)
+{
+    return (brick_layer != BRL_DEFAULT && player->layer != brick_layer);
 }
 
 /* hotspot "gambiarra" */

@@ -52,7 +52,6 @@ static surgescript_var_t* fun_finish(surgescript_object_t* object, const surgesc
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t IDX_ADDR = 1; /* must be the last address */
 static void update_music(surgescript_object_t* object);
-extern music_t* scripting_music_ptr(const surgescript_object_t* object);
 
 /*
  * scripting_register_level()

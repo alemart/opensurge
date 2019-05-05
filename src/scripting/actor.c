@@ -64,9 +64,6 @@ static const surgescript_heapptr_t OFFSET_ADDR = 4;
 static const double DEFAULT_ZINDEX = 0.5;
 static const double DEG2RAD = 0.01745329251994329576;
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
-extern const animation_t* scripting_animation_ptr(const surgescript_object_t* object);
-extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
-extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 
 /*
  * scripting_register_actor()

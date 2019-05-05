@@ -50,6 +50,7 @@ extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
 extern void scripting_register_animation(surgescript_vm_t* vm);
+extern void scripting_register_brick(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
@@ -91,6 +92,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
     scripting_register_animation(vm);
+    scripting_register_brick(vm);
     scripting_register_camera(vm);
     scripting_register_collisions(vm);
     scripting_register_console(vm);
@@ -231,8 +233,10 @@ static void world2local(surgescript_objectmanager_t* manager, surgescript_object
         world2local(manager, surgescript_object_parent(object), root, position, angle);
 
     surgescript_object_peek_transform(object, &transform);
-    surgescript_transform_apply2dinverse(&transform, &(position->x), &(position->y));
-    *angle -= transform.rotation.z;
+    if(position != NULL)
+        surgescript_transform_apply2dinverse(&transform, &(position->x), &(position->y));
+    if(angle != NULL)
+        *angle -= transform.rotation.z;
 }
 
 /* set the world position of an object (teleport) */
@@ -244,10 +248,8 @@ void scripting_util_set_world_position(surgescript_object_t* object, v2d_t posit
     surgescript_transform_t* transform = surgescript_object_transform(object);
 
     /* compute local transform */
-    if(handle != root) {
-        float angle = 0.0f;
-        world2local(manager, surgescript_object_parent(object), root, &position, &angle);
-    }
+    if(handle != root)
+        world2local(manager, surgescript_object_parent(object), root, &position, NULL);
 
     /* set local transform */
     transform->position.x = position.x;
@@ -263,10 +265,8 @@ void scripting_util_set_world_angle(surgescript_object_t* object, float angle)
     surgescript_transform_t* transform = surgescript_object_transform(object);
 
     /* compute local transform */
-    if(handle != root) {
-        v2d_t position = v2d_new(0, 0);
-        world2local(manager, surgescript_object_parent(object), root, &position, &angle);
-    }
+    if(handle != root)
+        world2local(manager, surgescript_object_parent(object), root, NULL, &angle);
 
     /* set local transform */
     transform->rotation.z = fmod(angle, 360.0f);
