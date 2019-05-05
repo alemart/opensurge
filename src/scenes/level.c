@@ -2968,7 +2968,6 @@ void editor_update()
                 surgescript_object_traverse_tree_ex(root, &ssobject, editor_pick_ssobj);
                 if(ssobject != NULL) {
                     int ssobj_id = editor_ssobj_id(surgescript_object_name(ssobject));
-                    video_showmessage("Got %d", ssobj_id);
                     if(!pick_object) {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, ssobj_id, scripting_util_world_position(ssobject));
                         editor_action_commit(eda);
@@ -3722,7 +3721,6 @@ int editor_ssobj_id(const char* entity_name)
 {
     /* find i such that editor_ssobj[i] == entity_name */
     for(int i = 0; i < editor_ssobj_count; i++) {
-        video_showmessage("Check %s/%s : %d", entity_name,editor_ssobj[i], strcmp(entity_name, editor_ssobj[i]));
         if(strcmp(entity_name, editor_ssobj[i]) == 0)
             return i;
     }
