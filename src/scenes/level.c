@@ -211,14 +211,15 @@ static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn
 static bool save_ssobject(surgescript_object_t* object, void* param);
 typedef struct ssobj_extradata_t ssobj_extradata_t;
 struct ssobj_extradata_t { v2d_t spawn_point; int spawned_in_the_editor; int sleeping; };
-static const char* hash_of_ssobj(const surgescript_object_t* object);
 static v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object);
 static int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
-static ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object);
+static int is_ssobj_sleeping(const surgescript_object_t* object);
+static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object);
 static void create_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata);
 static void remove_ssobj_extradata(const surgescript_object_t* object);
 static void free_ssobj_extradata(ssobj_extradata_t* data);
-HASHTABLE_GENERATE_CODE(ssobj_extradata_t, free_ssobj_extradata);
+static int hashaux_cmp(const surgescript_objecthandle_t* a, const surgescript_objecthandle_t* b) { return (*a > *b) - (*a < *b); }
+HASHTABLE_GENERATE_CODE_EX(ssobj_extradata_t, free_ssobj_extradata, surgescript_objecthandle_t*, hashaux_cmp, NULL, NULL, NULL);
 static HASHTABLE(ssobj_extradata_t, ssobj_extradata);
 static void add_bricklike_ssobject(surgescript_object_t* object);
 static inline surgescript_object_t* get_bricklike_ssobject(int index);
@@ -2410,21 +2411,19 @@ void update_ssobject(surgescript_object_t* object, void* param)
                 /* the entity should no longer be active and
                    should be repositioned to its spawn point */
                 ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-                if(obj_data && obj_data->spawned_in_the_editor) {
+                if(obj_data && obj_data->spawned_in_the_editor && !obj_data->sleeping) {
                     v2d_t spawn_point = obj_data->spawn_point;
                     if(!level_inside_screen(spawn_point.x, spawn_point.y, 1, 1)) {
-                        if(!obj_data->sleeping) {
-                            /* put it to sleep */
-                            obj_data->sleeping = TRUE;
+                        /* put it to sleep */
+                        obj_data->sleeping = TRUE;
 
-                            /* reposition the entity */
-                            if(v2d_magnitude(v2d_subtract(origin, spawn_point)) >= 1.0f)
-                                scripting_util_set_world_position(object, origin = spawn_point);
+                        /* reposition the entity */
+                        if(v2d_magnitude(v2d_subtract(origin, spawn_point)) >= 1.0f)
+                            scripting_util_set_world_position(object, origin = spawn_point);
 
-                            /* notify it */
-                            if(surgescript_object_has_function(object, "onReset"))
-                                surgescript_object_call_function(object, "onReset", NULL, 0, NULL);
-                        }
+                        /* notify it */
+                        if(surgescript_object_has_function(object, "onReset"))
+                            surgescript_object_call_function(object, "onReset", NULL, 0, NULL);
                     }
                 }
 
@@ -4253,16 +4252,6 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 
 
 /* extradata: extra metadata for SurgeScript objects */
-const char* hash_of_ssobj(const surgescript_object_t* object)
-{
-    /* TODO: use a faster key type */
-    static char buf[24] = { 0 };
-    char* p = buf + sizeof(buf) - 1;
-    surgescript_objecthandle_t h = surgescript_object_handle(object);
-    do { *--p = "0123456789abcdef"[h & 0xF]; } while(h /= 16);
-    return p;
-}
-
 v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object)
 {
     ssobj_extradata_t* data = get_ssobj_extradata(object);
@@ -4274,38 +4263,41 @@ int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object)
     ssobj_extradata_t* data = get_ssobj_extradata(object);
     return data != NULL ? data->spawned_in_the_editor : FALSE;
 }
-/*
+
 int is_ssobj_sleeping(const surgescript_object_t* object)
 {
     ssobj_extradata_t* data = get_ssobj_extradata(object);
     return data != NULL ? data->sleeping : FALSE;
 }
-*/
+
 /* Get the editor data of a given object
    It may return NULL (if no such data exists) */
 ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object)
 {
-    const char* hash = hash_of_ssobj(object);
-    return hashtable_ssobj_extradata_t_find(ssobj_extradata, hash); /* may be NULL */
+    surgescript_objecthandle_t key = surgescript_object_handle(object);
+    return hashtable_ssobj_extradata_t_find(ssobj_extradata, &key); /* may be NULL */
 }
 
 void create_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata)
 {
-    const char* hash = hash_of_ssobj(object);
-    ssobj_extradata_t* data = hashtable_ssobj_extradata_t_find(ssobj_extradata, hash);
+    surgescript_objecthandle_t key = surgescript_object_handle(object);
+    ssobj_extradata_t* data = hashtable_ssobj_extradata_t_find(ssobj_extradata, &key);
+
     if(data == NULL) {
         data = mallocx(sizeof *data);
         *data = extradata;
-        hashtable_ssobj_extradata_t_add(ssobj_extradata, hash, data);
+        hashtable_ssobj_extradata_t_add(ssobj_extradata, &key, data);
     }
     else
         *data = extradata; /*data->spawn_point = extradata.spawn_point;*/
+
+    (void)is_ssobj_sleeping;
 }
 
 void remove_ssobj_extradata(const surgescript_object_t* object)
 {
-    const char* hash = hash_of_ssobj(object);
-    hashtable_ssobj_extradata_t_remove(ssobj_extradata, hash);
+    surgescript_objecthandle_t key = surgescript_object_handle(object);
+    hashtable_ssobj_extradata_t_remove(ssobj_extradata, &key);
 }
 
 void free_ssobj_extradata(ssobj_extradata_t* data)

@@ -32,7 +32,7 @@
 #include "logfile.h"
 
 /* utilities */
-#define __H_TABLE_SIZE                97 /* prime number (must be a compile-time constant for compiler optimization) */
+#define __H_TABLE_SIZE                727 /* prime number (must be a compile-time constant for compiler optimization) */
 #define __H_HASH_FUNCTION(h, key)     ((h)->hash_function(key) % __H_TABLE_SIZE)
 #define __H_CONST(KEY_TYPE)           const KEY_TYPE
 #define HASHTABLE(T, var_name)        hashtable_##T* var_name = NULL; /* declares a hash table */
@@ -40,14 +40,14 @@
 /* hashtable_<typename> class: pretty much like C++ templates */
 /* DESTRUCTOR_FN is a void function that takes a T* as an argument (i.e., the object destructor) */
 #define HASHTABLE_GENERATE_CODE(T, DESTRUCTOR_FN) /* using case-insensitive strings as keys */ \
-    HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, char*, __h_hash_string_##T, __h_compare_string_##T, __h_clone_string_##T, __h_delete_string_##T)
+    HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, char*, __h_compare_string_##T, __h_hash_string_##T, __h_clone_string_##T, __h_delete_string_##T)
 
 /* Using keys that are not case-insensitive strings */
 /* currently, the KEY_TYPE must be a pointer */
-/* KEY_HASH_FN must be a uint32_t function - set this function pointer to NULL to use a default */
-/* KEY_COMPARE_FN should return 0 if two keys are the same - set this to NULL to use a default */
+/* KEY_COMPARE_FN must return 0 if two keys are the same - set this to NULL to use a default function */
+/* KEY_HASH_FN must be a uint32_t function - set this function pointer to NULL to use a default implementation */
 /* KEY_CLONE_FN, KEY_DELETE_FN may be set to NULL */
-#define HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, KEY_TYPE, KEY_HASH_FN, KEY_COMPARE_FN, KEY_CLONE_FN, KEY_DELETE_FN) \
+#define HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, KEY_TYPE, KEY_COMPARE_FN, KEY_HASH_FN, KEY_CLONE_FN, KEY_DELETE_FN) \
 static uint32_t __h_hash_string_##T(const char *key); \
 static int __h_compare_string_##T(const char *key1, const char *key2); \
 static char* __h_clone_string_##T(const char *key); \
