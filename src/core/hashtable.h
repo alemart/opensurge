@@ -118,7 +118,7 @@ static hashtable_##T* hashtable_##T##_destroy(hashtable_##T *h) \
 } \
 static T* hashtable_##T##_find(const hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_BUCKET(h, key); \
+    uint32_t k = __H_BUCKET(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) \
@@ -131,7 +131,7 @@ static T* hashtable_##T##_find(const hashtable_##T *h, __H_CONST(KEY_TYPE) key) 
 static void hashtable_##T##_add(hashtable_##T *h, __H_CONST(KEY_TYPE) key, T *value) \
 { \
     if(NULL == hashtable_##T##_find(h, key)) { \
-        int k = __H_BUCKET(h, key); \
+        uint32_t k = __H_BUCKET(h, key); \
         hashtable_list_##T *q; \
         q = mallocx(sizeof *q); \
         q->key = (h->key_clone != NULL) ? h->key_clone(key) : (KEY_TYPE)key; \
@@ -143,7 +143,7 @@ static void hashtable_##T##_add(hashtable_##T *h, __H_CONST(KEY_TYPE) key, T *va
 } \
 static void hashtable_##T##_remove(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_BUCKET(h, key); \
+    uint32_t k = __H_BUCKET(h, key); \
     hashtable_list_##T *p, *q; \
     if(h->data[k] != NULL) { \
         p = h->data[k]; \
@@ -183,7 +183,7 @@ static void hashtable_##T##_remove(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 } \
 static int hashtable_##T##_ref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_BUCKET(h, key); \
+    uint32_t k = __H_BUCKET(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) \
@@ -196,7 +196,7 @@ static int hashtable_##T##_ref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 } \
 static int hashtable_##T##_unref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_BUCKET(h, key); \
+    uint32_t k = __H_BUCKET(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) { \
@@ -211,7 +211,7 @@ static int hashtable_##T##_unref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 } \
 static int hashtable_##T##_refcount(const hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_BUCKET(h, key); \
+    uint32_t k = __H_BUCKET(h, key); \
     const hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) \
