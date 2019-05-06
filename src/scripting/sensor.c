@@ -37,10 +37,10 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static inline const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object);
 static inline sensor_t* get_sensor(const surgescript_object_t* object);
 static inline void update(surgescript_object_t* object);
@@ -49,9 +49,6 @@ static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
 #define SENSOR_COLOR() (color_hex("ffff00"))
-static const int STATUS_NONE = 0;
-static const int STATUS_SOLID = 1;
-static const int STATUS_ONEWAY = 2;
 
 /*
  * scripting_register_sensor()
@@ -65,10 +62,10 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "__init", fun_init, 5);
     surgescript_vm_bind(vm, "Sensor", "get_zindex", fun_getzindex, 0);
     surgescript_vm_bind(vm, "Sensor", "render", fun_render, 0);
-    surgescript_vm_bind(vm, "Sensor", "update", fun_update, 0);
     surgescript_vm_bind(vm, "Sensor", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Sensor", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
+    surgescript_vm_bind(vm, "Sensor", "onTransformChange", fun_ontransformchange, 0);
 }
 
 
@@ -153,7 +150,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
 /* update the collision status AT THIS MOMENT IN TIME;
    useful if you move the object and, in the same frame, need to revalidate the collision status */
-surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     update(object);
     return NULL;
@@ -232,15 +229,20 @@ void update(surgescript_object_t* object)
     const obstaclemap_t* obstaclemap = get_obstaclemap(object);
     const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, obstaclemap);
     surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* status = surgescript_heap_at(heap, STATUS_ADDR);
 
     if(obstacle != NULL) {
-        if(obstacle_is_solid(obstacle))
-            surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_SOLID);
-        else
-            surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_ONEWAY);
+        if(obstacle_is_solid(obstacle)) {
+            if(*(surgescript_var_fast_get_string(status)) != 's')
+                surgescript_var_set_string(status, "solid");
+        }
+        else {
+            if(*(surgescript_var_fast_get_string(status)) != 'c')
+                surgescript_var_set_string(status, "cloud");
+        }
     }
     else
-        surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), STATUS_NONE);
+        surgescript_var_set_null(status);
 }
 
 /* get the camera of the parent object (is it detached?) */
