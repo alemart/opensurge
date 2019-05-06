@@ -36,20 +36,26 @@
 #define __H_HASH_FUNCTION(h, key)     ((h)->hash_function(key) % __H_TABLE_SIZE)
 #define __H_CONST(KEY_TYPE)           const KEY_TYPE
 #define HASHTABLE(T, var_name)        hashtable_##T* var_name = NULL; /* declares a hash table */
-#define HASHTABLE_GENERATE_CODE(T, DESTRUCTOR_FN) /* use case-insensitive strings as keys */ \
-    HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, char*, __h_hash_key_##T, __h_compare_key_##T, __h_clone_key_##T, __h_delete_key_##T)
 
 /* hashtable_<typename> class: pretty much like C++ templates */
 /* DESTRUCTOR_FN is a void function that takes a T* as an argument (i.e., the object destructor) */
-/* currently, the KEY_TYPE should be a pointer; HASH_FN should be a uint32_t function */
-/* KEY_COMPARE_FN should return 0 if two keys are the same */
-/* if KEY_COMPARE is set to NULL, then the key pointers will simply be compared for equality */
-/* KEY_CLONE_FN, KEY_DELETE_FN may be NULL */
+#define HASHTABLE_GENERATE_CODE(T, DESTRUCTOR_FN) /* using case-insensitive strings as keys */ \
+    HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, char*, __h_hash_string_##T, __h_compare_string_##T, __h_clone_string_##T, __h_delete_string_##T)
+
+/* Using keys that are not case-insensitive strings */
+/* currently, the KEY_TYPE must be a pointer */
+/* KEY_HASH_FN must be a uint32_t function - set this function pointer to NULL to use a default */
+/* KEY_COMPARE_FN should return 0 if two keys are the same - set this to NULL to use a default */
+/* KEY_CLONE_FN, KEY_DELETE_FN may be set to NULL */
 #define HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, KEY_TYPE, KEY_HASH_FN, KEY_COMPARE_FN, KEY_CLONE_FN, KEY_DELETE_FN) \
-static uint32_t __h_hash_key_##T(const char *key); \
-static int __h_compare_key_##T(const char *key1, const char *key2); \
-static char* __h_clone_key_##T(const char *key); \
-static void __h_delete_key_##T(char *key); \
+static uint32_t __h_hash_string_##T(const char *key); \
+static int __h_compare_string_##T(const char *key1, const char *key2); \
+static char* __h_clone_string_##T(const char *key); \
+static void __h_delete_string_##T(char *key); \
+static uint32_t __h_default_hash_key_##T(__H_CONST(KEY_TYPE) key); \
+static int __h_default_compare_key_##T(__H_CONST(KEY_TYPE) key1, __H_CONST(KEY_TYPE) key2); \
+static KEY_TYPE __h_default_clone_key_##T(__H_CONST(KEY_TYPE) key); \
+static void __h_default_delete_key_##T(KEY_TYPE key); \
 static void __h_unused_##T(); \
 typedef struct hashtable_##T hashtable_##T; \
 typedef struct hashtable_list_##T hashtable_list_##T; \
@@ -72,11 +78,19 @@ static hashtable_##T* hashtable_##T##_create() \
     int i; \
     hashtable_##T *h = mallocx(sizeof *h); \
     logfile_message("hashtable_" #T "_create()"); \
-    h->destructor = DESTRUCTOR_FN; \
-    h->hash_function = KEY_HASH_FN; \
-    h->key_compare = KEY_COMPARE_FN; \
-    h->key_clone = KEY_CLONE_FN; \
-    h->key_delete = KEY_DELETE_FN; \
+    h->destructor = (DESTRUCTOR_FN); \
+    h->hash_function = (KEY_HASH_FN); \
+    h->key_compare = (KEY_COMPARE_FN); \
+    h->key_clone = (KEY_CLONE_FN); \
+    h->key_delete = (KEY_DELETE_FN); \
+    if(h->hash_function == NULL) \
+        h->hash_function = __h_default_hash_key_##T; \
+    if(h->key_compare == NULL) \
+        h->key_compare = __h_default_compare_key_##T; \
+    if(h->key_clone == NULL) \
+        h->key_clone = __h_default_clone_key_##T; \
+    if(h->key_delete == NULL) \
+        h->key_delete = __h_default_delete_key_##T; \
     for(i=0; i<__H_TABLE_SIZE; i++) \
         h->data[i] = NULL; \
     return h; \
@@ -222,23 +236,43 @@ static void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
         } \
     } \
 } \
-static uint32_t __h_hash_key_##T(const char *key) \
+static uint32_t __h_hash_string_##T(const char *key) \
 { \
     uint32_t hash = 0; \
     while(*key) /* case-insensitive hash */ \
         hash = tolower(*(key++)) + (hash << 6) + (hash << 16) - hash; \
     return hash; \
 } \
-static int __h_compare_key_##T(const char *key1, const char *key2) \
+static int __h_compare_string_##T(const char *key1, const char *key2) \
 { \
     /* case-insensitive comparison */ \
     return str_icmp(key1, key2); \
 } \
-static char* __h_clone_key_##T(const char *key) \
+static char* __h_clone_string_##T(const char *key) \
 { \
     return strcpy(mallocx((1 + strlen(key)) * sizeof(char)), key); \
 } \
-static void __h_delete_key_##T(char *key) \
+static void __h_delete_string_##T(char *key) \
+{ \
+    free(key); \
+} \
+static uint32_t __h_default_hash_key_##T(__H_CONST(KEY_TYPE) key) \
+{ \
+    uint32_t hash = 0; size_t num = sizeof *key; \
+    const uint8_t* data = (const uint8_t*)key; \
+    while(num) \
+        hash = (uint32_t)(data[--num]) + (hash << 6) + (hash << 16) - hash; \
+    return 0; \
+} \
+static int __h_default_compare_key_##T(__H_CONST(KEY_TYPE) key1, __H_CONST(KEY_TYPE) key2) \
+{ \
+    return memcmp(key1, key2, sizeof *key1); \
+} \
+static KEY_TYPE __h_default_clone_key_##T(__H_CONST(KEY_TYPE) key) \
+{ \
+    return (KEY_TYPE)(memcpy(mallocx(sizeof *key), key, sizeof *key)); \
+} \
+static void __h_default_delete_key_##T(KEY_TYPE key) \
 { \
     free(key); \
 } \
@@ -254,10 +288,14 @@ static void __h_unused_##T() \
     (void)hashtable_##T##_refcount; \
     (void)hashtable_##T##_unref; \
     (void)hashtable_##T##_release_unreferenced_entries; \
-    (void)__h_hash_key_##T; \
-    (void)__h_compare_key_##T; \
-    (void)__h_clone_key_##T; \
-    (void)__h_delete_key_##T; \
+    (void)__h_hash_string_##T; \
+    (void)__h_compare_string_##T; \
+    (void)__h_clone_string_##T; \
+    (void)__h_delete_string_##T; \
+    (void)__h_default_hash_key_##T; \
+    (void)__h_default_compare_key_##T; \
+    (void)__h_default_clone_key_##T; \
+    (void)__h_default_delete_key_##T; \
 }
 
 #endif
