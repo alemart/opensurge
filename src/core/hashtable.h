@@ -32,13 +32,13 @@
 #include "logfile.h"
 
 /* utilities */
-#define __H_TABLE_SIZE                727 /* prime number (must be a compile-time constant for compiler optimization) */
-#define __H_HASH_FUNCTION(h, key)     ((h)->hash_function(key) % __H_TABLE_SIZE)
-#define __H_CONST(KEY_TYPE)           const KEY_TYPE
-#define HASHTABLE(T, var_name)        hashtable_##T* var_name = NULL; /* declares a hash table */
+#define __H_CAPACITY               727 /* prime number (must be a compile-time constant for compiler optimization) */
+#define __H_BUCKET(h, key)         ((h)->hash_function(key) % __H_CAPACITY)
+#define __H_CONST(KEY_TYPE)        const KEY_TYPE
 
 /* hashtable_<typename> class: pretty much like C++ templates */
 /* DESTRUCTOR_FN is a void function that takes a T* as an argument (i.e., the object destructor) */
+#define HASHTABLE(T, var_name)     hashtable_##T* var_name = NULL; /* declares a hash table */
 #define HASHTABLE_GENERATE_CODE(T, DESTRUCTOR_FN) /* using case-insensitive strings as keys */ \
     HASHTABLE_GENERATE_CODE_EX(T, DESTRUCTOR_FN, char*, __h_compare_string_##T, __h_hash_string_##T, __h_clone_string_##T, __h_delete_string_##T)
 
@@ -60,7 +60,7 @@ static void __h_unused_##T(); \
 typedef struct hashtable_##T hashtable_##T; \
 typedef struct hashtable_list_##T hashtable_list_##T; \
 struct hashtable_##T { \
-    hashtable_list_##T *data[__H_TABLE_SIZE]; \
+    hashtable_list_##T *data[__H_CAPACITY]; \
     void (*destructor)(T*); \
     uint32_t (*hash_function)(__H_CONST(KEY_TYPE)); \
     int (*key_compare)(__H_CONST(KEY_TYPE),__H_CONST(KEY_TYPE)); \
@@ -91,7 +91,7 @@ static hashtable_##T* hashtable_##T##_create() \
         h->key_clone = __h_default_clone_key_##T; \
     if(h->key_delete == NULL) \
         h->key_delete = __h_default_delete_key_##T; \
-    for(i=0; i<__H_TABLE_SIZE; i++) \
+    for(i=0; i<__H_CAPACITY; i++) \
         h->data[i] = NULL; \
     return h; \
 } \
@@ -100,7 +100,7 @@ static hashtable_##T* hashtable_##T##_destroy(hashtable_##T *h) \
     int i; \
     hashtable_list_##T *p, *q; \
     logfile_message("hashtable_" #T "_destroy()"); \
-    for(i=0; i<__H_TABLE_SIZE; i++) { \
+    for(i=0; i<__H_CAPACITY; i++) { \
         p = h->data[i]; \
         while(p != NULL) { \
             q = p->next; \
@@ -118,7 +118,7 @@ static hashtable_##T* hashtable_##T##_destroy(hashtable_##T *h) \
 } \
 static T* hashtable_##T##_find(const hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_HASH_FUNCTION(h, key); \
+    int k = __H_BUCKET(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) \
@@ -131,7 +131,7 @@ static T* hashtable_##T##_find(const hashtable_##T *h, __H_CONST(KEY_TYPE) key) 
 static void hashtable_##T##_add(hashtable_##T *h, __H_CONST(KEY_TYPE) key, T *value) \
 { \
     if(NULL == hashtable_##T##_find(h, key)) { \
-        int k = __H_HASH_FUNCTION(h, key); \
+        int k = __H_BUCKET(h, key); \
         hashtable_list_##T *q; \
         q = mallocx(sizeof *q); \
         q->key = (h->key_clone != NULL) ? h->key_clone(key) : (KEY_TYPE)key; \
@@ -143,7 +143,7 @@ static void hashtable_##T##_add(hashtable_##T *h, __H_CONST(KEY_TYPE) key, T *va
 } \
 static void hashtable_##T##_remove(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_HASH_FUNCTION(h, key); \
+    int k = __H_BUCKET(h, key); \
     hashtable_list_##T *p, *q; \
     if(h->data[k] != NULL) { \
         p = h->data[k]; \
@@ -183,7 +183,7 @@ static void hashtable_##T##_remove(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 } \
 static int hashtable_##T##_ref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_HASH_FUNCTION(h, key); \
+    int k = __H_BUCKET(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) \
@@ -196,7 +196,7 @@ static int hashtable_##T##_ref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 } \
 static int hashtable_##T##_unref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_HASH_FUNCTION(h, key); \
+    int k = __H_BUCKET(h, key); \
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) { \
@@ -211,7 +211,7 @@ static int hashtable_##T##_unref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 } \
 static int hashtable_##T##_refcount(const hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
-    int k = __H_HASH_FUNCTION(h, key); \
+    int k = __H_BUCKET(h, key); \
     const hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) \
@@ -227,7 +227,7 @@ static void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
              to store the unreferenced entries */ \
     int i; \
     hashtable_list_##T *q; \
-    for(i=0; i<__H_TABLE_SIZE; i++) { \
+    for(i=0; i<__H_CAPACITY; i++) { \
         for(q=h->data[i]; q!=NULL; q=q->next) { \
             if(q->reference_count <= 0) { \
                 hashtable_##T##_remove(h, q->key); \
