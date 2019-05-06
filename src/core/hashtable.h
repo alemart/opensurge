@@ -258,10 +258,10 @@ static void __h_delete_string_##T(char *key) \
 } \
 static uint32_t __h_default_hash_key_##T(__H_CONST(KEY_TYPE) key) \
 { \
-    uint32_t hash = 0; size_t num = sizeof *key; \
+    uint32_t hash = 0; \
     const uint8_t* data = (const uint8_t*)key; \
-    while(num) \
-        hash = (uint32_t)(data[--num]) + (hash << 6) + (hash << 16) - hash; \
+    for(size_t j = 0; j < sizeof *key; j++) \
+        hash = (uint32_t)(data[j]) + (hash << 6) + (hash << 16) - hash; \
     return 0; \
 } \
 static int __h_default_compare_key_##T(__H_CONST(KEY_TYPE) key1, __H_CONST(KEY_TYPE) key2) \
