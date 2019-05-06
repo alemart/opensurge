@@ -148,7 +148,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     bricklike_data_t* data = mallocx(sizeof *data);
 
     /* default values */
-    data->type = BRK_OBSTACLE;
+    data->type = BRK_SOLID;
     data->layer = BRL_DEFAULT;
     data->mask = NULL;
     data->hot_spot = v2d_new(0, 0);
@@ -190,18 +190,15 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* sprite_name = surgescript_var_get_string(param[0], manager);
     int anim_id = BRICKLIKE_ANIMATION_ID;
+    animation_t* animation = sprite_animation_exists(sprite_name, anim_id) ? sprite_get_animation(sprite_name, anim_id) : sprite_get_animation(NULL, 0);
+    image_t* brick_image = sprite_get_image(animation, 0); /* get the first frame of the animation */
+    bricklike_data_t* data = get_data(object);
 
-    if(sprite_animation_exists(sprite_name, anim_id)) {
-        animation_t* animation = sprite_get_animation(sprite_name, anim_id);
-        image_t* brick_image = sprite_get_image(animation, 0); /* get the first frame of the animation */
-        bricklike_data_t* data = get_data(object);
+    if(data->mask != NULL)
+        collisionmask_destroy(data->mask);
 
-        if(data->mask != NULL)
-            collisionmask_destroy(data->mask);
-
-        data->mask = collisionmask_create(brick_image, 0, 0, image_width(brick_image), image_height(brick_image));
-        data->hot_spot = animation->hot_spot;
-    }
+    data->mask = collisionmask_create(brick_image, 0, 0, image_width(brick_image), image_height(brick_image));
+    data->hot_spot = animation->hot_spot;
 
     ssfree(sprite_name);
     return NULL;
@@ -213,7 +210,7 @@ surgescript_var_t* fun_gettype(surgescript_object_t* object, const surgescript_v
     bricklike_data_t* data = get_data(object);
 
     switch(data->type) {
-        case BRK_OBSTACLE:
+        case BRK_SOLID:
             return surgescript_var_set_string(surgescript_var_create(), "solid");
 
         case BRK_CLOUD:
@@ -231,7 +228,7 @@ surgescript_var_t* fun_settype(surgescript_object_t* object, const surgescript_v
     bricklike_data_t* data = get_data(object);
 
     if(strcmp(type, "solid") == 0)
-        data->type = BRK_OBSTACLE;
+        data->type = BRK_SOLID;
     else if(strcmp(type, "cloud") == 0)
         data->type = BRK_CLOUD;
 

@@ -504,7 +504,7 @@ bricktype_t brick_type(const brick_t* brk)
     if(brk->brick_ref)
         return brk->brick_ref->type;
     else
-        return BRK_OBSTACLE;
+        return BRK_SOLID;
 }
 
 
@@ -631,8 +631,8 @@ const char* brick_util_typename(bricktype_t type)
         case BRK_PASSABLE:
             return "PASSABLE";
 
-        case BRK_OBSTACLE:
-            return "OBSTACLE";
+        case BRK_SOLID:
+            return "SOLID";
 
         case BRK_CLOUD:
             return "CLOUD";
@@ -850,7 +850,7 @@ obstacle_t* destroy_obstacle(obstacle_t* obstacle)
 int get_obstacle_flags(const brick_t* brick)
 {
     return
-        ((brick_type(brick) == BRK_OBSTACLE) ? OF_SOLID : OF_CLOUD) |
+        ((brick_type(brick) == BRK_SOLID) ? OF_SOLID : OF_CLOUD) |
         ((brick->flip & BRF_HFLIP) ? OF_HFLIP : 0) |
         ((brick->flip & BRF_VFLIP) ? OF_VFLIP : 0)
     ;
@@ -916,12 +916,12 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         nanoparser_expect_string(p1, "Can't read brick attributes: must specify brick type");
         type = nanoparser_get_string(p1);
 
-        if(str_icmp(type, "OBSTACLE") == 0)
-            dat->type = BRK_OBSTACLE;
-        else if(str_icmp(type, "PASSABLE") == 0)
-            dat->type = BRK_PASSABLE;
+        if(str_icmp(type, "SOLID") == 0 || str_icmp(type, "OBSTACLE") == 0)
+            dat->type = BRK_SOLID;
         else if(str_icmp(type, "CLOUD") == 0)
             dat->type = BRK_CLOUD;
+        else if(str_icmp(type, "PASSABLE") == 0)
+            dat->type = BRK_PASSABLE;
         else
             fatal_error("Can't read brick attributes: unknown brick type '%s'", type);
     }

@@ -4911,14 +4911,14 @@ int onbrickcollision_should_trigger_event(eventstrategy_t *event, object_t *obje
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (up != NULL && brick_type(up) == BRK_OBSTACLE) ||
-        (upright != NULL && brick_type(upright) == BRK_OBSTACLE) ||
-        (right != NULL && brick_type(right) == BRK_OBSTACLE) ||
+        (up != NULL && brick_type(up) == BRK_SOLID) ||
+        (upright != NULL && brick_type(upright) == BRK_SOLID) ||
+        (right != NULL && brick_type(right) == BRK_SOLID) ||
         (downright != NULL && brick_type(downright) != BRK_PASSABLE) ||
         (down != NULL && brick_type(down) != BRK_PASSABLE) ||
         (downleft != NULL && brick_type(downleft) != BRK_PASSABLE) ||
-        (left != NULL && brick_type(left) == BRK_OBSTACLE) ||
-        (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE)
+        (left != NULL && brick_type(left) == BRK_SOLID) ||
+        (upleft != NULL && brick_type(upleft) == BRK_SOLID)
     ;
 }
 
@@ -4990,9 +4990,9 @@ int onceilingcollision_should_trigger_event(eventstrategy_t *event, object_t *ob
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE) ||
-        (up != NULL && brick_type(up) == BRK_OBSTACLE) ||
-        (upright != NULL && brick_type(upright) == BRK_OBSTACLE)
+        (upleft != NULL && brick_type(upleft) == BRK_SOLID) ||
+        (up != NULL && brick_type(up) == BRK_SOLID) ||
+        (upright != NULL && brick_type(upright) == BRK_SOLID)
     ;
 }
 
@@ -5027,8 +5027,8 @@ int onleftwallcollision_should_trigger_event(eventstrategy_t *event, object_t *o
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (left != NULL && brick_type(left) == BRK_OBSTACLE) ||
-        (upleft != NULL && brick_type(upleft) == BRK_OBSTACLE)
+        (left != NULL && brick_type(left) == BRK_SOLID) ||
+        (upleft != NULL && brick_type(upleft) == BRK_SOLID)
     ;
 }
 
@@ -5063,8 +5063,8 @@ int onrightwallcollision_should_trigger_event(eventstrategy_t *event, object_t *
     actor_sensors(act, brick_list, &up, &upright, &right, &downright, &down, &downleft, &left, &upleft);
 
     return
-        (right != NULL && brick_type(right) == BRK_OBSTACLE) ||
-        (upright != NULL && brick_type(upright) == BRK_OBSTACLE)
+        (right != NULL && brick_type(right) == BRK_SOLID) ||
+        (upright != NULL && brick_type(upright) == BRK_SOLID)
     ;
 }
 

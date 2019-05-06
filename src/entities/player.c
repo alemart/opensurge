@@ -1399,7 +1399,7 @@ obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
 {
     const collisionmask_t* mask = scripting_brick_mask(object); /* this is assumed to not be NULL */
     v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
-    int flags = (scripting_brick_type(object) == BRK_OBSTACLE) ? OF_SOLID : OF_CLOUD;
+    int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
     return obstacle_create(mask, position.x, position.y, flags);
 }
 

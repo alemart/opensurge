@@ -350,7 +350,7 @@ brick_t* brick_at(const brick_list_t *list, v2d_t spot)
             continue;
 
         /* I don't want clouds. */
-        if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_OBSTACLE))
+        if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_SOLID))
             continue;
 
         /* I don't want moving platforms */
@@ -363,7 +363,7 @@ brick_t* brick_at(const brick_list_t *list, v2d_t spot)
                 if(brick_behavior(p->data) != BRB_CIRCULAR && (ret && brick_behavior(ret) == BRB_CIRCULAR) && brick_position(p->data).y <= brick_position(ret).y) {
                     ret = p->data; /* No moving platforms. Let's grab a regular platform instead. */
                 }
-                else if(brick_type(p->data) == BRK_OBSTACLE && (ret && brick_type(ret) == BRK_CLOUD)) {
+                else if(brick_type(p->data) == BRK_SOLID && (ret && brick_type(ret) == BRK_CLOUD)) {
                     ret = p->data; /* No clouds. Let's grab an obstacle instead. */
                 }
                 else if(brick_type(p->data) == BRK_CLOUD && (ret && brick_type(ret) == BRK_CLOUD)) {

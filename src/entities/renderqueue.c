@@ -89,7 +89,7 @@ static float brick_zindex_offset(const brick_t *b)
     switch(brick_type(b)) {
         case BRK_PASSABLE:  s -= 0.00002f;  break;
         case BRK_CLOUD:     s -= 0.00001f;  break;
-        case BRK_OBSTACLE:  s -= 0.00000f;  break;
+        case BRK_SOLID:  s -= 0.00000f;  break;
     }
 
     switch(brick_layer(b)) {
