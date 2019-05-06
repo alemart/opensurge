@@ -21,13 +21,11 @@
 #ifndef _STRINGUTIL_H
 #define _STRINGUTIL_H
 
-#include <stdint.h>
 #include <stdlib.h>
 
 const char* str_to_upper(const char* str); /* returns a pointer to a static variable */
 const char* str_to_lower(const char* str); /* returns a pointer to a static variable */
 int str_icmp(const char* s1, const char* s2); /* case-insensitive compare function */
-uint32_t str_ihash(const char* str); /* generates a case-insensitive hash key */
 char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of strcpy() */
 char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */
 char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */

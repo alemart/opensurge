@@ -38,10 +38,10 @@ typedef struct inputmapnode_t inputmapnode_t;
 struct inputmapnode_t {
     inputmap_t *data;
 };
-HASHTABLE_GENERATE_CODE(inputmapnode_t);
-static hashtable_inputmapnode_t *mappings;
 static inputmapnode_t* inputmapnode_create(const char* name);
 static void inputmapnode_destroy(inputmapnode_t *x);
+HASHTABLE_GENERATE_CODE(inputmapnode_t, inputmapnode_destroy);
+static HASHTABLE(inputmapnode_t, mappings);
 
 /* file reader stuff (nanoparser) */
 static void load_inputmap_table();
@@ -512,7 +512,7 @@ static const int key_codes[] = {
 void inputmap_init()
 {
     logfile_message("inputmap_init()");
-    mappings = hashtable_inputmapnode_t_create(inputmapnode_destroy);
+    mappings = hashtable_inputmapnode_t_create();
     load_inputmap_table();
 }
 

@@ -26,9 +26,6 @@
 #include "../core/stringutil.h"
 #include "../core/audio.h"
 
-HASHTABLE_GENERATE_CODE(character_t)
-static hashtable_character_t* characters;
-
 /* private functions */
 static character_t *character_new(const char *name); /* creates a new character_t instance */
 static void character_delete(character_t* c); /* deletes c */
@@ -44,6 +41,10 @@ static int traverse_animations(const parsetree_statement_t *stmt, void *characte
 static int traverse_samples(const parsetree_statement_t *stmt, void *character);
 static int traverse_abilities(const parsetree_statement_t *stmt, void *character);
 
+/* hash table */
+HASHTABLE_GENERATE_CODE(character_t, character_delete);
+static HASHTABLE(character_t, characters);
+
 
 /* public */
 void charactersystem_init()
@@ -51,7 +52,7 @@ void charactersystem_init()
     parsetree_program_t *prog = NULL;
 
     logfile_message("Loading characters...");
-    characters = hashtable_character_t_create(character_delete);
+    characters = hashtable_character_t_create();
 
     /* Reading the parse tree */
     assetfs_foreach_file("characters", ".chr", dirfill, (void*)(&prog), true);

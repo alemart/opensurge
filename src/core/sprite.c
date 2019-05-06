@@ -31,8 +31,8 @@
 
 /* private stuff ;) */
 #define SPRITE_MAX_ANIM         1024 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
-HASHTABLE_GENERATE_CODE(spriteinfo_t)
-static hashtable_spriteinfo_t* sprites;
+HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
+static HASHTABLE(spriteinfo_t, sprites);
 static const char* DEFAULT_SPRITE = "SD_QUESTIONMARK";
 static const int DEFAULT_ANIM = 0;
 
@@ -62,7 +62,7 @@ void sprite_init()
     parsetree_program_t *prog = NULL;
 
     logfile_message("Loading sprites...");
-    sprites = hashtable_spriteinfo_t_create(spriteinfo_destroy);
+    sprites = hashtable_spriteinfo_t_create();
 
     /* reading the parse tree */
     assetfs_foreach_file("sprites", ".spr", dirfill, (void*)(&prog), true);

@@ -39,8 +39,8 @@ static void stringadapter_set_data(stringadapter_t *s, const char *data);
 static void stringadapter_destroy(stringadapter_t *s);
 
 /* hash table */
-HASHTABLE_GENERATE_CODE(stringadapter_t)
-static hashtable_stringadapter_t* strings;
+HASHTABLE_GENERATE_CODE(stringadapter_t, stringadapter_destroy);
+static HASHTABLE(stringadapter_t, strings);
 
 /* private stuff */
 typedef struct { const char *key; const char *value; } inout_t;
@@ -55,7 +55,7 @@ static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
 void lang_init()
 {
     logfile_message("Initializing the language module");
-    strings = hashtable_stringadapter_t_create(stringadapter_destroy);
+    strings = hashtable_stringadapter_t_create();
     lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
     logfile_message("lang_init() ok!");
 }

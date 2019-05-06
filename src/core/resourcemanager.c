@@ -25,14 +25,14 @@
 #include "logfile.h"
 
 /* code generation */
-HASHTABLE_GENERATE_CODE(image_t)
-HASHTABLE_GENERATE_CODE(sound_t)
-HASHTABLE_GENERATE_CODE(music_t)
+HASHTABLE_GENERATE_CODE(image_t, image_destroy);
+HASHTABLE_GENERATE_CODE(sound_t, sound_destroy);
+HASHTABLE_GENERATE_CODE(music_t, music_destroy);
 
 /* private data */
-static hashtable_image_t* images;
-static hashtable_sound_t* samples;
-static hashtable_music_t* musics;
+static HASHTABLE(image_t, images);
+static HASHTABLE(sound_t, samples);
+static HASHTABLE(music_t, musics);
 static int is_valid = FALSE; /* validity flag */
 
 
@@ -41,9 +41,9 @@ static int is_valid = FALSE; /* validity flag */
 /* ------ resource manager -------- */
 void resourcemanager_init()
 {
-    images = hashtable_image_t_create(image_destroy);
-    samples = hashtable_sound_t_create(sound_destroy);
-    musics = hashtable_music_t_create(music_destroy);
+    images = hashtable_image_t_create();
+    samples = hashtable_sound_t_create();
+    musics = hashtable_music_t_create();
     is_valid = TRUE;
 }
 

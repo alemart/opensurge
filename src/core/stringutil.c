@@ -88,24 +88,6 @@ int str_icmp(const char* s1, const char* s2)
 
 
 /*
- * str_ihash()
- * Generates a case-insensitive hash key
- */
-uint32_t str_ihash(const char *str)
-{
-    uint32_t hash = 0;
-
-    while(*str) {
-        /* we need to use tolower, as the hash key must be case insensitive */
-        hash = tolower(*(str++)) + (hash << 6) + (hash << 16) - hash;
-    }
-
-    return hash;
-}
-
-
-
-/*
  * str_cpy()
  * Safe version of strcpy(). Returns dest.
  * If we have something like char str[32], then

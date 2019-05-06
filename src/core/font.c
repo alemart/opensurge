@@ -58,12 +58,12 @@ static bool allow_antialias = true; /* allow antialiasing for all TTF fonts? */
 
 /* callback table: used for variable/text interpolation */
 typedef const char* (*fontcallback_t)();
-HASHTABLE_GENERATE_CODE(fontcallback_t)
-hashtable_fontcallback_t *callback_table;
 static void callbacktable_init();
 static void callbacktable_release();
 static void callbacktable_add(const char *variable_name, fontcallback_t callback);
 static fontcallback_t callbacktable_find(const char *variable_name);
+HASHTABLE_GENERATE_CODE(fontcallback_t, NULL);
+static HASHTABLE(fontcallback_t, callback_table);
 
 /* ------------------------------- */
 
@@ -1153,7 +1153,7 @@ int dirfill(const char *vpath, void *param)
 
 void callbacktable_init()
 {
-    callback_table = hashtable_fontcallback_t_create(NULL);
+    callback_table = hashtable_fontcallback_t_create();
 }
 
 void callbacktable_release()

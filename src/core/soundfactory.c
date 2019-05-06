@@ -33,10 +33,10 @@ typedef struct factorysound_t factorysound_t;
 struct factorysound_t {
     sound_t *data;
 };
-HASHTABLE_GENERATE_CODE(factorysound_t);
-static hashtable_factorysound_t *samples;
 static factorysound_t* factorysound_create();
 static void factorysound_destroy(factorysound_t *f);
+HASHTABLE_GENERATE_CODE(factorysound_t, factorysound_destroy);
+static HASHTABLE(factorysound_t, samples);
 
 /* file reader stuff (nanoparser) */
 static void load_samples_table();
@@ -54,7 +54,7 @@ static int traverse_sound(const parsetree_statement_t *stmt, void *factorysound)
 /* initializes the sound factory */
 void soundfactory_init()
 {
-    samples = hashtable_factorysound_t_create(factorysound_destroy);
+    samples = hashtable_factorysound_t_create();
     load_samples_table();
 }
 

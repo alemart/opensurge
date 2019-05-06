@@ -47,9 +47,6 @@
 #define MAX_CATEGORIES                  10240
 #define ROOT_CATEGORY                   category_table.category[0] /* all objects belong to the root category */
 
-typedef parsetree_program_t objectcode_t;
-HASHTABLE_GENERATE_CODE(objectcode_t);
-
 typedef struct object_children_t object_children_t;
 struct object_children_t {
     char *name;
@@ -81,8 +78,11 @@ static int category_exists(const char *category);
 static parsetree_program_t *objects;
 static object_name_data_t name_table;
 static object_category_data_t category_table;
-static hashtable_objectcode_t* lookup_table;
 static int allow_duplicate_scripts = FALSE;
+
+typedef parsetree_program_t objectcode_t;
+HASHTABLE_GENERATE_CODE(objectcode_t, NULL);
+static HASHTABLE(objectcode_t, lookup_table);
 
 
 /* ------ public class methods ---------- */
@@ -112,7 +112,7 @@ void objects_init()
     qsort(category_table.category, category_table.length, sizeof(category_table.category[0]), object_category_table_cmp);
 
     /* creating a lookup table to find objects fast */
-    lookup_table = hashtable_objectcode_t_create(NULL);
+    lookup_table = hashtable_objectcode_t_create();
     nanoparser_traverse_program_ex(objects, (void*)lookup_table, fill_lookup_table);
 
     /* done! */
