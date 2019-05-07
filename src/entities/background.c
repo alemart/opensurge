@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * background.c - level background/foreground
- * Copyright (C) 2010  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ typedef struct bgstrategy_linear_t bgstrategy_linear_t;
 struct bgtheme_t {
     background_t **data; /* array of background_t* */
     int length; /* length of the data vector */
+    char* filepath; /* filepath of the background */
 };
 
 /* === <<abstract>> bgstrategy_t === */
@@ -96,7 +97,7 @@ static void bgstrategy_linear_update(bgstrategy_t *strategy); /* private class m
 /* === internal methods === */
 static void sort_backgrounds(bgtheme_t *bgtheme);
 static int sort_cmp(const void *a, const void *b);
-static void render(bgtheme_t *theme, v2d_t camera_position, int foreground);
+static void render(const bgtheme_t *theme, v2d_t camera_position, int foreground);
 static int traverse(const parsetree_statement_t *stmt, void *bgtheme);
 static int traverse_background_attributes(const parsetree_statement_t *stmt, void *background);
 static void validate_background(const background_t *bg);
@@ -108,16 +109,17 @@ static void validate_background(const background_t *bg);
  * background_load()
  * Loads a background theme from a .bg file
  */
-bgtheme_t* background_load(const char *file)
+bgtheme_t* background_load(const char *filepath)
 {
     bgtheme_t *bgtheme;
     parsetree_program_t *tree;
     const char* fullpath;
 
-    logfile_message("background_load(\"%s\")", file);
-    fullpath = assetfs_fullpath(file);
+    logfile_message("Loading background \"%s\"...", filepath);
+    fullpath = assetfs_fullpath(filepath);
 
     bgtheme = mallocx(sizeof *bgtheme);
+    bgtheme->filepath = str_dup(filepath);
     bgtheme->data = NULL;
     bgtheme->length = 0;
 
@@ -129,8 +131,6 @@ bgtheme_t* background_load(const char *file)
     return bgtheme;
 }
 
-
-
 /*
  * background_unload()
  * Unloads a background theme
@@ -139,7 +139,7 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
 {
     int i;
 
-    logfile_message("background_unload()");
+    logfile_message("Unloading the background...");
 
     if(bgtheme->data != NULL) {
         for(i=0; i<bgtheme->length; i++)
@@ -148,11 +148,10 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
         free(bgtheme->data);
     }
 
+    free(bgtheme->filepath);
     free(bgtheme);
     return NULL;
 }
-
-
 
 /*
  * background_update()
@@ -169,13 +168,11 @@ void background_update(bgtheme_t *bgtheme)
     }
 }
 
-
-
 /*
  * background_render_bg()
  * Renders the background
  */
-void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position)
+void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
     render(bgtheme, camera_position, FALSE);
 }
@@ -184,11 +181,19 @@ void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position)
  * background_render_fg()
  * Renders the foreground
  */
-void background_render_fg(bgtheme_t *bgtheme, v2d_t camera_position)
+void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
     render(bgtheme, camera_position, TRUE);
 }
 
+/*
+ * background_filepath()
+ * Returns the filepath of the background
+ */
+const char* background_filepath(const bgtheme_t* bgtheme)
+{
+    return bgtheme->filepath;
+}
 
 
 
@@ -304,7 +309,7 @@ void bgstrategy_linear_update(bgstrategy_t *strategy)
 }
 
 
-void render(bgtheme_t *bgtheme, v2d_t camera_position, int foreground)
+void render(const bgtheme_t *bgtheme, v2d_t camera_position, int foreground)
 {
     int i;
     v2d_t halfscreen = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);

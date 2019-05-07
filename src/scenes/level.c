@@ -1945,6 +1945,28 @@ void level_abort()
     level_jump_to_next_stage();
 }
 
+/*
+ * level_change_background()
+ * Changes the background
+ */
+void level_change_background(const char* filepath)
+{
+    if(str_icmp(filepath, background_filepath(backgroundtheme)) != 0) {
+        /* string bgtheme (original path) is untouched */
+        logfile_message("Changing level background to \"%s\"...", filepath);
+        background_unload(backgroundtheme);
+        backgroundtheme = background_load(filepath);
+    }
+}
+
+/*
+ * level_background()
+ * Returns the background that is currently in use
+ */
+const struct bgtheme_t* level_background()
+{
+    return backgroundtheme;
+}
 
 
 

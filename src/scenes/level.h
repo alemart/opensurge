@@ -47,6 +47,7 @@ struct enemy_t;
 struct enemy_list_t;
 struct sound_t;
 struct music_t;
+struct bgtheme_t;
 
 /* level data */
 const char* level_file();
@@ -110,5 +111,7 @@ float level_gravity();
 void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);
 void level_hide_dialogbox();
+void level_change_background(const char* filepath);
+const struct bgtheme_t* level_background();
 
 #endif
