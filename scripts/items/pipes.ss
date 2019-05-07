@@ -137,7 +137,7 @@ object "Pipe In" is "entity", "gimmick"
     fun findNearestSensor()
     {
         bestSensor = null;
-        bestDistance = 99999; //Math.infinity;
+        bestDistance = Math.infinity;
         myPosition = pipeSensor.transform.position;
 
         sensors = Level.findObjects("Pipe Sensor");

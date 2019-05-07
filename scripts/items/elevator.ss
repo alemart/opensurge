@@ -30,7 +30,7 @@ object "Elevator" is "entity", "gimmick"
 {
     public readonly collider = CollisionBox(128, 8);
     public readonly transform = Transform();
-    public speed = 60; // in px/s
+    public speed = 64; // in px/s
     
     lineCollider = CollisionBox(128, 1);
     actor = Actor("Elevator");
@@ -145,6 +145,11 @@ object "Elevator" is "entity", "gimmick"
     fun onReset()
     {
         state = "idle";
+    }
+
+    fun onLeaveEditor()
+    {
+        cables = Level.findObjects("Elevator Cable");
     }
 
 
