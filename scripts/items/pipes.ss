@@ -12,7 +12,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Pipe Up" is "entity"
+object "Pipe Up" is "entity", "gimmick"
 {
     pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -28,7 +28,7 @@ object "Pipe Up" is "entity"
     }
 }
 
-object "Pipe Right" is "entity"
+object "Pipe Right" is "entity", "gimmick"
 {
     pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -44,7 +44,7 @@ object "Pipe Right" is "entity"
     }
 }
 
-object "Pipe Down" is "entity"
+object "Pipe Down" is "entity", "gimmick"
 {
     pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -60,7 +60,7 @@ object "Pipe Down" is "entity"
     }
 }
 
-object "Pipe Left" is "entity"
+object "Pipe Left" is "entity", "gimmick"
 {
     pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -76,7 +76,7 @@ object "Pipe Left" is "entity"
     }
 }
 
-object "Pipe Out" is "entity"
+object "Pipe Out" is "entity", "gimmick"
 {
     pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -92,7 +92,7 @@ object "Pipe Out" is "entity"
     }
 }
 
-object "Pipe In" is "entity"
+object "Pipe In" is "entity", "gimmick"
 {
     pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager).setAsEntrance();
@@ -220,7 +220,7 @@ object "Pipe Sensor" is "private", "entity"
 
 object "Pipe Manager" is "private", "awake", "entity"
 {
-    public speed = 512; // in px/s
+    public speed = 600; // in px/s
     pipeInSfx = Sound("samples/pipe_in.wav");
     pipeOutSfx = Sound("samples/pipe_out.wav");
     pipeSfx = null;

@@ -26,11 +26,11 @@ using SurgeEngine.Collisions.CollisionBox;
 //   obj.onElevatorActivate(this) whenever this elevator is activated, and
 //   obj.onElevatorComplete(this) whenever this elevator completes its path.
 //
-object "Elevator" is "entity"
+object "Elevator" is "entity", "gimmick"
 {
     public readonly collider = CollisionBox(128, 8);
     public readonly transform = Transform();
-    public speed = 64; // in px/s
+    public speed = 60; // in px/s
     
     lineCollider = CollisionBox(128, 1);
     actor = Actor("Elevator");
@@ -170,7 +170,7 @@ object "Elevator" is "entity"
     }
 }
 
-object "Elevator Cable" is "entity"
+object "Elevator Cable" is "entity", "gimmick"
 {
     public readonly collider = CollisionBox(8, 128);
 
