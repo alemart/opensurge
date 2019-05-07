@@ -226,6 +226,8 @@ static inline surgescript_object_t* get_bricklike_ssobject(int index);
 static inline void clear_bricklike_ssobjects();
 static surgescript_object_t* bricklike_ssobject[BRICKLIKE_MAX_COUNT];
 static int bricklike_ssobject_count = 0;
+bool notify_ssobject(surgescript_object_t* object, void* param);
+void notify_ssobjects(const char* fun_name);
 
 
 
@@ -2444,8 +2446,7 @@ void update_ssobject(surgescript_object_t* object, void* param)
                             scripting_util_set_world_position(object, origin = spawn_point);
 
                         /* notify it */
-                        if(surgescript_object_has_function(object, "onReset"))
-                            surgescript_object_call_function(object, "onReset", NULL, 0, NULL);
+                        notify_ssobject(object, "onReset");
                     }
                 }
 
@@ -2608,6 +2609,27 @@ bool save_ssobject(surgescript_object_t* object, void* param)
 
     return true;
 }
+
+/* notify an entity: call a function (if it exists) */
+bool notify_ssobject(surgescript_object_t* object, void* param)
+{
+    const char* fun_name = (const char*)param;
+
+    if(surgescript_object_has_tag(object, "entity")) {
+        if(surgescript_object_has_function(object, fun_name))
+            surgescript_object_call_function(object, fun_name, NULL, 0, NULL);
+    }
+
+    return true;
+}
+
+/* notifies all SurgeScript entities of the level */
+void notify_ssobjects(const char* fun_name)
+{
+    surgescript_object_traverse_tree_ex(level_ssobject(), (void*)fun_name, notify_ssobject);
+}
+
+
 
 
 
@@ -3175,6 +3197,9 @@ void editor_disable()
     update_level_size();
     editor_action_release();
     editor_enabled = FALSE;
+
+    /* notify the SurgeScript entities */
+    notify_ssobjects("onLeaveEditor");
 
     /* restoring the video resolution */
     video_changemode(editor_previous_video_resolution, editor_previous_video_smooth, video_is_fullscreen());
