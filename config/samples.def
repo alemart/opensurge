@@ -199,7 +199,7 @@ sample "power up"
 // ---------------------------------------------------------------------------
 sample "destroy"
 {
-    source_file         "samples/destroypop.wav"
+    source_file         "samples/destroy.wav"
 }
 
 sample "boss hit"

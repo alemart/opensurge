@@ -37,7 +37,7 @@ object "DefaultSwitchController"
                 if(p.midair || p.underwater || p.frozen)
                     deny.play();
                 else
-                    Player(Math.mod(i + 1, n)).focus();
+                    Player((i + 1) % n).focus();
                 break;
             }
         }

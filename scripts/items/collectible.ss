@@ -106,7 +106,7 @@ object "Scattered Collectible" is "entity", "disposable", "private"
         vlock -= dt;
 
         // horizontal movement
-        if(hsensor.status != 0) {
+        if(hsensor.status != null) {
             if(hlock <= 0.0) {
                 hlock = 0.25;
                 xsp *= -0.25;
@@ -114,7 +114,7 @@ object "Scattered Collectible" is "entity", "disposable", "private"
         }
 
         // vertical movement
-        if(vsensor.status != 0) {
+        if(vsensor.status != null) {
             if(vlock <= 0.0) {
                 vlock = 0.25;
                 if(ysp >= 0)

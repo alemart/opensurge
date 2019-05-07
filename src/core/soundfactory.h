@@ -46,7 +46,7 @@ sound_t *soundfactory_get(const char *sound_name);
 #define SFX_WATEROUT            sound_load("samples/water_out.wav")
 #define SFX_COLLECTIBLE         sound_load("samples/collectible.wav")
 #define SFX_1UP                 sound_load("samples/1up.ogg")
-#define SFX_DESTROY             sound_load("samples/destroypop.wav")
+#define SFX_DESTROY             sound_load("samples/destroy.wav")
 #define SFX_BREAK               sound_load("samples/break.wav")
 #define SFX_CHOOSE              sound_load("samples/choose.wav")
 #define SFX_DENY                sound_load("samples/deny.wav")

@@ -314,9 +314,9 @@ Mateus Reis
 --- samples/select.wav
 --- samples/select_2.wav
 --- samples/return.wav
---- samples/spin.wav
---- samples/spindash1.wav
---- samples/spindash2.wav
+--- samples/roll.wav
+--- samples/charge.wav
+--- samples/release.wav
 --- samples/choose.wav
 --- samples/bigring.wav
 --- samples/endsign.wav
@@ -343,6 +343,8 @@ Mateus Reis
 --- samples/crococopter_swoop_up.wav
 --- samples/crococopter_swoop_down.wav
 --- samples/secret.wav
+--- samples/pipe_in.wav
+--- samples/pipe_out.wav
 
 Di Rodrigues
 --- samples/1up.ogg
@@ -363,7 +365,7 @@ Colin Beard
 Alexandre Martins
 --- samples/spikes_appearing.wav
 --- samples/spikes_disappearing.wav
---- samples/destroypop.wav
+--- samples/destroy.wav
 --- samples/damaged.wav
 --- samples/talk.wav
 --- samples/zipline.wav

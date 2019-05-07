@@ -12,10 +12,10 @@ version "beta"
 requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
-bgtheme "themes/template.bg"
+bgtheme "themes/sunset.bg"
 spawn_point 128 4976
-startup "DefaultStartup"
-players "Surge"
+startup "DefaultStartup" "WaterworksSetup"
+players "Surge" "Neon"
 waterlevel 7296
 
 // dialogs
@@ -52,7 +52,6 @@ brick 48 7928 7128
 brick 252 7800 7144
 brick 252 7864 7144
 brick 252 7928 7144
-brick 46 7992 7128
 brick 36 8008 7128
 brick 39 7992 7160
 brick 39 7992 7224
@@ -61,7 +60,6 @@ brick 1 8136 7160
 brick 36 8072 7128
 brick 36 8136 7128
 brick 36 8200 7128
-brick 47 8264 7128
 brick 54 8280 7032
 brick 55 8280 6904
 brick 1 8264 7160
@@ -109,7 +107,6 @@ brick 252 7736 7144
 brick 36 6072 7016
 brick 1 6072 7048
 brick 36 6136 7016
-brick 47 6200 7016
 brick 73 6216 6984 hflip
 brick 73 6280 7016 hflip
 brick 73 6344 7048 hflip
@@ -124,7 +121,6 @@ brick 1 6216 7240
 brick 1 6344 7272
 brick 73 6472 7112 hflip
 brick 1 6408 7176
-brick 46 6560 7192
 brick 76 6384 6928 yellow
 brick 76 6448 6992 yellow
 brick 77 6576 7112 yellow
@@ -207,7 +203,6 @@ brick 1 2384 7016
 brick 1 2384 7144
 brick 1 2384 7272
 brick 55 8048 6792 hflip
-brick 45 8176 6792
 brick 75 6064 6680 yellow
 brick 76 6192 6736 yellow
 brick 76 6256 6800 yellow
@@ -226,7 +221,6 @@ brick 1 5448 6728
 brick 43 5448 6856
 brick 43 5512 6856
 brick 44 5432 6856
-brick 45 5576 6856
 brick 40 5576 6792
 brick 40 5576 6728
 brick 40 5576 6664
@@ -251,7 +245,6 @@ brick 1 5936 6680
 brick 103 5816 6760
 brick 64 4312 6504 hflip
 brick 1 4312 6632
-brick 46 4440 6632
 brick 36 4456 6632
 brick 36 4520 6632
 brick 36 4584 6632
@@ -285,13 +278,11 @@ brick 48 4984 6632
 brick 48 4920 6632
 brick 68 3448 6504 hflip
 brick 1 3448 6632
-brick 46 3576 6504
 brick 36 3592 6504
 brick 36 3656 6504
 brick 36 3720 6504
 brick 36 3784 6504
 brick 36 3848 6504
-brick 47 3912 6504
 brick 52 3896 6472
 brick 67 3928 6504 hflip
 brick 66 4056 6504 hflip
@@ -318,7 +309,6 @@ brick 3 2920 6664
 brick 3 2920 6792
 brick 36 3048 6504
 brick 36 3112 6504
-brick 47 3176 6504
 brick 34 2904 6504
 brick 1 3048 6536
 brick 1 3176 6536
@@ -345,7 +335,6 @@ brick 250 2448 6824
 brick 101 6064 6088
 brick 97 6064 6216
 brick 35 6192 6024
-brick 45 6192 6056
 brick 39 5432 6408
 brick 1 5448 6408
 brick 40 5576 6408
@@ -355,12 +344,10 @@ brick 39 5432 6280
 brick 40 5576 6280
 brick 1 5448 6280
 brick 106 5936 6296
-brick 46 5920 6216
 brick 36 5856 6216
 brick 36 5792 6216
 brick 67 5648 6184 hflip
 brick 67 5520 6152 hflip
-brick 46 5776 6216
 brick 1 5392 6248
 brick 1 5520 6264
 brick 1 5648 6312
@@ -379,7 +366,6 @@ brick 36 4360 6152
 brick 35 4424 6152
 brick 40 4424 6184
 brick 40 4424 6248
-brick 45 4424 6312
 brick 43 4360 6312
 brick 48 4504 6152
 brick 34 4632 6152
@@ -388,7 +374,6 @@ brick 36 4712 6152
 brick 36 4776 6152
 brick 6 4640 6176
 brick 6 4768 6176
-brick 47 4896 6152
 brick 36 4840 6152
 brick 67 4912 6120
 brick 1 5040 6120
@@ -518,7 +503,6 @@ brick 1 512 5160
 brick 1 640 5192
 brick 1 768 5192
 brick 36 912 5064
-brick 46 896 5064
 brick 36 976 5064
 brick 36 1040 5064
 brick 36 1104 5064
@@ -536,27 +520,32 @@ brick 1 1040 5096
 brick 1 912 5096
 brick 255 1168 4856
 brick 255 1296 4856
-brick 36 0 5000
-brick 36 64 5000
-brick 36 128 5000
-brick 36 192 5000
-brick 36 256 5000
-brick 36 320 5000
-brick 36 384 5000
-brick 36 448 5000
 brick 65 640 4936 hflip
 brick 64 768 4936 hflip
 brick 1 640 5064
 brick 1 768 5064
-brick 36 512 5000
-brick 36 560 5000
-brick 47 624 5000
 brick 2 0 5032
 brick 2 128 5032
 brick 2 256 5032
 brick 2 384 5032
 brick 2 512 5032
 brick 1 784 5096
+brick 33 0 5000
+brick 33 128 5000
+brick 33 256 5000
+brick 33 384 5000
+brick 33 512 5000
+brick 206 120 4776 vflip
+brick 38 256 4808
+brick 205 248 4984
+brick 211 248 5048
+brick 208 184 5048
+brick 208 136 5048
+brick 212 120 5048
+brick 206 120 4984 vflip
+brick 206 120 4920 vflip
+brick 206 120 4856 vflip
+brick 206 120 4840 vflip
 brick 1 1296 4728
 brick 1 1424 4728
 brick 1 1552 4728
@@ -565,8 +554,49 @@ brick 1 1296 4600
 brick 1 1424 4600
 brick 1 1552 4600
 brick 1 1168 4728
+brick 33 440 4520
+brick 206 120 4712 vflip
+brick 206 120 4648 vflip
+brick 38 256 4728
+brick 38 256 4632
+brick 207 504 4488
+brick 208 216 4584
+brick 208 152 4584
+brick 210 120 4584
+brick 206 120 4616 vflip
+brick 208 280 4584
+brick 208 344 4584
+brick 208 408 4584
+brick 208 536 4584
+brick 211 600 4584
+brick 206 600 4520
+brick 209 600 4488
+brick 208 536 4488
+brick 208 472 4584
 
 // entities
+entity "Elevator Cable" 432 4872
+entity "Elevator Cable" 432 4808
+entity "Elevator Cable" 432 4776
+entity "Elevator Cable" 432 4712
+entity "Elevator Cable" 432 4648
+entity "Elevator Cable" 1136 4992
+entity "Elevator Cable" 1136 4896
+entity "Elevator Cable" 432 4584
+entity "Elevator Cable" 432 4520
+entity "Elevator Cable" 576 4736
+entity "Elevator Cable" 576 4800
+entity "Elevator Cable" 576 4872
+entity "Elevator" 368 4968
+entity "Elevator" 520 4736
+entity "Pipe In" 264 5000
+entity "Pipe Down" 264 5032
+entity "Pipe Left" 264 5064
+entity "Pipe Up" 136 5064
+entity "Pipe Right" 136 4600
+entity "Pipe Up" 616 4600
+entity "Pipe Left" 616 4504
+entity "Pipe Out" 504 4504
 
 // legacy items
 item 83 6072 6984
@@ -612,6 +642,8 @@ item 82 1344 5792
 item 83 1216 5984
 item 83 1216 6016
 item 82 1344 5824
+item 21 320 5000
+item 21 480 5000
 
 // legacy objects
 

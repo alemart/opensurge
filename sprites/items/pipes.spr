@@ -1,0 +1,96 @@
+// -----------------------------------------------------------------------------
+// File: pipes.spr
+// Description: pipe system sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Pipe In"
+{
+    source_file     "images/pipes.png"
+    source_rect     0 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Pipe Out"
+{
+    source_file     "images/pipes.png"
+    source_rect     32 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Pipe Up"
+{
+    source_file     "images/pipes.png"
+    source_rect     64 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Pipe Right"
+{
+    source_file     "images/pipes.png"
+    source_rect     96 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Pipe Down"
+{
+    source_file     "images/pipes.png"
+    source_rect     128 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Pipe Left"
+{
+    source_file     "images/pipes.png"
+    source_rect     160 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
