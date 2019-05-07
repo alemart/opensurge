@@ -165,7 +165,7 @@ object "Pipe In" is "entity"
 object "Pipe Sensor" is "private", "entity"
 {
     public readonly transform = Transform();
-    collider = CollisionBox(32, 32);
+    collider = CollisionBox(28, 28);
     pipeManager = null;
     entrance = false;
 
