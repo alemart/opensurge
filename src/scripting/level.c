@@ -26,6 +26,7 @@
 #include "../core/stringutil.h"
 #include "../scenes/level.h"
 #include "../entities/player.h"
+#include "../entities/background.h"
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -42,6 +43,8 @@ static surgescript_var_t* fun_getversion(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -73,6 +76,8 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
     surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
+    surgescript_vm_bind(vm, "Level", "set_background", fun_setbackground, 1);
+    surgescript_vm_bind(vm, "Level", "get_background", fun_getbackground, 0);
     surgescript_vm_bind(vm, "Level", "clear", fun_clear, 0);
     surgescript_vm_bind(vm, "Level", "restart", fun_restart, 0);
     surgescript_vm_bind(vm, "Level", "quit", fun_quit, 0);
@@ -182,6 +187,21 @@ surgescript_var_t* fun_setwaterlevel(surgescript_object_t* object, const surgesc
 {
     int waterlevel = (int)surgescript_var_get_number(param[0]);
     level_set_waterlevel(waterlevel);
+    return NULL;
+}
+
+/* get the background path currently in use */
+surgescript_var_t* fun_getbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* bgpath = background_filepath(level_background());
+    return surgescript_var_set_string(surgescript_var_create(), bgpath);
+}
+
+/* change the background */
+surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* bgpath = surgescript_var_fast_get_string(param[0]);
+    level_change_background(bgpath);
     return NULL;
 }
 
