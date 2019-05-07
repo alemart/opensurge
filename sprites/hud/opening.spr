@@ -104,7 +104,7 @@ sprite "DefaultOpeningAnimation.Arrow"
         repeat      TRUE
         fps         8
         data        0
-        hot_spot    0 32
+        hot_spot    0 36
     }
 
     animation 1
@@ -112,6 +112,6 @@ sprite "DefaultOpeningAnimation.Arrow"
         repeat      TRUE
         fps         8
         data        1
-        hot_spot    32 0
+        hot_spot    32 -4
     }
 }
