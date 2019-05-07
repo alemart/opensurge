@@ -221,8 +221,8 @@ object "Pipe Sensor" is "private", "entity"
 object "Pipe Manager" is "private", "awake", "entity"
 {
     public speed = 512; // in px/s
-    pipeInSfx = Sound("samples/roll.wav");
-    pipeOutSfx = Sound("samples/release.wav");
+    pipeInSfx = Sound("samples/pipe_in.wav");
+    pipeOutSfx = Sound("samples/pipe_out.wav");
     pipeSfx = null;
     travelers = {};
 
