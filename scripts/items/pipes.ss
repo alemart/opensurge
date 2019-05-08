@@ -304,7 +304,7 @@ object "Pipe Manager" is "private", "awake", "entity"
 object "Pipe Traveler" is "private", "awake", "entity"
 {
     player = null;
-    rollAnimation = 3;
+    rollAnimation = 18;
     pipeManager = parent;
     throwSpeed = Vector2.zero;
 

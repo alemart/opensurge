@@ -32,7 +32,7 @@ sprite SD_NEON
         data        6 7
     }
 
-    // jumping / rolling
+    // jumping
     animation 3
     {
         repeat      TRUE
@@ -152,8 +152,16 @@ sprite SD_NEON
         data        50 51 52 53 54 55 56
     }
 
-    // jetpack
+    // rolling
     animation 18
+    {
+        repeat      TRUE
+        fps         16
+        data        8 9 10 11
+    }
+
+    // jetpack
+    animation 20
     {
         repeat      TRUE
         fps         16
@@ -161,7 +169,7 @@ sprite SD_NEON
     }
 
     // low jetpack power
-    animation 19
+    animation 21
     {
         repeat      TRUE
         fps         5
@@ -170,7 +178,7 @@ sprite SD_NEON
     }
 
     // carrying someone
-    animation 20
+    animation 22
     {
         repeat      TRUE
         fps         8
@@ -178,7 +186,7 @@ sprite SD_NEON
     }
 
     // relaxing, smiling, looking to the sky
-    animation 21
+    animation 23
     {
         repeat      FALSE
         fps         8
@@ -186,7 +194,7 @@ sprite SD_NEON
     }
 
     // relaxing, smiling, not looking to the sky
-    animation 22
+    animation 24
     {
         repeat      FALSE
         fps         8
@@ -194,7 +202,7 @@ sprite SD_NEON
     }
 
     // no longer relaxing... attention!
-    animation 23
+    animation 25
     {
         repeat      FALSE
         fps         8
@@ -202,7 +210,7 @@ sprite SD_NEON
     }
 
     // no longer relaxing... standing up
-    animation 24
+    animation 26
     {
         repeat      FALSE
         fps         8
@@ -210,7 +218,7 @@ sprite SD_NEON
     }
 
     // humpf... while sitting down
-    animation 25
+    animation 27
     {
         repeat      FALSE
         fps         8
@@ -218,7 +226,7 @@ sprite SD_NEON
     }
 
     // uh?!
-    animation 26
+    animation 28
     {
         repeat      FALSE
         fps         8
@@ -226,7 +234,7 @@ sprite SD_NEON
     }
 
     // discussing energetically... while sitting down
-    animation 27
+    animation 29
     {
         repeat      FALSE
         fps         8
@@ -234,7 +242,7 @@ sprite SD_NEON
     }
 
     // apologizing... while sitting down
-    animation 28
+    animation 30
     {
         repeat      FALSE
         fps         8
@@ -242,7 +250,7 @@ sprite SD_NEON
     }
 
     // relaxing
-    animation 29
+    animation 31
     {
         repeat      TRUE
         fps         8
@@ -250,7 +258,7 @@ sprite SD_NEON
     }
 
     // discussing... while sitting down
-    animation 30
+    animation 32
     {
         repeat      FALSE
         fps         8
@@ -258,26 +266,18 @@ sprite SD_NEON
     }
 
     // crouch up, after sitting down
-    animation 31
+    animation 33
     {
         repeat      FALSE
         fps         4
         data        84 85
     }
-}
 
-sprite SD_EASTERNEON
-{
-    source_file     images/easterneon.png
-    source_rect     0 0 500 500
-    frame_size      50 50
-    hot_spot        25 50
-
-    // win
-    animation 0
+    // happy easter!
+    animation 34
     {
         repeat      FALSE
         fps         8
-        data        0 1 2 3 4 5 6 7 8 9
+        data        90 91 92 93 94 95 96 97 98 99
     }
 }

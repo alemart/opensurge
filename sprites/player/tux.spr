@@ -32,7 +32,7 @@ sprite SD_TUX
         data        26 27 28 29   
     }
 
-    // jumping / rolling
+    // jumping
     animation 3
     {
         repeat      TRUE
@@ -150,6 +150,13 @@ sprite SD_TUX
         repeat      TRUE
         fps         8
         data        0
-    }    
-}
+    }
 
+    // rolling
+    animation 18
+    {
+        repeat      TRUE
+        fps         16
+        data        15 16 17 18 19
+    }
+}

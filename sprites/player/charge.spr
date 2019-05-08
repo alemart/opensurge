@@ -32,7 +32,7 @@ sprite SD_CHARGE
         data        30 31 32 33 34 33 32 31
     }
 
-    // jumping / rolling
+    // jumping
     animation 3
     {
         repeat      TRUE
@@ -153,8 +153,16 @@ sprite SD_CHARGE
         data        55 54 54 54 55 56 56 56 57 58 58 59 59 60
     }
 
-    // climbing
+    // rolling
     animation 18
+    {
+        repeat      TRUE
+        fps         26
+        data        16 17 18 19 20 21
+    }
+
+    // climbing
+    animation 20
     {
         repeat      TRUE
         fps         16

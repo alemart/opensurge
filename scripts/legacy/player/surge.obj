@@ -52,7 +52,7 @@ object ".surge_nolightwalk_controller" // his lighting sneakers can't shine when
         on_player_gethit "stand by"
         on_player_death "stand by"
 
-        set_player_animation "SD_SURGE" 18
+        set_player_animation "SD_SURGE" 20
         on_player_in_the_air "walking in the air"
         change_state "stand by"
     }
@@ -64,7 +64,7 @@ object ".surge_nolightwalk_controller" // his lighting sneakers can't shine when
         on_player_gethit "stand by"
         on_player_death "stand by"
 
-        set_player_animation "SD_SURGE" 19
+        set_player_animation "SD_SURGE" 21
         on_player_in_the_air "running in the air"
         change_state "stand by"
     }
@@ -76,7 +76,7 @@ object ".surge_nolightwalk_controller" // his lighting sneakers can't shine when
         on_player_gethit "stand by"
         on_player_death "stand by"
 
-        set_player_animation "SD_SURGE" 20
+        set_player_animation "SD_SURGE" 22
         on_player_in_the_air "braking in the air"
         change_state "stand by"
     }

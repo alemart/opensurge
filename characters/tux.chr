@@ -33,7 +33,7 @@ character "Tux"
         running                     2
         jumping                     3
         springing                   13
-        rolling                     3
+        rolling                     18
         pushing                     14
         gettinghit                  11
         dead                        8
