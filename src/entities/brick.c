@@ -130,7 +130,7 @@ void brickset_load(const char* filename)
         return;
     }
 
-    logfile_message("brickset_load(\"%s\")", filename);
+    logfile_message("Loading brickset \"%s\"...", filename);
     fullpath = assetfs_fullpath(filename);
 
     brickdata_count = 0;
@@ -160,7 +160,7 @@ void brickset_unload()
 {
     int i;
 
-    logfile_message("brickset_unload()");
+    logfile_message("Unloading the brickset...");
 
     for(i = 0; i < brickdata_count; i++)
         brickdata[i] = brickdata_delete(brickdata[i]);
@@ -302,7 +302,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             if(brk->state == BRS_IDLE && bb)
                 brk->state = BRS_ACTIVE;
 
-            if((brk->state == BRS_ACTIVE) && ((brk->value[1] += timer_get_delta()) >= BRB_FALL_TIME)) {
+            if((brk->state == BRS_ACTIVE) && ((brk->value[0] += timer_get_delta()) >= BRB_FALL_TIME)) {
                 int bi, bj, bw, bh;
                 int right_oriented = ((int)brk->brick_ref->behavior_arg[2] != 0);
                 image_t *brkimg = brk->brick_ref->image;
@@ -336,22 +336,24 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             float a[4], b[4];
             int i;
 
-            t = (brk->value[0] += timer_get_delta()); /* elapsed time */
+            if(brk->brick_ref->type == BRK_PASSABLE)
+                break;
+
+            /* compute the position */
+            t = (brk->value[0] = timer_get_ticks() * 0.001f); /* elapsed time */
             rx = brk->brick_ref->behavior_arg[0]; /* x-dist */
             ry = brk->brick_ref->behavior_arg[1]; /* y-dist */
             sx = brk->brick_ref->behavior_arg[2] * (2.0f * PI); /* x-speed */
             sy = brk->brick_ref->behavior_arg[3] * (2.0f * PI); /* x-speed */
             ph = brk->brick_ref->behavior_arg[4] * PI/180.0f; /* initial phase */
-
             brk->x = brk->sx + round(rx*cos(sx*t+ph));
             brk->y = brk->sy + round(ry*sin(sy*t+ph));
 
-            if(brk->brick_ref->type == BRK_PASSABLE)
-                break;
-
+            /* set the obstacle */
             if(brk->obstacle != NULL)
                 obstacle_set_position(brk->obstacle, brk->x, brk->y);
 
+            /* move the player(s) */
             for(i=0; i<team_size; i++) {
                 image_t* actor = actor_image(team[i]->actor);
                 v2d_t box_size = v2d_new(image_width(actor), image_height(actor));
@@ -412,38 +414,17 @@ void brick_render(brick_t *brk, v2d_t camera_position)
  */
 void brick_render_path(const brick_t *brk, v2d_t camera_position)
 {
-    float oldx = 0.0f, oldy = 0.0f, x = 0.0f, y = 0.0f, t = 0.0f;
-    float rx, ry, sx, sy, ph, off;
-    int w = brick_size(brk).x;
-    int h = brick_size(brk).y;
-    color_t color = color_rgb(255, 0, 0);
+    int w = brick_size(brk).x, h = brick_size(brk).y;
     v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+    color_t color = color_rgb(255, 0, 0);
 
     switch(brk->brick_ref->behavior) {
-        case BRB_CIRCULAR:
-            rx = brk->brick_ref->behavior_arg[0];             /* x-dist */
-            ry = brk->brick_ref->behavior_arg[1];             /* y-dist */
-            sx = brk->brick_ref->behavior_arg[2] * (2*PI);    /* x-speed */
-            sy = brk->brick_ref->behavior_arg[3] * (2*PI);    /* y-speed */
-            ph = brk->brick_ref->behavior_arg[4] * PI/180.0;  /* initial phase */
-
-            off = sx*t+ph;
-            while(sx*t+ph < 2*PI + off) {
-                x = brk->sx + round(rx*cos(sx*t+ph));
-                y = brk->sy + round(ry*sin(sy*t+ph));
-
-                if(t > 0.0f)
-                    image_line((int)(oldx-topleft.x+w/2), (int)(oldy-topleft.y+h/2), (int)(x-topleft.x+w/2), (int)(y-topleft.y+h/2), color);
-
-                oldx = x;
-                oldy = y;
-                t += 2*PI / 60.0f;
-            }
-
-            t = 0.0f;
-            x = brk->sx + round(rx*cos(sx*t+ph));
-            y = brk->sy + round(ry*sin(sy*t+ph));
-            image_line((int)(oldx-topleft.x+w/2), (int)(oldy-topleft.y+h/2), (int)(x-topleft.x+w/2), (int)(y-topleft.y+h/2), color);
+        case BRB_CIRCULAR: {
+            float rx = brk->brick_ref->behavior_arg[0]; /* x-dist */
+            float ry = brk->brick_ref->behavior_arg[1]; /* y-dist */
+            image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, fabs(rx), fabs(ry), color);
+            break;
+        }
 
         default:
             break;
