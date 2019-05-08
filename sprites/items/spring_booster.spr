@@ -84,3 +84,18 @@ sprite "Spring Booster Left"
         data        5
     }
 }
+
+sprite "Spring Booster Block"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     208 338 32 32
+    frame_size      32 32
+    hot_spot        32 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
