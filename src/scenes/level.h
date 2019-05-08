@@ -108,6 +108,7 @@ void level_set_watercolor(color_t color);
 /* misc */
 v2d_t level_size();
 float level_gravity();
+float level_time();
 void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);
 void level_hide_dialogbox();

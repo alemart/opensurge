@@ -41,11 +41,10 @@
 #include "../core/soundfactory.h"
 #include "../core/nanoparser/nanoparser.h"
 
-/* private stuff */
+/* constants */
 #define BRKDATA_MAX             16384 /* up to BRKDATA_MAX bricks per theme are supported */
 #define BRICK_MAXVALUES         2
 #define BRICKBEHAVIOR_MAXARGS   5
-#define BRB_FALL_TIME           1.0 /* time in seconds before a BRB_FALL gets destroyed */
 
 /* types */
 typedef enum brickstate_t brickstate_t;
@@ -62,7 +61,7 @@ enum brickstate_t {
 /* brick theme: meta data of bricks */
 struct brickdata_t {
     spriteinfo_t *data; /* this is not stored in the main hash */
-    image_t *image; /* pointer to the current brick image in the animation */
+    const image_t *image; /* pointer to a brick image in the animation */
     char* maskfile; /* collision mask file (may be NULL) */
     collisionmask_t *mask; /* collision mask (may be NULL) */
     float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
@@ -82,6 +81,7 @@ struct brick_t { /* a real, concrete brick */
     bricklayer_t layer; /* loop system: BRL_* */
     brickflip_t flip; /* flip bitwise flags */
     obstacle_t* obstacle; /* used by the physics system */
+    const image_t *image; /* pointer to the current brick image in the animation */
 };
 
 /* collision mask (parsed data) */
@@ -90,11 +90,7 @@ struct maskdetails_t {
     int x, y, w, h;
 };
 
-/* private data */
-static int brickdata_count = 0; /* size of brickdata[] */
-static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
-
-/* private functions */
+/* private stuff */
 static brickdata_t *brickdata_get(int id);
 static void brick_animate(brick_t *brk);
 static brickdata_t* brickdata_new();
@@ -109,7 +105,16 @@ static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
-#define round(x)                (int)(((x)>=0.0f)?((x)+0.5f):((x)-0.5f))
+static int brickdata_count = 0; /* size of brickdata[] */
+static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
+
+/* utilities */
+#define TWOPI(x)   ((x) * 6.28318530718f)
+#define DEG2RAD(x) ((x) / 57.2957795131f)
+#define ROUND(x)   (int)(((x)>=0.0f)?((x)+0.5f):((x)-0.5f))
+static const float BRB_FALL_TIME = 1.0f; /* time in seconds before a BRB_FALL gets destroyed */
+
+
 
 /* public functions */
 
@@ -213,6 +218,7 @@ brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t fl
     b->layer = layer;
     b->flip = flip_flags;
     b->obstacle = create_obstacle(b);
+    b->image = b->brick_ref->image;
 
     for(i=0; i<BRICK_MAXVALUES; i++)
         b->value[i] = 0.0f;
@@ -305,9 +311,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             if((brk->state == BRS_ACTIVE) && ((brk->value[0] += timer_get_delta()) >= BRB_FALL_TIME)) {
                 int bi, bj, bw, bh;
                 int right_oriented = ((int)brk->brick_ref->behavior_arg[2] != 0);
-                image_t *brkimg = brk->brick_ref->image;
-                int brkw = image_width(brkimg);
-                int brkh = image_height(brkimg);
+                int brkw = image_width(brk->brick_ref->image);
+                int brkh = image_height(brk->brick_ref->image);
 
                 /* particles */
                 bw = clip(brk->brick_ref->behavior_arg[0], 1, brkw);
@@ -330,24 +335,25 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
         /* movable bricks */
         case BRB_CIRCULAR: {
+            float rx, ry, sx, sy, ph, t;
             int brkw = image_width(brk->brick_ref->image);
             int brkh = image_height(brk->brick_ref->image);
-            float rx, ry, sx, sy, ph, t;
-            float a[4], b[4];
+            v2d_t offset = v2d_new(8, 4);
             int i;
 
-            if(brk->brick_ref->type == BRK_PASSABLE)
-                break;
-
             /* compute the position */
-            t = (brk->value[0] = timer_get_ticks() * 0.001f); /* elapsed time */
+            t = (brk->value[0] = level_time()); /* elapsed time */
             rx = brk->brick_ref->behavior_arg[0]; /* x-dist */
             ry = brk->brick_ref->behavior_arg[1]; /* y-dist */
-            sx = brk->brick_ref->behavior_arg[2] * (2.0f * PI); /* x-speed */
-            sy = brk->brick_ref->behavior_arg[3] * (2.0f * PI); /* x-speed */
-            ph = brk->brick_ref->behavior_arg[4] * PI/180.0f; /* initial phase */
-            brk->x = brk->sx + round(rx*cos(sx*t+ph));
-            brk->y = brk->sy + round(ry*sin(sy*t+ph));
+            sx = TWOPI(brk->brick_ref->behavior_arg[2]); /* x-speed */
+            sy = TWOPI(brk->brick_ref->behavior_arg[3]); /* x-speed */
+            ph = DEG2RAD(brk->brick_ref->behavior_arg[4]); /* initial phase */
+            brk->x = brk->sx + ROUND(rx*cosf(sx*t+ph));
+            brk->y = brk->sy + ROUND(ry*sinf(sy*t+ph));
+
+            /* passable bricks do not affect the player */
+            if(brk->brick_ref->type == BRK_PASSABLE)
+                break;
 
             /* set the obstacle */
             if(brk->obstacle != NULL)
@@ -355,27 +361,29 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
             /* move the player(s) */
             for(i=0; i<team_size; i++) {
-                image_t* actor = actor_image(team[i]->actor);
-                v2d_t box_size = v2d_new(image_width(actor), image_height(actor));
-                v2d_t position = v2d_subtract(team[i]->actor->position, team[i]->actor->hot_spot);
-                v2d_t offset = v2d_new(4.0f, 4.0f);
+                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
+                    image_t* img = actor_image(team[i]->actor);
+                    v2d_t box_size = v2d_new(image_width(img), image_height(img));
+                    v2d_t position = v2d_subtract(team[i]->actor->position, team[i]->actor->hot_spot);
+                    float a[4], b[4];
 
-                a[0] = position.x + box_size.x / 2 - offset.x;
-                a[1] = position.y + box_size.y - offset.y;
-                a[2] = position.x + box_size.x / 2 + offset.x;
-                a[3] = position.y + box_size.y + offset.y;
+                    a[0] = position.x + box_size.x / 2 - offset.x;
+                    a[1] = position.y + box_size.y - offset.y;
+                    a[2] = position.x + box_size.x / 2 + offset.x;
+                    a[3] = position.y + box_size.y + offset.y;
 
-                b[0] = brk->x;
-                b[1] = brk->y;
-                b[2] = b[0] + brkw;
-                b[3] = b[1] + brkh;
+                    b[0] = brk->x;
+                    b[1] = brk->y;
+                    b[2] = b[0] + brkw;
+                    b[3] = b[1] + brkh;
 
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && bounding_box(a,b)) {
-                    team[i]->on_movable_platform = TRUE;
-                    team[i]->actor->position = v2d_add(team[i]->actor->position, v2d_multiply(brick_movable_platform_offset(brk), timer_get_delta()));
+                    if(bounding_box(a, b)) {
+                        team[i]->on_movable_platform = TRUE;
+                        team[i]->actor->position = v2d_add(team[i]->actor->position,
+                            v2d_multiply(brick_movable_platform_offset(brk), timer_get_delta())
+                        );
+                    }
                 }
-                else
-                    team[i]->on_movable_platform = FALSE;
             }
             break;
         }
@@ -439,23 +447,24 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
  */
 v2d_t brick_movable_platform_offset(const brick_t *brk)
 {
-    float t, rx, ry, sx, sy, ph;
-
     if((brk == NULL) || (brk->brick_ref == NULL))
         return v2d_new(0,0);
 
-    t = brk->value[0]; /* elapsed time */
     switch(brk->brick_ref->behavior) {
-        case BRB_CIRCULAR:
-            rx = brk->brick_ref->behavior_arg[0];             /* x-dist */
-            ry = brk->brick_ref->behavior_arg[1];             /* y-dist */
-            sx = brk->brick_ref->behavior_arg[2] * (2*PI);    /* x-speed */
-            sy = brk->brick_ref->behavior_arg[3] * (2*PI);    /* y-speed */
-            ph = brk->brick_ref->behavior_arg[4] * PI/180.0;  /* initial phase */
+        case BRB_CIRCULAR: {
+            float t = brk->value[0];                                /* elapsed time */
+            float rx = brk->brick_ref->behavior_arg[0];             /* x-dist */
+            float ry = brk->brick_ref->behavior_arg[1];             /* y-dist */
+            float sx = TWOPI(brk->brick_ref->behavior_arg[2]);      /* x-speed */
+            float sy = TWOPI(brk->brick_ref->behavior_arg[3]);      /* y-speed */
+            float ph = DEG2RAD(brk->brick_ref->behavior_arg[4]);    /* initial phase */
 
             /* take the derivative. e.g.,
                d[ sx + A*cos(PI*t) ]/dt = -A*PI*sin(PI*t) */
-            return v2d_new( (-rx*sx)*sin(sx*t+ph), (ry*sy)*cos(sy*t+ph) );
+            float dx = -rx * sx * sinf(sx * t + ph);
+            float dy =  ry * sy * cosf(sy * t + ph);
+            return v2d_new(ROUND(dx), ROUND(dy));
+        }
 
         default:
             return v2d_new(0,0);
@@ -525,10 +534,7 @@ brickflip_t brick_flip(const brick_t* brk)
  */
 const image_t *brick_image(const brick_t *brk)
 {
-    if(brk->brick_ref)
-        return brk->brick_ref->image;
-    else
-        return NULL;
+    return brk->image;
 }
 
 /*
@@ -751,10 +757,10 @@ void brick_animate(brick_t *brk)
         if(!loop)
             brk->animation_frame = min(c-1, brk->animation_frame + sprite->animation_data[0]->fps * timer_get_delta());
         else
-            brk->animation_frame = (int)(sprite->animation_data[0]->fps * (timer_get_ticks() * 0.001f)) % c;
+            brk->animation_frame = (int)(sprite->animation_data[0]->fps * level_time()) % c;
 
         f = clip((int)brk->animation_frame, 0, c-1);
-        brk->brick_ref->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
+        brk->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
     }
 }
 
@@ -871,7 +877,11 @@ int traverse(const parsetree_statement_t *stmt)
         brickdata[brick_id] = brickdata_new();
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)brickdata[brick_id], traverse_brick_attributes);
         validate_brickdata(brickdata[brick_id]);
-        brickdata[brick_id]->image = brickdata[brick_id]->data->frame_data[0];
+
+        /* setup preview image */
+        brickdata[brick_id]->image = brickdata[brick_id]->data->frame_data[
+            brickdata[brick_id]->data->animation_data[0]->data[0]
+        ];
     }
     else
         fatal_error("Can't load bricks: unknown identifier '%s'", identifier);

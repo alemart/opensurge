@@ -998,9 +998,9 @@ void level_init(void *path_to_lev_file)
     video_display_loading_screen();
 
     /* main init */
-    gravity = 787.5;
+    gravity = 787.5f;
     level_width = level_height = 0;
-    level_timer = 0;
+    level_timer = 0.0f;
     dialogregion_size = 0;
     override_music = NULL;
     quit_level = FALSE;
@@ -1009,7 +1009,7 @@ void level_init(void *path_to_lev_file)
     must_load_another_level = FALSE;
     must_restart_this_level = FALSE;
     must_push_a_quest = FALSE;
-    dead_player_timeout = 0;
+    dead_player_timeout = 0.0f;
     team_size = 0;
     for(i=0; i<TEAM_MAX; i++)
         team[i] = NULL;
@@ -1970,6 +1970,14 @@ const struct bgtheme_t* level_background()
     return backgroundtheme;
 }
 
+/*
+ * level_time()
+ * The number of seconds since the level has started
+ */
+float level_time()
+{
+    return level_timer;
+}
 
 
 

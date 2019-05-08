@@ -38,7 +38,7 @@ struct animation_t {
     int frame_count; /* how many frames does this animation have? */
     int *data; /* frame vector */
     v2d_t hot_spot; /* hot spot */
-    image_t **frame_data; /* reference to spriteinfo->frame_data (not another vector) */
+    image_t **frame_data; /* reference to spriteinfo->frame_data */
     int repeat_from; /* n. if repeat == TRUE, jump back to the n-th frame of the animation. Defaults to zero */
 };
 

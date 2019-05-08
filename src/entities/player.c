@@ -349,6 +349,9 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         player->thrown_while_rolling = FALSE;
     else if(physicsactor_get_ysp(player->pa) < 0.0f && player_is_rolling(player))
         player->thrown_while_rolling = TRUE;
+
+    /* misc */
+    player->on_movable_platform = FALSE;
 }
 
 
