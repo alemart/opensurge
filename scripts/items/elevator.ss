@@ -31,7 +31,6 @@ object "Elevator" is "entity", "gimmick"
     public readonly collider = CollisionBox(128, 8);
     public readonly transform = Transform();
     public speed = 64; // in px/s
-    
     lineCollider = CollisionBox(128, 1);
     actor = Actor("Elevator");
     brick = Brick("Elevator");
@@ -41,9 +40,7 @@ object "Elevator" is "entity", "gimmick"
 
     state "main"
     {
-        // setup the elevator
-        cables = Level.findObjects("Elevator Cable");
-        sign = sign || (shouldMoveUp() ? -1.0 : 1.0);
+        setup();
         state = "idle";
     }
 
@@ -71,15 +68,15 @@ object "Elevator" is "entity", "gimmick"
         }
 
         // move the elevator
+        oldY = Math.floor(transform.localPosition.y);
         transform.move(0, sign * speed * Time.delta);
+        dy = Math.floor(transform.localPosition.y) - oldY;
 
         // move the player(s)
         for(i = 0; i < Player.count; i++) {
             player = Player(i);
-            if(collider.collidesWith(player.collider)) {
-                m = (sign < 0) ? 0.5 : 2;
-                player.transform.move(0, m * sign * speed * Time.delta);
-            }
+            if(collider.collidesWith(player.collider))
+                player.transform.move(0, dy);
         }
     }
 
@@ -93,6 +90,13 @@ object "Elevator" is "entity", "gimmick"
         collider.setAnchor(0, 1);
         //collider.visible = true;
         lineCollider.setAnchor(0, 0);
+    }
+
+    fun setup()
+    {
+        // setup the elevator
+        cables = Level.findObjects("Elevator Cable");
+        sign = shouldMoveUp() ? -1.0 : 1.0;
     }
 
     fun findOverlappingCable()
@@ -149,7 +153,7 @@ object "Elevator" is "entity", "gimmick"
 
     fun onLeaveEditor()
     {
-        cables = Level.findObjects("Elevator Cable");
+        setup();
     }
 
 
