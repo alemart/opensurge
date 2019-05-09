@@ -14,7 +14,7 @@ using SurgeEngine.Collisions.CollisionBox;
 
 object "Pipe Up" is "entity", "gimmick", "special"
 {
-    pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
+    pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     public zindex = 1.0;
 
@@ -30,7 +30,7 @@ object "Pipe Up" is "entity", "gimmick", "special"
 
 object "Pipe Right" is "entity", "gimmick", "special"
 {
-    pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
+    pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     public zindex = 1.0;
 
@@ -46,7 +46,7 @@ object "Pipe Right" is "entity", "gimmick", "special"
 
 object "Pipe Down" is "entity", "gimmick", "special"
 {
-    pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
+    pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     public zindex = 1.0;
 
@@ -62,7 +62,7 @@ object "Pipe Down" is "entity", "gimmick", "special"
 
 object "Pipe Left" is "entity", "gimmick", "special"
 {
-    pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
+    pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     public zindex = 1.0;
 
@@ -78,7 +78,7 @@ object "Pipe Left" is "entity", "gimmick", "special"
 
 object "Pipe Out" is "entity", "gimmick", "special"
 {
-    pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
+    pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     public zindex = 1.0;
 
@@ -94,7 +94,7 @@ object "Pipe Out" is "entity", "gimmick", "special"
 
 object "Pipe In" is "entity", "gimmick", "special"
 {
-    pipeManager = Level.findObject("Pipe Manager") || Level.spawn("Pipe Manager");
+    pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager).setAsEntrance();
     nearestSensor = null;
     public zindex = 1.0;

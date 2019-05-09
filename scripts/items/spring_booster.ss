@@ -7,8 +7,6 @@
 using SurgeEngine.Actor;
 using SurgeEngine.Brick;
 using SurgeEngine.Player;
-using SurgeEngine.Level;
-using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
@@ -56,7 +54,11 @@ object "Spring Booster" is "private", "entity"
 
     state "main"
     {
-        init();
+        springCollider.setAnchor(1 - (1 + direction) / 2, 1);
+        brick.offset = Vector2(-16 * direction, 0);
+        brick.enabled = false;
+        changeAnimation(3);
+        state = "invisible";
     }
 
     state "invisible"
@@ -96,15 +98,6 @@ object "Spring Booster" is "private", "entity"
         springCollider.setAnchor(0, 1);
         //sensorCollider.visible = true;
         //springCollider.visible = true;
-    }
-
-    fun init()
-    {
-        springCollider.setAnchor(1 - (1 + direction) / 2, 1);
-        brick.offset = Vector2(-16 * direction, 0);
-        brick.enabled = false;
-        changeAnimation(3);
-        state = "invisible";
     }
 
     fun appear()
@@ -147,6 +140,6 @@ object "Spring Booster" is "private", "entity"
 
     fun onReset()
     {
-        init();
+        state = "main";
     }
 }
