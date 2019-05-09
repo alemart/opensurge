@@ -12,7 +12,7 @@ version "beta"
 requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
-bgtheme "themes/template.bg"
+bgtheme "themes/sunshine.bg"
 spawn_point 296 4968
 startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
@@ -601,8 +601,6 @@ entity "Elevator Cable" 432 4808
 entity "Elevator Cable" 432 4776
 entity "Elevator Cable" 432 4712
 entity "Elevator Cable" 432 4648
-entity "Elevator Cable" 1136 4992
-entity "Elevator Cable" 1136 4896
 entity "Elevator Cable" 432 4584
 entity "Elevator Cable" 432 4520
 entity "Elevator Cable" 576 4736
@@ -618,9 +616,17 @@ entity "Pipe Left" 240 5208
 entity "Pipe Up" 136 5208
 entity "Pipe In" 240 5016
 entity "Pipe Down" 240 5096
-entity "Spring Booster Right" 544 5000
 entity "Spring Booster Right" 3376 6536
 entity "Spring Booster Left" 5304 6632
+entity "Spring Booster Right" 1096 5064
+entity "Background Exchanger" 560 4984
+entity "Background Exchanger" 560 4952
+entity "Background Exchanger" 560 4920
+entity "Background Exchanger" 560 4888
+entity "Background Exchanger" 592 4984
+entity "Background Exchanger" 592 4952
+entity "Background Exchanger" 592 4920
+entity "Background Exchanger" 592 4888
 
 // legacy items
 item 83 6072 6984
