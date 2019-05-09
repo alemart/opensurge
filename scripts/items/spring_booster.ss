@@ -117,7 +117,12 @@ object "Spring Booster" is "private", "entity"
 
     fun boost(player)
     {
-        player.speed = direction * boostSpeed;
+        // change speed
+        oldSpeed = Math.abs(player.speed);
+        if(boostSpeed > oldSpeed)
+            player.speed = direction * boostSpeed;
+
+        // misc
         boostSfx.play();
         changeAnimation(2);
         state = "boosting";
