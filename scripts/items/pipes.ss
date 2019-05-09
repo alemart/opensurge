@@ -194,7 +194,7 @@ object "Pipe Sensor" is "private", "entity"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(entrance && !player.hasFocus()) return; // FIXME
+            //if(entrance && !player.hasFocus()) return; // FIXME
             insidePipe = pipeManager.isInsidePipe(player);
             if((entrance && !insidePipe) || (!entrance && insidePipe)) {
                 player.transform.position = transform.position

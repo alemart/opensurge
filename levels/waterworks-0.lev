@@ -12,8 +12,8 @@ version "beta"
 requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
-bgtheme "themes/sunshine.bg"
-spawn_point 528 4984
+bgtheme "themes/template.bg"
+spawn_point 296 4968
 startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
 waterlevel 7296
@@ -618,6 +618,9 @@ entity "Pipe Left" 240 5208
 entity "Pipe Up" 136 5208
 entity "Pipe In" 240 5016
 entity "Pipe Down" 240 5096
+entity "Spring Booster Right" 544 5000
+entity "Spring Booster Right" 3376 6536
+entity "Spring Booster Left" 5304 6632
 
 // legacy items
 item 83 6072 6984
@@ -664,7 +667,6 @@ item 83 1216 5984
 item 83 1216 6016
 item 82 1344 5824
 item 20 1376 4984
-item 21 320 5000
 item 21 480 5000
 
 // legacy objects

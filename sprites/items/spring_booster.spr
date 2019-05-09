@@ -5,12 +5,16 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-sprite "Spring Booster Right"
+sprite "Spring Booster"
 {
     source_file     "images/spring_pads.png"
-    source_rect     16 338 384 32
+    source_rect     16 338 384 64 
     frame_size      64 32
     hot_spot        32 32
+
+    //
+    // Orientation: Right
+    //
 
     // visible
     animation 0
@@ -24,7 +28,7 @@ sprite "Spring Booster Right"
     animation 1
     {
         repeat      FALSE
-        fps         8
+        fps         48
         data        0 1 2 3
     }
 
@@ -33,7 +37,7 @@ sprite "Spring Booster Right"
     {
         repeat      FALSE
         fps         8
-        data        4 4 4 4 3
+        data        4 4 4 3
     }
 
     // invisible
@@ -42,6 +46,72 @@ sprite "Spring Booster Right"
         repeat      TRUE
         fps         8
         data        5
+    }
+
+    //
+    // Orientation: Left
+    //
+
+    // visible
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        9
+    }
+
+    // appearing
+    animation 6
+    {
+        repeat      FALSE
+        fps         48
+        data        6 7 8 9
+    }
+
+    // action!
+    animation 7
+    {
+        repeat      FALSE
+        fps         8
+        data        10 10 10 9
+    }
+
+    // invisible
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        11
+    }
+}
+
+sprite "Spring Booster Block"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     208 338 32 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spring Booster Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 338 384 32
+    frame_size      64 32
+    hot_spot        32 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        3
     }
 }
 
@@ -52,50 +122,10 @@ sprite "Spring Booster Left"
     frame_size      64 32
     hot_spot        32 32
 
-    // visible
     animation 0
     {
         repeat      TRUE
         fps         8
         data        3
-    }
-
-    // appearing
-    animation 1
-    {
-        repeat      FALSE
-        fps         8
-        data        0 1 2 3
-    }
-
-    // action!
-    animation 2
-    {
-        repeat      FALSE
-        fps         8
-        data        4 4 4 4 3
-    }
-
-    // invisible
-    animation 3
-    {
-        repeat      TRUE
-        fps         8
-        data        5
-    }
-}
-
-sprite "Spring Booster Block"
-{
-    source_file     "images/spring_pads.png"
-    source_rect     208 338 32 32
-    frame_size      32 32
-    hot_spot        32 32
-
-    animation 0
-    {
-        repeat      TRUE
-        fps         8
-        data        0
     }
 }

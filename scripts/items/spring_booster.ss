@@ -15,13 +15,78 @@ using SurgeEngine.Collisions.CollisionBox;
 
 object "Spring Booster Right" is "entity", "gimmick"
 {
-    actor = Actor("Spring Booster Right");
-    brick = Brick("Spring Booster Block");
-    sensorCollider = CollisionBox(96, 32);
-    springCollider = CollisionBox(16, 32);
+    booster = spawn("Spring Booster").setDirection(1);
 
     state "main"
     {
+    }
+
+    fun onReset()
+    {
+        // "Spring Booster" is not spawned via the editor;
+        // delegate responsibility
+        booster.onReset();
+    }
+}
+
+object "Spring Booster Left" is "entity", "gimmick"
+{
+    booster = spawn("Spring Booster").setDirection(-1);
+
+    state "main"
+    {
+    }
+
+    fun onReset()
+    {
+        booster.onReset();
+    }
+}
+
+object "Spring Booster" is "private", "entity"
+{
+    boostSpeed = 960; // pixels per second
+    actor = Actor("Spring Booster");
+    brick = Brick("Spring Booster Block");
+    sensorCollider = CollisionBox(96, 40);
+    springCollider = CollisionBox(16, 32);
+    boostSfx = Sound("samples/spring.wav");
+    appearSfx = Sound("samples/trotada.wav");
+    direction = 1; // 1: right, -1: left
+
+    state "main"
+    {
+        init();
+    }
+
+    state "invisible"
+    {
+    }
+
+    state "appearing"
+    {
+        if(actor.animation.finished) {
+            changeAnimation(0);
+            state = "visible";
+        }
+    }
+
+    state "visible"
+    {
+    }
+
+    state "boosting"
+    {
+        if(actor.animation.finished) {
+            changeAnimation(0);
+            state = "visible";
+        }
+    }
+
+    fun setDirection(dir)
+    {
+        direction = Math.sign(dir);
+        return this;
     }
 
     fun constructor()
@@ -29,12 +94,54 @@ object "Spring Booster Right" is "entity", "gimmick"
         brick.type = "cloud";
         sensorCollider.setAnchor(0.5, 1);
         springCollider.setAnchor(0, 1);
-        sensorCollider.visible = true;
-        springCollider.visible = true;
+        //sensorCollider.visible = true;
+        //springCollider.visible = true;
+    }
+
+    fun init()
+    {
+        springCollider.setAnchor(1 - (1 + direction) / 2, 1);
+        brick.offset = Vector2(-16 * direction, 0);
+        brick.enabled = false;
+        changeAnimation(3);
+        state = "invisible";
+    }
+
+    fun appear()
+    {
+        brick.enabled = true;
+        appearSfx.play();
+        changeAnimation(1);
+        state = "appearing";
+    }
+
+    fun boost(player)
+    {
+        player.speed = direction * boostSpeed;
+        boostSfx.play();
+        changeAnimation(2);
+        state = "boosting";
+    }
+
+    fun changeAnimation(baseID)
+    {
+        actor.anim = baseID + ((1 - direction) / 2) * 5;
+    }
+
+    fun onCollision(otherCollider)
+    {
+        if(otherCollider.entity.hasTag("player")) {
+            if(otherCollider.collidesWith(springCollider)) {
+                if(state != "invisible")
+                    boost(otherCollider.entity);
+            }
+            else if(state == "invisible")
+                appear();
+        }
     }
 
     fun onReset()
     {
-        
+        init();
     }
 }
