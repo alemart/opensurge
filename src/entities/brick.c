@@ -261,17 +261,23 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
         /* breakable bricks */
         case BRB_BREAKABLE: {
             for(i=0; i<team_size; i++) {
-                if((team[i]->attacking || player_is_rolling(team[i]) || player_is_charging(team[i]))) {
-                    if(player_overlaps(team[i], brk->x - 4, brk->y - 4, brk_width + 8, brk_height)) {
+                if(
+                    (team[i]->attacking || player_is_charging(team[i])) ||
+                    (player_is_rolling(team[i]) /*&& fabs(team[i]->actor->speed.x) >= 240.0f*/)
+                ) {
+                    if(player_overlaps(team[i], brk->x - 8, brk->y - 4, brk_width + 16, brk_height)) {
                         int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
                         int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
-                        float s = -sign(team[i]->actor->speed.x);
+                        float dx = team[i]->actor->position.x - brk->x;
 
                         /* create particles */
                         for(int bi=0; bi<bw; bi++) {
                             for(int bj=0; bj<bh; bj++) {
                                 v2d_t brk_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
-                                v2d_t brk_speed = v2d_new(s*(120+60*(bw-bi)/bw), -(120+60*(bh-bj)/bh));
+                                v2d_t brk_speed = v2d_new(
+                                    dx >= 0 ? (120 + 60*(1+bi)/bw) : -(120 + 60*(bw-bi)/bw),
+                                    -(120 + 60*(bh-bj)/bh)
+                                );
                                 image_t *brk_img = image_clone_region(brk->image,
                                     (bi * brk_width) / bw,
                                     (bj * brk_height) / bh,
@@ -405,7 +411,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     }
 
                     /* bounce player */
-                    player_bounce(team[i], -1.0f, FALSE);
+                    if(player_bounce(team[i], -1.0f, FALSE))
+                        team[i]->actor->speed.y = -180.0f;
 
                     /* destroy brick */
                     sound_play(SFX_BREAK);
@@ -608,7 +615,10 @@ const image_t *brick_image(const brick_t *brk)
  */
 const obstacle_t* brick_obstacle(const brick_t* brk)
 {
-    return brk->obstacle;
+    if(brk->state != BRS_DEAD)
+        return brk->obstacle;
+    else
+        return NULL;
 }
 
 /*

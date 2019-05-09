@@ -175,19 +175,22 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_setid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* anim_ref = surgescript_heap_at(heap, ANIMID_ADDR);
     const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITENAME_ADDR));
     int anim_id = (int)surgescript_var_get_number(param[0]);
 
     /* update data */
-    if(sprite_animation_exists(sprite_name, anim_id)) {
-        animation_t* animation = sprite_get_animation(sprite_name, anim_id);
-        surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), anim_id);
-        surgescript_object_set_userdata(object, animation);
-    }
-    else {
-        animation_t* animation = sprite_get_animation(NULL, 0);
-        surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), anim_id);
-        surgescript_object_set_userdata(object, animation);
+    if((int)surgescript_var_get_number(anim_ref) != anim_id) {
+        if(sprite_animation_exists(sprite_name, anim_id)) {
+            animation_t* animation = sprite_get_animation(sprite_name, anim_id);
+            surgescript_var_set_number(anim_ref, anim_id);
+            surgescript_object_set_userdata(object, animation);
+        }
+        else {
+            animation_t* animation = sprite_get_animation(NULL, 0);
+            surgescript_var_set_number(anim_ref, anim_id);
+            surgescript_object_set_userdata(object, animation);
+        }
     }
 
     /* done! */
