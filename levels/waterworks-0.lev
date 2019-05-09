@@ -13,7 +13,7 @@ requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/sunset.bg"
-spawn_point 128 4976
+spawn_point 528 4984
 startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
 waterlevel 7296
@@ -490,6 +490,10 @@ brick 1 384 5160
 brick 1 512 5160
 brick 1 640 5192
 brick 1 768 5192
+brick 211 224 5192
+brick 208 160 5192
+brick 212 120 5192
+brick 208 152 5192
 brick 80 1168 4984
 brick 81 1296 4984
 brick 85 1296 5112
@@ -507,27 +511,22 @@ brick 33 896 5064
 brick 33 1024 5064
 brick 33 1040 5064
 brick 293 1256 4744
+brick 258 912 5048
+brick 258 968 5048
+brick 258 1024 5048
 brick 65 640 4936 hflip
 brick 1 640 5064
 brick 1 768 5064
 brick 2 0 5032
-brick 2 128 5032
-brick 2 256 5032
 brick 2 384 5032
 brick 2 512 5032
 brick 1 784 5096
 brick 33 0 5000
-brick 33 128 5000
 brick 33 256 5000
 brick 33 384 5000
 brick 33 512 5000
 brick 206 120 4776 vflip
 brick 38 256 4808
-brick 205 248 4984
-brick 211 248 5048
-brick 208 184 5048
-brick 208 136 5048
-brick 212 120 5048
 brick 206 120 4984 vflip
 brick 206 120 4920 vflip
 brick 206 120 4856 vflip
@@ -548,6 +547,22 @@ brick 231 424 4920
 brick 231 464 4920
 brick 231 224 4920
 brick 249 224 4872
+brick 206 224 5064
+brick 206 224 5128
+brick 206 120 5048
+brick 206 120 5104
+brick 206 120 5128
+brick 33 96 5000
+brick 205 224 5000
+brick 258 224 4984
+brick 258 808 5048
+brick 258 856 5048
+brick 257 640 4928
+brick 257 536 4928
+brick 257 768 4872
+brick 257 584 4888
+brick 257 472 4888
+brick 257 672 4840
 brick 1 1424 4728
 brick 1 1552 4728
 brick 1 1424 4600
@@ -599,14 +614,14 @@ entity "Elevator Cable" 576 4800
 entity "Elevator Cable" 576 4872
 entity "Elevator" 368 4968
 entity "Elevator" 520 4736
-entity "Pipe In" 264 5000
-entity "Pipe Down" 264 5032
-entity "Pipe Left" 264 5064
-entity "Pipe Up" 136 5064
 entity "Pipe Right" 136 4600
 entity "Pipe Up" 616 4600
 entity "Pipe Left" 616 4504
 entity "Pipe Out" 504 4504
+entity "Pipe Left" 240 5208
+entity "Pipe Up" 136 5208
+entity "Pipe In" 240 5016
+entity "Pipe Down" 240 5096
 
 // legacy items
 item 83 6072 6984

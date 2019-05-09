@@ -3004,7 +3004,7 @@ brick 256
 brick 257
 {
     type                CLOUD
-    behavior            DEFAULT
+    behavior            FLOAT
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -3012,6 +3012,27 @@ brick 257
         source_file     "images/waterworks.png"
         source_rect     896 896 64 32
         frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 258
+{
+    type                SOLID
+    behavior            SMASHABLE 2 1
+    //mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     960 768 32 16
+        frame_size      32 16
 
         animation
         {
@@ -3213,7 +3234,7 @@ brick 296
 
 brick 297
 {
-    type                SOLID
+    type                CLOUD
     behavior            CIRCULAR 128 128 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
