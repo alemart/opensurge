@@ -117,7 +117,7 @@ brick 4
 brick 5
 {
     type                OBSTACLE
-    behavior            BREAKABLE 4 4
+    behavior            BREAKABLE 2 2
     mask                "images/brickset_mask.png"
 
     sprite
@@ -138,7 +138,7 @@ brick 5
 brick 6
 {
     type                OBSTACLE
-    behavior            BREAKABLE 4 8
+    behavior            BREAKABLE 2 4
     mask                "images/brickset_mask.png"
 
     sprite
