@@ -4,9 +4,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
-using SurgeEngine.Actor;
 using SurgeEngine.Player;
-using SurgeEngine.Vector2;
 using SurgeEngine.Level;
 using SurgeEngine.Collisions.CollisionBox;
 
