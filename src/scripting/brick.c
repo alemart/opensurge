@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include <surgescript.h>
+#include "scripting.h"
 #include "../core/util.h"
 #include "../core/sprite.h"
 #include "../entities/brick.h"
@@ -46,7 +47,10 @@ static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static inline bricklike_data_t* get_data(const surgescript_object_t* object);
+static const surgescript_heapptr_t OFFSET_ADDR = 0;
 static const int BRICKLIKE_ANIMATION_ID = 0; /* which animation number should be used to extract the collision mask? */
 
 /*
@@ -71,6 +75,8 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Brick", "set_layer", fun_setlayer, 1);
     surgescript_vm_bind(vm, "Brick", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Brick", "set_enabled", fun_setenabled, 1);
+    surgescript_vm_bind(vm, "Brick", "get_offset", fun_getoffset, 0);
+    surgescript_vm_bind(vm, "Brick", "set_offset", fun_setoffset, 1);
 }
 
 /*
@@ -143,17 +149,11 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t offset, me = surgescript_object_handle(object);
     surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
     surgescript_objecthandle_t parent = surgescript_object_parent(object);
-    bricklike_data_t* data = mallocx(sizeof *data);
-
-    /* default values */
-    data->type = BRK_SOLID;
-    data->layer = BRL_DEFAULT;
-    data->mask = NULL;
-    data->hot_spot = v2d_new(0, 0);
-    data->enabled = true;
-    surgescript_object_set_userdata(object, data);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    bricklike_data_t* data;
 
     /* sanity check */
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
@@ -167,6 +167,20 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
             break;
         }
     }
+
+    /* allocate the offset vector */
+    ssassert(OFFSET_ADDR == surgescript_heap_malloc(heap));
+    offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR), offset);
+
+    /* default values of the brick */
+    data = mallocx(sizeof *data);
+    data->type = BRK_SOLID;
+    data->layer = BRL_DEFAULT;
+    data->mask = NULL;
+    data->hot_spot = v2d_new(0, 0);
+    data->enabled = true;
+    surgescript_object_set_userdata(object, data);
 
     /* done */
     return NULL;
@@ -285,21 +299,39 @@ surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
+/* get offset */
+surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR));
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+
+    scripting_vector2_update(v2, transform->position.x, transform->position.y);
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+}
+
+/* set offset */
+surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
+    double x = 0.0, y = 0.0;
+
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    transform->position.x = x;
+    transform->position.y = y;
+
+    return NULL;
+}
+
 /* -- private -- */
 
 /* gets the brickdata structure (without checking the validity of the object) */
 bricklike_data_t* get_data(const surgescript_object_t* object)
 {
     return (bricklike_data_t*)(surgescript_object_userdata(object));
-}
-
-/* djb2 hash function */
-uint64_t hash(const char *str)
-{
-    int c; uint64_t hash = 5381;
-
-    while((c = *((unsigned char*)(str++))))
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-    return hash;
 }
