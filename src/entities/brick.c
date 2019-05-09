@@ -687,10 +687,9 @@ const char* brick_util_typename(bricktype_t type)
 
         case BRK_CLOUD:
             return "CLOUD";
-
-        default:
-            return "Unknown";
     }
+
+    return "Unknown";
 }
 
 
@@ -714,9 +713,14 @@ const char* brick_util_behaviorname(brickbehavior_t behavior)
         case BRB_FALL:
             return "FALL";
 
-        default:
-            return "Unknown";
+        case BRB_SMASHABLE:
+            return "SMASHABLE";
+
+        case BRB_FLOAT:
+            return "FLOAT";
     }
+
+    return "Unknown";
 }
 
 /* utilities */
