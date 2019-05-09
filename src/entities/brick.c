@@ -288,6 +288,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     }
                 }
             }
+            
             break;
         }
 
@@ -325,6 +326,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 sound_play(SFX_BREAK);
                 brk->state = BRS_DEAD;
             }
+
             break;
         }
 
@@ -363,6 +365,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     }
                 }
             }
+
+            /* done */
             break;
         }
 
