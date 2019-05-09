@@ -12,7 +12,7 @@ version "beta"
 requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
-bgtheme "themes/sunset.bg"
+bgtheme "themes/sunshine.bg"
 spawn_point 528 4984
 startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
@@ -538,7 +538,6 @@ brick 230 464 4872
 brick 230 392 4752
 brick 230 464 4744
 brick 249 248 4872
-brick 249 376 4872
 brick 231 264 4920
 brick 231 304 4920
 brick 231 344 4920
@@ -558,10 +557,7 @@ brick 258 224 4984
 brick 258 808 5048
 brick 258 856 5048
 brick 257 640 4928
-brick 257 536 4928
 brick 257 768 4872
-brick 257 584 4888
-brick 257 472 4888
 brick 257 672 4840
 brick 1 1424 4728
 brick 1 1552 4728
