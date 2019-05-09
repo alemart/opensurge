@@ -17,7 +17,7 @@ using SurgeEngine.Collisions.CollisionBox;
 object "Background Exchanger" is "entity", "special"
 {
     public background = "themes/template.bg";
-    collider = CollisionBox(2, 32);
+    collider = CollisionBox(32, 32);
     player = null;
     manager = Level.child("Background Exchange Manager") || Level.spawn("Background Exchange Manager");
 
