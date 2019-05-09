@@ -3115,10 +3115,7 @@ void editor_render()
     major_bricks = entitymanager_retrieve_active_bricks();
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
-
-
-
-
+    
     /* background */
     editor_render_background();
 
@@ -3156,10 +3153,6 @@ void editor_render()
         cursor = sprite_get_image(sprite_get_animation("SD_ERASER", 0), 0);
         image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
-
-
-
-
 
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);

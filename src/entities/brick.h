@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * brick.h - brick module
- * Copyright (C) 2008-2010, 2012, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2008-2012, 2018-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,8 +36,10 @@ enum bricktype_t
 enum brickbehavior_t {
     BRB_DEFAULT,        /* static bricks */
     BRB_CIRCULAR,       /* bricks with elliptical movement */
-    BRB_BREAKABLE,      /* bricks that can be broken */
-    BRB_FALL            /* bricks that are broken once you step on them */
+    BRB_BREAKABLE,      /* bricks that can be broken by rolling on them */
+    BRB_FALL,           /* bricks that are broken once you step on them */
+    BRB_SMASHABLE,      /* bricks that can be broken by jumping on them */
+    BRB_FLOAT           /* floating bricks */
 };
 
 /* brick layer (loop system) */
@@ -115,7 +117,6 @@ const char* brick_util_typename(bricktype_t type); /* type name */
 const char* brick_util_behaviorname(brickbehavior_t behavior); /* behavior name */
 const char* brick_util_layername(bricklayer_t layer); /* layer name */
 const char* brick_util_flipstr(brickflip_t flip); /* flip string */
-v2d_t brick_movable_platform_offset(const brick_t *brk); /* movable platforms must move actors on top of them. Returns a delta_space vector */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
 const struct image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
