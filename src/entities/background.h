@@ -30,7 +30,7 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme); /* unloads the bg/fg theme */
 void background_update(bgtheme_t *bgtheme); /* updates the given theme */
 void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position); /* renders the background */
 void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position); /* renders the foreground */
-const char* background_filepath(const bgtheme_t* bgtheme); /* get the filepath of the background */
+const char* background_filepath(const bgtheme_t *bgtheme); /* get the filepath of the background */
 
 #endif
 

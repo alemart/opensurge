@@ -113,7 +113,7 @@ bgtheme_t* background_load(const char *filepath)
 {
     bgtheme_t *bgtheme;
     parsetree_program_t *tree;
-    const char* fullpath;
+    const char *fullpath;
 
     logfile_message("Loading background \"%s\"...", filepath);
     fullpath = assetfs_fullpath(filepath);
@@ -137,12 +137,10 @@ bgtheme_t* background_load(const char *filepath)
  */
 bgtheme_t* background_unload(bgtheme_t *bgtheme)
 {
-    int i;
-
-    logfile_message("Unloading the background...");
+    logfile_message("Will unload background \"%s\"...", bgtheme->filepath);
 
     if(bgtheme->data != NULL) {
-        for(i=0; i<bgtheme->length; i++)
+        for(int i = 0; i < bgtheme->length; i++)
             bgtheme->data[i] = background_delete(bgtheme->data[i]);
 
         free(bgtheme->data);
@@ -159,11 +157,8 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
  */
 void background_update(bgtheme_t *bgtheme)
 {
-    int i;
-    background_t *bg;
-
-    for(i=0; i<bgtheme->length; i++) {
-        bg = bgtheme->data[i];
+    for(int i = 0; i < bgtheme->length; i++) {
+        background_t *bg = bgtheme->data[i];
         bg->strategy->update(bg->strategy);
     }
 }
@@ -190,7 +185,7 @@ void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
  * background_filepath()
  * Returns the filepath of the background
  */
-const char* background_filepath(const bgtheme_t* bgtheme)
+const char* background_filepath(const bgtheme_t *bgtheme)
 {
     return bgtheme->filepath;
 }
