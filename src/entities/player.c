@@ -738,6 +738,31 @@ int player_collision(const player_t *player, const actor_t *actor)
 }
 
 /*
+ * player_overlaps()
+ * Returns TRUE if the player is overlapping the given rectangle,
+ * given in world coordinates
+ */
+int player_overlaps(const player_t *player, int x, int y, int width, int height)
+{
+    float player_box[4], other_box[4];
+    int player_box_width, player_box_height;
+    v2d_t player_box_center;
+
+    physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
+    player_box[0] = player_box_center.x - player_box_width / 2;
+    player_box[1] = player_box_center.y - player_box_height / 2;
+    player_box[2] = player_box_center.x + player_box_width / 2;
+    player_box[3] = player_box_center.y + player_box_height / 2;
+
+    other_box[0] = x;
+    other_box[1] = y;
+    other_box[2] = x + width;
+    other_box[3] = y + height;
+
+    return bounding_box(player_box, other_box);
+}
+
+/*
  * player_is_attacking()
  * Returns TRUE if a given player is attacking;
  * FALSE otherwise
