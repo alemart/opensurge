@@ -511,9 +511,6 @@ brick 33 896 5064
 brick 33 1024 5064
 brick 33 1040 5064
 brick 293 1256 4744
-brick 258 912 5048
-brick 258 968 5048
-brick 258 1024 5048
 brick 65 640 4936 hflip
 brick 1 640 5064
 brick 1 768 5064
@@ -554,8 +551,6 @@ brick 206 120 5128
 brick 33 96 5000
 brick 205 224 5000
 brick 258 224 4984
-brick 258 808 5048
-brick 258 856 5048
 brick 257 640 4928
 brick 257 768 4872
 brick 257 672 4840
@@ -618,15 +613,9 @@ entity "Pipe In" 240 5016
 entity "Pipe Down" 240 5096
 entity "Spring Booster Right" 3376 6536
 entity "Spring Booster Left" 5304 6632
-entity "Spring Booster Right" 1096 5064
-entity "Background Exchanger" 560 4984
-entity "Background Exchanger" 560 4952
-entity "Background Exchanger" 560 4920
-entity "Background Exchanger" 560 4888
-entity "Background Exchanger" 592 4984
-entity "Background Exchanger" 592 4952
-entity "Background Exchanger" 592 4920
-entity "Background Exchanger" 592 4888
+entity "Background Exchanger" 1360 5504
+entity "Background Exchanger" 1360 5536
+entity "Spring Booster Right" 936 5064
 
 // legacy items
 item 83 6072 6984
