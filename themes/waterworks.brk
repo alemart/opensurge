@@ -2558,7 +2558,7 @@ brick 220
         animation
         {
             repeat      TRUE
-            fps         8
+            fps         12
             data        0 1
         }
     }
@@ -3010,8 +3010,29 @@ brick 257
     sprite
     {
         source_file     "images/waterworks.png"
-        source_rect     896 896 64 32
+        source_rect     896 896 64 64
         frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1
+        }
+    }
+}
+
+brick 258
+{
+    type                SOLID
+    behavior            SMASHABLE 2 1
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     960 1008 32 16
+        frame_size      32 16
 
         animation
         {
@@ -3022,17 +3043,17 @@ brick 257
     }
 }
 
-brick 258
+brick 259
 {
     type                SOLID
-    behavior            SMASHABLE 2 1
-    //mask                "images/waterworks_mask.png"
+    behavior            BREAKABLE 2 4
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
         source_file     "images/waterworks.png"
-        source_rect     960 768 32 16
-        frame_size      32 16
+        source_rect     992 960 32 64
+        frame_size      32 64
 
         animation
         {

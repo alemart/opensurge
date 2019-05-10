@@ -265,7 +265,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     (team[i]->attacking || player_is_charging(team[i])) ||
                     (player_is_rolling(team[i]) /*&& fabs(team[i]->actor->speed.x) >= 240.0f*/)
                 ) {
-                    if(player_overlaps(team[i], brk->x - 8, brk->y - 4, brk_width + 16, brk_height)) {
+                    if(player_overlaps(team[i], brk->x - 16, brk->y - 4, brk_width + 32, brk_height)) {
                         int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
                         int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
                         float dx = team[i]->actor->position.x - brk->x;
