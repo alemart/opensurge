@@ -555,7 +555,7 @@ brick 50
     sprite
     {
         source_file     "images/waterworks.png"
-        source_rect     210 224 16 32
+        source_rect     208 224 16 32
         frame_size      16 32
 
         animation
@@ -1433,8 +1433,8 @@ brick 104
     sprite
     {
         source_file     "images/waterworks.png"
-        source_rect     0 640 128 128
-        frame_size      128 128
+        source_rect     0 640 64 128
+        frame_size      64 128
 
         animation
         {

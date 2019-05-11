@@ -111,6 +111,8 @@ object "Elevator" is "entity", "gimmick"
 
     fun shouldMoveUp()
     {
+        return true; // FIXME
+        
         moveUp = true;
 
         if((cable = findOverlappingCable())) {
@@ -154,6 +156,7 @@ object "Elevator" is "entity", "gimmick"
     fun onLeaveEditor()
     {
         setup();
+        state = "idle";
     }
 
 
