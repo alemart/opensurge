@@ -55,7 +55,7 @@ brick 1
 {
     type                SOLID
     behavior            DEFAULT
-    zindex              0.49
+    zindex              0.485
     mask                "images/waterworks_mask.png"
 
     sprite
