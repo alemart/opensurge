@@ -3883,7 +3883,7 @@ int editor_brick_id(int index)
 /* initializes the grid module */
 void editor_grid_init()
 {
-    editor_grid_size = 16;
+    editor_grid_size = 8;
 }
 
 /* releases the grid module */
@@ -3909,7 +3909,7 @@ void editor_grid_update()
         if(editor_grid_size > 1)
             video_showmessage("Snap to grid: %dx%d", editor_grid_size, editor_grid_size);
         else
-            video_showmessage("Disabled grid");
+            video_showmessage("Snap to grid: disabled");
     }
 }
 
