@@ -186,7 +186,7 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
     extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
     
     /* a necessary evil :( */
-    if(video_resolution != resolution && fullscreen)
+    if(display != NULL && video_resolution != resolution && fullscreen)
         fullscreen = false;
 
     /* Log the event */
