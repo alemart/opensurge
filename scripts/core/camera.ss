@@ -7,6 +7,7 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Camera;
+using SurgeEngine.Video.Screen;
 
 object "DefaultCamera" is "entity", "awake", "private"
 {
@@ -43,6 +44,10 @@ object "DefaultCamera" is "entity", "awake", "private"
             player = Player.active;
             centerCamera(player.transform.position);
         }
+
+        // camera too far away? (e.g., player teleported)
+        if(delta.length > 2 * Screen.width)
+            centerCamera(player.transform.position);
 
         // stop camera
         if(player.activity == "dying" || player.activity == "drowning")
