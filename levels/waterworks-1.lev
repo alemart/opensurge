@@ -14,6 +14,7 @@ act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 128 4968
+music "musics/waterworks.ogg"
 startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
 waterlevel 7296
@@ -62,6 +63,10 @@ brick 37 9328 7424
 brick 1 9216 7456
 brick 6 9360 7424
 brick 1 9216 7552
+brick 216 8688 7472
+brick 216 8744 7472
+brick 216 8848 7440
+brick 216 8904 7440
 brick 41 7744 7360
 brick 41 7744 7424
 brick 41 7744 7488
@@ -1059,6 +1064,12 @@ brick 246 7536 6400
 brick 246 7600 6400
 brick 249 7672 6224
 brick 249 7672 6096
+brick 48 7376 6288
+brick 50 7440 6288
+brick 49 7360 6288
+brick 245 7440 6320
+brick 244 7376 6320
+brick 244 7344 6320
 brick 99 6064 6176
 brick 1 6048 6208
 brick 41 6176 6240
@@ -1074,6 +1085,8 @@ brick 33 6800 6432
 brick 34 6784 6432
 brick 257 6528 6440
 brick 257 6656 6440
+brick 223 6352 6368
+brick 222 6464 6432
 brick 6 5280 6048
 brick 6 5280 6176
 brick 36 5536 6176
@@ -1101,6 +1114,19 @@ brick 250 5264 6440
 brick 250 5392 6440
 brick 250 5520 6440
 brick 250 5648 6440
+brick 224 5728 6144
+brick 225 5728 6112
+brick 225 5728 6080
+brick 225 5728 6048
+brick 224 5632 6144
+brick 224 5824 6144
+brick 225 5824 6112
+brick 225 5632 6112
+brick 225 5632 6080
+brick 225 5632 6048
+brick 225 5824 6080
+brick 228 5824 6064
+brick 228 5632 6032
 brick 149 4576 6040
 brick 149 4576 6072
 brick 149 4576 6104
@@ -1127,23 +1153,17 @@ brick 1 5152 6176
 brick 40 5136 6176
 brick 40 5136 6240
 brick 250 5136 6440
-brick 65 3504 6136 hflip
-brick 8 3632 6264
 brick 1 3504 6264
 brick 40 3760 6200
 brick 40 3760 6136
 brick 40 3760 6072
 brick 3 3776 6136
-brick 39 3616 6232
-brick 8 3776 6264
 brick 149 3760 6264
 brick 149 3760 6296
 brick 149 3760 6328
 brick 149 3760 6360
 brick 1 3904 6264
 brick 1 3904 6136
-brick 244 3696 6200
-brick 244 3632 6200
 brick 244 3632 6136
 brick 244 3696 6136
 brick 244 3696 6072
@@ -1161,13 +1181,30 @@ brick 42 3648 6392
 brick 250 3648 6424
 brick 250 3776 6424
 brick 250 3816 6424
+brick 33 3488 6200
+brick 35 3616 6200
+brick 36 3472 6200
+brick 41 3616 6232
+brick 41 3616 6296
+brick 1 3488 6232
+brick 1 3632 6232
+brick 1 3632 6264
+brick 41 3616 6328
+brick 1 3792 6264
+brick 40 3760 6264
+brick 40 3760 6328
+brick 244 3632 6200
+brick 244 3696 6200
+brick 224 3552 6168
+brick 225 3552 6136
+brick 225 3552 6104
+brick 228 3552 6088
 brick 1 2688 6360
 brick 33 3104 6136
 brick 1 2816 6328
 brick 1 2848 6328
 brick 37 3232 6136
 brick 67 3248 6136 hflip
-brick 66 3376 6136 hflip
 brick 1 3232 6168
 brick 1 3376 6264
 brick 220 3056 6072
@@ -1210,6 +1247,7 @@ brick 216 2616 6184
 brick 220 2712 6136
 brick 220 2776 6136
 brick 1 3376 6392
+brick 66 3376 6136 hflip
 brick 76 1904 6064
 brick 76 1968 6128
 brick 77 2032 6184
@@ -1260,12 +1298,12 @@ brick 35 8840 5808
 brick 48 8792 5808
 brick 35 9392 6000
 brick 48 9344 6000
-brick 220 8672 5744
-brick 220 8736 5744
 brick 215 9160 5984
 brick 215 9216 5984
 brick 215 9272 5984
 brick 215 9328 5984
+brick 220 8800 5744
+brick 220 8608 5744
 brick 244 7800 6000
 brick 149 7832 5968
 brick 149 7800 5968
@@ -1333,6 +1371,8 @@ brick 105 5408 5760
 brick 105 5408 5888
 brick 105 5408 5632 yellow
 brick 98 5408 5632 green
+brick 225 5728 6016
+brick 227 5728 6000
 brick 33 4320 5656
 brick 149 4576 5816
 brick 149 4576 5848
@@ -1397,12 +1437,12 @@ brick 1 4992 5776
 brick 1 5008 5776
 brick 1 4864 5776
 brick 33 5008 5696
-brick 224 5040 5664
-brick 224 4976 5664
-brick 225 4976 5632
-brick 225 5040 5632
-brick 225 4976 5600
-brick 228 5040 5616
+brick 224 5008 5664
+brick 225 5008 5632
+brick 225 5008 5600
+brick 224 5072 5664
+brick 225 5072 5632
+brick 228 5072 5616
 brick 40 3760 6008
 brick 40 3760 5944
 brick 40 3760 5880
@@ -1435,15 +1475,11 @@ brick 41 3616 5816
 brick 41 3616 5752
 brick 42 3552 5880
 brick 33 3488 5720
-brick 35 3472 5688
-brick 37 3472 5720
 brick 33 3920 5688
 brick 34 3904 5688
-brick 36 3904 5720
 brick 33 4048 5688
 brick 33 4192 5656
 brick 34 4176 5656
-brick 36 4176 5688
 brick 1 3920 5720
 brick 1 4048 5720
 brick 1 4064 5720
@@ -1459,19 +1495,21 @@ brick 225 4112 5624
 brick 225 3984 5592
 brick 227 4112 5608
 brick 225 4048 5592
+brick 202 3664 5640
+brick 201 3712 5640
+brick 201 3728 5640
+brick 202 3648 5640
+brick 37 4176 5688
+brick 37 3904 5720
+brick 36 3472 5720
+brick 41 3472 5656
+brick 35 3472 5656
+brick 149 3440 5688
 brick 42 3376 5880
 brick 42 3312 5880
 brick 42 3248 5880
 brick 42 3184 5880
 brick 1 3360 5752
-brick 33 3344 5688
-brick 33 3200 5656
-brick 36 3328 5688
-brick 35 3328 5656
-brick 1 3344 5720
-brick 1 3224 5720
-brick 1 3200 5688
-brick 1 3232 5752
 brick 1 2944 5688
 brick 42 3056 5816
 brick 42 2992 5816
@@ -1480,8 +1518,17 @@ brick 60 3120 5848
 brick 1 3072 5688
 brick 1 3184 5752
 brick 1 3120 5720
-brick 216 3352 5672
-brick 216 3408 5672
+brick 33 3344 5656
+brick 33 3216 5656
+brick 36 3200 5656
+brick 1 3200 5688
+brick 1 3344 5720
+brick 1 3232 5752
+brick 1 3320 5688
+brick 224 3392 5624
+brick 225 3392 5592
+brick 225 3328 5592
+brick 224 3328 5624
 brick 76 1776 5936
 brick 76 1840 6000
 brick 250 2288 5920
@@ -1538,7 +1585,7 @@ brick 41 4608 5496 yellow
 brick 41 4608 5432 yellow
 brick 149 4576 5560 yellow
 brick 55 4480 5432 yellow
-brick 227 4976 5584
+brick 227 5008 5584
 brick 42 3488 5432
 brick 42 3552 5432
 brick 42 3616 5432
@@ -1575,6 +1622,9 @@ brick 1 3200 5304
 brick 5 2944 5432
 brick 1 2944 5304
 brick 1 2944 5560
+brick 227 3328 5576
+brick 225 3392 5560
+brick 228 3392 5544
 brick 1 1008 5160
 brick 1 1008 5288
 brick 1 880 5272
@@ -1613,8 +1663,6 @@ brick 1 880 5144
 brick 1 1008 4776
 brick 81 1136 4904
 brick 85 1136 5032
-brick 1 1136 4776
-brick 1 1264 4776
 brick 1 1264 4904
 brick 1 1392 4776
 brick 1 1392 4904
@@ -1622,6 +1670,10 @@ brick 1 1264 5032
 brick 1 1392 5032
 brick 1 944 4776
 brick 62 944 4904
+brick 1 1456 4776
+brick 1 1136 4776
+brick 1 1264 4776
+brick 253 1256 4776
 brick 33 0 4984
 brick 33 128 4984
 brick 33 256 4984
@@ -1651,17 +1703,21 @@ brick 245 768 4888
 brick 245 768 4936
 brick 48 576 4872
 brick 48 640 4872
-brick 48 704 4872
 brick 49 560 4872
 brick 257 456 4920
-brick 50 800 4872
-brick 48 736 4872
 brick 1 800 5016
 brick 1 784 5016
 brick 1 800 5144
 brick 1 512 5112
 brick 1 640 5112
 brick 1 672 5112
+brick 244 704 4824
+brick 245 768 4824
+brick 48 704 4808
+brick 48 736 4808
+brick 50 800 4808
+brick 49 688 4808
+brick 50 704 4872
 brick 249 944 4648
 brick 249 1072 4648
 brick 1 944 4520
@@ -1701,9 +1757,6 @@ entity "Background Exchanger" 1200 5400
 entity "Elevator Cable" 3696 5848
 entity "Elevator Cable" 3696 5720
 entity "Elevator Cable" 3696 6104
-entity "Elevator Cable" 3696 5976
-entity "Elevator Cable" 3696 6136
-entity "Elevator" 3632 6232
 entity "Pipe In" 3792 6696
 entity "Pipe Down" 3792 6760
 entity "Pipe Right" 3792 6968
@@ -1730,14 +1783,152 @@ entity "Background Exchanger" 7944 6080
 entity "Background Exchanger" 8128 6176
 entity "Background Exchanger" 8160 6176
 entity "Spring Booster Right" 5232 5632
-entity "Spring Booster Left" 3216 5656
 entity "Background Exchanger" 8704 6752
 entity "Background Exchanger" 8704 6720
 entity "Background Exchanger" 8704 6688
 entity "Background Exchanger" 8704 6656
+entity "Collectible" 288 4960
+entity "Collectible" 320 4960
+entity "Collectible" 352 4960
+entity "Collectible" 256 4960
+entity "Collectible" 224 4960
+entity "Collectible" 1792 5920
+entity "Collectible" 1824 5952
+entity "Collectible" 1856 5984
+entity "Collectible" 1888 6016
+entity "Collectible" 1920 6048
+entity "Collectible" 1952 6080
+entity "Collectible" 1984 6112
+entity "Collectible" 2384 6160
+entity "Collectible" 2416 6160
+entity "Collectible" 2448 6160
+entity "Collectible" 2400 6144
+entity "Collectible" 2432 6144
+entity "Collectible" 3696 6128
+entity "Collectible" 3696 6096
+entity "Collectible" 3696 6000
+entity "Collectible" 3696 5872
+entity "Collectible" 3696 5840
+entity "Collectible" 3696 5968
+entity "Collectible" 3584 5696
+entity "Collectible" 3552 5696
+entity "Collectible" 3520 5696
+entity "Collectible" 3808 5696
+entity "Collectible" 3840 5696
+entity "Collectible" 3872 5696
+entity "Collectible" 4496 5632
+entity "Collectible" 4528 5664
+entity "Collectible" 4560 5696
+entity "Collectible" 5536 5456
+entity "Collectible" 5536 5616
+entity "Collectible" 5616 5544
+entity "Collectible" 5456 5544
+entity "Collectible" 5592 5480
+entity "Collectible" 5584 5592
+entity "Collectible" 5480 5480
+entity "Collectible" 5456 5592
+entity "Collectible" 5456 5640
+entity "Collectible" 6064 6160
+entity "Collectible" 6064 6000
+entity "Collectible" 6144 6088
+entity "Collectible" 5984 6088
+entity "Collectible" 6120 6136
+entity "Collectible" 5984 6136
+entity "Collectible" 6120 6024
+entity "Collectible" 6008 6024
+entity "Collectible" 5984 6184
+entity "Collectible" 6304 6192
+entity "Collectible" 6304 6224
+entity "Collectible" 6304 6256
+entity "Collectible" 6496 6544
+entity "Collectible" 6528 6544
+entity "Collectible" 6560 6544
+entity "Collectible" 8224 7504
+entity "Collectible" 8192 7504
+entity "Collectible" 8160 7504
+entity "Collectible" 8016 7504
+entity "Collectible" 7984 7504
+entity "Collectible" 7952 7504
+entity "Collectible" 8584 6704
+entity "Collectible" 8584 6672
+entity "Collectible" 8584 6608
+entity "Collectible" 8584 6576
+entity "Collectible" 8584 6544
+entity "Collectible" 8584 6736
+entity "Collectible" 9904 6288
+entity "Collectible" 9936 6288
+entity "Collectible" 9968 6288
+entity "Collectible" 608 4856
+entity "Collectible" 672 4856
+entity "Collectible" 640 4856
+entity "Collectible" 4400 6352
+entity "Collectible" 4400 6320
+entity "Collectible" 4400 6288
+entity "Collectible" 4400 6256
+entity "Collectible" 5536 6968
+entity "Collectible" 5616 6888
+entity "Collectible" 5456 6888
+entity "Collectible" 5536 6808
+entity "Collectible" 5592 6832
+entity "Collectible" 5480 6832
+entity "Collectible" 5480 6944
+entity "Collectible" 5592 6944
+entity "Collectible" 8768 5792
+entity "Collectible" 8736 5792
+entity "Collectible" 8704 5792
+entity "Collectible" 8672 5792
+entity "Collectible" 9032 5888
+entity "Collectible" 9008 5864
+entity "Collectible" 9056 5912
+entity "Collectible" 9696 6192
+entity "Collectible" 9672 6168
+entity "Collectible" 9648 6144
+entity "Collectible" 9624 6120
+entity "Collectible" 9600 6096
+entity "Bubbles" 9040 7424
+entity "Collectible" 8400 7504
+entity "Collectible" 8432 7504
+entity "Collectible" 8464 7504
+entity "Collectible" 8048 6016
+entity "Collectible" 8080 6016
+entity "Collectible" 8112 6016
+entity "Collectible" 8176 6016
+entity "Collectible" 8208 6016
+entity "Collectible" 8240 6016
+entity "Collectible" 8304 6016
+entity "Collectible" 8336 6016
+entity "Collectible" 8368 6016
+entity "Collectible" 6304 6288
+entity "Spring Booster Left" 3248 5656
+entity "Collectible" 4976 5680
+entity "Collectible" 4944 5680
+entity "Collectible" 4912 5680
+entity "Collectible" 9176 7136
+entity "Collectible" 9272 7176
+entity "Collectible" 9304 7264
+entity "Collectible" 9088 7176
+entity "Collectible" 3520 5480
+entity "Collectible" 3552 5480
+entity "Collectible" 3584 5480
+entity "Collectible" 3808 5480
+entity "Collectible" 3840 5480
+entity "Collectible" 3872 5480
+entity "Collectible" 4112 5480
+entity "Collectible" 4144 5480
+entity "Collectible" 4176 5480
+entity "Elevator" 3632 6200
+entity "Collectible" 3696 5808
+entity "Collectible" 3696 5936
+entity "Elevator Cable" 3696 5976
+entity "Collectible" 3696 6064
+entity "Collectible" 9048 7264
+entity "Collectible" 10352 6120
+entity "Collectible" 10224 6248
+entity "Collectible" 10256 6160
+entity "Collectible" 10448 6160
 
 // legacy items
-item 3 7792 7520
+item 79 7792 7520
 item 82 5376 6952
 item 82 5376 6920
 item 82 5376 6888
@@ -1756,6 +1947,7 @@ item 29 10128 6272
 item 82 9344 6272
 item 82 9312 6272
 item 20 8520 6064
+item 2 7408 6288
 item 2 6864 6432
 item 82 5904 6144
 item 82 5904 6112
@@ -1810,8 +2002,18 @@ item 83 4416 5464
 item 82 1184 5448
 item 82 1184 5480
 item 1 1264 4776
-item 2 696 4872
+item 2 752 4808
 
 // legacy objects
+object "Wolfredo" 8752 7480
+object "Wolfredo" 8904 7448
+object "Lady Bugsy" 8848 7120
+object "Lady Bugsy" 4128 6648
+object "Lady Bugsy" 7856 6352
+object "Lady Bugsy" 2976 6168
+object "Wolfredo" 3104 6128
+object "Lady Bugsy" 4080 5688
+object "Wolfredo" 4296 5648
+object "Wolfredo" 3328 5648
 
 // EOF
