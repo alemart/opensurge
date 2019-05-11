@@ -344,13 +344,10 @@ static int editor_brick_index(int brick_id); /* index of brick_id at editor_bric
 static int editor_brick_id(int index); /* the index-th valid brick - at editor_brick[] */
 
 /* editor: grid */
-#define EDITOR_GRID_W         (int)(editor_grid_size().x)
-#define EDITOR_GRID_H         (int)(editor_grid_size().y)
-static int editor_grid_enabled; /* is the grid enabled? */
+static int editor_grid_size = 1;
 static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
-static v2d_t editor_grid_size(); /* returns the size of the grid */
 static v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
 
 
@@ -3886,7 +3883,7 @@ int editor_brick_id(int index)
 /* initializes the grid module */
 void editor_grid_init()
 {
-    editor_grid_enabled = TRUE;
+    editor_grid_size = 16;
 }
 
 /* releases the grid module */
@@ -3897,19 +3894,23 @@ void editor_grid_release()
 /* updates the grid module */
 void editor_grid_update()
 {
-    if(editorcmd_is_triggered(editor_cmd, "snap-to-grid")) {
-        editor_grid_enabled = !editor_grid_enabled;
-        video_showmessage("Snap to grid: %s", editor_grid_enabled ? "ON" : "OFF");
-    }
-}
+    static int grid_size[] = { 16, 8, 1 };
 
-/* returns the size of the grid */
-v2d_t editor_grid_size()
-{
-    if(!editor_grid_enabled)
-        return v2d_new(1,1);
-    else
-        return v2d_new(8,8);
+    /* next grid size */
+    if(editorcmd_is_triggered(editor_cmd, "snap-to-grid")) {
+        int n = sizeof(grid_size) / sizeof(grid_size[0]);
+        for(int i = 0; i < n; i++) {
+            if(editor_grid_size == grid_size[i]) {
+                editor_grid_size = grid_size[(i + 1) % n];
+                break;
+            }
+        }
+
+        if(editor_grid_size > 1)
+            video_showmessage("Snap to grid: %dx%d", editor_grid_size, editor_grid_size);
+        else
+            video_showmessage("Disabled grid");
+    }
 }
 
 /* aligns position to a cell in the grid */
@@ -3917,8 +3918,8 @@ v2d_t editor_grid_snap(v2d_t position)
 {
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
-    int w = EDITOR_GRID_W;
-    int h = EDITOR_GRID_H;
+    int w = editor_grid_size;
+    int h = editor_grid_size;
     int cx = (int)topleft.x % w;
     int cy = (int)topleft.y % h;
 
