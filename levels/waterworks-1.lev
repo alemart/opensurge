@@ -1986,6 +1986,7 @@ entity "Collectible" 4400 6224
 entity "Collectible" 6504 6544
 entity "Collectible" 6536 6544
 entity "Collectible" 9080 7176
+entity "Spring Booster Right" 5800 6176
 
 // legacy items
 item 2 9312 7424
