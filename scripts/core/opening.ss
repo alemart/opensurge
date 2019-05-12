@@ -245,7 +245,7 @@ object "DefaultOpeningAnimation.Formula" is "entity", "awake", "detached", "priv
     {
         transform.move(speed * Time.delta, 0);
         if(transform.position.x >= Screen.width)
-            transform.position = Vector2(-actor.width, transform.position.y);
+            transform.position = Vector2(-actor.width - (Screen.width - transform.position.x), transform.position.y);
     }
 
     fun constructor()

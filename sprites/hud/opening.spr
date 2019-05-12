@@ -8,9 +8,9 @@
 sprite "DefaultOpeningAnimation.LeftHalf"
 {
     source_file     "images/opening.png"
-    source_rect     0 32 426 240
-    frame_size      426 240
-    hot_spot        426 0
+    source_rect     0 32 480 240
+    frame_size      480 240
+    hot_spot        480 0
 
     animation 0
     {
@@ -23,8 +23,8 @@ sprite "DefaultOpeningAnimation.LeftHalf"
 sprite "DefaultOpeningAnimation.RightHalf"
 {
     source_file     "images/opening.png"
-    source_rect     0 272 426 240
-    frame_size      426 240
+    source_rect     0 272 480 240
+    frame_size      480 240
     hot_spot        0 0
 
     animation 0
@@ -52,8 +52,8 @@ sprite "DefaultOpeningAnimation.Void"
 sprite "DefaultOpeningAnimation.Formula"
 {
     source_file     "images/opening.png"
-    source_rect     0 800 320 224
-    frame_size      320 224
+    source_rect     0 784 320 240
+    frame_size      320 240
 
     animation 0
     {
@@ -66,7 +66,7 @@ sprite "DefaultOpeningAnimation.Formula"
 sprite "DefaultOpeningAnimation.Lighting"
 {
     source_file     "images/opening.png"
-    source_rect     448 32 64 64
+    source_rect     576 32 64 64
     frame_size      64 64
     hot_spot        32 32
 
@@ -81,7 +81,7 @@ sprite "DefaultOpeningAnimation.Lighting"
 sprite "DefaultOpeningAnimation.Wheel"
 {
     source_file     "images/opening.png"
-    source_rect     448 96 64 64
+    source_rect     576 96 64 64
     frame_size      64 64
     hot_spot        32 32
 
@@ -96,7 +96,7 @@ sprite "DefaultOpeningAnimation.Wheel"
 sprite "DefaultOpeningAnimation.Arrow"
 {
     source_file     "images/opening.png"
-    source_rect     448 160 64 64
+    source_rect     576 160 64 64
     frame_size      64 32
 
     animation 0
