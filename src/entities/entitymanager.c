@@ -2,7 +2,7 @@
  * Open Surge Engine
  * entitymanager.c - efficient data structure for retrieving bricks,
  *                   built-in items and custom objects in the level.
- * Copyright (C) 2011  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

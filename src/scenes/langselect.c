@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * langselect.c - language selection screen
- * Copyright (C) 2009-2010, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2009-2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

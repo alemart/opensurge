@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * color.h - color utility
- * Copyright (C) 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

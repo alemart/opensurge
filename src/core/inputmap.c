@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * inputmap.c - custom input mapping
- * Copyright (C) 2011, 2019  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

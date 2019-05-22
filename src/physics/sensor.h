@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sensor.h - physics system: sensors
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

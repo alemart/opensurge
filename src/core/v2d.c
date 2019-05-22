@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * v2d.c - 2D vectors
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2010, 2018  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
