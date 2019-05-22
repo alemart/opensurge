@@ -52,6 +52,7 @@ static int write_to_zip(const char* vpath, void* param);
 static bool is_valid_id(const char* str);
 static void console_print(const char* fmt, ...);
 static bool console_ask(const char* fmt, ...);
+static bool remove_folder(const char* fullpath);
 
 
 
@@ -266,6 +267,80 @@ bool build_game(const char* gameid)
 }
 
 
+/*
+ * uninstall_game()
+ * Removes files created by install_game()
+ * Note: interactive_mode may be set to true only on a console
+ */
+bool uninstall_game(const char* gameid, bool interactive_mode)
+{
+#if !defined(_WIN32)
+    bool use_strict;
+    bool remove_config_files = false; /* defaults to false */
+    const char* data_folder;
+    const char* cache_folder;
+    const char* config_folder;
+
+    /* validate gameid */
+    gameid = gameid && *gameid ? gameid : GAME_UNIXNAME;
+
+    /* is assetfs already initialized? */
+    if(assetfs_initialized()) {
+        console_print("Can't uninstall %s: assetfs is initialized.", gameid);
+        return false;
+    }
+
+    /* is the given game not installed? */
+    if(!is_game_installed(gameid)) {
+        console_print("Game %s is not installed. Check if the gameid is spelled correctly.", gameid);
+        return false;
+    }
+
+    /* confirm the operation */
+    if(interactive_mode) {
+        bool default_game = (strcmp(gameid, GAME_UNIXNAME) == 0);
+        if(!console_ask("Are you sure you want to %s %s? This will delete data!", (default_game ? "reset" : "uninstall"), gameid)) {
+            console_print("Won't proceed.");
+            return false;
+        }
+        remove_config_files = console_ask(
+            "Delete save states and configuration data as well? [default: %c]",
+            remove_config_files ? 'y' : 'n'
+        );
+    }
+
+    /* init assetfs */
+    use_strict = assetfs_use_strict(false);
+    assetfs_init(gameid, NULL);
+
+    /* get the absolute paths */
+    data_folder = assetfs_create_data_file("", true);
+    cache_folder = assetfs_create_cache_file("");
+    config_folder = assetfs_create_config_file("");
+
+    /* deleting the data */
+    console_print("Deleting data files in \"%s\"...", data_folder);
+    remove_folder(data_folder);
+    console_print("Deleting cache files in \"%s\"...", cache_folder);
+    remove_folder(cache_folder);
+    if(remove_config_files) {
+        console_print("Deleting configuration files in \"%s\"...", config_folder);
+        remove_folder(config_folder);
+    }
+
+    /* release assetfs */
+    assetfs_release();
+    assetfs_use_strict(use_strict);
+
+    /* done */
+    console_print("Done!");
+    return true;
+#else
+    console_print("Not implemented on this operating system.");
+    return false;
+#endif
+}
+
 
 /* ----- private ----- */
 
@@ -423,4 +498,72 @@ bool console_ask(const char* fmt, ...)
         else
             return false;
     }
+}
+
+/* Removes a folder: rm -rf fullpath
+   Returns true on success */
+bool remove_folder(const char* fullpath)
+{
+#if !defined(_WIN32)
+    bool success = true;
+    DIR* dir = opendir(fullpath);
+
+    if(dir != NULL) {
+        /* scan the directory */
+        struct dirent* d;
+        while((d = readdir(dir))) {
+            char* path = mallocx((strlen(fullpath) + strlen(d->d_name) + 2) * sizeof(*path));
+            bool is_dir = false;
+            bool is_file = false;
+            struct stat st;
+
+            /* compute the path of the current entry */
+            strcpy(path, fullpath);
+            if(path[0] && path[strlen(path) - 1] != '/')
+                strcat(path, "/");
+            strcat(path, d->d_name);
+
+            /* check the type of the entry */
+            lstat(path, &st);
+            is_dir = S_ISDIR(st.st_mode) && !(S_ISLNK(st.st_mode));
+            is_file = S_ISREG(st.st_mode) || S_ISLNK(st.st_mode);
+
+            /* recurse on directories */
+            if(is_dir) {
+                if(0 != strcmp(d->d_name, ".") && 0 != strcmp(d->d_name, "..")) {
+                    if(!remove_folder(path))
+                        success = false;
+                }
+            }
+
+            /* remove the file */
+            else if(is_file) {
+                if(0 != unlink(path)) {
+                    console_print("Can't remove file \"%s\": %s", path, strerror(errno));
+                    success = false;
+                }
+            }
+
+            /* done */
+            free(path);
+        }
+
+        /* close the directory */
+        if(closedir(dir))
+            console_print("Can't close directory \"%s\": %s", fullpath, strerror(errno));
+
+        /* remove the empty folder */
+        if(success && 0 != rmdir(fullpath)) {
+            console_print("Can't remove directory \"%s\": %s", fullpath, strerror(errno));
+            success = false;
+        }
+    }
+    else
+        console_print("Can't scan directory \"%s\": %s", fullpath, strerror(errno));
+
+    /* done! */
+    return success;
+#else
+    ; /* not implemented */
+#endif
 }

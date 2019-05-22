@@ -92,9 +92,11 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/my_quest.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/lang.lng)\n"
+                "    --reset                          restore Open Surge to its factory state (cleanup)\n"
                 "    --games                          list the installed Open Surge games\n"
                 "    --game \"gameid\"                  run the specified Open Surge game (e.g., opensurge)\n"
                 "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
+                "    --uninstall \"gameid\"             uninstall an Open Surge game package\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
@@ -211,6 +213,20 @@ commandline_t commandline_parse(int argc, char **argv)
             }
             else
                 crash("%s: missing --install parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--uninstall") == 0) {
+            if(++i < argc && *(argv[i]) != '-') {
+                uninstall_game(argv[i], true);
+                exit(0);
+            }
+            else
+                crash("%s: missing --uninstall parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--reset") == 0) {
+            uninstall_game(NULL, true);
+            exit(0);
         }
 
         else if(strcmp(argv[i], "--build") == 0) {

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * install.h - installs/builds/lists Open Surge games
- * Copyright (C) 2018  Alexandre Martins <alemartf(at)gmail(dot)com>
+ * Copyright (C) 2018-2019  Alexandre Martins <alemartf(at)gmail(dot)com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,5 +30,6 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
 int foreach_installed_game(int (*callback)(const char*,void*), void* data); /* all installed games */
 bool is_game_installed(const char* gameid); /* is a game installed? */
 bool build_game(const char* gameid); /* builds a game package; returns true on success */
+bool uninstall_game(const char* gameid, bool interactive_mode); /* returns true on success */
 
 #endif
