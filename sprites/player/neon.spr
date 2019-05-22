@@ -156,7 +156,7 @@ sprite SD_NEON
     animation 18
     {
         repeat      TRUE
-        fps         16
+        fps         24
         data        8 9 10 11
     }
 

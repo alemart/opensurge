@@ -156,7 +156,7 @@ sprite SD_TUX
     animation 18
     {
         repeat      TRUE
-        fps         16
+        fps         24
         data        15 16 17 18 19
     }
 }
