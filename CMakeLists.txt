@@ -383,6 +383,7 @@ SET(GAME_SRCS
   src/scripting/collisions.c
   src/scripting/console.c
   src/scripting/input.c
+  src/scripting/lang.c
   src/scripting/level.c
   src/scripting/levelmanager.c
   src/scripting/mouse.c

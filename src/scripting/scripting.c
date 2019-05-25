@@ -55,6 +55,7 @@ extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
 extern void scripting_register_input(surgescript_vm_t* vm);
+extern void scripting_register_lang(surgescript_vm_t* vm);
 extern void scripting_register_level(surgescript_vm_t* vm);
 extern void scripting_register_levelmanager(surgescript_vm_t* vm);
 extern void scripting_register_mouse(surgescript_vm_t* vm);
@@ -97,6 +98,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_collisions(vm);
     scripting_register_console(vm);
     scripting_register_input(vm);
+    scripting_register_lang(vm);
     scripting_register_level(vm);
     scripting_register_levelmanager(vm);
     scripting_register_mouse(vm);

@@ -100,7 +100,7 @@ void lang_loadfile(const char *filepath)
  * Reads the contents of the desired key directly from the
  * language file (without loading it into memory)
  */
-void lang_readstring(const char *filepath, const char *desired_key, char *str, int str_size)
+void lang_readstring(const char *filepath, const char *desired_key, char *str, size_t str_size)
 {
     inout_t param;
     parsetree_program_t *prog;
@@ -126,7 +126,7 @@ void lang_readstring(const char *filepath, const char *desired_key, char *str, i
  * lang_getstring()
  * Retrieves some string from the language definition file
  */
-void lang_getstring(const char *desired_key, char *str, int str_size)
+void lang_getstring(const char *desired_key, char *str, size_t str_size)
 {
     const stringadapter_t *s = hashtable_stringadapter_t_find(strings, desired_key);
 
@@ -161,6 +161,17 @@ void lang_readcompatibility(const char *filename, int *ver, int *subver, int *wi
     lang_readstring(filename, "LANG_COMPATIBILITY", compat, sizeof(compat));
     if(sscanf(compat, "%d.%d.%d", ver, subver, wipver) < 3)
         *ver = *subver = *wipver = 0;
+}
+
+
+/*
+ * lang_haskey()
+ * Checks if a key exists
+ */
+bool lang_haskey(const char *desired_key)
+{
+    const stringadapter_t *s = hashtable_stringadapter_t_find(strings, desired_key);
+    return s != NULL;
 }
 
 

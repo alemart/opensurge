@@ -48,6 +48,7 @@ object "SurgeEngine"
     audio = spawn("Audio");
     video = spawn("Video");
     prefs = spawn("Prefs");
+    lang = spawn("Lang");
     web = spawn("Web");
     transformFactory = spawn("TransformFactory");
     vectorFactory = spawn("VectorFactory");
@@ -75,6 +76,11 @@ object "SurgeEngine"
     fun get_Level()
     {
         return levelManager.currentLevel;
+    }
+
+    fun get_Lang()
+    {
+        return lang;
     }
 
     fun get_Camera()

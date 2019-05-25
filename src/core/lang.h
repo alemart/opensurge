@@ -21,13 +21,17 @@
 #ifndef _LANG_H
 #define _LANG_H
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 /* public functions */
 void lang_init();
 void lang_release();
-void lang_readstring(const char *filepath, const char *desired_key, char *str, int str_size);
+void lang_readstring(const char *filepath, const char *desired_key, char *str, size_t str_size);
 void lang_loadfile(const char *filepath);
-void lang_getstring(const char *desired_key, char *str, int str_size);
+void lang_getstring(const char *desired_key, char *str, size_t str_size);
 const char *lang_get(const char *desired_key);
+bool lang_haskey(const char *desired_key);
 void lang_readcompatibility(const char *filename, int *ver, int *subver, int *wipver);
 
 /* public constants */
