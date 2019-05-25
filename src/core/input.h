@@ -78,7 +78,7 @@ void input_clear(input_t *in);
 /* these will only work for a mouse input device */
 v2d_t input_get_xy(inputmouse_t *in);
 
-/* the following will only work for an user customized input device */
+/* the following will only work for a user customized input device */
 void input_change_mapping(inputuserdefined_t *in, const char* inputmap_name); /* set inputmap_name to NULL to use a default mapping */
 const char* input_get_mapping_name(inputuserdefined_t *in);
 
