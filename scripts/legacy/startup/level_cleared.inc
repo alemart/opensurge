@@ -226,7 +226,7 @@ object ".default_startup.level_cleared.title"
     state "move"
     {
         set_absolute_position "min(screen_width()/2, xpos()+1280*dt())" "ypos()"
-        textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE1"
+        textout_centre "hud_levelend" 0 0 "YOU HAVE"
     }
 }
 
@@ -253,7 +253,7 @@ object ".default_startup.level_cleared.title2"
     state "move"
     {
         set_absolute_position "max(screen_width()/2, xpos()-1280*dt())" "ypos()"
-        textout_centre "hud_levelend" 0 0 "$HUD_CLEARED_LINE2 <color=ffff00>$HUD_CLEARED_LINE2_ACT $act_number</color>"
+        textout_centre "hud_levelend" 0 0 "PASSED <color=ffff00>ACT $act_number</color>"
     }
 }
 
@@ -280,7 +280,7 @@ object ".default_startup.level_cleared.ringbonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_COLLECTIBLES</color>"
+        textout_right "hud" 0 0 "<color=ffff00>POWER BONUS</color>"
     }
 }
 
@@ -333,7 +333,7 @@ object ".default_startup.level_cleared.timebonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_TIME</color>"
+        textout_right "hud" 0 0 "<color=ffff00>TIME BONUS</color>"
     }
 }
 
@@ -386,7 +386,7 @@ object ".default_startup.level_cleared.secretbonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_SECRET</color>"
+        textout_right "hud" 0 0 "<color=ffff00>SUPER BONUS</color>"
     }
 }
 
@@ -439,7 +439,7 @@ object ".default_startup.level_cleared.totalbonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>$HUD_CLEARED_TOTAL</color>"
+        textout_right "hud" 0 0 "<color=ffff00>TOTAL</color>"
     }
 }
 

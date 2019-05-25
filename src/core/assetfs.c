@@ -89,7 +89,7 @@ static char* afs_gameid = NULL;
 
 /* internal functions */
 static bool is_valid_id(const char* str);
-static bool is_valid_writable_vpath(const char* vpath);
+static bool is_sane_vpath(const char* vpath);
 static bool is_asset_folder(const char* fullpath);
 static bool is_writable_file(const char* fullpath);
 static inline char* clone_str(const char* str);
@@ -199,7 +199,7 @@ const char* assetfs_fullpath(const char* vpath)
 
     if(file == NULL) {
         assetfs_log("Can't find asset \"%s\"", vpath);
-        if(is_valid_writable_vpath(vpath)) {
+        if(is_sane_vpath(vpath)) {
             /* return an invalid path to the program */
             char* sanitized_vpath = pathify(vpath);
             snprintf(path, sizeof(path), "surge://%s", sanitized_vpath);
@@ -497,13 +497,14 @@ bool is_valid_id(const char* str)
 }
 
 /* checks the validity of a writable virtual path */
-bool is_valid_writable_vpath(const char* vpath)
+bool is_sane_vpath(const char* vpath)
 {
     /* sanity */
     if(strstr(vpath, "../") != NULL || strstr(vpath, "/..") != NULL ||
     strstr(vpath, "..\\") != NULL || strstr(vpath, "\\..") != NULL ||
     strstr(vpath, "//") != NULL || strstr(vpath, "\\\\") != NULL ||
-    strstr(vpath, "~") != NULL || strstr(vpath, ":\\") != NULL)
+    strstr(vpath, "~") != NULL || strstr(vpath, ":") != NULL ||
+    vpath[0] == '/' || vpath[0] == '\\')
         return false;
 
     return true;
@@ -1268,7 +1269,7 @@ char* build_config_fullpath(const char* gameid, const char* vpath)
     char* result = NULL;
 
     /* sanity check */
-    if(!is_valid_writable_vpath(vpath)) {
+    if(!is_sane_vpath(vpath)) {
         assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
         return NULL;
     }
@@ -1385,7 +1386,7 @@ char* build_userdata_fullpath(const char* gameid, const char* vpath)
     char* result = NULL;
 
     /* sanity check */
-    if(!is_valid_writable_vpath(vpath)) {
+    if(!is_sane_vpath(vpath)) {
         assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
         return NULL;
     }
@@ -1502,7 +1503,7 @@ char* build_cache_fullpath(const char* gameid, const char* vpath)
     char* result = NULL;
 
     /* sanity check */
-    if(!is_valid_writable_vpath(vpath)) {
+    if(!is_sane_vpath(vpath)) {
         assetfs_fatal("Can't build path for \"%s\": invalid path", vpath);
         return NULL;
     }

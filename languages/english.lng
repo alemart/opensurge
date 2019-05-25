@@ -10,7 +10,7 @@
 // Translation metadata
 LANG_LANGUAGE               "English"
 LANG_AUTHOR                 "Alexandre Martins"
-LANG_LASTUPDATE             "2018-06-05"
+LANG_LASTUPDATE             "2019-05-25"
 LANG_COMPATIBILITY          "0.5.0" // required engine version
 
 // Colors
@@ -19,8 +19,6 @@ COLOR_NEON                  "bf7a0d"
 COLOR_CHARGE                "aca5a5"
 COLOR_TITLE                 "ff8800"
 COLOR_HIGHLIGHT             "ffee11"
-//COLOR_SUBHIGHLIGHT          "ffe13e"
-COLOR_SUBHIGHLIGHT          "cdc3b6"
 COLOR_INPUT                 "ff8800"
 COLOR_DANGER                "ff7777"
 COLOR_HUD                   "ffff00"
@@ -37,13 +35,7 @@ GAME_YEAR                   "$ENGINE_YEAR"
 
 // ========== MENUS ==========
 
-// Languages (please do not translate these sentences!)
-LANGSELECT_TITLE1           "<color=$COLOR_TITLE>SELECT YOUR</color>"
-LANGSELECT_TITLE2           "<color=$COLOR_TITLE>LANGUAGE</color>"
-LANGSELECT_AUTHOR           "<color=$COLOR_HIGHLIGHT>Translation by:</color> $1"
-LANGSELECT_PAGE             "page $1/$2"
-
-// Main Menu (from now on, you may translate)
+// Main Menu
 // Note: this block use bitmapped fonts and
 // doesn't support special characters
 MAINMENU_TITLE              "MENU"
@@ -54,15 +46,14 @@ MAINMENU_OPTIONS            "OPTIONS"
 MAINMENU_QUIT               "QUIT"
 
 // Create Menu
-// all entries - except CREATEMENU_TEXT - use
-// bitmapped fonts (so no special characters)
+// all entries, except CREATEMENU_TEXT, use
+// bitmapped fonts (don't use special characters)
 CREATEMENU_TITLE            "CREATE"
 CREATEMENU_PLAY             "PLAY DEMO"
 CREATEMENU_LEARN            "LEARN"
 CREATEMENU_BACK             "BACK"
 CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nReady to become a creator? Build your own levels, items, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
-
-// note: when translating CREATEMENU_TEXT, please make sure the text fits inside the screen!
+// note: when translating CREATEMENU_TEXT, make sure the text fits the screen!
 
 // Options
 OPTIONS_TITLE               "<color=$COLOR_TITLE>OPTIONS</color>"
@@ -100,37 +91,26 @@ QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color
 
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
-CREDITS_KEY                 "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
-CREDITS_HEADER              "<color=$COLOR_TITLE>$GAME_NAME version $GAME_VERSION</color>\n<color=$COLOR_HIGHLIGHT>powered by $ENGINE_NAME version $ENGINE_VERSION</color>\n<color=$COLOR_SUBHIGHLIGHT>$ENGINE_WEBSITE</color>"
-CREDITS_ACTIVE              "Open Surge team"
-CREDITS_CONTRIB             "Special contributors"
-CREDITS_RETIRED             "Retired members"
-CREDITS_THANKS              "Thanks to"
-CREDITS_RES_TITLE           "Credits per individual resources"
-CREDITS_RES_TEXT            "Unless explicitly told otherwise, the files listed below are licensed under the Creative Commons Attribution 3.0 (CC-BY 3.0)."
-CREDITS_RES_IMAGES          "Images"
-CREDITS_RES_MUSICS          "Musics"
-CREDITS_RES_SAMPLES         "Sound effects"
-CREDITS_RES_SCRIPTS         "Scripts"
-CREDITS_RES_SCRIPTS_TEXT    "The authors are specified within the scripts themselves."
+CREDITS_BACK                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME $ENGINE_VERSION\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Thanks to</color>"
 CREDITS_ALEXANDRE           "Founder, Programmer"
-CREDITS_DI                  "Musician"
-CREDITS_COLIN               "Story designer"
-CREDITS_MATEUSREIS          "Sound effects"
-CREDITS_JOHAN               "Musician"
-CREDITS_CELDECEA            "Artist"
 CREDITS_JOAO                "Artist"
-CREDITS_RAMON               "Illustrations"
-CREDITS_CHRISTOPHER         "Indonesian translation"
-CREDITS_RUBEN               "Level designer"
-CREDITS_SSDW                "Dutch translation"
-CREDITS_ARTHURBLOT          "French translation"
-CREDITS_REIMUND             "German translation"
-CREDITS_SZYMON              "Polish translation"
-CREDITS_TOMIRES             "Czech translation"
-CREDITS_FRANCESCO           "Italian translation"
-CREDITS_SANTIAGO            "Spanish translation"
-CREDITS_RAXILLAN            "Russian translation"
+CREDITS_MATEUS              "Sprites, Audio"
+CREDITS_CODY                "Concept art"
+CREDITS_JOHAN               "Musician (rest in peace, friend)"
+CREDITS_DI                  "Musician"
+CREDITS_COLIN               "Story, sprites"
+CREDITS_BRIAN               "Sprite artist"
+CREDITS_RUBEN               "Ideas"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individual resources</color>"
+CREDITS_RES_TEXT            "Unless explicitly told otherwise, the files listed below are licensed under the Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Images</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Music</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Sound effects</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
+CREDITS_RES_SCRIPTS_TEXT    "The authors are specified within the scripts themselves."
 
 // ======================= INPUT DEVICES ====================
 
@@ -183,147 +163,30 @@ INPUT_JOY_FIRE8         "BUTTON 8"
 // If a translation is not possible, you may
 // leave the following sentences in English.
 
-// Title screen
-TITLE_MESSAGE               "PRESS $INPUT_FIRE3"
-TITLE_VERSION               "ver."
-TITLE_DEVELOPMENT           "Development version"
-
-// Main menu
-MENU_PLAY                   "PLAY"
-MENU_OPTIONS                "OPTIONS"
-MENU_DONATE                 "DONATE"
-MENU_EXIT                   "EXIT"
+// Level Cleared animation
+CLEARED_LINE1           "YOU HAVE"
+CLEARED_LINE2           "CLEARED ZONE"
+CLEARED_POWER           "Power Bonus"
+CLEARED_TIME            "Time Bonus"
+CLEARED_SCORE           "Score"
 
 // Heads-Up Display
-HUD_SCORE                   "Score"
-HUD_TIME                    "Time"
-HUD_COLLECTIBLES            "Power"
-
-// Level Cleared animation
-CLEARED_LINE1               "YOU HAVE"
-CLEARED_LINE2               "CLEARED ZONE"
-CLEARED_POWER               "Power Bonus"
-CLEARED_TIME                "Time Bonus"
-CLEARED_SCORE               "Score"
-
-// obsolete
-HUD_CLEARED_LINE1           "YOU HAVE"
-HUD_CLEARED_LINE2           "PASSED"
-HUD_CLEARED_LINE2_ACT       "ACT"
-HUD_CLEARED_COLLECTIBLES    "POWER BONUS"
-HUD_CLEARED_TIME            "TIME BONUS"
-HUD_CLEARED_SECRET          "SUPER BONUS"
-HUD_CLEARED_TOTAL           "TOTAL"
-
-
+HUD_SCORE               "Score"
+HUD_TIME                "Time"
+HUD_COLLECTIBLES        "Power"
 
 
 
 // ============ GENERAL GAMEPLAY ============================
 
 // Quit game? confirm box
-CBOX_QUIT_QUESTION      "DO YOU REALLY WANT TO QUIT?"
-CBOX_QUIT_OPTION1       "YES"
-CBOX_QUIT_OPTION2       "NO"
+QUIT_QUESTION           "DO YOU REALLY WANT TO QUIT?"
+QUIT_OPTION1            "YES"
+QUIT_OPTION2            "NO"
 
 	
 // ===================== LEVELS ==============================
 
-// Sunset Paradise (Demo Level)
-SUNSETPAR_MESSAGE_10    "<color=$COLOR_TITLE>How to play</color>"
-SUNSETPAR_MESSAGE_20    "Welcome to the Open Surge Demo Level! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. <color=$COLOR_HIGHLIGHT>Press F12</color> to open the editor."
-
-
-
-// ===================== MISC ==============================
-
-// Opening cutscene
-OPENING_1				"A long time ago, the ancient gods have created a sacred and powerful item: the <color=ff8000>Dimensional Scepter</color>."
-OPENING_2				"This scepter grants ultimate power to anyone who possesses it, "
-OPENING_3				"and since it can be very dangerous in the wrong hands, the gods have hidden it in the <color=ff8000>Dimensional Gate</color>."
-OPENING_4				"<color=ff8000>Gimacian the Dark</color> is an evil wizard who needs darkness to increase his powers."
-OPENING_5				"He knows where the <color=ff8000>Dimensional Gate</color> is located and he will try to open it using the <color=ff8000>Dimensional Rings</color>." 
-OPENING_6				"If he gets that power, he will rule the universe, and nothing will be able to stop him." 
-OPENING_7				"<color=ff8000>Surge</color> and his friends must prevent <color=ff8000>Gimacian the Dark</color> from opening the gate,"
-OPENING_8				"or existence as we know it"
-OPENING_9				"will be over!"
-
-// cutscene 1: Surge and Neon
-CUTSCENE1_SKIP          "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to skip the cutscene"
-
-
-
-
-// =============== STORED STRINGS =============================
-
-// empty string (please do not change!)
-STRING_0             ""
-
-// some generic jibber-jabber...
-STRING_1             "Hello! This is a <color=ffff00>dialog box</color>! Testing a long, long string. I have nothing else to say."
-STRING_2             "Really?"
-
-// cutscene 1: Surge and Neon
-STRING_100          "Ahhh, this is the life, eh buddy?"
-STRING_101          "Yeah..."
-STRING_102          "Do you think that --"
-STRING_103          "Uh?!?"
-STRING_104          "<color=$COLOR_NEON>Neon</color>, stay here."
-STRING_105          "Do you think this has to do with these <color=$COLOR_DANGER>strange disappearances</color>?"
-STRING_106          "I don't know, buddy. I'm going to go see what the racket is this, just to avoid these... things..."
-STRING_107          "But <color=$COLOR_SURGE>Surge</color>, it's dangerous! I want to help!"
-STRING_108          "No, <color=$COLOR_NEON>Neon</color>. Wait here and stay on your guard. We don't know what these things are!"
-STRING_109          "No way!"
-STRING_110          "Fine..."
-STRING_111          "Let's meet up <color=$COLOR_DANGER>at the waterfall</color> then. Just stay on your guard. Remember, if it gets to be too much, just run."
-STRING_112          "Okay, but you be careful too!"
-STRING_113          "I will. Now, hurry!"
-STRING_114          "Go!"
-
-// Sunshine Paradise act 1
-STRING_130          "shhhhht! Nobody is supposed to see me in this game! Here, take <color=ffff00>50 batteries</color> and go away."
-STRING_131          "GET LOST!"
-
-// cutscene 2: Sunshine Paradise, between act 1 and 2
-// each one of these strings should fit in ONE line (i.e., they must not be larger than STRING_200)
-STRING_200          "Suddenly, <color=$COLOR_SURGE>Surge</color> is ambushed by a purple creature"
-STRING_201          "with sharp claws and a threatening roar."
-STRING_202          "The beast lunges at him,"
-STRING_203          "and nearly knocks <color=$COLOR_SURGE>Surge</color> out,"
-STRING_204          "but <color=$COLOR_SURGE>Surge</color> recovers and attacks the beast."
-STRING_205          "The beast goes away."
-STRING_206          "Oh my god. <color=$COLOR_NEON>Neon</color> could be in trouble."
-STRING_207          "- Surge rushes to the waterfall -"
-
-// cutscene 3: Sunshine Paradise, between act 2 and 3
-STRING_300          "Not so far away, <color=$COLOR_SURGE>Surge</color> sees a dam."
-STRING_301          "What the... that dam wasn't here yesterday. How the heck did that get built so fast?!"
-STRING_302          "<color=$COLOR_SURGE>Surge</color> looks around, but <color=$COLOR_NEON>Neon</color> isn't there."
-STRING_303          "Neeeeeeeooooooooon? Are you okay? Where are you? Neeeooon? Neeoon?!"
-STRING_304          "<color=$COLOR_NEON>Neon</color> must've been captured... or maybe he ran off when he saw some of those creatures. Either way, he's in trouble and I have to find him."
-STRING_305          "A young animal comes out of the woods."
-STRING_306          "<color=$COLOR_DANGER>HELP!!!</color> They're coming! Run! Run for your life!"
-STRING_307          "The animal gets grabbed by two of them..."
-STRING_308          "and they disappear with it."
-STRING_309          "<color=$COLOR_SURGE>Surge</color> is in shock."
-STRING_310          "What!? It's just... gone."
-STRING_311          "just like when <color=$COLOR_NEON>Neon</color> and I – wait a second... I remember these things! They appear out of nowhere and ambush whoever they are after."
-STRING_312          "So, these strange <color=$COLOR_DANGER>creatures of darkness</color> are the ones behind the <color=$COLOR_DANGER>disappearances of innocent animals</color>..."
-STRING_313          "and more of them are starting to appear."
-STRING_314          "Looks like it's up to me to stop whoever's behind this..."
-
-// Sunshine Paradise, boss
-STRING_400          "Wh-what are you?! Where are all my friends?!"
-STRING_401          "Okay, that's IT! You're going down! I've had it with with you monsters! I'm gonna put a stop to the disappearances right here and now!"
-
-// cutscene 4: Sunshine Paradise, after the boss
-STRING_420          "After the beast is beaten,"
-STRING_421          "a little monkey comes out of the woods."
-STRING_422          "<color=$COLOR_SURGE>Surge</color>! Please help us!"
-STRING_423          "What's wrong?"
-STRING_424          "<color=$COLOR_DANGER>That dam is cutting off our water supply</color>... we are running out of clean water to drink!"
-STRING_425          "Don't worry, I'll get your water back!"
-STRING_426          "All right, then!"
-STRING_427          "Now, run! It isn't safe here!"
-STRING_428          "hmmm... Maybe <color=$COLOR_NEON>Neon</color> just was concerned about this thing too and went to investigate..."
-STRING_429          "Either way, I've got to figure out a way to get these animals' water supplies back!"
+// Demo Level
+L_DEMO_10               "<color=$COLOR_TITLE>How to play</color>"
+L_DEMO_20               "Welcome to the Open Surge Demo Level! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. <color=$COLOR_HIGHLIGHT>Press F12</color> to open the editor."

@@ -101,8 +101,8 @@ void langselect_init(void *param)
 
     title[0] = font_create("menu.title");
     title[1] = font_create("menu.title");
-    font_set_text(title[0], "%s", "$LANGSELECT_TITLE1");
-    font_set_text(title[1], "%s", "$LANGSELECT_TITLE2");
+    font_set_text(title[0], "%s", "<color=$COLOR_TITLE>SELECT YOUR</color>");
+    font_set_text(title[1], "%s", "<color=$COLOR_TITLE>LANGUAGE</color>");
     font_set_position(title[0], v2d_new((VIDEO_SCREEN_W - font_get_textsize(title[0]).x)/2,5));
     font_set_position(title[1], v2d_new((VIDEO_SCREEN_W - font_get_textsize(title[1]).x)/2, font_get_position(title[0]).y + font_get_textsize(title[1]).y + 1));
 
@@ -149,7 +149,7 @@ void langselect_release()
 void langselect_update()
 {
     float dt = timer_get_delta();
-    char page[2][33];
+    int current_page, max_pages;
     v2d_t pos;
 
     scene_time += dt;
@@ -185,17 +185,15 @@ void langselect_update()
     }
 
     /* page label */
-    str_from_int(1 + option/LANG_MAXPERPAGE, page[0], sizeof(page[0]));
-    str_from_int(1 + max(0, lngcount-1)/LANG_MAXPERPAGE, page[1], sizeof(page[1]));
-    font_set_textarguments(page_label, 2, page[0], page[1]);
-    font_set_text(page_label, "%s", "$LANGSELECT_PAGE");
+    current_page = 1 + option / LANG_MAXPERPAGE;
+    max_pages = 1 + max(0, lngcount - 1) / LANG_MAXPERPAGE;
+    font_set_text(page_label, "page %d/%d", current_page, max_pages);
     pos.x = VIDEO_SCREEN_W - font_get_textsize(page_label).x - 10;
     pos.y = VIDEO_SCREEN_H - font_get_textsize(page_label).y - 5;
     font_set_position(page_label, pos);
 
     /* author label */
-    font_set_textarguments(author_label, 1, lngdata[option].author);
-    font_set_text(author_label, "%s", "$LANGSELECT_AUTHOR");
+    font_set_text(author_label, "<color=$COLOR_HIGHLIGHT>Translation by:</color> %s", lngdata[option].author);
     pos.x = 10;
     pos.y = VIDEO_SCREEN_H - font_get_textsize(author_label).y - 5;
     font_set_position(author_label, pos);

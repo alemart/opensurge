@@ -60,7 +60,7 @@ void intro_init(void *foo)
 
     /* create font */
     fnt = font_create(INTRO_FONT);
-    font_set_text(fnt, INTRO_TEXT);
+    font_set_text(fnt, "%s", INTRO_TEXT);
     font_set_align(fnt, FONTALIGN_CENTER);
     
     /* position font */

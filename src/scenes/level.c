@@ -1130,9 +1130,9 @@ void level_update()
             image_destroy(quit_level_img);
         quit_level_img = image_clone(video_get_backbuffer());
 
-        lang_getstring("CBOX_QUIT_QUESTION", op[0], sizeof(op[0]));
-        lang_getstring("CBOX_QUIT_OPTION1", op[1], sizeof(op[1]));
-        lang_getstring("CBOX_QUIT_OPTION2", op[2], sizeof(op[2]));
+        lang_getstring("QUIT_QUESTION", op[0], sizeof(op[0]));
+        lang_getstring("QUIT_OPTION1", op[1], sizeof(op[1]));
+        lang_getstring("QUIT_OPTION2", op[2], sizeof(op[2]));
 
         scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
         return;

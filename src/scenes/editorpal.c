@@ -146,7 +146,7 @@ void editorpal_update()
 
     /* no items? */
     if(item_count == 0) {
-        font_set_text(error_font, "No items found. [press ESC]");
+        font_set_text(error_font, "%s", "No items found. [press ESC]");
         font_set_visible(error_font, TRUE);
     }
     else
