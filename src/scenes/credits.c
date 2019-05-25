@@ -48,8 +48,8 @@ static font_t *title, *text, *back;
 static input_t *input;
 static bgtheme_t *bgtheme;
 static music_t *music;
-
 static scene_t *next_scene;
+static const int scroll_speed = 24;
 static char* read_credits_file();
 
 
@@ -76,7 +76,7 @@ void credits_init(void *foo)
     font_set_position(title, v2d_new((VIDEO_SCREEN_W - font_get_textsize(title).x)/2, 5));
 
     back = font_create("menu.text");
-    font_set_text(back, "%s", lang_get("CREDITS_KEY"));
+    font_set_text(back, "%s", lang_get("CREDITS_BACK"));
     font_set_position(back, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(back).y - 5));
 
     text = font_create("menu.text");
@@ -127,7 +127,7 @@ void credits_update()
 
     /* text movement */
     textpos = font_get_position(text);
-    textpos.y -= (VIDEO_SCREEN_H/7) * dt;
+    textpos.y -= scroll_speed * dt;
     if(textpos.y < -font_get_textsize(text).y)
         textpos.y = VIDEO_SCREEN_H;
     font_set_position(text, textpos);

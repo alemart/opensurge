@@ -1,93 +1,45 @@
 $CREDITS_HEADER
 
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_ACTIVE</color>
+$CREDITS_ACTIVE
 
-Alexandre Martins:
+Alexandre Martins
 $CREDITS_ALEXANDRE
 
-Di Rodrigues:
-$CREDITS_DI
-
-Joao Victor:
+João Victor
 $CREDITS_JOAO
 
-Mateus Reis:
-$CREDITS_MATEUSREIS
+Mateus Reis
+$CREDITS_MATEUS
 
-Johan Brodd:
+Cody Licorish
+$CREDITS_CODY
+
+
+$CREDITS_THANKS
+
+Johan Brodd
 $CREDITS_JOHAN
 
+Di Rodrigues
+$CREDITS_DI
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_CONTRIB</color>
-
-Christopher Martinus:
-$CREDITS_CHRISTOPHER
-
-Ramon Qua Nasc:
-$CREDITS_RAMON
-
-Sascha de waal:
-$CREDITS_SSDW
-
-Arthur Blot:
-$CREDITS_ARTHURBLOT
-
-Reimund Renner:
-$CREDITS_REIMUND
-
-Szymon Weihs:
-$CREDITS_SZYMON
-
-Tomires:
-$CREDITS_TOMIRES
-
-Francesco Sciusco:
-$CREDITS_FRANCESCO
-
-Santiago Tabarez:
-$CREDITS_SANTIAGO
-
-Raxillan:
-$CREDITS_RAXILLAN
-
-
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RETIRED</color>
-
-Brian Zablocky:
-$CREDITS_CELDECEA
-
-Colin Beard:
+Colin Beard
 $CREDITS_COLIN
 
-Ruben Caceres:
+Brian Zablocky
+$CREDITS_BRIAN
+
+Ruben Caceres
 $CREDITS_RUBEN
 
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_THANKS</color>
-
-SourceForge.net
-allegro.cc
-OpenGameArt.org
-FreeGamer
-gagagames.com.br
-VSoftGames
-Redshrike
-lunarrush
-Felicia-Val
-Joepotato28
-Alberto Pessoa
-SuperTux Team
-SuperTuxKart Team
-Lainz
-S32X
-
-
-<color=$COLOR_HIGHLIGHT>$CREDITS_RES_TITLE</color>
+$CREDITS_RES_TITLE
 
 $CREDITS_RES_TEXT
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_MUSICS</color>
+
+$CREDITS_RES_MUSICS
 
 Di Rodrigues
 --- musics/options.ogg
@@ -119,9 +71,9 @@ Johan Brodd (jobromedia)
 --- musics/option.ogg
 --- musics/spatial_choirs.ogg
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_IMAGES</color>
+$CREDITS_RES_IMAGES
 
-Joao Victor
+João Victor
 --- images/neon.png
 --- images/surge.png
 --- images/animals.png
@@ -155,13 +107,13 @@ Colin Beard
 --- images/pause.png
 --- images/eraser.png
 
-svgmovement & Colin Beard
+Cody Licorish & Colin Beard
 --- images/levels/1/springfling.png
 
-svgmovement & Joao Victor
+Cody Licorish & João Victor
 --- images/levels/1/boss2x.png
 
-svgmovement
+Cody Licorish
 --- images/collectibles.png
 --- images/levels/1/barrel.png
 --- images/levels/1/waterskimmer.png
@@ -169,12 +121,12 @@ svgmovement
 --- images/levels/1/boss2x.png
 --- logo.png
 
-Brian Zablocky (Celdecea)
+Brian Zablocky
 --- images/blue_door.png
 --- images/bumper.png
 --- images/checkpoint_orb.png
 --- images/grassland_template.png
---- images/item_boxes.png (battery icons by svgmovement)
+--- images/item_boxes.png (battery icons by Cody Licorish)
 --- images/lady_bugsy.png
 --- images/ring_shields.png
 --- images/spikes.png
@@ -198,7 +150,7 @@ Alexandre Martins
 --- images/dialogbox.png
 --- images/waterworks.png
 
-Matwek (edits by Alexandre, svgmovement)
+Matwek (edits by Alexandre, Cody Licorish)
 --- images/levels/1/sunshine_solids.png
 
 Christopher Martinus
@@ -209,10 +161,10 @@ Mateus Reis
 --- images/extra/surge_cool.png
 --- images/watersplash.png
 
-Joao Victor & Mateus Reis
+João Victor & Mateus Reis
 --- images/levels/1/waterfall.png
 
-Chritstopher Martinus, Joao Victor, Mateus Reis, squirrel
+Chritstopher Martinus, João Victor, Mateus Reis, squirrel
 --- images/levels/1/brickset.png
 
 Mateus Reis, bart (opengameart.org), Alexandre
@@ -262,7 +214,7 @@ Alexandre Martins & Gaivota
 Alexandre Martins & Ste Pickford
 --- images/water.png
 
-Joao Victor & Alexandre Martins
+João Victor & Alexandre Martins
 --- images/loading.png
 --- images/title.png
 --- images/dialogs.png
@@ -298,7 +250,8 @@ thekingphoenix
 Luis Zuno (ansimus)
 --- images/sunshine_bg.png
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_SAMPLES</color>
+
+$CREDITS_RES_SAMPLES
 
 Mateus Reis
 --- samples/break.wav
@@ -384,6 +337,7 @@ Johan Brodd
 --- samples/allegro.ogg (public domain)
 --- samples/creativecommons2.ogg (public domain)
 
-<color=$COLOR_SUBHIGHLIGHT>$CREDITS_RES_SCRIPTS</color>
+
+$CREDITS_RES_SCRIPTS
 
 $CREDITS_RES_SCRIPTS_TEXT
