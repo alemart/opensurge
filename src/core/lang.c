@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * lang.c - language/translation module
- * Copyright (C) 2009-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2009-2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -57,7 +57,7 @@ void lang_init()
     logfile_message("Initializing the language module");
     strings = hashtable_stringadapter_t_create();
     lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
-    logfile_message("lang_init() ok!");
+    logfile_message("The language module has been initialized");
 }
 
 
@@ -82,7 +82,12 @@ void lang_loadfile(const char *filepath)
     int ver, subver, wipver;
     parsetree_program_t *prog;
 
-    logfile_message("lang_loadfile(\"%s\")...", filepath);
+    logfile_message("Loading language file \"%s\"...", filepath);
+    if(!assetfs_exists(filepath) && 0 != strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH)) {
+        logfile_message("File \"%s\" doesn't exist.", filepath);
+        lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
+        return;
+    }
 
     lang_readcompatibility(filepath, &ver, &subver, &wipver);
     if(game_version_compare(ver, subver, wipver) < 0) /* backwards compatibility */
