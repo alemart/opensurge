@@ -29,7 +29,7 @@ object "Background Exchanger" is "entity", "special"
     {
         if(!collider.collidesWith(player.collider)) {
             // change the background state
-            if(player.speed > 0 || (player.speed == 0 && player.ysp > 0))
+            if((player.speed > 0) || (player.speed == 0 && player.ysp > 0))
                 manager.changeBackgroundOfPlayer(player, background);
             else
                 manager.restoreBackgroundOfPlayer(player);
