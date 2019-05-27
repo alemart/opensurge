@@ -14,6 +14,7 @@ act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 128 4968
+music "musics/waterworks.ogg"
 startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
 waterlevel 7296
@@ -824,8 +825,6 @@ brick 1 6944 6720
 brick 206 6992 6824
 brick 206 6992 6760
 brick 206 6992 6704
-brick 1 6944 6592
-brick 1 6944 6464
 brick 206 6992 6640
 brick 206 6992 6576
 brick 206 6992 6512
@@ -852,6 +851,8 @@ brick 42 7408 6544
 brick 42 7472 6544
 brick 42 7536 6544
 brick 42 7600 6544
+brick 1 6944 6592
+brick 1 6944 6512
 brick 33 6080 6688
 brick 1 6064 6720
 brick 1 6192 6720
@@ -1161,12 +1162,12 @@ brick 259 11000 6112
 brick 1 10648 6336
 brick 1 10776 6336
 brick 1 10904 6336
-brick 144 10696 6144
-brick 144 10728 6144
-brick 144 10728 6112
 brick 7 10648 6208
 brick 7 10776 6208
 brick 7 10904 6208
+brick 144 10880 6112
+brick 144 10912 6112
+brick 144 10944 6112
 brick 76 9600 6120 yellow
 brick 33 9536 6304
 brick 33 9664 6304
@@ -1439,7 +1440,6 @@ brick 6 7680 6384
 brick 249 7672 6224
 brick 41 7072 6384
 brick 41 7072 6288
-brick 1 6944 6384
 brick 1 6944 6224
 brick 1 6944 6096
 brick 207 7024 6352 hflip
@@ -1473,7 +1473,6 @@ brick 33 7536 6384
 brick 4 7312 6416
 brick 4 7440 6416
 brick 4 7184 6416
-brick 1 7056 6416
 brick 1 7568 6416
 brick 48 7736 6128
 brick 249 7672 6096
@@ -1488,19 +1487,21 @@ brick 257 7456 6232
 brick 247 7704 6160
 brick 247 7688 6176
 brick 244 7704 6288
+brick 1 7088 6416
+brick 1 6944 6384
 brick 99 6064 6176
 brick 101 6064 6048 green
 brick 33 6800 6432
 brick 34 6784 6432
 brick 257 6528 6440
 brick 257 6656 6440
-brick 223 6352 6368
-brick 222 6464 6432
 brick 40 6048 6176
 brick 43 6048 6240
 brick 44 6176 6240
 brick 42 6064 6240
 brick 42 6112 6240
+brick 223 6336 6368
+brick 222 6448 6432
 brick 6 5280 6048
 brick 36 5536 6176
 brick 33 5552 6176
@@ -2198,11 +2199,16 @@ brick 150 1424 5656
 brick 150 1424 5624
 brick 150 1424 5592
 brick 151 1456 5752
-brick 148 1424 5912
-brick 170 1488 5912
-brick 153 1456 5928
 brick 180 1440 5640
 brick 180 1440 5768
+brick 152 1504 5912
+brick 152 1504 5944
+brick 152 1504 5976
+brick 152 1504 6008
+brick 150 1424 5912
+brick 150 1424 5944
+brick 150 1424 5976
+brick 150 1424 6008
 brick 1 752 5928
 brick 1 752 5800
 brick 1 752 5672
@@ -2300,9 +2306,6 @@ brick 152 1504 5560
 brick 146 1488 5528
 brick 145 1424 5528
 brick 151 1456 5528
-brick 153 880 5160
-brick 153 912 5160
-brick 153 944 5160
 brick 1 752 5544
 brick 1 752 5416
 brick 1 752 5288
@@ -2319,15 +2322,11 @@ brick 153 80 5160
 brick 153 48 5160
 brick 153 16 5160
 brick 153 0 5160
-brick 153 816 5160
-brick 153 848 5160
 brick 80 1008 4904
 brick 249 944 4904
 brick 37 992 4984
 brick 33 864 4984
-brick 1 880 5016
 brick 1 1008 5032
-brick 1 880 5144
 brick 1 1008 4776
 brick 81 1136 4904
 brick 85 1136 5032
@@ -2339,24 +2338,18 @@ brick 1 1392 5032
 brick 1 944 4776
 brick 62 944 4904
 brick 1 1456 4776
+brick 147 976 5016
+brick 1 880 5144
+brick 155 928 5032
+brick 41 928 5064
+brick 147 912 5128
+brick 153 960 5032
+brick 153 880 5144
+brick 1 928 5016
+brick 180 960 4848
+brick 253 1200 4776
 brick 1 1136 4776
 brick 1 1264 4776
-brick 253 1256 4776
-brick 41 992 5016
-brick 41 992 5080
-brick 153 880 5032
-brick 156 912 5032
-brick 148 928 5048
-brick 156 944 5064
-brick 157 944 5096
-brick 151 912 5112
-brick 151 880 5112
-brick 154 864 5048
-brick 154 896 5048
-brick 154 928 5080
-brick 154 896 5080
-brick 154 864 5080
-brick 147 976 5144
 brick 33 0 4984
 brick 33 128 4984
 brick 33 256 4984
@@ -2388,8 +2381,6 @@ brick 48 576 4872
 brick 48 640 4872
 brick 49 560 4872
 brick 257 456 4920
-brick 1 800 5016
-brick 1 784 5016
 brick 1 800 5144
 brick 1 512 5112
 brick 1 640 5112
@@ -2417,18 +2408,14 @@ brick 227 112 4872
 brick 228 176 4904
 brick 228 48 4872
 brick 147 368 5144
-brick 155 816 5032
-brick 153 848 5032
-brick 151 848 5112
-brick 158 816 5096
-brick 152 816 5064
-brick 154 832 5048
-brick 154 832 5080
 brick 166 560 5016
 brick 166 560 5048
 brick 166 560 5080
 brick 166 560 5112
-brick 148 784 5144
+brick 153 848 5144
+brick 153 816 5144
+brick 148 784 5128
+brick 7 800 5016
 brick 249 944 4648
 brick 249 1072 4648
 brick 1 944 4520
@@ -2437,19 +2424,20 @@ brick 1 1200 4520
 brick 1 944 4392
 brick 1 1200 4392
 brick 1 1072 4392
-brick 1 1328 4520
 brick 1 1328 4392
-brick 1 1456 4648
-brick 1 1456 4520
 brick 1 1456 4392
 brick 249 1200 4648
 brick 255 1072 4648
-brick 254 1200 4648
 brick 253 944 4648
-brick 1 1328 4648
-brick 8 1320 4520
 brick 8 1184 4520
-brick 253 1328 4664
+brick 253 1328 4648
+brick 253 1328 4520
+brick 1 1328 4520
+brick 1 1328 4648
+brick 1 1328 4520
+brick 1 1456 4648
+brick 1 1456 4520
+brick 254 1200 4648
 brick 1 944 4264
 brick 1 1072 4264
 brick 1 1200 4264
@@ -2583,7 +2571,6 @@ entity "Collectible" 8304 6016
 entity "Collectible" 8336 6016
 entity "Collectible" 8368 6016
 entity "Collectible" 6304 6288
-entity "Spring Booster Left" 3248 5656
 entity "Collectible" 4976 5680
 entity "Collectible" 4944 5680
 entity "Collectible" 4912 5680
@@ -2655,6 +2642,38 @@ entity "Tube In" 1024 4968
 entity "Tube In" 1504 5736
 entity "Tube In" 8896 6416
 entity "Tube In" 9392 6288
+entity "Spring Booster Left" 3312 5656
+entity "Collectible" 10584 6144
+entity "Collectible" 10584 6160
+entity "Collectible" 10624 6144
+entity "Collectible" 10560 6112
+entity "Collectible" 10576 6112
+entity "Collectible" 10592 6112
+entity "Collectible" 10608 6112
+entity "Collectible" 10640 6112
+entity "Collectible" 10656 6112
+entity "Collectible" 10624 6128
+entity "Collectible" 10672 6128
+entity "Collectible" 10672 6144
+entity "Collectible" 10640 6160
+entity "Collectible" 10656 6160
+entity "Collectible" 10584 6128
+entity "Collectible" 10768 6112
+entity "Collectible" 10768 6160
+entity "Collectible" 10688 6128
+entity "Collectible" 10688 6112
+entity "Collectible" 10688 6144
+entity "Collectible" 10688 6160
+entity "Collectible" 10704 6160
+entity "Collectible" 10704 6112
+entity "Collectible" 10720 6128
+entity "Collectible" 10720 6144
+entity "Collectible" 10736 6128
+entity "Collectible" 10736 6144
+entity "Collectible" 10752 6112
+entity "Collectible" 10752 6160
+entity "Collectible" 10784 6128
+entity "Collectible" 10784 6144
 
 // legacy items
 item 2 9312 7424
@@ -2744,6 +2763,6 @@ object "Lady Bugsy" 2976 6168
 object "Wolfredo" 3104 6128
 object "Lady Bugsy" 4080 5688
 object "Wolfredo" 4296 5648
-object "Wolfredo" 3328 5648
+object "Moska" 3128 5536
 
 // EOF
