@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: bg_xchg.ss
-// Description: background exchanger sprite script
+// Description: script of the background exchanger
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------

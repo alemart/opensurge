@@ -2651,6 +2651,10 @@ entity "Pipe Up" 7008 6968
 entity "Pipe Right" 6784 7024
 entity "Pipe Right" 7008 6368
 entity "Collectible" 7376 6264
+entity "Tube In" 1024 4968
+entity "Tube In" 1504 5736
+entity "Tube In" 8896 6416
+entity "Tube In" 9392 6288
 
 // legacy items
 item 2 9312 7424

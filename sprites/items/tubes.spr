@@ -1,0 +1,36 @@
+// -----------------------------------------------------------------------------
+// File: tubes.spr
+// Description: tube system sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Tube In"
+{
+    source_file     "images/core.png"
+    source_rect     32 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Tube Out"
+{
+    source_file     "images/core.png"
+    source_rect     64 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
