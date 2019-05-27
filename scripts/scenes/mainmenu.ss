@@ -14,6 +14,7 @@ using SurgeEngine.Input;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
+using SurgeEngine.Camera;
 using SurgeEngine.Web;
 
 object "MainMenu"
@@ -41,6 +42,9 @@ object "MainMenu"
             Screen.height / 2 - 9
         )
         .build();
+    camera = spawn("MainMenuCameraEffect")
+        .startingAt(Screen.width * 0.7, Screen.height * 0.8)
+        .during(0.7);
     shareURL = "http://opensurge2d.org/share";
     nextState = "";
     fadeTime = 0.5;
@@ -139,7 +143,7 @@ object "MainMenu"
     }
 }
 
-object "SurgeCircle" is "private", "entity", "awake"
+object "SurgeCircle" is "private", "detached", "entity", "awake"
 {
     transform = Transform();
     actor = Actor("SurgeCircle");
@@ -157,7 +161,7 @@ object "SurgeCircle" is "private", "entity", "awake"
     }
 }
 
-object "MenuCircle" is "private", "entity", "awake"
+object "MenuCircle" is "private", "detached", "entity", "awake"
 {
     transform = Transform();
     actor = Actor("MenuCircle");
@@ -225,5 +229,60 @@ object "MainMenuGameVersion" is "private", "detached", "entity"
             text[0].text = "ver. " + SurgeEngine.version;
             text[1].visible = false;
         }
+    }
+}
+
+object "MainMenuCameraEffect"
+{
+    initialPosition = Vector2.zero;
+    finalPosition = Vector2(Screen.width / 2, Screen.height / 2);
+    totalTime = 0.5;
+    t = 0.0;
+
+    state "main"
+    {
+        Camera.position = initialPosition;
+        state = "move";
+    }
+
+    state "move"
+    {
+        Camera.position = interpolate(initialPosition, finalPosition, t);
+        t += Time.delta / totalTime;
+        if(t >= 1.0) {
+            Camera.position = finalPosition;
+            state = "done";
+        }
+    }
+
+    state "done"
+    {
+    }
+
+    fun interpolate(a, b, t)
+    {
+        // interpolate by t
+        //return a.plus(b.minus(a).scaledBy(t));
+        x = Math.smoothstep(a.x, b.x, t);
+        y = Math.smoothstep(a.y, b.y, t);
+        return Vector2(x, y);
+    }
+
+    fun startingAt(x, y)
+    {
+        initialPosition = Vector2(x, y);
+        return this;
+    }
+
+    fun finishingAt(x, y)
+    {
+        finalPosition = Vector2(x, y);
+        return this;
+    }
+
+    fun during(t)
+    {
+        totalTime = Math.max(0, t);
+        return this;
     }
 }
