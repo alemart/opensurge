@@ -311,7 +311,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             if((brk->state == BRS_ACTIVE) && ((brk->value[0] += timer_get_delta()) >= BRICK_FALL_TTL)) {
                 int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
                 int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
-                int right_oriented = ((int)brk->brick_ref->behavior_arg[2] == 0);
+                int right_oriented = ((int)brk->brick_ref->behavior_arg[2] >= 0);
 
                 /* create particles */
                 for(int bi=0; bi<bw; bi++) {
