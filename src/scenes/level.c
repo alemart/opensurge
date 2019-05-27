@@ -186,7 +186,7 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
-static void update_level_height_samples(int level_width);
+static void update_level_height_samples(int level_width, int default_level_height);
 static void restart(int preserve_current_spawnpoint);
 static void render_players();
 static void update_music();
@@ -1757,7 +1757,7 @@ v2d_t level_size()
  */
 int level_height_at(int xpos)
 {
-    int sample_width = max(0, level_width) / (height_at_count - 1);
+    int sample_width = max(0, level_width) / max(1, height_at_count - 1);
     int j = (xpos + (sample_width + 1) / 2) / sample_width;
 
     if(height_at != NULL && j < height_at_count) {
@@ -2092,8 +2092,8 @@ void update_level_size()
     v2d_t bottomright;
     brick_list_t *p, *brick_list;
 
+    /* compute the bounding box */
     max_x = max_y = -LARGE_INT;
-
     brick_list = entitymanager_retrieve_all_bricks();
     for(p=brick_list; p; p=p->next) {
         if(brick_type(p->data) != BRK_PASSABLE) {
@@ -2102,16 +2102,24 @@ void update_level_size()
             max_y = max(max_y, (int)bottomright.y);
         }
     }
-    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
 
+    /* validation */
     level_width = max(max_x, VIDEO_SCREEN_W);
     level_height = max(max_y, VIDEO_SCREEN_H);
+    if(brick_list == NULL) { /* no bricks have been found */
+        /* this is probably a special scene */
+        level_width = level_height = LARGE_INT;
+        update_level_height_samples(0, LARGE_INT);
+    }
+    else
+        update_level_height_samples(level_width, level_height);
 
-    update_level_height_samples(level_width);
+    /* done! */
+    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
 }
 
 /* samples the level height at different points (xpos) */
-void update_level_height_samples(int level_width)
+void update_level_height_samples(int level_width, int default_level_height)
 {
     const int SAMPLE_WIDTH = VIDEO_SCREEN_W;
     const int MAX_SAMPLES = 10240; /* limit memory usage */
@@ -2148,9 +2156,9 @@ void update_level_height_samples(int level_width)
                     height_at[j] = bottom;
             }
         }
-        if(brick_list == NULL)
-            height_at[j] = LARGE_INT; /* no bricks have been found */
-        entitymanager_release_retrieved_brick_list(brick_list);
+        if(brick_list == NULL) /* no bricks have been found */
+            height_at[j] = default_level_height;
+        brick_list = entitymanager_release_retrieved_brick_list(brick_list);
     }
 }
 
