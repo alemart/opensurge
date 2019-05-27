@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * spatialhash.h - generic-type spatial hash table (bidimensional)
- * Copyright (C) 2011  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _SPATIALHASH_H
 #define _SPATIALHASH_H
 
+#include <stdbool.h>
 #include "util.h"
 #include "logfile.h"
 
@@ -139,7 +140,7 @@ void spatialhash_##T##_add_persistent(spatialhash_##T *sh, T *element) \
     for(p = sh->persistent_elements; p != NULL; p = p->next) { \
         if(p->data == element) { \
             logfile_message("spatialhash_" #T "_add_persistent(): element '%p' already exists! It won't be added.", element); \
-            return ; \
+            return; \
         } \
     } \
     \
@@ -149,6 +150,18 @@ void spatialhash_##T##_add_persistent(spatialhash_##T *sh, T *element) \
     p->data = element; \
     p->next = sh->persistent_elements; \
     sh->persistent_elements = p; \
+} \
+/* checks if an element of the spatial hash is persistent */ \
+bool spatialhash_##T##_is_persistent(spatialhash_##T *sh, T *element) \
+{ \
+    spatialhash_list_##T *p; \
+    \
+    for(p = sh->persistent_elements; p != NULL; p = p->next) { \
+        if(p->data == element) \
+            return true; \
+    } \
+    \
+    return false; \
 } \
 /* removes an element from the spatial hash */ \
 void spatialhash_##T##_remove(spatialhash_##T *sh, T *element) \

@@ -42,6 +42,7 @@ void entitymanager_store_object(struct enemy_t *object);
 /* retrieving active entities efficiently */
 void entitymanager_set_active_region(int rectangle_xpos, int rectangle_ypos, int rectangle_width, int rectangle_height);
 struct brick_list_t* entitymanager_retrieve_active_bricks();
+struct brick_list_t* entitymanager_retrieve_active_unmoving_bricks();
 struct item_list_t* entitymanager_retrieve_active_items();
 struct enemy_list_t* entitymanager_retrieve_active_objects();
 

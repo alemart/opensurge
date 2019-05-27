@@ -2,7 +2,7 @@
  * Open Surge Engine
  * entitymanager.c - efficient data structure for retrieving bricks,
  *                   built-in items and custom objects in the level.
- * Copyright (C) 2011  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,6 +54,7 @@ static void add_to_dead_bricks_list(brick_t *brick);
 static void add_to_dead_items_list(item_t *item);
 static void add_to_dead_objects_list(enemy_t *object);
 
+static int retrieve_nonpersistent_bricks(brick_t *brick, void *ref_to_brick_list);
 static int retrieve_bricks(brick_t *brick, void *ref_to_brick_list);
 static int retrieve_items(item_t *item, void *ref_to_item_list);
 static int retrieve_objects(enemy_t *object, void *ref_to_object_list);
@@ -70,6 +71,8 @@ static int get_object_xpos(const enemy_t *object);
 static int get_object_ypos(const enemy_t *object);
 static int get_object_width(const enemy_t *object);
 static int get_object_height(const enemy_t *object);
+
+#define IS_MOVING_BRICK(brick) (brick_behavior(brick) == BRB_CIRCULAR)
 
 /* public methods */
 void entitymanager_init()
@@ -113,7 +116,7 @@ void entitymanager_release()
 
 void entitymanager_store_brick(brick_t *brick)
 {
-    (brick_behavior(brick) == BRB_CIRCULAR ? spatialhash_brick_t_add_persistent : spatialhash_brick_t_add)(bricks, brick);
+    (IS_MOVING_BRICK(brick) ? spatialhash_brick_t_add_persistent : spatialhash_brick_t_add)(bricks, brick);
     brick_count++;
 }
 
@@ -140,8 +143,38 @@ void entitymanager_set_active_region(int rectangle_xpos, int rectangle_ypos, int
 brick_list_t* entitymanager_retrieve_active_bricks()
 {
     brick_list_t *list = NULL;
-    if(bricks != NULL)
-        spatialhash_brick_t_foreach(bricks, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_bricks);
+
+    if(bricks != NULL) {
+        spatialhash_brick_t_foreach(
+            bricks,
+            active_rectangle_xpos,
+            active_rectangle_ypos,
+            active_rectangle_width,
+            active_rectangle_height,
+            (void*)(&list),
+            retrieve_bricks
+        );
+    }
+
+    return list;
+}
+
+brick_list_t* entitymanager_retrieve_active_unmoving_bricks()
+{
+    brick_list_t *list = NULL;
+
+    if(bricks != NULL) {
+        spatialhash_brick_t_foreach(
+            bricks,
+            active_rectangle_xpos,
+            active_rectangle_ypos,
+            active_rectangle_width,
+            active_rectangle_height,
+            (void*)(&list),
+            retrieve_nonpersistent_bricks
+        );
+    }
+
     return list;
 }
 
@@ -340,6 +373,24 @@ int get_object_width(const enemy_t *object)
 int get_object_height(const enemy_t *object)
 {
     return image_height(actor_image(object->actor));
+}
+
+int retrieve_nonpersistent_bricks(brick_t *brick, void *ref_to_brick_list)
+{
+    brick_list_t **list = (brick_list_t**)ref_to_brick_list;
+
+    if(brick_is_alive(brick)) {
+        if(!IS_MOVING_BRICK(brick)) { /* faster than if(!spatialhash_brick_t_is_persistent(bricks, brick)) { */
+            brick_list_t *p = mallocx(sizeof *p);
+            p->data = brick;
+            p->next = *list;
+            *list = p;
+        }
+    }
+    else
+        add_to_dead_bricks_list(brick);
+
+    return 0;
 }
 
 int retrieve_bricks(brick_t *brick, void *ref_to_brick_list)

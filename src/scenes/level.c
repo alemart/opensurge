@@ -1304,7 +1304,6 @@ void level_update()
             }
         }
     }
-    video_showmessage("%d", level_height_at(player->actor->position.x));
 
     /* someone is dying */
     if(got_dying_player) {
@@ -1760,7 +1759,7 @@ v2d_t level_size()
 int level_height_at(int xpos)
 {
     int sample_width = max(0, level_width) / (height_at_count - 1);
-    int j = xpos / sample_width;
+    int j = (xpos + (sample_width + 1) / 2) / sample_width;
 
     if(height_at != NULL && j < height_at_count) {
         int a = clip(j - 1, 0, height_at_count - 1);
@@ -2142,10 +2141,9 @@ void update_level_height_at(int level_width)
 
         height_at[j] = 0;
 
-        brick_list = entitymanager_retrieve_active_bricks();
+        brick_list = entitymanager_retrieve_active_unmoving_bricks();
         for(p = brick_list; p; p = p->next) {
-            bool is_persistent = (brick_behavior(p->data) == BRB_CIRCULAR);
-            if(brick_type(p->data) != BRK_PASSABLE && !is_persistent) {
+            if(brick_type(p->data) != BRK_PASSABLE) {
                 int bottom = (int)(brick_spawnpoint(p->data).y + brick_size(p->data).y);
                 if(bottom > height_at[j])
                     height_at[j] = bottom;
