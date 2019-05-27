@@ -1768,7 +1768,7 @@ int level_height_at(int xpos)
         a = clip(a, 0, height_at_count - 1);
         b = clip(b, 0, height_at_count - 1);
 
-        /* get the best height at [a,b] */
+        /* get the best height in [a,b] */
         best = height_at[b];
         for(i = a; i < b; i++) {
             if(height_at[i] > best)
