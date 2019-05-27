@@ -564,6 +564,6 @@ bool remove_folder(const char* fullpath)
     /* done! */
     return success;
 #else
-    ; /* not implemented */
+    return false; /* not implemented */
 #endif
 }
