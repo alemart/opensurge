@@ -186,7 +186,7 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
-static void update_level_height_samples(int level_width, int default_level_height);
+static void update_level_height_samples(int level_width, int level_height);
 static void restart(int preserve_current_spawnpoint);
 static void render_players();
 static void update_music();
@@ -1757,14 +1757,24 @@ v2d_t level_size()
  */
 int level_height_at(int xpos)
 {
-    int sample_width = max(0, level_width) / max(1, height_at_count - 1);
-    int j = (xpos + (sample_width + 1) / 2) / sample_width;
+    const int WINDOW_SIZE = VIDEO_SCREEN_W * 2;
+    int a, b, i, best, sample_width;
 
-    if(height_at != NULL && j < height_at_count) {
-        int a = clip(j - 1, 0, height_at_count - 1);
-        int b = max(j, 0);
-        int c = clip(j + 1, 0, height_at_count - 1);
-        return max(height_at[b], max(height_at[a], height_at[c]));
+    if(height_at != NULL && xpos >= 0 && xpos < level_width) {
+        /* clipping interval indexes */
+        sample_width = max(0, level_width) / max(1, height_at_count - 1);
+        a = ((xpos - WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
+        b = ((xpos + WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
+        a = clip(a, 0, height_at_count - 1);
+        b = clip(b, 0, height_at_count - 1);
+
+        /* get the best height at [a,b] */
+        best = height_at[b];
+        for(i = a; i < b; i++) {
+            if(height_at[i] > best)
+                best = height_at[i];
+        }
+        return best;
     }
     
     return level_height;
@@ -2119,9 +2129,9 @@ void update_level_size()
 }
 
 /* samples the level height at different points (xpos) */
-void update_level_height_samples(int level_width, int default_level_height)
+void update_level_height_samples(int level_width, int level_height)
 {
-    const int SAMPLE_WIDTH = VIDEO_SCREEN_W;
+    const int SAMPLE_WIDTH = VIDEO_SCREEN_W / 4;
     const int MAX_SAMPLES = 10240; /* limit memory usage */
     int j, num_samples = 1 + (max(0, level_width) / SAMPLE_WIDTH);
 
@@ -2157,7 +2167,7 @@ void update_level_height_samples(int level_width, int default_level_height)
             }
         }
         if(brick_list == NULL) /* no bricks have been found */
-            height_at[j] = default_level_height;
+            height_at[j] = (j > 0) ? height_at[j-1] : level_height;
         brick_list = entitymanager_release_retrieved_brick_list(brick_list);
     }
 }

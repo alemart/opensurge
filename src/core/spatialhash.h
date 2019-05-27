@@ -287,7 +287,7 @@ void spatialhash_##T##_foreach(spatialhash_##T *sh, int rectangle_xpos, int rect
                 \
                 if(cx >= first_col && cx <= last_col && cy >= first_row && cy <= last_row) { \
                     /* is p->data inside the given rectangle? (bounding box check) */ \
-                    if((e_x1 < r_x2 && e_x2 > r_x1) && (e_y1 < r_y2 && e_y2 > r_y1)) { \
+                    if((e_x1 <= r_x2 && e_x2 >= r_x1) && (e_y1 <= r_y2 && e_y2 >= r_y1)) { \
                         if((!stop_iteration) && (0 != callback_function(p->data, some_user_data))) \
                             stop_iteration = TRUE; \
                     } \
