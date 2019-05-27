@@ -9,6 +9,7 @@ using SurgeEngine.Player;
 using SurgeEngine.Level;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
+using SurgeEngine.Brick;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
@@ -80,15 +81,36 @@ object "Pipe Out" is "entity", "gimmick", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
+    brick = Brick("Pipe Out");
+    playerCollider = null;
+    isBlocked = { };
     public zindex = 1.0;
 
     state "main"
     {
+        brick.enabled = (isBlocked[Player.active.name] || false);
+    }
+
+    state "block"
+    {
+        if(!playerCollider.collidesWith(pipeSensor.collider)) {
+            player = playerCollider.entity;
+            isBlocked[player.name] = true;
+            state = "main";
+        }
     }
 
     fun onPipeActivate(player)
     {
         pipeManager.getOut(player);
+        playerCollider = player.collider;
+        state = "block";
+    }
+
+    fun constructor()
+    {
+        brick.type = "solid";
+        brick.enabled = false;
     }
 }
 
@@ -165,7 +187,7 @@ object "Pipe In" is "entity", "gimmick", "special"
 object "Pipe Sensor" is "private", "entity"
 {
     public readonly transform = Transform();
-    collider = CollisionBox(28, 28);
+    public readonly collider = CollisionBox(28, 28);
     pipeManager = null;
     entrance = false;
 
