@@ -426,14 +426,15 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
         case BRB_FLOAT: {
             const float ninety = 1.57079632679f; /* radians */
             player_t* player = NULL; /* player on top of the platform */
+            float seconds_til_fall;
             int dy, old_y;
 
             /* get the parameters */
-            float seconds_til_fall = brk->brick_ref->behavior_arg[0]; /* seconds AFTER the player lands on the brick */
-            if(seconds_til_fall <= 0.0f) /* 0 is the default value */
-                seconds_til_fall = INFINITY;
-            else
+            int modifier = (int)(brk->brick_ref->behavior_arg[0]); /* seconds AFTER the player lands on the brick */
+            if(modifier == 1)
                 seconds_til_fall = BRICK_FLOAT_TTL;
+            else /* 0 is the default value */
+                seconds_til_fall = INFINITY;
 
             /* passable bricks do not affect the player */
             if(brk->brick_ref->type == BRK_PASSABLE)
