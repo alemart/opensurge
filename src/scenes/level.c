@@ -186,7 +186,7 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
-static void update_level_height_at(int level_width);
+static void update_level_height_samples(int level_width);
 static void restart(int preserve_current_spawnpoint);
 static void render_players();
 static void update_music();
@@ -558,11 +558,10 @@ void level_unload()
     /* level size */
     level_width = 0;
     level_height = 0;
-    height_at_count = 0;
-    if(height_at != NULL) {
+    if(height_at != NULL)
         free(height_at);
-        height_at = NULL;
-    }
+    height_at = NULL;
+    height_at_count = 0;
 
     /* success! */
     logfile_message("The level has been unloaded.");
@@ -2108,14 +2107,14 @@ void update_level_size()
     level_width = max(max_x, VIDEO_SCREEN_W);
     level_height = max(max_y, VIDEO_SCREEN_H);
 
-    update_level_height_at(level_width);
+    update_level_height_samples(level_width);
 }
 
 /* samples the level height at different points (xpos) */
-void update_level_height_at(int level_width)
+void update_level_height_samples(int level_width)
 {
     const int SAMPLE_WIDTH = VIDEO_SCREEN_W;
-    const int MAX_SAMPLES = 2560; /* limit memory usage */
+    const int MAX_SAMPLES = 10240; /* limit memory usage */
     int j, num_samples = 1 + (max(0, level_width) / SAMPLE_WIDTH);
 
     /* limit the number of samples */
@@ -2149,6 +2148,8 @@ void update_level_height_at(int level_width)
                     height_at[j] = bottom;
             }
         }
+        if(brick_list == NULL)
+            height_at[j] = LARGE_INT; /* no bricks have been found */
         entitymanager_release_retrieved_brick_list(brick_list);
     }
 }
