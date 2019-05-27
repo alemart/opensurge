@@ -139,6 +139,7 @@ static int readonly; /* we can't activate the level editor */
 static float gravity;
 static int level_width;/* width of this level (in pixels) */
 static int level_height; /* height of this level (in pixels) */
+static int *height_at, height_at_count; /* level height at different sample points */
 static float level_timer;
 static v2d_t spawn_point;
 static music_t *music;
@@ -185,6 +186,7 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
+static void update_level_height_at(int level_width);
 static void restart(int preserve_current_spawnpoint);
 static void render_players();
 static void update_music();
@@ -425,7 +427,7 @@ void level_load(const char *filepath)
     const char* fullpath;
     FILE* fp;
 
-    logfile_message("level_load(\"%s\")", filepath);
+    logfile_message("Loading level \"%s\"...", filepath);
     fullpath = assetfs_fullpath(filepath);
 
     /* default values */
@@ -473,6 +475,20 @@ void level_load(const char *filepath)
     else
         fatal_error("Can\'t open level file \"%s\".", fullpath);
 
+    /* load the music */
+    block_music = FALSE;
+    music = *musicfile ? music_load(musicfile) : NULL;
+
+    /* background */
+    backgroundtheme = background_load(bgtheme);
+
+    /* level size */
+    level_width = 0;
+    level_height = 0;
+    height_at_count = 0;
+    height_at = NULL;
+    update_level_size();
+
     /* players */
     if(team_size == 0) {
         /* default players */
@@ -491,16 +507,8 @@ void level_load(const char *filepath)
     /* startup objects (2) */
     spawn_startup_objects();
 
-    /* load the music */
-    block_music = FALSE;
-    music = *musicfile ? music_load(musicfile) : NULL;
-
-    /* misc */
-    update_level_size();
-    backgroundtheme = background_load(bgtheme);
-
     /* success! */
-    logfile_message("level_load() ok");
+    logfile_message("The level has been loaded.");
 }
 
 /*
@@ -512,7 +520,7 @@ void level_unload()
 {
     int i;
 
-    logfile_message("level_unload()");
+    logfile_message("Unloading the level...");
     if(music != NULL) {
         music_stop();
         music_unref(music);
@@ -547,8 +555,17 @@ void level_unload()
     team_size = 0;
     player = NULL;
 
+    /* level size */
+    level_width = 0;
+    level_height = 0;
+    height_at_count = 0;
+    if(height_at != NULL) {
+        free(height_at);
+        height_at = NULL;
+    }
+
     /* success! */
-    logfile_message("level_unload() ok");
+    logfile_message("The level has been unloaded.");
 }
 
 
@@ -1281,12 +1298,13 @@ void level_update()
             }
 
             /* pitfall */
-            if(team[i]->actor->position.y > level_height-(h-hy)) {
-                if(inside_screen(x,y,w,h,DEFAULT_MARGIN/4))
+            if(team[i]->actor->position.y > level_height_at(x) - (h - hy)) {
+                if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4))
                     player_kill(team[i]);
             }
         }
     }
+    video_showmessage("%d", level_height_at(player->actor->position.x));
 
     /* someone is dying */
     if(got_dying_player) {
@@ -1734,6 +1752,26 @@ v2d_t level_size()
 }
 
 
+
+/*
+ * level_height_at()
+ * The height of the level at a certain x-position
+ */
+int level_height_at(int xpos)
+{
+    int sample_width = max(0, level_width) / (height_at_count - 1);
+    int j = xpos / sample_width;
+
+    if(height_at != NULL && j < height_at_count) {
+        int a = clip(j - 1, 0, height_at_count - 1);
+        int b = max(j, 0);
+        int c = clip(j + 1, 0, height_at_count - 1);
+        return max(height_at[b], max(height_at[a], height_at[c]));
+    }
+    
+    return level_height;
+}
+
 /*
  * level_override_music()
  * Stops the music while the given sample is playing.
@@ -2070,6 +2108,51 @@ void update_level_size()
 
     level_width = max(max_x, VIDEO_SCREEN_W);
     level_height = max(max_y, VIDEO_SCREEN_H);
+
+    update_level_height_at(level_width);
+}
+
+/* samples the level height at different points (xpos) */
+void update_level_height_at(int level_width)
+{
+    const int SAMPLE_WIDTH = VIDEO_SCREEN_W;
+    const int MAX_SAMPLES = 2560; /* limit memory usage */
+    int j, num_samples = 1 + (max(0, level_width) / SAMPLE_WIDTH);
+
+    /* limit the number of samples */
+    if(num_samples > MAX_SAMPLES)
+        num_samples = MAX_SAMPLES;
+
+    /* allocate the height_at vector */
+    if(height_at != NULL)
+        free(height_at);
+    height_at = mallocx(num_samples * sizeof(*height_at));
+    height_at_count = num_samples;
+
+    /* sample the height of the level at different points */
+    for(j = 0; j < num_samples; j++) {
+        brick_list_t *p, *brick_list;
+
+        entitymanager_set_active_region(
+            j * SAMPLE_WIDTH - (SAMPLE_WIDTH + 1) / 2,
+            -LARGE_INT/2,
+            SAMPLE_WIDTH,
+            LARGE_INT
+        );
+
+        height_at[j] = 0;
+
+        brick_list = entitymanager_retrieve_active_bricks();
+        for(p = brick_list; p; p = p->next) {
+            bool is_persistent = (brick_behavior(p->data) == BRB_CIRCULAR);
+            if(brick_type(p->data) != BRK_PASSABLE && !is_persistent) {
+                int bottom = (int)(brick_spawnpoint(p->data).y + brick_size(p->data).y);
+                if(bottom > height_at[j])
+                    height_at[j] = bottom;
+            }
+        }
+        entitymanager_release_retrieved_brick_list(brick_list);
+    }
 }
 
 /* restarts the level preserving

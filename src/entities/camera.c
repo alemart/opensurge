@@ -107,6 +107,8 @@ void camera_update()
     /* clipping... */
     camera.position.x = clip(camera.position.x, camera.region_topleft.x, camera.region_bottomright.x);
     camera.position.y = clip(camera.position.y, camera.region_topleft.y, camera.region_bottomright.y);
+    if(camera.position.y > level_height_at(camera.position.x) - VIDEO_SCREEN_H / 2)
+        camera.position.y = level_height_at(camera.position.x) - VIDEO_SCREEN_H / 2;
 }
 
 /*
@@ -184,7 +186,7 @@ void camera_set_position(v2d_t position)
 {
     if(!level_editmode()) {
         camera.dest.x = clip(position.x, VIDEO_SCREEN_W/2, level_size().x - VIDEO_SCREEN_W/2);
-        camera.dest.y = clip(position.y, VIDEO_SCREEN_H/2, level_size().y - VIDEO_SCREEN_H/2);
+        camera.dest.y = clip(position.y, VIDEO_SCREEN_H/2, level_height_at(camera.dest.x) - VIDEO_SCREEN_H/2);
         camera.position = camera.dest;
     }
     else
@@ -207,8 +209,8 @@ void define_boundaries(int x1, int y1, int x2, int y2)
 
     camera.dest_region_topleft.x = max(min(x1, x2), VIDEO_SCREEN_W/2);
     camera.dest_region_topleft.y = max(min(y1, y2), VIDEO_SCREEN_H/2);
-    camera.dest_region_bottomright.x = min(max(x1, x2), level_size().x-VIDEO_SCREEN_W/2);
-    camera.dest_region_bottomright.y = min(max(y1, y2), level_size().y-VIDEO_SCREEN_H/2);
+    camera.dest_region_bottomright.x = min(max(x1, x2), level_size().x - VIDEO_SCREEN_W/2);
+    camera.dest_region_bottomright.y = min(max(y1, y2), level_size().y - VIDEO_SCREEN_H/2);
 
     camera.region_topleft_speed = v2d_magnitude (
         v2d_subtract( camera.region_topleft, camera.dest_region_topleft )
