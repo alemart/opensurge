@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * particle.c - particle system
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -130,9 +130,9 @@ void particle_update_all(const struct brick_list_t* brick_list)
         }
         else {
             /* update this particle */
-            p->position.x += p->speed.x*dt;
-            p->position.y += p->speed.y*dt + 0.5*g*(dt*dt);
             p->speed.y += g*dt;
+            p->position.x += p->speed.x*dt;
+            p->position.y += p->speed.y*dt;
             prev = it;
         }
     }
