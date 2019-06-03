@@ -136,7 +136,6 @@ static int requires[3]; /* this level requires engine version x.y.z */
 static int readonly; /* we can't activate the level editor */
 
 /* internal data */
-static float gravity;
 static int level_width;/* width of this level (in pixels) */
 static int level_height; /* height of this level (in pixels) */
 static int *height_at, height_at_count; /* level height at different sample points */
@@ -1011,7 +1010,6 @@ void level_init(void *path_to_lev_file)
     video_display_loading_screen();
 
     /* main init */
-    gravity = 787.5f;
     level_width = level_height = 0;
     level_timer = 0.0f;
     dialogregion_size = 0;
@@ -1667,15 +1665,6 @@ surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t posit
         return NULL;
 }
 
-
-/*
- * level_gravity()
- * Returns the gravity of the level
- */
-float level_gravity()
-{
-    return gravity;
-}
 
 
 /*

@@ -2382,6 +2382,8 @@ objectmachine_t* objectdecorator_gravity_new(objectmachine_t *decorated_machine)
 
 
 /* private methods */
+static const float object_gravity = 828.0f;
+
 void gravity_init(objectmachine_t *obj)
 {
     objectdecorator_t *dec = (objectdecorator_t*)obj;
@@ -2475,7 +2477,7 @@ void gravity_update(objectmachine_t *obj, player_t **team, int team_size, brick_
             break;
 
         default:
-            act->speed.y += (0.21875f * 60.0f * 60.0f) * dt;
+            act->speed.y += object_gravity * dt;
             break;
     }
 

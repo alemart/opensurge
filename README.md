@@ -32,14 +32,14 @@ You can play Open Surge with the keyboard or with a joystick.
 
 ### How do I create a game?
 
-Open Surge is a highly flexible game. It can be remixed in many ways, allowing users to unleash their creativity. Modifications (MODs) range from small hacks to whole new games.
+Open Surge is a highly flexible game. It can be remixed in many ways, allowing users to unleash their creativity. Modifications (MODs) range from small hacks to wholly new games.
 
 Learn:
 * How to use the level editor (press F12 during gameplay)
 * How to do [basic hacking](http://opensurge2d.org) (modify sprites, sounds, characters, controls, etc.)
 * How to use [SurgeScript](http://docs.opensurge2d.org) to unleash your full creativity!
 
-Check the [video tutorials](http://youtube.com/alemart88) as well.
+Watch the developers' [video tutorials](http://youtube.com/alemart88).
 
 ### Running from the command line
 

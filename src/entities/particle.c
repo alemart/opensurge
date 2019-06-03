@@ -40,6 +40,7 @@ typedef struct particle_list_t {
 } particle_list_t;
 
 static particle_list_t *particle_list = NULL;
+static const float particle_gravity = 828.0f;
 
 
 
@@ -88,7 +89,7 @@ void particle_add(struct image_t *image, v2d_t position, v2d_t speed, int destro
 /* updates all the particles */
 void particle_update_all(const struct brick_list_t* brick_list)
 {
-    float dt = timer_get_delta(), g = level_gravity();
+    float dt = timer_get_delta(), g = particle_gravity;
     int got_brick, inside_area;
     particle_list_t *it, *prev = NULL, *next;
     particle_t *p;
