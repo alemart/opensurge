@@ -69,6 +69,12 @@ IF(UNIX)
   ENDIF()
 ENDIF()
 
+# Compiling the development version?
+OPTION(BLEEDING_EDGE "Include the development version notice" ON)
+IF(BLEEDING_EDGE)
+  SET(DEFS "${DEFS}" "GAME_BUILD_VERSION='dev'")
+ENDIF()
+
 # data directory (assets folder)
 IF(UNIX)
   IF(NOT IS_ABSOLUTE "${GAME_DATADIR}")
