@@ -32,12 +32,12 @@ object "DefaultSwitchController"
         if(n == 1 || !enabled)
             return;
         for(i = 0; i < n; i++) {
-            p = Player(i);
+            p = Player[i];
             if(p.hasFocus()) {
                 if(p.midair || p.underwater || p.frozen)
                     deny.play();
                 else
-                    Player((i + 1) % n).focus();
+                    Player[(i + 1) % n].focus();
                 break;
             }
         }

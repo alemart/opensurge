@@ -255,7 +255,7 @@ object "Pipe Manager" is "private", "awake", "entity"
     {
         // for each player, create a Pipe Traveler
         for(i = 0; i < Player.count; i++) {
-            player = Player(i);
+            player = Player[i];
             travelers[player.name] = spawn("Pipe Traveler").setPlayer(player);
         }
 

@@ -48,7 +48,7 @@ object "Elevator" is "entity", "gimmick"
     {
         // wait for the player(s)
         for(i = 0; i < Player.count; i++) {
-            player = Player(i);
+            player = Player[i];
             if(collider.collidesWith(player.collider)) {
                 state = "active";
                 notifyListeners();
@@ -74,7 +74,7 @@ object "Elevator" is "entity", "gimmick"
 
         // move the player(s)
         for(i = 0; i < Player.count; i++) {
-            player = Player(i);
+            player = Player[i];
             if(collider.collidesWith(player.collider))
                 player.transform.move(0, dy);
         }
@@ -130,7 +130,7 @@ object "Elevator" is "entity", "gimmick"
         oldy = Math.round(transform.position.y - sign * speed * Time.delta);
         transform.position = Vector2(transform.position.x, oldy + (oldy % 2));
         for(i = 0; i < Player.count; i++) {
-            player = Player(i);
+            player = Player[i];
             if(collider.collidesWith(player.collider)) {
                 oldy = Math.round(player.transform.position.y - sign * speed * Time.delta);
                 player.transform.position = Vector2(player.transform.position.x, oldy + (oldy % 2));

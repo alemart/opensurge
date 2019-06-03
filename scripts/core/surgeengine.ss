@@ -459,10 +459,13 @@ object "PlayerManager"
     }
 
     // get player by id
-    // returns null if not found
     fun get(playerId)
     {
-        return __getById(playerId);
+        player = __getById(playerId);
+        if(player == null)
+            Application.crash("Can't find Player #" + playerId + ": no such player in the scene.");
+
+        return player;
     }
 
     // does the given player exist in the current scene?
