@@ -1009,7 +1009,7 @@ void preprocessor_run(FILE *in, int depth)
                 strcpy(fullpath, dir);
                 strcat(fullpath, value);
 
-                if(strstr(value, "..") != NULL) {
+                if(strstr(value, "..") != NULL || !isalnum(value[0])) {
                     error(
                         "Preprocessor error in \"%s\" on line %d: couldn't include file \"%s\".",
                         errorcontext_detect_file_name(preprocessor_line),

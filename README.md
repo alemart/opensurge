@@ -12,7 +12,7 @@ Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play
 
 ## About Open Surge
 
-Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a computer scientist from Brazil. Nowadays, Open Surge has contributors all over the world!
+Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a developer from Brazil. Nowadays, Open Surge has contributors all over the world!
 
 ## How do I play?
 
@@ -28,8 +28,6 @@ You can play Open Surge with the keyboard or with a joystick.
 | Equals (=)    | Take snapshot    |
 | F12           | Open the editor  |
 
-You can change the controls by hacking file *config/input.def*
-
 ## Advanced users
 
 ### How do I create a game?
@@ -37,9 +35,9 @@ You can change the controls by hacking file *config/input.def*
 Open Surge is a highly flexible game. It can be remixed in many ways, allowing users to unleash their creativity. Modifications (MODs) range from small hacks to whole new games.
 
 Learn:
-* How to use the level editor
-* Basic hacking (sprites, bricksets, etc.)
-* Coding in [SurgeScript](http://docs.opensurge2d.org) to unleash your full creativity
+* How to use the level editor (press F12 during gameplay)
+* How to do [basic hacking](http://opensurge2d.org) (modify sprites, sounds, characters, controls, etc.)
+* How to use [SurgeScript](http://docs.opensurge2d.org) to unleash your full creativity!
 
 Check the [video tutorials](http://youtube.com/alemart88) as well.
 
