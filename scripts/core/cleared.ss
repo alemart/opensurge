@@ -90,7 +90,7 @@ object "DefaultClearedAnimation" is "entity", "awake", "detached", "private"
 
     state "finish"
     {
-        if(!jingle[0].playing && !jingle[1].playing) {
+        if((!jingle[0].playing && !jingle[1].playing) || timeout(25.0)) {
             title[0].disappear();
             title[1].disappear();
             counter[0].disappear();
