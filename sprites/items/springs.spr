@@ -1,0 +1,31 @@
+// -----------------------------------------------------------------------------
+// File: springs.spr
+// Description: springs sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Spring Standard Hidden"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 82 64 16
+    frame_size      32 16
+    hot_spot        16 16
+
+    // active
+    animation 0
+    {
+        repeat      FALSE
+        fps         4
+        data        1 1 1 1
+    }
+
+    // hidden
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+

@@ -1229,7 +1229,7 @@ void level_update()
     /* update background */
     background_update(backgroundtheme);
 
-    /* update items */
+    /* update legacy items */
     for(inode = major_items; inode != NULL; inode = inode->next) {
         float x = inode->data->actor->position.x;
         float y = inode->data->actor->position.y;
@@ -1251,7 +1251,7 @@ void level_update()
         }
     }
 
-    /* update objects */
+    /* update legacy objects */
     for(enode = major_enemies; enode != NULL; enode = enode->next) {
         float x = enode->data->actor->position.x;
         float y = enode->data->actor->position.y;
@@ -1272,6 +1272,10 @@ void level_update()
                 enode->data->actor->position = enode->data->actor->spawn_point;
         }
     }
+
+    /* update scripts */
+    clear_bricklike_ssobjects();
+    update_ssobjects();
 
     /* update players */
     for(i=0; i<team_size; i++) {
@@ -1298,31 +1302,6 @@ void level_update()
             if(team[i]->actor->position.y > level_height_at(x) - (h - hy)) {
                 if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4))
                     player_kill(team[i]);
-            }
-        }
-    }
-
-    /* someone is dying */
-    if(got_dying_player) {
-        /* fade out the music */
-        music_set_volume(music_get_volume() - 0.5*dt);
-
-        /* restart the level */
-        if(((dead_player_timeout += dt) >= 2.5f)) {
-            if(player_get_lives() > 1) {
-                /* restart the level! */
-                if(fadefx_is_over()) {
-                    player_set_lives(player_get_lives()-1);
-                    restart(TRUE);
-                    return;
-                }
-                fadefx_out(color_rgb(0,0,0), 1.0);
-            }
-            else {
-                /* game over */
-                scenestack_pop();
-                scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
-                return;
             }
         }
     }
@@ -1358,20 +1337,41 @@ void level_update()
         camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
     camera_update();
 
-    /* level timer */
-    if(!got_dying_player && !level_cleared)
-        level_timer += timer_get_delta();
-
-    /* update scripts */
-    clear_bricklike_ssobjects();
-    update_ssobjects();
-
     /* update particles */
     particle_update_all(major_bricks);
 
     /* update dialog box */
     update_dialogregions();
     update_dlgbox();
+
+    /* someone is dying */
+    if(got_dying_player) {
+        /* fade out the music */
+        music_set_volume(music_get_volume() - 0.5*dt);
+
+        /* restart the level */
+        if(((dead_player_timeout += dt) >= 2.5f)) {
+            if(player_get_lives() > 1) {
+                /* restart the level! */
+                if(fadefx_is_over()) {
+                    player_set_lives(player_get_lives()-1);
+                    restart(TRUE);
+                    return;
+                }
+                fadefx_out(color_rgb(0,0,0), 1.0);
+            }
+            else {
+                /* game over */
+                scenestack_pop();
+                scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
+                return;
+            }
+        }
+    }
+
+    /* level timer */
+    if(!got_dying_player && !level_cleared)
+        level_timer += timer_get_delta();
 
     /* "ungetting" major entities */
     entitymanager_release_retrieved_brick_list(major_bricks);
