@@ -12,6 +12,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Collisions.CollisionBox;
 
 object "Spring Standard Hidden" is "entity", "gimmick"
+,"awake"
 {
     actor = Actor("Spring Standard Hidden");
     spring = spawn("Spring Behavior")
@@ -23,6 +24,13 @@ object "Spring Standard Hidden" is "entity", "gimmick"
     state "main"
     {
         actor.anim = 1;
+
+        if(Player.active.input.buttonPressed("up")) {
+            Player.active.transform.move(0,-2);
+            //Player.active.input.simulateButtonDown("fire1");
+            //Player.active.gsp = -600;
+            Player.active.ysp = -600;
+        }
     }
 
     state "active"
@@ -59,7 +67,8 @@ object "Spring Behavior" is "private", "entity"
     fun onCollision(otherCollider)
     {
         if(otherCollider.entity.hasTag("player")) {
-            if(!sfx.playing) sfx.play();
+            if(!sfx.playing)
+                sfx.play();
             springify(otherCollider.entity);
         }
     }
@@ -70,18 +79,14 @@ object "Spring Behavior" is "private", "entity"
             // compute the strength vector
             v = direction.scaledBy(strength);
 
-            // hack
-            if(sensitive && v.y < 0)
-                player.transform.move(0, -20);
-
-            // change mode
-            player.springify();
-
             // boost player
             if(v.x != 0)
                 player.speed = v.x;
             if(v.y != 0)
                 player.ysp = v.y;
+
+            // change mode
+            player.springify();
 
             // call parent
             if(parent.hasFunction("onSpringActivate"))
@@ -109,6 +114,15 @@ object "Spring Behavior" is "private", "entity"
         return this;
     }
 
+    // set the size of the collider
+    // width, height given in pixels
+    fun setSize(width, height)
+    {
+        collider.width = width;
+        collider.height = height;
+        return this;
+    }
+
     // set the anchor of the collider
     // normally, 0 <= x, y <= 1
     fun setAnchor(x, y)
@@ -117,7 +131,8 @@ object "Spring Behavior" is "private", "entity"
         return this;
     }
 
-    // make the spring "sensitive"
+    // make the spring "sensitive" to touch
+    // (no need to jump on it)
     fun setSensitive()
     {
         sensitive = true;

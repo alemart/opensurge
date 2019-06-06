@@ -16,7 +16,7 @@ sprite "Spring Standard Hidden"
     animation 0
     {
         repeat      FALSE
-        fps         4
+        fps         8
         data        1 1 1 1
     }
 

@@ -378,14 +378,22 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
         /* smashable bricks */
         case BRB_SMASHABLE: {
+            int w, h, feet;
+            v2d_t center;
+
             /* check collision & conditions */
             for(i=0; i<team_size; i++) {
+                /* get the y-position of the feet of the player */
+                physicsactor_bounding_box(team[i]->pa, &w, &h, &center);
+                feet = center.y + h/2 - 2;
+
+                /* check collision */
                 if(
                     (
-                        ((player_is_jumping(team[i]) || player_is_rolling(team[i])) &&
+                        (player_is_jumping(team[i]) &&
                         physicsactor_get_ysp(team[i]->pa) > 0.0f) ||
-                        (player_is_charging(team[i]) &&
-                        physicsactor_get_position(team[i]->pa).y < brk->y)
+                        ((player_is_charging(team[i]) || player_is_rolling(team[i])) &&
+                        feet < brk->y)
                     ) &&
                     player_overlaps(team[i], brk->x, brk->y - 6, brk_width, min(6, brk_height))
                 ) {

@@ -2503,7 +2503,7 @@ brick 215
 {
     type                PASSABLE
     behavior            DEFAULT
-    zindex              0.8
+    zindex              0.5
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2525,7 +2525,7 @@ brick 216
 {
     type                PASSABLE
     behavior            DEFAULT
-    zindex              0.8
+    zindex              0.5
     mask                "images/waterworks_mask.png"
 
     sprite

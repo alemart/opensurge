@@ -67,7 +67,7 @@ object "Collectible" is "entity"
     {
         if(state != "disappearing") {
             player.collectibles++;
-            sfx.stop(); sfx.play();
+            sfx.play();
             actor.anim = 1;
             actor.zindex = 0.51;
             state = "disappearing";
@@ -152,7 +152,7 @@ object "Scattered Collectible" is "entity", "disposable", "private"
     {
         if(state != "disappearing") {
             player.collectibles++;
-            sfx.stop(); sfx.play();
+            sfx.play();
             actor.anim = 1;
             actor.zindex = 0.51;
             state = "disappearing";
