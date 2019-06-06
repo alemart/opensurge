@@ -208,9 +208,6 @@ static const int slp_table[23][23] = {
     { 0x60, 0x5E, 0x5C, 0x5A, 0x57, 0x54, 0x51, 0x4E, 0x4B, 0x47, 0x44, 0x40, 0x3C, 0x39, 0x35, 0x32, 0x2F, 0x2C, 0x29, 0x26, 0x24, 0x22, 0x20 }
 };
 
-/* helper macro */
-#define ANG2DEG(ang) ((int)((256 - (ang)) * 1.40625f) % 360)
-
 /* public methods */
 physicsactor_t* physicsactor_create(v2d_t position)
 {
@@ -403,7 +400,7 @@ physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa)
 
 int physicsactor_get_angle(const physicsactor_t *pa)
 {
-    return (int)((256 - pa->angle) * 1.40625) % 360;
+    return (((256 - pa->angle) * 180) / 128) % 360;
 }
 
 v2d_t physicsactor_get_position(const physicsactor_t *pa)
@@ -677,7 +674,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         int sensor_len = sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)); \
         int found_a = FALSE, found_b = FALSE; \
         int h, x, y, xa, ya, xb, yb, ang; \
-        for(int i = 0; i < sensor_len * 2 && !(found_a && found_b); i++) { \
+        for(int i = 0; i < sensor_len * 5/2 && !(found_a && found_b); i++) { \
             h = i + sensor_len / 2; \
             x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
             y = pa->position.y + h * COS(pa->angle) + 0.5f; \
