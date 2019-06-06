@@ -584,10 +584,19 @@ surgescript_var_t* fun_getysp(surgescript_object_t* object, const surgescript_va
 /* set vertical speed, in px/s */
 surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* TODO: fix adapter */
     player_t* player = get_player(object);
-    if(player != NULL)
-        player->actor->speed.y = surgescript_var_get_number(param[0]);
+    if(player != NULL) {
+        float ysp = surgescript_var_get_number(param[0]);
+        player->actor->speed.y = ysp;
+
+        /* hack */
+        if(ysp < 0.0f && !player_is_in_the_air(player)) {
+            if(!player_is_rolling(player))
+                player->actor->position.y -= 2;
+            else
+                player->actor->position.y -= 4;
+        }
+    }
     return NULL;
 }
 

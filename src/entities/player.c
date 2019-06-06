@@ -1316,7 +1316,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     }
     else {
         physicsactor_set_gsp(pa, act->speed.x);
-        physicsactor_set_ysp(pa, 0.0f);
+        physicsactor_set_ysp(pa, act->speed.y);
+        /*physicsactor_set_ysp(pa, 0.0f);*/ /* can't set player.ysp */
     }
 
     /* capturing input */
