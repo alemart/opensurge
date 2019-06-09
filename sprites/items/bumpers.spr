@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// File: bumpers.spr
+// Description: bumpers sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Bumper"
+{
+    source_file     "images/bumper.png"
+    source_rect     10 60 40 80
+    frame_size      40 40
+    hot_spot        20 20
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // active!
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+    }
+}
