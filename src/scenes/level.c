@@ -1273,10 +1273,6 @@ void level_update()
         }
     }
 
-    /* update scripts */
-    clear_bricklike_ssobjects();
-    update_ssobjects();
-
     /* update players */
     for(i=0; i<team_size; i++) {
         float x = team[i]->actor->position.x;
@@ -1330,12 +1326,16 @@ void level_update()
         brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
     }
 
-    /* update camera */
+    /* basic camera */
     if(level_cleared)
         camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
     else if(!got_dying_player)
         camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
     camera_update();
+
+    /* update scripts */
+    clear_bricklike_ssobjects();
+    update_ssobjects();
 
     /* update particles */
     particle_update_all(major_bricks);

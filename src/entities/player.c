@@ -1310,15 +1310,9 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* converting variables */
     physicsactor_set_position(pa, act->position);
-    if(physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player)) {
-        physicsactor_set_xsp(pa, act->speed.x);
-        physicsactor_set_ysp(pa, act->speed.y);
-    }
-    else {
-        physicsactor_set_gsp(pa, act->speed.x);
-        physicsactor_set_ysp(pa, act->speed.y);
-        /*physicsactor_set_ysp(pa, 0.0f);*/ /* can't set player.ysp */
-    }
+    physicsactor_set_gsp(pa, act->speed.x);
+    physicsactor_set_xsp(pa, act->speed.x);
+    physicsactor_set_ysp(pa, act->speed.y);
 
     /* capturing input */
     if(input_button_down(act->input, IB_RIGHT))
@@ -1387,7 +1381,10 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* unconverting variables */
     act->position = physicsactor_get_position(pa);
-    act->speed = physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player) ? v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa)) : v2d_new(physicsactor_get_gsp(pa), 0.0f);
+    if(physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player))
+        act->speed = v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa));
+    else
+        act->speed = v2d_new(physicsactor_get_gsp(pa), 0.0f);
 
     /* smoothing the angle */
     if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
