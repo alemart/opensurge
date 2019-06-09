@@ -97,6 +97,7 @@ static surgescript_var_t* fun_springify(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* PlayerManager */
 static surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -195,6 +196,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "roll", fun_roll, 0);
     surgescript_vm_bind(vm, "Player", "focus", fun_focus, 0);
     surgescript_vm_bind(vm, "Player", "hasFocus", fun_hasfocus, 0);
+    surgescript_vm_bind(vm, "Player", "hlock", fun_hlock, 1);
     
     /* general-purpose methods */
     surgescript_vm_bind(vm, "Player", "constructor", fun_constructor, 0);
@@ -522,8 +524,14 @@ surgescript_var_t* fun_getspeed(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_setspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
-    if(player != NULL)
-        player->actor->speed.x = surgescript_var_get_number(param[0]);
+    if(player != NULL) {
+        float speed = surgescript_var_get_number(param[0]);
+        player->actor->speed.x = speed;
+        if(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player))
+            physicsactor_set_xsp(player->pa, speed);
+        else
+            physicsactor_set_gsp(player->pa, speed);
+    }
     return NULL;
 }
 
@@ -1012,6 +1020,18 @@ surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surgescript_
 {
     player_t* player = get_player(object);
     return surgescript_var_set_bool(surgescript_var_create(), player != NULL && level_player() == player);
+}
+
+/* hlock: locks the horizontal input of the player for a few seconds */
+surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    float seconds = surgescript_var_get_number(param[0]);
+    player_t* player = get_player(object);
+
+    if(player != NULL && seconds > 0.0f)
+        player_lock_horizontally_for(player, seconds);
+
+    return NULL;
 }
 
 
