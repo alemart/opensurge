@@ -1310,7 +1310,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* converting variables */
     physicsactor_set_position(pa, act->position);
-    physicsactor_set_gsp(pa, act->speed.x);
+    if(!(physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player)))
+        physicsactor_set_gsp(pa, act->speed.x);
     physicsactor_set_xsp(pa, act->speed.x);
     physicsactor_set_ysp(pa, act->speed.y);
 
