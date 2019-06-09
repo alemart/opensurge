@@ -7,42 +7,255 @@
 using SurgeEngine.Actor;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Player;
-using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Spring Standard Hidden" is "entity", "gimmick"
-,"awake"
+
+
+//
+// A spring is an entity composed of two objects:
+//
+// Spring Graphic - controls the graphics
+// Spring Behavior - controls the logic
+//
+// Configure the objects differently, and you'll
+// have a ton of different springs.
+//
+
+object "Spring Standard" is "entity", "gimmick"
 {
-    actor = Actor("Spring Standard Hidden");
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
     spring = spawn("Spring Behavior")
+        .setSpeed(600)
         .setDirection(0, -1)
-        .setStrength(1)
-        .setSensitive()
-    ;
+        .setSize(32, 16)
+        .setAnchor(0.5, 1)
+        .setSensitivity(false);
 
     state "main"
     {
-        actor.anim = 1;
-
-        if(Player.active.input.buttonPressed("up")) {
-            Player.active.transform.move(0,-2);
-            //Player.active.input.simulateButtonDown("fire1");
-            //Player.active.gsp = -600;
-            Player.active.ysp = -600;
-        }
-    }
-
-    state "active"
-    {
-        if(actor.animation.finished)
-            state = "main";
     }
 
     fun onSpringActivate(player)
     {
-        actor.anim = 0;
-        state = "active";
+    }
+}
+
+object "Spring Standard Top Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Top Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(1, -1)
+        .setSize(22, 22)
+        .setAnchor(0, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(1, 0)
+        .setSize(16, 32)
+        .setAnchor(0, 0.5)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Bottom Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Bottom Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(1, 1)
+        .setSize(22, 22)
+        .setAnchor(0, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Bottom" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Bottom")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(0, 1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Bottom Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Bottom Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(-1, 1)
+        .setSize(22, 22)
+        .setAnchor(1, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(-1, 0)
+        .setSize(16, 32)
+        .setAnchor(1, 0.5)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Top Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Top Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(-1, -1)
+        .setSize(22, 22)
+        .setAnchor(1, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Standard Hidden" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Standard Hidden")
+        .setIdleAnimation(2)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(600)
+        .setDirection(0, -1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+
+
+
+
+
+//
+// Spring Components
+//
+
+object "Spring Graphic" is "private", "entity"
+{
+    actor = null;
+    idleAnim = 0;
+    activeAnim = 1;
+
+    state "main"
+    {
+        if(actor != null)
+            state = "idle";
+    }
+
+    state "idle"
+    {
+        actor.anim = idleAnim;
+    }
+
+    state "active"
+    {
+        actor.anim = activeAnim;
+        if(actor.animation.finished)
+            state = "idle";
+    }
+
+    fun onSpringActivate(player)
+    {
+        if(actor != null)
+            state = "active";
+    }
+
+
+
+    // --- MODIFIERS ---
+
+    fun setSprite(spriteName)
+    {
+        actor = Actor(spriteName);
+        return this;
+    }
+
+    fun setIdleAnimation(animationNumber)
+    {
+        idleAnim = animationNumber;
+        return this;
+    }
+
+    fun setActiveAnimation(animationNumber)
+    {
+        activeAnim = animationNumber;
+        return this;
     }
 }
 
@@ -51,7 +264,7 @@ object "Spring Behavior" is "private", "entity"
     sfx = Sound("samples/spring.wav");
     collider = CollisionBox(32, 16);
     direction = Vector2.up;
-    strength = 600; // 960;
+    speed = 600; // 960;
     sensitive = false;
 
     state "main"
@@ -61,34 +274,50 @@ object "Spring Behavior" is "private", "entity"
     fun constructor()
     {
         collider.setAnchor(0.5, 1);
-        //collider.visible = true;
+        collider.visible = true;
     }
 
     fun onCollision(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player")) {
-            if(!sfx.playing)
-                sfx.play();
-            springify(otherCollider.entity);
-        }
+        if(otherCollider.entity.hasTag("player"))
+            activateSpring(otherCollider.entity);
     }
 
-    fun springify(player)
+    fun activateSpring(player)
     {
         if(player.ysp > 0 || sensitive) {
-            // compute the strength vector
-            v = direction.scaledBy(strength);
+            // compute the velocity
+            v = direction.scaledBy(speed);
 
             // boost player
-            if(v.x != 0)
-                player.speed = v.x;
-            if(v.y != 0)
-                player.ysp = v.y;
+            if(direction.x != 0) {
+                if(v.x > 0 && v.x > player.speed)
+                    player.speed = v.x;
+                else if(v.x < 0 && v.x < player.speed)
+                    player.speed = v.x;
+            }
+            if(direction.y != 0) {
+                if(v.y > 0 && v.y > player.speed)
+                    player.ysp = v.y;
+                else if(v.y < 0 && v.y < player.speed)
+                    player.ysp = v.y;
+            }
+
+            // prevent braking
+            if(direction.x != 0)
+                player.hlock(0.27);
 
             // change mode
-            player.springify();
+            if(direction.y != 0)
+                player.springify();
 
-            // call parent
+            // play sound
+            if(sfx != null)
+                sfx.play();
+
+            // notify parent & graphic sibling
+            if((gfx = sibling("Spring Graphic")) != null)
+                gfx.onSpringActivate(player);
             if(parent.hasFunction("onSpringActivate"))
                 parent.onSpringActivate(player);
         }
@@ -98,12 +327,10 @@ object "Spring Behavior" is "private", "entity"
 
     // --- MODIFIERS ---
 
-    // set the strength of the spring
-    // x: 1, 2, 3...
-    fun setStrength(x)
+    // set the speed, in px/s
+    fun setSpeed(spd)
     {
-        s = Math.clamp(x, 1, 3) - 1;
-        strength = 600 + 360 * s;
+        speed = Math.abs(spd);
         return this;
     }
 
@@ -133,9 +360,18 @@ object "Spring Behavior" is "private", "entity"
 
     // make the spring "sensitive" to touch
     // (no need to jump on it)
-    fun setSensitive()
+    fun setSensitivity(isSensitive)
     {
-        sensitive = true;
+        sensitive = isSensitive;
+        return this;
+    }
+
+    // set the sound of the spring
+    // path must be the path of a sound (or null)
+    // e.g., "samples/spring.wav"
+    fun setSound(path)
+    {
+        sfx = (path !== null) ? Sound(path) : null;
         return this;
     }
 }
