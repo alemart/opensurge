@@ -19,6 +19,11 @@ object "WaterworksSetup"
         foreach(elevator in elevators)
             elevator.anim = 2;
 
+        // configure background exchangers
+        xchgs = Level.findObjects("Background Exchanger");
+        foreach(xchg in xchgs)
+            xchg.background = "themes/template.bg";
+
         // done
         state = "done";
     }
