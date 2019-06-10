@@ -51,6 +51,7 @@ MAINMENU_QUIT               "QUIT"
 CREATEMENU_TITLE            "CREATE"
 CREATEMENU_PLAY             "PLAY DEMO"
 CREATEMENU_LEARN            "LEARN"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "BACK"
 CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nReady to become a creator? Build your own levels, items, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
 // note: when translating CREATEMENU_TEXT, make sure the text fits the screen!

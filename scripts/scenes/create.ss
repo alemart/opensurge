@@ -23,11 +23,12 @@ object "CreateMenu"
     text = spawn("CreateMenuText");
     title = spawn("MenuBuilder").withTitle("$CREATEMENU_TITLE").at(Screen.width / 2, 90).build();
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
-        ["$CREATEMENU_PLAY", "$CREATEMENU_LEARN", "$CREATEMENU_BACK" ]
+        ["$CREATEMENU_PLAY", "$CREATEMENU_LEARN", "$CREATEMENU_SCRIPTING", "$CREATEMENU_BACK" ]
     ).withSpacing(211).withAxisAngle(0).build();
     learnURL = "http://opensurge2d.org";
-    nextState = "";
+    scriptingURL = "http://docs.opensurge2d.org";
     fadeTime = 0.5;
+    nextState = "";
 
     state "main"
     {
@@ -80,6 +81,11 @@ object "CreateMenu"
             fadeTo("restart");
         }
         else if(buttonIndex == 2) {
+            // scripting
+            Web.launchURL(scriptingURL);
+            fadeTo("restart");
+        }
+        else if(buttonIndex == 3) {
             // back
             fadeTo("back");
         }
