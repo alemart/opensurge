@@ -229,10 +229,426 @@ sprite "Spring Standard Hidden"
     }
 }
 
+sprite "Spring Stronger"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 50 64 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Top Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 150 78 39
+    frame_size      39 39
+    hot_spot        0 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     144 50 64 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Bottom Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     190 150 78 39
+    frame_size      39 39
+    hot_spot        0 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Bottom"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     80 50 64 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Bottom Left"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     274 150 78 39
+    frame_size      39 39
+    hot_spot        39 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Left"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     208 50 64 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Stronger Top Left"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     100 150 78 39
+    frame_size      39 39
+    hot_spot        39 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
 sprite "Spring Stronger Hidden"
 {
     source_file     "images/spring_pads.png"
     source_rect     16 50 64 16
+    frame_size      32 16
+    hot_spot        16 16
+
+    // preview
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+
+    // hidden
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spring Strongest"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 114 64 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Top Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 240 78 39
+    frame_size      39 39
+    hot_spot        0 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     144 114 64 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Bottom Right"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     190 240 78 39
+    frame_size      39 39
+    hot_spot        0 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Bottom"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     80 114 64 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Bottom Left"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     274 240 78 39
+    frame_size      39 39
+    hot_spot        39 0
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Left"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     208 114 64 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Top Left"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     100 240 78 39
+    frame_size      39 39
+    hot_spot        39 39
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // active
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        1 1 1
+    }
+}
+
+sprite "Spring Strongest Hidden"
+{
+    source_file     "images/spring_pads.png"
+    source_rect     16 114 64 16
     frame_size      32 16
     hot_spot        16 16
 

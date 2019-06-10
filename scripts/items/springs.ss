@@ -22,6 +22,12 @@ using SurgeEngine.Collisions.CollisionBox;
 // have a ton of different springs.
 //
 
+
+
+//
+// Standard Springs
+//
+
 object "Spring Standard" is "entity", "gimmick"
 {
     gfx = spawn("Spring Graphic")
@@ -199,11 +205,371 @@ object "Spring Standard Hidden" is "entity", "gimmick"
 
 
 
+//
+// Stronger Springs
+//
+
+object "Spring Stronger" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(0, -1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 1)
+        .setSensitivity(false);
+
+    state "main"
+    {
+    }
+
+    fun onSpringActivate(player)
+    {
+    }
+}
+
+object "Spring Stronger Top Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Top Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(1, -1)
+        .setSize(22, 22)
+        .setAnchor(0, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(1, 0)
+        .setSize(16, 32)
+        .setAnchor(0, 0.5)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Bottom Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Bottom Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(1, 1)
+        .setSize(22, 22)
+        .setAnchor(0, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Bottom" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Bottom")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(0, 1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Bottom Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Bottom Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(-1, 1)
+        .setSize(22, 22)
+        .setAnchor(1, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(-1, 0)
+        .setSize(16, 32)
+        .setAnchor(1, 0.5)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Top Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Top Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(-1, -1)
+        .setSize(22, 22)
+        .setAnchor(1, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Stronger Hidden" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Stronger Hidden")
+        .setIdleAnimation(2)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(960)
+        .setDirection(0, -1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+
+
+//
+// Strongest Springs
+//
+
+object "Spring Strongest" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(0, -1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 1)
+        .setSensitivity(false);
+
+    state "main"
+    {
+    }
+
+    fun onSpringActivate(player)
+    {
+    }
+}
+
+object "Spring Strongest Top Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Top Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(1, -1)
+        .setSize(22, 22)
+        .setAnchor(0, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(1, 0)
+        .setSize(16, 32)
+        .setAnchor(0, 0.5)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Bottom Right" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Bottom Right")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(1, 1)
+        .setSize(22, 22)
+        .setAnchor(0, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Bottom" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Bottom")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(0, 1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Bottom Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Bottom Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(-1, 1)
+        .setSize(22, 22)
+        .setAnchor(1, 0)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(-1, 0)
+        .setSize(16, 32)
+        .setAnchor(1, 0.5)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Top Left" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Top Left")
+        .setIdleAnimation(0)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(-1, -1)
+        .setSize(22, 22)
+        .setAnchor(1, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
+
+object "Spring Strongest Hidden" is "entity", "gimmick"
+{
+    gfx = spawn("Spring Graphic")
+        .setSprite("Spring Strongest Hidden")
+        .setIdleAnimation(2)
+        .setActiveAnimation(1);
+
+    spring = spawn("Spring Behavior")
+        .setSpeed(1320)
+        .setDirection(0, -1)
+        .setSize(32, 16)
+        .setAnchor(0.5, 1)
+        .setSensitivity(true);
+
+    state "main"
+    {
+    }
+}
 
 
 
 //
 // Spring Components
+// (where magic happens ;)
 //
 
 object "Spring Graphic" is "private", "entity"
@@ -274,7 +640,7 @@ object "Spring Behavior" is "private", "entity"
     fun constructor()
     {
         collider.setAnchor(0.5, 1);
-        collider.visible = true;
+        //collider.visible = true;
     }
 
     fun onCollision(otherCollider)
