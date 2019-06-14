@@ -44,6 +44,7 @@ static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getattacking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getblinking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -143,6 +144,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_activity", fun_getactivity, 0);
     surgescript_vm_bind(vm, "Player", "get_attacking", fun_getattacking, 0);
     surgescript_vm_bind(vm, "Player", "get_midair", fun_getmidair, 0);
+    surgescript_vm_bind(vm, "Player", "get_blinking", fun_getblinking, 0);
     surgescript_vm_bind(vm, "Player", "get_secondsToDrown", fun_getsecondstodrown, 0);
     surgescript_vm_bind(vm, "Player", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Player", "get_collider", fun_getcollider, 0);
@@ -431,6 +433,13 @@ surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript
 {
     player_t* player = get_player(object);
     return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_in_the_air(player));
+}
+
+/* is the player blinking? */
+surgescript_var_t* fun_getblinking(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_blinking(player));
 }
 
 /* seconds to drown, if underwater */

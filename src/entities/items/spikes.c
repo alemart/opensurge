@@ -166,7 +166,7 @@ void spikes_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
         for(i=0; i<team_size; i++) {
             player_t *player = team[i];
-            if(!player_is_dying(player) && !player_is_getting_hit(player) && !player->blinking && !player_is_invincible(player)) {
+            if(!player_is_dying(player) && !player_is_getting_hit(player) && !player_is_blinking(player) && !player_is_invincible(player)) {
                 if(me->collision(item, player)) {
                     sound_t *s = soundfactory_get("spikes hit");
                     if(!sound_is_playing(s))

@@ -1793,12 +1793,22 @@ music_t* level_music()
 
 
 /*
- * level_set_spawn_point()
+ * level_set_spawnpoint()
  * Defines a new spawn point
  */
-void level_set_spawn_point(v2d_t newpos)
+void level_set_spawnpoint(v2d_t newpos)
 {
     spawn_point = newpos;
+}
+
+
+/*
+ * level_spawnpoint()
+ * Gets the spawn point
+ */
+v2d_t level_spawnpoint()
+{
+    return spawn_point;
 }
 
 
@@ -4326,12 +4336,12 @@ void editor_action_commit(editor_action_t action)
     }
     else if(action.type == EDA_CHANGESPAWN) {
         /* change spawn point */
-        level_set_spawn_point(action.obj_position);
+        level_set_spawnpoint(action.obj_position);
         spawn_players();
     }
     else if(action.type == EDA_RESTORESPAWN) {
         /* restore spawn point */
-        level_set_spawn_point(action.obj_old_position);
+        level_set_spawnpoint(action.obj_old_position);
         spawn_players();
     }
 }

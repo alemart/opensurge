@@ -62,7 +62,8 @@ struct collisionmanager_t
 };
 
 #define COLLIDER_FLAG_ISVISIBLE             0x1
-#define COLLIDER_FLAG_MUSTNOTIFYENTITY      0x2
+#define COLLIDER_FLAG_NOTIFYONCOLLISION     0x2
+#define COLLIDER_FLAG_NOTIFYONOVERLAP       0x4
 #define COLLIDER_COLOR()                    (color_rgb(255, 255, 0))
 static const surgescript_heapptr_t BALL_CENTER_ADDR = 0;
 static inline collider_t* safe_get_collider(surgescript_object_t* object);
@@ -324,23 +325,34 @@ surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_va
     surgescript_objecthandle_t other_collider = surgescript_var_get_objecthandle(param[0]);
 
     darray_push(collider->curr_collisions, other_collider);
-    if(collider->flags & COLLIDER_FLAG_MUSTNOTIFYENTITY) {
+    if(collider->flags & (COLLIDER_FLAG_NOTIFYONCOLLISION | COLLIDER_FLAG_NOTIFYONOVERLAP)) {
         surgescript_objectmanager_t* manager = surgescript_object_manager(object);
         surgescript_var_t* tmp = surgescript_var_create();
         const surgescript_var_t* p[] = { tmp };
-        bool skip = false;
-
-        /* skip if other_collider is in prev_collisions */
-        for(int i = 0; i < darray_length(collider->prev_collisions) && !skip; i++) {
-            if(collider->prev_collisions[i] == other_collider)
-                skip = true;
-        }
 
         /* call entity.onCollision() */
-        if(!skip) {
+        if(collider->flags & COLLIDER_FLAG_NOTIFYONCOLLISION) {
+            bool skip = false;
+
+            /* skip if other_collider is in prev_collisions */
+            for(int i = 0; i < darray_length(collider->prev_collisions) && !skip; i++) {
+                if(collider->prev_collisions[i] == other_collider)
+                    skip = true;
+            }
+
+            /* call entity.onCollision() */
+            if(!skip) {
+                surgescript_object_t* entity = surgescript_objectmanager_get(manager, collider->entity);
+                surgescript_var_set_objecthandle(tmp, other_collider);
+                surgescript_object_call_function(entity, "onCollision", p, 1, NULL);
+            }
+        }
+
+        /* call entity.onOverlap() */
+        if(collider->flags & COLLIDER_FLAG_NOTIFYONOVERLAP) {
             surgescript_object_t* entity = surgescript_objectmanager_get(manager, collider->entity);
             surgescript_var_set_objecthandle(tmp, other_collider);
-            surgescript_object_call_function(entity, "onCollision", p, 1, NULL);
+            surgescript_object_call_function(entity, "onOverlap", p, 1, NULL);
         }
 
         /* done */
@@ -401,7 +413,9 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
 
     /* collision flags */
     if(surgescript_object_has_function(entity, "onCollision"))
-        collider->flags |= COLLIDER_FLAG_MUSTNOTIFYENTITY;
+        collider->flags |= COLLIDER_FLAG_NOTIFYONCOLLISION;
+    if(surgescript_object_has_function(entity, "onOverlap"))
+        collider->flags |= COLLIDER_FLAG_NOTIFYONOVERLAP;
 
     /* done */
     return NULL;
@@ -640,7 +654,9 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
 
     /* collision flags */
     if(surgescript_object_has_function(entity, "onCollision"))
-        collider->flags |= COLLIDER_FLAG_MUSTNOTIFYENTITY;
+        collider->flags |= COLLIDER_FLAG_NOTIFYONCOLLISION;
+    if(surgescript_object_has_function(entity, "onOverlap"))
+        collider->flags |= COLLIDER_FLAG_NOTIFYONOVERLAP;
 
     /* done */
     return NULL;

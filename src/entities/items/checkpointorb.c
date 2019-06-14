@@ -93,7 +93,7 @@ void checkpointorb_update(item_t* item, player_t** team, int team_size, brick_li
             if(!player_is_dying(player) && player_collision(player, act)) {
                 me->is_active = TRUE; /* I'm active! */
                 sound_play( soundfactory_get("checkpoint orb") );
-                level_set_spawn_point(act->position);
+                level_set_spawnpoint(act->position);
                 actor_change_animation(act, sprite_get_animation("SD_CHECKPOINT", 1));
                 break;
             }

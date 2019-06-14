@@ -1071,6 +1071,14 @@ void player_set_visible(player_t* player, int visible)
     player->visible = visible;
 }
 
+/*
+ * player_is_blinking()
+ * Is the player blinking? (happens after getting hit)
+ */
+int player_is_blinking(const player_t *player)
+{
+    return player->blinking;
+}
 
 
 

@@ -129,6 +129,7 @@ float player_seconds_remaining_to_drown(const player_t *player);
 
 int player_is_in_the_air(const player_t *player);
 int player_is_attacking(const player_t *player);
+int player_is_blinking(const player_t *player);
 int player_is_ultrafast(const player_t *player); /* wearing faster shoes? */
 void player_set_ultrafast(player_t* player, int turbo);
 int player_is_invincible(const player_t *player);

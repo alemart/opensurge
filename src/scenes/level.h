@@ -59,7 +59,6 @@ const char* level_license();
 
 /* players */
 void level_change_player(struct player_t *new_player); /* character switching */
-void level_set_spawn_point(v2d_t newpos);
 struct player_t* level_player(); /* active player */
 struct player_t* level_get_player_by_name(const char* name);
 struct player_t* level_get_player_by_id(int id);
@@ -108,6 +107,8 @@ void level_set_watercolor(color_t color);
 /* misc */
 v2d_t level_size();
 int level_height_at(int xpos);
+void level_set_spawnpoint(v2d_t newpos);
+v2d_t level_spawnpoint();
 float level_time();
 void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);

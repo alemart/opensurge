@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - scripting system: Level object
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,8 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getspawnpoint(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setspawnpoint(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getact(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -53,7 +55,8 @@ static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
-static const surgescript_heapptr_t IDX_ADDR = 1; /* must be the last address */
+static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
+static const surgescript_heapptr_t IDX_ADDR = 2; /* must be the last address */
 static void update_music(surgescript_object_t* object);
 
 /*
@@ -75,6 +78,8 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
+    surgescript_vm_bind(vm, "Level", "set_spawnpoint", fun_setspawnpoint, 1);
+    surgescript_vm_bind(vm, "Level", "get_spawnpoint", fun_getspawnpoint, 0);
     surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
     surgescript_vm_bind(vm, "Level", "set_background", fun_setbackground, 1);
     surgescript_vm_bind(vm, "Level", "get_background", fun_getbackground, 0);
@@ -91,10 +96,17 @@ void scripting_register_level(surgescript_vm_t* vm)
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t me = surgescript_object_handle(object);
+    surgescript_objecthandle_t spawnpoint = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
 
     /* Level music */
     ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_null(surgescript_heap_at(heap, MUSIC_ADDR));
+
+    /* spawn point */
+    ssassert(SPAWNPOINT_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, SPAWNPOINT_ADDR), spawnpoint);
 
     /*
      * Memory layout:
@@ -187,6 +199,34 @@ surgescript_var_t* fun_setwaterlevel(surgescript_object_t* object, const surgesc
 {
     int waterlevel = (int)surgescript_var_get_number(param[0]);
     level_set_waterlevel(waterlevel);
+    return NULL;
+}
+
+/* get the spawn point, a Vector2 */
+surgescript_var_t* fun_getspawnpoint(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t spawnpoint = surgescript_var_get_objecthandle(surgescript_heap_at(heap, SPAWNPOINT_ADDR));
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, spawnpoint);
+
+    /* update data, as the spawn point may have been changed inside the engine */
+    v2d_t sp = level_spawnpoint();
+    scripting_vector2_update(v2, sp.x, sp.y);
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), spawnpoint);
+}
+
+/* set the spawn point */
+surgescript_var_t* fun_setspawnpoint(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
+    double x = 0.0, y = 0.0;
+
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    level_set_spawnpoint(v2d_new(x, y));
+
     return NULL;
 }
 
