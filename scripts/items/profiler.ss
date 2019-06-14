@@ -9,7 +9,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Level;
 
-object "Profiler" is "entity", "awake"
+object "Profiler" is "entity", "awake", "special"
 {
     uiStats = spawn("Profiler.UI.Tree");
     uiDensity = spawn("Profiler.UI.Tree");

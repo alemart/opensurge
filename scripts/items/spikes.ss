@@ -10,7 +10,7 @@ using SurgeEngine.Brick;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Spikes" is "entity"
+object "Spikes" is "entity", "item"
 {
     actor = Actor("Spikes");
     brick = Brick("Spikes Mask");
@@ -45,7 +45,7 @@ object "Spikes" is "entity"
     }
 }
 
-object "Spikes Down" is "entity"
+object "Spikes Down" is "entity", "item"
 {
     actor = Actor("Spikes Down");
     brick = Brick("Spikes Down Mask");

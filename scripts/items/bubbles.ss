@@ -12,7 +12,7 @@ using SurgeEngine.Transform;
 using SurgeEngine.Collisions.CollisionBall;
 
 // these Bubbles help the player breathe (useful when underwater)
-object "Bubbles" is "entity"
+object "Bubbles" is "entity", "item"
 {
     transform = Transform();
     bubbles = Actor("Bubbles");

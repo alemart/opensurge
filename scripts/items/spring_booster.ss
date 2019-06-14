@@ -11,7 +11,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Spring Booster Right" is "entity", "gimmick"
+object "Spring Booster Right" is "entity", "item"
 {
     booster = spawn("Spring Booster").setDirection(1);
 
@@ -27,7 +27,7 @@ object "Spring Booster Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Booster Left" is "entity", "gimmick"
+object "Spring Booster Left" is "entity", "item"
 {
     booster = spawn("Spring Booster").setDirection(-1);
 

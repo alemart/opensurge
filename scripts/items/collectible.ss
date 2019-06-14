@@ -12,7 +12,7 @@ using SurgeEngine.Collisions.CollisionBall;
 using SurgeEngine.Collisions.Sensor;
 
 // a regular collectible that can be magnetized
-object "Collectible" is "entity"
+object "Collectible" is "entity", "item"
 {
     transform = Transform();
     actor = Actor("Collectible");

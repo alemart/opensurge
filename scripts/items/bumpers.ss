@@ -10,7 +10,7 @@ using SurgeEngine.Player;
 using SurgeEngine.Transform;
 using SurgeEngine.Collisions.CollisionBall;
 
-object "Bumper" is "entity", "gimmick"
+object "Bumper" is "entity", "item"
 {
     sfx = Sound("samples/bumper.wav");
     actor = Actor("Bumper");

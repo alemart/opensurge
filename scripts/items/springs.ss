@@ -28,7 +28,7 @@ using SurgeEngine.Collisions.CollisionBox;
 // Standard Springs
 //
 
-object "Spring Standard" is "entity", "gimmick"
+object "Spring Standard" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard")
@@ -51,7 +51,7 @@ object "Spring Standard" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Top Right" is "entity", "gimmick"
+object "Spring Standard Top Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Top Right")
@@ -70,7 +70,7 @@ object "Spring Standard Top Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Right" is "entity", "gimmick"
+object "Spring Standard Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Right")
@@ -89,7 +89,7 @@ object "Spring Standard Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Bottom Right" is "entity", "gimmick"
+object "Spring Standard Bottom Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Bottom Right")
@@ -108,7 +108,7 @@ object "Spring Standard Bottom Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Bottom" is "entity", "gimmick"
+object "Spring Standard Bottom" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Bottom")
@@ -127,7 +127,7 @@ object "Spring Standard Bottom" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Bottom Left" is "entity", "gimmick"
+object "Spring Standard Bottom Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Bottom Left")
@@ -146,7 +146,7 @@ object "Spring Standard Bottom Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Left" is "entity", "gimmick"
+object "Spring Standard Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Left")
@@ -165,7 +165,7 @@ object "Spring Standard Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Top Left" is "entity", "gimmick"
+object "Spring Standard Top Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Top Left")
@@ -184,7 +184,7 @@ object "Spring Standard Top Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Standard Hidden" is "entity", "gimmick"
+object "Spring Standard Hidden" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Standard Hidden")
@@ -209,7 +209,7 @@ object "Spring Standard Hidden" is "entity", "gimmick"
 // Stronger Springs
 //
 
-object "Spring Stronger" is "entity", "gimmick"
+object "Spring Stronger" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger")
@@ -232,7 +232,7 @@ object "Spring Stronger" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Top Right" is "entity", "gimmick"
+object "Spring Stronger Top Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Top Right")
@@ -251,7 +251,7 @@ object "Spring Stronger Top Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Right" is "entity", "gimmick"
+object "Spring Stronger Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Right")
@@ -270,7 +270,7 @@ object "Spring Stronger Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Bottom Right" is "entity", "gimmick"
+object "Spring Stronger Bottom Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Bottom Right")
@@ -289,7 +289,7 @@ object "Spring Stronger Bottom Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Bottom" is "entity", "gimmick"
+object "Spring Stronger Bottom" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Bottom")
@@ -308,7 +308,7 @@ object "Spring Stronger Bottom" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Bottom Left" is "entity", "gimmick"
+object "Spring Stronger Bottom Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Bottom Left")
@@ -327,7 +327,7 @@ object "Spring Stronger Bottom Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Left" is "entity", "gimmick"
+object "Spring Stronger Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Left")
@@ -346,7 +346,7 @@ object "Spring Stronger Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Top Left" is "entity", "gimmick"
+object "Spring Stronger Top Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Top Left")
@@ -365,7 +365,7 @@ object "Spring Stronger Top Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Stronger Hidden" is "entity", "gimmick"
+object "Spring Stronger Hidden" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Stronger Hidden")
@@ -390,7 +390,7 @@ object "Spring Stronger Hidden" is "entity", "gimmick"
 // Strongest Springs
 //
 
-object "Spring Strongest" is "entity", "gimmick"
+object "Spring Strongest" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest")
@@ -413,7 +413,7 @@ object "Spring Strongest" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Top Right" is "entity", "gimmick"
+object "Spring Strongest Top Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Top Right")
@@ -432,7 +432,7 @@ object "Spring Strongest Top Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Right" is "entity", "gimmick"
+object "Spring Strongest Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Right")
@@ -451,7 +451,7 @@ object "Spring Strongest Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Bottom Right" is "entity", "gimmick"
+object "Spring Strongest Bottom Right" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Bottom Right")
@@ -470,7 +470,7 @@ object "Spring Strongest Bottom Right" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Bottom" is "entity", "gimmick"
+object "Spring Strongest Bottom" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Bottom")
@@ -489,7 +489,7 @@ object "Spring Strongest Bottom" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Bottom Left" is "entity", "gimmick"
+object "Spring Strongest Bottom Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Bottom Left")
@@ -508,7 +508,7 @@ object "Spring Strongest Bottom Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Left" is "entity", "gimmick"
+object "Spring Strongest Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Left")
@@ -527,7 +527,7 @@ object "Spring Strongest Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Top Left" is "entity", "gimmick"
+object "Spring Strongest Top Left" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Top Left")
@@ -546,7 +546,7 @@ object "Spring Strongest Top Left" is "entity", "gimmick"
     }
 }
 
-object "Spring Strongest Hidden" is "entity", "gimmick"
+object "Spring Strongest Hidden" is "entity", "item"
 {
     gfx = spawn("Spring Graphic")
         .setSprite("Spring Strongest Hidden")
