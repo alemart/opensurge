@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * item.h - code for the items
- * Copyright (C) 2008-2011  Alexandre Martins <alemartf@gmail.com>
+ * item.h - legacy items (replaced by SurgeScript)
+ * Copyright (C) 2008-2011, 2018  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,14 +21,14 @@
 #ifndef _ITEM_H
 #define _ITEM_H
 
-#include "../core/v2d.h"
+#include "../../core/v2d.h"
 
 /* item list */
 #define ITEMDATA_MAX        84 /* number of existing items */
 
-#define IT_RING             0  /* ordinary ring */
+#define IT_COLLECTIBLE      0  /* collectible */
 #define IT_LIFEBOX          1  /* life box */
-#define IT_RINGBOX          2  /* ring box */
+#define IT_COLLECTIBLEBOX   2  /* collectible box */
 #define IT_STARBOX          3  /* invincibility stars */
 #define IT_SPEEDBOX         4  /* speed shoes */
 #define IT_GLASSESBOX       5  /* glasses */
@@ -40,7 +40,7 @@
 #define IT_FALGLASSES       11 /* UNUSED */
 #define IT_EXPLOSION        12 /* explosion sprite */
 #define IT_FLYINGTEXT       13 /* flying text */
-#define IT_BOUNCINGRING     14 /* bouncing ring */
+#define IT_BOUNCINGCOLLECT  14 /* bouncing collectible */
 #define IT_ANIMAL           15 /* little animal */
 #define IT_LOOPRIGHT        16 /* loop right */
 #define IT_LOOPMIDDLE       17 /* loop middle */
@@ -50,7 +50,7 @@
 #define IT_REDSPRING        21 /* red spring */
 #define IT_RREDSPRING       22 /* right red spring */
 #define IT_LREDSPRING       23 /* left red spring */
-#define IT_BLUERING         24 /* blue ring */
+#define IT_BLUECOLLECTIBLE  24 /* blue collectible */
 #define IT_SWITCH           25 /* switch */
 #define IT_DOOR             26 /* door */
 #define IT_TELEPORTER       27 /* teleporter */
@@ -111,8 +111,6 @@
 #define IT_LOOPGREEN        82 /* activates the green layer */
 #define IT_LOOPYELLOW       83 /* activates the yellow layer */
 
-
-
 /* forward declarations */
 struct actor_t;
 struct player_t;
@@ -160,5 +158,9 @@ item_t *item_create(int type); /* this is an item factory; type is a IT_* consta
 item_t* item_destroy(item_t *item);
 void item_update(item_t *item, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list);
 void item_render(item_t *item, v2d_t camera_position);
+
+/* item-specific functions (legacy stuff) */
+void bouncingcollectible_set_speed(item_t *item, v2d_t speed);
+void flyingtext_set_text(item_t *item, const char *text);
 
 #endif

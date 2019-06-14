@@ -21,9 +21,9 @@
 
 #include "entitymanager.h"
 #include "brick.h"
-#include "item.h"
 #include "enemy.h"
 #include "actor.h"
+#include "legacy/item.h"
 #include "../core/spatialhash.h"
 #include "../core/util.h"
 

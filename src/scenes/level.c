@@ -54,14 +54,13 @@
 #include "../entities/actor.h"
 #include "../entities/brick.h"
 #include "../entities/player.h"
-#include "../entities/item.h"
 #include "../entities/enemy.h"
 #include "../entities/camera.h"
 #include "../entities/background.h"
 #include "../entities/particle.h"
 #include "../entities/renderqueue.h"
-#include "../entities/items/flyingtext.h"
 #include "../entities/entitymanager.h"
+#include "../entities/legacy/item.h"
 #include "../scripting/scripting.h"
 #include "../scenes/editorpal.h"
 
@@ -289,7 +288,7 @@ static void editor_previous_entity();
 
 /* editor: legacy items */
 static int editor_item_list[] = {
-    IT_RING, IT_LIFEBOX, IT_RINGBOX, IT_STARBOX, IT_SPEEDBOX, IT_GLASSESBOX, IT_TRAPBOX,
+    IT_COLLECTIBLE, IT_LIFEBOX, IT_COLLECTIBLEBOX, IT_STARBOX, IT_SPEEDBOX, IT_GLASSESBOX, IT_TRAPBOX,
     IT_SHIELDBOX, IT_FIRESHIELDBOX, IT_THUNDERSHIELDBOX, IT_WATERSHIELDBOX,
     IT_ACIDSHIELDBOX, IT_WINDSHIELDBOX,
     IT_LOOPGREEN, IT_LOOPYELLOW,
@@ -299,7 +298,7 @@ static int editor_item_list[] = {
     IT_TRREDSPRING, IT_TLREDSPRING, IT_BRREDSPRING, IT_BLREDSPRING,
     IT_BLUESPRING, IT_BBLUESPRING, IT_RBLUESPRING, IT_LBLUESPRING,
     IT_TRBLUESPRING, IT_TLBLUESPRING, IT_BRBLUESPRING, IT_BLBLUESPRING,
-    IT_BLUERING, IT_SWITCH, IT_DOOR, IT_TELEPORTER, IT_BIGRING, IT_CHECKPOINT, IT_GOAL,
+    IT_BLUECOLLECTIBLE, IT_SWITCH, IT_DOOR, IT_TELEPORTER, IT_BIGRING, IT_CHECKPOINT, IT_GOAL,
     IT_ENDSIGN, IT_ENDLEVEL, IT_BUMPER,
     IT_DANGER, IT_VDANGER, IT_FIREDANGER, IT_VFIREDANGER,
     IT_SPIKES, IT_CEILSPIKES, IT_LWSPIKES, IT_RWSPIKES, IT_PERSPIKES,
@@ -1685,17 +1684,6 @@ void level_add_to_score(int score)
     snprintf(buf, sizeof(buf), "%d", score);
     flyingtext = level_create_item(IT_FLYINGTEXT, v2d_add(player->actor->position, v2d_new(0,-h/2)));
     flyingtext_set_text(flyingtext, buf);
-}
-
-
-/*
- * level_create_animal()
- * Creates a random animal
- */
-item_t* level_create_animal(v2d_t position)
-{
-    item_t *animal = level_create_item(IT_ANIMAL, position);
-    return animal;
 }
 
 

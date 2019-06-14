@@ -69,7 +69,6 @@ struct item_t* level_create_item(int id, v2d_t position);
 struct enemy_t* level_create_enemy(const char *name, v2d_t position);
 surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position);
 void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
-struct item_t* level_create_animal(v2d_t position);
 
 /* camera */
 void level_set_camera_focus(struct actor_t *act);

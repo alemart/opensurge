@@ -1980,7 +1980,7 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
                 player_bounce_ex(player, object->actor, FALSE);
                 level_add_to_score(score);
                 level_create_item(IT_EXPLOSION, v2d_add(object->actor->position, v2d_new(0,-15)));
-                level_create_animal(object->actor->position);
+                level_create_item(IT_ANIMAL, object->actor->position);
                 sound_play(SFX_DESTROY);
                 object->state = ES_DEAD;
             }

@@ -27,10 +27,8 @@
 #include "player.h"
 #include "brick.h"
 #include "enemy.h"
-#include "item.h"
 #include "character.h"
-#include "items/collectible.h"
-#include "items/bouncingcollectible.h"
+#include "legacy/item.h"
 #include "../core/global.h"
 #include "../core/audio.h"
 #include "../core/util.h"
@@ -474,7 +472,7 @@ void player_hit(player_t *player, float direction)
 
             /* create collectibles */
             for(int i = 0; i < r; i++) {
-                item_t* b = level_create_item(IT_BOUNCINGRING, player->actor->position);
+                item_t* b = level_create_item(IT_BOUNCINGCOLLECT, player->actor->position);
                 bouncingcollectible_set_speed(b, v2d_new(-sinf(DEG2RAD(a)) * spd * (1-2*(i%2)), cosf(DEG2RAD(a)) * spd));
                 a += 22.5f * (i % 2);
 

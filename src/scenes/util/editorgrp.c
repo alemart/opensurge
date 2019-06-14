@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include "editorgrp.h"
 #include "../../entities/brick.h"
-#include "../../entities/item.h"
 #include "../../entities/enemy.h"
+#include "../../entities/legacy/item.h"
 #include "../../core/logfile.h"
 #include "../../core/assetfs.h"
 #include "../../core/util.h"

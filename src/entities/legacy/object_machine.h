@@ -25,8 +25,8 @@
 #include "../player.h"
 #include "../brick.h"
 #include "../enemy.h"
-#include "../item.h"
 #include "../actor.h"
+#include "item.h"
 
 /* object machine: an object is a state machine; each state is a machine */
 typedef struct objectmachine_t objectmachine_t;

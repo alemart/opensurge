@@ -22,10 +22,10 @@
 #include <math.h>
 #include "nanocalc.h"
 #include "nanocalcext.h"
+#include "../item.h"
 #include "../../actor.h"
 #include "../../player.h"
 #include "../../enemy.h"
-#include "../../item.h"
 #include "../../brick.h"
 #include "../../camera.h"
 #include "../../../core/global.h"

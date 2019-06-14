@@ -406,33 +406,6 @@ SET(GAME_SRCS
   src/scripting/transform.c
   src/scripting/vector2.c
   src/scripting/web.c
-
-  src/entities/items/util/itemutil.c
-  src/entities/items/animal.c
-  src/entities/items/animalprison.c
-  src/entities/items/bigring.c
-  src/entities/items/bouncingcollectible.c
-  src/entities/items/bumper.c
-  src/entities/items/checkpointorb.c
-  src/entities/items/collectible.c
-  src/entities/items/crushedbox.c
-  src/entities/items/danger.c
-  src/entities/items/dnadoor.c
-  src/entities/items/door.c
-  src/entities/items/endsign.c
-  src/entities/items/explosion.c
-  src/entities/items/flyingtext.c
-  src/entities/items/goalsign.c
-  src/entities/items/icon.c
-  src/entities/items/itembox.c
-  src/entities/items/loop.c
-  src/entities/items/old_loop.c
-  src/entities/items/spikes.c
-  src/entities/items/spring.c
-  src/entities/items/supercollectible.c
-  src/entities/items/switch.c
-  src/entities/items/teleporter.c
-
   src/physics/obstacle.c
   src/physics/obstaclemap.c
   src/physics/physicsactor.c
@@ -440,13 +413,14 @@ SET(GAME_SRCS
   src/physics/sensorstate.c
   src/physics/collisionmask.c
 
-  src/entities/legacy/nanocalc/nanocalc.c
-  src/entities/legacy/nanocalc/nanocalc_addons.c
-  src/entities/legacy/nanocalc/nanocalcext.c
+  src/entities/legacy/item.c
   src/entities/legacy/object_compiler.c
   src/entities/legacy/object_decorators.c
   src/entities/legacy/object_machine.c
   src/entities/legacy/object_vm.c
+  src/entities/legacy/nanocalc/nanocalc.c
+  src/entities/legacy/nanocalc/nanocalc_addons.c
+  src/entities/legacy/nanocalc/nanocalcext.c
 
   src/entities/actor.c
   src/entities/background.c
@@ -455,7 +429,6 @@ SET(GAME_SRCS
   src/entities/character.c
   src/entities/enemy.c
   src/entities/entitymanager.c
-  src/entities/item.c
   src/entities/player.c
   src/entities/particle.c
   src/entities/renderqueue.c
@@ -520,33 +493,6 @@ SET(GAME_HEADERS
   src/scenes/stageselect.h
 
   src/scripting/scripting.h
-
-  src/entities/items/util/itemutil.h
-  src/entities/items/animal.h
-  src/entities/items/animalprison.h
-  src/entities/items/bigring.h
-  src/entities/items/bouncingcollectible.h
-  src/entities/items/bumper.h
-  src/entities/items/checkpointorb.h
-  src/entities/items/collectible.h
-  src/entities/items/crushedbox.h
-  src/entities/items/danger.h
-  src/entities/items/dnadoor.h
-  src/entities/items/door.h
-  src/entities/items/endsign.h
-  src/entities/items/explosion.h
-  src/entities/items/flyingtext.h
-  src/entities/items/goalsign.h
-  src/entities/items/icon.h
-  src/entities/items/itembox.h
-  src/entities/items/loop.h
-  src/entities/items/old_loop.h
-  src/entities/items/spikes.h
-  src/entities/items/spring.h
-  src/entities/items/supercollectible.h
-  src/entities/items/switch.h
-  src/entities/items/teleporter.h
-
   src/physics/obstacle.h
   src/physics/obstaclemap.h
   src/physics/physicsactor.h
@@ -554,6 +500,7 @@ SET(GAME_HEADERS
   src/physics/sensorstate.h
   src/physics/collisionmask.h
 
+  src/entities/legacy/item.h
   src/entities/legacy/object_compiler.h
   src/entities/legacy/object_decorators.h
   src/entities/legacy/object_machine.h
@@ -571,7 +518,6 @@ SET(GAME_HEADERS
   src/entities/entitymanager.h
   src/entities/object_compiler.h
   src/entities/object_vm.h
-  src/entities/item.h
   src/entities/player.h
   src/entities/particle.h
   src/entities/renderqueue.h
