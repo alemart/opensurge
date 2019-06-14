@@ -1,0 +1,126 @@
+// -----------------------------------------------------------------------------
+// File: spikes.spr
+// Description: spikes sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Spikes"
+{
+    source_file     "images/spikes.png"
+    source_rect     10 80 32 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Mask"
+{
+    source_file     "images/spikes.png"
+    source_rect     10 48 32 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Down"
+{
+    source_file     "images/spikes.png"
+    source_rect     74 80 32 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Down Mask"
+{
+    source_file     "images/spikes.png"
+    source_rect     74 48 32 32
+    frame_size      32 32
+    hot_spot        16 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Right"
+{
+    source_file     "images/spikes.png"
+    source_rect     42 80 32 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Right Mask"
+{
+    source_file     "images/spikes.png"
+    source_rect     42 48 32 32
+    frame_size      32 32
+    hot_spot        0 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Left"
+{
+    source_file     "images/spikes.png"
+    source_rect     106 80 32 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Spikes Left Mask"
+{
+    source_file     "images/spikes.png"
+    source_rect     106 48 32 32
+    frame_size      32 32
+    hot_spot        32 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
