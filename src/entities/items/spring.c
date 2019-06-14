@@ -33,10 +33,6 @@
 #include "../enemy.h"
 #include "../actor.h"
 
-/* constants */
-#define SPRING_BANG_TIMER           0.2 /* sfx control */
-/*#define SHOW_COLLIDER*/
-
 /* spring class */
 typedef struct spring_t spring_t;
 struct spring_t {
@@ -62,6 +58,11 @@ static void volatilespring_strategy(item_t *item, player_t *player); /* activate
 static void springfy_player(player_t *player, v2d_t strength);
 static void activate_spring(spring_t *spring, player_t *player);
 static int spring_collision(item_t *item, player_t *player);
+
+/* debug */
+/*#define SPRING SHOW_COLLIDER*/
+
+
 
 
 
@@ -292,7 +293,7 @@ void spring_update(item_t* item, player_t** team, int team_size, brick_list_t* b
 
 void spring_render(item_t* item, v2d_t camera_position)
 {
-#ifdef SHOW_COLLIDER
+#ifdef SPRING_SHOW_COLLIDER
     spring_t *me = (spring_t*)item;
     int x1 = (item->actor->position.x) + (me->box_offset.x - me->box_size.x/2.0f) - (camera_position.x - (VIDEO_SCREEN_W / 2));
     int y1 = (item->actor->position.y) + (me->box_offset.y - me->box_size.y/2.0f) - (camera_position.y - (VIDEO_SCREEN_H / 2));
@@ -322,6 +323,7 @@ void springfy_player(player_t *player, v2d_t strength)
 /* activate the spring */
 void activate_spring(spring_t *spring, player_t *player)
 {
+    const float SPRING_BANG_TIMER = 0.2f; /* sfx control */
     item_t *item = (item_t*)spring;
 
     spring->is_bumping = TRUE;

@@ -271,7 +271,7 @@ void state_releasing_handle(state_t *state, item_t *item, player_t **team, int t
             act->position.x - act->hot_spot.x + random(image_width(actor_image(act))),
             act->position.y - act->hot_spot.y + random(image_height(actor_image(act))/2)
         );
-        level_create_animal(pos);
+        level_create_item(IT_ANIMAL, pos);
     }
 
     /* congratulations! you have just cleared the level! */

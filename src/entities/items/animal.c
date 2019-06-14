@@ -31,8 +31,6 @@
 #include "../../physics/obstacle.h"
 
 
-#define MAX_ANIMALS                 12
-
 /* animal class */
 typedef struct animal_t animal_t;
 struct animal_t {
@@ -63,6 +61,7 @@ item_t* animal_create()
 /* private methods */
 void animal_init(item_t *item)
 {
+    const int MAX_ANIMALS = 12;
     animal_t *me = (animal_t*)item;
 
     item->always_active = FALSE;
