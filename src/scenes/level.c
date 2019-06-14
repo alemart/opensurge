@@ -328,6 +328,7 @@ static char** editor_ssobj; /* the names of all SurgeScript entities; a vector o
 static int editor_ssobj_count; /* length of editor_ssobj */
 static void editor_ssobj_init();
 static void editor_ssobj_release();
+static int editor_ssobj_sortfun(const void* a, const void* b);
 static void editor_ssobj_register(const char* entity_name, void* data); /* internal */
 static int editor_ssobj_id(const char* entity_name); /* an index k such that editor_ssobj[k] is entity_name */
 static const char* editor_ssobj_name(int entity_id); /* the inverse of editor_ssobj_id() */
@@ -3862,6 +3863,7 @@ void editor_ssobj_init()
     /* register entities */
     editor_ssobj = mallocx(editor_ssobj_count * sizeof(*editor_ssobj));
     surgescript_tagsystem_foreach_tagged_object(tag_system, "entity", &fill_counter, editor_ssobj_register);
+    qsort(editor_ssobj, editor_ssobj_count, sizeof(const char*), editor_ssobj_sortfun);
 }
 
 void editor_ssobj_register(const char* entity_name, void* data)
@@ -3882,6 +3884,24 @@ void editor_ssobj_release()
         free(editor_ssobj[i]);
     free(editor_ssobj);
     editor_ssobj = NULL;
+}
+
+/* comparison function between entity names (for sorting) */
+int editor_ssobj_sortfun(const void* a, const void* b)
+{
+    const char* x = *((const char**)a);
+    const char* y = *((const char**)b);
+
+    /* put "special"-tagged entities last */
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+    bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
+    bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
+
+    if(x_is_special != y_is_special)
+        return (x_is_special && !y_is_special) ? 1 : -1;
+    else
+        return strcmp(x, y);
 }
 
 /* associates an integer to each SurgeScript entity */
