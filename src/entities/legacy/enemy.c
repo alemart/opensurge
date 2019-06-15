@@ -403,7 +403,7 @@ enemy_t* create_from_script(const char *object_name)
     if(object_code != NULL)
         objectcompiler_compile(e, object_code);
     else
-        fatal_error("Can't spawn object '%s': it does not exist!", object_name);
+        fatal_error("Can't spawn legacy object '%s': it does not exist!", object_name);
 
     /* success! */
     return e;
