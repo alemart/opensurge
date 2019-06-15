@@ -161,7 +161,7 @@ player_t *player_create(const char *character_name)
         /* try to create the companion object using the new API if possible */
         if(!level_create_ssobject(c->companion_object_name, v2d_new(0, 0))) {
             /* not possible; use the old API */
-            enemy_t* e = level_create_enemy(c->companion_object_name, v2d_new(0, 0));
+            enemy_t* e = level_create_legacy_object(c->companion_object_name, v2d_new(0, 0));
             e->created_from_editor = FALSE;
         }
     }
@@ -472,10 +472,29 @@ void player_hit(player_t *player, float direction)
 
             /* create collectibles */
             for(int i = 0; i < r; i++) {
-                item_t* b = level_create_item(IT_BOUNCINGCOLLECT, player->actor->position);
-                bouncingcollectible_set_speed(b, v2d_new(-sinf(DEG2RAD(a)) * spd * (1-2*(i%2)), cosf(DEG2RAD(a)) * spd));
-                a += 22.5f * (i % 2);
+                v2d_t velocity = v2d_new(
+                    -sinf(DEG2RAD(a)) * spd * (1 - 2 * (i % 2)),
+                    cosf(DEG2RAD(a)) * spd
+                );
 
+                surgescript_object_t* collectible = level_create_ssobject("Scattered Collectible", player->actor->position);
+                if(collectible != NULL) {
+                    surgescript_var_t* x = surgescript_var_create();
+                    surgescript_var_t* y = surgescript_var_create();
+                    const surgescript_var_t* param[2] = {
+                        surgescript_var_set_number(x, velocity.x),
+                        surgescript_var_set_number(y, velocity.y),
+                    };
+                    surgescript_object_call_function(collectible, "setVelocity", param, 2, NULL);
+                    surgescript_var_destroy(y);
+                    surgescript_var_destroy(x);
+                }
+                else {
+                    item_t* b = level_create_legacy_item(IT_BOUNCINGCOLLECT, player->actor->position);
+                    bouncingcollectible_set_velocity(b, velocity);
+                }
+
+                a += 22.5f * (i % 2);
                 if(i == 16) {
                     spd *= 0.5f;
                     a -= 180.0f;
