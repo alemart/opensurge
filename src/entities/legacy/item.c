@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "item.h"
 #include "enemy.h"
@@ -957,7 +958,7 @@ void state_exploding_handle(state_t *state, item_t *item, player_t **team, int t
             act->position.x - act->hot_spot.x + random(image_width(actor_image(act))),
             act->position.y - act->hot_spot.y + random(image_height(actor_image(act))/2)
         );
-        level_create_item(IT_EXPLOSION, pos);
+        level_create_legacy_item(IT_EXPLOSION, pos);
         sound_play( soundfactory_get("explode") );
 
         s->explode_timer = 0.0f;
@@ -979,7 +980,7 @@ void state_releasing_handle(state_t *state, item_t *item, player_t **team, int t
             act->position.x - act->hot_spot.x + random(image_width(actor_image(act))),
             act->position.y - act->hot_spot.y + random(image_height(actor_image(act))/2)
         );
-        level_create_item(IT_ANIMAL, pos);
+        level_create_legacy_item(IT_ANIMAL, pos);
     }
 
     /* congratulations! you have just cleared the level! */
@@ -1118,9 +1119,9 @@ item_t* bouncingcollectible_create()
     return item;
 }
 
-void bouncingcollectible_set_speed(item_t *item, v2d_t speed)
+void bouncingcollectible_set_velocity(item_t *item, v2d_t velocity)
 {
-    item->actor->speed = speed;
+    item->actor->speed = velocity;
 }
 
 
@@ -1281,7 +1282,7 @@ void bouncingcollectible_update(item_t* item, player_t** team, int team_size, br
                 break;
 
             default:
-                act->speed.y += (0.09375f * 60.0f * 60.0f) * dt;
+                act->speed.y += 337.5f * dt;
                 break;
         }
 
@@ -2284,10 +2285,16 @@ item_t* flyingtext_create()
     return item;
 }
 
-void flyingtext_set_text(item_t *item, const char *text)
+void flyingtext_set_text(item_t *item, const char *fmt, ...)
 {
     flyingtext_t *me = (flyingtext_t*)item;
-    font_set_text(me->font, "%s", text);
+    va_list args; char buf[256];
+
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    font_set_text(me->font, "%s", buf);
     me->textsize = font_get_textsize(me->font);
 }
 
@@ -2752,10 +2759,10 @@ void itembox_update(item_t* item, player_t** team, int team_size, brick_list_t* 
 
         /* the player is about to crash this box... */
         if(item->state == IS_IDLE && player_collision(player, item->actor) && player_is_attacking(player)) {
-            item_t *icon = level_create_item(IT_ICON, v2d_add(act->position, v2d_new(0,-5)));
+            item_t *icon = level_create_legacy_item(IT_ICON, v2d_add(act->position, v2d_new(0,-5)));
             icon_change_animation(icon, me->anim_id);
-            level_create_item(IT_EXPLOSION, v2d_add(act->position, v2d_new(0,-20)));
-            level_create_item(IT_CRUSHEDBOX, act->position);
+            level_create_legacy_item(IT_EXPLOSION, v2d_add(act->position, v2d_new(0,-20)));
+            level_create_legacy_item(IT_CRUSHEDBOX, act->position);
 
             sound_play( soundfactory_get("destroy") );
             player_bounce_ex(player, act, TRUE);

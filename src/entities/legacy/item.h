@@ -160,7 +160,7 @@ void item_update(item_t *item, struct player_t** team, int team_size, struct bri
 void item_render(item_t *item, v2d_t camera_position);
 
 /* item-specific functions (legacy stuff) */
-void bouncingcollectible_set_speed(item_t *item, v2d_t speed);
-void flyingtext_set_text(item_t *item, const char *text);
+void bouncingcollectible_set_velocity(item_t *item, v2d_t velocity);
+void flyingtext_set_text(item_t *item, const char *fmt, ...);
 
 #endif

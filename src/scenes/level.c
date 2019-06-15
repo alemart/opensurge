@@ -921,7 +921,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             int type = clip(atoi(param[0]), 0, ITEMDATA_MAX-1);
             int x = atoi(param[1]);
             int y = atoi(param[2]);
-            level_create_item(type, v2d_new(x, y));
+            level_create_legacy_item(type, v2d_new(x, y));
         }
         else
             logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
@@ -938,7 +938,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
                 }
                 else
-                    level_create_enemy(name, v2d_new(x, y)); /* old API */
+                    level_create_legacy_object(name, v2d_new(x, y)); /* old API */
             }
         }
         else
@@ -1614,11 +1614,11 @@ brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickfli
 
 
 /*
- * level_create_item()
- * Creates and adds an item to the level. Returns the
- * created item.
+ * level_create_legacy_item()
+ * Creates and adds a legacy item to the level.
+ * Returns the legacy item.
  */
-item_t* level_create_item(int id, v2d_t position)
+item_t* level_create_legacy_item(int id, v2d_t position)
 {
     item_t *item = item_create(id);
     item->actor->spawn_point = position;
@@ -1630,11 +1630,11 @@ item_t* level_create_item(int id, v2d_t position)
 
 
 /*
- * level_create_enemy()
- * Creates and adds an enemy to the level. Returns the
- * created enemy.
+ * level_create_legacy_object()
+ * Creates and adds a legacy object to the level.
+ * Returns the legacy object.
  */
-enemy_t* level_create_enemy(const char *name, v2d_t position)
+enemy_t* level_create_legacy_object(const char *name, v2d_t position)
 {
     enemy_t *object = enemy_create(name);
     object->actor->spawn_point = position;
@@ -1653,10 +1653,12 @@ surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t posit
 {
     if(ssobject_exists(object_name)) {
         surgescript_vm_t* vm = surgescript_vm();
+        surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
         int spawned_in_the_editor =
             /* note: objects not created with this function (e.g., via scripting)
                will not have this flag set to true */
-            surgescript_tagsystem_has_tag(surgescript_vm_tagsystem(vm), object_name, "entity") &&
+            surgescript_tagsystem_has_tag(tag_system, object_name, "entity") &&
+            !surgescript_tagsystem_has_tag(tag_system, object_name, "private") &&
             !is_startup_object(object_name)
         ;
         return spawn_ssobject(object_name, position, spawned_in_the_editor);
@@ -1670,20 +1672,15 @@ surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t posit
 /*
  * level_add_to_score()
  * Adds a value to the player's score.
- * It also creates a flying text that
- * shows that score.
+ * (It also creates a flying text that
+ * shows that score)
  */
 void level_add_to_score(int score)
 {
-    item_t *flyingtext;
-    char buf[32];
-    int h = image_height(actor_image(player->actor));
-
+    // legacy item
+    item_t *flyingtext = level_create_legacy_item(IT_FLYINGTEXT, player->actor->position);
+    flyingtext_set_text(flyingtext, "%d", score);
     player_set_score(player_get_score() + score);
-
-    snprintf(buf, sizeof(buf), "%d", score);
-    flyingtext = level_create_item(IT_FLYINGTEXT, v2d_add(player->actor->position, v2d_new(0,-h/2)));
-    flyingtext_set_text(flyingtext, buf);
 }
 
 
@@ -2394,7 +2391,7 @@ void spawn_startup_objects()
         /* try to create an object using the new API.
            if failure, use the old API. */
         if(!level_create_ssobject(me->object_name, v2d_new(0, 0))) {
-            enemy_t* e = level_create_enemy(me->object_name, v2d_new(0, 0));
+            enemy_t* e = level_create_legacy_object(me->object_name, v2d_new(0, 0));
             e->created_from_editor = FALSE;
         }
     }
@@ -4242,13 +4239,13 @@ void editor_action_commit(editor_action_t action)
 
             case EDT_ITEM: {
                 /* new item */
-                level_create_item(action.obj_id, action.obj_position);
+                level_create_legacy_item(action.obj_id, action.obj_position);
                 break;
             }
 
             case EDT_ENEMY: {
-                /* new enemy */
-                level_create_enemy(editor_enemy_key2name(action.obj_id), action.obj_position);
+                /* new legacy object */
+                level_create_legacy_object(editor_enemy_key2name(action.obj_id), action.obj_position);
                 break;
             }
 

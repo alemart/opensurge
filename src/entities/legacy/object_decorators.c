@@ -1339,7 +1339,7 @@ void createchild_strategy(objectdecorator_children_t *me, player_t **team, int t
 
     offset.x = expression_evaluate(me->offset_x);
     offset.y = expression_evaluate(me->offset_y);
-    child = level_create_enemy(me->object_name, v2d_add(object->actor->position, offset));
+    child = level_create_legacy_object(me->object_name, v2d_add(object->actor->position, offset));
     if(child != NULL) {
         child->created_from_editor = FALSE;
         enemy_add_child(object, me->child_name, child);
@@ -1529,7 +1529,7 @@ void createitem_update(objectmachine_t *obj, player_t **team, int team_size, bri
     offset.x = expression_evaluate(me->offset_x);
     offset.y = expression_evaluate(me->offset_y);
 
-    level_create_item(item_id, v2d_add(object->actor->position, offset));
+    level_create_legacy_item(item_id, v2d_add(object->actor->position, offset));
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
@@ -1979,8 +1979,8 @@ void enemydecorator_update(objectmachine_t *obj, player_t **team, int team_size,
                 /* I've been defeated */
                 player_bounce_ex(player, object->actor, FALSE);
                 level_add_to_score(score);
-                level_create_item(IT_EXPLOSION, v2d_add(object->actor->position, v2d_new(0,-15)));
-                level_create_item(IT_ANIMAL, object->actor->position);
+                level_create_legacy_item(IT_EXPLOSION, v2d_add(object->actor->position, v2d_new(0,-15)));
+                level_create_legacy_item(IT_ANIMAL, object->actor->position);
                 sound_play(SFX_DESTROY);
                 object->state = ES_DEAD;
             }
