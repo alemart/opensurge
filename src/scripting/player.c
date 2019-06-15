@@ -723,7 +723,7 @@ surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript
     if(player != NULL) {
         switch(player_shield_type(player)) {
             case SH_NONE:
-                return surgescript_var_set_string(surgescript_var_create(), "none");
+                return surgescript_var_set_null(surgescript_var_create());
             case SH_SHIELD:
                 return surgescript_var_set_string(surgescript_var_create(), "shield");
             case SH_FIRESHIELD:
@@ -738,7 +738,7 @@ surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript
                 return surgescript_var_set_string(surgescript_var_create(), "wind");
         }
     }
-    return surgescript_var_set_string(surgescript_var_create(), "none");
+    return surgescript_var_set_null(surgescript_var_create());
 }
 
 /* grants the player a shield */
