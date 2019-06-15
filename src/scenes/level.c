@@ -288,22 +288,14 @@ static void editor_previous_entity();
 
 /* editor: legacy items */
 static int editor_item_list[] = {
-    IT_COLLECTIBLE, IT_LIFEBOX, IT_COLLECTIBLEBOX, IT_STARBOX, IT_SPEEDBOX, IT_GLASSESBOX, IT_TRAPBOX,
-    IT_SHIELDBOX, IT_FIRESHIELDBOX, IT_THUNDERSHIELDBOX, IT_WATERSHIELDBOX,
-    IT_ACIDSHIELDBOX, IT_WINDSHIELDBOX,
+    IT_SWITCH, IT_DOOR, IT_TELEPORTER, IT_BIGRING, IT_BLUECOLLECTIBLE, IT_GOAL,
+    IT_DANGER, IT_VDANGER, IT_FIREDANGER, IT_VFIREDANGER, IT_LWSPIKES, IT_RWSPIKES,
+    IT_PERSPIKES, IT_PERCEILSPIKES, IT_PERLWSPIKES, IT_PERRWSPIKES,
+    IT_DNADOOR, IT_DNADOORNEON, IT_DNADOORCHARGE, IT_HDNADOOR, IT_HDNADOORNEON, IT_HDNADOORCHARGE,
+    IT_LIFEBOX, IT_COLLECTIBLEBOX, IT_STARBOX, IT_SPEEDBOX, IT_GLASSESBOX, IT_TRAPBOX,
+    IT_SHIELDBOX, IT_FIRESHIELDBOX, IT_THUNDERSHIELDBOX, IT_WATERSHIELDBOX, IT_ACIDSHIELDBOX, IT_WINDSHIELDBOX,
     IT_LOOPGREEN, IT_LOOPYELLOW,
-    IT_YELLOWSPRING, IT_BYELLOWSPRING, IT_RYELLOWSPRING, IT_LYELLOWSPRING,
-    IT_TRYELLOWSPRING, IT_TLYELLOWSPRING, IT_BRYELLOWSPRING, IT_BLYELLOWSPRING,
-    IT_REDSPRING, IT_BREDSPRING, IT_RREDSPRING, IT_LREDSPRING,
-    IT_TRREDSPRING, IT_TLREDSPRING, IT_BRREDSPRING, IT_BLREDSPRING,
-    IT_BLUESPRING, IT_BBLUESPRING, IT_RBLUESPRING, IT_LBLUESPRING,
-    IT_TRBLUESPRING, IT_TLBLUESPRING, IT_BRBLUESPRING, IT_BLBLUESPRING,
-    IT_BLUECOLLECTIBLE, IT_SWITCH, IT_DOOR, IT_TELEPORTER, IT_BIGRING, IT_CHECKPOINT, IT_GOAL,
-    IT_ENDSIGN, IT_ENDLEVEL, IT_BUMPER,
-    IT_DANGER, IT_VDANGER, IT_FIREDANGER, IT_VFIREDANGER,
-    IT_SPIKES, IT_CEILSPIKES, IT_LWSPIKES, IT_RWSPIKES, IT_PERSPIKES,
-    IT_PERCEILSPIKES, IT_PERLWSPIKES, IT_PERRWSPIKES, IT_DNADOOR, IT_DNADOORNEON,
-    IT_DNADOORCHARGE, IT_HDNADOOR, IT_HDNADOORNEON, IT_HDNADOORCHARGE,
+    IT_CHECKPOINT, IT_ENDSIGN, IT_ENDLEVEL,
     -1 /* -1 represents the end of this list */
 };
 static int editor_item_list_size; /* counted automatically */
@@ -2772,7 +2764,7 @@ void editor_init()
     /* intializing... */
     editor_enabled = FALSE;
     editor_item_list_size = -1;
-    while(editor_item_list[++editor_item_list_size] >= 0) { }
+    while(editor_item_list[++editor_item_list_size] >= 0);
     editor_cursor_entity_type = EDT_BRICK;
     editor_cursor_entity_id = 0;
     /*editor_previous_video_resolution = video_get_resolution();
@@ -3581,6 +3573,9 @@ void editor_next_class()
 
     if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
         editor_next_entity(); /* it's guaranteed that we'll always have a brick (see brickset_load) */
+
+    if(editor_cursor_entity_type == EDT_ITEM)
+        editor_cursor_entity_id = editor_item_list[editor_cursor_itemid];
 }
 
 
@@ -3609,6 +3604,9 @@ void editor_previous_class()
 
     if(editor_cursor_entity_type == EDT_BRICK && !brick_exists(editor_cursor_entity_id))
         editor_previous_entity();
+
+    if(editor_cursor_entity_type == EDT_ITEM)
+        editor_cursor_entity_id = editor_item_list[editor_cursor_itemid];
 }
 
 
