@@ -151,7 +151,7 @@ static int must_restart_this_level;
 static int must_push_a_quest;
 static char quest_to_be_pushed[1024];
 static float dead_player_timeout;
-static int waterlevel; /* in pixels */
+static int waterlevel; /* y coordinate */
 static color_t watercolor;
 
 /* player data */
@@ -916,34 +916,6 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'brick' expects three or four parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
     }
-    else if(str_icmp(identifier, "item") == 0) {
-        if(param_count == 3) {
-            int type = clip(atoi(param[0]), 0, ITEMDATA_MAX-1);
-            int x = atoi(param[1]);
-            int y = atoi(param[2]);
-            level_create_legacy_item(type, v2d_new(x, y));
-        }
-        else
-            logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
-    }
-    else if(str_icmp(identifier, "enemy") == 0 || str_icmp(identifier, "object") == 0) {
-        if(param_count == 3) {
-            const char* name = param[0];
-            int x = atoi(param[1]);
-            int y = atoi(param[2]);
-            if(!is_startup_object(name)) {
-                surgescript_object_t* obj = level_create_ssobject(name, v2d_new(x, y));
-                if(obj != NULL) {
-                    if(!surgescript_object_has_tag(obj, "entity"))
-                        fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
-                }
-                else
-                    level_create_legacy_object(name, v2d_new(x, y)); /* old API */
-            }
-        }
-        else
-            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
-    }
     else if(str_icmp(identifier, "entity") == 0) {
         if(param_count == 3) {
             const char* name = param[0];
@@ -988,6 +960,36 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         }
         else
             logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
+    }
+    else if(str_icmp(identifier, "item") == 0) {
+        if(param_count == 3) {
+            int type = atoi(param[0]);
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
+            const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
+            if(object_name == NULL || !level_create_ssobject(object_name, v2d_new(x, y)))
+                level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
+        }
+        else
+            logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
+    }
+    else if(str_icmp(identifier, "enemy") == 0 || str_icmp(identifier, "object") == 0) {
+        if(param_count == 3) {
+            const char* name = param[0];
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
+            if(!is_startup_object(name)) {
+                surgescript_object_t* obj = level_create_ssobject(name, v2d_new(x, y));
+                if(obj != NULL) {
+                    if(!surgescript_object_has_tag(obj, "entity"))
+                        fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
+                }
+                else
+                    level_create_legacy_object(name, v2d_new(x, y)); /* old API */
+            }
+        }
+        else
+            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
     }
     else
         logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filename, fileline);

@@ -154,7 +154,7 @@ struct item_list_t {
 };
 
 /* public functions: these are used by the external world */
-item_t *item_create(int type); /* this is an item factory; type is a IT_* constant */
+item_t *item_create(int type); /* this is an item factory; type is an IT_* constant */
 item_t* item_destroy(item_t *item);
 void item_update(item_t *item, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list);
 void item_render(item_t *item, v2d_t camera_position);
@@ -162,5 +162,8 @@ void item_render(item_t *item, v2d_t camera_position);
 /* item-specific functions (legacy stuff) */
 void bouncingcollectible_set_velocity(item_t *item, v2d_t velocity);
 void flyingtext_set_text(item_t *item, const char *fmt, ...);
+
+/* legacy objects that have been ported to SurgeScript */
+const char* item2surgescript(int type);
 
 #endif

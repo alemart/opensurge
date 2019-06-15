@@ -482,6 +482,8 @@ item_t *item_create(int type)
             image_height(actor_image(item->actor))
         ) : NULL;
     }
+    else
+        fatal_error("Can't create item %d: item not found", type);
 
     return item;
 }
@@ -524,6 +526,57 @@ void item_update(item_t *item, player_t **team, int team_size, brick_list_t *bri
     item->update(item, team, team_size, brick_list, item_list, enemy_list);
 }
 
+
+
+/* =========== SurgeScript port ================ */
+
+/*
+ * item2surgescript()
+ * Returns the SurgeScript object name corresponding to
+ * the legacy item of the given type, or NULL if the item
+ * hasn't been ported. Included for retro-compatibility.
+ */
+const char* item2surgescript(int type)
+{
+    /* conversion table */
+    static const char* table[] = {
+        [IT_COLLECTIBLE] = "Collectible",
+        [IT_BOUNCINGCOLLECT] = "Scattered Collectible",
+        [IT_YELLOWSPRING] = "Spring Standard",
+        [IT_TRYELLOWSPRING] = "Spring Standard Top Right",
+        [IT_RYELLOWSPRING] = "Spring Standard Right",
+        [IT_BRYELLOWSPRING] = "Spring Standard Bottom Right",
+        [IT_BYELLOWSPRING] = "Spring Standard Bottom",
+        [IT_BLYELLOWSPRING] = "Spring Standard Bottom Left",
+        [IT_LYELLOWSPRING] = "Spring Standard Left",
+        [IT_TLYELLOWSPRING] = "Spring Standard Top Left",
+        [IT_REDSPRING] = "Spring Stronger",
+        [IT_TRREDSPRING] = "Spring Stronger Top Right",
+        [IT_RREDSPRING] = "Spring Stronger Right",
+        [IT_BRREDSPRING] = "Spring Stronger Bottom Right",
+        [IT_BREDSPRING] = "Spring Stronger Bottom",
+        [IT_BLREDSPRING] = "Spring Stronger Bottom Left",
+        [IT_LREDSPRING] = "Spring Stronger Left",
+        [IT_TLREDSPRING] = "Spring Stronger Top Left",
+        [IT_BLUESPRING] = "Spring Strongest",
+        [IT_TRBLUESPRING] = "Spring Strongest Top Right",
+        [IT_RBLUESPRING] = "Spring Strongest Right",
+        [IT_BRBLUESPRING] = "Spring Strongest Bottom Right",
+        [IT_BBLUESPRING] = "Spring Strongest Bottom",
+        [IT_BLBLUESPRING] = "Spring Strongest Bottom Left",
+        [IT_LBLUESPRING] = "Spring Strongest Left",
+        [IT_TLBLUESPRING] = "Spring Strongest Top Left",
+        [IT_BUMPER] = "Bumper",
+        [IT_SPIKES] = "Spikes",
+        [IT_CEILSPIKES] = "Spikes Down"
+    };
+
+    /* return the object name */
+    if(type >= 0 && type < sizeof(table)/sizeof(table[0]))
+        return table[type];
+    else
+        return NULL;
+}
 
 
 
@@ -2288,7 +2341,8 @@ item_t* flyingtext_create()
 void flyingtext_set_text(item_t *item, const char *fmt, ...)
 {
     flyingtext_t *me = (flyingtext_t*)item;
-    va_list args; char buf[256];
+    va_list args;
+    char buf[256];
 
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
