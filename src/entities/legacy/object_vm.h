@@ -23,7 +23,7 @@
 
 #include "object_machine.h"
 #include "nanocalc/nanocalc.h"
-#include "../enemy.h"
+#include "enemy.h"
 
 /* an objectvm_t is a finite state machine.
    Every state has a name an can be decorated

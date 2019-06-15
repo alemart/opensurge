@@ -414,6 +414,7 @@ SET(GAME_SRCS
   src/physics/collisionmask.c
 
   src/entities/legacy/item.c
+  src/entities/legacy/enemy.c
   src/entities/legacy/object_compiler.c
   src/entities/legacy/object_decorators.c
   src/entities/legacy/object_machine.c
@@ -427,7 +428,6 @@ SET(GAME_SRCS
   src/entities/brick.c
   src/entities/camera.c
   src/entities/character.c
-  src/entities/enemy.c
   src/entities/entitymanager.c
   src/entities/player.c
   src/entities/particle.c
@@ -501,6 +501,7 @@ SET(GAME_HEADERS
   src/physics/collisionmask.h
 
   src/entities/legacy/item.h
+  src/entities/legacy/enemy.h
   src/entities/legacy/object_compiler.h
   src/entities/legacy/object_decorators.h
   src/entities/legacy/object_machine.h
@@ -514,7 +515,6 @@ SET(GAME_HEADERS
   src/entities/brick.h
   src/entities/camera.h
   src/entities/character.h
-  src/entities/enemy.h
   src/entities/entitymanager.h
   src/entities/object_compiler.h
   src/entities/object_vm.h

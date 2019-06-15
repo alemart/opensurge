@@ -22,9 +22,9 @@
 #include <math.h>
 #include "brick.h"
 #include "player.h"
-#include "enemy.h"
 #include "actor.h"
 #include "legacy/item.h"
+#include "legacy/enemy.h"
 #include "../physics/collisionmask.h"
 #include "../physics/obstacle.h"
 #include "../physics/physicsactor.h"

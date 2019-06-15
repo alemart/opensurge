@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * enemy.h - baddies
+ * enemy.h - baddies (legacy)
  * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -22,7 +22,7 @@
 #ifndef _ENEMY_H
 #define _ENEMY_H
 
-#include "../core/v2d.h"
+#include "../../core/v2d.h"
 
 /* forward declarations */
 struct actor_t;

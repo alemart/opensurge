@@ -24,9 +24,9 @@
 #include "../../core/v2d.h"
 #include "../player.h"
 #include "../brick.h"
-#include "../enemy.h"
 #include "../actor.h"
 #include "item.h"
+#include "enemy.h"
 
 /* object machine: an object is a state machine; each state is a machine */
 typedef struct objectmachine_t objectmachine_t;

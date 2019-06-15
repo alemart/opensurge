@@ -22,8 +22,8 @@
 #include <stdlib.h>
 
 #include "item.h"
+#include "enemy.h"
 #include "../player.h"
-#include "../enemy.h"
 #include "../brick.h"
 #include "../actor.h"
 

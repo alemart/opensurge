@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * enemy.c - baddies
+ * enemy.c - baddies (legacy)
  * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -20,31 +20,31 @@
 
 #include <string.h>
 #include <math.h>
-#include "../core/nanoparser/nanoparser.h"
-#include "../core/global.h"
-#include "../core/util.h"
-#include "../core/audio.h"
-#include "../core/timer.h"
-#include "../core/input.h"
-#include "../core/logfile.h"
-#include "../core/stringutil.h"
-#include "../core/assetfs.h"
-#include "../core/video.h"
-#include "../core/hashtable.h"
-#include "../scenes/level.h"
-#include "legacy/item.h"
-#include "legacy/object_vm.h"
-#include "legacy/object_compiler.h"
-#include "legacy/nanocalc/nanocalcext.h"
-#include "actor.h"
-#include "player.h"
+#include "item.h"
 #include "enemy.h"
-#include "brick.h"
-#include "../physics/collisionmask.h"
+#include "object_vm.h"
+#include "object_compiler.h"
+#include "nanocalc/nanocalcext.h"
+#include "../actor.h"
+#include "../player.h"
+#include "../brick.h"
+#include "../../core/nanoparser/nanoparser.h"
+#include "../../core/global.h"
+#include "../../core/util.h"
+#include "../../core/audio.h"
+#include "../../core/timer.h"
+#include "../../core/input.h"
+#include "../../core/logfile.h"
+#include "../../core/stringutil.h"
+#include "../../core/assetfs.h"
+#include "../../core/video.h"
+#include "../../core/hashtable.h"
+#include "../../physics/collisionmask.h"
+#include "../../scenes/level.h"
 
 /* private stuff */
-#define MAX_OBJECTS                     10240
-#define MAX_CATEGORIES                  10240
+#define MAX_OBJECTS                     2048
+#define MAX_CATEGORIES                  512
 #define ROOT_CATEGORY                   category_table.category[0] /* all objects belong to the root category */
 
 typedef struct object_children_t object_children_t;
