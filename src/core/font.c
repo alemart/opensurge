@@ -343,7 +343,7 @@ void font_set_text(font_t *f, const char *fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    /* expand variables */
+    /* expand variables (AFTER printf) */
     while(has_variables_to_expand(buf, &passes))
         expand_variables(buf, f->argument, sizeof(buf));
 
