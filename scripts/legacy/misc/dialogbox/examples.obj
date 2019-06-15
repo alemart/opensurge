@@ -108,7 +108,7 @@ object .dialogbox.example
 //
 // another example
 //
-object balloon.example
+object .balloon.example
 {
     requires 0.2.0
     category Balloon
@@ -157,7 +157,7 @@ object balloon.example
 //
 // a more advanced example
 //
-object balloon.example2
+object .balloon.example2
 {
     requires 0.2.0
     category Balloon

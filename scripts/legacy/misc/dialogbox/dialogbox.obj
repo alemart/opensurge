@@ -152,11 +152,6 @@
 // gets called, or maybe just 'return_to_previous_state'.
 //
 
-#include "base/background.inc"
-#include "base/avatar.inc"
-#include "base/text.inc"
-#include "base/button.inc"
-
 //
 // The Dialog Box ;)
 //
