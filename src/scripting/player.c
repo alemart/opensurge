@@ -55,6 +55,7 @@ static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinput(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getdying(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -155,6 +156,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_angle", fun_getangle, 0);
     surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
     surgescript_vm_bind(vm, "Player", "get_input", fun_getinput, 0);
+    surgescript_vm_bind(vm, "Player", "get_dying", fun_getdying, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -426,6 +428,13 @@ surgescript_var_t* fun_getattacking(surgescript_object_t* object, const surgescr
 {
     player_t* player = get_player(object);
     return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_attacking(player));
+}
+
+/* returns true if the player is dying or drowning */
+surgescript_var_t* fun_getdying(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_dying(player));
 }
 
 /* player in midair? */

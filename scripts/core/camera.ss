@@ -50,7 +50,7 @@ object "DefaultCamera" is "entity", "awake", "private"
             centerCamera(player.transform.position);
 
         // stop camera
-        if(player.activity == "dying" || player.activity == "drowning")
+        if(player.dying)
             return;
 
         // update camera

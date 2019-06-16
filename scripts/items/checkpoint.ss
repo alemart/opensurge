@@ -34,6 +34,8 @@ object "Checkpoint" is "entity", "basic"
 
     state "active"
     {
+        // the checkpoint is
+        // now active!
     }
 
     fun onCollision(otherCollider)
@@ -44,7 +46,7 @@ object "Checkpoint" is "entity", "basic"
 
     fun checkpoint(player)
     {
-        if(player.activity != "dying") {
+        if(!player.dying) {
             sfx.play();
             Level.spawnpoint = transform.position.translatedBy(0, -collider.height/2);
             state = "activating";
