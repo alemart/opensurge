@@ -6,7 +6,6 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
 using SurgeEngine.Audio.Sound;
-using SurgeEngine.Player;
 using SurgeEngine.Transform;
 using SurgeEngine.Collisions.CollisionBall;
 
