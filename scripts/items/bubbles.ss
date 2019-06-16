@@ -62,7 +62,7 @@ object "Bubbles" is "entity", "basic"
 }
 
 // breathable behavior: bubble that the player can use to breathe
-object "BreathableBubble" is "collider"
+object "BreathableBubble"
 {
     collider = CollisionBall(16);
     bubble = parent;
