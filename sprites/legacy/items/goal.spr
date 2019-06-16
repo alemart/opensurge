@@ -30,7 +30,7 @@ sprite SD_GOAL
 sprite SD_ENDSIGN
 {
     source_file     images/goal.png
-    source_rect     0 0 184 107
+    source_rect     0 0 184 108
     frame_size      46 54
     hot_spot        23 53
 

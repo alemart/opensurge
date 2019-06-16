@@ -177,6 +177,7 @@ const char* item2surgescript(int type)
         [IT_LBLUESPRING] = "Spring Strongest Left",
         [IT_TLBLUESPRING] = "Spring Strongest Top Left",
         [IT_CHECKPOINT] = "Checkpoint",
+        [IT_ENDSIGN] = "Goal",
         [IT_BUMPER] = "Bumper",
         [IT_SPIKES] = "Spikes",
         [IT_CEILSPIKES] = "Spikes V"

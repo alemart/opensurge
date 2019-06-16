@@ -1,0 +1,62 @@
+// -----------------------------------------------------------------------------
+// File: goal.spr
+// Description: goal sign sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Goal"
+{
+    source_file     "images/goal.png"
+    source_rect     0 0 184 108
+    frame_size      46 54
+    hot_spot        23 54
+
+    // not cleared
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // rotating
+    animation 1
+    {
+        repeat      FALSE
+        fps         16
+        data        1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
+    }
+
+    // level cleared: generic
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+
+    // level cleared: Surge
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // level cleared: Neon
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    // level cleared: Charge
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+}
