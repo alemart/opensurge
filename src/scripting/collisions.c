@@ -448,7 +448,9 @@ surgescript_var_t* fun_collisionbox_setanchor(surgescript_object_t* object, cons
     double y = surgescript_var_get_number(param[1]);
     surgescript_transform_setposition2d(transform, (0.5 - x) * width, (0.5 - y) * height);
     ((collider_t*)collider)->worldpos = scripting_util_world_position(object); /* update worldpos */
-    return NULL;
+
+    /* return the object itself (this) */
+    return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
 }
 
 /* contains(): checks if world-position (x, y) is inside the collider */
@@ -738,7 +740,9 @@ surgescript_var_t* fun_collisionball_setanchor(surgescript_object_t* object, con
     double y = surgescript_var_get_number(param[1]);
     surgescript_transform_setposition2d(transform, (0.5 - x) * size, (0.5 - y) * size);
     ((collider_t*)collider)->worldpos = scripting_util_world_position(object); /* update worldpos */
-    return NULL;
+
+    /* return the object itself (this) */
+    return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
 }
 
 /* getCenter(): Vector2 (world coordinates) */
