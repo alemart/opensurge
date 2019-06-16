@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: bumpers.ss
-// Description: bumper script
+// File: checkpoint.ss
+// Description: checkpoint script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -8,59 +8,47 @@ using SurgeEngine.Actor;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Player;
 using SurgeEngine.Transform;
-using SurgeEngine.Collisions.CollisionBall;
+using SurgeEngine.Level;
+using SurgeEngine.Collisions.CollisionBox;
 
-object "Bumper" is "entity", "basic"
+object "Checkpoint" is "entity", "basic"
 {
-    sfx = Sound("samples/bumper.wav");
-    actor = Actor("Bumper");
-    collider = CollisionBall(16);
+    sfx = Sound("samples/checkpoint.wav");
+    actor = Actor("Checkpoint");
+    collider = CollisionBox(18, 65).setAnchor(0.5, 1.0);
     transform = Transform();
-    bumpSpeed = 420;
 
     state "main"
     {
-        state = "idle";
+        // the checkpoint is
+        // not yet active
     }
 
-    state "idle"
+    state "activating"
     {
-        actor.anim = 0;
+        actor.anim = 1;
+        if(actor.animation.finished) {
+            actor.anim = 2;
+            state = "active";
+        }
     }
 
     state "active"
     {
-        actor.anim = 1;
-        if(actor.animation.finished)
-            state = "idle";
-    }
-
-    fun constructor()
-    {
-        //collider.visible = true;
     }
 
     fun onCollision(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player"))
-            bump(otherCollider.entity);
+        if(state == "main" && otherCollider.entity.hasTag("player"))
+            checkpoint(otherCollider.entity);
     }
 
-    fun bump(player)
+    fun checkpoint(player)
     {
-        // compute the bump vector
-        v = transform.position
-            .directionTo(player.transform.position)
-            .scaledBy(bumpSpeed);
-
-        // bump player
-        player.speed = v.x;
-        player.ysp = v.y;
-
-        // play sound
-        sfx.play();
-
-        // change state
-        state = "active";
+        if(player.activity != "dying") {
+            sfx.play();
+            Level.spawnpoint = transform.position.translatedBy(0, -collider.height/2);
+            state = "activating";
+        }
     }
 }

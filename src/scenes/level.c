@@ -295,7 +295,7 @@ static int editor_item_list[] = {
     IT_LIFEBOX, IT_COLLECTIBLEBOX, IT_STARBOX, IT_SPEEDBOX, IT_GLASSESBOX, IT_TRAPBOX,
     IT_SHIELDBOX, IT_FIRESHIELDBOX, IT_THUNDERSHIELDBOX, IT_WATERSHIELDBOX, IT_ACIDSHIELDBOX, IT_WINDSHIELDBOX,
     IT_LOOPGREEN, IT_LOOPYELLOW,
-    IT_CHECKPOINT, IT_ENDSIGN, IT_ENDLEVEL,
+    IT_ENDSIGN, IT_ENDLEVEL,
     -1 /* -1 represents the end of this list */
 };
 static int editor_item_list_size; /* counted automatically */
