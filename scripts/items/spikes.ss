@@ -71,7 +71,7 @@ object "Spikes Down" is "entity", "basic"
     fun hit(player)
     {
         if(
-            !player.blinking && !player.dying
+            !player.blinking && !player.dying &&
             !player.invincible && player.activity != "gettinghit"
         ) {
             player.hit(actor);
