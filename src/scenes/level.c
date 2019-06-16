@@ -2081,9 +2081,11 @@ void update_level_size()
     v2d_t bottomright;
     brick_list_t *p, *brick_list;
 
+    /* get all bricks */
+    brick_list = entitymanager_retrieve_all_bricks();
+
     /* compute the bounding box */
     max_x = max_y = -LARGE_INT;
-    brick_list = entitymanager_retrieve_all_bricks();
     for(p=brick_list; p; p=p->next) {
         if(brick_type(p->data) != BRK_PASSABLE) {
             bottomright = v2d_add(brick_spawnpoint(p->data), brick_size(p->data));
@@ -3244,7 +3246,7 @@ void editor_render()
  */
 void editor_enable()
 {
-    logfile_message("editor_enable()");
+    logfile_message("Entering the level editor");
 
     /* activating the editor */
     editor_action_init();
@@ -3258,8 +3260,6 @@ void editor_enable()
     editor_previous_video_resolution = video_get_resolution();
     editor_previous_video_smooth = video_is_smooth();
     video_changemode(VIDEORESOLUTION_EDT, FALSE, video_is_fullscreen());
-
-    logfile_message("editor_enable() ok");
 }
 
 
@@ -3269,10 +3269,9 @@ void editor_enable()
  */
 void editor_disable()
 {
-    logfile_message("editor_disable()");
+    logfile_message("Exiting the level editor");
 
     /* disabling the level editor */
-    update_level_size();
     editor_action_release();
     editor_enabled = FALSE;
 
@@ -3282,7 +3281,8 @@ void editor_disable()
     /* restoring the video resolution */
     video_changemode(editor_previous_video_resolution, editor_previous_video_smooth, video_is_fullscreen());
 
-    logfile_message("editor_disable() ok");
+    /* updating the level size */
+    update_level_size();
 }
 
 
