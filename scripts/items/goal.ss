@@ -22,7 +22,6 @@ object "Goal" is "entity", "basic"
     {
         // the goal sign hasn't
         // been touched yet
-        collider.visible=true;
     }
 
     state "rotating"

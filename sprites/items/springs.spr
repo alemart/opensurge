@@ -29,7 +29,7 @@ sprite "Spring Standard"
     }
 }
 
-sprite "Spring Standard Top Right"
+sprite "Spring Standard Up Right"
 {
     source_file     "images/spring_pads.png"
     source_rect     16 195 78 39
@@ -77,7 +77,7 @@ sprite "Spring Standard Right"
     }
 }
 
-sprite "Spring Standard Bottom Right"
+sprite "Spring Standard Down Right"
 {
     source_file     "images/spring_pads.png"
     source_rect     190 195 78 39
@@ -101,7 +101,7 @@ sprite "Spring Standard Bottom Right"
     }
 }
 
-sprite "Spring Standard Bottom"
+sprite "Spring Standard Down"
 {
     source_file     "images/spring_pads.png"
     source_rect     80 82 64 32
@@ -125,7 +125,7 @@ sprite "Spring Standard Bottom"
     }
 }
 
-sprite "Spring Standard Bottom Left"
+sprite "Spring Standard Down Left"
 {
     source_file     "images/spring_pads.png"
     source_rect     274 195 78 39
@@ -173,7 +173,7 @@ sprite "Spring Standard Left"
     }
 }
 
-sprite "Spring Standard Top Left"
+sprite "Spring Standard Up Left"
 {
     source_file     "images/spring_pads.png"
     source_rect     100 195 78 39
@@ -253,7 +253,7 @@ sprite "Spring Stronger"
     }
 }
 
-sprite "Spring Stronger Top Right"
+sprite "Spring Stronger Up Right"
 {
     source_file     "images/spring_pads.png"
     source_rect     16 150 78 39
@@ -301,7 +301,7 @@ sprite "Spring Stronger Right"
     }
 }
 
-sprite "Spring Stronger Bottom Right"
+sprite "Spring Stronger Down Right"
 {
     source_file     "images/spring_pads.png"
     source_rect     190 150 78 39
@@ -325,7 +325,7 @@ sprite "Spring Stronger Bottom Right"
     }
 }
 
-sprite "Spring Stronger Bottom"
+sprite "Spring Stronger Down"
 {
     source_file     "images/spring_pads.png"
     source_rect     80 50 64 32
@@ -349,7 +349,7 @@ sprite "Spring Stronger Bottom"
     }
 }
 
-sprite "Spring Stronger Bottom Left"
+sprite "Spring Stronger Down Left"
 {
     source_file     "images/spring_pads.png"
     source_rect     274 150 78 39
@@ -397,7 +397,7 @@ sprite "Spring Stronger Left"
     }
 }
 
-sprite "Spring Stronger Top Left"
+sprite "Spring Stronger Up Left"
 {
     source_file     "images/spring_pads.png"
     source_rect     100 150 78 39
@@ -477,7 +477,7 @@ sprite "Spring Strongest"
     }
 }
 
-sprite "Spring Strongest Top Right"
+sprite "Spring Strongest Up Right"
 {
     source_file     "images/spring_pads.png"
     source_rect     16 240 78 39
@@ -525,7 +525,7 @@ sprite "Spring Strongest Right"
     }
 }
 
-sprite "Spring Strongest Bottom Right"
+sprite "Spring Strongest Down Right"
 {
     source_file     "images/spring_pads.png"
     source_rect     190 240 78 39
@@ -549,7 +549,7 @@ sprite "Spring Strongest Bottom Right"
     }
 }
 
-sprite "Spring Strongest Bottom"
+sprite "Spring Strongest Down"
 {
     source_file     "images/spring_pads.png"
     source_rect     80 114 64 32
@@ -573,7 +573,7 @@ sprite "Spring Strongest Bottom"
     }
 }
 
-sprite "Spring Strongest Bottom Left"
+sprite "Spring Strongest Down Left"
 {
     source_file     "images/spring_pads.png"
     source_rect     274 240 78 39
@@ -621,7 +621,7 @@ sprite "Spring Strongest Left"
     }
 }
 
-sprite "Spring Strongest Top Left"
+sprite "Spring Strongest Up Left"
 {
     source_file     "images/spring_pads.png"
     source_rect     100 240 78 39

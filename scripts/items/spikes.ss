@@ -45,10 +45,10 @@ object "Spikes" is "entity", "basic"
     }
 }
 
-object "Spikes V" is "entity", "basic"
+object "Spikes Down" is "entity", "basic"
 {
-    actor = Actor("Spikes V");
-    brick = Brick("Spikes V Mask");
+    actor = Actor("Spikes Down");
+    brick = Brick("Spikes Down Mask");
     sfx = Sound("samples/spikes.wav");
     collider = CollisionBox(20, 8);
 

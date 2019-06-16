@@ -51,10 +51,10 @@ object "Spring Standard" is "entity", "basic"
     }
 }
 
-object "Spring Standard Top Right" is "entity", "basic"
+object "Spring Standard Up Right" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Standard Top Right")
+        .setSprite("Spring Standard Up Right")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -89,10 +89,10 @@ object "Spring Standard Right" is "entity", "basic"
     }
 }
 
-object "Spring Standard Bottom Right" is "entity", "basic"
+object "Spring Standard Down Right" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Standard Bottom Right")
+        .setSprite("Spring Standard Down Right")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -108,10 +108,10 @@ object "Spring Standard Bottom Right" is "entity", "basic"
     }
 }
 
-object "Spring Standard Bottom" is "entity", "basic"
+object "Spring Standard Down" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Standard Bottom")
+        .setSprite("Spring Standard Down")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -127,10 +127,10 @@ object "Spring Standard Bottom" is "entity", "basic"
     }
 }
 
-object "Spring Standard Bottom Left" is "entity", "basic"
+object "Spring Standard Down Left" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Standard Bottom Left")
+        .setSprite("Spring Standard Down Left")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -165,10 +165,10 @@ object "Spring Standard Left" is "entity", "basic"
     }
 }
 
-object "Spring Standard Top Left" is "entity", "basic"
+object "Spring Standard Up Left" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Standard Top Left")
+        .setSprite("Spring Standard Up Left")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -232,10 +232,10 @@ object "Spring Stronger" is "entity", "basic"
     }
 }
 
-object "Spring Stronger Top Right" is "entity", "basic"
+object "Spring Stronger Up Right" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Stronger Top Right")
+        .setSprite("Spring Stronger Up Right")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -270,10 +270,10 @@ object "Spring Stronger Right" is "entity", "basic"
     }
 }
 
-object "Spring Stronger Bottom Right" is "entity", "basic"
+object "Spring Stronger Down Right" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Stronger Bottom Right")
+        .setSprite("Spring Stronger Down Right")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -289,10 +289,10 @@ object "Spring Stronger Bottom Right" is "entity", "basic"
     }
 }
 
-object "Spring Stronger Bottom" is "entity", "basic"
+object "Spring Stronger Down" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Stronger Bottom")
+        .setSprite("Spring Stronger Down")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -308,10 +308,10 @@ object "Spring Stronger Bottom" is "entity", "basic"
     }
 }
 
-object "Spring Stronger Bottom Left" is "entity", "basic"
+object "Spring Stronger Down Left" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Stronger Bottom Left")
+        .setSprite("Spring Stronger Down Left")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -346,10 +346,10 @@ object "Spring Stronger Left" is "entity", "basic"
     }
 }
 
-object "Spring Stronger Top Left" is "entity", "basic"
+object "Spring Stronger Up Left" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Stronger Top Left")
+        .setSprite("Spring Stronger Up Left")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -413,10 +413,10 @@ object "Spring Strongest" is "entity", "basic"
     }
 }
 
-object "Spring Strongest Top Right" is "entity", "basic"
+object "Spring Strongest Up Right" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Strongest Top Right")
+        .setSprite("Spring Strongest Up Right")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -451,10 +451,10 @@ object "Spring Strongest Right" is "entity", "basic"
     }
 }
 
-object "Spring Strongest Bottom Right" is "entity", "basic"
+object "Spring Strongest Down Right" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Strongest Bottom Right")
+        .setSprite("Spring Strongest Down Right")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -470,10 +470,10 @@ object "Spring Strongest Bottom Right" is "entity", "basic"
     }
 }
 
-object "Spring Strongest Bottom" is "entity", "basic"
+object "Spring Strongest Down" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Strongest Bottom")
+        .setSprite("Spring Strongest Down")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -489,10 +489,10 @@ object "Spring Strongest Bottom" is "entity", "basic"
     }
 }
 
-object "Spring Strongest Bottom Left" is "entity", "basic"
+object "Spring Strongest Down Left" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Strongest Bottom Left")
+        .setSprite("Spring Strongest Down Left")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
@@ -527,10 +527,10 @@ object "Spring Strongest Left" is "entity", "basic"
     }
 }
 
-object "Spring Strongest Top Left" is "entity", "basic"
+object "Spring Strongest Up Left" is "entity", "basic"
 {
     gfx = spawn("Spring Graphic")
-        .setSprite("Spring Strongest Top Left")
+        .setSprite("Spring Strongest Up Left")
         .setIdleAnimation(0)
         .setActiveAnimation(1);
 
