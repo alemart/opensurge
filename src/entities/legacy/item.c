@@ -179,7 +179,7 @@ const char* item2surgescript(int type)
         [IT_CHECKPOINT] = "Checkpoint",
         [IT_BUMPER] = "Bumper",
         [IT_SPIKES] = "Spikes",
-        [IT_CEILSPIKES] = "Spikes Down"
+        [IT_CEILSPIKES] = "Spikes V"
     };
 
     /* return the object name */

@@ -35,7 +35,7 @@ sprite "Spikes Mask"
     }
 }
 
-sprite "Spikes Down"
+sprite "Spikes V"
 {
     source_file     "images/spikes.png"
     source_rect     74 80 32 32
@@ -50,7 +50,7 @@ sprite "Spikes Down"
     }
 }
 
-sprite "Spikes Down Mask"
+sprite "Spikes V Mask"
 {
     source_file     "images/spikes.png"
     source_rect     74 48 32 32
