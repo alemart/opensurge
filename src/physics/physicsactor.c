@@ -354,7 +354,10 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->horizontal_control_lock_timer = max(0.0f, pa->horizontal_control_lock_timer - dt);
         input_simulate_button_up(pa->input, IB_LEFT);
         input_simulate_button_up(pa->input, IB_RIGHT);
-        pa->facing_right = !pa->in_the_air ? (pa->gsp > 0.0f) : (pa->xsp > 0.0f);
+        if(!pa->in_the_air && !nearly_equal(pa->gsp, 0.0f))
+            pa->facing_right = (pa->gsp > 0.0f);
+        else if(pa->in_the_air && !nearly_equal(pa->xsp, 0.0f))
+            pa->facing_right = (pa->xsp > 0.0f);
     }
 
     /* don't bother jumping */
