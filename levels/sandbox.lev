@@ -12,10 +12,10 @@ version "1.0"
 requires "0.5.0"
 act 1
 theme "themes/template.brk"
-bgtheme "themes/sunshine.bg"
+bgtheme "themes/template.bg"
 spawn_point 112 9960
 startup "DefaultStartup"
-players "Surge"
+players "Tux"
 
 // dialogs
 
@@ -48,15 +48,14 @@ brick 48 832 9744
 brick 48 832 9872
 brick 6 544 9936
 brick 6 512 9936
-brick 0 352 9840
 brick 0 384 1000
 
 // entities
-entity "Spikes" 280 10000
-entity "Collectible" 184 9976
-entity "Collectible" 224 9976
-entity "Spikes Down" 384 9904
 entity "Spring Standard" 480 10000
+entity "Collectible" 192 9976
+entity "Collectible" 240 9976
+entity "Collectible" 288 9976
+entity "Collectible" 336 9976
 
 // legacy items
 item 31 928 10000
