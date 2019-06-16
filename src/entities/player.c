@@ -1418,7 +1418,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_ducking(player) || player_is_looking_up(player) ||
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
-    ))) {
+    )) && !player_is_dying(player)) {
         float new_angle = DEG2RAD(fixangle(physicsactor_get_angle(pa), 15));
         if(ang_diff(new_angle, act->angle) < 1.6f) {
             float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
