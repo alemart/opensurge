@@ -64,7 +64,7 @@ static const char text[] =
 "Shift + Mouse wheel                Change item type (legacy)\n"
 "Ctrl + Mouse wheel                 Change obj. category (legacy)\n"
 "\n\n"
-"<color=ff8060>Layer system summary</color>: yellow object activates yellow layer and disables green. Green object activates green layer and disables yellow. Change brick layers with L.\n"
+"<color=ff8060>Using brick layers</color>: yellow object enables yellow layer and disables green. Green object enables green layer and disables yellow. Green appears in front of yelllow. Change layers with L.\n"
 ;
 
 

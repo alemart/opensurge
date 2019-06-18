@@ -56,9 +56,9 @@ entity "Collectible" 192 9976
 entity "Collectible" 240 9976
 entity "Collectible" 288 9976
 entity "Collectible" 336 9976
+entity "Goal" 928 10000
 
 // legacy items
-item 31 928 10000
 
 // legacy objects
 
