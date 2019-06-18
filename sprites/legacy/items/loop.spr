@@ -3,12 +3,11 @@
 
 sprite SD_LOOPGREEN
 {
-    source_file     images/loop.png
+    source_file     "images/core.png"
     source_rect     0 0 32 32
     frame_size      32 32
     hot_spot        0 0
 
-    // default
     animation 0
     {
         repeat      TRUE
@@ -19,12 +18,11 @@ sprite SD_LOOPGREEN
 
 sprite SD_LOOPYELLOW
 {
-    source_file     images/loop.png
+    source_file     "images/core.png"
     source_rect     32 0 32 32
     frame_size      32 32
     hot_spot        0 0
 
-    // default
     animation 0
     {
         repeat      TRUE
