@@ -181,6 +181,8 @@ const char* item2surgescript(int type)
         [IT_BUMPER] = "Bumper",
         [IT_SPIKES] = "Spikes",
         [IT_CEILSPIKES] = "Spikes Down"
+        /*[IT_LOOPGREEN] = "Layer Green", // includes code for specifics
+        [IT_LOOPYELLOW] = "Layer Yellow",*/
     };
 
     /* return the object name */
@@ -2868,6 +2870,7 @@ static void loop_init(item_t *item);
 static void loop_release(item_t* item);
 static void loop_update(item_t* item, player_t** team, int team_size, brick_list_t* brick_list, item_list_t* item_list, enemy_list_t* enemy_list);
 static void loop_render(item_t* item, v2d_t camera_position);
+static void loop_port_update(item_t* item, player_t** team, int team_size, brick_list_t* brick_list, item_list_t* item_list, enemy_list_t* enemy_list);
 
 
 
@@ -2891,7 +2894,7 @@ item_t* loop_create(const char *sprite_name, bricklayer_t layer_to_be_activated)
 
     item->init = loop_init;
     item->release = loop_release;
-    item->update = loop_update;
+    item->update = loop_port_update;
     item->render = loop_render;
 
     me->animation = sprite_get_animation(sprite_name, 0);
@@ -2928,6 +2931,25 @@ void loop_release(item_t* item)
         free(me->player_was_touching_me);
 }
 
+/* SurgeScript port */
+void loop_port_update(item_t* item, player_t** team, int team_size, brick_list_t* brick_list, item_list_t* item_list, enemy_list_t* enemy_list)
+{
+    const char* object_name = ((loop_t*)item)->layer_to_be_activated == BRL_GREEN ? "Layer Green" :
+        (((loop_t*)item)->layer_to_be_activated == BRL_YELLOW ? "Layer Yellow" : NULL);
+
+    /* adjust hot spot */
+    if(sprite_animation_exists(object_name, 0) && item->state != IS_DEAD) {
+        animation_t* anim = sprite_get_animation(object_name, 0);
+        v2d_t adjusted_position = v2d_add(v2d_subtract(item->actor->position, item->actor->hot_spot), anim->hot_spot);
+        if(level_create_ssobject(object_name, adjusted_position)) {
+            item->state = IS_DEAD;
+            return;
+        }
+    }
+
+    /* SurgeScript port not found; use legacy item */
+    item->update = loop_update;
+}
 
 
 void loop_update(item_t* item, player_t** team, int team_size, brick_list_t* brick_list, item_list_t* item_list, enemy_list_t* enemy_list)
