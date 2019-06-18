@@ -3,7 +3,7 @@
 // Shield
 sprite SD_SHIELD
 {
-    source_file     images/ring_shields.png
+    source_file     images/shields.png
     source_rect     0 50 230 42
     frame_size      46 42
     hot_spot        23 19
@@ -20,7 +20,7 @@ sprite SD_SHIELD
 // Fire shield
 sprite SD_FIRESHIELD
 {
-    source_file     images/ring_shields.png
+    source_file     images/shields.png
     source_rect     0 92 230 42
     frame_size      46 42
     hot_spot        23 19
