@@ -26,11 +26,8 @@ object "Collectible" is "entity", "basic"
     {
         // magnetism check
         for(i = 0; i < Player.count; i++) {
-            if(Player[i].shield == "thunder") {
-                dst = transform.position.distanceTo(Player[i].transform.position);
-                if(dst <= 128)
-                    magnetize(Player[i]);
-            }
+            if(shouldMagnetize(Player[i]))
+                magnetize(Player[i]);
         }
     }
 
@@ -74,6 +71,12 @@ object "Collectible" is "entity", "basic"
             actor.zindex = 0.51;
             state = "disappearing";
         }
+    }
+
+    fun shouldMagnetize(player)
+    {
+        return (player.shield == "thunder") &&
+               (transform.position.distanceTo(player.transform.position) <= 128);
     }
 
     fun magnetize(player)
@@ -160,6 +163,8 @@ object "Scattered Collectible" is "entity", "disposable", "private"
             state = "disappearing";
         }
     }
+
+    // --- MODIFIERS ---
 
     fun setVelocity(x, y)
     {
