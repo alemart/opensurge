@@ -51,14 +51,49 @@ brick 6 512 9936
 brick 0 384 1000
 
 // entities
-entity "Spring Standard" 480 10000
 entity "Collectible" 192 9976
-entity "Collectible" 240 9976
-entity "Collectible" 288 9976
 entity "Collectible" 336 9976
 entity "Goal" 928 10000
 entity "Powerup 1up" 40 10000
 entity "Powerup Super Bonus" 400 10000
+entity "Collectible" 192 9936
+entity "Collectible" 192 9904
+entity "Collectible" 192 9872
+entity "Collectible" 240 9872
+entity "Collectible" 240 9904
+entity "Collectible" 240 9936
+entity "Collectible" 288 9936
+entity "Collectible" 288 9904
+entity "Collectible" 288 9872
+entity "Collectible" 336 9872
+entity "Collectible" 336 9904
+entity "Collectible" 336 9936
+entity "Powerup Shield Thunder" 80 10000
+entity "Collectible" 192 9840
+entity "Collectible" 192 9808
+entity "Collectible" 192 9776
+entity "Collectible" 192 9744
+entity "Collectible" 192 9712
+entity "Collectible" 240 9840
+entity "Collectible" 240 9808
+entity "Collectible" 240 9776
+entity "Collectible" 240 9744
+entity "Collectible" 240 9712
+entity "Collectible" 288 9840
+entity "Collectible" 288 9808
+entity "Collectible" 288 9776
+entity "Collectible" 288 9744
+entity "Collectible" 288 9712
+entity "Collectible" 336 9840
+entity "Collectible" 336 9808
+entity "Collectible" 336 9776
+entity "Collectible" 336 9744
+entity "Collectible" 336 9712
+entity "Collectible" 192 9680
+entity "Collectible" 240 9680
+entity "Collectible" 288 9680
+entity "Collectible" 336 9680
+entity "Spring Standard" 264 10000
 
 // legacy items
 
