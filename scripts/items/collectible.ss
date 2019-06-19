@@ -6,8 +6,10 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
 using SurgeEngine.Actor;
+using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
+using SurgeEngine.Video.Screen;
 using SurgeEngine.Collisions.CollisionBall;
 using SurgeEngine.Collisions.Sensor;
 
@@ -166,3 +168,68 @@ object "Scattered Collectible" is "entity", "disposable", "private"
         return this;
     }
 }
+
+// Lucky Collectible moves in a spiral trajectory
+// towards the player and is used to give a bonus
+// HOWTO: Level.spawn("Lucky Collectible")
+//          .setPlayer(player).setPhase(k++); // k integer
+object "Lucky Collectible" is "private", "entity", "awake"
+{
+    radius = Screen.width * 0.6;
+    transform = Transform();
+    actor = Actor("Collectible");
+    sfx = Sound("samples/collectible.wav");
+    luckyPlayer = Player.active;
+    phase = 0;
+    t = 0;
+
+    state "main"
+    {
+        // collision check
+        if(t > 1) {
+            pickup(luckyPlayer);
+            return;
+        }
+
+        // spiral movement
+        transform.position = Vector2(
+            (radius * (1 - t)) * Math.cos(6.283 * t + phase),
+            (radius * (1 - t)) * -Math.sin(6.283 * t + phase)
+        ).plus(luckyPlayer.transform.position);
+        t += Time.delta;
+    }
+
+    state "disappearing"
+    {
+        if(actor.animation.finished)
+            destroy();
+    }
+
+    fun pickup(player)
+    {
+        if(state != "disappearing") {
+            player.collectibles++;
+            sfx.play();
+            actor.anim = 1;
+            actor.zindex = 0.51;
+            state = "disappearing";
+        }
+    }
+
+    // --- MODIFIERS ---
+
+    // set the beneficiary
+    fun setPlayer(player)
+    {
+        luckyPlayer = player;
+        return this;
+    }
+
+    // set the spiral phase, k = 0, 1, 2, ...
+    fun setPhase(k)
+    {
+        phase = Math.pi * k;
+        return this;
+    }
+}
+
