@@ -20,7 +20,7 @@ using SurgeEngine.Collisions.CollisionBox;
 //
 
 // Collectibles
-object "Powerup Collectibles" is "entity", "powerup"
+object "Powerup Collectibles" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(4);
 
@@ -35,7 +35,7 @@ object "Powerup Collectibles" is "entity", "powerup"
 }
 
 // Invincibility stars
-object "Powerup Invincibility" is "entity", "powerup"
+object "Powerup Invincibility" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(5);
     music = Music("musics/invincible.ogg");
@@ -52,7 +52,7 @@ object "Powerup Invincibility" is "entity", "powerup"
 }
 
 // Enhanced speed (turbo)
-object "Powerup Speed" is "entity", "powerup"
+object "Powerup Speed" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(6);
     music = Music("musics/speed.ogg");
@@ -69,7 +69,7 @@ object "Powerup Speed" is "entity", "powerup"
 }
 
 // 1up
-object "Powerup 1up" is "entity", "powerup"
+object "Powerup 1up" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(1);
     music = Music("samples/1up.ogg");
@@ -102,7 +102,7 @@ object "Powerup 1up" is "entity", "powerup"
 }
 
 // Regular shield
-object "Powerup Shield" is "entity", "powerup"
+object "Powerup Shield" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(8);
     sfx = Sound("samples/shield.wav");
@@ -119,7 +119,7 @@ object "Powerup Shield" is "entity", "powerup"
 }
 
 // Fire shield
-object "Powerup Shield Fire" is "entity", "powerup"
+object "Powerup Shield Fire" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(12);
     sfx = Sound("samples/fireshield.wav");
@@ -136,7 +136,7 @@ object "Powerup Shield Fire" is "entity", "powerup"
 }
 
 // Thunder shield
-object "Powerup Shield Thunder" is "entity", "powerup"
+object "Powerup Shield Thunder" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(13);
     sfx = Sound("samples/thundershield.wav");
@@ -153,7 +153,7 @@ object "Powerup Shield Thunder" is "entity", "powerup"
 }
 
 // Water shield
-object "Powerup Shield Water" is "entity", "powerup"
+object "Powerup Shield Water" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(14);
     sfx = Sound("samples/watershield.wav");
@@ -170,7 +170,7 @@ object "Powerup Shield Water" is "entity", "powerup"
 }
 
 // Acid shield
-object "Powerup Shield Acid" is "entity", "powerup"
+object "Powerup Shield Acid" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(15);
     sfx = Sound("samples/acidshield.wav");
@@ -187,7 +187,7 @@ object "Powerup Shield Acid" is "entity", "powerup"
 }
 
 // Wind shield
-object "Powerup Shield Wind" is "entity", "powerup"
+object "Powerup Shield Wind" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(16);
     sfx = Sound("samples/windshield.wav");
@@ -204,9 +204,9 @@ object "Powerup Shield Wind" is "entity", "powerup"
 }
 
 // Trap
-object "Powerup Trap" is "entity", "powerup"
+object "Powerup Trap" is "entity", "basic", "powerup"
 {
-    itemBox = spawn("Item Box").setAnimation(9);
+    itemBox = spawn("Item Box").setScore(0).setAnimation(9);
 
     state "main"
     {
@@ -219,7 +219,7 @@ object "Powerup Trap" is "entity", "powerup"
 }
 
 // Super Bonus!!!
-object "Powerup Super Bonus" is "entity", "powerup"
+object "Powerup Super Bonus" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(17);
     luckyPlayer = null;
@@ -261,6 +261,9 @@ object "Powerup Super Bonus" is "entity", "powerup"
 //
 
 // Item Box
+// Whenever the item box is crushed by the player,
+// it will call function onItemBoxCrushed(player)
+// on the parent object.
 object "Item Box" is "entity", "private"
 {
     actor = Actor("Item Box");
