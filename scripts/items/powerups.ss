@@ -229,26 +229,26 @@ object "Powerup Super Bonus" is "entity", "powerup"
     {
     }
 
-    state "lucky"
+    state "active"
     {
         if(timeout(0.02)) {
             if(++counter <= 50)
-                state = "blessing";
+                state = "lucky";
             else
                 state = "main";
         }
     }
 
-    state "blessing"
+    state "lucky"
     {
         Level.spawn("Lucky Collectible").setPlayer(luckyPlayer).setPhase(counter);
-        state = "lucky";
+        state = "active";
     }
 
     fun onItemBoxCrushed(player)
     {
         luckyPlayer = player;
-        state = "lucky";
+        state = "active";
     }
 }
 

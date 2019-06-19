@@ -58,7 +58,6 @@ entity "Collectible" 288 9976
 entity "Collectible" 336 9976
 entity "Goal" 928 10000
 entity "Powerup 1up" 40 10000
-entity "Powerup 1up" 416 10000
 entity "Powerup Super Bonus" 80 10000
 
 // legacy items
