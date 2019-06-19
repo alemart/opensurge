@@ -1,0 +1,491 @@
+// -----------------------------------------------------------------------------
+// File: powerups.spr
+// Description: powerups sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Powerup 1up"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 1 1 1 1 1 1
+    }
+}
+
+sprite "Powerup Collectibles"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        4 4 4 4 4 0 4 0 4 0 0 0 4 4 0 0 4 4 4 4 4 4 4 4
+    }
+}
+
+sprite "Powerup Invincibility"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        5 5 5 5 5 0 5 0 5 0 0 0 5 5 0 0 5 5 5 5 5 5 5 5
+    }
+}
+
+sprite "Powerup Speed"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        6 6 6 6 6 0 6 0 6 0 0 0 6 6 0 0 6 6 6 6 6 6 6 6
+    }
+}
+
+sprite "Powerup Shield"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        8 8 8 8 8 0 8 0 8 0 0 0 8 8 0 0 8 8 8 8 8 8 8 8
+    }
+}
+
+sprite "Powerup Shield Water"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        14 14 14 14 14 0 14 0 14 0 0 0 14 14 0 0 14 14 14 14 14 14 14 14
+    }
+}
+
+sprite "Powerup Shield Fire"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        12 12 12 12 12 0 12 0 12 0 0 0 12 12 0 0 12 12 12 12 12 12 12 12
+    }
+}
+
+sprite "Powerup Shield Thunder"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        13 13 13 13 13 0 13 0 13 0 0 0 13 13 0 0 13 13 13 13 13 13 13 13
+    }
+}
+
+sprite "Powerup Shield Acid"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        15 15 15 15 15 0 15 0 15 0 0 0 15 15 0 0 15 15 15 15 15 15 15 15
+    }
+}
+
+sprite "Powerup Shield Wind"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        16 16 16 16 16 0 16 0 16 0 0 0 16 16 0 0 16 16 16 16 16 16 16 16
+    }
+}
+
+sprite "Powerup Trap"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        9 9 9 9 9 0 9 0 9 0 0 0 9 9 0 0 9 9 9 9 9 9 9 9
+    }
+}
+
+sprite "Powerup Super Bonus"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        17 17 17 17 17 0 17 0 17 0 0 0 17 17 0 0 17 17 17 17 17 17 17 17
+    }
+}
+
+sprite "Item Box"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     9 100 180 96
+    frame_size      30 32
+    hot_spot        15 32
+
+    // empty box
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0
+    }
+
+    // Surge life box
+    animation 1
+    {
+        repeat      TRUE
+        fps         24
+        data        1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 1 1 1 1 1 1
+    }
+
+    // Neon life box
+    animation 2
+    {
+        repeat      TRUE
+        fps         24
+        data        2 2 2 2 2 0 2 0 2 0 0 0 2 2 0 0 2 2 2 2 2 2 2 2
+    }
+
+    // Charge life box
+    animation 3
+    {
+        repeat      TRUE
+        fps         24
+        data        3 3 3 3 3 0 3 0 3 0 0 0 3 3 0 0 3 3 3 3 3 3 3 3
+    }
+
+    // collectible box
+    animation 4
+    {
+        repeat      TRUE
+        fps         24
+        data        4 4 4 4 4 0 4 0 4 0 0 0 4 4 0 0 4 4 4 4 4 4 4 4
+    }
+
+    // invincibility box
+    animation 5
+    {
+        repeat      TRUE
+        fps         24
+        data        5 5 5 5 5 0 5 0 5 0 0 0 5 5 0 0 5 5 5 5 5 5 5 5
+    }
+
+    // turbo box
+    animation 6
+    {
+        repeat      TRUE
+        fps         24
+        data        6 6 6 6 6 0 6 0 6 0 0 0 6 6 0 0 6 6 6 6 6 6 6 6
+    }
+
+    // glasses box
+    animation 7
+    {
+        repeat      TRUE
+        fps         24
+        data        7 7 7 7 7 0 7 0 7 0 0 0 7 7 0 0 7 7 7 7 7 7 7 7
+    }
+
+    // shield box
+    animation 8
+    {
+        repeat      TRUE
+        fps         24
+        data        8 8 8 8 8 0 8 0 8 0 0 0 8 8 0 0 8 8 8 8 8 8 8 8
+    }
+
+    // trap box
+    animation 9
+    {
+        repeat      TRUE
+        fps         24
+        data        9 9 9 9 9 0 9 0 9 0 0 0 9 9 0 0 9 9 9 9 9 9 9 9
+    }
+
+    // special collectible box
+    animation 10
+    {
+        repeat      TRUE
+        fps         24
+        data        10 10 10 10 10 0 10 0 10 0 0 0 10 10 0 0 10 10 10 10 10 10 10 10
+    }
+
+    // crushed box
+    animation 11
+    {
+        repeat      TRUE
+        fps         24
+        data        11
+    }
+    
+    // fire shield box
+    animation 12
+    {
+        repeat      TRUE
+        fps         24
+        data        12 12 12 12 12 0 12 0 12 0 0 0 12 12 0 0 12 12 12 12 12 12 12 12
+    }
+
+    // thunder shield box
+    animation 13
+    {
+        repeat      TRUE
+        fps         24
+        data        13 13 13 13 13 0 13 0 13 0 0 0 13 13 0 0 13 13 13 13 13 13 13 13
+    }
+
+    // water shield box
+    animation 14
+    {
+        repeat      TRUE
+        fps         24
+        data        14 14 14 14 14 0 14 0 14 0 0 0 14 14 0 0 14 14 14 14 14 14 14 14
+    }
+
+    // acid shield box
+    animation 15
+    {
+        repeat      TRUE
+        fps         24
+        data        15 15 15 15 15 0 15 0 15 0 0 0 15 15 0 0 15 15 15 15 15 15 15 15
+    }
+
+    // wind shield box
+    animation 16
+    {
+        repeat      TRUE
+        fps         24
+        data        16 16 16 16 16 0 16 0 16 0 0 0 16 16 0 0 16 16 16 16 16 16 16 16
+    }
+
+    // super bonus box
+    animation 17
+    {
+        repeat      TRUE
+        fps         24
+        data        17 17 17 17 17 0 17 0 17 0 0 0 17 17 0 0 17 17 17 17 17 17 17 17
+    }
+}
+
+sprite "Item Box Icon"
+{
+    source_file     "images/item_boxes.png"
+    source_rect     200 100 96 42
+    frame_size      16 14
+    hot_spot        8 7
+
+    // empty icon
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // Surge life icon
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // Neon life icon
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // Charge life icon
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // collectible icon
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // invincibility icon
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    // turbo icon
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+
+    // glasses icon
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+
+    // shield icon
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        8
+    }
+
+    // trap
+    animation 9
+    {
+        repeat      TRUE
+        fps         8
+        data        9
+    }
+
+    // special collectible
+    animation 10
+    {
+        repeat      TRUE
+        fps         8
+        data        10
+    }
+
+    // none
+    animation 11
+    {
+        repeat      TRUE
+        fps         8
+        data        11
+    }
+    
+    // fire shield
+    animation 12
+    {
+        repeat      TRUE
+        fps         8
+        data        12
+    }
+
+    // thunder shield
+    animation 13
+    {
+        repeat      TRUE
+        fps         8
+        data        13
+    }
+
+    // water shield
+    animation 14
+    {
+        repeat      TRUE
+        fps         8
+        data        14
+    }
+
+    // acid shield
+    animation 15
+    {
+        repeat      TRUE
+        fps         8
+        data        15
+    }
+
+    // wind shield
+    animation 16
+    {
+        repeat      TRUE
+        fps         8
+        data        16
+    }
+
+    // super bonus
+    animation 17
+    {
+        repeat      TRUE
+        fps         8
+        data        17
+    }
+}
+
