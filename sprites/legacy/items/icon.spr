@@ -32,7 +32,7 @@ sprite SD_ICON
         data        3
     }
 
-    // ring icon
+    // collectible icon
     animation 3
     {
         repeat      TRUE
@@ -40,7 +40,7 @@ sprite SD_ICON
         data        4
     }
 
-    // invencibility icon
+    // invincibility icon
     animation 4
     {
         repeat      TRUE
@@ -48,7 +48,7 @@ sprite SD_ICON
         data        5
     }
 
-    // speed shoes icon
+    // turbo icon
     animation 5
     {
         repeat      TRUE
