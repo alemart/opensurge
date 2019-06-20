@@ -1,6 +1,8 @@
 // This is a blank canvas for
 // a SurgeScript Application
 
+// when copying this file, you may change
+// the parameters below
 name "SurgeScript Test"
 author "Alexandre Martins"
 license "CC-0"
@@ -11,5 +13,8 @@ theme "themes/template.brk"
 bgtheme "themes/template.bg"
 spawn_point 0 0
 startup "SurgeScriptMOTD" "DefaultSwitchController"
-players "none"
+players "None"
+
+// when copying this file, you may remove
+// the line below to access the level editor
 readonly
