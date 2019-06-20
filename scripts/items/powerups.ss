@@ -283,7 +283,7 @@ object "Item Box" is "entity", "private"
         actor.anim = 11; // can't change the animation if the item box is crushed
     }
 
-    fun onCollision(otherCollider)
+    fun onOverlap(otherCollider)
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
