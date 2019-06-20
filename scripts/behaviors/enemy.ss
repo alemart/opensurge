@@ -167,9 +167,9 @@ object "Enemy" is "private", "entity", "behavior"
     // --- MODIFIERS ---
 
     // set the boundaries of the collider (all coordinates in pixels,
-    // relative to the parent object. Example: setRect(-8, -16, 8, 16))
+    // relative to the parent object. Example: setBounds(-8, -16, 8, 16))
     // this is autodetected, but can be manually adjusted as well
-    fun setRect(left, top, right, bottom)
+    fun setBounds(left, top, right, bottom)
     {
         x1 = Math.min(left, right);
         y1 = Math.min(top, bottom);
