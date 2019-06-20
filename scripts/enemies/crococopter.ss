@@ -15,8 +15,9 @@ object "Crococopter" is "entity", "enemy"
 {
     actor = Actor("Crococopter");
     enemy = spawn("Enemy");
-    transform = Transform();
     helixCollider = CollisionBox(16, 8).setAnchor(0.5, 3);
+    movement = spawn("LinearMovement").setDirection(Vector2.up);
+    transform = Transform();
     t = 0;
 
     state "main"
@@ -28,8 +29,8 @@ object "Crococopter" is "entity", "enemy"
             actor.hflip = false;
 
         // up-down movement
-        dt = Time.delta; t += dt;
-        transform.move(0, 47 * Math.cos(3.1416 * t) * dt);
+        movement.speed = 47 * Math.cos(3.1416 * t);
+        t += Time.delta;
     }
 
     fun onCollision(otherCollider)
