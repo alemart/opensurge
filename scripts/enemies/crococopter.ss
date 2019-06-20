@@ -16,7 +16,7 @@ object "Crococopter" is "entity", "enemy"
     actor = Actor("Crococopter");
     enemy = spawn("Enemy");
     helixCollider = CollisionBox(16, 8).setAnchor(0.5, 3);
-    movement = spawn("LinearMovement").setDirection(Vector2.up);
+    movement = spawn("DirectionalMovement");
     transform = Transform();
     t = 0;
 
@@ -44,6 +44,7 @@ object "Crococopter" is "entity", "enemy"
 
     fun constructor()
     {
+        movement.direction = Vector2.up;
         //helixCollider.visible = true;
         //enemy.collider.visible = true;
     }

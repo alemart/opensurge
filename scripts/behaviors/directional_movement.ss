@@ -61,7 +61,7 @@ object "DirectionalMovement" is "behavior"
     fun constructor()
     {
         // validation
-        if(!parent.hasTag("entity"))
-            Application.crash("The parent of " + this.__name + " behavior, \"" + parent.__name + "\", should be tagged \"entity\".");
+        if(!parent.hasTag("entity2"))
+            Application.crash("The parent of " + this.__name + ", \"" + parent.__name + "\", should be tagged \"entity\".");
     }
 }
