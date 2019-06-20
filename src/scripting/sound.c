@@ -102,9 +102,15 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
     sound_t* sound = get_sound(object);
 
     if(sound != NULL) {
+        /*
+        // is this desirable? e.g., when you
+        // delete the parent object just after
+        // playing this sound
         if(sound_is_playing(sound))
             sound_stop(sound);
-        sound_unref(sound);
+        sound_unref(sound); // this may be a bug
+        */
+        surgescript_object_set_userdata(object, NULL);
     }
 
     return NULL;
