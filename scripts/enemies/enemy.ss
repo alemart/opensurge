@@ -159,7 +159,7 @@ object "Enemy" is "private", "entity"
         y1 = Math.min(top, bottom);
         x2 = left + right - x1;
         y2 = top + bottom - y1;
-        if(x1 == x2 || y1 == y2) // invalid
+        if(x1 == x2 || y1 == y2) // invalid coordinates
             return this;
 
         collider.width = x2 - x1;

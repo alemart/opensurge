@@ -170,11 +170,17 @@ object "Scattered Collectible" is "entity", "disposable", "private"
             destroy();
     }
 
+    state "stopped"
+    {
+    }
+
     fun onCollision(otherCollider)
     {
         if(Time.time >= startTime + 1.0) {
-            if(otherCollider.entity.hasTag("player"))
+            if(otherCollider.entity.hasTag("player")) {
                 base.pickup(otherCollider.entity);
+                state = "stopped";
+            }
         }
     }
 
