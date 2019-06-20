@@ -10,8 +10,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Collisions.CollisionBox;
 
-// Crococopter has a helix that
-// hits the player
+// Crococopter has a helix that hits the player
 object "Crococopter" is "entity", "enemy"
 {
     actor = Actor("Crococopter");

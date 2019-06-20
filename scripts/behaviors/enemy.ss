@@ -1,15 +1,9 @@
 // -----------------------------------------------------------------------------
 // File: enemy.ss
-// Description: enemy base script
+// Description: enemy behavior script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
-using SurgeEngine.Actor;
-using SurgeEngine.Level;
-using SurgeEngine.Vector2;
-using SurgeEngine.Transform;
-using SurgeEngine.Audio.Sound;
-using SurgeEngine.Collisions.CollisionBox;
 
 /*
  * A baddie is an entity that is a simple enemy:
@@ -88,6 +82,13 @@ object "My Baddie" is "entity", "enemy"
  *
  */
 
+using SurgeEngine.Actor;
+using SurgeEngine.Level;
+using SurgeEngine.Vector2;
+using SurgeEngine.Transform;
+using SurgeEngine.Audio.Sound;
+using SurgeEngine.Collisions.CollisionBox;
+
 // Codifies the generic behavior for enemies (baddies)
 object "Enemy" is "private", "entity", "behavior"
 {
@@ -95,12 +96,19 @@ object "Enemy" is "private", "entity", "behavior"
     sfx = Sound("samples/destroy.wav");
     transform = Transform();
     enemyIsInvincible = false;
+    skipAutodetect = false;
+    actor = null;
     score = 100;
 
     state "main"
     {
-        // autodetect collider size
         actor = sibling("Actor");
+        state = skipAutodetect ? "idle" : "autodetect";
+    }
+
+    state "autodetect"
+    {
+        // autodetect collider size
         if(actor != null) {
             hotspot = actor.animation.hotspot;
             collider.width = actor.width * 0.8;
@@ -124,8 +132,16 @@ object "Enemy" is "private", "entity", "behavior"
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
             if(player.attacking && !enemyIsInvincible) {
-                // destroy the enemy
+                // impact the player
                 player.score += score;
+                if(player.midair) {
+                    if(actor != null)
+                        player.bounceBack(actor);
+                    else
+                        player.bounce(null);
+                }
+
+                // destroy the enemy
                 Level.spawn("Explosion").at(Vector2(
                     collider.left + collider.width / 2,
                     collider.top + collider.height / 2
@@ -139,7 +155,7 @@ object "Enemy" is "private", "entity", "behavior"
             }
             else if(!player.invincible) {
                 // hit the player
-                player.hit(null);
+                player.hit(actor);
 
                 // notify parent
                 if(parent.hasFunction("onEnemyAttack"))
@@ -169,7 +185,7 @@ object "Enemy" is "private", "entity", "behavior"
             -y1 / (y2 - y1)
         );
 
-        state = "idle"; // skip autodetect
+        skipAutodetect = true;
         return this;
     }
 
