@@ -9,9 +9,10 @@ using SurgeEngine.Transform;
 
 object "DirectionalMovement" is "behavior"
 {
-    public speed = 0;
-    direction = Vector2.zero;
-    normalizedDirection = Vector2.zero;
+    public speed = 0; // speed in px/s
+    ccwAngle = 0; // counterclockwise angle
+    direction = Vector2.right; // initial direction: "forward"
+    normalizedDirection = Vector2.right;
     transform = null;
 
     state "main"
@@ -32,7 +33,19 @@ object "DirectionalMovement" is "behavior"
         // no movement
     }
 
-    // get/set direction
+    // constructor
+    fun constructor()
+    {
+        // behavior validation
+        if(!parent.hasTag("entity"))
+            Application.crash("Object \"" + parent.__name + "\" must be tagged \"entity\" to use " + this.__name + ".");
+    }
+
+
+
+    // --- PROPERTIES ---
+
+    // get/set the direction vector
     fun get_direction()
     {
         return direction;
@@ -43,6 +56,22 @@ object "DirectionalMovement" is "behavior"
         if(direction != newDirection) {
             direction = newDirection;
             normalizedDirection = direction.normalized();
+            ccwAngle = 360 - direction.angle;
+        }
+    }
+
+    // get/set the counterclockwise angle of the direction vector
+    // 0 means right, 90 means up, etc.
+    fun get_angle()
+    {
+        return ccwAngle;
+    }
+
+    fun set_angle(newAngle)
+    {
+        if(!Math.approximately(ccwAngle, newAngle)) {
+            this.direction = Vector2.right.rotatedBy(-ccwAngle);
+            ccwAngle = newAngle;
         }
     }
 
@@ -55,13 +84,5 @@ object "DirectionalMovement" is "behavior"
     fun set_enabled(enabled)
     {
         state = enabled ? "main" : "disabled";
-    }
-
-    // constructor
-    fun constructor()
-    {
-        // validation
-        if(!parent.hasTag("entity2"))
-            Application.crash("The parent of " + this.__name + ", \"" + parent.__name + "\", should be tagged \"entity\".");
     }
 }
