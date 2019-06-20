@@ -215,6 +215,7 @@ object "Lucky Collectible" is "private", "entity", "awake"
         // collision check
         if(t > 1) {
             base.pickup(luckyPlayer);
+            state = "done";
             return;
         }
 
@@ -224,6 +225,10 @@ object "Lucky Collectible" is "private", "entity", "awake"
             (radius * (1 - t)) * -Math.sin(6.283 * t + phase)
         ).plus(luckyPlayer.transform.position);
         t += Time.delta;
+    }
+
+    state "done"
+    {
     }
 
 
