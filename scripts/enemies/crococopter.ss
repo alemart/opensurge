@@ -22,7 +22,7 @@ object "Crococopter" is "entity", "enemy"
 
     state "main"
     {
-        // look to the player
+        // look at the player
         if(transform.position.x > Player.active.transform.position.x)
             actor.hflip = true;
         else
