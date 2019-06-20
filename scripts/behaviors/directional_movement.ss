@@ -1,16 +1,17 @@
 // -----------------------------------------------------------------------------
-// File: linear_movement.ss
-// Description: linear movement behavior script
+// File: direcional_movement.ss
+// Description: directional movement behavior
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 
-object "LinearMovement" is "behavior"
+object "DirectionalMovement" is "behavior"
 {
     public speed = 0;
-    public readonly direction = Vector2.zero;
+    direction = Vector2.zero;
+    normalizedDirection = Vector2.zero;
     transform = null;
 
     state "main"
@@ -20,30 +21,40 @@ object "LinearMovement" is "behavior"
             transform = parent.child("Transform2D") || parent.spawn("Transform2D");
 
         // move
-        dt = Time.delta;
-        transform.move(speed * direction.x * dt, speed * direction.y * dt);
+        if(speed != 0) {
+            dt = Time.delta;
+            transform.move(speed * normalizedDirection.x * dt, speed * normalizedDirection.y * dt);
+        }
     }
 
-    state "stopped"
+    state "disabled"
     {
+        // no movement
     }
 
-    // set direction: normalize the vector
+    // get/set direction
+    fun get_direction()
+    {
+        return direction;
+    }
+
     fun set_direction(newDirection)
     {
-        direction = newDirection.normalized();
+        if(direction != newDirection) {
+            direction = newDirection;
+            normalizedDirection = direction.normalized();
+        }
     }
 
-    // start the movement
-    fun start()
+    // enable/disable movement
+    fun get_enabled()
     {
-        state = "main";
+        return state != "disabled";
     }
 
-    // stop the movement
-    fun stop()
+    fun set_enabled(enabled)
     {
-        state = "stopped";
+        state = enabled ? "main" : "disabled";
     }
 
     // constructor
@@ -52,21 +63,5 @@ object "LinearMovement" is "behavior"
         // validation
         if(!parent.hasTag("entity"))
             Application.crash("The parent of " + this.__name + " behavior, \"" + parent.__name + "\", should be tagged \"entity\".");
-    }
-
-    // --- MODIFIERS ---
-
-    // set the speed of the linear movement   
-    fun setSpeed(newSpeed)
-    {
-        speed = newSpeed;
-        return this;
-    }
-
-    // set the direction of the linear movement
-    fun setDirection(newDirection)
-    {
-        set_direction(newDirection);
-        return this;
     }
 }
