@@ -89,7 +89,7 @@ object "My Baddie" is "entity", "enemy"
  */
 
 // Codifies the generic behavior for enemies (baddies)
-object "Enemy" is "private", "entity"
+object "Enemy" is "private", "entity", "behavior"
 {
     public readonly collider = CollisionBox(32, 32);
     sfx = Sound("samples/destroy.wav");
@@ -126,11 +126,11 @@ object "Enemy" is "private", "entity"
             if(player.attacking && !enemyIsInvincible) {
                 // destroy the enemy
                 player.score += score;
-                sfx.play();
                 Level.spawn("Explosion").at(Vector2(
                     collider.left + collider.width / 2,
                     collider.top + collider.height / 2
                 ));
+                sfx.play();
 
                 // notify & destroy parent
                 if(parent.hasFunction("onEnemyDestroy"))
