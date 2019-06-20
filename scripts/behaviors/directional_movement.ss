@@ -5,7 +5,6 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Vector2;
-using SurgeEngine.Transform;
 
 object "DirectionalMovement" is "behavior"
 {
