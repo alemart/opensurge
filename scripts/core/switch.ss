@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: switch.ss
-// Description: character switching, pause & quit
+// Description: handles character switching
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -8,7 +8,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Audio.Sound;
 
-object "DefaultSwitchController"
+object "SwitchController"
 {
     public enabled = true; // enable character switching?
     deny = Sound("samples/deny.wav");
@@ -16,12 +16,7 @@ object "DefaultSwitchController"
     state "main"
     {
         if(!Level.cleared) {
-            input = Player.active.input;
-            if(input.buttonPressed("fire3"))
-                Level.pause();
-            else if(input.buttonPressed("fire4"))
-                Level.quit();
-            else if(input.buttonPressed("fire2"))
+            if(Player.active.input.buttonPressed("fire2"))
                 switchCharacter();
         }
     }

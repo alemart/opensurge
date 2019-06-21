@@ -14,8 +14,9 @@ object "DefaultStartup"
 {
     hud = null;
     cam = spawn("DefaultCamera");
-    switchController = spawn("DefaultSwitchController");
-    waterController = spawn("DefaultWaterController");
+    switchController = spawn("SwitchController");
+    pauseController = spawn("PauseAndQuitController");
+    waterController = spawn("WaterController");
     clearedAnim = spawn("DefaultClearedAnimation");
     openingAnim = spawn("DefaultOpeningAnimation");
 

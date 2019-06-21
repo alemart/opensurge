@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: water.ss
-// Description: water effects
+// Description: water scripts
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -129,13 +129,14 @@ object "WaterSplash" is "entity", "private", "disposable"
     }
 }
 
+// --------------------------------------------------------------
 
 // this object controls water behavior: bubbles, breathing timer, and so on
-object "DefaultWaterController"
+object "WaterController"
 {
-    breathingBehavior = spawn("DefaultWaterController.BreathingBehavior");
-    underwaterTimer = spawn("DefaultWaterController.UnderwaterTimer");
-    splashListener = spawn("DefaultWaterController.SplashListener");
+    breathingBehavior = spawn("WaterController.BreathingBehavior");
+    underwaterTimer = spawn("WaterController.UnderwaterTimer");
+    splashListener = spawn("WaterController.SplashListener");
 
     state "main"
     {
@@ -143,7 +144,7 @@ object "DefaultWaterController"
 }
 
 // splash listener: creates a splash whenever the player gets underwater
-object "DefaultWaterController.SplashListener"
+object "WaterController.SplashListener"
 {
     state "main"
     {
@@ -173,7 +174,7 @@ object "DefaultWaterController.SplashListener"
 }
 
 // underwater timer: displayed when the player has been underwater for way too long
-object "DefaultWaterController.UnderwaterTimer" is "entity", "private", "detached", "awake"
+object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "awake"
 {
     transform = Transform();
     music = Music("musics/drowning.ogg");
@@ -218,7 +219,7 @@ object "DefaultWaterController.UnderwaterTimer" is "entity", "private", "detache
 }
 
 // this object creates bubbles whenever the player is underwater
-object "DefaultWaterController.BreathingBehavior"
+object "WaterController.BreathingBehavior"
 {
     interval = 0;
 
