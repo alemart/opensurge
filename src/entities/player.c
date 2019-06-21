@@ -154,7 +154,7 @@ player_t *player_create(const char *character_name)
     p->pa_old_state = physicsactor_get_state(p->pa);
     p->obstaclemap = obstaclemap_create();
     if(0 == player_count++)
-        darray_init_ex(tmp_obstacle, 1024);
+        darray_init_ex(tmp_obstacle, 32);
 
     /* misc */
     p->underwater = FALSE;
@@ -1381,7 +1381,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         }
     }
     for(i = 0; (bricklike_object = get_bricklike_object(i)) != NULL; i++) {
-        if(!surgescript_object_is_killed(bricklike_object)) { /* check if the object has not been destroyed just now */
+        if(!surgescript_object_is_killed(bricklike_object)) {
             if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object) && !ignore_obstacle(player, scripting_brick_layer(bricklike_object))) {
                 obstacle_t* obstacle = bricklike2obstacle(bricklike_object);
                 obstaclemap_add_obstacle(obstaclemap, obstacle);

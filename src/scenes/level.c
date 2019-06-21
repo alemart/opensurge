@@ -2512,6 +2512,8 @@ void update_ssobject(surgescript_object_t* object, void* param)
 
                 /* the entity should be updated */
                 surgescript_object_set_active(object, true);
+
+                /* is it a brick-like object? */
                 if(strcmp(surgescript_object_name(object), "Brick") == 0)
                     add_bricklike_ssobject(object);
             }
