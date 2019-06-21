@@ -3470,7 +3470,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
     *buf = 0;
 
     switch(objtype) {
-        case EDT_BRICK: {
+        case EDT_BRICK:
             if(brick_exists(objid)) {
                 snprintf(buf, sizeof(buf),
                     "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s", objid,
@@ -3485,12 +3485,10 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
             else
                 str_cpy(buf, "<missing>", sizeof(buf));
             break;
-        }
 
-        case EDT_ITEM: {
+        case EDT_ITEM:
             snprintf(buf, sizeof(buf), "%2d", objid);
             break;
-        }
 
         case EDT_ENEMY: {
             int len = 0;
@@ -3502,14 +3500,12 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
             break;
         }
 
-        case EDT_GROUP: {
+        case EDT_GROUP:
             break;
-        }
 
-        case EDT_SSOBJ: {
+        case EDT_SSOBJ:
             str_cpy(buf, editor_ssobj_name(objid), sizeof(buf));
             break;
-        }
     }
 
     return buf;
@@ -3868,19 +3864,34 @@ void editor_ssobj_release()
 /* comparison function between entity names (for sorting) */
 int editor_ssobj_sortfun(const void* a, const void* b)
 {
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     const char* x = *((const char**)a);
     const char* y = *((const char**)b);
 
-    /* put "special"-tagged entities last */
-    surgescript_vm_t* vm = surgescript_vm();
-    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
-    bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
-    bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
-
-    if(x_is_special != y_is_special)
-        return (x_is_special && !y_is_special) ? 1 : -1;
+    /* put "gimmick"-tagged entities last */
+    bool x_is_gimmick = surgescript_tagsystem_has_tag(tag_system, x, "gimmick");
+    bool y_is_gimmick = surgescript_tagsystem_has_tag(tag_system, y, "gimmick");
+    if(x_is_gimmick == y_is_gimmick) {
+        /* then, put "enemy"-tagged entites after the others */
+        bool x_is_enemy = surgescript_tagsystem_has_tag(tag_system, x, "enemy");
+        bool y_is_enemy = surgescript_tagsystem_has_tag(tag_system, y, "enemy");
+        if(x_is_enemy == y_is_enemy) {
+            /* then, put "special"-tagged entites after the others */
+            bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
+            bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
+            if(x_is_special == y_is_special) {
+                /* then, sort alphabetically */
+                return strcmp(x, y);
+            }
+            else
+                return (x_is_special && !y_is_special) ? 1 : -1;
+        }
+        else
+            return (x_is_enemy && !y_is_enemy) ? 1 : -1;
+    }
     else
-        return strcmp(x, y);
+        return (x_is_gimmick && !y_is_gimmick) ? 1 : -1;
 }
 
 /* associates an integer to each SurgeScript entity */
@@ -3901,7 +3912,6 @@ const char* editor_ssobj_name(int entity_id)
     int id = clip(entity_id, 0, editor_ssobj_count - 1);
     return editor_ssobj[id];
 }
-
 
 
 /* level editor: bricks */
