@@ -118,7 +118,10 @@ const char* brick_util_behaviorname(brickbehavior_t behavior); /* behavior name 
 const char* brick_util_layername(bricklayer_t layer); /* layer name */
 const char* brick_util_flipstr(brickflip_t flip); /* flip string */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
-const struct image_t* brick_image_preview(int id); /* image of the brick with the given id (may be NULL) */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
+const struct image_t* brick_image_preview(int id); /* image of the brick having the given id (may be NULL) */
+bricktype_t brick_type_preview(int id); /* the type of the brick having the given id */
+brickbehavior_t brick_behavior_preview(int id); /* the behavior of the brick having the given id */
+float brick_zindex_preview(int id); /* the zindex of the brick having the given id */
 
 #endif

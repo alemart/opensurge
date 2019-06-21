@@ -806,6 +806,16 @@ int brick_exists(int id)
 }
 
 /*
+ * brick_image_flags()
+ * Convert flags: brick flip to image flip
+ */
+int brick_image_flags(brickflip_t flip)
+{
+    brick_t b = { flip: flip }; /* hackish */
+    return get_image_flags(&b);
+}
+
+/*
  * brick_image_preview()
  * Image of the brick with the given id (may be NULL)
  */
@@ -819,14 +829,45 @@ const image_t* brick_image_preview(int id)
 }
 
 /*
- * brick_image_flags()
- * Convert flags: brick flip to image flip
+ * brick_type_preview()
+ * The type of the brick having the given id
  */
-int brick_image_flags(brickflip_t flip)
+bricktype_t brick_type_preview(int id)
 {
-    brick_t b = { flip: flip }; /* hackish */
-    return get_image_flags(&b);
+    if(id >= 0 && id < brickdata_count) {
+        if(brickdata[id] != NULL)
+            return brickdata[id]->type;
+    }
+    return BRK_PASSABLE;
 }
+
+/*
+ * brick_behavior_preview()
+ * The behavior of the brick having the given id
+ */
+brickbehavior_t brick_behavior_preview(int id)
+{
+    if(id >= 0 && id < brickdata_count) {
+        if(brickdata[id] != NULL)
+            return brickdata[id]->behavior;
+    }
+    return BRB_DEFAULT;
+}
+
+/*
+ * brick_zindex_preview()
+ * The zindex of the brick having the given id
+ */
+float brick_zindex_preview(int id)
+{
+    if(id >= 0 && id < brickdata_count) {
+        if(brickdata[id] != NULL)
+            return brickdata[id]->zindex;
+    }
+    return -1.0f;
+}
+
+
 
 
 

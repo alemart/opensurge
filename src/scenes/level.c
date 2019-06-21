@@ -3472,21 +3472,18 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
     switch(objtype) {
         case EDT_BRICK: {
             if(brick_exists(objid)) {
-                brick_t *x = brick_create(objid, v2d_new(0,0), BRL_DEFAULT, BRF_NOFLIP);
                 snprintf(buf, sizeof(buf),
-                    "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s",
-                    objid,
-                    brick_util_typename(brick_type(x)),
-                    brick_util_behaviorname(brick_behavior(x)),
-                    (int)brick_size(x).x,
-                    (int)brick_size(x).y,
-                    brick_zindex(x),
+                    "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s", objid,
+                    brick_util_typename(brick_type_preview(objid)),
+                    brick_util_behaviorname(brick_behavior_preview(objid)),
+                    image_width(brick_image_preview(objid)),
+                    image_height(brick_image_preview(objid)),
+                    brick_zindex_preview(objid),
                     brick_util_flipstr(editor_flip)
                 );
-                brick_destroy(x);
             }
             else
-                strcpy(buf, "<missing>");
+                str_cpy(buf, "<missing>", sizeof(buf));
             break;
         }
 
