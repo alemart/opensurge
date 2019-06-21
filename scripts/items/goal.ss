@@ -14,7 +14,7 @@ object "Goal" is "entity", "basic"
 {
     sfx = Sound("samples/endsign.wav");
     actor = Actor("Goal");
-    collider = CollisionBox(46, 54).setAnchor(0.5, 1.0);
+    collider = CollisionBox(actor.width, actor.height).setAnchor(0.5, 1.0);
     transform = Transform();
     clearedAnim = 2;
 

@@ -70,9 +70,9 @@ object "DefaultCamera" is "entity", "awake", "private"
 
 object "DefaultCamera.UpDownLogic"
 {
+    public readonly offset = 0;
     player = Player.active;
     speed = 120; // move at 120 px/s
-    offset = 0;
 
     state "main"
     {
@@ -127,10 +127,5 @@ object "DefaultCamera.UpDownLogic"
             offset = Math.max(0, offset - speed * Time.delta);
         else
             offset = Math.min(0, offset + speed * Time.delta);
-    }
-
-    fun get_offset()
-    {
-        return offset;
     }
 }
