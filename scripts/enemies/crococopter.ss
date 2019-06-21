@@ -22,24 +22,15 @@ object "Crococopter" is "entity", "enemy"
 
     state "main"
     {
-        /*
         // look at the player
         if(transform.position.x > Player.active.transform.position.x)
             actor.hflip = true;
         else
             actor.hflip = false;
-        */
 
         // up-down movement
         movement.speed = 47 * Math.cos(3.1416 * t);
         t += Time.delta;
-
-        if(timeout(5))
-        transform.rotate(45 * Time.delta);
-        //transform.lookAt(Player.active.transform);
-        movement.angle = transform.angle;
-        movement.speed = 15;
-        movement.speed = 0;
     }
 
     fun onCollision(otherCollider)
