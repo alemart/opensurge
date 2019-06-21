@@ -190,7 +190,7 @@ surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_va
         worldposition2d(looked, &looked_x, &looked_y);
 
         errno = 0;
-        angle = atan2(looked_y - looker_y, looked_x - looker_x);
+        angle = atan2(looker_y - looked_y, looked_x - looker_x);
         if(errno == 0) {
             setworldangle2d(looker, angle * RAD2DEG);
             notify_change(object);

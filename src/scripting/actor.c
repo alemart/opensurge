@@ -174,7 +174,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     actor_t* actor = scripting_actor_ptr(object);
 
     actor->position = scripting_util_world_position(object);
-    actor->angle = scripting_util_world_angle(object) * -DEG2RAD; /* flip y-axis */
+    actor->angle = scripting_util_world_angle(object) * DEG2RAD;
     actor->scale = world_lossyscale(object);
 
     actor_render(actor, camera);
