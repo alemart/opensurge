@@ -109,7 +109,7 @@ bricklayer_t scripting_brick_layer(const surgescript_object_t* object)
 bool scripting_brick_enabled(const surgescript_object_t* object)
 {
     const bricklike_data_t* data = get_data(object);
-    return data->enabled;
+    return data ? data->enabled : false;
 }
 
 /*
@@ -126,13 +126,13 @@ v2d_t scripting_brick_hotspot(const surgescript_object_t* object)
 /*
  * scripting_brick_mask()
  * Returns the collision mask associated with a brick-like object
- * This function may return NULL (if the associated sprite doesn't exist)
+ * This function may return NULL (e.g., if the associated sprite doesn't exist)
  * WARNING: Be sure that the referenced object is a Brick. This function won't check it.
  */
 collisionmask_t* scripting_brick_mask(const surgescript_object_t* object)
 {
     const bricklike_data_t* data = get_data(object);
-    return data->mask;
+    return data ? data->mask : NULL;
 }
 
 
@@ -195,6 +195,7 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
         collisionmask_destroy(data->mask);
 
     free(data);
+    surgescript_object_set_userdata(object, NULL);
     return NULL;
 }
 
@@ -231,7 +232,7 @@ surgescript_var_t* fun_gettype(surgescript_object_t* object, const surgescript_v
             return surgescript_var_set_string(surgescript_var_create(), "cloud");
 
         default:
-            return surgescript_var_set_string(surgescript_var_create(), "");
+            return NULL;
     }
 }
 
@@ -265,7 +266,7 @@ surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_
             return surgescript_var_set_string(surgescript_var_create(), "default");
     }
 
-    return surgescript_var_set_string(surgescript_var_create(), "");
+    return NULL;
 }
 
 /* set the layer of the brick to one of the following: "green", "yellow", "default" */
