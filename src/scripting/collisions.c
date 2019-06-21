@@ -64,6 +64,7 @@ struct collisionmanager_t
 #define COLLIDER_FLAG_ISVISIBLE             0x1
 #define COLLIDER_FLAG_NOTIFYONCOLLISION     0x2
 #define COLLIDER_FLAG_NOTIFYONOVERLAP       0x4
+#define COLLIDER_FLAG_ISDISABLED            0x8
 #define COLLIDER_COLOR()                    (color_rgb(255, 255, 0))
 static const surgescript_heapptr_t BOX_CENTER_ADDR = 0;
 static const surgescript_heapptr_t BALL_CENTER_ADDR = 0;
@@ -74,6 +75,8 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -127,6 +130,8 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBox", "get_entity", fun_getentity, 0);
     surgescript_vm_bind(vm, "CollisionBox", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "CollisionBox", "set_visible", fun_setvisible, 1);
+    surgescript_vm_bind(vm, "CollisionBox", "get_enabled", fun_getenabled, 0);
+    surgescript_vm_bind(vm, "CollisionBox", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "CollisionBox", "__notify", fun_notify, 1);
     surgescript_vm_bind(vm, "CollisionBox", "__init", fun_collisionbox_init, 3);
     surgescript_vm_bind(vm, "CollisionBox", "constructor", fun_collisionbox_constructor, 0);
@@ -150,6 +155,8 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBall", "get_entity", fun_getentity, 0);
     surgescript_vm_bind(vm, "CollisionBall", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "CollisionBall", "set_visible", fun_setvisible, 1);
+    surgescript_vm_bind(vm, "CollisionBall", "get_enabled", fun_getenabled, 0);
+    surgescript_vm_bind(vm, "CollisionBall", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "CollisionBall", "__notify", fun_notify, 1);
     surgescript_vm_bind(vm, "CollisionBall", "__init", fun_collisionball_init, 2);
     surgescript_vm_bind(vm, "CollisionBall", "constructor", fun_collisionball_constructor, 0);
@@ -268,31 +275,41 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* update world position (regardless if the collider is enabled or not) */
     collider_t* collider = surgescript_object_userdata(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_var_t* tmp = surgescript_var_create();
-    const surgescript_var_t* p[] = { tmp };
-    int i;
-
-    /* update world position */
     collider->worldpos = scripting_util_world_position(object); /* cached */
 
-    /* update collisions */
-    darray_clear(collider->prev_collisions);
-    for(i = 0; i < darray_length(collider->curr_collisions); i++)
-        darray_push(collider->prev_collisions, collider->curr_collisions[i]);
-    darray_clear(collider->curr_collisions);
+    /* if the collider is active, notify the collision manager */
+    if(!(collider->flags & COLLIDER_FLAG_ISDISABLED)) {
+        surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+        surgescript_var_t* tmp = surgescript_var_create();
+        const surgescript_var_t* p[] = { tmp };
+        int i;
 
-    /* notify the collision manager: I am active! */
-    surgescript_var_set_objecthandle(tmp, surgescript_object_handle(object));
-    surgescript_object_call_function(
-        surgescript_objectmanager_get(manager, collider->colmgr),
-        "__notify",
-        p, 1, NULL
-    );
+        /* update collisions */
+        darray_clear(collider->prev_collisions);
+        for(i = 0; i < darray_length(collider->curr_collisions); i++)
+            darray_push(collider->prev_collisions, collider->curr_collisions[i]);
+        darray_clear(collider->curr_collisions);
+
+        /* notify the collision manager: I am active! */
+        surgescript_var_set_objecthandle(tmp, surgescript_object_handle(object));
+        surgescript_object_call_function(
+            surgescript_objectmanager_get(manager, collider->colmgr),
+            "__notify",
+            p, 1, NULL
+        );
+
+        /* release resources */
+        surgescript_var_destroy(tmp);
+    }
+    else {
+        /* the collider is disabled */
+        darray_clear(collider->prev_collisions);
+        darray_clear(collider->curr_collisions);
+    }
 
     /* done */
-    surgescript_var_destroy(tmp);
     return NULL;
 }
 
@@ -320,6 +337,27 @@ surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescrip
         collider->flags &= ~COLLIDER_FLAG_ISVISIBLE;
     else
         collider->flags |= COLLIDER_FLAG_ISVISIBLE;
+
+    return NULL;
+}
+
+/* is the collider enabled? */
+surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    collider_t* collider = surgescript_object_userdata(object);
+    return surgescript_var_set_bool(surgescript_var_create(), (collider->flags & COLLIDER_FLAG_ISDISABLED) == 0);
+}
+
+/* enable/disable collider */
+surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    collider_t* collider = surgescript_object_userdata(object);
+    bool enabled = surgescript_var_get_bool(param[0]);
+
+    if(enabled)
+        collider->flags &= ~COLLIDER_FLAG_ISDISABLED;
+    else
+        collider->flags |= COLLIDER_FLAG_ISDISABLED;
 
     return NULL;
 }
