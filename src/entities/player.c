@@ -434,11 +434,11 @@ int player_bounce(player_t *player, float direction, int is_heavy_object)
  */
 int player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_object)
 {
-    int hw = image_width(actor_image(hazard))/2, hh = image_height(actor_image(hazard))/2;
-    int pw = image_width(actor_image(player->actor))/2, ph = image_height(actor_image(player->actor))/2;
-    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(hw/2, hh/2));
-    v2d_t player_centre = v2d_add(v2d_subtract(player->actor->position, player->actor->hot_spot), v2d_new(pw/2, ph/2));
-    return player_bounce(player, player_centre.y - hazard_centre.y, is_heavy_object);
+    int hh = image_height(actor_image(hazard));
+    int ph = image_height(actor_image(player->actor));
+    float hazard_centre = (hazard->position.y - hazard->hot_spot.y) + hh * 0.5f;
+    float player_centre = (player->actor->position.y - player->actor->hot_spot.y) + ph * 0.5f;
+    return player_bounce(player, player_centre - hazard_centre, is_heavy_object);
 }
 
 
@@ -517,11 +517,11 @@ void player_hit(player_t *player, float direction)
  */
 void player_hit_ex(player_t *player, const actor_t *hazard)
 {
-    int hw = image_width(actor_image(hazard))/2, hh = image_height(actor_image(hazard))/2;
-    int pw = image_width(actor_image(player->actor))/2, ph = image_height(actor_image(player->actor))/2;
-    v2d_t hazard_centre = v2d_add(v2d_subtract(hazard->position, hazard->hot_spot), v2d_new(hw/2, hh/2));
-    v2d_t player_centre = v2d_add(v2d_subtract(player->actor->position, player->actor->hot_spot), v2d_new(pw/2, ph/2));
-    player_hit(player, player_centre.x - hazard_centre.x);
+    int hw = image_width(actor_image(hazard));
+    int pw = image_width(actor_image(player->actor));
+    float hazard_centre = (hazard->position.x - hazard->hot_spot.x) + hw * 0.5f;
+    float player_centre = (player->actor->position.x - player->actor->hot_spot.x) + pw * 0.5f;
+    player_hit(player, player_centre - hazard_centre);
 }
 
 
