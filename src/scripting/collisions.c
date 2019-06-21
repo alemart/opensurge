@@ -65,6 +65,7 @@ struct collisionmanager_t
 #define COLLIDER_FLAG_NOTIFYONCOLLISION     0x2
 #define COLLIDER_FLAG_NOTIFYONOVERLAP       0x4
 #define COLLIDER_COLOR()                    (color_rgb(255, 255, 0))
+static const surgescript_heapptr_t BOX_CENTER_ADDR = 0;
 static const surgescript_heapptr_t BALL_CENTER_ADDR = 0;
 static inline collider_t* safe_get_collider(surgescript_object_t* object);
 
@@ -88,6 +89,7 @@ static surgescript_var_t* fun_collisionbox_setwidth(surgescript_object_t* object
 static surgescript_var_t* fun_collisionbox_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_setheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_collisionbox_getcenter(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
@@ -139,6 +141,7 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBox", "get_height", fun_collisionbox_getheight, 0);
     surgescript_vm_bind(vm, "CollisionBox", "set_width", fun_collisionbox_setwidth, 1);
     surgescript_vm_bind(vm, "CollisionBox", "set_height", fun_collisionbox_setheight, 1);
+    surgescript_vm_bind(vm, "CollisionBox", "get_center", fun_collisionbox_getcenter, 0);
     surgescript_vm_bind(vm, "CollisionBox", "render", fun_collisionbox_render, 0);
     surgescript_vm_bind(vm, "CollisionBox", "zindex", fun_collisionbox_zindex, 0);
 
@@ -170,8 +173,10 @@ void scripting_register_collisions(surgescript_vm_t* vm)
    or a crash if it isn't */
 collider_t* safe_get_collider(surgescript_object_t* object)
 {
-    if(!surgescript_object_has_tag(object, "collider")) {
-        fatal_error("Scripting error: \"%s\" isn't a collider", surgescript_object_name(object));
+    /*if(!surgescript_object_has_tag(object, "collider")) { // unreliable */
+    const char* name = surgescript_object_name(object);
+    if(!(0 == strcmp(name, "CollisionBox") || 0 == strcmp(name, "CollisionBall"))) {
+        fatal_error("Scripting error: \"%s\" isn't a collider", name);
         return NULL;
     }
 
@@ -226,6 +231,7 @@ surgescript_var_t* fun_manager_destructor(surgescript_object_t* object, const su
 {
     collisionmanager_t* colmgr = surgescript_object_userdata(object);
     darray_release(colmgr->colliders);
+    free(colmgr);
     return NULL;
 }
 
@@ -371,6 +377,7 @@ surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_va
 surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     collider_t* collider = mallocx(sizeof(boxcollider_t));
+    surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
     surgescript_objecthandle_t parent = surgescript_object_parent(object);
@@ -386,6 +393,10 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
     darray_init(collider->curr_collisions);
     ((boxcollider_t*)collider)->size = v2d_new(0, 0);
     surgescript_object_set_userdata(object, collider);
+
+    /* box center (lazy evaluation) */
+    ssassert(BOX_CENTER_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, BOX_CENTER_ADDR));
 
     /* get entity */
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
@@ -567,6 +578,31 @@ surgescript_var_t* fun_collisionbox_getbottom(surgescript_object_t* object, cons
     return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.y + boxcollider->size.y / 2.0f);
 }
 
+/* get center: Vector2 (world coordinates) */
+surgescript_var_t* fun_collisionbox_getcenter(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    collider_t* collider = surgescript_object_userdata(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_var_t* center = surgescript_heap_at(heap, BOX_CENTER_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
+
+    /* lazy evaluation */
+    if(surgescript_var_is_null(center)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(center, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(center);
+
+    /* get center */
+    v2 = surgescript_objectmanager_get(manager, handle);
+    scripting_vector2_update(v2, collider->worldpos.x, collider->worldpos.y);
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+}
+
 /* render */
 surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -596,7 +632,7 @@ surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const s
 /* zindex */
 surgescript_var_t* fun_collisionbox_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return surgescript_var_set_number(surgescript_var_create(), 1.0f);
+    return surgescript_var_set_number(surgescript_var_create(), 1.0);
 }
 
 
@@ -611,8 +647,6 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
     surgescript_objecthandle_t parent = surgescript_object_parent(object);
-    surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t center = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_object_t* entity = NULL;
 
     /* collider initialization */
@@ -626,9 +660,9 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
     ((ballcollider_t*)collider)->radius = 0.0f;
     surgescript_object_set_userdata(object, collider);
 
-    /* allocate center Vector2 */
+    /* ball center (lazy evaluation) */
     ssassert(BALL_CENTER_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, BALL_CENTER_ADDR), center);
+    surgescript_var_set_null(surgescript_heap_at(heap, BALL_CENTER_ADDR));
 
     /* get entity */
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
@@ -745,14 +779,27 @@ surgescript_var_t* fun_collisionball_setanchor(surgescript_object_t* object, con
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
 }
 
-/* getCenter(): Vector2 (world coordinates) */
+/* get center: Vector2 (world coordinates) */
 surgescript_var_t* fun_collisionball_getcenter(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     collider_t* collider = surgescript_object_userdata(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, BALL_CENTER_ADDR));
-    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    surgescript_var_t* center = surgescript_heap_at(heap, BALL_CENTER_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
+
+    /* lazy evaluation */
+    if(surgescript_var_is_null(center)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(center, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(center);
+
+    /* get center */
+    v2 = surgescript_objectmanager_get(manager, handle);
     scripting_vector2_update(v2, collider->worldpos.x, collider->worldpos.y);
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
