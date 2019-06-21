@@ -90,6 +90,8 @@ static inline int ignore_obstacle(const player_t* player, bricklayer_t brick_lay
 static inline float ang_diff(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static int fixangle(int degrees, int threshold);
+STATIC_DARRAY(obstacle_t*, tmp_obstacle); /* for the physics adapter */
+static int player_count = 0;
 
 
 /*
@@ -151,6 +153,8 @@ player_t *player_create(const char *character_name)
     p->pa = physicsactor_create(p->actor->position);
     p->pa_old_state = physicsactor_get_state(p->pa);
     p->obstaclemap = obstaclemap_create();
+    if(0 == player_count++)
+        darray_init_ex(tmp_obstacle, 1024);
 
     /* misc */
     p->underwater = FALSE;
@@ -204,18 +208,21 @@ player_t *player_create(const char *character_name)
  */
 player_t* player_destroy(player_t *player)
 {
-    int i;
-
-    for(i=0; i<PLAYER_MAX_INVSTAR; i++)
+    /* releasing actors */
+    for(int i = 0; i < PLAYER_MAX_INVSTAR; i++)
         actor_destroy(player->invstar[i]);
-
-    obstaclemap_destroy(player->obstaclemap);
-    physicsactor_destroy(player->pa);
     actor_destroy(player->shield);
     actor_destroy(player->actor);
+
+    /* physics */
+    obstaclemap_destroy(player->obstaclemap);
+    physicsactor_destroy(player->pa);
+    if(0 == --player_count)
+        darray_release(tmp_obstacle);
+
+    /* done */
     free(player->name);
     free(player);
-
     return NULL;
 }
 
@@ -1326,7 +1333,6 @@ void play_sounds(player_t* p)
 /* the interface between player_t and physicsactor_t */
 void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list, surgescript_object_t* (*get_bricklike_object)(int))
 {
-    DARRAY(obstacle_t*, tmp_obstacle);
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
     obstaclemap_t* obstaclemap = player->obstaclemap;
@@ -1352,8 +1358,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     if(input_button_down(act->input, IB_FIRE1))
         physicsactor_jump(pa);
 
-    /* create a container for temp obstacles */
-    darray_init(tmp_obstacle);
+    /* clear our container for temp obstacles */
+    darray_clear(tmp_obstacle);
 
     /* creating the obstacle map */
     for(; brick_list; brick_list = brick_list->next) {
@@ -1375,10 +1381,12 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         }
     }
     for(i = 0; (bricklike_object = get_bricklike_object(i)) != NULL; i++) {
-        if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object) && !ignore_obstacle(player, scripting_brick_layer(bricklike_object))) {
-            obstacle_t* obstacle = bricklike2obstacle(bricklike_object);
-            obstaclemap_add_obstacle(obstaclemap, obstacle);
-            darray_push(tmp_obstacle, obstacle);
+        if(!surgescript_object_is_killed(bricklike_object)) { /* check if the object has not been destroyed just now */
+            if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object) && !ignore_obstacle(player, scripting_brick_layer(bricklike_object))) {
+                obstacle_t* obstacle = bricklike2obstacle(bricklike_object);
+                obstaclemap_add_obstacle(obstaclemap, obstacle);
+                darray_push(tmp_obstacle, obstacle);
+            }
         }
     }
 
@@ -1391,7 +1399,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     /* removing temp obstacles */
     for(i = 0; i < darray_length(tmp_obstacle); i++)
         obstacle_destroy(tmp_obstacle[i]);
-    darray_release(tmp_obstacle);
+    darray_clear(tmp_obstacle);
 
     /* can't leave the screen */
     if(physicsactor_get_position(pa).x < 10) {

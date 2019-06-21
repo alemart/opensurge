@@ -29,6 +29,7 @@
  * declares a dynamic array of a given type
  */
 #define DARRAY(type, arr)                    type* arr; size_t arr##_len, arr##_cap;
+#define STATIC_DARRAY(type, arr)             static type* arr; static size_t arr##_len, arr##_cap;
 
 /*
  * darray_init()
