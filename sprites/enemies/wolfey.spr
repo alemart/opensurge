@@ -1,0 +1,23 @@
+// -----------------------------------------------------------------------------
+// File: wolfey.spr
+// Description: Wolfey sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by João Victor
+sprite "Wolfey"
+{
+    source_file     "images/wolfey.png"
+    source_rect     0 0 255 33
+    frame_size      51 33
+    hot_spot        26 33
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1 2 3 4
+    }
+}
+
