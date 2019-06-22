@@ -109,6 +109,7 @@ object "Enemy" is "private", "entity", "behavior"
 {
     public score = 100; // how many points should be gained once the player defeats this baddie
     public invincible = false; // should this baddie hit the player even if the player is attacking?
+    public enabled = true; // is this behavior enabled?
     public readonly collider = CollisionBox(32, 32);
     sfx = Sound("samples/destroy.wav");
     transform = Transform();
@@ -151,7 +152,7 @@ object "Enemy" is "private", "entity", "behavior"
 
     fun onCollision(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player")) {
+        if(enabled && otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
             if(player.attacking && !invincible) {
                 // impact the player
