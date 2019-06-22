@@ -247,21 +247,21 @@ object "WaterController.BreathingBehavior"
 
     fun createBubble(player)
     {
-        pos = player.transform.position;
+        position = player.transform.position;
         size = Math.random() <= 0.5 ? "xs" : "sm";
         Level.spawnEntity(
             "Water Bubble",
-            pos.translatedBy(8 * player.direction, -16)
+            position.translatedBy(8 * player.direction, -16)
         ).setSize(size);
     }
 
     fun createDrownBubble(player)
     {
-        pos = player.transform.position;
+        position = player.transform.position;
         size = Math.random() <= 0.5 ? "md" : "sm";
         Level.spawnEntity(
             "Water Bubble",
-            pos.translatedBy(0, -16)
+            position.translatedBy(0, -16)
         ).setSize(size);
     }
 }
