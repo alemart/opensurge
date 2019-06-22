@@ -21,44 +21,55 @@
  *    before you begin with SurgeScript
  * 1. Your object should be tagged (at least): "entity", "enemy"
  * 2. Spawn an Actor for the graphics and an Enemy object for the behavior.
+ *
  *    Example:
+ *
 
 using SurgeEngine.Actor;
-using SurgeEngine.Transform;
+using SurgeEngine.Behavior.Enemy;
+using SurgeEngine.Behavior.Platformer;
 
 object "My Baddie" is "entity", "enemy"
 {
     actor = Actor("My Baddie"); // handles the graphics
-    enemy = spawn("Enemy"); // handles the behavior
-    transform = Transform();
+    enemy = Enemy(); // handles the behavior
+    platformer = Platformer().walk(); // make it walk
 
     state "main"
     {
         // you may give it some movement
-        // using the transform, or do whatever
+        // using a platformer, or do whatever
         // you want (see the SurgeScript docs,
         // available at our website)
     }
 }
 
- * 3. optionally, use modifiers when spawning the Enemy object. Example:
+ *
+ * 3. optionally, change the properties of the Enemy behavior. Example:
+ *
 
 object "My Baddie" is "entity", "enemy"
 {
     actor = Actor("My Baddie"); // handles the graphics
-    enemy = spawn("Enemy").setScore(200); // setScore() is a modifier,
-                                          // see below for more
+    enemy = Enemy(); // handles the behavior
 
     // ...
+
+    fun constructor()
+    {
+        enemy.score = 200;
+    }
 }
 
+ *
  * 4. additionally, you may write functions onEnemyAttack(player) and
  *    onEnemyDestroy(player) if you want to catch those events. Example:
+ *
 
 object "My Baddie" is "entity", "enemy"
 {
-    actor = Actor("My Baddie"); // handles the graphics
-    enemy = spawn("Enemy");
+    actor = Actor("My Baddie");
+    enemy = Enemy();
 
     state "main"
     {
@@ -78,10 +89,15 @@ object "My Baddie" is "entity", "enemy"
     }
 }
 
+ *
  * 5. Have fun!!!
  *
  */
 
+// -----------------------------------------------------------------------------
+// The following code makes the Enemy behavior work.
+// Think twice before modifying this code!
+// -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
@@ -89,16 +105,15 @@ using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
-// Codifies the generic behavior for enemies (baddies)
 object "Enemy" is "private", "entity", "behavior"
 {
+    public score = 100; // how many points should be gained once the player defeats this baddie
+    public invincible = false; // should this baddie hit the player even if the player is attacking?
     public readonly collider = CollisionBox(32, 32);
     sfx = Sound("samples/destroy.wav");
     transform = Transform();
-    enemyIsInvincible = false;
     skipAutodetect = false;
     actor = null;
-    score = 100;
 
     state "main"
     {
@@ -127,13 +142,20 @@ object "Enemy" is "private", "entity", "behavior"
     {
     }
 
+    fun constructor()
+    {
+        // behavior validation
+        if(!parent.hasTag("entity") || !parent.hasTag("enemy"))
+            Application.crash("Object \"" + parent.__name + "\" must be tagged \"entity\", \"enemy\" to use " + this.__name + ".");
+    }
+
     fun onCollision(otherCollider)
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(player.attacking && !enemyIsInvincible) {
+            if(player.attacking && !invincible) {
                 // impact the player
-                player.score += score;
+                player.score += Math.max(0, score);
                 if(player.midair) {
                     if(actor != null)
                         player.bounceBack(actor);
@@ -161,6 +183,8 @@ object "Enemy" is "private", "entity", "behavior"
         }
     }
 
+
+
     // --- MODIFIERS ---
 
     // set the boundaries of the collider (all coordinates in pixels,
@@ -183,22 +207,6 @@ object "Enemy" is "private", "entity", "behavior"
         );
 
         skipAutodetect = true;
-        return this;
-    }
-
-    // set the score (how many points should be gained
-    // once the player defeats this baddie)
-    fun setScore(value)
-    {
-        score = Math.max(0, value);
-        return this;
-    }
-
-    // should this baddie hit the player even if the
-    // player is attacking? true or false.
-    fun setInvincible(invincible)
-    {
-        enemyIsInvincible = invincible;
         return this;
     }
 }
