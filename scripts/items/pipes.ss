@@ -13,7 +13,7 @@ using SurgeEngine.Brick;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Pipe Up" is "entity", "gimmick", "special"
+object "Pipe Up" is "entity", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -29,7 +29,7 @@ object "Pipe Up" is "entity", "gimmick", "special"
     }
 }
 
-object "Pipe Right" is "entity", "gimmick", "special"
+object "Pipe Right" is "entity", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -45,7 +45,7 @@ object "Pipe Right" is "entity", "gimmick", "special"
     }
 }
 
-object "Pipe Down" is "entity", "gimmick", "special"
+object "Pipe Down" is "entity", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -61,7 +61,7 @@ object "Pipe Down" is "entity", "gimmick", "special"
     }
 }
 
-object "Pipe Left" is "entity", "gimmick", "special"
+object "Pipe Left" is "entity", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -77,7 +77,7 @@ object "Pipe Left" is "entity", "gimmick", "special"
     }
 }
 
-object "Pipe Out" is "entity", "gimmick", "special"
+object "Pipe Out" is "entity", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
@@ -114,7 +114,7 @@ object "Pipe Out" is "entity", "gimmick", "special"
     }
 }
 
-object "Pipe In" is "entity", "gimmick", "special"
+object "Pipe In" is "entity", "special"
 {
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager).setAsEntrance();

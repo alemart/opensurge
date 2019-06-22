@@ -7,7 +7,7 @@
 using SurgeEngine.Player;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Tube In" is "entity", "gimmick", "special"
+object "Tube In" is "entity", "special"
 {
     public rollSpeed = 600;
     collider = CollisionBox(32, 32);

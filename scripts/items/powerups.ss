@@ -308,8 +308,8 @@ object "Item Box" is "entity", "private"
                 player.score += score;
 
             // crush the item box
-            collider.destroy();
-            brick.destroy();
+            collider.enabled = false;
+            brick.enabled = false;
             sfx.play();
             actor.anim = 11;
             state = "crushed";
