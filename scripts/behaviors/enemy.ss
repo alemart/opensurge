@@ -154,7 +154,7 @@ object "Enemy" is "private", "entity", "behavior"
     {
         if(enabled && otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(player.attacking && !invincible) {
+            if(player.attacking && (!invincible || player.invincible)) {
                 // impact the player
                 player.score += Math.max(0, score);
                 if(player.midair) {
