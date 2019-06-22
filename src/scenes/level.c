@@ -3879,15 +3879,22 @@ int editor_ssobj_sortfun(const void* a, const void* b)
         bool x_is_enemy = surgescript_tagsystem_has_tag(tag_system, x, "enemy");
         bool y_is_enemy = surgescript_tagsystem_has_tag(tag_system, y, "enemy");
         if(x_is_enemy == y_is_enemy) {
-            /* then, put "special"-tagged entites after the others */
-            bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
-            bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
-            if(x_is_special == y_is_special) {
-                /* then, sort alphabetically */
-                return strcmp(x, y);
+            /* then, put "basic"-tagged entites BEFORE the others */
+            bool x_is_basic = surgescript_tagsystem_has_tag(tag_system, x, "basic");
+            bool y_is_basic = surgescript_tagsystem_has_tag(tag_system, y, "basic");
+            if(x_is_basic == y_is_basic) {
+                /* then, put "special"-tagged entities after the others */
+                bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
+                bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
+                if(x_is_special == y_is_special) {
+                    /* then, sort alphabetically */
+                    return strcmp(x, y);
+                }
+                else
+                    return (x_is_special && !y_is_special) ? 1 : -1;
             }
             else
-                return (x_is_special && !y_is_special) ? 1 : -1;
+                return (x_is_basic && !y_is_basic) ? -1 : 1;
         }
         else
             return (x_is_enemy && !y_is_enemy) ? 1 : -1;
