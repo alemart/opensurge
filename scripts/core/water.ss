@@ -16,7 +16,7 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Camera;
 
 // how to spawn a Water Bubble:
-// bubble = Level.spawn("Water Bubble").at(x, y).sized("xs" | "sm" | "md" | "lg");
+// bubble = Level.spawnEntity("Water Bubble", position).setSize("xs" | "sm" | "md" | "lg");
 // [...]
 // bubble.burst(); // destroy
 object "Water Bubble" is "entity", "private", "disposable"
@@ -63,15 +63,8 @@ object "Water Bubble" is "entity", "private", "disposable"
         state = "burst";
     }
 
-    // set world position
-    fun at(x, y)
-    {
-        transform.position = Vector2(x, y);
-        return this;
-    }
-
     // set size
-    fun sized(size)
+    fun setSize(size)
     {
         if(size == "xs") {
             bubble.anim = 4;
@@ -105,19 +98,12 @@ object "Water Bubble" is "entity", "private", "disposable"
 
 object "Water Splash" is "entity", "private", "disposable"
 {
-    transform = Transform();
     splash = Actor("Water Splash");
 
     state "main"
     {
         if(timeout(0.27))
             destroy();
-    }
-
-    fun at(x, y)
-    {
-        transform.position = Vector2(x, y);
-        return this;
     }
 
     fun constructor()
@@ -167,7 +153,7 @@ object "WaterController.SplashListener"
 
     fun splash(player)
     {
-        Level.spawn("Water Splash").at(player.transform.position.x, Level.waterlevel);
+        Level.spawnEntity("Water Splash", Vector2(player.transform.position.x, Level.waterlevel));
     }
 }
 
@@ -263,13 +249,19 @@ object "WaterController.BreathingBehavior"
     {
         pos = player.transform.position;
         size = Math.random() <= 0.5 ? "xs" : "sm";
-        Level.spawn("Water Bubble").at(pos.x + 8 * player.direction, pos.y - 16).sized(size);
+        Level.spawnEntity(
+            "Water Bubble",
+            pos.translatedBy(8 * player.direction, -16)
+        ).setSize(size);
     }
 
     fun createDrownBubble(player)
     {
         pos = player.transform.position;
         size = Math.random() <= 0.5 ? "md" : "sm";
-        Level.spawn("Water Bubble").at(pos.x, pos.y - 16).sized(size);
+        Level.spawnEntity(
+            "Water Bubble",
+            pos.translatedBy(0, -16)
+        ).setSize(size);
     }
 }

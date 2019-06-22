@@ -165,7 +165,7 @@ object "Enemy" is "private", "entity", "behavior"
                 }
 
                 // destroy the enemy
-                Level.spawn("Explosion").at(collider.center);
+                Level.spawnEntity("Explosion", collider.center);
                 sfx.play();
 
                 // notify & destroy parent

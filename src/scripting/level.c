@@ -157,7 +157,6 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 {
     const char* child_name = surgescript_var_fast_get_string(param[0]);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
 
     /* spawn the new object */
     surgescript_objecthandle_t me = surgescript_object_handle(object);

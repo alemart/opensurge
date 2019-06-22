@@ -37,18 +37,23 @@ object "Water Bubbles" is "entity", "basic"
 
     state "create bubble"
     {
+        position = transform.position;
+
         if(++cnt < 16) {
-            x = transform.position.x;
-            y = transform.position.y - 4;
             size = (Math.random() <= 0.5) ? "sm" : "xs";
-            Level.spawn("Water Bubble").sized(size).at(x, y);
+            Level.spawnEntity(
+                "Water Bubble",
+                position.translatedBy(0, -4)
+            ).setSize(size);
         }
         else {
-            x = transform.position.x;
-            y = transform.position.y - 4;
-            Level.spawn("Water Bubble").sized("lg").at(x, y).addComponent("BreathableBubble");
+            Level.spawnEntity(
+                "Water Bubble",
+                position.translatedBy(0, -4)
+            ).setSize("lg").addComponent("BreathableBubble");
             cnt = 0;
         }
+
         state = "main";
     }
 

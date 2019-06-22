@@ -299,9 +299,14 @@ object "Item Box" is "entity", "private"
     {
         if(state != "crushed") {
             // create explosion & item box icon
-            Level.spawn("Explosion").at(transform.position.translatedBy(0, -actor.height * 0.7));
-            Level.spawn("Item Box Icon").setAnimation(actor.anim)
-                .at(transform.position.translatedBy(0, -actor.height * 0.7));
+            Level.spawnEntity(
+                "Explosion",
+                transform.position.translatedBy(0, -actor.height * 0.7)
+            );
+            Level.spawnEntity(
+                "Item Box Icon",
+                transform.position.translatedBy(0, -actor.height * 0.7)
+            ).setIcon(actor.anim);
 
             // add to score
             if(score != 0)
@@ -368,18 +373,10 @@ object "Item Box Icon" is "entity", "private", "disposable"
 
     // --- MODIFIERS ---
 
-    // set the animation of the icon
-    fun setAnimation(anim)
+    // set the icon, given as an animation ID
+    fun setIcon(anim)
     {
         actor.anim = anim;
-        return this;
-    }
-
-    // set the position of the icon
-    // position is a Vector2 object
-    fun at(position)
-    {
-        transform.position = position;
         return this;
     }
 }

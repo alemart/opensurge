@@ -5,12 +5,10 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
-using SurgeEngine.Transform;
 
 object "Explosion" is "entity", "private", "disposable"
 {
     actor = Actor("Explosion");
-    transform = Transform();
 
     state "main"
     {
@@ -18,14 +16,8 @@ object "Explosion" is "entity", "private", "disposable"
             destroy();
     }
 
-    fun constructor() { actor.zindex = 0.51; }
-
-    // at()
-    // positions the explosion (position is a Vector2 object)
-    // How to use: Level.spawn("explosion").at(position);
-    fun at(position)
+    fun constructor()
     {
-        transform.position = position;
-        return this;
+        actor.zindex = 0.51;
     }
 }
