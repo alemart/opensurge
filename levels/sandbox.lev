@@ -95,8 +95,8 @@ entity "Crococopter" 80 9856
 entity "Crococopter" 400 9896
 entity "Crococopter" 448 9872
 entity "Crococopter" 480 9912
-entity "Mosquito" 704 9968
 entity "Powerup Super Bonus" 40 10000
+entity "Mosquito" 640 9968
 
 // legacy items
 
