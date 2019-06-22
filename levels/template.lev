@@ -1762,7 +1762,7 @@ brick 7 3152 9744
 brick 7 3824 9808
 
 // entities
-entity "Bubbles" 5392 11184
+entity "Water Bubbles" 5392 11184
 
 // legacy items
 item 31 10512 9072

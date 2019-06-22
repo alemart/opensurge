@@ -2585,7 +2585,7 @@ entity "Collectible" 9672 6168
 entity "Collectible" 9648 6144
 entity "Collectible" 9624 6120
 entity "Collectible" 9600 6096
-entity "Bubbles" 9040 7424
+entity "Water Bubbles" 9040 7424
 entity "Collectible" 8400 7504
 entity "Collectible" 8432 7504
 entity "Collectible" 8464 7504

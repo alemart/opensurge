@@ -15,15 +15,15 @@ using SurgeEngine.Audio.Music;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Camera;
 
-// how to spawn a WaterBubble:
-// bubble = Level.spawn("WaterBubble").at(x, y).sized("xs" | "sm" | "md" | "lg");
+// how to spawn a Water Bubble:
+// bubble = Level.spawn("Water Bubble").at(x, y).sized("xs" | "sm" | "md" | "lg");
 // [...]
 // bubble.burst(); // destroy
-object "WaterBubble" is "entity", "private", "disposable"
+object "Water Bubble" is "entity", "private", "disposable"
 {
     transform = Transform();
     amplitude = 2 + Math.random() * 2;
-    bubble = Actor("SD_WATERAIRBUBBLE");
+    bubble = Actor("Water Bubble");
     hy = 16; t = 0;
     components = null;
 
@@ -93,7 +93,7 @@ object "WaterBubble" is "entity", "private", "disposable"
     }
 
     // dynamically add components
-    fun withComponent(componentName)
+    fun addComponent(componentName)
     {
         newComponent = spawn(componentName);
         if(components == null)
@@ -103,12 +103,10 @@ object "WaterBubble" is "entity", "private", "disposable"
     }
 }
 
-// how to spawn a WaterSplash:
-// splash = Level.spawn("WaterSplash").at(x, y);
-object "WaterSplash" is "entity", "private", "disposable"
+object "Water Splash" is "entity", "private", "disposable"
 {
     transform = Transform();
-    splash = Actor("SD_WATERSPLASH");
+    splash = Actor("Water Splash");
 
     state "main"
     {
@@ -169,7 +167,7 @@ object "WaterController.SplashListener"
 
     fun splash(player)
     {
-        Level.spawn("WaterSplash").at(player.transform.position.x, Level.waterlevel);
+        Level.spawn("Water Splash").at(player.transform.position.x, Level.waterlevel);
     }
 }
 
@@ -265,13 +263,13 @@ object "WaterController.BreathingBehavior"
     {
         pos = player.transform.position;
         size = Math.random() <= 0.5 ? "xs" : "sm";
-        Level.spawn("WaterBubble").at(pos.x + 8 * player.direction, pos.y - 16).sized(size);
+        Level.spawn("Water Bubble").at(pos.x + 8 * player.direction, pos.y - 16).sized(size);
     }
 
     fun createDrownBubble(player)
     {
         pos = player.transform.position;
         size = Math.random() <= 0.5 ? "md" : "sm";
-        Level.spawn("WaterBubble").at(pos.x, pos.y - 16).sized(size);
+        Level.spawn("Water Bubble").at(pos.x, pos.y - 16).sized(size);
     }
 }

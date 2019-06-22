@@ -1,0 +1,21 @@
+// -----------------------------------------------------------------------------
+// File: bubbles.spr
+// Description: sprite definition for water bubbles
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Water Bubbles"
+{
+    source_file     "images/water.png"
+    source_rect     0 96 96 32
+    frame_size      32 32
+    hot_spot        16 32
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1 2
+    }
+}

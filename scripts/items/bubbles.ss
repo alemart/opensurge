@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: bubbles.ss
-// Description: water bubbles (breathing)
+// Description: water bubbles (for breathing)
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -12,10 +12,10 @@ using SurgeEngine.Transform;
 using SurgeEngine.Collisions.CollisionBall;
 
 // these Bubbles help the player breathe (useful when underwater)
-object "Bubbles" is "entity", "basic"
+object "Water Bubbles" is "entity", "basic"
 {
     transform = Transform();
-    bubbles = Actor("Bubbles");
+    bubbles = Actor("Water Bubbles");
     hy = 16; cnt = 0;
 
     state "main"
@@ -41,12 +41,12 @@ object "Bubbles" is "entity", "basic"
             x = transform.position.x;
             y = transform.position.y - 4;
             size = (Math.random() <= 0.5) ? "sm" : "xs";
-            Level.spawn("WaterBubble").sized(size).at(x, y);
+            Level.spawn("Water Bubble").sized(size).at(x, y);
         }
         else {
             x = transform.position.x;
             y = transform.position.y - 4;
-            Level.spawn("WaterBubble").sized("lg").at(x, y).withComponent("BreathableBubble");
+            Level.spawn("Water Bubble").sized("lg").at(x, y).addComponent("BreathableBubble");
             cnt = 0;
         }
         state = "main";
@@ -82,7 +82,7 @@ object "BreathableBubble"
 // this is for retro compatibility
 object "water.air_source" is "entity", "private"
 {
-    bubbles = spawn("Bubbles");
+    bubbles = spawn("Water Bubbles");
 
     state "main"
     {
