@@ -8,17 +8,19 @@ using SurgeEngine.Actor;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
+using SurgeEngine.Behavior.Enemy;
+using SurgeEngine.Behavior.DirectionalMovement;
 using SurgeEngine.Collisions.CollisionBox;
 
 // Crococopter has a helix that hits the player
 object "Crococopter" is "entity", "enemy"
 {
     actor = Actor("Crococopter");
-    enemy = spawn("Enemy");
-    helixCollider = CollisionBox(16, 8).setAnchor(0.5, 3);
-    movement = spawn("DirectionalMovement");
+    enemy = Enemy();
+    movement = DirectionalMovement();
     transform = Transform();
-    t = 0;
+    helixCollider = CollisionBox(16, 8).setAnchor(0.5, 3);
+    elapsedTime = 0;
 
     state "main"
     {
@@ -29,8 +31,9 @@ object "Crococopter" is "entity", "enemy"
             actor.hflip = false;
 
         // up-down movement
-        movement.speed = 47 * Math.cos(3.1416 * t);
-        t += Time.delta;
+        movement.direction = Vector2.up;
+        movement.speed = 47 * Math.cos(3.1416 * elapsedTime);
+        elapsedTime += Time.delta;
     }
 
     fun onCollision(otherCollider)
@@ -42,10 +45,12 @@ object "Crococopter" is "entity", "enemy"
         }
     }
 
+    /*
     fun constructor()
     {
-        movement.direction = Vector2.up;
-        //helixCollider.visible = true;
-        //enemy.collider.visible = true;
+        // debug
+        helixCollider.visible = true;
+        enemy.collider.visible = true;
     }
+    */
 }
