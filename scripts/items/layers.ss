@@ -7,7 +7,7 @@
 using SurgeEngine.Actor;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Layer Green" is "entity", "special", "basic"
+object "Layer Green" is "entity", "special"
 {
     collider = CollisionBox(32, 32);
 
@@ -27,7 +27,7 @@ object "Layer Green" is "entity", "special", "basic"
     }
 }
 
-object "Layer Yellow" is "entity", "special", "basic"
+object "Layer Yellow" is "entity", "special"
 {
     collider = CollisionBox(32, 32);
 
