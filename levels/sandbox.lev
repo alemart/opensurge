@@ -52,7 +52,6 @@ brick 0 384 1000
 entity "Collectible" 192 9976
 entity "Collectible" 336 9976
 entity "Goal" 928 10000
-entity "Powerup Super Bonus" 400 10000
 entity "Collectible" 192 9936
 entity "Collectible" 192 9904
 entity "Collectible" 192 9872
@@ -96,7 +95,8 @@ entity "Crococopter" 80 9856
 entity "Crococopter" 400 9896
 entity "Crococopter" 448 9872
 entity "Crococopter" 480 9912
-entity "Powerup Shield" 40 10000
+entity "Mosquito" 704 9968
+entity "Powerup Super Bonus" 40 10000
 
 // legacy items
 
