@@ -22,45 +22,26 @@
 #include "../core/global.h"
 
 /* the following code, written in SurgeScript language, is MIT-licensed */
-static const char code_in_surgescript[] = "\n\
+static const char code_in_surgescript[] = "\
 @Plugin \n\
 object 'SurgeEngine' \n\
 { \n\
-    actorFactory = spawn('ActorFactory'); \n\
-    behaviorFactory = spawn('BehaviorFactory'); \n\
-    brickFactory = spawn('BrickFactory'); \n\
-    inputFactory = spawn('InputFactory'); \n\
+    public readonly Actor = spawn('ActorFactory'); \n\
+    public readonly Behavior = spawn('BehaviorFactory'); \n\
+    public readonly Brick = spawn('BrickFactory'); \n\
+    public readonly Input = spawn('InputFactory'); \n\
+    public readonly Camera = spawn('Camera'); \n\
+    public readonly Collisions = spawn('Collision'); \n\
+    public readonly UI = spawn('UI'); \n\
+    public readonly Audio = spawn('Audio'); \n\
+    public readonly Video = spawn('Video'); \n\
+    public readonly Prefs = spawn('Prefs'); \n\
+    public readonly Lang = spawn('Lang'); \n\
+    public readonly Web = spawn('Web'); \n\
+    public readonly Transform = spawn('TransformFactory'); \n\
+    public readonly Vector2 = spawn('VectorFactory'); \n\
+    public readonly version = '" GAME_VERSION_STRING "'; \n\
     levelManager = spawn('LevelManager'); \n\
-    camera = spawn('Camera'); \n\
-    collisions = spawn('Collision'); \n\
-    userInterface = spawn('UI'); \n\
-    audio = spawn('Audio'); \n\
-    video = spawn('Video'); \n\
-    prefs = spawn('Prefs'); \n\
-    lang = spawn('Lang'); \n\
-    web = spawn('Web'); \n\
-    transformFactory = spawn('TransformFactory'); \n\
-    vectorFactory = spawn('VectorFactory'); \n\
-\n\
-    fun get_Actor() \n\
-    { \n\
-        return actorFactory; \n\
-    } \n\
-\n\
-    fun get_Behavior() \n\
-    { \n\
-        return behaviorFactory; \n\
-    } \n\
-\n\
-    fun get_Brick() \n\
-    { \n\
-        return brickFactory; \n\
-    }    \n\
-\n\
-    fun get_Input() \n\
-    { \n\
-        return inputFactory; \n\
-    } \n\
 \n\
     fun get_LevelManager() \n\
     { \n\
@@ -72,62 +53,11 @@ object 'SurgeEngine' \n\
         return levelManager.currentLevel; \n\
     } \n\
 \n\
-    fun get_Lang() \n\
-    { \n\
-        return lang; \n\
-    } \n\
-\n\
-    fun get_Camera() \n\
-    { \n\
-        return camera; \n\
-    } \n\
-\n\
-    fun get_Collisions() \n\
-    { \n\
-        return collisions; \n\
-    } \n\
-\n\
-    fun get_Prefs() \n\
-    { \n\
-        return prefs; \n\
-    } \n\
-\n\
-    fun get_Web() \n\
-    { \n\
-        return web; \n\
-    } \n\
-\n\
-    fun get_Video() \n\
-    { \n\
-        return video; \n\
-    } \n\
-\n\
     fun get_Player() \n\
     { \n\
         return levelManager.playerManager; \n\
     } \n\
 \n\
-    fun get_UI() \n\
-    { \n\
-        return userInterface; \n\
-    } \n\
-\n\
-    fun get_Audio() \n\
-    { \n\
-        return audio; \n\
-    } \n\
-\n\
-    fun get_Transform() \n\
-    { \n\
-        return transformFactory; \n\
-    } \n\
-\n\
-    fun get_Vector2() \n\
-    { \n\
-        return vectorFactory; \n\
-    } \n\
-\n\
-    fun get_version() { return '" GAME_VERSION_STRING "'; } \n\
     fun destroy() { } \n\
 } \n\
 \n\
@@ -136,7 +66,7 @@ object 'SurgeEngine' \n\
 \n\
 \n\
 // ----------------------------------------------------------------------------- \n\
-// Factory methods \n\
+// Factories \n\
 // ----------------------------------------------------------------------------- \n\
 \n\
 object 'ActorFactory' \n\
@@ -153,23 +83,16 @@ object 'ActorFactory' \n\
 \n\
 object 'BehaviorFactory' \n\
 { \n\
-    fun DirectionalMovement() \n\
-    { \n\
-        return caller.spawn('DirectionalMovement'); \n\
-    } \n\
-\n\
-    fun Platformer() \n\
-    { \n\
-        return caller.spawn('PlatformMovement'); \n\
-    } \n\
-\n\
-    fun Enemy() \n\
-    { \n\
-        return caller.spawn('Enemy'); \n\
-    } \n\
+    public readonly DirectionalMovement = spawn('DirectionalMovementFactory'); \n\
+    public readonly Platformer = spawn('PlatformMovementFactory'); \n\
+    public readonly Enemy = spawn('EnemyFactory'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
+\n\
+object 'DirectionalMovementFactory' { fun call() { return caller.spawn('DirectionalMovement'); } } \n\
+object 'PlatformMovementFactory' { fun call() { return caller.spawn('PlatformMovement'); } } \n\
+object 'EnemyFactory' { fun call() { return caller.spawn('Enemy'); } } \n\
 \n\
 object 'BrickFactory' \n\
 { \n\
@@ -206,7 +129,7 @@ object 'SensorFactory' \n\
 \n\
 object 'InputFactory' \n\
 { \n\
-    mouse = spawn('Mouse'); \n\
+    public readonly Mouse = spawn('Mouse'); \n\
 \n\
     fun call(inputMap) \n\
     { \n\
@@ -215,50 +138,15 @@ object 'InputFactory' \n\
         return input; \n\
     } \n\
 \n\
-    fun get_Mouse() \n\
-    { \n\
-        return mouse; \n\
-    } \n\
-\n\
     fun destroy() { } \n\
 } \n\
 \n\
 object 'Collision' \n\
 { \n\
     manager = spawn('CollisionManager'); \n\
-    box = spawn('CollisionBoxFactory'); \n\
-    ball = spawn('CollisionBallFactory'); \n\
-    sensor = spawn('SensorFactory'); \n\
-\n\
-    fun get_CollisionBox() \n\
-    { \n\
-        return box; \n\
-    } \n\
-\n\
-    fun get_CollisionBall() \n\
-    { \n\
-        return ball; \n\
-    } \n\
-\n\
-    fun get_Sensor() \n\
-    { \n\
-        return sensor; \n\
-    } \n\
-\n\
-    fun CollisionBox(width, height) \n\
-    { \n\
-        return box(width, height); \n\
-    } \n\
-\n\
-    fun CollisionBall(radius) \n\
-    { \n\
-        return ball(radius); \n\
-    } \n\
-\n\
-    fun Sensor(x, y, w, h) \n\
-    { \n\
-        return sensor(x, y, w, h); \n\
-    } \n\
+    public readonly CollisionBox = spawn('CollisionBoxFactory'); \n\
+    public readonly CollisionBall = spawn('CollisionBallFactory'); \n\
+    public readonly Sensor = spawn('SensorFactory'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
@@ -298,17 +186,7 @@ object 'CollisionBallFactory' \n\
 \n\
 object 'UI' \n\
 { \n\
-    text = spawn('TextFactory'); \n\
-\n\
-    fun get_Text() \n\
-    { \n\
-        return text; \n\
-    } \n\
-\n\
-    fun Text(fontName) \n\
-    { \n\
-        return text(fontName); \n\
-    } \n\
+    public readonly Text = spawn('TextFactory'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
@@ -339,11 +217,11 @@ object 'TransformFactory' \n\
 object 'VectorFactory' \n\
 { \n\
     temp = System.child('__Temp'); \n\
-    up = spawn('Vector2'); \n\
-    right = spawn('Vector2'); \n\
-    down = spawn('Vector2'); \n\
-    left = spawn('Vector2'); \n\
-    zero = spawn('Vector2'); \n\
+    public readonly up = spawn('Vector2'); \n\
+    public readonly right = spawn('Vector2'); \n\
+    public readonly down = spawn('Vector2'); \n\
+    public readonly left = spawn('Vector2'); \n\
+    public readonly zero = spawn('Vector2'); \n\
 \n\
     fun call(x, y) \n\
     { \n\
@@ -361,48 +239,13 @@ object 'VectorFactory' \n\
         zero.__init(0, 0); \n\
     } \n\
 \n\
-    fun get_up() \n\
-    { \n\
-        return up; \n\
-    } \n\
-\n\
-    fun get_right() \n\
-    { \n\
-        return right; \n\
-    } \n\
-\n\
-    fun get_down() \n\
-    { \n\
-        return down; \n\
-    } \n\
-\n\
-    fun get_left() \n\
-    { \n\
-        return left; \n\
-    } \n\
-\n\
-    fun get_zero() \n\
-    { \n\
-        return zero; \n\
-    } \n\
-     \n\
     fun destroy() { } \n\
 } \n\
 \n\
 object 'Audio' \n\
 { \n\
-    music = spawn('MusicFactory'); \n\
-    sound = spawn('SoundFactory'); \n\
-\n\
-    fun get_Music() \n\
-    { \n\
-        return music; \n\
-    } \n\
-\n\
-    fun get_Sound() \n\
-    { \n\
-        return sound; \n\
-    } \n\
+    public readonly Music = spawn('MusicFactory'); \n\
+    public readonly Sound = spawn('SoundFactory'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
@@ -438,12 +281,7 @@ object 'SoundFactory' \n\
 \n\
 object 'Video' \n\
 { \n\
-    screen = spawn('Screen'); \n\
-\n\
-    fun get_Screen() \n\
-    { \n\
-        return screen; \n\
-    } \n\
+    public readonly Screen = spawn('Screen'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
