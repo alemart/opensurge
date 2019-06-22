@@ -52,8 +52,9 @@ struct collisionmask_t;
 struct music_t;
 struct player_t;
 
-extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
 extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
+extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
+extern v2d_t scripting_vector2_to_v2d(const surgescript_object_t* object);
 
 extern struct actor_t* scripting_actor_ptr(const surgescript_object_t* object);
 extern struct player_t* scripting_player_ptr(const surgescript_object_t* object);

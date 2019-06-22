@@ -100,10 +100,8 @@ surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescri
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
-    double x = 0.0, y = 0.0;
 
-    scripting_vector2_read(v2, &x, &y);
-    camera_set_position(v2d_new(x, y));
+    camera_set_position(scripting_vector2_to_v2d(v2));
 
     return NULL;
 }

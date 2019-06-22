@@ -25,6 +25,7 @@
 #include <float.h>
 #include <math.h>
 #include "../core/util.h"
+#include "../core/v2d.h"
 
 /* Vector2 structure */
 typedef struct surgescript_vector2_t surgescript_vector2_t;
@@ -98,6 +99,18 @@ void scripting_register_vector2(surgescript_vm_t* vm)
 }
 
 /*
+ * scripting_vector2_update()
+ * Updates the contents of a SurgeScript Vector2 object (useful for engine functions / performance)
+ * WARNING: Be sure that the referenced object is a Vector2. This function won't check it.
+ */
+void scripting_vector2_update(surgescript_object_t* object, double x, double y)
+{
+    surgescript_vector2_t* v = get_vector(object);
+    v->x = x;
+    v->y = y;
+}
+
+/*
  * scripting_vector2_read()
  * Reads the contents of a SurgeScript Vector2 object
  * If the given object is not a Vector2 object, then (0,0) is returned
@@ -110,15 +123,14 @@ void scripting_vector2_read(const surgescript_object_t* object, double* x, doubl
 }
 
 /*
- * scripting_vector2_update()
- * Updates the contents of a SurgeScript Vector2 object (useful for engine functions / performance)
- * WARNING: Be sure that the referenced object is a Vector2. This function won't check it.
+ * scripting_vector2_to_v2d()
+ * Converts a SurgeScript Vector2 object to a v2d_t
+ * If the given object is not a Vector2 object, then (0,0) is returned
  */
-void scripting_vector2_update(surgescript_object_t* object, double x, double y)
+v2d_t scripting_vector2_to_v2d(const surgescript_object_t* object)
 {
-    surgescript_vector2_t* v = get_vector(object);
-    v->x = x;
-    v->y = y;
+    const surgescript_vector2_t* v = safe_get_vector(object);
+    return v2d_new(v->x, v->y);
 }
 
 
