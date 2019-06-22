@@ -32,6 +32,7 @@
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -68,6 +69,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Level", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Level", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "Level", "spawnEntity", fun_spawnentity, 2);
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Level", "get_name", fun_getname, 0);
     surgescript_vm_bind(vm, "Level", "get_act", fun_getact, 0);
@@ -150,7 +152,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     return NULL;
 }
 
-/* spawn new object: entities will have special treatment */
+/* spawn new object as a child of Level: prevent garbage collection */
 surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     const char* child_name = surgescript_var_fast_get_string(param[0]);
@@ -161,18 +163,51 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t child = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
 
-    /* is the new object an entity? */
-    /* exception: startup objects may not be entities */
-    if(1 || surgescript_tagsystem_has_tag(tag_system, child_name, "entity")) {
-        /* store its reference, so it won't be Garbage Collected */
-        surgescript_heap_t* heap = surgescript_object_heap(object);
-        surgescript_heapptr_t ptr = surgescript_heap_malloc(heap);
-        surgescript_var_set_objecthandle(surgescript_heap_at(heap, ptr), child);
-        surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), 1 + IDX_ADDR); /* scan for broken references */
-    }
+    /* must the new object be an entity? */
+    /* well, no... startup objects may not be entities */
+    /*if(1 || surgescript_tagsystem_has_tag(tag_system, child_name, "entity"))*/
+
+    /* store its reference, so it won't be Garbage Collected */
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_heapptr_t ptr = surgescript_heap_malloc(heap);
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ptr), child);
+    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), 1 + IDX_ADDR); /* scan for broken references */
 
     /* done! */
     return surgescript_var_set_objecthandle(surgescript_var_create(), child);
+}
+
+/* spawn an entity at a certain position in world coordinates */
+surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    const char* entity_name = surgescript_var_fast_get_string(param[0]);
+
+    /* sanity check */
+    if(surgescript_tagsystem_has_tag(tag_system, entity_name, "entity")) {
+        surgescript_objecthandle_t pos = surgescript_var_get_objecthandle(param[1]);
+        surgescript_object_t* v2 = surgescript_objectmanager_get(manager, pos);
+
+        /* spawn entity */
+        surgescript_var_t* ret = fun_spawn(object, param, 1);
+        if(ret != NULL) {
+            surgescript_objecthandle_t child = surgescript_var_get_objecthandle(ret);
+            surgescript_var_destroy(ret);
+
+            /* position entity */
+            scripting_util_set_world_position(
+                surgescript_objectmanager_get(manager, child),
+                scripting_vector2_to_v2d(v2)
+            );
+
+            /* done */
+            return surgescript_var_set_objecthandle(surgescript_var_create(), child);
+        }
+    }
+
+    fatal_error("Scripting Error: %s.spawnEntity() requires object \"%s\" to be an entity.", surgescript_object_name(object), entity_name);
+    return NULL;
 }
 
 /* can't destroy this object */
@@ -221,11 +256,10 @@ surgescript_var_t* fun_getspawnpoint(surgescript_object_t* object, const surgesc
 surgescript_var_t* fun_setspawnpoint(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
-    double x = 0.0, y = 0.0;
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
 
-    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
-    level_set_spawnpoint(v2d_new(x, y));
+    level_set_spawnpoint(scripting_vector2_to_v2d(v2));
 
     return NULL;
 }
