@@ -27,6 +27,7 @@ static const char code_in_surgescript[] = "\n\
 object 'SurgeEngine' \n\
 { \n\
     actorFactory = spawn('ActorFactory'); \n\
+    behaviorFactory = spawn('BehaviorFactory'); \n\
     brickFactory = spawn('BrickFactory'); \n\
     inputFactory = spawn('InputFactory'); \n\
     levelManager = spawn('LevelManager'); \n\
@@ -44,6 +45,11 @@ object 'SurgeEngine' \n\
     fun get_Actor() \n\
     { \n\
         return actorFactory; \n\
+    } \n\
+\n\
+    fun get_Behavior() \n\
+    { \n\
+        return behaviorFactory; \n\
     } \n\
 \n\
     fun get_Brick() \n\
@@ -142,7 +148,26 @@ object 'ActorFactory' \n\
         return actor; \n\
     } \n\
 \n\
-    fun spawn(x) { return null; } \n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'BehaviorFactory' \n\
+{ \n\
+    fun DirectionalMovement() \n\
+    { \n\
+        return caller.spawn('DirectionalMovement'); \n\
+    } \n\
+\n\
+    fun Platformer() \n\
+    { \n\
+        return caller.spawn('PlatformMovement'); \n\
+    } \n\
+\n\
+    fun Enemy() \n\
+    { \n\
+        return caller.spawn('Enemy'); \n\
+    } \n\
+\n\
     fun destroy() { } \n\
 } \n\
 \n\
