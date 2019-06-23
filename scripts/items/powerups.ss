@@ -252,7 +252,6 @@ object "Item Box" is "entity", "private"
     actor = Actor("Item Box");
     brick = Brick("Item Box");
     collider = CollisionBox(36, 36).setAnchor(0.5, 1);
-    sfx = Sound("samples/destroy.wav");
     transform = Transform();
     score = 100;
 
@@ -298,7 +297,6 @@ object "Item Box" is "entity", "private"
             // crush the item box
             collider.enabled = false;
             brick.enabled = false;
-            sfx.play();
             actor.anim = 11;
             state = "crushed";
 

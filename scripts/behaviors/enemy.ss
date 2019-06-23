@@ -111,7 +111,6 @@ object "Enemy" is "private", "entity", "behavior"
     public invincible = false; // should this baddie hit the player even if the player is attacking?
     public enabled = true; // is this behavior enabled?
     public readonly collider = CollisionBox(32, 32);
-    sfx = Sound("samples/destroy.wav");
     transform = Transform();
     skipAutodetect = false;
     actor = null;
@@ -166,7 +165,6 @@ object "Enemy" is "private", "entity", "behavior"
 
                 // destroy the enemy
                 Level.spawnEntity("Explosion", collider.center);
-                sfx.play();
 
                 // notify & destroy parent
                 if(parent.hasFunction("onEnemyDestroy"))
