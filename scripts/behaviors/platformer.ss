@@ -208,6 +208,14 @@ object "PlatformMovement" is "behavior"
         return this;
     }
 
+    // propel upward (useful for double jump, for example)
+    fun propelUpward(speed)
+    {
+        if(!ceiling)
+            ysp = Math.max(-Math.abs(speed), -topjsp);
+        return this;
+    }
+
     // set the size of the sensor box
     fun setSensorBox(width, height)
     {

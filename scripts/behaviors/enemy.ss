@@ -164,6 +164,7 @@ object "Enemy" is "private", "entity", "behavior"
                 }
 
                 // destroy the enemy
+                Level.spawnEntity("Animal", collider.center);
                 Level.spawnEntity("Explosion", collider.center);
 
                 // notify & destroy parent
