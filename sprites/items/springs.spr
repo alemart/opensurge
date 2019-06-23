@@ -200,7 +200,7 @@ sprite "Spring Standard Up Left"
 sprite "Spring Standard Hidden"
 {
     source_file     "images/spring_pads.png"
-    source_rect     16 82 64 16
+    source_rect     272 98 64 16
     frame_size      32 16
     hot_spot        16 16
 
@@ -209,7 +209,7 @@ sprite "Spring Standard Hidden"
     {
         repeat      TRUE
         fps         8
-        data        1
+        data        0
     }
 
     // active
@@ -424,7 +424,7 @@ sprite "Spring Stronger Up Left"
 sprite "Spring Stronger Hidden"
 {
     source_file     "images/spring_pads.png"
-    source_rect     16 50 64 16
+    source_rect     272 66 64 16
     frame_size      32 16
     hot_spot        16 16
 
@@ -433,7 +433,7 @@ sprite "Spring Stronger Hidden"
     {
         repeat      TRUE
         fps         8
-        data        1
+        data        0
     }
 
     // active
@@ -648,7 +648,7 @@ sprite "Spring Strongest Up Left"
 sprite "Spring Strongest Hidden"
 {
     source_file     "images/spring_pads.png"
-    source_rect     16 114 64 16
+    source_rect     272 130 64 16
     frame_size      32 16
     hot_spot        16 16
 
@@ -657,7 +657,7 @@ sprite "Spring Strongest Hidden"
     {
         repeat      TRUE
         fps         8
-        data        1
+        data        0
     }
 
     // active
