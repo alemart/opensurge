@@ -218,37 +218,20 @@ object "Powerup Trap" is "entity", "basic", "powerup"
     }
 }
 
-// Super Bonus!!!
-object "Powerup Super Bonus" is "entity", "basic", "powerup"
+// Lucky Bonus
+object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(17);
-    luckyPlayer = null;
-    counter = 0;
 
     state "main"
     {
     }
 
-    state "active"
-    {
-        if(timeout(0.02)) {
-            if(++counter <= 50)
-                state = "lucky";
-            else
-                state = "main";
-        }
-    }
-
-    state "lucky"
-    {
-        Level.spawn("Lucky Collectible").setPlayer(luckyPlayer).setPhase(counter);
-        state = "active";
-    }
-
     fun onItemBoxCrushed(player)
     {
-        luckyPlayer = player;
-        state = "active";
+        bonus = Level.spawn("Lucky Bonus");
+        bonus.value = 50;
+        bonus.player = player;
     }
 }
 

@@ -170,7 +170,7 @@ sprite "Powerup Trap"
     }
 }
 
-sprite "Powerup Super Bonus"
+sprite "Powerup Lucky Bonus"
 {
     source_file     "images/item_boxes.png"
     source_rect     9 100 180 96

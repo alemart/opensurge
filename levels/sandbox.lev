@@ -95,7 +95,7 @@ entity "Crococopter" 80 9856
 entity "Crococopter" 400 9896
 entity "Crococopter" 448 9872
 entity "Crococopter" 480 9912
-entity "Powerup Super Bonus" 40 10000
+entity "Powerup Lucky Bonus" 40 10000
 entity "Mosquito" 640 9968
 entity "Spring Standard Hidden" 160 10000
 
