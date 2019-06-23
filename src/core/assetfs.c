@@ -54,6 +54,7 @@
 
 /* Defining the filesystem */
 typedef enum assetfiletype_t assetfiletype_t;
+typedef enum assetpriority_t assetpriority_t;
 typedef struct assetfile_t assetfile_t;
 typedef struct assetdir_t assetdir_t;
 typedef struct assetdirentry_t assetdirentry_t;
@@ -65,11 +66,18 @@ enum assetfiletype_t
     ASSET_CACHE    /* non-essential data (logs, etc.) */
 };
 
+enum assetpriority_t
+{
+    ASSET_PRIMARY,    /* asset comes from a primary source */
+    ASSET_SECONDARY   /* complimentary asset for compatibility purposes */
+};
+
 struct assetfile_t
 {
     char* name; /* filename.ext */
     char* fullpath; /* absolute filepath in the real filesystem */
     assetfiletype_t type; /* file type */
+    assetpriority_t priority; /* asset priority */
 };
 
 struct assetdirentry_t
@@ -99,8 +107,8 @@ static inline int vpathcmp(const char* vp1, const char* vp2);
 static inline int vpathncmp(const char* vp1, const char* vp2, int n);
 static inline int vpc(int c) { return (c == '\\') ? '/' : tolower(c); }
 static void scan_default_folders(const char* gameid);
-static bool scan_exedir(assetdir_t* dir);
-static void scan_folder(assetdir_t* dir, const char* abspath, assetfiletype_t type);
+static bool scan_exedir(assetdir_t* dir, assetpriority_t priority);
+static void scan_folder(assetdir_t* dir, const char* abspath, assetfiletype_t type, assetpriority_t priority);
 static int dircmp(const void* a, const void* b);
 static int filecmp(const void* a, const void* b);
 static int filematch(const void* key, const void* f);
@@ -118,7 +126,7 @@ static int mkpath(char* path);
 static assetdir_t* afs_mkdir(assetdir_t* parent, const char* dirname);
 static assetdir_t* afs_rmdir(assetdir_t* base);
 static assetdir_t* afs_finddir(assetdir_t* base, const char* dirpath);
-static assetfile_t* afs_mkfile(const char* filename, const char* fullpath, assetfiletype_t type);
+static assetfile_t* afs_mkfile(const char* filename, const char* fullpath, assetfiletype_t type, assetpriority_t priority);
 static assetfile_t* afs_rmfile(assetfile_t* file);
 static void afs_storefile(assetdir_t* dir, assetfile_t* file);
 static void afs_updatefile(assetfile_t* file, const char* fullpath);
@@ -159,9 +167,10 @@ void assetfs_init(const char* gameid, const char* datadir)
     if(is_valid_id(gameid)) {
         assetfs_log("Loading assets for %s...", gameid);
         if(datadir && *datadir) {
+            /* using custom data directory */
             if(!is_asset_folder(datadir))
                 assetfs_log("Custom asset folder \"%s\" is either invalid or obsolete.", datadir);
-            scan_folder(root, datadir, ASSET_DATA);
+            scan_folder(root, datadir, ASSET_DATA, ASSET_PRIMARY);
         }
         else
             scan_default_folders(gameid);
@@ -259,6 +268,17 @@ bool assetfs_use_strict(bool strict)
 }
 
 /*
+ * assetfs_is_primary_file()
+ * Checks if the file is primary, i.e., not
+ * gathered from a complimentary source
+ */
+bool assetfs_is_primary_file(const char* vpath)
+{
+    assetfile_t* file = afs_findfile(root, vpath);
+    return file != NULL ? file->priority == ASSET_PRIMARY : false;
+}
+
+/*
  * assetfs_create_config_file()
  * Creates a new config file in the virtual filesystem and
  * return its fullpath in the actual filesystem
@@ -273,7 +293,7 @@ const char* assetfs_create_config_file(const char* vpath)
 
         if((fullpath = build_config_fullpath(afs_gameid, path)) != NULL) {
             /* Create the path in the virtual filesystem */
-            file = afs_mkfile(vpathbasename(path, &dirlen), fullpath, ASSET_CONFIG);
+            file = afs_mkfile(vpathbasename(path, &dirlen), fullpath, ASSET_CONFIG, ASSET_PRIMARY);
             if(dirlen >= 0) {
                 path[dirlen] = '\0';
                 afs_storefile(afs_mkpath(root, path), file);
@@ -331,7 +351,7 @@ const char* assetfs_create_cache_file(const char* vpath)
 
         if((fullpath = build_cache_fullpath(afs_gameid, path)) != NULL) {
             /* Create the path in the virtual filesystem */
-            file = afs_mkfile(vpathbasename(path, &dirlen), fullpath, ASSET_CACHE);
+            file = afs_mkfile(vpathbasename(path, &dirlen), fullpath, ASSET_CACHE, ASSET_PRIMARY);
             if(dirlen >= 0) {
                 path[dirlen] = '\0';
                 afs_storefile(afs_mkpath(root, path), file);
@@ -396,7 +416,7 @@ const char* assetfs_create_data_file(const char* vpath, bool prefer_user_space)
 
         if((fullpath = build_userdata_fullpath(afs_gameid, path)) != NULL) {
             /* Create the path in the virtual filesystem */
-            file = afs_mkfile(vpathbasename(path, &dirlen), fullpath, ASSET_DATA);
+            file = afs_mkfile(vpathbasename(path, &dirlen), fullpath, ASSET_DATA, ASSET_PRIMARY);
             if(dirlen >= 0) {
                 path[dirlen] = '\0';
                 afs_storefile(afs_mkpath(root, path), file);
@@ -695,12 +715,13 @@ int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(c
 
 
 /* creates a new virtual file */
-assetfile_t* afs_mkfile(const char* filename, const char* fullpath, assetfiletype_t type)
+assetfile_t* afs_mkfile(const char* filename, const char* fullpath, assetfiletype_t type, assetpriority_t priority)
 {
     assetfile_t* file = mallocx(sizeof *file);
     file->name = clone_str(filename);
     file->fullpath = clone_str(fullpath);
     file->type = type;
+    file->priority = priority;
     return file;
 }
 
@@ -881,11 +902,11 @@ void scan_default_folders(const char* gameid)
     assetfs_log("Scanning assets...");
 
     /* scan asset folder: <exedir> */
-    if(!scan_exedir(root)) {
+    if(!scan_exedir(root, ASSET_PRIMARY)) {
         const char* path = ".";
         assetfs_log("Can't find the application folder: scanning the working dir");
         if(is_asset_folder(path))
-            scan_folder(root, path, ASSET_DATA);
+            scan_folder(root, path, ASSET_DATA, ASSET_PRIMARY);
     }
 #elif defined(__APPLE__) && defined(__MACH__)
     /* FIXME: untested */
@@ -898,40 +919,32 @@ void scan_default_folders(const char* gameid)
     /* scan user-specific config & cache files (must come 1st) */
     if(configdir != NULL) {
         mkpath(configdir, 0755);
-        scan_folder(root, configdir, ASSET_CONFIG);
+        scan_folder(root, configdir, ASSET_CONFIG, ASSET_PRIMARY);
         free(configdir);
     }
     if(cachedir != NULL) {
         mkpath(cachedir, 0755);
-        scan_folder(root, cachedir, ASSET_CACHE);
+        scan_folder(root, cachedir, ASSET_CACHE, ASSET_PRIMARY);
         free(cachedir);
     }
 
     /* scan primary asset folder: <exedir>/../Resources */
-    if(strcmp(gameid, GAME_UNIXNAME) == 0) {
-        if(scan_exedir(root))
-            must_scan_unixdir = false;
-    }
+    if(scan_exedir(root, ASSET_PRIMARY))
+        must_scan_unixdir = false;
 
     /* scan additional asset folder: ~/Library/<basedir>/<gameid> */
     if(userdatadir != NULL) {
         mkpath(userdatadir, 0755); /* userdatadir ends with '/' */
-        scan_folder(root, userdatadir, ASSET_DATA);
+        scan_folder(root, userdatadir, ASSET_DATA, must_scan_unixdir ? ASSET_PRIMARY : ASSET_SECONDARY);
         free(userdatadir);
     }
     else
         assetfs_log("Can't find the userdata directory: additional game assets may not be loaded");
 
-    /* fill-in any missing files (if custom gameid) for compatibility purposes */
-    if(strcmp(gameid, GAME_UNIXNAME) != 0) {
-        if(scan_exedir(root))
-            must_scan_unixdir = false;
-    }
-
     /* scan <unixdir> */
     if(must_scan_unixdir) {
         if(is_asset_folder(GAME_DATADIR))
-            scan_folder(root, GAME_DATADIR, ASSET_DATA);
+            scan_folder(root, GAME_DATADIR, ASSET_DATA, ASSET_SECONDARY);
         else if(afs_strict)
             assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
     }
@@ -945,40 +958,32 @@ void scan_default_folders(const char* gameid)
     /* scan user-specific config & cache files (must come 1st) */
     if(configdir != NULL) {
         mkpath(configdir, 0755);
-        scan_folder(root, configdir, ASSET_CONFIG);
+        scan_folder(root, configdir, ASSET_CONFIG, ASSET_PRIMARY);
         free(configdir);
     }
     if(cachedir != NULL) {
         mkpath(cachedir, 0755);
-        scan_folder(root, cachedir, ASSET_CACHE);
+        scan_folder(root, cachedir, ASSET_CACHE, ASSET_PRIMARY);
         free(cachedir);
     }
 
     /* scan primary asset folder: <exedir> */
-    if(strcmp(gameid, GAME_UNIXNAME) == 0) { /* gameid is provisory (should come from the command-line) */
-        if(scan_exedir(root))
-            must_scan_unixdir = false;
-    }
+    if(scan_exedir(root, ASSET_PRIMARY))
+        must_scan_unixdir = false;
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
     if(userdatadir != NULL) {
         mkpath(userdatadir, 0755); /* userdatadir ends with '/' */
-        scan_folder(root, userdatadir, ASSET_DATA);
+        scan_folder(root, userdatadir, ASSET_DATA, must_scan_unixdir ? ASSET_PRIMARY : ASSET_SECONDARY);
         free(userdatadir);
     }
     else
         assetfs_log("Can't find the userdata directory: additional game assets may not be loaded");
 
-    /* fill-in any missing files (if custom gameid) for compatibility purposes */
-    if(strcmp(gameid, GAME_UNIXNAME) != 0) {
-        if(scan_exedir(root))
-            must_scan_unixdir = false;
-    }
-
     /* scan <unixdir> */
     if(must_scan_unixdir) {
         if(is_asset_folder(GAME_DATADIR))
-            scan_folder(root, GAME_DATADIR, ASSET_DATA);
+            scan_folder(root, GAME_DATADIR, ASSET_DATA, ASSET_SECONDARY);
         else if(afs_strict)
             assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
     }
@@ -988,7 +993,7 @@ void scan_default_folders(const char* gameid)
 }
 
 /* scan the <exedir>; returns true if it's an asset folder */
-bool scan_exedir(assetdir_t* dir)
+bool scan_exedir(assetdir_t* dir, assetpriority_t priority)
 {
 #if defined(__APPLE__) && defined(__MACH__)
     int len, dirlen = 0;
@@ -1002,7 +1007,7 @@ bool scan_exedir(assetdir_t* dir)
         data_path = join_path(exedir, "../Resources"); /* use realpath() */
         if(is_asset_folder(data_path)) {
             success = true;
-            scan_folder(dir, data_path, ASSET_DATA);
+            scan_folder(dir, data_path, ASSET_DATA, priority);
         }
         free(exedir);
         free(data_path);
@@ -1021,7 +1026,7 @@ bool scan_exedir(assetdir_t* dir)
         exedir[dirlen] = '\0';
         if(is_asset_folder(exedir)) {
             success = true;
-            scan_folder(dir, exedir, ASSET_DATA);
+            scan_folder(dir, exedir, ASSET_DATA, priority);
         }
         free(exedir);
     }
@@ -1033,7 +1038,7 @@ bool scan_exedir(assetdir_t* dir)
 }
 
 /* scan a specific asset folder */
-void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type)
+void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type, assetpriority_t priority)
 {
     /* for debugging purposes */
     if(folder == root)
@@ -1058,15 +1063,21 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type)
                             char* path = join_path(abspath, filename);
                             assetdir_t* subfolder = afs_finddir(folder, filename);
                             subfolder = subfolder ? subfolder : afs_mkdir(folder, filename);
-                            scan_folder(subfolder, path, type);
+                            scan_folder(subfolder, path, type, priority);
                             free(path);
                         }
                     }
                     else {
                         /* scan the asset */
-                        if(!afs_findfile(folder, filename)) { /* no duplicate files */
+                        assetfile_t* file = afs_findfile(folder, filename);
+                        if(file == NULL) {
                             char* path = join_path(abspath, filename);
-                            afs_storefile(folder, afs_mkfile(filename, path, type));
+                            afs_storefile(folder, afs_mkfile(filename, path, type, priority));
+                            free(path);
+                        }
+                        else if(file->priority != ASSET_PRIMARY && priority == ASSET_PRIMARY) {
+                            char* path = join_path(abspath, filename);
+                            afs_updatefile(file, path);
                             free(path);
                         }
                     }
@@ -1115,16 +1126,22 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type)
                     char* path = join_path(abspath, d->d_name);
                     assetdir_t* subfolder = afs_finddir(folder, d->d_name);
                     subfolder = subfolder ? subfolder : afs_mkdir(folder, d->d_name);
-                    scan_folder(subfolder, path, type);
+                    scan_folder(subfolder, path, type, priority);
                     free(path);
                 }
             }
 
             /* scan the asset */
             else if(is_file) {
-                if(!afs_findfile(folder, d->d_name)) { /* no duplicate files */
+                assetfile_t* file = afs_findfile(folder, d->d_name);
+                if(file == NULL) {
                     char* path = join_path(abspath, d->d_name);
-                    afs_storefile(folder, afs_mkfile(d->d_name, path, type));
+                    afs_storefile(folder, afs_mkfile(d->d_name, path, type, priority));
+                    free(path);
+                }
+                else if(file->priority != ASSET_PRIMARY && priority == ASSET_PRIMARY) {
+                    char* path = join_path(abspath, d->d_name);
+                    afs_updatefile(file, path);
                     free(path);
                 }
             }

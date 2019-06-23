@@ -82,7 +82,6 @@ void scripting_init(int argc, const char** argv)
     surgescript_util_set_error_functions(log_fun, err_fun);
     check_if_compatible();
     vm = surgescript_vm_create();
-    surgescript_parser_set_flags(surgescript_vm_parser(vm), SSPARSER_ALLOW_DUPLICATES); /* for maximum compatibility */
 
     /* copy command line arguments */
     vm_argv = mallocx((vm_argc = argc) * sizeof(*vm_argv));
@@ -116,7 +115,7 @@ void scripting_init(int argc, const char** argv)
     scripting_register_web(vm);
 
     /* compile scripts */
-    assetfs_foreach_file("scripts", ".ss", compile_script, NULL, true);
+    assetfs_foreach_file("scripts", ".ss", compile_script, surgescript_vm_parser(vm), true);
 
     /* if no test script is present... */
     if(found_test_script(vm)) {
@@ -375,13 +374,23 @@ void err_fun(const char* message)
 /* compiles a script */
 int compile_script(const char* filepath, void* param)
 {
+    surgescript_parser_t* parser = (surgescript_parser_t*)param;
+    surgescript_parser_flags_t flags = SSPARSER_DEFAULTS;
     const char* fullpath = assetfs_fullpath(filepath);
+    bool success;
 
+    /* select flags for maximum compatibility */
+    if(!assetfs_is_primary_file(filepath))
+        flags |= SSPARSER_SKIP_DUPLICATES;
+
+    /* Compile script file */
     /*logfile_message("Compiling '%s'...", filepath);*/
-    if(surgescript_vm_compile(vm, fullpath))
-        return 0;
-    else
-        return -1; /* error */
+    surgescript_parser_set_flags(parser, flags);
+    success = surgescript_vm_compile(vm, fullpath);
+    surgescript_parser_set_flags(parser, SSPARSER_DEFAULTS);
+
+    /* done */
+    return success ? 0 : -1;
 }
 
 /* do we have a test script? (that is, did the user write his/her own "Application" object?) */
