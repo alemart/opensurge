@@ -215,16 +215,10 @@ object "Goal Capsule Broken Part" is "entity", "private", "disposable"
 
         // neat explosion ;)
         if((t += Time.delta) >= 0.2 * (1 + r)) {
+            explosion = Level.spawnEntity("Explosion", transform.position).mute();
+            explosion.zindex = actor[0].zindex + 0.01;
             t = 0;
-            state = "explode";
         }
-    }
-
-    state "explode"
-    {
-        explosion = Level.spawnEntity("Explosion", transform.position).mute();
-        explosion.zindex = actor[0].zindex + 0.01;
-        state = "moving";
     }
 
     fun goLeft()
