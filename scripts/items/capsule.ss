@@ -95,12 +95,12 @@ object "Goal Capsule" is "entity", "basic"
             player = otherCollider.entity;
             if(!player.midair) {
                 collider.enabled = false;
-                openCapsule();
+                explodeCapsule();
             }
         }
     }
 
-    fun openCapsule()
+    fun explodeCapsule()
     {
         if(state == "main") {
             brick[0].enabled = false;
