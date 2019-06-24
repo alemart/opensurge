@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: bumpers.ss
-// Description: bumper script
+// File: capsule.ss
+// Description: goal capsule script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
