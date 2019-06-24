@@ -9,6 +9,8 @@ using SurgeEngine.Actor;
 
 object "Explosion" is "entity", "private", "disposable"
 {
+    public zindex = 0.51;
+
     actor = Actor("Explosion");
     silence = false;
 
@@ -20,6 +22,9 @@ object "Explosion" is "entity", "private", "disposable"
             sfx.play();
         }
 
+        // adjust zindex
+        actor.zindex = zindex;
+
         // change state
         state = "exploding";
     }
@@ -28,11 +33,6 @@ object "Explosion" is "entity", "private", "disposable"
     {
         if(actor.animation.finished)
             destroy();
-    }
-
-    fun constructor()
-    {
-        actor.zindex = 0.51;
     }
 
 

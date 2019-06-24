@@ -12,15 +12,18 @@ object "Animal" is "entity", "private", "disposable"
 {
     public id = 0; // animal ID: 0, 1, 2, 3...
     public secondsBeforeMoving = 0.0;
+    public zindex = 0.5;
 
-    animalCount = 12; // max animals; see the sprite
     actor = Actor("Animal");
     platformer = Platformer();
+    animalCount = 12; // max animals; see the sprite
+    t = 0;
 
     state "main"
     {
         // play "appearing" animation
         actor.anim = 2 * Math.clamp(id, 0, animalCount - 1);
+        actor.zindex = zindex;
 
         // wait a bit
         state = "wait";
@@ -29,7 +32,7 @@ object "Animal" is "entity", "private", "disposable"
     state "wait"
     {
         platformer.enabled = false;
-        if(timeout(secondsBeforeMoving)) {
+        if((t += Time.delta) >= secondsBeforeMoving) {
             platformer.enabled = true;
             platformer.propelUpward(240);
             state = "initial jump";

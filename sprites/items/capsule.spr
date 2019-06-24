@@ -1,0 +1,107 @@
+// -----------------------------------------------------------------------------
+// File: capsule.spr
+// Description: goal capsule sprite definition
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Goal Capsule"
+{
+    source_file     "images/capsule.png"
+    source_rect     0 48 256 160
+    frame_size      64 80
+    hot_spot        32 80
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1
+    }
+
+    // pressing
+    animation 1
+    {
+        repeat      FALSE
+        fps         24
+        data        2 3 4 5 6
+    }
+
+    // open
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+}
+
+sprite "Goal Capsule Mask 1"
+{
+    source_file     "images/capsule.png"
+    source_rect     256 48 64 80
+    frame_size      64 80
+    hot_spot        32 80
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Goal Capsule Mask 2"
+{
+    source_file     "images/capsule.png"
+    source_rect     256 128 64 80
+    frame_size      64 80
+    hot_spot        32 80
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Goal Capsule Broken Lateral"
+{
+    source_file     "images/capsule.png"
+    source_rect     0 80 64 32
+    frame_size      16 32
+    hot_spot        8 16
+
+    // left
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // right
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+}
+
+sprite "Goal Capsule Broken Core"
+{
+    source_file     "images/capsule.png"
+    source_rect     16 80 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
