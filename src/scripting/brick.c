@@ -212,8 +212,10 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     if(data->mask != NULL)
         collisionmask_destroy(data->mask);
 
+    image_lock(brick_image);
     data->mask = collisionmask_create(brick_image, 0, 0, image_width(brick_image), image_height(brick_image));
     data->hot_spot = animation->hot_spot;
+    image_unlock(brick_image);
 
     ssfree(sprite_name);
     return NULL;
