@@ -339,7 +339,7 @@ object "DefaultOpeningAnimation.Wheel" is "entity", "awake", "detached", "privat
 {
     transform = Transform();
     actor = Actor("DefaultOpeningAnimation.Wheel");
-    speed = 360;
+    speed = -360;
 
     state "main"
     {
