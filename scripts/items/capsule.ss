@@ -59,11 +59,11 @@ object "Goal Capsule" is "entity", "basic"
         // spawn many animals
         for(s = 1, i = 0; i <= 7; i++) {
             x = Math.floor(i / 2) * (s = -s);
-            spawnAnimal(x, 0.16 + i * 0.12);
+            spawnAnimal(x, 0.66 + i * 0.12);
         }
         for(i = 1; i <= 9; i++) {
             x = Math.floor(Math.random() * 5) - 2;
-            spawnAnimal(x, 1.0 + i * 0.12);
+            spawnAnimal(x, 1.5 + i * 0.12);
         }
 
         // spawn capsule parts
@@ -77,7 +77,7 @@ object "Goal Capsule" is "entity", "basic"
     state "open"
     {
         // the capsule is open!
-        if(timeout(1.0)) {
+        if(timeout(2.0)) {
             Level.clear();
             state = "done";
         }
