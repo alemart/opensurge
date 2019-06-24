@@ -2705,94 +2705,97 @@ entity "Collectible" 4824 5728
 entity "Collectible" 4856 5736
 entity "Spring Booster Right" 5888 6176
 entity "Spring Booster Right" 5360 5632
+entity "Powerup Collectibles" 9312 7424
+entity "Powerup Shield Water" 7792 7520
+entity "Powerup 1up" 5536 6776
+entity "Goal" 10824 6176
+entity "Checkpoint" 10128 6272
+entity "Spring Standard" 8560 6064
+entity "Powerup Collectibles" 7736 6128
+entity "Powerup Collectibles" 6864 6432
+entity "Powerup 1up" 1264 4776
+entity "Powerup Collectibles" 752 4808
+entity "Wolfey" 8752 7480
+entity "Wolfey" 8904 7448
+entity "Wolfey" 4296 5648
+entity "Layer Yellow" 1344 5736
+entity "Layer Yellow" 1312 5736
+entity "Layer Yellow" 1072 5824
+entity "Layer Yellow" 1072 5792
+entity "Layer Green" 1120 5864
+entity "Layer Green" 1152 5864
+entity "Layer Green" 1200 5464
+entity "Layer Green" 1200 5496
+entity "Layer Green" 3616 5704
+entity "Layer Green" 3680 5704
+entity "Layer Green" 3648 5704
+entity "Layer Green" 3744 5704
+entity "Layer Green" 3712 5704
+entity "Layer Green" 3776 5704
+entity "Layer Yellow" 4400 5480
+entity "Layer Yellow" 4432 5480
+entity "Layer Green" 5392 6968
+entity "Layer Green" 5392 6936
+entity "Layer Green" 5392 6904
+entity "Layer Green" 5392 6872
+entity "Layer Green" 5392 5616
+entity "Layer Green" 5392 5584
+entity "Layer Green" 5392 5552
+entity "Layer Green" 5392 5520
+entity "Layer Yellow" 5488 6808
+entity "Layer Yellow" 5456 5744
+entity "Layer Yellow" 5488 5744
+entity "Layer Yellow" 5456 5776
+entity "Layer Yellow" 5488 5776
+entity "Layer Green" 5488 5808
+entity "Layer Green" 5456 5808
+entity "Layer Green" 5456 5840
+entity "Layer Green" 5488 5840
+entity "Layer Yellow" 5488 5456
+entity "Layer Yellow" 5520 6808
+entity "Layer Green" 5552 6808
+entity "Layer Yellow" 5520 5456
+entity "Layer Green" 5552 5456
+entity "Layer Green" 5584 6808
+entity "Layer Green" 5584 5456
+entity "Layer Yellow" 5680 6904
+entity "Layer Yellow" 5680 6936
+entity "Layer Yellow" 5680 6968
+entity "Layer Yellow" 5680 6872
+entity "Layer Green" 5920 6160
+entity "Layer Green" 5920 6128
+entity "Layer Green" 5920 6096
+entity "Layer Green" 5920 6064
+entity "Layer Yellow" 5984 6288
+entity "Layer Yellow" 5984 6320
+entity "Layer Green" 5984 6352
+entity "Layer Green" 5984 6384
+entity "Layer Yellow" 6016 6288
+entity "Layer Yellow" 6016 6320
+entity "Layer Green" 6016 6352
+entity "Layer Green" 6016 6384
+entity "Layer Yellow" 6048 6000
+entity "Layer Yellow" 6016 6000
+entity "Layer Green" 6080 6000
+entity "Layer Green" 6112 6000
+entity "Layer Yellow" 8504 5856
+entity "Layer Yellow" 8472 5856
+entity "Layer Yellow" 8568 5856
+entity "Layer Yellow" 8536 5856
+entity "Layer Green" 9328 6288
+entity "Layer Green" 9360 6288
+entity "Wolfey" 2912 6168
+entity "Crococopter" 3104 6064
+entity "Mosquito" 4144 5664
+entity "Crococopter" 8912 7064
+entity "Crococopter" 8816 7064
+entity "Wolfey" 4176 6648
+entity "Crococopter" 3864 6600
+entity "Crococopter" 3720 6592
+entity "Mosquito" 7912 6320
 
 // legacy items
-item 2 9312 7424
-item 79 7792 7520
-item 82 5376 6952
-item 82 5376 6920
-item 82 5376 6888
-item 83 5664 6888
-item 83 5664 6920
-item 83 5664 6952
-item 82 5376 6856
-item 83 5664 6856
-item 83 5504 6792
-item 83 5472 6792
-item 82 5536 6792
-item 82 5568 6792
-item 1 5536 6776
-item 31 10824 6176
-item 29 10128 6272
-item 82 9344 6272
-item 82 9312 6272
-item 20 8560 6064
-item 2 7736 6128
-item 2 6864 6432
-item 82 5904 6144
-item 82 5904 6112
-item 82 5904 6080
-item 82 5904 6048
-item 83 5968 6272
-item 83 6000 6272
-item 83 5968 6304
-item 83 6000 6304
-item 82 5968 6336
-item 82 6000 6336
-item 82 6000 6368
-item 82 5968 6368
-item 83 8552 5840
-item 83 8520 5840
-item 83 8488 5840
-item 83 8456 5840
-item 82 6064 5984
-item 82 6096 5984
-item 83 6032 5984
-item 83 6000 5984
-item 82 5376 5600
-item 83 5440 5728
-item 83 5472 5728
-item 83 5440 5760
-item 83 5472 5760
-item 82 5472 5792
-item 82 5440 5792
-item 82 5440 5824
-item 82 5472 5824
-item 82 3728 5688
-item 82 3696 5688
-item 82 3664 5688
-item 82 3632 5688
-item 82 3760 5688
-item 82 3600 5688
-item 83 1328 5720
-item 83 1296 5720
-item 83 1056 5808
-item 83 1056 5776
-item 82 1104 5848
-item 82 1136 5848
-item 82 5376 5568
-item 82 5376 5536
-item 82 5376 5504
-item 83 5472 5440
-item 83 5504 5440
-item 82 5536 5440
-item 82 5568 5440
-item 83 4384 5464
-item 83 4416 5464
-item 82 1184 5448
-item 82 1184 5480
-item 1 1264 4776
-item 2 752 4808
 
 // legacy objects
-object "Wolfredo" 8752 7480
-object "Wolfredo" 8904 7448
-object "Lady Bugsy" 8848 7120
-object "Lady Bugsy" 4128 6648
-object "Lady Bugsy" 7856 6352
-object "Lady Bugsy" 2976 6168
-object "Wolfredo" 3104 6128
-object "Lady Bugsy" 4080 5688
-object "Wolfredo" 4296 5648
 
 // EOF
