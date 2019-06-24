@@ -81,8 +81,6 @@ object "DefaultCamera.UpDownLogic"
             state = "wait up";
         else if(player.activity == "ducking")
             state = "wait down";
-        else if(player.activity == "winning")
-            state = "move up";
         else
             moveBackToZero();
     }
