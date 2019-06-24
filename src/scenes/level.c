@@ -827,7 +827,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "act") == 0) {
         if(param_count == 1)
-            act = atoi(param[0]);
+            act = clip(atoi(param[0]), 0, 99);
         else
             logfile_message("Level loader - command 'act' expects one parameter: act number");
     }
