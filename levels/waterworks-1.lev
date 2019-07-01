@@ -2715,9 +2715,9 @@ entity "Powerup Collectibles" 7736 6128
 entity "Powerup Collectibles" 6864 6432
 entity "Powerup 1up" 1264 4776
 entity "Powerup Collectibles" 752 4808
-entity "Wolfey" 8752 7480
-entity "Wolfey" 8904 7448
-entity "Wolfey" 4296 5648
+entity "GreenMarmot" 8752 7480
+entity "GreenMarmot" 8904 7448
+entity "GreenMarmot" 4296 5648
 entity "Layer Yellow" 1344 5736
 entity "Layer Yellow" 1312 5736
 entity "Layer Yellow" 1072 5824
@@ -2784,12 +2784,12 @@ entity "Layer Yellow" 8568 5856
 entity "Layer Yellow" 8536 5856
 entity "Layer Green" 9328 6288
 entity "Layer Green" 9360 6288
-entity "Wolfey" 2912 6168
+entity "GreenMarmot" 2912 6168
 entity "Crococopter" 3104 6064
 entity "Mosquito" 4144 5664
 entity "Crococopter" 8912 7064
 entity "Crococopter" 8816 7064
-entity "Wolfey" 4176 6648
+entity "GreenMarmot" 4176 6648
 entity "Crococopter" 3864 6600
 entity "Crococopter" 3720 6592
 entity "Mosquito" 7912 6320
