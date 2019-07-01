@@ -460,11 +460,10 @@ void player_hit(player_t *player, float direction)
         return;
 
     if(player_get_collectibles() > 0 || player->shield_type != SH_NONE) {
-        if(direction != 0.0f) {
-            player->actor->speed.x = (physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
-            player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
-            player->actor->position.y -= 2; /* bugfix */
-        }
+        if(direction != 0.0f)
+            player->actor->speed.x = fabs(physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
+        player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
+        player->actor->position.y -= 2; /* bugfix */
 
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_hit(player->pa);
