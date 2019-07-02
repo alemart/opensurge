@@ -37,13 +37,13 @@
 /* private data */
 #define INTRO_TIMEOUT       3.0f
 #define INTRO_FADETIME      0.5f
-#define INTRO_BGCOLOR()     color_hex("0a0a0a")
 #define INTRO_FONT          "GoodNeighbors"
-#define INTRO_TEXT          "powered by\nOpen Surge Engine"
+#define INTRO_TEXT          "Open Surge Engine\nopensurge2d.org"
 static float elapsed_time;
 static int debug_mode;
 static font_t* fnt;
 static input_t* in;
+static image_t* box;
 
 /* public functions */
 
@@ -53,10 +53,19 @@ static input_t* in;
  */
 void intro_init(void *foo)
 {
+    image_t* target;
+
     /* initialize variables */
     elapsed_time = 0.0f;
     debug_mode = FALSE;
     in = input_create_user(NULL);
+
+    /* create box */
+    box = image_create(VIDEO_SCREEN_W * 3 / 2, VIDEO_SCREEN_H * 9 / 10);
+    target = image_drawing_target();
+    image_set_drawing_target(box);
+    image_clear(color_hex("ffee11"));
+    image_set_drawing_target(target);
 
     /* create font */
     fnt = font_create(INTRO_FONT);
@@ -81,6 +90,7 @@ void intro_init(void *foo)
 void intro_release()
 {
     font_destroy(fnt);
+    image_destroy(box);
     input_destroy(in);
 }
 
@@ -127,6 +137,9 @@ void intro_update()
 void intro_render()
 {
     v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
-    image_clear(INTRO_BGCOLOR());
+    const float angle = 18.45f / 57.2957795131f;
+
+    image_clear(color_hex("ff8800"));
+    image_draw_rotated(box, VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2, image_width(box)/2, image_height(box)/2, angle, IF_NONE);
     font_render(fnt, camera);
 }
