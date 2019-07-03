@@ -834,7 +834,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 pa->state = PAS_WALKING;
         }
         else {
-            if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING)
+            if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
                 pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
             else if(pa->state == PAS_PUSHING)
                 pa->state = PAS_WALKING;

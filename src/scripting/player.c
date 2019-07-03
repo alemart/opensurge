@@ -371,12 +371,15 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
             surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
             surgescript_objecthandle_t companion, null = surgescript_objectmanager_null(manager);
             for(int i = 0; (companion_name = player_companion_name(player, i)) != NULL; i++) {
+                /* allocate memory */
+                surgescript_heapptr_t addr = COMPANION_BASE_ADDR + i;
+                if(!surgescript_heap_validaddress(heap, addr))
+                    ssassert(addr == surgescript_heap_malloc(heap));
+
+                /* spawn the object */
                 if(surgescript_programpool_is_compiled(pool, companion_name)) {
                     /* spawn the companion in SurgeScript */
                     if(surgescript_object_child(object, companion_name) == null) {
-                        surgescript_heapptr_t addr = COMPANION_BASE_ADDR + i;
-                        if(!surgescript_heap_validaddress(heap, addr))
-                            ssassert(addr == surgescript_heap_malloc(heap));
                         companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);
                         surgescript_var_set_objecthandle(surgescript_heap_at(heap, addr), companion);
                     }
@@ -385,6 +388,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
                     /* the companion doesn't exist in SurgeScript: use the legacy API */
                     logfile_message("Warning: no SurgeScript object found for companion \"%s\" (of \"%s\")", companion_name, player_name(player));
                     level_create_legacy_object(companion_name, v2d_new(0, 0));
+                    surgescript_var_set_null(surgescript_heap_at(heap, addr));
                 }
             }
         }

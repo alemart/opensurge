@@ -238,12 +238,15 @@ int traverse_character(const parsetree_statement_t *stmt, void *character)
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), character, traverse_abilities);
     }
     else if(str_icmp(identifier, "companions") == 0) {
+        static const int MAX_COMPANIONS = 128;
         int j, num_companions = nanoparser_get_number_of_parameters(param_list);
 
         if(darray_length(c->companion_name) > 0)
             fatal_error("Duplicate attribute: companions in \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         else if(num_companions < 1)
             fatal_error("Attribute companions requires one or more companion objects in \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        else if(num_companions > MAX_COMPANIONS)
+            fatal_error("Can't have more than %d companion objects in \"%s\" near line %d", MAX_COMPANIONS, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
         for(j = 1; j <= num_companions; j++) {
             pj = nanoparser_get_nth_parameter(param_list, j);
@@ -254,7 +257,8 @@ int traverse_character(const parsetree_statement_t *stmt, void *character)
     else if(str_icmp(identifier, "companion_object") == 0) { /* deprecated syntax; replaced by 'companions' */
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "companion_object must be the name of an object");
-        darray_push(c->companion_name, str_dup(nanoparser_get_string(p1)));
+        if(darray_length(c->companion_name) == 0)
+            darray_push(c->companion_name, str_dup(nanoparser_get_string(p1)));
     }
     else
         fatal_error("Can't load characters. Unknown identifier \"%s\" in\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
