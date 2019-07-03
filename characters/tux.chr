@@ -9,6 +9,8 @@
 
 character "Tux"
 {
+    companions                      "Super Peel Out"
+
     multipliers
     {
         acceleration                1.0
