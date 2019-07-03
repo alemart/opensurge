@@ -26,6 +26,14 @@ static const char code_in_surgescript[] = "\
 @Plugin \n\
 object 'SurgeEngine' \n\
 { \n\
+    public readonly Vector2 = spawn('VectorFactory'); \n\
+    public readonly Transform = spawn('TransformFactory'); \n\
+    public readonly Audio = spawn('Audio'); \n\
+    public readonly Video = spawn('Video'); \n\
+    public readonly Prefs = spawn('Prefs'); \n\
+    public readonly Lang = spawn('Lang'); \n\
+    public readonly Web = spawn('Web'); \n\
+    public readonly LevelManager = spawn('LevelManager'); \n\
     public readonly Actor = spawn('ActorFactory'); \n\
     public readonly Behavior = spawn('BehaviorFactory'); \n\
     public readonly Brick = spawn('BrickFactory'); \n\
@@ -33,41 +41,22 @@ object 'SurgeEngine' \n\
     public readonly Camera = spawn('Camera'); \n\
     public readonly Collisions = spawn('Collision'); \n\
     public readonly UI = spawn('UI'); \n\
-    public readonly Audio = spawn('Audio'); \n\
-    public readonly Video = spawn('Video'); \n\
-    public readonly Prefs = spawn('Prefs'); \n\
-    public readonly Lang = spawn('Lang'); \n\
-    public readonly Web = spawn('Web'); \n\
-    public readonly Transform = spawn('TransformFactory'); \n\
-    public readonly Vector2 = spawn('VectorFactory'); \n\
     public readonly version = '" GAME_VERSION_STRING "'; \n\
-    levelManager = spawn('LevelManager'); \n\
-\n\
-    fun get_LevelManager() \n\
-    { \n\
-        return levelManager; \n\
-    } \n\
 \n\
     fun get_Level() \n\
     { \n\
-        return levelManager.currentLevel; \n\
+        return LevelManager.currentLevel; \n\
     } \n\
 \n\
     fun get_Player() \n\
     { \n\
-        return levelManager.playerManager; \n\
+        return LevelManager.playerManager; \n\
     } \n\
 \n\
     fun destroy() { } \n\
 } \n\
 \n\
 \n\
-\n\
-\n\
-\n\
-// ----------------------------------------------------------------------------- \n\
-// Factories \n\
-// ----------------------------------------------------------------------------- \n\
 \n\
 object 'ActorFactory' \n\
 { \n\
@@ -90,9 +79,20 @@ object 'BehaviorFactory' \n\
     fun destroy() { } \n\
 } \n\
 \n\
-object 'DirectionalMovementFactory' { fun call() { return caller.spawn('DirectionalMovement'); } } \n\
-object 'PlatformMovementFactory' { fun call() { return caller.spawn('PlatformMovement'); } } \n\
-object 'EnemyFactory' { fun call() { return caller.spawn('Enemy'); } } \n\
+object 'DirectionalMovementFactory' { \n\
+    fun call() { return caller.spawn('DirectionalMovement'); } \n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'PlatformMovementFactory' { \n\
+    fun call() { return caller.spawn('PlatformMovement'); } \n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'EnemyFactory' { \n\
+    fun call() { return caller.spawn('Enemy'); } \n\
+    fun destroy() { } \n\
+} \n\
 \n\
 object 'BrickFactory' \n\
 { \n\
@@ -282,56 +282,6 @@ object 'SoundFactory' \n\
 object 'Video' \n\
 { \n\
     public readonly Screen = spawn('Screen'); \n\
-\n\
-    fun destroy() { } \n\
-} \n\
-\n\
-\n\
-\n\
-// ----------------------------------------------------------------------------- \n\
-// Player API \n\
-// ----------------------------------------------------------------------------- \n\
-\n\
-object 'PlayerManager' \n\
-{ \n\
-    // get player by name or id \n\
-    fun call(nameOrId) \n\
-    { \n\
-        if(typeof(nameOrId) == 'string') { \n\
-            if((player = __getByName(nameOrId)) != null) \n\
-                return player; \n\
-        } \n\
-        else if(typeof(nameOrId) == 'number') { \n\
-            if((player = __getById(nameOrId)) != null) \n\
-                return player; \n\
-        } \n\
-\n\
-        // error \n\
-        Application.crash('Cannot find Player \"' + nameOrId + '\": no such player in the scene.'); \n\
-        return null; \n\
-    } \n\
-\n\
-    // get player by id \n\
-    fun get(playerId) \n\
-    { \n\
-        player = __getById(playerId); \n\
-        if(player == null) \n\
-            Application.crash('Cannot find Player #' + playerId + ': no such player in the scene.'); \n\
-\n\
-        return player; \n\
-    } \n\
-\n\
-    // does the given player exist in the current scene? \n\
-    fun exists(playerName) \n\
-    { \n\
-        return __getByName(playerName) != null; \n\
-    } \n\
-\n\
-    // fun __spawnPlayers() { [builtin] } \n\
-    // fun __getById(id) { [builtin] } \n\
-    // fun __getByName(name) { [builtin] } \n\
-    // fun get_active() { [builtin] } \n\
-    // fun get_count() { [builtin] } \n\
 \n\
     fun destroy() { } \n\
 } \n\
