@@ -57,6 +57,23 @@ static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, cons
 static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinput(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getdying(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getstopped(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwalking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getrunning(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwaiting(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getjumping(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getspringing(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getrolling(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getcharging(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getpushing(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gethit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getbraking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getbalancing(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getdrowning(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getbreathing(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getcrouchingdown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlookingup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwinning(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -159,6 +176,23 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
     surgescript_vm_bind(vm, "Player", "get_input", fun_getinput, 0);
     surgescript_vm_bind(vm, "Player", "get_dying", fun_getdying, 0);
+    surgescript_vm_bind(vm, "Player", "get_stopped", fun_getstopped, 0);
+    surgescript_vm_bind(vm, "Player", "get_walking", fun_getwalking, 0);
+    surgescript_vm_bind(vm, "Player", "get_running", fun_getrunning, 0);
+    surgescript_vm_bind(vm, "Player", "get_waiting", fun_getwaiting, 0);
+    surgescript_vm_bind(vm, "Player", "get_jumping", fun_getjumping, 0);
+    surgescript_vm_bind(vm, "Player", "get_springing", fun_getspringing, 0);
+    surgescript_vm_bind(vm, "Player", "get_rolling", fun_getrolling, 0);
+    surgescript_vm_bind(vm, "Player", "get_charging", fun_getcharging, 0);
+    surgescript_vm_bind(vm, "Player", "get_pushing", fun_getpushing, 0);
+    surgescript_vm_bind(vm, "Player", "get_hit", fun_gethit, 0);
+    surgescript_vm_bind(vm, "Player", "get_braking", fun_getbraking, 0);
+    surgescript_vm_bind(vm, "Player", "get_balancing", fun_getbalancing, 0);
+    surgescript_vm_bind(vm, "Player", "get_drowning", fun_getdrowning, 0);
+    surgescript_vm_bind(vm, "Player", "get_breathing", fun_getbreathing, 0);
+    surgescript_vm_bind(vm, "Player", "get_crouchingDown", fun_getcrouchingdown, 0);
+    surgescript_vm_bind(vm, "Player", "get_lookingUp", fun_getlookingup, 0);
+    surgescript_vm_bind(vm, "Player", "get_winning", fun_getwinning, 0);
 
     /* read-write properties */
     surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
@@ -482,6 +516,125 @@ surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, const sur
 {
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(), player != NULL ? player_seconds_remaining_to_drown(player) : INFINITY);
+}
+
+/* returns true if the player is stopped */
+surgescript_var_t* fun_getstopped(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_STOPPED);
+}
+
+/* returns true if the player is walking */
+surgescript_var_t* fun_getwalking(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_WALKING);
+}
+
+/* returns true if the player is running */
+surgescript_var_t* fun_getrunning(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_RUNNING);
+}
+
+/* returns true if the player is waiting */
+surgescript_var_t* fun_getwaiting(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_WAITING);
+}
+
+/* returns true if the player is jumping */
+surgescript_var_t* fun_getjumping(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_JUMPING);
+}
+
+/* returns true if the player is in the "springing" state */
+surgescript_var_t* fun_getspringing(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_SPRINGING);
+}
+
+/* returns true if the player is rolling */
+surgescript_var_t* fun_getrolling(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_ROLLING);
+}
+
+/* returns true if the player is charging a rolling movement */
+surgescript_var_t* fun_getcharging(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_CHARGING);
+}
+
+/* returns true if the player is pushing a wall */
+surgescript_var_t* fun_getpushing(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_PUSHING);
+}
+
+/* returns true if the player is getting hit */
+surgescript_var_t* fun_gethit(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_GETTINGHIT);
+}
+
+/* returns true if the player is braking */
+surgescript_var_t* fun_getbraking(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_BRAKING);
+}
+
+/* returns true if the player is balancing on a ledge */
+surgescript_var_t* fun_getbalancing(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_LEDGE);
+}
+
+/* returns true if the player is drowning */
+surgescript_var_t* fun_getdrowning(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_DROWNED);
+}
+
+/* returns true if the player is breathing an air bubble underwater */
+surgescript_var_t* fun_getbreathing(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_BREATHING);
+}
+
+/* returns true if the player is crouching down */
+surgescript_var_t* fun_getcrouchingdown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_DUCKING);
+}
+
+/* returns true if the player is looking up */
+surgescript_var_t* fun_getlookingup(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_LOOKINGUP);
+}
+
+/* returns true if the player is in the "winning" state, displayed after clearing a level */
+surgescript_var_t* fun_getwinning(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && physicsactor_get_state(player->pa) == PAS_WINNING);
 }
 
 /* Transform component */
