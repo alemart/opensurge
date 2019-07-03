@@ -13,7 +13,7 @@
 object "DefaultStartup"
 {
     hud = null;
-    cam = spawn("DefaultCamera");
+    cam = spawn("Default Camera");
     switchController = spawn("SwitchController");
     pauseController = spawn("PauseAndQuitController");
     waterController = spawn("WaterController");

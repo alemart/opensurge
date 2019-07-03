@@ -8,12 +8,16 @@ using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Camera;
 using SurgeEngine.Level;
+using SurgeEngine.Vector2;
 using SurgeEngine.Video.Screen;
 
-object "DefaultCamera" is "entity", "awake", "private"
+object "Default Camera" is "entity", "awake", "private"
 {
+    public offset = Vector2.zero; // an adjustable offset
+    public enabled = true; // is this camera enbaled?
+
     transform = Transform();
-    upDown = spawn("DefaultCamera.UpDownLogic");
+    upDown = spawn("Default Camera - UpDownLogic");
     player = Player.active;
 
     state "main"
@@ -55,12 +59,14 @@ object "DefaultCamera" is "entity", "awake", "private"
             state = "frozen";
 
         // update camera
-        Camera.position = transform.position.translatedBy(0, upDown.offset);
+        if(enabled)
+            Camera.position = transform.position.translatedBy(offset.x, offset.y + upDown.offset);
     }
 
     state "frozen"
     {
-        Camera.position = transform.position;
+        if(enabled)
+            Camera.position = transform.position.plus(offset);
     }
 
     fun constructor()
@@ -74,7 +80,7 @@ object "DefaultCamera" is "entity", "awake", "private"
     }
 }
 
-object "DefaultCamera.UpDownLogic"
+object "Default Camera - UpDownLogic"
 {
     public readonly offset = 0;
     player = Player.active;

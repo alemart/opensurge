@@ -5,7 +5,7 @@
 // License: MIT
 // ----------------------------------------------------------------------------
 
-sprite "DefaultCamera"
+sprite "Default Camera"
 {
     source_file     "images/core.png"
     source_rect     128 0 32 32
