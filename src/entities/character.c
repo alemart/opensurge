@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * character.c - Character system: meta data about a playable character
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -89,7 +89,7 @@ character_t *character_new(const char *name)
     character_t *c = mallocx(sizeof *c);
 
     c->name = str_dup(name);
-    c->companion_object_name = str_dup("");
+    darray_init(c->companion_name);
 
     c->multiplier.acc = 1.0f;
     c->multiplier.dec = 1.0f;
@@ -139,9 +139,11 @@ character_t *character_new(const char *name)
 
 void character_delete(character_t* c)
 {
-    free(c->name);
-    free(c->companion_object_name);
+    for(int i = 0; i < darray_length(c->companion_name); i++)
+        free(c->companion_name[i]);
+    darray_release(c->companion_name);
     free(c->animation.sprite_name);
+    free(c->name);
     free(c);
 }
 
@@ -209,19 +211,13 @@ int traverse_character(const parsetree_statement_t *stmt, void *character)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1;
+    const parsetree_parameter_t *p1, *pj;
     character_t *c = (character_t*)character;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
 
-    if(str_icmp(identifier, "companion_object") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "companion_object must be the name of an object");
-        free(c->companion_object_name);
-        c->companion_object_name = str_dup(nanoparser_get_string(p1));
-    }
-    else if(str_icmp(identifier, "multipliers") == 0) {
+    if(str_icmp(identifier, "multipliers") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_program(p1, "multipliers must be a block");
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), character, traverse_multipliers);
@@ -241,8 +237,27 @@ int traverse_character(const parsetree_statement_t *stmt, void *character)
         nanoparser_expect_program(p1, "abilities must be a block");
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), character, traverse_abilities);
     }
+    else if(str_icmp(identifier, "companions") == 0) {
+        int j, num_companions = nanoparser_get_number_of_parameters(param_list);
+
+        if(darray_length(c->companion_name) > 0)
+            fatal_error("Duplicate attribute: companions in \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        else if(num_companions < 1)
+            fatal_error("Attribute companions requires one or more companion objects in \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+        for(j = 1; j <= num_companions; j++) {
+            pj = nanoparser_get_nth_parameter(param_list, j);
+            nanoparser_expect_string(pj, "Attribute companions is a list of objects");
+            darray_push(c->companion_name, str_dup(nanoparser_get_string(pj)));
+        }
+    }
+    else if(str_icmp(identifier, "companion_object") == 0) { /* deprecated syntax; replaced by 'companions' */
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "companion_object must be the name of an object");
+        darray_push(c->companion_name, str_dup(nanoparser_get_string(p1)));
+    }
     else
-        fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        fatal_error("Can't load characters. Unknown identifier \"%s\" in\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }

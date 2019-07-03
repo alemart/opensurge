@@ -378,7 +378,6 @@ enemy_t* create_from_script(const char *object_name)
     e->annotation = "";
     e->category = NULL;
     e->category_count = 0;
-
     e->state = ES_IDLE;
     e->zindex = 0.5f;
     e->actor = actor_create();
@@ -403,7 +402,7 @@ enemy_t* create_from_script(const char *object_name)
     if(object_code != NULL)
         objectcompiler_compile(e, object_code);
     else
-        fatal_error("Can't spawn legacy object '%s': it does not exist!", object_name);
+        fatal_error("Can't spawn \"%s\": the object does not exist!", object_name);
 
     /* success! */
     return e;

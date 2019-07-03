@@ -23,6 +23,7 @@
 #include <math.h>
 #include "scripting.h"
 #include "../core/util.h"
+#include "../core/logfile.h"
 #include "../scenes/level.h"
 #include "../entities/actor.h"
 #include "../entities/player.h"
@@ -115,6 +116,7 @@ static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static const surgescript_heapptr_t INPUT_ADDR = 4;
+static const surgescript_heapptr_t COMPANION_BASE_ADDR = 5;
 static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
@@ -328,6 +330,30 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         surgescript_var_set_objecthandle(surgescript_heap_at(heap, INPUT_ADDR),
             surgescript_objectmanager_spawn(manager, handle, "Input", player->actor->input)
         );
+
+        /* spawn the companion objects */
+        if(player_companion_name(player, 0) != NULL) {
+            const char* companion_name = NULL;
+            surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
+            surgescript_objecthandle_t companion, null = surgescript_objectmanager_null(manager);
+            for(int i = 0; (companion_name = player_companion_name(player, i)) != NULL; i++) {
+                if(surgescript_programpool_is_compiled(pool, companion_name)) {
+                    /* spawn the companion in SurgeScript */
+                    if(surgescript_object_child(object, companion_name) == null) {
+                        surgescript_heapptr_t addr = COMPANION_BASE_ADDR + i;
+                        if(!surgescript_heap_validaddress(heap, addr))
+                            ssassert(addr == surgescript_heap_malloc(heap));
+                        companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);
+                        surgescript_var_set_objecthandle(surgescript_heap_at(heap, addr), companion);
+                    }
+                }
+                else {
+                    /* the companion doesn't exist in SurgeScript: use the legacy API */
+                    logfile_message("Warning: no SurgeScript object found for companion \"%s\" (of \"%s\")", companion_name, player_name(player));
+                    level_create_legacy_object(companion_name, v2d_new(0, 0));
+                }
+            }
+        }
     }
     else
         fatal_error("Player.__init(): can't get the Player pointer for \"%s\"", surgescript_var_fast_get_string(name));

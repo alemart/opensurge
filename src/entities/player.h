@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * player.h - player module
- * Copyright (C) 2008-2011, 2014  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2011, 2014, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,6 +52,7 @@ struct item_list_t;
 struct enemy_list_t;
 struct physicsactor_t;
 struct obstaclemap_t;
+struct character_t;
 struct surgescript_object_t;
 typedef struct player_t player_t;
 typedef enum playershield_t playershield_t;
@@ -98,6 +99,7 @@ struct player_t {
     int thrown_while_rolling;
     int visible;
     struct obstaclemap_t* obstaclemap;
+    const struct character_t* character;
 };
 
 /* public functions */
@@ -166,6 +168,7 @@ const char* player_name(const player_t* player);
 const struct animation_t* player_animation(const player_t* player);
 void player_override_animation(player_t* player, const struct animation_t* animation);
 const char* player_sprite_name(const player_t* player);
+const char* player_companion_name(const player_t* player, int index);
 
 int player_get_collectibles();
 void player_set_collectibles(int c);

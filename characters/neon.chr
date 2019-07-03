@@ -3,13 +3,13 @@
 // http://opensurge2d.org
 //
 // File:   characters/neon.chr
-// Desc:   character definitions: Neon
+// Desc:   character definitions for Neon
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
 character "Neon"
 {
-    companion_object                ".neon_companion"
+    companions                      ".neon_companion"
     
     multipliers
     {

@@ -3,14 +3,12 @@
 // http://opensurge2d.org
 //
 // File:   characters/tux.chr
-// Desc:   character definitions: Tux
-// Author: script by Alexandre, sprite by Constantin from supertuxkart-team
+// Desc:   character definitions for Tux
+// Author: script by Alexandre, sprite art by Constantin from supertuxkart-team
 // ---------------------------------------------------------------------------
 
 character "Tux"
 {
-    companion_object                ".tux_companion"
-    
     multipliers
     {
         acceleration                1.0

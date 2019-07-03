@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * player.c - player module
- * Copyright (C) 2008-2012, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2012, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -47,21 +47,19 @@
 #include "../scripting/scripting.h"
 
 
-/* Uncomment to render the sensors */
-/*#define SHOW_SENSORS*/
 
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 3
 
 /* macros */
-#define ON_STATE(s) \
-    if(p->pa_old_state != (s) && physicsactor_get_state(p->pa) == (s))
+#define ON_STATE(player, s) \
+    if((player)->pa_old_state != (s) && physicsactor_get_state((player)->pa) == (s))
 
-#define CHANGE_ANIM(id) do { \
-    animation_t *an = sprite_get_animation(charactersystem_get(p->name)->animation.sprite_name, charactersystem_get(p->name)->animation.id); \
-    float sf = p->actor->animation_speed_factor; \
-    actor_change_animation(p->actor, an); \
-    actor_change_animation_speed_factor(p->actor, sf); \
+#define CHANGE_ANIM(player, id) do { \
+    animation_t *an = sprite_get_animation((player)->character->animation.sprite_name, (player)->character->animation.id); \
+    float sf = (player)->actor->animation_speed_factor; \
+    actor_change_animation((player)->actor, an); \
+    actor_change_animation_speed_factor((player)->actor, sf); \
 } while(0)
 
 #define ANIM_SPEED_FACTOR(k, spd) \
@@ -71,6 +69,7 @@
     ((x) / 57.2957795131f)
 
 /* private data */
+/*#define SHOW_SENSORS*/                 /* uncomment to render the collision sensors */
 #define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player blink if he/she gets hurt? */
 #define PLAYER_UNDERWATER_BREATH    30.0 /* how many seconds can the player stay underwater before drowning? */
 static int hundred_collectibles;         /* counter (extra lives) */
@@ -79,9 +78,9 @@ static int lives;                        /* shared lives */
 static int score;                        /* shared score */
 
 /* misc */
-static void update_shield(player_t *p);
-static void update_animation(player_t *p);
-static void play_sounds(player_t *p);
+static void update_shield(player_t *player);
+static void update_animation(player_t *player);
+static void play_sounds(player_t *player);
 static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list, surgescript_object_t* (*get_bricklike_object)(int));
 static obstacle_t* item2obstacle(const item_t* item);
 static obstacle_t* object2obstacle(const object_t* object);
@@ -108,6 +107,7 @@ player_t *player_create(const char *character_name)
 
     /* initializing... */
     p->name = str_dup(character_name);
+    p->character = c;
     p->disable_movement = FALSE;
     p->disable_roll = FALSE;
     p->in_locked_area = FALSE;
@@ -118,7 +118,7 @@ player_t *player_create(const char *character_name)
     p->visible = TRUE;
     p->actor = actor_create();
     p->actor->input = input_create_user(NULL);
-    CHANGE_ANIM(stopped);
+    CHANGE_ANIM(p, stopped);
 
     /* auxiliary variables */
     p->on_movable_platform = FALSE;
@@ -160,16 +160,6 @@ player_t *player_create(const char *character_name)
     p->underwater = FALSE;
     p->underwater_timer = 0.0f;
 
-    /* character system: spawning the companion object */
-    if(c->companion_object_name[0] != '\0') {
-        /* try to create the companion object using the new API if possible */
-        if(!level_create_ssobject(c->companion_object_name, v2d_new(0, 0))) {
-            /* not possible; use the old API */
-            enemy_t* e = level_create_legacy_object(c->companion_object_name, v2d_new(0, 0));
-            e->created_from_editor = FALSE;
-        }
-    }
-
     /* character system: setting the multipliers */
     physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);
     physicsactor_set_dec(p->pa, physicsactor_get_dec(p->pa) * c->multiplier.dec);
@@ -197,7 +187,7 @@ player_t *player_create(const char *character_name)
 
     /* success! */
     hundred_collectibles = collectibles = 0;
-    logfile_message("player_create() ok");
+    logfile_message("Created player \"%s\"", p->name);
     return p;
 }
 
@@ -550,7 +540,7 @@ void player_kill(player_t *player)
 
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_kill(player->pa);
-        sound_play( charactersystem_get(player->name)->sample.death );
+        sound_play(player->character->sample.death);
     }
 }
 
@@ -1217,20 +1207,34 @@ void player_override_animation(player_t* player, const animation_t* animation)
  */
 const char* player_sprite_name(const player_t* player)
 {
-    return charactersystem_get(player->name)->animation.sprite_name;
+    return player->character->animation.sprite_name;
+}
+
+
+/*
+ * player_companion_name()
+ * The name of the i-th companion object, or NULL if there is no such companion
+ * index = 0, 1, 2...
+ */
+const char* player_companion_name(const player_t* player, int index)
+{
+    if(index >= 0 && index < darray_length(player->character->companion_name))
+        return player->character->companion_name[index];
+    else
+        return NULL;
 }
 
 
 /* private functions */
 
 /* updates the position and the animation of the current shield */
-void update_shield(player_t *p)
+void update_shield(player_t *player)
 {
-    actor_t *sh = p->shield, *act = p->actor;
+    actor_t *sh = player->shield, *act = player->actor;
     v2d_t off = v2d_new(0,0);
     sh->position = v2d_add(act->position, v2d_rotate(off, -act->angle));
 
-    switch(p->shield_type) {
+    switch(player->shield_type) {
         case SH_SHIELD:
             actor_change_animation(sh, sprite_get_animation("SD_SHIELD", 0));
             break;
@@ -1255,75 +1259,75 @@ void update_shield(player_t *p)
 }
 
 /* updates the animation of the player */
-void update_animation(player_t *p)
+void update_animation(player_t *player)
 {
     /* animations */
-    if(!p->disable_animation_control) {
-        physicsactorstate_t state = physicsactor_get_state(p->pa);
-        float xsp = fabs(physicsactor_get_xsp(p->pa));
-        float gsp = fabs(physicsactor_get_gsp(p->pa));
+    if(!player->disable_animation_control) {
+        physicsactorstate_t state = physicsactor_get_state(player->pa);
+        float xsp = fabs(physicsactor_get_xsp(player->pa));
+        float gsp = fabs(physicsactor_get_gsp(player->pa));
 
         switch(state) {
-            case PAS_STOPPED:    CHANGE_ANIM(stopped);    break;
-            case PAS_WALKING:    CHANGE_ANIM(walking);    break;
-            case PAS_RUNNING:    CHANGE_ANIM(running);    break;
-            case PAS_JUMPING:    CHANGE_ANIM(jumping);    break;
-            case PAS_SPRINGING:  CHANGE_ANIM(springing);  break;
-            case PAS_ROLLING:    CHANGE_ANIM(rolling);    break;
-            case PAS_CHARGING:   CHANGE_ANIM(charging);   break;
-            case PAS_PUSHING:    CHANGE_ANIM(pushing);    break;
-            case PAS_GETTINGHIT: CHANGE_ANIM(gettinghit); break;
-            case PAS_DEAD:       CHANGE_ANIM(dead);       break;
-            case PAS_BRAKING:    CHANGE_ANIM(braking);    break;
-            case PAS_LEDGE:      CHANGE_ANIM(ledge);      break;
-            case PAS_DROWNED:    CHANGE_ANIM(drowned);    break;
-            case PAS_BREATHING:  CHANGE_ANIM(breathing);  break;
-            case PAS_WAITING:    CHANGE_ANIM(waiting);    break;
-            case PAS_DUCKING:    CHANGE_ANIM(ducking);    break;
-            case PAS_LOOKINGUP:  CHANGE_ANIM(lookingup);  break;
-            case PAS_WINNING:    CHANGE_ANIM(winning);    break;
+            case PAS_STOPPED:    CHANGE_ANIM(player, stopped);    break;
+            case PAS_WALKING:    CHANGE_ANIM(player, walking);    break;
+            case PAS_RUNNING:    CHANGE_ANIM(player, running);    break;
+            case PAS_JUMPING:    CHANGE_ANIM(player, jumping);    break;
+            case PAS_SPRINGING:  CHANGE_ANIM(player, springing);  break;
+            case PAS_ROLLING:    CHANGE_ANIM(player, rolling);    break;
+            case PAS_CHARGING:   CHANGE_ANIM(player, charging);   break;
+            case PAS_PUSHING:    CHANGE_ANIM(player, pushing);    break;
+            case PAS_GETTINGHIT: CHANGE_ANIM(player, gettinghit); break;
+            case PAS_DEAD:       CHANGE_ANIM(player, dead);       break;
+            case PAS_BRAKING:    CHANGE_ANIM(player, braking);    break;
+            case PAS_LEDGE:      CHANGE_ANIM(player, ledge);      break;
+            case PAS_DROWNED:    CHANGE_ANIM(player, drowned);    break;
+            case PAS_BREATHING:  CHANGE_ANIM(player, breathing);  break;
+            case PAS_WAITING:    CHANGE_ANIM(player, waiting);    break;
+            case PAS_DUCKING:    CHANGE_ANIM(player, ducking);    break;
+            case PAS_LOOKINGUP:  CHANGE_ANIM(player, lookingup);  break;
+            case PAS_WINNING:    CHANGE_ANIM(player, winning);    break;
         }
 
         if(state == PAS_WALKING || state == PAS_RUNNING)
-            actor_change_animation_speed_factor(p->actor, ANIM_SPEED_FACTOR(480, gsp));
-        else if(state == PAS_ROLLING && !physicsactor_is_in_the_air(p->pa))
-            actor_change_animation_speed_factor(p->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
-        else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_in_the_air(p->pa))))
-            actor_change_animation_speed_factor(p->actor, 1.0f);
-        else if(state == PAS_JUMPING && p->actor->animation_speed_factor < 1.0f)
-            actor_change_animation_speed_factor(p->actor, 1.0f);
+            actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, gsp));
+        else if(state == PAS_ROLLING && !physicsactor_is_in_the_air(player->pa))
+            actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
+        else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_in_the_air(player->pa))))
+            actor_change_animation_speed_factor(player->actor, 1.0f);
+        else if(state == PAS_JUMPING && player->actor->animation_speed_factor < 1.0f)
+            actor_change_animation_speed_factor(player->actor, 1.0f);
     }
     else
-        p->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
+        player->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
 }
 
 /* play sounds as needed */
-void play_sounds(player_t* p)
+void play_sounds(player_t* player)
 {
-    ON_STATE(PAS_JUMPING) {
-        sound_play( charactersystem_get(p->name)->sample.jump );
+    ON_STATE(player, PAS_JUMPING) {
+        sound_play(player->character->sample.jump);
     }
 
-    ON_STATE(PAS_BRAKING) {
-        sound_play( charactersystem_get(p->name)->sample.brake );
+    ON_STATE(player, PAS_BRAKING) {
+        sound_play(player->character->sample.brake);
     }
 
-    ON_STATE(PAS_CHARGING) {
-        sound_play( charactersystem_get(p->name)->sample.charge );
+    ON_STATE(player, PAS_CHARGING) {
+        sound_play(player->character->sample.charge);
     }
 
-    ON_STATE(PAS_ROLLING) {
-        if(p->pa_old_state != PAS_CHARGING)
-            sound_play( charactersystem_get(p->name)->sample.roll );
+    ON_STATE(player, PAS_ROLLING) {
+        if(player->pa_old_state != PAS_CHARGING)
+            sound_play(player->character->sample.roll);
         else
-            sound_play( charactersystem_get(p->name)->sample.release );
+            sound_play(player->character->sample.release);
     }
 
-    if(physicsactor_get_state(p->pa) == PAS_CHARGING) {
-        if(input_button_pressed(p->actor->input, IB_FIRE1)) {
-            sound_t* sample = charactersystem_get(p->name)->sample.charge;
-            float max_pitch = charactersystem_get(p->name)->sample.charge_pitch;
-            float freq = lerp(1.0f, max_pitch, physicsactor_charge_intensity(p->pa) - 0.25f);
+    if(physicsactor_get_state(player->pa) == PAS_CHARGING) {
+        if(input_button_pressed(player->actor->input, IB_FIRE1)) {
+            sound_t* sample = player->character->sample.charge;
+            float max_pitch = player->character->sample.charge_pitch;
+            float freq = lerp(1.0f, max_pitch, physicsactor_charge_intensity(player->pa) - 0.25f);
             sound_play_ex(sample, 1.0f, 0.0f, freq);
         }
     }

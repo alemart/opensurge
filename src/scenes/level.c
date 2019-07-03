@@ -972,8 +972,10 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
                 }
-                else
-                    level_create_legacy_object(name, v2d_new(x, y)); /* old API */
+                else {
+                    enemy_t* e = level_create_legacy_object(name, v2d_new(x, y)); /* old API */
+                    e->created_from_editor = TRUE;
+                }
             }
         }
         else
@@ -1629,6 +1631,7 @@ enemy_t* level_create_legacy_object(const char *name, v2d_t position)
     enemy_t *object = enemy_create(name);
     object->actor->spawn_point = position;
     object->actor->position = position;
+    object->created_from_editor = (name[0] != '.');
     entitymanager_store_object(object);
     return object;
 }
@@ -2621,7 +2624,7 @@ bool ssobject_exists(const char* object_name)
 {
     surgescript_vm_t* vm = surgescript_vm();
     surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
-    return surgescript_programpool_exists(pool, object_name, "state:main");
+    return surgescript_programpool_is_compiled(pool, object_name);
 }
 
 /* get the Level object (SurgeScript) */

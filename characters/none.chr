@@ -3,14 +3,14 @@
 // http://opensurge2d.org
 //
 // File:   characters/none.chr
-// Desc:   character definitions: None. 
-//         a special player that doesn't move and doesn't appear in the screen
+// Desc:   character definitions for 'None' 
+//         'None' a special player that doesn't move and doesn't appear in the screen
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
 character "None"
 {
-    companion_object                ".none_companion"
+    companions                      ".none_companion"
     
     multipliers
     {

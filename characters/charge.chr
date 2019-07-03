@@ -3,14 +3,12 @@
 // http://opensurge2d.org
 //
 // File:   characters/charge.chr
-// Desc:   character definitions: Charge
+// Desc:   character definitions for Charge
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
 character "Charge"
 {
-    companion_object                ".charge_companion"
-    
     multipliers
     {
         acceleration                1.0
