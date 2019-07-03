@@ -7,6 +7,7 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Camera;
+using SurgeEngine.Level;
 using SurgeEngine.Video.Screen;
 
 object "DefaultCamera" is "entity", "awake", "private"
@@ -50,11 +51,16 @@ object "DefaultCamera" is "entity", "awake", "private"
             centerCamera(player.transform.position);
 
         // stop camera
-        if(player.dying)
-            return;
+        if(player.dying || Level.cleared)
+            state = "frozen";
 
         // update camera
         Camera.position = transform.position.translatedBy(0, upDown.offset);
+    }
+
+    state "frozen"
+    {
+        Camera.position = transform.position;
     }
 
     fun constructor()
