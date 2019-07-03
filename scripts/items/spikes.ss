@@ -37,7 +37,7 @@ object "Spikes" is "entity", "basic"
     {
         if(
             !player.blinking && !player.dying &&
-            !player.invincible && player.activity != "gettinghit"
+            !player.invincible && !player.hit
         ) {
             player.hit(actor);
             sfx.play();
@@ -72,7 +72,7 @@ object "Spikes Down" is "entity", "basic"
     {
         if(
             !player.blinking && !player.dying &&
-            !player.invincible && player.activity != "gettinghit"
+            !player.invincible && !player.hit
         ) {
             player.hit(actor);
             sfx.play();

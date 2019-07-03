@@ -218,7 +218,7 @@ object "WaterController.BreathingBehavior"
             }
 
             // drowning sensor
-            if(player.activity == "drowning")
+            if(player.drowning)
                 state = "drowning";
         }
     }

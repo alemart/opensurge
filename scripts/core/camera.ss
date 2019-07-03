@@ -17,7 +17,7 @@ object "Default Camera" is "entity", "awake", "private"
     public enabled = true; // is this camera enbaled?
 
     transform = Transform();
-    upDown = spawn("Default Camera - UpDownLogic");
+    upDown = spawn("Default Camera - Up/Down Logic");
     player = Player.active;
 
     state "main"
@@ -80,7 +80,7 @@ object "Default Camera" is "entity", "awake", "private"
     }
 }
 
-object "Default Camera - UpDownLogic"
+object "Default Camera - Up/Down Logic"
 {
     public readonly offset = 0;
     player = Player.active;
@@ -89,9 +89,9 @@ object "Default Camera - UpDownLogic"
     state "main"
     {
         player = Player.active;
-        if(player.activity == "lookingup")
+        if(player.lookingUp)
             state = "wait up";
-        else if(player.activity == "ducking")
+        else if(player.crouchingDown)
             state = "wait down";
         else
             moveBackToZero();
@@ -101,7 +101,7 @@ object "Default Camera - UpDownLogic"
     {
         if(timeout(2.0))
             state = "move up";
-        else if(Player.active != player || player.activity != "lookingup")
+        else if(Player.active != player || !player.lookingUp)
             state = "main";
         else
             moveBackToZero();
@@ -111,7 +111,7 @@ object "Default Camera - UpDownLogic"
     {
         if(timeout(2.0))
             state = "move down";
-        else if(Player.active != player || player.activity != "ducking")
+        else if(Player.active != player || !player.crouchingDown)
             state = "main";
         else
             moveBackToZero();
@@ -120,14 +120,14 @@ object "Default Camera - UpDownLogic"
     state "move up"
     {
         offset = Math.max(-96, offset - speed * Time.delta);
-        if(Player.active != player || player.activity != "lookingup")
+        if(Player.active != player || !player.lookingUp)
             state = "main";
     }
 
     state "move down"
     {
         offset = Math.min(92, offset + speed * Time.delta);
-        if(Player.active != player || player.activity != "ducking")
+        if(Player.active != player || !player.crouchingDown)
             state = "main";
     }
 
