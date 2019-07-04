@@ -11,7 +11,7 @@ using SurgeEngine.Audio.Sound;
 // companion object in a character definition file (.chr)
 //
 // When you are stopped, hold up and press jump to charge.
-// Release up after 0.5 second and you'll gain a nice boost!
+// Release up after 0.3 second and you'll gain a nice boost!
 //
 object "Super Peel Out"
 {
@@ -43,7 +43,7 @@ object "Super Peel Out"
 
         // ready to go?
         if(player.input.buttonReleased("up")) {
-            if(timeout(0.5)) {
+            if(timeout(0.3)) {
                 player.gsp = speed * player.direction; // dash!!!
                 release.play();
             }
