@@ -3,13 +3,13 @@
 // http://opensurge2d.org
 //
 // File:   characters/surge.chr
-// Desc:   character definitions for Surge
+// Desc:   character definition for Surge
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
 
 character "Surge"
 {
-    companions                      ".surge_companion"
+    companions                      "Surge's Light Sneakers"
     
     multipliers
     {
