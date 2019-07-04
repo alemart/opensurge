@@ -3,7 +3,7 @@
 // http://opensurge2d.org
 //
 // File:   characters/none.chr
-// Desc:   character definitions for 'None' 
+// Desc:   character definition for 'None' 
 //         'None' a special player that doesn't move and doesn't appear in the screen
 // Author: script by Alexandre
 // ---------------------------------------------------------------------------
