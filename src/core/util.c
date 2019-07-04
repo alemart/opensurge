@@ -151,11 +151,11 @@ void fatal_error(const char *fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    logfile_message("%s", buf);
+    logfile_message("----- crash -----\n%s", buf);
 #if defined(A5BUILD)
     al_show_native_message_box(al_get_current_display(),
-        "Fatal error",
-        "An error has been encountered",
+        "Error",
+        "Ooops...",
         buf,
     NULL, ALLEGRO_MESSAGEBOX_ERROR);
 #else

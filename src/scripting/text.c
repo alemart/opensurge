@@ -105,7 +105,7 @@ font_t* scripting_text_fontptr(const surgescript_object_t* object)
     if(font == NULL) {
         surgescript_heap_t* heap = surgescript_object_heap(object);
         const char* text = surgescript_var_fast_get_string(surgescript_heap_at(heap, TEXT_ADDR));
-        fatal_error("Scripting Error: font not found for\n\"%s\"", text);
+        fatal_error("Scripting Error: font not found for \"%s\"", text);
     }
     return font;
 }
@@ -154,7 +154,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* sanity check */
     if(!surgescript_object_has_tag(parent, "entity")) {
         const char* parent_name = surgescript_object_name(parent);
-        fatal_error("Scripting Error: object \"%s\" spawns a Text. Hence, it should be tagged as an \"entity\".", parent_name);
+        scripting_error(object, "Object \"%s\" spawns a Text. Hence, it should be tagged as an \"entity\".", parent_name);
     }
 
     /* done! */

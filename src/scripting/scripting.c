@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdarg.h>
 #include <surgescript/compiler/parser.h>
 #include "scripting.h"
 #include "../core/logfile.h"
@@ -346,6 +347,20 @@ surgescript_object_t* scripting_util_get_component(surgescript_object_t* object,
     surgescript_var_destroy(ret);
     ssfree(accessor_fun);
     return surgescript_objectmanager_get(manager, handle);
+}
+
+/* display a scripting error and crash the application */
+void scripting_error(const surgescript_object_t* object, const char* fmt, ...)
+{
+    const char* object_name = surgescript_object_name(object);
+    char buf[1024];
+    va_list args;
+
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    fatal_error("A scripting error was triggered in \"%s\".\n\n%s", object_name, buf);
 }
 
 

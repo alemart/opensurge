@@ -205,7 +205,7 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
         }
     }
 
-    fatal_error("Scripting Error: %s.spawnEntity() requires object \"%s\" to be an entity.", surgescript_object_name(object), entity_name);
+    scripting_error(object, "%s.spawnEntity() requires object \"%s\" to be an entity.", surgescript_object_name(object), entity_name);
     return NULL;
 }
 

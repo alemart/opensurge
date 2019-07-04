@@ -183,7 +183,7 @@ collider_t* safe_get_collider(surgescript_object_t* object)
     /*if(!surgescript_object_has_tag(object, "collider")) { // unreliable */
     const char* name = surgescript_object_name(object);
     if(!(0 == strcmp(name, "CollisionBox") || 0 == strcmp(name, "CollisionBall"))) {
-        fatal_error("Scripting error: \"%s\" isn't a collider", name);
+        scripting_error(object, "\"%s\" isn't a collider", name);
         return NULL;
     }
 
@@ -440,8 +440,8 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
         parent = surgescript_object_parent(surgescript_objectmanager_get(manager, parent));
         if(parent == root) {
-            fatal_error(
-                "Scripting Error: collider \"%s\" must be a descendant of an entity (parent is \"%s\")",
+            scripting_error(object, 
+                "Collider \"%s\" must be a descendant of an entity (parent is \"%s\")",
                 surgescript_object_name(object),
                 surgescript_object_name(surgescript_objectmanager_get(manager, surgescript_object_parent(object)))
             );
@@ -453,8 +453,8 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
 
     /* validation */
     if(surgescript_object_has_tag(entity, "detached")) {
-        fatal_error(
-            "Scripting Error: \"%s\" won't work with detached entities like \"%s\"",
+        scripting_error(object, 
+            "\"%s\" won't work with detached entities like \"%s\"",
             surgescript_object_name(object),
             surgescript_object_name(entity)
         );
@@ -706,8 +706,8 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
         parent = surgescript_object_parent(surgescript_objectmanager_get(manager, parent));
         if(parent == root) {
-            fatal_error(
-                "Scripting Error: collider \"%s\" must be a descendant of an entity (parent is \"%s\")",
+            scripting_error(object, 
+                "Collider \"%s\" must be a descendant of an entity (parent is \"%s\")",
                 surgescript_object_name(object),
                 surgescript_object_name(surgescript_objectmanager_get(manager, surgescript_object_parent(object)))
             );
@@ -719,8 +719,8 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
 
     /* validation */
     if(surgescript_object_has_tag(entity, "detached")) {
-        fatal_error(
-            "Scripting Error: \"%s\" won't work with detached entities like \"%s\"",
+        scripting_error(object, 
+            "\"%s\" won't work with detached entities like \"%s\"",
             surgescript_object_name(object),
             surgescript_object_name(entity)
         );

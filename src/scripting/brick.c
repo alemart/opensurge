@@ -159,8 +159,8 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
         parent = surgescript_object_parent(surgescript_objectmanager_get(manager, parent));
         if(parent == root) {
-            fatal_error(
-                "Scripting Error: object \"%s\" must be a descendant of an entity (parent is \"%s\")",
+            scripting_error(object, 
+                "Object \"%s\" must be a descendant of an entity (parent is \"%s\")",
                 surgescript_object_name(object),
                 surgescript_object_name(surgescript_objectmanager_get(manager, surgescript_object_parent(object)))
             );

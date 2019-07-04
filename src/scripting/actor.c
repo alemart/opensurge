@@ -150,7 +150,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* sanity check */
     if(!surgescript_object_has_tag(parent, "entity")) {
         const char* parent_name = surgescript_object_name(parent);
-        fatal_error("Scripting Error: object \"%s\" spawns an Actor. Hence, it should be tagged as an \"entity\".", parent_name);
+        scripting_error(object, "Object \"%s\" spawns an Actor. Hence, it should be tagged as an \"entity\".", parent_name);
     }
 
     /* done! */

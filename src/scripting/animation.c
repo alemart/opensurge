@@ -123,7 +123,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 
     /* sanity check */
     if(strcmp(parent_name, "Actor") != 0 && strcmp(parent_name, "Player") != 0) {
-        fatal_error("Scripting Error: object \"%s\" can't spawn an Animation object.", parent_name);
+        scripting_error(object, "Object \"%s\" can't spawn an Animation object.", parent_name);
         /* note: Animation.finished depends on the parent */
     }
 

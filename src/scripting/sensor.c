@@ -83,7 +83,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 
     /* the parent object can't be detached */
     if(surgescript_object_has_tag(parent, "detached"))
-        fatal_error("Scripting Error: an object (\"%s\") that spawns a Sensor cannot be \"detached\".", scripting_util_parent_name(object));
+        scripting_error(object, "An object (\"%s\") that spawns a Sensor cannot be \"detached\".", scripting_util_parent_name(object));
 
     /* done! */
     return NULL;
@@ -136,7 +136,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         surgescript_object_set_userdata(object, sensor);
     }
     else
-        fatal_error("Scripting Error: object \"%s\" spawns a Sensor with invalid coordinates.", scripting_util_parent_name(object));
+        scripting_error(object, "Object \"%s\" spawns a Sensor with invalid coordinates.", scripting_util_parent_name(object));
 
     /* initial configuration */
     ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));

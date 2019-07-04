@@ -278,7 +278,7 @@ player_t* scripting_player_ptr(const surgescript_object_t* object)
     if(player == NULL) {
         surgescript_heap_t* heap = surgescript_object_heap(object);
         const char* name = surgescript_var_fast_get_string(surgescript_heap_at(heap, NAME_ADDR));
-        fatal_error("Scripting Error: player not found - \"%s\"", name);
+        scripting_error(object, "Player not found - \"%s\"", name);
     }
 
     return player;
@@ -338,7 +338,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 
     /* Player must be a child of PlayerManager */
     if(strcmp(surgescript_object_name(parent), "PlayerManager") != 0)
-        fatal_error("Scripting Error: object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
+        scripting_error(object, "Object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
 
     /* done */
     surgescript_var_destroy(tmp[4]);
@@ -405,7 +405,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         }
     }
     else
-        fatal_error("Player.__init(): can't get the Player pointer for \"%s\"", surgescript_var_fast_get_string(name));
+        scripting_error(object, "Player.__init(): can't get the Player pointer for \"%s\"", surgescript_var_fast_get_string(name));
 
     /* done! */
     return surgescript_var_set_bool(surgescript_var_create(), true);
@@ -1103,7 +1103,7 @@ surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_va
                 player_bounce_ex(player, hazard_actor, FALSE);
             }
             else
-                fatal_error("Scripting Error: %s.bounce(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_error(object, "%s.bounce(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else
             player_bounce(player, -1.0f, FALSE);
@@ -1125,10 +1125,10 @@ surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescrip
                 player_bounce_ex(player, hazard_actor, TRUE);
             }
             else
-                fatal_error("Scripting Error: %s.bounceBack(hazard) requires hazard to be an Actor, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_error(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else
-            fatal_error("Scripting Error: %s.bounceBack(hazard) requires hazard to be an Actor, but hazard is null.", surgescript_object_name(object));
+            scripting_error(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is null.", surgescript_object_name(object));
     }
     return NULL;
 }
@@ -1147,7 +1147,7 @@ surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t
                 player_hit_ex(player, hazard_actor);
             }
             else
-                fatal_error("Scripting Error: %s.hit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_error(object, "%s.hit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else {
             float direction = physicsactor_is_facing_right(player->pa) ? -1.0f : 1.0f;
@@ -1487,7 +1487,7 @@ surgescript_var_t* fun_manager_get(surgescript_object_t* object, const surgescri
     }
 
     if(handle == null_handle)
-        fatal_error("Can't find Player #%d: no such player in the scene.", id);
+        scripting_error(object, "Can't find Player #%d: no such player in the scene.", id);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
@@ -1507,7 +1507,7 @@ surgescript_var_t* fun_manager_call(surgescript_object_t* object, const surgescr
     }
 
     if(handle == null_handle)
-        fatal_error("Can't find Player \"%s\": no such player in the scene.", name);
+        scripting_error(object, "Can't find Player \"%s\": no such player in the scene.", name);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }

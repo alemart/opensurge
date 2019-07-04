@@ -6,6 +6,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine.Web;
 
 // Need to hack this?
 // It's not recommended to change this object. You may want to copy this object,
@@ -22,6 +23,7 @@ object "DefaultStartup"
 
     state "main"
     {
+            Web.launchURL("opensurge2d.org");
         // wait for the completion of the opening animation
         if(timeout(3.0)) {
             hud = spawn("DefaultHUD");
