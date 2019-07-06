@@ -14,6 +14,5 @@ object "None"
     {
         // disable physics
         player.frozen = true;
-        Console.print(player.name);
     }
 }
