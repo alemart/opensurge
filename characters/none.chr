@@ -10,7 +10,7 @@
 
 character "None"
 {
-    companions                      ".none_companion"
+    companions                      "None"
     
     multipliers
     {
