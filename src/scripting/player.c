@@ -23,6 +23,7 @@
 #include <math.h>
 #include "scripting.h"
 #include "../core/util.h"
+#include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../scenes/level.h"
 #include "../entities/actor.h"
@@ -1445,7 +1446,7 @@ surgescript_var_t* fun_manager_getbyname(surgescript_object_t* object, const sur
     player_t* player;
 
     for(int i = 0; (player = level_get_player_by_id(i)) != NULL; i++) {
-        if(strcmp(player_name(player), name) == 0) {
+        if(str_icmp(player_name(player), name) == 0) { /* will accept case-insensitive matches (e.g. "none" is "None") */
             surgescript_objecthandle_t handle = surgescript_object_nth_child(object, i);
             return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
         }
