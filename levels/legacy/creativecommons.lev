@@ -13,5 +13,5 @@ theme "themes/none.brk"
 bgtheme "themes/none.bg"
 spawn_point 0 0
 startup ".creativecommons_startup"
-players "none"
+players "None"
 readonly

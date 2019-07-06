@@ -9,5 +9,5 @@ bgtheme "themes/menus/mainmenu.bg"
 music "musics/option.ogg"
 spawn_point 0 0
 startup "CreateMenu"
-players "none"
+players "None"
 readonly
