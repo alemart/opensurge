@@ -107,6 +107,7 @@ using SurgeEngine.Collisions.CollisionBox;
 
 object "Enemy" is "private", "entity", "behavior"
 {
+    public readonly entity = parent; // the entity associated with this behavior
     public score = 100; // how many points should be gained once the player defeats this baddie
     public invincible = false; // should this baddie hit the player even if the player is attacking?
     public enabled = true; // is this behavior enabled?
@@ -145,8 +146,8 @@ object "Enemy" is "private", "entity", "behavior"
     fun constructor()
     {
         // behavior validation
-        if(!parent.hasTag("entity") || !parent.hasTag("enemy"))
-            Application.crash("Object \"" + parent.__name + "\" must be tagged \"entity\", \"enemy\" to use " + this.__name + ".");
+        if(!entity.hasTag("entity") || !entity.hasTag("enemy"))
+            Application.crash("Object \"" + entity.__name + "\" must be tagged \"entity\", \"enemy\" to use " + this.__name + ".");
     }
 
     fun onCollision(otherCollider)
@@ -167,18 +168,18 @@ object "Enemy" is "private", "entity", "behavior"
                 Level.spawnEntity("Animal", collider.center);
                 Level.spawnEntity("Explosion", collider.center);
 
-                // notify & destroy parent
-                if(parent.hasFunction("onEnemyDestroy"))
-                    parent.onEnemyDestroy(player);
-                parent.destroy();
+                // notify & destroy the entity
+                if(entity.hasFunction("onEnemyDestroy"))
+                    entity.onEnemyDestroy(player);
+                entity.destroy();
             }
             else if(!player.invincible) {
                 // hit the player
                 player.hit(actor);
 
-                // notify parent
-                if(parent.hasFunction("onEnemyAttack"))
-                    parent.onEnemyAttack(player);
+                // notify the entity
+                if(entity.hasFunction("onEnemyAttack"))
+                    entity.onEnemyAttack(player);
             }
         }
     }
@@ -188,7 +189,7 @@ object "Enemy" is "private", "entity", "behavior"
     // --- MODIFIERS ---
 
     // set the boundaries of the collider (all coordinates in pixels,
-    // relative to the parent object. Example: setBounds(-8, -16, 8, 16))
+    // relative to the entity. Example: setBounds(-8, -16, 8, 16))
     // this is autodetected, but can be manually adjusted as well
     fun setBounds(left, top, right, bottom)
     {

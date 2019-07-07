@@ -49,6 +49,7 @@ using SurgeEngine.Player;
 
 object "PlatformMovement" is "behavior"
 {
+    public readonly entity = parent; // the entity associated with this behavior
     speed = 120; // speed in px/s
     public gravity = 828; // px/s^2
     public jumpSpeed = 400; // px/s
@@ -74,7 +75,7 @@ object "PlatformMovement" is "behavior"
     {
         // setup
         if(transform == null)
-            transform = sibling("Transform2D") || parent.spawn("Transform2D");
+            transform = entity.child("Transform2D") || entity.spawn("Transform2D");
         if(actor == null)
             actor = sibling("Actor");
         if(sensors == null) {
@@ -161,8 +162,8 @@ object "PlatformMovement" is "behavior"
     fun constructor()
     {
         // behavior validation
-        if(!parent.hasTag("entity"))
-            Application.crash("Object \"" + parent.__name + "\" must be tagged \"entity\" to use " + this.__name + ".");
+        if(!entity.hasTag("entity"))
+            Application.crash("Object \"" + entity.__name + "\" must be tagged \"entity\" to use " + this.__name + ".");
     }
 
     // --- MODIFIERS ----

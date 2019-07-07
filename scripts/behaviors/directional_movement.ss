@@ -52,7 +52,9 @@ using SurgeEngine.Vector2;
 
 object "DirectionalMovement" is "behavior"
 {
+    public readonly entity = parent; // the entity associated with this behavior
     public speed = 0; // speed in px/s
+
     ccwAngle = 0; // counterclockwise angle
     direction = Vector2.right; // initial direction: "forward"
     normalizedDirection = Vector2.right;
@@ -62,7 +64,7 @@ object "DirectionalMovement" is "behavior"
     {
         // setup
         if(transform == null)
-            transform = parent.child("Transform2D") || parent.spawn("Transform2D");
+            transform = entity.child("Transform2D") || entity.spawn("Transform2D");
 
         // move
         if(speed != 0) {
@@ -80,8 +82,8 @@ object "DirectionalMovement" is "behavior"
     fun constructor()
     {
         // behavior validation
-        if(!parent.hasTag("entity"))
-            Application.crash("Object \"" + parent.__name + "\" must be tagged \"entity\" to use " + this.__name + ".");
+        if(!entity.hasTag("entity"))
+            Application.crash("Object \"" + entity.__name + "\" must be tagged \"entity\" to use " + this.__name + ".");
     }
 
 
