@@ -948,10 +948,9 @@ surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript
 /* grants the player a shield */
 surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     player_t* player = get_player(object);
     if(player != NULL) {
-        char* shield = surgescript_var_get_string(param[0], manager);
+        const char* shield = surgescript_var_fast_get_string(param[0]);
         if(strcmp(shield, "none") == 0)
             player_grant_shield(player, SH_NONE);
         else if(strcmp(shield, "shield") == 0)
@@ -966,7 +965,6 @@ surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript
             player_grant_shield(player, SH_ACIDSHIELD);
         else if(strcmp(shield, "wind") == 0)
             player_grant_shield(player, SH_WINDSHIELD);
-        ssfree(shield);
     }
     return NULL;
 }
@@ -1075,17 +1073,15 @@ surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_
 /* set the current layer of the player to one of the following: "green", "yellow", "default" */
 surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     player_t* player = get_player(object);
     if(player != NULL) {
-        char* layer = surgescript_var_get_string(param[0], manager);
+        const char* layer = surgescript_var_fast_get_string(param[0]);
         if(strcmp(layer, "green") == 0)
             player_set_layer(player, BRL_GREEN);
         else if(strcmp(layer, "yellow") == 0)
             player_set_layer(player, BRL_YELLOW);
         else
             player_set_layer(player, BRL_DEFAULT);
-        ssfree(layer);
     }
     return NULL;
 }
