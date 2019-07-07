@@ -25,7 +25,7 @@ character "Charge"
     
     animations
     {
-        sprite_name                 "SD_CHARGE"
+        sprite_name                 "Charge"
         stopped                     0
         walking                     1
         running                     2

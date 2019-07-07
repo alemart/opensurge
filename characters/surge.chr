@@ -27,7 +27,7 @@ character "Surge"
     
     animations
     {
-        sprite_name                 "SD_SURGE"
+        sprite_name                 "Surge"
         stopped                     0
         walking                     1
         running                     2

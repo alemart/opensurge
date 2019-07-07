@@ -1,9 +1,13 @@
-// script by Alexandre
+// -----------------------------------------------------------------------------
+// File: charge.spr
+// Description: sprite definition file (.spr) for Charge
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
 
-// Charge
-sprite SD_CHARGE
+sprite "Charge"
 {
-    source_file     images/charge.png
+    source_file     "images/charge.png"
     source_rect     0 0 300 600
     frame_size      50 50
     hot_spot        25 30

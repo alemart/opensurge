@@ -27,7 +27,7 @@ character "Neon"
     
     animations
     {
-        sprite_name                 "SD_NEON"
+        sprite_name                 "Neon"
         stopped                     0
         walking                     1
         running                     2

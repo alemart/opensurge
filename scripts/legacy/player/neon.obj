@@ -79,6 +79,6 @@ object ".neon_easter"
 
     state "easter show"
     {
-        set_player_animation "SD_NEON" 34
+        set_player_animation "Neon" 34
     }
 }

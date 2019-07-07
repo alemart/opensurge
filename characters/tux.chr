@@ -27,7 +27,7 @@ character "Tux"
     
     animations
     {
-        sprite_name                 "SD_TUX"
+        sprite_name                 "Tux"
         stopped                     0
         walking                     1
         running                     2

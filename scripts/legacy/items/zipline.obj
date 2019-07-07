@@ -241,25 +241,25 @@ object ".Zipline.GrabberPlayerAnim"
 
     state activate_surge
     {
-        set_player_animation SD_SURGE $anim
+        set_player_animation "Surge" $anim
         let $_zipline_offx=7
     }
 
     state activate_neon
     {
-        set_player_animation SD_NEON $anim
+        set_player_animation "Neon" $anim
         let $_zipline_offx=0
     }
 
     state activate_charge
     {
-        set_player_animation SD_CHARGE $anim
+        set_player_animation "Charge" $anim
         let $_zipline_offx=0
     }
 
     state activate_tux
     {
-        set_player_animation SD_TUX $anim
+        set_player_animation "Tux" $anim
         let $_zipline_offx=0
     }
 
