@@ -30,7 +30,7 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_simulatebuttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
 #define BUTTON_UP             0x5979CA        /* hash("up") */
@@ -63,7 +63,7 @@ void scripting_register_input(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Input", "buttonDown", fun_buttondown, 1);
     surgescript_vm_bind(vm, "Input", "buttonPressed", fun_buttonpressed, 1);
     surgescript_vm_bind(vm, "Input", "buttonReleased", fun_buttonreleased, 1);
-    surgescript_vm_bind(vm, "Input", "simulateButtonDown", fun_simulatebuttondown, 1);
+    surgescript_vm_bind(vm, "Input", "simulateButton", fun_simulatebutton, 2);
     surgescript_vm_bind(vm, "Input", "__init", fun_init, 1);
 }
 
@@ -196,27 +196,29 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
     }
 }
 
-/* simulateButtonDown(button): simulates that a button is being held down
+/* simulateButton(button, down): simulates that a button is being held down/not down
  * valid buttons are: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8"
  * for optimization reasons, it's mandatory: button must be of the string type */
-surgescript_var_t* fun_simulatebuttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
+    bool down = surgescript_var_get_bool(param[1]);
+    void (*simulate_button)(input_t*,inputbutton_t) = down ? input_simulate_button_down : input_simulate_button_up;
 
     switch(hash(button)) {
-        case BUTTON_UP:     input_simulate_button_down(input, IB_UP); break;
-        case BUTTON_DOWN:   input_simulate_button_down(input, IB_DOWN); break;
-        case BUTTON_LEFT:   input_simulate_button_down(input, IB_LEFT); break;
-        case BUTTON_RIGHT:  input_simulate_button_down(input, IB_RIGHT); break;
-        case BUTTON_FIRE1:  input_simulate_button_down(input, IB_FIRE1); break;
-        case BUTTON_FIRE2:  input_simulate_button_down(input, IB_FIRE2); break;
-        case BUTTON_FIRE3:  input_simulate_button_down(input, IB_FIRE3); break;
-        case BUTTON_FIRE4:  input_simulate_button_down(input, IB_FIRE4); break;
-        case BUTTON_FIRE5:  input_simulate_button_down(input, IB_FIRE5); break;
-        case BUTTON_FIRE6:  input_simulate_button_down(input, IB_FIRE6); break;
-        case BUTTON_FIRE7:  input_simulate_button_down(input, IB_FIRE7); break;
-        case BUTTON_FIRE8:  input_simulate_button_down(input, IB_FIRE8); break;
+        case BUTTON_UP:     simulate_button(input, IB_UP); break;
+        case BUTTON_DOWN:   simulate_button(input, IB_DOWN); break;
+        case BUTTON_LEFT:   simulate_button(input, IB_LEFT); break;
+        case BUTTON_RIGHT:  simulate_button(input, IB_RIGHT); break;
+        case BUTTON_FIRE1:  simulate_button(input, IB_FIRE1); break;
+        case BUTTON_FIRE2:  simulate_button(input, IB_FIRE2); break;
+        case BUTTON_FIRE3:  simulate_button(input, IB_FIRE3); break;
+        case BUTTON_FIRE4:  simulate_button(input, IB_FIRE4); break;
+        case BUTTON_FIRE5:  simulate_button(input, IB_FIRE5); break;
+        case BUTTON_FIRE6:  simulate_button(input, IB_FIRE6); break;
+        case BUTTON_FIRE7:  simulate_button(input, IB_FIRE7); break;
+        case BUTTON_FIRE8:  simulate_button(input, IB_FIRE8); break;
     }
 
     return NULL;
