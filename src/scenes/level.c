@@ -2582,12 +2582,14 @@ bool render_ssobject(surgescript_object_t* object, void* param)
                 renderqueue_enqueue_ssobject_debug(object);
             return true;
         }
-        else if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render")) {
-            renderqueue_enqueue_ssobject(object);
+        else {
+            ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
+            if(obj_data && obj_data->sleeping)
+                return false;
+            else if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render"))
+                renderqueue_enqueue_ssobject(object);
             return true;
         }
-        else
-            return true;
     }
     else
         return false;
