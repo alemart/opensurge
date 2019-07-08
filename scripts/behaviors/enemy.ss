@@ -118,7 +118,7 @@ object "Enemy" is "private", "entity", "behavior"
 
     state "main"
     {
-        actor = sibling("Actor");
+        actor = entity.child("Actor");
         state = skipAutodetect ? "idle" : "autodetect";
     }
 

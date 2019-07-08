@@ -6,19 +6,19 @@
 // -----------------------------------------------------------------------------
 
 /*
- * This behavior performs a Directional Movement in
- * the 2D plane. It has a direction vector and a
- * speed, a scalar value given in pixels per second.
+ * This behavior makes the entity perform a Directional
+ * Movement on the 2D plane. It has a direction vector
+ * and a speed, a scalar value given in pixels per second.
  *
  * You may control the direction of the movement using
  * a vector or an angle given in degrees. Additionally,
  * you may control the speed of the movement by
  * changing the speed property directly.
  *
- * The Directional Movement is very versatile; for
- * example, you can implement baddies of many types,
- * flying objects, and even racing cars viewed from
- * a top-down view. Your imagination is the limit!
+ * DirectionalMovement is very versatile; for example,
+ * you can implement baddies of many types, flying
+ * objects, and even racing cars viewed from a
+ * top-down view. Your imagination is the limit!
  *
  * Example:
  *

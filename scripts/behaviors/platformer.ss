@@ -77,7 +77,7 @@ object "PlatformMovement" is "behavior"
         if(transform == null)
             transform = entity.child("Transform2D") || entity.spawn("Transform2D");
         if(actor == null)
-            actor = sibling("Actor");
+            actor = entity.child("Actor");
         if(sensors == null) {
             if(actor != null) // autodetect collision box
                 setSensorBox(actor.width * 0.8, actor.height);
@@ -209,8 +209,8 @@ object "PlatformMovement" is "behavior"
         return this;
     }
 
-    // propel upward (useful for double jump, for example)
-    fun propelUpward(speed)
+    // force jump (useful for double jump, for example)
+    fun forceJump(speed)
     {
         if(!ceiling)
             ysp = Math.max(-Math.abs(speed), -topjsp);
@@ -275,25 +275,25 @@ object "PlatformMovement" is "behavior"
     }
 
     // am I touching a wall to my left?
-    fun get_leftwall()
+    fun get_leftWall()
     {
         return lwall;
     }
 
     // am I touching a wall to my right?
-    fun get_rightwall()
+    fun get_rightWall()
     {
         return rwall;
     }
 
     // am I standing on a ledge to my left?
-    fun get_leftledge()
+    fun get_leftLedge()
     {
         return lledge;
     }
 
     // am I standing on a ledge to my right?
-    fun get_rightledge()
+    fun get_rightLedge()
     {
         return rledge;
     }
@@ -388,14 +388,14 @@ object "PlatformMovementAutoWalker"
 
     state "autoWalk"
     {
-        rightwall = platformer.rightwall;
-        leftwall = platformer.leftwall;
+        rightWall = platformer.rightWall;
+        leftWall = platformer.leftWall;
 
-        if((!rightwall && leftwall) || platformer.leftledge)
+        if((!rightWall && leftWall) || platformer.leftLedge)
             platformer.walkRight();
-        else if((rightwall && !leftwall) || platformer.rightledge)
+        else if((rightWall && !leftWall) || platformer.rightLedge)
             platformer.walkLeft();
-        else if(rightwall && leftwall)
+        else if(rightWall && leftWall)
             platformer.stop();
     }
 }

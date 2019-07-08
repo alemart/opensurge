@@ -34,7 +34,7 @@ object "Animal" is "entity", "private", "disposable"
         platformer.enabled = false;
         if((t += Time.delta) >= secondsBeforeMoving) {
             platformer.enabled = true;
-            platformer.propelUpward(240);
+            platformer.forceJump(240);
             state = "initial jump";
         }
     }
