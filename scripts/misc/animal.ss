@@ -57,6 +57,10 @@ object "Animal" is "entity", "private", "disposable"
     {
         if(!platformer.midair)
             platformer.jump();
+        else if(platformer.rightWall)
+            platformer.walkLeft();
+        else if(platformer.leftWall)
+            platformer.walkRight();
     }
 
     fun constructor()
