@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * animation.c - scripting system: animation object
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,8 @@ static surgescript_var_t* fun_getframe(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ANIMID_ADDR = 0;
 static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
 static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
@@ -72,6 +74,8 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_frameCount", fun_getframecount, 0);
     surgescript_vm_bind(vm, "Animation", "get_speedFactor", fun_getspeedfactor, 0);
     surgescript_vm_bind(vm, "Animation", "set_speedFactor", fun_setspeedfactor, 1);
+    surgescript_vm_bind(vm, "Animation", "get_sync", fun_getsync, 0);
+    surgescript_vm_bind(vm, "Animation", "set_sync", fun_setsync, 1);
 }
 
 /*
@@ -276,6 +280,25 @@ surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surges
 
     if(actor != NULL)
         actor_change_animation_speed_factor(actor, factor);
+    
+    return NULL;
+}
+
+/* is the animation synchronized? */
+surgescript_var_t* fun_getsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = get_animation_actor(object);
+    return surgescript_var_set_bool(surgescript_var_create(), actor != NULL ? actor->synchronized_animation : false);
+}
+
+/* makes the animation synchronized (or not) */
+surgescript_var_t* fun_setsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = get_animation_actor(object);
+    bool sync = surgescript_var_get_bool(param[0]);
+
+    if(actor != NULL)
+        actor_synchronize_animation(actor, sync);
     
     return NULL;
 }
