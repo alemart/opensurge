@@ -49,6 +49,11 @@ object "Base Collectible" is "private", "entity"
         return actor.height / 2;
     }
 
+    fun constructor()
+    {
+        actor.animation.sync = true;
+    }
+
 
 
     // --- MODIFIERS ---
