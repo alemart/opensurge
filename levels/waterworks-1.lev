@@ -2482,317 +2482,317 @@ brick 290 10336 6232
 brick 289 10336 6232
 
 // entities
-entity "Background Exchanger" 1200 5368
-entity "Background Exchanger" 1200 5400
-entity "Elevator Cable" 3696 5848
-entity "Elevator Cable" 3696 5720
-entity "Elevator Cable" 3696 6104
-entity "Pipe In" 3792 6696
-entity "Pipe Down" 3792 6760
-entity "Pipe In" 6784 6704
-entity "Pipe Down" 6784 6768
-entity "Spring Booster Right" 8224 6320
-entity "Spring Booster Left" 8624 7088
-entity "Elevator Cable" 8584 6672
-entity "Elevator Cable" 8584 6560
-entity "Background Exchanger" 8704 6752
-entity "Background Exchanger" 8704 6720
-entity "Background Exchanger" 8704 6688
-entity "Background Exchanger" 8704 6656
-entity "Collectible" 1792 5920
-entity "Collectible" 1824 5952
-entity "Collectible" 1856 5984
-entity "Collectible" 1888 6016
-entity "Collectible" 1920 6048
-entity "Collectible" 1952 6080
-entity "Collectible" 1984 6112
-entity "Collectible" 2384 6160
-entity "Collectible" 2416 6160
-entity "Collectible" 2448 6160
-entity "Collectible" 2400 6144
-entity "Collectible" 2432 6144
-entity "Collectible" 3696 6128
-entity "Collectible" 3696 6096
-entity "Collectible" 3696 6000
-entity "Collectible" 3696 5872
-entity "Collectible" 3696 5840
-entity "Collectible" 3696 5968
-entity "Collectible" 3584 5696
-entity "Collectible" 3552 5696
-entity "Collectible" 3520 5696
-entity "Collectible" 3808 5696
-entity "Collectible" 3840 5696
-entity "Collectible" 3872 5696
-entity "Collectible" 4496 5632
-entity "Collectible" 4528 5664
-entity "Collectible" 4560 5696
-entity "Collectible" 5536 5456
-entity "Collectible" 5536 5616
-entity "Collectible" 5616 5544
-entity "Collectible" 5456 5544
-entity "Collectible" 5592 5480
-entity "Collectible" 5584 5592
-entity "Collectible" 5480 5480
-entity "Collectible" 5456 5592
-entity "Collectible" 5456 5640
-entity "Collectible" 6064 6160
-entity "Collectible" 6064 6000
-entity "Collectible" 6144 6088
-entity "Collectible" 5984 6088
-entity "Collectible" 6120 6136
-entity "Collectible" 5984 6136
-entity "Collectible" 6120 6024
-entity "Collectible" 6008 6024
-entity "Collectible" 5984 6184
-entity "Collectible" 6304 6192
-entity "Collectible" 6304 6224
-entity "Collectible" 6304 6256
-entity "Collectible" 8224 7504
-entity "Collectible" 8192 7504
-entity "Collectible" 8160 7504
-entity "Collectible" 7984 7504
-entity "Collectible" 7952 7504
-entity "Collectible" 8584 6704
-entity "Collectible" 8584 6672
-entity "Collectible" 8584 6608
-entity "Collectible" 8584 6576
-entity "Collectible" 8584 6544
-entity "Collectible" 8584 6736
-entity "Collectible" 9904 6288
-entity "Collectible" 9936 6288
-entity "Collectible" 9968 6288
-entity "Collectible" 4400 6352
-entity "Collectible" 4400 6320
-entity "Collectible" 4400 6288
-entity "Collectible" 4400 6256
-entity "Collectible" 5536 6968
-entity "Collectible" 5616 6888
-entity "Collectible" 5456 6888
-entity "Collectible" 5536 6808
-entity "Collectible" 5592 6832
-entity "Collectible" 5480 6832
-entity "Collectible" 5480 6944
-entity "Collectible" 5592 6944
-entity "Collectible" 8768 5792
-entity "Collectible" 8736 5792
-entity "Collectible" 8704 5792
-entity "Collectible" 8672 5792
-entity "Collectible" 9032 5888
-entity "Collectible" 9008 5864
-entity "Collectible" 9056 5912
-entity "Collectible" 9696 6192
-entity "Collectible" 9672 6168
-entity "Collectible" 9648 6144
-entity "Collectible" 9624 6120
-entity "Collectible" 9600 6096
-entity "Water Bubbles" 9040 7424
-entity "Collectible" 8400 7504
-entity "Collectible" 8432 7504
-entity "Collectible" 8464 7504
-entity "Collectible" 8048 6016
-entity "Collectible" 8080 6016
-entity "Collectible" 8112 6016
-entity "Collectible" 8176 6016
-entity "Collectible" 8208 6016
-entity "Collectible" 8240 6016
-entity "Collectible" 8304 6016
-entity "Collectible" 8336 6016
-entity "Collectible" 8368 6016
-entity "Collectible" 6304 6288
-entity "Collectible" 9176 7136
-entity "Collectible" 9272 7176
-entity "Collectible" 9304 7264
-entity "Collectible" 3520 5480
-entity "Collectible" 3552 5480
-entity "Collectible" 3584 5480
-entity "Collectible" 3808 5480
-entity "Collectible" 3840 5480
-entity "Collectible" 3872 5480
-entity "Collectible" 4112 5480
-entity "Collectible" 4144 5480
-entity "Collectible" 4176 5480
-entity "Elevator" 3632 6200
-entity "Collectible" 3696 5808
-entity "Collectible" 3696 5936
-entity "Elevator Cable" 3696 5976
-entity "Collectible" 3696 6064
-entity "Collectible" 9048 7264
-entity "Collectible" 10352 6120
-entity "Collectible" 10224 6248
-entity "Collectible" 10256 6160
-entity "Collectible" 10448 6160
-entity "Collectible" 6304 6320
-entity "Collectible" 4400 6224
-entity "Collectible" 6504 6544
-entity "Collectible" 6536 6544
-entity "Collectible" 9080 7176
-entity "Spring Booster Right" 8752 6432
-entity "Elevator Cable" 8584 6432
-entity "Collectible" 8584 6480
-entity "Collectible" 8584 6448
-entity "Collectible" 8584 6416
-entity "Collectible" 8976 6608
-entity "Collectible" 8976 6576
-entity "Collectible" 8976 6544
-entity "Collectible" 8944 6608
-entity "Collectible" 8944 6576
-entity "Collectible" 8944 6544
-entity "Collectible" 7920 7504
-entity "Elevator" 8528 6768
-entity "Pipe Right" 6008 6968
-entity "Pipe Out" 7744 7024
-entity "Pipe Out" 7072 6368
-entity "Collectible" 288 4960
-entity "Collectible" 320 4960
-entity "Collectible" 352 4960
-entity "Collectible" 608 4848
-entity "Collectible" 640 4848
-entity "Collectible" 672 4848
-entity "Pipe In" 5936 6968
-entity "Pipe Out" 5136 6968
-entity "Spring Booster Right" 6160 6688
-entity "Background Exchanger" 7976 6144
-entity "Background Exchanger" 7944 6144
-entity "Background Exchanger" 7944 6176
-entity "Background Exchanger" 7976 6176
-entity "Background Exchanger" 8008 6144
-entity "Background Exchanger" 8008 6176
-entity "Pipe Right" 3792 6968
-entity "Pipe Up" 7008 6968
-entity "Pipe Right" 6784 7024
-entity "Pipe Right" 7008 6368
-entity "Collectible" 7376 6264
-entity "Tube In" 1024 4968
-entity "Tube In" 1504 5736
-entity "Tube In" 8896 6416
-entity "Tube In" 9392 6288
-entity "Spring Booster Left" 3312 5656
-entity "Collectible" 10584 6144
-entity "Collectible" 10584 6160
-entity "Collectible" 10624 6144
-entity "Collectible" 10560 6112
-entity "Collectible" 10576 6112
-entity "Collectible" 10592 6112
-entity "Collectible" 10608 6112
-entity "Collectible" 10640 6112
-entity "Collectible" 10656 6112
-entity "Collectible" 10624 6128
-entity "Collectible" 10672 6128
-entity "Collectible" 10672 6144
-entity "Collectible" 10640 6160
-entity "Collectible" 10656 6160
-entity "Collectible" 10584 6128
-entity "Collectible" 10768 6112
-entity "Collectible" 10768 6160
-entity "Collectible" 10688 6128
-entity "Collectible" 10688 6112
-entity "Collectible" 10688 6144
-entity "Collectible" 10688 6160
-entity "Collectible" 10704 6160
-entity "Collectible" 10704 6112
-entity "Collectible" 10720 6128
-entity "Collectible" 10720 6144
-entity "Collectible" 10736 6128
-entity "Collectible" 10736 6144
-entity "Collectible" 10752 6112
-entity "Collectible" 10752 6160
-entity "Collectible" 10784 6128
-entity "Collectible" 10784 6144
-entity "Spring Standard Hidden" 5120 5760
-entity "Collectible" 4760 5712
-entity "Collectible" 4792 5720
-entity "Collectible" 4824 5728
-entity "Collectible" 4856 5736
-entity "Spring Booster Right" 5888 6176
-entity "Spring Booster Right" 5360 5632
-entity "Powerup Collectibles" 9312 7424
-entity "Powerup Shield Water" 7792 7520
-entity "Powerup 1up" 5536 6776
-entity "Goal" 10824 6176
-entity "Checkpoint" 10128 6272
-entity "Spring Standard" 8560 6064
-entity "Powerup Collectibles" 7736 6128
-entity "Powerup Collectibles" 6864 6432
-entity "Powerup 1up" 1264 4776
-entity "Powerup Collectibles" 752 4808
-entity "GreenMarmot" 8752 7480
-entity "GreenMarmot" 8904 7448
-entity "GreenMarmot" 4296 5648
-entity "Layer Yellow" 1344 5736
-entity "Layer Yellow" 1312 5736
-entity "Layer Yellow" 1072 5824
-entity "Layer Yellow" 1072 5792
-entity "Layer Green" 1120 5864
-entity "Layer Green" 1152 5864
-entity "Layer Green" 1200 5464
-entity "Layer Green" 1200 5496
-entity "Layer Green" 3616 5704
-entity "Layer Green" 3680 5704
-entity "Layer Green" 3648 5704
-entity "Layer Green" 3744 5704
-entity "Layer Green" 3712 5704
-entity "Layer Green" 3776 5704
-entity "Layer Yellow" 4400 5480
-entity "Layer Yellow" 4432 5480
-entity "Layer Green" 5392 6968
-entity "Layer Green" 5392 6936
-entity "Layer Green" 5392 6904
-entity "Layer Green" 5392 6872
-entity "Layer Green" 5392 5616
-entity "Layer Green" 5392 5584
-entity "Layer Green" 5392 5552
-entity "Layer Green" 5392 5520
-entity "Layer Yellow" 5488 6808
-entity "Layer Yellow" 5456 5744
-entity "Layer Yellow" 5488 5744
-entity "Layer Yellow" 5456 5776
-entity "Layer Yellow" 5488 5776
-entity "Layer Green" 5488 5808
-entity "Layer Green" 5456 5808
-entity "Layer Green" 5456 5840
-entity "Layer Green" 5488 5840
-entity "Layer Yellow" 5488 5456
-entity "Layer Yellow" 5520 6808
-entity "Layer Green" 5552 6808
-entity "Layer Yellow" 5520 5456
-entity "Layer Green" 5552 5456
-entity "Layer Green" 5584 6808
-entity "Layer Green" 5584 5456
-entity "Layer Yellow" 5680 6904
-entity "Layer Yellow" 5680 6936
-entity "Layer Yellow" 5680 6968
-entity "Layer Yellow" 5680 6872
-entity "Layer Green" 5920 6160
-entity "Layer Green" 5920 6128
-entity "Layer Green" 5920 6096
-entity "Layer Green" 5920 6064
-entity "Layer Yellow" 5984 6288
-entity "Layer Yellow" 5984 6320
-entity "Layer Green" 5984 6352
-entity "Layer Green" 5984 6384
-entity "Layer Yellow" 6016 6288
-entity "Layer Yellow" 6016 6320
-entity "Layer Green" 6016 6352
-entity "Layer Green" 6016 6384
-entity "Layer Yellow" 6048 6000
-entity "Layer Yellow" 6016 6000
-entity "Layer Green" 6080 6000
-entity "Layer Green" 6112 6000
-entity "Layer Yellow" 8504 5856
-entity "Layer Yellow" 8472 5856
-entity "Layer Yellow" 8568 5856
-entity "Layer Yellow" 8536 5856
-entity "Layer Green" 9328 6288
-entity "Layer Green" 9360 6288
-entity "GreenMarmot" 2912 6168
-entity "Crococopter" 3104 6064
-entity "Mosquito" 4144 5664
-entity "Crococopter" 8912 7064
-entity "Crococopter" 8816 7064
-entity "GreenMarmot" 4176 6648
-entity "Crococopter" 3864 6600
-entity "Crococopter" 3720 6592
-entity "Mosquito" 7912 6320
+entity "Background Exchanger" 1200 5368 "a082646c7285d69f"
+entity "Background Exchanger" 1200 5400 "0606966584229af2"
+entity "Elevator Cable" 3696 5848 "b03b9b08525c2347"
+entity "Elevator Cable" 3696 5720 "8a1e8750041aaac1"
+entity "Elevator Cable" 3696 6104 "87f8811ce8480fd4"
+entity "Pipe In" 3792 6696 "c2af2eee17f7eacb"
+entity "Pipe Down" 3792 6760 "34ad9f3f64c7d7de"
+entity "Pipe In" 6784 6704 "48c545400ee26ff1"
+entity "Pipe Down" 6784 6768 "dd8769219546776e"
+entity "Spring Booster Right" 8224 6320 "0abe8f07891ce000"
+entity "Spring Booster Left" 8624 7088 "5f5878b5eeb6d9c0"
+entity "Elevator Cable" 8584 6672 "e13dbf227b03c473"
+entity "Elevator Cable" 8584 6560 "d1314cb7f9fcbf3b"
+entity "Background Exchanger" 8704 6752 "00880160afcde885"
+entity "Background Exchanger" 8704 6720 "b9c51d41c4d0f214"
+entity "Background Exchanger" 8704 6688 "e57925dec0c756f0"
+entity "Background Exchanger" 8704 6656 "303a34a76ef7645d"
+entity "Collectible" 1792 5920 "7fd5663b0ad23dd5"
+entity "Collectible" 1824 5952 "946b3c8b162e4cee"
+entity "Collectible" 1856 5984 "a7f92eeb95e2ebf7"
+entity "Collectible" 1888 6016 "aafedaf500cd33e0"
+entity "Collectible" 1920 6048 "0571c5e1dcf25187"
+entity "Collectible" 1952 6080 "f6b0b65d002734e4"
+entity "Collectible" 1984 6112 "21514a98d26cc38d"
+entity "Collectible" 2384 6160 "a0fb9566521d594a"
+entity "Collectible" 2416 6160 "30c4941750367178"
+entity "Collectible" 2448 6160 "46d988a73a11439a"
+entity "Collectible" 2400 6144 "9d5745b7577cc79d"
+entity "Collectible" 2432 6144 "ad0690268cb47952"
+entity "Collectible" 3696 6128 "f59a820169d90520"
+entity "Collectible" 3696 6096 "905961bbc3bbff2a"
+entity "Collectible" 3696 6000 "36e88fb3218e0254"
+entity "Collectible" 3696 5872 "8bfb1e5bf2a70b50"
+entity "Collectible" 3696 5840 "e87e1b1a2f669146"
+entity "Collectible" 3696 5968 "e3dd45228b7ccde4"
+entity "Collectible" 3584 5696 "8724f7ae121bcd7f"
+entity "Collectible" 3552 5696 "36eff5403b294525"
+entity "Collectible" 3520 5696 "3255ce94a474feef"
+entity "Collectible" 3808 5696 "23cc4b12967a4cd2"
+entity "Collectible" 3840 5696 "20278d51fdc9cccb"
+entity "Collectible" 3872 5696 "8334823d0efc0d92"
+entity "Collectible" 4496 5632 "981f5104e842d109"
+entity "Collectible" 4528 5664 "15f2e59ac6d136eb"
+entity "Collectible" 4560 5696 "35a7fda2fd404e46"
+entity "Collectible" 5536 5456 "c11a478ddfd59f5a"
+entity "Collectible" 5536 5616 "dfe72e42c72ea2e4"
+entity "Collectible" 5616 5544 "6acf92e3d016c6a1"
+entity "Collectible" 5456 5544 "07c35a960c0b636c"
+entity "Collectible" 5592 5480 "1c0a256d13f22eaa"
+entity "Collectible" 5584 5592 "c82c290b30652077"
+entity "Collectible" 5480 5480 "e6a4631fb4ad17f7"
+entity "Collectible" 5456 5592 "5f501e5fa24f5018"
+entity "Collectible" 5456 5640 "e7a6147bf5acc8b8"
+entity "Collectible" 6064 6160 "5554d8de8e30bf29"
+entity "Collectible" 6064 6000 "e1c6c6c6c0c83417"
+entity "Collectible" 6144 6088 "7ca8d16efab841bf"
+entity "Collectible" 5984 6088 "6e0306f0fc92befc"
+entity "Collectible" 6120 6136 "48607f672719a481"
+entity "Collectible" 5984 6136 "4265b5ee34be9788"
+entity "Collectible" 6120 6024 "720fe89904cd08a7"
+entity "Collectible" 6008 6024 "6d23b8b4127e5b76"
+entity "Collectible" 5984 6184 "bb1d0dcb5a22ba40"
+entity "Collectible" 6304 6192 "461508a2cd186f34"
+entity "Collectible" 6304 6224 "4188d55de6ab12ea"
+entity "Collectible" 6304 6256 "052204a4e961be4f"
+entity "Collectible" 8224 7504 "ac4a6a91d2f30ef3"
+entity "Collectible" 8192 7504 "200638f84417342e"
+entity "Collectible" 8160 7504 "e2e3adb5f45bd1c6"
+entity "Collectible" 7984 7504 "e44a5fe75cb5d7e5"
+entity "Collectible" 7952 7504 "1cdbd212cf91e50a"
+entity "Collectible" 8584 6704 "17badd5aba56c440"
+entity "Collectible" 8584 6672 "1e812d32b18b79c8"
+entity "Collectible" 8584 6608 "50ba87ebe3791d3b"
+entity "Collectible" 8584 6576 "e8a0e6cc4addc1c1"
+entity "Collectible" 8584 6544 "cf00274889042a02"
+entity "Collectible" 8584 6736 "02775cbd19f0e2d6"
+entity "Collectible" 9904 6288 "94cb393eee877693"
+entity "Collectible" 9936 6288 "8844858ca529bcbe"
+entity "Collectible" 9968 6288 "eed3783dc1150047"
+entity "Collectible" 4400 6352 "53e9d620e8d1db87"
+entity "Collectible" 4400 6320 "48a6dca055e679f0"
+entity "Collectible" 4400 6288 "f575f46b31ebc903"
+entity "Collectible" 4400 6256 "8d8aabc698f83e51"
+entity "Collectible" 5536 6968 "e113c430d8d67a6d"
+entity "Collectible" 5616 6888 "718e73fd9806edd9"
+entity "Collectible" 5456 6888 "f8775d11d3b2b642"
+entity "Collectible" 5536 6808 "88a059494d2c03ae"
+entity "Collectible" 5592 6832 "46944b8bf4917029"
+entity "Collectible" 5480 6832 "309d2d3118337889"
+entity "Collectible" 5480 6944 "64474bb321bc1c38"
+entity "Collectible" 5592 6944 "179c1b257f7f6a00"
+entity "Collectible" 8768 5792 "1e974b952eb314d4"
+entity "Collectible" 8736 5792 "bd35b0fc454bc7fd"
+entity "Collectible" 8704 5792 "d37743bb89ab0f32"
+entity "Collectible" 8672 5792 "5ea1d9d05ec5d5ac"
+entity "Collectible" 9032 5888 "ae090edd9fb6b507"
+entity "Collectible" 9008 5864 "be6f2759ecde79ad"
+entity "Collectible" 9056 5912 "7fde5dafbb900e1e"
+entity "Collectible" 9696 6192 "4e137fc6d2236982"
+entity "Collectible" 9672 6168 "c43b0613a5cf0fd1"
+entity "Collectible" 9648 6144 "a52ea1359ba1458e"
+entity "Collectible" 9624 6120 "75206288797ca485"
+entity "Collectible" 9600 6096 "677acb131b2fdc8c"
+entity "Water Bubbles" 9040 7424 "0c2883d84d152035"
+entity "Collectible" 8400 7504 "46b714ed52aba735"
+entity "Collectible" 8432 7504 "72e847c66c779d3b"
+entity "Collectible" 8464 7504 "2c5cb682b76d5cc1"
+entity "Collectible" 8048 6016 "48a67c36eebc9638"
+entity "Collectible" 8080 6016 "476b9da47cab6114"
+entity "Collectible" 8112 6016 "6c9c49449704f2d6"
+entity "Collectible" 8176 6016 "8059308a5c2a8eb3"
+entity "Collectible" 8208 6016 "70f6cc373d3b176e"
+entity "Collectible" 8240 6016 "3fac35158ae97ac0"
+entity "Collectible" 8304 6016 "8afcf0b404901835"
+entity "Collectible" 8336 6016 "5d4f33f561139545"
+entity "Collectible" 8368 6016 "439687d03bc2432f"
+entity "Collectible" 6304 6288 "21181f28fb92ec69"
+entity "Collectible" 9176 7136 "d60cdcfdf4b1f3f1"
+entity "Collectible" 9272 7176 "c4567e1b85f64c56"
+entity "Collectible" 9304 7264 "42f22970ec78754e"
+entity "Collectible" 3520 5480 "1effb6be315c1624"
+entity "Collectible" 3552 5480 "a911118bd6efa708"
+entity "Collectible" 3584 5480 "dd373715fac6ba46"
+entity "Collectible" 3808 5480 "7d194cf77ab166b2"
+entity "Collectible" 3840 5480 "0de28571c535e8ff"
+entity "Collectible" 3872 5480 "14af89186f065cee"
+entity "Collectible" 4112 5480 "dfa53654027cabd7"
+entity "Collectible" 4144 5480 "ab7229272ea84740"
+entity "Collectible" 4176 5480 "2d5de5724d90c7ce"
+entity "Elevator" 3632 6200 "07e3e01e7e41d5c1"
+entity "Collectible" 3696 5808 "a4043f69e424062a"
+entity "Collectible" 3696 5936 "807badbbb76484a6"
+entity "Elevator Cable" 3696 5976 "71e4519ec1e1a42f"
+entity "Collectible" 3696 6064 "b74347aca9c08ca7"
+entity "Collectible" 9048 7264 "a06a9d7819d8c47e"
+entity "Collectible" 10352 6120 "d8dd1bd4d3b9aa76"
+entity "Collectible" 10224 6248 "e6118cd5a87e84a2"
+entity "Collectible" 10256 6160 "8977b79fee4d112b"
+entity "Collectible" 10448 6160 "fafe8323a362a1c9"
+entity "Collectible" 6304 6320 "af8d13cb052136ca"
+entity "Collectible" 4400 6224 "3afc60f6f1f18627"
+entity "Collectible" 6504 6544 "40e5dadb49610ceb"
+entity "Collectible" 6536 6544 "6768c2cbae499432"
+entity "Collectible" 9080 7176 "d716e7800ec24b9a"
+entity "Spring Booster Right" 8752 6432 "5cd8c5e82424698d"
+entity "Elevator Cable" 8584 6432 "5131ea61b47be21e"
+entity "Collectible" 8584 6480 "220b0c07b11c525a"
+entity "Collectible" 8584 6448 "98ac0b930bddbc7e"
+entity "Collectible" 8584 6416 "b5970c68dc26d886"
+entity "Collectible" 8976 6608 "13359db3365674b7"
+entity "Collectible" 8976 6576 "58dceaed200d159e"
+entity "Collectible" 8976 6544 "5ce8fb060bd1a835"
+entity "Collectible" 8944 6608 "171ea75d8ae0a625"
+entity "Collectible" 8944 6576 "3a29c61d014a4e29"
+entity "Collectible" 8944 6544 "671ff2c4c1f470f5"
+entity "Collectible" 7920 7504 "502a92c5b1dd0554"
+entity "Elevator" 8528 6768 "83191a1d39e96a5e"
+entity "Pipe Right" 6008 6968 "b1aea14d8a9fef0a"
+entity "Pipe Out" 7744 7024 "5930891eef385254"
+entity "Pipe Out" 7072 6368 "ac235f20795837f0"
+entity "Collectible" 288 4960 "7b1e0c199e677b9f"
+entity "Collectible" 320 4960 "b0bdb247bea6b2a8"
+entity "Collectible" 352 4960 "58c8335ce5b855cd"
+entity "Collectible" 608 4848 "8f76990bd493f626"
+entity "Collectible" 640 4848 "c4527e59a997984a"
+entity "Collectible" 672 4848 "797561aa47dfe5fa"
+entity "Pipe In" 5936 6968 "86ec992fd17464b1"
+entity "Pipe Out" 5136 6968 "f66c4f745f298038"
+entity "Spring Booster Right" 6160 6688 "fd4d5af9f780dd38"
+entity "Background Exchanger" 7976 6144 "d73dbf3edafb9282"
+entity "Background Exchanger" 7944 6144 "c149075c61b48527"
+entity "Background Exchanger" 7944 6176 "7c998798af2845ed"
+entity "Background Exchanger" 7976 6176 "c240feecc096ce26"
+entity "Background Exchanger" 8008 6144 "644196f2b114aa3a"
+entity "Background Exchanger" 8008 6176 "a891f7671fc74dee"
+entity "Pipe Right" 3792 6968 "4a3c7d9a387c78f5"
+entity "Pipe Up" 7008 6968 "8dc51cf8a6841d44"
+entity "Pipe Right" 6784 7024 "567656f5fd9ac47e"
+entity "Pipe Right" 7008 6368 "ecb9e82a74b32e76"
+entity "Collectible" 7376 6264 "6ffd0d4f420b15aa"
+entity "Tube In" 1024 4968 "5640353a6efd2901"
+entity "Tube In" 1504 5736 "3c6eb681666cb313"
+entity "Tube In" 8896 6416 "259b34a5f484ceb5"
+entity "Tube In" 9392 6288 "69cb9a309358ca68"
+entity "Spring Booster Left" 3312 5656 "3c2ee948fef9e1fc"
+entity "Collectible" 10584 6144 "123023fd373ded3f"
+entity "Collectible" 10584 6160 "2242650ecdc53925"
+entity "Collectible" 10624 6144 "99a077a7b21a5a17"
+entity "Collectible" 10560 6112 "c7b449b3266c0b63"
+entity "Collectible" 10576 6112 "1c579db88d246bb5"
+entity "Collectible" 10592 6112 "74373da0e4166e22"
+entity "Collectible" 10608 6112 "dc64fc63797d8a7e"
+entity "Collectible" 10640 6112 "c7bbe12e0c762eea"
+entity "Collectible" 10656 6112 "832a0c91f8563837"
+entity "Collectible" 10624 6128 "44c551a0fa207987"
+entity "Collectible" 10672 6128 "b7ded58c4d92b8b4"
+entity "Collectible" 10672 6144 "68b94fe4073b30c5"
+entity "Collectible" 10640 6160 "c8fd8b5ec829d7e4"
+entity "Collectible" 10656 6160 "849bf49ebfa6fd4b"
+entity "Collectible" 10584 6128 "9da55ab3b02d8271"
+entity "Collectible" 10768 6112 "a3401229a6096535"
+entity "Collectible" 10768 6160 "f90d9bd06ec49abf"
+entity "Collectible" 10688 6128 "b8aaa1f454fc5c4a"
+entity "Collectible" 10688 6112 "eb3712aae42ff672"
+entity "Collectible" 10688 6144 "1c16031baee8751e"
+entity "Collectible" 10688 6160 "e59bc63d69e32274"
+entity "Collectible" 10704 6160 "3bc8ccbafdd6f930"
+entity "Collectible" 10704 6112 "7a57694c133118c2"
+entity "Collectible" 10720 6128 "bba8de6e70af0a73"
+entity "Collectible" 10720 6144 "159317de378ca8a7"
+entity "Collectible" 10736 6128 "769dfb370db17836"
+entity "Collectible" 10736 6144 "1100ad518e7ed746"
+entity "Collectible" 10752 6112 "97ed19d91eef3b68"
+entity "Collectible" 10752 6160 "185e76928e4d3f1e"
+entity "Collectible" 10784 6128 "a90a00eeda3da2e0"
+entity "Collectible" 10784 6144 "00f98d64fff761a5"
+entity "Spring Standard Hidden" 5120 5760 "4049f777aba84626"
+entity "Collectible" 4760 5712 "e6570052187e5f2a"
+entity "Collectible" 4792 5720 "f5e729a33a142914"
+entity "Collectible" 4824 5728 "c00a10edf4c4c446"
+entity "Collectible" 4856 5736 "81408c00be089c4e"
+entity "Spring Booster Right" 5888 6176 "a40d474293365ef6"
+entity "Spring Booster Right" 5360 5632 "b2e0ffbc8fcf4fcb"
+entity "Powerup Collectibles" 9312 7424 "2d7e996d6bd24394"
+entity "Powerup Shield Water" 7792 7520 "db5189b009c18213"
+entity "Powerup 1up" 5536 6776 "64811478e25ee5d7"
+entity "Goal" 10824 6176 "6ec4a510c321cddc"
+entity "Checkpoint" 10128 6272 "1b8e56d0e1e17947"
+entity "Spring Standard" 8560 6064 "1404ccd103be0a75"
+entity "Powerup Collectibles" 7736 6128 "2e7acf9519374b21"
+entity "Powerup Collectibles" 6864 6432 "8fb2530d0c5dcdf7"
+entity "Powerup 1up" 1264 4776 "6e9f24726fd0ebac"
+entity "Powerup Collectibles" 752 4808 "1db38fdb20b6217b"
+entity "GreenMarmot" 8752 7480 "98a484ba98a273f9"
+entity "GreenMarmot" 8904 7448 "6820a6e059cce95e"
+entity "GreenMarmot" 4296 5648 "d501ba5fb976e70c"
+entity "Layer Yellow" 1344 5736 "5059d75314d849c2"
+entity "Layer Yellow" 1312 5736 "cf21c9141e79c9d1"
+entity "Layer Yellow" 1072 5824 "6f726e544d096e02"
+entity "Layer Yellow" 1072 5792 "0e88822bf2b4bc5e"
+entity "Layer Green" 1120 5864 "d1fb586f9ab902a6"
+entity "Layer Green" 1152 5864 "375ed15ef9de1923"
+entity "Layer Green" 1200 5464 "245c0566eb2d8dd1"
+entity "Layer Green" 1200 5496 "d6df81f65936828a"
+entity "Layer Green" 3616 5704 "3626d8af326b0d0f"
+entity "Layer Green" 3680 5704 "5dd6764566c778d5"
+entity "Layer Green" 3648 5704 "5c6982b474066364"
+entity "Layer Green" 3744 5704 "88bed018bc5e36a2"
+entity "Layer Green" 3712 5704 "2a2004e298e1624f"
+entity "Layer Green" 3776 5704 "744bbcd2ef57d34b"
+entity "Layer Yellow" 4400 5480 "862288d3f94ece2d"
+entity "Layer Yellow" 4432 5480 "dabd2f81252878f1"
+entity "Layer Green" 5392 6968 "5dd755f60ae23440"
+entity "Layer Green" 5392 6936 "39017666d8a2e028"
+entity "Layer Green" 5392 6904 "7bb2f5753e7eafe8"
+entity "Layer Green" 5392 6872 "f16956b6cf3aa8b7"
+entity "Layer Green" 5392 5616 "3a96827f19541026"
+entity "Layer Green" 5392 5584 "4c22b35bd36a7186"
+entity "Layer Green" 5392 5552 "af34ba64f9aa04e5"
+entity "Layer Green" 5392 5520 "923ee192891cc9ac"
+entity "Layer Yellow" 5488 6808 "1d304dc244771b3f"
+entity "Layer Yellow" 5456 5744 "3e2d69fb8bccdac9"
+entity "Layer Yellow" 5488 5744 "eb5215dab6ccd13c"
+entity "Layer Yellow" 5456 5776 "8bb0c4e0258e879e"
+entity "Layer Yellow" 5488 5776 "a1a834fe2cb5bd11"
+entity "Layer Green" 5488 5808 "9b6d0ac92e77b22b"
+entity "Layer Green" 5456 5808 "b4f3e85cb89cb78f"
+entity "Layer Green" 5456 5840 "d708efd2aa718d20"
+entity "Layer Green" 5488 5840 "74b41a2dee96263a"
+entity "Layer Yellow" 5488 5456 "7f7fecbb5de9c4f6"
+entity "Layer Yellow" 5520 6808 "2ffd8573bc43eaff"
+entity "Layer Green" 5552 6808 "34513822534a32ea"
+entity "Layer Yellow" 5520 5456 "a22cded53b235c0f"
+entity "Layer Green" 5552 5456 "1301f145c0edf977"
+entity "Layer Green" 5584 6808 "1ae685b3f1b69f45"
+entity "Layer Green" 5584 5456 "7f200a472e6c833b"
+entity "Layer Yellow" 5680 6904 "023f68ba428df4fd"
+entity "Layer Yellow" 5680 6936 "0fa2277ecb427054"
+entity "Layer Yellow" 5680 6968 "800e356e6b2a61b4"
+entity "Layer Yellow" 5680 6872 "39d8dd5e81bcd877"
+entity "Layer Green" 5920 6160 "f4d07a7d70895c07"
+entity "Layer Green" 5920 6128 "2de1ecbbdd41af7f"
+entity "Layer Green" 5920 6096 "e42de4c3e8bd13e1"
+entity "Layer Green" 5920 6064 "bdcb364e8158b186"
+entity "Layer Yellow" 5984 6288 "1de65b241e8ca165"
+entity "Layer Yellow" 5984 6320 "6da71e2ee37b4167"
+entity "Layer Green" 5984 6352 "80f41747140b0e25"
+entity "Layer Green" 5984 6384 "9a433e659bd63179"
+entity "Layer Yellow" 6016 6288 "d87e5480a5f4e35b"
+entity "Layer Yellow" 6016 6320 "2bb717673d56bc5d"
+entity "Layer Green" 6016 6352 "4691a53d3dc2a665"
+entity "Layer Green" 6016 6384 "afd2a938570e1a69"
+entity "Layer Yellow" 6048 6000 "6a3c06495f51bc1d"
+entity "Layer Yellow" 6016 6000 "64d09bff5e49b825"
+entity "Layer Green" 6080 6000 "2aec25e901b58215"
+entity "Layer Green" 6112 6000 "e0a5bafd9636cc51"
+entity "Layer Yellow" 8504 5856 "af038e6c12319589"
+entity "Layer Yellow" 8472 5856 "ff1779b11d05b4e2"
+entity "Layer Yellow" 8568 5856 "214a093806d8c70b"
+entity "Layer Yellow" 8536 5856 "c74c63fb708fd445"
+entity "Layer Green" 9328 6288 "9c47d5d7aa497aad"
+entity "Layer Green" 9360 6288 "d38faaf27e26e318"
+entity "GreenMarmot" 2912 6168 "ab65d8fe1ebd68de"
+entity "Crococopter" 3104 6064 "ce652e9c2bdfe58f"
+entity "Mosquito" 4144 5664 "e601f731abc8d984"
+entity "Crococopter" 8912 7064 "c2ce4eff73f7a937"
+entity "Crococopter" 8816 7064 "0c8688795296eba5"
+entity "GreenMarmot" 4176 6648 "beed0094c6998f32"
+entity "Crococopter" 3864 6600 "d02c965519c930ac"
+entity "Crococopter" 3720 6592 "b06e3640f43909cd"
+entity "Mosquito" 7912 6320 "bf67d1c30b96a89e"
 
 // legacy items
 
