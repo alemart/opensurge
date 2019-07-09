@@ -72,6 +72,6 @@ void fatal_error(const char *fmt, ...);
 void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
-uint64_t random64(); /* random 64-bit number */
+uint64_t random64(); /* pseudo-random 64-bit number */
 
 #endif

@@ -212,7 +212,7 @@ const char* str_basename(const char *path)
 /*
  * x64_to_str()
  * Converts a uint64_t to a padded hex-string
- * If buf is NULL, an internal buffer is used
+ * If buf is NULL, an internal buffer is used and returned
  * If buf is not NULL, size should be at least 17
  */
 char* x64_to_str(uint64_t value, char* buf, size_t size)
