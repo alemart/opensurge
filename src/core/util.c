@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * util.c - utilities
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2018-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <time.h>
 #include <math.h>
 #include "v2d.h"
 #include "util.h"
@@ -195,6 +196,32 @@ float lerp_angle(float alpha, float beta, float t)
     return atan2f(c.y, c.x);
 }
 
+/*
+ * random64()
+ * xorshift random number generator
+ */
+uint64_t random64()
+{
+    static uint64_t state = 0;
+
+    /* generate seed: wang hash */
+    if(!state) {
+        state = time(NULL);
+        state = (~state) + (state << 21);
+        state = state ^ (state >> 24); 
+        state = (state + (state << 3)) + (state << 8);
+        state = state ^ (state >> 14); 
+        state = (state + (state << 2)) + (state << 4);
+        state = state ^ (state >> 28);
+        state = state + (state << 31);
+    }
+
+    /* xorshift */ 
+    state ^= state << 13;
+    state ^= state >> 7;
+    state ^= state << 17;
+    return state;
+}
 
 /*
  * merge_sort()

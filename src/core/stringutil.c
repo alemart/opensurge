@@ -207,3 +207,46 @@ const char* str_basename(const char *path)
     }
     return path;
 }
+
+
+/*
+ * x64_to_str()
+ * Converts a uint64_t to a padded hex-string
+ * If buf is NULL, an internal buffer is used
+ * If buf is not NULL, size should be at least 17
+ */
+char* x64_to_str(uint64_t value, char* buf, size_t size)
+{
+    static char c[] = "0123456789abcdef", _buf[17] = "";
+    char *p = buf ? (buf + size) : (_buf + (size = sizeof(_buf)));
+    if(!size) return buf;
+
+    *(--p) = 0;
+    while(--size) {
+        *(--p) = c[value & 15];
+        value >>= 4;
+    }
+
+    return p;
+}
+
+
+/*
+ * str_to_x64()
+ * Converts a hex-string to a uint64_t
+ */
+uint64_t str_to_x64(const char* buf)
+{
+    uint64_t value = 0;
+    static uint8_t t[128] = { /* accepts any 0-128 char */
+        ['0'] = 0, ['1'] = 1, ['2'] = 2, ['3'] = 3, ['4'] = 4,
+        ['5'] = 5, ['6'] = 6, ['7'] = 7, ['8'] = 8, ['9'] = 9,
+        ['a'] = 10, ['b'] = 11, ['c'] = 12, ['d'] = 13, ['e'] = 14, ['f'] = 15,
+        ['A'] = 10, ['B'] = 11, ['C'] = 12, ['D'] = 13, ['E'] = 14, ['F'] = 15
+    };
+
+    while(*buf)
+        value = (value << 4) | t[*(buf++) & 127];
+
+    return value;
+}
