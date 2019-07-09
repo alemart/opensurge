@@ -652,12 +652,14 @@ int level_save(const char *filepath)
     }
 
     /* dialog regions */
-    fprintf(fp, "\n// dialogs\n");
-    for(i=0; i<dialogregion_size; i++) {
-        char title[256], message[1024];
-        str_cpy(title, str_addslashes(dialogregion[i].title), sizeof(title));
-        str_cpy(message, str_addslashes(dialogregion[i].message), sizeof(message));
-        fprintf(fp, "dialogbox %d %d %d %d \"%s\" \"%s\"\n", dialogregion[i].rect_x, dialogregion[i].rect_y, dialogregion[i].rect_w, dialogregion[i].rect_h, title, message);
+    if(dialogregion_size > 0) {
+        fprintf(fp, "\n// dialogs\n");
+        for(i=0; i<dialogregion_size; i++) {
+            char title[256], message[1024];
+            str_cpy(title, str_addslashes(dialogregion[i].title), sizeof(title));
+            str_cpy(message, str_addslashes(dialogregion[i].message), sizeof(message));
+            fprintf(fp, "dialogbox %d %d %d %d \"%s\" \"%s\"\n", dialogregion[i].rect_x, dialogregion[i].rect_y, dialogregion[i].rect_w, dialogregion[i].rect_h, title, message);
+        }
     }
 
     /* brick list */
@@ -681,17 +683,21 @@ int level_save(const char *filepath)
     surgescript_object_traverse_tree_ex(level_ssobject(), fp, save_ssobject);
 
     /* item list */
-    fprintf(fp, "\n// legacy items\n");
-    for(iti=item_list; iti; iti=iti->next) {
-        if(iti->data->state != IS_DEAD)
-           fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
+    if(item_list) {
+        fprintf(fp, "\n// legacy items\n");
+        for(iti=item_list; iti; iti=iti->next) {
+            if(iti->data->state != IS_DEAD)
+                fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
+        }
     }
 
     /* legacy object list */
-    fprintf(fp, "\n// legacy objects\n");
-    for(ite=object_list; ite; ite=ite->next) {
-        if(ite->data->created_from_editor && ite->data->state != ES_DEAD)
-            fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
+    if(object_list) {
+        fprintf(fp, "\n// legacy objects\n");
+        for(ite=object_list; ite; ite=ite->next) {
+            if(ite->data->created_from_editor && ite->data->state != ES_DEAD)
+                fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
+        }
     }
 
     /* done! */
