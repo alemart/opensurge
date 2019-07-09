@@ -17,8 +17,6 @@ spawn_point 112 9960
 startup "DefaultStartup"
 players "Tux"
 
-// dialogs
-
 // bricks
 brick 0 896 10000
 brick 0 960 10000
@@ -97,9 +95,5 @@ entity "Crococopter" 448 9872 "baa633d3499334e5"
 entity "Crococopter" 480 9912 "b88c38f7fac98bcc"
 entity "Powerup Lucky Bonus" 40 10000 "fbaece6f41916bdb"
 entity "Mosquito" 640 9968 "e2044c7669abdfcc"
-
-// legacy items
-
-// legacy objects
 
 // EOF

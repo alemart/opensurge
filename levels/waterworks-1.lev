@@ -19,8 +19,6 @@ startup "DefaultStartup" "WaterworksSetup"
 players "Surge" "Neon"
 waterlevel 7296
 
-// dialogs
-
 // bricks
 brick 41 7744 7744
 brick 33 8688 7488
@@ -2793,9 +2791,5 @@ entity "GreenMarmot" 4176 6648 "beed0094c6998f32"
 entity "Crococopter" 3864 6600 "d02c965519c930ac"
 entity "Crococopter" 3720 6592 "b06e3640f43909cd"
 entity "Mosquito" 7912 6320 "bf67d1c30b96a89e"
-
-// legacy items
-
-// legacy objects
 
 // EOF
