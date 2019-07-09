@@ -91,7 +91,7 @@ static hashtable_##T* hashtable_##T##_create() \
         h->key_clone = __h_default_clone_key_##T; \
     if(h->key_delete == NULL) \
         h->key_delete = __h_default_delete_key_##T; \
-    for(i=0; i<__H_CAPACITY; i++) \
+    for(i = 0; i < __H_CAPACITY; i++) \
         h->data[i] = NULL; \
     return h; \
 } \
@@ -100,7 +100,7 @@ static hashtable_##T* hashtable_##T##_destroy(hashtable_##T *h) \
     int i; \
     hashtable_list_##T *p, *q; \
     logfile_message("hashtable_" #T "_destroy()"); \
-    for(i=0; i<__H_CAPACITY; i++) { \
+    for(i = 0; i < __H_CAPACITY; i++) { \
         p = h->data[i]; \
         while(p != NULL) { \
             q = p->next; \
@@ -181,6 +181,18 @@ static void hashtable_##T##_remove(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
         } \
     } \
 } \
+static int hashtable_##T##_foreach(hashtable_##T *h, void *data, void (*callback)(T*,void*)) \
+{ \
+    int i, count = 0; \
+    hashtable_list_##T *p; \
+    for(i = 0; i < __H_CAPACITY; i++) { \
+        for(p = h->data[i]; p != NULL; p = p->next) { \
+            ++count; \
+            callback(p->value, data); \
+        } \
+    } \
+    return count; \
+} \
 static int hashtable_##T##_ref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
     uint32_t k = __H_BUCKET(h, key); \
@@ -227,8 +239,8 @@ static void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
              to store the unreferenced entries */ \
     int i; \
     hashtable_list_##T *q; \
-    for(i=0; i<__H_CAPACITY; i++) { \
-        for(q=h->data[i]; q!=NULL; q=q->next) { \
+    for(i = 0; i < __H_CAPACITY; i++) { \
+        for(q = h->data[i]; q != NULL; q = q->next) { \
             if(q->reference_count <= 0) { \
                 hashtable_##T##_remove(h, q->key); \
                 return; /* fast hack */ \
@@ -284,6 +296,7 @@ static void __h_unused_##T() \
     (void)hashtable_##T##_find; \
     (void)hashtable_##T##_add; \
     (void)hashtable_##T##_remove; \
+    (void)hashtable_##T##_foreach; \
     (void)hashtable_##T##_ref; \
     (void)hashtable_##T##_refcount; \
     (void)hashtable_##T##_unref; \
