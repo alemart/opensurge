@@ -60,31 +60,30 @@ color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
  */
 color_t color_hex(const char* hex_string)
 {
-    char buf[9] = "000000ff", *p, c;
+    static const char t[128] = { /* accepts any 0-127 char */
+        ['0'] = 0, ['1'] = 1, ['2'] = 2, ['3'] = 3, ['4'] = 4,
+        ['5'] = 5, ['6'] = 6, ['7'] = 7, ['8'] = 8, ['9'] = 9,
+        ['a'] = 10, ['b'] = 11, ['c'] = 12, ['d'] = 13, ['e'] = 14, ['f'] = 15,
+        ['A'] = 10, ['B'] = 11, ['C'] = 12, ['D'] = 13, ['E'] = 14, ['F'] = 15
+    };
+    char buf[8] = { 0, 0, 0, 0, 0, 0, 15, 15 }, *p = buf;
     uint8_t r, g, b, a;
 
-    /* sanitize hex color */
-    for(p = buf; *p && *hex_string; p++) {
-        c = *(hex_string++);
-        if(c >= 'a' && c <= 'f')
-            *p = c - 'a' + 10;
-        else if(c >= 'A' && c <= 'F')
-            *p = c - 'A' + 10;
-        else if(c >= '0' && c <= '9')
-            *p = c - '0';
-    }
+    /* process hex color */
+    while(p < buf + sizeof(buf) && *hex_string)
+        *p++ = t[*hex_string++ & 127];
 
     /* obtain colors */
     if(p > buf + 3) {
-        r = buf[0] * 16 + buf[1];
-        g = buf[2] * 16 + buf[3];
-        b = buf[4] * 16 + buf[5];
-        a = buf[6] * 16 + buf[7];
+        r = (buf[0] << 4) + buf[1];
+        g = (buf[2] << 4) + buf[3];
+        b = (buf[4] << 4) + buf[5];
+        a = (buf[6] << 4) + buf[7];
     }
     else {
-        r = buf[0] * 16 + buf[0];
-        g = buf[1] * 16 + buf[1];
-        b = buf[2] * 16 + buf[2];
+        r = (buf[0] << 4) + buf[0];
+        g = (buf[1] << 4) + buf[1];
+        b = (buf[2] << 4) + buf[2];
         a = 255;
     }
 
