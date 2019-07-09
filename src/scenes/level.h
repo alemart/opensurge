@@ -64,11 +64,11 @@ struct player_t* level_get_player_by_name(const char* name);
 struct player_t* level_get_player_by_id(int id);
 
 /* level objects */
+void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
 struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip);
 struct item_t* level_create_legacy_item(int id, v2d_t position);
 struct enemy_t* level_create_legacy_object(const char *name, v2d_t position);
-surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t position);
-void level_create_particle(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
+surgescript_object_t* level_create_entity(const char* object_name, v2d_t position);
 
 /* camera */
 void level_set_camera_focus(struct actor_t *act);
