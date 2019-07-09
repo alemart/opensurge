@@ -207,11 +207,12 @@ static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
 static surgescript_object_t* level_ssobject();
-static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor);
+static surgescript_object_t* spawn_ssobject(const char* object_name, uint64_t id, v2d_t spawn_point, int spawned_in_the_editor);
 static bool save_ssobject(surgescript_object_t* object, void* param);
 typedef struct ssobj_extradata_t ssobj_extradata_t;
-struct ssobj_extradata_t { v2d_t spawn_point; int spawned_in_the_editor; int sleeping; };
+struct ssobj_extradata_t { uint64_t id; v2d_t spawn_point; int spawned_in_the_editor; int sleeping; };
 static v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object);
+static uint64_t get_ssobj_id(const surgescript_object_t* object);
 static int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
 static int is_ssobj_sleeping(const surgescript_object_t* object);
 static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object);
@@ -858,15 +859,19 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'spawn_point' expects two parameters: xpos, ypos");
     }
     else if(str_icmp(identifier, "dialogbox") == 0) {
-        if(param_count == 6 && dialogregion_size < DIALOGREGION_MAX) {
-            dialogregion_t *d = &(dialogregion[dialogregion_size++]);
-            d->disabled = FALSE;
-            d->rect_x = atoi(param[0]);
-            d->rect_y = atoi(param[1]);
-            d->rect_w = atoi(param[2]);
-            d->rect_h = atoi(param[3]);
-            str_cpy(d->title, param[4], sizeof(d->title));
-            str_cpy(d->message, param[5], sizeof(d->message));
+        if(param_count == 6) {
+            if(dialogregion_size < DIALOGREGION_MAX) {
+                dialogregion_t *d = &(dialogregion[dialogregion_size++]);
+                d->disabled = FALSE;
+                d->rect_x = atoi(param[0]);
+                d->rect_y = atoi(param[1]);
+                d->rect_w = atoi(param[2]);
+                d->rect_h = atoi(param[3]);
+                str_cpy(d->title, param[4], sizeof(d->title));
+                str_cpy(d->message, param[5], sizeof(d->message));
+            }
+            else
+                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
         }
         else
             logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
@@ -878,7 +883,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'readonly' expects no parameters");
     }
     else if(str_icmp(identifier, "brick") == 0) {
-        if(param_count >= 3) {
+        if(param_count == 3 || param_count == 4 || param_count == 5) {
             if(*theme != 0) {
                 bricklayer_t layer = BRL_DEFAULT;
                 brickflip_t flip = BRF_NOFLIP;
@@ -902,10 +907,10 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 logfile_message("Level loader - warning: cannot create a new brick if the theme is not defined");
         }
         else
-            logfile_message("Level loader - command 'brick' expects three or four parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
+            logfile_message("Level loader - command 'brick' expects three, four or five parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
     }
     else if(str_icmp(identifier, "entity") == 0) {
-        if(param_count == 3) {
+        if(param_count == 3 || param_count == 4) {
             const char* name = param[0];
             int x = atoi(param[1]);
             int y = atoi(param[2]);
@@ -914,13 +919,15 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
+                    else if(param_count > 3 && get_ssobj_extradata(obj))
+                        get_ssobj_extradata(obj)->id = str_to_x64(param[3]);
                 }
                 else
                     fatal_error("Level loader - can't spawn \"%s\": entity does not exist", name);
             }
         }
         else
-            logfile_message("Level loader - command 'entity' expects three parameters: name, xpos, ypos");
+            logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
     }
     else if(str_icmp(identifier, "startup") == 0) {
         if(param_count > 0) {
@@ -1654,7 +1661,7 @@ surgescript_object_t* level_create_ssobject(const char* object_name, v2d_t posit
             !surgescript_tagsystem_has_tag(tag_system, object_name, "private") &&
             !is_startup_object(object_name)
         ;
-        return spawn_ssobject(object_name, position, spawned_in_the_editor);
+        return spawn_ssobject(object_name, random64(), position, spawned_in_the_editor);
     }
     else
         return NULL;
@@ -2638,7 +2645,7 @@ surgescript_object_t* level_ssobject()
 }
 
 /* spawns a ssobject */
-surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor)
+surgescript_object_t* spawn_ssobject(const char* object_name, uint64_t id, v2d_t spawn_point, int spawned_in_the_editor)
 {
     if(ssobject_exists(object_name)) {
         /* create the object by invoking Level.spawn */
@@ -2662,6 +2669,7 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point,
         /* save the editor-related data (entities only) */
         if(surgescript_object_has_tag(object, "entity")) {
             create_ssobj_extradata(object, (ssobj_extradata_t){
+                .id = id,
                 .spawn_point = spawn_point,
                 .spawned_in_the_editor = spawned_in_the_editor,
                 .sleeping = TRUE
@@ -2694,7 +2702,8 @@ bool save_ssobject(surgescript_object_t* object, void* param)
         FILE* fp = (FILE*)param;
         const char* object_name = surgescript_object_name(object);
         v2d_t spawn_point = get_ssobj_spawnpoint(object);
-        fprintf(fp, "entity \"%s\" %d %d\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y);
+        uint64_t entity_id = get_ssobj_id(object);
+        fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
     }
 
     return true;
@@ -4427,6 +4436,12 @@ v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object)
 {
     ssobj_extradata_t* data = get_ssobj_extradata(object);
     return data != NULL ? data->spawn_point : v2d_new(0, 0);
+}
+
+uint64_t get_ssobj_id(const surgescript_object_t* object)
+{
+    ssobj_extradata_t* data = get_ssobj_extradata(object);
+    return data != NULL ? data->id : 0;
 }
 
 int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object)
