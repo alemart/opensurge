@@ -238,7 +238,7 @@ char* x64_to_str(uint64_t value, char* buf, size_t size)
 uint64_t str_to_x64(const char* buf)
 {
     uint64_t value = 0;
-    static uint8_t t[128] = { /* accepts any 0-128 char */
+    static uint8_t t[128] = { /* accepts any 0-127 char */
         ['0'] = 0, ['1'] = 1, ['2'] = 2, ['3'] = 3, ['4'] = 4,
         ['5'] = 5, ['6'] = 6, ['7'] = 7, ['8'] = 8, ['9'] = 9,
         ['a'] = 10, ['b'] = 11, ['c'] = 12, ['d'] = 13, ['e'] = 14, ['f'] = 15,
