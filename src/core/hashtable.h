@@ -193,6 +193,17 @@ static int hashtable_##T##_foreach(hashtable_##T *h, void *data, void (*callback
     } \
     return count; \
 } \
+static T* hashtable_##T##_findsome(hashtable_##T *h, void *data, bool (*test_fn)(T*,void*)) \
+{ \
+    hashtable_list_##T *p; \
+    for(int i = 0; i < __H_CAPACITY; i++) { \
+        for(p = h->data[i]; p != NULL; p = p->next) { \
+            if(test_fn(p->value, data)) \
+                return p->value; \
+        } \
+    } \
+    return NULL; \
+} \
 static int hashtable_##T##_ref(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
 { \
     uint32_t k = __H_BUCKET(h, key); \
@@ -297,6 +308,7 @@ static void __h_unused_##T() \
     (void)hashtable_##T##_add; \
     (void)hashtable_##T##_remove; \
     (void)hashtable_##T##_foreach; \
+    (void)hashtable_##T##_findsome; \
     (void)hashtable_##T##_ref; \
     (void)hashtable_##T##_refcount; \
     (void)hashtable_##T##_unref; \
