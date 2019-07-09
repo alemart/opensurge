@@ -75,15 +75,15 @@ color_t color_hex(const char* hex_string)
 
     /* obtain colors */
     if(p > buf + 3) {
-        r = (buf[0] << 4) + buf[1];
-        g = (buf[2] << 4) + buf[3];
-        b = (buf[4] << 4) + buf[5];
-        a = (buf[6] << 4) + buf[7];
+        r = (buf[0] << 4) | buf[1];
+        g = (buf[2] << 4) | buf[3];
+        b = (buf[4] << 4) | buf[5];
+        a = (buf[6] << 4) | buf[7];
     }
     else {
-        r = (buf[0] << 4) + buf[0];
-        g = (buf[1] << 4) + buf[1];
-        b = (buf[2] << 4) + buf[2];
+        r = (buf[0] << 4) | buf[0];
+        g = (buf[1] << 4) | buf[1];
+        b = (buf[2] << 4) | buf[2];
         a = 255;
     }
 
