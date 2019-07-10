@@ -347,6 +347,13 @@ static void editor_grid_release();
 static void editor_grid_update();
 static v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
 
+/* editor: tooltip */
+static void editor_tooltip_init();
+static void editor_tooltip_release();
+static void editor_tooltip_update();
+static void editor_tooltip_render();
+static font_t* editor_ssobj_tooltip;
+
 
 /* implementing UNDO and REDO */
 
@@ -2830,14 +2837,17 @@ void editor_init()
     /* grid */
     editor_grid_init();
 
+    /* tooltip */
+    editor_tooltip_init();
+
     /* bricks */
     editor_brick_init();
 
-    /* groups */
-    editorgrp_init(grouptheme);
-
     /* SurgeScript entities */
     editor_ssobj_init();
+
+    /* groups */
+    editorgrp_init(grouptheme);
 
     /* done */
     logfile_message("editor_init() ok");
@@ -2852,17 +2862,20 @@ void editor_release()
 {
     logfile_message("editor_release()");
 
-    /* grid */
-    editor_grid_release();
-
     /* groups */
     editorgrp_release();
+
+    /* SurgeScript entities */
+    editor_ssobj_release();
 
     /* bricks */
     editor_brick_release();
 
-    /* SurgeScript entities */
-    editor_ssobj_release();
+    /* tooltip */
+    editor_tooltip_release();
+    
+    /* grid */
+    editor_grid_release();
 
     /* destroying objects */
     editorcmd_destroy(editor_cmd);
@@ -3162,10 +3175,8 @@ void editor_update()
 
             /* SurgeScript entity */
             case EDT_SSOBJ: {
-                surgescript_vm_t* vm = surgescript_vm();
-                surgescript_object_t* root = surgescript_vm_root_object(vm);
                 surgescript_object_t* ssobject = NULL;
-                surgescript_object_traverse_tree_ex(root, &ssobject, editor_pick_ssobj);
+                surgescript_object_traverse_tree_ex(level_ssobject(), &ssobject, editor_pick_ssobj);
                 if(ssobject != NULL) {
                     int ssobj_id = editor_ssobj_id(surgescript_object_name(ssobject));
                     if(!pick_object) {
@@ -3195,6 +3206,9 @@ void editor_update()
 
     /* scrolling */
     editor_scroll();
+
+    /* tooltop */
+    editor_tooltip_update();
 
     /* cursor coordinates */
     font_set_text(editor_cursor_font, "%d,%d", (int)editor_grid_snap(editor_cursor).x, (int)editor_grid_snap(editor_cursor).y);
@@ -3279,6 +3293,10 @@ void editor_render()
         image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
 
+    /* tooltip */
+    editor_tooltip_render();
+
+    /* done */
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);
     entitymanager_release_retrieved_object_list(major_enemies);
@@ -4095,6 +4113,67 @@ v2d_t editor_grid_snap(v2d_t position)
 }
 
 
+
+/* level editor: tooltip */
+
+/* initializes the tooltip */
+void editor_tooltip_init()
+{
+    editor_ssobj_tooltip = font_create("default");
+    font_set_visible(editor_ssobj_tooltip, false);
+}
+
+/* releases the tooltip */
+void editor_tooltip_release()
+{
+    font_destroy(editor_ssobj_tooltip);
+}
+
+/* updates the tooltip */
+void editor_tooltip_update()
+{
+    font_set_visible(editor_ssobj_tooltip, false);
+    if(editor_cursor_entity_type == EDT_SSOBJ) {
+        surgescript_object_t* target = NULL;
+        surgescript_object_t* level = level_ssobject();
+        surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+        int n = surgescript_object_child_count(level);
+
+        /* locate a target (onmouseover) */
+        for(int i = 0; i < n; i++) {
+            surgescript_objecthandle_t handle = surgescript_object_nth_child(level, i);
+            surgescript_object_t* child = surgescript_objectmanager_get(manager, handle);
+            if(get_ssobj_extradata(child) != NULL)
+                editor_pick_ssobj(child, &target);
+        }
+
+        /* found a target */
+        if(target != NULL && !surgescript_object_is_killed(target)) {
+            ssobj_extradata_t* data = get_ssobj_extradata(target);
+            const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
+            v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
+            font_set_text(editor_ssobj_tooltip, "%s\n(%d,%d)\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id);
+            font_set_position(editor_ssobj_tooltip, scripting_util_world_position(target));
+            font_set_visible(editor_ssobj_tooltip, true);
+        }
+    }
+}
+
+/* renders the tooltip */
+void editor_tooltip_render()
+{
+    if(font_is_visible(editor_ssobj_tooltip)) {
+        v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+        v2d_t rectpos = v2d_subtract(font_get_position(editor_ssobj_tooltip), v2d_add(topleft, v2d_new(8, 8)));
+        v2d_t rectsize = v2d_add(font_get_textsize(editor_ssobj_tooltip), v2d_new(16, 16));
+        image_rectfill(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgba(40, 44, 52, 128));
+        image_rect(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgb(40, 44, 52));
+        font_render(editor_ssobj_tooltip, editor_camera);
+    }
+}
+
+
+
 /* level editor actions */
 
 
@@ -4392,9 +4471,7 @@ void editor_action_commit(editor_action_t action)
 
             case EDT_SSOBJ: {
                 /* delete SurgeScript entity */
-                surgescript_vm_t* vm = surgescript_vm();
-                surgescript_object_t* root = surgescript_vm_root_object(vm);
-                surgescript_object_traverse_tree_ex(root, &action, editor_remove_ssobj);
+                surgescript_object_traverse_tree_ex(level_ssobject(), &action, editor_remove_ssobj);
                 break;
             }
         }
