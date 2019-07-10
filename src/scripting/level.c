@@ -55,6 +55,7 @@ static surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getentitybyid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
 static const surgescript_heapptr_t IDX_ADDR = 2; /* must be the last address */
@@ -92,6 +93,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "pause", fun_pause, 0);
     surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
     surgescript_vm_bind(vm, "Level", "finish", fun_finish, 0);
+    surgescript_vm_bind(vm, "Level", "getEntityById", fun_getentitybyid, 1);
 }
 
 /* constructor */
@@ -379,6 +381,21 @@ surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_va
 {
     level_jump_to_next_stage();
     return NULL;
+}
+
+/* get an entity given its ID in the .lev file;
+   it's recommended to cache the return value of this function */
+surgescript_var_t* fun_getentitybyid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* entity_id = surgescript_var_fast_get_string(param[0]);
+    surgescript_object_t* entity = level_get_entity_by_id(entity_id);
+
+    if(entity != NULL) {
+        surgescript_objecthandle_t handle = surgescript_object_handle(entity);
+        return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+    }
+    else
+        return NULL;
 }
 
 
