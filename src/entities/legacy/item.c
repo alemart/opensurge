@@ -2953,7 +2953,7 @@ void loop_port_update(item_t* item, player_t** team, int team_size, brick_list_t
     if(sprite_animation_exists(object_name, 0) && item->state != IS_DEAD) {
         animation_t* anim = sprite_get_animation(object_name, 0);
         v2d_t adjusted_position = v2d_add(v2d_subtract(item->actor->position, item->actor->hot_spot), anim->hot_spot);
-        if(level_create_entity(object_name, adjusted_position)) {
+        if(level_create_object(object_name, adjusted_position)) {
             item->state = IS_DEAD;
             return;
         }
