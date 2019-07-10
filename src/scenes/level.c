@@ -207,10 +207,16 @@ static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
 static surgescript_object_t* level_ssobject();
-static surgescript_object_t* spawn_ssobject(const char* object_name, uint64_t id, v2d_t spawn_point, int spawned_in_the_editor);
+static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor);
 static bool save_ssobject(surgescript_object_t* object, void* param);
 typedef struct ssobj_extradata_t ssobj_extradata_t;
-struct ssobj_extradata_t { uint64_t id; v2d_t spawn_point; int spawned_in_the_editor; int sleeping; };
+struct ssobj_extradata_t {
+    surgescript_objecthandle_t handle;
+    uint64_t entity_id;
+    v2d_t spawn_point;
+    int spawned_in_the_editor;
+    int sleeping;
+};
 static v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object);
 static uint64_t get_ssobj_id(const surgescript_object_t* object);
 static int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
@@ -219,6 +225,7 @@ static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t*
 static void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata);
 static void clear_ssobj_extradata(const surgescript_object_t* object);
 static void free_ssobj_extradata(ssobj_extradata_t* data);
+static bool match_ssobj_id(ssobj_extradata_t* data, void* id);
 static int hashaux_cmp(const surgescript_objecthandle_t* a, const surgescript_objecthandle_t* b) { return (*a > *b) - (*a < *b); }
 HASHTABLE_GENERATE_CODE_EX(ssobj_extradata_t, free_ssobj_extradata, surgescript_objecthandle_t*, hashaux_cmp, NULL, NULL, NULL);
 static HASHTABLE(ssobj_extradata_t, ssobj_extradata);
@@ -921,12 +928,12 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             int x = atoi(param[1]);
             int y = atoi(param[2]);
             if(!is_startup_object(name)) {
-                surgescript_object_t* obj = level_create_entity(name, v2d_new(x, y));
+                surgescript_object_t* obj = level_create_object(name, v2d_new(x, y));
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
                     else if(param_count > 3 && get_ssobj_extradata(obj))
-                        get_ssobj_extradata(obj)->id = str_to_x64(param[3]);
+                        get_ssobj_extradata(obj)->entity_id = str_to_x64(param[3]);
                 }
                 else
                     fatal_error("Level loader - can't spawn \"%s\": entity does not exist", name);
@@ -968,7 +975,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             int x = atoi(param[1]);
             int y = atoi(param[2]);
             const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
-            if(object_name == NULL || !level_create_entity(object_name, v2d_new(x, y)))
+            if(object_name == NULL || !level_create_object(object_name, v2d_new(x, y)))
                 level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
         }
         else
@@ -980,7 +987,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             int x = atoi(param[1]);
             int y = atoi(param[2]);
             if(!is_startup_object(name)) {
-                surgescript_object_t* obj = level_create_entity(name, v2d_new(x, y));
+                surgescript_object_t* obj = level_create_object(name, v2d_new(x, y));
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
@@ -1651,11 +1658,11 @@ enemy_t* level_create_legacy_object(const char *name, v2d_t position)
 
 
 /*
- * level_create_entity()
+ * level_create_object()
  * Creates a SurgeScript object and adds it to the level.
  * Returns the new object, or NULL if the object couldn't be found
  */
-surgescript_object_t* level_create_entity(const char* object_name, v2d_t position)
+surgescript_object_t* level_create_object(const char* object_name, v2d_t position)
 {
     if(ssobject_exists(object_name)) {
         surgescript_vm_t* vm = surgescript_vm();
@@ -1667,12 +1674,31 @@ surgescript_object_t* level_create_entity(const char* object_name, v2d_t positio
             !surgescript_tagsystem_has_tag(tag_system, object_name, "private") &&
             !is_startup_object(object_name)
         ;
-        return spawn_ssobject(object_name, random64(), position, spawned_in_the_editor);
+        return spawn_ssobject(object_name, position, spawned_in_the_editor);
     }
     else
         return NULL;
 }
 
+/*
+ * level_get_entity_by_id()
+ * Gets a SurgeScript entity by its ID, a 64-bit hex-string
+ * Returns NULL if no such entity is found
+ */
+surgescript_object_t* level_get_entity_by_id(const char* entity_id)
+{
+    uint64_t id = str_to_x64(entity_id);
+    ssobj_extradata_t* data = hashtable_ssobj_extradata_t_findsome(ssobj_extradata, &id, match_ssobj_id);
+
+    if(data != NULL) {
+        surgescript_vm_t* vm = surgescript_vm();
+        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+        if(surgescript_objectmanager_exists(manager, data->handle)) /* the object may have been deleted */
+            return surgescript_objectmanager_get(manager, data->handle);
+    }
+
+    return NULL; /* not found */
+}
 
 
 /*
@@ -2398,7 +2424,7 @@ void spawn_startup_objects()
     for(me=startupobject_list; me; me=me->next) {
         /* try to create an object using the new API.
            if failure, use the old API. */
-        if(!level_create_entity(me->object_name, v2d_new(0, 0))) {
+        if(!level_create_object(me->object_name, v2d_new(0, 0))) {
             enemy_t* e = level_create_legacy_object(me->object_name, v2d_new(0, 0));
             e->created_from_editor = FALSE;
         }
@@ -2651,7 +2677,7 @@ surgescript_object_t* level_ssobject()
 }
 
 /* spawns a ssobject */
-surgescript_object_t* spawn_ssobject(const char* object_name, uint64_t id, v2d_t spawn_point, int spawned_in_the_editor)
+surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor)
 {
     if(ssobject_exists(object_name)) {
         /* create the object by invoking Level.spawn */
@@ -2675,7 +2701,8 @@ surgescript_object_t* spawn_ssobject(const char* object_name, uint64_t id, v2d_t
         /* save the editor-related data (entities only) */
         if(surgescript_object_has_tag(object, "entity")) {
             store_ssobj_extradata(object, (ssobj_extradata_t){
-                .id = id,
+                .handle = surgescript_object_handle(object),
+                .entity_id = random64(),
                 .spawn_point = spawn_point,
                 .spawned_in_the_editor = spawned_in_the_editor,
                 .sleeping = TRUE
@@ -4284,7 +4311,7 @@ void editor_action_commit(editor_action_t action)
 
             case EDT_SSOBJ: {
                 /* new SurgeScript object */
-                level_create_entity(editor_ssobj_name(action.obj_id), action.obj_position);
+                level_create_object(editor_ssobj_name(action.obj_id), action.obj_position);
                 break;
             }
 
@@ -4448,7 +4475,7 @@ v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object)
 uint64_t get_ssobj_id(const surgescript_object_t* object)
 {
     ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->id : 0;
+    return data != NULL ? data->entity_id : 0;
 }
 
 int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object)
@@ -4496,4 +4523,9 @@ void clear_ssobj_extradata(const surgescript_object_t* object)
 void free_ssobj_extradata(ssobj_extradata_t* data)
 {
     free(data);
+}
+
+bool match_ssobj_id(ssobj_extradata_t* data, void* id)
+{
+    return data->entity_id == *((uint64_t*)id);
 }
