@@ -208,12 +208,12 @@ uint64_t random64()
     if(!state) {
         state = time(NULL);
         state = (~state) + (state << 21);
-        state = state ^ (state >> 24); 
+        state ^= state >> 24;
         state = (state + (state << 3)) + (state << 8);
-        state = state ^ (state >> 14); 
+        state ^= state >> 14;
         state = (state + (state << 2)) + (state << 4);
-        state = state ^ (state >> 28);
-        state = state + (state << 31);
+        state ^= state >> 28;
+        state += state << 31;
     }
 
     /* xorshift */ 
