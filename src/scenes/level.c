@@ -73,7 +73,7 @@
  * box appears
  * ------------------------ */
 /* constants */
-#define DIALOGREGION_MAX 100
+#define DIALOGREGION_MAX 16
 
 /* structure */
 typedef struct {
@@ -348,11 +348,13 @@ static void editor_grid_update();
 static v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
 
 /* editor: tooltip */
+static font_t* editor_tooltip_font;
 static void editor_tooltip_init();
 static void editor_tooltip_release();
 static void editor_tooltip_update();
 static void editor_tooltip_render();
-static font_t* editor_ssobj_tooltip;
+static const char* editor_tooltip_ssproperties(surgescript_object_t* object);
+static void editor_tooltip_ssproperties_add(const char* object_name, void* data);
 
 
 /* implementing UNDO and REDO */
@@ -4119,20 +4121,20 @@ v2d_t editor_grid_snap(v2d_t position)
 /* initializes the tooltip */
 void editor_tooltip_init()
 {
-    editor_ssobj_tooltip = font_create("default");
-    font_set_visible(editor_ssobj_tooltip, false);
+    editor_tooltip_font = font_create("default");
+    font_set_visible(editor_tooltip_font, false);
 }
 
 /* releases the tooltip */
 void editor_tooltip_release()
 {
-    font_destroy(editor_ssobj_tooltip);
+    font_destroy(editor_tooltip_font);
 }
 
 /* updates the tooltip */
 void editor_tooltip_update()
 {
-    font_set_visible(editor_ssobj_tooltip, false);
+    font_set_visible(editor_tooltip_font, false);
     if(editor_cursor_entity_type == EDT_SSOBJ) {
         surgescript_object_t* target = NULL;
         surgescript_object_t* level = level_ssobject();
@@ -4152,9 +4154,9 @@ void editor_tooltip_update()
             ssobj_extradata_t* data = get_ssobj_extradata(target);
             const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
             v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
-            font_set_text(editor_ssobj_tooltip, "%s\n(%d,%d)\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id);
-            font_set_position(editor_ssobj_tooltip, scripting_util_world_position(target));
-            font_set_visible(editor_ssobj_tooltip, true);
+            font_set_text(editor_tooltip_font, "%s\n(%d,%d)\n%s%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
+            font_set_position(editor_tooltip_font, scripting_util_world_position(target));
+            font_set_visible(editor_tooltip_font, true);
         }
     }
 }
@@ -4162,21 +4164,90 @@ void editor_tooltip_update()
 /* renders the tooltip */
 void editor_tooltip_render()
 {
-    if(font_is_visible(editor_ssobj_tooltip)) {
+    if(font_is_visible(editor_tooltip_font)) {
         v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-        v2d_t rectpos = v2d_subtract(font_get_position(editor_ssobj_tooltip), v2d_add(topleft, v2d_new(8, 8)));
-        v2d_t rectsize = v2d_add(font_get_textsize(editor_ssobj_tooltip), v2d_new(16, 16));
-        image_rectfill(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgba(40, 44, 52, 128));
+        v2d_t rectpos = v2d_subtract(font_get_position(editor_tooltip_font), v2d_add(topleft, v2d_new(8, 8)));
+        v2d_t rectsize = v2d_add(font_get_textsize(editor_tooltip_font), v2d_new(16, 16));
+        image_rectfill(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgba(40, 44, 52, 160));
         image_rect(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgb(40, 44, 52));
-        font_render(editor_ssobj_tooltip, editor_camera);
+        font_render(editor_tooltip_font, editor_camera);
+    }
+}
+
+/* lists the public properties (and their values) of the given object */
+struct editor_tooltip_ssproperties_helper_t {
+    surgescript_object_t* object;
+    surgescript_programpool_t* pool;
+    char buf[1024];
+    bool rw;
+};
+
+const char* editor_tooltip_ssproperties(surgescript_object_t* object)
+{
+    static struct editor_tooltip_ssproperties_helper_t helper;
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
+    
+    helper.object = object;
+    helper.pool = pool;
+    helper.buf[0] = '\0';
+    helper.rw = true;
+    surgescript_programpool_foreach_ex(pool, surgescript_object_name(object), &helper, editor_tooltip_ssproperties_add);
+    helper.rw = false;
+    surgescript_programpool_foreach_ex(pool, surgescript_object_name(object), &helper, editor_tooltip_ssproperties_add);
+
+    return helper.buf; /* a static buffer is returned */
+}
+
+void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
+{
+    /* this is callback utility function */
+    static char setter[128] = "set_", value[128];
+    struct editor_tooltip_ssproperties_helper_t* helper =
+        (struct editor_tooltip_ssproperties_helper_t*)data;
+
+    /* are we dealing with a property? */
+    if(strncmp(fun_name, "get_", 4) == 0) {
+        const char* property_name = fun_name + 4;
+        surgescript_var_t* ret = NULL;
+        bool readonly = false;
+        int len = 0;
+
+        /* is it a readonly property? */
+        strncpy(setter + 4, property_name, sizeof(setter) - 4);
+        setter[sizeof(setter)-1] = '\0';
+        readonly = !(surgescript_programpool_exists(
+            helper->pool,
+            surgescript_object_name(helper->object),
+            setter
+        ));
+
+        if((!readonly && helper->rw) || (readonly && !helper->rw)) {
+            /* get the current value of the property */
+            ret = surgescript_var_create();
+            surgescript_object_call_function(helper->object, fun_name, NULL, 0, ret);
+            surgescript_var_to_string(ret, value, sizeof(value));
+            surgescript_var_destroy(ret);
+
+            /* blank separator */
+            if(helper->buf[0] == '\0')
+                snprintf(helper->buf, sizeof(helper->buf), "\n");
+
+            /* write property to the buffer */
+            len = strlen(helper->buf);
+            if(!readonly)
+                snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n%s: %s", property_name, value);
+            else if(strcmp(property_name, "__file") != 0)
+                snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n<color=aaa>%s: %s</color>", property_name, value);
+            else
+                snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n%s<color=aaa>%s</color>", len == 1 ? "" : "\n", value);
+        }
     }
 }
 
 
 
 /* level editor actions */
-
-
 
 /* action: constructor (entity) */
 editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_type obj_type, int obj_id, v2d_t obj_position)
