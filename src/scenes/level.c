@@ -4154,7 +4154,7 @@ void editor_tooltip_update()
             ssobj_extradata_t* data = get_ssobj_extradata(target);
             const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
             v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
-            font_set_text(editor_tooltip_font, "%s\n(%d,%d)\n%s%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
+            font_set_text(editor_tooltip_font, "%s\n%d,%d\n%s%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
             font_set_position(editor_tooltip_font, scripting_util_world_position(target));
             font_set_visible(editor_tooltip_font, true);
         }
