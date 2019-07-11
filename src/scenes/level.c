@@ -4232,7 +4232,7 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
             ));
 
             if((!readonly && helper->rw) || (readonly && !helper->rw)) {
-                static char value[32];
+                static char value[32]; /* size must be >= 4 */
                 int len = 0;
                 char *p;
 
@@ -4250,7 +4250,7 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
 
                 /* add ellipsis if necessary */
                 if(strlen(value) == sizeof(value) - 1)
-                    memset(value + sizeof(value) - 3, '.', 3);
+                    strcpy(value + sizeof(value) - 4, "...");
 
                 /* write property to the buffer */
                 len = strlen(helper->buf);
