@@ -4236,8 +4236,6 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
                 int len = 0;
                 char *p;
 
-                memset(value, 0, sizeof(value));
-
                 /* get the current value of the property */
                 surgescript_var_t* ret = surgescript_var_create();
                 surgescript_object_call_function(helper->object, fun_name, NULL, 0, ret);
