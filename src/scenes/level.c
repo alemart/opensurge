@@ -355,6 +355,7 @@ static void editor_tooltip_update();
 static void editor_tooltip_render();
 static const char* editor_tooltip_ssproperties(surgescript_object_t* object);
 static void editor_tooltip_ssproperties_add(const char* object_name, void* data);
+static const char* editor_tooltip_ssproperties_file(surgescript_object_t* object);
 
 
 /* implementing UNDO and REDO */
@@ -3228,7 +3229,7 @@ void editor_update()
     font_set_position(editor_properties_font, v2d_new(8, 8));
     font_set_text(
         editor_properties_font,
-        "<color=ff8060>%s</color> <color=ffffff>%s</color>",
+        "<color=ff8060>%s</color> %s",
         editor_entity_class(editor_cursor_entity_type),
         editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
     );
@@ -4154,7 +4155,7 @@ void editor_tooltip_update()
             ssobj_extradata_t* data = get_ssobj_extradata(target);
             const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
             v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
-            font_set_text(editor_tooltip_font, "%s\n%d,%d\n%s%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
+            font_set_text(editor_tooltip_font, "<color=ffee11>%s</color>\n%d,%d\n%s\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
             font_set_position(editor_tooltip_font, scripting_util_world_position(target));
             font_set_visible(editor_tooltip_font, true);
         }
@@ -4187,7 +4188,9 @@ const char* editor_tooltip_ssproperties(surgescript_object_t* object)
     static struct editor_tooltip_ssproperties_helper_t helper;
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
+    int len = 0;
     
+    /* write public properties to the internal buffer */
     helper.object = object;
     helper.pool = pool;
     helper.buf[0] = '\0';
@@ -4196,53 +4199,82 @@ const char* editor_tooltip_ssproperties(surgescript_object_t* object)
     helper.rw = false;
     surgescript_programpool_foreach_ex(pool, surgescript_object_name(object), &helper, editor_tooltip_ssproperties_add);
 
-    return helper.buf; /* a static buffer is returned */
+    /* write the source file */
+    len = strlen(helper.buf);
+    snprintf(helper.buf + len, sizeof(helper.buf) - len, "\n%s%s",
+        len == 0 ? "" : "\n", editor_tooltip_ssproperties_file(object)
+    );
+
+    /* a static buffer is returned */
+    return helper.buf;
 }
 
 void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
 {
     /* this is callback utility function */
-    static char setter[128] = "set_", value[128];
     struct editor_tooltip_ssproperties_helper_t* helper =
         (struct editor_tooltip_ssproperties_helper_t*)data;
 
     /* are we dealing with a property? */
     if(strncmp(fun_name, "get_", 4) == 0) {
         const char* property_name = fun_name + 4;
-        surgescript_var_t* ret = NULL;
-        bool readonly = false;
-        int len = 0;
+        if(strncmp(property_name, "__", 2) != 0) {
+            static char setter[128] = "set_";
+            bool readonly = false;
 
-        /* is it a readonly property? */
-        strncpy(setter + 4, property_name, sizeof(setter) - 4);
-        setter[sizeof(setter)-1] = '\0';
-        readonly = !(surgescript_programpool_exists(
-            helper->pool,
-            surgescript_object_name(helper->object),
-            setter
-        ));
+            /* is it a readonly property? */
+            strncpy(setter + 4, property_name, sizeof(setter) - 4);
+            setter[sizeof(setter)-1] = '\0';
+            readonly = !(surgescript_programpool_exists(
+                helper->pool,
+                surgescript_object_name(helper->object),
+                setter
+            ));
 
-        if((!readonly && helper->rw) || (readonly && !helper->rw)) {
-            /* get the current value of the property */
-            ret = surgescript_var_create();
-            surgescript_object_call_function(helper->object, fun_name, NULL, 0, ret);
-            surgescript_var_to_string(ret, value, sizeof(value));
-            surgescript_var_destroy(ret);
+            if((!readonly && helper->rw) || (readonly && !helper->rw)) {
+                static char value[32];
+                int len = 0;
+                char *p;
 
-            /* blank separator */
-            if(helper->buf[0] == '\0')
-                snprintf(helper->buf, sizeof(helper->buf), "\n");
+                memset(value, 0, sizeof(value));
 
-            /* write property to the buffer */
-            len = strlen(helper->buf);
-            if(!readonly)
-                snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n%s: %s", property_name, value);
-            else if(strcmp(property_name, "__file") != 0)
-                snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n<color=aaa>%s: %s</color>", property_name, value);
-            else
-                snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n%s<color=aaa>%s</color>", len == 1 ? "" : "\n", value);
+                /* get the current value of the property */
+                surgescript_var_t* ret = surgescript_var_create();
+                surgescript_object_call_function(helper->object, fun_name, NULL, 0, ret);
+                surgescript_var_to_string(ret, value, sizeof(value));
+                surgescript_var_destroy(ret);
+
+                /* remove '\n' from the string */
+                for(p = value; *p; p++) {
+                    if(*p == '\n' || *p == '\r')
+                        *p = ' ';
+                }
+
+                /* add ellipsis if necessary */
+                if(strlen(value) == sizeof(value) - 1)
+                    memset(value + sizeof(value) - 3, '.', 3);
+
+                /* write property to the buffer */
+                len = strlen(helper->buf);
+                if(!readonly)
+                    snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n<color=fff>%s: %s</color>", property_name, value);
+                else
+                    snprintf(helper->buf + len, sizeof(helper->buf) - len, "\n<color=aaa>%s: %s</color>", property_name, value);
+            }
         }
     }
+}
+
+const char* editor_tooltip_ssproperties_file(surgescript_object_t* object)
+{
+    static char file[128];
+
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_object_call_function(object, "get___file", NULL, 0, ret);
+    surgescript_var_to_string(ret, file, sizeof(file));
+    surgescript_var_destroy(ret);
+
+    return file;
 }
 
 
