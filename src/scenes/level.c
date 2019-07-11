@@ -73,7 +73,7 @@
  * box appears
  * ------------------------ */
 /* constants */
-#define DIALOGREGION_MAX 16
+#define DIALOGREGION_MAX 8
 
 /* structure */
 typedef struct {
