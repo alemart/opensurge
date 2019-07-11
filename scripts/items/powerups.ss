@@ -221,6 +221,7 @@ object "Powerup Trap" is "entity", "basic", "powerup"
 // Lucky Bonus
 object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
 {
+    public bonus = 50;
     itemBox = spawn("Item Box").setAnimation(17);
 
     state "main"
@@ -229,9 +230,9 @@ object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
 
     fun onItemBoxCrushed(player)
     {
-        bonus = Level.spawn("Lucky Bonus");
-        bonus.value = 50;
-        bonus.player = player;
+        lucky = Level.spawn("Lucky Bonus");
+        lucky.bonus = Math.max(bonus, 0);
+        lucky.player = player;
     }
 }
 

@@ -10,13 +10,13 @@ using SurgeEngine.Level;
 object "Lucky Bonus"
 {
     public player = Player.active;
-    public value = 50;
+    public bonus = 50;
     counter = 0;
 
     state "main"
     {
         if(timeout(0.02)) {
-            if(++counter <= value)
+            if(++counter <= bonus)
                 state = "lucky";
             else
                 state = "done";
