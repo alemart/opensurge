@@ -1106,7 +1106,7 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type, 
             #ifdef _DIRENT_HAVE_D_TYPE
             if(d->d_type != DT_UNKNOWN) {
                 is_dir = (d->d_type == DT_DIR) && (d->d_type != DT_LNK); /* d'uh */
-                is_file = (d->d_type == DT_REG) || (d->d_type == DT_LNK);
+                is_file = (d->d_type == DT_REG) && (d->d_type != DT_LNK);
             }
             else {
             #endif
@@ -1114,7 +1114,7 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type, 
                 struct stat st;
                 lstat(path, &st);
                 is_dir = S_ISDIR(st.st_mode) && !(S_ISLNK(st.st_mode));
-                is_file = S_ISREG(st.st_mode) || S_ISLNK(st.st_mode);
+                is_file = S_ISREG(st.st_mode) && !(S_ISLNK(st.st_mode));
                 free(path);
             #ifdef _DIRENT_HAVE_D_TYPE
             }
