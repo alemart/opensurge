@@ -56,9 +56,12 @@ static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
-static const surgescript_heapptr_t IDX_ADDR = 2; /* must be the last address */
+static const surgescript_heapptr_t SETUP_ADDR = 2;
+static const surgescript_heapptr_t IDX_ADDR = 3; /* must be the last address */
+static const char code_in_surgescript[];
 static void update_music(surgescript_object_t* object);
 
 /*
@@ -94,6 +97,8 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
     surgescript_vm_bind(vm, "Level", "finish", fun_finish, 0);
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
+    surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
+    surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
 }
 
 /* constructor */
@@ -103,6 +108,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t spawnpoint = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+    surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "Level Setup", NULL);
 
     /* Level music */
     ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
@@ -111,6 +117,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* spawn point */
     ssassert(SPAWNPOINT_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, SPAWNPOINT_ADDR), spawnpoint);
+
+    /* Level Setup */
+    ssassert(SETUP_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, SETUP_ADDR), setup);
 
     /*
      * Memory layout:
@@ -398,6 +408,20 @@ surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_va
         return NULL;
 }
 
+/* Level.setup(config): configure level entities using a config Dictionary */
+surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, SETUP_ADDR));
+    surgescript_object_t* setup = surgescript_objectmanager_get(manager, handle);
+
+    /* call setup.call(config) */
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_object_call_function(setup, "call", param, num_params, ret);
+    return ret;
+}
+
 
 
 /* -- utils -- */
@@ -432,3 +456,43 @@ void update_music(surgescript_object_t* object)
         surgescript_var_destroy(tmp[0]);
     }
 }
+
+/* SurgeScript code */
+static const char code_in_surgescript[] = "\
+using SurgeEngine.Level; \n\
+\n\
+object 'Level Setup' \n\
+{ \n\
+    state 'main' \n\
+    { \n\
+    } \n\
+\n\
+    fun call(config) \n\
+    { \n\
+        entities = { }; \n\
+\n\
+        foreach(entry in config) { \n\
+            if(Level.entity(entry.key) == null) { \n\
+                objs = Level.findObjects(entry.key); \n\
+                for(i = 0; i < objs.length; i++) \n\
+                    setup(objs[i], entry.value); \n\
+            } \n\
+            else \n\
+                entities[entry.key] = entry.value; \n\
+        } \n\
+ \n\
+        foreach(entry in entities) { \n\
+            obj = Level.entity(entry.key); \n\
+            setup(obj, entry.value); \n\
+        } \n\
+    } \n\
+ \n\
+    fun setup(obj, properties) \n\
+    { \n\
+        foreach(entry in properties) { \n\
+            if(obj.hasFunction('set_' + entry.key)) \n\
+                obj.__invoke('set_' + entry.key, [ entry.value ]); \n\
+        } \n\
+    } \n\
+} \n\
+";
