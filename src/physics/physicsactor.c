@@ -674,10 +674,12 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
     do { \
         const int hoff = 5; \
         const obstacle_t* gnd = NULL; \
-        int sensor_len = sensor_get_y2(sensor_A(pa)) - sensor_get_y1(sensor_A(pa)); \
+        const sensor_t* sensor = sensor_A(pa); \
+        int sensor_len = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
         int found_a = FALSE, found_b = FALSE; \
         int h, x, y, xa, ya, xb, yb, ang; \
-        for(int i = 0; i < sensor_len * 5/2 && !(found_a && found_b); i++) { \
+        int m = !pa->in_the_air && was_in_the_air ? 6 : 2; \
+        for(int i = 0; i < sensor_len * m / 2 && !(found_a && found_b); i++) { \
             h = i + sensor_len / 2; \
             x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
             y = pa->position.y + h * COS(pa->angle) + 0.5f; \

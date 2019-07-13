@@ -69,7 +69,7 @@
     ((x) / 57.2957795131f)
 
 /* private data */
-/*#define SHOW_SENSORS*/                 /* uncomment to render the collision sensors */
+#define SHOW_SENSORS                0    /* render the collision sensors? */
 #define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player blink if he/she gets hurt? */
 #define PLAYER_UNDERWATER_BREATH    30.0 /* how many seconds can the player stay underwater before drowning? */
 static int hundred_collectibles;         /* counter (extra lives) */
@@ -390,7 +390,7 @@ void player_render(player_t *player, v2d_t camera_position)
     /* restore hot spot */
     act->hot_spot = hot_spot;
 
-#ifdef SHOW_SENSORS
+#if SHOW_SENSORS != 0
     /* sensors */
     physicsactor_render_sensors(player->pa, camera_position);
 #endif
