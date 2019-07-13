@@ -15,7 +15,7 @@ theme "themes/waterworks.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 128 4968
 music "musics/waterworks.ogg"
-startup "DefaultStartup" "WaterworksSetup"
+startup "DefaultStartup" "Waterworks Setup"
 players "Surge" "Neon"
 waterlevel 7296
 
