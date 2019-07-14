@@ -49,6 +49,11 @@ object "Base Collectible" is "private", "entity"
         return actor.height / 2;
     }
 
+    fun get_disappearing()
+    {
+        return state == "disappearing";
+    }
+
     fun constructor()
     {
         actor.animation.sync = true;
@@ -100,7 +105,7 @@ object "Collectible" is "entity", "basic"
         transform.move(ds.x * xsp * dt, ds.y * ysp * dt);
 
         // demagnetize
-        if(target.shield != "thunder")
+        if(base.disappearing || target.shield != "thunder")
             state = "main";
     }
 
