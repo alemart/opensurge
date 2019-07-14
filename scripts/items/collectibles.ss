@@ -118,6 +118,7 @@ object "Collectible" is "entity", "basic"
     fun shouldMagnetize(player)
     {
         return (player.shield == "thunder") &&
+               (!base.disappearing) &&
                (transform.position.distanceTo(player.transform.position) <= 160);
     }
 
