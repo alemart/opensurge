@@ -280,12 +280,12 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->M_intheair = sensor_create_horizontal(0, -11, 11, color_rgb(255,0,0)); /* use 10 (sensor M_normal) + 1 */
     pa->U_intheair = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-4, 0, 18, color_rgb(0,255,0)); /* use 9 (sensor A) / 2 */
-    pa->B_jumproll = sensor_create_vertical(4, 0, 18, color_rgb(255,255,0)); /* use 20 (sensor A) - 2 */
-    pa->C_jumproll = sensor_create_vertical(-4, -10, 0, color_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(4, -10, 0, color_rgb(128,128,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -10, 10, color_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
+    pa->A_jumproll = sensor_create_vertical(-5, 0, 19, color_rgb(0,255,0));
+    pa->B_jumproll = sensor_create_vertical(5, 0, 19, color_rgb(255,255,0));
+    pa->C_jumproll = sensor_create_vertical(-5, -10, 0, color_rgb(0,128,0));
+    pa->D_jumproll = sensor_create_vertical(5, -10, 0, color_rgb(128,128,0));
+    pa->M_jumproll = sensor_create_horizontal(0, -11, 11, color_rgb(255,0,0));
+    pa->U_jumproll = sensor_create_horizontal(-10, -5, 5, color_rgb(255,255,255));
 
     /* success!!! ;-) */
     return pa;
@@ -559,7 +559,7 @@ void physicsactor_set_airdrag(physicsactor_t *pa, float value)
 #define GENERATE_SENSOR_ACCESSOR(x) \
 const sensor_t* sensor_##x(const physicsactor_t *pa) \
 { \
-    if((pa->state == PAS_JUMPING && pa->ysp < 0.0f) || pa->state == PAS_ROLLING) \
+    if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) \
         return pa->x##_jumproll; \
     else if(pa->in_the_air || pa->state == PAS_SPRINGING) \
         return pa->x##_intheair; \
@@ -672,14 +672,14 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 /* compute the current pa->angle */
 #define UPDATE_ANGLE() \
     do { \
-        const int hoff = 5; \
         const obstacle_t* gnd = NULL; \
         const sensor_t* sensor = sensor_A(pa); \
-        int sensor_len = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
+        const int hoff = (-sensor_get_x1(sensor) + 1) / 2; \
+        const int sensor_len = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
         int found_a = FALSE, found_b = FALSE; \
         int h, x, y, xa, ya, xb, yb, ang; \
-        int m = !pa->in_the_air && was_in_the_air ? 6 : 2; \
-        for(int i = 0; i < sensor_len * m / 2 && !(found_a && found_b); i++) { \
+        int m = !pa->in_the_air && was_in_the_air ? 3 : 2; \
+        for(int i = 0; i < sensor_len * m && !(found_a && found_b); i++) { \
             h = i + sensor_len / 2; \
             x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
             y = pa->position.y + h * COS(pa->angle) + 0.5f; \
@@ -936,7 +936,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->xsp = pa->gsp * COS(pa->angle);
         pa->ysp = pa->gsp * -SIN(pa->angle);
 
-        /* BUGGED? falling off walls and ceilings */
+        /* falling off walls and ceilings */
         if(pa->movmode != MM_FLOOR) {
             if(fabs(pa->gsp) < pa->falloffthreshold) {
                 pa->horizontal_control_lock_timer = 0.5f;
@@ -1327,12 +1327,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(!pa->in_the_air && nearly_equal(pa->gsp, 0.0f) && pa->state != PAS_PUSHING && pa->movmode == MM_FLOOR) {
         const sensor_t* s = at_A ? sensor_A(pa) : sensor_B(pa);
         int x = (int)pa->position.x;
-        int y = (int)pa->position.y + sensor_get_y2(s) + (sensor_get_y2(s) - sensor_get_y1(s)) / 2;
-        if(at_A != NULL && at_B == NULL && !obstacle_got_collision(at_A, x, y, x, y)) {
+        int y = (int)pa->position.y + sensor_get_y2(s);
+        if(at_A != NULL && at_B == NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
             pa->state = PAS_LEDGE;
             pa->facing_right = TRUE;
         }
-        else if(at_A == NULL && at_B != NULL && !obstacle_got_collision(at_B, x, y, x, y)) {
+        else if(at_A == NULL && at_B != NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
             pa->state = PAS_LEDGE;
             pa->facing_right = FALSE;
         }

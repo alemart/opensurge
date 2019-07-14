@@ -4069,7 +4069,7 @@ int editor_brick_id(int index)
 /* initializes the grid module */
 void editor_grid_init()
 {
-    editor_grid_size = 8;
+    editor_grid_size = 16;
 }
 
 /* releases the grid module */

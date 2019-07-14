@@ -1538,7 +1538,6 @@ void hotspot_magic(player_t* player)
                 break;
 
             case MM_CEILING:
-                roll_delta = max(roll_delta, 2);
                 act->hot_spot.x -= (6 - roll_delta) * sinf(act->angle);
                 act->hot_spot.y += 4 - roll_delta - 6 * cosf(act->angle);
                 break;
