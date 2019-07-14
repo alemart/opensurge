@@ -32,7 +32,7 @@
 
 
 /* private data */
-#define GAMEOVER_TIMEOUT        6.0f
+#define GAMEOVER_TIMEOUT        7.0f
 #define GAMEOVER_MUSICFILE      "musics/gameover.ogg"
 static font_t *gameover_fnt[2];
 static image_t *gameover_buf;

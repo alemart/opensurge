@@ -94,10 +94,8 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
                 console_print("Installing %s to \"%s\"...", gameid, destdir);
 
                 /* Inform the gameid */
-                if(out_gameid != NULL) {
-                    strncpy(out_gameid, gameid, out_gameid_size);
-                    out_gameid[out_gameid_size - 1] = '\0';
-                }
+                if(out_gameid != NULL)
+                    str_cpy(out_gameid, gameid, out_gameid_size);
 
                 /* Unpack the game */
                 for(i = 0; i < n; i++) {
@@ -375,8 +373,7 @@ char* guess_root_folder(const char* zip_fullpath)
                 if((p = strstr(entry_name, dir)) != NULL && is_suffix(entry_name, ext)) {
                     int len = p - entry_name;
                     root_folder = mallocx((1 + len) * sizeof(*root_folder));
-                    strncpy(root_folder, entry_name, len);
-                    root_folder[len] = '\0';
+                    str_cpy(root_folder, entry_name, 1 + len);
                 }
             }
             zip_entry_close(zip);
@@ -542,6 +539,12 @@ bool remove_folder(const char* fullpath)
                     console_print("Can't remove file \"%s\": %s", path, strerror(errno));
                     success = false;
                 }
+            }
+            
+            /* unknown entry */
+            else {
+                console_print("Won't remove \"%s\".", path);
+                success = false;
             }
 
             /* done */
