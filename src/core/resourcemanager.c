@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * resourcemanager.c - resource manager: a dictionary of resources
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ HASHTABLE_GENERATE_CODE(music_t, music_destroy);
 static HASHTABLE(image_t, images);
 static HASHTABLE(sound_t, samples);
 static HASHTABLE(music_t, musics);
-static int is_valid = FALSE; /* validity flag */
+static bool is_valid = false; /* validity flag */
 
 
 /* public methods */
@@ -41,18 +41,22 @@ static int is_valid = FALSE; /* validity flag */
 /* ------ resource manager -------- */
 void resourcemanager_init()
 {
-    images = hashtable_image_t_create();
-    samples = hashtable_sound_t_create();
-    musics = hashtable_music_t_create();
-    is_valid = TRUE;
+    if(!is_valid) {
+        images = hashtable_image_t_create();
+        samples = hashtable_sound_t_create();
+        musics = hashtable_music_t_create();
+        is_valid = true;
+    }
 }
 
 void resourcemanager_release()
 {
-    is_valid = FALSE;
-    images = hashtable_image_t_destroy(images);
-    samples = hashtable_sound_t_destroy(samples);
-    musics = hashtable_music_t_destroy(musics);
+    if(is_valid) {
+        is_valid = false;
+        images = hashtable_image_t_destroy(images);
+        samples = hashtable_sound_t_destroy(samples);
+        musics = hashtable_music_t_destroy(musics);
+    }
 }
 
 void resourcemanager_release_unused_resources()
@@ -64,6 +68,10 @@ void resourcemanager_release_unused_resources()
     }
 }
 
+bool resourcemanager_is_initialized()
+{
+    return is_valid;
+}
 
 
 
@@ -89,7 +97,7 @@ int resourcemanager_unref_image(const char *key)
 }
 
 /* returns TRUE on success (i.e., the image has been successfully purged) */
-int resourcemanager_purge_image(const char *key)
+bool resourcemanager_purge_image(const char *key)
 {
     if(is_valid && resourcemanager_find_image(key) != NULL) {
         int refs = hashtable_image_t_refcount(images, key);
@@ -97,7 +105,7 @@ int resourcemanager_purge_image(const char *key)
         /* sanity check */
         if(refs > 0) {
             /* won't purge if there are active references */
-            return FALSE;
+            return false;
         }
 
         /* purge the image */
@@ -106,7 +114,7 @@ int resourcemanager_purge_image(const char *key)
     }
 
     /* done */
-    return TRUE;
+    return true;
 }
 
 /* -------- musics --------- */

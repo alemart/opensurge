@@ -21,6 +21,8 @@
 #ifndef _RESOURCEMANAGER_H
 #define _RESOURCEMANAGER_H
 
+#include <stdbool.h>
+
 /* forward declarations */
 struct image_t;
 struct sound_t;
@@ -30,13 +32,14 @@ struct music_t;
 void resourcemanager_init(); /* initializes the resource manager */
 void resourcemanager_release(); /* releases the resource manager */
 void resourcemanager_release_unused_resources(); /* memory optimization: reference counting */
+bool resourcemanager_is_initialized(); /* is the resource manager initialized? */
 
 /* data handling */
 void resourcemanager_add_image(const char *key, struct image_t *data); /* adds an image to the dictionary */
 struct image_t* resourcemanager_find_image(const char *key); /* finds an image in the dictionary */
 int resourcemanager_ref_image(const char *key); /* increments and returns the reference counting */
 int resourcemanager_unref_image(const char *key); /* decrements and returns the reference counting */
-int resourcemanager_purge_image(const char *key); /* use with care */
+bool resourcemanager_purge_image(const char *key); /* use with care */
 
 void resourcemanager_add_music(const char *key, struct music_t *data);
 struct music_t* resourcemanager_find_music(const char *key);

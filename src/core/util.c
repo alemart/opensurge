@@ -29,6 +29,7 @@
 #include "util.h"
 #include "timer.h"
 #include "logfile.h"
+#include "resourcemanager.h"
 
 #if defined(A5BUILD)
 #include <allegro5/allegro.h>
@@ -140,7 +141,7 @@ int game_version_compare(int version, int sub_version, int wip_version)
 
 /*
  * fatal_error()
- * Displays a fatal error and aborts the application
+ * Displays a fatal error and exits the application
  * (printf() format)
  */
 void fatal_error(const char *fmt, ...)
@@ -148,10 +149,12 @@ void fatal_error(const char *fmt, ...)
     char buf[1024];
     va_list args;
 
+    /* format message */
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
+    /* display an error */
     logfile_message("----- crash -----\n%s", buf);
 #if defined(A5BUILD)
     al_show_native_message_box(al_get_current_display(),
@@ -168,6 +171,11 @@ void fatal_error(const char *fmt, ...)
 #endif
 #endif
 
+    /* clear up resources */
+    if(resourcemanager_is_initialized())
+        resourcemanager_release();
+
+    /* exit */
     exit(1);
 }
 
