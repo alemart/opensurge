@@ -946,7 +946,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                         get_ssobj_extradata(obj)->entity_id = str_to_x64(param[3]);
                 }
                 else
-                    fatal_error("Level loader - can't spawn \"%s\": entity does not exist", name);
+                    logfile_message("Level loader - can't spawn \"%s\": entity doesn't exist", name);
             }
         }
         else
@@ -1002,10 +1002,12 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
                 }
-                else {
+                else if(enemy_exists(name)) {
                     enemy_t* e = level_create_legacy_object(name, v2d_new(x, y)); /* old API */
                     e->created_from_editor = TRUE;
                 }
+                else
+                    logfile_message("Level loader - can't spawn \"%s\": object doesn't exist", name);
             }
         }
         else
@@ -2432,11 +2434,17 @@ void spawn_startup_objects()
         add_to_startup_object_list(DEFAULT_STARTUP_OBJECT);
 
     for(me=startupobject_list; me; me=me->next) {
-        /* try to create an object using the new API.
-           if failure, use the old API. */
+        /* try to create an object using the SurgeScript API.
+           if this is not possible, use the legacy API. */
         if(!level_create_object(me->object_name, v2d_new(0, 0))) {
-            enemy_t* e = level_create_legacy_object(me->object_name, v2d_new(0, 0));
-            e->created_from_editor = FALSE;
+            if(enemy_exists(me->object_name)) {
+                enemy_t* e = level_create_legacy_object(me->object_name, v2d_new(0, 0));
+                e->created_from_editor = FALSE;
+            }
+            else {
+                logfile_message("Missing startup script: %s", me->object_name);
+                video_showmessage("Missing startup script: %s", me->object_name);
+            }
         }
     }
 }
@@ -4437,7 +4445,7 @@ void editor_action_undo()
         editor_action_commit(a);
     }
     else
-        video_showmessage("Already at oldest change.");
+        video_showmessage("Already at the oldest change.");
 }
 
 
@@ -4461,7 +4469,7 @@ void editor_action_redo()
         editor_action_commit(a);
     }
     else
-        video_showmessage("Already at newest change.");
+        video_showmessage("Already at the newest change.");
 }
 
 /* commit action */
