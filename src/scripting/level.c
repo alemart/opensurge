@@ -469,6 +469,7 @@ object 'Level Setup' \n\
 \n\
     fun call(config) \n\
     { \n\
+        if(!config) return; \n\
         entities = { }; \n\
 \n\
         foreach(entry in config) { \n\

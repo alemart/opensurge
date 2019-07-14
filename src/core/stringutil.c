@@ -95,8 +95,8 @@ int str_icmp(const char* s1, const char* s2)
  */
 char* str_cpy(char* dest, const char* src, size_t dest_size)
 {
-    for(size_t c = 0; (c < dest_size) && (dest[c] = src[c]); c++);
-    dest[dest_size-1] = 0;
+    strncpy(dest, src, dest_size);
+    dest[dest_size - 1] = 0;
     return dest;
 }
 

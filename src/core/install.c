@@ -96,7 +96,7 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
                 /* Inform the gameid */
                 if(out_gameid != NULL) {
                     strncpy(out_gameid, gameid, out_gameid_size);
-                    out_gameid[out_gameid_size] = '\0';
+                    out_gameid[out_gameid_size - 1] = '\0';
                 }
 
                 /* Unpack the game */

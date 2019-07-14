@@ -4223,8 +4223,7 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
             bool readonly = false;
 
             /* is it a readonly property? */
-            strncpy(setter + 4, property_name, sizeof(setter) - 4);
-            setter[sizeof(setter)-1] = '\0';
+            str_cpy(setter + 4, property_name, sizeof(setter) - 4);
             readonly = !(surgescript_programpool_exists(
                 helper->pool,
                 surgescript_object_name(helper->object),
