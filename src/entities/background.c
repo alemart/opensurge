@@ -270,8 +270,8 @@ void bgstrategy_circular_update(bgstrategy_t *strategy)
     float t, sx, cy;
 
     t = (me->timer += dt);
-    sx = sin(me->angularspeed_x * t + me->initialphase_x);
-    cy = cos(me->angularspeed_y * t + me->initialphase_y);
+    sx = sinf(me->angularspeed_x * t + me->initialphase_x);
+    cy = cosf(me->angularspeed_y * t + me->initialphase_y);
 
     /* elliptical trajectory */
     bg->actor->position.x += (-me->angularspeed_x * me->amplitude_x * sx) * dt;
