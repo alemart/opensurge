@@ -182,7 +182,11 @@ void spriteinfo_destroy(spriteinfo_t *info)
     }
 
     if(info->source_file != NULL) {
+        #if 0
+        /* this may crash the editor on reload.
+           further investigation is needed. */
         resourcemanager_purge_image(info->source_file); /* force reload */
+        #endif
         free(info->source_file);
     }
 
