@@ -40,14 +40,14 @@ object "My Baddie" is "entity", "enemy"
  */
 
 // -----------------------------------------------------------------------------
-// The following code makes PlatformMovement work.
+// The following code makes the Platform Movement work.
 // Think twice before modifying this code!
 // -----------------------------------------------------------------------------
 using SurgeEngine.Collisions.Sensor;
 using SurgeEngine.Vector2;
 using SurgeEngine.Player;
 
-object "PlatformMovement" is "behavior"
+object "Platformer" is "behavior"
 {
     public readonly entity = parent; // the entity associated with this behavior
     speed = 120; // speed in px/s
@@ -62,8 +62,9 @@ object "PlatformMovement" is "behavior"
     oldx = 0;
     ceiling = false;
     midair = false;
-    lwall = false;
+    wall = false;
     rwall = false;
+    lwall = false;
     lledge = false;
     rledge = false;
     sensors = null;
@@ -102,7 +103,9 @@ object "PlatformMovement" is "behavior"
 
         // wall collision
         if(xsp != 0 && sensors.wall) {
-            lwall = (xsp < 0); rwall = (xsp > 0);
+            lwall = (xsp < 0);
+            rwall = (xsp > 0);
+            wall = true;
             xsp = 0;
             dx = oldx - transform.position.x;
             transform.move(dx, 0);
@@ -113,7 +116,7 @@ object "PlatformMovement" is "behavior"
             }
         }
         else
-            lwall = rwall = false;
+            wall = false;
 
         // ceiling collision
         if(sensors.ceiling) {
@@ -128,7 +131,7 @@ object "PlatformMovement" is "behavior"
             ceiling = false;
 
         // ground collision
-        if(!sensors.midair) {
+        if(!sensors.midair && (!sensors.cloud || ysp > 0)) {
             ysp = 0;
             midair = false;
             lledge = sensors.lledge;
@@ -138,7 +141,6 @@ object "PlatformMovement" is "behavior"
                 sensors.update();
             }
             transform.move(0, 1);
-
         }
         else {
             midair = true;
@@ -186,7 +188,7 @@ object "PlatformMovement" is "behavior"
     fun walk()
     {
         if(autowalk == null)
-            autowalk = spawn("PlatformMovementAutoWalker");
+            autowalk = spawn("PlatformerAutoWalker");
         return this;
     }
 
@@ -220,8 +222,8 @@ object "PlatformMovement" is "behavior"
     // set the size of the sensor box
     fun setSensorBox(width, height)
     {
-        sensors = spawn("PlatformMovementSensors").setSensorBox(width, height);
-        //sensors.visible = true;
+        sensors = spawn("PlatformerSensors").setSensorBox(width, height);
+        sensors.visible = true;
         return this;
     }
 
@@ -274,6 +276,12 @@ object "PlatformMovement" is "behavior"
         return midair;
     }
 
+    // am I touching a wall?
+    fun get_wall()
+    {
+        return wall;
+    }
+
     // am I touching a wall to my left?
     fun get_leftWall()
     {
@@ -307,7 +315,7 @@ object "PlatformMovement" is "behavior"
     */
 }
 
-object "PlatformMovementSensors"
+object "PlatformerSensors"
 {
     // sensors
     public readonly left = null;
@@ -321,6 +329,8 @@ object "PlatformMovementSensors"
     public readonly ceiling = false;
     public readonly lledge = false;
     public readonly rledge = false;
+    public readonly ground = false;
+    public readonly cloud = false;
 
     state "main"
     {
@@ -335,11 +345,13 @@ object "PlatformMovementSensors"
         m = mid.status;
         t = top.status;
 
-        midair = !l && !r;
         rledge = (l != null && r == null);
         lledge = (l == null && r != null);
         wall = (m == "solid");
         ceiling = (t == "solid");
+        cloud = (l == "cloud" || r == "cloud");
+        ground = (l == "solid" || r == "solid");
+        midair = (!l && !r) || (cloud && m == "cloud");
     }
 
     fun update()
@@ -376,7 +388,7 @@ object "PlatformMovementSensors"
     }
 }
 
-object "PlatformMovementAutoWalker"
+object "PlatformerAutoWalker"
 {
     platformer = parent;
 

@@ -73,7 +73,7 @@ object 'ActorFactory' \n\
 object 'BehaviorFactory' \n\
 { \n\
     public readonly DirectionalMovement = spawn('DirectionalMovementFactory'); \n\
-    public readonly Platformer = spawn('PlatformMovementFactory'); \n\
+    public readonly Platformer = spawn('PlatformerFactory'); \n\
     public readonly Enemy = spawn('EnemyFactory'); \n\
 \n\
     fun destroy() { } \n\
@@ -84,8 +84,8 @@ object 'DirectionalMovementFactory' { \n\
     fun destroy() { } \n\
 } \n\
 \n\
-object 'PlatformMovementFactory' { \n\
-    fun call() { return caller.spawn('PlatformMovement'); } \n\
+object 'PlatformerFactory' { \n\
+    fun call() { return caller.spawn('Platformer'); } \n\
     fun destroy() { } \n\
 } \n\
 \n\
