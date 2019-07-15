@@ -223,7 +223,7 @@ object "Platformer" is "behavior"
     fun setSensorBox(width, height)
     {
         sensors = spawn("PlatformerSensors").setSensorBox(width, height);
-        sensors.visible = true;
+        //sensors.visible = true;
         return this;
     }
 
