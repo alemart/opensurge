@@ -13,7 +13,7 @@ using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
 
-object "DefaultClearedAnimation" is "entity", "awake", "detached", "private"
+object "Default Cleared Animation" is "entity", "awake", "detached", "private"
 {
     title = [
         spawn("DefaultClearedAnimation.Title").init(0),

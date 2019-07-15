@@ -7,7 +7,7 @@
 using SurgeEngine.Level;
 using SurgeEngine.Player;
 
-object "PauseAndQuitController"
+object "Pause and Quit"
 {
     state "main"
     {

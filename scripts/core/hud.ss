@@ -12,7 +12,7 @@ using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 
-object "DefaultHUD" is "entity", "detached", "awake", "private"
+object "Default HUD" is "entity", "detached", "awake", "private"
 {
     score = spawn("DefaultHUD.Score");
     timer = spawn("DefaultHUD.Time");

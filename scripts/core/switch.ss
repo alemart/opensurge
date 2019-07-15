@@ -8,7 +8,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Audio.Sound;
 
-object "SwitchController"
+object "Switch Controller"
 {
     public enabled = true; // enable character switching?
     deny = Sound("samples/deny.wav");

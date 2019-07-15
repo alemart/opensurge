@@ -16,17 +16,17 @@ object "Default Setup"
 {
     hud = null;
     cam = spawn("Default Camera");
-    switchController = spawn("SwitchController");
-    pauseController = spawn("PauseAndQuitController");
-    waterController = spawn("WaterController");
-    clearedAnim = spawn("DefaultClearedAnimation");
-    openingAnim = spawn("DefaultOpeningAnimation");
+    switchController = spawn("Switch Controller");
+    pauseController = spawn("Pause and Quit");
+    waterController = spawn("Water Controller");
+    clearedAnim = spawn("Default Cleared Animation");
+    openingAnim = spawn("Default Opening Animation");
 
     state "main"
     {
         // wait for the completion of the opening animation
         if(timeout(3.0)) {
-            hud = spawn("DefaultHUD");
+            hud = spawn("Default HUD");
             state = "done";
         }
     }
@@ -37,5 +37,5 @@ object "Default Setup"
 }
 
 // this is for retro-compatibility
-object ".default_startup" { startup = spawn("Default Setup"); }
-object "DefaultStartup" { startup = spawn("Default Setup"); }
+object ".default_startup" { setup = spawn("Default Setup"); }
+object "DefaultStartup" { setup = spawn("Default Setup"); }

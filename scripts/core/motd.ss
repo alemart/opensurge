@@ -5,8 +5,8 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// SurgeScriptMOTD greets the user with the Message Of The Day
-object "SurgeScriptMOTD"
+// Greets the user with the Message Of The Day ;)
+object "SurgeScript MOTD"
 {
     state "main"
     {

@@ -116,7 +116,7 @@ object "Water Splash" is "entity", "private", "disposable"
 // --------------------------------------------------------------
 
 // this object controls water behavior: bubbles, breathing timer, and so on
-object "WaterController"
+object "Water Controller"
 {
     breathingBehavior = spawn("WaterController.BreathingBehavior");
     underwaterTimer = spawn("WaterController.UnderwaterTimer");

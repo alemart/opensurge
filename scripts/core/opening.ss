@@ -11,7 +11,7 @@ using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 
-object "DefaultOpeningAnimation" is "entity", "awake", "detached", "private"
+object "Default Opening Animation" is "entity", "awake", "detached", "private"
 {
     theVoid = spawn("DefaultOpeningAnimation.Void");
     leftHalf = spawn("DefaultOpeningAnimation.LeftHalf");
