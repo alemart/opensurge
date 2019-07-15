@@ -1,16 +1,18 @@
 // -----------------------------------------------------------------------------
-// File: startup.ss
-// Description: the DefaultStartup object spawns: Default HUD, Default Camera,
+// File: setup.ss
+// Description: the Default Setup object spawns: Default HUD, Default Camera,
 //              Switch Controller, and so on. This is spawned by default on
-//              every level, but that can be changed by hacking (see below)
+//              every level, but that can be changed manually (see below)
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 
+//
 // Need to hack this?
 // It's not recommended to change this object. You may want to copy this object,
-// give it a different name and change the 'startup' parameter on the .lev file.
-object "DefaultStartup"
+// give it a different name and change the "startup" parameter on the .lev file.
+//
+object "Default Setup"
 {
     hud = null;
     cam = spawn("Default Camera");
@@ -35,11 +37,5 @@ object "DefaultStartup"
 }
 
 // this is for retro-compatibility
-object ".default_startup"
-{
-    defaultStartup = spawn("DefaultStartup");
-
-    state "main"
-    {
-    }
-}
+object ".default_startup" { startup = spawn("Default Setup"); }
+object "DefaultStartup" { startup = spawn("Default Setup"); }
