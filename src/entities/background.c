@@ -202,7 +202,7 @@ background_t *background_new()
 
     bg->actor = actor_create();
     bg->data = NULL;
-    bg->strategy = NULL;
+    bg->strategy = bgstrategy_default_new(bg);
     bg->repeat_x = FALSE;
     bg->repeat_y = FALSE;
     bg->zindex = 0.0f;
@@ -212,11 +212,11 @@ background_t *background_new()
 
 background_t *background_delete(background_t *bg)
 {
+    if(bg->data != NULL)
+        spriteinfo_destroy(bg->data);
     bg->strategy = bgstrategy_delete(bg->strategy);
-    spriteinfo_destroy(bg->data);
     actor_destroy(bg->actor);
     free(bg);
-
     return NULL;
 }
 
@@ -485,8 +485,5 @@ void validate_background(const background_t *bg)
 {
     if(bg->data == NULL)
         fatal_error("Can't read background: no sprite data given");
-
-    if(bg->strategy == NULL)
-        fatal_error("Can't read background: no behavior given");
 }
 
