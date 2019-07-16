@@ -116,7 +116,7 @@ object "Platformer" is "behavior"
             }
         }
         else
-            wall = false;
+            wall = lwall = rwall = false;
 
         // ceiling collision
         if(sensors.ceiling) {
@@ -403,9 +403,9 @@ object "PlatformerAutoWalker"
         rightWall = platformer.rightWall;
         leftWall = platformer.leftWall;
 
-        if((!rightWall && leftWall) || platformer.leftLedge)
+        if((!rightWall && leftWall) || (platformer.leftLedge && platformer.direction < 0))
             platformer.walkRight();
-        else if((rightWall && !leftWall) || platformer.rightLedge)
+        else if((rightWall && !leftWall) || (platformer.rightLedge && platformer.direction > 0))
             platformer.walkLeft();
         else if(rightWall && leftWall)
             platformer.stop();

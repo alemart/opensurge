@@ -11,7 +11,7 @@ sprite "GreenMarmot"
     source_file     "images/marmot-green.png"
     source_rect     0 80 240 40
     frame_size      40 40
-    hot_spot        14 40
+    hot_spot        20 40
 
     animation 0
     {
