@@ -405,7 +405,7 @@ void player_render(player_t *player, v2d_t camera_position)
  */
 int player_bounce(player_t *player, float direction, int is_heavy_object)
 {
-    if(physicsactor_is_in_the_air(player->pa)) {
+    if(physicsactor_is_in_the_air(player->pa) && !player_is_dying(player)) {
         actor_t *act = player->actor;
         
         if(direction <= 0.0f && act->speed.y >= 0.0f)
@@ -552,7 +552,8 @@ void player_kill(player_t *player)
 void player_roll(player_t *player)
 {
     player->pa_old_state = physicsactor_get_state(player->pa);
-    physicsactor_roll(player->pa);
+    if(!player_is_dying(player))
+        physicsactor_roll(player->pa);
 }
 
 /*
@@ -588,7 +589,8 @@ void player_disable_roll(player_t *player)
 void player_spring(player_t *player)
 {
     player->pa_old_state = physicsactor_get_state(player->pa);
-    physicsactor_spring(player->pa);
+    if(!player_is_dying(player))
+        physicsactor_spring(player->pa);
 }
 
 /*
@@ -613,7 +615,7 @@ void player_drown(player_t *player)
  */
 void player_breathe(player_t *player)
 {
-    if(player_is_underwater(player) && physicsactor_get_state(player->pa) != PAS_BREATHING && physicsactor_get_state(player->pa) != PAS_DROWNED && physicsactor_get_state(player->pa) != PAS_DEAD) {
+    if(player_is_underwater(player) && physicsactor_get_state(player->pa) != PAS_BREATHING && !player_is_dying(player)) {
         player_reset_underwater_timer(player);
         player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
@@ -786,7 +788,7 @@ int player_overlaps(const player_t *player, int x, int y, int width, int height)
  */
 int player_is_attacking(const player_t *player)
 {
-    return player->attacking || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING || physicsactor_get_state(player->pa) == PAS_CHARGING;
+    return !player_is_dying(player) && (player->attacking || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING || physicsactor_get_state(player->pa) == PAS_CHARGING);
 }
 
 
