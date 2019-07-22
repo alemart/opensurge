@@ -136,7 +136,7 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBox", "__init", fun_collisionbox_init, 3);
     surgescript_vm_bind(vm, "CollisionBox", "constructor", fun_collisionbox_constructor, 0);
     surgescript_vm_bind(vm, "CollisionBox", "collidesWith", fun_collisionbox_collideswith, 1);
-    surgescript_vm_bind(vm, "CollisionBox", "contains", fun_collisionbox_contains, 2);
+    surgescript_vm_bind(vm, "CollisionBox", "contains", fun_collisionbox_contains, 1);
     surgescript_vm_bind(vm, "CollisionBox", "setAnchor", fun_collisionbox_setanchor, 2);
     surgescript_vm_bind(vm, "CollisionBox", "get_left", fun_collisionbox_getleft, 0);
     surgescript_vm_bind(vm, "CollisionBox", "get_right", fun_collisionbox_getright, 0);
@@ -161,7 +161,7 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBall", "__init", fun_collisionball_init, 2);
     surgescript_vm_bind(vm, "CollisionBall", "constructor", fun_collisionball_constructor, 0);
     surgescript_vm_bind(vm, "CollisionBall", "collidesWith", fun_collisionball_collideswith, 1);
-    surgescript_vm_bind(vm, "CollisionBall", "contains", fun_collisionball_contains, 2);
+    surgescript_vm_bind(vm, "CollisionBall", "contains", fun_collisionball_contains, 1);
     surgescript_vm_bind(vm, "CollisionBall", "setAnchor", fun_collisionball_setanchor, 2);
     surgescript_vm_bind(vm, "CollisionBall", "get_center", fun_collisionball_getcenter, 0);
     surgescript_vm_bind(vm, "CollisionBall", "get_radius", fun_collisionball_getradius, 0);
@@ -502,14 +502,18 @@ surgescript_var_t* fun_collisionbox_setanchor(surgescript_object_t* object, cons
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
 }
 
-/* contains(): checks if world-position (x, y) is inside the collider */
+/* contains(): checks if world-position pos = (x, y) is inside the collider */
 surgescript_var_t* fun_collisionbox_contains(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* pos = surgescript_objectmanager_get(manager, handle);
     boxcollider_t* collider = surgescript_object_userdata(object);
     v2d_t worldpos = ((collider_t*)collider)->worldpos;
     double width = collider->size.x, height = collider->size.y;
-    double x = surgescript_var_get_number(param[0]);
-    double y = surgescript_var_get_number(param[1]);
+    double x = 0.0, y = 0.0;
+
+    scripting_vector2_read(pos, &x, &y);
     return surgescript_var_set_bool(surgescript_var_create(),
         x >= worldpos.x - width / 2.0 && x <= worldpos.x + width / 2.0 &&
         y >= worldpos.y - height / 2.0 && y <= worldpos.y + height / 2.0
@@ -784,15 +788,20 @@ surgescript_var_t* fun_collisionball_collideswith(surgescript_object_t* object, 
     return surgescript_var_set_bool(surgescript_var_create(), false);
 }
 
-/* contains(): checks if world-position (x, y) is inside the collider */
+/* contains(): checks if world-position pos = (x, y) is inside the collider */
 surgescript_var_t* fun_collisionball_contains(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* pos = surgescript_objectmanager_get(manager, handle);
     collider_t* collider = surgescript_object_userdata(object);
-    double x = surgescript_var_get_number(param[0]);
-    double y = surgescript_var_get_number(param[1]);
     double r = ((ballcollider_t*)collider)->radius;
-    double dx = x - collider->worldpos.x;
-    double dy = y - collider->worldpos.y;
+    double x = 0.0, y = 0.0, dx = 0.0, dy = 0.0;
+
+    scripting_vector2_read(pos, &x, &y);
+    dx = x - collider->worldpos.x;
+    dy = y - collider->worldpos.y;
+    
     return surgescript_var_set_bool(surgescript_var_create(), dx * dx + dy * dy <= r * r);
 }
 
