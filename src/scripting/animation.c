@@ -40,6 +40,7 @@ static surgescript_var_t* fun_getrepeats(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -71,6 +72,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_hotspot", fun_gethotspot, 0);
     surgescript_vm_bind(vm, "Animation", "get_sprite", fun_getsprite, 0);
     surgescript_vm_bind(vm, "Animation", "get_frame", fun_getframe, 0);
+    surgescript_vm_bind(vm, "Animation", "set_frame", fun_setframe, 1);
     surgescript_vm_bind(vm, "Animation", "get_frameCount", fun_getframecount, 0);
     surgescript_vm_bind(vm, "Animation", "get_speedFactor", fun_getspeedfactor, 0);
     surgescript_vm_bind(vm, "Animation", "set_speedFactor", fun_setspeedfactor, 1);
@@ -251,11 +253,23 @@ surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescrip
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
-/* current frame, a number in [0, frameCount - 1] */
+/* get the current frame, a number in [0, frameCount - 1] */
 surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     const actor_t* actor = get_animation_actor(object);
     return surgescript_var_set_number(surgescript_var_create(), actor != NULL ? actor_animation_frame(actor) : 0);
+}
+
+/* set the current frame, a number in [0, frameCount - 1] */
+surgescript_var_t* fun_setframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = get_animation_actor(object);
+    int frame = surgescript_var_get_number(param[0]);
+
+    if(actor != NULL)
+        actor_change_animation_frame(actor, frame);
+
+    return NULL;
 }
 
 /* the number of frames in the animation */

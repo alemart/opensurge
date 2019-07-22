@@ -150,7 +150,7 @@ static void update_transform(surgescript_object_t* object, v2d_t world_position,
 static void update_animation(surgescript_object_t* object, int anim_id);
 static void read_transform(surgescript_object_t* object, v2d_t* world_position);
 static const double RAD2DEG = 57.2957795131;
-#define FIXANG(rad) ((rad) >= 0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
+#define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 
 
 /*
