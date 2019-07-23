@@ -48,8 +48,6 @@ brick 0 576 9744
 brick 0 384 1000
 
 // entities
-entity "Collectible" 192 9976 "6c2c94bc7951d486"
-entity "Collectible" 336 9976 "2404b32c421896af"
 entity "Goal" 928 10000 "4136e5c056e8ec42"
 entity "Collectible" 192 9936 "7933112fabc26d1a"
 entity "Collectible" 192 9904 "881e5ac4972def40"
@@ -99,5 +97,8 @@ entity "Goal Capsule" 928 9744 "c91231e84d4fd7c5"
 entity "Spring Standard" 272 10000 "455504a3e4553db5"
 entity "Bumper" 400 9824 "393059531bd1e221"
 entity "Bridge" 736 9744 "481c9ccb42a38268"
+entity "Collectible" 336 9968 "4d39f77aebeac935"
+entity "Collectible" 192 9968 "7d967c005e67f1e7"
+entity "Switch" 864 9744 "891b284139a29de1"
 
 // EOF

@@ -4241,12 +4241,19 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
             if((!readonly && helper->rw) || (readonly && !helper->rw)) {
                 static char value[32]; /* size must be >= 4 */
                 int len = 0;
-                char *p;
+                char* p;
 
                 /* get the current value of the property */
                 surgescript_var_t* ret = surgescript_var_create();
                 surgescript_object_call_function(helper->object, fun_name, NULL, 0, ret);
-                surgescript_var_to_string(ret, value, sizeof(value));
+                if(surgescript_var_is_objecthandle(ret)) {
+                    const surgescript_objectmanager_t* manager = surgescript_object_manager(helper->object);
+                    char* str = surgescript_var_get_string(ret, manager); /* will call toString() */
+                    str_cpy(value, str, sizeof(value));
+                    ssfree(str);
+                }
+                else
+                    surgescript_var_to_string(ret, value, sizeof(value));
                 surgescript_var_destroy(ret);
 
                 /* remove '\n' from the string */

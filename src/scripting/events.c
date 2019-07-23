@@ -27,7 +27,7 @@ using SurgeEngine.Level; \n\
 object 'Event' is 'event' \n\
 { \n\
     fun call() { } \n\
-    fun toString() { return '<missing event>'; } \n\
+    fun toString() { return '(missing event)'; } \n\
 } \n\
 \n\
 object 'EntityEvent' is 'event' \n\
