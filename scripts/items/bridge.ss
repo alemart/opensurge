@@ -14,8 +14,9 @@ using SurgeEngine.Collisions.CollisionBox;
 // Bridge
 object "Bridge" is "entity", "gimmick"
 {
-    public length = 12;
-    public anim = 1;
+    public length = 12; // how many bridge elements
+    public anim = 1; // animation number
+    public layer = "default"; // must be "green", "yellow" or "default"
 
     bridgeCollider = CollisionBox(1, 1);
     transform = Transform();
@@ -44,7 +45,7 @@ object "Bridge" is "entity", "gimmick"
         // according to the position of the players
         for(i = 0; i < Player.count; i++) { // for each player
             player = Player[i];
-            if(!player.midair && bridgeCollider.collidesWith(player.collider)) { // player on the bridge
+            if(compatiblePlayer(player) && bridgeCollider.collidesWith(player.collider)) { // player on the bridge
                 numPlayers++;
                 feet = Vector2(player.collider.center.x, player.collider.bottom);
                 for(j = 0; j < elements.length; j++) {
@@ -91,7 +92,7 @@ object "Bridge" is "entity", "gimmick"
         // create the bridge elements
         length = Math.clamp(length, 6, 24); // at most 24 elements (entity not awake)
         for(i = 0; i < length; i++) {
-            e = spawn("Bridge Element").setElement(i, length, anim);
+            e = spawn("Bridge Element").setElement(i, length, anim, layer);
             elements.push(e);
         }
 
@@ -125,6 +126,11 @@ object "Bridge" is "entity", "gimmick"
         }
         elements = [];
     }
+
+    fun compatiblePlayer(player)
+    {
+        return !player.midair && ((layer == "default") || (layer == player.layer));
+    }
 }
 
 // Bridge Element
@@ -149,7 +155,7 @@ object "Bridge Element" is "entity", "private"
         //collider.visible = true;
     }
 
-    fun setElement(idx, len, anim)
+    fun setElement(idx, len, anim, layer)
     {
         // set the animation
         actor.anim = anim;
@@ -159,6 +165,13 @@ object "Bridge Element" is "entity", "private"
 
         // store the length of the bridge
         length = len;
+
+        // set the brick layer
+        brick.layer = layer;
+        if(layer == "green")
+            actor.zindex += 0.0001;
+        else if(layer == "yellow")
+            actor.zindex -= 0.0001;
 
         // set the position of the element
         offx = (index - length / 2) * actor.width;
