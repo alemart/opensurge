@@ -9,6 +9,7 @@ using SurgeEngine.Actor;
 using SurgeEngine.Brick;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
+using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
 // Bridge
@@ -45,7 +46,7 @@ object "Bridge" is "entity", "gimmick"
         // according to the position of the players
         for(i = 0; i < Player.count; i++) { // for each player
             player = Player[i];
-            if(compatiblePlayer(player) && bridgeCollider.collidesWith(player.collider)) { // player on the bridge
+            if(gotPlayer(player)) { // player on the bridge
                 numPlayers++;
                 feet = Vector2(player.collider.center.x, player.collider.bottom);
                 for(j = 0; j < elements.length; j++) {
@@ -85,6 +86,10 @@ object "Bridge" is "entity", "gimmick"
         // position the bridge elements
         for(j = 0; j < elements.length; j++)
             elements[j].updatePosition(smoothIndex, smoothMaxDepth);
+    }
+
+    state "collapsing"
+    {
     }
 
     fun setup()
@@ -127,9 +132,31 @@ object "Bridge" is "entity", "gimmick"
         elements = [];
     }
 
-    fun compatiblePlayer(player)
+    // is the player on the bridge?
+    fun gotPlayer(player)
     {
-        return !player.midair && ((layer == "default") || (layer == player.layer));
+        return (
+            !player.midair &&
+            ((layer == "default") || (layer == player.layer)) &&
+            bridgeCollider.collidesWith(player.collider)
+        );
+    }
+
+    // collapse the bridge
+    fun collapse()
+    {
+        if(state != "collapsing") {
+            // collapse elements
+            for(j = 0; j < elements.length; j++)
+                elements[j].collapse();
+
+            // play sound
+            sfx = Sound("samples/break.wav");
+            sfx.play();
+
+            // change state
+            state = "collapsing";
+        }
     }
 }
 
@@ -146,6 +173,7 @@ object "Bridge Element" is "entity", "private"
     length = 1;
     offx = 0;
     offy = 0;
+    ysp = 0;
     timer = 0;
     ninety = Math.deg2rad(90);
     originalOffset = Vector2.zero;
@@ -153,6 +181,12 @@ object "Bridge Element" is "entity", "private"
     state "main"
     {
         //collider.visible = true;
+    }
+
+    state "collapsing"
+    {
+        ysp += 828 * Time.delta; // grv * dt
+        transform.move(0, ysp * Time.delta);
     }
 
     fun setElement(idx, len, anim, layer)
@@ -257,6 +291,12 @@ object "Bridge Element" is "entity", "private"
     fun get_height()
     {
         return actor.height;
+    }
+
+    fun collapse()
+    {
+        brick.enabled = false;
+        state = "collapsing";
     }
 
     fun constructor()
