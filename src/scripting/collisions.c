@@ -45,7 +45,8 @@ typedef struct boxcollider_t boxcollider_t;
 struct boxcollider_t
 {
     collider_t collider;
-    v2d_t size; /* width, height */
+    double width;
+    double height;
 };
 
 typedef struct ballcollider_t ballcollider_t;
@@ -429,7 +430,8 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
     collider->flags = 0;
     darray_init(collider->prev_collisions);
     darray_init(collider->curr_collisions);
-    ((boxcollider_t*)collider)->size = v2d_new(0, 0);
+    ((boxcollider_t*)collider)->width = 0.0;
+    ((boxcollider_t*)collider)->height = 0.0;
     surgescript_object_set_userdata(object, collider);
 
     /* box center (lazy evaluation) */
@@ -476,8 +478,8 @@ surgescript_var_t* fun_collisionbox_init(surgescript_object_t* object, const sur
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
     collider->colmgr = surgescript_var_get_objecthandle(param[0]); /* collision manager */
-    boxcollider->size.x = max(1.0f, surgescript_var_get_number(param[1])); /* width */
-    boxcollider->size.y = max(1.0f, surgescript_var_get_number(param[2])); /* height */
+    boxcollider->width = max(1.0, surgescript_var_get_number(param[1])); /* collider width */
+    boxcollider->height = max(1.0, surgescript_var_get_number(param[2])); /* collider height */
     return NULL;
 }
 
@@ -492,7 +494,7 @@ surgescript_var_t* fun_collisionbox_setanchor(surgescript_object_t* object, cons
     */
     boxcollider_t* collider = surgescript_object_userdata(object);
     surgescript_transform_t* transform = surgescript_object_transform(object);
-    double width = collider->size.x, height = collider->size.y;
+    double width = collider->width, height = collider->height;
     double x = surgescript_var_get_number(param[0]);
     double y = surgescript_var_get_number(param[1]);
     surgescript_transform_setposition2d(transform, (0.5 - x) * width, (0.5 - y) * height);
@@ -510,13 +512,13 @@ surgescript_var_t* fun_collisionbox_contains(surgescript_object_t* object, const
     surgescript_object_t* pos = surgescript_objectmanager_get(manager, handle);
     boxcollider_t* collider = surgescript_object_userdata(object);
     v2d_t worldpos = ((collider_t*)collider)->worldpos;
-    double width = collider->size.x, height = collider->size.y;
+    double halfWidth = collider->width / 2.0, halfHeight = collider->height / 2.0;
     double x = 0.0, y = 0.0;
 
     scripting_vector2_read(pos, &x, &y);
     return surgescript_var_set_bool(surgescript_var_create(),
-        x >= worldpos.x - width / 2.0 && x <= worldpos.x + width / 2.0 &&
-        y >= worldpos.y - height / 2.0 && y <= worldpos.y + height / 2.0
+        x >= worldpos.x - halfWidth && x <= worldpos.x + halfWidth &&
+        y >= worldpos.y - halfHeight && y <= worldpos.y + halfHeight
     );
 }
 
@@ -526,18 +528,18 @@ surgescript_var_t* fun_collisionbox_collideswith(surgescript_object_t* object, c
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t other_collider = surgescript_var_get_objecthandle(param[0]);
     boxcollider_t* collider = surgescript_object_userdata(object);
-    double my_left = ((collider_t*)collider)->worldpos.x - collider->size.x / 2.0;
-    double my_right = ((collider_t*)collider)->worldpos.x + collider->size.x / 2.0;
-    double my_top = ((collider_t*)collider)->worldpos.y - collider->size.y / 2.0;
-    double my_bottom = ((collider_t*)collider)->worldpos.y + collider->size.y / 2.0;
+    double my_left = ((collider_t*)collider)->worldpos.x - collider->width / 2.0;
+    double my_right = ((collider_t*)collider)->worldpos.x + collider->width / 2.0;
+    double my_top = ((collider_t*)collider)->worldpos.y - collider->height / 2.0;
+    double my_bottom = ((collider_t*)collider)->worldpos.y + collider->height / 2.0;
     collider_t* other = safe_get_collider(surgescript_objectmanager_get(manager, other_collider));
 
     switch(other->type) {
         case COLLIDER_TYPE_BOX: {
-            double other_left = other->worldpos.x - ((boxcollider_t*)other)->size.x / 2.0;
-            double other_right = other->worldpos.x + ((boxcollider_t*)other)->size.x / 2.0;
-            double other_top = other->worldpos.y - ((boxcollider_t*)other)->size.y / 2.0;
-            double other_bottom = other->worldpos.y + ((boxcollider_t*)other)->size.y / 2.0;
+            double other_left = other->worldpos.x - ((boxcollider_t*)other)->width / 2.0;
+            double other_right = other->worldpos.x + ((boxcollider_t*)other)->width / 2.0;
+            double other_top = other->worldpos.y - ((boxcollider_t*)other)->height / 2.0;
+            double other_bottom = other->worldpos.y + ((boxcollider_t*)other)->height / 2.0;
             return surgescript_var_set_bool(surgescript_var_create(),
                 my_left < other_right && my_right > other_left &&
                 my_top < other_bottom && my_bottom > other_top
@@ -565,7 +567,7 @@ surgescript_var_t* fun_collisionbox_setwidth(surgescript_object_t* object, const
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
     double width = surgescript_var_get_number(param[0]);
-    boxcollider->size.x = max(1.0f, width);
+    boxcollider->width = max(1.0, width);
     return NULL;
 }
 
@@ -574,7 +576,7 @@ surgescript_var_t* fun_collisionbox_setheight(surgescript_object_t* object, cons
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
     double height = surgescript_var_get_number(param[0]);
-    boxcollider->size.y = max(1.0f, height);
+    boxcollider->height = max(1.0, height);
     return NULL;
 }
 
@@ -582,13 +584,13 @@ surgescript_var_t* fun_collisionbox_setheight(surgescript_object_t* object, cons
 surgescript_var_t* fun_collisionbox_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     boxcollider_t* boxcollider = (boxcollider_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_number(surgescript_var_create(), boxcollider->size.x);
+    return surgescript_var_set_number(surgescript_var_create(), boxcollider->width);
 }
 
 surgescript_var_t* fun_collisionbox_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     boxcollider_t* boxcollider = (boxcollider_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_number(surgescript_var_create(), boxcollider->size.y);
+    return surgescript_var_set_number(surgescript_var_create(), boxcollider->height);
 }
 
 /* get coordinates */
@@ -596,28 +598,28 @@ surgescript_var_t* fun_collisionbox_getleft(surgescript_object_t* object, const 
 {
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
-    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.x - boxcollider->size.x / 2.0f);
+    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.x - boxcollider->width / 2.0);
 }
 
 surgescript_var_t* fun_collisionbox_getright(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
-    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.x + boxcollider->size.x / 2.0f);
+    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.x + boxcollider->width / 2.0);
 }
 
 surgescript_var_t* fun_collisionbox_gettop(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
-    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.y - boxcollider->size.y / 2.0f);
+    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.y - boxcollider->height / 2.0);
 }
 
 surgescript_var_t* fun_collisionbox_getbottom(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     collider_t* collider = surgescript_object_userdata(object);
     boxcollider_t* boxcollider = (boxcollider_t*)collider;
-    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.y + boxcollider->size.y / 2.0f);
+    return surgescript_var_set_number(surgescript_var_create(), collider->worldpos.y + boxcollider->height / 2.0);
 }
 
 /* get center: Vector2 (world coordinates) */
@@ -655,10 +657,10 @@ surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const s
         color_t color = COLLIDER_COLOR();
         v2d_t camera = scripting_util_object_camera(object);
         v2d_t center = ((collider_t*)collider)->worldpos;
-        double left = center.x - collider->size.x / 2.0;
-        double right = center.x + collider->size.x / 2.0;
-        double top = center.y - collider->size.y / 2.0;
-        double bottom = center.y + collider->size.y / 2.0;
+        double left = center.x - collider->width / 2.0;
+        double right = center.x + collider->width / 2.0;
+        double top = center.y - collider->height / 2.0;
+        double bottom = center.y + collider->height / 2.0;
 
         int l = left - (camera.x - VIDEO_SCREEN_W / 2);
         int r = right - (camera.x - VIDEO_SCREEN_W / 2) - 1;
@@ -699,7 +701,7 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
     collider->flags = 0;
     darray_init(collider->prev_collisions);
     darray_init(collider->curr_collisions);
-    ((ballcollider_t*)collider)->radius = 0.0f;
+    ((ballcollider_t*)collider)->radius = 0.0;
     surgescript_object_set_userdata(object, collider);
 
     /* ball center (lazy evaluation) */
@@ -746,7 +748,7 @@ surgescript_var_t* fun_collisionball_init(surgescript_object_t* object, const su
     collider_t* collider = surgescript_object_userdata(object);
     ballcollider_t* ballcollider = (ballcollider_t*)collider;
     collider->colmgr = surgescript_var_get_objecthandle(param[0]); /* collision manager */
-    ballcollider->radius = max(1.0f, surgescript_var_get_number(param[1])); /* radius */
+    ballcollider->radius = max(1.0, surgescript_var_get_number(param[1])); /* radius */
     return NULL;
 }
 
@@ -762,10 +764,10 @@ surgescript_var_t* fun_collisionball_collideswith(surgescript_object_t* object, 
 
     switch(other->type) {
         case COLLIDER_TYPE_BOX: {
-            double other_left = other->worldpos.x - ((boxcollider_t*)other)->size.x / 2.0;
-            double other_right = other->worldpos.x + ((boxcollider_t*)other)->size.x / 2.0;
-            double other_top = other->worldpos.y - ((boxcollider_t*)other)->size.y / 2.0;
-            double other_bottom = other->worldpos.y + ((boxcollider_t*)other)->size.y / 2.0;
+            double other_left = other->worldpos.x - ((boxcollider_t*)other)->width / 2.0;
+            double other_right = other->worldpos.x + ((boxcollider_t*)other)->width / 2.0;
+            double other_top = other->worldpos.y - ((boxcollider_t*)other)->height / 2.0;
+            double other_bottom = other->worldpos.y + ((boxcollider_t*)other)->height / 2.0;
             double dx = my_center.x - clip(my_center.x, other_left, other_right);
             double dy = my_center.y - clip(my_center.y, other_top, other_bottom);
             return surgescript_var_set_bool(surgescript_var_create(),
