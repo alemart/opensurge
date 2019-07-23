@@ -389,6 +389,7 @@ SET(GAME_SRCS
   src/scripting/camera.c
   src/scripting/collisions.c
   src/scripting/console.c
+  src/scripting/events.c
   src/scripting/input.c
   src/scripting/lang.c
   src/scripting/level.c
