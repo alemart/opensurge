@@ -4,9 +4,9 @@
 sprite SD_SWITCH
 {
     source_file     images/switches.png
-    source_rect     10 80 32 14
-    frame_size      32 7
-    hot_spot        16 7
+    source_rect     288 64 64 8
+    frame_size      32 8
+    hot_spot        16 8
 
     // default
     animation 0

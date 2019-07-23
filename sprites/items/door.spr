@@ -1,0 +1,95 @@
+// -----------------------------------------------------------------------------
+// File: door.spr
+// Description: sprite definition for doors
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Celdecea
+sprite "Door"
+{
+    source_file     "images/switches.png"
+    source_rect     0 0 288 256
+    frame_size      24 64
+    hot_spot        0 0
+
+    // yellow door: closed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // yellow door: open
+    animation 1
+    {
+        repeat      FALSE
+        fps         24
+        data        1 2 3 4 5 6 7 8 9 10
+    }
+
+    // blue door: closed
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        12
+    }
+
+    // blue door: open
+    animation 3
+    {
+        repeat      FALSE
+        fps         24
+        data        13 14 15 16 17 18 19 20 21 22
+    }
+
+    // red door: closed
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        24
+    }
+
+    // red door: open
+    animation 5
+    {
+        repeat      FALSE
+        fps         24
+        data        25 26 27 28 29 30 31 32 33 34
+    }
+
+    // green door: closed
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        36
+    }
+
+    // green door: open
+    animation 7
+    {
+        repeat      FALSE
+        fps         24
+        data        37 38 39 40 41 42 43 44 45 46
+    }
+}
+
+// Collision Mask
+sprite "Door Mask"
+{
+    source_file     "images/switches.png"
+    source_rect     0 0 24 64
+    frame_size      24 64
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

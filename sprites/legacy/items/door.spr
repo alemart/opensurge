@@ -4,7 +4,7 @@
 sprite SD_DOOR
 {
     source_file     images/switches.png
-    source_rect     50 80 24 64
+    source_rect     0 0 24 64
     frame_size      24 64
     hot_spot        0 0
 

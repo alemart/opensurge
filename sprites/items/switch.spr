@@ -1,0 +1,96 @@
+// -----------------------------------------------------------------------------
+// File: switch.spr
+// Description: sprite definition for the on/off switches
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Celdecea
+sprite "Switch"
+{
+    source_file     "images/switches.png"
+    source_rect     288 64 128 16
+    frame_size      32 8
+    hot_spot        16 8
+
+    // yellow switch: not pressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // yellow switch: pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // blue switch: not pressed
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // blue switch: pressed
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // red switch: not pressed
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // red switch: pressed
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    // green switch: not pressed
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+
+    // green switch: pressed
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+}
+
+// Collision Mask
+sprite "Switch Mask"
+{
+    source_file     "images/switches.png"
+    source_rect     288 64 64 8
+    frame_size      32 8
+    hot_spot        16 8
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
