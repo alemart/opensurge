@@ -19,3 +19,18 @@ sprite "Background Exchanger"
         data        0
     }
 }
+
+sprite "Background Restorer"
+{
+    source_file     "images/core.png"
+    source_rect     32 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

@@ -28,13 +28,34 @@ object "Background Exchanger" is "entity", "special"
     state "watch collision"
     {
         if(!collider.collidesWith(player.collider)) {
-            // change the background state
-            if((player.speed > 0) || (player.speed == 0 && player.ysp > 0))
-                manager.changeBackgroundOfPlayer(player, background);
-            else
-                manager.restoreBackgroundOfPlayer(player);
+            manager.changeBackgroundOfPlayer(player, background);
+            state = "main";
+        }
+    }
 
-            // done
+    fun onCollision(otherCollider)
+    {
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            state = "watch collision";
+        }
+    }
+}
+
+object "Background Restorer" is "entity", "special"
+{
+    collider = CollisionBox(32, 32);
+    player = null;
+    manager = Level.child("Background Exchange Manager") || Level.spawn("Background Exchange Manager");
+
+    state "main"
+    {
+    }
+
+    state "watch collision"
+    {
+        if(!collider.collidesWith(player.collider)) {
+            manager.restoreBackgroundOfPlayer(player);
             state = "main";
         }
     }

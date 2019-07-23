@@ -8,7 +8,7 @@
 sprite "Tube In"
 {
     source_file     "images/core.png"
-    source_rect     32 64 32 32
+    source_rect     64 64 32 32
     frame_size      32 32
     hot_spot        16 16
 
@@ -23,7 +23,7 @@ sprite "Tube In"
 sprite "Tube Out"
 {
     source_file     "images/core.png"
-    source_rect     64 64 32 32
+    source_rect     96 64 32 32
     frame_size      32 32
     hot_spot        16 16
 
