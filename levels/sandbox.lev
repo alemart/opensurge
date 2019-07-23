@@ -99,5 +99,7 @@ entity "Bridge" 736 9744 "481c9ccb42a38268"
 entity "Collectible" 336 9968 "4d39f77aebeac935"
 entity "Collectible" 192 9968 "7d967c005e67f1e7"
 entity "Switch" 880 9744 "142f0aa6855b991a"
+entity "Event Trigger 1" 528 9952 "bf2c0b5b364bd74c"
+entity "Event Trigger 1" 528 9984 "f8a9333f4fff13e2"
 
 // EOF
