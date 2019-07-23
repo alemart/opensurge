@@ -1,27 +1,32 @@
 // -----------------------------------------------------------------------------
 // File: bridge.ss
-// Description: bridge
+// Description: script for bridges
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
 using SurgeEngine.Actor;
 using SurgeEngine.Brick;
-using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Collisions.CollisionBox;
 
-// Bridge Controller
+// Bridge
 object "Bridge" is "entity", "gimmick"
 {
     public length = 12;
     public anim = 1;
 
     bridgeCollider = CollisionBox(1, 1);
+    transform = Transform();
     elements = [];
     leftCorner = null;
     rightCorner = null;
+    prevMaxDepth = 0;
+    smoothMaxDepth = 0;
+    prevIndex = 0;
+    smoothIndex = 0;
+    timer = 0;
 
     state "main"
     {
@@ -31,19 +36,23 @@ object "Bridge" is "entity", "gimmick"
 
     state "idle"
     {
+        deepestElementIndex = -1;
+        maxDepth = 0;
+        numPlayers = 0;
+
         // compute the maximum depth of all bridge elements
         // according to the position of the players
-        maxDepth = 0; deepestElementIndex = -1;
         for(i = 0; i < Player.count; i++) { // for each player
             player = Player[i];
-            if(bridgeCollider.collidesWith(player.collider)) { // player on the bridge
+            if(!player.midair && bridgeCollider.collidesWith(player.collider)) { // player on the bridge
+                numPlayers++;
                 feet = Vector2(player.collider.center.x, player.collider.bottom);
                 for(j = 0; j < elements.length; j++) {
                     if(elements[j].gotCollision(feet)) { // player on bridge element j
                         depth = elements[j].depth;
                         if(depth > maxDepth) {
-                            maxDepth = depth;
                             deepestElementIndex = j;
+                            maxDepth = depth;
                         }
                         break;
                     }
@@ -51,32 +60,50 @@ object "Bridge" is "entity", "gimmick"
             }
         }
 
+        // smoothing the bridge
+        if(deepestElementIndex >= 0) {
+            if(Math.abs(prevMaxDepth - maxDepth) >= 1) {
+                prevMaxDepth = maxDepth;
+                timer = 0;
+            }
+            else if(Math.abs(prevIndex - deepestElementIndex) >= 1) {
+                prevIndex = deepestElementIndex;
+                timer = 0;
+            }
+            timer += Time.delta / 0.25;
+            smoothMaxDepth = Math.lerp(smoothMaxDepth, maxDepth, timer);
+            smoothIndex = (smoothIndex >= 0 && (numPlayers > 1 || Player.active.jumping)) ?
+                Math.smoothstep(smoothIndex, deepestElementIndex, timer) :
+                deepestElementIndex;
+        }
+        else {
+            smoothIndex = deepestElementIndex;
+            smoothMaxDepth = maxDepth;
+        }
+
         // position the bridge elements
         for(j = 0; j < elements.length; j++)
-            elements[j].updatePosition(deepestElementIndex, maxDepth);
+            elements[j].updatePosition(smoothIndex, smoothMaxDepth);
     }
 
     fun setup()
     {
-        // need to reset?
-        if(elements.length > 0)
-            clear();
-
         // create the bridge elements
-        length = Math.clamp(length, 6, 24);
+        length = Math.clamp(length, 6, 24); // at most 24 elements (entity not awake)
         for(i = 0; i < length; i++) {
             e = spawn("Bridge Element").setElement(i, length, anim);
             elements.push(e);
         }
 
         // create the corners
-        leftCorner = spawn("Bridge Corner").setCorner(-1, anim);
-        rightCorner = spawn("Bridge Corner").setCorner(length, anim);
+        leftCorner = spawn("Bridge Corner").setCorner(-1, length, anim);
+        rightCorner = spawn("Bridge Corner").setCorner(length, length, anim);
 
         // setup the bridge collider
         bridgeCollider.width = elements[0].width * length;
         bridgeCollider.height = elements[0].height;
-        bridgeCollider.setAnchor(0, 0.5);
+        bridgeCollider.setAnchor(0.5, 0.5);
+        //bridgeCollider.visible = true;
     }
 
     fun clear()
@@ -109,13 +136,13 @@ object "Bridge Element" is "entity", "private"
     transform = Transform();
     actor = Actor("Bridge Element");
     brick = Brick("Bridge Element");
-    collider = CollisionBox(actor.width, actor.height).setAnchor(0, 0.5);
+    collider = CollisionBox(actor.width, actor.height).setAnchor(0, 8 / actor.height);
     length = 1;
     offx = 0;
     offy = 0;
     timer = 0;
     ninety = Math.deg2rad(90);
-    accomodationTime = 0.3;
+    originalOffset = Vector2.zero;
 
     state "main"
     {
@@ -134,8 +161,9 @@ object "Bridge Element" is "entity", "private"
         length = len;
 
         // set the position of the element
-        offx = index * actor.width;
-        transform.localPosition = Vector2(offx, 0);
+        offx = (index - length / 2) * actor.width;
+        originalOffset = Vector2(offx, 0);
+        transform.localPosition = originalOffset;
 
         // compute its depth
         d1 = index + 1;
@@ -148,7 +176,7 @@ object "Bridge Element" is "entity", "private"
 
     fun updatePosition(deepestElementIndex, maxDepth)
     {
-        // if the player is on the bridge...
+        // if a player is on the bridge...
         if(deepestElementIndex >= 0) {
             // compute the depth factor of this element
             f1 = (index + 1) / (deepestElementIndex + 1);
@@ -156,7 +184,7 @@ object "Bridge Element" is "entity", "private"
             factor = Math.min(f1, f2);
 
             // update timer
-            timer += Time.delta / accomodationTime;
+            timer += Time.delta / 0.33;
             if(timer > 1)
                 timer = 1;
 
@@ -168,18 +196,22 @@ object "Bridge Element" is "entity", "private"
             offy = maxDepth * Math.sin(ninety * factor);
             y = Math.smoothstep(0, offy, timer);
             dy = y - transform.localPosition.y;
-            transform.localPosition = Vector2(offx, y);
+            transform.move(0, dy);
 
-            // move player
-            if(dy > 0.7) {
-                player = Player.active;
-                if(collider.collidesWith(player.collider))
-                    player.transform.move(0, dy - 0.7);
+            // move player(s)
+            if(dy > 0.0) {
+                for(j = 0; j < Player.count; j++) {
+                    player = Player[j];
+                    if(player.ysp >= 0 && collider.collidesWith(player.collider)) {
+                        ddy = player == Player.active ? Math.max(0, dy - 0.7) : dy;
+                        player.transform.move(0, ddy);
+                    }
+                }
             }
         }
         else if(timer > 0) {
             // update timer
-            timer -= Time.delta / accomodationTime;
+            timer -= Time.delta / 0.25;
             if(timer < 0)
                 timer = 0;
 
@@ -190,10 +222,12 @@ object "Bridge Element" is "entity", "private"
             // update position
             y = Math.smoothstep(0, offy, timer);
             dy = y - transform.localPosition.y;
-            transform.localPosition = Vector2(offx, y);
+            transform.move(0, dy);
         }
-        else
+        else {
             actor.animation.frame = 0;
+            transform.localPosition = originalOffset;
+        }
     }
 
     fun gotCollision(position)
@@ -226,12 +260,13 @@ object "Bridge Corner" is "entity", "private"
     {
     }
 
-    fun setCorner(index, anim)
+    fun setCorner(index, length, anim)
     {
         // configure the actor
         actor = Actor((index > 0) ? "Bridge Corner Right" : "Bridge Corner Left");
         actor.anim = anim;
-        actor.offset = Vector2(index * actor.width, 0);
+        actor.zindex = 0.51; // appear in front of the player
+        actor.offset = Vector2((index - length / 2) * actor.width, 0);
 
         // return the object
         return this;

@@ -106,7 +106,7 @@ sprite "Bridge"
     source_file     "images/bridges.png"
     source_rect     64 48 192 16
     frame_size      192 16
-    hot_spot        0 0
+    hot_spot        96 0
 
     animation 0
     {
