@@ -21,7 +21,7 @@
 #include <surgescript.h>
 #include "../core/global.h"
 
-/* the following code, written in SurgeScript language, is MIT-licensed */
+/* SurgeScript code */
 static const char code_in_surgescript[] = "\
 @Plugin \n\
 object 'SurgeEngine' \n\
@@ -41,6 +41,7 @@ object 'SurgeEngine' \n\
     public readonly Camera = spawn('Camera'); \n\
     public readonly Collisions = spawn('Collision'); \n\
     public readonly UI = spawn('UI'); \n\
+    public readonly Events = spawn('Events'); \n\
     public readonly version = '" GAME_VERSION_STRING "'; \n\
 \n\
     fun get_Level() \n\
@@ -282,6 +283,56 @@ object 'SoundFactory' \n\
 object 'Video' \n\
 { \n\
     public readonly Screen = spawn('Screen'); \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'Events' \n\
+{ \n\
+    public readonly Event = spawn('EventFactory'); \n\
+    public readonly EntityEvent = spawn('EntityEventFactory'); \n\
+    public readonly FunctionEvent = spawn('FunctionEventFactory'); \n\
+    public readonly EventList = spawn('EventListFactory'); \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'EventFactory' \n\
+{ \n\
+    fun call() \n\
+    { \n\
+        return caller.spawn('Event'); \n\
+    } \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'EntityEventFactory' \n\
+{ \n\
+    fun call(entityId, functionName) \n\
+    { \n\
+        return caller.spawn('EntityEvent').__init(entityId, functionName); \n\
+    } \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'FunctionEventFactory' \n\
+{ \n\
+    fun call(objectName) \n\
+    { \n\
+        return caller.spawn('FunctionEvent').__init(objectName); \n\
+    } \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'EventListFactory' \n\
+{ \n\
+    fun call(eventList) \n\
+    { \n\
+        return caller.spawn('EventList').__init(eventList); \n\
+    } \n\
 \n\
     fun destroy() { } \n\
 } \n\
