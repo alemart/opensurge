@@ -7,8 +7,9 @@
 using SurgeEngine.Actor;
 using SurgeEngine.Brick;
 using SurgeEngine.Audio.Sound;
-using SurgeEngine.Collisions.CollisionBox;
 using SurgeEngine.Events.Event;
+using SurgeEngine.Events.EntityEvent;
+using SurgeEngine.Collisions.CollisionBox;
 
 object "Switch" is "entity", "gimmick"
 {
@@ -81,10 +82,8 @@ object "Switch" is "entity", "gimmick"
         }
     }
 
-    /*
-    fun get_active()
+    fun isActive()
     {
         return (state == "active");
     }
-    */
 }

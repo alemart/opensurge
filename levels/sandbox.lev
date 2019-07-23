@@ -13,7 +13,7 @@ requires "0.5.0"
 act 1
 theme "themes/template.brk"
 bgtheme "themes/template.bg"
-spawn_point 128 9984
+spawn_point 128 9968
 startup "Default Setup"
 players "Tux"
 
@@ -93,12 +93,11 @@ entity "Crococopter" 448 9872 "baa633d3499334e5"
 entity "Crococopter" 480 9912 "b88c38f7fac98bcc"
 entity "Powerup Lucky Bonus" 40 10000 "fbaece6f41916bdb"
 entity "Mosquito" 640 9968 "e2044c7669abdfcc"
-entity "Goal Capsule" 928 9744 "c91231e84d4fd7c5"
 entity "Spring Standard" 272 10000 "455504a3e4553db5"
 entity "Bumper" 400 9824 "393059531bd1e221"
 entity "Bridge" 736 9744 "481c9ccb42a38268"
 entity "Collectible" 336 9968 "4d39f77aebeac935"
 entity "Collectible" 192 9968 "7d967c005e67f1e7"
-entity "Switch" 864 9744 "891b284139a29de1"
+entity "Switch" 880 9744 "142f0aa6855b991a"
 
 // EOF
