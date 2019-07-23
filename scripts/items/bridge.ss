@@ -209,7 +209,7 @@ object "Bridge Element" is "entity", "private"
                 }
             }
         }
-        else if(timer > 0) {
+        else if(timer > 0) { // bridge going back to normal
             // update timer
             timer -= Time.delta / 0.25;
             if(timer < 0)
@@ -225,6 +225,7 @@ object "Bridge Element" is "entity", "private"
             transform.move(0, dy);
         }
         else {
+            // no movement
             actor.animation.frame = 0;
             transform.localPosition = originalOffset;
         }
@@ -265,7 +266,7 @@ object "Bridge Corner" is "entity", "private"
         // configure the actor
         actor = Actor((index > 0) ? "Bridge Corner Right" : "Bridge Corner Left");
         actor.anim = anim;
-        actor.zindex = 0.51; // appear in front of the player
+        actor.zindex = 0.51; // will appear in front of the player
         actor.offset = Vector2((index - length / 2) * actor.width, 0);
 
         // return the object
