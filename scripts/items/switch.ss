@@ -68,7 +68,7 @@ object "Switch" is "entity", "gimmick"
         if(state != "active") {
             actor.anim++;
             sfx.play();
-            onActivate.call();
+            onActivate();
             state = "active";
         }
     }
@@ -77,7 +77,7 @@ object "Switch" is "entity", "gimmick"
     {
         if(state == "active") {
             actor.anim--;
-            onDeactivate.call();
+            onDeactivate();
             state = "idle";
         }
     }

@@ -160,7 +160,7 @@ object "Bridge" is "entity", "gimmick"
     }
 
     // is the bridge collapsing?
-    fun get_collapsing()
+    fun isCollapsing()
     {
         return (state == "collapsing");
     }
