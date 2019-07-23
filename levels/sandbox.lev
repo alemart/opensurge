@@ -14,7 +14,7 @@ act 1
 theme "themes/template.brk"
 bgtheme "themes/template.bg"
 spawn_point 128 9968
-startup "Default Setup"
+startup "Default Setup" "Example Setup"
 players "Tux"
 
 // bricks
