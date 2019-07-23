@@ -20,6 +20,14 @@ sprite "Elevator"
         data        0
     }
 
+    // Sunshine elevator
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
     // Waterworks elevator
     animation 2
     {
