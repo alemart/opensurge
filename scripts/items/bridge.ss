@@ -158,6 +158,12 @@ object "Bridge" is "entity", "gimmick"
             state = "collapsing";
         }
     }
+
+    // is the bridge collapsing?
+    fun get_collapsing()
+    {
+        return (state == "collapsing");
+    }
 }
 
 // Bridge Element
