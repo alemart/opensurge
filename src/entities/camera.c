@@ -43,7 +43,7 @@ struct camera_t {
 };
 
 static camera_t camera;
-static const int inf = (1 << 30);
+static const int inf = 0x40000000; /* no overflow (+,-) */
 
 static inline void define_boundaries(int x1, int y1, int x2, int y2);
 static inline void reset_boundaries();
