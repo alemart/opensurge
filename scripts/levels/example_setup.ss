@@ -24,13 +24,13 @@ object "Example Setup"
             // the configuration below is just an example
             // (modify at will - tip: backup this file first)
 
-            // Example: configuring all bridges
+            // Example: configuring all Bridges
             "Bridge": {
-                "length": 12,
+                "length": 12, // length 12 is the default
                 "anim": 1
             },
 
-            // Example: configuring all elevators
+            // Example: configuring all Elevators
             "Elevator": {
                 "anim": 2 // animation number
             },
@@ -50,10 +50,19 @@ object "Example Setup"
                 "background": "themes/template.bg"
             },
 
-            // Example: collapse a specific bridge (id: 481c9ccb42a38268)
-            // when activating a specific switch (id: 142f0aa6855b991a).
+            // Example: collapse a specific Bridge (id: 481c9ccb42a38268)
+            // when activating a specific Switch (id: 142f0aa6855b991a)
             "142f0aa6855b991a": {
                 "onActivate": EntityEvent("481c9ccb42a38268", "collapse")
+            },
+
+            // Example: open a specific Door (id: 2bbc752e0454d031) ONLY
+            // IF a specific red Switch (id: 66b9b90da2a5a5fa) is pressed
+            "66b9b90da2a5a5fa": {
+                "color": "red",
+                "sticky": false,
+                "onActivate": EntityEvent("2bbc752e0454d031", "open"),
+                "onDeactivate": EntityEvent("2bbc752e0454d031", "close")
             }
         },
 
@@ -61,7 +70,15 @@ object "Example Setup"
         // zone 2 only
         //
         "2": {
-
+            // Example: make all Switches blue.
+            // Make them trigger multiple events!
+            "Switch": {
+                "color": "blue",
+                "onActivate": EventList([
+                    FunctionEvent("Print").addParameter("Oh my! Look at the water!"),
+                    FunctionEvent("Water Level").addParameter(128) // raise water to ypos = 128
+                ])
+            }
         },
 
         //
@@ -72,6 +89,8 @@ object "Example Setup"
         }
 
     };
+
+    // -------------------------------------------------------------------------
 
     //
     // Below you'll find the setup code.
