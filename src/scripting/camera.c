@@ -29,6 +29,9 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlocked(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_lock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_unlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
 /*
@@ -43,6 +46,9 @@ void scripting_register_camera(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Camera", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Camera", "get_position", fun_getposition, 0);
     surgescript_vm_bind(vm, "Camera", "set_position", fun_setposition, 1);
+    surgescript_vm_bind(vm, "Camera", "get_locked", fun_getlocked, 0);
+    surgescript_vm_bind(vm, "Camera", "lock", fun_lock, 4);
+    surgescript_vm_bind(vm, "Camera", "unlock", fun_unlock, 0);
 }
 
 /* constructor */
@@ -103,5 +109,31 @@ surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescri
 
     camera_set_position(scripting_vector2_to_v2d(v2));
 
+    return NULL;
+}
+
+/* is the camera locked? */
+surgescript_var_t* fun_getlocked(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_bool(surgescript_var_create(), camera_is_locked());
+}
+
+/* lock the camera to the boundaries (x1, y1, x2, y2). All coordinates are given in pixels; x1 < x2, y1 < y2 */
+surgescript_var_t* fun_lock(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int x1 = surgescript_var_get_number(param[0]);
+    int y1 = surgescript_var_get_number(param[1]);
+    int x2 = surgescript_var_get_number(param[2]);
+    int y2 = surgescript_var_get_number(param[3]);
+
+    camera_lock(x1, y1, x2, y2);
+
+    return NULL;
+}
+
+/* unlock the camera */
+surgescript_var_t* fun_unlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    camera_unlock();
     return NULL;
 }
