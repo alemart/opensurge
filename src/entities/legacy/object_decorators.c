@@ -26,6 +26,7 @@
 #include "nanocalc/nanocalc_addons.h"
 #include "nanocalc/nanocalcext.h"
 #include "../actor.h"
+#include "../camera.h"
 #include "../player.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
@@ -3101,7 +3102,7 @@ void lockcamera_release(objectmachine_t *obj)
 
     if(me->has_locked_somebody) {
         player->in_locked_area = FALSE;
-        level_unlock_camera();
+        camera_unlock();
     }
 
     expression_destroy(me->x1);
@@ -3169,7 +3170,7 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
                 /* welcome, player! You have been locked. BWHAHAHA!!! */
                 me->has_locked_somebody = TRUE;
                 team[i]->in_locked_area = TRUE;
-                level_lock_camera(rx, ry, rx+rw, ry+rh);
+                camera_lock(rx, ry, rx+rw, ry+rh);
             }
         }
     }
@@ -5189,9 +5190,7 @@ void oncameralock_release(eventstrategy_t *event)
 
 int oncameralock_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
-    return level_is_camera_locked();
-    /*player_t *player = enemy_get_observed_player(object);
-    return player->in_locked_area;*/
+    return camera_is_locked();
 }
 
 

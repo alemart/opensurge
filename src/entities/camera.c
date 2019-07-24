@@ -152,12 +152,17 @@ void camera_move_to(v2d_t position, float seconds)
 
 /*
  * camera_lock()
- * locks the camera, so it will only move within the given rectangle (in pixels)
+ * locks the camera, so it can only render points inside the given rectangle
  */
 void camera_lock(int x1, int y1, int x2, int y2)
 {
     camera.is_locked = TRUE;
-    define_boundaries(x1, y1, x2, y2);
+    define_boundaries(
+        x1 + VIDEO_SCREEN_W/2,
+        y1 + VIDEO_SCREEN_H/2,
+        x2 - VIDEO_SCREEN_W/2,
+        y2 - VIDEO_SCREEN_H/2
+    );
 }
 
 /*

@@ -74,9 +74,6 @@ surgescript_object_t* level_get_entity_by_id(const char* entity_id);
 /* camera */
 void level_set_camera_focus(struct actor_t *act);
 struct actor_t* level_get_camera_focus();
-int level_is_camera_locked();
-void level_lock_camera(int x1, int y1, int x2, int y2);
-void level_unlock_camera();
 int level_inside_screen(int x, int y, int w, int h);
 
 /* editor */

@@ -527,6 +527,8 @@ void level_unload()
     int i;
 
     logfile_message("Unloading the level...");
+
+    /* music */
     if(music != NULL) {
         music_stop();
         music_unref(music);
@@ -568,6 +570,9 @@ void level_unload()
         free(height_at);
     height_at = NULL;
     height_at_count = 0;
+
+    /* misc */
+    camera_unlock();
 
     /* success! */
     logfile_message("The level has been unloaded.");
@@ -2346,25 +2351,6 @@ void update_dlgbox()
 
 
 
-
-
-
-
-/* camera facade */
-void level_lock_camera(int x1, int y1, int x2, int y2) /* the camera can show any point in this rectangle */
-{
-    camera_lock(x1+VIDEO_SCREEN_W/2, y1+VIDEO_SCREEN_H/2, x2-VIDEO_SCREEN_W/2, y2-VIDEO_SCREEN_H/2);
-}
-
-void level_unlock_camera()
-{
-    camera_unlock();
-}
-
-int level_is_camera_locked()
-{
-    return camera_is_locked();
-}
 
 
 
