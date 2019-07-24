@@ -51,4 +51,10 @@ v2d_t camera_get_position();
 /* sets a new position */
 void camera_set_position(v2d_t position);
 
+/* clip position to the visible playfield */
+v2d_t camera_clip(v2d_t position);
+
+/* is the position inside the visible playfield? */
+bool camera_clip_test(v2d_t position);
+
 #endif
