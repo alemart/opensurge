@@ -94,7 +94,7 @@ object "Example Setup"
 
     //
     // Below you'll find the setup code.
-    // You can keep the defaults or extend it.
+    // You can keep it as it is or extend it.
     //
     state "main"
     {
