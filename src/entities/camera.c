@@ -28,7 +28,7 @@
 /* private stuff */
 typedef struct camera_t camera_t;
 struct camera_t {
-    /* the camera is actually a particle */
+    /* the camera is represented by a position in 2D space */
     v2d_t position; /* current position, mapped to the center of the screen */
     v2d_t target; /* target position: used to make things smooth */
     float speed; /* the camera will move from position to dest in speed px/s */
