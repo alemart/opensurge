@@ -52,17 +52,13 @@ object "Waterworks Setup"
 
     state "main"
     {
-        zone = String(Level.act);
-
-        // setup the entities
-        Level.setup(config["*"] || { });
-        Level.setup(config[zone] || { });
-
-        // done
-        state = "done";
     }
 
-    state "done"
+    // setup the entities
+    fun constructor()
     {
+        zone = String(Level.act);
+        Level.setup(config["*"] || { });
+        Level.setup(config[zone] || { });
     }
 }

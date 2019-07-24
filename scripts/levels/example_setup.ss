@@ -98,18 +98,14 @@ object "Example Setup"
     //
     state "main"
     {
-        zone = String(Level.act);
-
-        // setup the entities
-        Level.setup(config["*"] || { });
-        Level.setup(config[zone] || { });
-
-        // done
-        state = "done";
+        // write your code here
     }
 
-    state "done"
+    // setup the entities
+    fun constructor()
     {
-        // the setup is done!
+        zone = String(Level.act);
+        Level.setup(config["*"] || { });
+        Level.setup(config[zone] || { });
     }
 }
