@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * camera.h - camera routines
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
+#include <stdbool.h>
 #include "../core/v2d.h"
 
 /* initializes the camera */
@@ -42,7 +43,7 @@ void camera_lock(int x1, int y1, int x2, int y2);
 void camera_unlock();
 
 /* is the camera locked? */
-int camera_is_locked();
+bool camera_is_locked();
 
 /* returns the position of the camera */
 v2d_t camera_get_position();

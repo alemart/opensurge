@@ -3485,6 +3485,7 @@ void editor_scroll()
     editor_camera.x = (int)max(editor_camera.x, VIDEO_SCREEN_W/2);
     editor_camera.y = (int)max(editor_camera.y, VIDEO_SCREEN_H/2);
     camera_set_position(editor_camera);
+    camera_update();
 }
 
 /*
