@@ -862,7 +862,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         if(param_count == 1)
             waterlevel = atoi(param[0]);
         else
-            logfile_message("Level loader - command 'waterlevel' expects one parameter: water level (y-coordinate, in pixels)");
+            logfile_message("Level loader - command 'waterlevel' expects one parameter: y coordinate");
     }
     else if(str_icmp(identifier, "watercolor") == 0) {
         if(param_count == 3) {
