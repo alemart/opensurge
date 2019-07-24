@@ -37,7 +37,7 @@ object "Example Setup"
 
             // Example: configuring an event
             "Event Trigger 1": {
-                "onTrigger": FunctionEvent("Print").withArgument("Hello from Event 1!")
+                "onTrigger": FunctionEvent("Print").withArgument("Hello! Give me pizza!")
             }
         },
 
