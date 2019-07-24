@@ -28,15 +28,15 @@
 /* private stuff */
 typedef struct camera_t camera_t;
 struct camera_t {
-    /* the camera is represented by a position in 2D space */
+    /* the camera is represented by a point in 2D space */
     v2d_t position; /* current position, mapped to the center of the screen */
-    v2d_t target; /* target position: used to make things smooth */
-    float speed; /* the camera will move from position to dest in speed px/s */
+    v2d_t target; /* the target position is used to make things smooth */
+    float speed; /* the camera will move from position to target in speed px/s */
 
     /* camera boundaries */
     struct {
         int x1, y1, x2, y2; /* x1 <= x2, y1 <= y2 */
-        bool enabled;
+        bool enabled; /* boundaries applicable? */
     } boundaries;
 
     /* locking the camera */
@@ -77,7 +77,7 @@ void camera_update()
     const float threshold = 10.0f;
     float dt = timer_get_delta();
     v2d_t ds;
-    
+
     /* updating the boundaries */
     if(level_editmode()) /* no boundaries in the editor */
         disable_boundaries();
@@ -119,7 +119,6 @@ void camera_move_to(v2d_t position, float seconds)
         camera.speed = v2d_magnitude( v2d_subtract(camera.position, camera.target) ) / seconds;
     else
         camera.position = camera.target;
-
 }
 
 /*

@@ -1323,7 +1323,6 @@ void level_update()
         float y = team[i]->actor->position.y;
         float w = image_width(actor_image(team[i]->actor));
         float h = image_height(actor_image(team[i]->actor));
-        float hy = team[i]->actor->hot_spot.y;
 
         /* somebody is hurt! show it to the user */
         if(team[i] != player) {
