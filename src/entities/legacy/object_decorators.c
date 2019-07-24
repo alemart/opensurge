@@ -3098,12 +3098,9 @@ void lockcamera_release(objectmachine_t *obj)
     objectdecorator_t *dec = (objectdecorator_t*)obj;
     objectmachine_t *decorated_machine = dec->decorated_machine;
     objectdecorator_lockcamera_t *me = (objectdecorator_lockcamera_t*)obj;
-    player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
 
-    if(me->has_locked_somebody) {
-        player->in_locked_area = FALSE;
+    if(me->has_locked_somebody)
         camera_unlock();
-    }
 
     expression_destroy(me->x1);
     expression_destroy(me->x2);
@@ -3169,7 +3166,6 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
             if(bounding_box(a, b)) {
                 /* welcome, player! You have been locked. BWHAHAHA!!! */
                 me->has_locked_somebody = TRUE;
-                team[i]->in_locked_area = TRUE;
                 camera_lock(rx, ry, rx+rw, ry+rh);
             }
         }
@@ -3182,12 +3178,10 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
         if(ta->position.x < rx) {
             ta->position.x = rx;
             ta->speed.x = max(0.0f, ta->speed.x);
-            player->at_some_border = TRUE;
         }
         if(ta->position.x > rx + rw) {
             ta->position.x = rx + rw;
             ta->speed.x = min(0.0f, ta->speed.x);
-            player->at_some_border = TRUE;
         }
         ta->position.y = clip(ta->position.y, ry, ry + rh);
     }
@@ -7594,11 +7588,12 @@ void switchcharacter_update(objectmachine_t *obj, player_t **team, int team_size
 
     if(new_player != NULL) {
         int allow_switching, got_dying_player = FALSE;
+        int in_locked_area = camera_is_locked() && camera_clip_test(player->actor->position);
 
         for(i=0; i<team_size && !got_dying_player; i++)
             got_dying_player = player_is_dying(team[i]);
 
-        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_movable_platform && !player_is_frozen(player) && !player->in_locked_area;
+        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_movable_platform && !player_is_frozen(player) && !in_locked_area;
 
         if(allow_switching || me->force_switch)
             level_change_player(new_player);

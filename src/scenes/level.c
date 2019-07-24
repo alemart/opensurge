@@ -1337,12 +1337,6 @@ void level_update()
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
                     player_update(team[i], team, team_size, major_bricks, major_items, major_enemies, get_bricklike_ssobject);
             }
-
-            /* pitfall */
-            if(team[i]->actor->position.y > level_height_at(x) - (h - hy)) {
-                if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4))
-                    player_kill(team[i]);
-            }
         }
     }
 

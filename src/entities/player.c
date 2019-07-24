@@ -26,6 +26,7 @@
 #include "actor.h"
 #include "player.h"
 #include "brick.h"
+#include "camera.h"
 #include "character.h"
 #include "legacy/item.h"
 #include "legacy/enemy.h"
@@ -110,8 +111,6 @@ player_t *player_create(const char *character_name)
     p->character = c;
     p->disable_movement = FALSE;
     p->disable_roll = FALSE;
-    p->in_locked_area = FALSE;
-    p->at_some_border = FALSE;
     p->disable_collectible_loss = FALSE;
     p->disable_animation_control = FALSE;
     p->attacking = FALSE;
@@ -260,9 +259,9 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         update_shield(player);
 
     /* underwater logic */
-    if(!(player->underwater) && player->actor->position.y >= level_waterlevel())
+    if(!(player->underwater) && act->position.y >= level_waterlevel())
         player_enter_water(player);
-    else if(player->underwater && player->actor->position.y < level_waterlevel())
+    else if(player->underwater && act->position.y < level_waterlevel())
         player_leave_water(player);
     if(player->underwater) {
         player->speedshoes_timer = max(player->speedshoes_timer, PLAYER_MAX_SPEEDSHOES); /* disable speed shoes */
@@ -344,6 +343,17 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         player->thrown_while_rolling = FALSE;
     else if(physicsactor_get_ysp(player->pa) < 0.0f && player_is_rolling(player))
         player->thrown_while_rolling = TRUE;
+
+    /* active player can't get off camera */
+    if(player == level_player()) {
+        v2d_t clipped_position = camera_clip(act->position);
+        act->position.x = clipped_position.x;
+        act->position.y = max(act->position.y, clipped_position.y); /* won't prevent pits */
+    }
+
+    /* pitfalls */
+    if(act->position.y >= level_height_at(act->position.x))
+        player_kill(player);
 
     /* misc */
     player->on_movable_platform = FALSE;

@@ -367,7 +367,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
                     if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
                         team[i]->on_movable_platform = TRUE;
-                        team[i]->actor->position = v2d_add(team[i]->actor->position, v2d_new(dx, dy));
+                        team[i]->actor->position.x += dx;
+                        team[i]->actor->position.y += dy;
                     }
                 }
             }

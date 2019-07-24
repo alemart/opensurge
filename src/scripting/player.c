@@ -27,6 +27,7 @@
 #include "../core/logfile.h"
 #include "../scenes/level.h"
 #include "../entities/actor.h"
+#include "../entities/camera.h"
 #include "../entities/legacy/enemy.h"
 #include "../entities/player.h"
 #include "../physics/physicsactor.h"
@@ -1213,8 +1214,12 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
                 return surgescript_var_set_bool(surgescript_var_create(), false);
         }
 
-        /* error if player is in the air, etc. */
-        if(player_is_in_the_air(player) || player_is_frozen(player) || player->in_locked_area || player->on_movable_platform)
+        /* error if player is midair, etc. */
+        if(player_is_in_the_air(player) || player_is_frozen(player) || player->on_movable_platform)
+            return surgescript_var_set_bool(surgescript_var_create(), false);
+
+        /* player inside locked area? */
+        if(camera_is_locked() && camera_clip_test(player->actor->position))
             return surgescript_var_set_bool(surgescript_var_create(), false);
 
         /* error if level cleared */
