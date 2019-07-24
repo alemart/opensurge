@@ -224,10 +224,13 @@ void sanitize_boundaries()
 
 v2d_t clip_to_boundaries(v2d_t position)
 {
+    int max_y;
+
     if(enabled_boundaries()) {
-        int max_y = level_height_at(position.x) - VIDEO_SCREEN_H / 2;
         position.x = clip(position.x, camera.boundaries.x1, camera.boundaries.x2);
         position.y = clip(position.y, camera.boundaries.y1, camera.boundaries.y2);
+        
+        max_y = level_height_at(position.x) - VIDEO_SCREEN_H / 2;
         if(position.y > max_y)
             position.y = max_y;
     }
