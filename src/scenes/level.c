@@ -105,7 +105,8 @@ static void init_startup_object_list();
 static void release_startup_object_list();
 static void add_to_startup_object_list(const char *object_name);
 static void spawn_startup_objects();
-static int is_startup_object(const char* object_name);
+static bool is_startup_object_list_empty();
+static bool is_startup_object(const char* object_name);
 
 
 
@@ -510,7 +511,7 @@ void level_load(const char *filepath)
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
 
     /* startup objects (2) */
-    spawn_startup_objects();
+    spawn_startup_objects(); /* FIX */
 
     /* success! */
     logfile_message("The level has been loaded.");
@@ -782,14 +783,16 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
 {
     /* interpreting the command */
     if(str_icmp(identifier, "theme") == 0) {
-        if(param_count == 1) {
-            if(!brickset_loaded()) {
+        if(!brickset_loaded()) {
+            if(param_count == 1) {
                 str_cpy(theme, param[0], sizeof(theme));
                 brickset_load(theme);
             }
+            else
+                logfile_message("Level loader - command 'theme' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?");
         }
         else
-            logfile_message("Level loader - command 'theme' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?");
+            logfile_message("Level loader - duplicate command 'theme' on line %d. Ignoring...", fileline);
     }
     else if(str_icmp(identifier, "bgtheme") == 0) {
         if(param_count == 1)
@@ -900,10 +903,14 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
     }
     else if(str_icmp(identifier, "readonly") == 0) {
-        if(param_count == 0)
-            readonly = TRUE;
+        if(!readonly) {
+            if(param_count == 0)
+                readonly = TRUE;
+            else
+                logfile_message("Level loader - command 'readonly' expects no parameters");
+        }
         else
-            logfile_message("Level loader - command 'readonly' expects no parameters");
+            logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
     }
     else if(str_icmp(identifier, "brick") == 0) {
         if(param_count == 3 || param_count == 4 || param_count == 5) {
@@ -953,31 +960,39 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
     }
     else if(str_icmp(identifier, "startup") == 0) {
-        if(param_count > 0) {
-            for(int i = param_count - 1; i >= 0; i--)
-                add_to_startup_object_list(param[i]);
+        if(is_startup_object_list_empty()) {
+            if(param_count > 0) {
+                for(int i = param_count - 1; i >= 0; i--)
+                    add_to_startup_object_list(param[i]);
+            }
+            else
+                logfile_message("Level loader - command 'startup' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]");
         }
         else
-            logfile_message("Level loader - command 'startup' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]");
+            logfile_message("Level loader - duplicate command 'startup' on line %d. Ignoring... (note: 'startup' accepts one or more parameters)", fileline);
     }
     else if(str_icmp(identifier, "players") == 0) {
-        if(param_count > 0) {
-            for(int i = 0; i < param_count; i++) {
-                if(team_size < TEAM_MAX) {
-                    for(int j = 0; j < team_size; j++) {
-                        if(strcmp(team[j]->name, param[i]) == 0)
-                            fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filename, fileline);
-                    }
+        if(team_size == 0) {
+            if(param_count > 0) {
+                for(int i = 0; i < param_count; i++) {
+                    if(team_size < TEAM_MAX) {
+                        for(int j = 0; j < team_size; j++) {
+                            if(strcmp(team[j]->name, param[i]) == 0)
+                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filename, fileline);
+                        }
 
-                    logfile_message("Loading player '%s'...", param[i]);
-                    team[team_size++] = player_create(param[i]);
+                        logfile_message("Loading player '%s'...", param[i]);
+                        team[team_size++] = player_create(param[i]);
+                    }
+                    else
+                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filename, fileline);
                 }
-                else
-                    fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filename, fileline);
             }
+            else
+                logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
         }
         else
-            logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
+            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring... (note: 'players' accepts one or more parameters)", fileline);
     }
     else if(str_icmp(identifier, "item") == 0) {
         if(param_count == 3) {
@@ -2414,6 +2429,11 @@ void release_startup_object_list()
     }
 }
 
+/* empty list? */
+bool is_startup_object_list_empty()
+{
+    return startupobject_list == NULL;
+}
 
 /* adds a new object to the startup object list */
 /* (actually it inserts the new object in the first position of the linked list) */
@@ -2450,17 +2470,17 @@ void spawn_startup_objects()
 }
 
 /* check if object_name is in the startup object list */
-int is_startup_object(const char* object_name)
+bool is_startup_object(const char* object_name)
 {
     for(startupobject_list_t* me = startupobject_list; me != NULL; me = me->next) {
         if(str_icmp(object_name, me->object_name) == 0)
-            return TRUE;
+            return true;
     }
 
     if(str_icmp(object_name, DEFAULT_STARTUP_OBJECT) == 0)
-        return TRUE;
+        return true;
 
-    return FALSE;
+    return false;
 }
 
 

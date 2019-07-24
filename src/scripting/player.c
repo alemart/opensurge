@@ -27,6 +27,7 @@
 #include "../core/logfile.h"
 #include "../scenes/level.h"
 #include "../entities/actor.h"
+#include "../entities/legacy/enemy.h"
 #include "../entities/player.h"
 #include "../physics/physicsactor.h"
 
@@ -396,11 +397,16 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
                         surgescript_var_set_objecthandle(surgescript_heap_at(heap, addr), companion);
                     }
                 }
-                else {
+                else if(enemy_exists(companion_name)) {
                     /* the companion doesn't exist in SurgeScript: use the legacy API */
-                    logfile_message("Warning: no SurgeScript object found for companion \"%s\" (of \"%s\")", companion_name, player_name(player));
-                    level_create_legacy_object(companion_name, v2d_new(0, 0));
+                    logfile_message("Warning: no SurgeScript object found for companion \"%s\" of player \"%s\"", companion_name, player_name(player));
                     surgescript_var_set_null(surgescript_heap_at(heap, addr));
+                    level_create_legacy_object(companion_name, v2d_new(0, 0));
+                }
+                else {
+                    /* the companion doesn't exist */
+                    surgescript_var_set_null(surgescript_heap_at(heap, addr));
+                    scripting_error(object, "Can't find companion \"%s\" of player \"%s\"", companion_name, player_name(player));
                 }
             }
         }
