@@ -76,7 +76,7 @@ object "Example Setup"
                 "color": "blue",
                 "onActivate": EventList([
                     FunctionEvent("Print").withArgument("Oh my! Look at the water!"),
-                    FunctionEvent("Water Level").withArgument(128) // raise water to ypos = 128
+                    FunctionEvent("Change Water Level").withArgument(128) // raise water to ypos = 128
                 ])
             }
         },

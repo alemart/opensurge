@@ -10,10 +10,10 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 
 //
-// Water Level is a function object that changes the
-// water level with an animation
+// Change Water Level is a function object that
+// changes the water level with an animation
 //
-object "Water Level"
+object "Change Water Level"
 {
     animationTime = 3.0; // seconds
     newLevel = Level.waterlevel;
