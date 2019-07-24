@@ -33,19 +33,24 @@ object 'Event' is 'event' \n\
 object 'EntityEvent' is 'event' \n\
 { \n\
     target = null; \n\
-    method = null; \n\
+    method = 'call'; \n\
     params = []; \n\
 \n\
-    fun __init(entityId, functionName) \n\
+    fun __init(entityId) \n\
     { \n\
         target = entityId || ''; \n\
+        return this; \n\
+    } \n\
+\n\
+    fun willCall(functionName) \n\
+    { \n\
         method = functionName || 'call'; \n\
         return this; \n\
     } \n\
 \n\
-    fun addParameter(param) \n\
+    fun withArgument(x) \n\
     { \n\
-        params.push(param); \n\
+        params.push(x); \n\
         return this; \n\
     } \n\
 \n\
@@ -100,9 +105,9 @@ object 'FunctionEvent' is 'event' \n\
         return this; \n\
     } \n\
 \n\
-    fun addParameter(param) \n\
+    fun withArgument(x) \n\
     { \n\
-        params.push(param); \n\
+        params.push(x); \n\
         return this; \n\
     } \n\
 \n\

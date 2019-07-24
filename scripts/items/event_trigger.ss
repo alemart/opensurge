@@ -36,7 +36,7 @@ using SurgeEngine.Collisions.CollisionBox;
 // /* in your setup script... */
 // Level.setup({
 //   "Event Trigger 1": {
-//     "onTrigger": FunctionEvent("Print").addParameter("Hello from Event!")
+//     "onTrigger": FunctionEvent("Print").withArgument("Hello from Event!")
 //   }
 // });
 //

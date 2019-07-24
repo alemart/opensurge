@@ -309,9 +309,9 @@ object 'EventFactory' \n\
 \n\
 object 'EntityEventFactory' \n\
 { \n\
-    fun call(entityId, functionName) \n\
+    fun call(entityId) \n\
     { \n\
-        return caller.spawn('EntityEvent').__init(entityId, functionName); \n\
+        return caller.spawn('EntityEvent').__init(entityId); \n\
     } \n\
 \n\
     fun destroy() { } \n\

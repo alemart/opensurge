@@ -37,7 +37,7 @@ object "Example Setup"
 
             // Example: configuring an event
             "Event Trigger 1": {
-                "onTrigger": FunctionEvent("Print").addParameter("Hello from Event 1!")
+                "onTrigger": FunctionEvent("Print").withArgument("Hello from Event 1!")
             }
         },
 
@@ -53,7 +53,7 @@ object "Example Setup"
             // Example: collapse a specific Bridge (id: 481c9ccb42a38268)
             // when activating a specific Switch (id: 142f0aa6855b991a)
             "142f0aa6855b991a": {
-                "onActivate": EntityEvent("481c9ccb42a38268", "collapse")
+                "onActivate": EntityEvent("481c9ccb42a38268").willCall("collapse")
             },
 
             // Example: open a specific Door (id: 2bbc752e0454d031) ONLY
@@ -61,8 +61,8 @@ object "Example Setup"
             "66b9b90da2a5a5fa": {
                 "color": "red",
                 "sticky": false,
-                "onActivate": EntityEvent("2bbc752e0454d031", "open"),
-                "onDeactivate": EntityEvent("2bbc752e0454d031", "close")
+                "onActivate": EntityEvent("2bbc752e0454d031").willCall("open"),
+                "onDeactivate": EntityEvent("2bbc752e0454d031").willCall("close")
             }
         },
 
@@ -75,8 +75,8 @@ object "Example Setup"
             "Switch": {
                 "color": "blue",
                 "onActivate": EventList([
-                    FunctionEvent("Print").addParameter("Oh my! Look at the water!"),
-                    FunctionEvent("Water Level").addParameter(128) // raise water to ypos = 128
+                    FunctionEvent("Print").withArgument("Oh my! Look at the water!"),
+                    FunctionEvent("Water Level").withArgument(128) // raise water to ypos = 128
                 ])
             }
         },
