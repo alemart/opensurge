@@ -27,12 +27,12 @@ using SurgeEngine.Level; \n\
 object 'Event' is 'event' \n\
 { \n\
     fun call() { } \n\
-    fun toString() { return '(missing event)'; } \n\
+    fun toString() { return '[missing event]'; } \n\
 } \n\
 \n\
 object 'EntityEvent' is 'event' \n\
 { \n\
-    target = null; \n\
+    target = ''; \n\
     method = 'call'; \n\
     params = []; \n\
 \n\
@@ -60,6 +60,15 @@ object 'EntityEvent' is 'event' \n\
         if(entity !== null && entity.hasFunction(method)) \n\
             entity.__invoke(method, params); \n\
     } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        entity = Level.entity(target); \n\
+        if(entity !== null) \n\
+            return 'EntityEvent[' + (entity.__name + '.' + method) + ']'; \n\
+        else \n\
+            return 'EntityEvent[missing link]'; \n\
+    } \n\
 } \n\
 \n\
 object 'EventList' is 'event' \n\
@@ -83,6 +92,11 @@ object 'EventList' is 'event' \n\
     { \n\
         for(j = 0; j < events.length; j++) \n\
             events[j].call(); \n\
+    } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        return 'EventList[' + events.length + ']'; \n\
     } \n\
 } \n\
 \n\
@@ -120,6 +134,11 @@ object 'FunctionEvent' is 'event' \n\
             if(functor.__name === target)" /* just to be sure */ " \n\
                 functor.__invoke(method, params); \n\
         } \n\
+    } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        return 'FunctionEvent[' + target + ']'; \n\
     } \n\
 } \n\
 ";
