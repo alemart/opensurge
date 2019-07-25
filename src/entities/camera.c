@@ -35,8 +35,8 @@ struct camera_t {
 
     /* camera boundaries */
     struct {
-        int x1, y1, x2, y2; /* x1 <= x2, y1 <= y2 */
-        bool enabled; /* boundaries applicable? */
+        float x1, y1, x2, y2; /* x1 <= x2, y1 <= y2 */
+        bool enabled; /* without boundaries, the camera travels through infinity */
     } boundaries;
 
     /* locking the camera */
@@ -44,12 +44,13 @@ struct camera_t {
 };
 
 static camera_t camera;
-static inline void define_boundaries(int x1, int y1, int x2, int y2);
+static inline void define_boundaries(float x1, float y1, float x2, float y2);
 static inline void reset_boundaries();
 static inline void sanitize_boundaries();
+static inline void enable_boundaries();
 static inline void disable_boundaries();
 static inline v2d_t clip_to_boundaries(v2d_t position);
-static v2d_t clip_position(v2d_t position, int x1, int y1, int x2, int y2);
+static v2d_t clip_position(v2d_t position, float x1, float y1, float x2, float y2);
 
 
 
@@ -83,6 +84,8 @@ void camera_update()
         disable_boundaries();
     else if(!camera.is_locked) /* the level size may have changed since the last frame */
         reset_boundaries();
+    else
+        enable_boundaries();
 
     /* updating the camera position */
     ds = v2d_subtract(camera.target, camera.position);
@@ -102,7 +105,8 @@ void camera_update()
  */
 void camera_release()
 {
-    ; /* empty */
+    camera_unlock();
+    disable_boundaries();
 }
 
 /*
@@ -127,17 +131,32 @@ void camera_move_to(v2d_t position, float seconds)
  */
 void camera_lock(int x1, int y1, int x2, int y2)
 {
-    int left = min(x1, x2);
-    int top = min(y1, y2);
-    int right = max(x1, x2);
-    int bottom = max(y1, y2);
+    int max_x = max(level_size().x - 1, 0);
+    int max_y = max(level_size().y - 1, 0);
+    int left = max(min(x1, x2), 0);
+    int top = max(min(y1, y2), 0);
+    int right = min(max(x1, x2), max_x);
+    int bottom = min(max(y1, y2), max_y);
 
+    /* not enough space? */
+    if(right < left + VIDEO_SCREEN_W) {
+        int m = (left + right + 1) / 2;
+        left = m - VIDEO_SCREEN_W / 2;
+        right = m + VIDEO_SCREEN_W / 2;
+    }
+    if(bottom < top + VIDEO_SCREEN_H) {
+        int m = (top + bottom + 1) / 2;
+        top = m - VIDEO_SCREEN_H / 2;
+        bottom = m + VIDEO_SCREEN_H / 2;
+    }
+
+    /* lock & set boundaries */
     camera.is_locked = true;
     define_boundaries(
-        max(left, 0) + VIDEO_SCREEN_W / 2,
-        max(top, 0) + VIDEO_SCREEN_H / 2,
-        min(right, level_size().x) - VIDEO_SCREEN_W / 2,
-        min(bottom, level_size().y) - VIDEO_SCREEN_H / 2
+        left + VIDEO_SCREEN_W / 2,
+        top + VIDEO_SCREEN_H / 2,
+        right - VIDEO_SCREEN_W / 2,
+        bottom - VIDEO_SCREEN_H / 2
     );
 }
 
@@ -148,7 +167,6 @@ void camera_lock(int x1, int y1, int x2, int y2)
 void camera_unlock()
 {
     camera.is_locked = false;
-    reset_boundaries();
 }
 
 /*
@@ -157,7 +175,7 @@ void camera_unlock()
  */
 v2d_t camera_get_position()
 {
-    return v2d_new(floorf(camera.position.x), floorf(camera.position.y));
+    return camera.position;
 }
 
 /*
@@ -207,24 +225,29 @@ bool camera_clip_test(v2d_t position)
 }
 
 /* private methods */
-void define_boundaries(int x1, int y1, int x2, int y2)
+void define_boundaries(float x1, float y1, float x2, float y2)
 {
-    camera.boundaries.enabled = true;
     camera.boundaries.x1 = x1;
     camera.boundaries.y1 = y1;
     camera.boundaries.x2 = x2;
     camera.boundaries.y2 = y2;
     sanitize_boundaries();
+    enable_boundaries();
 }
 
 void reset_boundaries()
 {
-    camera.boundaries.enabled = true;
-    camera.boundaries.x1 = VIDEO_SCREEN_W / 2;
-    camera.boundaries.y1 = VIDEO_SCREEN_H / 2;
-    camera.boundaries.x2 = level_size().x - VIDEO_SCREEN_W / 2;
-    camera.boundaries.y2 = level_size().y - VIDEO_SCREEN_H / 2;
+    camera.boundaries.x1 = 0.0f;
+    camera.boundaries.y1 = 0.0f;
+    camera.boundaries.x2 = INFINITY;
+    camera.boundaries.y2 = INFINITY;
     sanitize_boundaries();
+    enable_boundaries();
+}
+
+void enable_boundaries()
+{
+    camera.boundaries.enabled = true;
 }
 
 void disable_boundaries()
@@ -232,17 +255,28 @@ void disable_boundaries()
     camera.boundaries.enabled = false;
 }
 
+/* ensures x1 <= x2 and y1 <= y2, clipping all coordinates to the playfield */
 void sanitize_boundaries()
 {
-    int x1 = camera.boundaries.x1;
-    int y1 = camera.boundaries.y1;
-    int x2 = camera.boundaries.x2;
-    int y2 = camera.boundaries.y2;
+    float min_x = VIDEO_SCREEN_W / 2;
+    float max_x = max(min_x, level_size().x - VIDEO_SCREEN_W / 2);
+    float min_y = VIDEO_SCREEN_H / 2;
+    float max_y = max(min_y, level_size().y - VIDEO_SCREEN_H / 2);
 
-    camera.boundaries.x1 = max(min(x1, x2), VIDEO_SCREEN_W / 2);
-    camera.boundaries.y1 = max(min(y1, y2), VIDEO_SCREEN_H / 2);
-    camera.boundaries.x2 = min(max(x1, x2), level_size().x - VIDEO_SCREEN_W / 2);
-    camera.boundaries.y2 = min(max(y1, y2), level_size().y - VIDEO_SCREEN_H / 2);
+    float x1 = clip(camera.boundaries.x1, min_x, max_x);
+    float y1 = clip(camera.boundaries.y1, min_y, max_y);
+    float x2 = clip(camera.boundaries.x2, min_x, max_x);
+    float y2 = clip(camera.boundaries.y2, min_y, max_y);
+
+    if(x1 > x2)
+        x1 = x2 = (x1 + x2) / 2;
+    if(y1 > y2)
+        y1 = y2 = (y1 + y2) / 2;
+
+    camera.boundaries.x1 = x1;
+    camera.boundaries.y1 = y1;
+    camera.boundaries.x2 = x2;
+    camera.boundaries.y2 = y2;
 }
 
 v2d_t clip_to_boundaries(v2d_t position)
@@ -259,9 +293,9 @@ v2d_t clip_to_boundaries(v2d_t position)
         return position;
 }
 
-v2d_t clip_position(v2d_t position, int x1, int y1, int x2, int y2)
+v2d_t clip_position(v2d_t position, float x1, float y1, float x2, float y2)
 {
-    int max_y;
+    float max_y;
 
     position.x = clip(position.x, x1, x2);
     position.y = clip(position.y, y1, y2);

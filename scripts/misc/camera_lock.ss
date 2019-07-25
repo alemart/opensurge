@@ -85,19 +85,17 @@ object "Camera Lock"
         if(state == "locking")
             return false;
 
+        // sanitize
+        if(left > right)
+            left = right = (left + right) / 2;
+        if(top > bottom)
+            top = bottom = (top + bottom) / 2;
+
         // set up initial values
         initialX1 = left - mx;
         initialY1 = top - my;
         initialX2 = right + mx;
         initialY2 = bottom + my;
-
-        // make sure that the locked area won't shrink initially
-        if(this.locked) {
-            initialX1 = Math.min(initialX1, x1);
-            initialY1 = Math.min(initialY1, y1);
-            initialX2 = Math.max(initialX2, x2);
-            initialY2 = Math.max(initialY2, y2);
-        }
 
         // set up target values
         targetX1 = left;
@@ -149,16 +147,26 @@ object "Camera Lock"
             return false;
 
         // set up initial values
-        initialX1 = x1;
-        initialY1 = y1;
-        initialX2 = x2;
-        initialY2 = y2;
+        initialX1 = targetX1;
+        initialY1 = targetY1;
+        initialX2 = targetX2;
+        initialY2 = targetY2;
 
         // set up target values
-        targetX1 = x1 - deltaLeft;
-        targetY1 = y1 - deltaTop;
-        targetX2 = x2 + deltaRight;
-        targetY2 = y2 + deltaBottom;
+        targetX1 = initialX1 - deltaLeft;
+        targetY1 = initialY1 - deltaTop;
+        targetX2 = initialX2 + deltaRight;
+        targetY2 = initialY2 + deltaBottom;
+
+        // sanitize
+        if(targetX1 > targetX2) {
+            targetX1 = initialX1;
+            targetX2 = initialX2;
+        }
+        if(targetY1 > targetY2) {
+            targetY1 = initialY1;
+            targetY2 = initialY2;
+        }
 
         // start transition
         timer = 0;
