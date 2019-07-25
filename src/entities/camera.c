@@ -127,12 +127,17 @@ void camera_move_to(v2d_t position, float seconds)
  */
 void camera_lock(int x1, int y1, int x2, int y2)
 {
+    int left = min(x1, x2);
+    int top = min(y1, y2);
+    int right = max(x1, x2);
+    int bottom = max(y1, y2);
+
     camera.is_locked = true;
     define_boundaries(
-        min(x1, x2) + VIDEO_SCREEN_W / 2,
-        min(y1, y2) + VIDEO_SCREEN_H / 2,
-        max(x1, x2) - VIDEO_SCREEN_W / 2,
-        max(y1, y2) - VIDEO_SCREEN_H / 2
+        max(left, 0) + VIDEO_SCREEN_W / 2,
+        max(top, 0) + VIDEO_SCREEN_H / 2,
+        min(right, level_size().x) - VIDEO_SCREEN_W / 2,
+        min(bottom, level_size().y) - VIDEO_SCREEN_H / 2
     );
 }
 
