@@ -131,6 +131,27 @@ object "Example Setup"
                         FunctionEvent("Change Water Level").withArgument(128)
                     ).willWait(7.0) // wait 7 seconds before triggering this
                 ])
+            },
+
+            // Example: make a specific Switch (ID: 142f0aa6855b991a)
+            // trigger different messages when pressed (in a sequence)
+            "142f0aa6855b991a": {
+                "sticky": false,
+                "onActivate": EventList([
+                    FunctionEvent("Print").withArgument("First time"),
+                    FunctionEvent("Setup Level").withArgument({
+                        "142f0aa6855b991a": { // when pressed, change the event of the switch
+                            "onActivate": EventList([
+                                FunctionEvent("Print").withArgument("Second time"),
+                                FunctionEvent("Setup Level").withArgument({
+                                    "142f0aa6855b991a": {
+                                        "onActivate": FunctionEvent("Print").withArgument("Enough!")
+                                    }
+                                })
+                            ])
+                        }
+                    })
+                ])
             }
         },
 
