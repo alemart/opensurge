@@ -4,12 +4,16 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine.Lang;
 using SurgeEngine.Level;
+using SurgeEngine.Player;
+using SurgeEngine.Vector2;
+using SurgeEngine.Audio.Music;
+using SurgeEngine.Audio.Sound;
 using SurgeEngine.Events.EventList;
 using SurgeEngine.Events.EntityEvent;
 using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
-using SurgeEngine.Vector2;
 
 /*
                      SETUP SCRIPT
@@ -130,27 +134,6 @@ object "Example Setup"
                     DelayedEvent(
                         FunctionEvent("Change Water Level").withArgument(128)
                     ).willWait(7.0) // wait 7 seconds before triggering this
-                ])
-            },
-
-            // Example: make a specific Switch (ID: 142f0aa6855b991a)
-            // trigger different messages when pressed (in a sequence)
-            "142f0aa6855b991a": {
-                "sticky": false,
-                "onActivate": EventList([
-                    FunctionEvent("Print").withArgument("First time"),
-                    FunctionEvent("Setup Level").withArgument({
-                        "142f0aa6855b991a": { // when pressed, change the event of the switch
-                            "onActivate": EventList([
-                                FunctionEvent("Print").withArgument("Second time"),
-                                FunctionEvent("Setup Level").withArgument({
-                                    "142f0aa6855b991a": {
-                                        "onActivate": FunctionEvent("Print").withArgument("Enough!")
-                                    }
-                                })
-                            ])
-                        }
-                    })
                 ])
             }
         },
