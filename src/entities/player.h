@@ -28,10 +28,9 @@
 #include "brick.h"
 
 /* constants */
-#define PLAYER_INITIAL_LIVES        5    /* initial lives */
-#define PLAYER_MAX_INVINCIBILITY    23.0 /* invincibility timer */
-#define PLAYER_MAX_SPEEDSHOES       23.0 /* speed shoes timer */
-#define PLAYER_MAX_INVSTAR          5    /* how many invincibility stars */
+extern const int PLAYER_INITIAL_LIVES;       /* initial lives */
+extern const float PLAYER_MAX_INVINCIBILITY; /* invincibility timer */
+extern const float PLAYER_MAX_SPEEDSHOES;    /* turbo timer */
 
 /* shield types */
 enum playershield_t {
@@ -76,8 +75,8 @@ struct player_t {
 
     /* invincibility */
     int invincible;
-    float invtimer;
-    struct actor_t* invstar[PLAYER_MAX_INVSTAR];
+    float invincibility_timer;
+    struct actor_t** star;
 
     /* speed shoes */
     int got_speedshoes;

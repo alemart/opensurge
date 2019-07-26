@@ -2471,7 +2471,7 @@ void render_powerups()
     image_t *icon[MAX_POWERUPS]; /* icons */
     int visible[MAX_POWERUPS]; /* is icon[i] visible? */
     int i, c = 0; /* c is the icon count */
-    float t = timer_get_ticks() * 0.001;
+    float t = timer_get_ticks() * 0.001f;
 
     for(i=0; i<MAX_POWERUPS; i++)
         visible[i] = TRUE;
@@ -2480,7 +2480,7 @@ void render_powerups()
         if(player->got_glasses)
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 6) , 0 );
 
-        switch (player_shield_type(player))
+        switch(player_shield_type(player))
         {
             case SH_SHIELD:
                 icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 7) , 0 );
@@ -2506,19 +2506,19 @@ void render_powerups()
 
         if(player_is_invincible(player)) {
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 4) , 0 );
-            if(player->invtimer >= PLAYER_MAX_INVINCIBILITY*0.75) { /* it blinks */
-                /* we want something that blinks faster as player->invtimer tends to PLAYER_MAX_INVINCIBLITY */
-                float x = ((PLAYER_MAX_INVINCIBILITY-player->invtimer)/(PLAYER_MAX_INVINCIBILITY*0.25)); /* 1 = x --> 0 */
-                visible[c-1] = sin( (0.5*PI*t) / (x+0.1) ) >= 0;
+            if(player->invincibility_timer >= PLAYER_MAX_INVINCIBILITY * 0.75f) { /* it blinks */
+                /* we want something that blinks faster as player->invincibility_timer tends to PLAYER_MAX_INVINCIBLITY */
+                float x = (PLAYER_MAX_INVINCIBILITY - player->invincibility_timer) / (PLAYER_MAX_INVINCIBILITY * 0.25f);
+                visible[c-1] = sinf( (0.5f*PI*t) / (x+0.1f) ) >= 0.0f;
             }
         }
 
         if(player_is_ultrafast(player)) {
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 5) , 0 );
-            if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES*0.75) { /* it blinks */
+            if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES * 0.75f) { /* it blinks */
                 /* we want something that blinks faster as player->speedshoes_timer tends to PLAYER_MAX_SPEEDSHOES */
-                float x = ((PLAYER_MAX_SPEEDSHOES-player->speedshoes_timer)/(PLAYER_MAX_SPEEDSHOES*0.25)); /* 1 = x --> 0 */
-                visible[c-1] = sin( (0.5*PI*t) / (x+0.1) ) >= 0;
+                float x = (PLAYER_MAX_SPEEDSHOES - player->speedshoes_timer) / (PLAYER_MAX_SPEEDSHOES * 0.25f);
+                visible[c-1] = sinf( (0.5f*PI*t) / (x+0.1f) ) >= 0.0f;
             }
         }
     }

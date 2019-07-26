@@ -52,6 +52,9 @@
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 3
 
+/* render the collision sensors? */
+#define SHOW_SENSORS 0
+
 /* macros */
 #define ON_STATE(player, s) \
     if((player)->pa_old_state != (s) && physicsactor_get_state((player)->pa) == (s))
@@ -69,14 +72,21 @@
 #define DEG2RAD(x) \
     ((x) / 57.2957795131f)
 
+/* public constants */
+const int PLAYER_INITIAL_LIVES = 5;           /* initial lives */
+const float PLAYER_MAX_INVINCIBILITY = 23.0f; /* invincibility timer */
+const float PLAYER_MAX_SPEEDSHOES = 23.0f;    /* turbo timer */
+
+/* private constants */
+static const int PLAYER_MAX_STARS = 16;              /* how many invincibility stars */
+static const float PLAYER_MAX_BLINK = 2.0f;          /* how many seconds does the player blink if he/she gets hurt? */
+static const float PLAYER_UNDERWATER_BREATH = 30.0f; /* how many seconds can the player stay underwater before drowning? */
+
 /* private data */
-#define SHOW_SENSORS                0    /* render the collision sensors? */
-#define PLAYER_MAX_BLINK            2.0  /* how many seconds does the player blink if he/she gets hurt? */
-#define PLAYER_UNDERWATER_BREATH    30.0 /* how many seconds can the player stay underwater before drowning? */
-static int hundred_collectibles;         /* counter (extra lives) */
-static int collectibles;                 /* shared collectibles */
-static int lives;                        /* shared lives */
-static int score;                        /* shared score */
+static int hundred_collectibles; /* counter (extra lives) */
+static int collectibles;         /* shared collectibles */
+static int lives;                /* shared lives */
+static int score;                /* shared score */
 
 /* misc */
 static void update_shield(player_t *player);
@@ -135,10 +145,11 @@ player_t *player_create(const char *character_name)
 
     /* invincibility */
     p->invincible = FALSE;
-    p->invtimer = 0;
-    for(i=0; i<PLAYER_MAX_INVSTAR; i++) {
-        p->invstar[i] = actor_create();
-        actor_change_animation(p->invstar[i], sprite_get_animation("SD_INVSTAR", 0));
+    p->invincibility_timer = 0;
+    p->star = mallocx(PLAYER_MAX_STARS * sizeof(actor_t*));
+    for(i = 0; i < PLAYER_MAX_STARS; i++) {
+        p->star[i] = actor_create();
+        actor_change_animation(p->star[i], sprite_get_animation("Invincibility", 0));
     }
 
     /* speed shoes */
@@ -197,11 +208,14 @@ player_t *player_create(const char *character_name)
  */
 player_t* player_destroy(player_t *player)
 {
+    int i;
+
     /* releasing actors */
-    for(int i = 0; i < PLAYER_MAX_INVSTAR; i++)
-        actor_destroy(player->invstar[i]);
     actor_destroy(player->shield);
     actor_destroy(player->actor);
+    for(i = 0; i < PLAYER_MAX_STARS; i++)
+        actor_destroy(player->star[i]);
+    free(player->star);
 
     /* physics */
     obstaclemap_destroy(player->obstaclemap);
@@ -223,7 +237,6 @@ player_t* player_destroy(player_t *player)
  */
 void player_update(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, enemy_list_t *enemy_list, surgescript_object_t* (*get_bricklike_object)(int))
 {
-    int i;
     actor_t *act = player->actor;
     float dt = timer_get_delta();
 
@@ -280,22 +293,27 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
     /* invincibility stars */
     if(player->invincible) {
-        int maxf = sprite_get_animation("SD_INVSTAR", 0)->frame_count;
-        int invangle[PLAYER_MAX_INVSTAR];
-        v2d_t starpos;
+        const float magic = PLAYER_MAX_STARS * PLAYER_MAX_STARS * 1.5f;
+        const float angpi = (2.0f * PI) / PLAYER_MAX_STARS;
+        float x, angle, distance, max_distance;
+        int i, width, height;
+        v2d_t center;
 
-        for(i=0; i<PLAYER_MAX_INVSTAR; i++) {
-            invangle[i] = (180*4) * timer_get_ticks()*0.001 + (i+1)*(360/PLAYER_MAX_INVSTAR);
-            starpos.x = 25*cos(invangle[i]*PI/180);
-            starpos.y = ((timer_get_ticks()+i*400)%2000)/40;
-            /*starpos = v2d_rotate(starpos, act->angle);*/
-            player->invstar[i]->position.x = act->position.x - act->hot_spot.x + image_width(actor_image(act))/2 + starpos.x;
-            player->invstar[i]->position.y = act->position.y - act->hot_spot.y + image_height(actor_image(act)) - starpos.y + 5;
-            actor_change_animation_frame(player->invstar[i], random(maxf));
+        /* animate */
+        physicsactor_bounding_box(player->pa, &width, &height, &center);
+        max_distance = min(width, height);
+        for(i = 0; i < PLAYER_MAX_STARS; i++) {
+            x = 1.0f - fmodf(timer_get_ticks() + (magic * i), 1000.0f) * 0.001f;
+            distance = max_distance * (1.0f - x * x * x);
+            angle = -i * angpi;
+            player->star[i]->alpha = x * x;
+            player->star[i]->position = v2d_add(center, v2d_rotate(v2d_new(distance, 0.0f), angle));
+            actor_change_animation_speed_factor(player->star[i], 1.0f + i * 0.25f);
         }
 
-        player->invtimer += dt;
-        if(player->invtimer >= PLAYER_MAX_INVINCIBILITY)
+        /* update timer & finish */
+        player->invincibility_timer += dt;
+        if(player->invincibility_timer >= PLAYER_MAX_INVINCIBILITY)
             player->invincible = FALSE;
     }
 
@@ -303,6 +321,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     if(player->got_speedshoes) {
         physicsactor_t *pa = player->pa;
 
+        /* set turbo */
         if(player->speedshoes_timer == 0) {
             physicsactor_set_acc(pa, physicsactor_get_acc(pa) * 2.0f);
             physicsactor_set_frc(pa, physicsactor_get_frc(pa) * 2.0f);
@@ -310,7 +329,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             physicsactor_set_air(pa, physicsactor_get_air(pa) * 2.0f);
             physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * 2.0f);
         }
-        else if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES) {
+        
+        /* update timer */
+        player->speedshoes_timer += dt;
+
+        /* unset turbo */
+        if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES) {
             physicsactor_set_acc(pa, physicsactor_get_acc(pa) / 2.0f);
             physicsactor_set_frc(pa, physicsactor_get_frc(pa) / 2.0f);
             physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) / 2.0f);
@@ -318,8 +342,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) / 2.0f);
             player->got_speedshoes = FALSE;
         }
-
-        player->speedshoes_timer += dt;
     }
 
     /* animation */
@@ -330,7 +352,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
     /* is it a CPU controlled player? */
     if(player != level_player()) {
-        for(i=0; i<IB_MAX; i++)
+        for(int i = 0; i < IB_MAX; i++)
             input_simulate_button_up(act->input, (inputbutton_t)i);
     }
 
@@ -368,18 +390,10 @@ void player_render(player_t *player, v2d_t camera_position)
 {
     actor_t *act = player->actor;
     v2d_t hot_spot = act->hot_spot;
-    int i, behind_player[PLAYER_MAX_INVSTAR];
 
     /* invisible player? */
     if(!player->visible)
         return;
-
-    /* invincibility stars I */
-    for(i=0; i<PLAYER_MAX_INVSTAR && player->invincible; i++) {
-        behind_player[i] = (int)((180*4) * timer_get_ticks()*0.001 + (i+1)*(360/PLAYER_MAX_INVSTAR)) % 360 >= 180;
-        if(behind_player[i])
-            actor_render(player->invstar[i], camera_position);
-    }
 
     /* hotspot "gambiarra" */
     hotspot_magic(player);
@@ -391,19 +405,19 @@ void player_render(player_t *player, v2d_t camera_position)
     if(player->shield_type != SH_NONE)
         actor_render(player->shield, camera_position);
 
-    /* invincibility stars II */
-    for(i=0; i<PLAYER_MAX_INVSTAR && player->invincible; i++) {
-        if(!behind_player[i])
-            actor_render(player->invstar[i], camera_position);
+    /* invincibility stars */
+    if(player->invincible) {
+        for(int i = 0; i < PLAYER_MAX_STARS; i++)
+            actor_render(player->star[i], camera_position);
     }
-
-    /* restore hot spot */
-    act->hot_spot = hot_spot;
 
 #if SHOW_SENSORS != 0
     /* sensors */
     physicsactor_render_sensors(player->pa, camera_position);
 #endif
+
+    /* restore hot spot */
+    act->hot_spot = hot_spot;
 }
 
 
@@ -1020,7 +1034,7 @@ void player_set_invincible(player_t* player, int invincible)
     if((!player_is_invincible(player) && invincible) || (player_is_invincible(player) && !invincible)) {
         player->invincible = invincible;
         if(player->invincible)
-            player->invtimer = 0.0f;
+            player->invincibility_timer = 0.0f;
     }
 }
 
