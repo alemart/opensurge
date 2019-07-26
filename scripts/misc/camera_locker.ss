@@ -1,13 +1,13 @@
 // -----------------------------------------------------------------------------
-// File: camera_lock.ss
-// Description: the Camera Lock utility is used to smoothly lock the camera
+// File: camera_locker.ss
+// Description: the Camera Locker utility is used to smoothly lock the camera
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Camera;
 using SurgeEngine.Video.Screen;
 
-object "Camera Lock"
+object "Camera Locker"
 {
     public readonly x1 = -Math.infinity;
     public readonly y1 = -Math.infinity;
@@ -170,7 +170,7 @@ object "Camera Lock"
 
         // start transition
         timer = 0;
-        state = "locking";
+        state = "expanding";
 
         // success
         return true;

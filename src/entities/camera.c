@@ -97,6 +97,7 @@ void camera_update()
 
     /* clipping... */
     camera.position = clip_to_boundaries(camera.position);
+    //video_showmessage("%.2f...%.2f",camera.boundaries.x1,camera.boundaries.x2);
 }
 
 /*
