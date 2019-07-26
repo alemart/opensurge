@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// File: water_level.ss
+// File: change_water_level.ss
 // Description: a function object that changes the water level
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
