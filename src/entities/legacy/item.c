@@ -2718,7 +2718,7 @@ void starbox_strategy(item_t *item, player_t *player)
 void speedbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player_set_ultrafast(player, TRUE);
+    player_set_turbo(player, TRUE);
     music_play(music_load("musics/speed.ogg"), false);
 }
 

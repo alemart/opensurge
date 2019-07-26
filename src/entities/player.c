@@ -74,8 +74,8 @@
 
 /* public constants */
 const int PLAYER_INITIAL_LIVES = 5;           /* initial lives */
+const float PLAYER_MAX_TURBO = 23.0f;         /* turbo timer */
 const float PLAYER_MAX_INVINCIBILITY = 23.0f; /* invincibility timer */
-const float PLAYER_MAX_SPEEDSHOES = 23.0f;    /* turbo timer */
 
 /* private constants */
 static const int PLAYER_MAX_STARS = 16;              /* how many invincibility stars */
@@ -152,9 +152,9 @@ player_t *player_create(const char *character_name)
         actor_change_animation(p->star[i], sprite_get_animation("Invincibility", 0));
     }
 
-    /* speed shoes */
-    p->got_speedshoes = FALSE;
-    p->speedshoes_timer = 0;
+    /* turbo */
+    p->turbo = FALSE;
+    p->turbo_timer = 0;
 
     /* loop system */
     p->layer = BRL_DEFAULT;
@@ -238,11 +238,12 @@ player_t* player_destroy(player_t *player)
 void player_update(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, enemy_list_t *enemy_list, surgescript_object_t* (*get_bricklike_object)(int))
 {
     actor_t *act = player->actor;
+    physicsactor_t *pa = player->pa;
     float dt = timer_get_delta();
 
     /* physics */
     if(!player->disable_movement) {
-        player->pa_old_state = physicsactor_get_state(player->pa);
+        player->pa_old_state = physicsactor_get_state(pa);
         physics_adapter(player, team, team_size, brick_list, item_list, enemy_list, get_bricklike_object);
     }
 
@@ -261,7 +262,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         }
     }
 
-    if(physicsactor_get_state(player->pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT) {
+    if(physicsactor_get_state(pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT) {
         player->blinking = TRUE;
         player->blink_timer = 0.0f;
         player->blink_visibility_timer = 0.0f;
@@ -277,7 +278,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     else if(player->underwater && act->position.y < level_waterlevel())
         player_leave_water(player);
     if(player->underwater) {
-        player->speedshoes_timer = max(player->speedshoes_timer, PLAYER_MAX_SPEEDSHOES); /* disable speed shoes */
+        player->turbo_timer = max(player->turbo_timer, PLAYER_MAX_TURBO); /* disable turbo */
 
         if(player->shield_type != SH_WATERSHIELD)
             player->underwater_timer += dt;
@@ -300,7 +301,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         v2d_t center;
 
         /* animate */
-        physicsactor_bounding_box(player->pa, &width, &height, &center);
+        physicsactor_bounding_box(pa, &width, &height, &center);
         max_distance = min(width, height);
         for(i = 0; i < PLAYER_MAX_STARS; i++) {
             x = 1.0f - fmodf(timer_get_ticks() + (magic * i), 1000.0f) * 0.001f;
@@ -317,12 +318,10 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             player->invincible = FALSE;
     }
 
-    /* speed shoes */
-    if(player->got_speedshoes) {
-        physicsactor_t *pa = player->pa;
-
+    /* turbo */
+    if(player->turbo) {
         /* set turbo */
-        if(player->speedshoes_timer == 0) {
+        if(player->turbo_timer == 0) {
             physicsactor_set_acc(pa, physicsactor_get_acc(pa) * 2.0f);
             physicsactor_set_frc(pa, physicsactor_get_frc(pa) * 2.0f);
             physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * 2.0f);
@@ -331,16 +330,16 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         }
         
         /* update timer */
-        player->speedshoes_timer += dt;
+        player->turbo_timer += dt;
 
         /* unset turbo */
-        if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES) {
+        if(player->turbo_timer >= PLAYER_MAX_TURBO) {
             physicsactor_set_acc(pa, physicsactor_get_acc(pa) / 2.0f);
             physicsactor_set_frc(pa, physicsactor_get_frc(pa) / 2.0f);
             physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) / 2.0f);
             physicsactor_set_air(pa, physicsactor_get_air(pa) / 2.0f);
             physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) / 2.0f);
-            player->got_speedshoes = FALSE;
+            player->turbo = FALSE;
         }
     }
 
@@ -358,12 +357,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
     /* winning pose */
     if(level_has_been_cleared())
-        physicsactor_enable_winning_pose(player->pa);
+        physicsactor_enable_winning_pose(pa);
 
     /* rolling misc */
     if(!player_is_in_the_air(player))
         player->thrown_while_rolling = FALSE;
-    else if(physicsactor_get_ysp(player->pa) < 0.0f && player_is_rolling(player))
+    else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
         player->thrown_while_rolling = TRUE;
 
     /* active player can't get off camera */
@@ -554,7 +553,7 @@ void player_kill(player_t *player)
 {
     if(!player_is_dying(player)) {
         player->invincible = FALSE;
-        player->got_speedshoes = FALSE;
+        player->turbo = FALSE;
         player->shield_type = SH_NONE;
         player->blinking = FALSE;
         player->attacking = FALSE;
@@ -989,27 +988,27 @@ int player_is_in_the_air(const player_t *player)
 }
 
 /*
- * player_is_ultrafast()
- * TRUE if, and only if, the player is wearing speed shoes
+ * player_is_turbocharged()
+ * TRUE if, and only if, the player is turbocharged
+ * (i.e., runs faster than normal)
  */
-int player_is_ultrafast(const player_t* player)
+int player_is_turbocharged(const player_t* player)
 {
-    return player->got_speedshoes;
+    return player->turbo;
 }
 
 /*
- * player_set_ultrafast()
+ * player_set_turbo()
  * Enable (or disable) turbo mode
  */
-void player_set_ultrafast(player_t* player, int turbo)
+void player_set_turbo(player_t* player, int turbo)
 {
     if(player_is_dying(player))
         return;
 
-    if((!player_is_ultrafast(player) && turbo) || (player_is_ultrafast(player) && !turbo)) {
-        player->got_speedshoes = turbo;
-        if(player->got_speedshoes)
-            player->speedshoes_timer = 0.0f;
+    if(turbo || player_is_turbocharged(player)) {
+        player->turbo = turbo;
+        player->turbo_timer = 0.0f;
     }
 }
 
@@ -1031,10 +1030,9 @@ void player_set_invincible(player_t* player, int invincible)
     if(player_is_dying(player))
         return;
 
-    if((!player_is_invincible(player) && invincible) || (player_is_invincible(player) && !invincible)) {
+    if(invincible || player_is_invincible(player)) {
         player->invincible = invincible;
-        if(player->invincible)
-            player->invincibility_timer = 0.0f;
+        player->invincibility_timer = 0.0f;
     }
 }
 

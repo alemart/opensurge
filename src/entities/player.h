@@ -30,7 +30,7 @@
 /* constants */
 extern const int PLAYER_INITIAL_LIVES;       /* initial lives */
 extern const float PLAYER_MAX_INVINCIBILITY; /* invincibility timer */
-extern const float PLAYER_MAX_SPEEDSHOES;    /* turbo timer */
+extern const float PLAYER_MAX_TURBO;         /* turbo timer */
 
 /* shield types */
 enum playershield_t {
@@ -78,9 +78,9 @@ struct player_t {
     float invincibility_timer;
     struct actor_t** star;
 
-    /* speed shoes */
-    int got_speedshoes;
-    float speedshoes_timer;
+    /* turbo */
+    int turbo;
+    float turbo_timer;
 
     /* loop system */
     bricklayer_t layer;
@@ -129,8 +129,8 @@ float player_seconds_remaining_to_drown(const player_t *player);
 int player_is_in_the_air(const player_t *player);
 int player_is_attacking(const player_t *player);
 int player_is_blinking(const player_t *player);
-int player_is_ultrafast(const player_t *player); /* wearing faster shoes? */
-void player_set_ultrafast(player_t* player, int turbo);
+int player_is_turbocharged(const player_t *player);
+void player_set_turbo(player_t* player, int turbo);
 int player_is_invincible(const player_t *player);
 void player_set_invincible(player_t* player, int invincible);
 playershield_t player_shield_type(const player_t* player);

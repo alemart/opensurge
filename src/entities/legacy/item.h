@@ -30,7 +30,7 @@
 #define IT_LIFEBOX          1  /* life box */
 #define IT_COLLECTIBLEBOX   2  /* collectible box */
 #define IT_STARBOX          3  /* invincibility stars */
-#define IT_SPEEDBOX         4  /* speed shoes */
+#define IT_SPEEDBOX         4  /* turbo */
 #define IT_GLASSESBOX       5  /* glasses */
 #define IT_SHIELDBOX        6  /* shield */
 #define IT_TRAPBOX          7  /* trap box */

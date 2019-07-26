@@ -2513,11 +2513,11 @@ void render_powerups()
             }
         }
 
-        if(player_is_ultrafast(player)) {
+        if(player_is_turbocharged(player)) {
             icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 5) , 0 );
-            if(player->speedshoes_timer >= PLAYER_MAX_SPEEDSHOES * 0.75f) { /* it blinks */
-                /* we want something that blinks faster as player->speedshoes_timer tends to PLAYER_MAX_SPEEDSHOES */
-                float x = (PLAYER_MAX_SPEEDSHOES - player->speedshoes_timer) / (PLAYER_MAX_SPEEDSHOES * 0.25f);
+            if(player->turbo_timer >= PLAYER_MAX_TURBO * 0.75f) { /* it blinks */
+                /* we want something that blinks faster as player->turbo_timer tends to PLAYER_MAX_TURBO */
+                float x = (PLAYER_MAX_TURBO - player->turbo_timer) / (PLAYER_MAX_TURBO * 0.25f);
                 visible[c-1] = sinf( (0.5f*PI*t) / (x+0.1f) ) >= 0.0f;
             }
         }

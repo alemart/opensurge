@@ -980,7 +980,7 @@ surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript
 surgescript_var_t* fun_getturbo(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
-    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_ultrafast(player));
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_turbocharged(player));
 }
 
 /* enable/disable turbo mode */
@@ -989,10 +989,7 @@ surgescript_var_t* fun_setturbo(surgescript_object_t* object, const surgescript_
     player_t* player = get_player(object);
     if(player != NULL) {
         bool turbo = surgescript_var_get_bool(param[0]);
-        if(turbo && !player_is_ultrafast(player))
-            player_set_ultrafast(player, TRUE);
-        else if(!turbo && player_is_ultrafast(player))
-            player_set_ultrafast(player, FALSE);
+        player_set_turbo(player, turbo);
     }
     return NULL;
 }
@@ -1010,10 +1007,7 @@ surgescript_var_t* fun_setinvincible(surgescript_object_t* object, const surgesc
     player_t* player = get_player(object);
     if(player != NULL) {
         bool invincible = surgescript_var_get_bool(param[0]);
-        if(invincible && !player_is_invincible(player))
-            player_set_invincible(player, TRUE);
-        else if(!invincible && player_is_invincible(player))
-            player_set_invincible(player, FALSE);
+        player_set_invincible(player, invincible);
     }
     return NULL;
 }
