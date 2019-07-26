@@ -71,35 +71,6 @@ object 'EntityEvent' is 'event' \n\
     } \n\
 } \n\
 \n\
-object 'EventList' is 'event' \n\
-{ \n\
-    events = []; \n\
-\n\
-    fun __init(eventList) \n\
-    { \n\
-        if(typeof(eventList) == 'object' && eventList.__name == 'Array') { \n\
-            for(j = 0; j < eventList.length; j++) { \n\
-                event = eventList[j]; \n\
-                if(event.hasTag('event')) \n\
-                    events.push(event); \n\
-            } \n\
-        } \n\
-\n\
-        return this; \n\
-    } \n\
-\n\
-    fun call() \n\
-    { \n\
-        for(j = 0; j < events.length; j++) \n\
-            events[j].call(); \n\
-    } \n\
-\n\
-    fun toString() \n\
-    { \n\
-        return 'EventList[' + events.length + ']'; \n\
-    } \n\
-} \n\
-\n\
 object 'FunctionEvent' is 'event' \n\
 { \n\
     target = ''; \n\
@@ -139,6 +110,80 @@ object 'FunctionEvent' is 'event' \n\
     fun toString() \n\
     { \n\
         return 'FunctionEvent[' + target + ']'; \n\
+    } \n\
+} \n\
+\n\
+object 'EventList' is 'event' \n\
+{ \n\
+    events = []; \n\
+\n\
+    fun __init(eventList) \n\
+    { \n\
+        if(typeof(eventList) == 'object' && eventList.__name == 'Array') { \n\
+            for(j = 0; j < eventList.length; j++) { \n\
+                event = eventList[j]; \n\
+                if(event.hasTag('event')) \n\
+                    events.push(event); \n\
+            } \n\
+        } \n\
+\n\
+        return this; \n\
+    } \n\
+\n\
+    fun call() \n\
+    { \n\
+        for(j = 0; j < events.length; j++) \n\
+            events[j].call(); \n\
+    } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        return 'EventList[' + events.length + ']'; \n\
+    } \n\
+} \n\
+\n\
+object 'DelayedEvent' is 'event' \n\
+{ \n\
+    event = null; \n\
+    timer = 0; \n\
+    delay = 0; \n\
+\n\
+    state 'main' \n\
+    { \n\
+    } \n\
+\n\
+    state 'active' \n\
+    { \n\
+        timer += Time.delta; \n\
+        if(timer >= delay) { \n\
+            if(event != null) \n\
+                event.call(); \n\
+            state = 'main'; \n\
+        } \n\
+    } \n\
+\n\
+    fun __init(theEvent) \n\
+    { \n\
+        if(theEvent.hasTag('event')) \n\
+            event = theEvent; \n\
+        return this; \n\
+    } \n\
+\n\
+    fun willWait(seconds) \n\
+    { \n\
+        delay = Math.max(seconds, 0); \n\
+        return this; \n\
+    } \n\
+\n\
+    fun call() \n\
+    { \n\
+        timer = 0; \n\
+        state = 'active'; \n\
+    } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        return 'DelayedEvent[' + delay + ']'; \n\
     } \n\
 } \n\
 ";

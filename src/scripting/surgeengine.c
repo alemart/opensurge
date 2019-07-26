@@ -293,6 +293,7 @@ object 'Events' \n\
     public readonly EntityEvent = spawn('EntityEventFactory'); \n\
     public readonly FunctionEvent = spawn('FunctionEventFactory'); \n\
     public readonly EventList = spawn('EventListFactory'); \n\
+    public readonly DelayedEvent = spawn('DelayedEventFactory'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
@@ -332,6 +333,16 @@ object 'EventListFactory' \n\
     fun call(eventList) \n\
     { \n\
         return caller.spawn('EventList').__init(eventList); \n\
+    } \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'DelayedEventFactory' \n\
+{ \n\
+    fun call(event) \n\
+    { \n\
+        return caller.spawn('DelayedEvent').__init(event); \n\
     } \n\
 \n\
     fun destroy() { } \n\

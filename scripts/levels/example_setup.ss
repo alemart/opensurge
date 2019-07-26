@@ -7,6 +7,7 @@
 using SurgeEngine.Level;
 using SurgeEngine.Events.EventList;
 using SurgeEngine.Events.EntityEvent;
+using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
 using SurgeEngine.Vector2;
 
@@ -84,7 +85,7 @@ object "Example Setup"
             // may be triggered during gameplay. This will print a message
             "Event Trigger 1": {
                 "onTrigger": FunctionEvent("Print").withArgument("Hello! Give me pizza!")
-            }
+            },
 
             // Example: collapse a specific Bridge (ID: 481c9ccb42a38268)
             // when activating a specific Switch (ID: 142f0aa6855b991a)
@@ -113,6 +114,22 @@ object "Example Setup"
                 "onActivate": EventList([
                     FunctionEvent("Print").withArgument("Oh my! Look at the water!"),
                     FunctionEvent("Change Water Level").withArgument(128) // raise water to ypos = 128
+                ])
+            },
+
+            // Example: tell a story. Trigger one event at a time!
+            "Event Trigger 2": {
+                "onTrigger": EventList([
+                    FunctionEvent("Print").withArgument("Oh my! Something is about to happen!"),
+                    DelayedEvent(
+                        FunctionEvent("Print").withArgument("I can feel... water...")
+                    ).willWait(3.0), // wait 3 seconds before triggering this
+                    DelayedEvent(
+                        FunctionEvent("Print").withArgument("WATCH OUT!")
+                    ).willWait(6.0), // wait 6 seconds before triggering this
+                    DelayedEvent(
+                        FunctionEvent("Change Water Level").withArgument(128)
+                    ).willWait(7.0) // wait 7 seconds before triggering this
                 ])
             }
         },
