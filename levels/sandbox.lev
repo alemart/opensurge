@@ -10,10 +10,10 @@ author "YOUR_NAME_HERE"
 license "CC-0"
 version "1.0"
 requires "0.5.0"
-act 3
+act 1
 theme "themes/template.brk"
 bgtheme "themes/template.bg"
-spawn_point 128 9952
+spawn_point 128 9968
 startup "Default Setup" "Example Setup"
 players "Tux"
 
@@ -24,14 +24,6 @@ brick 48 896 9872
 brick 48 896 9744
 brick 0 896 9744
 brick 0 960 9744
-brick 0 944 10128
-brick 0 1024 10000
-brick 0 1088 10000
-brick 0 1152 10000
-brick 0 1216 10000
-brick 64 1280 9936
-brick 64 1536 9936
-brick 51 1504 9808
 brick 0 0 10000
 brick 0 64 10000
 brick 0 128 10000
@@ -53,17 +45,10 @@ brick 0 832 9744
 brick 48 832 9744
 brick 48 832 9872
 brick 0 576 9744
-brick 0 112 10128
-brick 0 256 10144
-brick 0 352 10128
-brick 0 496 10128
-brick 0 608 10128
-brick 0 752 10112
-brick 0 832 10112
-brick 0 32 10144
 brick 0 384 1000
 
 // entities
+entity "Goal" 928 10000 "4136e5c056e8ec42"
 entity "Collectible" 192 9936 "7933112fabc26d1a"
 entity "Collectible" 192 9904 "881e5ac4972def40"
 entity "Collectible" 192 9872 "c8a29491a1ac649e"
@@ -107,16 +92,14 @@ entity "Crococopter" 400 9896 "d5e449cc09e641e6"
 entity "Crococopter" 448 9872 "baa633d3499334e5"
 entity "Crococopter" 480 9912 "b88c38f7fac98bcc"
 entity "Powerup Lucky Bonus" 40 10000 "fbaece6f41916bdb"
+entity "Mosquito" 640 9968 "e2044c7669abdfcc"
 entity "Spring Standard" 272 10000 "455504a3e4553db5"
 entity "Bumper" 400 9824 "393059531bd1e221"
 entity "Bridge" 736 9744 "481c9ccb42a38268"
+entity "Collectible" 336 9968 "4d39f77aebeac935"
+entity "Collectible" 192 9968 "7d967c005e67f1e7"
 entity "Switch" 880 9744 "142f0aa6855b991a"
 entity "Event Trigger 1" 528 9952 "bf2c0b5b364bd74c"
 entity "Event Trigger 1" 528 9984 "f8a9333f4fff13e2"
-entity "Goal Capsule" 1664 9936 "28d873734478177e"
-entity "Spring Stronger" 1056 10000 "4dcd002b5c3e2026"
-entity "Event Trigger 4" 560 9952 "ba3b10c848f9916d"
-entity "Event Trigger 4" 560 9984 "625bf5a7e63f990f"
-entity "Event Trigger 3" 1296 9920 "928e90902415bb77"
 
 // EOF
