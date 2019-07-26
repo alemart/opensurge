@@ -108,7 +108,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t spawnpoint = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
-    surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "Level Setup", NULL);
+    surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "Setup Level", NULL);
 
     /* Level music */
     ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
@@ -118,7 +118,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(SPAWNPOINT_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, SPAWNPOINT_ADDR), spawnpoint);
 
-    /* Level Setup */
+    /* Setup functor */
     ssassert(SETUP_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, SETUP_ADDR), setup);
 
@@ -461,7 +461,7 @@ void update_music(surgescript_object_t* object)
 static const char code_in_surgescript[] = "\
 using SurgeEngine.Level; \n\
 \n\
-object 'Level Setup' \n\
+object 'Setup Level' \n\
 { \n\
     state 'main' \n\
     { \n\
