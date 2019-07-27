@@ -396,7 +396,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                         ((player_is_charging(team[i]) || player_is_rolling(team[i])) &&
                         feet < brk->y)
                     ) &&
-                    player_overlaps(team[i], brk->x, brk->y - 6, brk_width, min(6, brk_height))
+                    player_overlaps(team[i], brk->x, brk->y - 10, brk_width, min(8, brk_height))
                 ) {
                     /* create particles */
                     int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
