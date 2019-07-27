@@ -29,8 +29,8 @@ object "Fader" is "entity", "detached", "awake", "private"
 {
     transform = Transform();
     actor = Actor("SD_HUDBLACKSCREEN");
+    zindex = Math.infinity;
     fadeTime = 1.0;
-    zindex = Math.infinity; //1001;
 
     state "main"
     {
