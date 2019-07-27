@@ -8,6 +8,9 @@
 //
 // Print is a function object that prints a message
 //
+// Arguments:
+// - message: string. The message to be printed.
+//
 object "Print"
 {
     fun call(message)

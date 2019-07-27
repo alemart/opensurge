@@ -10,7 +10,22 @@ using SurgeEngine.Video.Screen;
 
 //
 // Lock Camera is a function object that locks
-// the camera within a certain range
+// the camera within a certain range.
+//
+// Arguments:
+// - param: number | Vector2 | Array. Lock specification.
+//
+// Argument param can be:
+//
+// 1. a positive number (gives space to the right)
+//    or a negative number (gives space to the left)
+//    specifying an offset relative to the player
+//
+// 2. a Vector2 object (gives space in both axis)
+//    specifying an offset relative to the player
+//
+// 3. a 4-element Array specifying the world
+//    coordinates of the camera lock
 //
 object "Lock Camera"
 {
@@ -35,19 +50,6 @@ object "Lock Camera"
             state = "main";
     }
 
-    //
-    // The argument (param) can be:
-    //
-    // 1. a positive number (gives space to the right)
-    //    or a negative number (gives space to the left)
-    //    specifying an offset relative to the player
-    //
-    // 2. a Vector2 object (gives space in both axis)
-    //    specifying an offset relative to the player
-    //
-    // 3. a 4-element Array specifying the world
-    //    coordinates of the camera lock
-    //
     fun call(param)
     {
         // initializing

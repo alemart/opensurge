@@ -136,6 +136,11 @@ object "Example Setup"
                     ).willWait(7.0) // wait 7 seconds before triggering this
                 ])
             }
+
+            //
+            // Tip: explore the scripts/functions/ folder for more
+            //      functions you can use with events
+            //
         },
 
         //

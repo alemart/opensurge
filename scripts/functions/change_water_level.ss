@@ -11,7 +11,10 @@ using SurgeEngine.Audio.Sound;
 
 //
 // Change Water Level is a function object that
-// changes the water level with an animation
+// changes the water level with an animation.
+//
+// Arguments:
+// - ypos: number. The new value for the water level.
 //
 object "Change Water Level"
 {
