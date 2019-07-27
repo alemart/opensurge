@@ -41,10 +41,8 @@
 
 /* private stuff */
 static bool file_exists(const char *filepath);
-static inline char ch2hex(int code);
-static char *url_encode(const char *str);
-/*static char *url_decode(const char *str);*/
-/*static char hex2ch(char ch);*/
+static inline char ch2hex(unsigned char code);
+static char *url_encode(const char *url);
 
 
 
@@ -60,12 +58,12 @@ static char *url_encode(const char *str);
 bool launch_url(const char *url)
 {
     bool success = true;
-    char *safe_url = url_encode(url); /* it's VERY important to sanitize the URL... */
+    char *safe_url = url_encode(url); /* encode the URL */
 
     if(video_is_fullscreen())
-        video_changemode(video_get_resolution(), video_is_smooth(), FALSE);
+        video_changemode(video_get_resolution(), video_is_smooth(), false);
 
-    if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "ftp://", 6) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
+    if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
 #if defined(_WIN32)
         ShellExecuteA(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
         (void)file_exists;
@@ -123,7 +121,7 @@ bool launch_url(const char *url)
     }
     else {
         success = false;
-        fatal_error("Can't launch URL: invalid protocol (the valid ones are: http, https, ftp, mailto).\n%s", safe_url);
+        fatal_error("Can't launch URL (invalid protocol): \"%s\"", safe_url);
     }
 
     if(!success)
@@ -147,62 +145,46 @@ bool file_exists(const char *filepath)
     return (stat(filepath, &st) == 0);
 #else
     FILE* fp = fopen(filepath, "rb");
-    bool valid = false;
-    if(fp != NULL) {
-        valid = true;
+    bool valid = (fp != NULL);
+    if(fp != NULL)
         fclose(fp);
-    }
     return valid;
 #endif
 }
 
-/* converts ch from hex */
-/*char hex2ch(char ch) {
-    return isdigit(ch) ? (ch - '0') : ((char)toupper(ch) - 'A' + 10);
-}*/
-
-/* converts code to hex */
-char ch2hex(int code) {
+/* converts to hex */
+char ch2hex(unsigned char code) {
     static char hex[] = "0123456789ABCDEF";
     return hex[code & 0xF];
 }
 
-/* returns an url-encoded version of str */
-char *url_encode(const char *str) {
-    const char *p;
-    char *buf = mallocx(sizeof(char) * (strlen(str) * 3 + 1)), *q = buf;
+/* returns an encoded version of url */
+char* url_encode(const char* url)
+{
+    static char encode[256] = { 0 }, special[] = ":/-_.?=&~@#$,;";
+    char* buf = mallocx((3 * strlen(url) + 1) * sizeof(char));
+    char* p = buf;
 
-    for(p = str; *p; p++) {
-        if(isalnum(*p) || *p == '-' || *p == '#' || *p == '_' || *p == '.' || *p == '~' || *p == ':' || *p == '?' || *p == '&' || *p == '/' || *p == '=' || *p == '+' || *p == '@')
-            *q++ = *p; /* safety: we ensure that *p != '\\', *p != '\"' */
-        else if(*p == ' ') 
-            *q++ = '+';
-        else 
-            *q++ = '%', *q++ = ch2hex(*p / 16), *q++ = ch2hex(*p % 16);
+    /* create an encoding table */
+    if(!encode[0]) {
+        for(int i = 1; i < 256; i++)
+            encode[i] = !(isalnum(i) || (strchr(special, i) != NULL));
+        encode[0] = 1;
     }
 
-    *q = 0;
+    /* encode string */
+    while(*url) {
+        if(encode[(unsigned char)(*url)]) {
+            *p++ = '%';
+            *p++ = ch2hex((unsigned char)(*url) / 16);
+            *p++ = ch2hex((unsigned char)(*url) % 16);
+            url++;
+        }
+        else
+            *p++ = *url++;
+    }
+    *p = 0;
+
+    /* done */
     return buf;
 }
-
-/* returns an url-decoded version of str */
-/*char *url_decode(const char *str) {
-    const char *p;
-    char *buf = mallocx(sizeof(char) * (strlen(str) + 1)), *q = buf;
-
-    for(p = str; *p; p++) {
-        if(*p == '%') {
-            if(*(p+1) && *(p+2)) {
-                *q++ = (hex2ch(*(p+1)) << 4) | hex2ch(*(p+2));
-                p += 2;
-            }
-        }
-        else if(*p == '+')
-            *q++ = ' ';
-        else
-            *q++ = *p;
-    }
-
-    *q = 0;
-    return buf;
-}*/
