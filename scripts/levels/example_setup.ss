@@ -11,6 +11,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Events.EventList;
+using SurgeEngine.Events.EventChain;
 using SurgeEngine.Events.EntityEvent;
 using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
@@ -41,6 +42,8 @@ object (e.g., "Example Setup") to the startup field. Example:
 
 Happy hacking! ;)
 
+Tip: explore folder scripts/functions/ to know about many
+     functions you can use with events.
 */
 
 object "Example Setup"
@@ -58,18 +61,18 @@ object "Example Setup"
             // the configuration below is just an example
             // (modify at will, but backup this file first!)
 
-            // Example: configuring all Bridges
+            // Example: configuring all Bridges.
             "Bridge": {
                 "length": 12, // length 12 is the default
                 "anim": 1
             },
 
-            // Example: configuring all Elevators
+            // Example: configuring all Elevators.
             "Elevator": {
                 "anim": 2 // animation number
             },
 
-            // Example: make a specific Door become red.
+            // Example: making a specific Door become red.
             // (suppose its ID is 532ab77cef1252ae)
             "532ab77cef1252ae": {
                 "color": "red"
@@ -80,25 +83,26 @@ object "Example Setup"
         // zone 1 only
         //
         "1": {
-            // Example: configuring the Background Exchanger for zone 1
+            // Example: configuring the Background Exchanger for zone 1.
             "Background Exchanger": {
                 "background": "themes/template.bg"
             },
 
             // Example: configuring an event. An event is something that
             // may be triggered during gameplay. This will print a message
+            // as soon as the player touches an "Event Trigger 1" entity.
             "Event Trigger 1": {
                 "onTrigger": FunctionEvent("Print").withArgument("Hello! Give me pizza!")
             },
 
             // Example: collapse a specific Bridge (ID: 481c9ccb42a38268)
-            // when activating a specific Switch (ID: 142f0aa6855b991a)
+            // when activating a specific Switch (ID: 142f0aa6855b991a).
             "142f0aa6855b991a": {
                 "onActivate": EntityEvent("481c9ccb42a38268").willCall("collapse")
             },
 
             // Example: open a specific Door (ID: 2bbc752e0454d031) ONLY IF
-            // a specific red Switch (ID: 66b9b90da2a5a5fa) is being pressed
+            // a specific red Switch (ID: 66b9b90da2a5a5fa) is being pressed.
             "66b9b90da2a5a5fa": {
                 "color": "red",
                 "sticky": false,
@@ -112,7 +116,7 @@ object "Example Setup"
         //
         "2": {
             // Example: make all Switches blue.
-            // Make them trigger multiple events!
+            // Make them trigger multiple events at the same time!
             "Switch": {
                 "color": "blue",
                 "onActivate": EventList([
@@ -135,33 +139,60 @@ object "Example Setup"
                         FunctionEvent("Change Water Level").withArgument(128)
                     ).willWait(7.0) // wait 7 seconds before triggering this
                 ])
-            }
+            },
 
-            //
-            // Tip: explore the scripts/functions/ folder for more
-            //      functions you can use with events
-            //
+            // Example: trigger different events when pressing a
+            // Switch multiple times. The events will be triggered
+            // sequentially, like the links of a chain.
+            "e58aecd5740a0547": {
+                "sticky": false,
+                "onActivate": EventChain([
+                    FunctionEvent("Print").withArgument("First time you pressed it"),
+                    FunctionEvent("Print").withArgument("Second time you pressed it"),
+                    FunctionEvent("Print").withArgument("Third time you pressed it"),
+                    FunctionEvent("Print").withArgument("Don't you get tired?"),
+                    FunctionEvent("Print").withArgument("Enough!")
+                ])
+            },
+
+            // Example: trigger alternating events. Raise the water
+            // level and then restore it back to its original level,
+            // again and again, whenever the blue Switch is pressed.
+            "ab5264eabc2564cc": {
+                "color": "blue",
+                "sticky": false,
+                "onActivate": EventChain([
+                    FunctionEvent("Change Water Level").withArgument(128),
+                    FunctionEvent("Change Water Level").withArgument(Level.waterlevel)
+                ]).willLoop()
+            }
         },
 
         //
         // zone 3 only
         //
         "3": {
-            // Example: lock the camera for a boss fight
+            // Example: lock the camera for a boss fight.
             "Event Trigger 4": {
                 "onTrigger": FunctionEvent("Lock Camera").withArgument(800) // give a space of 800 pixels to the right
             },
 
             // Example: extend the locked region after a boss fight.
-            // "My Boss" is a hypothetical entity that triggers onDefeat
+            // "My Boss" is a hypothetical entity that triggers onDefeat.
             "My Boss": {
                 "onDefeat": FunctionEvent("Lock Camera").withArgument(512) // give more 512 pixels of space
             },
 
             // Example: unlock the camera after a mini-boss fight,
-            // so the player can keep moving throughout the level
+            // so the player can keep moving throughout the level.
             "My Mini Boss": {
                 "onDefeat": FunctionEvent("Unlock Camera")
+            },
+
+            // Example: when touching Event Trigger 3, give the player
+            // a bonus of 50 collectibles to prepare for the boss fight!
+            "Event Trigger 3": {
+                "onTrigger": FunctionEvent("Give Lucky Bonus").withArgument(50)
             }
         }
 
