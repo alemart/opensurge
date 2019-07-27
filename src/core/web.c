@@ -167,8 +167,14 @@ char* url_encode(const char* url)
 
     /* create an encoding table */
     if(!encode[0]) {
-        for(int i = 1; i < 256; i++)
-            encode[i] = !(isalnum(i) || (strchr(special, i) != NULL));
+        for(int i = 1; i < 256; i++) {
+            encode[i] = !(
+                (i >= '0' && i <= '9') || /* isalnum depends on the locale */
+                (i >= 'a' && i <= 'z') ||
+                (i >= 'A' && i <= 'Z') ||
+                (strchr(special, i) != NULL)
+            );
+        }
         encode[0] = 1;
     }
 
