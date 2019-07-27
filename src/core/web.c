@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * web.h - Web routines
- * Copyright (C) 2012, 2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2012, 2013, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -169,7 +167,7 @@ char* url_encode(const char* url)
     if(!encode[0]) {
         for(int i = 1; i < 256; i++) {
             encode[i] = !(
-                (i >= '0' && i <= '9') || /* isalnum depends on the locale */
+                (i >= '0' && i <= '9') || /* locale independent */
                 (i >= 'a' && i <= 'z') ||
                 (i >= 'A' && i <= 'Z') ||
                 (strchr(special, i) != NULL)
