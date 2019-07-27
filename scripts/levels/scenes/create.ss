@@ -8,7 +8,6 @@ using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Level;
 using SurgeEngine.Player;
-using SurgeEngine.Input;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Camera;
@@ -16,8 +15,7 @@ using SurgeEngine.Web;
 
 object "CreateMenu"
 {
-    //profiler = spawn("Profiler");
-    input = Input(null);
+    input = Player.active.input;
     fader = spawn("Fader");
     circle = spawn("MenuCircle");
     text = spawn("CreateMenuText");

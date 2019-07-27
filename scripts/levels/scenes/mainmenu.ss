@@ -10,7 +10,6 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Level;
 using SurgeEngine.Actor;
 using SurgeEngine.Player;
-using SurgeEngine.Input;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
@@ -19,8 +18,7 @@ using SurgeEngine.Web;
 
 object "MainMenu"
 {
-    //profiler = spawn("Profiler");
-    input = Input(null);
+    input = Player.active.input;
     fader = spawn("Fader");
     cool = spawn("SurgeCool");
     circle = spawn("SurgeCircle");

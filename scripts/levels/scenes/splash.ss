@@ -4,12 +4,12 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
-using SurgeEngine.Input;
 using SurgeEngine.Level;
+using SurgeEngine.Player;
 
 object "Splash"
 {
-    input = Input(null);
+    input = Player.active.input;
     fader = spawn("Fader");
     waitTime = 2.0;
     fadeTime = 0.5;
