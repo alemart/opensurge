@@ -159,7 +159,7 @@ char ch2hex(unsigned char code) {
 /* returns an encoded version of url */
 char* url_encode(const char* url)
 {
-    static char encode[256] = { 0 }, special[] = ":/-_.?=&~@#$,;";
+    static char encode[256] = { 0 };
     char* buf = mallocx((3 * strlen(url) + 1) * sizeof(char));
     char* p = buf;
 
@@ -170,7 +170,7 @@ char* url_encode(const char* url)
                 (i >= '0' && i <= '9') || /* locale independent */
                 (i >= 'a' && i <= 'z') ||
                 (i >= 'A' && i <= 'Z') ||
-                (strchr(special, i) != NULL)
+                (strchr(":/-_.?=&~@#$,;", i) != NULL)
             );
         }
         encode[0] = 1;
