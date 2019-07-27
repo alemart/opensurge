@@ -28,6 +28,7 @@ object 'Event' is 'event' \n\
 { \n\
     fun call() { } \n\
     fun toString() { return '[missing event]'; } \n\
+    fun destroy() { } \n\
 } \n\
 \n\
 object 'EntityEvent' is 'event' \n\
@@ -69,6 +70,8 @@ object 'EntityEvent' is 'event' \n\
         else \n\
             return 'EntityEvent[missing link]'; \n\
     } \n\
+\n\
+    fun destroy() { } \n\
 } \n\
 \n\
 object 'FunctionEvent' is 'event' \n\
@@ -111,35 +114,8 @@ object 'FunctionEvent' is 'event' \n\
     { \n\
         return 'FunctionEvent[' + target + ']'; \n\
     } \n\
-} \n\
 \n\
-object 'EventList' is 'event' \n\
-{ \n\
-    events = []; \n\
-\n\
-    fun __init(eventList) \n\
-    { \n\
-        if(typeof(eventList) == 'object' && eventList.__name == 'Array') { \n\
-            for(j = 0; j < eventList.length; j++) { \n\
-                event = eventList[j]; \n\
-                if(event.hasTag('event')) \n\
-                    events.push(event); \n\
-            } \n\
-        } \n\
-\n\
-        return this; \n\
-    } \n\
-\n\
-    fun call() \n\
-    { \n\
-        for(j = 0; j < events.length; j++) \n\
-            events[j].call(); \n\
-    } \n\
-\n\
-    fun toString() \n\
-    { \n\
-        return 'EventList[' + events.length + ']'; \n\
-    } \n\
+    fun destroy() { } \n\
 } \n\
 \n\
 object 'DelayedEvent' is 'event' \n\
@@ -185,6 +161,85 @@ object 'DelayedEvent' is 'event' \n\
     { \n\
         return 'DelayedEvent[' + delay + ']'; \n\
     } \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'EventList' is 'event' \n\
+{ \n\
+    events = []; \n\
+\n\
+    fun __init(list) \n\
+    { \n\
+        if(typeof(list) == 'object' && list.__name == 'Array') { \n\
+            for(j = 0; j < list.length; j++) { \n\
+                event = list[j]; \n\
+                if(event.hasTag('event')) \n\
+                    events.push(event); \n\
+            } \n\
+        } \n\
+\n\
+        return this; \n\
+    } \n\
+\n\
+    fun call() \n\
+    { \n\
+        for(j = 0; j < events.length; j++) \n\
+            events[j].call(); \n\
+    } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        return 'EventList[' + events.length + ']'; \n\
+    } \n\
+\n\
+    fun destroy() { } \n\
+} \n\
+\n\
+object 'EventChain' is 'event' \n\
+{ \n\
+    events = []; \n\
+    index = 0; \n\
+    loop = false; \n\
+\n\
+    state 'main' \n\
+    { \n\
+    } \n\
+\n\
+    fun __init(list) \n\
+    { \n\
+        if(typeof(list) == 'object' && list.__name == 'Array') { \n\
+            for(j = 0; j < list.length; j++) { \n\
+                event = list[j]; \n\
+                if(event.hasTag('event')) \n\
+                    events.push(event); \n\
+            } \n\
+        } \n\
+\n\
+        return this; \n\
+    } \n\
+\n\
+    fun call() \n\
+    { \n\
+        if(events.length > 0) { \n\
+            events[index].call(); \n\
+            if(++index >= events.length) \n\
+                index = loop ? 0 : index - 1; \n\
+        } \n\
+    } \n\
+\n\
+    fun willLoop() \n\
+    { \n\
+        loop = true; \n\
+        return this; \n\
+    } \n\
+\n\
+    fun toString() \n\
+    { \n\
+        return 'EventChain[' + events.length + ']'; \n\
+    } \n\
+\n\
+    fun destroy() { } \n\
 } \n\
 ";
 
