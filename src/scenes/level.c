@@ -92,21 +92,21 @@ static void update_dialogregions();
 
 
 /* ------------------------
- * Startup objects
+ * Setup objects
  * ------------------------ */
-#define DEFAULT_STARTUP_OBJECT "Default Setup"
-typedef struct startupobject_list_t startupobject_list_t;
-struct startupobject_list_t {
+#define DEFAULT_SETUP_OBJECT "Default Setup"
+typedef struct setupobject_list_t setupobject_list_t;
+struct setupobject_list_t {
     char *object_name;
-    startupobject_list_t *next;
+    setupobject_list_t *next;
 };
-static startupobject_list_t *startupobject_list;
-static void init_startup_object_list();
-static void release_startup_object_list();
-static void add_to_startup_object_list(const char *object_name);
-static void spawn_startup_objects();
-static bool is_startup_object_list_empty();
-static bool is_startup_object(const char* object_name);
+static setupobject_list_t *setupobject_list;
+static void init_setup_object_list();
+static void release_setup_object_list();
+static void add_to_setup_object_list(const char *object_name);
+static void spawn_setup_objects();
+static bool is_setup_object_list_empty();
+static bool is_setup_object(const char* object_name);
 
 
 
@@ -464,8 +464,8 @@ void level_load(const char *filepath)
     /* entity manager */
     entitymanager_init();
 
-    /* startup objects (1) */
-    init_startup_object_list();
+    /* setup objects (1) */
+    init_setup_object_list();
 
     /* traversing the level file */
     fp = fopen(fullpath, "r");
@@ -510,8 +510,8 @@ void level_load(const char *filepath)
     player_set_collectibles(0);
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
 
-    /* startup objects (2) */
-    spawn_startup_objects(); /* FIX */
+    /* setup objects (2) */
+    spawn_setup_objects();
 
     /* success! */
     logfile_message("The level has been loaded.");
@@ -536,8 +536,8 @@ void level_unload()
     /*music_unref("musics/invincible.ogg");
     music_unref("musics/speed.ogg");*/
 
-    /* releases the startup object list */
-    release_startup_object_list();
+    /* releases the setup object list */
+    release_setup_object_list();
 
     /* entity manager */
     entitymanager_release();
@@ -592,7 +592,7 @@ int level_save(const char *filepath)
     brick_list_t *itb, *brick_list;
     item_list_t *iti, *item_list;
     enemy_list_t *ite, *object_list;
-    startupobject_list_t *its;
+    setupobject_list_t *its;
 
     brick_list = entitymanager_retrieve_all_bricks();
     item_list = entitymanager_retrieve_all_items();
@@ -649,9 +649,9 @@ int level_save(const char *filepath)
     if(strcmp(grouptheme, "") != 0)
         fprintf(fp, "grouptheme \"%s\"\n", grouptheme);
 
-    /* startup objects? */
-    fprintf(fp, "startup");
-    for(its=startupobject_list; its; its=its->next)
+    /* setup objects? */
+    fprintf(fp, "setup");
+    for(its=setupobject_list; its; its=its->next)
         fprintf(fp, " \"%s\"", str_addslashes(its->object_name));
     fprintf(fp, "\n");
 
@@ -949,7 +949,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             const char* name = param[0];
             int x = atoi(param[1]);
             int y = atoi(param[2]);
-            if(!is_startup_object(name)) {
+            if(!is_setup_object(name)) {
                 surgescript_object_t* obj = level_create_object(name, v2d_new(x, y));
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
@@ -964,17 +964,20 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
     }
-    else if(str_icmp(identifier, "startup") == 0) {
-        if(is_startup_object_list_empty()) {
+    else if(
+        str_icmp(identifier, "setup") == 0 ||
+        str_icmp(identifier, "startup") == 0 /* retro-compatibility */
+    ) {
+        if(is_setup_object_list_empty()) {
             if(param_count > 0) {
                 for(int i = param_count - 1; i >= 0; i--)
-                    add_to_startup_object_list(param[i]);
+                    add_to_setup_object_list(param[i]);
             }
             else
-                logfile_message("Level loader - command 'startup' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]");
+                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", identifier);
         }
         else
-            logfile_message("Level loader - duplicate command 'startup' on line %d. Ignoring... (note: 'startup' accepts one or more parameters)", fileline);
+            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring... (note: the command accepts one or more parameters)", identifier, fileline);
     }
     else if(str_icmp(identifier, "players") == 0) {
         if(team_size == 0) {
@@ -1011,12 +1014,15 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
     }
-    else if(str_icmp(identifier, "enemy") == 0 || str_icmp(identifier, "object") == 0) {
+    else if(
+        str_icmp(identifier, "object") == 0 ||
+        str_icmp(identifier, "enemy") == 0 /* retro-compatibility */
+    ) {
         if(param_count == 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
             int y = atoi(param[2]);
-            if(!is_startup_object(name)) {
+            if(!is_setup_object(name)) {
                 surgescript_object_t* obj = level_create_object(name, v2d_new(x, y));
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
@@ -1697,7 +1703,7 @@ surgescript_object_t* level_create_object(const char* object_name, v2d_t positio
                will not have this flag set to true */
             surgescript_tagsystem_has_tag(tag_system, object_name, "entity") &&
             !surgescript_tagsystem_has_tag(tag_system, object_name, "private") &&
-            !is_startup_object(object_name)
+            !is_setup_object(object_name)
         ;
         return spawn_ssobject(object_name, position, spawned_in_the_editor);
     }
@@ -2388,20 +2394,20 @@ void update_dialogregions()
 
 
 
-/* startup objects */
+/* setup objects */
 
-/* initializes the startup object list */
-void init_startup_object_list()
+/* initializes the setup object list */
+void init_setup_object_list()
 {
-    startupobject_list = NULL;
+    setupobject_list = NULL;
 }
 
-/* releases the startup object list */
-void release_startup_object_list()
+/* releases the setup object list */
+void release_setup_object_list()
 {
-    startupobject_list_t *me, *next;
+    setupobject_list_t *me, *next;
 
-    for(me=startupobject_list; me; me=next) {
+    for(me=setupobject_list; me; me=next) {
         next = me->next;
         free(me->object_name);
         free(me);
@@ -2409,30 +2415,30 @@ void release_startup_object_list()
 }
 
 /* empty list? */
-bool is_startup_object_list_empty()
+bool is_setup_object_list_empty()
 {
-    return startupobject_list == NULL;
+    return setupobject_list == NULL;
 }
 
-/* adds a new object to the startup object list */
+/* adds a new object to the setup object list */
 /* (actually it inserts the new object in the first position of the linked list) */
-void add_to_startup_object_list(const char *object_name)
+void add_to_setup_object_list(const char *object_name)
 {
-    startupobject_list_t *first_node = mallocx(sizeof *first_node);
+    setupobject_list_t *first_node = mallocx(sizeof *first_node);
     first_node->object_name = str_dup(object_name);
-    first_node->next = startupobject_list;
-    startupobject_list = first_node;
+    first_node->next = setupobject_list;
+    setupobject_list = first_node;
 }
 
-/* spawns the startup objects */
-void spawn_startup_objects()
+/* spawns the setup objects */
+void spawn_setup_objects()
 {
-    startupobject_list_t *me;
+    setupobject_list_t *me;
 
-    if(startupobject_list == NULL)
-        add_to_startup_object_list(DEFAULT_STARTUP_OBJECT);
+    if(setupobject_list == NULL)
+        add_to_setup_object_list(DEFAULT_SETUP_OBJECT);
 
-    for(me=startupobject_list; me; me=me->next) {
+    for(me=setupobject_list; me; me=me->next) {
         /* try to create an object using the SurgeScript API.
            if this is not possible, use the legacy API. */
         if(!level_create_object(me->object_name, v2d_new(0, 0))) {
@@ -2441,22 +2447,22 @@ void spawn_startup_objects()
                 e->created_from_editor = FALSE;
             }
             else {
-                logfile_message("Missing startup script: %s", me->object_name);
-                video_showmessage("Missing startup script: %s", me->object_name);
+                logfile_message("Missing setup object: %s", me->object_name);
+                video_showmessage("Missing setup object: %s", me->object_name);
             }
         }
     }
 }
 
-/* check if object_name is in the startup object list */
-bool is_startup_object(const char* object_name)
+/* check if object_name is in the setup object list */
+bool is_setup_object(const char* object_name)
 {
-    for(startupobject_list_t* me = startupobject_list; me != NULL; me = me->next) {
+    for(setupobject_list_t* me = setupobject_list; me != NULL; me = me->next) {
         if(str_icmp(object_name, me->object_name) == 0)
             return true;
     }
 
-    if(str_icmp(object_name, DEFAULT_STARTUP_OBJECT) == 0)
+    if(str_icmp(object_name, DEFAULT_SETUP_OBJECT) == 0)
         return true;
 
     return false;

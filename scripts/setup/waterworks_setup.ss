@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: waterworks.ss
-// Description: startup object for Waterworks Zone
+// Description: setup object for Waterworks Zone
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------

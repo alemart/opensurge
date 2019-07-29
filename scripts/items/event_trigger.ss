@@ -28,7 +28,7 @@ using SurgeEngine.Collisions.CollisionBox;
 //
 // To define the specific events, you may use
 // a level setup script that runs on the level
-// startup. Example:
+// setup. Example:
 //
 // using SurgeEngine.Level;
 // using SurgeEngine.Events.FunctionEvent;

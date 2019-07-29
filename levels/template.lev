@@ -15,7 +15,7 @@ theme "themes/template.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 184 9976
 music "musics/template.ogg"
-startup "Default Setup" "Example Setup"
+setup "Default Setup" "Example Setup"
 players "Surge" "Neon"
 waterlevel 10944
 

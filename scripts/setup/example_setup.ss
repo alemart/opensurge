@@ -36,9 +36,9 @@ The exact properties of an entity can be found in its script
 
 To associate a setup script with a particular level, open the
 .lev file with a text editor and add the name of the setup
-object (e.g., "Example Setup") to the startup field. Example:
+object (e.g., "Example Setup") to the setup field. Example:
 
-    startup "Default Setup" "Example Setup"
+    setup "Default Setup" "Example Setup"
 
 Happy hacking! ;)
 

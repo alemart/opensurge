@@ -175,7 +175,7 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     surgescript_objecthandle_t child = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
 
     /* must the new object be an entity? */
-    /* well, no... startup objects may not be entities */
+    /* well, no... setup objects may not be entities */
     /*if(1 || surgescript_tagsystem_has_tag(tag_system, child_name, "entity"))*/
 
     /* store its reference, so it won't be Garbage Collected */

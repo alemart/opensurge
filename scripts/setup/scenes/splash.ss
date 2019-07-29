@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: splash.ss
-// Description: a startup object for displaying a Splash Screen
+// Description: a setup object for displaying a Splash Screen
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------

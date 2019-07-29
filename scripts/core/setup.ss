@@ -9,18 +9,18 @@
 
 //
 // Need to hack this?
-// It's not recommended to change this object. You may want to copy this object,
-// give it a different name and change the "startup" parameter on the .lev file.
+// It's not recommended to change this object. Instead, copy this object, give
+// it a different name and change the setup field on the .lev file accordingly.
 //
 object "Default Setup"
 {
-    hud = null;
     cam = spawn("Default Camera");
     switchController = spawn("Switch Controller");
     pauseController = spawn("Pause and Quit");
     waterController = spawn("Water Controller");
     clearedAnim = spawn("Default Cleared Animation");
     openingAnim = spawn("Default Opening Animation");
+    hud = null;
 
     state "main"
     {
