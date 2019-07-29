@@ -17,7 +17,7 @@ using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
 
 /*
-                     SETUP SCRIPT
+                      SETUP SCRIPT
 
 The setup script is used to set up entities and data in a level.
 Below you'll find a configuration object partitioned into zones.
@@ -90,9 +90,15 @@ object "Example Setup"
 
             // Example: configuring an event. An event is something that
             // may be triggered during gameplay. This will print a message
-            // as soon as the player touches an "Event Trigger 1" entity.
+            // as soon as the player touches an Event Trigger 1 entity.
             "Event Trigger 1": {
                 "onTrigger": FunctionEvent("Print").withArgument("Hello! Give me pizza!")
+            },
+
+            // Example: lock the camera as soon as the player touches an
+            // Event Trigger 4 entity, ideally placed near the goal flag.
+            "Event Trigger 4": {
+                "onTrigger": FunctionEvent("Lock Camera").withArgument(2048) // give a maximum space of 2048 pixels to the right
             },
 
             // Example: collapse a specific Bridge (ID: 481c9ccb42a38268)
@@ -172,21 +178,30 @@ object "Example Setup"
         // zone 3 only
         //
         "3": {
-            // Example: lock the camera for a boss fight.
+            // Example: start a boss fight!
             "Event Trigger 4": {
-                "onTrigger": FunctionEvent("Lock Camera").withArgument(800) // give a space of 800 pixels to the right
+                "onTrigger": EventList([
+                    FunctionEvent("Play Boss Music"),
+                    FunctionEvent("Lock Camera").withArgument(800) // lock camera with a space of 800 pixels to the right
+                ])
             },
 
             // Example: extend the locked region after a boss fight.
             // "My Boss" is a hypothetical entity that triggers onDefeat.
             "My Boss": {
-                "onDefeat": FunctionEvent("Lock Camera").withArgument(512) // give more 512 pixels of space
+                "onDefeat": EventList([
+                    FunctionEvent("Stop Boss Music"),
+                    FunctionEvent("Lock Camera").withArgument(512) // give more 512 pixels of space
+                ])
             },
 
             // Example: unlock the camera after a mini-boss fight,
             // so the player can keep moving throughout the level.
             "My Mini Boss": {
-                "onDefeat": FunctionEvent("Unlock Camera")
+                "onDefeat": EventList([
+                    FunctionEvent("Stop Boss Music"),
+                    FunctionEvent("Unlock Camera")
+                ])
             },
 
             // Example: when touching Event Trigger 3, give the player
