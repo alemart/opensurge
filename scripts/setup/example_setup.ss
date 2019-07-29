@@ -31,8 +31,8 @@ each entity is uniquely identified by its ID.
 Entities may be referenced in the configuration object using
 their names or their unique IDs. Once you reference an entity,
 you may change its properties following the template below.
-The exact properties of an entity can be found in its script
-(look for the public keyword).
+The exact properties of an entity can be found by inspecting
+it in the level editor.
 
 To associate a setup script with a particular level, open the
 .lev file with a text editor and add the name of the setup
@@ -61,10 +61,11 @@ object "Example Setup"
             // the configuration below is just an example
             // (modify at will, but backup this file first!)
 
-            // Example: configuring all Bridges.
+            // Example: configuring all Bridges. Setting their
+            // length and their animation number.
             "Bridge": {
                 "length": 12, // length 12 is the default
-                "anim": 1
+                "anim": 1     // animation number (the sprite is "Bridge")
             },
 
             // Example: configuring all Elevators.
