@@ -36,6 +36,7 @@ object 'EntityEvent' is 'event' \n\
     target = ''; \n\
     method = 'call'; \n\
     params = []; \n\
+    arity = 0; \n\
 \n\
     fun __init(entityId) \n\
     { \n\
@@ -52,14 +53,23 @@ object 'EntityEvent' is 'event' \n\
     fun withArgument(x) \n\
     { \n\
         params.push(x); \n\
+        arity++; \n\
         return this; \n\
     } \n\
 \n\
     fun call() \n\
     { \n\
         entity = Level.entity(target); \n\
-        if(entity !== null && entity.hasFunction(method)) \n\
-            entity.__invoke(method, params); \n\
+        if(entity !== null && entity.hasFunction(method)) { \n\
+            if(entity.__arity(method) == arity) \n\
+                entity.__invoke(method, params); \n\
+            else \n\
+                Console.print(this.__name + ': incorrect arguments for ' + method); \n\
+        } \n\
+        else if(entity !== null) \n\
+            Console.print(this.__name + ': undefined function ' + method); \n\
+        else \n\
+            Console.print(this.__name + ': missing entity ' + target); \n\
     } \n\
 \n\
     fun toString() \n\
@@ -80,6 +90,7 @@ object 'FunctionEvent' is 'event' \n\
     method = 'call'; \n\
     functor = null; \n\
     params = []; \n\
+    arity = 0; \n\
 \n\
     fun __init(func) \n\
     { \n\
@@ -96,6 +107,7 @@ object 'FunctionEvent' is 'event' \n\
     fun withArgument(x) \n\
     { \n\
         params.push(x); \n\
+        arity++; \n\
         return this; \n\
     } \n\
 \n\
@@ -105,9 +117,15 @@ object 'FunctionEvent' is 'event' \n\
             functor = spawn(target); \n\
 \n\
         if(functor != null && functor.hasFunction(method)) { \n\
-            if(functor.__name === target)" /* just to be sure */ " \n\
-                functor.__invoke(method, params); \n\
+            if(functor.__arity(method) == arity) { \n\
+                if(functor.__name === target)" /* just to be sure */ " \n\
+                    functor.__invoke(method, params); \n\
+            } \n\
+            else \n\
+                Console.print(this.__name + ': incorrect arguments for ' + target); \n\
         } \n\
+        else \n\
+            Console.print(this.__name + ': undefined function object ' + target); \n\
     } \n\
 \n\
     fun toString() \n\

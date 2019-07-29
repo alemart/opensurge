@@ -75,9 +75,6 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     /* synchronize volume property with the built-in volume of the engine */
     if(music != NULL && music_current() == music) {
         surgescript_heap_t* heap = surgescript_object_heap(object);
-
-        /* NOTE: unsure about the performance of music_get_volume(),
-                 as it is implementation-defined */
         surgescript_var_set_number(surgescript_heap_at(heap, VOLUME_ADDR), music_get_volume());
     }
 
