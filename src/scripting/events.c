@@ -39,13 +39,13 @@ object 'EntityEvent' is 'event' \n\
 \n\
     fun __init(entityId) \n\
     { \n\
-        target = entityId || ''; \n\
+        target = String(entityId || ''); \n\
         return this; \n\
     } \n\
 \n\
     fun willCall(functionName) \n\
     { \n\
-        method = functionName || 'call'; \n\
+        method = String(functionName || 'call'); \n\
         return this; \n\
     } \n\
 \n\
