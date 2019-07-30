@@ -126,8 +126,10 @@ static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
     const image_t* img = sprite_get_image(anim, 0);
     v2d_t hot_spot = anim->hot_spot;
     v2d_t position = scripting_util_world_position(r.ssobject);
-    v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    image_draw(img, position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
+    if(level_inside_screen(position.x - hot_spot.x, position.y - hot_spot.y, image_width(img), image_height(img))) {
+        v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+        image_draw(img, position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
+    }
 }
 static void render_background(renderable_t r, v2d_t camera_position) { background_render_bg(r.theme, camera_position); }
 static void render_foreground(renderable_t r, v2d_t camera_position) { background_render_fg(r.theme, camera_position); }
