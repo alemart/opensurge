@@ -274,8 +274,6 @@ enum editor_entity_type {
                 ((t) == EDITORGRP_ENTITY_ITEM) ? EDT_ITEM : \
                 EDT_ENEMY );
 
-
-
 /* internal stuff */
 static int editor_enabled; /* is the level editor enabled? */
 static int editor_previous_video_resolution;
@@ -322,6 +320,7 @@ static void editor_previous_object_category();
 /* editor: SurgeScript entities */
 static char** editor_ssobj; /* the names of all SurgeScript entities; a vector of strings */
 static int editor_ssobj_count; /* length of editor_ssobj */
+static struct { char name[256]; uint64_t id; } editor_ssobj_picked_entity; /* recently picked entity */
 static void editor_ssobj_init();
 static void editor_ssobj_release();
 static int editor_ssobj_sortfun(const void* a, const void* b);
@@ -358,7 +357,6 @@ static const char* editor_tooltip_ssproperties(surgescript_object_t* object);
 static void editor_tooltip_ssproperties_add(const char* object_name, void* data);
 static const char* editor_tooltip_ssproperties_file(surgescript_object_t* object);
 
-
 /* implementing UNDO and REDO */
 
 /* in order to implement UNDO and REDO,
@@ -382,6 +380,7 @@ typedef struct editor_action_t {
     v2d_t obj_old_position;
     bricklayer_t layer;
     brickflip_t flip;
+    uint64_t ssobj_id;
 } editor_action_t;
 
 /* action: constructors */
@@ -472,9 +471,11 @@ void level_load(const char *filepath)
     if(fp != NULL) {
         int ln = 0;
         while(fgets(line, sizeof(line) / sizeof(char), fp)) {
-            char *q = line + strlen(line) - 1;
-            if(*q == '\n') *q = '\0'; /* no newlines, please! */
-            level_interpret_line(fullpath, ++ln, line);
+            if(*line) {
+                char *q = line + strlen(line) - 1;
+                if(*q == '\n') *q = '\0'; /* no newlines, please! */
+                level_interpret_line(fullpath, ++ln, line);
+            }
         }
         fclose(fp);
     }
@@ -626,7 +627,7 @@ int level_save(const char *filepath)
     /* author */
     fprintf(fp, "author \"%s\"\n", str_addslashes(author));
     if(strcmp(license, "") != 0)
-        fprintf(fp, "license \"%s\"\n", license);
+        fprintf(fp, "license \"%s\"\n", str_addslashes(license));
 
     /* level attributes */
     fprintf(fp, 
@@ -3194,14 +3195,18 @@ void editor_update()
                 surgescript_object_t* ssobject = NULL;
                 surgescript_object_traverse_tree_ex(level_ssobject(), &ssobject, editor_pick_ssobj);
                 if(ssobject != NULL) {
-                    int ssobj_id = editor_ssobj_id(surgescript_object_name(ssobject));
+                    int obj_id = editor_ssobj_id(surgescript_object_name(ssobject));
                     if(!pick_object) {
-                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, ssobj_id, scripting_util_world_position(ssobject));
+                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, obj_id, scripting_util_world_position(ssobject));
+                        eda.ssobj_id = get_ssobj_id(ssobject);
                         editor_action_commit(eda);
                         editor_action_register(eda);
                     }
-                    else
-                        editor_cursor_entity_id = ssobj_id;
+                    else {
+                        editor_cursor_entity_id = obj_id;
+                        editor_ssobj_picked_entity.id = get_ssobj_id(ssobject);
+                        str_cpy(editor_ssobj_picked_entity.name, surgescript_object_name(ssobject), sizeof(editor_ssobj_picked_entity.name));
+                    }
                 }
                 break;               
             }
@@ -3915,6 +3920,8 @@ void editor_ssobj_init()
 
     editor_ssobj = NULL;
     editor_ssobj_count = 0;
+    editor_ssobj_picked_entity.id = 0;
+    editor_ssobj_picked_entity.name[0] = '\0';
 
     /* count SurgeScript objects tagged as "entity" */
     surgescript_tagsystem_foreach_tagged_object(tag_system, "entity", &editor_ssobj_count, editor_ssobj_register);
@@ -4310,6 +4317,7 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
     o.obj_old_position = obj_position;
     o.layer = editor_layer;
     o.flip = editor_flip;
+    o.ssobj_id = 0;
 
     /* are we removing a brick? Store its layer & flip flags */
     if(!is_new_object && obj_type == EDT_BRICK) {
@@ -4340,6 +4348,7 @@ editor_action_t editor_action_spawnpoint_new(int is_changing, v2d_t obj_position
     o.obj_type = EDT_ITEM;
     o.layer = editor_layer;
     o.flip = editor_flip;
+    o.ssobj_id = 0;
     return o;
 }
 
@@ -4511,7 +4520,29 @@ void editor_action_commit(editor_action_t action)
 
             case EDT_SSOBJ: {
                 /* new SurgeScript object */
-                level_create_object(editor_ssobj_name(action.obj_id), action.obj_position);
+                surgescript_object_t* ssobj = level_create_object(editor_ssobj_name(action.obj_id), action.obj_position);
+
+                /* recover entity ID */
+                ssobj_extradata_t* data = get_ssobj_extradata(ssobj);
+                if(data != NULL) {
+                    uint64_t recovered_id;
+
+                    /* what is the ID to recover? */
+                    if(action.ssobj_id != 0)
+                        recovered_id = action.ssobj_id; /* undo? */
+                    else if(editor_ssobj_picked_entity.id != 0 && strcmp(surgescript_object_name(ssobj), editor_ssobj_picked_entity.name) == 0)
+                        recovered_id = editor_ssobj_picked_entity.id; /* picked entity? */
+                    else
+                        recovered_id = 0; /* give a new ID */
+
+                    /* enforce uniqueness */
+                    if(recovered_id != 0) {
+                        if(level_get_entity_by_id(x64_to_str(recovered_id, NULL, 0)) == NULL)
+                            data->entity_id = recovered_id;
+                    }
+                }
+                editor_ssobj_picked_entity.id = 0;
+                editor_ssobj_picked_entity.name[0] = '\0';
                 break;
             }
 
@@ -4617,8 +4648,10 @@ bool editor_remove_ssobj(surgescript_object_t* object, void* data)
             editor_action_t *action = (editor_action_t*)data;
             if(editor_ssobj_id(object_name) == action->obj_id) {
                 v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
-                if(nearly_equal(v2d_magnitude(delta), 0.0f))
+                if(nearly_equal(v2d_magnitude(delta), 0.0f)) {
                     surgescript_object_kill(object);
+                    clear_ssobj_extradata(object);
+                }
             }
         }
 
