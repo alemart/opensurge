@@ -71,12 +71,6 @@ object "Example Setup"
             // Example: configuring all Elevators.
             "Elevator": {
                 "anim": 2 // animation number
-            },
-
-            // Example: making a specific Door become red.
-            // (suppose its ID is 532ab77cef1252ae)
-            "532ab77cef1252ae": {
-                "color": "red"
             }
         },
 
@@ -87,6 +81,12 @@ object "Example Setup"
             // Example: configuring the Background Exchanger for zone 1.
             "Background Exchanger": {
                 "background": "themes/template.bg"
+            },
+
+            // Example: making a specific Door become red.
+            // (suppose its ID is 532ab77cef1252ae)
+            "532ab77cef1252ae": {
+                "color": "red"
             },
 
             // Example: configuring an event. An event is something that
