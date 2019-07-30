@@ -242,7 +242,7 @@ object "Bridge Element" is "entity", "private"
                 timer = 1;
 
             // update graphics
-            targetFrame = Math.floor((timer * factor * factor) * (actor.animation.frameCount - 1));
+            targetFrame = Math.floor(Math.sin(ninety * factor) * (actor.animation.frameCount - 1));
             actor.animation.frame = targetFrame;
 
             // update position
