@@ -31,6 +31,8 @@ static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
 #define BUTTON_UP             0x5979CA        /* hash("up") */
@@ -64,6 +66,8 @@ void scripting_register_input(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Input", "buttonPressed", fun_buttonpressed, 1);
     surgescript_vm_bind(vm, "Input", "buttonReleased", fun_buttonreleased, 1);
     surgescript_vm_bind(vm, "Input", "simulateButton", fun_simulatebutton, 2);
+    surgescript_vm_bind(vm, "Input", "get_enabled", fun_getenabled, 0);
+    surgescript_vm_bind(vm, "Input", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Input", "__init", fun_init, 1);
 }
 
@@ -224,6 +228,30 @@ surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surges
     return NULL;
 }
 
+/* is the input object enabled? */
+surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    input_t* input = (input_t*)surgescript_object_userdata(object);
+    return surgescript_var_set_bool(surgescript_var_create(), !input_is_ignored(input));
+}
+
+/* enable or disable the input object */
+surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    input_t* input = (input_t*)surgescript_object_userdata(object);
+    bool enabled = surgescript_var_get_bool(param[0]);
+
+    if(enabled) {
+        if(input_is_ignored(input))
+            input_restore(input);
+    }
+    else {
+        if(!input_is_ignored(input))
+            input_ignore(input);
+    }
+
+    return NULL;
+}
 
 /* -- private -- */
 

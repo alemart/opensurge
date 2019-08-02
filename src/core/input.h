@@ -73,7 +73,6 @@ void input_simulate_button_up(input_t *in, inputbutton_t button);
 void input_ignore(input_t *in);
 void input_restore(input_t *in);
 bool input_is_ignored(input_t *in);
-void input_clear(input_t *in);
 
 /* these will only work for a mouse input device */
 v2d_t input_get_xy(inputmouse_t *in);

@@ -104,6 +104,7 @@ static input_list_t *inlist;
 /* private methods */
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
+static inline void input_clear(input_t *in);
 
 
 
@@ -314,14 +315,14 @@ input_t *input_create_mouse()
 {
     inputmouse_t *me = mallocx(sizeof *me);
     input_t *in = (input_t*)me;
-    int i;
 
     in->update = inputmouse_update;
     in->enabled = true;
-    for(i=0; i<IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = false;
-
-    me->dx = me->dy = me->x = me->y = 0;
+    me->dx = 0;
+    me->dy = 0;
+    me->x = 0;
+    me->y = 0;
+    input_clear(in);
 
     input_register(in);
     return in;
@@ -339,12 +340,10 @@ input_t *input_create_computer()
 {
     inputcomputer_t *me = mallocx(sizeof *me);
     input_t *in = (input_t*)me;
-    int i;
 
     in->update = inputcomputer_update;
     in->enabled = true;
-    for(i=0; i<IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = false;
+    input_clear(in);
 
     input_register(in);
     return in;
@@ -358,12 +357,10 @@ input_t *input_create_user(const char* inputmap_name)
 {
     inputuserdefined_t *me = mallocx(sizeof *me);
     input_t *in = (input_t*)me;
-    int i;
 
     in->update = inputuserdefined_update;
     in->enabled = true;
-    for(i=0; i<IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = false;
+    input_clear(in);
 
     /* if there isn't such a inputmap_name, the game will exit beautifully */
     inputmap_name = inputmap_name ? inputmap_name : DEFAULT_INPUTMAP_NAME;
@@ -425,17 +422,6 @@ bool input_is_ignored(input_t *in)
 }
 
 
-
-
-/*
- * input_clear()
- * Clears all the input buttons
- */
-void input_clear(input_t *in)
-{
-    for(int i = 0; i < IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = false;
-}
 
 
 
@@ -597,6 +583,13 @@ void input_unregister(input_t *in)
             node->next = next;
         }
     }
+}
+
+/* clears all the input buttons */
+void input_clear(input_t *in)
+{
+    for(int i = 0; i < IB_MAX; i++)
+        in->state[i] = in->oldstate[i] = false;
 }
 
 /* update specific input devices */
