@@ -1324,10 +1324,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* I'm on the edge */
-    if(!pa->in_the_air && nearly_equal(pa->gsp, 0.0f) && pa->state != PAS_PUSHING && pa->movmode == MM_FLOOR) {
+    if(
+        !pa->in_the_air && pa->movmode == MM_FLOOR && nearly_equal(pa->gsp, 0.0f) &&
+        !(pa->state == PAS_LEDGE || pa->state == PAS_PUSHING)
+    ) {
         const sensor_t* s = at_A ? sensor_A(pa) : sensor_B(pa);
         int x = (int)pa->position.x;
-        int y = (int)pa->position.y + sensor_get_y2(s);
+        int y = (int)pa->position.y + sensor_get_y2(s) + 8;
         if(at_A != NULL && at_B == NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
             pa->state = PAS_LEDGE;
             pa->facing_right = TRUE;
