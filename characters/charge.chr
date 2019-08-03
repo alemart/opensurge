@@ -9,6 +9,8 @@
 
 character "Charge"
 {
+    companions                      "Roll Smoke"
+
     multipliers
     {
         acceleration                1.0
