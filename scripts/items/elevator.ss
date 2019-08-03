@@ -90,6 +90,7 @@ object "Elevator" is "entity", "gimmick"
         collider.setAnchor(0, 1);
         //collider.visible = true;
         lineCollider.setAnchor(0, 0);
+        actor.zindex = 0.65;
     }
 
     fun setup()
