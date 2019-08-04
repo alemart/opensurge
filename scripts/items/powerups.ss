@@ -286,20 +286,17 @@ object "Item Box" is "entity", "private"
     fun crush(player)
     {
         if(state != "crushed") {
+            // where should we spawn the sprites?
+            actionSpot = transform.position.translatedBy(0, -actor.height * 0.7);
+
             // create explosion & item box icon
-            Level.spawnEntity(
-                "Explosion",
-                transform.position.translatedBy(0, -actor.height * 0.7)
-            );
-            Level.spawnEntity(
-                "Item Box Icon",
-                transform.position.translatedBy(0, -actor.height * 0.7)
-            ).setIcon(actor.anim);
+            Level.spawnEntity("Explosion", actionSpot);
+            Level.spawnEntity("Item Box Icon", actionSpot).setIcon(actor.anim);
 
             // add to score
             if(score != 0) {
                 player.score += score;
-                Level.spawnEntity("Score Text", collider.center).setText(score);
+                Level.spawnEntity("Score Text", actionSpot).setText(score);
             }
 
             // crush the item box
@@ -335,19 +332,20 @@ object "Item Box Icon" is "entity", "private", "disposable"
 {
     actor = Actor("Item Box Icon");
     transform = Transform();
-    speed = 40;
+    speed = 50;
     hscale = 1;
+    timeToLive = 2.0;
 
     state "main"
     {
         transform.move(0, -speed * Time.delta);
-        if(timeout(1.0))
+        if(timeout(timeToLive * 0.25))
             state = "wait";
     }
 
     state "wait"
     {
-        if(timeout(1.5))
+        if(timeout(timeToLive * 0.75))
             state = "disappear";
     }
 
