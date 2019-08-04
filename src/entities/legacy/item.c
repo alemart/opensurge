@@ -197,7 +197,9 @@ const char* item2surgescript(int type)
         [IT_TELEPORTER] = "Teleporter",
         [IT_SWITCH] = ".compat_switch",
         [IT_LOOPGREEN] = ".compat_loopgreen",
-        [IT_LOOPYELLOW] = ".compat_loopyellow"
+        [IT_LOOPYELLOW] = ".compat_loopyellow",
+        [IT_PERSPIKES] = ".compat_perspikes",
+        [IT_PERCEILSPIKES] = ".compat_perceilspikes"
     };
 
     /* return the object name */

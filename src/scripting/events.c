@@ -96,7 +96,7 @@ object 'EntityEvent' is 'event' \n\
 \n\
     fun unique(target) \n\
     { \n\
-        return (typeof(target) == 'object' && target.__name == trgnam) ? target : Level.entity(target);\n\
+        return (target != null && typeof(target) == 'object' && target.__name == trgnam) ? target : Level.entity(target);\n\
     } \n\
 \n\
     fun toString() \n\

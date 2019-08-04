@@ -40,6 +40,34 @@ object ".compat_loopyellow" is "private", "entity"
     }
 }
 
+object ".compat_perspikes" is "private", "entity"
+{
+    spikes = spawn("Spikes");
+
+    state "main"
+    {
+    }
+
+    fun constructor()
+    {
+        spikes.periodic = true;
+    }
+}
+
+object ".compat_perceilspikes" is "private", "entity"
+{
+    spikes = spawn("Spikes Down");
+
+    state "main"
+    {
+    }
+
+    fun constructor()
+    {
+        spikes.periodic = true;
+    }
+}
+
 object ".compat_switch" is "private", "entity"
 {
     obj = spawn("Switch");
