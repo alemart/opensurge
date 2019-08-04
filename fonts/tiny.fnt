@@ -1,0 +1,17 @@
+// -----------------------------------------------------------------------------
+// File: tiny.fnt
+// Description: script for the Tom Thumb Tiny ASCII font by Robey Pointer
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "tiny"
+{
+    bitmap
+    {
+        source_file             "fonts/tiny.png"
+        source_rect             0 7 160 21
+        frame_size              5 7
+        keymap                  " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\x60abcdefghijklmnopqrstuvwxyz{|}~\x7f"
+    }
+}
