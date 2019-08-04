@@ -9,7 +9,7 @@
 
 character "Tux"
 {
-    companions                      "Super Peel Out" "Roll Smoke"
+    companions                      "Super Peel Out" "Dash Smoke" "Brake Smoke"
 
     multipliers
     {

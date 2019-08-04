@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: roll_smoke.ss
-// Description: roll smoke effect (companion object)
+// File: dash_smoke.ss
+// Description: dash smoke effect (companion object)
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -11,10 +11,10 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 
 //
-// Roll Smoke is a companion object that produces a
+// Dash Smoke is a companion object that produces a
 // neat smoke effect when the player is charging a dash
 //
-object "Roll Smoke"
+object "Dash Smoke"
 {
     player = parent;
     dy = 0;
@@ -34,7 +34,7 @@ object "Roll Smoke"
             spawnSmoke(1.0);
             state = "main";
         }
-        else if(timeout(0.35)) {
+        else if(timeout(0.25)) {
             spawnSmoke(0.75);
             state = "cool out";
         }
@@ -49,39 +49,9 @@ object "Roll Smoke"
     {
         if(!player.midair) {
             Level.spawnEntity(
-                "Roll Smoke Sprite",
+                "Speed Smoke",
                 player.collider.center.translatedBy(player.direction * -22, dy - 3)
             ).setDirection(player.direction).setScale(scale);
         }
-    }
-}
-
-object "Roll Smoke Sprite" is "entity", "private", "disposable"
-{
-    actor = Actor("Roll Smoke");
-    transform = Transform();
-
-    state "main"
-    {
-        if(actor.animation.finished)
-            destroy();
-    }
-
-    fun setOffset(x, y)
-    {
-        actor.offset = Vector2(x, y);
-        return this;
-    }
-
-    fun setDirection(direction)
-    {
-        actor.hflip = (direction < 0);
-        return this;
-    }
-
-    fun setScale(scale)
-    {
-        transform.localScale = Vector2(scale, scale);
-        return this;
     }
 }

@@ -12,7 +12,7 @@ version "1.0"
 requires "0.5.0"
 act 1
 theme "themes/template.brk"
-bgtheme "themes/sunshine.bg"
+bgtheme "themes/template.bg"
 spawn_point 184 9976
 music "musics/template.ogg"
 setup "Default Setup" "Example Setup"

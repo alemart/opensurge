@@ -4,6 +4,8 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine.Level;
+using SurgeEngine.Vector2;
 using SurgeEngine.Audio.Sound;
 
 //
@@ -46,11 +48,25 @@ object "Super Peel Out"
             if(timeout(0.3)) {
                 player.gsp = speed * player.direction; // dash!!!
                 release.play();
+                spawnSmoke();
             }
             player.frozen = false; // enable physics
             state = "main";
         }
         else if(player.input.buttonPressed("fire1"))
             charge.play();
+    }
+
+    fun spawnSmoke()
+    {
+        if(!player.midair) {
+            Level.spawnEntity(
+                "Speed Smoke",
+                Vector2(
+                    player.collider.center.x - player.direction * 22,
+                    player.collider.bottom - 3
+                )
+            ).setDirection(player.direction);
+        }
     }
 }

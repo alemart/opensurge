@@ -1,14 +1,30 @@
 // -----------------------------------------------------------------------------
-// File: roll_smoke.spr
+// File: smoke.spr
 // Description: sprite definition for a smoke sprite
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// art by klausdell
-sprite "Roll Smoke"
+// art by KnoblePersona
+sprite "Smoke"
 {
-    source_file     "images/roll_smoke.png"
+    source_file     "images/smoke.png"
+    source_rect     0 0 64 32
+    frame_size      16 16
+    hot_spot        8 8
+
+    animation 0
+    {
+        repeat      FALSE
+        fps         16
+        data        0 1 2 3 4 5 6 7
+    }
+}
+
+// art by klausdell
+sprite "Speed Smoke"
+{
+    source_file     "images/speed_smoke.png"
     source_rect     0 0 832 64
     frame_size      64 64
     hot_spot        32 48

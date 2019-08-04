@@ -9,7 +9,7 @@
 
 character "Surge"
 {
-    companions                      "Surge's Light Sneakers" "Roll Smoke"
+    companions                      "Surge's Light Sneakers" "Dash Smoke" "Brake Smoke"
     
     multipliers
     {
