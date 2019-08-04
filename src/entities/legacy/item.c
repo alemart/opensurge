@@ -194,6 +194,7 @@ const char* item2surgescript(int type)
         [IT_SPIKES] = "Spikes",
         [IT_CEILSPIKES] = "Spikes Down",
         [IT_DOOR] = "Door",
+        [IT_TELEPORTER] = "Teleporter",
         [IT_SWITCH] = ".compat_switch",
         [IT_LOOPGREEN] = ".compat_loopgreen",
         [IT_LOOPYELLOW] = ".compat_loopyellow"
