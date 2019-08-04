@@ -76,7 +76,7 @@ object "Platformer" is "behavior"
     {
         // setup
         if(transform == null)
-            transform = entity.child("Transform2D") || entity.spawn("Transform2D");
+            transform = entity.child("Transform") || entity.spawn("Transform");
         if(actor == null)
             actor = entity.child("Actor");
         if(sensors == null) {

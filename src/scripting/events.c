@@ -40,7 +40,7 @@ object 'EntityEvent' is 'event' \n\
 \n\
     fun __init(entityId) \n\
     { \n\
-        if(typeof(entityId) == 'object') { \n\
+        if(typeof(entityId) == 'object' && entityId.hasTag('entity')) { \n\
             target = entityId; \n\
             trgnam = target.__name; \n\
         } \n\

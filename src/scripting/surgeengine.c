@@ -208,8 +208,8 @@ object 'TransformFactory' \n\
 { \n\
     fun call() \n\
     { \n\
-        t2 = caller.child('Transform2D'); \n\
-        return t2 != null ? t2 : caller.spawn('Transform2D'); \n\
+        t2 = caller.child('Transform'); \n\
+        return t2 != null ? t2 : caller.spawn('Transform'); \n\
     } \n\
      \n\
     fun destroy() { } \n\

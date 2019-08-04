@@ -64,7 +64,7 @@ object "DirectionalMovement" is "behavior"
     {
         // setup
         if(transform == null)
-            transform = entity.child("Transform2D") || entity.spawn("Transform2D");
+            transform = entity.child("Transform") || entity.spawn("Transform");
 
         // move
         if(speed != 0) {

@@ -295,7 +295,7 @@ static void editor_previous_entity();
 
 /* editor: legacy items */
 static int editor_item_list[] = {
-    IT_SWITCH, IT_DOOR, IT_TELEPORTER, IT_BIGRING, IT_GLASSESBOX, IT_BLUECOLLECTIBLE, IT_GOAL,
+    IT_TELEPORTER, IT_BIGRING, IT_GLASSESBOX, IT_BLUECOLLECTIBLE, IT_GOAL,
     IT_DANGER, IT_VDANGER, IT_FIREDANGER, IT_VFIREDANGER, IT_LWSPIKES, IT_RWSPIKES,
     IT_PERSPIKES, IT_PERCEILSPIKES, IT_PERLWSPIKES, IT_PERRWSPIKES,
     IT_DNADOOR, IT_DNADOORNEON, IT_DNADOORCHARGE, IT_HDNADOOR, IT_HDNADOORNEON, IT_HDNADOORCHARGE,
@@ -1008,8 +1008,14 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             int type = atoi(param[0]);
             int x = atoi(param[1]);
             int y = atoi(param[2]);
+            surgescript_object_t* object = NULL;
             const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
-            if(object_name == NULL || !level_create_object(object_name, v2d_new(x, y)))
+            if(object_name != NULL && (object = level_create_object(object_name, v2d_new(x, y))) != NULL) {
+                ssobj_extradata_t* data = get_ssobj_extradata(object);
+                if(data != NULL)
+                    data->spawned_in_the_editor = TRUE; /* force this flag, so the port gets persisted */
+            }
+            else
                 level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
         }
         else
@@ -4239,7 +4245,7 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
     /* are we dealing with a property? */
     if(strncmp(fun_name, "get_", 4) == 0) {
         const char* property_name = fun_name + 4;
-        if(strncmp(property_name, "__", 2) != 0) {
+        if(property_name[0] != '_') { /* properties starting with '_' are hidden */
             static char setter[128] = "set_";
             bool readonly = false;
 

@@ -295,7 +295,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t transform = surgescript_objectmanager_spawn(manager, me, "Transform2D", NULL);
+    surgescript_objecthandle_t transform = surgescript_objectmanager_spawn(manager, me, "Transform", NULL);
     surgescript_objecthandle_t animation = surgescript_objectmanager_spawn(manager, me, "Animation", NULL);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);

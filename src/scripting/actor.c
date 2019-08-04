@@ -121,7 +121,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
-    surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform2D");
+    surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     bool is_detached = surgescript_object_has_tag(parent, "detached");

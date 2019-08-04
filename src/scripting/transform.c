@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * transform.c - scripting system: Transform2D
+ * transform.c - scripting system: Transform
  * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -69,23 +69,23 @@ static const surgescript_heapptr_t LOCALSCALE_ADDR = 2;
  */
 void scripting_register_transform(surgescript_vm_t* vm)
 {
-    surgescript_vm_bind(vm, "Transform2D", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "Transform2D", "constructor", fun_constructor, 0);
-    surgescript_vm_bind(vm, "Transform2D", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Transform2D", "move", fun_move, 2);
-    surgescript_vm_bind(vm, "Transform2D", "translate", fun_translate, 1);
-    surgescript_vm_bind(vm, "Transform2D", "rotate", fun_rotate, 1);
-    surgescript_vm_bind(vm, "Transform2D", "lookAt", fun_lookat, 1);
-    surgescript_vm_bind(vm, "Transform2D", "get_position", fun_getposition, 0);
-    surgescript_vm_bind(vm, "Transform2D", "set_position", fun_setposition, 1);
-    surgescript_vm_bind(vm, "Transform2D", "get_angle", fun_getangle, 0);
-    surgescript_vm_bind(vm, "Transform2D", "set_angle", fun_setangle, 1);
-    surgescript_vm_bind(vm, "Transform2D", "get_localPosition", fun_getlocalposition, 0);
-    surgescript_vm_bind(vm, "Transform2D", "set_localPosition", fun_setlocalposition, 1);
-    surgescript_vm_bind(vm, "Transform2D", "get_localAngle", fun_getlocalangle, 0);
-    surgescript_vm_bind(vm, "Transform2D", "set_localAngle", fun_setlocalangle, 1);
-    surgescript_vm_bind(vm, "Transform2D", "get_localScale", fun_getlocalscale, 0);
-    surgescript_vm_bind(vm, "Transform2D", "set_localScale", fun_setlocalscale, 1);
+    surgescript_vm_bind(vm, "Transform", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Transform", "constructor", fun_constructor, 0);
+    surgescript_vm_bind(vm, "Transform", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "Transform", "move", fun_move, 2);
+    surgescript_vm_bind(vm, "Transform", "translate", fun_translate, 1);
+    surgescript_vm_bind(vm, "Transform", "rotate", fun_rotate, 1);
+    surgescript_vm_bind(vm, "Transform", "lookAt", fun_lookat, 1);
+    surgescript_vm_bind(vm, "Transform", "get_position", fun_getposition, 0);
+    surgescript_vm_bind(vm, "Transform", "set_position", fun_setposition, 1);
+    surgescript_vm_bind(vm, "Transform", "get_angle", fun_getangle, 0);
+    surgescript_vm_bind(vm, "Transform", "set_angle", fun_setangle, 1);
+    surgescript_vm_bind(vm, "Transform", "get_localPosition", fun_getlocalposition, 0);
+    surgescript_vm_bind(vm, "Transform", "set_localPosition", fun_setlocalposition, 1);
+    surgescript_vm_bind(vm, "Transform", "get_localAngle", fun_getlocalangle, 0);
+    surgescript_vm_bind(vm, "Transform", "set_localAngle", fun_setlocalangle, 1);
+    surgescript_vm_bind(vm, "Transform", "get_localScale", fun_getlocalscale, 0);
+    surgescript_vm_bind(vm, "Transform", "set_localScale", fun_setlocalscale, 1);
 }
 
 
@@ -325,12 +325,12 @@ surgescript_object_t* target(const surgescript_object_t* object)
     );
 }
 
-/* will check if the given object is a Transform2D and return its target object */
+/* will check if the given object is a Transform and return its target object */
 surgescript_object_t* checked_target(const surgescript_object_t* object)
 {
     const char* name = surgescript_object_name(object);
 
-    if(strcmp(name, "Transform2D") != 0)
+    if(strcmp(name, "Transform") != 0)
         return NULL;
         
     return target(object);
