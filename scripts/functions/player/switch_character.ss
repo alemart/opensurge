@@ -10,6 +10,9 @@ using SurgeEngine.Player;
 // Switch Character is a function object that switches
 // the character (i.e., changes the active player)
 //
+// Arguments:
+// - playerName: string. The name of a character.
+//
 object "Switch Character"
 {
     fun call(playerName)
