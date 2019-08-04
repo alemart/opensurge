@@ -496,7 +496,7 @@ void player_hit(player_t *player, float direction)
                     cosf(DEG2RAD(a)) * spd
                 );
 
-                surgescript_object_t* collectible = level_create_object("Scattered Collectible", player->actor->position);
+                surgescript_object_t* collectible = level_create_object("Bouncing Collectible", player->actor->position);
                 if(collectible != NULL) {
                     surgescript_var_t* x = surgescript_var_create();
                     surgescript_var_t* y = surgescript_var_create();

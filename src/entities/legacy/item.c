@@ -151,7 +151,7 @@ const char* item2surgescript(int type)
     /* conversion table */
     static const char* table[] = {
         [IT_COLLECTIBLE] = "Collectible",
-        [IT_BOUNCINGCOLLECT] = "Scattered Collectible",
+        [IT_BOUNCINGCOLLECT] = "Bouncing Collectible",
         [IT_YELLOWSPRING] = "Spring Standard",
         [IT_TRYELLOWSPRING] = "Spring Standard Up Right",
         [IT_RYELLOWSPRING] = "Spring Standard Right",
@@ -203,7 +203,7 @@ const char* item2surgescript(int type)
     };
 
     /* return the object name */
-    if(type >= 0 && type < sizeof(table)/sizeof(table[0]))
+    if(type >= 0 && type < sizeof(table) / sizeof(table[0]))
         return table[type];
     else
         return NULL;

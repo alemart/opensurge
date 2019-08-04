@@ -134,7 +134,7 @@ object "Collectible" is "entity", "basic"
 
 // this object is created whenever the player gets hit
 // and its collectible counter is greater than zero
-object "Scattered Collectible" is "entity", "disposable", "private"
+object "Bouncing Collectible" is "entity", "disposable", "private"
 {
     base = spawn("Base Collectible");
     transform = Transform();
