@@ -42,7 +42,7 @@ object "Score Text" is "entity", "private", "disposable"
 
     fun constructor()
     {
-        text.zindex = 0.51;
+        text.zindex = 0.91;
         text.align = "center";
         text.text = "0";
     }

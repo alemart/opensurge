@@ -34,7 +34,7 @@ object "Smoke" is "entity", "private", "disposable"
 
     fun constructor()
     {
-        actor.zindex = 0.51;
+        actor.zindex = 0.6;
     }
 }
 
