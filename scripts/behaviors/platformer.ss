@@ -19,8 +19,8 @@
  *
 
 using SurgeEngine.Actor;
-using SurgeEngine.Behavior.Enemy;
-using SurgeEngine.Behavior.Platformer;
+using SurgeEngine.Behaviors.Enemy;
+using SurgeEngine.Behaviors.Platformer;
 
 object "My Baddie" is "entity", "enemy"
 {

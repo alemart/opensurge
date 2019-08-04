@@ -5,8 +5,8 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
-using SurgeEngine.Behavior.Enemy;
-using SurgeEngine.Behavior.Platformer;
+using SurgeEngine.Behaviors.Enemy;
+using SurgeEngine.Behaviors.Platformer;
 
 // Wolfey is a baddie that simply walks around
 object "Wolfey" is "entity", "enemy"

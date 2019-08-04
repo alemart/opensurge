@@ -25,7 +25,7 @@
 
 using SurgeEngine.Actor;
 using SurgeEngine.Vector2;
-using SurgeEngine.Behavior.DirectionalMovement;
+using SurgeEngine.Behaviors.DirectionalMovement;
 
 object "Simple Ball" is "entity"
 {

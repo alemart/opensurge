@@ -5,7 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
-using SurgeEngine.Behavior.Platformer;
+using SurgeEngine.Behaviors.Platformer;
 
 // a generic little animal (usually spawned when defeating baddies)
 object "Animal" is "entity", "private", "disposable"

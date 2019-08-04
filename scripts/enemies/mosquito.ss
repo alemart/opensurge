@@ -6,8 +6,8 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
 using SurgeEngine.Vector2;
-using SurgeEngine.Behavior.Enemy;
-using SurgeEngine.Behavior.DirectionalMovement;
+using SurgeEngine.Behaviors.Enemy;
+using SurgeEngine.Behaviors.DirectionalMovement;
 
 // Mosquito is a flying baddie
 object "Mosquito" is "entity", "enemy"

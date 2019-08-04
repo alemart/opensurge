@@ -8,8 +8,8 @@ using SurgeEngine.Actor;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
-using SurgeEngine.Behavior.Enemy;
-using SurgeEngine.Behavior.DirectionalMovement;
+using SurgeEngine.Behaviors.Enemy;
+using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Collisions.CollisionBox;
 
 // Crococopter has a helix that hits the player

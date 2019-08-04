@@ -35,7 +35,7 @@ object 'SurgeEngine' \n\
     public readonly Web = spawn('Web'); \n\
     public readonly LevelManager = spawn('LevelManager'); \n\
     public readonly Actor = spawn('ActorFactory'); \n\
-    public readonly Behavior = spawn('BehaviorFactory'); \n\
+    public readonly Behaviors = spawn('BehaviorFactory'); \n\
     public readonly Brick = spawn('BrickFactory'); \n\
     public readonly Input = spawn('InputFactory'); \n\
     public readonly Camera = spawn('Camera'); \n\
@@ -54,6 +54,7 @@ object 'SurgeEngine' \n\
         return LevelManager.playerManager; \n\
     } \n\
 \n\
+    fun get_Behavior() { return Behaviors; } \n\
     fun destroy() { } \n\
 } \n\
 \n\
