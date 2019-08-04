@@ -297,8 +297,10 @@ object "Item Box" is "entity", "private"
             ).setIcon(actor.anim);
 
             // add to score
-            if(score != 0)
+            if(score != 0) {
                 player.score += score;
+                Level.spawnEntity("Score Text", collider.center).setText(score);
+            }
 
             // crush the item box
             collider.enabled = false;

@@ -156,12 +156,18 @@ object "Enemy" is "private", "entity", "behavior"
             player = otherCollider.entity;
             if(player.attacking && (!invincible || player.invincible)) {
                 // impact the player
-                player.score += Math.max(0, score);
                 if(player.midair) {
                     if(actor != null)
                         player.bounceBack(actor);
                     else
                         player.bounce(null);
+                }
+
+                // add to score
+                newScore = Math.floor(score);
+                if(newScore != 0) {
+                    player.score += newScore;
+                    Level.spawnEntity("Score Text", collider.center).setText(newScore);
                 }
 
                 // destroy the enemy
