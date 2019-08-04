@@ -74,7 +74,7 @@ OPTIONS_GAME                "GAME"
 OPTIONS_GAMEPAD             "Use gamepad"
 OPTIONS_LANGUAGE            "Change language"
 OPTIONS_STAGESELECT         "Stage select"
-OPTIONS_CREDITS             "Credits"
+OPTIONS_CREDITS             "Open Surge Credits"
 OPTIONS_BACK                "BACK"
 
 // stage select
