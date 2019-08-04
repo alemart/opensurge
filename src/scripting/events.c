@@ -36,10 +36,16 @@ object 'EntityEvent' is 'event' \n\
     target = ''; \n\
     method = 'call'; \n\
     params = []; \n\
+    trgnam = ''; \n\
 \n\
     fun __init(entityId) \n\
     { \n\
-        target = String(entityId || ''); \n\
+        if(typeof(entityId) == 'object') { \n\
+            target = entityId; \n\
+            trgnam = target.__name; \n\
+        } \n\
+        else \n\
+            target = String(entityId || ''); \n\
         return this; \n\
     } \n\
 \n\
@@ -57,7 +63,7 @@ object 'EntityEvent' is 'event' \n\
 \n\
     fun call() \n\
     { \n\
-        entity = Level.entity(target); " /* select by entity id */ " \n\
+        entity = unique(target); " /* select by entity id */ " \n\
         if(entity !== null) { \n\
             if(entity.hasFunction(method)) { \n\
                 if(entity.__arity(method) == params.length) \n\
@@ -86,6 +92,11 @@ object 'EntityEvent' is 'event' \n\
         } \n\
         else \n\
             Console.print(this.__name + ': missing entity ' + target); \n\
+    } \n\
+\n\
+    fun unique(target) \n\
+    { \n\
+        return (typeof(target) == 'object' && target.__name == trgnam) ? target : Level.entity(target);\n\
     } \n\
 \n\
     fun toString() \n\
