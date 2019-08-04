@@ -7,6 +7,7 @@
 using SurgeEngine.Actor;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
+using SurgeEngine.Behaviors.DirectionalMovement;
 
 // Smoke: used when braking
 object "Smoke" is "entity", "private", "disposable"
@@ -71,5 +72,37 @@ object "Speed Smoke" is "entity", "private", "disposable"
     fun constructor()
     {
         actor.zindex = 0.5;
+    }
+}
+
+// Mini Smoke: used when dashing
+object "Mini Smoke" is "entity", "private", "disposable"
+{
+    actor = Actor("Mini Smoke");
+    movement = DirectionalMovement();
+
+    state "main"
+    {
+        if(actor.animation.finished)
+            destroy();
+    }
+
+    fun setDirection(direction)
+    {
+        movement.direction = direction;
+        return this;
+    }
+
+    fun setSpeed(speed)
+    {
+        movement.speed = speed;
+        return this;
+    }
+
+    fun constructor()
+    {
+        movement.speed = 60;
+        movement.direction = Vector2.zero;
+        return this;
     }
 }
