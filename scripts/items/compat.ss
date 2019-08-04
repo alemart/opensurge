@@ -13,7 +13,6 @@ using SurgeEngine.Events.FunctionEvent;
 object ".compat_loopgreen" is "private", "entity"
 {
     obj = spawn("Layer Green");
-    transform = Transform();
 
     state "main"
     {
@@ -21,6 +20,7 @@ object ".compat_loopgreen" is "private", "entity"
 
     fun constructor()
     {
+        transform = obj.child("Transform") || obj.spawn("Transform");
         transform.move(16, 16);
     }
 }
@@ -28,7 +28,6 @@ object ".compat_loopgreen" is "private", "entity"
 object ".compat_loopyellow" is "private", "entity"
 {
     obj = spawn("Layer Yellow");
-    transform = Transform();
 
     state "main"
     {
@@ -36,6 +35,7 @@ object ".compat_loopyellow" is "private", "entity"
 
     fun constructor()
     {
+        transform = obj.child("Transform") || obj.spawn("Transform");
         transform.move(16, 16);
     }
 }

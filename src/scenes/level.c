@@ -325,8 +325,8 @@ static void editor_ssobj_init();
 static void editor_ssobj_release();
 static int editor_ssobj_sortfun(const void* a, const void* b);
 static void editor_ssobj_register(const char* entity_name, void* data); /* internal */
-static int editor_ssobj_id(const char* entity_name); /* an index k such that editor_ssobj[k] is entity_name */
-static const char* editor_ssobj_name(int entity_id); /* the inverse of editor_ssobj_id() */
+static int editor_ssobj_index(const char* entity_name); /* an index k such that editor_ssobj[k] is entity_name */
+static const char* editor_ssobj_name(int entity_index); /* the inverse of editor_ssobj_index() */
 static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
 static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
 
@@ -3201,15 +3201,15 @@ void editor_update()
                 surgescript_object_t* ssobject = NULL;
                 surgescript_object_traverse_tree_ex(level_ssobject(), &ssobject, editor_pick_ssobj);
                 if(ssobject != NULL) {
-                    int obj_id = editor_ssobj_id(surgescript_object_name(ssobject));
+                    int index = editor_ssobj_index(surgescript_object_name(ssobject));
                     if(!pick_object) {
-                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, obj_id, scripting_util_world_position(ssobject));
+                        editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, index, scripting_util_world_position(ssobject));
                         eda.ssobj_id = get_ssobj_id(ssobject);
                         editor_action_commit(eda);
                         editor_action_register(eda);
                     }
-                    else {
-                        editor_cursor_entity_id = obj_id;
+                    else if(index >= 0) {
+                        editor_cursor_entity_id = index;
                         editor_ssobj_picked_entity.id = get_ssobj_id(ssobject);
                         str_cpy(editor_ssobj_picked_entity.name, surgescript_object_name(ssobject), sizeof(editor_ssobj_picked_entity.name));
                     }
@@ -3999,7 +3999,7 @@ int editor_ssobj_sortfun(const void* a, const void* b)
 }
 
 /* associates an integer to each SurgeScript entity */
-int editor_ssobj_id(const char* entity_name)
+int editor_ssobj_index(const char* entity_name)
 {
     /* find i such that editor_ssobj[i] == entity_name */
     for(int i = 0; i < editor_ssobj_count; i++) {
@@ -4011,10 +4011,10 @@ int editor_ssobj_id(const char* entity_name)
     return -1;
 }
 
-const char* editor_ssobj_name(int entity_id)
+const char* editor_ssobj_name(int entity_index)
 {
-    int id = clip(entity_id, 0, editor_ssobj_count - 1);
-    return editor_ssobj[id];
+    int idx = clip(entity_index, 0, editor_ssobj_count - 1);
+    return editor_ssobj[idx];
 }
 
 
@@ -4649,10 +4649,10 @@ void editor_action_commit(editor_action_t action)
 bool editor_remove_ssobj(surgescript_object_t* object, void* data)
 {
     if(surgescript_object_is_active(object)) {
-        if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private")) {
+        if(is_ssobj_spawned_in_the_editor(object)) {
             const char* object_name = surgescript_object_name(object);
             editor_action_t *action = (editor_action_t*)data;
-            if(editor_ssobj_id(object_name) == action->obj_id) {
+            if(editor_ssobj_index(object_name) == action->obj_id) {
                 v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
                 if(nearly_equal(v2d_magnitude(delta), 0.0f)) {
                     surgescript_object_kill(object);
@@ -4670,7 +4670,7 @@ bool editor_remove_ssobj(surgescript_object_t* object, void* data)
 bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 {
     if(surgescript_object_is_active(object)) {
-        if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private")) {
+        if(is_ssobj_spawned_in_the_editor(object)) {
             v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
             float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
             float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x + 1 , editor_cursor.y + topleft.y + 1 };
@@ -4679,8 +4679,8 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
             const char* name = surgescript_object_name(object);
             const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
             const image_t* img = sprite_get_image(anim, 0);
-            v2d_t hot_spot = anim->hot_spot;
             v2d_t worldpos = scripting_util_world_position(object);
+            v2d_t hot_spot = anim->hot_spot;
             a[0] = worldpos.x - hot_spot.x;
             a[1] = worldpos.y - hot_spot.y;
             a[2] = a[0] + image_width(img);
