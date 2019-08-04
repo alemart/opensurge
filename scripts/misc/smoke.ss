@@ -87,22 +87,17 @@ object "Mini Smoke" is "entity", "private", "disposable"
             destroy();
     }
 
-    fun setDirection(direction)
+    // velocity must be a Vector2 object
+    fun setVelocity(velocity)
     {
-        movement.direction = direction;
-        return this;
-    }
-
-    fun setSpeed(speed)
-    {
-        movement.speed = speed;
+        movement.direction = velocity.normalized();
+        movement.speed = velocity.length;
         return this;
     }
 
     fun constructor()
     {
-        movement.speed = 60;
-        movement.direction = Vector2.zero;
-        return this;
+        movement.speed = 0;
+        //actor.zindex = 0.51;
     }
 }

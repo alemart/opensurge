@@ -170,15 +170,15 @@ sprite "Neon"
         repeat      TRUE
         fps         16
         data        17 18
+        hot_spot    28 30
     }
 
     // low jetpack power
     animation 21
     {
         repeat      TRUE
-        fps         5
+        fps         12
         data        19 20 21 22
-        repeat_from 1
     }
 
     // carrying someone

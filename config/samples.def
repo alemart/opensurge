@@ -186,7 +186,7 @@ sample "wind shield"
 
 sample "jetpack"
 {
-    source_file         "samples/neon_jetpack.wav"
+    source_file         "samples/jetpack2.wav"
 }
 
 sample "power up"

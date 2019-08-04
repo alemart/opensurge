@@ -304,7 +304,6 @@ Mateus Reis
 --- samples/door2.wav
 --- samples/powerup.wav
 --- samples/drown.wav
---- samples/neon_jetpack.wav
 --- samples/cannon.ogg
 --- samples/floorhit.wav
 --- samples/growlmod.wav
@@ -316,6 +315,7 @@ Mateus Reis
 --- samples/secret.wav
 --- samples/pipe_in.wav
 --- samples/pipe_out.wav
+--- samples/jetpack2.wav (modified by Alexandre)
 
 Di Rodrigues
 --- samples/1up.ogg
@@ -343,6 +343,7 @@ Alexandre Martins
 --- samples/zipline2.wav
 --- samples/impact.wav
 --- samples/slide.wav
+--- samples/jetpack.wav
 
 d1337r
 --- samples/deny.wav
