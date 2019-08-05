@@ -20,7 +20,7 @@ object "Neon's Jetpack"
     smokehlp = spawn("Neon's Jetpack Smoke Helper");
 
     maxFlyingTime = 8; // seconds
-    maxSpeed = 90; // px/s
+    maxSpeed = 60; // px/s
     acceleration = 60; // px/s^2
     flyingTime = 0;
     grv = 828;
@@ -67,7 +67,7 @@ object "Neon's Jetpack"
     {
         if(canFly(player)) {
             player.anim = 21;
-            player.ysp = Math.min(player.ysp, maxSpeed);
+            player.ysp = Math.min(player.ysp, maxSpeed * 1.5);
         }
         else
             state = "main";
