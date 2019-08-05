@@ -15,7 +15,7 @@ using SurgeEngine.Audio.Sound;
 //
 object "Neon's Jetpack"
 {
-    player = Player("Neon");
+    public readonly player = Player("Neon");
     soundhlp = spawn("Neon's Jetpack Sound Helper");
     smokehlp = spawn("Neon's Jetpack Smoke Helper");
 
@@ -128,14 +128,14 @@ object "Neon's Jetpack Sound Helper"
 object "Neon's Jetpack Smoke Helper"
 {
     jetpack = parent;
-    neon = jetpack.parent;
+    player = jetpack.player;
     baseSpeed = 30;
 
     state "main"
     {
         if(jetpack.flying) {
-            Level.spawnEntity("Mini Smoke", neon.collider.center.translatedBy(
-                neon.direction * -8, 8
+            Level.spawnEntity("Mini Smoke", player.collider.center.translatedBy(
+                player.direction * -8, 8
             )).setVelocity(Vector2((Math.random() - 0.5) * baseSpeed, 3 * baseSpeed));
             state = "wait";
         }
