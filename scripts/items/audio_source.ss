@@ -100,7 +100,6 @@ object "Audio Mixer"
         foreach(entry in volume) {
             sfx = sound[entry.key];
             sfx.volume = entry.value;
-            Console.print(sfx.volume);
             if(!sfx.playing && sfx.volume > 0)
                 sfx.play();
         }
