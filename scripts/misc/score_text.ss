@@ -13,18 +13,18 @@ object "Score Text" is "entity", "private", "disposable"
     text = Text("Tiny");
     transform = Transform();
     speed = 90; // pixels per second
-    timeToLive = 2.0; // seconds
+    timeToLive = 1.0; // seconds
 
     state "main"
     {
         transform.move(0, -speed * Time.delta);
-        if(timeout(timeToLive * 0.25))
+        if(timeout(timeToLive * 0.5))
             state = "waiting";
     }
 
     state "waiting"
     {
-        if(timeout(timeToLive * 0.75))
+        if(timeout(timeToLive * 0.5))
             destroy();
     }
 

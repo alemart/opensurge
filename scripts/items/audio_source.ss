@@ -22,6 +22,8 @@ using SurgeEngine.Video.Screen;
 // - type: string. Either "line" or "point" ("line" plays nicely on a platformer).
 // - mindist: number. Within a distance of mindist pixels, the sound will stay the loudest.
 // - maxdist: number. Outside the region of maxdist pixels, the sound will be silent.
+// - volume: number. Base volume: a number between 0 and 1. Usually set to 1.
+// - enabled: boolean. Whether the audio source is enabled or not.
 //
 object "Audio Source" is "entity", "special", "awake"
 {
@@ -34,6 +36,7 @@ object "Audio Source" is "entity", "special", "awake"
     distance = null;
     snd = null;
     vol = 0;
+    basevol = 1;
 
     // get the sound effect
     state "main"
@@ -67,8 +70,20 @@ object "Audio Source" is "entity", "special", "awake"
     fun volumeAt(position)
     {
         dist = distance(transform.position, position);
-        cpdist = Math.clamp(dist, mindist, maxdist);
-        return (maxdist - cpdist) / (maxdist - mindist);
+        dist = Math.clamp(dist, mindist, maxdist);
+        return basevol * (maxdist - dist) / (maxdist - mindist);
+    }
+
+    // get the base volume
+    fun get_volume()
+    {
+        return basevol;
+    }
+
+    // set the base volume
+    fun set_volume(value)
+    {
+        basevol = Math.clamp(value, 0, 1);
     }
 
     // is the audio source enabled?
@@ -94,23 +109,30 @@ object "Audio Mixer"
 {
     volume = {};
     sound = {};
+    audible = false;
 
     state "main"
     {
-        foreach(entry in volume) {
-            sfx = sound[entry.key];
-            sfx.volume = entry.value;
-            if(!sfx.playing && sfx.volume > 0)
-                sfx.play();
+        if(audible) {
+            audible = false;
+            foreach(entry in volume) {
+                sfx = sound[entry.key];
+                if(0 < (sfx.volume = entry.value)) {
+                    audible = true;
+                    if(!sfx.playing)
+                        sfx.play();
+                }
+            }
+            volume.clear();
         }
-        volume.clear();
     }
 
     fun notify(snd, vol)
     {
         if(!sound.has(snd))
             sound[snd] = Sound(snd);
-        volume[snd] = Math.max(vol, volume[snd] || 0);
+        if(0 < (volume[snd] = Math.max(vol, volume[snd] || 0)))
+            audible = true;
     }
 }
 
@@ -118,13 +140,21 @@ object "Audio Mixer"
 // of a and b, both Vector2 objects
 object "Audio Source - Horizontal Distance"
 {
+    margin = Screen.height / 2;
+
     fun call(a, b)
     {
-        dy = Math.abs(a.y - b.y) - Screen.height;
+        dy = Math.abs(a.y - b.y) - margin;
         if(dy < 0)
             return Math.abs(a.x - b.x);
         else
-            return Math.abs(a.x - b.x) + (dy * dy * 0.04);
+            return Math.abs(a.x - b.x) + dy * 2;
+    }
+
+    fun setLineHeight(value)
+    {
+        margin = Math.max(value, 0) / 2;
+        return this;
     }
 }
 
