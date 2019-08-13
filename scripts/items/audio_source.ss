@@ -21,7 +21,7 @@ using SurgeEngine.Video.Screen;
 // - sound: string. Path to a .wav file in the samples/ folder.
 // - type: string. Either "line" or "point" ("line" plays nicely on a platformer).
 // - mindist: number. Within a distance of mindist pixels, the sound will stay the loudest.
-// - maxdist: number. Outside a distance of maxdist pixels, the sound will be silent.
+// - maxdist: number. Outside the region of maxdist pixels, the sound will be silent.
 //
 object "Audio Source" is "entity", "special", "awake"
 {
