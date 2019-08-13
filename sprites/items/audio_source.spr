@@ -1,0 +1,21 @@
+// -----------------------------------------------------------------------------
+// File: audio_source.spr
+// Description: audio source sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Audio Source"
+{
+    source_file     "images/core.png"
+    source_rect     0 96 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
