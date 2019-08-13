@@ -40,7 +40,7 @@ object "Audio Source" is "entity", "special", "awake"
     {
         if(sound != null) {
             if(typeof(sound) == "string") {
-                distance = distance || ((type == "directional") ?
+                distance = distance || ((type == "line") ?
                     spawn("Audio Source - Horizontal Distance") :
                     spawn("Audio Source - Euclidean Distance")
                 );
