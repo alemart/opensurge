@@ -16,7 +16,7 @@ Cody Licorish
 $CREDITS_CODY
 
 
-$CREDITS_THANKS
+$CREDITS_RETIRED
 
 Johan Brodd
 $CREDITS_JOHAN
@@ -30,8 +30,11 @@ $CREDITS_COLIN
 Brian Zablocky
 $CREDITS_BRIAN
 
+
+$CREDITS_THANKS
+
+Allegro staff at allegro.cc
 Ruben Caceres
-$CREDITS_RUBEN
 
 
 $CREDITS_RES_TITLE
@@ -95,9 +98,11 @@ João Victor
 --- images/extra/surge_artwork.png
 --- images/extra/surge_entrance.png
 --- images/opensurge.png
---- src/misc/icon16.png
---- src/misc/icon32.png
---- src/misc/icon64.png
+--- src/misc/opensurge_16x16.png
+--- src/misc/opensurge_32x32.png
+--- src/misc/opensurge_48x48.png
+--- src/misc/opensurge_64x64.png
+--- src/misc/opensurge_72x72.png
 --- surge.png (CC-0)
 --- images/wolfey.png
 --- images/mosquito.png
@@ -131,7 +136,6 @@ Brian Zablocky
 --- images/item_boxes.png (battery icons by Cody Licorish)
 --- images/lady_bugsy.png
 --- images/shields.png
---- images/spikes.png
 --- images/switches.png
 
 Brian Zablocky (Celdecea) & Alex V. (squirrel) & Alexandre Martins
@@ -200,6 +204,9 @@ Robey Pointer
 Constantin (supertuxkart-team)
 --- images/tux.png
 
+Carl Olsson aka surt (opengameart.org)
+--- images/spikes.png
+
 Daniel Cook (lostgarden.com)
 --- images/explosion.png
 
@@ -233,8 +240,9 @@ Andrew Pociask
 --- images/levels/1/mountains.png
 
 lainz
---- src/misc/icon128.png
---- src/misc/icon256.png
+--- src/misc/opensurge_96x96.png
+--- src/misc/opensurge_128x128.png
+--- src/misc/opensurge_256x256.png
 
 Shawn Hargreaves
 --- images/allegro.png (giftware)
@@ -357,6 +365,9 @@ Johan Brodd
 
 InspectorJ (www.jshaw.co.uk) of freesound.org
 --- samples/waterlevel.wav
+
+mas123456 (freesound.org)
+--- samples/waterfall.wav (CC-0)
 
 
 $CREDITS_RES_SCRIPTS

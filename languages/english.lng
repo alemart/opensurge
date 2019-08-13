@@ -24,15 +24,6 @@ COLOR_DANGER                "ff7777"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
-// Game data
-GAME_NAME                   "Open Surge"
-GAME_VERSION                "$ENGINE_VERSION"
-GAME_WEBSITE                "$ENGINE_WEBSITE"
-GAME_YEAR                   "$ENGINE_YEAR"
-
-
-
-
 // ========== MENUS ==========
 
 // Main Menu
@@ -93,18 +84,18 @@ QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
 CREDITS_BACK                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME $ENGINE_VERSION\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Retired</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Thanks to</color>"
-CREDITS_ALEXANDRE           "Founder, Programmer"
+CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer"
 CREDITS_JOAO                "Artist"
-CREDITS_MATEUS              "Sprites, Audio"
+CREDITS_MATEUS              "Sound effects"
 CREDITS_CODY                "Concept art"
-CREDITS_JOHAN               "Musician (rest in peace, friend)"
+CREDITS_JOHAN               "Musician\n(rest in peace, friend)"
 CREDITS_DI                  "Musician"
 CREDITS_COLIN               "Story, sprites"
 CREDITS_BRIAN               "Sprite artist"
-CREDITS_RUBEN               "Ideas"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individual resources</color>"
 CREDITS_RES_TEXT            "Unless explicitly told otherwise, the files listed below are licensed under the Creative Commons Attribution 3.0 (CC-BY 3.0)."
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Images</color>"

@@ -22,6 +22,9 @@ object "Waterworks Setup"
             },
             "Elevator": {
                 "anim": 2
+            },
+            "Audio Source": {
+                "sound": "samples/waterfall.wav"
             }
         },
 

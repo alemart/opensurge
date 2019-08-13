@@ -29,6 +29,7 @@
 
 #if defined(A5BUILD)
 
+#define ALLEGRO_UNSTABLE
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -47,6 +48,7 @@ struct sound_t {
     bool valid_id;
     float duration;
     float end_time;
+    float volume; /* 0: silence; 1: default */
     char* filepath; /* relative path */
 };
 
@@ -707,6 +709,7 @@ sound_t *sound_load(const char *path)
         s->duration = 0.0f;
         s->end_time = 0.0f;
         s->valid_id = false;
+        s->volume = 1.0f;
         s->filepath = str_dup(path);
         if(NULL == (s->sample = al_load_sample(fullpath)))
             fatal_error("Can't load sound \"%s\"", path);
@@ -893,7 +896,7 @@ void sound_destroy(sound_t *sample)
 #if defined(A5BUILD)
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, 1.0f, 0.0f, 1.0f);
+    sound_play_ex(sample, sample->volume, 0.0f, 1.0f);
 }
 #elif !defined(__USE_OPENAL__)
 void sound_play(sound_t *sample)
@@ -929,10 +932,12 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
         if(al_play_sample(sample->sample, vol, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id)) {
             sample->end_time = (0.001f * timer_get_ticks()) + sample->duration; /* when does it end? */
             sample->valid_id = true;
+            sample->volume = vol;
         }
         else {
             sample->end_time = 0.0f;
             sample->valid_id = false;
+            sample->volume = vol;
         }
     }
 }
@@ -1009,7 +1014,8 @@ void sound_stop(sound_t *sample)
     if(sample != NULL) {
         if(sample->valid_id) {
             al_stop_sample(&sample->id);
-            sample->valid_id = false; /* is this needed? */
+            sample->valid_id = false;
+            sample->end_time = 0.0f;
         }
     }
 }
@@ -1086,26 +1092,10 @@ bool sound_is_playing(sound_t *sample)
 #if defined(A5BUILD)
 float sound_get_volume(sound_t *sample)
 {
-    /* TODO */
-    return 1.0f;
-
-#if 0
-    /* Unstable API (Allegro 5.2.3) */
-    if(sample != NULL) {
-        if(sample->valid_id) {
-            ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
-            if(instance != NULL) {
-                float gain = al_get_sample_instance_gain(instance);
-                al_unlock_sample_id(&sample->id);
-                return gain;
-            }
-            else
-                return false;
-        }
-    }
-
-    return false;
-#endif
+    if(sample != NULL)
+        return sample->volume;
+    else
+        return 0.0f;
 }
 #elif !defined(__USE_OPENAL__)
 float sound_get_volume(sound_t *sample)
@@ -1131,21 +1121,18 @@ float sound_get_volume(sound_t *sample)
 #if defined(A5BUILD)
 void sound_set_volume(sound_t *sample, float volume)
 {
-    /* TODO */
-    /* not yet implemented */
-
-#if 0
-    /* Unstable API (Allegro 5.2.3) */
+    /* Unstable API (since Allegro 5.2.3) */
     if(sample != NULL) {
+        sample->volume = max(0.0f, volume);
         if(sample->valid_id) {
             ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
             if(instance != NULL) {
-                al_set_sample_instance_gain(instance, max(0.0f, volume));
+                if(al_get_sample_instance_playing(instance))
+                    al_set_sample_instance_gain(instance, sample->volume);
                 al_unlock_sample_id(&sample->id);
             }
         }
     }
-#endif
 }
 #elif !defined(__USE_OPENAL__)
 void sound_set_volume(sound_t *sample, float volume)

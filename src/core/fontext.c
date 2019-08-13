@@ -49,6 +49,10 @@ static const char* f_engine_name() { return GAME_TITLE; }
 static const char* f_engine_version() { return GAME_VERSION_STRING; }
 static const char* f_engine_website() { return GAME_WEBSITE; }
 static const char* f_engine_year() { return GAME_YEAR; }
+static const char* f_game_name() { return "Open Surge"; }
+static const char* f_game_version() { return GAME_VERSION_STRING; }
+static const char* f_game_website() { return GAME_WEBSITE; }
+static const char* f_game_year() { return GAME_YEAR; }
 
 
 /*
@@ -84,4 +88,8 @@ void fontext_register_variables()
     font_register_variable("$ENGINE_VERSION", f_engine_version);
     font_register_variable("$ENGINE_WEBSITE", f_engine_website);
     font_register_variable("$ENGINE_YEAR", f_engine_year);
+    font_register_variable("$GAME_NAME", f_game_name);
+    font_register_variable("$GAME_VERSION", f_game_version);
+    font_register_variable("$GAME_WEBSITE", f_game_website);
+    font_register_variable("$GAME_YEAR", f_game_year);
 }
