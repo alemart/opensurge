@@ -111,7 +111,7 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
     state "done"
     {
         if(timeout(2.0))
-            Level.finish();
+            Level.loadNext();
     }
 
     fun finish()

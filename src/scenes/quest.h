@@ -37,8 +37,8 @@ void quest_release();
 
 /* utilities: current quest */
 void quest_abort(); /* aborts the current quest */
-void quest_set_next_level(int id); /* set the next level (0..n-1) */
-int quest_next_level(); /* id of the next level (0..n-1) */
+void quest_set_next_level(int id); /* set the next level (0..num_levels) */
+int quest_next_level(); /* id of the next level (0..num_levels) */
 const struct quest_t* quest_current(); /* returns the current quest, or NULL if no quest is active */
 
 #endif

@@ -25,6 +25,7 @@
 #include "../core/audio.h"
 #include "../core/stringutil.h"
 #include "../scenes/level.h"
+#include "../scenes/quest.h"
 #include "../entities/player.h"
 #include "../entities/background.h"
 
@@ -34,7 +35,6 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setwaterlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getspawnpoint(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -48,15 +48,18 @@ static surgescript_var_t* fun_getlicense(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
 static const surgescript_heapptr_t SETUP_ADDR = 2;
@@ -89,13 +92,15 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
     surgescript_vm_bind(vm, "Level", "set_background", fun_setbackground, 1);
     surgescript_vm_bind(vm, "Level", "get_background", fun_getbackground, 0);
+    surgescript_vm_bind(vm, "Level", "set_next", fun_setnext, 1);
+    surgescript_vm_bind(vm, "Level", "get_next", fun_getnext, 0);
     surgescript_vm_bind(vm, "Level", "clear", fun_clear, 0);
     surgescript_vm_bind(vm, "Level", "restart", fun_restart, 0);
     surgescript_vm_bind(vm, "Level", "quit", fun_quit, 0);
     surgescript_vm_bind(vm, "Level", "abort", fun_abort, 0);
     surgescript_vm_bind(vm, "Level", "pause", fun_pause, 0);
     surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
-    surgescript_vm_bind(vm, "Level", "finish", fun_finish, 0);
+    surgescript_vm_bind(vm, "Level", "loadNext", fun_loadnext, 0);
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
     surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
@@ -290,6 +295,21 @@ surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgesc
     return NULL;
 }
 
+/* get the number of the next level in the current quest (1: first level, 2: second level, and so on) */
+surgescript_var_t* fun_getnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int next = quest_next_level() + 1; /* the engine counts from zero */
+    return surgescript_var_set_number(surgescript_var_create(), next);
+}
+
+/* set the next level in the current quest, identified by a number (1: first level, 2: second level, etc.) */
+surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int next = max(1, surgescript_var_get_number(param[0]));
+    quest_set_next_level(next - 1);
+    return NULL;
+}
+
 /* will be true if the level has been cleared (will show the cleared animation) */
 surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -387,7 +407,7 @@ surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_
 }
 
 /* loads the next level in the quest */
-surgescript_var_t* fun_finish(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     level_jump_to_next_stage();
     return NULL;

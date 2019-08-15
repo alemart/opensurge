@@ -18,7 +18,7 @@ object "Splash"
     state "fade in"  { if(timeout(fadeTime)) state = "wait"; }
     state "wait"     { if(timeout(waitTime) || skip()) { fader.fadeOut(fadeTime); state = "fade out"; } }
     state "fade out" { if(timeout(fadeTime)) state = "done"; }
-    state "done"     { Level.finish(); }
+    state "done"     { Level.loadNext(); }
 
     fun skip() { return input.buttonPressed("fire1") || input.buttonPressed("fire3") || input.buttonPressed("fire4"); }
 }

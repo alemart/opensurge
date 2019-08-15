@@ -119,17 +119,21 @@ void quest_abort()
 
 /*
  * quest_set_next_level()
- * Jumps to the given level, 0 <= lev < n
+ * Jumps to the given level, 0 <= lev <= n
+ * If set to n (level_count), the quest will be cleared
  */
 void quest_set_next_level(int id)
 {
-    if(top >= 0)
-        stack[top].next_level = max(0, id);
+    if(top >= 0) {
+        const quest_t* quest = stack[top].current_quest;
+        stack[top].next_level = clip(id, 0, quest->level_count);
+    }
 }
 
 /*
  * quest_next_level()
- * id of the current level, 0 <= id < n
+ * id of the current level, 0 <= id <= n,
+ * where n is the number of levels of the quest
  */
 int quest_next_level()
 {
