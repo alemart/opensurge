@@ -33,7 +33,7 @@
 static int top = -1;
 static struct {
     quest_t* current_quest;
-    int current_level;
+    int next_level;
     int abort_quest;
 } stack[STACK_MAX]; /* one can stack quests */
 
@@ -55,12 +55,11 @@ void quest_init(void *path_to_qst_file)
         fatal_error("The quest stack can't hold more than %d quests.", STACK_MAX);
 
     stack[top].current_quest = quest_load(filepath);
-    stack[top].current_level = 0;
+    stack[top].next_level = 0;
     stack[top].abort_quest = FALSE;
 
     logfile_message("Pushed quest \"%s\" (\"%s\") onto the quest stack...", stack[top].current_quest->file, stack[top].current_quest->name);
 }
-
 
 /*
  * quest_release()
@@ -72,7 +71,6 @@ void quest_release()
     logfile_message("The quest has been released.");
 }
 
-
 /*
  * quest_render()
  * Actually, this function does nothing
@@ -81,7 +79,6 @@ void quest_render()
 {
     ;
 }
-
 
 /*
  * quest_update()
@@ -94,9 +91,9 @@ void quest_update()
         fatal_error("Quest '%s' has no levels.", stack[top].current_quest->file);
 
     /* quest manager */
-    if(stack[top].current_level < stack[top].current_quest->level_count && !stack[top].abort_quest) {
+    if(stack[top].next_level < stack[top].current_quest->level_count && !stack[top].abort_quest) {
         /* next level... */
-        const char *path_to_lev_file = stack[top].current_quest->level_path[stack[top].current_level++];
+        const char *path_to_lev_file = stack[top].current_quest->level_path[stack[top].next_level++];
         push_appropriate_scene(path_to_lev_file);
     }
     else {
@@ -110,20 +107,6 @@ void quest_update()
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
  * quest_abort()
  * Aborts the current quest, popping it from the stack
@@ -134,42 +117,32 @@ void quest_abort()
         stack[top].abort_quest = TRUE;
 }
 
-
 /*
- * quest_setlevel()
+ * quest_set_next_level()
  * Jumps to the given level, 0 <= lev < n
  */
-void quest_setlevel(int lev)
+void quest_set_next_level(int id)
 {
     if(top >= 0)
-        stack[top].current_level = max(0, lev);
+        stack[top].next_level = max(0, id);
 }
 
 /*
- * quest_currentlevel()
+ * quest_next_level()
  * id of the current level, 0 <= id < n
  */
-int quest_currentlevel()
+int quest_next_level()
 {
-    return top >= 0 ? stack[top].current_level : 0;
+    return top >= 0 ? stack[top].next_level : 0;
 }
 
 /*
- * quest_numberoflevels()
- * number of levels of the current quest
+ * quest_current()
+ * Returns the current quest, or NULL if no quest is active
  */
-int quest_numberoflevels()
+const quest_t* quest_current()
 {
-    return top >= 0 ? stack[top].current_quest->level_count : 0;
-}
-
-/*
- * quest_getname()
- * Returns the name of the last running quest
- */
-const char *quest_getname()
-{
-    return top >= 0 ? stack[top].current_quest->name : "null";
+    return top >= 0 ? stack[top].current_quest : NULL;
 }
 
 

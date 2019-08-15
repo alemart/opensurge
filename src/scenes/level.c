@@ -1161,7 +1161,7 @@ void level_update()
     if(must_push_a_quest) {
         must_push_a_quest = FALSE;
         scenestack_pop();
-        quest_setlevel(quest_currentlevel() - 1); /* will return to the current level */
+        quest_set_next_level(quest_next_level() - 1); /* will return to the current level */
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)quest_to_be_pushed);
         return;
     }

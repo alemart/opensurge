@@ -29,17 +29,16 @@
    dispatches the player to the correct levels.
 */
 
-/* public scene functions */
+/* quest scene: functions */
 void quest_init(void *path_to_qst_file); /* pass an string */
 void quest_update();
 void quest_render();
 void quest_release();
 
-/* current quest */
+/* utilities: current quest */
 void quest_abort(); /* aborts the current quest */
-void quest_setlevel(int lev); /* jumps to the given level (0..n-1) */
-int quest_currentlevel(); /* id of the current level (0..n-1) */
-int quest_numberoflevels(); /* returns the number of levels (n) of the current quest */
-const char *quest_getname(); /* returns the name of the current quest */
+void quest_set_next_level(int id); /* set the next level (0..n-1) */
+int quest_next_level(); /* id of the next level (0..n-1) */
+const struct quest_t* quest_current(); /* returns the current quest, or NULL if no quest is active */
 
 #endif
