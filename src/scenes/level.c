@@ -1161,7 +1161,7 @@ void level_update()
     if(must_push_a_quest) {
         must_push_a_quest = FALSE;
         scenestack_pop();
-        quest_setlevel(quest_currentlevel() - 1);
+        quest_setlevel(quest_currentlevel() - 1); /* will return to the current level */
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)quest_to_be_pushed);
         return;
     }
@@ -2236,11 +2236,17 @@ void update_level_height_samples(int level_width, int level_height)
  * the current spawn point */
 void restart(int preserve_current_spawnpoint)
 {
+    char path[sizeof(file)];
     v2d_t sp = spawn_point;
 
-    level_release();
-    level_init((void*)file);
+    /* restart the scene */
+    scenestack_pop();
+    scenestack_push(
+        storyboard_get_scene(SCENE_LEVEL),
+        str_cpy(path, file, sizeof(path))
+    );
 
+    /* restore the spawn point */
     if(preserve_current_spawnpoint) {
         spawn_point = sp;
         spawn_players();

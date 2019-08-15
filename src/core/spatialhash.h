@@ -266,12 +266,13 @@ void spatialhash_##T##_foreach(spatialhash_##T *sh, int rectangle_xpos, int rect
     } \
     \
     /* scanning regular elements */ \
+    stop_iteration = !((rectangle_width > 0) && (rectangle_height > 0)); \
     for(row=first_row; row<=last_row; row++) { \
         for(col=first_col; col<=last_col; col++) { \
             prev = NULL; \
             p = sh->bucket[row][col]; \
             \
-            while(p != NULL) { \
+            while(p != NULL && !stop_iteration) { \
                 int cx, cy; \
                 e_x1 = sh->xpos(p->data); \
                 e_y1 = sh->ypos(p->data); \

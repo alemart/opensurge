@@ -52,6 +52,7 @@ struct animation_t;
 struct collisionmask_t;
 struct music_t;
 struct player_t;
+struct obstaclemap_t;
 
 extern void scripting_vector2_update(surgescript_object_t* object, double x, double y);
 extern void scripting_vector2_read(const surgescript_object_t* object, double* x, double* y);
@@ -69,5 +70,7 @@ extern bricklayer_t scripting_brick_layer(const surgescript_object_t* object);
 extern bool scripting_brick_enabled(const surgescript_object_t* object);
 extern v2d_t scripting_brick_hotspot(const surgescript_object_t* object);
 extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* object);
+
+extern struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 
 #endif

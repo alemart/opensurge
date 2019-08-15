@@ -74,9 +74,15 @@ void scripting_register_sensor(surgescript_vm_t* vm)
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+
+    /* allocate variables */
+    ssassert(OBSTACLEMAP_ADDR == surgescript_heap_malloc(heap));
+    ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));
+    ssassert(STATUS_ADDR == surgescript_heap_malloc(heap));
 
     /* will create the sensor later */
     surgescript_object_set_userdata(object, NULL);
@@ -121,10 +127,13 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     if(sensor != NULL)
         return NULL;
 
-    /* store reference to the obstacle map */
-    ssassert(OBSTACLEMAP_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR), obstaclemap);
+    /* make sure that the obstacle map is alright */
     ssassert(0 == strcmp("ObstacleMap", surgescript_object_name(surgescript_objectmanager_get(manager, obstaclemap))));
+
+    /* initial configuration */
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR), obstaclemap);
+    surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), false);
+    surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), 0);
 
     /* create a new sensor */
     if(x1 == x2) {
@@ -137,12 +146,6 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     }
     else
         scripting_error(object, "Object \"%s\" spawns a Sensor with invalid coordinates.", scripting_util_parent_name(object));
-
-    /* initial configuration */
-    ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));
-    ssassert(STATUS_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), false);
-    surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), 0);
 
     /* done! */
     return NULL;
@@ -211,8 +214,8 @@ const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object)
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR));
     surgescript_object_t* target = surgescript_objectmanager_get(manager, handle);
-    obstaclemap_t* obstaclemap = (obstaclemap_t*)(surgescript_object_userdata(target));
-    ssassert(NULL != obstaclemap);
+    obstaclemap_t* obstaclemap = scripting_obstaclemap_ptr(target);
+    ssassert(obstaclemap != NULL);
     return obstaclemap;
 }
 

@@ -25,6 +25,7 @@
 #define _PLAYER_H
 
 #include "../core/v2d.h"
+#include "../core/darray.h"
 #include "brick.h"
 
 /* constants */
@@ -95,8 +96,9 @@ struct player_t {
     float blink_visibility_timer;
     int thrown_while_rolling;
     int visible;
-    struct obstaclemap_t* obstaclemap;
     const struct character_t* character;
+    struct obstaclemap_t* obstaclemap;
+    DARRAY(struct obstacle_t*, mock_obstacles);
 };
 
 /* public functions */

@@ -76,7 +76,7 @@
  * darray_length()
  * returns the length of the array
  */
-#define darray_length(arr)                   (arr##_len)
+#define darray_length(arr)                   (+arr##_len)
 
 /*
  * darray_clear()
