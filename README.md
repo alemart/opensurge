@@ -1,10 +1,10 @@
 ![Open Surge](logo.png)
 
-<img src="surge.png" alt="Surge" width="384" align="right">
-
 Welcome to the **Open Surge** source code repository!
 
 Get the game at [opensurge2d.org](http://opensurge2d.org)
+
+<img src="surge.png" alt="Surge" width="384" align="right">
 
 ## What is Open Surge?
 
