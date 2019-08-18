@@ -8,9 +8,13 @@ Get the game at [opensurge2d.org](http://opensurge2d.org)
 
 ## What is Open Surge?
 
-Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. Play, hack, become a creator and unleash your creativity! Available for Microsoft Windows and GNU/Linux. Currently under development.
+Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that makes you a powerful creator! Play, hack, create games and unleash your creativity!
+
+Open Surge is currently available for Microsoft Windows and GNU/Linux. It is in active development!
 
 ## About Open Surge
+
+Open Surge is two projects in one: a game and a game creation system (game engine). It is released as [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software).
 
 Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a developer from Brazil. Nowadays, Open Surge has contributors all over the world!
 
@@ -28,18 +32,17 @@ You can play Open Surge using a keyboard or a joystick.
 | Equals (=)    | Take snapshot    |
 | F12           | Open the editor  |
 
+## How do I create a game?
+
+You can use Open Surge to create your own amazing games!
+
+* The first step to create your game is learning how to use the level editor (press F12 during gameplay)
+* Then, comes learning how to do [basic hacking](http://opensurge2d.org) (modify the images, sounds, scenarios, characters, etc.)
+* Finally, learning [SurgeScript](http://docs.opensurge2d.org) gives you ultimate power to unleash your creativity and realize your imagination!
+
+To learn more, watch the [video tutorials](http://youtube.com/alemart88) made by the developer of the engine.
+
 ## Advanced users
-
-### How do I create a game?
-
-Open Surge is a highly flexible game. It can be remixed in many ways, allowing you to fully unleash your creativity. Modifications (MODs) range from small hacks to wholly new games.
-
-You're invited to learn:
-* How to use the level editor (press F12 during gameplay)
-* How to do [basic hacking](http://opensurge2d.org) (modify sprites, sounds, characters, controls, etc.)
-* How to use [SurgeScript](http://docs.opensurge2d.org) to fully unleash your creativity!
-
-Watch the developers' [video tutorials](http://youtube.com/alemart88).
 
 ### Running from the command line
 
@@ -73,3 +76,11 @@ sudo make install
 You may run `ccmake` or `cmake-gui` to know additional build options (e.g., to change the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
 
 **Linux users:** game assets (images, sounds, etc.) can be stored globally or in user-space. Assets located in user-space take precedence over assets located in system directories. Open Surge uses the XDG Base Directory specification; look for the *opensurge2d* directory.
+
+| Files         | Usual locations       |
+| --------------|-----------------------|
+| Game assets   | /usr/local/share/games, ~/.local/share/opensurge2d |
+| Game config.  | ~/.config/opensurge2d |
+| Logs, etc.    | ~/.cache/opensurge2d  |
+
+**Portable setup:** if you haven't done a system-wide installation, Open Surge can also read files from the executable folder.
