@@ -89,15 +89,19 @@ static float brick_zindex_offset(const brick_t *b)
     switch(brick_type(b)) {
         case BRK_PASSABLE:  s -= 0.00002f;  break;
         case BRK_CLOUD:     s -= 0.00001f;  break;
-        case BRK_SOLID:  s -= 0.00000f;  break;
+        case BRK_SOLID:     break;
     }
 
     switch(brick_layer(b)) {
         case BRL_YELLOW:    s -= 0.00005f;  break;
         case BRL_GREEN:     s += 0.00005f;  break;
-        case BRL_DEFAULT:   s += 0.00000f;  break;
+        case BRL_DEFAULT:   break;
     }
+
+    if(brick_behavior(b) == BRB_DEFAULT)
+        s -= 0.000001f;
     
+    /* done */
     return s;
 }
 
