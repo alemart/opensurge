@@ -16,8 +16,8 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
-        source_rect     768 192 32 32
+        source_file     "images/sunshine_bg.png"
+        source_rect     0 0 32 32
         frame_size      32 32
 
         animation
@@ -40,8 +40,8 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
-        source_rect     1024 32 384 32
+        source_file     "images/sunshine_bg.png"
+        source_rect     0 288 384 32
         frame_size      384 32
 
         animation
@@ -56,17 +56,17 @@ background
 // clouds
 background
 {
-    initial_position    0 32
+    initial_position    0 24
     scroll_speed        -0.02 0
-    behavior            LINEAR -15 0
+    behavior            LINEAR -7 0
     repeat_x            TRUE
     repeat_y            FALSE
 
     sprite
     {
-        source_file     images/sunshine_bg.png
-        source_rect     1024 32 384 224
-        frame_size      384 224
+        source_file     "images/sunshine_bg.png"
+        source_rect     0 288 384 176
+        frame_size      384 176
 
         animation
         {
@@ -77,10 +77,36 @@ background
     }
 }
 
+// sun
+background
+{
+    initial_position    160 16
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/sunshine_bg.png"
+        source_rect     416 288 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
 // islands
 background
 {
-    initial_position    0 96
+    initial_position    0 80
     scroll_speed        -0.05 0
     behavior            DEFAULT
     repeat_x            TRUE
@@ -88,7 +114,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     192 96 384 160
         frame_size      384 160
 
@@ -113,7 +139,7 @@ background
 //
 //    sprite
 //    {
-//        source_file     images/sunshine_bg.png
+//        source_file     "images/sunshine_bg.png"
 //        source_rect     0 128 160 128
 //        frame_size      160 128
 //
@@ -131,7 +157,7 @@ background
 // ------------------------------
 background
 {
-    initial_position    0 128
+    initial_position    0 112
     scroll_speed        -0.125 0
     behavior            LINEAR -8 0
     repeat_x            TRUE
@@ -139,7 +165,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 128 384 4
         frame_size      48 4
 
@@ -154,7 +180,7 @@ background
 
 background
 {
-    initial_position    0 132
+    initial_position    0 116
     scroll_speed        -0.15 0
     behavior            LINEAR -8.5 0
     repeat_x            TRUE
@@ -162,7 +188,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 132 384 4
         frame_size      48 4
 
@@ -177,7 +203,7 @@ background
 
 background
 {
-    initial_position    0 136
+    initial_position    0 120
     scroll_speed        -0.175 0
     behavior            LINEAR -9 0
     repeat_x            TRUE
@@ -185,7 +211,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 136 384 4
         frame_size      48 4
 
@@ -200,7 +226,7 @@ background
 
 background
 {
-    initial_position    0 140
+    initial_position    0 124
     scroll_speed        -0.2 0
     behavior            LINEAR -9.5 0
     repeat_x            TRUE
@@ -208,7 +234,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 140 384 4
         frame_size      48 4
 
@@ -223,7 +249,7 @@ background
 
 background
 {
-    initial_position    0 144
+    initial_position    0 128
     scroll_speed        -0.225 0
     behavior            LINEAR -10 0
     repeat_x            TRUE
@@ -231,7 +257,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 144 384 4
         frame_size      48 4
 
@@ -246,7 +272,7 @@ background
 
 background
 {
-    initial_position    0 148
+    initial_position    0 132
     scroll_speed        -0.25 0
     behavior            LINEAR -10.5 0
     repeat_x            TRUE
@@ -254,7 +280,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 148 384 4
         frame_size      48 4
 
@@ -269,7 +295,7 @@ background
 
 background
 {
-    initial_position    0 152
+    initial_position    0 136
     scroll_speed        -0.275 0
     behavior            LINEAR -11 0
     repeat_x            TRUE
@@ -277,7 +303,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 152 384 4
         frame_size      48 4
 
@@ -292,7 +318,7 @@ background
 
 background
 {
-    initial_position    0 156
+    initial_position    0 140
     scroll_speed        -0.3 0
     behavior            LINEAR -11.5 0
     repeat_x            TRUE
@@ -300,7 +326,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 156 384 4
         frame_size      48 4
 
@@ -315,7 +341,7 @@ background
 
 background
 {
-    initial_position    0 160
+    initial_position    0 144
     scroll_speed        -0.325 0
     behavior            LINEAR -12 0
     repeat_x            TRUE
@@ -323,7 +349,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 160 384 4
         frame_size      48 4
 
@@ -338,7 +364,7 @@ background
 
 background
 {
-    initial_position    0 164
+    initial_position    0 148
     scroll_speed        -0.35 0
     behavior            LINEAR -12.5 0
     repeat_x            TRUE
@@ -346,7 +372,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 164 384 4
         frame_size      48 4
 
@@ -361,7 +387,7 @@ background
 
 background
 {
-    initial_position    0 168
+    initial_position    0 152
     scroll_speed        -0.375 0
     behavior            LINEAR -13 0
     repeat_x            TRUE
@@ -369,7 +395,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 168 384 4
         frame_size      48 4
 
@@ -384,7 +410,7 @@ background
 
 background
 {
-    initial_position    0 172
+    initial_position    0 156
     scroll_speed        -0.4 0
     behavior            LINEAR -13.5 0
     repeat_x            TRUE
@@ -392,7 +418,7 @@ background
 
     sprite
     {
-        source_file     images/sunshine_bg.png
+        source_file     "images/sunshine_bg.png"
         source_rect     608 172 384 84
         frame_size      48 84
 
