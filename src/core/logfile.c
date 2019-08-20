@@ -53,15 +53,18 @@ void logfile_init()
  */
 void logfile_message(const char* fmt, ...)
 {
-    if(logfile != NULL) {
+    /*FILE* fp = logfile ? logfile : stdout;*/
+    FILE* fp = logfile;
+
+    if(fp != NULL) {
         va_list args;
 
         va_start(args, fmt);
-        vfprintf(logfile, fmt, args);
+        vfprintf(fp, fmt, args);
         va_end(args);
 
-        fputc('\n', logfile);
-        fflush(logfile);
+        fputc('\n', fp);
+        fflush(fp);
     }
 }
 
@@ -77,5 +80,7 @@ void logfile_release()
     
     if(logfile != NULL)
         fclose(logfile);
+
+    logfile = NULL;
 }
 
