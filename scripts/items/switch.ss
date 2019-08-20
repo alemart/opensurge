@@ -57,7 +57,7 @@ object "Switch" is "entity", "gimmick"
     fun onOverlap(otherCollider)
     {
         entity = otherCollider.entity;
-        if(entity.hasTag("player") || entity.hasTag("blocky")) {
+        if(entity.hasTag("player") || entity.hasTag("weight")) {
             pressed = true;
             activate();
         }
