@@ -275,7 +275,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                             for(int bj=0; bj<bh; bj++) {
                                 v2d_t brk_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
                                 v2d_t brk_speed = v2d_new(
-                                    dx >= 0 ? (120 + 60*(1+bi)/bw) : -(120 + 60*(bw-bi)/bw),
+                                    dx >= 0 ? (90 + 60*(1+bi)/bw) : -(90 + 60*(bw-bi)/bw),
                                     -(120 + 60*(bh-bj)/bh)
                                 );
                                 image_t *brk_img = image_clone_region(brk->image,
@@ -342,8 +342,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
             /* get the parameters */
             float t = (brk->value[0] = level_time()); /* elapsed time */
-            float rx = brk->brick_ref->behavior_arg[0]; /* x-dist */
-            float ry = brk->brick_ref->behavior_arg[1]; /* y-dist */
+            float rx = max(brk->brick_ref->behavior_arg[0], 0.0f); /* x-dist */
+            float ry = max(brk->brick_ref->behavior_arg[1], 0.0f); /* y-dist */
             float sx = TWOPI(brk->brick_ref->behavior_arg[2]); /* x-speed */
             float sy = TWOPI(brk->brick_ref->behavior_arg[3]); /* x-speed */
             float ph = DEG2RAD(brk->brick_ref->behavior_arg[4]); /* initial phase */
@@ -407,7 +407,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                             v2d_t brk_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
                             v2d_t brk_speed = v2d_new(
                                 60.0f * ((bi + 0.5f) / bw - 0.5f),
-                                -120.0f * (bh - bj / bh)
+                                -(120 + 60*(bh-bj)/bh)
                             );
                             image_t *brk_img = image_clone_region(brk->image,
                                 (bi * brk_width) / bw,
@@ -508,6 +508,50 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             break;
         }
 
+        /* pendular bricks */
+        case BRB_PENDULAR: {
+            int dx, dy, old_x, old_y;
+
+            /* get the parameters */
+            float t = (brk->value[0] = level_time()); /* elapsed time */
+            float r = max(brk->brick_ref->behavior_arg[0], 0.0f); /* radius */
+            float f = TWOPI(brk->brick_ref->behavior_arg[1]); /* cycles per second */
+            float ph = DEG2RAD(brk->brick_ref->behavior_arg[2]); /* initial phase */
+            float off = DEG2RAD(90.0f + brk->brick_ref->behavior_arg[3]); /* angular offset */
+            float a = DEG2RAD(fmodf(180.0f + brk->brick_ref->behavior_arg[4], 360.0f)); /* angular amplitude */
+
+            /* compute the angle */
+            float ang = (a / 2.0f) * cosf(f * t + ph) + off;
+
+            /* compute the position */
+            old_x = brk->x; old_y = brk->y;
+            brk->x = brk->sx + ROUND(r * cosf(ang));
+            brk->y = brk->sy + ROUND(r * sinf(ang));
+            dx = brk->x - old_x; dy = brk->y - old_y;
+
+            /* passable bricks do not affect the player */
+            if(brk->brick_ref->type == BRK_PASSABLE)
+                break;
+
+            /* set the obstacle */
+            if(brk->obstacle != NULL)
+                obstacle_set_position(brk->obstacle, brk->x, brk->y);
+
+            /* move the player(s) */
+            for(i=0; i<team_size; i++) {
+                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
+                    if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
+                        team[i]->on_movable_platform = TRUE;
+                        team[i]->actor->position.x += dx;
+                        team[i]->actor->position.y += dy;
+                    }
+                }
+            }
+
+            /* done */
+            break;
+        }
+
         /* static bricks */
         default: {
             break;
@@ -544,6 +588,12 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
             float rx = brk->brick_ref->behavior_arg[0]; /* x-dist */
             float ry = brk->brick_ref->behavior_arg[1]; /* y-dist */
             image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, fabs(rx), fabs(ry), color);
+            break;
+        }
+
+        case BRB_PENDULAR: {
+            float r = brk->brick_ref->behavior_arg[0]; /* radius */
+            image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, fabs(r), fabs(r), color);
             break;
         }
 
@@ -738,6 +788,9 @@ const char* brick_util_behaviorname(brickbehavior_t behavior)
 
         case BRB_FLOAT:
             return "FLOAT";
+
+        case BRB_PENDULAR:
+            return "PENDULAR";
     }
 
     return "Unknown";
@@ -1062,10 +1115,12 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
             dat->behavior = BRB_SMASHABLE;
         else if(str_icmp(type, "FLOAT") == 0)
             dat->behavior = BRB_FLOAT;
+        else if(str_icmp(type, "PENDULAR") == 0)
+            dat->behavior = BRB_PENDULAR;
         else
             fatal_error("Can't read brick attributes: unknown brick type '%s'", type);
 
-        for(j=0; j<BRICKBEHAVIOR_MAXARGS; j++) {
+        for(j = 0; j < BRICKBEHAVIOR_MAXARGS; j++) {
             pj = nanoparser_get_nth_parameter(param_list, 2+j);
             dat->behavior_arg[j] = atof(nanoparser_get_string(pj));
         }
