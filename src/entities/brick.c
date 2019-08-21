@@ -1132,8 +1132,8 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
     }
     else if(str_icmp(identifier, "zindex") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "Can't read brick attributes: zindex must be a number between 0.0 and 1.0");
-        dat->zindex = clip(atof(nanoparser_get_string(p1)), 0.0f, 1.0f);
+        nanoparser_expect_string(p1, "Can't read brick attributes: zindex should be a number between 0.0 and 1.0");
+        dat->zindex = min(atof(nanoparser_get_string(p1)), 1.0f);
     }
     else if(str_icmp(identifier, "mask") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
