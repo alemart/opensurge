@@ -1596,7 +1596,29 @@ brick 149
     }
 }
 
-brick 151
+brick 150
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/sunshine_mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file     "images/sunshine.png"
+        source_rect     448 960 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 152
 {
     type                PASSABLE
     behavior            DEFAULT
