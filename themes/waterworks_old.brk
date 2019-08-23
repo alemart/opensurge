@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// File: waterworks.brk
+// File: waterworks_old.brk
 // Description: a brickset script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
@@ -34,11 +34,11 @@ brick 0
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 64 32 32
         frame_size      32 32
 
@@ -56,11 +56,11 @@ brick 1
     type                SOLID
     behavior            DEFAULT
     zindex              0.485
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 0 128 128
         frame_size      128 128
 
@@ -78,11 +78,11 @@ brick 2
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     256 0 128 128
         frame_size      128 128
 
@@ -100,11 +100,11 @@ brick 3
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 0 128 128
         frame_size      128 128
 
@@ -122,11 +122,11 @@ brick 4
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 0 128 128
         frame_size      128 128
 
@@ -144,11 +144,11 @@ brick 5
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     640 0 128 128
         frame_size      128 128
 
@@ -166,11 +166,11 @@ brick 6
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 0 128 128
         frame_size      128 128
 
@@ -188,11 +188,11 @@ brick 7
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 0 128 128
         frame_size      128 128
 
@@ -210,11 +210,11 @@ brick 8
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 128 128 128
         frame_size      128 128
 
@@ -235,11 +235,11 @@ brick 32
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     32 64 32 32
         frame_size      32 32
 
@@ -256,11 +256,11 @@ brick 33
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 128 128 32
         frame_size      128 32
 
@@ -277,11 +277,11 @@ brick 34
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 160 16 32
         frame_size      16 32
 
@@ -298,11 +298,11 @@ brick 35
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     144 160 16 32
         frame_size      16 32
 
@@ -319,11 +319,11 @@ brick 36
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     160 160 16 32
         frame_size      16 32
 
@@ -340,11 +340,11 @@ brick 37
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     176 160 16 32
         frame_size      16 32
 
@@ -361,11 +361,11 @@ brick 38
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     192 160 16 32
         frame_size      16 32
 
@@ -382,11 +382,11 @@ brick 39
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     208 160 16 32
         frame_size      16 32
 
@@ -403,11 +403,11 @@ brick 40
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     224 160 16 64
         frame_size      16 64
 
@@ -424,11 +424,11 @@ brick 41
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     240 160 16 64
         frame_size      16 64
 
@@ -445,11 +445,11 @@ brick 42
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 192 64 32
         frame_size      64 32
 
@@ -466,11 +466,11 @@ brick 43
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     192 192 16 32
         frame_size      16 32
 
@@ -487,11 +487,11 @@ brick 44
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     208 192 16 32
         frame_size      16 32
 
@@ -508,11 +508,11 @@ brick 48
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 224 64 32
         frame_size      64 32
 
@@ -529,11 +529,11 @@ brick 49
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     192 224 16 32
         frame_size      16 32
 
@@ -550,11 +550,11 @@ brick 50
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     208 224 16 32
         frame_size      16 32
 
@@ -571,11 +571,11 @@ brick 52
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     224 224 32 32
         frame_size      32 32
 
@@ -592,11 +592,11 @@ brick 54
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     256 128 128 128
         frame_size      128 128
 
@@ -613,11 +613,11 @@ brick 55
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 128 128 128
         frame_size      128 128
 
@@ -634,11 +634,11 @@ brick 56
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 128 128 128
         frame_size      128 128
 
@@ -655,11 +655,11 @@ brick 57
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     640 128 128 128
         frame_size      128 128
 
@@ -676,11 +676,11 @@ brick 58
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 128 64 64
         frame_size      64 64
 
@@ -697,11 +697,11 @@ brick 59
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 192 64 64
         frame_size      64 64
 
@@ -718,11 +718,11 @@ brick 60
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 128 64 64
         frame_size      64 64
 
@@ -739,11 +739,11 @@ brick 61
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 128 64 64
         frame_size      64 64
 
@@ -760,11 +760,11 @@ brick 62
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 192 64 64
         frame_size      64 64
 
@@ -781,11 +781,11 @@ brick 63
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 192 64 64
         frame_size      64 64
 
@@ -802,11 +802,11 @@ brick 64
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 256 128 128
         frame_size      128 128
 
@@ -823,11 +823,11 @@ brick 65
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 256 128 128
         frame_size      128 128
 
@@ -844,11 +844,11 @@ brick 66
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     256 256 128 128
         frame_size      128 128
 
@@ -865,11 +865,11 @@ brick 67
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 256 128 128
         frame_size      128 128
 
@@ -886,11 +886,11 @@ brick 68
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 256 128 128
         frame_size      128 128
 
@@ -907,11 +907,11 @@ brick 69
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     640 256 128 128
         frame_size      128 128
 
@@ -928,11 +928,11 @@ brick 70
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 256 128 128
         frame_size      128 128
 
@@ -949,11 +949,11 @@ brick 71
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 256 64 64
         frame_size      64 64
 
@@ -970,11 +970,11 @@ brick 72
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 256 64 64
         frame_size      64 64
 
@@ -991,11 +991,11 @@ brick 73
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 320 64 64
         frame_size      64 64
 
@@ -1012,11 +1012,11 @@ brick 74
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 320 64 64
         frame_size      64 64
 
@@ -1033,11 +1033,11 @@ brick 75
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 384 128 128
         frame_size      128 128
 
@@ -1054,11 +1054,11 @@ brick 76
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 384 64 128
         frame_size      64 128
 
@@ -1075,11 +1075,11 @@ brick 77
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     256 384 128 128
         frame_size      128 128
 
@@ -1099,11 +1099,11 @@ brick 80
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 384 128 128
         frame_size      128 128
 
@@ -1121,11 +1121,11 @@ brick 81
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 384 128 128
         frame_size      128 128
 
@@ -1143,11 +1143,11 @@ brick 82
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     640 384 128 128
         frame_size      128 128
 
@@ -1165,11 +1165,11 @@ brick 83
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 384 128 128
         frame_size      128 128
 
@@ -1187,11 +1187,11 @@ brick 84
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 384 128 128
         frame_size      128 128
 
@@ -1209,11 +1209,11 @@ brick 85
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 512 128 128
         frame_size      128 128
 
@@ -1231,11 +1231,11 @@ brick 86
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.495
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 512 128 128
         frame_size      128 128
 
@@ -1259,11 +1259,11 @@ brick 96
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     64 64 32 32
         frame_size      32 32
 
@@ -1280,11 +1280,11 @@ brick 97
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 512 128 32
         frame_size      128 32
 
@@ -1301,11 +1301,11 @@ brick 98
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 544 128 32
         frame_size      128 32
 
@@ -1323,11 +1323,11 @@ brick 99
     type                SOLID
     behavior            DEFAULT
     zindex              0.55
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 576 128 64
         frame_size      128 64
 
@@ -1344,11 +1344,11 @@ brick 100
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 512 128 128
         frame_size      128 128
 
@@ -1365,11 +1365,11 @@ brick 101
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     640 512 128 128
         frame_size      128 128
 
@@ -1386,11 +1386,11 @@ brick 102
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 512 128 128
         frame_size      128 128
 
@@ -1407,11 +1407,11 @@ brick 103
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 512 128 128
         frame_size      128 128
 
@@ -1428,11 +1428,11 @@ brick 104
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 640 64 128
         frame_size      64 128
 
@@ -1450,11 +1450,11 @@ brick 105
     type                SOLID
     behavior            DEFAULT
     zindex              0.49
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     64 640 32 128
         frame_size      32 128
 
@@ -1471,11 +1471,11 @@ brick 106
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     96 640 32 128
         frame_size      32 128
 
@@ -1492,11 +1492,11 @@ brick 107
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 640 128 128
         frame_size      128 128
 
@@ -1516,11 +1516,11 @@ brick 144
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     96 64 32 32
         frame_size      32 32
 
@@ -1537,11 +1537,11 @@ brick 145
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 768 32 32
         frame_size      32 32
 
@@ -1558,11 +1558,11 @@ brick 146
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     416 768 32 32
         frame_size      32 32
 
@@ -1579,11 +1579,11 @@ brick 147
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     416 800 32 32
         frame_size      32 32
 
@@ -1600,11 +1600,11 @@ brick 148
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 800 32 32
         frame_size      32 32
 
@@ -1622,11 +1622,11 @@ brick 149
     type                SOLID
     behavior            DEFAULT
     zindex              0.492
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 800 32 32
         frame_size      32 32
 
@@ -1643,11 +1643,11 @@ brick 150
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     544 768 16 32
         frame_size      16 32
 
@@ -1664,11 +1664,11 @@ brick 151
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     544 800 32 16
         frame_size      32 16
 
@@ -1685,11 +1685,11 @@ brick 152
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     560 768 16 32
         frame_size      16 32
 
@@ -1706,11 +1706,11 @@ brick 153
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     544 816 32 16
         frame_size      32 16
 
@@ -1728,11 +1728,11 @@ brick 154
     type                SOLID
     behavior            DEFAULT
     zindex              0.5
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 768 32 32
         frame_size      32 32
 
@@ -1749,11 +1749,11 @@ brick 155
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     448 768 32 32
         frame_size      32 32
 
@@ -1770,11 +1770,11 @@ brick 156
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     480 768 32 32
         frame_size      32 32
 
@@ -1791,11 +1791,11 @@ brick 157
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     480 800 32 32
         frame_size      32 32
 
@@ -1812,11 +1812,11 @@ brick 158
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     448 800 32 32
         frame_size      32 32
 
@@ -1833,11 +1833,11 @@ brick 159
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 832 32 16
         frame_size      32 16
 
@@ -1854,11 +1854,11 @@ brick 160
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 848 32 32
         frame_size      32 32
 
@@ -1875,11 +1875,11 @@ brick 161
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 880 32 16
         frame_size      32 16
 
@@ -1896,11 +1896,11 @@ brick 162
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     544 832 32 16
         frame_size      32 16
 
@@ -1917,11 +1917,11 @@ brick 163
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     544 848 32 32
         frame_size      32 32
 
@@ -1938,11 +1938,11 @@ brick 164
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     544 880 32 16
         frame_size      32 16
 
@@ -1959,11 +1959,11 @@ brick 165
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     576 832 64 16
         frame_size      64 16
 
@@ -1980,11 +1980,11 @@ brick 166
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     576 848 64 32
         frame_size      64 32
 
@@ -2001,11 +2001,11 @@ brick 167
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     576 880 64 16
         frame_size      64 16
 
@@ -2022,11 +2022,11 @@ brick 168
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 832 32 32
         frame_size      32 32
 
@@ -2043,11 +2043,11 @@ brick 169
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     416 832 32 32
         frame_size      32 32
 
@@ -2064,11 +2064,11 @@ brick 170
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     416 864 32 32
         frame_size      32 32
 
@@ -2085,11 +2085,11 @@ brick 171
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 864 32 32
         frame_size      32 32
 
@@ -2106,11 +2106,11 @@ brick 172
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     448 832 32 32
         frame_size      32 32
 
@@ -2127,11 +2127,11 @@ brick 173
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     480 832 32 32
         frame_size      32 32
 
@@ -2148,11 +2148,11 @@ brick 174
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     480 864 32 32
         frame_size      32 32
 
@@ -2169,11 +2169,11 @@ brick 175
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     448 864 32 32
         frame_size      32 32
 
@@ -2191,11 +2191,11 @@ brick 180
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.497
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     576 768 64 64
         frame_size      64 64
 
@@ -2216,11 +2216,11 @@ brick 200
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 96 32 32
         frame_size      32 32
 
@@ -2239,11 +2239,11 @@ brick 201
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 768 32 32
         frame_size      16 32
 
@@ -2260,11 +2260,11 @@ brick 202
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     800 768 32 32
         frame_size      16 32
 
@@ -2281,11 +2281,11 @@ brick 203
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 800 32 32
         frame_size      32 16
 
@@ -2302,11 +2302,11 @@ brick 204
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     800 800 32 32
         frame_size      32 16
 
@@ -2326,11 +2326,11 @@ brick 205
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     832 768 32 64
         frame_size      32 64
 
@@ -2348,11 +2348,11 @@ brick 206
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     864 768 32 64
         frame_size      32 64
 
@@ -2370,11 +2370,11 @@ brick 207
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 832 64 32
         frame_size      64 32
 
@@ -2392,11 +2392,11 @@ brick 208
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 864 64 32
         frame_size      64 32
 
@@ -2414,11 +2414,11 @@ brick 209
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     832 832 32 32
         frame_size      32 32
 
@@ -2436,11 +2436,11 @@ brick 210
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     864 832 32 32
         frame_size      32 32
 
@@ -2458,11 +2458,11 @@ brick 211
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     832 864 32 32
         frame_size      32 32
 
@@ -2480,11 +2480,11 @@ brick 212
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     864 864 32 32
         frame_size      32 32
 
@@ -2504,11 +2504,11 @@ brick 215
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.5
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 768 64 16
         frame_size      64 16
 
@@ -2526,11 +2526,11 @@ brick 216
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.5
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 784 64 16
         frame_size      64 16
 
@@ -2547,11 +2547,11 @@ brick 220
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 768 64 64
         frame_size      32 64
 
@@ -2568,11 +2568,11 @@ brick 222
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 832 64 64
         frame_size      16 64
 
@@ -2589,11 +2589,11 @@ brick 223
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     0 896 128 128
         frame_size      128 128
 
@@ -2610,11 +2610,11 @@ brick 224
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 992 32 32
         frame_size      32 32
 
@@ -2630,11 +2630,11 @@ brick 225
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 960 32 32
         frame_size      32 32
 
@@ -2651,11 +2651,11 @@ brick 226
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 928 32 16
         frame_size      32 16
 
@@ -2672,11 +2672,11 @@ brick 227
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 912 32 16
         frame_size      32 16
 
@@ -2693,11 +2693,11 @@ brick 228
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     128 896 32 16
         frame_size      32 16
 
@@ -2714,11 +2714,11 @@ brick 230
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     160 896 16 128
         frame_size      16 128
 
@@ -2735,12 +2735,12 @@ brick 231
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     184 896 40 32
         frame_size      40 32
 
@@ -2758,11 +2758,11 @@ brick 244
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.2
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     256 896 64 64
         frame_size      64 64
 
@@ -2780,11 +2780,11 @@ brick 245
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.2
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     320 896 64 64
         frame_size      64 64
 
@@ -2802,11 +2802,11 @@ brick 246
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.2
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     256 960 64 64
         frame_size      64 64
 
@@ -2824,11 +2824,11 @@ brick 247
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.2
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     320 960 64 64
         frame_size      64 64
 
@@ -2849,11 +2849,11 @@ brick 248
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     32 96 32 32
         frame_size      32 32
 
@@ -2871,11 +2871,11 @@ brick 249
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.05
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     384 896 128 128
         frame_size      128 128
 
@@ -2893,11 +2893,11 @@ brick 250
     type                PASSABLE
     behavior            DEFAULT
     zindex              0.1
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 640 512 128
         frame_size      128 128
 
@@ -2915,11 +2915,11 @@ brick 253
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     512 896 128 128
         frame_size      128 128
 
@@ -2937,11 +2937,11 @@ brick 254
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     640 896 128 128
         frame_size      128 128
 
@@ -2959,11 +2959,11 @@ brick 255
     type                PASSABLE
     behavior            DEFAULT
     zindex              1.0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     768 896 128 128
         frame_size      128 128
 
@@ -2984,11 +2984,11 @@ brick 256
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     64 96 32 32
         frame_size      32 32
 
@@ -3005,11 +3005,11 @@ brick 257
 {
     type                CLOUD
     behavior            FLOAT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     896 896 64 64
         frame_size      64 32
 
@@ -3026,11 +3026,11 @@ brick 258
 {
     type                SOLID
     behavior            SMASHABLE 2 1
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 1008 32 16
         frame_size      32 16
 
@@ -3047,11 +3047,11 @@ brick 259
 {
     type                SOLID
     behavior            BREAKABLE 2 4
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     992 960 32 64
         frame_size      32 64
 
@@ -3068,11 +3068,11 @@ brick 288
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 896 64 32
         frame_size      32 32
 
@@ -3089,11 +3089,11 @@ brick 289
 {
     type                PASSABLE
     behavior            CIRCULAR 32 32 0.25 0.25 0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 896 64 32
         frame_size      32 32
 
@@ -3110,11 +3110,11 @@ brick 290
 {
     type                PASSABLE
     behavior            CIRCULAR 64 64 0.25 0.25 0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 896 64 32
         frame_size      32 32
 
@@ -3131,11 +3131,11 @@ brick 291
 {
     type                PASSABLE
     behavior            CIRCULAR 96 96 0.25 0.25 0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 896 64 32
         frame_size      32 32
 
@@ -3152,11 +3152,11 @@ brick 292
 {
     type                CLOUD
     behavior            CIRCULAR 128 128 0.25 0.25 0
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 896 64 32
         frame_size      32 32
 
@@ -3173,11 +3173,11 @@ brick 293
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 928 64 32
         frame_size      32 32
 
@@ -3194,11 +3194,11 @@ brick 294
 {
     type                PASSABLE
     behavior            CIRCULAR 32 32 -0.25 -0.25 180
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 928 64 32
         frame_size      32 32
 
@@ -3215,11 +3215,11 @@ brick 295
 {
     type                PASSABLE
     behavior            CIRCULAR 64 64 -0.25 -0.25 180
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 928 64 32
         frame_size      32 32
 
@@ -3236,11 +3236,11 @@ brick 296
 {
     type                PASSABLE
     behavior            CIRCULAR 96 96 -0.25 -0.25 180
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 928 64 32
         frame_size      32 32
 
@@ -3257,11 +3257,11 @@ brick 297
 {
     type                CLOUD
     behavior            CIRCULAR 128 128 -0.25 -0.25 180
-    mask                "images/waterworks_mask.png"
+    mask                "images/waterworks_old_mask.png"
 
     sprite
     {
-        source_file     "images/waterworks.png"
+        source_file     "images/waterworks_old.png"
         source_rect     960 928 64 32
         frame_size      32 32
 
