@@ -1,0 +1,83 @@
+// -----------------------------------------------------------------------------
+// File: marmot.spr
+// Description: Chain marmot sprite script
+// Author: Cody Licorish <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Cody Licorish
+sprite "RedMarmot"
+{
+    // NOTE: since the marmot carries the chain on only one side
+    //   of the body, sometimes the marmot needs two separate
+    //   direction sprites to look consistent.
+    source_file     "images/marmot-red.png"
+    source_rect     0 80 240 160
+    frame_size      40 40
+    hot_spot        20 40
+
+    animation 1 //right with chain
+    {
+        repeat      TRUE
+        fps         7
+        data        12 13 14 15 16 17
+    }
+    animation 0 //default
+    {
+        repeat      TRUE
+        fps         7
+        data        0 1 2 3 4 5
+    }
+    animation 2 //left with chain
+    {
+        repeat      TRUE
+        fps         7
+        data        6 7 8 9 10 11
+    }
+    animation 3 //right with chain
+    {
+        repeat      FALSE
+        fps         2
+        data        21 22 22
+    }
+    animation 4 //left with chain
+    {
+        repeat      FALSE
+        fps         2
+        data        18 19 19
+    }
+    animation 5 //right, has thrown chain
+    {
+        repeat      FALSE
+        fps         1
+        data        23
+    }
+    animation 6 //left, has thrown chain
+    {
+        repeat      FALSE
+        fps         1
+        data        20
+    }
+}
+
+sprite "RedMarmotChain"
+{
+    source_file     "images/marmot-red.png"
+    source_rect     160 240 160 40
+    frame_size      40 10
+    hot_spot        20 5
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        2 3 6 7 10 11
+    }
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        0 4 8
+    }
+}
+
