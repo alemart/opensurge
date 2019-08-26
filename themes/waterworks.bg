@@ -1,0 +1,483 @@
+// -----------------------------------------------------------------------------
+// File: waterworks.bg
+// Description: background script for Waterworks Zone (outdoors)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// clear screen
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     0 0 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// sky
+background
+{
+    initial_position    192 48
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     32 160 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// sun
+background
+{
+    initial_position    192 8
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     96 160 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// clouds
+background
+{
+    initial_position    0 48
+    scroll_speed        0 0
+    behavior            LINEAR -7 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     32 128 384 16
+        frame_size      384 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// ------------------------------
+// water layers
+// ------------------------------
+background
+{
+    initial_position    0 92
+    scroll_speed        -0.05 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 101 256 16
+        frame_size      64 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1 2 3
+        }
+    }
+}
+
+// water
+background
+{
+    initial_position    9 92
+    scroll_speed        0 0
+    behavior            LINEAR -2 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 110 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         8
+            data        1 2 3 0
+        }
+    }
+}
+
+background
+{
+    initial_position    18 108
+    scroll_speed        -0.05 0
+    behavior            LINEAR -2.5 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         9
+            data        2 3 0 1
+        }
+    }
+}
+
+background
+{
+    initial_position    27 110
+    scroll_speed        -0.1 0
+    behavior            LINEAR -3 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         10
+            data        3 0 1 2
+        }
+    }
+}
+
+background
+{
+    initial_position    36 120
+    scroll_speed        -0.15 0
+    behavior            LINEAR -3.5 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         11
+            data        0 1 2 3
+        }
+    }
+}
+
+background
+{
+    initial_position    45 130
+    scroll_speed        -0.2 0
+    behavior            LINEAR -4 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         12
+            data        1 2 3 0
+        }
+    }
+}
+
+background
+{
+    initial_position    54 140
+    scroll_speed        -0.25 0
+    behavior            LINEAR -4.5 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         13
+            data        2 3 0 1
+        }
+    }
+}
+
+background
+{
+    initial_position    63 150
+    scroll_speed        -0.3 0
+    behavior            LINEAR -5 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         14
+            data        3 0 1 2
+        }
+    }
+}
+
+background
+{
+    initial_position    72 160
+    scroll_speed        -0.35 0
+    behavior            LINEAR -5.5 0
+    repeat_x            true
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 128 272 16
+        frame_size      68 16
+
+        animation
+        {
+            repeat      true
+            fps         15
+            data        0 1 2 3
+        }
+    }
+}
+
+// water surface 1
+background
+{
+    initial_position    0 94
+    scroll_speed        -0.1 0
+    behavior            LINEAR -4 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 204 272 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+        }
+    }
+}
+
+// water surface 2
+background
+{
+    initial_position    0 108
+    scroll_speed        -0.15 0
+    behavior            LINEAR -8 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 208 272 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+        }
+    }
+}
+
+// water surface 3
+background
+{
+    initial_position    0 124
+    scroll_speed        -0.2 0
+    behavior            LINEAR -12 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 208 272 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+        }
+    }
+}
+
+// water surface 4
+background
+{
+    initial_position    0 140
+    scroll_speed        -0.25 0
+    behavior            LINEAR -16 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 208 272 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+        }
+    }
+}
+
+// water surface 5
+background
+{
+    initial_position    0 156
+    scroll_speed        -0.3 0
+    behavior            LINEAR -20 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     512 208 272 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+        }
+    }
+}
+
+
+// -------------------
+
+// walls
+background
+{
+    initial_position    0 148
+    scroll_speed        -0.4 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     864 96 64 128
+        frame_size      64 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    -1 180
+    scroll_speed        -0.4 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     32 256 256 128
+        frame_size      64 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         12
+            data        0 1 2 3
+        }
+    }
+}

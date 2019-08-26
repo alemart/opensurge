@@ -18,7 +18,7 @@ object "Waterworks Setup"
         //
         "*": {
             "Background Exchanger": {
-                "background": "themes/template.bg"
+                "background": "themes/waterworks_indoors.bg"
             },
             "Elevator": {
                 "anim": 2

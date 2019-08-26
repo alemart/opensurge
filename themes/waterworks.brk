@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: sunshine.brk
-// Description: brickset script for Sunshine Paradise
+// File: waterworks.brk
+// Description: brickset script for Waterworks Zone
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -35,11 +35,11 @@ brick 0
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 96 32 32
         frame_size      32 32
 
@@ -56,12 +56,12 @@ brick 1
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.3
+    mask                "images/waterworks_mask.png"
+    zindex              0.29
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 0 128 128
         frame_size      128 128
 
@@ -78,12 +78,12 @@ brick 2
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 0 128 128
         frame_size      128 128
 
@@ -100,12 +100,12 @@ brick 3
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 0 128 128
         frame_size      128 128
 
@@ -122,12 +122,12 @@ brick 4
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 0 128 128
         frame_size      128 128
 
@@ -144,12 +144,12 @@ brick 5
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     640 0 128 128
         frame_size      128 128
 
@@ -166,12 +166,12 @@ brick 6
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     768 0 128 128
         frame_size      128 128
 
@@ -188,12 +188,12 @@ brick 7
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 0 128 128
         frame_size      128 128
 
@@ -210,12 +210,12 @@ brick 8
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 128 128 128
         frame_size      128 128
 
@@ -232,12 +232,12 @@ brick 9
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 128 128 128
         frame_size      128 128
 
@@ -254,12 +254,12 @@ brick 10
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.7
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 128 128 128
         frame_size      128 128
 
@@ -276,12 +276,12 @@ brick 11
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.7
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 128 128 128
         frame_size      128 128
 
@@ -298,12 +298,12 @@ brick 12
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.3
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 128 384 128
         frame_size      128 128
 
@@ -320,12 +320,12 @@ brick 15
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.1
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 128 128 128
         frame_size      128 128
 
@@ -340,14 +340,13 @@ brick 15
 
 brick 16
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 256 128 128
         frame_size      128 128
 
@@ -362,14 +361,13 @@ brick 16
 
 brick 17
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 256 128 128
         frame_size      128 128
 
@@ -384,14 +382,13 @@ brick 17
 
 brick 18
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 256 128 128
         frame_size      128 128
 
@@ -406,14 +403,13 @@ brick 18
 
 brick 19
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 256 128 128
         frame_size      128 128
 
@@ -428,14 +424,13 @@ brick 19
 
 brick 20
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 256 128 128
         frame_size      128 128
 
@@ -450,14 +445,13 @@ brick 20
 
 brick 21
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     640 256 128 128
         frame_size      128 128
 
@@ -472,14 +466,13 @@ brick 21
 
 brick 22
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     768 256 128 128
         frame_size      128 128
 
@@ -494,14 +487,13 @@ brick 22
 
 brick 23
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 256 128 128
         frame_size      128 128
 
@@ -518,12 +510,11 @@ brick 24
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 384 128 128
         frame_size      128 128
 
@@ -540,12 +531,11 @@ brick 25
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 384 128 128
         frame_size      128 128
 
@@ -562,12 +552,11 @@ brick 26
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 384 128 128
         frame_size      128 128
 
@@ -584,12 +573,11 @@ brick 27
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 384 128 128
         frame_size      128 128
 
@@ -606,12 +594,11 @@ brick 28
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 384 128 128
         frame_size      128 128
 
@@ -628,12 +615,11 @@ brick 29
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     640 384 128 128
         frame_size      128 128
 
@@ -650,12 +636,11 @@ brick 30
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     768 384 128 128
         frame_size      128 128
 
@@ -672,12 +657,11 @@ brick 31
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 384 128 128
         frame_size      128 128
 
@@ -694,12 +678,11 @@ brick 32
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 512 128 128
         frame_size      128 128
 
@@ -716,12 +699,11 @@ brick 33
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 512 128 128
         frame_size      128 128
 
@@ -738,12 +720,11 @@ brick 34
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 512 128 128
         frame_size      128 128
 
@@ -760,12 +741,11 @@ brick 35
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 512 128 128
         frame_size      128 128
 
@@ -780,14 +760,13 @@ brick 35
 
 brick 36
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 512 128 128
         frame_size      128 128
 
@@ -802,14 +781,13 @@ brick 36
 
 brick 37
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     640 512 128 128
         frame_size      128 128
 
@@ -824,14 +802,13 @@ brick 37
 
 brick 38
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     768 512 128 128
         frame_size      128 128
 
@@ -846,14 +823,13 @@ brick 38
 
 brick 39
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 512 128 128
         frame_size      128 128
 
@@ -868,14 +844,13 @@ brick 39
 
 brick 40
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 640 128 128
         frame_size      128 128
 
@@ -890,14 +865,13 @@ brick 40
 
 brick 41
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 640 128 128
         frame_size      128 128
 
@@ -912,14 +886,13 @@ brick 41
 
 brick 42
 {
-    type                SOLID
+    type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 640 128 128
         frame_size      128 128
 
@@ -936,12 +909,11 @@ brick 43
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 640 128 128
         frame_size      128 128
 
@@ -958,12 +930,11 @@ brick 44
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 640 128 128
         frame_size      128 128
 
@@ -980,12 +951,11 @@ brick 45
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     640 640 128 128
         frame_size      128 128
 
@@ -1002,12 +972,11 @@ brick 46
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     768 640 128 128
         frame_size      128 128
 
@@ -1024,12 +993,11 @@ brick 47
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 640 128 128
         frame_size      128 128
 
@@ -1046,12 +1014,11 @@ brick 48
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 768 128 128
         frame_size      128 128
 
@@ -1068,12 +1035,11 @@ brick 49
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     128 768 128 128
         frame_size      128 128
 
@@ -1090,12 +1056,11 @@ brick 50
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     256 768 128 128
         frame_size      128 128
 
@@ -1112,12 +1077,11 @@ brick 51
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     384 768 128 128
         frame_size      128 128
 
@@ -1134,12 +1098,11 @@ brick 52
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     512 768 128 128
         frame_size      128 128
 
@@ -1156,12 +1119,11 @@ brick 53
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     640 768 128 128
         frame_size      128 128
 
@@ -1178,12 +1140,11 @@ brick 54
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     768 768 128 128
         frame_size      128 128
 
@@ -1200,12 +1161,11 @@ brick 55
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.49
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     896 768 128 128
         frame_size      128 128
 
@@ -1226,12 +1186,11 @@ brick 128
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     32 96 32 32
         frame_size      32 32
 
@@ -1248,12 +1207,11 @@ brick 129
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 896 96 64
         frame_size      32 64
 
@@ -1270,12 +1228,12 @@ brick 130
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     96 896 32 48
         frame_size      32 16
 
@@ -1292,12 +1250,12 @@ brick 131
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              0.35
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     0 960 128 48
         frame_size      128 16
 
@@ -1314,14 +1272,13 @@ brick 132
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     128 960 64 64
-        frame_size      64 64
+        source_file     "images/waterworks.png"
+        source_rect     128 896 128 128
+        frame_size      128 128
 
         animation
         {
@@ -1336,20 +1293,19 @@ brick 133
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     192 960 64 64
-        frame_size      64 64
+        source_file     "images/waterworks.png"
+        source_rect     256 896 64 64
+        frame_size      32 64
 
         animation
         {
             repeat      TRUE
-            fps         8
-            data        0
+            fps         16
+            data        0 1
         }
     }
 }
@@ -1358,14 +1314,13 @@ brick 134
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     128 896 128 64
-        frame_size      128 64
+        source_file     "images/waterworks.png"
+        source_rect     320 896 16 64
+        frame_size      16 64
 
         animation
         {
@@ -1380,14 +1335,13 @@ brick 135
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     256 944 64 80
-        frame_size      64 80
+        source_file     "images/waterworks.png"
+        source_rect     336 896 16 64
+        frame_size      16 64
 
         animation
         {
@@ -1402,14 +1356,34 @@ brick 136
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     320 944 64 80
-        frame_size      64 80
+        source_file     "images/waterworks.png"
+        source_rect     352 896 16 64
+        frame_size      16 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 137
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     368 896 16 64
+        frame_size      16 64
 
         animation
         {
@@ -1424,20 +1398,20 @@ brick 140
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
+    zindex              0.4
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     384 896 32 32
-        frame_size      16 32
+        source_file     "images/waterworks.png"
+        source_rect     256 960 16 64
+        frame_size      16 64
 
         animation
         {
             repeat      TRUE
             fps         8
-            data        0 1
+            data        0
         }
     }
 }
@@ -1446,20 +1420,19 @@ brick 141
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     416 896 32 32
-        frame_size      16 32
+        source_file     "images/waterworks.png"
+        source_rect     272 960 16 64
+        frame_size      16 64
 
         animation
         {
             repeat      TRUE
             fps         8
-            data        0 1
+            data        0
         }
     }
 }
@@ -1468,42 +1441,19 @@ brick 142
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     384 928 32 32
-        frame_size      16 32
+        source_file     "images/waterworks.png"
+        source_rect     288 960 16 64
+        frame_size      16 64
 
         animation
         {
             repeat      TRUE
             fps         8
-            data        0 1
-        }
-    }
-}
-
-brick 143
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
-
-    sprite
-    {
-        source_file     "images/sunshine.png"
-        source_rect     416 928 32 32
-        frame_size      16 32
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0 1
+            data        0
         }
     }
 }
@@ -1512,14 +1462,13 @@ brick 144
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     448 896 32 32
-        frame_size      32 16
+        source_file     "images/waterworks.png"
+        source_rect     304 960 16 32
+        frame_size      16 16
 
         animation
         {
@@ -1534,14 +1483,13 @@ brick 145
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     480 896 32 32
-        frame_size      32 16
+        source_file     "images/waterworks.png"
+        source_rect     304 992 16 32
+        frame_size      16 16
 
         animation
         {
@@ -1552,23 +1500,43 @@ brick 145
     }
 }
 
-brick 148
+brick 147
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     384 960 64 32
-        frame_size      64 32
+        source_file     "images/waterworks.png"
+        source_rect     320 960 32 64
+        frame_size      16 64
 
         animation
         {
             repeat      TRUE
-            fps         8
+            fps         24
+            data        0 0 0 0 0 1 0 1 0 1 1 1 0 0 1 1 0 0 0 0 0 0 0 0
+        }
+    }
+}
+
+brick 148
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     352 960 16 64
+        frame_size      16 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         24
             data        0
         }
     }
@@ -1578,19 +1546,18 @@ brick 149
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     384 992 64 32
-        frame_size      64 32
+        source_file     "images/waterworks.png"
+        source_rect     368 960 16 64
+        frame_size      16 64
 
         animation
         {
             repeat      TRUE
-            fps         8
+            fps         24
             data        0
         }
     }
@@ -1600,20 +1567,19 @@ brick 150
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     448 960 32 32
+        source_file     "images/waterworks.png"
+        source_rect     384 896 64 64
         frame_size      32 32
 
         animation
         {
             repeat      TRUE
-            fps         8
-            data        0
+            fps         16
+            data        0 1 2 3
         }
     }
 }
@@ -1622,14 +1588,14 @@ brick 151
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     480 960 32 32
-        frame_size      32 32
+        source_file     "images/waterworks.png"
+        source_rect     448 896 32 64
+        frame_size      32 64
 
         animation
         {
@@ -1644,14 +1610,338 @@ brick 152
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     448 992 64 32
+        source_file     "images/waterworks.png"
+        source_rect     480 896 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 153
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     384 960 64 32
         frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 154
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     384 992 64 32
+        frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 155
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     448 960 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 156
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     480 960 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 157
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     448 992 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 158
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    zindex              1.0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     480 992 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 160
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     512 896 80 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 0 0 0 1 2 3 4 4 4 4 3 2 1
+        }
+    }
+}
+
+brick 161
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     592 896 16 16
+        frame_size      16 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 162
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     512 912 48 16
+        frame_size      48 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 163
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     560 912 48 16
+        frame_size      48 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 164
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     512 928 64 16
+        frame_size      64 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 165
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     512 944 64 16
+        frame_size      64 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 166
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     512 960 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 170
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     608 896 16 64
+        frame_size      16 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 171
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     624 896 16 64
+        frame_size      16 64
 
         animation
         {
@@ -1666,13 +1956,13 @@ brick 180
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              1.0
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     640 896 64 64
+        source_file     "images/waterworks.png"
+        source_rect     768 896 64 64
         frame_size      64 64
 
         animation
@@ -1692,11 +1982,11 @@ brick 224
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     64 96 32 32
         frame_size      32 32
 
@@ -1712,56 +2002,35 @@ brick 224
 brick 225
 {
     type                CLOUD
-    behavior            FALL 4 4 -1
-    mask                "images/sunshine_mask.png"
+    behavior            FLOAT
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     768 896 80 64
-        frame_size      80 64
+        source_file     "images/waterworks.png"
+        source_rect     960 896 64 64
+        frame_size      64 32
 
         animation
         {
             repeat      TRUE
             fps         8
-            data        0
-        }
-    }
-}
-
-brick 226
-{
-    type                CLOUD
-    behavior            FALL 4 4 1
-    mask                "images/sunshine_mask.png"
-
-    sprite
-    {
-        source_file     "images/sunshine.png"
-        source_rect     816 960 80 64
-        frame_size      80 64
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
+            data        0 1
         }
     }
 }
 
 brick 227
 {
-    type                CLOUD
-    behavior            FLOAT
-    mask                "images/sunshine_mask.png"
+    type                SOLID
+    behavior            BREAKABLE 4 8
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     896 896 64 64
-        frame_size      64 64
+        source_file     "images/waterworks.png"
+        source_rect     896 896 32 64
+        frame_size      32 64
 
         animation
         {
@@ -1775,14 +2044,14 @@ brick 227
 brick 228
 {
     type                SOLID
-    behavior            BREAKABLE 4 8
-    mask                "images/sunshine_mask.png"
+    behavior            BREAKABLE 4 4
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     992 896 32 64
-        frame_size      32 64
+        source_file     "images/waterworks.png"
+        source_rect     896 896 32 32
+        frame_size      32 32
 
         animation
         {
@@ -1796,14 +2065,14 @@ brick 228
 brick 229
 {
     type                SOLID
-    behavior            BREAKABLE 4 4
-    mask                "images/sunshine_mask.png"
+    behavior            SMASHABLE 2 1
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     992 896 32 32
-        frame_size      32 32
+        source_file     "images/waterworks.png"
+        source_rect     896 976 32 16
+        frame_size      32 16
 
         animation
         {
@@ -1818,12 +2087,12 @@ brick 230
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 960 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 960 16 16
         frame_size      16 16
 
         animation
@@ -1838,13 +2107,13 @@ brick 230
 brick 231
 {
     type                PASSABLE
-    behavior            PENDULAR 16 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 16 16 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1859,13 +2128,13 @@ brick 231
 brick 232
 {
     type                PASSABLE
-    behavior            PENDULAR 32 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 32 32 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1880,13 +2149,13 @@ brick 232
 brick 233
 {
     type                PASSABLE
-    behavior            PENDULAR 48 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 48 48 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1901,13 +2170,13 @@ brick 233
 brick 234
 {
     type                PASSABLE
-    behavior            PENDULAR 64 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 64 64 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1922,13 +2191,13 @@ brick 234
 brick 235
 {
     type                PASSABLE
-    behavior            PENDULAR 80 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 80 80 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1943,13 +2212,13 @@ brick 235
 brick 236
 {
     type                PASSABLE
-    behavior            PENDULAR 96 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 96 96 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1964,13 +2233,13 @@ brick 236
 brick 237
 {
     type                PASSABLE
-    behavior            PENDULAR 112 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 112 112 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -1985,14 +2254,14 @@ brick 237
 brick 238
 {
     type                CLOUD
-    behavior            PENDULAR 128 0.25 0
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 128 128 0.25 0.25
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     896 960 48 48
-        frame_size      48 48
+        source_file     "images/waterworks.png"
+        source_rect     960 960 48 16
+        frame_size      48 16
 
         animation
         {
@@ -2007,12 +2276,12 @@ brick 240
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 960 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 960 16 16
         frame_size      16 16
 
         animation
@@ -2027,13 +2296,13 @@ brick 240
 brick 241
 {
     type                PASSABLE
-    behavior            PENDULAR 16 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 16 16 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2048,13 +2317,13 @@ brick 241
 brick 242
 {
     type                PASSABLE
-    behavior            PENDULAR 32 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 32 32 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2069,13 +2338,13 @@ brick 242
 brick 243
 {
     type                PASSABLE
-    behavior            PENDULAR 48 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 48 48 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2090,13 +2359,13 @@ brick 243
 brick 244
 {
     type                PASSABLE
-    behavior            PENDULAR 64 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 64 64 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2111,13 +2380,13 @@ brick 244
 brick 245
 {
     type                PASSABLE
-    behavior            PENDULAR 80 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 80 80 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2132,13 +2401,13 @@ brick 245
 brick 246
 {
     type                PASSABLE
-    behavior            PENDULAR 96 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 96 96 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2153,13 +2422,13 @@ brick 246
 brick 247
 {
     type                PASSABLE
-    behavior            PENDULAR 112 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 112 112 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     944 976 16 16
+        source_file     "images/waterworks.png"
+        source_rect     1008 976 16 16
         frame_size      16 16
 
         animation
@@ -2174,36 +2443,14 @@ brick 247
 brick 248
 {
     type                CLOUD
-    behavior            PENDULAR 128 0.25 180
-    mask                "images/sunshine_mask.png"
+    behavior            CIRCULAR 128 128 0.25 0.25 180
+    mask                "images/waterworks_mask.png"
 
     sprite
     {
-        source_file     "images/sunshine.png"
-        source_rect     896 960 48 48
-        frame_size      48 48
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 250
-{
-    type                SOLID
-    behavior            SMASHABLE 4 4
-    mask                "images/sunshine_mask.png"
-    zindex              0.5
-
-    sprite
-    {
-        source_file     "images/sunshine.png"
-        source_rect     992 896 32 32
-        frame_size      32 32
+        source_file     "images/waterworks.png"
+        source_rect     960 960 48 16
+        frame_size      48 16
 
         animation
         {
@@ -2218,12 +2465,12 @@ brick 254
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              -1.0
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     960 992 32 32
         frame_size      32 32
 
@@ -2240,12 +2487,12 @@ brick 255
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/sunshine_mask.png"
+    mask                "images/waterworks_mask.png"
     zindex              -1.0
 
     sprite
     {
-        source_file     "images/sunshine.png"
+        source_file     "images/waterworks.png"
         source_rect     992 992 32 32
         frame_size      32 32
 

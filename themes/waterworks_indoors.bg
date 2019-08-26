@@ -1,0 +1,247 @@
+// -----------------------------------------------------------------------------
+// File: waterworks_indoors.bg
+// Description: background script for Waterworks Zone (indoors)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// clear screen
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     0 32 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// main bg
+background
+{
+    initial_position    0 48
+    scroll_speed        -0.05 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     320 256 120 128
+        frame_size      120 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// ceiling 1
+background
+{
+    initial_position    0 -16
+    scroll_speed        -0.15 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     864 256 64 28
+        frame_size      64 28
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// ceiling 2
+background
+{
+    initial_position    0 12
+    scroll_speed        -0.175 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     864 256 64 28
+        frame_size      64 28
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// bottom
+background
+{
+    initial_position    0 180
+    scroll_speed        -0.2 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     864 320 96 64
+        frame_size      96 94
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// pipes
+background
+{
+    initial_position    0 -32
+    scroll_speed        -0.4 -0.05
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     480 256 352 256
+        frame_size      352 256
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// foreground
+background
+{
+    initial_position    2400 0
+    scroll_speed        -2.0 -1.5
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            TRUE
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     0 384 480 83
+        frame_size      480 83
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    4800 0
+    scroll_speed        -2.0 -1.5
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            TRUE
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     0 384 480 83
+        frame_size      480 83
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    6200 0
+    scroll_speed        -2.0 -1.5
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            TRUE
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     0 384 480 83
+        frame_size      480 83
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    9600 0
+    scroll_speed        -2.0 -1.5
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            TRUE
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/waterworks_bg.png"
+        source_rect     0 384 480 83
+        frame_size      480 83
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}

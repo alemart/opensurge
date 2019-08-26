@@ -5,14 +5,14 @@
 // ------------------------------------------------------------
 
 // header
-name "Waterworks Zone"
+name "Waterworks Beta"
 author "Alexandre Martins"
 license "CC-0"
 version "0.5"
 requires "0.5.0"
 act 1
 theme "themes/waterworks_old.brk"
-bgtheme "themes/sunshine.bg"
+bgtheme "themes/waterworks.bg"
 spawn_point 128 4968
 music "musics/waterworks.ogg"
 setup "Default Setup" "Waterworks Setup"
