@@ -345,7 +345,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             float rx = max(brk->brick_ref->behavior_arg[0], 0.0f); /* x-dist */
             float ry = max(brk->brick_ref->behavior_arg[1], 0.0f); /* y-dist */
             float sx = TWOPI(brk->brick_ref->behavior_arg[2]); /* x-speed */
-            float sy = TWOPI(brk->brick_ref->behavior_arg[3]); /* x-speed */
+            float sy = TWOPI(brk->brick_ref->behavior_arg[3]); /* y-speed */
             float ph = DEG2RAD(brk->brick_ref->behavior_arg[4]); /* initial phase */
 
             /* compute the position */
