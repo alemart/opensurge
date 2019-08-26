@@ -89,6 +89,8 @@ static surgescript_var_t* fun_getinvincible(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setinvincible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getbreathtime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setbreathtime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -214,6 +216,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_turbo", fun_setturbo, 1);
     surgescript_vm_bind(vm, "Player", "get_underwater", fun_getunderwater, 0);
     surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1);
+    surgescript_vm_bind(vm, "Player", "get_breathTime", fun_getbreathtime, 0);
+    surgescript_vm_bind(vm, "Player", "set_breathTime", fun_setbreathtime, 1);
     surgescript_vm_bind(vm, "Player", "get_frozen", fun_getfrozen, 0);
     surgescript_vm_bind(vm, "Player", "set_frozen", fun_setfrozen, 1);
     surgescript_vm_bind(vm, "Player", "get_layer", fun_getlayer, 0);
@@ -1029,6 +1033,24 @@ surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgesc
             player_enter_water(player);
         else if(!underwater && player_is_underwater(player))
             player_leave_water(player);
+    }
+    return NULL;
+}
+
+/* get the maximum number of seconds the player can stay underwater without breathing */
+surgescript_var_t* fun_getbreathtime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? player_breath_time(player) : 0.0f);
+}
+
+/* set the maximum number of seconds the player can stay underwater without breathing */
+surgescript_var_t* fun_setbreathtime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        float seconds = surgescript_var_get_number(param[0]);
+        player_set_breath_time(player, seconds);
     }
     return NULL;
 }
