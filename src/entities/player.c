@@ -165,6 +165,7 @@ player_t *player_create(const char *character_name)
     /* misc */
     p->underwater = FALSE;
     p->underwater_timer = 0.0f;
+    p->breath_time = PLAYER_UNDERWATER_BREATH;
 
     /* character system: setting the multipliers */
     physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);
@@ -630,7 +631,6 @@ void player_drown(player_t *player)
     }
 }
 
-
 /*
  * player_breathe()
  * Breathe (air bubble, underwater)
@@ -645,7 +645,6 @@ void player_breathe(player_t *player)
         sound_play(SFX_BREATHE);
     }
 }
-
 
 /*
  * player_enter_water()
@@ -680,7 +679,6 @@ void player_enter_water(player_t *player)
     }
 }
 
-
 /*
  * player_leave_water()
  * Leaves the water
@@ -710,7 +708,6 @@ void player_leave_water(player_t *player)
     }
 }
 
-
 /*
  * player_is_underwater()
  * Is the player underwater?
@@ -719,8 +716,6 @@ int player_is_underwater(const player_t *player)
 {
     return player->underwater;
 }
-
-
 
 /*
  * player_reset_underwater_timer()
@@ -731,16 +726,32 @@ void player_reset_underwater_timer(player_t *player)
     player->underwater_timer = 0.0f;
 }
 
-
 /*
  * player_seconds_remaining_to_drown()
  * How many seconds to drown?
  */
 float player_seconds_remaining_to_drown(const player_t *player)
 {
-    return player->underwater && player->shield_type != SH_WATERSHIELD ? max(0.0f, PLAYER_UNDERWATER_BREATH - player->underwater_timer) : INFINITY;
+    return player->underwater && player->shield_type != SH_WATERSHIELD ? max(0.0f, player->breath_time - player->underwater_timer) : INFINITY;
 }
 
+/*
+ * player_set_breath_time()
+ * Set the maximum time the player can remain underwater without breathing
+ */
+void player_set_breath_time(player_t* player, float seconds)
+{
+    player->breath_time = max(0.0f, seconds);
+}
+
+/*
+ * player_breath_time()
+ * The maximum time the player can remain underwater without breathing, in seconds
+ */
+float player_breath_time(const player_t* player)
+{
+    return player->breath_time;
+}
 
 /*
  * player_lock_horizontally_for()

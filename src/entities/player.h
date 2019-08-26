@@ -91,6 +91,7 @@ struct player_t {
     int pa_old_state;
     int underwater;
     float underwater_timer;
+    float breath_time;
     int blinking;
     float blink_timer;
     float blink_visibility_timer;
@@ -127,6 +128,8 @@ void player_reset_underwater_timer(player_t *player);
 void player_drown(player_t *player);
 int player_is_underwater(const player_t *player);
 float player_seconds_remaining_to_drown(const player_t *player);
+void player_set_breath_time(player_t* player, float seconds);
+float player_breath_time(const player_t* player);
 
 int player_is_in_the_air(const player_t *player);
 int player_is_attacking(const player_t *player);
