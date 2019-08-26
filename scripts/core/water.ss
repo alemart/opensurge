@@ -98,7 +98,7 @@ object "Water Bubble" is "entity", "private", "disposable"
 
 object "Water Splash" is "entity", "private", "disposable"
 {
-    splash = Actor("Water Splash");
+    actor = Actor("Water Splash");
 
     state "main"
     {
@@ -108,8 +108,34 @@ object "Water Splash" is "entity", "private", "disposable"
 
     fun constructor()
     {
-        splash.zindex = 0.99;
-        splash.alpha = 0.7;
+        actor.zindex = 0.99;
+        actor.alpha = 0.7;
+    }
+}
+
+object "Water Surface" is "entity", "private", "awake"
+{
+    actor = Actor("Water Surface");
+    transform = Transform();
+    sw = actor.width;
+    dx = 0;
+
+    state "main"
+    {
+        xpos = (Math.floor(Camera.position.x / sw) + dx) * sw;
+        transform.position = Vector2(xpos, Level.waterlevel);
+    }
+
+    fun constructor()
+    {
+        actor.zindex = 0.99;
+        actor.alpha = 0.2;
+    }
+
+    fun setOffset(offset)
+    {
+        dx = offset;
+        return this;
     }
 }
 
@@ -121,6 +147,7 @@ object "Water Controller"
     breathingBehavior = spawn("WaterController.BreathingBehavior");
     underwaterTimer = spawn("WaterController.UnderwaterTimer");
     splashListener = spawn("WaterController.SplashListener");
+    surfaceAnimation = spawn("WaterController.SurfaceAnimation");
 
     state "main"
     {
@@ -164,6 +191,8 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
     music = Music("musics/drowning.ogg");
     counter = Text("GoodNeighborsLarge");
     seconds = 5; // when should we display the timer?
+    breathTime = { };
+    inf = 1200;
 
     state "main"
     {
@@ -171,6 +200,17 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
         if(player.shield == "water")
             return;
         if(player.underwater) {
+            // prevent drowning if the head is not underwater
+            if(canBreathe(player)) {
+                if(player.breathTime < inf) {
+                    breathTime[player.name] = player.breathTime;
+                    player.breathTime = inf;
+                }
+            }
+            else if(player.breathTime >= inf && (bt = breathTime[player.name]) !== null)
+                player.breathTime = bt;
+
+            // breathing counter
             t = player.secondsToDrown;
             if(t > 0 && t <= seconds) {
                 // show counter
@@ -191,6 +231,12 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
             counter.visible = false;
             music.stop();
         }
+    }
+
+    fun canBreathe(player)
+    {
+        collider = player.collider;
+        return Math.lerp(collider.bottom, collider.top, 0.8) < Level.waterlevel;
     }
 
     fun constructor()
@@ -263,5 +309,19 @@ object "WaterController.BreathingBehavior"
             "Water Bubble",
             position.translatedBy(0, -16)
         ).setSize(size);
+    }
+}
+
+// this object controls the surface animation of the water
+object "WaterController.SurfaceAnimation"
+{
+    surfaces = [
+        Level.spawn("Water Surface").setOffset(-1),
+        Level.spawn("Water Surface").setOffset(0),
+        Level.spawn("Water Surface").setOffset(1)
+    ];
+
+    state "main"
+    {
     }
 }

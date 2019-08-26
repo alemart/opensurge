@@ -74,3 +74,18 @@ sprite "Water Bubble"
         data        0
     }
 }
+
+sprite "Water Surface"
+{
+    source_file     "images/watersurface.png"
+    source_rect     0 0 416 48
+    frame_size      416 16
+    hot_spot        0 2
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1 0 2
+    }
+}

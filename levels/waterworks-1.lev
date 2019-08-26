@@ -13,12 +13,31 @@ requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/waterworks_indoors.bg"
-spawn_point 864 9536
+spawn_point 1696 9712
 music "musics/waterworks.ogg"
 setup "Default Setup"
 players "Surge"
+waterlevel 9800
 
 // bricks
+brick 36 2624 9648
+brick 36 1808 9648
+brick 36 1936 9648
+brick 36 2064 9648
+brick 9 1808 9776
+brick 9 1936 9776
+brick 9 2064 9776
+brick 142 1744 9680
+brick 142 1840 9680
+brick 142 1936 9680
+brick 142 2032 9680
+brick 142 2128 9680
+brick 144 1744 9664
+brick 145 1840 9664
+brick 144 1936 9664
+brick 145 2032 9664
+brick 144 2128 9664
+brick 38 2176 9648
 brick 2 896 9984
 brick 1 896 10112
 brick 142 912 9888
@@ -44,15 +63,10 @@ brick 255 1472 9952
 brick 255 1504 9952
 brick 1 1408 9952
 brick 10 1408 9824
-brick 255 1408 9792
-brick 255 1440 9792
-brick 255 1472 9792
-brick 255 1504 9792
 brick 23 1296 9760
 brick 18 1280 9856
 brick 150 1360 9904
 brick 20 1264 9568
-brick 22 1392 9568
 brick 22 1264 9392
 brick 18 1136 9392
 brick 17 1008 9392
@@ -93,6 +107,12 @@ brick 15 1136 9760
 brick 163 928 9584
 brick 23 880 9520
 brick 163 864 9584
+brick 9 1680 9776
+brick 36 1680 9648
+brick 255 1424 9792
+brick 255 1456 9824
+brick 255 1488 9824
+brick 255 1504 9824
 brick 16 0 9920
 brick 16 128 9920
 brick 16 256 9920
@@ -164,5 +184,6 @@ brick 241 336 9728
 
 // entities
 entity "Spring Standard" 1008 9952 "b4fb923c1d394efc"
+entity "SwoopHarrier" 2016 9664 "741067f0e419efa8"
 
 // EOF
