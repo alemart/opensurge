@@ -64,6 +64,14 @@ object "Door" is "entity", "gimmick"
         }
     }
 
+    fun toggle()
+    {
+        if(isOpen())
+            close();
+        else
+            open();
+    }
+
     fun isOpen()
     {
         return (state == "open");
