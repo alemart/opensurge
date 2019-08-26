@@ -64,3 +64,63 @@ sprite "Event Trigger 4"
         data        0
     }
 }
+
+sprite "Event Trigger 5"
+{
+    source_file     "images/core.png"
+    source_rect     128 96 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Event Trigger 6"
+{
+    source_file     "images/core.png"
+    source_rect     160 96 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Event Trigger 7"
+{
+    source_file     "images/core.png"
+    source_rect     192 96 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Event Trigger 8"
+{
+    source_file     "images/core.png"
+    source_rect     224 96 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

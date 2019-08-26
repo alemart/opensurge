@@ -94,6 +94,56 @@ object "Event Trigger 4" is "entity", "special"
     }
 }
 
+// Event Trigger 5
+object "Event Trigger 5" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(5);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+}
+
+// Event Trigger 6
+object "Event Trigger 6" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(6);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+}
+
+// Event Trigger 7
+object "Event Trigger 7" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(7);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+}
+
+// Event Trigger 8
+object "Event Trigger 8" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(8);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+}
+
+//  --------------------
+
 object "Event Trigger Base" is "private", "entity", "special"
 {
     collider = CollisionBox(32, 32);
@@ -122,7 +172,7 @@ object "Event Trigger Base" is "private", "entity", "special"
 
 object "Event Trigger Manager" is "private", "awake", "entity"
 {
-    triggers = [ null, null, null, null, null ];
+    triggers = [ null, null, null, null, null, null, null, null, null ];
 
     state "main"
     {
