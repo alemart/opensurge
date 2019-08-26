@@ -42,7 +42,7 @@ object "Barrel - right,rotation"
 
     state rotate
     {
-        set_player_animation SD_NONE 0
+        set_player_animation "None" 0
         set_angle "45 * sin(2 * pi() * ($t += dt()))"
         on_button_pressed fire1 fire
     }

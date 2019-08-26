@@ -1,17 +1,16 @@
 // -----------------------------------------------------------------------------
-// File: none.spr
-// Description: sprite definition file (.spr) for "None"
+// File: pointer.spr
+// Description: a pointer for the UI
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-// A transparent sprite
-sprite "None"
+sprite "UI Pointer"
 {
     source_file     "images/core.png"
-    source_rect     200 8 16 16
-    frame_size      16 16
-    hot_spot        8 8
+    source_rect     236 12 7 8
+    frame_size      7 8
+    hot_spot        -5 -2
 
     animation 0
     {

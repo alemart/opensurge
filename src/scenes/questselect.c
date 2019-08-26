@@ -120,7 +120,7 @@ void questselect_init(void *foo)
     bgtheme = background_load(QUEST_BGFILE);
 
     icon = actor_create();
-    actor_change_animation(icon, sprite_get_animation("SD_GUIARROW", 0));
+    actor_change_animation(icon, sprite_get_animation("UI Pointer", 0));
 
     load_quest_list();
     fadefx_in(color_rgb(0,0,0), 1.0);

@@ -109,7 +109,7 @@ void langselect_init(void *param)
     bgtheme = background_load(LANG_BGFILE);
 
     arrow = actor_create();
-    actor_change_animation(arrow, sprite_get_animation("SD_GUIARROW", 0));
+    actor_change_animation(arrow, sprite_get_animation("UI Pointer", 0));
 
     load_lang_list();
     if(lngcount <= 1) {

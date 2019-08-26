@@ -33,7 +33,7 @@
 #define SPRITE_MAX_ANIM         1024 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
 HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
 static HASHTABLE(spriteinfo_t, sprites);
-static const char* DEFAULT_SPRITE = "SD_QUESTIONMARK";
+static const char* DEFAULT_SPRITE = "null";
 static const int DEFAULT_ANIM = 0;
 
 /* private functions */

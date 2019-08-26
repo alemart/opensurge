@@ -1,0 +1,105 @@
+// -----------------------------------------------------------------------------
+// File: shields.spr
+// Description: sprite definition for the player shields
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Celdecea
+sprite "Shield"
+{
+    source_file     "images/shields.png"
+    source_rect     0 50 230 42
+    frame_size      46 42
+    hot_spot        23 19
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0 1 2 3 4
+    }
+}
+
+// art by Celdecea
+sprite "Fire shield"
+{
+    source_file     "images/shields.png"
+    source_rect     0 92 230 42
+    frame_size      46 42
+    hot_spot        23 19
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0 1 2 3 4
+    }
+}
+
+// art by Colin Beard
+sprite "Thunder shield"
+{
+    source_file     "images/more_shields.png"
+    source_rect     0 50 230 42
+    frame_size      46 42
+    hot_spot        23 19
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0 1 2 3 4
+    }
+}
+
+// art by Colin Beard
+sprite "Water shield"
+{
+    source_file     "images/more_shields.png"
+    source_rect     0 92 230 42
+    frame_size      46 42
+    hot_spot        23 19
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0 1 2 3 4
+    }
+}
+
+// art by Colin Beard
+sprite "Wind shield"
+{
+    source_file     "images/even_more_shields.png"
+    source_rect     0 50 230 42
+    frame_size      46 42
+    hot_spot        23 19
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0 1 2 3 4
+    }
+}
+
+// art by Colin Beard
+sprite "Acid shield"
+{
+    source_file     "images/even_more_shields.png"
+    source_rect     0 92 230 42
+    frame_size      46 42
+    hot_spot        23 19
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         24
+        data        0 1 2 3 4
+    }
+}

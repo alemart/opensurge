@@ -1104,7 +1104,7 @@ void level_init(void *path_to_lev_file)
     dlgbox_starttime = 0;
     dlgbox = actor_create();
     dlgbox->position.y = VIDEO_SCREEN_H;
-    actor_change_animation(dlgbox, sprite_get_animation("SD_DIALOGBOX", 0));
+    actor_change_animation(dlgbox, sprite_get_animation("Message Box", 0));
     dlgbox_title = font_create("dialogbox");
     dlgbox_message = font_create("dialogbox");
 
@@ -2352,7 +2352,6 @@ void update_dlgbox()
         }
         dlgbox->position.x = (VIDEO_SCREEN_W - image_width(actor_image(dlgbox)))/2;
         dlgbox->position.y = max(dlgbox->position.y - speed*dt, VIDEO_SCREEN_H - image_height(actor_image(dlgbox))*1.3f);
-
     }
     else {
         dlgbox->position.y = min(dlgbox->position.y + speed*dt, VIDEO_SCREEN_H);
@@ -2489,6 +2488,7 @@ bool is_setup_object(const char* object_name)
 /* render powerups */
 void render_powerups()
 {
+    const char *sprite_name = "Item Box Icon";
     image_t *icon[MAX_POWERUPS]; /* icons */
     int visible[MAX_POWERUPS]; /* is icon[i] visible? */
     int i, c = 0; /* c is the icon count */
@@ -2499,34 +2499,34 @@ void render_powerups()
 
     if(player) {
         if(player->got_glasses)
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 6) , 0 );
+            icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 7) , 0 );
 
         switch(player_shield_type(player))
         {
             case SH_SHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 7) , 0 );
+                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 8) , 0 );
                 break;
             case SH_FIRESHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 11) , 0 );
+                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 12) , 0 );
                 break;
             case SH_THUNDERSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 12) , 0 );
+                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 13) , 0 );
                 break;
             case SH_WATERSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 13) , 0 );
+                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 14) , 0 );
                 break;
             case SH_ACIDSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 14) , 0 );
+                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 15) , 0 );
                 break;
             case SH_WINDSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 15) , 0 );
+                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 16) , 0 );
                 break;
             case SH_NONE:
                 break;
         }
 
         if(player_is_invincible(player)) {
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 4) , 0 );
+            icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 5) , 0 );
             if(player->invincibility_timer >= PLAYER_MAX_INVINCIBILITY * 0.75f) { /* it blinks */
                 /* we want something that blinks faster as player->invincibility_timer tends to PLAYER_MAX_INVINCIBLITY */
                 float x = (PLAYER_MAX_INVINCIBILITY - player->invincibility_timer) / (PLAYER_MAX_INVINCIBILITY * 0.25f);
@@ -2535,7 +2535,7 @@ void render_powerups()
         }
 
         if(player_is_turbocharged(player)) {
-            icon[c++] = sprite_get_image( sprite_get_animation("SD_ICON", 5) , 0 );
+            icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 6) , 0 );
             if(player->turbo_timer >= PLAYER_MAX_TURBO * 0.75f) { /* it blinks */
                 /* we want something that blinks faster as player->turbo_timer tends to PLAYER_MAX_TURBO */
                 float x = (PLAYER_MAX_TURBO - player->turbo_timer) / (PLAYER_MAX_TURBO * 0.25f);
@@ -3313,7 +3313,7 @@ void editor_render()
         editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(editor_grid_snap(editor_cursor), topleft));
 
         /* drawing the cursor arrow */
-        cursor = sprite_get_image(sprite_get_animation("SD_ARROW", 0), 0);
+        cursor = sprite_get_image(sprite_get_animation("Mouse Cursor", 0), 0);
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
@@ -3324,7 +3324,7 @@ void editor_render()
     }
     else {
         /* drawing an eraser */
-        cursor = sprite_get_image(sprite_get_animation("SD_ERASER", 0), 0);
+        cursor = sprite_get_image(sprite_get_animation("Eraser", 0), 0);
         image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
 

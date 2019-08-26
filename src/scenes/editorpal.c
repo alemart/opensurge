@@ -33,7 +33,7 @@
 
 
 /* private data */
-#define CURSOR_SPRITE               "SD_ARROW"
+#define CURSOR_SPRITE               "Mouse Cursor"
 #define ITEM_SPRITE_MAXSIZE         128
 #define ITEM_BOX_SIZE               160 /* sprite size + padding */
 #define ITEM_MAX_ZOOM               2.0f

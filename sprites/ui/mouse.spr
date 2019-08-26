@@ -1,16 +1,16 @@
 // -----------------------------------------------------------------------------
-// File: pause.spr
-// Description: sprite script for the pause icon
+// File: mouse.spr
+// Description: script for the mouse cursor
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // ----------------------------------------------------------------------------
 
-// art by Colin Beard
-sprite "Pause"
+// art by qubodup (opengameart.org)
+sprite "Mouse Cursor"
 {
-    source_file     "images/pause.png"
-    source_rect     0 0 23 20
-    frame_size      23 20
+    source_file     "images/cursor.png"
+    source_rect     0 0 12 16
+    frame_size      12 16
     hot_spot        0 0
 
     animation 0
@@ -20,3 +20,4 @@ sprite "Pause"
         data        0
     }
 }
+

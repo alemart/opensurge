@@ -1,17 +1,16 @@
 // -----------------------------------------------------------------------------
-// File: none.spr
-// Description: sprite definition file (.spr) for "None"
+// File: null.spr
+// Description: null sprite
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-// A transparent sprite
-sprite "None"
+sprite "null"
 {
     source_file     "images/core.png"
-    source_rect     200 8 16 16
-    frame_size      16 16
-    hot_spot        8 8
+    source_rect     96 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
 
     animation 0
     {

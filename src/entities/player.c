@@ -1270,22 +1270,22 @@ void update_shield(player_t *player)
 
     switch(player->shield_type) {
         case SH_SHIELD:
-            actor_change_animation(sh, sprite_get_animation("SD_SHIELD", 0));
+            actor_change_animation(sh, sprite_get_animation("Shield", 0));
             break;
         case SH_FIRESHIELD:
-            actor_change_animation(sh, sprite_get_animation("SD_FIRESHIELD", 0));
+            actor_change_animation(sh, sprite_get_animation("Fire shield", 0));
             break;
         case SH_THUNDERSHIELD:
-            actor_change_animation(sh, sprite_get_animation("SD_THUNDERSHIELD", 0));
+            actor_change_animation(sh, sprite_get_animation("Thunder shield", 0));
             break;
         case SH_WATERSHIELD:
-            actor_change_animation(sh, sprite_get_animation("SD_WATERSHIELD", 0));
+            actor_change_animation(sh, sprite_get_animation("Water shield", 0));
             break;
         case SH_ACIDSHIELD:
-            actor_change_animation(sh, sprite_get_animation("SD_ACIDSHIELD", 0));
+            actor_change_animation(sh, sprite_get_animation("Acid shield", 0));
             break;
         case SH_WINDSHIELD:
-            actor_change_animation(sh, sprite_get_animation("SD_WINDSHIELD", 0));
+            actor_change_animation(sh, sprite_get_animation("Wind shield", 0));
             break;
         case SH_NONE:
             break;

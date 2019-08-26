@@ -1,44 +1,17 @@
-// script by Alexandre
+// -----------------------------------------------------------------------------
+// File: editor.spr
+// Description: script for editor sprites
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
 
-// Arrow
-sprite SD_ARROW
+// art by Colin Beard
+sprite "Eraser"
 {
-    source_file     images/cursor.png
-    source_rect     0 0 12 16
-    frame_size      12 16
-    hot_spot        0 0
-
-    animation 0
-    {
-        repeat      TRUE
-        fps         8
-        data        0
-    }
-}
-
-// Eraser
-sprite SD_ERASER
-{
-    source_file     images/eraser.png
+    source_file     "images/eraser.png"
     source_rect     0 0 19 18
     frame_size      19 18
     hot_spot        9 9
-
-    animation 0
-    {
-        repeat      TRUE
-        fps         8
-        data        0
-    }
-}
-
-// Question Mark
-sprite SD_QUESTIONMARK
-{
-    source_file     images/core.png
-    source_rect     96 0 32 32
-    frame_size      32 32
-    hot_spot        16 16
 
     animation 0
     {

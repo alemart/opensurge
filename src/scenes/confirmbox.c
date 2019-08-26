@@ -70,12 +70,12 @@ void confirmbox_init(void *text_and_options)
 
     background = image_clone(video_get_backbuffer());
 
-    box = sprite_get_image(sprite_get_animation("SD_CONFIRMBOX", 0), 0);
+    box = sprite_get_image(sprite_get_animation("Confirm Box", 0), 0);
     boxpos = v2d_new( (VIDEO_SCREEN_W - image_width(box))/2 , VIDEO_SCREEN_H );
 
     input = input_create_user(NULL);
     arrow = actor_create();
-    actor_change_animation(arrow, sprite_get_animation("SD_GUIARROW", 0));
+    actor_change_animation(arrow, sprite_get_animation("UI Pointer", 0));
 
     textfnt = font_create("dialogbox");
     font_set_text(textfnt, "%s", text);

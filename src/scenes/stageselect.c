@@ -129,7 +129,7 @@ void stageselect_init(void *should_enable_debug)
     font_set_position(page, v2d_new(VIDEO_SCREEN_W - font_get_textsize(page).x - 10, font_get_position(msg).y));
 
     icon = actor_create();
-    actor_change_animation(icon, sprite_get_animation("SD_GUIARROW", 0));
+    actor_change_animation(icon, sprite_get_animation("UI Pointer", 0));
 
     load_stage_list();
     bgtheme = background_load(STAGE_BGFILE);

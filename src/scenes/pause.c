@@ -124,7 +124,7 @@ void pause_update()
  */
 void pause_render()
 {
-    image_t *p = sprite_get_image(sprite_get_animation("SD_PAUSE", 0), 0);
+    image_t *p = sprite_get_image(sprite_get_animation("Pause", 0), 0);
     float scale = 1+0.5*fabs(cos(PI/2*pause_timer));
     v2d_t pos = v2d_new((VIDEO_SCREEN_W-image_width(p))/2 - (scale-1)*image_width(p)/2, (VIDEO_SCREEN_H-image_height(p))/2 - (scale-1)*image_height(p)/2);
 

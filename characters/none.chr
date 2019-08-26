@@ -28,7 +28,7 @@ character "None"
     
     animations
     {
-        sprite_name                 "SD_NONE"
+        sprite_name                 "None"
         stopped                     0
         walking                     0
         running                     0

@@ -1,14 +1,18 @@
-// script by Alexandre
+// -----------------------------------------------------------------------------
+// File: dialogs.spr
+// Description: dialog boxes
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
 
 // Confirm Box
-sprite SD_CONFIRMBOX
+sprite "Confirm Box"
 {
-    source_file     images/dialogbox.png
+    source_file     "images/dialogbox.png"
     source_rect     0 68 179 63
     frame_size      179 63
     hot_spot        0 0
 
-    // default
     animation 0
     {
         repeat      TRUE
@@ -17,15 +21,14 @@ sprite SD_CONFIRMBOX
     }
 }
 
-// Dialog Box
-sprite SD_DIALOGBOX
+// Message Box
+sprite "Message Box"
 {
     source_file     images/dialogbox.png
     source_rect     0 0 272 68
     frame_size      272 68
     hot_spot        0 0
 
-    // idle
     animation 0
     {
         repeat      TRUE

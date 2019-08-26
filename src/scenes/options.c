@@ -95,7 +95,7 @@ void options_init(void *foo)
     bgtheme = background_load(OPTIONS_BGFILE);
 
     icon = actor_create();
-    actor_change_animation(icon, sprite_get_animation("SD_GUIARROW", 0));
+    actor_change_animation(icon, sprite_get_animation("UI Pointer", 0));
     icon->position = v2d_new(-50,-50);
 
     root = create_grouptree();
