@@ -42,7 +42,7 @@ object "Peixudo"
     {
         let "$volume = 1 - abs(player_xpos() - xpos()) / 640"
         let "$pan = (xpos() - player_xpos()) / 160"
-        play_sample "samples/peixudo.wav" "$volume" "$pan"
+        play_sample "samples/fish.wav" "$volume" "$pan"
         change_state "jump"
     }
 

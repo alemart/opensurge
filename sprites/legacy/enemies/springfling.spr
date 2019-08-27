@@ -1,6 +1,6 @@
 //Spring Fling: Sprite By SilverstepP
 // script by SilverstepP, modified by Alexandre
-sprite "Springfling"
+sprite "Spring Fling"
 {
 	source_file	"images/levels/1/springfling.png"
 	source_rect	0 0 64 64

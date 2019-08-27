@@ -1,0 +1,42 @@
+// -----------------------------------------------------------------------------
+// File: springfling.spr
+// Description: Springfling sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// sprite art by Colin Beard, concept art by Cody Licorish
+sprite "Springfling"
+{
+    source_file     "images/springfling.png"
+    source_rect     0 0 64 64
+    frame_size      32 32
+    hot_spot        16 32
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // jumping
+    animation 1
+    {
+        repeat      FALSE
+        fps         16
+        data        2 3 1
+    }
+
+    // back to the ground
+    animation 2
+    {
+        repeat      FALSE
+        fps         16
+        data        3 2 3
+    }   
+}
+
+
+

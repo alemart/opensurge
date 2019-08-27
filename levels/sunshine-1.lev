@@ -11,10 +11,9 @@ license "CC-BY 3.0"
 version "1.0"
 requires "0.5.0"
 act 1
-music "musics/sunshine.ogg"
 theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
-spawn_point 800 9792
+spawn_point 896 9744
 setup "Default Setup"
 players "Surge"
 
@@ -31,6 +30,7 @@ brick 1 1280 10112
 brick 1 1408 10080
 brick 226 880 9840
 brick 227 1008 9808
+brick 27 880 9792
 brick 16 0 9952
 brick 16 128 9952
 brick 16 256 9952
@@ -80,7 +80,9 @@ brick 16 752 9760
 brick 1 752 9888
 brick 225 672 9840
 brick 151 688 9952
+brick 26 624 9776
 
 // entities
+entity "Fish" 816 9856 "853d6d90f9d0c324"
 
 // EOF
