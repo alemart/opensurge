@@ -192,7 +192,7 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
     counter = Text("GoodNeighborsLarge");
     seconds = 5; // when should we display the timer?
     breathTime = { };
-    inf = 1200;
+    inf = 120000;
 
     state "main"
     {
