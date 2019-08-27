@@ -306,6 +306,12 @@ object "Platformer" is "behavior"
         return rledge;
     }
 
+    // am I falling down?
+    fun get_falling()
+    {
+        return midair && ysp > 0;
+    }
+
     /*
     // __sensors
     fun get___sensors()
@@ -394,7 +400,10 @@ object "PlatformerAutoWalker"
 
     state "main"
     {
-        platformer.walkRight();
+        if(platformer.direction >= 0)
+            platformer.walkRight();
+        else
+            platformer.walkLeft();
         state = "autoWalk";
     }
 
