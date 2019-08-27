@@ -13,7 +13,8 @@ using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
 
-// Fish is a baddie that appears all of a sudden...
+// Fish is a baddie that attacks when the player
+// is within a visible range
 object "Fish" is "entity", "enemy"
 {
     public anim = 0;
