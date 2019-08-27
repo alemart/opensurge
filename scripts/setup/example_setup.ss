@@ -97,8 +97,8 @@ object "Example Setup"
             },
 
             // Example: lock the camera as soon as the player touches an
-            // Event Trigger 4 entity, ideally placed near the goal flag.
-            "Event Trigger 4": {
+            // Event Trigger 7 entity, ideally placed near the goal flag.
+            "Event Trigger 7": {
                 "onTrigger": FunctionEvent("Lock Camera").withArgument(2048) // give a maximum space of 2048 pixels to the right
             },
 
@@ -180,7 +180,7 @@ object "Example Setup"
         //
         "3": {
             // Example: start a boss fight!
-            "Event Trigger 4": {
+            "Event Trigger 7": {
                 "onTrigger": EventList([
                     FunctionEvent("Play Boss Music"),
                     FunctionEvent("Lock Camera").withArgument(800) // lock camera with a space of 800 pixels to the right
