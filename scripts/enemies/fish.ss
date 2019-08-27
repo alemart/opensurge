@@ -14,7 +14,7 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
 
 // Fish is a baddie that appears all of a sudden...
-object "Fish" is "entity", "enemy", "awake"
+object "Fish" is "entity", "enemy"
 {
     public anim = 0;
     public jumpHeight = 128; // in pixels (y-axis)
