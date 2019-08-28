@@ -164,7 +164,6 @@ object "Goal Capsule Broken Part" is "entity", "private", "disposable"
     xsp = 0;
     ysp = 0;
     phi = 0;
-    grv = 828;
     part = "core"; // left | right | core
     actor = [
         Actor("Goal Capsule Broken Core"),
@@ -209,7 +208,7 @@ object "Goal Capsule Broken Part" is "entity", "private", "disposable"
     {
         // move
         dt = Time.delta;
-        ysp += grv * dt;
+        ysp += Level.gravity * dt;
         transform.move(xsp * dt, ysp * dt);
         transform.rotate(phi * dt);
 

@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
+using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
@@ -26,7 +27,6 @@ object "Fish" is "entity", "enemy"
     movement = DirectionalMovement();
     transform = Transform();
     sfx = Sound("samples/fish.wav");
-    grv = 828; // gravity in px/s^2
     spawnPoint = 0;
 
     state "main"
@@ -55,7 +55,7 @@ object "Fish" is "entity", "enemy"
     state "jumping"
     {
         // move the fish
-        movement.speed += grv * Time.delta;
+        movement.speed += Level.gravity * Time.delta;
         actor.visible = true;
 
         // reposition the fish & stop its movement
@@ -76,7 +76,7 @@ object "Fish" is "entity", "enemy"
     fun jumpSpeed()
     {
         // Torricelli's
-        return -Math.sqrt(2 * grv * Math.abs(jumpHeight));
+        return -Math.sqrt(2 * Level.gravity * Math.abs(jumpHeight));
     }
 
     fun jumpVolume()

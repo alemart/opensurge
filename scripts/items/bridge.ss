@@ -4,9 +4,10 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
-using SurgeEngine.Player;
 using SurgeEngine.Actor;
 using SurgeEngine.Brick;
+using SurgeEngine.Level;
+using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
@@ -191,7 +192,7 @@ object "Bridge Element" is "entity", "private"
 
     state "collapsing"
     {
-        ysp += 828 * Time.delta; // grv * dt
+        ysp += Level.gravity * Time.delta;
         transform.move(0, ysp * Time.delta);
     }
 

@@ -46,12 +46,12 @@ object "My Baddie" is "entity", "enemy"
 using SurgeEngine.Collisions.Sensor;
 using SurgeEngine.Vector2;
 using SurgeEngine.Player;
+using SurgeEngine.Level;
 
 object "Platformer" is "behavior"
 {
     public readonly entity = parent; // the entity associated with this behavior
     speed = 120; // speed in px/s
-    public gravity = 828; // px/s^2
     public jumpSpeed = 400; // px/s
     xsp = 0;
     ysp = 0;
@@ -92,7 +92,7 @@ object "Platformer" is "behavior"
 
         // gravity
         if(sensors.midair) {
-            ysp += gravity * dt;
+            ysp += Level.gravity * dt;
             if(ysp > topysp)
                 ysp = topysp;
         }

@@ -23,7 +23,6 @@ object "Neon's Jetpack"
     maxSpeed = 60; // px/s
     acceleration = 60; // px/s^2
     flyingTime = 0;
-    grv = 828;
 
     state "main"
     {
@@ -51,7 +50,7 @@ object "Neon's Jetpack"
         if(canFly(player) && player.input.buttonDown("fire1")) {
             // fly
             player.anim = 20;
-            player.ysp = Math.max(-maxSpeed, player.ysp - (grv + acceleration) * Time.delta);
+            player.ysp = Math.max(-maxSpeed, player.ysp - (Level.gravity + acceleration) * Time.delta);
             player.springify();
 
             // flying time
