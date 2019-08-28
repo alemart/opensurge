@@ -145,28 +145,28 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
         if(x1 != x2) {
             /* horizontal sensor */
             if(y1 >= o_y1 && y1 < o_y2) {
-                for(int x = x2; x >= x1; x--) {
-                    if(x >= o_x1 && x < o_x2) {
-                        px = x - o_x1;
-                        py = y1 - o_y1;
-                        flip(obstacle, &px, &py, NULL);
-                        if(collisionmask_at(mask, px, py, pitch))
-                            return TRUE;
-                    }
+                int _x1 = max(x1, o_x1);
+                int _x2 = min(x2, o_x2 - 1);
+                for(int x = _x2; x >= _x1; x--) {
+                    px = x - o_x1;
+                    py = y1 - o_y1;
+                    flip(obstacle, &px, &py, NULL);
+                    if(collisionmask_at(mask, px, py, pitch))
+                        return TRUE;
                 }
             }
         }
         else if(y1 != y2) {
             /* vertical sensor */
             if(x1 >= o_x1 && x1 < o_x2) {
-                for(int y = y2; y >= y1; y--) {
-                    if(y >= o_y1 && y < o_y2) {
-                        px = x1 - o_x1;
-                        py = y - o_y1;
-                        flip(obstacle, &px, &py, NULL);
-                        if(collisionmask_at(mask, px, py, pitch))
-                            return TRUE;
-                    }
+                int _y1 = max(y1, o_y1);
+                int _y2 = min(y2, o_y2 - 1);
+                for(int y = _y2; y >= _y1; y--) {
+                    px = x1 - o_x1;
+                    py = y - o_y1;
+                    flip(obstacle, &px, &py, NULL);
+                    if(collisionmask_at(mask, px, py, pitch))
+                        return TRUE;
                 }
             }
         }
