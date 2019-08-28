@@ -44,8 +44,8 @@ object "Default HUD" is "entity", "detached", "awake", "private"
 object "DefaultHUD.Score" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
-    label = Text("GoodNeighbors");
-    value = Text("GoodNeighbors");
+    label = Text("HUD");
+    value = Text("HUD");
 
     state "main"
     {
@@ -64,8 +64,8 @@ object "DefaultHUD.Score" is "entity", "detached", "awake", "private"
 object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
-    label = Text("GoodNeighbors");
-    value = Text("GoodNeighbors");
+    label = Text("HUD");
+    value = Text("HUD");
     timer = 0.0;
 
     state "main"
@@ -101,8 +101,8 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
 object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
-    label = Text("GoodNeighbors");
-    value = Text("GoodNeighbors");
+    label = Text("HUD");
+    value = Text("HUD");
     blinkTime = 0.35;
 
     state "main"
@@ -135,7 +135,7 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
     icon = Actor("LifeCounter");
-    value = Text("GoodNeighbors");
+    value = Text("HUD");
 
     state "main"
     {

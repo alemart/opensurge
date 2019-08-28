@@ -189,7 +189,7 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
 {
     transform = Transform();
     music = Music("musics/drowning.ogg");
-    counter = Text("GoodNeighborsLarge");
+    counter = Text("HUD Large");
     seconds = 5; // when should we display the timer?
     breathTime = { };
     inf = 120000;

@@ -276,7 +276,7 @@ object "DefaultOpeningAnimation.Formula" is "entity", "awake", "detached", "priv
 object "DefaultOpeningAnimation.Title" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    text = Text("GoodNeighborsLarge");
+    text = Text("HUD Large");
 
     state "main"
     {
@@ -306,7 +306,7 @@ object "DefaultOpeningAnimation.Title" is "entity", "awake", "detached", "privat
 object "DefaultOpeningAnimation.Act" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    text = Text("GoodNeighborsLarge");
+    text = Text("HUD Large");
     wheel = spawn("DefaultOpeningAnimation.Wheel");
 
     state "main"
@@ -366,7 +366,7 @@ object "DefaultOpeningAnimation.Wheel" is "entity", "awake", "detached", "privat
 object "DefaultOpeningAnimation.Game" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    text = Text("GoodNeighbors");
+    text = Text("HUD");
     label = "opensurge2d.org";
     margin = 4;
 

@@ -123,7 +123,7 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
 object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    text = Text("GoodNeighborsLarge");
+    text = Text("HUD Large");
     appearSpeed = 3 * Screen.width; // in px/s
 
     state "main"
@@ -197,8 +197,8 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    text = Text("GoodNeighbors");
-    value = Text("GoodNeighbors");
+    text = Text("HUD");
+    value = Text("HUD");
     counter = null;
     appearSpeed = 3 * Screen.width; // in px/s
     isMaster = false;
