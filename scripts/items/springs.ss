@@ -651,7 +651,7 @@ object "Spring Behavior" is "private", "entity"
 
     fun activateSpring(player)
     {
-        if(player.ysp > 0 || sensitive) {
+        if((player.ysp > 0 || sensitive) && !player.hit && !player.dying) {
             // compute the velocity
             v = direction.scaledBy(speed);
 
