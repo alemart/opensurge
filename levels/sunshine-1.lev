@@ -13,7 +13,7 @@ requires "0.5.0"
 act 1
 theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
-spawn_point 896 9744
+spawn_point 1088 9600
 setup "Default Setup"
 players "Surge"
 
@@ -31,6 +31,12 @@ brick 1 1408 10080
 brick 226 880 9840
 brick 227 1008 9808
 brick 27 880 9792
+brick 16 1056 9552
+brick 133 1008 9616
+brick 133 1008 9680
+brick 133 1008 9744
+brick 133 1008 9776
+brick 134 976 9552
 brick 16 0 9952
 brick 16 128 9952
 brick 16 256 9952
@@ -83,6 +89,30 @@ brick 151 688 9952
 brick 26 624 9776
 
 // entities
-entity "Fish" 816 9856 "853d6d90f9d0c324"
+entity "Zipline Right" 1040 9728 "a1225b9496b7672d"
+entity "Zipline Right" 1104 9760 "3a25959c3be062a3"
+entity "Zipline Grabber" 1040 9728 "8e69e8f3d7ba2df3"
+entity "Zipline Right" 1168 9792 "723345ab475686fb"
+entity "Zipline Right" 1232 9824 "58850856fecaf536"
+entity "Zipline Right" 1296 9856 "683db6796594ed5c"
+entity "Zipline Right" 1360 9888 "20b3a06048c31386"
+entity "Zipline Left" 912 9632 "e2a0f9b3c8605edc"
+entity "Zipline Left" 848 9664 "c1489c4f74a60e16"
+entity "Zipline Left" 784 9696 "3318f4220d1a078a"
+entity "Zipline Left" 720 9728 "3413120b6d7a9105"
+entity "Zipline Left" 656 9760 "e04835127dea8567"
+entity "Zipline Left" 592 9792 "bb934863a046e9ad"
+entity "Zipline Grabber" 1040 9632 "d71d5500f5f5af3e"
+entity "Crococopter" 880 9696 "3b50117bb4eb8844"
+entity "Crococopter" 832 9728 "0b5f89f894c0ce54"
+entity "Crococopter" 752 9760 "4f38c276f9805ac8"
+entity "Crococopter" 656 9808 "b5200f05afc6e87d"
+entity "Crococopter" 1120 9760 "c2b82bd13df6daed"
+entity "Crococopter" 1248 9808 "d6a3fabb61562c18"
+entity "Crococopter" 1328 9872 "57de70858b1c8640"
+entity "Crococopter" 1424 9936 "2036f3a3897b2f4c"
+entity "Powerup Collectibles" 1120 9648 "66e8675560062ea1"
+entity "Spring Standard" 832 10000 "6b206f210ce8385e"
+entity "Powerup Collectibles" 784 9856 "ea4b21c90ca83fae"
 
 // EOF
