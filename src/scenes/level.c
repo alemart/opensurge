@@ -348,7 +348,10 @@ static int editor_grid_size = 1;
 static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
-static v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
+static void editor_grid_render();
+static inline v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
+static inline v2d_t editor_grid_snap_ex(v2d_t position, int grid_width, int grid_height);
+static inline bool editor_grid_is_enabled();
 
 /* editor: tooltip */
 static font_t* editor_tooltip_font;
@@ -3305,6 +3308,9 @@ void editor_render()
     /* background */
     editor_render_background();
 
+    /* render the grid */
+    editor_grid_render();
+
     /* path of the movable platforms */
     editor_movable_platforms_path_render(major_bricks);
 
@@ -4139,20 +4145,46 @@ void editor_grid_update()
             }
         }
 
-        if(editor_grid_size > 1)
+        if(editor_grid_is_enabled())
             video_showmessage("Snap to grid: %dx%d", editor_grid_size, editor_grid_size);
         else
             video_showmessage("Snap to grid: disabled");
     }
 }
 
+/* render the grid */
+void editor_grid_render()
+{
+    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+    const color_t color = color_rgb(255, 255, 255);
+    const int grid_size = 128;
+
+    /* no grid */
+    if(!editor_grid_is_enabled())
+        return;
+
+    /* render */
+    for(int x = 0; x < VIDEO_SCREEN_W + grid_size; x += grid_size) {
+        for(int y = 0; y < VIDEO_SCREEN_H + grid_size; y += grid_size) {
+            v2d_t grid = v2d_subtract(editor_grid_snap_ex(v2d_new(x, y), grid_size, grid_size), topleft);
+            image_rectfill(grid.x, grid.y, grid.x + 1, grid.y + 1, color);
+        }
+    }
+}
+
 /* aligns position to a cell in the grid */
 v2d_t editor_grid_snap(v2d_t position)
 {
+    return editor_grid_snap_ex(position, editor_grid_size, editor_grid_size);
+}
+
+/* snap to grid with custom grid size */
+v2d_t editor_grid_snap_ex(v2d_t position, int grid_width, int grid_height)
+{
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
-    int w = editor_grid_size;
-    int h = editor_grid_size;
+    int w = max(1, grid_width);
+    int h = max(1, grid_height);
     int cx = (int)topleft.x % w;
     int cy = (int)topleft.y % h;
 
@@ -4160,6 +4192,12 @@ v2d_t editor_grid_snap(v2d_t position)
     int ypos = -cy + ((int)position.y / h) * h;
 
     return v2d_add(topleft, v2d_new(xpos, ypos));
+}
+
+/* is the grid enabled? */
+bool editor_grid_is_enabled()
+{
+    return editor_grid_size > 1;
 }
 
 
