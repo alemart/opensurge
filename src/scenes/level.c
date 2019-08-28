@@ -61,6 +61,7 @@
 #include "../entities/entitymanager.h"
 #include "../entities/legacy/item.h"
 #include "../entities/legacy/enemy.h"
+#include "../physics/obstacle.h"
 #include "../scripting/scripting.h"
 #include "../scenes/editorpal.h"
 
@@ -3109,15 +3110,30 @@ void editor_update()
             /* brick */
             case EDT_BRICK: {
                 brick_t *candidate = NULL;
+                int candidate_got_collision = FALSE;
 
                 for(itb=major_bricks;itb;itb=itb->next) {
                     v2d_t brk_topleft = brick_position(itb->data);
                     v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(itb->data));
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
-                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
+                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
+
                     if(bounding_box(a,b)) {
-                        if(candidate == NULL || brick_zindex(itb->data) >= brick_zindex(candidate))
+                        const obstacle_t* obstacle = brick_obstacle(itb->data);
+
+                        /* pick the best brick that is in front of the others */
+                        if(
+                            (candidate == NULL) ||
+                            (obstacle == NULL && !candidate_got_collision && (
+                                brick_obstacle(candidate) != NULL || brick_zindex(itb->data) >= brick_zindex(candidate)
+                            )) ||
+                            (obstacle != NULL && obstacle_got_collision(obstacle, b[0], b[1], b[2], b[3]) && (
+                                !candidate_got_collision || brick_zindex(itb->data) >= brick_zindex(candidate)
+                            ))
+                        ) {
                             candidate = itb->data;
+                            candidate_got_collision = (obstacle != NULL) && obstacle_got_collision(obstacle, b[0], b[1], b[2], b[3]);
+                        }
                     }
                 }
 
@@ -3143,7 +3159,7 @@ void editor_update()
 
                 for(iti=major_items;iti;iti=iti->next) {
                     float a[4] = {iti->data->actor->position.x-iti->data->actor->hot_spot.x, iti->data->actor->position.y-iti->data->actor->hot_spot.y, iti->data->actor->position.x-iti->data->actor->hot_spot.x + image_width(actor_image(iti->data->actor)), iti->data->actor->position.y-iti->data->actor->hot_spot.y + image_height(actor_image(iti->data->actor))};
-                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
+                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
 
                     if(bounding_box(a,b)) {
                         if(candidate == NULL || !iti->data->bring_to_back)
@@ -3176,7 +3192,7 @@ void editor_update()
 
                 for(ite=major_enemies;ite;ite=ite->next) {
                     float a[4] = {ite->data->actor->position.x-ite->data->actor->hot_spot.x, ite->data->actor->position.y-ite->data->actor->hot_spot.y, ite->data->actor->position.x-ite->data->actor->hot_spot.x + image_width(actor_image(ite->data->actor)), ite->data->actor->position.y-ite->data->actor->hot_spot.y + image_height(actor_image(ite->data->actor))};
-                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x+1 , editor_cursor.y+topleft.y+1 };
+                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
                     int mykey = editor_enemy_name2key(ite->data->name);
                     if(mykey >= 0 && bounding_box(a,b)) {
                         if(candidate == NULL || ite->data->zindex >= candidate->zindex) {
@@ -4681,7 +4697,7 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
         if(is_ssobj_spawned_in_the_editor(object)) {
             v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
             float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x + 1 , editor_cursor.y + topleft.y + 1 };
+            float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
 
             /* find the bounding box of the entity */
             const char* name = surgescript_object_name(object);
