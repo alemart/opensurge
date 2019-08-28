@@ -3102,17 +3102,13 @@ void editor_update()
     pick_object = editorcmd_is_triggered(editor_cmd, "pick-item");
     delete_object = editorcmd_is_triggered(editor_cmd, "delete-item") || editor_is_eraser_enabled();
     if(pick_object || delete_object) {
-        brick_list_t *itb;
-        item_list_t *iti;
-        enemy_list_t *ite;
-
         switch(editor_cursor_entity_type) {
             /* brick */
             case EDT_BRICK: {
-                brick_t *candidate = NULL;
+                brick_t* candidate = NULL;
                 int candidate_got_collision = FALSE;
 
-                for(itb=major_bricks;itb;itb=itb->next) {
+                for(brick_list_t* itb = major_bricks; itb != NULL; itb = itb->next) {
                     v2d_t brk_topleft = brick_position(itb->data);
                     v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(itb->data));
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
@@ -3155,9 +3151,9 @@ void editor_update()
 
             /* item */
             case EDT_ITEM: {
-                item_t *candidate = NULL;
+                item_t* candidate = NULL;
 
-                for(iti=major_items;iti;iti=iti->next) {
+                for(item_list_t* iti = major_items; iti != NULL; iti = iti->next) {
                     float a[4] = {iti->data->actor->position.x-iti->data->actor->hot_spot.x, iti->data->actor->position.y-iti->data->actor->hot_spot.y, iti->data->actor->position.x-iti->data->actor->hot_spot.x + image_width(actor_image(iti->data->actor)), iti->data->actor->position.y-iti->data->actor->hot_spot.y + image_height(actor_image(iti->data->actor))};
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
 
@@ -3190,7 +3186,7 @@ void editor_update()
                 enemy_t *candidate = NULL;
                 int candidate_key = 0;
 
-                for(ite=major_enemies;ite;ite=ite->next) {
+                for(enemy_list_t* ite = major_enemies; ite != NULL; ite = ite->next) {
                     float a[4] = {ite->data->actor->position.x-ite->data->actor->hot_spot.x, ite->data->actor->position.y-ite->data->actor->hot_spot.y, ite->data->actor->position.x-ite->data->actor->hot_spot.x + image_width(actor_image(ite->data->actor)), ite->data->actor->position.y-ite->data->actor->hot_spot.y + image_height(actor_image(ite->data->actor))};
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
                     int mykey = editor_enemy_name2key(ite->data->name);
