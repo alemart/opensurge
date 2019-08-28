@@ -49,6 +49,7 @@ static surgescript_var_t* fun_getfile(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_getbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -85,11 +86,12 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_license", fun_getlicense, 0);
     surgescript_vm_bind(vm, "Level", "get_file", fun_getfile, 0);
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
+    surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
+    surgescript_vm_bind(vm, "Level", "get_gravity", fun_getgravity, 0);
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
     surgescript_vm_bind(vm, "Level", "set_spawnpoint", fun_setspawnpoint, 1);
     surgescript_vm_bind(vm, "Level", "get_spawnpoint", fun_getspawnpoint, 0);
-    surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
     surgescript_vm_bind(vm, "Level", "set_background", fun_setbackground, 1);
     surgescript_vm_bind(vm, "Level", "get_background", fun_getbackground, 0);
     surgescript_vm_bind(vm, "Level", "set_next", fun_setnext, 1);
@@ -350,6 +352,13 @@ surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescrip
 surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_string(surgescript_var_create(), level_file());
+}
+
+/* level gravity in px/s^s */
+surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* TODO: grab value from the physics engine */
+    return surgescript_var_set_number(surgescript_var_create(), 828.0);
 }
 
 /* clears the level (will show the level cleared animation) */
