@@ -3,7 +3,7 @@
 
 sprite Zipline.Grabber
 {
-    source_file     images/zipline.png
+    source_file     images/levels/1/zipline.png
     source_rect     0 0 16 16
     frame_size      16 16
     hot_spot        8 16
@@ -18,7 +18,7 @@ sprite Zipline.Grabber
 
 sprite Zipline.Pole
 {
-	source_file     images/zipline.png
+	source_file     images/levels/1/zipline.png
 	source_rect     75 0 5 96
 	frame_size		5 96
 	hot_spot		0 0
