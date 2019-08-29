@@ -7,99 +7,83 @@
 // header
 name "Sandbox"
 author "YOUR_NAME_HERE"
-license "CC-0"
+license "CC-BY 3.0"
 version "1.0"
 requires "0.5.0"
 act 1
-theme "themes/template.brk"
+theme "themes/waterworks.brk"
 bgtheme "themes/template.bg"
-spawn_point 128 9968
+spawn_point 384 9632
 setup "Default Setup" "Example Setup"
 players "Tux"
 
 // bricks
-brick 0 896 10000
-brick 0 960 10000
-brick 48 896 9872
-brick 48 896 9744
-brick 0 896 9744
-brick 0 960 9744
-brick 0 0 10000
-brick 0 64 10000
-brick 0 128 10000
-brick 0 192 10000
-brick 0 256 10000
-brick 0 320 10000
-brick 0 384 10000
-brick 0 448 10000
-brick 0 512 10000
-brick 0 576 10000
-brick 0 640 10000
-brick 0 704 10000
-brick 0 768 10000
-brick 0 512 9872
-brick 0 512 9808
-brick 0 512 9744
-brick 0 832 10000
-brick 0 832 9744
-brick 48 832 9744
-brick 48 832 9872
-brick 0 576 9744
-brick 0 384 1000
+brick 1 896 9216
+brick 3 896 9472
+brick 3 896 9600
+brick 3 896 9728
+brick 3 896 9856
+brick 3 896 9344
+brick 1 896 9984
+brick 17 0 9856
+brick 16 128 9856
+brick 16 256 9856
+brick 25 256 9856
+brick 23 256 9728
+brick 21 256 9600
+brick 17 384 9600
+brick 18 512 9600
+brick 22 640 9600
+brick 24 640 9728
+brick 27 640 9856
+brick 26 384 9856
+brick 2 384 9728
+brick 2 512 9728
+brick 26 512 9856
+brick 16 384 9856
+brick 16 512 9856
+brick 18 640 9856
+brick 28 768 9856
+brick 23 768 9728
+brick 23 768 9600
+brick 23 768 9472
+brick 30 768 9344
+brick 26 640 9344
+brick 26 512 9344
+brick 26 384 9344
+brick 26 256 9344
+brick 26 128 9344
+brick 26 0 9344
+brick 5 0 9216
+brick 6 128 9216
+brick 6 256 9216
+brick 6 384 9216
+brick 6 512 9216
+brick 6 640 9216
+brick 7 768 9216
+brick 2 0 9984
+brick 2 128 9984
+brick 2 256 9984
+brick 2 384 9984
+brick 2 512 9984
+brick 2 640 9984
+brick 2 768 9984
 
 // entities
-entity "Goal" 928 10000 "4136e5c056e8ec42"
-entity "Collectible" 192 9936 "7933112fabc26d1a"
-entity "Collectible" 192 9904 "881e5ac4972def40"
-entity "Collectible" 192 9872 "c8a29491a1ac649e"
-entity "Collectible" 240 9872 "18ce0b2ed2cbdbd7"
-entity "Collectible" 240 9904 "d5b20b11f5a259a0"
-entity "Collectible" 240 9936 "be647e181fcd7513"
-entity "Collectible" 288 9936 "57f0d701e47fcb39"
-entity "Collectible" 288 9904 "d938c81cb4fcdaef"
-entity "Collectible" 288 9872 "91c77bc2d8ca789a"
-entity "Collectible" 336 9872 "c3761f7735208aeb"
-entity "Collectible" 336 9904 "90d8cc4aa049113e"
-entity "Collectible" 336 9936 "fea531a71c520c9c"
-entity "Powerup Shield Thunder" 80 10000 "bb32ff7d18700f85"
-entity "Collectible" 192 9840 "288319aca207aeda"
-entity "Collectible" 192 9808 "8acefe11217d5707"
-entity "Collectible" 192 9776 "d2b32e9fee588c69"
-entity "Collectible" 192 9744 "93eabea658480731"
-entity "Collectible" 192 9712 "d73e057af0e17b7f"
-entity "Collectible" 240 9840 "e41e5db31ea38649"
-entity "Collectible" 240 9808 "f3c02f7746bc7305"
-entity "Collectible" 240 9776 "c39d88b55c0b6aa3"
-entity "Collectible" 240 9744 "188a87093051b4b6"
-entity "Collectible" 240 9712 "a47977d4f474fa5f"
-entity "Collectible" 288 9840 "5687515a173f646b"
-entity "Collectible" 288 9808 "2ae04b1040836063"
-entity "Collectible" 288 9776 "acc91e2a10101e63"
-entity "Collectible" 288 9744 "0732c367cec5c69f"
-entity "Collectible" 288 9712 "5274973e1d5e0ad2"
-entity "Collectible" 336 9840 "256b9d4473324247"
-entity "Collectible" 336 9808 "7c666b1cd10a5703"
-entity "Collectible" 336 9776 "45d83b642607e36d"
-entity "Collectible" 336 9744 "ef86f166bc0897eb"
-entity "Collectible" 336 9712 "d49db1fa59a01c04"
-entity "Collectible" 192 9680 "1c1032127cecdd3c"
-entity "Collectible" 240 9680 "a88f287f6f89cb86"
-entity "Collectible" 288 9680 "c51150acb976f991"
-entity "Collectible" 336 9680 "72c00b1dc2cc5022"
-entity "Crococopter" 40 9896 "60fee379b3b97b82"
-entity "Crococopter" 80 9856 "50a1f545d21aa9f5"
-entity "Crococopter" 400 9896 "d5e449cc09e641e6"
-entity "Crococopter" 448 9872 "baa633d3499334e5"
-entity "Crococopter" 480 9912 "b88c38f7fac98bcc"
-entity "Powerup Lucky Bonus" 40 10000 "fbaece6f41916bdb"
-entity "Mosquito" 640 9968 "e2044c7669abdfcc"
-entity "Spring Standard" 272 10000 "455504a3e4553db5"
-entity "Bumper" 400 9824 "393059531bd1e221"
-entity "Bridge" 736 9744 "481c9ccb42a38268"
-entity "Collectible" 336 9968 "4d39f77aebeac935"
-entity "Collectible" 192 9968 "7d967c005e67f1e7"
-entity "Switch" 880 9744 "142f0aa6855b991a"
-entity "Event Trigger 1" 528 9952 "bf2c0b5b364bd74c"
-entity "Event Trigger 1" 528 9984 "f8a9333f4fff13e2"
+entity "Powerup Lucky Bonus" 32 9952 "d9e6b5cb0626d3e8"
+entity "Event Trigger 1" 368 9936 "f9bd0110550aadd7"
+entity "Event Trigger 1" 368 9904 "3260f0c438292d4c"
+entity "Crococopter" 160 9744 "ad1dac687430efc3"
+entity "Crococopter" 208 9712 "1ff6e99d88a31edc"
+entity "Goal Capsule" 512 9696 "f5c494ba6917e6c8"
+entity "Collectible" 416 9920 "74567f4c638e4c2d"
+entity "Collectible" 464 9920 "a37f2e6426b5fbf5"
+entity "Collectible" 512 9920 "ddf13416667ccd42"
+entity "Collectible" 560 9920 "c4d5877e049b2458"
+entity "Collectible" 608 9920 "121746c2b2f00410"
+entity "Collectible" 656 9920 "e64198904b26e018"
+entity "Bumper" 288 9776 "6bde6de8813b267d"
+entity "Spring Standard" 240 9952 "8e08a4ea18030220"
+entity "Spring Booster Right" 528 9952 "b7518b941231c90d"
 
 // EOF
