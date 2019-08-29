@@ -10,4 +10,4 @@ name            "Demo Level"
 author          "Alexandre Martins"
 
 // level list
-level           "levels/template.lev"
+level           "levels/demo.lev"
