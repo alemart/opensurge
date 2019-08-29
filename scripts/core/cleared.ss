@@ -28,6 +28,7 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
         Music("musics/winning.ogg"),
         Music("musics/winning_plus.ogg")
     ];
+    fader = spawn("Fader");
 
     state "main"
     {
@@ -103,14 +104,14 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
     state "fadeout"
     {
         if(timeout(1.0)) {
-            // TODO: fade out
+            fader.fadeOut(0.5);
             state = "done";
         }
     }
 
     state "done"
     {
-        if(timeout(2.0))
+        if(timeout(1.0))
             Level.loadNext();
     }
 
