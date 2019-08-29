@@ -36,3 +36,15 @@ font "menu.small"
         shadow
     }
 }
+
+// menu: bold
+font "menu.bold"
+{
+    truetype
+    {
+        source_file             "fonts/Ubuntu-B.ttf"
+        size                    16
+        shadow
+        antialias
+    }
+}
