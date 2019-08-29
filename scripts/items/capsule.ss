@@ -93,7 +93,7 @@ object "Goal Capsule" is "entity", "basic"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(!player.midair) {
+            if(!player.midair || player.ysp == 0) {
                 collider.enabled = false;
                 explodeCapsule();
             }
@@ -153,6 +153,7 @@ object "Goal Capsule" is "entity", "basic"
         //collider.visible = true;
         brick[0].enabled = true;
         brick[1].enabled = false;
+        brick[1].type = "cloud";
     }
 }
 

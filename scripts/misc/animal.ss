@@ -31,7 +31,6 @@ object "Animal" is "entity", "private", "disposable"
 
     state "wait"
     {
-        platformer.enabled = false;
         if((t += Time.delta) >= secondsBeforeMoving) {
             platformer.enabled = true;
             platformer.forceJump(240);
@@ -73,5 +72,6 @@ object "Animal" is "entity", "private", "disposable"
         // setup the platformer
         platformer.speed = 64;
         platformer.jumpSpeed = 200;
+        platformer.enabled = false;
     }
 }
