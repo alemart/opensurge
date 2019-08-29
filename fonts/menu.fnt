@@ -25,3 +25,14 @@ font "menu.text"
         shadow
     }
 }
+
+// menu: small
+font "menu.small"
+{
+    truetype
+    {
+        source_file             "fonts/Ubuntu-M.ttf"
+        size                    12
+        shadow
+    }
+}
