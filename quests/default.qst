@@ -1,13 +1,13 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensurge2d.org
-//
-// File:   quests/default.qst
-// Desc:   this is the default quest
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// File: default.qst
+// Description: the default quest (it plays the regular levels)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
 
 // quest properties
 name            "Default quest"
+author          "Alexandre Martins"
 
 // level list (in order of appearance)
 level           "levels/waterworks_old.lev"

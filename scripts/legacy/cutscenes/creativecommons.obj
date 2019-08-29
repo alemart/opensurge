@@ -154,6 +154,6 @@ object ".creativecommons_startup.disclaimer"
 
     state show_text
     {
-        textout_centre "menu.small" 0 0 "<color=ffffff>Game assets under the CC</color>"
+        textout_centre "menu.small" 0 0 ""
     }
 }
