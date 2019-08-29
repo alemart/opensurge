@@ -296,7 +296,7 @@ static void editor_previous_entity();
 
 /* editor: legacy items */
 static int editor_item_list[] = {
-    IT_BIGRING, IT_GOAL,
+    IT_GOAL, IT_BIGRING,
     IT_GLASSESBOX, IT_BLUECOLLECTIBLE,
     IT_DANGER, IT_VDANGER, IT_FIREDANGER, IT_VFIREDANGER,
     IT_LWSPIKES, IT_RWSPIKES, IT_PERLWSPIKES, IT_PERRWSPIKES,

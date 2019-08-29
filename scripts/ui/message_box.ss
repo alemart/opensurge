@@ -24,7 +24,7 @@ using SurgeEngine.Video.Screen;
 //   mb = Level.spawn("Message Box");
 //   mb.text = "Hello, world!";
 //
-object "Message Box" is "detached", "entity"
+object "Message Box" is "detached", "private", "entity"
 {
     public time = 10.0; // time in seconds
 
