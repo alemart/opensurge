@@ -1,0 +1,55 @@
+// -----------------------------------------------------------------------------
+// File: lady_bugsy.spr
+// Description: Lady Bugsy sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// pixel art by Alexandre Martins, based on Celdecea's Lady Bugsy
+sprite "Lady Bugsy"
+{
+    source_file     "images/bugsy.png"
+    source_rect     0 32 192 64
+    frame_size      48 32
+    hot_spot        24 32
+
+    // stopped
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // moving
+    animation 1
+    {
+        repeat      TRUE
+        fps         12
+        data        0 1 2 3
+    }
+
+    // shooting
+    animation 2
+    {
+        repeat      FALSE
+        fps         12
+        data        5 6 4 0 0
+    }
+}
+
+sprite "Lady Bugsy Bullet"
+{
+    source_file     "images/bugsy.png"
+    source_rect     160 64 32 32
+    frame_size      16 16
+    hot_spot        8 8
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0 1
+    }
+}
+
