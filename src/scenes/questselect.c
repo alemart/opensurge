@@ -51,7 +51,7 @@
 
 
 /* private data */
-#define QUEST_BGFILE             "themes/menus/questselect.bg"
+#define QUEST_BGFILE             "themes/scenes/questselect.bg"
 #define QUEST_MAXPERPAGE         (VIDEO_SCREEN_H / 48)
 static font_t *title; /* title */
 static font_t *msg; /* message */

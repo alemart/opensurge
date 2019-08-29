@@ -44,7 +44,7 @@
 
 
 /* private data */
-#define LANG_BGFILE             "themes/menus/langselect.bg"
+#define LANG_BGFILE             "themes/scenes/langselect.bg"
 #define LANG_MAXPERPAGE         7
 typedef struct {
     char title[128];

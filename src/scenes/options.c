@@ -44,7 +44,7 @@
 
 
 /* private data */
-#define OPTIONS_BGFILE                  "themes/menus/options.bg"
+#define OPTIONS_BGFILE                  "themes/scenes/options.bg"
 static bool quit, fadein;
 static font_t *title;
 static actor_t *icon;
