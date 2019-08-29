@@ -1,0 +1,47 @@
+// -----------------------------------------------------------------------------
+// File: skaterbug.spr
+// Description: Skaterbug sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Cody Licorish (modded slighly by Alexandre)
+sprite "Skaterbug"
+{
+    source_file     "images/skaterbug.png"
+    source_rect     0 16 96 48
+    frame_size      48 48
+    hot_spot        24 44
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // jumping
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+        hot_spot    24 42
+    }
+}
+
+sprite "Skaterbug Mask"
+{
+    source_file     "images/skaterbug.png"
+    source_rect     96 16 48 48
+    frame_size      48 48
+    hot_spot        24 48
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
