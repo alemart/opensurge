@@ -13,7 +13,7 @@ requires "0.5.0"
 act 1
 theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
-spawn_point 1088 9600
+spawn_point 480 9984
 setup "Default Setup"
 players "Surge"
 
@@ -65,7 +65,6 @@ brick 235 160 9840
 brick 236 160 9840
 brick 237 160 9840
 brick 238 144 9824
-brick 248 448 9824
 brick 240 464 9840
 brick 241 464 9840
 brick 242 464 9840
@@ -87,6 +86,8 @@ brick 1 752 9888
 brick 225 672 9840
 brick 151 688 9952
 brick 26 624 9776
+brick 255 128 10016
+brick 255 128 9984
 
 // entities
 entity "Zipline Right" 1040 9728 "a1225b9496b7672d"
@@ -114,5 +115,8 @@ entity "Crococopter" 1424 9936 "2036f3a3897b2f4c"
 entity "Powerup Collectibles" 1120 9648 "66e8675560062ea1"
 entity "Spring Standard" 832 10000 "6b206f210ce8385e"
 entity "Powerup Collectibles" 784 9856 "ea4b21c90ca83fae"
+entity "Springfling" 160 10032 "6b1f50dd92b88c4a"
+entity "Lady Bugsy" 368 10032 "3cc41a1f30183292"
+entity "Powerup Lucky Bonus" 480 10048 "dec3a331143ff48f"
 
 // EOF
