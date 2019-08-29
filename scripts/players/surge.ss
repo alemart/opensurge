@@ -9,7 +9,7 @@ using SurgeEngine.Player;
 //
 // Surge's sneakers won't be lit while he's midair
 //
-object "Surge's Light Sneakers"
+object "Surge's Light Sneakers" is "companion"
 {
     player = Player("Surge");
 

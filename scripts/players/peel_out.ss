@@ -15,7 +15,7 @@ using SurgeEngine.Audio.Sound;
 // When you are stopped, hold up and press jump to charge.
 // Release up after 0.3 second and you'll gain a nice boost!
 //
-object "Super Peel Out"
+object "Super Peel Out" is "companion"
 {
     charge = Sound("samples/charge.wav");
     release = Sound("samples/release.wav");

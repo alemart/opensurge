@@ -14,7 +14,7 @@ using SurgeEngine.Transform;
 // Dash Smoke is a companion object that produces a
 // neat smoke effect when the player is charging a dash
 //
-object "Dash Smoke"
+object "Dash Smoke" is "companion"
 {
     player = parent;
     dy = 0;

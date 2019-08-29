@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
 
-object "None"
+object "None" is "companion"
 {
     player = Player("None");
 

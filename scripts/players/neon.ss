@@ -13,7 +13,7 @@ using SurgeEngine.Audio.Sound;
 //
 // Neon's Jetpack
 //
-object "Neon's Jetpack"
+object "Neon's Jetpack" is "companion"
 {
     public readonly player = Player("Neon");
     soundhlp = spawn("Neon's Jetpack Sound Helper");

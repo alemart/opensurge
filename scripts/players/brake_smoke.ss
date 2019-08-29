@@ -12,7 +12,7 @@ using SurgeEngine.Vector2;
 // Brake Smoke is a companion object that produces a
 // neat smoke effect when the player is braking
 //
-object "Brake Smoke"
+object "Brake Smoke" is "companion"
 {
     player = parent;
 
