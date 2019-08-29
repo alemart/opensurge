@@ -9,16 +9,16 @@
 sprite "Skaterbug"
 {
     source_file     "images/skaterbug.png"
-    source_rect     0 16 96 48
+    source_rect     0 16 96 96
     frame_size      48 48
-    hot_spot        24 44
+    hot_spot        24 48
 
     // idle
     animation 0
     {
         repeat      TRUE
-        fps         8
-        data        0
+        fps         16
+        data        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 3 2
     }
 
     // jumping
@@ -27,7 +27,7 @@ sprite "Skaterbug"
         repeat      TRUE
         fps         8
         data        1
-        hot_spot    24 42
+        hot_spot    24 46
     }
 }
 

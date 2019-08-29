@@ -25,7 +25,7 @@ object "Skaterbug" is "entity", "friend"
 {
     actor = Actor("Skaterbug");
     brick = Brick("Skaterbug Mask");
-    sfx = Sound("samples/jump.wav");
+    sfx = Sound("samples/skaterbug.wav");
     collider = CollisionBox(24, 32).setAnchor(0.5, 1);
     transform = Transform();
     jumpVelocity = Vector2(180, -300); // in px/s
