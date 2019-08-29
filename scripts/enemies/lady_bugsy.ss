@@ -68,7 +68,8 @@ object "Lady Bugsy" is "entity", "enemy"
             actor.width * gunSpot.x * bulletDirection.x,
             actor.height * gunSpot.y
         );
-        Level.spawnEntity("Lady Bugsy Bullet", bulletPosition).setDirection(bulletDirection);
+        bullet = Level.spawnEntity("Lady Bugsy Bullet", bulletPosition);
+        bullet.setDirection(bulletDirection);
 
         // play sound
         sfx.play();
@@ -86,11 +87,11 @@ object "Lady Bugsy Bullet" is "disposable", "private", "entity"
 
     state "main"
     {
-        movement.speed = 60;
     }
 
     fun setDirection(direction)
     {
+        movement.speed = 60;
         movement.direction = direction;
         actor.hflip = (direction.x < 0);
         return this;
