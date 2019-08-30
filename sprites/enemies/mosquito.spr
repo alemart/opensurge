@@ -9,15 +9,24 @@
 sprite "Mosquito"
 {
     source_file     "images/mosquito.png"
-    source_rect     0 0 72 30
-    frame_size      36 30
-    hot_spot        18 15
+    source_rect     0 16 180 64
+    frame_size      36 32
+    hot_spot        18 16
 
+    // Standard Mosquito
     animation 0
     {
         repeat      TRUE
         fps         12
         data        0 1
+    }
+
+    // Angry Mosquito
+    animation 1
+    {
+        repeat      TRUE
+        fps         12
+        data        5 6
     }
 }
 
