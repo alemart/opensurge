@@ -17,7 +17,7 @@ using SurgeEngine.Collisions.CollisionBox;
 object "Bridge" is "entity", "gimmick"
 {
     public length = 12; // how many bridge elements
-    public anim = 1; // animation number
+    public anim = 0; // animation number
     public layer = "default"; // must be "green", "yellow" or "default"
 
     bridgeCollider = CollisionBox(1, 1);
@@ -175,7 +175,7 @@ object "Bridge Element" is "entity", "private"
 
     transform = Transform();
     actor = Actor("Bridge Element");
-    brick = Brick("Bridge Element");
+    brick = Brick("Bridge Element Mask");
     collider = CollisionBox(actor.width, actor.height).setAnchor(0, 8 / actor.height);
     length = 1;
     offx = 0;

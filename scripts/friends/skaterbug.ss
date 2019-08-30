@@ -21,7 +21,7 @@ using SurgeEngine.Collisions.Sensor;
 // Properties:
 // - direction: string. It can be "right" or "left".
 //
-object "Skaterbug" is "entity", "friend"
+object "Skaterbug" is "entity", "friend", "gimmick"
 {
     actor = Actor("Skaterbug");
     brick = Brick("Skaterbug Mask");
