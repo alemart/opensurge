@@ -13,7 +13,7 @@ requires "0.5.0"
 act 1
 theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
-spawn_point 432 9968
+spawn_point 896 9760
 setup "Default Setup"
 players "Surge"
 
@@ -122,5 +122,6 @@ entity "Springfling" 160 10032 "6b1f50dd92b88c4a"
 entity "Lady Bugsy" 368 10032 "3cc41a1f30183292"
 entity "Powerup Lucky Bonus" 480 10048 "dec3a331143ff48f"
 entity "Skaterbug" 1216 9648 "d3cf57ea46ad827c"
+entity "Fish" 816 9856 "667b8383f480b017"
 
 // EOF

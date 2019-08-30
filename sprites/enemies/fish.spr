@@ -5,20 +5,27 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// art by João Victor
 sprite "Fish"
 {
     source_file     "images/fish.png"
-    source_rect     0 24 180 56
-    frame_size      40 56
-    hot_spot        20 28
+    source_rect     0 16 160 144
+    frame_size      32 48
+    hot_spot        16 0
 
-    // Blowfish
+    // Blowfish (art by João Victor)
     animation 0
     {
         repeat      TRUE
         fps         12
         data        0 1
+    }
+
+    // Fishburne (art by Alexandre)
+    animation 1
+    {
+        repeat      TRUE
+        fps         12
+        data        5 6
     }
 }
 
