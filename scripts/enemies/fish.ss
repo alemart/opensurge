@@ -81,8 +81,7 @@ object "Fish" is "entity", "enemy"
 
     fun jumpVolume()
     {
-        player = Player.active;
-        vol = 1 - Math.abs(player.transform.position.x - transform.position.x) / Screen.width;
+        vol = 1 - distance(Player.active) / Screen.width;
         return Math.max(0, vol);
     }
 
