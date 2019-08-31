@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * player.c - scripting system: player bridge
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,6 @@ static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const su
 static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinput(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -103,6 +102,8 @@ static surgescript_var_t* fun_getxsp(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_setxsp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getysp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -183,7 +184,6 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
-    surgescript_vm_bind(vm, "Player", "get_angle", fun_getangle, 0);
     surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
     surgescript_vm_bind(vm, "Player", "get_input", fun_getinput, 0);
     surgescript_vm_bind(vm, "Player", "get_dying", fun_getdying, 0);
@@ -232,6 +232,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_xsp", fun_setxsp, 1);
     surgescript_vm_bind(vm, "Player", "get_ysp", fun_getysp, 0);
     surgescript_vm_bind(vm, "Player", "set_ysp", fun_setysp, 1);
+    surgescript_vm_bind(vm, "Player", "get_angle", fun_getangle, 0);
+    surgescript_vm_bind(vm, "Player", "set_angle", fun_setangle, 1);
     surgescript_vm_bind(vm, "Player", "get_collectibles", fun_getcollectibles, 0);
     surgescript_vm_bind(vm, "Player", "set_collectibles", fun_setcollectibles, 1);
     surgescript_vm_bind(vm, "Player", "get_lives", fun_getlives, 0);
@@ -445,7 +447,7 @@ surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const sur
     if(player != NULL) {
         v2d_t position, scale;
         float angle;
-        
+
         /* assuming local position == world position */
         read_transform(object, &position, &angle, &scale);
         player->actor->position = position;
@@ -711,15 +713,6 @@ surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript
     return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_height(actor_image(player->actor)) : 0.0f);
 }
 
-/* player angle, in degrees */
-surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    player_t* player = get_player(object);
-    return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL) ? FIXANG(player->actor->angle) : 0.0f
-    );
-}
-
 /* top speed, in px/s */
 surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -834,6 +827,26 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
                 player->actor->position.y -= 4;
         }
     }
+    return NULL;
+}
+
+/* player angle, in degrees */
+surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(),
+        (player != NULL) ? FIXANG(player->actor->angle) : 0.0f
+    );
+}
+
+/* set player angle, in degrees */
+surgescript_var_t* fun_setangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR));
+    surgescript_object_t* transform = surgescript_objectmanager_get(manager, handle);
+    surgescript_object_call_function(transform, "set_localAngle", param, 1, NULL);
     return NULL;
 }
 
