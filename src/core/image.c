@@ -98,7 +98,7 @@ image_t* image_load(const char* path)
 
     if(NULL == (img = resourcemanager_find_image(path))) {
         const char* fullpath = assetfs_fullpath(path);
-        logfile_message("image_load(\"%s\")", fullpath);
+        logfile_message("Loading image \"%s\"...", fullpath);
 
         /* build the image object */
         img = mallocx(sizeof *img);
@@ -128,9 +128,6 @@ image_t* image_load(const char* path)
         img->path = str_dup(path);
         resourcemanager_add_image(img->path, img);
         resourcemanager_ref_image(img->path);
-
-        /* done! */
-        logfile_message("image_load() ok");
     }
     else
         resourcemanager_ref_image(path);
@@ -141,7 +138,7 @@ image_t* image_load(const char* path)
 
     if(NULL == (img = resourcemanager_find_image(path))) {
         const char* fullpath = assetfs_fullpath(path);
-        logfile_message("image_load(\"%s\")", fullpath);
+        logfile_message("Loading image \"%s\"...", fullpath);
 
         /* build the image object */
         img = mallocx(sizeof *img);
@@ -149,7 +146,7 @@ image_t* image_load(const char* path)
         /* loading the image */
         img->data = load_bitmap(fullpath, NULL);
         if(img->data == NULL) {
-            fatal_error("image_load(\"%s\") error: %s", fullpath, allegro_error);
+            fatal_error("Failed to load image \"%s\": %s", fullpath, allegro_error);
             free(img);
             return NULL;
         }
@@ -163,9 +160,6 @@ image_t* image_load(const char* path)
         img->path = str_dup(path);
         resourcemanager_add_image(img->path, img);
         resourcemanager_ref_image(img->path);
-
-        /* done! */
-        logfile_message("image_load() ok");
     }
     else
         resourcemanager_ref_image(path);

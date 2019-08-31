@@ -1261,12 +1261,13 @@ const char* player_companion_name(const player_t* player, int index)
 
 /* private functions */
 
-/* updates the position and the animation of the current shield */
+/* updates the current shield */
 void update_shield(player_t *player)
 {
     actor_t *sh = player->shield, *act = player->actor;
     v2d_t off = v2d_new(0,0);
     sh->position = v2d_add(act->position, v2d_rotate(off, -act->angle));
+    sh->scale = act->scale;
 
     switch(player->shield_type) {
         case SH_SHIELD:

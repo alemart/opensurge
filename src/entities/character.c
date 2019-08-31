@@ -188,7 +188,7 @@ int traverse(const parsetree_statement_t *stmt)
         nanoparser_expect_program(p2, "Must provide character attributes");
 
         s = nanoparser_get_string(p1);
-        logfile_message("Loading character '%s'", s);
+        logfile_message("Loading character \"%s\" defined in \"%s\"", s, nanoparser_get_file(stmt));
 
         if(NULL == hashtable_character_t_find(characters, s)) {
             character_t *c = character_new(s);
@@ -197,9 +197,7 @@ int traverse(const parsetree_statement_t *stmt)
             register_character(c);
         }
         else
-            fatal_error("Can't redefine character '%s'\nin\"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-
-        logfile_message("Loaded character '%s'", s);
+            fatal_error("Can't redefine character \"%s\" in\"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
         fatal_error("Can't load characters. Unknown identifier '%s'\nin\"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));

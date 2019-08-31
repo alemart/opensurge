@@ -411,15 +411,15 @@ int traverse(const parsetree_statement_t *stmt)
         nanoparser_expect_program(p2, "Must provide sprite attributes");
 
         s = nanoparser_get_string(p1);
-        logfile_message("Loading sprite '%s'", s);
+        logfile_message("Loading sprite \"%s\" defined in \"%s\"", s, nanoparser_get_file(stmt));
 
         if(NULL == hashtable_spriteinfo_t_find(sprites, s))
             register_sprite(s, spriteinfo_create(nanoparser_get_program(p2)));
         else
-            logfile_message("Can't redefine sprite '%s'\nin \"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
-        fatal_error("Can't load sprite. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        fatal_error("Can't load sprite. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }

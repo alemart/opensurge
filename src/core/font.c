@@ -878,14 +878,14 @@ int traverse(const parsetree_statement_t *stmt)
         /* read the data */
         nanoparser_expect_string(p1, "Font script error: font name is expected");
         name = nanoparser_get_string(p1);
-        logfile_message("Loading font \"%s\"...", name);
+        logfile_message("Loading font \"%s\" defined in \"%s\"", name, nanoparser_get_file(stmt));
         nanoparser_expect_program(p2, "Font script error: font block is expected after the font name");
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)(&header), traverse_block);
 
         /* duplicate font? */
         if(NULL != fontdrv_list_find(name)) {
             /* fail silently */
-            logfile_message("Font script error: can't redefine font \"%s\"\nin \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            logfile_message("WARNING: can't redefine font \"%s\" in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
             return 0;
         }
 
