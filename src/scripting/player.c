@@ -150,9 +150,9 @@ static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 static void update_player(surgescript_object_t* object);
 static void update_collider(surgescript_object_t* object, int width, int height);
-static void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees);
 static void update_animation(surgescript_object_t* object, int anim_id);
-static void read_transform(surgescript_object_t* object, v2d_t* world_position);
+static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
+static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
 static const double RAD2DEG = 57.2957795131;
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 
@@ -439,13 +439,18 @@ surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_v
 /* onTransformChange(transform): the player transform was changed somewhere in the script */
 surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* we'll tell the engine about the new position of the player;
-       other parameters (angle, scale) will be ignored */
-    v2d_t world_position;
+    /* tell the engine about the new position/angle of the player;
+       currently, the scale parameter is ignored */
     player_t* player = get_player(object);
     if(player != NULL) {
-        read_transform(object, &world_position);
-        player->actor->position = world_position;
+        v2d_t position, scale;
+        float angle;
+        
+        /* assuming local position == world position */
+        read_transform(object, &position, &angle, &scale);
+        player->actor->position = position;
+        player->actor->angle = angle / (float)RAD2DEG;
+        player->actor->scale = scale;
     }
     return NULL;
 }
@@ -1321,9 +1326,9 @@ void update_player(surgescript_object_t* object)
 
     /* update the transform */
     if(player != NULL)
-        update_transform(object, player->actor->position, FIXANG(player->actor->angle));
+        update_transform(object, player->actor->position, FIXANG(player->actor->angle), player->actor->scale);
     else
-        update_transform(object, v2d_new(0.0f, 0.0f), 0.0f);
+        update_transform(object, v2d_new(0.0f, 0.0f), 0.0f, v2d_new(1.0f, 1.0f));
 
     /* update the collider */
     if(player != NULL) {
@@ -1345,25 +1350,25 @@ void update_player(surgescript_object_t* object)
 }
 
 /* update the player transform */
-void update_transform(surgescript_object_t* object, v2d_t world_position, float rotation_degrees)
+void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale)
 {
-    /*surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objecthandle_t transform = surgescript_var_get_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR));
-    call set_worldX, set_worldY*/
+    /* the angle is given in degrees */
     surgescript_transform_t transform;
     surgescript_transform_reset(&transform);
-    surgescript_transform_setposition2d(&transform, world_position.x, world_position.y); /* this assumes local position == world position */
-    surgescript_transform_setrotation2d(&transform, rotation_degrees);
-    surgescript_transform_setscale2d(&transform, 1.0f, 1.0f);
+    surgescript_transform_setposition2d(&transform, position.x, position.y); /* assuming local position == world position */
+    surgescript_transform_setrotation2d(&transform, angle);
+    surgescript_transform_setscale2d(&transform, scale.x, scale.y);
     surgescript_object_poke_transform(object, &transform);
 }
 
 /* read the player transform */
-void read_transform(surgescript_object_t* object, v2d_t* world_position)
+void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale)
 {
     surgescript_transform_t transform;
     surgescript_object_peek_transform(object, &transform);
-    *world_position = v2d_new(transform.position.x, transform.position.y); /* assuming local position == world position */
+    *position = v2d_new(transform.position.x, transform.position.y); /* assuming local position == world position */
+    *angle = transform.rotation.z;
+    *scale = v2d_new(transform.scale.x, transform.scale.y);
 }
 
 /* update the collider */
