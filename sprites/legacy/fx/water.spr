@@ -71,7 +71,7 @@ sprite SD_WATERAIRSOURCE
 sprite SD_WATERAIRBUBBLE
 {
     source_file     "images/water.png"
-    source_rect     0 128 298 32
+    source_rect     0 128 288 32
     frame_size      32 32
     hot_spot        16 16
 

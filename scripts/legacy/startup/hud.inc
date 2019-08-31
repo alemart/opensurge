@@ -55,7 +55,7 @@ object ".default_startup.hud.score"
         on_level_cleared "go away"
 
         let "$score = score()"
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_SCORE</color> $score"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_SCORE</color> $score"
     }
 
     state "go away"
@@ -64,7 +64,7 @@ object ".default_startup.hud.score"
         set_absolute_position "xpos() - 500*dt()" "ypos()"
 
         let "$score = score()"
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_SCORE</color> $score"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_SCORE</color> $score"
     }
 
     state "hidden"
@@ -118,7 +118,7 @@ object ".default_startup.hud.time"
         let "$_ds_hud_time_xpos = xpos()"
         let "$_ds_hud_time_ypos = ypos()"
 
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_TIME</color>"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_TIME</color>"
     }
 
     state "go away"
@@ -128,7 +128,7 @@ object ".default_startup.hud.time"
         let "$_ds_hud_time_xpos = xpos()"
         let "$_ds_hud_time_ypos = ypos()"
 
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_TIME</color>"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_TIME</color>"
     }
 
     state "freeze"
@@ -140,7 +140,7 @@ object ".default_startup.hud.time"
         let "$_ds_hud_time_xpos = xpos()"
         let "$_ds_hud_time_ypos = ypos()"
 
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_TIME</color>"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_TIME</color>"
     }
 
     state "hidden"
@@ -168,7 +168,7 @@ object ".default_startup.hud.time.minutes"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         let "$xrel = -8 * floor(log10(max(1,$_ds_hud_time_minutes)))"
-        textout "hud" $xrel 0 "$HUD_TIME $_ds_hud_time_minutes'"
+        textout "hud_legacy" $xrel 0 "$HUD_TIME $_ds_hud_time_minutes'"
     }
 
     state "hidden"
@@ -196,7 +196,7 @@ object ".default_startup.hud.time.seconds"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_seconds >= 10" "without_leading_zero"
-        textout "hud" 0 0 "$HUD_TIME   0$_ds_hud_time_seconds\""
+        textout "hud_legacy" 0 0 "$HUD_TIME   0$_ds_hud_time_seconds\""
     }
 
     state "without_leading_zero"
@@ -204,7 +204,7 @@ object ".default_startup.hud.time.seconds"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_seconds < 10" "with_leading_zero"
-        textout "hud" 0 0 "$HUD_TIME   $_ds_hud_time_seconds\""
+        textout "hud_legacy" 0 0 "$HUD_TIME   $_ds_hud_time_seconds\""
     }
 
     state "hidden"
@@ -232,7 +232,7 @@ object ".default_startup.hud.time.tenths"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_tenths >= 10" "without_leading_zero"
-        textout "hud" 0 0 "$HUD_TIME      0$_ds_hud_time_tenths"
+        textout "hud_legacy" 0 0 "$HUD_TIME      0$_ds_hud_time_tenths"
     }
 
     state "without_leading_zero"
@@ -240,7 +240,7 @@ object ".default_startup.hud.time.tenths"
         if "$_hide_hud" "hidden"
         set_absolute_position "$_ds_hud_time_xpos" "$_ds_hud_time_ypos"
         if "$_ds_hud_time_tenths < 10" "with_leading_zero"
-        textout "hud" 0 0 "$HUD_TIME      $_ds_hud_time_tenths"
+        textout "hud_legacy" 0 0 "$HUD_TIME      $_ds_hud_time_tenths"
     }
 
     state "hidden"
@@ -276,7 +276,7 @@ object ".default_startup.hud.collectibles"
 
         let "$collectibles = collectibles()"
         if "$collectibles == 0" "danger"
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
     }
 
     state "danger"
@@ -287,7 +287,7 @@ object ".default_startup.hud.collectibles"
 
         let "$collectibles = collectibles()"
         if "$collectibles > 0" "normal"
-        textout "hud" 0 0 "<color=$COLOR_HUDDANGER>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUDDANGER>$HUD_COLLECTIBLES</color> $collectibles"
 
         on_timeout "$blink_interval" "blinking_danger"
     }
@@ -300,7 +300,7 @@ object ".default_startup.hud.collectibles"
 
         let "$collectibles = collectibles()"
         if "$collectibles > 0" "normal"
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
 
         on_timeout "$blink_interval" "danger"
     }
@@ -311,7 +311,7 @@ object ".default_startup.hud.collectibles"
         set_absolute_position "xpos() - 500*dt()" "ypos()"
 
         let "$collectibles = collectibles()"
-        textout "hud" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
     }
 
     state "hidden"
@@ -415,7 +415,7 @@ object ".default_startup.hud.lives.counter"
         let "$lives = lives()"
 
         set_absolute_position "$_ds_hud_lives_xpos" "$_ds_hud_lives_ypos"
-        textout "hud" 20 9 "x$lives"
+        textout "hud_legacy" 20 9 "x$lives"
     }
 
     state "hidden"

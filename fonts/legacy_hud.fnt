@@ -21,7 +21,7 @@ font "hud_subtext"
     }
 }
 
-font "hud"
+font "hud_legacy"
 {
     bitmap
     {

@@ -280,7 +280,7 @@ object ".default_startup.level_cleared.ringbonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>POWER BONUS</color>"
+        textout_right "hud_legacy" 0 0 "<color=ffff00>POWER BONUS</color>"
     }
 }
 
@@ -306,7 +306,7 @@ object ".default_startup.level_cleared.ringbonus_counter"
     state "move"
     {
         set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "$_ds_levelcleared_ringbonus"
+        textout_right "hud_legacy" 0 0 "$_ds_levelcleared_ringbonus"
     }
 }
 
@@ -333,7 +333,7 @@ object ".default_startup.level_cleared.timebonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>TIME BONUS</color>"
+        textout_right "hud_legacy" 0 0 "<color=ffff00>TIME BONUS</color>"
     }
 }
 
@@ -359,7 +359,7 @@ object ".default_startup.level_cleared.timebonus_counter"
     state "move"
     {
         set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "$_ds_levelcleared_timebonus"
+        textout_right "hud_legacy" 0 0 "$_ds_levelcleared_timebonus"
     }
 }
 
@@ -386,7 +386,7 @@ object ".default_startup.level_cleared.secretbonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>SUPER BONUS</color>"
+        textout_right "hud_legacy" 0 0 "<color=ffff00>SUPER BONUS</color>"
     }
 }
 
@@ -412,7 +412,7 @@ object ".default_startup.level_cleared.secretbonus_counter"
     state "move"
     {
         set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "$_ds_levelcleared_secretbonus"
+        textout_right "hud_legacy" 0 0 "$_ds_levelcleared_secretbonus"
     }
 }
 
@@ -439,7 +439,7 @@ object ".default_startup.level_cleared.totalbonus"
     state "move"
     {
         set_absolute_position "min(screen_width()/2-10, xpos()+(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "<color=ffff00>TOTAL</color>"
+        textout_right "hud_legacy" 0 0 "<color=ffff00>TOTAL</color>"
     }
 }
 
@@ -465,7 +465,7 @@ object ".default_startup.level_cleared.totalbonus_counter"
     state "move"
     {
         set_absolute_position "max(screen_width()/2+60, xpos()-(screen_width()*2)*dt())" "ypos()"
-        textout_right "hud" 0 0 "$_ds_levelcleared_totalbonus"
+        textout_right "hud_legacy" 0 0 "$_ds_levelcleared_totalbonus"
     }
 }
 
