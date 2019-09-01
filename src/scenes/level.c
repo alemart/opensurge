@@ -2223,11 +2223,9 @@ void update_level_height_samples(int level_width, int level_height)
         {
             height_at[j] = 0;
             for(p = brick_list; p; p = p->next) {
-                if(brick_type(p->data) != BRK_PASSABLE) {
-                    int bottom = (int)(brick_spawnpoint(p->data).y + brick_size(p->data).y);
-                    if(bottom > height_at[j])
-                        height_at[j] = bottom;
-                }
+                int bottom = (int)(brick_spawnpoint(p->data).y + brick_size(p->data).y);
+                if(bottom > height_at[j])
+                    height_at[j] = bottom;
             }
             if(brick_list == NULL) /* no bricks have been found */
                 height_at[j] = (j > 0) ? height_at[j-1] : level_height;

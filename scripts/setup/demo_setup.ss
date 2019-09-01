@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: waterworks_setup.ss
-// Description: setup object for Waterworks Zone
+// File: demo_setup.ss
+// Description: setup object for the Demo Level
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -9,7 +9,7 @@ using SurgeEngine.Events.EventList;
 using SurgeEngine.Events.EntityEvent;
 using SurgeEngine.Events.FunctionEvent;
 
-object "Waterworks Setup"
+object "Demo Setup"
 {
     config = {
 
@@ -17,18 +17,15 @@ object "Waterworks Setup"
         // all zones / acts
         //
         "*": {
-            "Background Exchanger": {
-                "background": "themes/waterworks_indoors.bg"
-            },
-            "Elevator": {
-                "anim": 2
-            },
             "Bridge": {
-                "anim": 2
+                "anim": 0
             },
             "Audio Source": {
                 "sound": "samples/waterfall.wav"
-            }
+            },
+            "Zipline Grabber": {
+                "anim": 1
+            },
         },
 
         //

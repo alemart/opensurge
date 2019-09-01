@@ -71,6 +71,11 @@ object "Example Setup"
             // Example: configuring all Elevators.
             "Elevator": {
                 "anim": 2 // animation number
+            },
+
+            // Example: configuring all Audio Sources.
+            "Audio Source": {
+                "sound": "samples/waterfall.wav" // path to a sound
             }
         },
 
