@@ -23,7 +23,7 @@
 
 /* SurgeScript code */
 static const char code_in_surgescript[] = "\
-@Plugin \n\
+@Package \n\
 object 'SurgeEngine' \n\
 { \n\
     public readonly Vector2 = spawn('VectorFactory'); \n\
