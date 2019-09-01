@@ -23,6 +23,7 @@
 #include "brick.h"
 #include "player.h"
 #include "actor.h"
+#include "sfx.h"
 #include "legacy/item.h"
 #include "legacy/enemy.h"
 #include "../physics/collisionmask.h"
@@ -39,7 +40,6 @@
 #include "../core/timer.h"
 #include "../core/audio.h"
 #include "../core/sprite.h"
-#include "../core/soundfactory.h"
 #include "../core/nanoparser/nanoparser.h"
 
 /* constants */

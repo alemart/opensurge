@@ -31,12 +31,12 @@
 #include "../core/timer.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
-#include "../core/soundfactory.h"
 #include "../core/font.h"
 #include "../core/assetfs.h"
 #include "../core/logfile.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
+#include "../entities/sfx.h"
 
 
 /* private data */

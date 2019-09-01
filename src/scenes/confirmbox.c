@@ -22,6 +22,7 @@
 #include <math.h>
 #include "confirmbox.h"
 #include "../entities/actor.h"
+#include "../entities/sfx.h"
 #include "../core/global.h"
 #include "../core/font.h"
 #include "../core/fadefx.h"
@@ -32,7 +33,6 @@
 #include "../core/timer.h"
 #include "../core/scene.h"
 #include "../core/stringutil.h"
-#include "../core/soundfactory.h"
 
 
 /* private data */

@@ -44,7 +44,6 @@
 #include "timer.h"
 #include "fadefx.h"
 #include "sprite.h"
-#include "soundfactory.h"
 #include "lang.h"
 #include "screenshot.h"
 #include "modmanager.h"
@@ -359,7 +358,6 @@ void init_accessories(const commandline_t* cmd)
     sprite_init();
     font_init(commandline_getint(cmd->allow_font_smoothing, TRUE));
     fontext_register_variables();
-    soundfactory_init();
     charactersystem_init();
     objects_init();
     scripting_init(cmd->user_argc, cmd->user_argv);
@@ -427,7 +425,6 @@ void release_accessories()
     scripting_release();
     objects_release();
     charactersystem_release();
-    soundfactory_release();
     font_release();
     sprite_release();
 }

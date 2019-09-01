@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * soundfactory.h - sound factory
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * sfx.h - default sounds
+ * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,19 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SOUNDFACTORY_H
-#define _SOUNDFACTORY_H
+#ifndef _SFX_H
+#define _SFX_H
 
-#include "audio.h"
-
-/* initializes the sound factory */
-void soundfactory_init();
-
-/* releases the sound factory */
-void soundfactory_release();
-
-/* given a sound name, returns the corresponding sound effect */
-sound_t *soundfactory_get(const char *sound_name);
+#include "../core/audio.h"
 
 #define SFX_JUMP                sound_load("samples/jump.wav")
 #define SFX_BRAKE               sound_load("samples/brake.wav")
@@ -55,5 +46,25 @@ sound_t *soundfactory_get(const char *sound_name);
 #define SFX_SAVE                sound_load("samples/glasses.wav")
 #define SFX_PAUSE               sound_load("samples/select_2.wav")
 #define SFX_SECRET              sound_load("samples/secret.wav")
+#define SFX_BOSSHIT             sound_load("samples/bosshit.wav")
+#define SFX_EXPLODE             sound_load("samples/bosshit.wav")
+#define SFX_BONUS               sound_load("samples/bigring.wav")
+#define SFX_BUMPER              sound_load("samples/bumper.wav")
+#define SFX_CHECKPOINT          sound_load("samples/checkpoint.wav")
+#define SFX_SWITCH              sound_load("samples/switch.wav")
+#define SFX_DOOROPEN            sound_load("samples/door1.wav")
+#define SFX_DOORCLOSE           sound_load("samples/door2.wav")
+#define SFX_TELEPORTER          sound_load("samples/teleporter.wav")
+#define SFX_GOALSIGN            sound_load("samples/endsign.wav")
+#define SFX_SPIKES              sound_load("samples/spikes.wav")
+#define SFX_SPIKESIN            sound_load("samples/spikes_appearing.wav")
+#define SFX_SPIKESOUT           sound_load("samples/spikes_disappearing.wav")
+#define SFX_SPRING              sound_load("samples/spring.wav")
+#define SFX_SHIELD              sound_load("samples/shield.wav")
+#define SFX_FIRESHIELD          sound_load("samples/fireshield.wav")
+#define SFX_THUNDERSHIELD       sound_load("samples/thundershield.wav")
+#define SFX_WATERSHIELD         sound_load("samples/watershield.wav")
+#define SFX_ACIDSHIELD          sound_load("samples/acidshield.wav")
+#define SFX_WINDSHIELD          sound_load("samples/windshield.wav")
 
 #endif

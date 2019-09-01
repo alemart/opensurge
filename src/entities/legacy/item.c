@@ -27,6 +27,7 @@
 #include "../player.h"
 #include "../brick.h"
 #include "../actor.h"
+#include "../sfx.h"
 
 #include "../../core/v2d.h"
 #include "../../core/global.h"
@@ -38,7 +39,6 @@
 #include "../../core/color.h"
 #include "../../core/font.h"
 #include "../../core/audio.h"
-#include "../../core/soundfactory.h"
 
 #include "../../scenes/quest.h"
 #include "../../scenes/level.h"
@@ -1001,7 +1001,7 @@ void state_idle_handle(state_t *state, item_t *item, player_t **team, int team_s
             /* oh no! the player is attacking this object! */
             s->being_hit = TRUE;
             actor_change_animation(act, sprite_get_animation("SD_ENDLEVEL", 1));
-            sound_play( soundfactory_get("boss hit") );
+            sound_play(SFX_BOSSHIT);
             player_bounce_ex(player, act, FALSE);
             player->actor->speed.x *= -0.5;
 
@@ -1033,7 +1033,7 @@ void state_exploding_handle(state_t *state, item_t *item, player_t **team, int t
             act->position.y - act->hot_spot.y + random(image_height(actor_image(act))/2)
         );
         level_create_legacy_item(IT_EXPLOSION, pos);
-        sound_play( soundfactory_get("explode") );
+        sound_play(SFX_EXPLODE);
 
         s->explode_timer = 0.0f;
     }
@@ -1152,7 +1152,7 @@ void bigring_update(item_t* item, player_t** team, int team_size, brick_list_t* 
         if(!player_is_dying(player) && player_collision(player, item->actor)) {
             item->state = IS_DEAD;
             player_set_collectibles( player_get_collectibles() + 50 );
-            sound_play( soundfactory_get("big ring") );
+            sound_play(SFX_BONUS);
         }
     }
 }
@@ -1232,7 +1232,7 @@ void bouncingcollectible_update(item_t* item, player_t** team, int team_size, br
     float dt = timer_get_delta();
     bouncingcollectible_t *me = (bouncingcollectible_t*)item;
     actor_t *act = item->actor;
-    sound_t *sfx = soundfactory_get("collectible");
+    sound_t *sfx = SFX_COLLECTIBLE;
 
     /* a player has just got this bouncing collectible */
     for(i=0; i<team_size; i++) {
@@ -1441,7 +1441,7 @@ void bumper_update(item_t* item, player_t** team, int team_size, brick_list_t* b
             if(!me->getting_hit) {
                 me->getting_hit = TRUE;
                 actor_change_animation(act, sprite_get_animation("SD_BUMPER", 1));
-                sound_play( soundfactory_get("bumper") );
+                sound_play(SFX_BUMPER);
                 bump(item, player);
             }
         }
@@ -1571,7 +1571,7 @@ void checkpointorb_update(item_t* item, player_t** team, int team_size, brick_li
             player_t *player = team[i];
             if(!player_is_dying(player) && player_collision(player, act)) {
                 me->is_active = TRUE; /* I'm active! */
-                sound_play( soundfactory_get("checkpoint orb") );
+                sound_play(SFX_CHECKPOINT);
                 level_set_spawnpoint(act->position);
                 actor_change_animation(act, sprite_get_animation("SD_CHECKPOINT", 1));
                 break;
@@ -1651,7 +1651,7 @@ void collectible_update(item_t* item, player_t** team, int team_size, brick_list
     float dt = timer_get_delta();
     collectible_t *me = (collectible_t*)item;
     actor_t *act = item->actor;
-    sound_t *sfx = soundfactory_get("collectible");
+    sound_t *sfx = SFX_COLLECTIBLE;
 
     /* a player has just got this collectible */
     for(i=0; i<team_size; i++) {
@@ -2114,14 +2114,14 @@ void door_open(item_t *door)
 {
     door_t *me = (door_t*)door;
     me->is_closed = FALSE;
-    sound_play( soundfactory_get("open door") );
+    sound_play(SFX_DOOROPEN);
 }
 
 void door_close(item_t *door)
 {
     door_t *me = (door_t*)door;
     me->is_closed = TRUE;
-    sound_play( soundfactory_get("close door") );
+    sound_play(SFX_DOORCLOSE);
 }
 
 
@@ -2235,7 +2235,7 @@ void endsign_update(item_t* item, player_t** team, int team_size, brick_list_t* 
             player_t *player = team[i];
             if(!player_is_dying(player) && player_collision(player, act)) {
                 me->who = player; /* I have just been touched by 'player' */
-                sound_play( soundfactory_get("end sign") );
+                sound_play(SFX_GOALSIGN);
                 actor_change_animation(act, sprite_get_animation("SD_ENDSIGN", 1));
                 level_clear(item->actor);
             }
@@ -2703,14 +2703,14 @@ void lifebox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_set_lives( player_get_lives()+1 );
-    level_override_music( soundfactory_get("1up") );
+    level_override_music(SFX_1UP);
 }
 
 void collectiblebox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_set_collectibles( player_get_collectibles()+10 );
-    sound_play( soundfactory_get("ring") );
+    sound_play(SFX_COLLECTIBLE);
 }
 
 void starbox_strategy(item_t *item, player_t *player)
@@ -2737,42 +2737,42 @@ void shieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_grant_shield(player, SH_SHIELD);
-    sound_play( soundfactory_get("shield") );
+    sound_play(SFX_SHIELD);
 }
 
 void fireshieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_grant_shield(player, SH_FIRESHIELD);
-    sound_play( soundfactory_get("fire shield") );
+    sound_play(SFX_FIRESHIELD);
 }
 
 void thundershieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_grant_shield(player, SH_THUNDERSHIELD);
-    sound_play( soundfactory_get("thunder shield") );
+    sound_play(SFX_THUNDERSHIELD);
 }
 
 void watershieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_grant_shield(player, SH_WATERSHIELD);
-    sound_play( soundfactory_get("water shield") );
+    sound_play(SFX_WATERSHIELD);
 }
 
 void acidshieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_grant_shield(player, SH_ACIDSHIELD);
-    sound_play( soundfactory_get("acid shield") );
+    sound_play(SFX_ACIDSHIELD);
 }
 
 void windshieldbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_grant_shield(player, SH_WINDSHIELD);
-    sound_play( soundfactory_get("wind shield") );
+    sound_play(SFX_WINDSHIELD);
 }
 
 void trapbox_strategy(item_t *item, player_t *player)
@@ -2839,7 +2839,7 @@ void itembox_update(item_t* item, player_t** team, int team_size, brick_list_t* 
             level_create_legacy_item(IT_EXPLOSION, v2d_add(act->position, v2d_new(0,-20)));
             level_create_legacy_item(IT_CRUSHEDBOX, act->position);
 
-            sound_play( soundfactory_get("destroy") );
+            sound_play(SFX_DESTROY);
             player_bounce_ex(player, act, TRUE);
 
             me->on_destroy(item, player);
@@ -3258,11 +3258,10 @@ void spikes_update(item_t* item, player_t** team, int team_size, brick_list_t* b
     if(me->timer >= me->cycle_length * 0.5f) {
         me->timer = 0.0f;
         me->hidden = !me->hidden;
-        sound_play(
-            soundfactory_get(
-                me->hidden ? "spikes disappearing" : "spikes appearing"
-            )
-        );
+        if(me->hidden)
+            sound_play(SFX_SPIKESOUT);
+        else
+            sound_play(SFX_SPIKESIN);
     }
     item->obstacle = !me->hidden;
     item->actor->visible = !me->hidden;
@@ -3275,7 +3274,7 @@ void spikes_update(item_t* item, player_t** team, int team_size, brick_list_t* b
             player_t *player = team[i];
             if(!player_is_dying(player) && !player_is_getting_hit(player) && !player_is_blinking(player) && !player_is_invincible(player)) {
                 if(me->collision(item, player)) {
-                    sound_t *s = soundfactory_get("spikes hit");
+                    sound_t *s = SFX_SPIKES;
                     if(!sound_is_playing(s))
                         sound_play(s);
                     player_hit_ex(player, item->actor);
@@ -3673,7 +3672,7 @@ void activate_spring(spring_t *spring, player_t *player)
         player_spring(player);
 
     if(spring->bang_timer > SPRING_BANG_TIMER) {
-        sound_play( soundfactory_get("spring") );
+        sound_play(SFX_SPRING);
         spring->bang_timer = 0.0f;
     }
 }
@@ -3764,7 +3763,7 @@ void supercollectible_update(item_t* item, player_t** team, int team_size, brick
             /* the player is capturing this ring */
             actor_change_animation(act, sprite_get_animation("SD_SUPERCOLLECTIBLE", 1));
             player_set_collectibles( player_get_collectibles() + 5 );
-            sound_play( soundfactory_get("super collectible") );
+            sound_play(SFX_COLLECTIBLE);
             me->is_disappearing = TRUE;
         }
     }
@@ -3908,7 +3907,7 @@ void handle_logic(item_t *item, item_t *other, player_t **team, int team_size, v
             nobody_is_pressing_me = FALSE;
             if(!me->is_pressed) {
                 stepin(other, player);
-                sound_play( soundfactory_get("switch") );
+                sound_play(SFX_SWITCH);
                 actor_change_animation(act, sprite_get_animation("SD_SWITCH", 1));
                 me->is_pressed = TRUE;
             }
@@ -4018,7 +4017,7 @@ void teleporter_activate(item_t *teleporter, player_t *who)
 
         input_ignore(who->actor->input);
         level_set_camera_focus(act);
-        sound_play( soundfactory_get("teleporter") );
+        sound_play(SFX_TELEPORTER);
     }
 }
 

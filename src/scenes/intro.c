@@ -32,7 +32,7 @@
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
-#include "../core/soundfactory.h"
+#include "../entities/sfx.h"
 
 /* private data */
 #define INTRO_TIMEOUT       3.0f

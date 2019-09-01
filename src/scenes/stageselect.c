@@ -38,12 +38,12 @@
 #include "../core/lang.h"
 #include "../core/input.h"
 #include "../core/timer.h"
-#include "../core/soundfactory.h"
 #include "../core/nanoparser/nanoparser.h"
 #include "../core/font.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/player.h"
+#include "../entities/sfx.h"
 #include "../entities/legacy/nanocalc/nanocalc.h"
 #include "../entities/legacy/nanocalc/nanocalc_addons.h"
 

@@ -22,7 +22,6 @@
 #include "../core/font.h"
 #include "../core/scene.h"
 #include "../core/audio.h"
-#include "../core/soundfactory.h"
 #include "../core/util.h"
 #include "../core/color.h"
 #include "../core/video.h"
@@ -30,6 +29,7 @@
 #include "../core/sprite.h"
 #include "../core/input.h"
 #include "../entities/brick.h"
+#include "../entities/sfx.h"
 
 
 /* private data */

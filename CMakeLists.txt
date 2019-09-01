@@ -354,7 +354,6 @@ SET(GAME_SRCS
   src/core/scene.c
   src/core/screenshot.c
   src/core/fadefx.c
-  src/core/soundfactory.c
   src/core/sprite.c
   src/core/storyboard.c
   src/core/stringutil.c
@@ -466,7 +465,6 @@ SET(GAME_HEADERS
   src/core/scene.h
   src/core/screenshot.h
   src/core/fadefx.h
-  src/core/soundfactory.h
   src/core/spatialhash.h
   src/core/sprite.h
   src/core/storyboard.h
@@ -522,6 +520,7 @@ SET(GAME_HEADERS
   src/entities/player.h
   src/entities/particle.h
   src/entities/renderqueue.h
+  src/entities/sfx.h
 
   src/misc/iconwin.rc
 )

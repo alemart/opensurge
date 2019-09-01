@@ -35,12 +35,12 @@
 #include "../core/lang.h"
 #include "../core/input.h"
 #include "../core/timer.h"
-#include "../core/soundfactory.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
 #include "../core/modmanager.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
+#include "../entities/sfx.h"
 
 
 /* private data */
