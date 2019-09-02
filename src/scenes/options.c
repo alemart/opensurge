@@ -1058,6 +1058,8 @@ group_t *create_grouptree()
     group_addchild(graphics, group_fullscreen_create());
 #if !defined(A5BUILD)
     group_addchild(graphics, group_smooth_create());
+#else
+    (void)group_smooth_create;
 #endif
     group_addchild(graphics, group_fps_create());
 

@@ -335,6 +335,7 @@ bool uninstall_game(const char* gameid, bool interactive_mode)
     return true;
 #else
     console_print("Not implemented on this operating system.");
+    (void)remove_folder;
     return false;
 #endif
 }
