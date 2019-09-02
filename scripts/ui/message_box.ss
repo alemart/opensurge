@@ -8,6 +8,7 @@ using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
+using SurgeEngine.Level;
 using SurgeEngine.Video.Screen;
 
 //
@@ -26,17 +27,22 @@ using SurgeEngine.Video.Screen;
 //
 object "Message Box" is "detached", "private", "entity"
 {
+    public text = ""; // string to be displayed
     public time = 10.0; // time in seconds
 
     box = Actor("Message Box");
     txt = Text("dialogbox");
-    spd = Screen.height / 2;
-    pad = 16;
+    spd = Screen.height;
+    pad = 8;
     transform = Transform();
+    controller = null;
 
     state "main"
     {
+        box.visible = true;
+        txt.text = String(text);
         transform.position = Vector2((Screen.width - box.width) / 2, Screen.height);
+        controller.show(this);
         state = "appearing";
     }
 
@@ -56,7 +62,7 @@ object "Message Box" is "detached", "private", "entity"
     state "waiting"
     {
         if(timeout(time))
-            state = "disappearing";
+            disappear();
     }
 
     state "disappearing"
@@ -72,25 +78,28 @@ object "Message Box" is "detached", "private", "entity"
 
     state "done"
     {
+        controller.hide(this);
         destroy();
     }
 
     fun constructor()
     {
-        box.zindex = 1001.0;
-        txt.zindex = box.zindex + 0.1;
-        txt.offset = Vector2(8, 8);
-        txt.maxWidth = box.width - 16;
+        this.zindex = 1001.0;
+        box.visible = false;
+        txt.offset = Vector2(8, 5);
+        txt.maxWidth = box.width - txt.offset.x * 2;
+        controller = Level.child("Message Box Controller") || Level.spawn("Message Box Controller");
     }
 
-    fun set_text(text)
+    fun set_zindex(zindex)
     {
-        txt.text = String(text);
+        box.zindex = zindex;
+        txt.zindex = zindex + 0.01;
     }
 
-    fun get_text()
+    fun get_zindex()
     {
-        return txt.text;
+        return box.zindex;
     }
 
     /* it appears automatically
@@ -101,7 +110,31 @@ object "Message Box" is "detached", "private", "entity"
 
     fun disappear()
     {
-        if(state == "appearing" || state == "waiting")
+        if(state == "appearing" || state == "waiting") {
+            this.zindex -= 0.1;
             state = "disappearing";
+        }
+    }
+}
+
+// Only one Message Box should be
+// active at any given time
+object "Message Box Controller"
+{
+    msgbox = null;
+
+    fun show(mb)
+    {
+        if(msgbox != null && msgbox != mb)
+            msgbox.disappear();
+        msgbox = mb;
+    }
+
+    fun hide(mb)
+    {
+        if(msgbox == mb) {
+            msgbox.disappear();
+            msgbox = null;
+        }
     }
 }

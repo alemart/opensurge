@@ -4,9 +4,16 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine.Lang;
 using SurgeEngine.Level;
+using SurgeEngine.Player;
+using SurgeEngine.Vector2;
+using SurgeEngine.Audio.Music;
+using SurgeEngine.Audio.Sound;
 using SurgeEngine.Events.EventList;
+using SurgeEngine.Events.EventChain;
 using SurgeEngine.Events.EntityEvent;
+using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
 
 object "Demo Setup"
@@ -26,13 +33,27 @@ object "Demo Setup"
             "Zipline Grabber": {
                 "anim": 1
             },
+            "Event Trigger 7": {
+                "onTrigger": FunctionEvent("Lock Camera").withArgument(2048)
+            }
         },
 
         //
         // zone 1 only
         //
         "1": {
-
+            "Event Trigger 1": {
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_1"])
+            },
+            "Event Trigger 2": {
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_2"])
+            },
+            "Event Trigger 3": {
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_3"])
+            },
+            "Event Trigger 4": {
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_4"])
+            }
         },
 
         //

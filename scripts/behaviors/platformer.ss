@@ -270,6 +270,18 @@ object "Platformer" is "behavior"
         return xsp != 0;
     }
 
+    // am I walking right?
+    fun get_walkingRight()
+    {
+        return xsp > 0;
+    }
+
+    // am I walking left?
+    fun get_walkingLeft()
+    {
+        return xsp < 0;
+    }
+
     // am I midair?
     fun get_midair()
     {
