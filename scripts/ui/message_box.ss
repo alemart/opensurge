@@ -121,7 +121,13 @@ object "Message Box" is "detached", "private", "entity"
 // active at any given time
 object "Message Box Controller"
 {
-    msgbox = null;
+    msgbox = null; // active Message Box object
+
+    state "main"
+    {
+        if(Level.cleared)
+            hide(msgbox);
+    }
 
     fun show(mb)
     {
@@ -132,7 +138,7 @@ object "Message Box Controller"
 
     fun hide(mb)
     {
-        if(msgbox == mb) {
+        if(msgbox != null && msgbox == mb) {
             msgbox.disappear();
             msgbox = null;
         }

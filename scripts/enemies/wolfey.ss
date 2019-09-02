@@ -17,7 +17,7 @@ object "Wolfey" is "entity", "enemy"
 
     state "main"
     {
-        platformer.speed = 100;
+        platformer.speed = 80;
         state = "walking";
     }
 

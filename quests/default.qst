@@ -10,4 +10,4 @@ name            "Default quest"
 author          "Alexandre Martins"
 
 // level list (in order of appearance)
-level           "levels/waterworks_old.lev"
+level           "levels/demo.lev"

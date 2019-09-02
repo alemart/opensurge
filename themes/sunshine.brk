@@ -211,7 +211,7 @@ brick 8
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.5
+    zindex              0.49
 
     sprite
     {
@@ -233,7 +233,7 @@ brick 9
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.5
+    zindex              0.49
 
     sprite
     {
@@ -563,7 +563,6 @@ brick 26
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -585,7 +584,6 @@ brick 27
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -607,7 +605,7 @@ brick 28
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.48
+    zindex              0.49
 
     sprite
     {
@@ -629,7 +627,7 @@ brick 29
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.48
+    zindex              0.49
 
     sprite
     {
@@ -651,7 +649,6 @@ brick 30
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -673,7 +670,6 @@ brick 31
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -805,7 +801,6 @@ brick 37
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -827,7 +822,6 @@ brick 38
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -849,7 +843,6 @@ brick 39
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -871,7 +864,6 @@ brick 40
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -893,7 +885,6 @@ brick 41
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -915,7 +906,6 @@ brick 42
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -937,7 +927,6 @@ brick 43
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -1271,7 +1260,7 @@ brick 130
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.5
+    zindex              0.51
 
     sprite
     {

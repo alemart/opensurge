@@ -2169,11 +2169,9 @@ void update_level_size()
     /* compute the bounding box */
     max_x = max_y = -LARGE_INT;
     for(p=brick_list; p; p=p->next) {
-        if(brick_type(p->data) != BRK_PASSABLE) {
-            bottomright = v2d_add(brick_spawnpoint(p->data), brick_size(p->data));
-            max_x = max(max_x, (int)bottomright.x);
-            max_y = max(max_y, (int)bottomright.y);
-        }
+        bottomright = v2d_add(brick_spawnpoint(p->data), brick_size(p->data));
+        max_x = max(max_x, (int)bottomright.x);
+        max_y = max(max_y, (int)bottomright.y);
     }
 
     /* validation */

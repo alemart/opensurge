@@ -43,16 +43,16 @@ object "Demo Setup"
         //
         "1": {
             "Event Trigger 1": {
-                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_1"])
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_1"])
             },
             "Event Trigger 2": {
-                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_2"])
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_2"])
             },
             "Event Trigger 3": {
-                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_3"])
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_3"])
             },
             "Event Trigger 4": {
-                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LV_DEMO_4"])
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_4"])
             }
         },
 
