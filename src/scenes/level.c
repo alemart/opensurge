@@ -3472,7 +3472,7 @@ void editor_save()
 {
     if(level_save(file)) {
         sound_play(SFX_SAVE);
-        video_showmessage("Level saved.");
+        video_showmessage("Level saved to %s", file);
     }
     else {
         sound_play(SFX_DENY);

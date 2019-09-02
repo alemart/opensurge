@@ -44,6 +44,7 @@ static input_t *in;
 static const char text[] = 
 "<color=ff8060>General</color>\n\n"
 "F12                                Return to the game\n"
+"1 | 2                              Open palette: brick | entity\n"
 "Ctrl + S                           Save the level\n"
 "Ctrl + R                           Reload the level\n"
 "Arrow keys | WASD                  Move the camera\n"
@@ -51,7 +52,6 @@ static const char text[] =
 "Ctrl + Z | Ctrl + Y                Undo | Redo\n"
 "F1                                 Show help\n"
 "G                                  Snap to grid\n"
-"1 | 2                              Open palette: brick | entity\n"
 "\n\n"
 "<color=ff8060>Item placement</color>\n\n"
 "Left mouse button                  Put item\n"

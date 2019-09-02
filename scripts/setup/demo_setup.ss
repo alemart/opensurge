@@ -24,14 +24,8 @@ object "Demo Setup"
         // all zones / acts
         //
         "*": {
-            "Bridge": {
-                "anim": 0
-            },
             "Audio Source": {
                 "sound": "samples/waterfall.wav"
-            },
-            "Zipline Grabber": {
-                "anim": 1
             },
             "Event Trigger 7": {
                 "onTrigger": FunctionEvent("Lock Camera").withArgument(2048)
@@ -53,6 +47,12 @@ object "Demo Setup"
             },
             "Event Trigger 4": {
                 "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_4"])
+            },
+            "Bridge": {
+                "anim": 0
+            },
+            "Zipline Grabber": {
+                "anim": 1
             }
         },
 
@@ -60,7 +60,15 @@ object "Demo Setup"
         // zone 2 only
         //
         "2": {
-
+            "Event Trigger 1": {
+                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_5"])
+            },
+            "Bridge": {
+                "anim": 1
+            },
+            "Zipline Grabber": {
+                "anim": 0
+            }
         },
 
         //

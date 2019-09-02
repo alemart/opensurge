@@ -11,3 +11,4 @@ author          "Alexandre Martins"
 
 // level list (in order of appearance)
 level           "levels/demo.lev"
+level           "levels/demo-2.lev"
