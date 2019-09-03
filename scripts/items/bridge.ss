@@ -173,14 +173,14 @@ object "Bridge" is "entity", "gimmick"
         player.angle = 0;
         if(player.running) {
             // fix: the player loses a tiny bit of speed when running on the bridge
-            ds = 5; // give a small boost
+            minspeed = player.topspeed + 5; // give a small boost
             if(player.direction > 0) {
                 if(player.input.buttonDown("right"))
-                    player.speed = Math.max(player.speed, ds + player.topspeed);
+                    player.speed = Math.max(player.speed, minspeed);
             }
             else {
                 if(player.input.buttonDown("left"))
-                    player.speed = Math.min(player.speed, -(ds + player.topspeed));
+                    player.speed = Math.min(player.speed, -minspeed);
             }
         }
     }
