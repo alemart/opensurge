@@ -60,6 +60,7 @@ object "Bridge" is "entity", "gimmick"
                         break;
                     }
                 }
+                fixPlayerAnimation(player);
             }
         }
 
@@ -164,6 +165,24 @@ object "Bridge" is "entity", "gimmick"
     fun isCollapsing()
     {
         return (state == "collapsing");
+    }
+
+    // adjust player's angle & animation
+    fun fixPlayerAnimation(player)
+    {
+        player.angle = 0;
+        if(player.running) {
+            // FIXME: the player loses a tiny bit of speed when running on the bridge
+            ds = 5; // give a small boost
+            if(player.direction > 0) {
+                if(player.input.buttonDown("right"))
+                    player.speed = Math.max(player.speed, ds + player.topspeed);
+            }
+            else {
+                if(player.input.buttonDown("left"))
+                    player.speed = Math.min(player.speed, -(ds + player.topspeed));
+            }
+        }
     }
 }
 
@@ -326,7 +345,7 @@ object "Bridge Corner" is "entity", "private"
         // configure the actor
         actor = Actor((index > 0) ? "Bridge Corner Right" : "Bridge Corner Left");
         actor.anim = anim;
-        actor.zindex = 0.51; // will appear in front of the player
+        //actor.zindex = 0.51; // will appear in front of the player
         actor.offset = Vector2((index - length / 2) * actor.width, 0);
 
         // return the object

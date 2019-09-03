@@ -108,16 +108,20 @@ object "Zipline Grabber" is "entity", "gimmick"
 
     fun lockPlayer(player)
     {
+        speed = Math.abs(player.speed);
         player.gsp = player.xsp = player.ysp = 0;
         player.frozen = true;
+        player.angle = 0;
         player.springify();
         lockedPlayer = player;
     }
 
     fun unlockPlayer()
     {
-        if(lockedPlayer != null)
+        if(lockedPlayer != null) {
             lockedPlayer.frozen = false;
+            lockedPlayer.speed = speed * direction;
+        }
         lockedPlayer = null;
     }
 
