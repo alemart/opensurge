@@ -6,7 +6,7 @@
 
 // header
 name "Sandbox"
-author "YOUR_NAME_HERE"
+author "YOUR NAME HERE"
 license "CC-BY 3.0"
 version "1.0"
 requires "0.5.0"

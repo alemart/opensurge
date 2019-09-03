@@ -68,6 +68,9 @@ object "Demo Setup"
             },
             "Zipline Grabber": {
                 "anim": 0
+            },
+            "Fish": {
+                "anim": 1
             }
         },
 

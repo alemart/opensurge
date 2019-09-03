@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: waterworks_setup.ss
-// Description: setup object for Waterworks Zone
+// File: sunshine_setup.ss
+// Description: setup object for Sunshine Paradise
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -16,7 +16,7 @@ using SurgeEngine.Events.EntityEvent;
 using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
 
-object "Waterworks Setup"
+object "Sunshine Setup"
 {
     config = {
 
@@ -24,17 +24,20 @@ object "Waterworks Setup"
         // all zones / acts
         //
         "*": {
-            "Background Exchanger": {
-                "background": "themes/waterworks_indoors.bg"
-            },
-            "Elevator": {
-                "anim": 2
-            },
             "Bridge": {
-                "anim": 1
+                "anim": 0
             },
             "Audio Source": {
                 "sound": "samples/waterfall.wav"
+            },
+            "Fish": {
+                "anim": 0
+            },
+            "Mosquito": {
+                "anim": 0
+            },
+            "Zipline Grabber": {
+                "anim": 1
             }
         },
 
@@ -42,7 +45,10 @@ object "Waterworks Setup"
         // zone 1 only
         //
         "1": {
-
+            // Bridge
+            "31689decb2eab796": {
+                "length": 8
+            },
         },
 
         //

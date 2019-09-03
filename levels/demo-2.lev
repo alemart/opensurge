@@ -6,7 +6,7 @@
 
 // header
 name "Demo Level"
-author "Alexandre Martins"
+author "YOUR NAME HERE"
 license "CC-BY 3.0"
 version "1.0"
 requires "0.5.0"

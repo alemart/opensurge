@@ -1651,7 +1651,10 @@ entity "Collectible" 8424 9712 "8eddd27500f5fca3"
 entity "Collectible" 8472 9712 "9de484b1d72b5f9a"
 entity "Collectible" 8424 9872 "bb38706b4aebafa5"
 entity "Collectible" 8472 9872 "5257d5c6301531ba"
-
-// legacy objects
+entity "Collectible" 1680 9600 "e4d241842724a7b9"
+entity "Collectible" 1712 9600 "ac6fe58233d820b6"
+entity "Collectible" 1648 9600 "690397fc3f4f7d77"
+entity "Collectible" 1744 9600 "cba01eb547da5e4d"
+entity "Collectible" 1616 9600 "7fa37b352369d9b1"
 
 // EOF
