@@ -98,6 +98,7 @@ static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
 static inline int ignore_obstacle(const player_t* player, bricklayer_t brick_layer);
 static inline float ang_diff(float alpha, float beta);
 static void hotspot_magic(player_t* player);
+static void animate_invincibility_stars(player_t* player);
 static int fixangle(int degrees, int threshold);
 
 
@@ -294,23 +295,8 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
     /* invincibility stars */
     if(player->invincible) {
-        const float magic = PLAYER_MAX_STARS * PLAYER_MAX_STARS * 1.5f;
-        const float angpi = (2.0f * PI) / PLAYER_MAX_STARS;
-        float x, angle, distance, max_distance;
-        int i, width, height;
-        v2d_t center;
-
         /* animate */
-        physicsactor_bounding_box(pa, &width, &height, &center);
-        max_distance = min(width, height);
-        for(i = 0; i < PLAYER_MAX_STARS; i++) {
-            x = 1.0f - fmodf(timer_get_ticks() + (magic * i), 1000.0f) * 0.001f;
-            distance = max_distance * (1.0f - x * x * x);
-            angle = -i * angpi;
-            player->star[i]->alpha = x * x;
-            player->star[i]->position = v2d_add(center, v2d_rotate(v2d_new(distance, 0.0f), angle));
-            actor_change_animation_speed_factor(player->star[i], 1.0f + i * 0.25f);
-        }
+        animate_invincibility_stars(player);
 
         /* update timer & finish */
         player->invincibility_timer += dt;
@@ -419,8 +405,6 @@ void player_render(player_t *player, v2d_t camera_position)
     act->hot_spot = hot_spot;
 }
 
-
-
 /*
  * player_bounce()
  * Rebound. Returns TRUE if the player actually bounces.
@@ -496,7 +480,11 @@ void player_hit(player_t *player, float direction)
                     cosf(DEG2RAD(a)) * spd
                 );
 
+                #if 1
                 surgescript_object_t* collectible = level_create_object("Bouncing Collectible", player->actor->position);
+                #else
+                surgescript_object_t* collectible = NULL; /* faster (FIXME) */
+                #endif
                 if(collectible != NULL) {
                     surgescript_var_t* x = surgescript_var_create();
                     surgescript_var_t* y = surgescript_var_create();
@@ -1582,6 +1570,34 @@ void hotspot_magic(player_t* player)
         act->angle = 0.0f;
     }
 }
+
+/* sets the position of the invincibility stars */
+void animate_invincibility_stars(player_t* player)
+{
+    const float magic = PLAYER_MAX_STARS * PLAYER_MAX_STARS * 1.5f;
+    const float angpi = (2.0f * PI) / PLAYER_MAX_STARS;
+    float x, angle, distance, max_distance;
+    int i, width, height;
+    v2d_t center;
+
+    /* get coordinates & dimensions */
+    physicsactor_bounding_box(player->pa, &width, &height, &center);
+    max_distance = min(width, height);
+    if(player->disable_movement) /* frozen player? */
+        center = player->actor->position;
+
+    /* animate */
+    for(i = 0; i < PLAYER_MAX_STARS; i++) {
+        x = 1.0f - fmodf(timer_get_ticks() + (magic * i), 1000.0f) * 0.001f;
+        distance = max_distance * (1.0f - x * x * x);
+        angle = -i * angpi;
+        player->star[i]->alpha = x * x;
+        player->star[i]->position = v2d_add(center, v2d_rotate(v2d_new(distance, 0.0f), angle));
+        actor_change_animation_speed_factor(player->star[i], 1.0f + i * 0.25f);
+    }
+}
+
+
 
 /* given two angles in [0, 2pi], return their difference */
 float ang_diff(float alpha, float beta)

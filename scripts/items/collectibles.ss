@@ -175,7 +175,7 @@ object "Bouncing Collectible" is "entity", "disposable", "private"
 
         // move object
         transform.move(xsp * dt, ysp * dt);
-
+        
         // timeout
         if(timeout(5.0))
             destroy();

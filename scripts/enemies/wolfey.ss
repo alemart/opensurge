@@ -24,7 +24,7 @@ object "Wolfey" is "entity", "enemy"
 
     state "walking"
     {
-        if(timeout(3.0))
+        if(timeout(2.5))
             state = "new direction";
     }
 

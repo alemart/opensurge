@@ -24,11 +24,11 @@ object "Sunshine Setup"
         // all zones / acts
         //
         "*": {
-            "Bridge": {
-                "anim": 0
-            },
             "Audio Source": {
                 "sound": "samples/waterfall.wav"
+            },
+            "Bridge": {
+                "anim": 0
             },
             "Fish": {
                 "anim": 0
@@ -38,6 +38,9 @@ object "Sunshine Setup"
             },
             "Zipline Grabber": {
                 "anim": 1
+            },
+            "Event Trigger 7": {
+                "onTrigger": FunctionEvent("Lock Camera").withArgument(2048)
             }
         },
 
@@ -46,9 +49,35 @@ object "Sunshine Setup"
         //
         "1": {
             // Bridge
-            "31689decb2eab796": {
+            "75d7cacbe3448333": {
+                "length": 8,
+                "layer": "green"
+            },
+
+            // Bridge
+            "ce6187aed9016033": {
                 "length": 8
             },
+
+            // Bridge
+            "1706a5edf48b0e33": {
+                "length": 8
+            },
+
+            // Bridge
+            "9f41cc898da84f8b": {
+                "length": 10
+            },
+
+            // Bridge
+            "6160b07a29ec8598": {
+                "length": 14
+            },
+
+            // Bridge
+            "a8f66404e8ca6d3c": {
+                "length": 14
+            }
         },
 
         //

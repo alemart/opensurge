@@ -140,7 +140,7 @@ object "Platformer" is "behavior"
                 transform.move(0, -1);
                 sensors.update();
             }
-            transform.move(0, 1);
+            transform.move(0, 2);
         }
         else {
             midair = true;
@@ -223,7 +223,7 @@ object "Platformer" is "behavior"
     fun setSensorBox(width, height)
     {
         sensors = spawn("PlatformerSensors").setSensorBox(width, height);
-        //sensors.visible = true;
+        //sensors.visible = true; // debug
         return this;
     }
 
@@ -398,8 +398,8 @@ object "PlatformerSensors"
 
     fun setSensorBox(w, h)
     {
-        left = Sensor(-w * 0.4, -h * 0.5, 1, h * 0.5 + 1);
-        right = Sensor(w * 0.4, -h * 0.5, 1, h * 0.5 + 1);
+        left = Sensor(-w * 0.4, -h * 0.5, 1, h * 0.5 + 2);
+        right = Sensor(w * 0.4, -h * 0.5, 1, h * 0.5 + 2);
         mid = Sensor(-w * 0.4 - 1, -h * 0.4, w * 0.8 + 3, 1);
         top = Sensor(-w * 0.4, -h, w * 0.8 + 1, 1);
         return this;

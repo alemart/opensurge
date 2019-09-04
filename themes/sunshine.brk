@@ -948,7 +948,6 @@ brick 44
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
 
     sprite
     {
@@ -1279,7 +1278,7 @@ brick 130
 
 brick 131
 {
-    type                CLOUD
+    type                PASSABLE
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
     zindex              0.35
