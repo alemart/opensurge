@@ -753,7 +753,6 @@ brick 16 11136 9376
 brick 141 11168 9440
 brick 142 10960 9440
 brick 145 10528 10288
-brick 149 10400 10272
 brick 17 9472 10368
 brick 31 9600 10496
 brick 28 9984 10368
@@ -943,11 +942,6 @@ brick 28 8608 9632
 brick 17 8704 9600
 brick 17 8832 9568
 brick 29 8960 9568
-brick 31 8960 9664
-brick 36 8960 9760
-brick 35 8832 9760
-brick 35 8704 9760
-brick 34 8608 9760
 brick 238 9152 9616
 brick 237 9168 9632
 brick 236 9168 9632
@@ -961,10 +955,6 @@ brick 30 8704 10560
 brick 30 8704 10624
 brick 31 8832 10560
 brick 31 8832 10624
-brick 180 8736 9728
-brick 180 8768 9728
-brick 180 8832 9696
-brick 180 8896 9696
 brick 2 9088 10528
 brick 1 9088 10624
 brick 1 9216 10496
@@ -998,6 +988,14 @@ brick 254 8944 10496
 brick 254 8976 10496
 brick 254 9008 10496
 brick 254 9040 10496
+brick 36 8960 9664
+brick 36 8960 9696
+brick 36 8960 9728
+brick 34 8608 9728
+brick 35 8736 9728
+brick 35 8832 9728
+brick 180 8832 9696
+brick 180 8896 9696
 brick 1 7840 10240
 brick 16 7808 10240
 brick 17 7840 9984
@@ -1789,7 +1787,6 @@ entity "Layer Yellow" 11904 10096 "73d640b899a48e49"
 entity "Layer Yellow" 11904 10064 "18e0f1d1fa577515"
 entity "Bridge" 12560 9952 "75d7cacbe3448333"
 entity "Spring Stronger Right" 11248 10352 "f17f7a4fe459e6f8"
-entity "Powerup Speed" 10432 10304 "c99849a6875deb35"
 entity "Layer Yellow" 12512 10000 "f29432b85883920e"
 entity "Layer Yellow" 12544 10000 "0b9c4af4d7c3d6aa"
 entity "Layer Yellow" 12576 10000 "289e3d35c342bb87"
@@ -1835,10 +1832,6 @@ entity "Zipline Grabber" 16160 9616 "5bd6bdd7868986bf"
 entity "Powerup Collectibles" 13376 9696 "c550f371e3463a01"
 entity "Powerup Collectibles" 16000 9952 "bf869e1b3a241635"
 entity "Fish" 3392 10256 "de67795519f047d7"
-entity "Fish" 7664 10144 "d516a5f7ac76a1e7"
-entity "Fish" 7728 10144 "af847efd9f0a48f6"
-entity "Fish" 14800 10176 "77a899e6876ed487"
-entity "Fish" 14896 10176 "a76ff712da99c8ee"
 entity "Fish" 14896 9632 "370c779f61bd00ff"
 entity "Fish" 14800 9632 "054a0e6763cf91f4"
 entity "Mosquito" 2704 9696 "0b2a2516c16912f8"
@@ -1875,11 +1868,6 @@ entity "Collectible" 16112 10000 "f78aeab2f82eb11e"
 entity "Collectible" 4352 10112 "25ebbc440faf80fa"
 entity "Collectible" 8160 10304 "778c0f38fd367943"
 entity "Collectible" 14400 9984 "7af9da4b44982571"
-entity "Collectible" 14848 10016 "e64832d12240697b"
-entity "Collectible" 14816 10016 "ba86826f4b92ea87"
-entity "Collectible" 14880 10016 "9188a41431cb8e92"
-entity "Collectible" 14832 9984 "e8d2035ae087fd0f"
-entity "Collectible" 14864 9984 "f2013bc429725135"
 entity "Collectible" 14848 9456 "4ffc22b3063c58d7"
 entity "Collectible" 14816 9456 "e7ddde898f70f5a6"
 entity "Collectible" 14880 9456 "b1c64b76257dbdcd"
@@ -1964,11 +1952,6 @@ entity "Collectible" 3104 10208 "0bb9a5af280b590f"
 entity "Collectible" 2864 10144 "76037f3adf26fee5"
 entity "Collectible" 2864 10112 "c0f89560e84baa58"
 entity "Collectible" 2864 10080 "9102bd0c1822ab0c"
-entity "Collectible" 7696 9984 "e5253bc6e360c2ca"
-entity "Collectible" 7664 9984 "fa1201fa4d51f1cf"
-entity "Collectible" 7728 9984 "9ed8b5dd5056c1ec"
-entity "Collectible" 7712 9952 "3aa3971f09a5976f"
-entity "Collectible" 7680 9952 "a55f2eba233ce781"
 entity "Collectible" 8080 10032 "b419736eb8af5e0e"
 entity "Collectible" 8112 10032 "012706a323ac4332"
 entity "Collectible" 8048 10032 "e816892828f59734"
@@ -2006,12 +1989,6 @@ entity "Collectible" 8656 10480 "7d4edc3e3ecb06c3"
 entity "Collectible" 8976 10480 "c4d2d103ce8bd944"
 entity "Collectible" 9008 10480 "04c96c132f241ff6"
 entity "Collectible" 8944 10480 "16d118e297116a49"
-entity "Collectible" 8720 9968 "65abd7f6d94942a7"
-entity "Collectible" 8752 9968 "52e73b397d3b99e2"
-entity "Collectible" 8688 9968 "9d8570809eb9d651"
-entity "Collectible" 8960 9968 "a0d05fe7284111bd"
-entity "Collectible" 8992 9968 "6d4f4b5e6dde5cde"
-entity "Collectible" 8928 9968 "1afc15fa42c717e7"
 entity "Collectible" 9856 10464 "d129b2307ad0b7a2"
 entity "Collectible" 9888 10464 "82db6223596a4071"
 entity "Collectible" 9824 10464 "817a2d915c24a8b1"
@@ -2244,5 +2221,27 @@ entity "Event Trigger 7" 17296 10000 "7751ce3e1392a1c4"
 entity "Event Trigger 7" 17296 9968 "0ea29e1e342b7587"
 entity "Event Trigger 7" 17296 9936 "698f42772976a2ac"
 entity "Event Trigger 7" 17296 9904 "c8ecb9a5870b64e9"
+entity "Collectible" 7664 10064 "255d70d23a1e6035"
+entity "Collectible" 7696 10064 "f9ac1217369ef1b5"
+entity "Collectible" 7728 10064 "2943ebdf63550116"
+entity "Collectible" 8688 9888 "bbe52658f5d92e94"
+entity "Collectible" 8720 9888 "d6344bc56439b9c9"
+entity "Collectible" 8752 9888 "a2ebd1c1e65298fa"
+entity "Collectible" 8704 9856 "4cc10e9f24b1434b"
+entity "Collectible" 8736 9856 "f272f25e38db930d"
+entity "Fish" 8720 10048 "64c13ac324920f25"
+entity "Collectible" 8928 9888 "994e760c10a581b1"
+entity "Collectible" 8960 9888 "62f139c6c48f177f"
+entity "Collectible" 8992 9888 "a06962cde50e3691"
+entity "Collectible" 8976 9856 "f28948e7a6e3aebc"
+entity "Collectible" 8944 9856 "f4a5de67295046e1"
+entity "Fish" 8960 10048 "9d809ea547977e2c"
+entity "Powerup Shield Thunder" 10432 10304 "b33e903fb0a25bd0"
+entity "Collectible" 14816 10016 "48344cb87ae1eb67"
+entity "Collectible" 14848 10016 "cae71b67ade01171"
+entity "Collectible" 14880 10016 "dbd4c82542b7ad13"
+entity "Collectible" 14832 9984 "c33360449d69e689"
+entity "Collectible" 14864 9984 "a67961f91cf3b704"
+entity "Fish" 14848 10176 "1695876d8613116a"
 
 // EOF
