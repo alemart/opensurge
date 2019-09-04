@@ -386,6 +386,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             for(i=0; i<team_size; i++) {
                 /* get the y-position of the feet of the player */
                 physicsactor_bounding_box(team[i]->pa, &w, &h, &center);
+                if(player_is_frozen(team[i]))
+                    center = team[i]->actor->position;
                 feet = center.y + h/2 - 2;
 
                 /* check collision */

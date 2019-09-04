@@ -763,6 +763,9 @@ int player_collision(const player_t *player, const actor_t *actor)
     image_t *img = actor_image(actor);
 
     physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
+    if(player_is_frozen(player))
+        player_box_center = player->actor->position;
+
     player_box[0] = player_box_center.x - player_box_width / 2;
     player_box[1] = player_box_center.y - player_box_height / 2;
     player_box[2] = player_box_center.x + player_box_width / 2;
@@ -789,6 +792,9 @@ int player_overlaps(const player_t *player, int x, int y, int width, int height)
     v2d_t player_box_center;
 
     physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
+    if(player_is_frozen(player))
+        player_box_center = player->actor->position;
+
     player_box[0] = player_box_center.x - player_box_width / 2;
     player_box[1] = player_box_center.y - player_box_height / 2;
     player_box[2] = player_box_center.x + player_box_width / 2;
@@ -1583,7 +1589,7 @@ void animate_invincibility_stars(player_t* player)
     /* get coordinates & dimensions */
     physicsactor_bounding_box(player->pa, &width, &height, &center);
     max_distance = min(width, height);
-    if(player->disable_movement) /* frozen player? */
+    if(player_is_frozen(player))
         center = player->actor->position;
 
     /* animate */
