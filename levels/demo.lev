@@ -126,16 +126,9 @@ brick 141 11120 10784
 brick 46 9600 10368
 brick 50 9856 10368
 brick 49 9728 10368
-brick 45 9856 10624
-brick 48 9856 10496
 brick 28 9552 10384
-brick 32 9648 10576
-brick 34 9552 10576
-brick 34 9632 10624
 brick 30 9552 10480
-brick 35 9728 10624
 brick 1 9680 10480
-brick 1 9760 10496
 brick 18 9472 10656
 brick 18 9600 10688
 brick 18 9728 10720
@@ -147,8 +140,6 @@ brick 2 9472 10784
 brick 16 9984 10880
 brick 16 10112 10880
 brick 17 10240 10880
-brick 36 9984 10624
-brick 31 9984 10496
 brick 31 9984 10368
 brick 31 9984 10240
 brick 31 9984 10112
@@ -237,6 +228,22 @@ brick 149 10000 10944
 brick 141 10288 10928
 brick 142 10160 10944
 brick 144 10096 10960
+brick 51 9856 10496
+brick 34 9552 10576
+brick 35 9680 10576
+brick 35 9744 10576
+brick 47 9984 10496
+brick 29 10032 10512
+brick 36 10032 10608
+brick 34 9776 10608
+brick 35 9904 10608
+brick 180 9808 10512
+brick 180 9792 10496
+brick 254 9472 10448
+brick 254 9504 10448
+brick 254 9536 10448
+brick 254 9568 10448
+brick 254 9600 10448
 brick 1 8704 10112
 brick 1 8704 10368
 brick 1 8736 9984
@@ -382,6 +389,11 @@ brick 6 8736 10336
 brick 1 8704 10496
 brick 145 8880 9920
 brick 150 8880 9904
+brick 254 9312 10448
+brick 254 9344 10448
+brick 254 9376 10448
+brick 254 9408 10448
+brick 254 9440 10448
 brick 1 8192 10112
 brick 19 7808 10336
 brick 17 7936 10304
@@ -1397,10 +1409,6 @@ entity "Spikes" 8128 10368 "a2b5ab20ae73cb82"
 entity "Event Trigger 7" 11280 10832 "b44632cc8a1aa8ce"
 entity "Event Trigger 7" 11280 10800 "4b6a1db21c836e1f"
 entity "Event Trigger 7" 11280 10768 "c5f18dda2ba40f03"
-entity "Event Trigger 7" 11280 10736 "4fddb31e38aae7dd"
-entity "Event Trigger 7" 11280 10704 "e98bedd0b83de552"
-entity "Event Trigger 7" 11280 10672 "a75ccc1fbeae8a18"
-entity "Event Trigger 7" 11280 10640 "35d973d9592a510c"
 entity "Event Trigger 1" 384 9808 "230eca166671c6ae"
 entity "Event Trigger 1" 384 9776 "c61342e7735f4ea3"
 entity "Event Trigger 1" 384 9744 "c8b834a9f24238fe"
@@ -1435,7 +1443,6 @@ entity "Tube In" 3696 10048 "c05dc2830658e0d6"
 entity "Tube In" 4496 10048 "0ae4ade1c358a497"
 entity "Tube In" 9232 10432 "d725a06a6259d01e"
 entity "Tube In" 9712 10432 "181c882c5296a43e"
-entity "Tube In" 9920 10640 "e8ffc640f6f146f6"
 entity "Tube In" 8944 9920 "a1482de8fb9c0c88"
 entity "Audio Source" 1680 9792 "1440410c61db1691"
 entity "Audio Source" 1680 9920 "0103d4b324f724fc"
@@ -1550,14 +1557,11 @@ entity "Collectible" 9504 10432 "f43146607476228f"
 entity "Collectible" 9536 10432 "b9ba68f077538d0a"
 entity "Collectible" 9568 10432 "a8e14b2863df2890"
 entity "Collectible" 9600 10432 "1f3d0c5c4442b2c1"
-entity "Collectible" 9920 10784 "0a7be7d397055106"
 entity "Collectible" 9920 10880 "d47dc5e3002e6f69"
 entity "Collectible" 9936 10928 "2142261c93b6c9f7"
 entity "Collectible" 9968 10960 "0b4f8b38ed5539a4"
 entity "Collectible" 10016 10960 "74a21a559b5b7ad7"
 entity "Collectible" 9920 10832 "c75e6bbfba2d99e2"
-entity "Collectible" 9920 10736 "95ba35c409a1fa51"
-entity "Collectible" 9920 10688 "b1971c95cd4c0de5"
 entity "Collectible" 10064 10960 "0e4dc6a4ad154cbe"
 entity "Collectible" 7584 10608 "5687bda1234c8b74"
 entity "Collectible" 7616 10608 "5d87b877bd824f62"
@@ -1656,5 +1660,9 @@ entity "Collectible" 1712 9600 "ac6fe58233d820b6"
 entity "Collectible" 1648 9600 "690397fc3f4f7d77"
 entity "Collectible" 1744 9600 "cba01eb547da5e4d"
 entity "Collectible" 1616 9600 "7fa37b352369d9b1"
+entity "Tube In" 10000 10560 "0295e6c1af68240e"
+entity "Event Trigger 7" 11280 10736 "4fddb31e38aae7dd"
+
+// legacy objects
 
 // EOF

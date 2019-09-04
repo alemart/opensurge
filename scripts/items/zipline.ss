@@ -25,7 +25,7 @@ object "Zipline Grabber" is "entity", "gimmick"
     grab = Sound("samples/zipline.wav");
     zipSound = spawn("Zipline Sound");
     speed = 0.0; // current speed in px/s
-    maxSpeed = 512.0; // max speed in px/s
+    maxSpeed = 640.0; // max speed in px/s
     zipline = null; // current zipline
     lockedPlayer = null;
     zippingPlayerHands = Vector2(-0.35, -0.8); // relative position of the hands
