@@ -70,7 +70,8 @@ static const command_t command[] = {
     { "flip-next", "F" },
     { "flip-previous", "Shift+F" },
     { "layer-next", "L" },
-    { "layer-previous", "Shift+L" }
+    { "layer-previous", "Shift+L" },
+    { "toggle-masks", "M" }
 };
 static const int command_count = sizeof(command) / sizeof(command_t);
 static bool hotkey_is_triggered(const editorcmd_t* cmd, const char* hotkey);
@@ -194,7 +195,7 @@ bool hotkey_is_triggered(const editorcmd_t* cmd, const char* hotkey)
         case 'R': return input_button_pressed(cmd->keyboard[0], IB_FIRE6);
         case '1': return input_button_pressed(cmd->keyboard[1], IB_FIRE1);
         case '2': return input_button_pressed(cmd->keyboard[1], IB_FIRE2);
-        case '3': return input_button_pressed(cmd->keyboard[1], IB_FIRE3);
+        case 'M': return input_button_pressed(cmd->keyboard[1], IB_FIRE3);
         case 'G': return input_button_pressed(cmd->keyboard[1], IB_FIRE4);
         case 'L': return input_button_pressed(cmd->keyboard[1], IB_FIRE5);
         case 'F': return input_button_pressed(cmd->keyboard[1], IB_FIRE6);

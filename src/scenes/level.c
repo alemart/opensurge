@@ -338,6 +338,7 @@ static int* editor_brick; /* an array of all valid brick numbers */
 static int editor_brick_count; /* length of editor_brick */
 static bricklayer_t editor_layer; /* current layer */
 static brickflip_t editor_flip; /* flip flags */
+static bool editor_should_render_masks; /* render brick masks? */
 static void editor_brick_init();
 static void editor_brick_release();
 static int editor_brick_index(int brick_id); /* index of brick_id at editor_brick[] */
@@ -2112,6 +2113,14 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
         for(bnode=major_bricks; bnode; bnode=bnode->next)
             renderqueue_enqueue_brick(bnode->data);
 
+        /* render the masks of the bricks */
+        if(editor_is_enabled()) {
+            if(editor_should_render_masks) {
+                for(bnode=major_bricks; bnode; bnode=bnode->next)
+                   renderqueue_enqueue_brick_mask(bnode->data);
+            }
+        }
+
         /* render items */
         for(inode=major_items; inode; inode=inode->next)
             renderqueue_enqueue_item(inode->data);
@@ -3081,6 +3090,10 @@ void editor_update()
         else
             sound_play(SFX_DENY);
     }
+
+    /* show/hide brick masks */
+    if(editorcmd_is_triggered(editor_cmd, "toggle-masks"))
+        editor_should_render_masks = !editor_should_render_masks;
 
     /* new spawn point */
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
@@ -4053,6 +4066,7 @@ void editor_brick_init()
     /* layer & flip flags */
     editor_layer = BRL_DEFAULT;
     editor_flip = BRF_NOFLIP;
+    editor_should_render_masks = false;
 
     /* which are the valid bricks? */
     if(brickset_loaded()) {

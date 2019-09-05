@@ -234,7 +234,7 @@ inputmap "editorcmd2"
         left            KEY_A
         fire1           KEY_1
         fire2           KEY_2
-        fire3           KEY_3
+        fire3           KEY_M
         fire4           KEY_G
         fire5           KEY_L
         fire6           KEY_F

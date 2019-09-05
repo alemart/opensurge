@@ -47,6 +47,7 @@ void renderqueue_end();
 
 /* enqueues entities */
 void renderqueue_enqueue_brick(struct brick_t *brick);
+void renderqueue_enqueue_brick_mask(struct brick_t *brick);
 void renderqueue_enqueue_item(struct item_t *item);
 void renderqueue_enqueue_object(struct enemy_t *object);
 void renderqueue_enqueue_player(struct player_t *player);

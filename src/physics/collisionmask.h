@@ -21,14 +21,16 @@
 #ifndef _COLLISIONMASK_H
 #define _COLLISIONMASK_H
 
+#include "../core/color.h"
+
 struct image_t;
 struct collisionmask_t;
 typedef struct collisionmask_t collisionmask_t;
 
 /* create and destroy a collision mask */
-collisionmask_t *collisionmask_create(const struct image_t *image, int x, int y, int width, int height);
-collisionmask_t *collisionmask_create_box(int width, int height);
-collisionmask_t *collisionmask_destroy(collisionmask_t *mask);
+collisionmask_t* collisionmask_create(const struct image_t* image, int x, int y, int width, int height);
+collisionmask_t* collisionmask_create_box(int width, int height);
+collisionmask_t* collisionmask_destroy(collisionmask_t *mask);
 
 /* retrieve dimensions */
 int collisionmask_width(const collisionmask_t* mask);
@@ -43,5 +45,8 @@ int collisionmask_peek(const collisionmask_t* mask, int x, int y); /* mask value
 /* locating the ground */
 typedef enum { GD_DOWN, GD_LEFT, GD_UP, GD_RIGHT } grounddir_t;
 int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, grounddir_t ground_direction);
+
+/* utilities */
+struct image_t* collisionmask_to_image(const collisionmask_t* mask, color_t color);
 
 #endif

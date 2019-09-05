@@ -58,20 +58,20 @@ brick 141 17296 9984
 brick 141 17616 9984
 brick 142 17696 9984
 brick 142 17488 9984
-brick 142 17360 9984
 brick 142 17824 9984
-brick 140 17440 9984
 brick 140 17568 9984
 brick 140 17744 9984
-brick 141 17776 9984
-brick 141 17792 9984
-brick 141 17536 9984
-brick 141 17520 9984
-brick 141 17392 9984
-brick 141 17408 9984
 brick 142 17312 9984
 brick 142 17872 9984
 brick 141 17888 9984
+brick 142 17376 9984
+brick 141 17424 9984
+brick 141 17504 9984
+brick 141 17760 9984
+brick 141 17808 9984
+brick 141 17552 9984
+brick 142 17440 9984
+brick 140 17360 9984
 brick 16 16512 9856
 brick 16 16640 9856
 brick 16 16768 9856
@@ -586,7 +586,6 @@ brick 34 11536 10208 yellow
 brick 22 11536 10080 yellow
 brick 38 11632 10048 yellow
 brick 30 11776 10176
-brick 20 11808 10080
 brick 16 11936 10080
 brick 16 12032 10080
 brick 37 11632 10080 yellow
@@ -668,6 +667,8 @@ brick 145 11440 9232
 brick 145 11312 9232
 brick 145 11600 9456
 brick 142 12032 10144
+brick 20 11808 10080
+brick 255 11904 10176
 brick 16 10368 10272
 brick 18 10496 10304
 brick 18 10624 10336
@@ -1398,7 +1399,6 @@ brick 19 3504 9616
 brick 35 3504 9872
 brick 35 3536 9872
 brick 29 3632 9616
-brick 9 3632 9744
 brick 36 3632 9872
 brick 1 3504 10352
 brick 1 3632 10352
@@ -1469,6 +1469,7 @@ brick 145 3472 9664
 brick 152 3536 9664
 brick 144 3472 10208
 brick 140 4272 9616
+brick 31 3632 9744
 brick 16 2608 9680
 brick 24 2736 9680
 brick 33 2592 9888
@@ -1487,7 +1488,6 @@ brick 17 2896 9616
 brick 30 3120 9712
 brick 29 3248 9616
 brick 29 3280 9616
-brick 9 3280 9712
 brick 180 3232 9728
 brick 12 3328 9728
 brick 28 3376 9616
@@ -1525,9 +1525,7 @@ brick 34 3120 9872
 brick 36 3280 9872
 brick 36 3248 9872
 brick 180 3248 9840
-brick 9 3280 9776
 brick 30 3120 9776
-brick 180 3248 9776
 brick 12 3328 9856
 brick 15 2944 9904 hflip
 brick 33 2928 9840
@@ -1538,7 +1536,6 @@ brick 15 3200 10112 hflip
 brick 15 3200 9856 hflip
 brick 29 3024 9616
 brick 28 3120 9616
-brick 9 3024 9744
 brick 12 3072 9728
 brick 12 3072 9712
 brick 12 3328 9712
@@ -1581,6 +1578,9 @@ brick 254 3328 10224
 brick 254 3360 10224
 brick 254 3392 10224
 brick 254 3424 10224
+brick 180 3248 9776
+brick 31 3280 9744
+brick 31 3024 9712
 brick 29 1792 9792
 brick 31 1792 9920
 brick 27 1792 9984
@@ -1814,12 +1814,9 @@ entity "Zipline Right" 12608 9824 "24ece8587a7ed978"
 entity "Spring Standard" 5200 10432 "cfebdb7ac09b8c13"
 entity "Spikes" 15552 10112 "a1334e98ddeddfcb"
 entity "Spikes" 15296 10112 "e26fcc3e01b096b4"
-entity "Spikes" 8160 10432 "a3ffda91b672da99"
 entity "Spikes" 14400 10112 "371212702023b96c"
 entity "Spikes" 4352 10208 "2907d118f59c251e"
-entity "Powerup Speed" 9776 9920 "a0aa619500f87687"
 entity "Powerup Lucky Bonus" 5056 10432 "bdf8d94cabaf44e1"
-entity "Powerup Shield Thunder" 5584 10272 "7ade8dcb35e50228"
 entity "Powerup Shield Thunder" 4736 9472 "e373d1b7fed3422c"
 entity "Spring Stronger" 14368 9568 "efd00b7245a68d6c"
 entity "Powerup 1up" 15088 9248 "91e10d072fcf1b76"
@@ -1866,7 +1863,6 @@ entity "Collectible" 15552 9984 "53deb37d0d888528"
 entity "Collectible" 15888 10000 "65697ac63953de22"
 entity "Collectible" 16112 10000 "f78aeab2f82eb11e"
 entity "Collectible" 4352 10112 "25ebbc440faf80fa"
-entity "Collectible" 8160 10304 "778c0f38fd367943"
 entity "Collectible" 14400 9984 "7af9da4b44982571"
 entity "Collectible" 14848 9456 "4ffc22b3063c58d7"
 entity "Collectible" 14816 9456 "e7ddde898f70f5a6"
@@ -1876,10 +1872,6 @@ entity "Collectible" 14864 9424 "dae1b5b85778335d"
 entity "Collectible" 14368 9984 "e095526d3b26e0db"
 entity "Collectible" 14384 9952 "5939fd54c8eaf468"
 entity "Mosquito" 14704 9952 "bb2e751caf79a88d"
-entity "Collectible" 8128 10304 "8302018bcc64d89c"
-entity "Collectible" 8192 10304 "ff5bad443583b62d"
-entity "Collectible" 8144 10272 "10a19a229fc29a01"
-entity "Collectible" 8176 10272 "2730f07e07f1bf75"
 entity "Collectible" 3392 10128 "a48f2e1f72e9214b"
 entity "Collectible" 3360 10128 "f24bfd1951ffc1c9"
 entity "Collectible" 3424 10128 "81e2cfa23c816c0a"
@@ -2243,5 +2235,11 @@ entity "Collectible" 14880 10016 "dbd4c82542b7ad13"
 entity "Collectible" 14832 9984 "c33360449d69e689"
 entity "Collectible" 14864 9984 "a67961f91cf3b704"
 entity "Fish" 14848 10176 "1695876d8613116a"
+entity "Powerup Speed" 5584 10272 "a0aa619500f87687"
+entity "Spikes" 7984 10384 "5fa8aab39edd4b7f"
+entity "Powerup Shield Thunder" 8160 10432 "29d96f3f1596bd25"
+entity "Collectible" 8256 10416 "009ae8b75ed51c04"
+entity "Collectible" 8256 10384 "6be1563548d7373c"
+entity "Collectible" 8256 10352 "200652085dc8d652"
 
 // EOF

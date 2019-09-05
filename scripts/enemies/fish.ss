@@ -27,12 +27,12 @@ object "Fish" is "entity", "enemy"
     movement = DirectionalMovement();
     transform = Transform();
     sfx = Sound("samples/fish.wav");
-    spawnPoint = 0;
+    spawnPoint = Vector2.zero;
 
     state "main"
     {
         // setup
-        spawnPoint = transform.position.y;
+        spawnPoint = transform.position.scaledBy(1); // clone
         movement.direction = Vector2.down;
         movement.speed = 0;
         actor.anim = anim;
@@ -45,10 +45,12 @@ object "Fish" is "entity", "enemy"
         // wait for the player
         actor.visible = false;
         if(distance(Player.active) <= visibleRange) {
-            movement.speed = jumpSpeed();
-            sfx.volume = jumpVolume();
-            sfx.play();
-            state = "jumping";
+            if(Player.active.transform.position.y <= spawnPoint.y) {
+                movement.speed = jumpSpeed();
+                sfx.volume = jumpVolume();
+                sfx.play();
+                state = "jumping";
+            }
         }
     }
 
@@ -59,8 +61,8 @@ object "Fish" is "entity", "enemy"
         actor.visible = true;
 
         // reposition the fish & stop its movement
-        if(transform.position.y >= spawnPoint) {
-            transform.move(0, spawnPoint - transform.position.y);
+        if(transform.position.y >= spawnPoint.y) {
+            transform.move(0, spawnPoint.y - transform.position.y);
             movement.speed = 0;
             actor.visible = false;
             state = "cooldown";

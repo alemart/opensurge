@@ -111,6 +111,7 @@ static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 
 static float zindex_item(renderable_t r) { return r.item->bring_to_back ? 0.49999f : 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
+static float zindex_brick_mask(renderable_t r) { return 99999.0f + brick_zindex_offset(r.brick); }
 static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
 static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
 static float zindex_background(renderable_t r) { return 0.0f; }
@@ -122,6 +123,7 @@ static void render_player(renderable_t r, v2d_t camera_position) { player_render
 static void render_item(renderable_t r, v2d_t camera_position) { item_render(r.item, camera_position); }
 static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(r.object, camera_position); }
 static void render_brick(renderable_t r, v2d_t camera_position) { brick_render(r.brick, camera_position); }
+static void render_brick_mask(renderable_t r, v2d_t camera_position) { brick_render_mask(r.brick, camera_position); }
 static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "render", NULL, 0, NULL); }
 static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
 {
@@ -216,6 +218,19 @@ void renderqueue_enqueue_brick(brick_t *brick)
     node->cell.entity.brick = brick;
     node->cell.zindex = zindex_brick;
     node->cell.render = render_brick;
+    node->cell.ypos = ypos_brick;
+    node->cell.type = type_brick;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_brick_mask(brick_t *brick)
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.entity.brick = brick;
+    node->cell.zindex = zindex_brick_mask;
+    node->cell.render = render_brick_mask;
     node->cell.ypos = ypos_brick;
     node->cell.type = type_brick;
     node->next = queue;

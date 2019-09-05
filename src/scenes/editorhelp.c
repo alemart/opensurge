@@ -32,7 +32,7 @@
 
 /* private data */
 #define BOX_WIDTH               615
-#define BOX_HEIGHT              350
+#define BOX_HEIGHT              360
 #define BOX_XPOS                ((VIDEO_SCREEN_W - BOX_WIDTH) / 2)
 #define BOX_YPOS                ((VIDEO_SCREEN_H - BOX_HEIGHT) / 2)
 #define BOX_PADDING             15
@@ -61,6 +61,7 @@ static const char text[] =
 "Ctrl + Left mouse button           Change the spawn point\n"
 "L | Shift + L                      Change brick layer\n"
 "F | Shift + F                      Flip brick\n"
+"M                                  Show/hide collision masks\n"
 "Shift + Mouse wheel                Change item type (legacy)\n"
 "Ctrl + Mouse wheel                 Change obj. category (legacy)\n"
 "\n\n"

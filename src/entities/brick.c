@@ -65,6 +65,7 @@ struct brickdata_t {
     const image_t *image; /* pointer to a brick image in the animation */
     char* maskfile; /* collision mask file (may be NULL) */
     collisionmask_t *mask; /* collision mask (may be NULL) */
+    image_t* maskimg; /* mask image for rendering (may be NULL) */
     float zindex; /* 0.0 (background) <= z-index <= 1.0 (foreground) */
     bricktype_t type;
     brickbehavior_t behavior;
@@ -605,6 +606,16 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
 }
 
 /*
+ * brick_render_mask()
+ * Renders the mask of a brick (if any)
+ */
+void brick_render_mask(brick_t *brk, v2d_t camera_position)
+{
+    if(brk->brick_ref->maskimg != NULL)
+        image_draw(brk->brick_ref->maskimg, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+}
+
+/*
  * brick_id()
  * Returns the brick ID, i.e., its number in the brickset
  */
@@ -960,6 +971,7 @@ brickdata_t* brickdata_new()
     obj->image = NULL;
     obj->mask = NULL;
     obj->maskfile = NULL;
+    obj->maskimg = NULL;
     obj->type = BRK_PASSABLE;
     obj->behavior = BRB_DEFAULT;
     obj->zindex = 0.5f;
@@ -978,6 +990,8 @@ brickdata_t* brickdata_delete(brickdata_t *obj)
             spriteinfo_destroy(obj->data);
         if(obj->mask != NULL)
             collisionmask_destroy(obj->mask);
+        if(obj->maskimg != NULL)
+            image_destroy(obj->maskimg);
         if(obj->maskfile != NULL)
             free(obj->maskfile);
         free(obj);
@@ -1226,6 +1240,7 @@ void create_collisionmasks()
     image_t* mask = NULL;
     const char* prev_maskfile = "";
 
+    /* creates the collision masks */
     for(i = 0; i < brickdata_count; i++) {
         if(brickdata[i] != NULL && brickdata[i]->type != BRK_PASSABLE && brickdata[i]->mask == NULL) {
             const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
@@ -1254,5 +1269,14 @@ void create_collisionmasks()
     if(mask != NULL) {
         image_unlock(mask);
         image_unload(mask);
+    }
+
+    /* creates the images of the masks */
+    for(i = 0; i < brickdata_count; i++) {
+        if(brickdata[i] != NULL && brickdata[i]->mask != NULL) {
+            bricktype_t type = brickdata[i]->type;
+            color_t color = (type == BRK_SOLID) ? color_rgb(255, 0, 0) : color_rgb(255, 255, 255);
+            brickdata[i]->maskimg = collisionmask_to_image(brickdata[i]->mask, color);
+        }
     }
 }

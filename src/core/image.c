@@ -539,7 +539,7 @@ image_t* image_snapshot()
 void image_lock(image_t* img)
 {
 #if defined(A5BUILD)
-    al_lock_bitmap(img->data, al_get_bitmap_format(img->data), ALLEGRO_LOCK_READONLY);
+    al_lock_bitmap(img->data, al_get_bitmap_format(img->data), ALLEGRO_LOCK_READWRITE);
 #else
     ;
 #endif
@@ -589,6 +589,19 @@ color_t image_getpixel(const image_t* img, int x, int y)
     return (color_t){ al_get_pixel(img->data, x, y) };
 #else
     return (color_t){ getpixel(img->data, x, y) };
+#endif
+}
+
+/*
+ * image_putpixel()
+ * Puts a pixel on the target image. Make sure to lock it first
+ */
+void image_putpixel(int x, int y, color_t color)
+{
+#if defined(A5BUILD)
+    al_put_pixel(x, y, color._color);
+#else
+    putpixel(get_target()->data, x, y, color._value);
 #endif
 }
 

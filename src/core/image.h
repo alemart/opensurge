@@ -53,6 +53,7 @@ image_t* image_snapshot(); /* take a snapshot */
 void image_lock(image_t* img);
 void image_unlock(image_t* img);
 color_t image_getpixel(const image_t* img, int x, int y);
+void image_putpixel(int x, int y, color_t color);
 
 /* drawing target */
 void image_set_drawing_target(image_t* new_target);

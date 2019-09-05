@@ -93,6 +93,7 @@ brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t fl
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
 void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
 void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
+void brick_render_mask(brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */
 
 /* brick properties & operations */
 int brick_id(const brick_t* brk); /* brick id (its number in the brickset) */
