@@ -54,6 +54,16 @@ object "Base Collectible" is "private", "entity"
         return state == "disappearing";
     }
 
+    fun get_zindex()
+    {
+        return actor.zindex;
+    }
+
+    fun set_zindex(zindex)
+    {
+        actor.zindex = zindex;
+    }
+
     fun constructor()
     {
         actor.animation.sync = true;
@@ -224,7 +234,7 @@ object "Lucky Collectible" is "private", "entity", "awake"
     state "main"
     {
         // collision check
-        if(t > 1) {
+        if(t >= 1) {
             base.pickup(luckyPlayer);
             state = "done";
             return;
@@ -240,6 +250,11 @@ object "Lucky Collectible" is "private", "entity", "awake"
 
     state "done"
     {
+    }
+
+    fun constructor()
+    {
+        base.zindex = 1.0;
     }
 
 

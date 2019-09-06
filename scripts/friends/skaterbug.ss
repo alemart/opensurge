@@ -28,7 +28,7 @@ object "Skaterbug" is "entity", "friend", "gimmick"
     sfx = Sound("samples/skaterbug.wav");
     collider = CollisionBox(24, 32).setAnchor(0.5, 1);
     transform = Transform();
-    jumpVelocity = Vector2(180, -300); // in px/s
+    jumpVelocity = Vector2(180, jumpSpeed(64)); // in px/s
     restTime = 0.5; // seconds between jumps
 
     direction = "right";
@@ -133,6 +133,12 @@ object "Skaterbug" is "entity", "friend", "gimmick"
     {
         sensor = (dir > 0) ? rightSensor : leftSensor;
         return (sensor.status == null);
+    }
+
+    fun jumpSpeed(jumpHeight)
+    {
+        // Torricelli's
+        return -Math.sqrt(2 * Level.gravity * Math.abs(jumpHeight));
     }
 
     //

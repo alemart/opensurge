@@ -62,13 +62,8 @@ object "Zipline Grabber" is "entity", "gimmick"
             lockedPlayer.anim = zippingPlayerAnimation;
             repositionPlayer(lockedPlayer);
 
-            // player needs to jump out
-            if(lockedPlayer.input.buttonPressed("fire1")) {
-                lockedPlayer.ysp = -180;
-                lockedPlayer.roll();
-                finishZipping();
-            }
-            else if(lockedPlayer.hit || lockedPlayer.dying)
+            // finish prematurely
+            if(lockedPlayer.hit || lockedPlayer.dying)
                 finishZipping();
         }
         else {

@@ -1203,13 +1203,13 @@ brick 144 6448 10064
 brick 148 6496 10048
 brick 142 6768 10304
 brick 141 6752 10304
-brick 149 6224 10240
 brick 134 6128 10080
 brick 133 6160 10144
 brick 133 6288 10176
 brick 134 6256 10112
 brick 149 6032 10192
 brick 149 6096 10208
+brick 149 6208 10240
 brick 29 5248 9728
 brick 31 5248 9824
 brick 36 5248 9920
@@ -2036,8 +2036,6 @@ entity "Collectible" 13936 9760 "86f9fbda9d1b7d6d"
 entity "Collectible" 13984 9728 "e2a3af8e60fdb0d7"
 entity "Collectible" 14016 9680 "18d12dc3c9a69e76"
 entity "Collectible" 14032 9632 "31ae6ee7e9c88eca"
-entity "Collectible" 14384 9136 "6dcb8e0fadf322c0"
-entity "Collectible" 14352 9136 "c2bf3b3643327485"
 entity "Collectible" 14352 9104 "a4ff1bc58fe1912c"
 entity "Collectible" 14384 9104 "0dd33812fca3990e"
 entity "Collectible" 14720 9200 "95c390f36b8d85b8"
@@ -2054,7 +2052,6 @@ entity "Collectible" 14496 9216 "db17e5651932340c"
 entity "Collectible" 14624 9184 "466b82d67fc4d364"
 entity "Collectible" 14368 9088 "cce27fac9210d8ff"
 entity "Collectible" 14368 9120 "067b6a0f1901268e"
-entity "Collectible" 14368 9152 "93963b6bed2d4743"
 entity "Collectible" 14368 9056 "0b8532a0b0f6e717"
 entity "Lady Bugsy" 15616 9344 "76c516fd22c38dac"
 entity "Collectible" 16768 9936 "8db9883b80053507"
@@ -2241,5 +2238,8 @@ entity "Powerup Shield Thunder" 8160 10432 "29d96f3f1596bd25"
 entity "Collectible" 8256 10416 "009ae8b75ed51c04"
 entity "Collectible" 8256 10384 "6be1563548d7373c"
 entity "Collectible" 8256 10352 "200652085dc8d652"
+entity "Collectible" 14368 9024 "6da8aea691dea3fe"
+entity "Collectible" 14352 9040 "70447a303d582139"
+entity "Collectible" 14384 9040 "0c3c677bf17bff3b"
 
 // EOF

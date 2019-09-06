@@ -2114,11 +2114,9 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
             renderqueue_enqueue_brick(bnode->data);
 
         /* render the masks of the bricks */
-        if(editor_is_enabled()) {
-            if(editor_should_render_masks) {
-                for(bnode=major_bricks; bnode; bnode=bnode->next)
-                   renderqueue_enqueue_brick_mask(bnode->data);
-            }
+        if(editor_is_enabled() && editor_should_render_masks) {
+            for(bnode=major_bricks; bnode; bnode=bnode->next)
+                renderqueue_enqueue_brick_mask(bnode->data);
         }
 
         /* render items */
