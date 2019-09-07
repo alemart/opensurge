@@ -37,15 +37,19 @@ object "Fish" is "entity", "enemy"
         movement.speed = 0;
         actor.anim = anim;
         actor.visible = false;
+        enemy.enabled = false;
         state = "waiting";
     }
 
     state "waiting"
     {
         // wait for the player
-        actor.visible = false;
+        actor.visible = enemy.enabled = false;
+
+        // activate the fish
         if(distance(Player.active) <= visibleRange) {
             if(Player.active.transform.position.y <= spawnPoint.y) {
+                actor.visible = enemy.enabled = true;
                 movement.speed = jumpSpeed();
                 sfx.volume = jumpVolume();
                 sfx.play();
@@ -58,13 +62,12 @@ object "Fish" is "entity", "enemy"
     {
         // move the fish
         movement.speed += Level.gravity * Time.delta;
-        actor.visible = true;
 
         // reposition the fish & stop its movement
         if(transform.position.y >= spawnPoint.y) {
+            actor.visible = enemy.enabled = false;
             transform.move(0, spawnPoint.y - transform.position.y);
             movement.speed = 0;
-            actor.visible = false;
             state = "cooldown";
         }
     }

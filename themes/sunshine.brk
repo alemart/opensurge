@@ -1164,10 +1164,10 @@ brick 53
 
 brick 54
 {
-    type                SOLID
+    type                PASSABLE
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
+    zindex              0.5
 
     sprite
     {
@@ -1189,7 +1189,7 @@ brick 55
     type                SOLID
     behavior            DEFAULT
     mask                "images/sunshine_mask.png"
-    zindex              0.49
+    zindex              0.5
 
     sprite
     {
