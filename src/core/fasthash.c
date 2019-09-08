@@ -48,7 +48,7 @@ struct fasthash_t
 };
 
 /* static data */
-static int INITIAL_CAPACITY = 4111;
+static int INITIAL_CAPACITY = 32917; /* make it large */
 static const int GROWTH_FACTOR = 2;
 static const int SPARSITY = 4; /* 1 / load_factor */
 static fasthash_entry_t BLANK_ENTRY = { 0, BLANK, NULL };
@@ -129,7 +129,7 @@ void* fasthash_get(fasthash_t* hashtable, uint32_t key)
             marker = k; /* save first deleted entry */
 
         /* probe */
-        ++(k); (k) %= hashtable->capacity;
+        ++k; k %= hashtable->capacity;
     }
 
     return NULL;
@@ -166,7 +166,7 @@ void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value)
             }
 
             /* probe */
-            ++(k); (k) %= hashtable->capacity;
+            ++k; k %= hashtable->capacity;
         }
 
         /* insert new element */
@@ -203,7 +203,7 @@ bool fasthash_delete(fasthash_t* hashtable, uint32_t key)
         }
 
         /* probe */
-        ++(k); (k) %= hashtable->capacity;
+        ++k; k %= hashtable->capacity;
     }
 
     /* key not found */
