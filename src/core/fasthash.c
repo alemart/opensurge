@@ -41,16 +41,16 @@ struct fasthash_entry_t
 
 struct fasthash_t
 {
-    int length;
-    int capacity;
+    size_t length;
+    size_t capacity;
     fasthash_entry_t* data;
     void (*destructor)(void*); /* element destructor */
 };
 
 /* static data */
-static int INITIAL_CAPACITY = 32917; /* make it large */
-static const int GROWTH_FACTOR = 2;
-static const int SPARSITY = 4; /* 1 / load_factor */
+static size_t INITIAL_CAPACITY = 32917; /* make it large */
+static const unsigned GROWTH_FACTOR = 2;
+static const unsigned SPARSITY = 4; /* 1 / load_factor */
 static fasthash_entry_t BLANK_ENTRY = { 0, BLANK, NULL };
 static inline uint32_t hash(uint32_t x);
 static inline void grow(fasthash_t* hashtable);
@@ -107,13 +107,13 @@ fasthash_t* fasthash_destroy(fasthash_t* hashtable)
 void* fasthash_get(fasthash_t* hashtable, uint32_t key)
 {
     uint32_t k = hash(key) % hashtable->capacity;
-    uint32_t marker = -1;
+    uint32_t marker = hashtable->capacity;
 
     while(hashtable->data[k].state != BLANK) {
         if(hashtable->data[k].state == ACTIVE) {
             if(hashtable->data[k].key == key) {
                 /* swap marker */
-                if(marker >= 0) {
+                if(marker < hashtable->capacity) {
                     /* remove deleted entry */
                     hashtable->data[marker] = hashtable->data[k];
                     hashtable->data[k] = BLANK_ENTRY;
@@ -125,7 +125,7 @@ void* fasthash_get(fasthash_t* hashtable, uint32_t key)
                 return hashtable->data[k].value;
             }
         }
-        else if(marker < 0)
+        else if(marker == hashtable->capacity)
             marker = k; /* save first deleted entry */
 
         /* probe */
@@ -235,7 +235,8 @@ void* fasthash_find(fasthash_t* hashtable, bool (*test)(const void*,void*), void
 
 void grow(fasthash_t* hashtable)
 {
-    int i, old_cap = hashtable->capacity;
+    size_t old_cap = hashtable->capacity;
+    int i;
 
     hashtable->capacity *= GROWTH_FACTOR;
     hashtable->data = reallocx(hashtable->data, hashtable->capacity * sizeof(fasthash_entry_t));
