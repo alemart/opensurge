@@ -27,4 +27,4 @@ fasthash_t* fasthash_destroy(fasthash_t* hashtable);
 void* fasthash_get(fasthash_t* hashtable, uint32_t key);
 void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value);
 bool fasthash_delete(fasthash_t* hashtable, uint32_t key);
-void* fasthash_find(fasthash_t* hashtable, bool (*predicate)(void*,void*), void* data);
+void* fasthash_find(fasthash_t* hashtable, bool (*predicate)(const void*,void*), void* data);

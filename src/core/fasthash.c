@@ -216,7 +216,7 @@ bool fasthash_delete(fasthash_t* hashtable, uint32_t key)
  * data is a generic pointer given as a parameter
  * If no element satisfies the given test function, NULL is returned
  */
-void* fasthash_find(fasthash_t* hashtable, bool (*test)(void*,void*), void* data)
+void* fasthash_find(fasthash_t* hashtable, bool (*test)(const void*,void*), void* data)
 {
     /* search the entire table */
     for(int i = 0; i < hashtable->capacity; i++) {
@@ -245,13 +245,9 @@ void grow(fasthash_t* hashtable)
 
 uint32_t hash(uint32_t x)
 {
-#if 0
-    return x;
-#else
     x = ((x >> 16) ^ x) * 0x45d9f3b;
     x = ((x >> 16) ^ x) * 0x45d9f3b;
     return ((x >> 16) ^ x);
-#endif
 }
 
 void empty_destructor(void* data)

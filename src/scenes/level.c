@@ -227,7 +227,7 @@ static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t*
 static void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata);
 static void clear_ssobj_extradata(const surgescript_object_t* object);
 static void free_ssobj_extradata(void* data);
-static bool match_ssobj_id(void* value, void* data);
+static bool match_ssobj_id(const void* value, void* data);
 static fasthash_t* ssobj_extradata;
 static void add_bricklike_ssobject(surgescript_object_t* object);
 static inline surgescript_object_t* get_bricklike_ssobject(int index);
@@ -4833,7 +4833,7 @@ void free_ssobj_extradata(void* data)
     free(data);
 }
 
-bool match_ssobj_id(void* value, void* data)
+bool match_ssobj_id(const void* value, void* data)
 {
     ssobj_extradata_t* entry = (ssobj_extradata_t*)value;
     return entry->entity_id == *((uint64_t*)data);

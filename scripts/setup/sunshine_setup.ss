@@ -84,7 +84,25 @@ object "Sunshine Setup"
         // zone 2 only
         //
         "2": {
+            // Bridge
+            "15f489476699f7d5": {
+                "length": 14
+            },
 
+            // Bridge
+            "6a824b81a2f4ad4f": {
+                "length": 18
+            },
+
+            // Bridge
+            "85ac1895bc891dd1": {
+                "length": 14
+            },
+
+            // Bridge
+            "decfa93bc1602d3f": {
+                "length": 20
+            }
         },
 
         //
