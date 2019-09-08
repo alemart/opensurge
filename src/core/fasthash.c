@@ -106,8 +106,8 @@ fasthash_t* fasthash_destroy(fasthash_t* hashtable)
  */
 void* fasthash_get(fasthash_t* hashtable, uint32_t key)
 {
-    int k = hash(key) % hashtable->capacity;
-    int marker = -1;
+    uint32_t k = hash(key) % hashtable->capacity;
+    uint32_t marker = -1;
 
     while(hashtable->data[k].state != BLANK) {
         if(hashtable->data[k].state == ACTIVE) {
@@ -142,7 +142,7 @@ void* fasthash_get(fasthash_t* hashtable, uint32_t key)
 void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value)
 {
     if(hashtable->length < hashtable->capacity / SPARSITY) { /* make it sparse */
-        int k = hash(key) % hashtable->capacity;
+        uint32_t k = hash(key) % hashtable->capacity;
 
         /* won't accept NULL values */
         if(value == NULL)
@@ -188,7 +188,7 @@ void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value)
  */
 bool fasthash_delete(fasthash_t* hashtable, uint32_t key)
 {
-    int k = hash(key) % hashtable->capacity;
+    uint32_t k = hash(key) % hashtable->capacity;
 
     while(hashtable->data[k].state != BLANK) {
         if(hashtable->data[k].key == key) {
