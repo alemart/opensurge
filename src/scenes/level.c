@@ -42,7 +42,7 @@
 #include "../core/timer.h"
 #include "../core/sprite.h"
 #include "../core/assetfs.h"
-#include "../core/hashtable.h"
+#include "../core/fasthash.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/lang.h"
@@ -226,11 +226,9 @@ static int is_ssobj_sleeping(const surgescript_object_t* object);
 static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object);
 static void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata);
 static void clear_ssobj_extradata(const surgescript_object_t* object);
-static void free_ssobj_extradata(ssobj_extradata_t* data);
-static bool match_ssobj_id(ssobj_extradata_t* data, void* id);
-static int hashaux_cmp(const surgescript_objecthandle_t* a, const surgescript_objecthandle_t* b) { return (*a > *b) - (*a < *b); }
-HASHTABLE_GENERATE_CODE_EX(ssobj_extradata_t, free_ssobj_extradata, surgescript_objecthandle_t*, hashaux_cmp, NULL, NULL, NULL);
-static HASHTABLE(ssobj_extradata_t, ssobj_extradata);
+static void free_ssobj_extradata(void* data);
+static bool match_ssobj_id(void* value, void* data);
+static fasthash_t* ssobj_extradata;
 static void add_bricklike_ssobject(surgescript_object_t* object);
 static inline surgescript_object_t* get_bricklike_ssobject(int index);
 static inline void clear_bricklike_ssobjects();
@@ -464,7 +462,7 @@ void level_load(const char *filepath)
 
     /* scripting: preparing a new Level... */
     cached_level_ssobject = NULL;
-    ssobj_extradata = hashtable_ssobj_extradata_t_create();
+    ssobj_extradata = fasthash_create(free_ssobj_extradata);
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
 
     /* entity manager */
@@ -553,7 +551,7 @@ void level_unload()
     /* scripting */
     if(surgescript_vm_is_active(surgescript_vm()))
         surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
-    ssobj_extradata = hashtable_ssobj_extradata_t_destroy(ssobj_extradata);
+    ssobj_extradata = fasthash_destroy(ssobj_extradata);
     cached_level_ssobject = NULL;
 
     /* unloading the brickset */
@@ -1733,7 +1731,7 @@ surgescript_object_t* level_create_object(const char* object_name, v2d_t positio
 surgescript_object_t* level_get_entity_by_id(const char* entity_id)
 {
     uint64_t id = str_to_x64(entity_id);
-    ssobj_extradata_t* data = hashtable_ssobj_extradata_t_findsome(ssobj_extradata, &id, match_ssobj_id);
+    ssobj_extradata_t* data = fasthash_find(ssobj_extradata, match_ssobj_id, &id);
 
     if(data != NULL) {
         surgescript_vm_t* vm = surgescript_vm();
@@ -4805,21 +4803,21 @@ int is_ssobj_sleeping(const surgescript_object_t* object)
 ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object)
 {
     surgescript_objecthandle_t key = surgescript_object_handle(object);
-    return hashtable_ssobj_extradata_t_find(ssobj_extradata, &key); /* may be NULL */
+    return fasthash_get(ssobj_extradata, key); /* may be NULL */
 }
 
 void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata)
 {
     surgescript_objecthandle_t key = surgescript_object_handle(object);
-    ssobj_extradata_t* data = hashtable_ssobj_extradata_t_find(ssobj_extradata, &key);
+    ssobj_extradata_t* data = fasthash_get(ssobj_extradata, key);
 
     if(data == NULL) {
         data = mallocx(sizeof *data);
         *data = extradata;
-        hashtable_ssobj_extradata_t_add(ssobj_extradata, &key, data);
+        fasthash_put(ssobj_extradata, key, data);
     }
     else
-        *data = extradata; /*data->spawn_point = extradata.spawn_point;*/
+        *data = extradata;
 
     (void)is_ssobj_sleeping;
 }
@@ -4827,15 +4825,16 @@ void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t
 void clear_ssobj_extradata(const surgescript_object_t* object)
 {
     surgescript_objecthandle_t key = surgescript_object_handle(object);
-    hashtable_ssobj_extradata_t_remove(ssobj_extradata, &key);
+    fasthash_delete(ssobj_extradata, key);
 }
 
-void free_ssobj_extradata(ssobj_extradata_t* data)
+void free_ssobj_extradata(void* data)
 {
     free(data);
 }
 
-bool match_ssobj_id(ssobj_extradata_t* data, void* id)
+bool match_ssobj_id(void* value, void* data)
 {
-    return data->entity_id == *((uint64_t*)id);
+    ssobj_extradata_t* entry = (ssobj_extradata_t*)value;
+    return entry->entity_id == *((uint64_t*)data);
 }

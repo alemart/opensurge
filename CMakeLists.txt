@@ -338,6 +338,7 @@ SET(GAME_SRCS
   src/core/color.c
   src/core/commandline.c
   src/core/engine.c
+  src/core/fasthash.c
   src/core/font.c
   src/core/fontext.c
   src/core/image.c
@@ -447,6 +448,7 @@ SET(GAME_HEADERS
   src/core/color.h
   src/core/commandline.h
   src/core/engine.h
+  src/core/fasthash.h
   src/core/font.h
   src/core/fontext.h
   src/core/global.h
