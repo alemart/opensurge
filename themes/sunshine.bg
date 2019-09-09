@@ -89,7 +89,7 @@ background
     sprite
     {
         source_file     "images/sunshine_bg.png"
-        source_rect     416 288 32 32
+        source_rect     32 112 32 32
         frame_size      32 32
 
         animation
@@ -127,32 +127,7 @@ background
     }
 }
 
-// trees
-//background
-//{
-//    initial_position    0 680
-//    scroll_speed        -0.45 -0.05
-//    behavior            DEFAULT
-//    repeat_x            TRUE
-//    repeat_y            FALSE
-//    zindex              0.25
-//
-//    sprite
-//    {
-//        source_file     "images/sunshine_bg.png"
-//        source_rect     0 128 160 128
-//        frame_size      160 128
-//
-//        animation
-//        {
-//            repeat      TRUE
-//            fps         8
-//            data        0
-//        }
-//    }
-//}
-
-//// ------------------------------
+// ------------------------------
 // water layers
 // ------------------------------
 background
