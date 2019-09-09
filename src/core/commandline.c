@@ -86,7 +86,9 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
+#if !defined(A5BUILD)
                 "    --smooth                         display smooth graphics (applicable when resolution > 1)\n"
+#endif
                 "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                       show the FPS (frames per second) counter\n"
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
@@ -128,7 +130,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--smooth") == 0) {
-#ifndef A5BUILD
+#if !defined(A5BUILD)
             cmd.smooth_graphics = TRUE;
             if(cmd.video_resolution == VIDEORESOLUTION_1X)
                 cmd.video_resolution = VIDEORESOLUTION_2X;
