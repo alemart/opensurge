@@ -2966,6 +2966,7 @@ void editor_update()
         editor_disable();
         editor_release();
         level_unload();
+        scripting_reload();
         level_load(file);
         editor_init();
         editor_enable();

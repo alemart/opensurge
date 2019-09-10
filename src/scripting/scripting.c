@@ -39,6 +39,7 @@ static int vm_argc = 0;
 static bool test_mode = false;
 static void log_fun(const char* message);
 static void err_fun(const char* message);
+static void compile_scripts(surgescript_vm_t* vm);
 static int compile_script(const char* filepath, void* param);
 static bool found_test_script(const surgescript_vm_t* vm);
 static void check_if_compatible();
@@ -47,6 +48,7 @@ static void check_if_compatible();
 static const char* min_surgescript_version = "0.5.4";
 
 /* SurgeEngine */
+static void setup_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
@@ -91,44 +93,10 @@ void scripting_init(int argc, const char** argv)
         vm_argv[argc] = str_dup(argv[argc]);
 
     /* register SurgeEngine builtins */
-    scripting_register_surgeengine(vm);
-    scripting_register_actor(vm);
-    scripting_register_animation(vm);
-    scripting_register_brick(vm);
-    scripting_register_camera(vm);
-    scripting_register_collisions(vm);
-    scripting_register_console(vm);
-    scripting_register_events(vm);
-    scripting_register_input(vm);
-    scripting_register_lang(vm);
-    scripting_register_level(vm);
-    scripting_register_levelmanager(vm);
-    scripting_register_mouse(vm);
-    scripting_register_music(vm);
-    scripting_register_obstaclemap(vm);
-    scripting_register_player(vm);
-    scripting_register_prefs(vm);
-    scripting_register_screen(vm);
-    scripting_register_sensor(vm);
-    scripting_register_sound(vm);
-    scripting_register_text(vm);
-    scripting_register_time(vm);
-    scripting_register_transform(vm);
-    scripting_register_vector2(vm);
-    scripting_register_web(vm);
+    setup_surgeengine(vm);
 
     /* compile scripts */
-    assetfs_foreach_file("scripts", ".ss", compile_script, surgescript_vm_parser(vm), true);
-
-    /* if no test script is present... */
-    if(found_test_script(vm)) {
-        logfile_message("Got a test script...");
-        test_mode = true;
-    }
-    else {
-        scripting_register_application(vm);
-        test_mode = false;
-    }
+    compile_scripts(vm);
 
     /* launch VM */
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
@@ -158,7 +126,6 @@ surgescript_vm_t* surgescript_vm()
     return vm;
 }
 
-
 /*
  * scripting_testmode()
  * Are we in test mode?
@@ -167,6 +134,30 @@ bool scripting_testmode()
 {
     return test_mode;
 }
+
+/*
+ * scripting_reload()
+ * Reloads the entire scripting system,
+ * clearing up all the scripts & objects
+ */
+void scripting_reload()
+{
+    logfile_message("Reloading scripts...");
+
+    /* reset the SurgeScript VM */
+    if(!surgescript_vm_reset(vm))
+        return;
+
+    /* register SurgeEngine builtins */
+    setup_surgeengine(vm);
+
+    /* compile scripts */
+    compile_scripts(vm);
+
+    /* launch VM */
+    surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
+}
+
 
 
 /* utilities */
@@ -386,6 +377,53 @@ void log_fun(const char* message)
 void err_fun(const char* message)
 {
     fatal_error("%s", message);
+}
+
+/* register SurgeEngine builtins */
+void setup_surgeengine(surgescript_vm_t* vm)
+{
+    scripting_register_surgeengine(vm);
+    scripting_register_actor(vm);
+    scripting_register_animation(vm);
+    scripting_register_brick(vm);
+    scripting_register_camera(vm);
+    scripting_register_collisions(vm);
+    scripting_register_console(vm);
+    scripting_register_events(vm);
+    scripting_register_input(vm);
+    scripting_register_lang(vm);
+    scripting_register_level(vm);
+    scripting_register_levelmanager(vm);
+    scripting_register_mouse(vm);
+    scripting_register_music(vm);
+    scripting_register_obstaclemap(vm);
+    scripting_register_player(vm);
+    scripting_register_prefs(vm);
+    scripting_register_screen(vm);
+    scripting_register_sensor(vm);
+    scripting_register_sound(vm);
+    scripting_register_text(vm);
+    scripting_register_time(vm);
+    scripting_register_transform(vm);
+    scripting_register_vector2(vm);
+    scripting_register_web(vm);
+}
+
+/* compiles all .ss scripts from the scripts/ folder */
+void compile_scripts(surgescript_vm_t* vm)
+{
+    /* compile scripts */
+    assetfs_foreach_file("scripts", ".ss", compile_script, surgescript_vm_parser(vm), true);
+
+    /* if no test script is present... */
+    if(found_test_script(vm)) {
+        logfile_message("Got a test script...");
+        test_mode = true;
+    }
+    else {
+        scripting_register_application(vm);
+        test_mode = false;
+    }
 }
 
 /* compiles a script */
