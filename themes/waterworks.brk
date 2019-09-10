@@ -233,7 +233,7 @@ brick 9
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
-    zindex              0.3
+    zindex              0.28
 
     sprite
     {
@@ -448,6 +448,7 @@ brick 21
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.49
 
     sprite
     {
@@ -469,6 +470,7 @@ brick 22
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.49
 
     sprite
     {
@@ -553,6 +555,7 @@ brick 26
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.49
 
     sprite
     {
@@ -886,7 +889,7 @@ brick 41
 
 brick 42
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
 
@@ -1974,6 +1977,72 @@ brick 180
     }
 }
 
+brick 181
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     832 896 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 182
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     864 896 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 183
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     864 960 32 64
+        frame_size      32 64
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
 //
 // Special
 //
@@ -2460,6 +2529,50 @@ brick 248
         }
     }
 }
+
+brick 250
+{
+    type                CLOUD
+    behavior            CIRCULAR 0 128 0 0.25 0
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     960 896 64 64
+        frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1
+        }
+    }
+}
+
+brick 251
+{
+    type                CLOUD
+    behavior            CIRCULAR 0 128 0 0.25 180
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     960 896 64 64
+        frame_size      64 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0 1
+        }
+    }
+}
+
+
 
 brick 254
 {

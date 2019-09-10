@@ -42,7 +42,10 @@ object "Waterworks Setup"
         // zone 1 only
         //
         "1": {
-
+            // Bridge
+            "7af32f24d4d3fbad": {
+                "layer": "yellow"
+            }
         },
 
         //

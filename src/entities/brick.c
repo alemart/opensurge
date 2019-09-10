@@ -588,15 +588,18 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
 
     switch(brk->brick_ref->behavior) {
         case BRB_CIRCULAR: {
-            float rx = brk->brick_ref->behavior_arg[0]; /* x-dist */
-            float ry = brk->brick_ref->behavior_arg[1]; /* y-dist */
-            image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, fabs(rx), fabs(ry), color);
+            float rx = fabs(brk->brick_ref->behavior_arg[0]); /* x-dist */
+            float ry = fabs(brk->brick_ref->behavior_arg[1]); /* y-dist */
+            if(rx < 1 || ry < 1)
+                image_line(brk->sx - topleft.x + w/2 - rx, brk->sy - topleft.y + h/2 - ry, brk->sx - topleft.x + w/2 + rx, brk->sy - topleft.y + h/2 + ry, color);
+            else
+                image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, rx, ry, color);
             break;
         }
 
         case BRB_PENDULAR: {
-            float r = brk->brick_ref->behavior_arg[0]; /* radius */
-            image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, fabs(r), fabs(r), color);
+            float r = fabs(brk->brick_ref->behavior_arg[0]); /* radius */
+            image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, r, r, color);
             break;
         }
 
