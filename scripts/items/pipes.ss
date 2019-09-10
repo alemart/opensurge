@@ -328,7 +328,7 @@ object "Pipe Traveler" is "private", "awake", "entity"
     player = null;
     rollAnimation = 18;
     pipeManager = parent;
-    throwSpeed = Vector2.zero;
+    throwVelocity = Vector2.zero;
 
     state "main"
     {
@@ -350,8 +350,8 @@ object "Pipe Traveler" is "private", "awake", "entity"
     state "out"
     {
         // throw player
-        player.speed = throwSpeed.x;
-        player.ysp = throwSpeed.y;
+        player.speed = throwVelocity.x;
+        player.ysp = throwVelocity.y;
         player.roll();
         player.anim = rollAnimation;
         state = "stopped";
@@ -391,7 +391,7 @@ object "Pipe Traveler" is "private", "awake", "entity"
         return this;
     }
 
-    fun computeThrowSpeed(direction)
+    fun computeThrowVelocity(direction)
     {
         if(direction == "up")
             return Vector2.up.scaledBy(pipeManager.speed);
@@ -416,7 +416,7 @@ object "Pipe Traveler" is "private", "awake", "entity"
     fun getOut()
     {
         if(isTraveling()) {
-            throwSpeed = computeThrowSpeed(state);
+            throwVelocity = computeThrowVelocity(state);
             player.frozen = false;
             state = "out";
         }
