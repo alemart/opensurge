@@ -373,7 +373,9 @@ enum editor_action_type {
     EDA_NEWOBJECT,
     EDA_DELETEOBJECT,
     EDA_CHANGESPAWN,
-    EDA_RESTORESPAWN
+    EDA_RESTORESPAWN,
+    EDA_CHANGEWATER,
+    EDA_RESTOREWATER
 };
 
 /* action = action type + action properties */
@@ -391,6 +393,7 @@ typedef struct editor_action_t {
 /* action: constructors */
 static editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_type obj_type, int obj_id, v2d_t obj_position);
 static editor_action_t editor_action_spawnpoint_new(int is_changing, v2d_t obj_position, v2d_t obj_old_position);
+static editor_action_t editor_action_waterlevel_new(int is_changing, int new_waterlevel, int old_waterlevel);
 
 /* linked list */
 typedef struct editor_action_list_t {
@@ -3092,10 +3095,18 @@ void editor_update()
     if(editorcmd_is_triggered(editor_cmd, "toggle-masks"))
         editor_should_render_masks = !editor_should_render_masks;
 
-    /* new spawn point */
+    /* change spawn point */
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
         editor_action_t eda = editor_action_spawnpoint_new(TRUE, nsp, spawn_point);
+        editor_action_commit(eda);
+        editor_action_register(eda);
+    }
+
+    /* change waterlevel */
+    if(editorcmd_is_triggered(editor_cmd, "change-waterlevel")) {
+        v2d_t nsp = editor_grid_snap(editor_cursor);
+        editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, waterlevel);
         editor_action_commit(eda);
         editor_action_register(eda);
     }
@@ -4423,7 +4434,22 @@ editor_action_t editor_action_spawnpoint_new(int is_changing, v2d_t obj_position
     o.obj_id = 0;
     o.obj_position = obj_position;
     o.obj_old_position = obj_old_position;
-    o.obj_type = EDT_ITEM;
+    o.obj_type = EDT_BRICK;
+    o.layer = editor_layer;
+    o.flip = editor_flip;
+    o.ssobj_id = 0;
+    return o;
+}
+
+/* action: constructor (waterlevel) */
+editor_action_t editor_action_waterlevel_new(int is_changing, int new_waterlevel, int old_waterlevel)
+{
+    editor_action_t o;
+    o.type = is_changing ? EDA_CHANGEWATER : EDA_RESTOREWATER;
+    o.obj_id = 0;
+    o.obj_position = v2d_new(0, new_waterlevel);
+    o.obj_old_position = v2d_new(0, old_waterlevel);
+    o.obj_type = EDT_BRICK;
     o.layer = editor_layer;
     o.flip = editor_flip;
     o.ssobj_id = 0;
@@ -4541,6 +4567,8 @@ void editor_action_undo()
         (a.type == EDA_DELETEOBJECT) ? EDA_NEWOBJECT :
         (a.type == EDA_CHANGESPAWN) ? EDA_RESTORESPAWN :
         (a.type == EDA_RESTORESPAWN) ? EDA_CHANGESPAWN :
+        (a.type == EDA_CHANGEWATER) ? EDA_RESTOREWATER :
+        (a.type == EDA_RESTOREWATER) ? EDA_CHANGEWATER :
         a.type;
         editor_action_commit(a);
     }
@@ -4715,6 +4743,14 @@ void editor_action_commit(editor_action_t action)
         /* restore spawn point */
         level_set_spawnpoint(action.obj_old_position);
         spawn_players();
+    }
+    else if(action.type == EDA_CHANGEWATER) {
+        /* change waterlevel */
+        level_set_waterlevel(action.obj_position.y);
+    }
+    else if(action.type == EDA_RESTOREWATER) {
+        /* restore waterlevel */
+        level_set_waterlevel(action.obj_old_position.y);
     }
 }
 

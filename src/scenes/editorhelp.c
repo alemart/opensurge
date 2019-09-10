@@ -59,11 +59,11 @@ static const char text[] =
 "Middle mouse button                Pick item\n"
 "Right mouse button                 Erase item (hold: eraser)\n"
 "Mouse wheel                        Change the current item\n"
+"Shift + Left mouse button          Change the level of the water\n"
 "Ctrl + Left mouse button           Change the spawn point\n"
 "L | Shift + L                      Change brick layer\n"
 "F | Shift + F                      Flip brick\n"
 "Shift + Mouse wheel                Change item type (legacy)\n"
-"Ctrl + Mouse wheel                 Change obj. category (legacy)\n"
 "\n\n"
 "<color=ff8060>Layer system</color>: yellow L (see palette) enables yellow layer and disables green. Green L enables green layer and disables yellow. Green appears in front of yelllow. Change brick layers with L.\n"
 ;

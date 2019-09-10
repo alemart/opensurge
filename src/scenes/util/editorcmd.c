@@ -60,6 +60,7 @@ static const command_t command[] = {
     { "next-category", "Ctrl+WheelUp" },
     { "previous-category", "Ctrl+WheelDown" },
     { "change-spawnpoint", "Ctrl+LeftClick" },
+    { "change-waterlevel", "Shift+LeftClick" },
     { "erase-area", "HoldRightClick" },
     { "undo", "Ctrl+Z" },
     { "redo", "Ctrl+Y" },
