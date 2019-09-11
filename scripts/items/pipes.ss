@@ -95,8 +95,10 @@ object "Pipe Out" is "entity", "special"
     {
         if(!playerCollider.collidesWith(pipeSensor.collider)) {
             player = playerCollider.entity;
-            isBlocked[player.name] = true;
-            state = "main";
+            if(!player.midair || player.ysp >= 0) {
+                isBlocked[player.name] = true;
+                state = "main";
+            }
         }
     }
 
