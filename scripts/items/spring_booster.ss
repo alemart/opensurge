@@ -143,3 +143,78 @@ object "Spring Booster" is "private", "entity"
         state = "main";
     }
 }
+
+object "Spring Booster Up" is "entity", "basic"
+{
+    boostSpeed = 960; // pixels per second
+    actor = Actor("Spring Booster Up");
+    springCollider = CollisionBox(32, 16).setAnchor(0.5, 2);
+    sensorCollider = CollisionBox(32, 64).setAnchor(0.5, 0.5);
+    boostSfx = Sound("samples/spring.wav");
+    appearSfx = Sound("samples/trotada.wav");
+
+    state "main"
+    {
+        actor.anim = 3;
+        springCollider.visible = true;
+        sensorCollider.visible = true;
+        state = "invisible";
+    }
+
+    state "invisible"
+    {
+        actor.anim = 3;
+    }
+
+    state "appearing"
+    {
+        actor.anim = 1;
+        if(actor.animation.finished)
+            state = "visible";
+    }
+
+    state "visible"
+    {
+        actor.anim = 0;
+    }
+
+    state "boosting"
+    {
+        actor.anim = 2;
+        if(actor.animation.finished)
+            state = "visible";
+    }
+
+    fun appear()
+    {
+        appearSfx.play();
+        state = "appearing";
+    }
+
+    fun boost(player)
+    {
+        if(player.ysp > 0 && !player.hit && !player.dying) {
+            player.ysp = -boostSpeed;
+            player.springify();
+            boostSfx.play();
+            state = "boosting";
+        }
+    }
+
+    fun onCollision(otherCollider)
+    {
+        if(otherCollider.entity.hasTag("player")) {
+            if(otherCollider.collidesWith(springCollider)) {
+                if(state != "invisible")
+                    boost(otherCollider.entity);
+            }
+            else if(state == "invisible")
+                appear();
+        }
+    }
+
+    fun onReset()
+    {
+        state = "main";
+    }
+}
