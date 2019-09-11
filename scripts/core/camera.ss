@@ -30,7 +30,7 @@ object "Default Camera" is "entity", "awake", "private"
             transform.move(Math.min(16, delta.x - 8), 0);
         else if(delta.x < -8)
             transform.move(Math.max(-16, delta.x + 8), 0);
-        if(player.midair) {
+        if(player.midair || player.frozen) {
             if(delta.y > 32)
                 transform.move(0, Math.min(16, delta.y - 32));
             else if(delta.y < -32)

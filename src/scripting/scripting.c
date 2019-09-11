@@ -145,8 +145,10 @@ void scripting_reload()
     logfile_message("Reloading scripts...");
 
     /* reset the SurgeScript VM */
-    if(!surgescript_vm_reset(vm))
+    if(!surgescript_vm_reset(vm)) {
+        logfile_message("Failed to reload the scripts");
         return;
+    }
 
     /* register SurgeEngine builtins */
     setup_surgeengine(vm);
@@ -156,6 +158,9 @@ void scripting_reload()
 
     /* launch VM */
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
+
+    /* done */
+    logfile_message("The scripts have been reloaded!");
 }
 
 

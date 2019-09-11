@@ -299,7 +299,7 @@ brick 12
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
-    zindex              0.3
+    zindex              0.1
 
     sprite
     {
@@ -492,6 +492,7 @@ brick 23
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.5
 
     sprite
     {
@@ -513,6 +514,7 @@ brick 24
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.5
 
     sprite
     {
