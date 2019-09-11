@@ -591,9 +591,9 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
             float rx = fabs(brk->brick_ref->behavior_arg[0]); /* x-dist */
             float ry = fabs(brk->brick_ref->behavior_arg[1]); /* y-dist */
             if(rx < 1)
-                image_line(brk->sx - topleft.x + w/2, brk->sy - topleft.y - ry, brk->sx - topleft.x + w/2, brk->sy - topleft.y + ry, color);
+                image_line(brk->sx - topleft.x + w/2, brk->sy - topleft.y - ry + h/2, brk->sx - topleft.x + w/2, brk->sy - topleft.y + ry + h/2, color);
             else if(ry < 1)
-                image_line(brk->sx - topleft.x - rx, brk->sy - topleft.y + h/2, brk->sx - topleft.x + rx, brk->sy - topleft.y + h/2, color);
+                image_line(brk->sx - topleft.x - rx + w/2, brk->sy - topleft.y + h/2, brk->sx - topleft.x + rx + w/2, brk->sy - topleft.y + h/2, color);
             else
                 image_ellipse(brk->sx - topleft.x + w/2, brk->sy - topleft.y + h/2, rx, ry, color);
             break;
