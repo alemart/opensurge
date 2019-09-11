@@ -6,6 +6,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine.Player;
 
 //
 // Need to hack this?
@@ -21,12 +22,21 @@ object "Default Setup"
     clearedAnim = spawn("Default Cleared Animation");
     openingAnim = spawn("Default Opening Animation");
     hud = null;
+    player = null;
 
     state "main"
     {
-        // wait for the completion of the opening animation
+        player = Player.active;
+        player.input.enabled = false;
+        state = "wait";
+    }
+
+    // wait for the completion of the opening animation
+    state "wait"
+    {
         if(timeout(3.0)) {
             hud = spawn("Default HUD");
+            player.input.enabled = true;
             state = "done";
         }
     }
@@ -34,6 +44,20 @@ object "Default Setup"
     state "done"
     {
     }
+}
+
+//
+// A debug setup object without the opening animation.
+// Useful for development & debugging.
+//
+object "Debug Setup"
+{
+    cam = spawn("Default Camera");
+    switchController = spawn("Switch Controller");
+    pauseController = spawn("Pause and Quit");
+    waterController = spawn("Water Controller");
+    clearedAnim = spawn("Default Cleared Animation");
+    hud = spawn("Default HUD");
 }
 
 // this is for retro-compatibility
