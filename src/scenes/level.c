@@ -229,10 +229,10 @@ static void clear_ssobj_extradata(const surgescript_object_t* object);
 static void free_ssobj_extradata(void* data);
 static bool match_ssobj_id(const void* value, void* data);
 static fasthash_t* ssobj_extradata;
-static void add_bricklike_ssobject(surgescript_object_t* object);
+static void add_bricklike_ssobject(surgescript_objecthandle_t handle);
 static inline surgescript_object_t* get_bricklike_ssobject(int index);
 static inline void clear_bricklike_ssobjects();
-static surgescript_object_t* bricklike_ssobject[BRICKLIKE_MAX_COUNT];
+static surgescript_objecthandle_t bricklike_ssobject[BRICKLIKE_MAX_COUNT];
 static int bricklike_ssobject_count = 0;
 bool notify_ssobject(surgescript_object_t* object, void* param);
 void notify_ssobjects(const char* fun_name);
@@ -2602,7 +2602,7 @@ void update_ssobject(surgescript_object_t* object, void* param)
 
                 /* is it a brick-like object? */
                 if(strcmp(surgescript_object_name(object), "Brick") == 0)
-                    add_bricklike_ssobject(object);
+                    add_bricklike_ssobject(surgescript_object_handle(object));
             }
             else if(!surgescript_object_has_tag(object, "disposable")) {
                 /* the entity should no longer be active and
@@ -2681,21 +2681,29 @@ bool render_ssobject(surgescript_object_t* object, void* param)
 }
 
 /* brick-like objects */
-void add_bricklike_ssobject(surgescript_object_t* object)
+void add_bricklike_ssobject(surgescript_objecthandle_t handle)
 {
     /* object is guaranteed to be named "Brick" */
     /* add it to the bricklike_ssobject array */
-    if(bricklike_ssobject_count >= BRICKLIKE_MAX_COUNT)
-        return;
-    bricklike_ssobject[bricklike_ssobject_count++] = object;
+    if(bricklike_ssobject_count < BRICKLIKE_MAX_COUNT)
+        bricklike_ssobject[bricklike_ssobject_count++] = handle;
 }
 
 surgescript_object_t* get_bricklike_ssobject(int index)
 {
-    if(index >= 0 && index < bricklike_ssobject_count)
-        return bricklike_ssobject[index];
-    else
-        return NULL;
+    if(index >= 0 && index < bricklike_ssobject_count) {
+        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(surgescript_vm());
+        surgescript_objecthandle_t handle = bricklike_ssobject[index];
+        if(surgescript_objectmanager_exists(manager, handle)) {
+            surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
+            if(!surgescript_object_is_killed(obj)) {
+                if(strcmp(surgescript_object_name(obj), "Brick") == 0) /* make sure it's a brick */
+                    return obj;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 inline void clear_bricklike_ssobjects()
