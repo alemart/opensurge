@@ -1,13 +1,13 @@
 // -----------------------------------------------------------------------------
-// File: tubes.ss
-// Description: script of the tube system
+// File: roll.ss
+// Description: script of the "Roll" special object (used to roll the player)
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Tube In" is "entity", "special"
+object "Roll" is "entity", "special"
 {
     public rollSpeed = 600;
     collider = CollisionBox(32, 32);
@@ -27,7 +27,8 @@ object "Tube In" is "entity", "special"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            boost(player);
+            if(!player.midair)
+                boost(player);
             state = "roll";
         }
     }

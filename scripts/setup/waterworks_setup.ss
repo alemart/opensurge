@@ -24,9 +24,6 @@ object "Waterworks Setup"
         // all zones / acts
         //
         "*": {
-            "Background Exchanger": {
-                "background": "themes/waterworks_indoors.bg"
-            },
             "Elevator": {
                 "anim": 2
             },
@@ -48,6 +45,10 @@ object "Waterworks Setup"
         // zone 1 only
         //
         "1": {
+            "Background Exchanger": {
+                "background": "themes/waterworks_indoors.bg"
+            },
+
             // Bridge
             "7af32f24d4d3fbad": {
                 "layer": "yellow"
@@ -68,7 +69,14 @@ object "Waterworks Setup"
         // zone 2 only
         //
         "2": {
+            "Background Exchanger": {
+                "background": "themes/waterworks.bg"
+            },
 
+            // Bridge
+            "48bacb13be3c2c0f": {
+                "length": 20
+            }
         },
 
         //
