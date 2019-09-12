@@ -12,3 +12,5 @@ author          "Alexandre Martins"
 // level list (in order of appearance)
 level           "levels/sunshine-1.lev"
 level           "levels/sunshine-2.lev"
+level           "levels/waterworks-1.lev"
+level           "levels/waterworks-2.lev"

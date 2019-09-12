@@ -8,8 +8,33 @@ using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Collisions.CollisionBox;
 
-// Tube Out rolls and unlocks the player
+// Tube Out unlocks the player
 object "Tube Out" is "entity", "special"
+{
+    tube = spawn("Tube");
+
+    fun onTubeCollision(player)
+    {
+        // Tube In guarantees that
+        // player.input.enabled == false
+        // just before this occurs
+        player.input.enabled = !player.input.enabled;
+    }
+}
+
+// Tube In locks the player
+object "Tube In" is "entity", "special"
+{
+    tube = spawn("Tube");
+
+    fun onTubeCollision(player)
+    {
+        player.input.enabled = false;
+    }
+}
+
+// Tube rolls the player
+object "Tube" is "private", "special", "entity"
 {
     public rollSpeed = 600;
     collider = CollisionBox(32, 32);
@@ -29,9 +54,9 @@ object "Tube Out" is "entity", "special"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            player.input.enabled = true;
             if(shouldBoost(player))
                 boost(player);
+            parent.onTubeCollision(player);
             state = "roll";
         }
     }
@@ -47,23 +72,5 @@ object "Tube Out" is "entity", "special"
     fun shouldBoost(player)
     {
         return player.ysp >= 0;
-    }
-}
-
-// Tube In locks the player
-object "Tube In" is "entity", "special"
-{
-    collider = CollisionBox(32, 32);
-
-    state "main"
-    {
-    }
-
-    fun onCollision(otherCollider)
-    {
-        if(otherCollider.entity.hasTag("player")) {
-            player = otherCollider.entity;
-            player.input.enabled = false;
-        }
     }
 }

@@ -828,7 +828,7 @@ brick 38
 
 brick 39
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
 
@@ -849,7 +849,7 @@ brick 39
 
 brick 40
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
 
@@ -870,7 +870,7 @@ brick 40
 
 brick 41
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
 
@@ -1434,6 +1434,7 @@ brick 141
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.25
 
     sprite
     {
@@ -1560,6 +1561,7 @@ brick 149
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.25
 
     sprite
     {
@@ -2567,6 +2569,7 @@ brick 248
     type                CLOUD
     behavior            CIRCULAR 128 128 0.25 0.25 180
     mask                "images/waterworks_mask.png"
+    zindex              0.7
 
     sprite
     {
@@ -2588,6 +2591,7 @@ brick 250
     type                CLOUD
     behavior            CIRCULAR 0 128 0 0.25 0
     mask                "images/waterworks_mask.png"
+    zindex              0.7
 
     sprite
     {
@@ -2609,6 +2613,7 @@ brick 251
     type                CLOUD
     behavior            CIRCULAR 0 128 0 0.25 180
     mask                "images/waterworks_mask.png"
+    zindex              0.7
 
     sprite
     {

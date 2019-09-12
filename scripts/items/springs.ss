@@ -667,7 +667,7 @@ object "Spring Behavior" is "private", "entity"
                     player.speed = v.x;
             }
             if(direction.y != 0) {
-                if(player.midair || hidden || player.gsp == 0) {
+                if(player.midair || hidden || direction.x != 0) {
                     if(v.y > 0 && v.y > player.speed)
                         player.ysp = v.y;
                     else if(v.y < 0 && v.y < player.speed)
