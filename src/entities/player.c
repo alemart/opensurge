@@ -809,6 +809,16 @@ int player_overlaps(const player_t *player, int x, int y, int width, int height)
 }
 
 /*
+ * player_senses_layer()
+ * Returns TRUE if the player is currently capable of
+ * sensing the given layer
+ */
+int player_senses_layer(const player_t* player, bricklayer_t layer)
+{
+    return (layer == BRL_DEFAULT) || (player->layer == layer);
+}
+
+/*
  * player_is_attacking()
  * Returns TRUE if a given player is attacking;
  * FALSE otherwise
@@ -1498,7 +1508,7 @@ obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
 /* ignore the obstacle? */
 int ignore_obstacle(const player_t* player, bricklayer_t brick_layer)
 {
-    return (brick_layer != BRL_DEFAULT && player->layer != brick_layer);
+    return !player_senses_layer(player, brick_layer);
 }
 
 /* hotspot "gambiarra" */

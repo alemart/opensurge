@@ -120,6 +120,7 @@ void player_disable_roll(player_t *player);
 void player_lock_horizontally_for(player_t *player, float seconds);
 int player_collision(const player_t *player, const struct actor_t *actor);
 int player_overlaps(const player_t *player, int x, int y, int width, int height);
+int player_senses_layer(const player_t* player, bricklayer_t layer);
 
 void player_enter_water(player_t *player);
 void player_leave_water(player_t *player);

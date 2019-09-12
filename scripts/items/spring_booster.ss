@@ -156,8 +156,8 @@ object "Spring Booster Up" is "entity", "basic"
     state "main"
     {
         actor.anim = 3;
-        springCollider.visible = true;
-        sensorCollider.visible = true;
+        //springCollider.visible = true;
+        //sensorCollider.visible = true;
         state = "invisible";
     }
 
@@ -204,7 +204,7 @@ object "Spring Booster Up" is "entity", "basic"
     fun onCollision(otherCollider)
     {
         if(otherCollider.entity.hasTag("player")) {
-            if(otherCollider.collidesWith(springCollider)) {
+            if(otherCollider.collidesWith(springCollider) && state != "invisible") {
                 if(state != "invisible")
                     boost(otherCollider.entity);
             }

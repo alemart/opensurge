@@ -266,7 +266,10 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     (team[i]->attacking || player_is_charging(team[i])) ||
                     (player_is_rolling(team[i]) /*&& fabs(team[i]->actor->speed.x) >= 240.0f*/)
                 ) {
-                    if(player_overlaps(team[i], brk->x - 16, brk->y - 4, brk_width + 32, brk_height)) {
+                    if(
+                        player_senses_layer(team[i], brk->layer) &&
+                        player_overlaps(team[i], brk->x - 16, brk->y - 4, brk_width + 32, brk_height)
+                    ) {
                         int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
                         int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
                         float dx = team[i]->actor->position.x - brk->x;
@@ -303,8 +306,10 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
         case BRB_FALL: {
             int collision = FALSE;
 
-            for(i=0; i<team_size && !collision; i++)
-                collision = player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height));
+            for(i=0; i<team_size && !collision; i++) {
+                if(player_senses_layer(team[i], brk->layer))
+                    collision = player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height));
+            }
             
             if(brk->state == BRS_IDLE && collision)
                 brk->state = BRS_ACTIVE;
@@ -366,10 +371,12 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             /* move the player(s) */
             for(i=0; i<team_size; i++) {
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
-                    if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
-                        team[i]->on_movable_platform = TRUE;
-                        team[i]->actor->position.x += dx;
-                        team[i]->actor->position.y += dy;
+                    if(player_senses_layer(team[i], brk->layer)) {
+                        if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
+                            team[i]->on_movable_platform = TRUE;
+                            team[i]->actor->position.x += dx;
+                            team[i]->actor->position.y += dy;
+                        }
                     }
                 }
             }
@@ -399,6 +406,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                         ((player_is_charging(team[i]) || player_is_rolling(team[i])) &&
                         feet < brk->y)
                     ) &&
+                    player_senses_layer(team[i], brk->layer) &&
                     player_overlaps(team[i], brk->x, brk->y - 10, brk_width, min(8, brk_height))
                 ) {
                     /* create particles */
@@ -455,8 +463,10 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             /* check for collisions */
             for(i=0; i<team_size && !player; i++) {
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
-                    if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height)))
-                        player = team[i];
+                    if(player_senses_layer(team[i], brk->layer)) {
+                        if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height)))
+                            player = team[i];
+                    }
                 }
             }
             
@@ -543,10 +553,12 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             /* move the player(s) */
             for(i=0; i<team_size; i++) {
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
-                    if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
-                        team[i]->on_movable_platform = TRUE;
-                        team[i]->actor->position.x += dx;
-                        team[i]->actor->position.y += dy;
+                    if(player_senses_layer(team[i], brk->layer)) {
+                        if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
+                            team[i]->on_movable_platform = TRUE;
+                            team[i]->actor->position.x += dx;
+                            team[i]->actor->position.y += dy;
+                        }
                     }
                 }
             }
@@ -569,11 +581,15 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 void brick_render(brick_t *brk, v2d_t camera_position)
 {
     brick_animate(brk);
-
-    if(brk->layer == BRL_DEFAULT || !level_editmode())
-        image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+    if(level_editmode()) {
+        brick_render_path(brk, camera_position);
+        if(brk->layer != BRL_DEFAULT)
+            image_draw_lit(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), get_image_flags(brk));
+        else
+            image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+    }
     else
-        image_draw_lit(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), get_image_flags(brk));
+        image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
 }
 
 /*

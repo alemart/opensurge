@@ -663,19 +663,23 @@ object "Spring Behavior" is "private", "entity"
                     player.speed = v.x;
             }
             if(direction.y != 0) {
-                if(v.y > 0 && v.y > player.speed)
-                    player.ysp = v.y;
-                else if(v.y < 0 && v.y < player.speed)
-                    player.ysp = v.y;
+                if(player.midair || player.gsp == 0) {
+                    if(v.y > 0 && v.y > player.speed)
+                        player.ysp = v.y;
+                    else if(v.y < 0 && v.y < player.speed)
+                        player.ysp = v.y;
+
+                    // change mode
+                    player.springify();
+                }
+                else {
+                    player.gsp = -v.y;
+                }
             }
 
             // prevent braking
             if(direction.x != 0)
                 player.hlock(0.27);
-
-            // change mode
-            if(direction.y != 0)
-                player.springify();
 
             // play sound
             if(sfx != null)

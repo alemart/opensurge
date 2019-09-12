@@ -254,7 +254,6 @@ static int editor_is_enabled();
 static int editor_want_to_activate();
 static void editor_update_background();
 static void editor_render_background();
-static void editor_movable_platforms_path_render(brick_list_t *major_bricks);
 static void editor_waterline_render(int ycoord, color_t color);
 static void editor_save();
 static void editor_scroll();
@@ -2700,6 +2699,16 @@ surgescript_object_t* get_bricklike_ssobject(int index)
                     return obj;
             }
         }
+
+        /* quick fix */
+        return get_bricklike_ssobject(index + 1);
+
+        /* a bricklike object may have been removed between its
+           addition to the bricklike_ssobject array and its
+           retrieval by this function (who knows, maybe a parent
+           object gets destroyed).
+
+           TODO: filter out invalid bricks before querying */
     }
 
     return NULL;
@@ -3335,9 +3344,6 @@ void editor_render()
     /* render the grid */
     editor_grid_render();
 
-    /* path of the movable platforms */
-    editor_movable_platforms_path_render(major_bricks);
-
     /* render level */
     render_level(major_bricks, major_items, major_enemies);
 
@@ -3462,19 +3468,6 @@ void editor_render_background()
 {
     image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(40, 44, 52));
     background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
-}
-
-
-/*
- * editor_movable_platforms_path_render()
- * Renders the path of the movable platforms
- */
-void editor_movable_platforms_path_render(brick_list_t *major_bricks)
-{
-    brick_list_t *it;
-
-    for(it=major_bricks; it; it=it->next)
-        brick_render_path(it->data, editor_camera);
 }
 
 

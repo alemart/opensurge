@@ -40,7 +40,7 @@ object "Elevator" is "entity", "gimmick"
 
     state "main"
     {
-        setup();
+        actor.zindex = 0.65;
         state = "idle";
     }
 
@@ -50,6 +50,7 @@ object "Elevator" is "entity", "gimmick"
         for(i = 0; i < Player.count; i++) {
             player = Player[i];
             if(collider.collidesWith(player.collider)) {
+                setup(); // update cables
                 state = "active";
                 notifyListeners();
                 return;
@@ -90,7 +91,6 @@ object "Elevator" is "entity", "gimmick"
         collider.setAnchor(0, 1);
         //collider.visible = true;
         lineCollider.setAnchor(0, 0);
-        actor.zindex = 0.65;
     }
 
     fun setup()
@@ -113,17 +113,6 @@ object "Elevator" is "entity", "gimmick"
     fun shouldMoveUp()
     {
         return true; // FIXME
-        
-        moveUp = true;
-
-        if((cable = findOverlappingCable())) {
-            transform.move(0, -cable.collider.height);
-            lineCollider.setAnchor(0, 0); // redo cache
-            moveUp = (findOverlappingCable() != null);
-            transform.move(0, cable.collider.height);
-        }
-
-        return moveUp;
     }
 
     fun fixPositions()

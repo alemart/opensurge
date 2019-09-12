@@ -1020,6 +1020,7 @@ brick 48
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1041,6 +1042,7 @@ brick 49
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1062,6 +1064,7 @@ brick 50
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1083,6 +1086,7 @@ brick 51
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1104,6 +1108,7 @@ brick 52
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1125,6 +1130,7 @@ brick 53
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1146,6 +1152,7 @@ brick 54
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -1167,6 +1174,7 @@ brick 55
     type                SOLID
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
+    zindex              0.45
 
     sprite
     {
@@ -2091,7 +2099,7 @@ brick 225
     }
 }
 
-brick 227
+brick 226
 {
     type                SOLID
     behavior            BREAKABLE 4 8
@@ -2112,7 +2120,7 @@ brick 227
     }
 }
 
-brick 228
+brick 227
 {
     type                SOLID
     behavior            BREAKABLE 4 4
@@ -2133,7 +2141,7 @@ brick 228
     }
 }
 
-brick 229
+brick 228
 {
     type                SOLID
     behavior            SMASHABLE 2 1
@@ -2144,6 +2152,27 @@ brick 229
         source_file     "images/waterworks.png"
         source_rect     896 976 32 16
         frame_size      32 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 229
+{
+    type                SOLID
+    behavior            SMASHABLE 4 4
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     896 896 32 32
+        frame_size      32 32
 
         animation
         {
