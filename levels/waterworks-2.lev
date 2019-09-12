@@ -221,7 +221,6 @@ brick 43 14848 9312
 brick 255 14848 9440
 brick 255 14880 9440
 brick 255 14912 9440
-brick 1 14720 9472
 brick 17 14944 9344
 brick 1 14976 9472
 brick 1 15104 9472
@@ -272,6 +271,7 @@ brick 1 15104 10240
 brick 1 15104 10368
 brick 36 15344 10192
 brick 9 15344 10304
+brick 1 14720 9472
 brick 154 13760 10112
 brick 157 13824 10112
 brick 152 13824 10048
@@ -1157,7 +1157,6 @@ entity "Powerup Collectibles" 10624 10848 "3bb252d85bf21401"
 entity "Spikes" 10224 10784 "67202194f592d069"
 entity "Spikes" 9872 10208 "57655fd97dd2cf89"
 entity "Spikes" 10256 10080 "64608854b2c7a856"
-entity "Layer Green" 11072 9680 "448a3cab197358de"
 entity "Layer Yellow" 10960 9392 "5d6043a8732a84ef"
 entity "Layer Yellow" 10864 9552 "9b1214b6adbc0a26"
 entity "Layer Yellow" 10864 9520 "493195c159c53bb2"
@@ -1179,8 +1178,7 @@ entity "Layer Yellow" 11792 9680 "2e04c6d6569f1595"
 entity "Layer Yellow" 11792 9648 "d788ce9662b9eefe"
 entity "Layer Yellow" 11792 9616 "a24f0d75189ee2a3"
 entity "Layer Yellow" 11792 9584 "99127fbc260f17a6"
-entity "Roll" 10928 9600 "bf1edf5428dd6bcd"
-entity "Roll" 11104 9680 "01cb87a41e1b825a"
+entity "Tube Out" 11104 9680 "01cb87a41e1b825a"
 entity "Layer Green" 11040 9680 "85023b77673063de"
 entity "Bridge" 12288 9696 "aeebba433cd06cb0"
 entity "Spikes" 12560 9696 "ecd59c2b43f6e069"
@@ -1216,8 +1214,6 @@ entity "Pipe Up" 14160 9840 "3c8a225810b2d58a"
 entity "Pipe Out" 14160 9680 "3c2d0f21f3d592a1"
 entity "Layer Green" 14160 9616 "86d10f8723642ecc"
 entity "Layer Green" 14160 9648 "cdf21172d8c7b07b"
-entity "Roll" 14160 9456 "5b23307982fb355e"
-entity "Layer Green" 14160 9584 "dd2f44b3eec0d0d3"
 entity "Layer Yellow" 14224 9392 "f52737cd9d2ef5ff"
 entity "Layer Yellow" 14224 9424 "61381f4cfcbe37d4"
 entity "Spring Booster Up" 14160 9568 "1fe8337602e45b4a"
@@ -1231,13 +1227,11 @@ entity "Layer Yellow" 14864 9264 "f94d788fe35f8039"
 entity "Layer Yellow" 14896 9264 "2d2b8b11f98c1179"
 entity "Layer Yellow" 14704 9360 "126151e0d562771b"
 entity "Layer Yellow" 14704 9328 "db99f4b628dc1535"
-entity "Layer Green" 14768 9520 "5898c12dc7dc1df1"
 entity "Layer Green" 14768 9552 "4677d2f01bfef98a"
-entity "Roll" 14768 9488 "bb58cd927190405f"
+entity "Tube Out" 14768 9488 "bb58cd927190405f"
 entity "Spring Stronger Right" 15408 10320 "bd3c862e11b0c5d0"
-entity "Layer Yellow" 15344 9920 "4082c4a199aed05b"
 entity "Layer Yellow" 15312 9920 "acd00c3e9d54fb3b"
-entity "Roll" 15376 9920 "4c5b2444d22dfc0d"
+entity "Tube Out" 15376 9920 "4c5b2444d22dfc0d"
 entity "Powerup Shield Water" 15440 10272 "f181489efdf922d5"
 entity "Checkpoint" 16384 10208 "aeab91d936af2f54"
 entity "Layer Green" 15952 10320 "e894f4dce511f899"
@@ -1273,5 +1267,14 @@ entity "Bumper" 2112 10496 "27e0466306a2202b"
 entity "Spikes" 2992 10784 "d28626be31740eab"
 entity "Spikes" 3024 10784 "90de60d1c92c2c76"
 entity "Spikes" 3728 10848 "cc7f1b7f36fcf8c5"
+entity "Tube In" 10928 9632 "3bb6083e871d0468"
+entity "Tube In" 11072 9680 "8d9d80d2d51f2460"
+entity "Layer Green" 11008 9680 "96777225d7a00228"
+entity "Layer Green" 14768 9584 "a42b9d9c9403ac14"
+entity "Tube In" 14768 9520 "a8328f8684da2e4c"
+entity "Tube In" 15344 9920 "4f762e80e8b18910"
+entity "Layer Yellow" 15280 9920 "745097b0a824ae02"
+entity "Tube Out" 10928 9600 "bf1edf5428dd6bcd"
+entity "Tube Out" 14160 9488 "b9ba668e44075611"
 
 // EOF

@@ -13,8 +13,8 @@ requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/waterworks.bg"
-spawn_point 8992 10911
-setup "Default Setup" "Waterworks Setup"
+spawn_point 18224 11280
+setup "Debug Setup" "Waterworks Setup"
 players "Surge"
 waterlevel 9999999
 
@@ -167,17 +167,6 @@ brick 23 19712 11520
 brick 23 19712 11392
 brick 23 19712 11264
 brick 23 19712 11136
-brick 16 18944 11584
-brick 16 19200 11584
-brick 16 19328 11584
-brick 22 19648 11584
-brick 24 19648 11712
-brick 24 19648 11776
-brick 27 19648 11904
-brick 26 19520 11904
-brick 26 19456 11904
-brick 26 19328 11904
-brick 26 19200 11904
 brick 26 19072 11904
 brick 26 18944 11904
 brick 135 19712 11616
@@ -200,11 +189,6 @@ brick 8 19520 11136
 brick 8 19520 11008
 brick 8 19520 10880
 brick 8 19520 10752
-brick 43 19072 11552 green
-brick 42 18944 11552 yellow
-brick 44 18944 11424
-brick 45 19072 11424
-brick 16 19072 11584
 brick 25 19328 11392
 brick 26 19456 11392
 brick 23 19328 10880
@@ -222,23 +206,10 @@ brick 15 19680 11136
 brick 15 19680 11008
 brick 21 19712 10880
 brick 23 19712 11008
-brick 18 19520 11584
-brick 16 19456 11584
 brick 23 19712 12224
 brick 150 19776 12352
-brick 2 18944 11712
-brick 2 19072 11712
 brick 1 18944 11776
 brick 1 19072 11776
-brick 7 19504 11712
-brick 6 19376 11712
-brick 5 19248 11712
-brick 1 19200 11712
-brick 1 19200 11792
-brick 1 19328 11776
-brick 1 19456 11776
-brick 1 19520 11776
-brick 1 19520 11712
 brick 21 19360 12288
 brick 23 19360 12416
 brick 3 19488 12416
@@ -246,6 +217,67 @@ brick 17 19488 12288
 brick 16 19616 12288
 brick 1 19584 12416
 brick 1 19712 12416
+brick 28 19072 11584
+brick 21 19072 11456
+brick 22 19200 11456
+brick 24 19200 11584
+brick 18 18944 11584
+brick 24 19200 11712
+brick 24 19200 11776
+brick 27 19200 11904
+brick 36 19552 11600
+brick 36 19424 11600
+brick 36 19296 11600
+brick 36 19232 11600
+brick 38 19664 11600
+brick 136 19664 11616
+brick 136 19424 11616
+brick 135 19424 11552
+brick 135 19424 11488
+brick 135 19664 11552
+brick 135 19664 11488
+brick 134 19664 11424
+brick 134 19424 11424
+brick 135 19712 11808
+brick 135 19760 11808
+brick 135 19712 11872
+brick 135 19760 11872
+brick 135 19712 11488
+brick 135 19760 11488
+brick 135 19712 11424
+brick 135 19760 11424
+brick 135 19712 11360
+brick 135 19760 11360
+brick 135 19712 11296
+brick 135 19760 11296
+brick 135 19760 11232
+brick 135 19712 11232
+brick 135 19712 11168
+brick 135 19760 11168
+brick 135 19760 11104
+brick 135 19712 11104
+brick 135 19712 11040
+brick 135 19760 11040
+brick 135 19760 10976
+brick 135 19712 10976
+brick 135 19712 10912
+brick 135 19760 10912
+brick 135 19712 10848
+brick 135 19760 10848
+brick 135 19760 10784
+brick 135 19712 10784
+brick 135 19712 10720
+brick 135 19760 10720
+brick 135 19760 10656
+brick 135 19712 10656
+brick 135 19712 10592
+brick 135 19760 10592
+brick 24 19648 10624
+brick 8 19520 10624
+brick 23 19328 10624
+brick 1 19456 10624
+brick 5 18944 11712
+brick 7 19072 11712
 brick 45 18176 11760
 brick 17 18080 11360
 brick 43 18176 11888 yellow
@@ -259,20 +291,6 @@ brick 17 18176 12288
 brick 16 18304 12288
 brick 16 18432 12288
 brick 16 18208 11360
-brick 44 18432 11200
-brick 45 18560 11200
-brick 43 18560 11328 yellow
-brick 46 18432 11328 green
-brick 18 18528 11360 yellow
-brick 24 18656 11360 yellow
-brick 27 18656 11488 yellow
-brick 26 18528 11488 yellow
-brick 26 18464 11488 yellow
-brick 16 18464 11360 yellow
-brick 16 18336 11360
-brick 24 18432 11456 green
-brick 29 18432 11584
-brick 17 18560 11584
 brick 1 18080 11488
 brick 1 18080 11520
 brick 1 18176 11488 hflip
@@ -282,7 +300,6 @@ brick 8 18112 11488
 brick 26 18176 11648
 brick 26 18304 11648
 brick 1 18208 11520 hflip
-brick 16 18688 11584
 brick 16 18816 11584
 brick 25 18336 11712
 brick 181 18432 11664
@@ -306,6 +323,32 @@ brick 1 18560 12416
 brick 1 18432 12416
 brick 1 18304 12416
 brick 1 18176 12416
+brick 44 18480 11200
+brick 45 18608 11200
+brick 43 18608 11328
+brick 52 18464 11600
+brick 55 18464 11488
+brick 49 18688 11600
+brick 24 18704 11456
+brick 24 18704 11472
+brick 50 18592 11600
+brick 255 18544 11456
+brick 255 18480 11456
+brick 255 18576 11456
+brick 255 18608 11456
+brick 255 18640 11456
+brick 255 18672 11456
+brick 255 18448 11456
+brick 8 18576 11488
+brick 1 18336 11488
+brick 1 18336 11536
+brick 17 18736 11584
+brick 46 18480 11328 yellow
+brick 1 18576 11456
+brick 255 18512 11456 green
+brick 184 18480 11456
+brick 18 18320 11360
+brick 1 18448 11456
 brick 36 17536 11536 yellow
 brick 36 17664 11536 yellow
 brick 44 18048 11760
@@ -467,25 +510,14 @@ brick 135 15232 11264
 brick 135 15232 11200
 brick 135 15232 11136
 brick 17 13760 11376
-brick 43 14080 11344 yellow
-brick 18 14048 11376 yellow
-brick 24 14176 11376 yellow
-brick 27 14176 11504 yellow
-brick 26 14048 11504 yellow
 brick 45 14080 11216
 brick 44 13952 11216
-brick 46 13952 11344 green
-brick 24 13952 11472 green
-brick 26 13952 11504 yellow
-brick 29 13952 11648
 brick 1 13760 11504
 brick 1 13760 11520
 brick 1 13760 11648
 brick 1 13824 11648
 brick 1 13824 11504
 brick 1 13824 11520
-brick 17 14080 11648
-brick 16 14208 11648
 brick 24 14592 11776
 brick 24 14592 11904
 brick 2 14464 11776
@@ -502,14 +534,35 @@ brick 1 14080 11904
 brick 1 14208 11904
 brick 1 14336 11904
 brick 1 14464 11904
-brick 24 13952 11600
 brick 28 14464 11648
 brick 24 14592 11648
 brick 22 14592 11520
 brick 21 14464 11520
 brick 18 14336 11648
-brick 16 13856 11376
-brick 16 13984 11376 yellow
+brick 46 13952 11344 yellow
+brick 55 13936 11504
+brick 52 13936 11664
+brick 49 14160 11664
+brick 50 14064 11664
+brick 55 13936 11536
+brick 24 14176 11536
+brick 24 14176 11520
+brick 1 14064 11536
+brick 255 14016 11472
+brick 255 14048 11472
+brick 255 14080 11472
+brick 255 14112 11472
+brick 255 14144 11472
+brick 255 13952 11472
+brick 18 13824 11376
+brick 1 14064 11504
+brick 8 14048 11536
+brick 17 14208 11648
+brick 43 14080 11344
+brick 24 14176 11472
+brick 1 14048 11472
+brick 255 13984 11472 green
+brick 184 13952 11472
 brick 24 12928 11520
 brick 22 12928 11248
 brick 24 12928 11376
@@ -709,13 +762,7 @@ brick 40 10912 9872 yellow
 brick 40 10976 9936 yellow
 brick 41 11040 10000 yellow
 brick 39 11040 10080 green hflip
-brick 40 10912 10128 green hflip
-brick 40 10848 10192 green hflip
 brick 36 11168 10000
-brick 40 10784 10256 green hflip
-brick 40 10720 10320 green hflip
-brick 41 10656 10384 green hflip
-brick 22 10624 10368
 brick 18 10496 10368
 brick 16 10368 10368
 brick 26 10368 10624
@@ -772,6 +819,18 @@ brick 23 11168 9216
 brick 21 11008 10368
 brick 17 11136 10368
 brick 18 11168 10368
+brick 37 10544 10384
+brick 38 11088 10384
+brick 22 10624 10368
+brick 40 10720 10320 yellow hflip
+brick 41 10656 10384 yellow hflip
+brick 36 10656 10384 green
+brick 36 10784 10384 green
+brick 36 10912 10384 green
+brick 36 10976 10384 green
+brick 40 10848 10192 hflip
+brick 40 10912 10128 green hflip
+brick 40 10784 10256 yellow hflip
 brick 18 10112 11232
 brick 21 10112 11200
 brick 17 10240 11200
@@ -1074,10 +1133,6 @@ brick 26 8064 10240
 brick 26 8192 10240
 brick 26 8320 10240
 brick 44 8192 10336
-brick 29 8192 10880
-brick 17 8320 10880
-brick 16 8448 10880
-brick 24 8192 10752
 brick 151 7872 10080
 brick 18 7744 9984
 brick 18 7936 9984
@@ -1238,17 +1293,6 @@ brick 1 8080 11008
 brick 1 8192 11008
 brick 255 7776 10592
 brick 255 8064 10592
-brick 46 8192 10464 green
-brick 43 8320 10464 yellow
-brick 24 8416 10496 yellow
-brick 27 8416 10624 yellow
-brick 26 8288 10624 yellow
-brick 26 8192 10624 yellow
-brick 24 8192 10624 green
-brick 24 8192 10592 green
-brick 18 8288 10496 yellow
-brick 16 8192 10496 yellow
-brick 17 8096 10496
 brick 18 8576 10880
 brick 5 8320 11008
 brick 6 8448 11008
@@ -1268,6 +1312,41 @@ brick 1 8064 11136
 brick 9 7936 11136
 brick 9 7808 11136
 brick 24 7776 11136
+brick 1 7872 8704
+brick 1 7936 8704
+brick 8 7744 10112
+brick 8 7904 10112
+brick 46 8192 10464 yellow
+brick 255 8192 10592
+brick 255 8256 10592
+brick 255 8288 10592
+brick 255 8320 10592
+brick 43 8320 10464
+brick 255 8352 10592
+brick 255 8384 10592
+brick 255 8416 10592
+brick 255 8160 10592
+brick 255 8128 10592
+brick 255 8096 10592
+brick 52 8176 10896
+brick 49 8400 10896
+brick 50 8304 10896
+brick 24 8416 10768
+brick 24 8416 10752
+brick 24 8416 10624
+brick 24 8416 10592
+brick 17 8448 10880
+brick 8 8288 10624
+brick 8 8288 10752
+brick 1 8304 10784
+brick 1 8096 10592
+brick 1 8288 10592
+brick 55 8176 10768
+brick 55 8176 10624
+brick 55 8176 10752
+brick 1 8256 10592
+brick 255 8224 10592 green
+brick 184 8192 10592
 brick 26 7296 9344
 brick 26 7168 9344
 brick 26 7040 9344
@@ -1301,7 +1380,6 @@ brick 44 6912 9440
 brick 45 7040 9440
 brick 18 7296 8928
 brick 1 7168 9216
-brick 1 7296 9216
 brick 17 6912 8960
 brick 18 6976 8960
 brick 19 7104 8960
@@ -1386,6 +1464,29 @@ brick 42 6912 9568 yellow
 brick 36 7584 8976 yellow
 brick 36 7456 8976 yellow
 brick 17 7360 10016 yellow
+brick 1 6912 9088
+brick 1 7040 9088
+brick 1 7168 9088
+brick 1 7232 9056
+brick 4 7296 9056
+brick 4 7296 9184
+brick 1 7296 9216
+brick 2 7168 10176
+brick 2 7040 10176
+brick 36 6912 8720
+brick 36 7040 8720
+brick 36 7168 8720
+brick 36 7296 8720
+brick 38 7424 8720
+brick 136 6912 8736
+brick 136 7168 8736
+brick 136 7424 8736
+brick 135 6912 8672
+brick 135 6912 8608
+brick 135 7168 8672
+brick 135 7168 8608
+brick 135 7424 8672
+brick 135 7424 8608
 brick 28 6032 9456
 brick 23 6032 9328
 brick 30 6032 9216
@@ -1425,7 +1526,6 @@ brick 19 6144 9088
 brick 19 6272 9056
 brick 18 6528 9024
 brick 1 6272 9184
-brick 1 6400 9152
 brick 1 6400 9216
 brick 1 6528 9216
 brick 1 6656 9216
@@ -1461,11 +1561,35 @@ brick 23 6848 10624 yellow
 brick 17 6784 9600 yellow
 brick 36 6432 9616 yellow
 brick 16 6848 9600
-brick 40 5216 9600
-brick 41 5280 9664
-brick 41 5408 9664 hflip
-brick 40 5472 9600 hflip
-brick 39 5600 9552 hflip
+brick 24 6400 10368
+brick 24 6400 10496
+brick 2 6144 10176
+brick 2 6272 10176
+brick 1 6144 10240
+brick 1 6272 10240
+brick 1 6272 10368
+brick 1 6144 10368
+brick 1 6144 10496
+brick 1 6272 10496
+brick 1 6400 9152
+brick 1 6592 9152
+brick 1 6848 9120
+brick 1 6464 9152
+brick 2 6656 9120
+brick 2 6784 9120
+brick 36 6144 8832
+brick 36 6656 8720
+brick 36 6784 8720
+brick 230 6448 8848
+brick 38 6272 8832
+brick 37 6528 8720
+brick 136 6656 8736
+brick 136 6272 8848
+brick 135 6272 8784
+brick 135 6272 8720
+brick 135 6272 8656
+brick 135 6656 8672
+brick 135 6656 8608
 brick 21 5648 9456
 brick 17 5776 9456
 brick 37 5728 9472 hflip
@@ -1481,7 +1605,6 @@ brick 17 5664 9280
 brick 26 5856 9408
 brick 26 5760 9408
 brick 26 5632 9408
-brick 17 5504 9088
 brick 18 5520 9088
 brick 23 5376 9280
 brick 25 5376 9408
@@ -1589,8 +1712,6 @@ brick 1 5760 10368
 brick 1 5888 10368
 brick 1 5760 10496
 brick 1 5888 10496
-brick 24 6016 10368
-brick 24 6016 10496
 brick 23 5376 10368
 brick 23 5376 10496
 brick 24 5248 10368
@@ -1601,23 +1722,33 @@ brick 17 6016 10048
 brick 18 6016 9088
 brick 21 5888 10048
 brick 23 5648 9856
-brick 18 4352 10608
-brick 28 4480 10608
-brick 23 4480 10480
-brick 23 4480 10352 green
-brick 47 4480 10224 green
-brick 45 4480 10096
-brick 44 4352 10096
-brick 42 4352 10224 yellow
-brick 16 4352 10256 yellow
-brick 26 4352 10384 yellow
-brick 16 4480 10256 yellow
-brick 26 4480 10384 yellow
-brick 16 4608 10256
-brick 16 4736 10256
-brick 18 4864 10256
-brick 9 4352 10016
-brick 9 4480 10016
+brick 36 5216 9472
+brick 36 5344 9472
+brick 2 6016 10176
+brick 1 6016 10240
+brick 1 6016 10368
+brick 1 6016 10496
+brick 40 5488 9600 yellow hflip
+brick 40 5424 9664 yellow hflip
+brick 41 5360 9728 yellow hflip
+brick 36 5232 9728 yellow
+brick 39 5616 9552 yellow hflip
+brick 36 5600 9472 green
+brick 36 5472 9472 green
+brick 36 5856 8832
+brick 36 5888 8832
+brick 36 6016 8832
+brick 17 5504 9088
+brick 136 6016 8848
+brick 136 5760 8848
+brick 36 5760 8832
+brick 37 5632 8832
+brick 135 5760 8784
+brick 135 6016 8784
+brick 135 6016 8720
+brick 135 6016 8656
+brick 135 5760 8720
+brick 135 5760 8656
 brick 23 4864 10224
 brick 1 4992 10256
 brick 9 4896 10288
@@ -1628,12 +1759,7 @@ brick 1 4736 10496
 brick 1 4864 10496
 brick 1 4736 10624
 brick 1 4864 10624
-brick 3 4608 10384
 brick 1 4608 10624
-brick 1 4352 10704
-brick 1 4480 10704
-brick 1 4352 10752
-brick 1 4480 10752
 brick 1 4608 10752
 brick 1 4736 10752
 brick 1 4864 10752
@@ -1674,22 +1800,8 @@ brick 18 4784 9328
 brick 24 4912 9456
 brick 37 4832 9344
 brick 39 4960 9424
-brick 40 5088 9472
-brick 40 5152 9536
 brick 22 4912 9328
-brick 1 4352 10880
-brick 1 4480 10880
-brick 1 4608 10880
 brick 1 4736 10880
-brick 255 4576 10112
-brick 255 4576 10080
-brick 255 4576 10048
-brick 255 4576 10016
-brick 255 4576 9984
-brick 255 4576 9952
-brick 255 4576 9920
-brick 255 4576 9888
-brick 255 4576 9856
 brick 255 4576 9824
 brick 255 4576 9728
 brick 255 4576 9792
@@ -1700,7 +1812,6 @@ brick 255 4480 9728
 brick 255 4448 9728
 brick 1 4352 9728
 brick 1 4480 9728
-brick 1 4528 9728
 brick 1 4784 9456
 brick 1 4656 9456
 brick 1 4656 9584
@@ -1718,7 +1829,52 @@ brick 1 4992 10624
 brick 24 4912 9584
 brick 24 4912 9712
 brick 2 5120 10240
-brick 3 4608 10512
+brick 41 5088 9472
+brick 30 4480 10112
+brick 55 4496 10496
+brick 31 4352 10112
+brick 29 4352 10240
+brick 1 4480 9984
+brick 1 4480 9856
+brick 1 4352 9984
+brick 1 4352 9856
+brick 27 4912 9824
+brick 1 4528 9728
+brick 26 4784 9824
+brick 26 4736 9824
+brick 27 4608 10240
+brick 24 4608 10112
+brick 24 4608 9984
+brick 24 4608 9856
+brick 24 4608 9840
+brick 26 4640 9824
+brick 17 4608 10240
+brick 16 4736 10240
+brick 18 4864 10240
+brick 1 4608 10368
+brick 1 4624 10496
+brick 1 4352 10368
+brick 55 4496 10368
+brick 255 4576 10336
+brick 255 4512 10336
+brick 255 4480 10336
+brick 3 4384 10384
+brick 3 4384 10512
+brick 8 4352 10880
+brick 8 4480 10880
+brick 1 4608 10880
+brick 53 4496 10624
+brick 50 4368 10624
+brick 1 4352 10752
+brick 1 4480 10752
+brick 255 4576 10272 yellow
+brick 255 4576 10304 yellow
+brick 36 5104 9728 yellow
+brick 36 4976 9728 yellow
+brick 36 4944 9728 yellow
+brick 255 4544 10336 green
+brick 184 4512 10336
+brick 1 4480 10336
 brick 8 3456 10496
 brick 8 3584 10496
 brick 8 3456 10880
@@ -1727,24 +1883,13 @@ brick 53 3456 10752
 brick 54 3456 10624
 brick 51 3584 10624
 brick 52 3584 10752
-brick 53 3712 10752
-brick 54 3712 10624
-brick 49 3840 10624
 brick 8 3712 10496
 brick 8 3712 10880
 brick 24 3856 10496
 brick 1 3728 10496
-brick 1 3760 10752
 brick 1 3760 10880
-brick 17 3904 10608
-brick 16 3968 10608
-brick 16 4096 10608
-brick 16 4224 10608
-brick 17 4096 10256
-brick 16 4224 10256
 brick 26 4224 10384
 brick 26 4096 10384
-brick 255 3888 10704
 brick 1 3968 10240
 brick 1 3968 10112
 brick 1 3840 10240
@@ -1754,31 +1899,7 @@ brick 26 3888 10384
 brick 1 3968 10256
 brick 1 3840 10272
 brick 24 3856 10400
-brick 9 4096 10240
-brick 9 4224 10240
-brick 9 4096 10112
-brick 9 4224 10112
-brick 9 4272 10064
-brick 1 3888 10704
-brick 1 3968 10704
-brick 1 4096 10704
-brick 1 4224 10704
-brick 1 3840 10752
-brick 1 3968 10752
-brick 1 4096 10752
-brick 1 4224 10752
-brick 18 3568 9344 green
-brick 43 3568 9312 green
-brick 45 3568 9184
-brick 44 3440 9184
-brick 16 3440 9344 green
-brick 46 3440 9312 yellow
-brick 24 3440 9440 yellow
-brick 27 3696 9472
-brick 22 3696 9344
-brick 26 3568 9472 green
 brick 48 3840 9600
-brick 17 3568 9584
 brick 18 3792 9584
 brick 16 3696 9584
 brick 23 3824 9472
@@ -1819,13 +1940,6 @@ brick 1 4224 8832
 brick 1 4224 8704
 brick 1 4096 8704
 brick 8 3952 8704
-brick 24 3440 9568
-brick 26 3440 9472 green
-brick 29 3440 9584
-brick 1 3840 10880
-brick 1 3968 10880
-brick 1 4096 10880
-brick 1 4224 10880
 brick 1 3712 10368
 brick 1 3728 10368
 brick 1 3584 10368
@@ -1840,16 +1954,63 @@ brick 1 3840 9728
 brick 1 3712 9728
 brick 1 3584 9728
 brick 1 3456 9728
-brick 1 3456 9712
-brick 1 3584 9712
-brick 1 3712 9712
-brick 1 3840 9712
 brick 1 3456 9856
 brick 1 3584 9856
 brick 1 3712 9856
 brick 1 3840 9856
 brick 1 3968 9856
 brick 1 4096 9856
+brick 16 3616 9584
+brick 16 3488 9584
+brick 17 3456 9584
+brick 2 3744 9712
+brick 2 3616 9712
+brick 2 3488 9712
+brick 1 3456 9712
+brick 1 3872 9712
+brick 23 4256 10496
+brick 23 4256 10400
+brick 1 4224 10240
+brick 1 4224 10112
+brick 1 4224 9984
+brick 1 4224 9856
+brick 1 4096 10240
+brick 1 4096 10112
+brick 1 4096 9984
+brick 1 3968 9984
+brick 1 3840 9984
+brick 1 4096 10256
+brick 1 4224 10256
+brick 1 3712 10112
+brick 1 3456 10112
+brick 1 3584 10112
+brick 1 3456 9984
+brick 1 3584 9984
+brick 1 3712 9984
+brick 1 3840 10864
+brick 1 3968 10864
+brick 1 4096 10864
+brick 1 4224 10864
+brick 8 3840 10880
+brick 8 3968 10880
+brick 8 4096 10880
+brick 8 4224 10880
+brick 49 3840 10624
+brick 48 4272 10624
+brick 17 3872 10608
+brick 16 4000 10608
+brick 16 4096 10608
+brick 18 4224 10608
+brick 54 3712 10624
+brick 53 3712 10752
+brick 8 3968 10752
+brick 8 4096 10752
+brick 8 4224 10752
+brick 8 3840 10752
+brick 1 3840 10736
+brick 1 3968 10736
+brick 1 4096 10736
+brick 1 4224 10736
 brick 16 2688 10608
 brick 48 2944 10624
 brick 18 2896 10608
@@ -1896,9 +2057,6 @@ brick 26 2896 10080
 brick 24 2656 9472
 brick 27 2656 9600
 brick 21 2928 9344
-brick 17 3056 9344
-brick 16 3184 9344
-brick 16 3312 9344
 brick 1 3328 10368
 brick 1 3200 10368
 brick 1 3072 10368
@@ -1914,16 +2072,9 @@ brick 1 3056 9984
 brick 1 3072 9856
 brick 1 3056 9856
 brick 1 3328 9728
-brick 1 3328 9600
-brick 1 3328 9472
-brick 1 3200 9472
-brick 1 3200 9600
 brick 1 3200 9728
 brick 3 3040 9472
-brick 3 3040 9600
 brick 3 3040 9728
-brick 1 3168 9472
-brick 1 3168 9600
 brick 1 3168 9728
 brick 1 3200 9856
 brick 1 3200 9984
@@ -1940,6 +2091,45 @@ brick 1 2928 9968
 brick 1 2944 9888
 brick 1 2688 9888
 brick 1 2816 9888
+brick 52 3184 9600
+brick 43 3328 9312
+brick 45 3328 9184
+brick 44 3200 9184
+brick 49 3408 9600
+brick 24 3424 9472
+brick 24 3424 9440
+brick 46 3200 9312 yellow
+brick 1 3312 9472
+brick 50 3312 9600
+brick 55 3184 9472
+brick 255 3200 9440
+brick 255 3264 9440
+brick 255 3296 9440
+brick 255 3328 9440
+brick 255 3360 9440
+brick 255 3392 9440
+brick 1 3056 9440
+brick 3 3040 9600
+brick 1 3072 9600
+brick 1 3072 9568
+brick 255 3056 9440
+brick 255 3088 9440
+brick 255 3120 9440
+brick 255 3168 9440
+brick 255 3152 9440
+brick 24 2656 9344
+brick 24 2656 9216
+brick 24 2656 9088
+brick 24 2656 8960
+brick 24 2656 8832
+brick 24 2656 8704
+brick 1 3296 9440
+brick 8 3296 9472
+brick 1 3328 9984
+brick 1 3328 10112
+brick 255 3232 9440 green
+brick 184 3200 9440
+brick 1 3072 9440
 brick 40 1760 10128 yellow
 brick 40 1824 10192 yellow
 brick 41 1744 9968 green
@@ -1987,6 +2177,46 @@ brick 1 2432 9952
 brick 2 2432 9920
 brick 2 2560 9920
 brick 1 2416 9904
+brick 26 2176 9600
+brick 26 2304 9600
+brick 26 2432 9600
+brick 26 2528 9600
+brick 25 2048 9600
+brick 23 2048 9472
+brick 23 2048 9344
+brick 23 2048 9216
+brick 23 2048 9088
+brick 23 2048 8960
+brick 23 2048 8832
+brick 23 2048 8704
+brick 1 2176 9472
+brick 1 2304 9472
+brick 1 2432 9472
+brick 1 2528 9472
+brick 1 2528 9216
+brick 1 2528 9344
+brick 1 2528 9088
+brick 1 2528 8960
+brick 1 2528 8832
+brick 1 2528 8704
+brick 1 2432 9344
+brick 1 2304 9344
+brick 1 2176 9344
+brick 1 2176 9216
+brick 1 2304 9216
+brick 1 2432 9216
+brick 1 2432 9088
+brick 1 2304 9088
+brick 1 2176 9088
+brick 1 2176 8960
+brick 1 2304 8960
+brick 1 2432 8960
+brick 1 2432 8832
+brick 1 2304 8832
+brick 1 2176 8832
+brick 1 2176 8704
+brick 1 2304 8704
+brick 1 2432 8704
 brick 41 896 9968 green hflip
 brick 39 896 9824 yellow
 brick 40 1024 9872 yellow
@@ -2024,7 +2254,29 @@ brick 36 400 9744
 brick 36 512 9744
 brick 37 768 9744
 brick 23 7744 8576
+brick 1 7872 8576
+brick 1 7936 8576
+brick 135 6912 8544
+brick 135 6912 8480
+brick 135 7168 8544
+brick 135 7168 8480
+brick 135 7424 8544
+brick 135 7424 8480
+brick 135 6272 8592
+brick 135 6656 8544
+brick 135 6656 8480
+brick 135 6016 8592
+brick 135 5760 8592
 brick 250 14784 11488
+brick 250 5568 8992
+brick 238 6432 8848
+brick 237 6448 8848
+brick 236 6448 8848
+brick 235 6448 8848
+brick 234 6448 8848
+brick 233 6448 8848
+brick 232 6448 8848
+brick 231 6448 8848
 
 // entities
 entity "Layer Green" 880 10032 "73f444434cbcdb8b"
@@ -2062,44 +2314,12 @@ entity "Layer Yellow" 1968 10256 "ab44db7f1088911b"
 entity "Layer Yellow" 1968 10224 "ee72d241935ca6f9"
 entity "Layer Yellow" 1968 10192 "9e8632f3506481f4"
 entity "Layer Yellow" 1968 10352 "88f597fb5434b5f7"
-entity "Roll" 3056 10688 "eb709a99bbb7415c"
-entity "Roll" 3856 10688 "2cbaf0c37c87f8de"
-entity "Spring Standard Hidden" 4944 10352 "5c3134a78542a944"
-entity "Layer Yellow" 4464 10176 "ad2d7cccf8e40f10"
-entity "Layer Yellow" 4432 10176 "169e39ffdfe8030e"
-entity "Layer Green" 4496 10176 "d30f35eb7b26d088"
-entity "Layer Green" 4528 10176 "49ac42d1c027bf29"
-entity "Layer Yellow" 4624 10336 "ec34ad7aa9831a17"
-entity "Layer Yellow" 4624 10304 "e61c7112ac9279e3"
-entity "Layer Yellow" 4624 10240 "73ab07234347a35b"
-entity "Layer Yellow" 4624 10272 "f043b11015f89add"
-entity "Layer Green" 4560 10496 "66fdc194a1fe7ca8"
-entity "Layer Green" 4528 10496 "4972ba6f6c15aa51"
-entity "Layer Green" 4496 10496 "4c872c9868673545"
-entity "Layer Green" 4464 10496 "bbe94673b30c0a6f"
-entity "Layer Green" 4464 10464 "6ee55238c55369bb"
-entity "Layer Green" 4464 10432 "d924146e0e64c1a8"
-entity "Spring Booster Right" 3744 9680 "fb225d9f02994e92"
-entity "Spring Booster Right" 4208 10704 "8c9ff88c8203988f"
-entity "Layer Green" 3424 9424 "fd458b18769d036f"
-entity "Layer Green" 3424 9392 "dd3e4a7a440f02a9"
-entity "Layer Green" 3424 9360 "d5a546db7eca96ec"
-entity "Layer Green" 3424 9328 "d72485ce59cd38c1"
-entity "Layer Green" 3584 9264 "afc6563b74c8b2f0"
-entity "Layer Green" 3616 9264 "106d767419799f95"
-entity "Layer Yellow" 3552 9264 "dabd8b0dcf0a29ea"
-entity "Layer Yellow" 3520 9264 "7e192ccf5d510739"
-entity "Layer Yellow" 3488 9584 "d6e0a87121a34b77"
-entity "Layer Yellow" 3520 9584 "60d2d5e5a21e3021"
-entity "Layer Yellow" 3552 9584 "40d0ecc160d02401"
-entity "Layer Yellow" 3584 9584 "ff47f46b9a8aa409"
-entity "Layer Yellow" 3584 9552 "25a0651b9d959301"
-entity "Layer Yellow" 3584 9520 "0859ebd0cd645867"
+entity "Tube Out" 3056 10688 "eb709a99bbb7415c"
 entity "Spring Stronger Right" 2688 9360 "0779471403a15805"
 entity "Spring Stronger" 3008 9856 "c1a97e4054e2358e"
 entity "Spring Stronger Up Left" 3024 9584 "d1f72faaccf725e2"
-entity "Roll" 4624 9408 "d1daf2efa649f329"
-entity "Roll" 3952 9664 "9ecda213c0028a8f"
+entity "Tube Out" 4624 9408 "d1daf2efa649f329"
+entity "Tube Out" 3952 9664 "9ecda213c0028a8f"
 entity "Background Exchanger" 4400 9408 "697cb7006084febe"
 entity "Background Exchanger" 4368 9408 "faae3f3def2b98c3"
 entity "Background Restorer" 4336 9408 "1e894bca136f9f32"
@@ -2171,26 +2391,11 @@ entity "Layer Green" 9744 9744 "8dd520a84fa98f0a"
 entity "Layer Green" 9744 9712 "7b8c2067799c5e94"
 entity "Layer Green" 9744 9680 "63eb799eddf84329"
 entity "Layer Green" 9744 9648 "2a0a3f0925e859ef"
-entity "Layer Yellow" 8176 10576 "f636409363b0129c"
-entity "Layer Yellow" 8176 10544 "f72132fc005255b9"
-entity "Layer Yellow" 8176 10512 "4ffb0372d8d4bf52"
-entity "Layer Yellow" 8176 10480 "ca7b4d999af882ac"
-entity "Layer Yellow" 8336 10416 "7ef9e14bb6ea58a9"
-entity "Layer Yellow" 8368 10416 "2f2696b0dcb48658"
-entity "Layer Green" 8304 10416 "24736df2f24f7954"
-entity "Layer Green" 8272 10416 "1ae67f620e1332a6"
-entity "Layer Green" 8240 10768 "811a7bf3d2117d43"
-entity "Layer Green" 8272 10768 "5c9df53640b06f79"
-entity "Layer Green" 8304 10768 "754b50d1ee0bf1e7"
-entity "Layer Green" 8336 10768 "80faade44e9f7fc4"
-entity "Layer Green" 8336 10736 "84133435ae53303b"
-entity "Layer Green" 8336 10704 "b6a8c575c6f2f89b"
-entity "Layer Green" 8336 10672 "4dfbecf479865baa"
 entity "Checkpoint" 8992 10944 "6203de2ec0acfd9d"
 entity "Powerup Collectibles" 8880 10944 "0d9bd975efed6326"
 entity "Powerup Lucky Bonus" 8896 11360 "6dc4cbefa9f4440a"
-entity "Roll" 11760 11328 "4315520bfa0a495e"
-entity "Roll" 12560 11328 "e2a6c99fb2dfca4c"
+entity "Tube Out" 11760 11328 "4315520bfa0a495e"
+entity "Tube Out" 12560 11328 "e2a6c99fb2dfca4c"
 entity "Background Restorer" 12176 11456 "109593b90eb166d8"
 entity "Background Restorer" 12208 11456 "4db08f569804b215"
 entity "Background Restorer" 12208 11424 "1402dfe9327f434d"
@@ -2198,21 +2403,6 @@ entity "Background Exchanger" 12144 11456 "43cb29100ab4ce8b"
 entity "Background Exchanger" 12112 11456 "d288c690d5ef65d6"
 entity "Background Exchanger" 12112 11424 "18e4afdb7e1d0e9d"
 entity "Powerup Shield Thunder" 15168 11632 "6868763b110306e0"
-entity "Layer Yellow" 13936 11456 "d5e152d426beec1c"
-entity "Layer Yellow" 13936 11424 "bd1b5839d14316c4"
-entity "Layer Yellow" 13936 11392 "621b7b2cd32ea1e9"
-entity "Layer Yellow" 13936 11360 "347336b0d8c9a6ea"
-entity "Layer Yellow" 14096 11296 "9de5186b2182cf27"
-entity "Layer Yellow" 14128 11296 "67d2318e0864e379"
-entity "Layer Green" 14064 11296 "4f67152438ddd4ff"
-entity "Layer Green" 14032 11296 "86afef969c6ab096"
-entity "Layer Green" 14000 11616 "9ab76d92c848da8e"
-entity "Layer Green" 14032 11616 "0a0ef78cb5c928bb"
-entity "Layer Green" 14064 11616 "eab9680813abf42a"
-entity "Layer Green" 14096 11616 "3e0cac45b4c81810"
-entity "Layer Green" 14096 11584 "8f010fa216e58c20"
-entity "Layer Green" 14096 11552 "e06013bac45f4f38"
-entity "Layer Green" 14096 11520 "69660226ae474859"
 entity "Layer Green" 16272 11616 "cd3658c7e7c4a2da"
 entity "Layer Green" 16272 11584 "f4cce386b746dd1f"
 entity "Layer Green" 16272 11552 "54799f9a008c63cb"
@@ -2255,37 +2445,10 @@ entity "Layer Green" 17632 11840 "0ea2262e1eac523c"
 entity "Layer Green" 17632 11808 "1e93edb468f20598"
 entity "Layer Green" 17632 11776 "3735d24873378793"
 entity "Elevator" 19680 11680 "23f8a9a0ee6e0f84"
-entity "Layer Yellow" 18416 11440 "3302705e1fd9d4de"
-entity "Layer Yellow" 18416 11408 "3c777ed34ee690f7"
-entity "Layer Yellow" 18416 11376 "48494aa283ed8016"
-entity "Layer Yellow" 18416 11344 "200a3bfbb0a49e96"
-entity "Layer Yellow" 18576 11280 "29525d159966b22b"
-entity "Layer Yellow" 18608 11280 "7dff749e16a3958f"
-entity "Layer Green" 18544 11280 "4c078e9252125164"
-entity "Layer Green" 18512 11280 "621d1f44e182acc6"
-entity "Layer Green" 18576 11536 "461ea4ee6697a6e1"
-entity "Layer Green" 18576 11568 "4e7fb832c8b711ec"
-entity "Layer Green" 18576 11600 "9dc7d7596b4184cf"
-entity "Layer Green" 18544 11600 "2068d11a9163d406"
-entity "Layer Green" 18512 11600 "125e18592268d22e"
-entity "Layer Green" 18480 11600 "fc2fb6d68049480a"
 entity "Layer Green" 18192 12064 "12c4a027262e981a"
-entity "Layer Green" 18576 11504 "0f1ba5e4379383aa"
 entity "Elevator Cable" 19744 11584 "db095a993cdd3128"
 entity "Elevator Cable" 19744 11456 "624bf6631d59c14a"
 entity "Elevator Cable" 19744 11328 "2979f09775aa6048"
-entity "Layer Green" 18928 11664 "c5ed01796852e52c"
-entity "Layer Green" 18928 11632 "355e0d16c5528be6"
-entity "Layer Green" 18928 11600 "ad3af61bc3e41771"
-entity "Layer Green" 18928 11568 "08e9626bc9b6231f"
-entity "Layer Yellow" 19216 11664 "823a3cf766fc6899"
-entity "Layer Yellow" 19216 11632 "f73eedf996289608"
-entity "Layer Yellow" 19216 11600 "93d1274277a84524"
-entity "Layer Yellow" 19216 11568 "809f3881a8aedcae"
-entity "Layer Yellow" 19056 11504 "405ea4358ef36a97"
-entity "Layer Yellow" 19024 11504 "de71cd0da762c982"
-entity "Layer Green" 19088 11504 "543ba24e648c2c91"
-entity "Layer Green" 19120 11504 "343637ba3fcc3088"
 entity "Elevator Cable" 19744 10976 "34e9cf4fd8edfbb5"
 entity "Background Exchanger" 19696 11184 "86ad43e8fe69cd58"
 entity "Background Exchanger" 19728 11184 "d7b6e4071dc948c2"
@@ -2297,7 +2460,6 @@ entity "Background Restorer" 19760 11216 "bbbbab45085b60ab"
 entity "Background Restorer" 19792 11216 "97fb5d57c1d29caa"
 entity "Elevator Cable" 19744 11104 "70d618bf71f304c5"
 entity "Elevator Cable" 19744 11216 "8d371e665437c66a"
-entity "Spring Booster Left" 19600 11680 "5856b487946b2208"
 entity "Pipe Up" 20048 12368 "b06e15b53d9db29c"
 entity "Pipe Right" 20048 11216 "74f80ed1db2baef9"
 entity "Pipe Right" 19856 12368 "50288f062c2bb353"
@@ -2336,7 +2498,6 @@ entity "Background Exchanger" 20080 11600 "9aabbeb3415d76b9"
 entity "Background Restorer" 20080 11632 "b6cc919f5a7d4214"
 entity "Background Restorer" 20016 11632 "2cfc239228fbbd90"
 entity "Background Exchanger" 20016 11600 "5d5ff1ae18212eeb"
-entity "Spring Booster Right" 18384 11456 "6fb235c0056bb676"
 entity "Layer Yellow" 16272 11344 "161cb33bf0ba171a"
 entity "Spring Booster Right" 20048 10976 "6febb90ff466adf0"
 entity "Spring Stronger Left" 7840 9040 "404020d9a0f823fd"
@@ -2402,10 +2563,6 @@ entity "Layer Green" 11216 10064 "9b1493d35dcf2615"
 entity "Layer Green" 11216 10032 "4248fd65564d9d19"
 entity "Layer Green" 11216 10000 "6358e7497ce36063"
 entity "Layer Green" 11216 9968 "29c7ded90608de63"
-entity "Layer Green" 10640 10448 "5c709c1a43c1371f"
-entity "Layer Green" 10640 10416 "28f9701b848a92b1"
-entity "Layer Green" 10640 10384 "efe07269d4d90bd4"
-entity "Layer Green" 10640 10352 "c4a832f289ceccc3"
 entity "Spring Stronger Left" 11264 10064 "dd6a02e0c5c2019a"
 entity "Layer Green" 10096 10448 "70d41f9972c8a319"
 entity "Layer Green" 10096 10416 "0d86b36e4e58d41f"
@@ -2419,10 +2576,119 @@ entity "Layer Yellow" 10384 10448 "b459ca21365cd2eb"
 entity "Layer Yellow" 10384 10416 "226125801a45b18e"
 entity "Layer Yellow" 10384 10384 "0fd6fedc0ff6996d"
 entity "Layer Yellow" 10384 10352 "1a145719875c8f1f"
-entity "Bumper" 3376 9344 "dd85f6e4ce3c1a58"
-entity "Bumper" 3376 9296 "d865ca26e335f46c"
-entity "Bumper" 3408 9264 "c93aee6ad40b0484"
-entity "Layer Green" 3280 9392 "22da9c6704e8b38d"
-entity "Layer Yellow" 3312 9392 "d1b31d7ba5e821aa"
+entity "Layer Green" 3184 9424 "fe659854aa5df9b7"
+entity "Layer Green" 3184 9392 "ebff8586b449cf84"
+entity "Layer Green" 3184 9360 "802ae8ede8943d1b"
+entity "Layer Green" 3184 9328 "aa241886f6ab33a1"
+entity "Layer Yellow" 3312 9264 "76d8c0226cf2ad86"
+entity "Layer Yellow" 3280 9264 "074fb6c6938ae95d"
+entity "Layer Green" 3344 9264 "64890806b6a20bcf"
+entity "Layer Green" 3376 9264 "dfdc6907ea045c18"
+entity "Tube Out" 3248 9488 "cb3ad5fd1e37882c"
+entity "Tube Out" 3424 9664 "fbf4c95ce26b3173"
+entity "Layer Yellow" 3248 9552 "692d14f6300ed026"
+entity "Spring Standard Hidden" 4944 10336 "edb2df15be2a6acd"
+entity "Powerup Shield Thunder" 512 9824 "273e6d2b08252d58"
+entity "Collectible" 4176 10512 "3722ba659e5c93e0"
+entity "Collectible" 4224 10480 "cbd475ccf5b6d2c7"
+entity "Collectible" 4224 10464 "24be87cf06f5eea2"
+entity "Collectible" 4112 10464 "df46ffd6a8f0385e"
+entity "Layer Green" 4624 10320 "b2a425b4ccf4dcd6"
+entity "Layer Green" 4624 10288 "04da9ed3821ec0ef"
+entity "Layer Yellow" 4496 10160 "89341a2337eb26ae"
+entity "Layer Yellow" 4560 10448 "4aa4c7e318b382e8"
+entity "Tube Out" 4560 10384 "03acfabbf710ce12"
+entity "Layer Yellow" 4528 10160 "1677d321291e0ed8"
+entity "Layer Green" 4464 10160 "4e160bc7e49e84c5"
+entity "Layer Green" 4432 10160 "db051266cd76288c"
+entity "Tube Out" 4384 10688 "8f3a28b50f769ddc"
+entity "Tube Out" 3856 10688 "6b2a06a064ba87e7"
+entity "Spring Booster Right" 4240 10704 "c7ef427e8c7eeb28"
+entity "Spring Stronger Right" 4944 9792 "8a52b5a50a45dcfe"
+entity "Powerup Invincibility" 4992 9808 "6cd70db73b37a8c7"
+entity "Powerup Collectibles" 5024 9808 "de73f262411f1656"
+entity "Layer Green" 4928 9408 "2b158411db667dfa"
+entity "Layer Green" 4928 9376 "baa74de2f1f28f81"
+entity "Layer Green" 4928 9344 "184b177e4cfeaade"
+entity "Layer Green" 4928 9312 "54e922701a80200b"
+entity "Layer Green" 4928 9280 "ae82d21adbaa428b"
+entity "Layer Green" 4928 9248 "e1d293c4e540d4ce"
+entity "Layer Green" 4928 9216 "0429173f6be8a6e7"
+entity "Layer Yellow" 5808 9536 "06ca8a7a7864fcc6"
+entity "Layer Yellow" 5808 9504 "cad2da9b834dc4bf"
+entity "Layer Yellow" 5808 9472 "c3ed16fcfe4190f6"
+entity "Spring Stronger Left" 11264 10448 "4affbabb06ac634f"
+entity "Powerup 1up" 11216 10464 "37e1f8c45e75be19"
+entity "Layer Green" 10608 10352 "27b60b9439a73e93"
+entity "Layer Green" 10608 10384 "ec7a3a2af795b42e"
+entity "Layer Green" 10608 10416 "9e4af935581e54c6"
+entity "Layer Green" 10608 10448 "d5cb75d5cc7d99ef"
+entity "Layer Green" 10960 10208 "e582b8bf3986f91c"
+entity "Layer Green" 10960 10176 "599187e09eb433ee"
+entity "Layer Green" 10960 10144 "f783a6eeb4ea6009"
+entity "Layer Green" 10960 10112 "1b7ef2a632089689"
+entity "Layer Yellow" 10928 10240 "05bdbdbee55005e4"
+entity "Layer Yellow" 10928 10208 "58c3ed9875f95cef"
+entity "Layer Yellow" 10928 10176 "20f82351fbf47596"
+entity "Layer Yellow" 10928 10144 "54f56f4f5a5638fd"
+entity "Layer Yellow" 10928 10112 "82f591eb81eb0bcc"
+entity "Layer Green" 10960 10080 "ab71f3169ef8b346"
+entity "Layer Green" 10608 10320 "13db31eec1963907"
+entity "Layer Green" 10608 10288 "3d125978d7d1b4b5"
+entity "Layer Green" 10608 10256 "04daf00ed1bd9a9c"
+entity "Tube Out" 8240 10640 "d1bfdc4e75f8b91a"
+entity "Tube Out" 8416 10960 "d7cb7ee81dce4ee8"
+entity "Layer Green" 8176 10576 "1a30bedda7516875"
+entity "Layer Green" 8176 10544 "b5b716b50a8177e5"
+entity "Layer Green" 8176 10512 "bedaa8e0b6a12c4a"
+entity "Layer Green" 8176 10480 "8c80c754832a3c92"
+entity "Layer Green" 8336 10416 "927dcdfdbfe70c6b"
+entity "Layer Green" 8368 10416 "d67f47582db0b8b3"
+entity "Layer Yellow" 8304 10416 "ea3ea7ccccd79502"
+entity "Layer Yellow" 8272 10416 "5eef943ce75b3aa8"
+entity "Layer Yellow" 8240 10704 "874cfa5f4c0359d0"
+entity "Tube Out" 14176 11728 "23c62f16cfb12b63"
+entity "Tube Out" 14000 11520 "99f2e91cc8e2f1f5"
+entity "Layer Green" 13936 11456 "6099fd03455de956"
+entity "Layer Green" 13936 11424 "9280b58c278fc704"
+entity "Layer Green" 13936 11392 "23071abc17c5998a"
+entity "Layer Green" 13936 11360 "b338620e4dcf3039"
+entity "Layer Green" 14096 11296 "0fc6d1dfc4ad8019"
+entity "Layer Green" 14128 11296 "726713971af5fd59"
+entity "Layer Yellow" 14064 11296 "2765b700f7d260e3"
+entity "Layer Yellow" 14032 11296 "d5f43fda777d9ce2"
+entity "Layer Yellow" 14000 11584 "1e46df9801db15a5"
+entity "Layer Green" 18464 11440 "e30eddde4522f45f"
+entity "Layer Green" 18464 11408 "c665a06c63704677"
+entity "Layer Green" 18464 11376 "8a382289d91fdb3b"
+entity "Layer Green" 18464 11344 "184727e1e2a64a4d"
+entity "Layer Green" 18624 11280 "2646eef22a8a3599"
+entity "Layer Green" 18656 11280 "cf87cf36e58567b2"
+entity "Layer Yellow" 18592 11280 "954f5a62c61bc1fd"
+entity "Layer Yellow" 18560 11280 "77b6fe14af24293e"
+entity "Layer Yellow" 18528 11568 "8ea7125e8de4ca31"
+entity "Tube Out" 18528 11504 "58febb728f41afe5"
+entity "Tube Out" 18704 11664 "7f9618d5ae12772c"
+entity "Tube In" 18528 11536 "8fd0916500be5a9c"
+entity "Tube In" 18672 11664 "0ee795e42c280129"
+entity "Layer Yellow" 18528 11600 "b1207aeb98833b6b"
+entity "Tube In" 14144 11728 "58d1e3cb07ab87dd"
+entity "Tube In" 14000 11552 "c011c545049a8792"
+entity "Layer Yellow" 14000 11616 "d773e69dd4fa161d"
+entity "Tube In" 12528 11328 "93823a9119f7c571"
+entity "Tube In" 11792 11328 "a640c4aa13ed56bb"
+entity "Tube In" 8384 10960 "e41c014a93e442d6"
+entity "Tube In" 8240 10672 "17ddd683882fffd3"
+entity "Layer Yellow" 8240 10736 "d5c54abd12e234ec"
+entity "Tube In" 4592 9408 "e60ae09e01dd4b85"
+entity "Tube In" 3984 9664 "9ea4d51d8358b052"
+entity "Tube In" 4416 10688 "5a04331f842b4199"
+entity "Tube In" 4560 10416 "c5e4bf9d7b74515a"
+entity "Layer Yellow" 4560 10480 "2f1713a9484daf78"
+entity "Tube In" 3824 10688 "315386666815ea26"
+entity "Tube In" 3088 10688 "aaf84c050c1f8872"
+entity "Tube In" 3248 9520 "9a85fd8a272febe2"
+entity "Layer Yellow" 3248 9584 "8544dbd31c8d0cb5"
+entity "Tube In" 3392 9664 "9466b5f10fb99bec"
 
 // EOF

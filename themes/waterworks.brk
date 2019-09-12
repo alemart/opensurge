@@ -2053,6 +2053,28 @@ brick 183
     }
 }
 
+brick 184
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+    zindex              0.46
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     768 960 96 32
+        frame_size      96 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
 //
 // Special
 //

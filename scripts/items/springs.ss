@@ -196,6 +196,7 @@ object "Spring Standard Hidden" is "entity", "basic"
         .setDirection(0, -1)
         .setSize(32, 16)
         .setAnchor(0.5, 1)
+        .setHidden(true)
         .setSensitivity(true);
 
     state "main"
@@ -377,6 +378,7 @@ object "Spring Stronger Hidden" is "entity", "basic"
         .setDirection(0, -1)
         .setSize(32, 16)
         .setAnchor(0.5, 1)
+        .setHidden(true)
         .setSensitivity(true);
 
     state "main"
@@ -558,6 +560,7 @@ object "Spring Strongest Hidden" is "entity", "basic"
         .setDirection(0, -1)
         .setSize(32, 16)
         .setAnchor(0.5, 1)
+        .setHidden(true)
         .setSensitivity(true);
 
     state "main"
@@ -632,6 +635,7 @@ object "Spring Behavior" is "private", "entity"
     direction = Vector2.up;
     speed = 600; // 960;
     sensitive = false;
+    hidden = false;
 
     state "main"
     {
@@ -663,7 +667,7 @@ object "Spring Behavior" is "private", "entity"
                     player.speed = v.x;
             }
             if(direction.y != 0) {
-                if(player.midair || player.gsp == 0) {
+                if(player.midair || hidden || player.gsp == 0) {
                     if(v.y > 0 && v.y > player.speed)
                         player.ysp = v.y;
                     else if(v.y < 0 && v.y < player.speed)
@@ -733,6 +737,13 @@ object "Spring Behavior" is "private", "entity"
     fun setSensitivity(isSensitive)
     {
         sensitive = isSensitive;
+        return this;
+    }
+
+    // make the spring a "hidden" spring
+    fun setHidden(isHidden)
+    {
+        hidden = isHidden;
         return this;
     }
 
