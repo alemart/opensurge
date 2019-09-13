@@ -80,7 +80,7 @@ object "Background Exchange Manager" is "private", "awake", "entity"
         // initialize
         for(i = 0; i < Player.count; i++) {
             playerName = Player[i].name;
-            originalBackgroundOf[playerName] = Level.background;
+            originalBackgroundOf[playerName] = Level.bgtheme;
             currentBackgroundOf[playerName] = Level.background;
         }
 

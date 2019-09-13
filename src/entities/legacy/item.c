@@ -1573,6 +1573,7 @@ void checkpointorb_update(item_t* item, player_t** team, int team_size, brick_li
                 me->is_active = TRUE; /* I'm active! */
                 sound_play(SFX_CHECKPOINT);
                 level_set_spawnpoint(act->position);
+                level_save_state();
                 actor_change_animation(act, sprite_get_animation("SD_CHECKPOINT", 1));
                 break;
             }

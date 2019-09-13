@@ -121,13 +121,15 @@ static bool is_setup_object(const char* object_name);
 #define TEAM_MAX                16
 #define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)
+#define PATH_MAXLEN             1024
+#define LINE_MAXLEN             1024
 
 /* level attributes */
-static char file[1024];
-static char musicfile[1024];
-static char theme[1024];
-static char bgtheme[1024];
-static char grouptheme[1024];
+static char file[PATH_MAXLEN];
+static char musicfile[PATH_MAXLEN];
+static char theme[PATH_MAXLEN];
+static char bgtheme[PATH_MAXLEN];
+static char grouptheme[PATH_MAXLEN];
 static char name[128];
 static char author[128];
 static char version[128];
@@ -135,13 +137,34 @@ static char license[128];
 static int act;
 static int requires[3]; /* this level requires engine version x.y.z */
 static int readonly; /* we can't activate the level editor */
+static v2d_t spawn_point;
+static int waterlevel; /* y coordinate */
+static color_t watercolor;
+
+/* player data */
+static player_t *team[TEAM_MAX]; /* players */
+static int team_size; /* size of team[] */
+static player_t *player; /* reference to the current player */
+
+/* level state */
+typedef struct levelstate_t levelstate_t;
+struct levelstate_t { /* stores attributes that can be changed during gameplay */
+    bool is_valid;
+    v2d_t spawn_point;
+    int waterlevel;
+    color_t watercolor;
+    char bgtheme[PATH_MAXLEN];
+};
+static levelstate_t saved_state;
+static void save_level_state(levelstate_t* state);
+static void restore_level_state(const levelstate_t* state);
+static void clear_level_state(levelstate_t* state);
 
 /* internal data */
 static int level_width;/* width of this level (in pixels) */
 static int level_height; /* height of this level (in pixels) */
 static int *height_at, height_at_count; /* level height at different sample points */
 static float level_timer;
-static v2d_t spawn_point;
 static music_t *music;
 static sound_t *override_music;
 static int block_music;
@@ -151,18 +174,9 @@ static bgtheme_t *backgroundtheme;
 static int must_load_another_level;
 static int must_restart_this_level;
 static int must_push_a_quest;
-static char quest_to_be_pushed[1024];
+static char quest_to_be_pushed[PATH_MAXLEN];
 static float dead_player_timeout;
-static int waterlevel; /* y coordinate */
-static color_t watercolor;
-
-/* player data */
-static player_t *team[TEAM_MAX]; /* players */
-static int team_size; /* size of team[] */
-static player_t *player; /* reference to the current player */
-
-/* camera */
-static actor_t *camera_focus;
+static actor_t *camera_focus; /* camera */
 
 /* scripting controlled variables */
 static int level_cleared; /* display the level cleared animation */
@@ -187,7 +201,7 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
 static void update_level_height_samples(int level_width, int level_height);
-static void restart(int preserve_current_state);
+static void restart(int preserve_level_state);
 static void render_players();
 static void update_music();
 static void spawn_players();
@@ -435,7 +449,7 @@ static editor_action_list_t* editor_action_delete_list(editor_action_list_t *lis
  */
 void level_load(const char *filepath)
 {
-    char line[1024];
+    char line[LINE_MAXLEN];
     const char* fullpath;
     FILE* fp;
 
@@ -751,7 +765,7 @@ void level_interpret_line(const char *filename, int fileline, const char *line)
 {
     int param_count, i;
     char *param[16], *identifier;
-    char tmp[1024], *p, *q;
+    char tmp[LINE_MAXLEN], *p, *q;
     const int sz = (sizeof(tmp)/sizeof(*tmp))-1;
 
     /* skip spaces */
@@ -1096,6 +1110,7 @@ void level_init(void *path_to_lev_file)
     jump_to_next_stage = FALSE;
 
     /* helpers */
+    clear_level_state(&saved_state);
     clear_bricklike_ssobjects();
     particle_init();
     music_stop();
@@ -1496,6 +1511,7 @@ void level_release()
     camera_release();
     editor_release();
     prefs_save(modmanager_prefs());
+    clear_level_state(&saved_state);
 
     font_destroy(dlgbox_title);
     font_destroy(dlgbox_message);
@@ -1574,6 +1590,15 @@ const char* level_license()
 int level_act()
 {
     return act;
+}
+
+/*
+ * level_bgtheme()
+ * Returns the relative path to the original background of the level
+ */
+const char* level_bgtheme()
+{
+    return bgtheme;
 }
 
 /*
@@ -2084,6 +2109,16 @@ float level_time()
     return level_timer;
 }
 
+/*
+ * level_save_state()
+ * Saves the state of the level (spawn point, waterlevel, etc.)
+ * The next time the level is restarted, those properties will
+ * be restored to what they were at the moment they were saved
+ */
+void level_save_state()
+{
+    save_level_state(&saved_state);
+}
 
 
 
@@ -2241,38 +2276,24 @@ void update_level_height_samples(int level_width, int level_height)
 
 /* restarts the level preserving the current
  * state (spawn point, waterlevel, etc.) */
-void restart(int preserve_current_state)
+void restart(int preserve_level_state)
 {
-    char* path = str_dup(file);
-    struct {
-        v2d_t spawn_point;
-        int waterlevel;
-        color_t watercolor;
-        char* background;
-    } state;
-
-    /* save the state */
-    state.spawn_point = level_spawnpoint();
-    state.waterlevel = level_waterlevel();
-    state.watercolor = level_watercolor();
-    state.background = str_dup(background_filepath(backgroundtheme));
+    char path[PATH_MAXLEN];
+    levelstate_t state = saved_state;
 
     /* restart the scene */
     scenestack_pop();
-    scenestack_push(storyboard_get_scene(SCENE_LEVEL), path);
+    scenestack_push(
+        storyboard_get_scene(SCENE_LEVEL),
+        str_cpy(path, file, sizeof(path))
+    );
 
-    /* restore the state */
-    if(preserve_current_state) {
-        level_change_background(state.background);
-        level_set_watercolor(state.watercolor);
-        level_set_waterlevel(state.waterlevel);
-        level_set_spawnpoint(state.spawn_point);
-        spawn_players();
+    /* restore the saved state */
+    if(preserve_level_state) {
+        saved_state = state;
+        restore_level_state(&saved_state);
+        spawn_players(); /* reposition players */
     }
-
-    /* done */
-    free(state.background);
-    free(path);
 }
 
 
@@ -2570,6 +2591,40 @@ void render_powerups()
         if(visible[i])
             image_draw(icon[i], VIDEO_SCREEN_W - image_width(icon[i]) * (i+1) - 5*i - 15, 10, IF_NONE);
     }
+}
+
+
+/* level state */
+
+/* save current state */
+void save_level_state(levelstate_t* state)
+{
+    state->spawn_point = spawn_point;
+    state->waterlevel = waterlevel;
+    state->watercolor = watercolor;
+    str_cpy(
+        state->bgtheme,
+        (backgroundtheme != NULL) ? background_filepath(backgroundtheme) : bgtheme,
+        sizeof(state->bgtheme)
+    );
+    state->is_valid = true;
+}
+
+/* restore previously saved state */
+void restore_level_state(const levelstate_t* state)
+{
+    if(state->is_valid) {
+        spawn_point = state->spawn_point;
+        waterlevel = state->waterlevel;
+        watercolor = state->watercolor;
+        level_change_background(state->bgtheme);
+    }
+}
+
+/* clear level state */
+void clear_level_state(levelstate_t* state)
+{
+    state->is_valid = false;
 }
 
 

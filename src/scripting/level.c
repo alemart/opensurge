@@ -46,6 +46,7 @@ static surgescript_var_t* fun_getversion(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getbgtheme(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -88,6 +89,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
     surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
     surgescript_vm_bind(vm, "Level", "get_gravity", fun_getgravity, 0);
+    surgescript_vm_bind(vm, "Level", "get_bgtheme", fun_getbgtheme, 0);
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
     surgescript_vm_bind(vm, "Level", "set_spawnpoint", fun_setspawnpoint, 1);
@@ -278,6 +280,7 @@ surgescript_var_t* fun_setspawnpoint(surgescript_object_t* object, const surgesc
     surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
 
     level_set_spawnpoint(scripting_vector2_to_v2d(v2));
+    level_save_state(); /* if we don't save the state, changing the spawn point means nothing */
 
     return NULL;
 }
@@ -285,16 +288,23 @@ surgescript_var_t* fun_setspawnpoint(surgescript_object_t* object, const surgesc
 /* get the background path currently in use */
 surgescript_var_t* fun_getbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    const char* bgpath = background_filepath(level_background());
-    return surgescript_var_set_string(surgescript_var_create(), bgpath);
+    const char* path = background_filepath(level_background());
+    return surgescript_var_set_string(surgescript_var_create(), path);
 }
 
 /* change the background */
 surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    const char* bgpath = surgescript_var_fast_get_string(param[0]);
-    level_change_background(bgpath);
+    const char* path = surgescript_var_fast_get_string(param[0]);
+    level_change_background(path);
     return NULL;
+}
+
+/* get the original background of the level */
+surgescript_var_t* fun_getbgtheme(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* path = level_bgtheme();
+    return surgescript_var_set_string(surgescript_var_create(), path);
 }
 
 /* get the number of the next level in the current quest (1: first level, 2: second level, and so on) */

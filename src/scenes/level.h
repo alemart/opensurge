@@ -56,6 +56,7 @@ int level_act();
 const char* level_version();
 const char* level_author();
 const char* level_license();
+const char* level_bgtheme();
 
 /* players */
 void level_change_player(struct player_t *new_player); /* character switching */
@@ -77,7 +78,7 @@ struct actor_t* level_get_camera_focus();
 int level_inside_screen(int x, int y, int w, int h);
 
 /* editor */
-int level_editmode();
+int level_editmode(); /* active editor? */
 
 /* music */
 void level_override_music(struct sound_t *sample);
@@ -85,7 +86,7 @@ struct music_t* level_music();
 
 /* management */
 void level_change(const char* path_to_lev_file); /* change the level */
-int level_persist(); /* persists (saves) the current level */
+int level_persist(); /* saves the current level */
 void level_clear(struct actor_t *end_sign);
 int level_has_been_cleared();
 void level_jump_to_next_stage();
@@ -95,22 +96,24 @@ void level_restart();
 void level_abort();
 void level_push_quest(const char* path_to_qst_file);
 
-/* water */
+/* level state */
+void level_save_state();
+void level_set_spawnpoint(v2d_t newpos);
+v2d_t level_spawnpoint();
 int level_waterlevel();
 void level_set_waterlevel(int ycoord);
 color_t level_watercolor();
 void level_set_watercolor(color_t color);
+void level_change_background(const char* filepath);
+const struct bgtheme_t* level_background();
 
 /* misc */
 v2d_t level_size();
 int level_height_at(int xpos);
-void level_set_spawnpoint(v2d_t newpos);
-v2d_t level_spawnpoint();
 float level_time();
 void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);
 void level_hide_dialogbox();
-void level_change_background(const char* filepath);
-const struct bgtheme_t* level_background();
+
 
 #endif
