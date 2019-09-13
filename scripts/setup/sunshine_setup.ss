@@ -30,7 +30,7 @@ object "Sunshine Setup"
             "Bridge": {
                 "anim": 0
             },
-            "Fish": {
+            "Jumping Fish": {
                 "anim": 0
             },
             "Mosquito": {

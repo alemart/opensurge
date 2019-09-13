@@ -1,13 +1,13 @@
 // -----------------------------------------------------------------------------
-// File: fish.spr
-// Description: Fish sprite script
+// File: jumping_fish.spr
+// Description: Jumping Fish sprite script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 
-sprite "Fish"
+sprite "Jumping Fish"
 {
-    source_file     "images/fish.png"
+    source_file     "images/jumping_fish.png"
     source_rect     0 16 160 144
     frame_size      32 48
     hot_spot        16 0

@@ -30,7 +30,7 @@ object "Waterworks Setup"
             "Bridge": {
                 "anim": 1
             },
-            "Fish": {
+            "Jumping Fish": {
                 "anim": 1
             },
             "Audio Source": {
@@ -49,20 +49,19 @@ object "Waterworks Setup"
                 "background": "themes/waterworks_indoors.bg"
             },
 
+            "Switch": {
+                "onActivate": EventList([
+                    FunctionEvent("Change Water Level").withArgument(9999999),
+                    EntityEvent("Door").willCall("open"),
+                    EntityEvent("Jumping Fish").willCall("destroy"),
+                    EntityEvent("Skaterbug").willCall("destroy")
+                ])
+            },
+
             // Bridge
             "7af32f24d4d3fbad": {
                 "layer": "yellow"
             },
-
-            // Switch
-            "b19e8c2134008c5a": {
-                "onActivate": EventList([
-                    EntityEvent("4df9ba74277932dd").willCall("open"), // open Door
-                    FunctionEvent("Change Water Level").withArgument(9999999),
-                    EntityEvent("Fish").willCall("destroy"),
-                    EntityEvent("Skaterbug").willCall("destroy")
-                ])
-            }
         },
 
         //

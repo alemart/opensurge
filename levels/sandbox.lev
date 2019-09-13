@@ -13,8 +13,8 @@ requires "0.5.0"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/template.bg"
-spawn_point 80 9840
-setup "Default Setup" "Example Setup"
+spawn_point 112 9904
+setup "Debug Setup" "Example Setup"
 players "Tux"
 
 // bricks
@@ -25,7 +25,6 @@ brick 3 896 9728
 brick 3 896 9856
 brick 3 896 9344
 brick 1 896 9984
-brick 17 0 9856
 brick 16 256 9856
 brick 25 256 9856
 brick 23 256 9728
@@ -68,17 +67,12 @@ brick 2 512 9984
 brick 2 640 9984
 brick 2 768 9984
 brick 16 128 9856
-brick 36 0 9776
-brick 38 128 9776
-brick 9 0 9904
-brick 9 16 9904 hflip
+brick 16 0 9856
 
 // entities
 entity "Powerup Lucky Bonus" 32 9952 "d9e6b5cb0626d3e8"
 entity "Event Trigger 1" 368 9936 "f9bd0110550aadd7"
 entity "Event Trigger 1" 368 9904 "3260f0c438292d4c"
-entity "Crococopter" 160 9744 "ad1dac687430efc3"
-entity "Crococopter" 208 9712 "1ff6e99d88a31edc"
 entity "Goal Capsule" 512 9696 "f5c494ba6917e6c8"
 entity "Collectible" 416 9920 "74567f4c638e4c2d"
 entity "Collectible" 464 9920 "a37f2e6426b5fbf5"

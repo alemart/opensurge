@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: fish.ss
-// Description: Fish enemy script
+// File: jumping_fish.ss
+// Description: Jumping Fish enemy script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -14,15 +14,15 @@ using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
 
-// Fish is a baddie that attacks when the player
+// Jumping Fish is a baddie that attacks when the player
 // is within a visible range
-object "Fish" is "entity", "enemy"
+object "Jumping Fish" is "entity", "enemy"
 {
     public anim = 0;
     public jumpHeight = 128; // in pixels (y-axis)
     public visibleRange = 128; // in pixels (x-axis)
 
-    actor = Actor("Fish");
+    actor = Actor("Jumping Fish");
     enemy = Enemy();
     movement = DirectionalMovement();
     transform = Transform();

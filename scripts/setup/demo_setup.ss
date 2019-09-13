@@ -69,7 +69,7 @@ object "Demo Setup"
             "Zipline Grabber": {
                 "anim": 0
             },
-            "Fish": {
+            "Jumping Fish": {
                 "anim": 1
             }
         },

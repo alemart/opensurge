@@ -27,7 +27,7 @@ object "SwoopHarrier" is "entity", "enemy"
     public maxDistance = 150;
     accel = Vector2.zero;
     public swoopSpeed = 200;
-    public ascendSpeed = 20;
+    public ascendSpeed = 30; //20;
     public flySpeed = 120;
     public trapCheck = 1;
     swoop_time = 1;
@@ -37,9 +37,9 @@ object "SwoopHarrier" is "entity", "enemy"
     {
         movement.direction = Vector2.right;
         movement.speed = flySpeed;
-        floorSensor.visible = true;
-        rightWallSensor.visible = true;
-        leftWallSensor.visible = false;
+        //floorSensor.visible = true;
+        //rightWallSensor.visible = true;
+        //leftWallSensor.visible = false;
         state = "fly";
         checkDirection();
     }
@@ -76,9 +76,11 @@ object "SwoopHarrier" is "entity", "enemy"
             if (ownDirectionX > 0) {
               /* compute right swoop angle */
               transform.angle = -velocity.angle;
+              actor.hflip = false;
             } else {
               /* compute left swoop angle */
               transform.angle = 180-velocity.angle;
+              actor.hflip = true;
             }
         }
         if (timeout(swoop_time)) {
@@ -184,8 +186,8 @@ object "SwoopHarrier" is "entity", "enemy"
                     state = "fly";
                     set_direction(Vector2.left);
                     movement.speed = flySpeed;
-                    rightWallSensor.visible = false;
-                    leftWallSensor.visible = true;
+                    //rightWallSensor.visible = false;
+                    //leftWallSensor.visible = true;
                     last_frame_switch = 0;
                     return true;
                 }
@@ -201,8 +203,8 @@ object "SwoopHarrier" is "entity", "enemy"
                     state = "fly";
                     set_direction(Vector2.right);
                     movement.speed = flySpeed;
-                    leftWallSensor.visible = false;
-                    rightWallSensor.visible = true;
+                    //leftWallSensor.visible = false;
+                    //rightWallSensor.visible = true;
                     last_frame_switch = 0;
                     return true;
                 }
