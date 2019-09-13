@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - code for the game levels
- * Copyright (C) 2008-2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -187,7 +187,7 @@ static void level_interpret_parsed_line(const char *filename, int fileline, cons
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
 static void update_level_height_samples(int level_width, int level_height);
-static void restart(int preserve_current_spawnpoint);
+static void restart(int preserve_current_state);
 static void render_players();
 static void update_music();
 static void spawn_players();
@@ -2239,25 +2239,40 @@ void update_level_height_samples(int level_width, int level_height)
     }
 }
 
-/* restarts the level preserving
- * the current spawn point */
-void restart(int preserve_current_spawnpoint)
+/* restarts the level preserving the current
+ * state (spawn point, waterlevel, etc.) */
+void restart(int preserve_current_state)
 {
-    char path[sizeof(file)];
-    v2d_t sp = spawn_point;
+    char* path = str_dup(file);
+    struct {
+        v2d_t spawn_point;
+        int waterlevel;
+        color_t watercolor;
+        char* background;
+    } state;
+
+    /* save the state */
+    state.spawn_point = level_spawnpoint();
+    state.waterlevel = level_waterlevel();
+    state.watercolor = level_watercolor();
+    state.background = str_dup(background_filepath(backgroundtheme));
 
     /* restart the scene */
     scenestack_pop();
-    scenestack_push(
-        storyboard_get_scene(SCENE_LEVEL),
-        str_cpy(path, file, sizeof(path))
-    );
+    scenestack_push(storyboard_get_scene(SCENE_LEVEL), path);
 
-    /* restore the spawn point */
-    if(preserve_current_spawnpoint) {
-        spawn_point = sp;
+    /* restore the state */
+    if(preserve_current_state) {
+        level_change_background(state.background);
+        level_set_watercolor(state.watercolor);
+        level_set_waterlevel(state.waterlevel);
+        level_set_spawnpoint(state.spawn_point);
         spawn_players();
     }
+
+    /* done */
+    free(state.background);
+    free(path);
 }
 
 
