@@ -1883,6 +1883,8 @@ music_t* level_music()
 /*
  * level_set_spawnpoint()
  * Defines a new spawn point
+ * You need to call level_save_state() just
+ * after calling this (if you're in gameplay)
  */
 void level_set_spawnpoint(v2d_t newpos)
 {
