@@ -1764,6 +1764,14 @@ brick 1 8192 8960
 brick 1 8320 8960
 brick 1 8448 8960
 brick 1 8576 8960
+brick 255 7904 10112
+brick 255 7904 10144
+brick 255 7904 10176
+brick 255 7840 10112
+brick 255 7840 10144
+brick 255 7840 10176
+brick 255 7840 10208
+brick 255 7904 10208
 brick 26 7296 9344
 brick 26 7168 9344
 brick 26 7040 9344
@@ -1933,8 +1941,6 @@ brick 140 7472 10384
 brick 161 7648 10576
 brick 161 7584 10576
 brick 161 7728 10576
-brick 161 7136 10128
-brick 161 7168 10128
 brick 136 7104 9824
 brick 135 7104 9760
 brick 136 7568 8992
@@ -1976,6 +1982,8 @@ brick 135 7040 8672
 brick 135 7040 8608
 brick 36 7136 8720
 brick 36 6912 8720
+brick 161 7248 10128
+brick 161 7056 10128
 brick 28 6032 9456
 brick 23 6032 9328
 brick 30 6032 9216
@@ -3751,18 +3759,16 @@ entity "Fish" 10768 11184 "0f298aaf50060064"
 entity "Fish" 10432 11200 "0edd063be5e29564"
 entity "Jumping Fish" 9920 11040 "5d425ccf84366d0e"
 entity "Collectible" 9920 10912 "20d5ad18dfac8254"
-entity "Crococopter" 7168 10064 "d12e565cccf36ecb"
-entity "Collectible" 7968 10064 "13684c8d91c45ad6"
-entity "Collectible" 8000 10064 "005cec1f3f6da7e3"
-entity "Collectible" 7936 10064 "f72e68e8a65ee46c"
-entity "Collectible" 7808 10064 "0ff16296b96ec2a4"
-entity "Collectible" 7840 10064 "c644dd207bba3621"
-entity "Collectible" 7776 10064 "7abc35fa471eea0d"
 entity "Spring Booster Right" 4128 10704 "21264b9f64a729dd"
 entity "Crococopter" 9168 9504 "e3e4b3174f7c7ea2"
 entity "Crococopter" 9344 9504 "d9f7341fec976edf"
 entity "Collectible" 736 9712 "35aa246ef5513023"
 entity "Collectible" 768 9712 "1ba700d6aff5fa83"
 entity "Collectible" 800 9712 "a74e2f8be3e8d1b6"
+entity "Crococopter" 7936 10000 "1ac71cf31b3e46bf"
+entity "Crococopter" 7840 10000 "627c39f711aa75f2"
+entity "Collectible" 7136 10128 "903c574251296be2"
+entity "Collectible" 7168 10128 "705ad006b1c781b5"
+entity "Collectible" 7200 10128 "4e6ac8d7ba9ec3f6"
 
 // EOF
