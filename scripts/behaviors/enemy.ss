@@ -143,11 +143,24 @@ object "Enemy" is "private", "entity", "behavior"
     {
     }
 
-    fun constructor()
+    fun getDestroyed(player)
     {
-        // behavior validation
-        if(!entity.hasTag("entity") || !entity.hasTag("enemy"))
-            Application.crash("Object \"" + entity.__name + "\" must be tagged \"entity\", \"enemy\" to use " + this.__name + ".");
+        // add to score
+        newScore = Math.floor(score);
+        if(newScore != 0) {
+            if(player != null)
+                player.score += newScore;
+            Level.spawnEntity("Score Text", collider.center).setText(newScore);
+        }
+
+        // explode
+        Level.spawnEntity("Animal", collider.center);
+        Level.spawnEntity("Explosion", collider.center);
+
+        // notify & destroy the entity
+        if(entity.hasFunction("onEnemyDestroy"))
+            entity.onEnemyDestroy(player);
+        entity.destroy();
     }
 
     fun onCollision(otherCollider)
@@ -163,21 +176,8 @@ object "Enemy" is "private", "entity", "behavior"
                         player.bounce(null);
                 }
 
-                // add to score
-                newScore = Math.floor(score);
-                if(newScore != 0) {
-                    player.score += newScore;
-                    Level.spawnEntity("Score Text", collider.center).setText(newScore);
-                }
-
                 // destroy the enemy
-                Level.spawnEntity("Animal", collider.center);
-                Level.spawnEntity("Explosion", collider.center);
-
-                // notify & destroy the entity
-                if(entity.hasFunction("onEnemyDestroy"))
-                    entity.onEnemyDestroy(player);
-                entity.destroy();
+                getDestroyed(player);
             }
             else if(!player.invincible) {
                 // hit the player
@@ -189,6 +189,15 @@ object "Enemy" is "private", "entity", "behavior"
             }
         }
     }
+
+    fun constructor()
+    {
+        // behavior validation
+        if(!entity.hasTag("entity") || !entity.hasTag("enemy"))
+            Application.crash("Object \"" + entity.__name + "\" must be tagged \"entity\", \"enemy\" to use " + this.__name + ".");
+    }
+
+
 
 
 
