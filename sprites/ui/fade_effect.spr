@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------------
+// File: fade_effect.spr
+// Description: fade effect
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+sprite "Fade Effect"
+{
+    source_file     "images/fade_effect.png"
+    source_rect     0 0 426 240
+    frame_size      426 240
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
