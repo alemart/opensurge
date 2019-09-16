@@ -46,7 +46,7 @@ object "Waterworks Setup"
         //
         "1": {
             "Background Exchanger": {
-                "background": "themes/waterworks_indoors.bg"
+                "background": "themes/waterworks_indoors_fg.bg"
             },
 
             "Switch": {
@@ -70,6 +70,17 @@ object "Waterworks Setup"
         "2": {
             "Background Exchanger": {
                 "background": "themes/waterworks.bg"
+            },
+
+            "Switch": {
+                "onActivate": EntityEvent("Door").willCall("open")
+            },
+
+            "Event Trigger 1": {
+                "onTrigger": EventList([
+                    EntityEvent("Door").willCall("close"),
+                    FunctionEvent("Change Water Level").withArgument(9728)
+                ])
             },
 
             // Bridge

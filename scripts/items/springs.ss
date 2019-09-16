@@ -664,9 +664,9 @@ object "Spring Behavior" is "private", "entity"
             }
             if(direction.y != 0) {
                 if(player.midair || direction.x != 0 || direction.y < 0) {
-                    if(v.y > 0 && v.y > player.speed)
+                    if(v.y > 0 && v.y > player.ysp)
                         player.ysp = v.y;
-                    else if(v.y < 0 && v.y < player.speed)
+                    else if(v.y < 0 && v.y < player.ysp)
                         player.ysp = v.y;
 
                     // change mode
