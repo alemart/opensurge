@@ -536,7 +536,6 @@ brick 43 19328 9184 green
 brick 45 19328 9056
 brick 44 19200 9056
 brick 42 19200 9184 yellow
-brick 225 19040 9136
 brick 18 19584 9216
 brick 44 19712 9056
 brick 46 19712 9184 yellow
@@ -725,7 +724,6 @@ brick 36 18688 9232
 brick 38 18896 9232
 brick 21 18816 9216
 brick 36 18768 9232
-brick 225 18912 9216
 brick 23 18816 9344
 brick 23 18816 9472
 brick 23 18816 9600
@@ -2964,11 +2962,9 @@ brick 145 1184 10000
 brick 161 1152 10064
 brick 161 1392 10064
 brick 16 0 9984
-brick 16 128 9984
 brick 16 256 9984
 brick 16 384 9984
 brick 16 512 9984
-brick 18 640 9984
 brick 22 768 9984
 brick 24 768 10112
 brick 24 768 10240
@@ -2994,14 +2990,11 @@ brick 1 640 10240
 brick 142 192 10016
 brick 142 320 10016
 brick 142 704 10016
-brick 142 64 10016
 brick 142 192 9984
-brick 145 64 10000
 brick 144 192 9968
 brick 145 320 10000
 brick 144 704 10000
 brick 161 736 10064
-brick 161 640 10064
 brick 161 256 10064
 brick 161 128 10064
 brick 142 576 10016
@@ -3012,6 +3005,26 @@ brick 142 432 9984
 brick 144 432 9968
 brick 161 528 10064
 brick 161 480 10064
+brick 140 0 9936
+brick 140 0 10048
+brick 140 32 9984
+brick 140 48 10016
+brick 141 0 10000
+brick 141 32 10032
+brick 140 64 10032
+brick 142 160 10016
+brick 145 160 10000
+brick 16 128 9984
+brick 161 224 10064
+brick 161 288 10064
+brick 161 96 10064
+brick 161 352 10064
+brick 161 400 10064
+brick 141 16 10032
+brick 140 16 9968
+brick 18 640 9984
+brick 161 672 10064
+brick 161 608 10064
 brick 1 25856 8576
 brick 1 25984 8576
 brick 1 26112 8448
@@ -3189,7 +3202,6 @@ brick 36 21280 8368
 brick 24 21248 8448
 brick 24 21248 8576
 brick 12 21376 8192
-brick 12 21376 8320
 brick 12 21376 8448
 brick 12 21248 8448
 brick 12 21248 8320
@@ -3215,12 +3227,10 @@ brick 1 20736 8192
 brick 1 20736 8320
 brick 1 20736 8448
 brick 1 20736 8576
-brick 142 21328 8384
-brick 142 21408 8384
-brick 142 21408 8352
-brick 142 21328 8352
-brick 145 21328 8336
-brick 144 21408 8336
+brick 12 21376 8320
+brick 161 21312 8432
+brick 161 21376 8432
+brick 161 21440 8432
 brick 152 20576 8576
 brick 156 20576 8544
 brick 154 20608 8544
@@ -3645,6 +3655,7 @@ brick 231 11328 9408
 brick 250 11840 9504
 brick 250 20784 7856
 brick 251 5856 10288
+brick 250 19040 9136
 
 // entities
 entity "Bridge" 960 10080 "48bacb13be3c2c0f"
@@ -4077,7 +4088,6 @@ entity "Spring Booster Left" 24464 8800 "8d8af3f65a0fcf17"
 entity "Spring Booster Right" 22768 8544 "ee191eb0ddfc78d0"
 entity "RulerSalamander" 24768 8800 "a50006ac33af1dcc"
 entity "Spring Standard Hidden" 24896 8928 "de644c67d03833b3"
-entity "Spring Booster Right" 19120 9312 "de1eda40db68d386"
 entity "Audio Source" 21376 7952 "c8046cd3a3440e66"
 entity "Audio Source" 21376 7824 "0c018d11eb39dffa"
 entity "Audio Source" 21376 7696 "d3f48dd818ed12c5"
@@ -4149,7 +4159,6 @@ entity "Collectible" 992 10064 "e3fe38cf92cb0f96"
 entity "Collectible" 1024 10064 "2ea9b8bca6cdbc09"
 entity "Collectible" 896 10064 "b9f6e6e1d10c0531"
 entity "Collectible" 512 9984 "77132b6b33ff717b"
-entity "Powerup Shield Water" 32 10080 "7681d2a3d4ab8053"
 entity "Layer Yellow" 2096 10704 "56564953ca29fc60"
 entity "Collectible" 1832 10176 "3441b88530a0acf7"
 entity "Collectible" 1880 10176 "7a0fb24467a8306e"
@@ -4302,8 +4311,6 @@ entity "Collectible" 22072 8552 "6fd4b4a8f354d510"
 entity "Collectible" 22016 8528 "ab9cf3dd9c5138ba"
 entity "Collectible" 21936 8608 "2822a6b6fca6f44b"
 entity "Collectible" 22096 8608 "5fad5d07f0adcb63"
-entity "Collectible" 22400 8496 "854d62f03d382835"
-entity "Collectible" 22256 8448 "ae7a6f007c04f525"
 entity "Collectible" 24960 8368 "4ade928bc87b158f"
 entity "Collectible" 24880 8448 "7119b36d63576064"
 entity "Collectible" 25040 8448 "a989f7b32f0d57a4"
@@ -4415,7 +4422,6 @@ entity "Tube In" 3920 10032 "1132a77e9fb59462"
 entity "Tube Out" 3920 10000 "d994b4a672f7a7ca"
 entity "Collectible" 544 9984 "949f68bd2e6f5579"
 entity "Collectible" 480 9984 "7147595996d9b159"
-entity "SwoopHarrier" 24800 8704 "a678abba33affcc8"
 entity "GreenMarmot" 11648 9488 "2b1dafdcca8b6453"
 entity "Spikes" 10048 10208 "1350bd03c0666deb"
 entity "Spikes" 9664 10336 "c1b348cd57bc0697"
@@ -4438,5 +4444,12 @@ entity "SwoopHarrier" 24432 7952 "6557638fe3b6633f"
 entity "SwoopHarrier" 24752 7920 "2db969da9dfc2039"
 entity "Spring Booster Right" 22000 8064 "fe7ab5132423444d"
 entity "Fish" 4448 10768 "7a28ad32d82b03a6"
+entity "Powerup Shield Water" 32 10080 "7681d2a3d4ab8053"
+entity "Spring Booster Right" 19152 9312 "9146ae4bf121c72a"
+entity "Collectible" 19072 9024 "db98e3610a1f0e24"
+entity "Collectible" 19072 9088 "913677bedc7c3938"
+entity "Collectible" 19072 9152 "01ac5cb227798f4a"
+entity "Collectible" 19072 9216 "53f535167115eed4"
+entity "SwoopHarrier" 24768 8704 "398120467b45bb16"
 
 // EOF
