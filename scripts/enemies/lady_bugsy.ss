@@ -101,7 +101,7 @@ object "Lady Bugsy Bullet" is "disposable", "private", "entity"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            player.hit(actor);
+            player.getHit(actor);
             destroy();
         }
     }

@@ -192,7 +192,7 @@ object "RedMarmotChain" is "entity", "private", "awake"
           player = other.entity;
           //Console.print("touched player "+player.name);
           if (!player.attacking) {
-            player.hit(actor);
+            player.getHit(actor);
           } else {
             accel = accel.scaledBy(-1);
             velocity = velocity.scaledBy(-1);

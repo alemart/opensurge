@@ -168,14 +168,14 @@ object "Example Setup"
             },
 
             // Example: trigger alternating events. Raise the water
-            // level and then restore it back to its original level,
-            // again and again, whenever the blue Switch is pressed.
+            // level and then disable it, again and again, whenever
+            // the blue Switch is pressed.
             "ab5264eabc2564cc": {
                 "color": "blue",
                 "sticky": false,
                 "onActivate": EventChain([
                     FunctionEvent("Change Water Level").withArgument(128),
-                    FunctionEvent("Change Water Level").withArgument(Level.waterlevel)
+                    FunctionEvent("Change Water Level").withArgument(9999999)
                 ]).willLoop()
             }
         },

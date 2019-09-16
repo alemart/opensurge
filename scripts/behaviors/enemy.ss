@@ -181,7 +181,7 @@ object "Enemy" is "private", "entity", "behavior"
             }
             else if(!player.invincible) {
                 // hit the player
-                player.hit(actor);
+                player.getHit(actor);
 
                 // notify the entity
                 if(entity.hasFunction("onEnemyAttack"))

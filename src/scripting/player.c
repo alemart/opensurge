@@ -116,7 +116,7 @@ static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const sur
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_ouch(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -244,7 +244,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
     surgescript_vm_bind(vm, "Player", "bounceBack", fun_bounceback, 1);
-    surgescript_vm_bind(vm, "Player", "hit", fun_hit, 1);
+    surgescript_vm_bind(vm, "Player", "getHit", fun_ouch, 1);
     surgescript_vm_bind(vm, "Player", "kill", fun_kill, 0);
     surgescript_vm_bind(vm, "Player", "breathe", fun_breathe, 0);
     surgescript_vm_bind(vm, "Player", "springify", fun_springify, 0);
@@ -1171,8 +1171,8 @@ surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* get hit: hit(hazard), where hazard: Actor | null */
-surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* get hit: getHit(hazard), where hazard: Actor | null */
+surgescript_var_t* fun_ouch(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     player_t* player = get_player(object);
@@ -1185,7 +1185,7 @@ surgescript_var_t* fun_hit(surgescript_object_t* object, const surgescript_var_t
                 player_hit_ex(player, hazard_actor);
             }
             else
-                scripting_error(object, "%s.hit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_error(object, "%s.getHit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else {
             float direction = physicsactor_is_facing_right(player->pa) ? -1.0f : 1.0f;

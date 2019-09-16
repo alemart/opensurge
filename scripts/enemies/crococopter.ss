@@ -41,7 +41,7 @@ object "Crococopter" is "entity", "enemy"
         // player collided with the helix
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            player.hit(actor);
+            player.getHit(actor);
         }
     }
 

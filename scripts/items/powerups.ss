@@ -214,7 +214,7 @@ object "Powerup Trap" is "entity", "basic", "powerup"
 
     fun onItemBoxCrushed(player)
     {
-        player.hit(null);
+        player.getHit(null);
     }
 }
 

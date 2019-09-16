@@ -75,7 +75,7 @@ object "Spikes" is "entity", "basic"
             }
 
             // hit player
-            player.hit(actor);
+            player.getHit(actor);
             sfx.play();
         }
     }
@@ -145,7 +145,7 @@ object "Spikes Down" is "entity", "basic"
             }
 
             // hit player
-            player.hit(actor);
+            player.getHit(actor);
             sfx.play();
         }
     }
