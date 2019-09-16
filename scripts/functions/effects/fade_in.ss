@@ -11,7 +11,7 @@
 //
 // Arguments:
 // - duration: number. The duration of the effect,
-//                     in seconds.
+//                     in seconds (example: 0.5)
 //
 object "Fade In"
 {
@@ -21,7 +21,8 @@ object "Fade In"
     {
         if(duration > 0) {
             fader = fader || spawn("Fader");
-            fader.fadeIn(duration);
+            fader.fadeTime = duration;
+            fader.fadeIn();
         }
     }
 }

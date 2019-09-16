@@ -104,7 +104,7 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
     state "fadeout"
     {
         if(timeout(3.0)) {
-            fader.fadeOut(0.5);
+            fader.fadeOut();
             state = "done";
         }
     }

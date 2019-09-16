@@ -25,7 +25,6 @@ object "CreateMenu"
     ).withSpacing(211).withAxisAngle(0).build();
     learnURL = "http://opensurge2d.org";
     scriptingURL = "http://docs.opensurge2d.org";
-    fadeTime = 0.5;
     nextState = "";
 
     state "main"
@@ -41,14 +40,14 @@ object "CreateMenu"
     state "waitToFade"
     {
         if(timeout(0.5)) {
-            fader.fadeOut(fadeTime);
+            fader.fadeOut();
             state = "fading";
         }
     }
 
     state "fading"
     {
-        if(timeout(fadeTime))
+        if(timeout(fader.fadeTime))
             state = nextState;
     }
 
@@ -105,7 +104,7 @@ object "CreateMenu"
     fun constructor()
     {
         resetPlayerData();
-        fader.fadeIn(fadeTime);
+        fader.fadeIn();
     }
 }
 

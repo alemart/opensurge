@@ -45,7 +45,6 @@ object "MainMenu"
         .during(0.7);
     shareURL = "http://opensurge2d.org/share";
     nextState = "";
-    fadeTime = 0.5;
 
     state "main"
     {
@@ -60,14 +59,14 @@ object "MainMenu"
     state "waitToFade"
     {
         if(timeout(0.5)) {
-            fader.fadeOut(fadeTime);
+            fader.fadeOut();
             state = "fading";
         }
     }
 
     state "fading"
     {
-        if(timeout(fadeTime))
+        if(timeout(fader.fadeTime))
             state = nextState;
     }
 
@@ -137,7 +136,7 @@ object "MainMenu"
     fun constructor()
     {
         resetPlayerData();
-        fader.fadeIn(fadeTime);
+        fader.fadeIn();
     }
 }
 

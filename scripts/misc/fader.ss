@@ -10,66 +10,93 @@ using SurgeEngine.Actor;
 using SurgeEngine.Video.Screen;
 
 //
-// How to use:
+// Fader is a transition effect used to fade the screen
+//
+// Functions:
+// - fadeIn(): fade from black
+// - fadeOut(): fade to black
+//
+// Properties:
+// - fadeTime: number. Transition time, in seconds
+//
+// Example - how to use:
 //
 // object "FadeTest" {
 //     fader = spawn("Fader");
 //
 //     state "main" {
-//         if(timeout(2.0))
-//             fader.fadeOut(1.0); // fade out - duration: 1 second
+//         fader.fadeIn();
+//         state = "wait";
 //     }
 //
-//     fun constructor() {
-//         fader.fadeIn(0.5); // fade in - duration: 0.5s
+//     state "wait" {
+//         if(timeout(fader.fadeTime + 2.0)) {
+//             fader.fadeOut();
+//             state = "done";
+//         }
 //     }
+//
+//     state "done" { }
 // }
 //
 object "Fader" is "entity", "detached", "awake", "private"
 {
+    actor = Actor("Fade Effect");
     transform = Transform();
-    actor = Actor("SD_HUDBLACKSCREEN");
-    zindex = Math.infinity;
-    fadeTime = 1.0;
+    fadeTime = 0.5; // seconds
 
     state "main"
     {
+        // idle
     }
 
     state "fade out"
     {
         actor.alpha += Time.delta / fadeTime;
-        if(actor.alpha >= 1.0)
+        if(actor.alpha >= 1.0) {
+            actor.alpha = 1.0;
             state = "main";
+        }
     }
 
     state "fade in"
     {
         actor.alpha -= Time.delta / fadeTime;
-        if(actor.alpha <= 0.0)
+        if(actor.alpha <= 0.0) {
+            actor.alpha = 0.0;
+            actor.visible = false;
             state = "main";
+        }
     }
 
-    fun fadeOut(t)
+    fun fadeOut()
     {
-        fadeTime = Math.max(t, 0.001);
         actor.alpha = 0.0;
         actor.visible = true;
         state = "fade out";
     }
 
-    fun fadeIn(t)
+    fun fadeIn()
     {
-        fadeTime = Math.max(t, 0.001);
         actor.alpha = 1.0;
         actor.visible = true;
         state = "fade in";
     }
 
+    fun get_fadeTime()
+    {
+        return fadeTime;
+    }
+
+    fun set_fadeTime(seconds)
+    {
+        fadeTime = Math.max(seconds, 0.001);
+    }
+
     fun constructor()
     {
         transform.position = Vector2.zero;
-        actor.zindex = zindex;
+        actor.zindex = Math.infinity;
         actor.visible = false;
     }
 }
