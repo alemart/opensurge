@@ -1,0 +1,122 @@
+// -----------------------------------------------------------------------------
+// File: giant_wolf.spr
+// Description: Giant Wolf Boss - sprite definition
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+// art by João Victor
+sprite "Giant Wolf"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     512 32 176 304
+    frame_size      176 304
+    hot_spot        88 304
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Giant Wolf's Body"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     352 32 160 176
+    frame_size      160 176
+    hot_spot        80 176
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Giant Wolf's Head"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     0 32 352 352
+    frame_size      176 176
+    hot_spot        88 88
+
+    // normal
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+    }
+
+    // closed eyes
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // got hit
+    animation 2
+    {
+        repeat      FALSE
+        fps         12
+        data        2 2 1 1 1 1 1
+    }
+
+    // roar
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+}
+
+sprite "Giant Wolf's Hand"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     352 224 64 64
+    frame_size      64 64
+    hot_spot        32 64
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Giant Wolf's Hand Mask"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     352 288 64 64
+    frame_size      64 64
+    hot_spot        32 64
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Giant Wolf's Hand Impact"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     448 208 64 96
+    frame_size      64 32
+    hot_spot        32 26
+
+    animation 0
+    {
+        repeat      FALSE
+        fps         12
+        data        0 1 2
+    }
+}

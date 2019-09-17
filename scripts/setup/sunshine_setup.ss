@@ -109,7 +109,20 @@ object "Sunshine Setup"
         // zone 3 only
         //
         "3": {
+            "Event Trigger 7": {
+                "onTrigger": EventList([
+                    EntityEvent("Giant Wolf").willCall("activate"),
+                    FunctionEvent("Play Boss Music"),
+                    FunctionEvent("Lock Camera").withArgument(800)
+                ])
+            },
 
+            "Giant Wolf": {
+                "onDefeat": EventList([
+                    FunctionEvent("Stop Boss Music"),
+                    FunctionEvent("Lock Camera").withArgument(1024)
+                ])
+            }
         }
 
     };
