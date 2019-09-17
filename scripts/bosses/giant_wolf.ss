@@ -32,27 +32,28 @@ object "Giant Wolf" is "entity", "boss", "awake"
     basePosition = 0;
     offsetY = 8;
     angryHp = 1;
+    withdrawal = DirectionalMovement();
     explosionTime = 2.0; // seconds
-
+    walkTimer = 0;
     chase = DirectionalMovement();
-    chaseSpeed = 60;
-    chaseAmplitudeY = 4;
     chaseMargin = 112; // easy !!! (should not touch the player)
-    chaseTimer = 0;
 
     state "main"
     {
+        // setup
         actor.zindex = 0.4;
         basePosition = transform.position.y + offsetY;
-        chase.direction = Vector2.right;
-        chase.speed = chaseSpeed;
-        chase.enabled = false;
-        state = "waiting";
 
-        // debug
-        /*
-        activate();
-        */
+        chase.direction = Vector2.left;
+        chase.speed = 60;
+        chase.enabled = false;
+
+        withdrawal.direction = Vector2.down;
+        withdrawal.speed = 60;
+        withdrawal.enabled = false;
+
+        // done
+        state = "waiting";
     }
 
     state "waiting"
@@ -68,7 +69,7 @@ object "Giant Wolf" is "entity", "boss", "awake"
     // chase the player and punch
     state "chasing player"
     {
-        if(walkTowardsPlayer(Player.active)) {
+        if(walkTowards(Player.active)) {
             leftHand.punch();
             rightHand.punch();
         }
@@ -78,7 +79,7 @@ object "Giant Wolf" is "entity", "boss", "awake"
     state "angry"
     {
         chaseMargin = 80; // an angry boss is a harder boss
-        walkTowardsPlayer(Player.active);
+        walkTowards(Player.active);
         leftHand.punch();
         rightHand.punch();
     }
@@ -93,9 +94,8 @@ object "Giant Wolf" is "entity", "boss", "awake"
     // defeated
     state "defeated"
     {
-        defeatSpeed = 60; // px/s
-        transform.move(0, defeatSpeed * Time.delta);
-        if(timeout(actor.height * 2.0 / defeatSpeed)) {
+        withdrawal.enabled = true;
+        if(timeout(actor.height * 2.0 / withdrawal.speed)) {
             onDefeat.call();
             state = "done";
         }
@@ -154,10 +154,9 @@ object "Giant Wolf" is "entity", "boss", "awake"
             state = "chasing player";
     }
 
-    // returns true if the player
-    // is within a "punch" area,
-    // false otherwise
-    fun walkTowardsPlayer(player)
+    // Walk towards the player. Returns true if the
+    // player is within a "punch" area, false otherwise
+    fun walkTowards(player)
     {
         inPunchArea = false;
 
@@ -185,9 +184,9 @@ object "Giant Wolf" is "entity", "boss", "awake"
 
         // walking effect
         // (movement on the y-axis)
-        chaseTimer += Time.delta;
-        walk = Math.sin(9.5 * chaseTimer);
-        ypos = basePosition + chaseAmplitudeY * Math.abs(walk);
+        walkTimer += Time.delta;
+        walk = Math.sin(9.5 * walkTimer);
+        ypos = basePosition + 4.0 * Math.abs(walk);
         transform.position = Vector2(xpos, ypos);
 
         // done
@@ -308,7 +307,7 @@ object "Giant Wolf's Hand" is "private", "entity", "awake"
     prevX = 0;
     punchSpeed = 360;
     liftSpeed = punchSpeed / 2;
-    shakeTime = 0.5;
+    shakeTime = 1.0;
     restTime = 2.5; // very easy
 
     state "main"
@@ -322,7 +321,6 @@ object "Giant Wolf's Hand" is "private", "entity", "awake"
         /*
         collider.visible = true;
         sensor.visible = true;
-        Player.active.collectibles = 50;
         */
     }
 

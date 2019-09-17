@@ -64,7 +64,7 @@ sprite "Giant Wolf's Head"
     {
         repeat      FALSE
         fps         12
-        data        2 2 1 1 1 1 1
+        data        2 2 1 1 1 1 1 1 1
     }
 
     // roar
