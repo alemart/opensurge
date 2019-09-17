@@ -20,6 +20,7 @@ object "Goal Capsule" is "entity", "basic"
     sfx = Sound("samples/switch.wav");
     transform = Transform();
     explosionCounter = 0;
+    explosionTime = 2.0; // seconds
     animalCounter = 0;
     player = null; // the winner
 
@@ -29,29 +30,8 @@ object "Goal Capsule" is "entity", "basic"
 
     state "exploding"
     {
-        if(timeout(0.10)) {
-            if(++explosionCounter <= 15)
-                state = "explode";
-            else
-                state = "opening";
-        }
-    }
-
-    state "explode"
-    {
-        // compute the explosion offset
-        width = Math.max(0, actor.width - 16);
-        height = Math.max(0, actor.height - 32);
-        lenx = Math.floor(width / 8);
-        leny = Math.floor(height / 4);
-        gridx = Math.floor(Math.random() * (1 + lenx)) - lenx / 2;
-        gridy = Math.floor(Math.random() * (1 + leny));
-
-        // create explosion
-        spawnExplosion(gridx, gridy);
-
-        // done with this explosion
-        state = "exploding";
+        if(timeout(explosionTime))
+            state = "opening";
     }
 
     state "opening"
@@ -103,22 +83,19 @@ object "Goal Capsule" is "entity", "basic"
     fun explodeCapsule()
     {
         if(state == "main") {
+            // modify capsule
             brick[0].enabled = false;
             brick[1].enabled = true;
             actor.anim = 1;
             sfx.play();
+
+            // create explosions
+            Level.spawnEntity(
+                "Explosion Combo",
+                transform.position.translatedBy(0, -28)
+            ).setSize(actor.width - 16, actor.height - 32).setDuration(explosionTime);
             state = "exploding";
         }
-    }
-
-    fun spawnExplosion(gridx, gridy)
-    {
-        Level.spawnEntity("Explosion",
-            transform.position.translatedBy(
-                8 * gridx,
-                4 * -(gridy + 2)
-            )
-        );
     }
 
     fun spawnAnimal(gridx, secondsBeforeMoving)
