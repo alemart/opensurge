@@ -51,6 +51,7 @@ static surgescript_var_t* fun_getbackground(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setbackground(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -89,6 +90,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_music", fun_getmusic, 0);
     surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
     surgescript_vm_bind(vm, "Level", "get_gravity", fun_getgravity, 0);
+    surgescript_vm_bind(vm, "Level", "get_time", fun_gettime, 0);
     surgescript_vm_bind(vm, "Level", "get_bgtheme", fun_getbgtheme, 0);
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
@@ -369,6 +371,12 @@ surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescrip
 {
     /* TODO: grab value from the physics engine */
     return surgescript_var_set_number(surgescript_var_create(), 828.0);
+}
+
+/* level time, in seconds */
+surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_number(surgescript_var_create(), level_time());
 }
 
 /* clears the level (will show the level cleared animation) */
