@@ -47,7 +47,15 @@ object "Fader" is "entity", "detached", "awake", "private"
 
     state "main"
     {
-        // idle
+        // setup
+        transform.position = Vector2.zero;
+        actor.zindex = Math.infinity;
+        actor.visible = false;
+        state = "idle";
+    }
+
+    state "idle"
+    {
     }
 
     state "fade out"
@@ -55,7 +63,7 @@ object "Fader" is "entity", "detached", "awake", "private"
         actor.alpha += Time.delta / fadeTime;
         if(actor.alpha >= 1.0) {
             actor.alpha = 1.0;
-            state = "main";
+            state = "idle";
         }
     }
 
@@ -65,7 +73,7 @@ object "Fader" is "entity", "detached", "awake", "private"
         if(actor.alpha <= 0.0) {
             actor.alpha = 0.0;
             actor.visible = false;
-            state = "main";
+            state = "idle";
         }
     }
 
@@ -91,12 +99,5 @@ object "Fader" is "entity", "detached", "awake", "private"
     fun set_fadeTime(seconds)
     {
         fadeTime = Math.max(seconds, 0.001);
-    }
-
-    fun constructor()
-    {
-        transform.position = Vector2.zero;
-        actor.zindex = Math.infinity;
-        actor.visible = false;
     }
 }
