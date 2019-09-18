@@ -197,7 +197,7 @@ object "Example Setup"
             "My Boss": {
                 "onDefeat": EventList([
                     FunctionEvent("Stop Boss Music"),
-                    FunctionEvent("Lock Camera").withArgument(1024) // give more 1024 pixels of space
+                    FunctionEvent("Lock Camera").withArgument(9999) // give more space
                 ])
             },
 

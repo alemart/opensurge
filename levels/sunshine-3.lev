@@ -662,5 +662,6 @@ entity "Collectible" 2576 10304 "6d98a0ee76ed48aa"
 entity "Spring Standard Hidden" 3424 10544 "a3f49abd460aebd1"
 entity "Collectible" 320 9856 "50cf7689dd1efd8d"
 entity "Collectible" 352 9856 "5c02dce450c60336"
+entity "Mosquito" 2432 10208 "406de9f0963f89ce"
 
 // EOF

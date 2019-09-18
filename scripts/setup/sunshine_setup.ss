@@ -120,7 +120,7 @@ object "Sunshine Setup"
             "Giant Wolf": {
                 "onDefeat": EventList([
                     FunctionEvent("Stop Boss Music"),
-                    FunctionEvent("Lock Camera").withArgument(1024)
+                    FunctionEvent("Lock Camera").withArgument(9999)
                 ])
             }
         }

@@ -16,7 +16,6 @@ using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Behaviors.CircularMovement;
 using SurgeEngine.Collisions.CollisionBox;
 using SurgeEngine.Collisions.CollisionBall;
-using SurgeEngine.Collisions.Sensor;
 
 // Hydra is the Waterworks Zone Boss
 object "Hydra" is "entity", "awake", "boss"
@@ -390,7 +389,7 @@ object "Hydra's Orb" is "private", "entity", "awake"
         fall.enabled = false;
         fall.direction = Vector2.down;
         fall.speed = 0;
-        actor.zindex = 0.45;
+        actor.zindex = 0.451;
         state = "active";
     }
 
