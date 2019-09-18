@@ -6,7 +6,10 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Level;
 using SurgeEngine.Player;
+using SurgeEngine.Vector2;
+using SurgeEngine.Transform;
 using SurgeEngine.Video.Screen;
+using SurgeEngine.Collisions.Sensor;
 
 //
 // Lock Camera is a function object that locks
@@ -82,8 +85,9 @@ object "Lock Camera"
             player = Player.active;
 
             // compute base position
+            groundFinder = Level.child("Lock Camera Ground Finder") || Level.spawn("Lock Camera Ground Finder");
             baseX = player.collider.center.x;
-            baseY = player.collider.bottom + 32;
+            baseY = groundFinder.findGround(player.collider.center) + 32;
 
             // compute lock coordinates
             if(offsetX >= 0) {
@@ -181,3 +185,26 @@ object "Lock Camera"
 
 // this object is used to keep a state between event calls
 object "Lock Camera Direction" { public direction = 0; }
+
+// this is a utility to find the position of the ground
+object "Lock Camera Ground Finder" is "private", "awake", "entity"
+{
+    transform = Transform();
+    sensor = Sensor(0, 0, 16, 1);
+    maxAttempts = 256;
+
+    // finds the y position of the ground nearest the given position
+    fun findGround(position)
+    {
+        transform.position = position.translatedBy(0, -1);
+        for(i = 0; i < maxAttempts; i++) {
+            transform.move(0, 1);
+            sensor.onTransformChange();
+            if(sensor.status !== null)
+                break;
+        }
+        y = Math.floor(transform.position.y);
+        //Console.print("Found ground at " + y);
+        return y;
+    }
+}
