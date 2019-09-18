@@ -39,6 +39,8 @@ static surgescript_var_t* fun_render(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static inline const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object);
@@ -48,6 +50,7 @@ static v2d_t parent_camera(const surgescript_object_t* object);
 static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
+static const surgescript_heapptr_t ENABLED_ADDR = 3;
 #define SENSOR_COLOR() (color_hex("ffff00"))
 
 /*
@@ -62,9 +65,11 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "__init", fun_init, 5);
     surgescript_vm_bind(vm, "Sensor", "get_zindex", fun_getzindex, 0);
     surgescript_vm_bind(vm, "Sensor", "render", fun_render, 0);
+    surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
     surgescript_vm_bind(vm, "Sensor", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Sensor", "get_visible", fun_getvisible, 0);
-    surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
+    surgescript_vm_bind(vm, "Sensor", "set_enabled", fun_setenabled, 1);
+    surgescript_vm_bind(vm, "Sensor", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Sensor", "onTransformChange", fun_ontransformchange, 0);
 }
 
@@ -83,6 +88,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(OBSTACLEMAP_ADDR == surgescript_heap_malloc(heap));
     ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));
     ssassert(STATUS_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ENABLED_ADDR == surgescript_heap_malloc(heap));
 
     /* will create the sensor later */
     surgescript_object_set_userdata(object, NULL);
@@ -134,6 +140,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR), obstaclemap);
     surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), false);
     surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), 0);
+    surgescript_var_set_bool(surgescript_heap_at(heap, ENABLED_ADDR), true);
 
     /* create a new sensor */
     if(x1 == x2) {
@@ -155,6 +162,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
    useful if you move the object and, in the same frame, need to revalidate the collision status */
 surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* alternatively, you may enable and disable the sensor */
     update(object);
     return NULL;
 }
@@ -195,6 +203,29 @@ surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescrip
     return surgescript_var_clone(surgescript_heap_at(heap, VISIBLE_ADDR));
 }
 
+/* enable or disable the sensor */
+surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    bool currently_enabled = surgescript_var_get_bool(surgescript_heap_at(heap, ENABLED_ADDR));
+    bool enabled = surgescript_var_get_bool(param[0]);
+
+    /* changed the variable? */
+    if(enabled != currently_enabled) {
+        surgescript_var_set_bool(surgescript_heap_at(heap, ENABLED_ADDR), enabled);
+        update(object);
+    }
+
+    return NULL;
+}
+
+/* is the sensor enabled? Defaults to true */
+surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, ENABLED_ADDR));
+}
+
 /* get status */
 surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -228,21 +259,27 @@ sensor_t* get_sensor(const surgescript_object_t* object)
 /* update the sensor */
 void update(surgescript_object_t* object)
 {
-    sensor_t* sensor = get_sensor(object);
-    const obstaclemap_t* obstaclemap = get_obstaclemap(object);
-    const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, obstaclemap);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* status = surgescript_heap_at(heap, STATUS_ADDR);
+    bool sensor_is_enabled = surgescript_var_get_bool(surgescript_heap_at(heap, ENABLED_ADDR));
 
-    if(obstacle != NULL) {
-        if(obstacle_is_solid(obstacle)) {
-            if(*(surgescript_var_fast_get_string(status)) != 's')
-                surgescript_var_set_string(status, "solid");
+    if(sensor_is_enabled) {
+        sensor_t* sensor = get_sensor(object);
+        const obstaclemap_t* obstaclemap = get_obstaclemap(object);
+        const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, obstaclemap);
+
+        if(obstacle != NULL) {
+            if(obstacle_is_solid(obstacle)) {
+                if(*(surgescript_var_fast_get_string(status)) != 's')
+                    surgescript_var_set_string(status, "solid");
+            }
+            else {
+                if(*(surgescript_var_fast_get_string(status)) != 'c')
+                    surgescript_var_set_string(status, "cloud");
+            }
         }
-        else {
-            if(*(surgescript_var_fast_get_string(status)) != 'c')
-                surgescript_var_set_string(status, "cloud");
-        }
+        else
+            surgescript_var_set_null(status);
     }
     else
         surgescript_var_set_null(status);
