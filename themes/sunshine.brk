@@ -2205,9 +2205,9 @@ brick 250
 brick 254
 {
     type                CLOUD
-    behavior            DEFAULT
+    behavior            MARKER
     mask                "images/sunshine_mask.png"
-    zindex              -1.0
+    zindex              1.0
 
     sprite
     {
@@ -2227,9 +2227,9 @@ brick 254
 brick 255
 {
     type                SOLID
-    behavior            DEFAULT
+    behavior            MARKER
     mask                "images/sunshine_mask.png"
-    zindex              -1.0
+    zindex              1.0
 
     sprite
     {

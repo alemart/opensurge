@@ -40,7 +40,8 @@ enum brickbehavior_t {
     BRB_FALL,           /* bricks that are broken once you step on them */
     BRB_SMASHABLE,      /* bricks that can be broken by jumping on them */
     BRB_FLOAT,          /* floating bricks */
-    BRB_PENDULAR        /* pendular bricks */
+    BRB_PENDULAR,       /* pendular bricks */
+    BRB_MARKER          /* markers are only rendered in the editor */
 };
 
 /* brick layer (loop system) */

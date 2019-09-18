@@ -588,8 +588,10 @@ void brick_render(brick_t *brk, v2d_t camera_position)
         else
             image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
     }
-    else
-        image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+    else {
+        if(brk->brick_ref->behavior != BRB_MARKER)
+            image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+    }
 }
 
 /*
@@ -825,6 +827,9 @@ const char* brick_util_behaviorname(brickbehavior_t behavior)
 
         case BRB_PENDULAR:
             return "PENDULAR";
+
+        case BRB_MARKER:
+            return "MARKER";
     }
 
     return "Unknown";
@@ -1154,6 +1159,8 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
             dat->behavior = BRB_FLOAT;
         else if(str_icmp(type, "PENDULAR") == 0)
             dat->behavior = BRB_PENDULAR;
+        else if(str_icmp(type, "MARKER") == 0)
+            dat->behavior = BRB_MARKER;
         else
             fatal_error("Can't read brick attributes: unknown brick type '%s'", type);
 
