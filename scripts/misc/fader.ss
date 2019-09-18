@@ -49,8 +49,6 @@ object "Fader" is "entity", "detached", "awake", "private"
     {
         // setup
         transform.position = Vector2.zero;
-        actor.zindex = Math.infinity;
-        actor.visible = false;
         state = "idle";
     }
 
@@ -99,5 +97,11 @@ object "Fader" is "entity", "detached", "awake", "private"
     fun set_fadeTime(seconds)
     {
         fadeTime = Math.max(seconds, 0.001);
+    }
+
+    fun constructor()
+    {
+        actor.zindex = Math.infinity;
+        actor.visible = false;
     }
 }

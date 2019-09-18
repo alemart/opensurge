@@ -76,7 +76,7 @@ commandline_t commandline_parse(int argc, char **argv)
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf(
-                "%s\n<%s>\n\n"
+                "%s\n<http://%s>\n\n"
                 "usage:\n"
                 "    %s [options ...]\n"
                 "\n"

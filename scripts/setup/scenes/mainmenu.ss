@@ -14,6 +14,7 @@ using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Camera;
+using SurgeEngine.Lang;
 using SurgeEngine.Web;
 
 object "MainMenu"
@@ -43,7 +44,7 @@ object "MainMenu"
     camera = spawn("MainMenuCameraEffect")
         .startingAt(Screen.width * 0.7, Screen.height * 0.8)
         .during(0.7);
-    shareURL = "http://opensurge2d.org/share";
+    shareURL = "http://opensurge2d.org/share?lang=" + Lang["LANG_ID"];
     nextState = "";
 
     state "main"

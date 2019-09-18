@@ -5,7 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// modders: generally, you don't need to modify this file.
+// modders: you don't need to modify this file.
 
 // quest properties
 name            "Options screen"

@@ -1,0 +1,13 @@
+name "Congratulations"
+author "Alexandre Martins"
+license "CC-BY 3.0"
+version "1.0"
+requires "0.5.0"
+act 1
+theme "themes/none.brk"
+bgtheme "themes/scenes/mainmenu.bg"
+music "musics/theme.ogg"
+spawn_point 0 0
+setup "Congratulations"
+players "None"
+readonly

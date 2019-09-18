@@ -295,7 +295,7 @@ int dirfill(const char *filename, void *param)
     lang_readcompatibility(filename, &ver, &subver, &wipver);
     if(game_version_compare(ver, subver, wipver) >= 0) {
         str_cpy(lngdata[*c].filepath, filename, sizeof(lngdata[*c].filepath));
-        lang_readstring(filename, "LANG_LANGUAGE", lngdata[*c].title, sizeof( lngdata[*c].title ));
+        lang_readstring(filename, "LANG_NAME", lngdata[*c].title, sizeof( lngdata[*c].title ));
         lang_readstring(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
         (*c)++;
     }
