@@ -30,7 +30,6 @@ object "Giant Wolf" is "entity", "boss", "awake"
     transform = Transform();
 
     basePosition = 0;
-    offsetY = 8;
     angryHp = 1;
     withdrawal = DirectionalMovement();
     explosionTime = 2.0; // seconds
@@ -42,7 +41,7 @@ object "Giant Wolf" is "entity", "boss", "awake"
     {
         // setup
         actor.zindex = 0.4;
-        basePosition = transform.position.y + offsetY;
+        basePosition = transform.position.y + 8; // offset it a bit
 
         chase.direction = Vector2.left;
         chase.speed = 60;
@@ -285,9 +284,10 @@ object "Giant Wolf's Head" is "private", "entity", "awake"
                 player = otherCollider.entity;
                 if(player.attacking) {
                     hit.play();
-                    player.bounceBack(actor);
-                    state = "getting hit";
                     wolf.getHit();
+                    player.bounceBack(actor);
+                    player.xsp = -player.xsp;
+                    state = "getting hit";
                 }
             }
         }
@@ -331,7 +331,7 @@ object "Giant Wolf's Hand" is "private", "entity", "awake"
 
     state "shaking"
     {
-        if(timeout(shakeTime)) {
+        if(timeout(shakeTime) || (wolf.isAngry() && timeout(0.3 * shakeTime))) {
             shakeY = 0;
             brick.enabled = true;
             state = "idle";
