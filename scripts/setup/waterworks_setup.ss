@@ -93,7 +93,24 @@ object "Waterworks Setup"
         // zone 3 only
         //
         "3": {
+           "Event Trigger 7": {
+                "onTrigger": EventList([
+                    EntityEvent("Hydra").willCall("activate"),
+                    FunctionEvent("Play Boss Music"),
+                    FunctionEvent("Lock Camera").withArgument(600)
+                ])
+            },
 
+            "Hydra": {
+                "onDefeat": EventList([
+                    FunctionEvent("Stop Boss Music"),
+                    FunctionEvent("Lock Camera").withArgument(1024)
+                ])
+            },
+
+            "Bridge": {
+                "length": 24
+            }
         }
 
     };

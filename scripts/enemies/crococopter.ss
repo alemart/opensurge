@@ -9,7 +9,7 @@ using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Behaviors.Enemy;
-using SurgeEngine.Behaviors.DirectionalMovement;
+using SurgeEngine.Behaviors.CircularMovement;
 using SurgeEngine.Collisions.CollisionBox;
 
 // Crococopter has a helix that hits the player
@@ -17,23 +17,23 @@ object "Crococopter" is "entity", "enemy"
 {
     actor = Actor("Crococopter");
     enemy = Enemy();
-    movement = DirectionalMovement();
-    transform = Transform();
+    movement = CircularMovement();
     helixCollider = CollisionBox(16, 8).setAnchor(0.5, 3);
-    elapsedTime = 0;
+    transform = Transform();
 
     state "main"
     {
-        // look at the player
-        if(transform.position.x > Player.active.transform.position.x)
-            actor.hflip = true;
-        else
-            actor.hflip = false;
+        // setup movement
+        movement.radius = 24;
+        movement.rate = 0.5;
+        movement.scale = Vector2.up; // move only on the y-axis
+        state = "active";
+    }
 
-        // up-down movement
-        movement.direction = Vector2.up;
-        movement.speed = 47 * Math.cos(3.1416 * elapsedTime);
-        elapsedTime += Time.delta;
+    state "active"
+    {
+        // look at the player
+        actor.hflip = (transform.position.x > Player.active.transform.position.x);
     }
 
     fun onCollision(otherCollider)

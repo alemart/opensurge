@@ -1,0 +1,95 @@
+// -----------------------------------------------------------------------------
+// File: hydra.spr
+// Description: Hydra Boss - sprite definition
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+// boss art by Antifarea (Charles Gabriel)
+// edits & art complements by Alexandre
+sprite "Hydra"
+{
+    source_file     "images/hydra.png"
+    source_rect     0 32 320 480
+    frame_size      160 160
+    hot_spot        80 96
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // charging
+    animation 1
+    {
+        repeat      TRUE
+        fps         24
+        data        1 2
+    }
+
+    // getting hit
+    animation 2
+    {
+        repeat      FALSE
+        fps         12
+        data        3 3 0
+    }
+
+    // exploding
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // defeated
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+}
+
+sprite "Hydra's Orb"
+{
+    source_file     "images/hydra.png"
+    source_rect     320 32 32 32
+    frame_size      16 16
+    hot_spot        8 8
+
+    // green orb
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // blue orb
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Hydra's Lighting Strike"
+{
+    source_file     "images/hydra.png"
+    source_rect     384 32 128 480
+    frame_size      128 480
+    hot_spot        64 240
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

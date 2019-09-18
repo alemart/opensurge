@@ -23,6 +23,7 @@ object "Simple Ball" is "entity"
 
     state "main"
     {
+        // you must set at least the radius and the rate
         movement.radius = 128; // using a radius of 128 pixels
         movement.rate = 0.25;  // it takes 4 seconds to complete one cycle
     }
@@ -37,6 +38,7 @@ object "Simple Ball" is "entity"
  * - clockwise: boolean. Indicates whether the movement is clockwise or counter-clockwise.
  * - scale: Vector2 object. Used to distort the circle. Vector2(1.0, 1.0) means no distortion (default).
  * - phaseOffset: number. A value given in degrees. Defaults to zero (180 means opposite phase).
+ * - center: Vector2 object | null. Use it to force the center of the movement (null means no forcing).
  * - phase: number, readonly. A value given in degrees that indicates the current phase of the movement.
  * - entity: object, readonly. The entity associated with this behavior.
  */
@@ -56,11 +58,12 @@ object "CircularMovement" is "behavior"
     rate = 0.0;
     angle = 0.0;
     sign = 1.0;
-    scale = Vector2(1.0, 1.0);
     offset = 0.0;
     offsetDeg = 0;
     twopi = 2.0 * Math.pi;
-    cachedV2 = null;
+    center = null;
+    scale = Vector2(1.0, 1.0);
+    cachedScale = null;
 
     state "main"
     {
@@ -72,12 +75,21 @@ object "CircularMovement" is "behavior"
         if(rate != 0) {
             dt = Time.delta;
             w = sign * twopi * rate;
-            rw = radius * w;
             angle += w * dt;
-            transform.move(
-                -rw * Math.cos(angle + offset) * scale.x * dt,
-                 rw * Math.sin(angle + offset) * scale.y * dt
-            );
+            if(center == null) {
+                rw = radius * w;
+                transform.move(
+                    -rw * Math.cos(angle + offset) * scale.x * dt,
+                    rw * Math.sin(angle + offset) * scale.y * dt
+                );
+            }
+            else {
+                transform.position = center;
+                transform.move(
+                    radius * Math.cos(angle + offset) * scale.x,
+                    radius * Math.sin(angle + offset) * scale.y
+                );
+            }
         }
     }
 
@@ -134,11 +146,6 @@ object "CircularMovement" is "behavior"
         return (Math.rad2deg(angle) + 360) % 360;
     }
 
-    fun set_phase(deg)
-    {
-        angle = Math.deg2rad(deg);
-    }
-
     // movement rate, given in cycles per second
     fun get_rate()
     {
@@ -169,11 +176,26 @@ object "CircularMovement" is "behavior"
 
     fun set_scale(v2)
     {
-        if(v2 !== cachedV2) {
+        if(v2 !== cachedScale) {
             if(typeof(v2) == "object" && v2.__name == "Vector2") {
                 scale = v2.scaledBy(1.0); // clone object
-                cachedV2 = v2;
+                cachedScale = v2;
             }
         }
+    }
+
+    // center of the movement, a Vector2 object. It may be set to null (default)
+    fun get_center()
+    {
+        return center;
+    }
+
+    fun set_center(v2)
+    {
+        // no caching
+        if(typeof(v2) == "object" && v2.__name == "Vector2")
+            center = v2.scaledBy(1.0); // clone object
+        else if(v2 === null)
+            center = null;
     }
 }
