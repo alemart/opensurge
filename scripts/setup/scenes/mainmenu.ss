@@ -215,6 +215,7 @@ object "MainMenuGameVersion" is "private", "detached", "entity"
     fun constructor()
     {
         transform.position = Vector2(Screen.width - 4, 4);
+        text[0].zindex = text[1].zindex = 1.0;
         if(SurgeEngine.version.indexOf("dev") >= 0) {
             text[0].align = "right";
             text[0].text = "Development version";

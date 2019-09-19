@@ -11,20 +11,15 @@
 //
 
 // Translation metadata
-LANG_ID                     "en_US" // language code & country, according to ISO 639-1 & ISO 3166-1, respectively
-LANG_NAME                   "English"
-LANG_AUTHOR                 "Alexandre Martins"
-LANG_LASTUPDATE             "2019-09-18"
-LANG_COMPATIBILITY          "0.5.0" // required engine version
+LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "English"                 // language name
+LANG_AUTHOR                 "Alexandre Martins"       // translation author
+LANG_LASTUPDATE             "2019-09-18"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.0"                   // required engine version
 
 // Colors
-COLOR_SURGE                 "ff8000"
-COLOR_NEON                  "bf7a0d"
-COLOR_CHARGE                "aca5a5"
 COLOR_TITLE                 "ff8800"
 COLOR_HIGHLIGHT             "ffee11"
-COLOR_INPUT                 "ff8800"
-COLOR_DANGER                "ff7777"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
@@ -58,19 +53,19 @@ OPTIONS_BACK                "BACK"
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
 STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEBUG MODE</color>"
-STAGESELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
+STAGESELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
 STAGESELECT_ACT             "Act"
 
 // Quest Select
 QUESTSELECT_TITLE           "<color=$COLOR_TITLE>QUEST SELECT</color>"
-QUESTSELECT_MSG             "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to cancel"
+QUESTSELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to cancel"
 QUESTSELECT_PAGE            "page $1/$2"
 QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color=$COLOR_HIGHLIGHT>Author:</color> $2\n<color=$COLOR_HIGHLIGHT>Description:</color> $3"
 
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
-CREDITS_BACK                "Press <color=$COLOR_INPUT>$INPUT_FIRE4</color> to go back"
+CREDITS_BACK                "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
 CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Retired</color>"
