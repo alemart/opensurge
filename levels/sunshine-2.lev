@@ -3572,5 +3572,6 @@ entity "Tube In" 8816 10304 "4c449394ce71b880"
 entity "Tube In" 14256 10224 "1316ff68bb717bf1"
 entity "Tube In" 14384 9904 "f2cf2d9813ab4546"
 entity "Tube In" 15248 10704 "b8379459a56d824c"
+entity "Powerup Invincibility" 13632 9536 "4ef005040677aea1"
 
 // EOF
