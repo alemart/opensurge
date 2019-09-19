@@ -12,8 +12,16 @@ sprite "Goal"
     frame_size      46 54
     hot_spot        23 54
 
-    // not cleared
+    // sprite preview
     animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // not cleared
+    animation 1
     {
         repeat      TRUE
         fps         8
@@ -21,19 +29,11 @@ sprite "Goal"
     }
 
     // rotating
-    animation 1
+    animation 2
     {
         repeat      FALSE
         fps         16
         data        1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
-    }
-
-    // level cleared: generic
-    animation 2
-    {
-        repeat      TRUE
-        fps         8
-        data        7
     }
 
     // level cleared: Surge
@@ -58,5 +58,13 @@ sprite "Goal"
         repeat      TRUE
         fps         8
         data        6
+    }
+
+    // level cleared: generic
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        7
     }
 }

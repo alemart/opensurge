@@ -218,14 +218,14 @@ object "MainMenuGameVersion" is "private", "detached", "entity"
         text[0].zindex = text[1].zindex = 1.0;
         if(SurgeEngine.version.indexOf("dev") >= 0) {
             text[0].align = "right";
-            text[0].text = "Development version";
+            text[0].text = "$MAINMENU_DEVBUILD";
             text[1].align = "right";
             text[1].text = SurgeEngine.version;
             text[1].offset = Vector2(0, 12);
         }
         else {
             text[0].align = "right";
-            text[0].text = "ver. " + SurgeEngine.version;
+            text[0].text = "$MAINMENU_VERSION " + SurgeEngine.version;
             text[1].visible = false;
         }
     }

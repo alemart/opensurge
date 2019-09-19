@@ -20,20 +20,27 @@ object "Goal" is "entity", "basic"
 
     state "main"
     {
+        // setup
+        actor.anim = 1;
+        state = "not cleared";
+    }
+
+    state "not cleared"
+    {
         // the goal sign hasn't
         // been touched yet
     }
 
     state "rotating"
     {
-        actor.anim = 1;
+        actor.anim = 2;
         if(actor.animation.finished) {
             actor.anim = clearedAnim;
-            state = "clear";
+            state = "cleared";
         }
     }
 
-    state "clear"
+    state "cleared"
     {
         // the goal sign now
         // shows: level cleared!
@@ -41,7 +48,7 @@ object "Goal" is "entity", "basic"
 
     fun onCollision(otherCollider)
     {
-        if(state == "main" && otherCollider.entity.hasTag("player"))
+        if(state == "not cleared" && otherCollider.entity.hasTag("player"))
             goal(otherCollider.entity);
     }
 
@@ -64,6 +71,6 @@ object "Goal" is "entity", "basic"
         else if(playerName == "Charge")
             return 5;
         else
-            return 2;
+            return 6;
     }
 }

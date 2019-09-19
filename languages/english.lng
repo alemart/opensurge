@@ -23,6 +23,19 @@ COLOR_HIGHLIGHT             "ffee11"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
+//
+// Note to translators:
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// In the options screen, highlight "Stage select", press
+// right 3 times and enter. You'll see all .lev files.
+//
+
 
 
 //
@@ -55,11 +68,11 @@ STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
 STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEBUG MODE</color>"
 STAGESELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
-STAGESELECT_ACT             "Act"
+STAGESELECT_ACT             "Zone"
 
 // Quest Select
 QUESTSELECT_TITLE           "<color=$COLOR_TITLE>QUEST SELECT</color>"
-QUESTSELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to cancel"
+QUESTSELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 QUESTSELECT_PAGE            "page $1/$2"
 QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color=$COLOR_HIGHLIGHT>Author:</color> $2\n<color=$COLOR_HIGHLIGHT>Description:</color> $3"
 
@@ -68,7 +81,6 @@ CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
 CREDITS_BACK                "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
-CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Retired</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Thanks to</color>"
 CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer"
 CREDITS_JOAO                "Artist"
@@ -85,6 +97,10 @@ CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Music</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Sound effects</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "The authors are specified within the scripts themselves."
+
+// Main Menu
+MAINMENU_DEVBUILD           "Development version"
+MAINMENU_VERSION            "ver." // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -151,7 +167,7 @@ QUIT_OPTION2                "NO"
 LEV_DEMO_1                  "<color=$COLOR_TITLE>How to play</color>\nWelcome to the <color=$COLOR_HIGHLIGHT>Open Surge Demo Level</color>! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. Use $INPUT_FIRE2 to switch character."
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Did you know...?</color>\nEverything in Open Surge is customizable. You can make levels, items, bosses, characters and more! It's a full <color=$COLOR_HIGHLIGHT>game creation system</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Unleash your creativity!</color>\nOne of the key features in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. It's scripting for games! Use it to build anything your imagination can conceive!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> to create your own awesome games today!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> to create your own awesome games today!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! <color=$COLOR_HIGHLIGHT>Press F12 to open the editor</color>. Next, open the item palette and start building your level! (use F1 for help)"
 
 
@@ -161,7 +177,7 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow i
 //
 
 //
-// ** Note to translators **
+// Note to translators:
 //
 // Since the game uses bitmap fonts, parts of
 // the translation don't accept special characters.

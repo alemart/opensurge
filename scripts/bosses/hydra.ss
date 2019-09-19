@@ -30,8 +30,8 @@ object "Hydra" is "entity", "awake", "boss"
     transform = Transform();
     hit = Sound("samples/bosshit.wav");
     electric = Sound("samples/electric_bulb.wav");
-    appear = Sound("samples/teleport_in.wav");
-    disappear = Sound("samples/teleport_out.wav");
+    appear = Sound("samples/teleport_appear.wav");
+    disappear = Sound("samples/teleport_disappear.wav");
     chargeup = Sound("samples/charging_up.wav");
     aim = null;
     teleportTime = 2.0; // seconds

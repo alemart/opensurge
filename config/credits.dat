@@ -16,7 +16,7 @@ Cody Licorish
 $CREDITS_CODY
 
 
-$CREDITS_RETIRED
+$CREDITS_THANKS
 
 Johan Brodd
 $CREDITS_JOHAN
@@ -29,9 +29,6 @@ $CREDITS_COLIN
 
 Brian Zablocky
 $CREDITS_BRIAN
-
-
-$CREDITS_THANKS
 
 Allegro staff at allegro.cc
 Ruben Caceres
@@ -119,6 +116,9 @@ Colin Beard
 --- images/pause.png
 --- images/eraser.png
 
+Colin Beard & Cody Licorish
+--- images/springfling.png
+
 Cody Licorish
 --- images/collectibles.png
 --- images/marmot-green.png
@@ -133,9 +133,6 @@ Cody Licorish
 
 Cody Licorish & João Victor
 --- images/levels/1/boss2x.png
-
-Cody Licorish & Colin Beard
---- images/springfling.png
 
 Brian Zablocky
 --- images/bumper.png
@@ -180,7 +177,7 @@ Christopher Martinus
 
 Mateus Reis
 --- images/levels/1/background.png
---- images/extra/surge_cool.png
+--- images/surge_cool.png
 --- images/watersplash.png
 
 João Victor & Mateus Reis
@@ -236,9 +233,6 @@ Colin Beard & Mateus Reis
 Alexandre Martins & Brian Zablocky
 --- images/squarebg.png
 
-Alexandre Martins & Gaivota
---- images/rings.png
-
 Alexandre Martins & Ste Pickford
 --- images/water.png
 
@@ -247,6 +241,10 @@ João Victor & Alexandre Martins
 --- images/title.png
 --- images/dialogs.png
 --- images/jumping_fish.png
+--- images/giant_wolf.png
+
+Gaivota & Alexandre Martins
+--- images/rings.png
 
 treeform (opengameart.org)
 --- images/violet.png
@@ -292,6 +290,9 @@ KnoblePersona
 
 Master484
 --- images/mini_smoke.png
+
+Antifarea (opengameart.org) & Alexandre
+--- images/hydra.png (CC-BY-SA 3.0)
 
 
 $CREDITS_RES_SAMPLES
@@ -398,8 +399,8 @@ Selector (freesound.org)
 --- samples/discharge.wav (CC-0)
 
 little_dog4000 (freesound.org)
---- samples/teleport_in.wav (CC-0 - sound edited by Alexandre)
---- samples/teleport_out.wav (CC-0 - sound edited by Alexandre)
+--- samples/teleport_appear.wav (CC-0 - sound edited by Alexandre)
+--- samples/teleport_disappear.wav (CC-0 - sound edited by Alexandre)
 
 
 $CREDITS_RES_SCRIPTS

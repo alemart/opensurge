@@ -9,7 +9,7 @@
 // when the engine is run, you may change the fields below
 
 // quest metadata
-name            "Introduction quest"
+name            "Introduction"
 author          "Alexandre Martins"
 
 // level list (in order of appearance)
