@@ -3768,7 +3768,7 @@ entity "Crococopter" 7840 10000 "627c39f711aa75f2"
 entity "Collectible" 7136 10128 "903c574251296be2"
 entity "Collectible" 7168 10128 "705ad006b1c781b5"
 entity "Collectible" 7200 10128 "4e6ac8d7ba9ec3f6"
-entity "RulerSalamander" 9168 9600 "b1c559ffb1b5d155"
-entity "RulerSalamander" 9344 9600 "afe2698606e64fb7"
+entity "Crococopter" 9152 9536 "c6fa85cd35449602"
+entity "Crococopter" 9344 9536 "dd297cb4d397dfae"
 
 // EOF
