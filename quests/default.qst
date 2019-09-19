@@ -7,7 +7,6 @@
 
 // quest properties
 name            "Default quest"
-author          "Alexandre Martins"
 
 // level list (in order of appearance)
 level           "levels/sunshine-1.lev"

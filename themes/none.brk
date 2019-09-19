@@ -1,4 +1,10 @@
-// Author: script by Alexandre
+// -----------------------------------------------------------------------------
+// File: none.brk
+// Description: an empty brickset
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
 brick 0
 {
     type                PASSABLE
@@ -7,7 +13,7 @@ brick 0
 
     sprite
     {
-        source_file     images/fade_effect.png
+        source_file     "images/fade_effect.png"
         source_rect     0 0 16 16
         frame_size      16 16
 

@@ -7,8 +7,7 @@
 
 // quest data
 name            "Demo"
-author          "Alexandre Martins"
 
 // level list
-level           "levels/demo.lev"
+level           "levels/demo-1.lev"
 level           "levels/demo-2.lev"

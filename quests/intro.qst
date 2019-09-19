@@ -10,8 +10,8 @@
 
 // quest metadata
 name            "Introduction"
-author          "Alexandre Martins"
 
 // level list (in order of appearance)
+level           "levels/scenes/contrib.lev"
 level           "levels/scenes/allegro.lev"
 level           "levels/scenes/mainmenu.lev"

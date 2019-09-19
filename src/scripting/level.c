@@ -63,10 +63,14 @@ static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
 static const surgescript_heapptr_t SETUP_ADDR = 2;
-static const surgescript_heapptr_t IDX_ADDR = 3; /* must be the last address */
+static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3;
+static const surgescript_heapptr_t IDX_ADDR = 4; /* must be the last address */
 static const char code_in_surgescript[];
 static void update_music(surgescript_object_t* object);
 
@@ -100,6 +104,8 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_background", fun_getbackground, 0);
     surgescript_vm_bind(vm, "Level", "set_next", fun_setnext, 1);
     surgescript_vm_bind(vm, "Level", "get_next", fun_getnext, 0);
+    surgescript_vm_bind(vm, "Level", "set_onUnload", fun_setonunload, 1);
+    surgescript_vm_bind(vm, "Level", "get_onUnload", fun_getonunload, 0);
     surgescript_vm_bind(vm, "Level", "clear", fun_clear, 0);
     surgescript_vm_bind(vm, "Level", "restart", fun_restart, 0);
     surgescript_vm_bind(vm, "Level", "quit", fun_quit, 0);
@@ -109,6 +115,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "loadNext", fun_loadnext, 0);
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
+    surgescript_vm_bind(vm, "Level", "__callUnloadFunctor", fun_callunloadfunctor, 0);
     surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
 }
 
@@ -132,6 +139,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* Setup functor */
     ssassert(SETUP_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, SETUP_ADDR), setup);
+
+    /* Unload functor */
+    ssassert(UNLOADFUNCTOR_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, UNLOADFUNCTOR_ADDR));
 
     /*
      * Memory layout:
@@ -324,6 +335,22 @@ surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_v
     return NULL;
 }
 
+/* gets onUnload, a functor called when unloading the level */
+surgescript_var_t* fun_getonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, UNLOADFUNCTOR_ADDR));
+}
+
+/* sets onUnload, a functor called when unloading the level */
+surgescript_var_t* fun_setonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* onunload = surgescript_heap_at(heap, UNLOADFUNCTOR_ADDR);
+    surgescript_var_copy(onunload, param[0]);
+    return NULL;
+}
+
 /* will be true if the level has been cleared (will show the cleared animation) */
 surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -467,6 +494,27 @@ surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var
     surgescript_var_t* ret = surgescript_var_create();
     surgescript_object_call_function(setup, "call", param, num_params, ret);
     return ret;
+}
+
+/* this function gets called when the level is unloaded */
+surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* onunload = surgescript_heap_at(heap, UNLOADFUNCTOR_ADDR);
+
+    /* we require Level.onUnload to be an existing function object;
+       otherwise, do nothing */
+    if(surgescript_var_is_objecthandle(onunload)) {
+        surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+        surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(onunload);
+        if(surgescript_objectmanager_exists(manager, handle)) {
+            surgescript_object_t* functor = surgescript_objectmanager_get(manager, handle);
+            if(surgescript_object_has_function(functor, "call"))
+                surgescript_object_call_function(functor, "call", NULL, 0, NULL);
+        }
+    }
+
+    return NULL;
 }
 
 

@@ -107,6 +107,7 @@ surgescript_var_t* fun_onlevelunload(surgescript_object_t* object, const surgesc
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* level = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, LEVEL_ADDR)));
     surgescript_object_t* playermanager = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, PLAYERMANAGER_ADDR)));
+    surgescript_object_call_function(level, "__callUnloadFunctor", NULL, 0, NULL); /* call Level.onUnload(), if applicable */
     surgescript_object_kill(level); /* destroy the Level, as well as its objects */
     surgescript_var_set_null(surgescript_heap_at(heap, LEVEL_ADDR)); /* nobody can access the Level now */
     surgescript_object_kill(playermanager);

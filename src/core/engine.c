@@ -360,13 +360,13 @@ void init_accessories(const commandline_t* cmd)
     fontext_register_variables();
     charactersystem_init();
     objects_init();
-    scripting_init(cmd->user_argc, cmd->user_argv);
     storyboard_init();
     screenshot_init();
     fadefx_init();
     lang_init();
     if(custom_lang && *custom_lang)
         lang_loadfile(custom_lang);
+    scripting_init(cmd->user_argc, cmd->user_argv);
     
     scenestack_init();
 }
@@ -419,10 +419,10 @@ void release_accessories()
 {
     scenestack_release();
     storyboard_release();
+    scripting_release();
     lang_release();
     fadefx_release();
     screenshot_release();
-    scripting_release();
     objects_release();
     charactersystem_release();
     font_release();

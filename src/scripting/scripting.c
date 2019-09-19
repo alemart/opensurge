@@ -108,6 +108,15 @@ void scripting_init(int argc, const char** argv)
  */
 void scripting_release()
 {
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    surgescript_objecthandle_t app = surgescript_objectmanager_application(manager);
+
+    /* call exit handler (similar to stdlib's atexit()) */
+    surgescript_object_call_function(
+        surgescript_objectmanager_get(manager, app),
+        "__callExitFunctor", NULL, 0, NULL
+    );
+
     /* release command line arguments */
     while(vm_argc-- > 0)
         free(vm_argv[vm_argc]);

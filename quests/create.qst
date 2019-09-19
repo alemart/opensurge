@@ -7,7 +7,6 @@
 
 // quest data
 name            "Create Menu"
-author          "Alexandre Martins"
 
 // level list
 level           "levels/scenes/create.lev"

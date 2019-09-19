@@ -550,6 +550,10 @@ void level_unload()
 
     logfile_message("Unloading the level...");
 
+    /* scripting */
+    if(surgescript_vm_is_active(surgescript_vm()))
+        surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
+
     /* music */
     if(music != NULL) {
         music_stop();
@@ -558,17 +562,15 @@ void level_unload()
     /*music_unref("musics/invincible.ogg");
     music_unref("musics/speed.ogg");*/
 
-    /* releases the setup object list */
-    release_setup_object_list();
+    /* destroy extradata */
+    ssobj_extradata = fasthash_destroy(ssobj_extradata);
+    cached_level_ssobject = NULL;
 
     /* entity manager */
     entitymanager_release();
 
-    /* scripting */
-    if(surgescript_vm_is_active(surgescript_vm()))
-        surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
-    ssobj_extradata = fasthash_destroy(ssobj_extradata);
-    cached_level_ssobject = NULL;
+    /* releases the setup object list */
+    release_setup_object_list();
 
     /* unloading the brickset */
     logfile_message("Unloading the brickset...");

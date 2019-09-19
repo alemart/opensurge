@@ -101,7 +101,8 @@ void questselect_init(void *foo)
 
     title = font_create("menu.title");
     font_set_text(title, "%s", "$QUESTSELECT_TITLE");
-    font_set_position(title, v2d_new((VIDEO_SCREEN_W - font_get_textsize(title).x)/2, 10));
+    font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 10));
+    font_set_align(title, FONTALIGN_CENTER);
 
     msg = font_create("menu.text");
     font_set_text(msg, "%s", "$QUESTSELECT_MSG");

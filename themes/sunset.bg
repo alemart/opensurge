@@ -1,11 +1,9 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensurge2d.org
-//
-// File:   themes/sunset.bg
-// Desc:   sunset background
-// Author: script by Alexandre
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// File: sunset.bg
+// Description: sunset background
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
 
 background
 {
@@ -17,7 +15,7 @@ background
 
     sprite
     {
-        source_file     images/violet.png
+        source_file     "images/violet.png"
         source_rect     0 0 960 480
         frame_size      960 480
 
@@ -45,7 +43,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 165 256 16
         frame_size      64 16
 
@@ -70,7 +68,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 256 272 8
         frame_size      16 8
 
@@ -95,7 +93,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 272 272 16
         frame_size      16 16
 
@@ -120,7 +118,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 272 272 16 //0 240 272 16
         frame_size      16 16
 
@@ -145,7 +143,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 272 272 16 //0 240 272 16
         frame_size      16 16
 
@@ -170,7 +168,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 272 272 16 //0 240 272 16
         frame_size      16 16
 
@@ -195,7 +193,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 174 272 16
         frame_size      68 16
 
@@ -219,7 +217,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 
@@ -243,7 +241,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 
@@ -267,7 +265,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 
@@ -291,7 +289,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 
@@ -315,7 +313,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 
@@ -339,7 +337,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 
@@ -363,7 +361,7 @@ background
 
     sprite
     {
-        source_file     images/sea.png
+        source_file     "images/sea.png"
         source_rect     0 192 272 16
         frame_size      68 16
 

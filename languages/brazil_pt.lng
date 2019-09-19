@@ -166,7 +166,7 @@ QUIT_OPTION2                "Não"
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Como jogar</color>\nBem-vindo à <color=$COLOR_HIGHLIGHT>Fase Demo</color>! Use $INPUT_DIRECTIONAL para andar e $INPUT_FIRE1 para pular. Aperte $INPUT_FIRE2 para trocar o personagem."
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Saca só que irado!</color>\nTudo no Open Surge é customizável. Você pode criar fases, ítens, chefes, personagens e muito mais! Ele é um <color=$COLOR_HIGHLIGHT>sistema p/ criar jogos</color>!"
-LEV_DEMO_3                  "<color=$COLOR_TITLE>Liberte sua criatividade!</color>\nUm dos recursos-chave do Open Surge é o <color=$COLOR_HIGHLIGHT>SurgeScript</color>: scripting para games! Use-o para construir tudo o que você imaginar!"
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Liberte sua criatividade!</color>\nUm dos recursos-chave do Open Surge é o <color=$COLOR_HIGHLIGHT>SurgeScript</color>: programação para games! Use-o para construir tudo o que você imaginar!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Que massa!</color>\nE aí, curtiu? Sua imaginação é o limite! Visite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é sua vez!</color>\nVamos conhecer o editor de fases. <color=$COLOR_HIGHLIGHT>Aperte F12 para abrí-lo</color>. Depois, abra a palheta de ítens e comece a criar sua fase! (use F1 p/ ajuda)"
 

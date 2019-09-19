@@ -12,7 +12,7 @@ using SurgeEngine.Level;
 //
 // Arguments:
 // - path: string. The path of the .lev file to be loaded
-//                 (e.g., "levels/demo.lev")
+//                 (e.g., "levels/sunshine-1.lev")
 //
 object "Load Level"
 {

@@ -54,7 +54,7 @@ typedef struct {
 
 static bool quit;
 static int lngcount;
-static font_t *title[2], **lngfnt[2], *page_label, *author_label;
+static font_t *title, **lngfnt[2], *page_label, *author_label;
 static lngdata_t *lngdata;
 static int option; /* current option: 0..n-1 */
 static actor_t *arrow;
@@ -99,12 +99,10 @@ void langselect_init(void *param)
     page_label = font_create("menu.text");
     author_label = font_create("menu.text");
 
-    title[0] = font_create("menu.title");
-    title[1] = font_create("menu.title");
-    font_set_text(title[0], "%s", "<color=$COLOR_TITLE>SELECT YOUR</color>");
-    font_set_text(title[1], "%s", "<color=$COLOR_TITLE>LANGUAGE</color>");
-    font_set_position(title[0], v2d_new((VIDEO_SCREEN_W - font_get_textsize(title[0]).x)/2,5));
-    font_set_position(title[1], v2d_new((VIDEO_SCREEN_W - font_get_textsize(title[1]).x)/2, font_get_position(title[0]).y + font_get_textsize(title[1]).y + 1));
+    title = font_create("menu.title");
+    font_set_text(title, "%s", "<color=$COLOR_TITLE>SELECT YOUR\nLANGUAGE</color>");
+    font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 5));
+    font_set_align(title, FONTALIGN_CENTER);
 
     bgtheme = background_load(LANG_BGFILE);
 
@@ -133,8 +131,7 @@ void langselect_release()
     bgtheme = background_unload(bgtheme);
 
     actor_destroy(arrow);
-    font_destroy(title[0]);
-    font_destroy(title[1]);
+    font_destroy(title);
     font_destroy(author_label);
     font_destroy(page_label);
     input_destroy(input);
@@ -226,8 +223,7 @@ void langselect_render()
     background_render_bg(bgtheme, cam);
     background_render_fg(bgtheme, cam);
 
-    font_render(title[0], cam);
-    font_render(title[1], cam);
+    font_render(title, cam);
     font_render(page_label, cam);
     font_render(author_label, cam);
 
