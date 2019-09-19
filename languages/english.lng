@@ -108,7 +108,7 @@ CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! 
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
-CONGRATULATIONS_TEXT        "Thanks for playing Open Surge version $GAME_VERSION.\nWanna play more? Go to $GAME_WEBSITE for updates!\n\nOpen Surge lets you play and create your own games. It's developed by people like you. Tell your family, friends, pets and acquaintances about it and help to spread the word!"
+CONGRATULATIONS_TEXT        "Thanks for playing Open Surge version $GAME_VERSION.\nWanna play more? Go to $GAME_WEBSITE for updates!\n\nOpen Surge lets you play and create your own games. It's developed by people like you. Now share the joy! Tell your family, friends and pets about it and spread the word!"
 
 
 
