@@ -1,0 +1,224 @@
+// -----------------------------------------------------------------------------
+// File: languages/brazil_pt.lng
+// Description: brazilian portuguese translation (encoding: utf-8)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+//
+// Section: generic
+//
+
+// Translation metadata
+LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Português (Brasil)"      // language name
+LANG_AUTHOR                 "Alexandre Martins"       // translation author
+LANG_LASTUPDATE             "2019-09-18"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.0"                   // required engine version
+
+// Colors
+COLOR_TITLE                 "ff8800"
+COLOR_HIGHLIGHT             "ffee11"
+COLOR_HUD                   "ffff00"
+COLOR_HUDDANGER             "ff0000"
+
+//
+// Note to translators:
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// In the options screen, highlight "Stage select", press
+// right 3 times and enter. You'll see all .lev files.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "<color=$COLOR_TITLE>CONFIGURAÇÕES</color>"
+OPTIONS_YES                 "SIM"
+OPTIONS_NO                  "NÃO"
+OPTIONS_GRAPHICS            "GRÁFICOS"
+OPTIONS_FULLSCREEN          "Tela cheia"
+OPTIONS_RESOLUTION          "Tamanho"
+OPTIONS_RESOLUTION_OPT1     "1X"
+OPTIONS_RESOLUTION_OPT2     "2X"
+OPTIONS_RESOLUTION_OPT3     "3X"
+OPTIONS_RESOLUTION_OPT4     "4X"
+OPTIONS_SMOOTHGFX           "Gráficos suaves"
+OPTIONS_SMOOTHGFX_ERROR     "[só em 32 bpp]"
+OPTIONS_FPS                 "Mostrar FPS"
+OPTIONS_GAME                "JOGO"
+OPTIONS_GAMEPAD             "Usar joystick"
+OPTIONS_LANGUAGE            "Trocar idioma"
+OPTIONS_STAGESELECT         "Seleção de fases"
+OPTIONS_CREDITS             "Créditos do Open Surge"
+OPTIONS_BACK                "VOLTAR"
+
+// Stage Select
+STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>MODO DEBUG</color>"
+STAGESELECT_MSG             "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
+STAGESELECT_PAGE            "pág. $1/$2"
+STAGESELECT_ACT             "Zona"
+
+// Quest Select
+QUESTSELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE QUESTS</color>"
+QUESTSELECT_MSG             "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
+QUESTSELECT_PAGE            "pág. $1/$2"
+QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Versão:</color> $1\n<color=$COLOR_HIGHLIGHT>Autor:</color> $2\n<color=$COLOR_HIGHLIGHT>Descrição:</color> $3"
+
+// Credits
+CREDITS_TITLE               "<color=$COLOR_TITLE>CRÉDITOS</color>"
+CREDITS_BACK                "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versão $GAME_VERSION</color>\nrodando na $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Galera</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Agradecimentos</color>"
+CREDITS_ALEXANDRE           "Fundador e líder do projeto\nDesenvolvedor do projeto"
+CREDITS_JOAO                "Artista"
+CREDITS_MATEUS              "Efeitos sonoros"
+CREDITS_CODY                "Arte conceitual"
+CREDITS_JOHAN               "Músico\n(descanse em paz, amigo)"
+CREDITS_DI                  "Músico"
+CREDITS_COLIN               "Sprites, primeira história"
+CREDITS_BRIAN               "Sprites"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Créditos dos assets</color>"
+CREDITS_RES_TEXT            "A não ser quando dito explicitamente, os arquivos a seguir estão sob a Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Imagens</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Músicas</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efeitos sonoros</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts."
+
+// Main Menu
+MAINMENU_DEVBUILD           "Versão de desenvolvimento"
+MAINMENU_VERSION            "ver." // abbreviated
+
+// Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!\nLiberte sua criatividade! Dê asas à sua imaginação!\n\nVocê pode ser um criador! Crie suas fases, personagens, ítens e mais! Conheça o editor de fases, aprenda a engine e confira o SurgeScript para ganhar super poderes criativos!"
+
+// Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TEXT        "Obrigado por jogar o Open Surge versão $GAME_VERSION.\nQuer jogar mais? Visite $GAME_WEBSITE p/ atualizações!\n\nCom o Open Surge, você joga e cria seus games. Sabia que ele é feito por gente como você? Conte para sua família, seus amigos e seus bichinhos e ajude a divulgar o jogo!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "as SETAS"
+INPUT_KEYB_LEFT             "a SETA DA ESQ."
+INPUT_KEYB_RIGHT            "a SETA DA DIR."
+INPUT_KEYB_UP               "a SETA P/ CIMA"
+INPUT_KEYB_DOWN             "a SETA P/ BAIXO"
+INPUT_KEYB_FIRE1            "ESPAÇO"
+INPUT_KEYB_FIRE2            "o CTRL esquerdo"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "W"
+INPUT_KEYB_FIRE6            "A"
+INPUT_KEYB_FIRE7            "S"
+INPUT_KEYB_FIRE8            "D"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "o DIRECIONAL"
+INPUT_JOY_LEFT              "ESQUERDA"
+INPUT_JOY_RIGHT             "DIREITA"
+INPUT_JOY_UP                "CIMA"
+INPUT_JOY_DOWN              "BAIXO"
+INPUT_JOY_FIRE1             "o BOTÃO 1"
+INPUT_JOY_FIRE2             "o BOTÃO 2"
+INPUT_JOY_FIRE3             "o BOTÃO 3"
+INPUT_JOY_FIRE4             "o BOTÃO 4"
+INPUT_JOY_FIRE5             "o BOTÃO 5"
+INPUT_JOY_FIRE6             "o BOTÃO 6"
+INPUT_JOY_FIRE7             "o BOTÃO 7"
+INPUT_JOY_FIRE8             "o BOTÃO 8"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "Quer mesmo sair e perder seu progresso?"
+QUIT_OPTION1                "Sim"
+QUIT_OPTION2                "Não"
+
+	
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Como jogar</color>\nBem-vindo à <color=$COLOR_HIGHLIGHT>Fase Demo</color>! Use $INPUT_DIRECTIONAL para andar e $INPUT_FIRE1 para pular. Aperte $INPUT_FIRE2 para trocar o personagem."
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Saca só que irado!</color>\nTudo no Open Surge é customizável. Você pode criar fases, ítens, chefes, personagens e muito mais! Ele é um <color=$COLOR_HIGHLIGHT>sistema p/ criar jogos</color>!"
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Liberte sua criatividade!</color>\nUm dos recursos-chave do Open Surge é o <color=$COLOR_HIGHLIGHT>SurgeScript</color>: scripting para games! Use-o para construir tudo o que você imaginar!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Que massa!</color>\nE aí, curtiu? Sua imaginação é o limite! Visite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é sua vez!</color>\nVamos conhecer o editor de fases. <color=$COLOR_HIGHLIGHT>Aperte F12 para abrí-lo</color>. Depois, abra a palheta de ítens e comece a criar sua fase! (use F1 p/ ajuda)"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Note to translators:
+//
+// Since the game uses bitmap fonts, parts of
+// the translation don't accept special characters.
+//
+// This section does not accept language-specific
+// special characters.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Pontos"
+HUD_TIME                    "Tempo"
+HUD_COLLECTIBLES            "Poder"
+
+// Level Cleared animation
+CLEARED_LINE1               "VOCE ZEROU"
+CLEARED_LINE2               "A ZONA"
+CLEARED_POWER               "Bonus de Poder"
+CLEARED_TIME                "Bonus de Tempo"
+CLEARED_SCORE               "Pontos"
+
+// Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "JOGAR"
+MAINMENU_CREATE             "CRIAR"
+MAINMENU_SHARE              "COMPARTILHAR"
+MAINMENU_OPTIONS            "CONFIGURAR"
+MAINMENU_QUIT               "SAIR"
+
+// Create Menu
+CREATEMENU_TITLE            "CRIAR"
+CREATEMENU_PLAY             "VER DEMO"
+CREATEMENU_LEARN            "APRENDA"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "VOLTAR"
+
+// Congratulations Screen
+CONGRATULATIONS_TITLE       "OBRIGADO POR JOGAR"
+CONGRATULATIONS_SHARE       "COMPARTILHE"
