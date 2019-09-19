@@ -14,7 +14,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2019-09-18"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2019-09-19"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.0"                   // required engine version
 
 // Colors
