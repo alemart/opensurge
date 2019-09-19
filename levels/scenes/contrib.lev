@@ -1,0 +1,12 @@
+name "Contribute Page"
+author "Alexandre Martins"
+license "CC-BY 3.0"
+version "1.0"
+requires "0.5.0"
+act 1
+theme "themes/none.brk"
+bgtheme "themes/none.bg"
+spawn_point 0 0
+setup "Contribute Page"
+players "None"
+readonly
