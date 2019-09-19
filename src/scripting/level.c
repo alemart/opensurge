@@ -503,7 +503,7 @@ surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const sur
     surgescript_var_t* onunload = surgescript_heap_at(heap, UNLOADFUNCTOR_ADDR);
 
     /* we require Level.onUnload to be an existing function object;
-       otherwise, do nothing */
+       if it's not, do nothing */
     if(surgescript_var_is_objecthandle(onunload)) {
         surgescript_objectmanager_t* manager = surgescript_object_manager(object);
         surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(onunload);

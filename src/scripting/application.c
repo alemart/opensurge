@@ -59,14 +59,14 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     return NULL;
 }
 
-/* this function is called when the engine closes */
+/* this function is called when the engine is closed */
 surgescript_var_t* fun_callexitfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* onexit = surgescript_heap_at(heap, EXITFUNCTOR_ADDR);
 
     /* we require Application.onExit to be an existing function object;
-       otherwise, do nothing */
+       if it's not, do nothing */
     if(surgescript_var_is_objecthandle(onexit)) {
         surgescript_objectmanager_t* manager = surgescript_object_manager(object);
         surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(onexit);

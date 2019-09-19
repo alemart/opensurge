@@ -143,7 +143,7 @@ void confirmbox_update()
     }
 
     /* positioning stuff */
-    arrow->position = v2d_new(boxpos.x + current_option * image_width(box)/option_count + 10, boxpos.y + image_height(box) * 0.75);
+    arrow->position = v2d_new(boxpos.x + current_option * image_width(box)/option_count + 10, boxpos.y + image_height(box) * 0.75 + 2);
     font_set_position(textfnt, v2d_new(boxpos.x + 10 , boxpos.y + 10));
     for(i=0; i<option_count; i++) {
         font_set_position(optionfnt[i][0], v2d_new(boxpos.x + i * image_width(box)/option_count + 25, boxpos.y + image_height(box) * 0.75));
