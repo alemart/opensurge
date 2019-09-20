@@ -225,6 +225,8 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
                 counter.visible = false;
                 if(t <= 0)
                     Level.music.stop();
+                else
+                    music.stop(); // got an air bubble
             }
         }
         else if(music.playing) {
