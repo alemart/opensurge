@@ -83,4 +83,4 @@ You may run `ccmake` or `cmake-gui` to know additional build options (e.g., to c
 | Game config.  | ~/.config/opensurge2d |
 | Logs, etc.    | ~/.cache/opensurge2d  |
 
-**Portable setup:** if you haven't done a system-wide installation, Open Surge can also read files from the executable folder.
+**Portable setup:** if you haven't done a system-wide installation, Open Surge can also read files from the folder of the executable.
