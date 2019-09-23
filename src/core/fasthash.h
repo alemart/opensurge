@@ -17,6 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef _FASTHASH_H
+#define _FASTHASH_H
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -28,3 +32,5 @@ void* fasthash_get(fasthash_t* hashtable, uint32_t key);
 void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value);
 bool fasthash_delete(fasthash_t* hashtable, uint32_t key);
 void* fasthash_find(fasthash_t* hashtable, bool (*predicate)(const void*,void*), void* data);
+
+#endif

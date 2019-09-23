@@ -35,10 +35,10 @@ object "Simple Ball" is "entity"
  * - enabled: boolean. Indicates whether the movement is enabled or not (defaults to true).
  * - radius: number. A positive number given in pixels (e.g., 128 means a radius of 128 pixels).
  * - rate: number. A positive number given in cycles per second (1.0 means one cycle per second).
- * - clockwise: boolean. Indicates whether the movement is clockwise or counter-clockwise.
+ * - clockwise: boolean. Indicates whether the movement is clockwise or counterclockwise.
  * - scale: Vector2 object. Used to distort the circle. Vector2(1.0, 1.0) means no distortion (default).
- * - phaseOffset: number. A value given in degrees. Defaults to zero (180 means opposite phase).
  * - center: Vector2 object | null. Use it to force the center of the movement (null means no forcing).
+ * - phaseOffset: number. A value given in degrees. Defaults to zero (180 means opposite phase relative to zero).
  * - phase: number, readonly. A value given in degrees that indicates the current phase of the movement.
  * - entity: object, readonly. The entity associated with this behavior.
  */
