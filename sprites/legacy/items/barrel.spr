@@ -2,7 +2,7 @@
 // image by svgmovement, script by Alexandre
 sprite Barrel
 {
-    source_file     images/levels/1/barrel.png
+    source_file     images/barrel.png
     source_rect     0 0 38 32
     frame_size      38 32
     hot_spot        19 16
