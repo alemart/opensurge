@@ -42,7 +42,6 @@
 #include "../core/timer.h"
 #include "../core/sprite.h"
 #include "../core/assetfs.h"
-#include "../core/fasthash.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/lang.h"
@@ -65,6 +64,8 @@
 #include "../scripting/scripting.h"
 #include "../scenes/editorpal.h"
 
+#define FASTHASH_INLINE
+#include "../core/fasthash.h"
 
 /* ------------------------
  * Dialog Regions
@@ -478,7 +479,7 @@ void level_load(const char *filepath)
 
     /* scripting: preparing a new Level... */
     cached_level_ssobject = NULL;
-    ssobj_extradata = fasthash_create(free_ssobj_extradata);
+    ssobj_extradata = fasthash_create(free_ssobj_extradata, 15);
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
 
     /* entity manager */

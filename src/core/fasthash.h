@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * fasthash.h - a fast tiny hash table with integer keys and linear probing
+ * fasthash.h - a fast hash table with integer keys and linear probing
  * Copyright (C) 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -17,20 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #ifndef _FASTHASH_H
 #define _FASTHASH_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct fasthash_t fasthash_t;
+/* Inline usage:
 
-fasthash_t* fasthash_create(void (*element_destructor)(void*));
-fasthash_t* fasthash_destroy(fasthash_t* hashtable);
-void* fasthash_get(fasthash_t* hashtable, uint32_t key);
-void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value);
-bool fasthash_delete(fasthash_t* hashtable, uint32_t key);
-void* fasthash_find(fasthash_t* hashtable, bool (*predicate)(const void*,void*), void* data);
+#define FASTHASH_INLINE
+#include "fasthash.h"
+
+No need to compile fasthash.c separately */
+#if defined(FASTHASH_INLINE)
+#define FASTHASH_API static inline
+#else
+#define FASTHASH_API
+#endif
+
+typedef struct fasthash_t fasthash_t;
+FASTHASH_API fasthash_t* fasthash_create(void (*element_destructor)(void*), size_t lg2_cap);
+FASTHASH_API fasthash_t* fasthash_destroy(fasthash_t* hashtable);
+FASTHASH_API void* fasthash_get(fasthash_t* hashtable, uint64_t key);
+FASTHASH_API void fasthash_put(fasthash_t* hashtable, uint64_t key, void* value);
+FASTHASH_API bool fasthash_delete(fasthash_t* hashtable, uint64_t key);
+FASTHASH_API void* fasthash_find(fasthash_t* hashtable, bool (*predicate)(const void*,void*), void* data);
+
+#if defined(FASTHASH_INLINE)
+#include "fasthash.c"
+#endif
 
 #endif

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * fasthash.c - a fast tiny hash table with integer keys and linear probing
+ * fasthash.c - a fast hash table with integer keys and linear probing
  * Copyright (C) 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -34,7 +34,7 @@ enum fasthash_entry_state_t {
 
 struct fasthash_entry_t
 {
-    uint32_t key;
+    uint64_t key;
     fasthash_entry_state_t state;
     void* value;
 };
@@ -43,16 +43,15 @@ struct fasthash_t
 {
     size_t length;
     size_t capacity;
+    uint64_t cap_mask; /* capacity - 1 */
     fasthash_entry_t* data;
     void (*destructor)(void*); /* element destructor */
 };
 
 /* static data */
-static size_t INITIAL_CAPACITY = 32917; /* make it large */
-static const unsigned GROWTH_FACTOR = 2;
 static const unsigned SPARSITY = 4; /* 1 / load_factor */
 static fasthash_entry_t BLANK_ENTRY = { 0, BLANK, NULL };
-static inline uint32_t hash(uint32_t x);
+static inline uint64_t hash(uint64_t x, uint64_t m);
 static inline void grow(fasthash_t* hashtable);
 static void empty_destructor(void* data);
 
@@ -65,14 +64,17 @@ static void empty_destructor(void* data);
  * Create a new hash table
  * Function element_destructor deallocates individual elements
  * (it may be set to NULL if no destructor is desired)
+ * The initial capacity of the hash table will be set to 2^lg2_cap
+ * (it grows as needed)
  */
-fasthash_t* fasthash_create(void (*element_destructor)(void*))
+fasthash_t* fasthash_create(void (*element_destructor)(void*), size_t lg2_cap)
 {
     fasthash_t* hashtable = mallocx(sizeof(fasthash_t));
     int i;
 
     hashtable->length = 0;
-    hashtable->capacity = INITIAL_CAPACITY;
+    hashtable->capacity = 1 << min(16, lg2_cap); /* no more than 64K */
+    hashtable->cap_mask = hashtable->capacity - 1;
     hashtable->destructor = element_destructor ? element_destructor : empty_destructor;
     hashtable->data = mallocx(hashtable->capacity * sizeof(fasthash_entry_t));
     for(i = 0; i < hashtable->capacity; i++)
@@ -96,6 +98,14 @@ fasthash_t* fasthash_destroy(fasthash_t* hashtable)
     /* release the hash table */
     free(hashtable->data);
     free(hashtable);
+
+    /* omit warnings */
+    (void)fasthash_get;
+    (void)fasthash_put;
+    (void)fasthash_delete;
+    (void)fasthash_find;
+
+    /* done */
     return NULL;
 }
 
@@ -104,9 +114,9 @@ fasthash_t* fasthash_destroy(fasthash_t* hashtable)
  * Gets an element from the hash table
  * Returns NULL if the element doesn't exist
  */
-void* fasthash_get(fasthash_t* hashtable, uint32_t key)
+void* fasthash_get(fasthash_t* hashtable, uint64_t key)
 {
-    uint32_t k = hash(key) % hashtable->capacity;
+    uint32_t k = hash(key, hashtable->cap_mask);
     uint32_t marker = hashtable->capacity;
 
     while(hashtable->data[k].state != BLANK) {
@@ -129,7 +139,7 @@ void* fasthash_get(fasthash_t* hashtable, uint32_t key)
             marker = k; /* save first deleted entry */
 
         /* probe */
-        ++k; k %= hashtable->capacity;
+        ++k; k &= hashtable->cap_mask;
     }
 
     return NULL;
@@ -139,10 +149,10 @@ void* fasthash_get(fasthash_t* hashtable, uint32_t key)
  * fasthash_put()
  * Puts an element into the hash table
  */
-void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value)
+void fasthash_put(fasthash_t* hashtable, uint64_t key, void* value)
 {
     if(hashtable->length < hashtable->capacity / SPARSITY) { /* make it sparse */
-        uint32_t k = hash(key) % hashtable->capacity;
+        uint32_t k = hash(key, hashtable->cap_mask);
 
         /* won't accept NULL values */
         if(value == NULL)
@@ -166,7 +176,7 @@ void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value)
             }
 
             /* probe */
-            ++k; k %= hashtable->capacity;
+            ++k; k &= hashtable->cap_mask;
         }
 
         /* insert new element */
@@ -186,9 +196,9 @@ void fasthash_put(fasthash_t* hashtable, uint32_t key, void* value)
  * Deletes an element from the hash table
  * Returns true on success
  */
-bool fasthash_delete(fasthash_t* hashtable, uint32_t key)
+bool fasthash_delete(fasthash_t* hashtable, uint64_t key)
 {
-    uint32_t k = hash(key) % hashtable->capacity;
+    uint32_t k = hash(key, hashtable->cap_mask);
 
     while(hashtable->data[k].state != BLANK) {
         if(hashtable->data[k].key == key) {
@@ -203,7 +213,7 @@ bool fasthash_delete(fasthash_t* hashtable, uint32_t key)
         }
 
         /* probe */
-        ++k; k %= hashtable->capacity;
+        ++k; k &= hashtable->cap_mask;
     }
 
     /* key not found */
@@ -238,17 +248,20 @@ void grow(fasthash_t* hashtable)
     size_t old_cap = hashtable->capacity;
     int i;
 
-    hashtable->capacity *= GROWTH_FACTOR;
+    hashtable->capacity *= 2;
+    hashtable->cap_mask = (hashtable->cap_mask << 1) | 1;
     hashtable->data = reallocx(hashtable->data, hashtable->capacity * sizeof(fasthash_entry_t));
     for(i = old_cap; i < hashtable->capacity; i++)
         hashtable->data[i] = BLANK_ENTRY;
 }
 
-uint32_t hash(uint32_t x)
+uint64_t hash(uint64_t x, uint64_t m)
 {
-    x = ((x >> 16) ^ x) * 0x45d9f3b;
-    x = ((x >> 16) ^ x) * 0x45d9f3b;
-    return ((x >> 16) ^ x);
+    /* splitmix64 */
+    x += UINT64_C(0x9e3779b97f4a7c15);
+	x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
+	x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
+	return (x ^ (x >> 31)) & m; /* m = 2^k - 1 */
 }
 
 void empty_destructor(void* data)
