@@ -70,7 +70,7 @@ IF(UNIX)
 ENDIF()
 
 # Compiling the development version?
-OPTION(BLEEDING_EDGE "Enable if using the development version (yes by default)" ON)
+OPTION(BLEEDING_EDGE "Enable if using the development version" OFF)
 SET(BLEEDING_EDGE_VERSION "custom" CACHE STRING "Build version (bleeding edge)")
 IF(BLEEDING_EDGE)
   SET(DEFS "${DEFS}" "GAME_BUILD_VERSION='${BLEEDING_EDGE_VERSION}-dev'")

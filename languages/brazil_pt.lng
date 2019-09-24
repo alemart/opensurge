@@ -101,7 +101,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts
 
 // Main Menu
 MAINMENU_DEVBUILD           "Versão de desenvolvimento"
-MAINMENU_VERSION            "ver." // abbreviated
+MAINMENU_VERSION            "v." // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
