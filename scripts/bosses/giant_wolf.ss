@@ -11,6 +11,7 @@ using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
+using SurgeEngine.Video.Screen;
 using SurgeEngine.Events.Event;
 using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Collisions.CollisionBox;
@@ -355,6 +356,8 @@ object "Giant Wolf's Hand" is "private", "entity", "awake"
             Level.spawnEntity("Giant Wolf's Hand Impact", transform.position);
             state = "resting";
         }
+        else if(transform.localPosition.y >= Screen.height)
+            state = "resting"; // no bricks outside the screen
         else
             transform.move(0, punchSpeed * Time.delta);
     }

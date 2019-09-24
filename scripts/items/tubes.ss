@@ -15,10 +15,16 @@ object "Tube Out" is "entity", "special"
 
     fun onTubeCollision(player)
     {
-        // Tube In guarantees that
-        // player.input.enabled == false
-        // just before this occurs
-        player.input.enabled = !player.input.enabled;
+        if(player.rolling) {
+            // Tube In guarantees that
+            // player.input.enabled == false
+            // just before this occurs
+            player.input.enabled = !player.input.enabled;
+        }
+        else {
+            // walking?
+            player.input.enabled = true;
+        }
     }
 }
 

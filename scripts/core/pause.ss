@@ -5,14 +5,15 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Level;
-using SurgeEngine.Player;
+using SurgeEngine.Input;
 
 object "Pause and Quit"
 {
+    input = Input("default");
+
     state "main"
     {
         if(!Level.cleared) {
-            input = Player.active.input;
             if(input.buttonPressed("fire3"))
                 Level.pause();
             else if(input.buttonPressed("fire4"))
