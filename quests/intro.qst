@@ -12,6 +12,6 @@
 name            "Introduction"
 
 // level list (in order of appearance)
-level           "levels/scenes/contrib.lev"
+level           "levels/scenes/contrib.lev" // opens a "contribute" web page at the end
 level           "levels/scenes/allegro.lev"
 level           "levels/scenes/mainmenu.lev"
