@@ -18,48 +18,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
     <link rel="shortcut icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
-    <style>
-      html {
-        background: #353e73 url('surge.png') no-repeat right fixed;
-        background-size: contain;
-      }
-      body {
-        background: rgba(53, 62, 115, 0.9);
-        font-size: 16pt;
-        color: #fff;
-        text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.85);
-        letter-spacing: 1px;
-      }
-      a, a:visited, a:hover, a:active, a:focus { color: #ffee11; }
-      .cartoon {
-        color: #fff;
-        font-weight: bold;
-        font-family: 'Luckiest Guy', sans-serif;
-        text-shadow:
-          -1px -1px 0 rgba(0,0,0,0.8),
-          1px -1px 0 rgba(0,0,0,0.8),
-          -1px 2px 0 rgba(0,0,0,0.8),
-          1px 2px 0 rgba(0,0,0,0.8);
-        letter-spacing: 3px;
-      }
-      .btn { border: 0; border-radius: 0; text-transform: uppercase; padding: 8px 24px; font-size: 20pt; font-weight: 900; }
-      .btn-primary, .btn-primary:focus, .btn-primary:active, .btn-primary.active { background: #ff8800 !important; color: #fff !important; }
-      .btn-primary { box-shadow: 8px 8px 0px 1px #2b2b56 !important; }
-      .btn-primary:hover { background: #ffee11 !important; }
-      h2 { font-weight: bold; margin-top: 1.5em; margin-bottom: 0.75em; }
-      h2:before {
-        margin-right: 0.2em;
-        margin-bottom: -0.2em;
-        display: inline-block;
-        content: ' ';
-        background-image: url('thunder.svg');
-        background-size: 32px 32px;
-        height: 32px;
-        width: 32px;
-      }
-      @media(min-width:768px) { section p, section ul { margin-left: 1.9em; } }
-      footer { font-size: 14pt; background: #2c2c2c; text-shadow: 0 0 0 #000; margin-top: 2em; }
-    </style>
+    <link href="/style.css" rel="stylesheet">
   </head>
   <body>
    <div class="container">
@@ -67,7 +26,7 @@
         <img class="img-fluid" src="logo.png" alt="Open Surge">
     </header>
     <nav class="d-flex flex-column flex-sm-row justify-content-center">
-      <a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank" class="btn btn-primary cartoon m-3">Play</a>
+      <a href="#download" class="btn btn-primary cartoon m-3">Play</a>
       <a href="http://opensnc.sf.net/wiki/index.php/Introduction_to_Modding" target="_blank" class="btn btn-primary cartoon m-3">Create</a>
       <a href="http://opensurge2d.org/share" target="_blank" class="btn btn-primary cartoon m-3">Share</a>
       <a href="http://youtube.com/alemart88" target="_blank" class="btn btn-primary cartoon m-3"><i class="fa fa-youtube"></i></a>
@@ -78,6 +37,43 @@
         <img src="surge-demo.gif" alt="Demo" class="img-fluid" style="width:600px">
       </div>
       <p>Currently available for Windows and GNU/Linux.</p>
+    </section>
+    <section id="download">
+      <h2>Download the game</h2>
+      <div class="container-fluid text-center">
+        <div class="row">
+          <div class="col-xs-12 col-md">
+            <img src="pics/windows.png" class="os-logo">
+            <h3 class="mb-3">Windows</h3>
+            <a href="#" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
+            <small class="d-block">full game &amp; engine</small>
+          </div>
+          <div class="col-xs-12 col-md">
+            <img src="pics/linux.png" class="os-logo">
+            <h3 class="mb-3">Linux</h3>
+            <a href="#" target="_blank" class="d-block m-2"><i class="fa fa-file-archive-o mr-2"></i>Get the sources</a>
+            <small class="d-block">distro-specific packages: soon</small>
+          </div>
+          <div class="col-xs-12 col-md">
+            <img src="pics/android.png" class="os-logo">
+            <h3 class="mb-3">Android</h3>
+            <a href="#" target="_blank" class="d-block m-2"><i class="fa fa-file-text-o mr-2"></i>Get early access</a>
+            <small class="d-block">mobile version: coming soon</small>
+          </div>
+        </div>
+      </div>
+      <p class="mt-3">&nbsp;</p>
+      <div class="text-center">
+      <p>Please support Open Surge by making a contribution!</p>
+      <ul class="d-inline-block">
+        <li><w href="#"><i class="fa fa-thumbs-up mr-2"></i>Purchase a copy of the software</a>.</li>
+        <li><small>Alternatively, <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3WAZYYTB22KFG" target="_blank">donate via PayPal</a>.</small></li>
+      </ul>
+      <p>Open Surge is created independently and your contribution directly helps the development!</p>
+      </div>
+      <p class="mt-4">&nbsp;</p>
+      <p>Latest release: Open Surge version 0.5.0</p>
+      <p><img src="pics/rpi.png" width="32" class="mr-2">Raspberry Pi version: in the future!</p>
     </section>
     <section id="about">
       <h2>About Open Surge</h2>
@@ -140,7 +136,7 @@
       <h2>This is so awesome!</h2>
       <p>Indeed it is! But enough talking.</p>
       <p class="text-center">
-        <a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank" class="btn btn-primary cartoon m-3">Get it now!</a>
+        <a href="#download" class="btn btn-primary cartoon m-3">Get it now!</a>
       </p>
     </section>
    </div>
