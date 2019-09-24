@@ -24,6 +24,7 @@ extern "C" {
     !defined(__ssize_t_defined) && !defined(ssize_t) && \
     !defined(_SSIZE_T_DECLARED) && !defined(HAVE_SSIZE_T)
 #define _SSIZE_T
+#define __ssize_t_defined
 typedef long  ssize_t;  /* byte count or error */
 #endif
 
