@@ -2,11 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Open Surge: 2D game engine for retro platformers</title>
+    <title>Support Open Surge!</title>
     <meta name="robots" content="index, follow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that empowers you to unleash your creativity! Play, hack, create & share!">
     <meta property="og:image" content="http://opensurge2d.org/pics/demo500.png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -14,23 +15,68 @@
       gtag('js', new Date());
       gtag('config', 'UA-120511928-1');
     </script>
+    <script type="text/javascript" src="https://static.itch.io/api.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
     <link rel="shortcut icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
     <link href="/style.css" rel="stylesheet">
   </head>
-  <body style="height:calc(100vh - 32px)">
-   <div class="container">
-    <header class="text-center my-3">
+  <body>
+    <!-- Page contents -->
+    <div class="container">
+      <header class="text-center my-3">
         <img class="img-fluid" src="/logo.png" alt="Open Surge">
-    </header>
-    <section id="contribute" class="text-center p-3" style="font-size: 18pt">
-      <p>Thank you for playing Open Surge! It is available as free and open source for all. It is intended to bring joy to the people, and to let them express their full creativity!</p>
-      <p>Open Surge is created independently and asks for your contribution. Your contribution directly helps the development of the project.</p>
-      <p>Support the project by purchasing a copy. It is available in a <em>&quot;pay what you want&quot;</em> model. <strong>Suggested value: $20 USD or more</strong>.</p>
-      <p><a href="#" class="btn btn-primary cartoon m-3">Purchase now!</a></p>
-    </section>
-   </div>
+      </header>
+      <section id="contribute" class="text-center p-3" style="font-size: 18pt">
+        <div class="lang en_US">
+          <p>Thank you for playing Open Surge! It is available as free and open source for all. It is intended to bring joy to the people, and to let them express their creativity fully!</p>
+          <p>Open Surge is created independently and asks for your contribution. Your contribution directly helps the development of the project and is very much appreciated!</p>
+          <p>Purchase your copy of the software! You can pay what you want.<br><strong>Suggested value: $20 USD or more</strong>.</p>
+        </div>
+        <div class="lang pt_BR">
+          <p>Obrigado por jogar o Open Surge! Ele está disponível para todos &ndash; como software livre &ndash; e se propõe a trazer alegria e criatividade, de modo que todos possam jogar e criar!</p>
+          <p>O Open Surge é criado de forma independente e pede a sua contribuição. Sua contribuição ajuda diretamente o desenvolvimento do projeto e é apreciada!</p>
+          <p>Compre agora sua cópia do software! Você paga o quanto desejar!<br><strong>Valor sugerido: $20 ou mais</strong>.</p>
+        </div>
+        <p><a id="purchase" href="javascript:;" class="btn btn-primary cartoon m-3">
+          <span class="lang en_US">Purchase now!</span>
+          <span class="lang pt_BR">Compre agora!</span>
+        </a></p>
+      </section>
+    </div>
+
+    <!-- Language selector -->
+    <script>
+    window.qs = (function(params) {
+        var param = {};
+        for(var i = 0; i < params.length; i++) {
+            var p = params[i].split('=', 2);
+            if(p.length == 1)
+                param[p[0]] = '';
+            else
+                param[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
+        }
+        return param;
+    })(window.location.search.substr(1).split('&'));
+    window.lang = (window.qs || {})['lang'] || 'en_US';
+    $(document).ready(function() {
+        var hasLang = $('.lang.' + window.lang).length > 0;
+        if(hasLang) {
+            $('.lang').hide();
+            $('.lang.' + window.lang).show();
+        }
+    });
+    </script>
+
+    <!-- itch API -->
+    <script type="text/javascript">
+    $(document).ready(function() {
+      Itch.attachBuyButton(document.getElementById("purchase"), {
+        user: "alemart",
+        game: "opensurge"
+      });
+    });
+    </script>
   </body>
 </html>

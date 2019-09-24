@@ -4,6 +4,7 @@ html {
 }
 body {
     background: rgba(53, 62, 115, 0.9);
+    min-height: calc(100vh - 32px);
     font-size: 16pt;
     color: #fff;
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.85);
@@ -40,3 +41,5 @@ h2:before {
 footer { font-size: 14pt; background: #2c2c2c; text-shadow: 0 0 0 #000; margin-top: 2em; }
 img.os-logo { max-width: 128px; margin: 32px 0 16px 0; }
 ul { list-style-type: none; }
+.lang { display: none; }
+.lang.en_US { display: inline-block; }

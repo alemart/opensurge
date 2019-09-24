@@ -7,12 +7,12 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=ua-120511928-1"></script>
         <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'UA-120511928-1');
+          window.datalayer = window.datalayer || [];
+          function gtag(){datalayer.push(arguments);}
+          gtag('js', new date());
+          gtag('config', 'ua-120511928-1');
         </script>
         <style>
         body {
@@ -93,13 +93,14 @@
             <div class="container text-center">
                 <div class="panel">
                     <img class="icon" src="icon.png" alt="Open Surge">
-                    <h3>Enjoy the game?<br>Share it with your friends!</h3>
-                    <h5 class="hidden">(opens in a new window)</h5>
+                    <h3 class="lang en_US">Have you enjoyed the game?<br>Share it with your friends!</h3>
+                    <h3 class="lang pt_BR">Curtiu o jogo?<br>Compartilhe com seus amigos!</h3>
                     <div>
                         <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'facebook')" class="btn"><img src="facebook.png" alt="Facebook"></a>
-                        <a href="http://twitter.com/share?text=Open%20Surge%3A%202D%20game%20engine%20for%20retro%20platformers&url=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'twitter')" class="btn"><img src="twitter.png" alt="Twitter"></a>
+                        <a href="http://twitter.com/share?text=Open%20Surge%3A%20a%20fun%202D%20retro%20platformer%20inspired%20by%20old-school%20Sonic%20games.%20It's%20also%20a%20game%20creation%20system!&url=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'twitter')" class="btn"><img src="twitter.png" alt="Twitter"></a>
                     </div>
-                    <h4 class="text-center">You will be redirected shortly...</h4>
+                    <h4 class="text-center lang en_US">You will be redirected shortly...</h4>
+                    <h4 class="text-center lang pt_BR">Você será redirecionado.</h4>
                     <progress id="progressbar" value="0" max="1000"></progress>
                 </div>
             </div>
@@ -125,10 +126,33 @@
         })(jQuery);
         </script>
 
+        <!-- Language selector -->
+        <script>
+        window.qs = (function(params) {
+            var param = {};
+            for(var i = 0; i < params.length; i++) {
+                var p = params[i].split('=', 2);
+                if(p.length == 1)
+                    param[p[0]] = '';
+                else
+                    param[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
+            }
+            return param;
+        })(window.location.search.substr(1).split('&'));
+        window.lang = (window.qs || {})['lang'] || 'en_US';
+        $(document).ready(function() {
+            var languageExists = $('.lang.' + window.lang).length > 0;
+            if(languageExists) {
+                $('.lang').hide();
+                $('.lang.' + window.lang).show();
+            }
+        })
+        </script>
+
         <!-- Sharing Code -->
         <script>
         $(document).ready(function() {
-            var redirect = function() { window.location = 'http://opensurge2d.org'; }
+            var redirect = function() { window.location = '/contribute?lang=' + window.lang; }
             var progress = $('#progressbar').progress(10.0, redirect);
             window.share = function(link, on) {
                 var win = window.open(link.href, 'Social ' + on, 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes'); //width=657,height=487

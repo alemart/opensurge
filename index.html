@@ -14,6 +14,7 @@
       gtag('js', new Date());
       gtag('config', 'UA-120511928-1');
     </script>
+    <script type="text/javascript" src="https://static.itch.io/api.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
     <link rel="shortcut icon" href="favicon.ico">
@@ -28,7 +29,7 @@
     <nav class="d-flex flex-column flex-sm-row justify-content-center">
       <a href="#download" class="btn btn-primary cartoon m-3">Play</a>
       <a href="http://opensnc.sf.net/wiki/index.php/Introduction_to_Modding" target="_blank" class="btn btn-primary cartoon m-3">Create</a>
-      <a href="http://opensurge2d.org/share" target="_blank" class="btn btn-primary cartoon m-3">Share</a>
+      <a href="/share" target="_blank" class="btn btn-primary cartoon m-3">Share</a>
       <a href="http://youtube.com/alemart88" target="_blank" class="btn btn-primary cartoon m-3"><i class="fa fa-youtube"></i></a>
     </nav>
     <section id="intro" class="text-center p-3">
@@ -45,19 +46,19 @@
           <div class="col-xs-12 col-md">
             <img src="pics/windows.png" class="os-logo">
             <h3 class="mb-3">Windows</h3>
-            <a href="#" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
-            <small class="d-block">full game &amp; engine</small>
+            <a id="get-win32" href="javascript:;" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
+            <small class="d-block">view on <a href="https://alemart.itch.io/opensurge" target="_blank">itch.io</a></small>
           </div>
           <div class="col-xs-12 col-md">
             <img src="pics/linux.png" class="os-logo">
             <h3 class="mb-3">Linux</h3>
-            <a href="#" target="_blank" class="d-block m-2"><i class="fa fa-file-archive-o mr-2"></i>Get the sources</a>
+            <a href="https://github.com/alemart/opensurge" target="_blank" class="d-block m-2"><i class="fa fa-file-archive-o mr-2"></i>Get the sources</a>
             <small class="d-block">distro-specific packages: soon</small>
           </div>
           <div class="col-xs-12 col-md">
             <img src="pics/android.png" class="os-logo">
             <h3 class="mb-3">Android</h3>
-            <a href="#" target="_blank" class="d-block m-2"><i class="fa fa-file-text-o mr-2"></i>Get early access</a>
+            <a href="javascript:alert('Soon!')" target="_blank" class="d-block m-2"><i class="fa fa-file-text-o mr-2"></i>Get early access</a>
             <small class="d-block">mobile version: coming soon</small>
           </div>
         </div>
@@ -66,13 +67,12 @@
       <div class="text-center">
       <p>Please support Open Surge by making a contribution!</p>
       <ul class="d-inline-block">
-        <li><w href="#"><i class="fa fa-thumbs-up mr-2"></i>Purchase a copy of the software</a>.</li>
-        <li><small>Alternatively, <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3WAZYYTB22KFG" target="_blank">donate via PayPal</a>.</small></li>
+        <li><a id="purchase" href="javascript:;"><i class="fa fa-thumbs-up mr-2"></i>Purchase a copy of the software</a></li>
       </ul>
       <p>Open Surge is created independently and your contribution directly helps the development!</p>
       </div>
       <p class="mt-4">&nbsp;</p>
-      <p>Latest release: Open Surge version 0.5.0</p>
+      <p class="float-right text-right">Latest release: Open Surge version 0.5.0<br><small>(<a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank">dev builds</a> for early adopters)</small></p>
       <p><img src="pics/rpi.png" width="32" class="mr-2">Raspberry Pi version: in the future!</p>
     </section>
     <section id="about">
@@ -149,5 +149,15 @@
      </p>
     </div>
    </footer>
+
+   <!-- itch API -->
+   <script type="text/javascript">
+     ["get-win32", "purchase"].forEach(function(id) {
+       Itch.attachBuyButton(document.getElementById(id), {
+         user: "alemart",
+         game: "opensurge"
+       });
+     });
+   </script>
   </body>
 </html>
