@@ -33,7 +33,7 @@
       <a href="http://youtube.com/alemart88" target="_blank" class="btn btn-primary cartoon m-3"><i class="fa fa-youtube"></i></a>
     </nav>
     <section id="intro" class="text-center p-3">
-      <p>Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that empowers you to unleash your creativity! Play, hack, create &amp; share!</p>
+      <p>Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that lets you unleash your creativity! Play, hack, create &amp; share!</p>
       <div class="mx-4 text-center cartoon">
         <img src="surge-demo.gif" alt="Demo" class="img-fluid" style="width:600px">
       </div>
@@ -46,20 +46,20 @@
           <div class="col-xs-12 col-md">
             <img src="pics/windows.png" class="os-logo">
             <h3 class="mb-3">Windows</h3>
-            <a id="get-win32" href="javascript:;" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
+            <a id="get-win" href="javascript:;" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
             <small class="d-block">view on <a href="https://alemart.itch.io/opensurge" target="_blank">itch.io</a></small>
           </div>
           <div class="col-xs-12 col-md">
             <img src="pics/linux.png" class="os-logo">
             <h3 class="mb-3">Linux</h3>
-            <a href="https://github.com/alemart/opensurge" target="_blank" class="d-block m-2"><i class="fa fa-file-archive-o mr-2"></i>Get the packages</a>
-            <small class="d-block">view sources on <a href="https://github.com/alemart/opensurge" target="_blank">GitHub</a></small>
+            <a id="get-linux" href="javascript:;" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
+            <small class="d-block">for <a href="http://opensnc.sourceforge.net/forum/viewtopic.php?id=2041" target="_blank">your distro</a> | view on <a href="https://github.com/alemart/opensurge" target="_blank">GitHub</a></small>
           </div>
           <div class="col-xs-12 col-md">
             <img src="pics/android.png" class="os-logo">
             <h3 class="mb-3">Android</h3>
-            <a href="javascript:alert('Soon!')" target="_blank" class="d-block m-2"><i class="fa fa-file-text-o mr-2"></i>Get early access</a>
-            <small class="d-block">mobile version: coming soon</small>
+            <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="_blank" class="d-block m-2"><i class="fa fa-mobile mr-2"></i>Join our beta</a>
+            <small class="d-block">mobile version: soon</small>
           </div>
         </div>
       </div>
@@ -67,9 +67,9 @@
       <div class="text-center">
       <p>Please support Open Surge by making a contribution!</p>
       <p class="text-center">
-        <a id="purchase" href="javascript:;"><i class="fa fa-thumbs-up mr-2"></i>Purchase a copy of the software</a>
+        <a id="purchase" href="javascript:;">Purchase a copy of the software!</a>
       </p>
-      <p>Open Surge is created independently and your contribution directly helps the development!</p>
+      <p>Open Surge is created independently and your contribution directly helps its development!</p>
       </div>
       <p class="mt-4">&nbsp;</p>
       <p class="float-right text-right">Latest release: Open Surge version 0.5.0<br><small>(<a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank">dev builds</a> for early adopters)</small></p>
@@ -152,7 +152,7 @@
 
    <!-- itch API -->
    <script type="text/javascript">
-     ["get-win32", "purchase"].forEach(function(id) {
+     ["get-win", "get-linux", "purchase"].forEach(function(id) {
        Itch.attachBuyButton(document.getElementById(id), {
          user: "alemart",
          game: "opensurge"
