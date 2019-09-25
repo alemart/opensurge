@@ -152,7 +152,7 @@ background
 // foreground
 background
 {
-    initial_position    8000 0
+    initial_position    9500 0
     scroll_speed        -2.0 -1.5
     behavior            DEFAULT
     repeat_x            FALSE
@@ -176,31 +176,7 @@ background
 
 background
 {
-    initial_position    10000 0
-    scroll_speed        -2.0 -1.5
-    behavior            DEFAULT
-    repeat_x            FALSE
-    repeat_y            TRUE
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/waterworks_bg.png"
-        source_rect     0 384 480 83
-        frame_size      480 83
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-background
-{
-    initial_position    12000 0
+    initial_position    12500 0
     scroll_speed        -2.0 -1.5
     behavior            DEFAULT
     repeat_x            FALSE
