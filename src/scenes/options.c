@@ -897,6 +897,7 @@ static void group_stageselect_update(group_t *g)
                     stageselect_enable_debug = true;
                     cnt = -1;
                 }
+                cnt2 = min(cnt2, 0);
             }
             else if(input_button_pressed(input, IB_LEFT)) { /* stage select: quest select trick */
                 if(cnt2 >= 0 && ++cnt2 == 3) {
@@ -904,6 +905,7 @@ static void group_stageselect_update(group_t *g)
                     scn = SCENE_QUESTSELECT;
                     cnt2 = -1;
                 }
+                cnt = min(cnt, 0);
             }
             else if(input_button_pressed(input, IB_UP) || input_button_pressed(input, IB_DOWN)) {
                 cnt = min(cnt, 0);

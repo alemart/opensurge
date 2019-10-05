@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * intro.c - introduction screen
- * Copyright (C) 2008-2011, 2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2011, 2013, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include "intro.h"
 #include "../core/global.h"
@@ -44,6 +45,8 @@ static int debug_mode;
 static font_t* fnt;
 static input_t* in;
 static image_t* box;
+static bool any_button_pressed(input_t* in);
+
 
 /* public functions */
 
@@ -100,6 +103,8 @@ void intro_release()
  */
 void intro_update()
 {
+    static int cnt = 0;
+
     /* elapsed time */
     elapsed_time += timer_get_delta();
 
@@ -120,7 +125,6 @@ void intro_update()
 
     /* secret */
     if(input_button_pressed(in, IB_RIGHT)) {
-        static int cnt = 0;
         if(!debug_mode && ++cnt == 3) {
             sound_play(SFX_SECRET);
             elapsed_time += INTRO_TIMEOUT;
@@ -128,6 +132,8 @@ void intro_update()
             cnt = 0;
         }
     }
+    else if(any_button_pressed(in) && cnt < 3)
+        cnt = 0;
 }
 
 /*
@@ -142,4 +148,19 @@ void intro_render()
     image_clear(color_hex("ff8800"));
     image_draw_rotated(box, VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2, image_width(box)/2, image_height(box)/2, angle, IF_NONE);
     font_render(fnt, camera);
+}
+
+
+
+/* private stuff */
+
+/* checks if any button has been pressed */
+bool any_button_pressed(input_t* in)
+{
+    for(int i = 0; i < (int)IB_MAX; i++) {
+        if(input_button_pressed(in, (inputbutton_t)i))
+            return true;
+    }
+
+    return false;
 }
