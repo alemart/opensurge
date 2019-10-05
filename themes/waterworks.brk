@@ -1412,7 +1412,7 @@ brick 140
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/waterworks_mask.png"
-    zindex              0.4
+    zindex              0.26
 
     sprite
     {

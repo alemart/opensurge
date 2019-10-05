@@ -1347,9 +1347,6 @@ brick 11 8832 11232
 brick 15 8960 11232
 brick 15 8832 11232
 brick 180 8960 11232
-brick 180 9024 11232
-brick 180 8960 11296
-brick 180 9024 11296
 brick 180 8960 11328
 brick 180 9024 11328
 brick 180 8832 11360
@@ -1495,6 +1492,9 @@ brick 142 9008 10848
 brick 145 9008 10832
 brick 162 8880 10928
 brick 162 8944 10928
+brick 180 9024 11232
+brick 180 8960 11296
+brick 180 9024 11296
 brick 18 8544 9888
 brick 45 8320 10336
 brick 26 7808 10240 yellow
@@ -3527,7 +3527,6 @@ entity "GreenMarmot" 5856 10176 "6ff2870dc8b73043"
 entity "Layer Yellow" 7824 9968 "82d466ccc5b887d7"
 entity "Layer Yellow" 7824 9936 "c51fa056e4d8e318"
 entity "Layer Yellow" 7824 9904 "9d1f90a14af694de"
-entity "RedMarmot" 10816 10976 "d46027894789a142"
 entity "Skaterbug" 9152 11008 "45c296465354b215"
 entity "Jumping Fish" 9344 11040 "860d71ace0fe3e31"
 entity "Jumping Fish" 9488 11040 "10b81e849d6c6e0d"
@@ -3634,8 +3633,6 @@ entity "Collectible" 7472 10400 "73bad944f27a54b1"
 entity "Collectible" 7472 10464 "efc83cbef72dac58"
 entity "Collectible" 11088 10912 "dbd77170e7414f00"
 entity "Collectible" 11088 10880 "0b15613be4000d9e"
-entity "Collectible" 10512 10960 "1359547f0515a68d"
-entity "Collectible" 10512 10928 "0acd0cfb17a78e80"
 entity "Collectible" 9216 11264 "a6c0178e653dc91f"
 entity "Collectible" 9216 11232 "d446a7d3a53c154d"
 entity "Collectible" 9440 11344 "ccb9494a18403cad"
@@ -3656,7 +3653,6 @@ entity "Collectible" 17472 11904 "b3b9d4e9b056fad7"
 entity "Collectible" 17344 11776 "caf085c944c592e7"
 entity "Collectible" 17312 11744 "d7ff8c0486cee002"
 entity "Collectible" 17280 11712 "e3fa22129aff3d42"
-entity "Collectible" 10352 10976 "177455967179a6e6"
 entity "Collectible" 6112 9408 "b1e178d26f782c2b"
 entity "Collectible" 6112 9376 "1968e3067d4eb6b3"
 entity "Collectible" 6112 9440 "7cefd5693af3e71e"
