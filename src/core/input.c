@@ -431,6 +431,7 @@ bool input_is_ignored(input_t *in)
  */
 void input_simulate_button_down(input_t *in, inputbutton_t button)
 {
+    in->oldstate[(int)button] = in->state[(int)button];
     in->state[(int)button] = true;
 }
 
@@ -442,8 +443,10 @@ void input_simulate_button_down(input_t *in, inputbutton_t button)
  */
 void input_simulate_button_up(input_t *in, inputbutton_t button)
 {
+    in->oldstate[(int)button] = in->state[(int)button];
     in->state[(int)button] = false;
 }
+
 
 
 /*
@@ -568,6 +571,9 @@ void input_unregister(input_t *in)
 {
     input_list_t *node, *next;
 
+    if(!inlist)
+        return;
+
     if(inlist->data == in) {
         next = inlist->next;
         free(inlist);
@@ -656,17 +662,17 @@ void inputuserdefined_update(input_t* in)
 
     if(im->keyboard.enabled) {
         for(button = 0; button < IB_MAX; button++)
-            in->state[button] |= (im->keyboard.scancode[button] > 0) && a5_key[im->keyboard.scancode[button]];
+            in->state[button] = (im->keyboard.scancode[button] > 0) && a5_key[im->keyboard.scancode[button]];
     }
 
     if(im->joystick.enabled) {
         if(input_is_joystick_enabled() && im->joystick.id < min(input_number_of_joysticks(), MAX_JOYS)) {
-            in->state[IB_UP] |= (joy[im->joystick.id].axis[1] <= -joy_threshold);
-            in->state[IB_DOWN] |= (joy[im->joystick.id].axis[1] >= joy_threshold);
-            in->state[IB_LEFT] |= (joy[im->joystick.id].axis[0] <= -joy_threshold);
-            in->state[IB_RIGHT] |= (joy[im->joystick.id].axis[0] >= joy_threshold);
+            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[1] <= -joy_threshold);
+            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[1] >= joy_threshold);
+            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[0] <= -joy_threshold);
+            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[0] >= joy_threshold);
             for(button = IB_FIRE1; button <= IB_FIRE8; button++)
-                in->state[button] |= (joy[im->joystick.id].button >> (button - IB_FIRE1)) & 1;
+                in->state[button] = in->state[button] || ((joy[im->joystick.id].button >> (button - IB_FIRE1)) & 1);
         }
     }
 #else
@@ -679,23 +685,23 @@ void inputuserdefined_update(input_t* in)
 
     if(im->keyboard.enabled) {
         for(i=0; i<IB_MAX; i++)
-            in->state[i] |= (im->keyboard.scancode[i] > 0) && key[ im->keyboard.scancode[i] ];
+            in->state[i] = (im->keyboard.scancode[i] > 0) && key[ im->keyboard.scancode[i] ];
     }
 
     if(input_is_joystick_enabled() && im->joystick.enabled && im->joystick.id < input_number_of_joysticks()) {
         k = im->joystick.id;
-        in->state[IB_UP] |= joy[k].stick[0].axis[1].d1;
-        in->state[IB_DOWN] |= joy[k].stick[0].axis[1].d2;
-        in->state[IB_LEFT] |= joy[k].stick[0].axis[0].d1;
-        in->state[IB_RIGHT] |= joy[k].stick[0].axis[0].d2;
-        in->state[IB_FIRE1] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE1]) ? joy[k].button[ im->joystick.button[IB_FIRE1] ].b : false;
-        in->state[IB_FIRE2] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE2]) ? joy[k].button[ im->joystick.button[IB_FIRE2] ].b : false;
-        in->state[IB_FIRE3] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE3]) ? joy[k].button[ im->joystick.button[IB_FIRE3] ].b : false;
-        in->state[IB_FIRE4] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE4]) ? joy[k].button[ im->joystick.button[IB_FIRE4] ].b : false;
-        in->state[IB_FIRE5] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE5]) ? joy[k].button[ im->joystick.button[IB_FIRE5] ].b : false;
-        in->state[IB_FIRE6] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE6]) ? joy[k].button[ im->joystick.button[IB_FIRE6] ].b : false;
-        in->state[IB_FIRE7] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE7]) ? joy[k].button[ im->joystick.button[IB_FIRE7] ].b : false;
-        in->state[IB_FIRE8] |= (joy[k].num_buttons > im->joystick.button[IB_FIRE8]) ? joy[k].button[ im->joystick.button[IB_FIRE8] ].b : false;
+        in->state[IB_UP] = in->state[IB_UP] || joy[k].stick[0].axis[1].d1;
+        in->state[IB_DOWN] = in->state[IB_DOWN] || joy[k].stick[0].axis[1].d2;
+        in->state[IB_LEFT] = in->state[IB_LEFT] || joy[k].stick[0].axis[0].d1;
+        in->state[IB_RIGHT] = in->state[IB_RIGHT] || joy[k].stick[0].axis[0].d2;
+        in->state[IB_FIRE1] = in->state[IB_FIRE1] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE1]) && joy[k].button[ im->joystick.button[IB_FIRE1] ].b);
+        in->state[IB_FIRE2] = in->state[IB_FIRE2] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE2]) && joy[k].button[ im->joystick.button[IB_FIRE2] ].b);
+        in->state[IB_FIRE3] = in->state[IB_FIRE3] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE3]) && joy[k].button[ im->joystick.button[IB_FIRE3] ].b);
+        in->state[IB_FIRE4] = in->state[IB_FIRE4] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE4]) && joy[k].button[ im->joystick.button[IB_FIRE4] ].b);
+        in->state[IB_FIRE5] = in->state[IB_FIRE5] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE5]) && joy[k].button[ im->joystick.button[IB_FIRE5] ].b);
+        in->state[IB_FIRE6] = in->state[IB_FIRE6] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE6]) && joy[k].button[ im->joystick.button[IB_FIRE6] ].b);
+        in->state[IB_FIRE7] = in->state[IB_FIRE7] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE7]) && joy[k].button[ im->joystick.button[IB_FIRE7] ].b);
+        in->state[IB_FIRE8] = in->state[IB_FIRE8] || ((joy[k].num_buttons > im->joystick.button[IB_FIRE8]) && joy[k].button[ im->joystick.button[IB_FIRE8] ].b);
     }
 #endif
 }
