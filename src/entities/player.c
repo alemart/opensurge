@@ -1397,7 +1397,9 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         physicsactor_duck(pa);
     if(input_button_down(act->input, IB_UP))
         physicsactor_look_up(pa);
-    if(input_button_down(act->input, IB_FIRE1))
+    if(input_button_pressed(act->input, IB_FIRE1))
+        physicsactor_1stjump(pa);
+    else if(input_button_down(act->input, IB_FIRE1))
         physicsactor_jump(pa);
 
     /* clearing the obstacle map &

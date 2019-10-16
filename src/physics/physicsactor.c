@@ -64,6 +64,7 @@ struct physicsactor_t
     int angle; /* angle (0-255 clockwise) */
     int in_the_air; /* is the player in the air? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
+    float jump_lock_timer; /* jump lock timer, in seconds */
     int facing_right; /* is the player facing right? */
     float wait_timer; /* the time, in seconds, that the physics actor is stopped */
     int winning_pose; /* winning pose enabled? */
@@ -224,6 +225,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->in_the_air = TRUE;
     pa->state = PAS_STOPPED;
     pa->horizontal_control_lock_timer = 0.0f;
+    pa->jump_lock_timer = 0.0f;
     pa->facing_right = TRUE;
     pa->input = input_create_computer();
     pa->wait_timer = 0.0f;
@@ -469,6 +471,13 @@ void physicsactor_look_up(physicsactor_t *pa)
 
 void physicsactor_jump(physicsactor_t *pa)
 {
+    input_simulate_button_down(pa->input, IB_FIRE1);
+    input_simulate_button_down(pa->input, IB_FIRE1);
+}
+
+void physicsactor_1stjump(physicsactor_t *pa)
+{
+    input_simulate_button_up(pa->input, IB_FIRE1);
     input_simulate_button_down(pa->input, IB_FIRE1);
 }
 
@@ -904,21 +913,22 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* charging... */
     if(pa->state == PAS_CHARGING) {
+        /* charging more...! */
+        if(input_button_pressed(pa->input, IB_FIRE1))
+            pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
+        else if(fabs(pa->charge_intensity) >= 0.015625f)
+            pa->charge_intensity *= 0.99955f - 1.84845f * dt; /* attenuate charge intensity */
+
         /* release */
         if(!input_button_down(pa->input, IB_DOWN)) {
             float s = pa->facing_right ? 1.0f : -1.0f;
             pa->gsp = (s * pa->chrg) * (0.67f + pa->charge_intensity * 0.33f);
             pa->state = PAS_ROLLING;
             pa->charge_intensity = 0.0f;
+            pa->jump_lock_timer = 0.125f;
         }
         else
             pa->gsp = 0.0f;
-
-        /* charging more...! */
-        if(input_button_pressed(pa->input, IB_FIRE1))
-            pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
-        else
-            pa->charge_intensity *= 0.99955f - 1.84845f * dt; /* attenuate charge intensity */
     }
 
     /*
@@ -990,14 +1000,17 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     else {
 
         /* jumping */
-        if(input_button_down(pa->input, IB_FIRE1) && !input_button_down(pa->input, IB_DOWN) && !input_button_down(pa->input, IB_UP)) {
-            float grv_attenuation = (pa->gsp * SIN(pa->angle) < 0.0f) ? 1.0f : 0.5f;
-            pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
-            pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle) * grv_attenuation;
-            pa->gsp = 0.0f;
-            pa->angle = 0x0;
-            pa->state = PAS_JUMPING;
-            UPDATE_MOVMODE();
+        pa->jump_lock_timer = max(0.0f, pa->jump_lock_timer - dt);
+        if(pa->jump_lock_timer <= 0.0f) {
+            if(input_button_pressed(pa->input, IB_FIRE1) && !input_button_down(pa->input, IB_DOWN) && !input_button_down(pa->input, IB_UP)) {
+                float grv_attenuation = (pa->gsp * SIN(pa->angle) < 0.0f) ? 1.0f : 0.5f;
+                pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
+                pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle) * grv_attenuation;
+                pa->gsp = 0.0f;
+                pa->angle = 0x0;
+                pa->state = PAS_JUMPING;
+                UPDATE_MOVMODE();
+            }
         }
 
     }
