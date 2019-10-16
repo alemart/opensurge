@@ -44,7 +44,7 @@ object "MainMenu"
     camera = spawn("MainMenuCameraEffect")
         .startingAt(Screen.width * 0.7, Screen.height * 0.8)
         .during(0.7);
-    shareURL = "http://opensurge2d.org/share?lang=" + Lang["LANG_ID"];
+    shareURL = "http://opensurge2d.org/share?lang=" + Lang["LANG_ID"] + "&v=" + SurgeEngine.version;
     nextState = "";
 
     state "main"

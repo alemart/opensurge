@@ -4,6 +4,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Level;
@@ -24,7 +25,7 @@ object "Congratulations"
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
         ["$CONGRATULATIONS_SHARE" ]
     ).withAxisAngle(0).build();
-    shareURL = "http://opensurge2d.org/share?lang=" + Lang["LANG_ID"];
+    shareURL = "http://opensurge2d.org/share?lang=" + Lang["LANG_ID"] + "&v=" + SurgeEngine.version;
     nextState = "";
 
     state "main"
