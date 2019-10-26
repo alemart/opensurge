@@ -280,11 +280,12 @@ void clean_garbage()
 void init_basic_stuff(const commandline_t* cmd)
 {
     const char* gameid = commandline_getstring(cmd->gameid, NULL);
-    const char* datadir = commandline_getstring(cmd->datadir, NULL);
+    const char* basedir = commandline_getstring(cmd->basedir, NULL);
+    const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
 
 #if defined(A5BUILD)
     srand(time(NULL));
-    assetfs_init(gameid, datadir);
+    assetfs_init(gameid, basedir, gamedir);
     logfile_init();
     init_nanoparser();
 
@@ -303,7 +304,7 @@ void init_basic_stuff(const commandline_t* cmd)
     set_uformat(U_UTF8);
     allegro_init();
     srand(time(NULL));
-    assetfs_init(gameid, datadir);
+    assetfs_init(gameid, basedir, gamedir);
     logfile_init();
     init_nanoparser();
 #endif

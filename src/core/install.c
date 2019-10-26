@@ -89,7 +89,7 @@ bool install_game(const char* zip_fullpath, char* out_gameid, size_t out_gameid_
 
                 /* Init assetfs */
                 use_strict = assetfs_use_strict(false);
-                assetfs_init(gameid, NULL);
+                assetfs_init(gameid, NULL, NULL);
                 destdir = assetfs_create_data_file("", true);
                 console_print("Installing %s to \"%s\"...", gameid, destdir);
 
@@ -181,7 +181,7 @@ int foreach_installed_game(int (*callback)(const char*,void*), void* data)
     }
     else {
         int value = 0;
-        assetfs_init(NULL, NULL);
+        assetfs_init(NULL, NULL, NULL);
         value = foreach_installed_game(callback, data);
         assetfs_release();
         return value;
@@ -207,7 +207,7 @@ bool is_game_installed(const char* gameid)
     }
     else {
         bool result = false;
-        assetfs_init(NULL, NULL);
+        assetfs_init(NULL, NULL, NULL);
         result = is_game_installed(gameid);
         assetfs_release();
         return result;
@@ -237,7 +237,7 @@ bool build_game(const char* gameid)
         char* zip_path = strcat(strcpy(mallocx((5 + strlen(gameid)) * sizeof(*gameid)), gameid), ".zip");
 
         console_print("Building %s...", gameid);
-        assetfs_init(gameid, NULL);
+        assetfs_init(gameid, NULL, NULL);
 
         if((zip = zip_open(zip_path, ZIP_DEFAULT_COMPRESSION_LEVEL, 'w')) != NULL) {
             assetfs_foreach_file("/", NULL, write_to_zip, zip, true);
@@ -309,7 +309,7 @@ bool uninstall_game(const char* gameid, bool interactive_mode)
 
     /* init assetfs */
     use_strict = assetfs_use_strict(false);
-    assetfs_init(gameid, NULL);
+    assetfs_init(gameid, NULL, NULL);
 
     /* get the absolute paths */
     data_folder = assetfs_create_data_file("", true);

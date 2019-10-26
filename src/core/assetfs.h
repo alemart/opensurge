@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 /* assetfs virtual filesystem */
-void assetfs_init(const char* gameid, const char* datadir); /* datadir may be NULL (for default locations) */
+void assetfs_init(const char* gameid, const char* basedir, const char* datadir); /* datadir may be NULL (for default locations) */
 void assetfs_release(); /* release the assetfs */
 const char* assetfs_fullpath(const char* vpath); /* give the (absolute) fullpath of a (relative) virtual path */
 bool assetfs_exists(const char* vpath); /* does the given file exist? */

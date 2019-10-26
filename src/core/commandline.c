@@ -60,7 +60,8 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.custom_quest_path[0] = '\0';
     cmd.language_filepath[0] = '\0';
     cmd.install_game_path[0] = '\0';
-    cmd.datadir[0] = '\0';
+    cmd.basedir[0] = '\0';
+    cmd.gamedir[0] = '\0';
     cmd.gameid[0] = '\0';
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
     cmd.user_argv = NULL;
@@ -82,7 +83,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "\n"
                 "where options include:\n"
                 "    --help -h                        display this message\n"
-                "    --version                        show the version of this program\n"
+                "    --version -v                     show the version of this program\n"
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
@@ -100,7 +101,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
                 "    --uninstall \"gameid\"             uninstall an Open Surge game package\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
-                "    --data-dir \"/path/to/data\"       load the game assets from the specified folder\n"
+                "    --game-folder \"/path/to/data\"    use game assets only from the specified folder\n"
+                "    --base \"/path/to/data\"         set a custom base folder for the assets (*nix only)\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n",
                 COPYRIGHT, GAME_WEBSITE,
@@ -109,7 +111,7 @@ commandline_t commandline_parse(int argc, char **argv)
             exit(0);
         }
 
-        else if(strcmp(argv[i], "--version") == 0) {
+        else if(strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             puts(GAME_VERSION_STRING);
             exit(0);
         }
@@ -185,12 +187,20 @@ commandline_t commandline_parse(int argc, char **argv)
                 crash("%s: missing --language parameter", program);
         }
 
-        else if(strcmp(argv[i], "--data-dir") == 0) {
+        else if(strcmp(argv[i], "--base") == 0) {
             if(++i < argc && *(argv[i]) != '-')
-                str_cpy(cmd.datadir, argv[i], sizeof(cmd.datadir));
+                str_cpy(cmd.basedir, argv[i], sizeof(cmd.basedir));
             else
-                crash("%s: missing --data-dir parameter", program);
+                crash("%s: missing --base parameter", program);
         }
+
+        else if(strcmp(argv[i], "--game-folder") == 0) {
+            if(++i < argc && *(argv[i]) != '-')
+                str_cpy(cmd.gamedir, argv[i], sizeof(cmd.gamedir));
+            else
+                crash("%s: missing --game-folder parameter", program);
+        }
+
 
         else if(strcmp(argv[i], "--games") == 0) {
             foreach_installed_game(print_gameid, NULL);

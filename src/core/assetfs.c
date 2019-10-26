@@ -106,7 +106,7 @@ static inline char* pathify(const char* path);
 static inline int vpathcmp(const char* vp1, const char* vp2);
 static inline int vpathncmp(const char* vp1, const char* vp2, int n);
 static inline int vpc(int c) { return (c == '\\') ? '/' : tolower(c); }
-static void scan_default_folders(const char* gameid);
+static void scan_default_folders(const char* gameid, const char* basedir);
 static bool scan_exedir(assetdir_t* dir, assetpriority_t priority);
 static void scan_folder(assetdir_t* dir, const char* abspath, assetfiletype_t type, assetpriority_t priority);
 static int dircmp(const void* a, const void* b);
@@ -145,9 +145,10 @@ static bool afs_strict = true;
  * assetfs_init()
  * Initializes the asset filesystem
  * gameid: a string (lowercase letters, numbers), or NULL if we have specified no custom gameid
- * datadir: an absolute filepath, or NULL to look for the assets in default places
+ * basedir: an absolute filepath, or NULL to use GAME_DATADIR as the base directory for the assets
+ * datadir: will read assets only from this path; if NULL, will look for the assets in default places
  */
-void assetfs_init(const char* gameid, const char* datadir)
+void assetfs_init(const char* gameid, const char* basedir, const char* datadir)
 {
     /* error? */
     if(assetfs_initialized()) {
@@ -163,6 +164,9 @@ void assetfs_init(const char* gameid, const char* datadir)
     gameid = gameid && *gameid ? gameid : GAME_UNIXNAME;
     afs_gameid = clone_str(gameid);
 
+    /* validate basedir */
+    basedir = basedir && *basedir ? basedir : GAME_DATADIR;
+
     /* scan the assets */
     if(is_valid_id(gameid)) {
         assetfs_log("Loading assets for %s...", gameid);
@@ -173,7 +177,7 @@ void assetfs_init(const char* gameid, const char* datadir)
             scan_folder(root, datadir, ASSET_DATA, ASSET_PRIMARY);
         }
         else
-            scan_default_folders(gameid);
+            scan_default_folders(gameid, basedir);
     }
     else
         assetfs_fatal("Can't scan assets: invalid gameid \"%s\". Please use only lowercase letters / digits.", gameid);
@@ -896,7 +900,7 @@ bool is_writable_file(const char* fullpath)
 
 
 /* scans the default folders that store game assets */
-void scan_default_folders(const char* gameid)
+void scan_default_folders(const char* gameid, const char* basedir)
 {
 #if defined(_WIN32)
     assetfs_log("Scanning assets...");
@@ -913,7 +917,7 @@ void scan_default_folders(const char* gameid)
     char* userdatadir = build_userdata_fullpath(gameid, "");
     char* configdir = build_config_fullpath(gameid, "");
     char* cachedir = build_cache_fullpath(gameid, "");
-    bool must_scan_unixdir = true;
+    bool must_scan_basedir = true;
     assetfs_log("Scanning assets...");
 
     /* scan user-specific config & cache files (must come 1st) */
@@ -930,29 +934,29 @@ void scan_default_folders(const char* gameid)
 
     /* scan primary asset folder: <exedir>/../Resources */
     if(scan_exedir(root, ASSET_PRIMARY))
-        must_scan_unixdir = false;
+        must_scan_basedir = false;
 
     /* scan additional asset folder: ~/Library/<basedir>/<gameid> */
     if(userdatadir != NULL) {
         mkpath(userdatadir, 0755); /* userdatadir ends with '/' */
-        scan_folder(root, userdatadir, ASSET_DATA, must_scan_unixdir ? ASSET_PRIMARY : ASSET_SECONDARY);
+        scan_folder(root, userdatadir, ASSET_DATA, must_scan_basedir ? ASSET_PRIMARY : ASSET_SECONDARY);
         free(userdatadir);
     }
     else
         assetfs_log("Can't find the userdata directory: additional game assets may not be loaded");
 
-    /* scan <unixdir> */
-    if(must_scan_unixdir) {
-        if(is_asset_folder(GAME_DATADIR))
-            scan_folder(root, GAME_DATADIR, ASSET_DATA, ASSET_SECONDARY);
+    /* scan <basedir> */
+    if(must_scan_basedir) {
+        if(is_asset_folder(basedir))
+            scan_folder(root, basedir, ASSET_DATA, ASSET_SECONDARY);
         else if(afs_strict)
-            assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
+            assetfs_fatal("Can't load %s: assets not found in %s", gameid, basedir);
     }
 #elif defined(__unix__) || defined(__unix)
     char* userdatadir = build_userdata_fullpath(gameid, "");
     char* configdir = build_config_fullpath(gameid, "");
     char* cachedir = build_cache_fullpath(gameid, "");
-    bool must_scan_unixdir = true;
+    bool must_scan_basedir = true;
     assetfs_log("Scanning assets...");
 
     /* scan user-specific config & cache files (must come 1st) */
@@ -969,23 +973,23 @@ void scan_default_folders(const char* gameid)
 
     /* scan primary asset folder: <exedir> */
     if(scan_exedir(root, ASSET_PRIMARY))
-        must_scan_unixdir = false;
+        must_scan_basedir = false;
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
     if(userdatadir != NULL) {
         mkpath(userdatadir, 0755); /* userdatadir ends with '/' */
-        scan_folder(root, userdatadir, ASSET_DATA, must_scan_unixdir ? ASSET_PRIMARY : ASSET_SECONDARY);
+        scan_folder(root, userdatadir, ASSET_DATA, must_scan_basedir ? ASSET_PRIMARY : ASSET_SECONDARY);
         free(userdatadir);
     }
     else
         assetfs_log("Can't find the userdata directory: additional game assets may not be loaded");
 
-    /* scan <unixdir> */
-    if(must_scan_unixdir) {
-        if(is_asset_folder(GAME_DATADIR))
-            scan_folder(root, GAME_DATADIR, ASSET_DATA, ASSET_SECONDARY);
+    /* scan <basedir> */
+    if(must_scan_basedir) {
+        if(is_asset_folder(basedir))
+            scan_folder(root, basedir, ASSET_DATA, ASSET_SECONDARY);
         else if(afs_strict)
-            assetfs_fatal("Can't load %s: assets not found in %s", gameid, GAME_DATADIR);
+            assetfs_fatal("Can't load %s: assets not found in %s", gameid, basedir);
     }
 #else
 #error "Unsupported operating system."

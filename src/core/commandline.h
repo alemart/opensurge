@@ -39,7 +39,8 @@ struct commandline_t {
     char custom_quest_path[COMMANDLINE_PATHMAX];
     char language_filepath[COMMANDLINE_PATHMAX];
     char install_game_path[COMMANDLINE_PATHMAX];
-    char datadir[COMMANDLINE_PATHMAX];
+    char basedir[COMMANDLINE_PATHMAX];
+    char gamedir[COMMANDLINE_PATHMAX];
 
     /* other options */
     char gameid[128];
