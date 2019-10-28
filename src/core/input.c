@@ -266,7 +266,7 @@ void input_release()
     logfile_message("input_release()");
     inputmap_release();
 
-    logfile_message("releasing registed input objects...");
+    logfile_message("releasing registered input objects...");
     for(it = inlist; it; it=next) {
         next = it->next;
         free(it->data);
