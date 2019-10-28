@@ -1202,7 +1202,7 @@ int traverse_brick_attributes(const parsetree_statement_t *stmt, void *brickdata
         dat->data = spriteinfo_create(nanoparser_get_program(p1));
     }
     else
-        fatal_error("Can't read brick attributes: unkown identifier '%s'", identifier);
+        fatal_error("Can't read brick attributes: unknown identifier '%s'", identifier);
 
     return 0;
 }
