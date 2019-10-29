@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Open Surge
+GenericName=Game Engine
+Comment=A fun 2D retro platformer inspired by old-school Sonic games
+Exec=opensurge
+Icon=opensurge
+Terminal=false
+Categories=Game;ActionGame;

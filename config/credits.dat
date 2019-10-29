@@ -79,6 +79,7 @@ Mateus Reis
 $CREDITS_RES_IMAGES
 
 João Victor
+--- surge.png (CC-0)
 --- images/neon.png
 --- images/surge.png
 --- images/animals.png
@@ -93,12 +94,6 @@ João Victor
 --- images/extra/surge_artwork.png
 --- images/extra/surge_entrance.png
 --- images/opensurge.png
---- src/misc/opensurge_16x16.png
---- src/misc/opensurge_32x32.png
---- src/misc/opensurge_48x48.png
---- src/misc/opensurge_64x64.png
---- src/misc/opensurge_72x72.png
---- surge.png (CC-0)
 --- images/wolfey.png
 --- images/mosquito.png
 
@@ -223,11 +218,6 @@ Gaivota & Alexandre Martins
 
 treeform (opengameart.org)
 --- images/violet.png
-
-lainz
---- src/misc/opensurge_96x96.png
---- src/misc/opensurge_128x128.png
---- src/misc/opensurge_256x256.png
 
 Shawn Hargreaves
 --- images/allegro.png (giftware)
