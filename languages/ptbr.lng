@@ -14,7 +14,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português (Brasil)"      // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2019-09-24"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2019-11-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.0"                   // required engine version
 
 // Colors
@@ -105,7 +105,7 @@ MAINMENU_VERSION            "v." // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
-CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!\nSolte sua criatividade! Crie tudo o que você imaginar!\n\nVocê pode ser um criador! Crie suas fases, personagens, ítens e mais! Conheça o editor de fases, brinque na engine e aprenda SurgeScript para ganhar super poderes criativos!"
+CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!\nSolte sua criatividade! Crie tudo o que você imaginar!\n\nTorne-se um criador! Crie suas fases, cenários, personagens, ítens e mais! Brinque no editor de fases, conheça a engine e aprenda SurgeScript para ganhar super poderes criativos!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
