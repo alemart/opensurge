@@ -1,6 +1,6 @@
 ![Open Surge](logo.png)
 
-Welcome to the **Open Surge** source code repository!
+Welcome to **Open Surge**!
 
 Get the game at [opensurge2d.org](http://opensurge2d.org)
 
@@ -38,7 +38,7 @@ You can use Open Surge to create your own amazing games!
 
 * The first step to create your game is learning how to use the level editor (press F12 during gameplay)
 * Then, comes learning how to do [basic hacking](http://opensurge2d.org) (modify the images, sounds, scenarios, characters, etc.)
-* Finally, learning [SurgeScript](http://docs.opensurge2d.org) gives you ultimate power to unleash your creativity and make your dreams come alive!
+* Finally, learning [SurgeScript](http://docs.opensurge2d.org), a scripting language for games, gives you ultimate power to unleash your creativity and make your dreams come alive!
 
 To learn more, watch the [video tutorials](http://youtube.com/alemart88) made by the developer of the engine.
 
@@ -56,8 +56,8 @@ opensurge --help
 
 To compile Open Surge from the source code, you'll need a C compiler, [CMake](http://cmake.org), and the following development libraries:
 
-* [Allegro 5](http://liballeg.org) (5.2.5 or higher)
-* [SurgeScript](http://github.com/alemart/surgescript)
+* [Allegro 5](http://liballeg.org) (version 5.2.5 or higher)
+* [SurgeScript](http://github.com/alemart/surgescript) (version 0.5.4 or higher)
 
 After downloading and extracting the source code, create a build directory and compile from there:
 
@@ -73,7 +73,7 @@ You can perform a system-wide installation on Linux by running:
 sudo make install
 ```
 
-You may run `ccmake` or `cmake-gui` to know additional build options (e.g., to change the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
+You may run `ccmake` or `cmake-gui` to know additional build options (e.g., set the path of the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
 
 **Linux users:** game assets (images, sounds, etc.) can be stored globally or in user-space. Assets located in user-space take precedence over assets located in system directories. Open Surge uses the XDG Base Directory specification; look for the *opensurge2d* directory.
 
