@@ -33,7 +33,8 @@
 static void crash(char *fmt, ...);
 static int print_gameid(const char* gameid, void* data);
 static const char* COPYRIGHT = "Open Surge Engine version " GAME_VERSION_STRING "\n"
-                               "Copyright (C) " GAME_YEAR " Alexandre Martins";
+                               "Copyright (C) " GAME_YEAR " Alexandre Martins\n"
+                               "http://" GAME_WEBSITE;
 static int COMMANDLINE_UNDEFINED = -1;
 
 
@@ -77,7 +78,7 @@ commandline_t commandline_parse(int argc, char **argv)
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf(
-                "%s\n<http://%s>\n\n"
+                "%s\n\n"
                 "usage:\n"
                 "    %s [options ...]\n"
                 "\n"
@@ -105,8 +106,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --base \"/path/to/data\"         set a custom base folder for the assets (*nix only)\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n",
-                COPYRIGHT, GAME_WEBSITE,
-                program
+                COPYRIGHT, program
             );
             exit(0);
         }
