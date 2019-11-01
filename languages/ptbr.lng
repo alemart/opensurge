@@ -105,7 +105,7 @@ MAINMENU_VERSION            "v." // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
-CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!\nSolte sua criatividade! Crie tudo o que você imaginar!\n\nTorne-se um criador! Crie suas fases, cenários, personagens, ítens e mais! Brinque no editor de fases, conheça a engine e aprenda SurgeScript para ganhar super poderes criativos!"
+CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!\nSolte sua criatividade! Crie tudo o que você imaginar!\n\nInicie seu projeto! Crie suas fases, cenários, personagens, ítens e mais! Confira o editor de fases, conheça a engine e aprenda SurgeScript para ganhar super poderes criativos!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)

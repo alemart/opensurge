@@ -14,7 +14,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2019-09-24"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2019-01-11"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.0"                   // required engine version
 
 // Colors
@@ -105,7 +105,7 @@ MAINMENU_VERSION            "v." // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
-CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nReady to become a creator? Create your own levels, items, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
+CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nStart your own project! Create new levels, items, specials, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
