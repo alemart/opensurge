@@ -32,7 +32,7 @@
 /* private stuff ;) */
 static void crash(char *fmt, ...);
 static int print_gameid(const char* gameid, void* data);
-static const char* COPYRIGHT = "Open Surge Engine version " GAME_VERSION_STRING "\n"
+static const char* COPYRIGHT = GAME_TITLE " version " GAME_VERSION_STRING "\n"
                                "Copyright (C) " GAME_YEAR " Alexandre Martins\n"
                                "http://" GAME_WEBSITE;
 static int COMMANDLINE_UNDEFINED = -1;
