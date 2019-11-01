@@ -26,8 +26,6 @@ apps:
       - x11
       - opengl
       - joystick
-      - network
-      - network-bind
 
 parts:
   opensurge:
