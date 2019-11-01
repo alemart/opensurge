@@ -83,15 +83,19 @@ void lang_loadfile(const char *filepath)
     parsetree_program_t *prog;
 
     logfile_message("Loading language file \"%s\"...", filepath);
-    if(!assetfs_exists(filepath) && 0 != strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH)) {
-        logfile_message("File \"%s\" doesn't exist.", filepath);
-        lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
-        return;
+    if(!assetfs_exists(filepath)) {
+        if(0 != strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH)) {
+            logfile_message("File \"%s\" doesn't exist.", filepath);
+            lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
+            return;
+        }
+        else
+            fatal_error("Missing default language file: \"%s\". Please reinstall the game.", DEFAULT_LANGUAGE_FILEPATH);
     }
 
     lang_readcompatibility(filepath, &ver, &subver, &wipver);
     if(game_version_compare(ver, subver, wipver) < 0) /* backwards compatibility */
-        fatal_error("\"%s\" (version %d.%d.%d) is not compatible with version %d.%d.%d of the engine", filepath, ver, subver, wipver, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+        fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%d.%d.%d)!", filepath, ver, subver, wipver, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
 
     fullpath = assetfs_fullpath(filepath);
     prog = nanoparser_construct_tree(fullpath);
