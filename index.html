@@ -44,19 +44,19 @@
       <div class="container-fluid text-center">
         <div class="row">
           <div class="col-xs-12 col-md">
-            <img src="pics/windows.png" class="os-logo">
+            <a id="get-win2" href="javascript:;"><img src="pics/windows.png" class="os-logo"></a>
             <h3 class="mb-3">Windows</h3>
             <a id="get-win" href="javascript:;" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
             <small class="d-block">view on <a href="https://alemart.itch.io/opensurge" target="_blank">itch.io</a></small>
           </div>
           <div class="col-xs-12 col-md">
-            <img src="pics/linux.png" class="os-logo">
+            <a href="https://snapcraft.io/opensurge" target="_blank"><img src="pics/linux.png" class="os-logo"></a>
             <h3 class="mb-3">Linux</h3>
             <a href="https://snapcraft.io/opensurge" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
             <small class="d-block">packs for <a href="http://opensnc.sourceforge.net/forum/viewtopic.php?id=2041" target="_blank">your distro</a></small>
           </div>
           <div class="col-xs-12 col-md">
-            <img src="pics/android.png" class="os-logo">
+            <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="_blank"><img src="pics/android.png" class="os-logo"></a>
             <h3 class="mb-3">Android</h3>
             <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="_blank" class="d-block m-2"><i class="fa fa-mobile mr-2"></i>Join our beta</a>
             <small class="d-block">mobile version: soon</small>
@@ -152,7 +152,7 @@
 
    <!-- itch API -->
    <script type="text/javascript">
-     ["get-win", "purchase"].forEach(function(id) {
+     ["get-win", "get-win2", "purchase"].forEach(function(id) {
        Itch.attachBuyButton(document.getElementById(id), {
          user: "alemart",
          game: "opensurge"
