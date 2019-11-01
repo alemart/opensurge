@@ -5,7 +5,7 @@
     <title>Open Surge: 2D game engine for retro platformers</title>
     <meta name="robots" content="index, follow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that empowers you to unleash your creativity! Play, hack, create & share!">
+    <meta name="description" content="Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that lets you unleash your creativity! Play, create & share!">
     <meta property="og:image" content="http://opensurge2d.org/pics/demo500.png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
     <script>
@@ -52,8 +52,8 @@
           <div class="col-xs-12 col-md">
             <img src="pics/linux.png" class="os-logo">
             <h3 class="mb-3">Linux</h3>
-            <a id="get-linux" href="javascript:;" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
-            <small class="d-block">for <a href="http://opensnc.sourceforge.net/forum/viewtopic.php?id=2041" target="_blank">your distro</a> | view on <a href="https://github.com/alemart/opensurge" target="_blank">GitHub</a></small>
+            <a href="https://snapcraft.io/opensurge" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
+            <small class="d-block">packs for <a href="http://opensnc.sourceforge.net/forum/viewtopic.php?id=2041" target="_blank">your distro</a></small>
           </div>
           <div class="col-xs-12 col-md">
             <img src="pics/android.png" class="os-logo">
@@ -69,8 +69,11 @@
         Open Surge is created independently and your contribution directly helps its development!
       </p>
       <p class="mt-4">&nbsp;</p>
-      <p class="float-right text-right">Latest release: Open Surge version 0.5.0<br><small>(<a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank">dev builds</a> for early adopters)</small></p>
-      <p><img src="pics/rpi.png" width="32" class="mr-2">Raspberry Pi version: in the future!</p>
+      <p class="float-right text-right">Latest release: Open Surge version 0.5.0-2<br><small>(<a href="http://opensnc.sf.net/forum/viewtopic.php?id=1931" target="_blank">dev builds</a> for early adopters)</small></p>
+      <p>
+        <img src="pics/osx.png" width="32" class="mr-2">Mac OS X: get the <a href="https://github.com/alemart/opensurge" target="_blank">source code</a><br>
+        <img src="pics/rpi.png" width="32" class="mr-2">Raspberry Pi version: in the future!
+      </p>
     </section>
     <section id="about">
       <h2>About Open Surge</h2>
@@ -124,8 +127,8 @@
       <p>You can use Open Surge to create your own amazing games!</p>
       <ul>
         <li>The first step is learning how to use the level editor (press F12 during gameplay)</li>
-        <li>Next, comes learning how to do <a href="http://opensnc.sf.net/wiki/index.php/Introduction_to_Modding" target="_blank">basic hacking</a> (modify the images, scenarios, sprites, etc.)</li>
-        <li>Finally, learning <a href="http://docs.opensurge2d.org" target="_blank">SurgeScript</a> gives you ultimate power to unleash your creativity and make your dreams come alive!</li>
+        <li>Next, comes learning how to do <a href="http://opensnc.sf.net/wiki/index.php/Introduction_to_Modding" target="_blank">basic hacking</a> (modify the images/sounds, create new scenarios, characters, etc.)</li>
+        <li>Finally, learning <a href="http://docs.opensurge2d.org" target="_blank">SurgeScript</a>, a scripting language for games, gives you ultimate power to create anything you desire and make your dreams come alive!</li>
       </ul>
       <p>To learn more, watch the <a href="http://youtube.com/alemart88" target="_blank">video tutorials</a> made by the developer of the engine.</p>
     </section>
@@ -149,7 +152,7 @@
 
    <!-- itch API -->
    <script type="text/javascript">
-     ["get-win", "get-linux", "purchase"].forEach(function(id) {
+     ["get-win", "purchase"].forEach(function(id) {
        Itch.attachBuyButton(document.getElementById(id), {
          user: "alemart",
          game: "opensurge"
