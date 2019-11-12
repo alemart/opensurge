@@ -34,11 +34,11 @@ You can play Open Surge using a keyboard or a joystick.
 
 ## How do I create a game?
 
-You can use Open Surge to create your own amazing games!
+Use Open Surge to create your own amazing games! Create new levels, items, bosses, gameplay mechanics, playable characters, special abilities and much more!
 
-* The first step to create your game is learning how to use the level editor (press F12 during gameplay)
-* Then, comes learning how to do [basic hacking](http://opensurge2d.org) (modify the images/sounds, create new scenarios, characters, etc.)
-* Finally, learning [SurgeScript](http://docs.opensurge2d.org), a scripting language for games, gives you ultimate power to create anything you desire and make your dreams come alive!
+* First, learn how to create a level using the built-in editor (press F12 during gameplay)
+* Next, learn how to do [basic hacking](http://opensurge2d.org) (modify the images/sounds, create new scenery, new characters, etc.)
+* Finally, have fun with scripting! [SurgeScript](http://docs.opensurge2d.org), the scripting language that comes with Open Surge, gives you ultimate power to create anything you desire and make your dreams come alive!
 
 To learn more, watch the [video tutorials](http://youtube.com/alemart88) made by the developer of the engine.
 
