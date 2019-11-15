@@ -103,7 +103,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --uninstall \"gameid\"             uninstall an Open Surge game package\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --game-folder \"/path/to/data\"    use game assets only from the specified folder\n"
-                "    --base \"/path/to/data\"         set a custom base folder for the assets (*nix only)\n"
+                "    --base \"/path/to/data\"           set a custom base folder for the assets (*nix only)\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n",
                 COPYRIGHT, program
