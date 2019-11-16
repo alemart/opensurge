@@ -70,10 +70,10 @@
     window.lang = (window.qs || {})['lang'] || 'en_US';
     $(document).ready(function() {
         var hasLang = $('.lang.' + window.lang).length > 0;
-        if(hasLang) {
-            $('.lang').hide();
-            $('.lang.' + window.lang).show();
-        }
+        if(hasLang)
+            $('.lang:not(.' + window.lang + ')').hide();
+        else
+            $('.lang:not(.en_US)').hide();
     });
     </script>
 
