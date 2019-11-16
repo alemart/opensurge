@@ -27,7 +27,7 @@
 #define GAME_VERSION            0
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        0
-#define GAME_PATCH_VERSION      2
+#define GAME_PATCH_VERSION      3
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2019"
 
@@ -44,7 +44,7 @@
 #define STRINGIFY(x)            _STRINGIFY(x)
 
 /* Version code */
-#define GAME_VERSION_CODE       ((GAME_VERSION) * 10000 + (GAME_SUB_VERSION) * 100 + (GAME_WIP_VERSION)) /* will not include patch */
+#define GAME_VERSION_CODE       ((GAME_VERSION) * 10000 + (GAME_SUB_VERSION) * 100 + (GAME_WIP_VERSION)) /* should not include GAME_PATCH_VERSION */
 
 /* Version string */
 #if !defined(GAME_BUILD_VERSION) && !defined(GAME_PATCH_VERSION) /* stable version */
