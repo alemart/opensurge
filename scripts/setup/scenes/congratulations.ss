@@ -25,7 +25,7 @@ object "Congratulations"
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
         ["$CONGRATULATIONS_SHARE" ]
     ).withAxisAngle(0).build();
-    shareURL = "http://opensurge2d.org/share?lang=" + Lang["LANG_ID"] + "&v=" + SurgeEngine.version;
+    shareURL = "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     nextState = "";
 
     state "main"
