@@ -12,7 +12,7 @@
         <script>
           window.datalayer = window.datalayer || [];
           function gtag(){datalayer.push(arguments);}
-          gtag('js', new date());
+          gtag('js', new Date());
           gtag('config', 'ua-120511928-1');
         </script>
         <style>
@@ -141,19 +141,20 @@
             return param;
         })(window.location.search.substr(1).split('&'));
         window.lang = (window.qs || {})['lang'] || 'en_US';
+        window.ver = (window.qs || {})['v'] || null;
         $(document).ready(function() {
-            var languageExists = $('.lang.' + window.lang).length > 0;
-            if(languageExists) {
-                $('.lang').hide();
-                $('.lang.' + window.lang).show();
-            }
-        })
+            var hasLang = $('.lang.' + window.lang).length > 0;
+            if(hasLang)
+                $('.lang:not(.' + window.lang + ')').hide();
+            else
+                $('.lang:not(.en_US)').hide();
+        });
         </script>
 
         <!-- Sharing Code -->
         <script>
         $(document).ready(function() {
-            var redirect = function() { window.location = '/contribute?lang=' + window.lang; }
+            var redirect = function() { window.location = '/contribute?v=' + window.ver + '&lang=' + window.lang; }
             var progress = $('#progressbar').progress(10.0, redirect);
             window.share = function(link, on) {
                 var win = window.open(link.href, 'Social ' + on, 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes'); //width=657,height=487
