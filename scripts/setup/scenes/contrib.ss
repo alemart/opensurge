@@ -28,7 +28,7 @@ object "Contribute Page"
 // it's similar to atexit() from the C standard library
 object "On Exit"
 {
-    url = "http://opensurge2d.org/contribute?lang=" + Lang["LANG_ID"] + "&v=" + SurgeEngine.version;
+    url = "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     contrib = "contrib-" + SurgeEngine.version;
     contribInterval = 31536000; // 1 year
 

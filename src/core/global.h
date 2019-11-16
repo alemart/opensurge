@@ -24,10 +24,10 @@
 /* Game data */
 #define GAME_UNIXNAME           "opensurge"
 #define GAME_TITLE              "Open Surge Engine"
-#define GAME_VERSION            0
+#define GAME_SUP_VERSION        0
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        0
-#define GAME_PATCH_VERSION      3
+#define GAME_PATCH_VERSION      3 /* if defined, this is a patch version of a released build */
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2019"
 
@@ -39,22 +39,24 @@
 #define GAME_DATADIR            "/usr/local/share/games/" GAME_UNIXNAME
 #endif
 
-/* Magic ;) */
-#define _STRINGIFY(x)           #x
+/* Utilities */
+#define VERSION_CODE(X,Y,Z)     ((X) * 10000 + (Y) * 100 + (Z))
+#define VERSION_STRING(X,Y,Z)   STRINGIFY(X) "." STRINGIFY(Y) "." STRINGIFY(Z)
 #define STRINGIFY(x)            _STRINGIFY(x)
+#define _STRINGIFY(x)           #x
 
 /* Version code */
-#define GAME_VERSION_CODE       ((GAME_VERSION) * 10000 + (GAME_SUB_VERSION) * 100 + (GAME_WIP_VERSION)) /* should not include GAME_PATCH_VERSION */
+#define GAME_VERSION_CODE       VERSION_CODE(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) /* should not include GAME_PATCH_VERSION */
 
 /* Version string */
 #if !defined(GAME_BUILD_VERSION) && !defined(GAME_PATCH_VERSION) /* stable version */
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION)
+#define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION)
 #elif !defined(GAME_BUILD_VERSION) && defined(GAME_PATCH_VERSION) /* stable version with patch */
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION) "-" STRINGIFY(GAME_PATCH_VERSION)
+#define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) "-" STRINGIFY(GAME_PATCH_VERSION)
 #elif defined(GAME_BUILD_VERSION) && !defined(GAME_PATCH_VERSION) /* development version */
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION) "-" STRINGIFY(GAME_BUILD_VERSION)
+#define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) "-" STRINGIFY(GAME_BUILD_VERSION)
 #else /* development version */
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION) "." STRINGIFY(GAME_SUB_VERSION) "." STRINGIFY(GAME_WIP_VERSION) "-" STRINGIFY(GAME_PATCH_VERSION) "-" STRINGIFY(GAME_BUILD_VERSION)
+#define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) "-" STRINGIFY(GAME_PATCH_VERSION) "-" STRINGIFY(GAME_BUILD_VERSION)
 #endif
 
 /* Legacy constants */

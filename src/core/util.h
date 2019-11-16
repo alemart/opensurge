@@ -61,7 +61,7 @@
 /* Game routines */
 void game_quit(void); /* quit */
 int game_is_over(); /* game over? */
-int game_version_compare(int version, int sub_version, int wip_version); /* compare to this version of the game */
+int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game */
 
 /* Memory management */
 void* __mallocx(size_t bytes, const char* location);

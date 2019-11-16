@@ -286,17 +286,17 @@ void load_lang_list()
 int dirfill(const char *filename, void *param)
 {
     int *c = (int*)param;
-    int ver, subver, wipver;
+    int supver, subver, wipver;
 
-    lang_readcompatibility(filename, &ver, &subver, &wipver);
-    if(game_version_compare(ver, subver, wipver) >= 0) {
+    lang_readcompatibility(filename, &supver, &subver, &wipver);
+    if(game_version_compare(supver, subver, wipver) >= 0) {
         str_cpy(lngdata[*c].filepath, filename, sizeof(lngdata[*c].filepath));
         lang_readstring(filename, "LANG_NAME", lngdata[*c].title, sizeof( lngdata[*c].title ));
         lang_readstring(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
         (*c)++;
     }
-    if(game_version_compare(ver, subver, wipver) != 0)
-        logfile_message("Warning: language file \"%s\" (compatibility: %d.%d.%d) may not be fully compatible with this version of the engine (%s)", filename, ver, subver, wipver, GAME_VERSION_STRING);
+    if(game_version_compare(supver, subver, wipver) != 0)
+        logfile_message("Warning: language file \"%s\" (compatibility: %d.%d.%d) may not be fully compatible with this version of the engine (%s)", filename, supver, subver, wipver, GAME_VERSION_STRING);
 
     return 0;
 }
@@ -304,10 +304,10 @@ int dirfill(const char *filename, void *param)
 int dircount(const char *filename, void *param)
 {
     int *lngcount = (int*)param;
-    int ver, subver, wipver;
+    int supver, subver, wipver;
 
-    lang_readcompatibility(filename, &ver, &subver, &wipver);
-    if(game_version_compare(ver, subver, wipver) >= 0)
+    lang_readcompatibility(filename, &supver, &subver, &wipver);
+    if(game_version_compare(supver, subver, wipver) >= 0)
         (*lngcount)++;
 
     return 0;

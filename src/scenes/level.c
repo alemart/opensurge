@@ -470,7 +470,7 @@ void level_load(const char *filepath)
     spawn_point = v2d_new(0,0);
     dialogregion_size = 0;
     act = 1;
-    requires[0] = GAME_VERSION;
+    requires[0] = GAME_SUP_VERSION;
     requires[1] = GAME_SUB_VERSION;
     requires[2] = GAME_WIP_VERSION;
     readonly = FALSE;
@@ -662,7 +662,7 @@ int level_save(const char *filepath)
     "bgtheme \"%s\"\n"
     "spawn_point %d %d\n",
     version,
-    GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION,
+    GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION,
     act, theme, bgtheme,
     (int)spawn_point.x, (int)spawn_point.y);
 

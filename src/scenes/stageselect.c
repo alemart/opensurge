@@ -354,7 +354,7 @@ void unload_stage_list()
 /* callback that fills stage_data[] */
 int dirfill(const char *vpath, void *param)
 {
-    int ver, subver, wipver;
+    int supver, subver, wipver;
     stagedata_t *s;
 
     /* can't have more than STAGE_MAX levels installed */
@@ -363,11 +363,11 @@ int dirfill(const char *vpath, void *param)
 
     s = stagedata_load(vpath);
     if(s != NULL) {
-        ver = s->requires[0];
+        supver = s->requires[0];
         subver = s->requires[1];
         wipver = s->requires[2];
 
-        if(game_version_compare(ver, subver, wipver) >= 0) {
+        if(game_version_compare(supver, subver, wipver) >= 0) {
             stage_data[ stage_count++ ] = s;
             if(enable_debug) { /* debug mode: changing the names... */
                 char *p = str_rstr(s->filepath, "levels/");
@@ -383,7 +383,7 @@ int dirfill(const char *vpath, void *param)
             }
         }
         else {
-            logfile_message("Warning: level \"%s\" isn't compatible with this version of the game (requires: %d.%d.%d).", vpath, ver, subver, wipver);
+            logfile_message("Warning: level \"%s\" isn't compatible with this version of the game (requires: %d.%d.%d).", vpath, supver, subver, wipver);
             stagedata_unload(s);
         }
     }

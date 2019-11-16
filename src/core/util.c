@@ -129,11 +129,10 @@ int game_is_over()
  * = 0 (same version),
  * > 0 (game version is superior)
  */
-int game_version_compare(int version, int sub_version, int wip_version)
+int game_version_compare(int sup_version, int sub_version, int wip_version)
 {
-    int game_version = (GAME_VERSION * 10000 + GAME_SUB_VERSION * 100 + GAME_WIP_VERSION);
-    int other_version = (max(0, version) * 10000 + max(0, sub_version) * 100 + max(0, wip_version));
-    return game_version - other_version;
+    int version_code = VERSION_CODE(max(0, sup_version), max(0, sub_version), max(0, wip_version));
+    return GAME_VERSION_CODE - version_code;
 }
 
 

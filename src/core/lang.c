@@ -79,7 +79,7 @@ void lang_release()
 void lang_loadfile(const char *filepath)
 {
     const char* fullpath;
-    int ver, subver, wipver;
+    int supver, subver, wipver;
     parsetree_program_t *prog;
 
     logfile_message("Loading language file \"%s\"...", filepath);
@@ -93,9 +93,9 @@ void lang_loadfile(const char *filepath)
             fatal_error("Missing default language file: \"%s\". Please reinstall the game.", DEFAULT_LANGUAGE_FILEPATH);
     }
 
-    lang_readcompatibility(filepath, &ver, &subver, &wipver);
-    if(game_version_compare(ver, subver, wipver) < 0) /* backwards compatibility */
-        fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%d.%d.%d)!", filepath, ver, subver, wipver, GAME_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION);
+    lang_readcompatibility(filepath, &supver, &subver, &wipver);
+    if(game_version_compare(supver, subver, wipver) < 0) /* backwards compatibility */
+        fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%s)!", filepath, supver, subver, wipver, GAME_VERSION_STRING);
 
     fullpath = assetfs_fullpath(filepath);
     prog = nanoparser_construct_tree(fullpath);
@@ -164,12 +164,12 @@ const char *lang_get(const char *desired_key)
  * lang_readcompatibility()
  * Language files are made for specific game versions
  */
-void lang_readcompatibility(const char *filename, int *ver, int *subver, int *wipver)
+void lang_readcompatibility(const char *filename, int *supver, int *subver, int *wipver)
 {
     char compat[32];
     lang_readstring(filename, "LANG_COMPATIBILITY", compat, sizeof(compat));
-    if(sscanf(compat, "%d.%d.%d", ver, subver, wipver) < 3)
-        *ver = *subver = *wipver = 0;
+    if(sscanf(compat, "%d.%d.%d", supver, subver, wipver) < 3)
+        *supver = *subver = *wipver = 0;
 }
 
 
