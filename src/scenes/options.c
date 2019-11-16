@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * options.c - options screen
- * Copyright (C) 2010-2012  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2012, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,14 +37,18 @@
 #include "../core/font.h"
 #include "../core/prefs.h"
 #include "../core/modmanager.h"
+#include "../core/web.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/sfx.h"
 #include "stageselect.h"
 
 
+/* public data */
+const char *OPTIONS_MUSICFILE = "musics/options.ogg";
+
 /* private data */
-#define OPTIONS_BGFILE                  "themes/scenes/options.bg"
+static const char *OPTIONS_BGFILE = "themes/scenes/options.bg";
 static bool quit, fadein;
 static font_t *title;
 static actor_t *icon;
@@ -58,6 +62,7 @@ static const int OFFSET_X = 60;
 
 /* private methods */
 static void save_preferences();
+static void open_donate_page();
 
 /* group tree */
 static int option; /* current option: 0 <= option <= option_count - 1 */
@@ -242,6 +247,18 @@ void save_preferences()
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 }
 
+/* opens a donate page */
+void open_donate_page()
+{
+    const char* donate_url = "http://opensurge2d.org/contribute";
+    char url[128];
+    
+    snprintf(url, sizeof(url),
+        "%s?v=%s&lang=%s",
+        donate_url, GAME_VERSION_STRING, lang_get("LANG_ID")
+    );
+    launch_url(url);
+}
 
 
 
@@ -857,6 +874,49 @@ static group_t *group_credits_create()
     return group_create(group_credits_init, group_credits_release, group_credits_update, group_credits_render);
 }
 
+/* "Donate" label */
+static void group_donate_init(group_t *g)
+{
+    group_highlightable_init(g, "OPTIONS_DONATE", option_count++);
+}
+
+static void group_donate_release(group_t *g)
+{
+    group_highlightable_release(g);
+}
+
+static int group_donate_is_highlighted(group_t *g)
+{
+    return group_highlightable_is_highlighted(g);
+}
+
+static void group_donate_update(group_t *g)
+{
+    /* base class */
+    group_highlightable_update(g);
+
+    /* derived class */
+    if(group_donate_is_highlighted(g)) {
+        if(!fadefx_is_fading()) {
+            if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
+                sound_play(SFX_CONFIRM);
+                open_donate_page();
+                quit = true;
+            }
+        }
+    }
+}
+
+static void group_donate_render(group_t *g, v2d_t camera_position)
+{
+    group_highlightable_render(g, camera_position);
+}
+
+static group_t *group_donate_create()
+{
+    return group_create(group_donate_init, group_donate_release, group_donate_update, group_donate_render);
+}
+
 /* "Stage Select" label */
 static void group_stageselect_init(group_t *g)
 {
@@ -1068,10 +1128,11 @@ group_t *create_grouptree()
 
     /* section: game */
     game = group_game_create();
-    group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_gamepad_create());
     group_addchild(game, group_stageselect_create());
+    group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_credits_create());
+    group_addchild(game, group_donate_create());
 
     /* section: root */
     root = group_root_create();

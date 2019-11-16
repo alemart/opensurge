@@ -61,6 +61,7 @@ OPTIONS_GAMEPAD             "Usar joystick"
 OPTIONS_LANGUAGE            "Trocar idioma"
 OPTIONS_STAGESELECT         "Seleção de fases"
 OPTIONS_CREDITS             "Créditos do Open Surge"
+OPTIONS_DONATE              "Doar para o Open Surge"
 OPTIONS_BACK                "VOLTAR"
 
 // Stage Select

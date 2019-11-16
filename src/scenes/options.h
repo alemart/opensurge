@@ -21,13 +21,13 @@
 #ifndef _OPTIONS_H
 #define _OPTIONS_H
 
-/* public data */
-#define OPTIONS_MUSICFILE        "musics/options.ogg"
-
 /* public functions */
 void options_init(void*);
 void options_release();
 void options_update();
 void options_render();
+
+/* public data */
+extern const char* OPTIONS_MUSICFILE; /* path to a music file */
 
 #endif
