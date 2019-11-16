@@ -436,6 +436,8 @@ SET(GAME_SRCS
   src/entities/particle.c
   src/entities/renderqueue.c
 
+  src/misc/icon.c
+  
   src/main.c
 )
 
@@ -532,7 +534,7 @@ SET(GAME_HEADERS
 # Allegro 4 specifics
 IF(NOT USE_A5)
   IF(UNIX)
-    SET(GAME_SRCS ${GAME_SRCS} src/misc/iconlin.c)
+    SET(GAME_SRCS ${GAME_SRCS} src/misc/icon_a4.c)
   ENDIF()
   SET(GAME_SRCS ${GAME_SRCS} src/core/hqx/hqx.c)
   SET(GAME_HEADERS ${GAME_HEADERS} src/core/hqx/hqx.h)
