@@ -177,7 +177,7 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
             appearSpeed *= -1.0;
         }
         else if(lineId == 1) {
-            text.text = "$CLEARED_LINE2 " + Level.act;
+            text.text = "$CLEARED_LINE2";
             transform.localPosition = Vector2(-Screen.width / 2, 76);
             appearSpeed *= 1.0;
         }

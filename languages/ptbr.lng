@@ -14,7 +14,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português (Brasil)"      // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2019-11-01"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2019-11-16"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.0"                   // required engine version
 
 // Colors
@@ -200,7 +200,7 @@ HUD_COLLECTIBLES            "Poder"
 
 // Level Cleared animation
 CLEARED_LINE1               "VOCE ZEROU"
-CLEARED_LINE2               "A ZONA"
+CLEARED_LINE2               "A ZONA $LEVEL_ACT"
 CLEARED_POWER               "Bonus de Poder"
 CLEARED_TIME                "Bonus de Tempo"
 CLEARED_SCORE               "Pontos"

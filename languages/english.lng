@@ -14,7 +14,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2019-01-11"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2019-11-16"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.0"                   // required engine version
 
 // Colors
@@ -200,7 +200,7 @@ HUD_COLLECTIBLES            "Power"
 
 // Level Cleared animation
 CLEARED_LINE1               "YOU HAVE"
-CLEARED_LINE2               "CLEARED ZONE"
+CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT"
 CLEARED_POWER               "Power Bonus"
 CLEARED_TIME                "Time Bonus"
 CLEARED_SCORE               "Score"
