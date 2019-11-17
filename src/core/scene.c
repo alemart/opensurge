@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * scene.c - scene management
- * Copyright (C) 2008-2010, 2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2013, 2018-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,18 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include "scene.h"
 #include "../core/util.h"
 #include "../core/logfile.h"
 
 
-/* constants */
-#define SCENESTACK_CAPACITY         32      /* up to SCENESTACK_CAPACITY scenes running simultaneously */
-
-
 /* private stuff */
+#define SCENESTACK_CAPACITY         32 /* up to SCENESTACK_CAPACITY scenes running simultaneously */
 static scene_t* scenestack[SCENESTACK_CAPACITY];
 static int scenestack_size = 0;
+static bool is_duplicate_scene(const scene_t* scn);
 
 
 
@@ -74,12 +73,10 @@ void scenestack_push(scene_t *scn, void *data)
         fatal_error("scenestack_push(): stack overflow");
         return;
     }
-    /*for(int i = 0; i < scenestack_size; i++) { // FIXME
-        if(scenestack[i] == scn) {
-            fatal_error("scenestack_push(): duplicate scene");
-            return;
-        }
-    }*/
+    if(is_duplicate_scene(scn)) {
+        fatal_error("scenestack_push(): duplicate scenes are not supported");
+        return;
+    }
     scenestack[scenestack_size++] = scn;
     scn->init(data);
     logfile_message("scenestack_push(): success");
@@ -163,3 +160,17 @@ scene_t *scene_destroy(scene_t *scn)
     return NULL;
 }
 
+
+
+/* private */
+
+/* Returns true if scn is already in the scene stack */
+extern void quest_init(void*); /* quest_* supports duplicates */
+bool is_duplicate_scene(const scene_t* scn)
+{
+    for(int i = 0; i < scenestack_size; i++) {
+        if(scenestack[i]->init == scn->init && scn->init != quest_init)
+            return true;
+    }
+    return false;
+}
