@@ -30,6 +30,8 @@
 #include "util.h"
 #include "global.h"
 #include "stringutil.h"
+#include "font.h"
+#include "lang.h"
 
 #if defined(A5BUILD)
 
@@ -78,7 +80,6 @@ static void setup_color_depth(int bpp);
 
 /* private stuff */
 #define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
-#define LOADING_SCREEN_FILE     "images/loading.png"
 
 /* video manager */
 static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
@@ -696,9 +697,21 @@ int video_fps()
  */
 void video_display_loading_screen()
 {
-    image_t *img = image_load(LOADING_SCREEN_FILE);
-    image_blit(img, 0, 0, (VIDEO_SCREEN_W - image_width(img))/2, (VIDEO_SCREEN_H - image_height(img))/2, image_width(img), image_height(img));
+    static const char* LOADING_IMAGE = "images/loading.png";
+    static const char* LOADING_FONT = "GoodNeighbors";
+    image_t *img = image_load(LOADING_IMAGE);
+    font_t* fnt = font_create(LOADING_FONT);
+    v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
+
+    image_clear(color_rgb(0, 0, 0));
+    image_blit(img, 0, 0, (VIDEO_SCREEN_W - image_width(img)) / 2, (VIDEO_SCREEN_H - image_height(img)) / 2, image_width(img), image_height(img));
+    font_set_align(fnt, FONTALIGN_CENTER);
+    font_set_text(fnt, "%s", lang_get("LOADING_TEXT"));
+    font_set_position(fnt, v2d_subtract(cam, v2d_new(0, font_get_textsize(fnt).y / 2)));
+    font_render(fnt, cam);
     video_render();
+    
+    font_destroy(fnt);
 }
 
 
