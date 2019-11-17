@@ -1,0 +1,238 @@
+// -----------------------------------------------------------------------------
+// File: languages/dede.lng
+// Description: German translation (encoding: utf-8)
+// Author: Wuzzy
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+//
+// Section: generic
+//
+
+// Translation metadata
+LANG_ID                     "de_DE"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Deutsch"                 // language name
+LANG_AUTHOR                 "Wuzzy"                   // translation author
+LANG_LASTUPDATE             "2019-11-16"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.0"                   // required engine version
+
+// Colors
+COLOR_TITLE                 "ff8800"
+COLOR_HIGHLIGHT             "ffee11"
+COLOR_HUD                   "ffff00"
+COLOR_HUDDANGER             "ff0000"
+
+//
+// Note to translators:
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// In the options screen, highlight "Stage select", press
+// right 3 times and enter. You'll see all .lev files.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "<color=$COLOR_TITLE>EINSTELLUNGEN</color>"
+OPTIONS_YES                 "JA"
+OPTIONS_NO                  "NEIN"
+OPTIONS_GRAPHICS            "GRAFIK"
+OPTIONS_FULLSCREEN          "Vollbild"
+OPTIONS_RESOLUTION          "Bildschirmgröße"
+OPTIONS_RESOLUTION_OPT1     "1×"
+OPTIONS_RESOLUTION_OPT2     "2×"
+OPTIONS_RESOLUTION_OPT3     "3×"
+OPTIONS_RESOLUTION_OPT4     "4×"
+OPTIONS_SMOOTHGFX           "Weiche Grafik"
+OPTIONS_SMOOTHGFX_ERROR     "[nur 32 bpp]"
+OPTIONS_FPS                 "FPS anzeigen"
+OPTIONS_GAME                "SPIEL"
+OPTIONS_GAMEPAD             "Gamepad benutzen"
+OPTIONS_LANGUAGE            "Sprache wechseln"
+OPTIONS_STAGESELECT         "Level auswählen"
+OPTIONS_CREDITS             "Mitwirkende von Open Surge"
+OPTIONS_DONATE              "An Open Surge spenden"
+OPTIONS_BACK                "ZURÜCK"
+
+// Stage Select
+STAGESELECT_TITLE           "<color=$COLOR_TITLE>LEVELWAHL</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEBUG-MODUS</color>"
+STAGESELECT_MSG             "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> drücken, um zurückzukehren"
+STAGESELECT_PAGE            "Seite $1/$2"
+STAGESELECT_ACT             "Zone"
+
+// Quest Select
+QUESTSELECT_TITLE           "<color=$COLOR_TITLE>MISSIONSWAHL</color>"
+QUESTSELECT_MSG             "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> drücken, um zurückzukehren"
+QUESTSELECT_PAGE            "Seite $1/$2"
+QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color=$COLOR_HIGHLIGHT>Autor:</color> $2\n<color=$COLOR_HIGHLIGHT>Beschreibung:</color> $3"
+
+// Credits
+CREDITS_TITLE               "<color=$COLOR_TITLE>MITWIRKENDE</color>"
+CREDITS_BACK                "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> drücken, um zurückzukehren"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME Version $GAME_VERSION</color>\nbasierend auf $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Leute</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dank an</color>"
+CREDITS_ALEXANDRE           "Projektleiter und -gründer\nProjektentwickler"
+CREDITS_JOAO                "Künstler"
+CREDITS_MATEUS              "Toneffekte"
+CREDITS_CODY                "Concept-Art"
+CREDITS_JOHAN               "Musiker (Ruhe in Frieden, Freund)"
+CREDITS_DI                  "Musiker"
+CREDITS_VICTOR              "Musiker"
+CREDITS_COLIN               "Sprites, erste Geschichte"
+CREDITS_BRIAN               "Sprite-Autor"
+CREDITS_TRANSLATOR          "Übersetzer"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Mitwirkende der einzelnen Mediendaten</color>"
+CREDITS_RES_TEXT            "Wenn nicht anders vermerkt, sind die folgenden Dateien unter der Creative Commons Attribution 3.0 (CC-BY 3.0) lizensiert."
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Bilder</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Musik</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Toneffekte</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skripte</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Die Autoren werden in den Skripten selbst genannt."
+
+// Main Menu
+MAINMENU_DEVBUILD           "Entwicklungsversion"
+MAINMENU_VERSION            "v." // abbreviated
+
+// Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TEXT             "Open Surge lässt dich deine eigenen großartigen Spiele erstellen. Lass deiner Kreativität freien Lauf!\nStarte dein eigenes Projekt! Erstelle neue Levels, Dinge, Besonderheiten, Figuren und mehr! Lern den Level-Editor kennen, lern die Engine und tauch in SurgeScript ein, um tolle Sachen zu machen!"
+
+// Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TEXT        "Danke, dass du Open Surge Version $GAME_VERSION spielst. Willst du mehr spielen? Besuche $GAME_WEBSITE für Updates! Open Surge lässt dich deine eigenen Spiele spielen und erstellen. Es wird für Leute wie dich entwickelt. Und jetzt verbreite den Spaß! Erzähl deiner Famile, Freunden und Haustieren davon!"
+
+// Loading Screen
+LOADING_TEXT                "Laden ..."
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "die PFEILTASTEN"
+INPUT_KEYB_LEFT             "die LINKS-TASTE"
+INPUT_KEYB_RIGHT            "die RECHTS-TASTE"
+INPUT_KEYB_UP               "die HOCH-TASTE"
+INPUT_KEYB_DOWN             "die RUNTER-TASTE"
+INPUT_KEYB_FIRE1            "LEERTASTE"
+INPUT_KEYB_FIRE2            "STRG LINKS"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "W"
+INPUT_KEYB_FIRE6            "A"
+INPUT_KEYB_FIRE7            "S"
+INPUT_KEYB_FIRE8            "D"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "die RICHTUNGSTASTEN"
+INPUT_JOY_LEFT              "der LINKS-BUTTON"
+INPUT_JOY_RIGHT             "der RECHTS-BUTTON"
+INPUT_JOY_UP                "der HOCH-BUTTON"
+INPUT_JOY_DOWN              "der RUNTER-BUTTON"
+INPUT_JOY_FIRE1             "BUTTON 1"
+INPUT_JOY_FIRE2             "BUTTON 2"
+INPUT_JOY_FIRE3             "BUTTON 3"
+INPUT_JOY_FIRE4             "BUTTON 4"
+INPUT_JOY_FIRE5             "BUTTON 5"
+INPUT_JOY_FIRE6             "BUTTON 6"
+INPUT_JOY_FIRE7             "BUTTON 7"
+INPUT_JOY_FIRE8             "BUTTON 8"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "WILLST DU WIRKLICH GEHEN?"
+QUIT_OPTION1                "JA"
+QUIT_OPTION2                "NEIN"
+
+	
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "Willkommen im <color=$COLOR_HIGHLIGHT>Demo-Level</color>! Benutze $INPUT_DIRECTIONAL zum Bewegen, $INPUT_FIRE1 zum Springen, $INPUT_FIRE2 zum Figurenwechsel."
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Schon gewusst?</color> Alles in Open Surge kann angepasst werden. Du kannst Levels, Dinge, Bosse, Figuren und mehr erstellen. Es ist ein vollwertiges <color=$COLOR_HIGHLIGHT>Spielerstellungssystem</color>."
+LEV_DEMO_3                  "Eines der Hauptfunktionen in Open Surge ist <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Das ist eine Skriptsprache für Spiele. Benutze sie, um alles, was du dir nur vorstellen kannst, zu bauen!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nIst das nicht toll? Es gibt keine Grenzen! Besuch <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, um noch heute deine großartigen Spiele zu machen!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Versuch es selbst!</color> Jetzt bist du an der Reihe! <color=$COLOR_HIGHLIGHT>Drück F12, um den Editor zu öffnen</color>. Öffne als nächstes die Palette und fang an, dein Level zu bauen! (Drück F1 für Hilfe.)"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Note to translators:
+//
+// Since the game uses bitmap fonts, parts of
+// the translation don't accept special characters.
+//
+// This section does not accept language-specific
+// special characters.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+//
+// NOTE BY TRANSLATOR:
+// Non-ASCII letters in German are: äÄöÖüÜßẞ
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Punkte"
+HUD_TIME                    "Zeit"
+HUD_COLLECTIBLES            "Energie"
+
+// Level Cleared animation
+CLEARED_LINE1               "DU HAST ZONE $LEVEL_ACT"
+CLEARED_LINE2               "GESCHAFFT!"
+CLEARED_POWER               "Energiebonus"
+CLEARED_TIME                "Zeitbonus"
+CLEARED_SCORE               "Punkte"
+
+// Main Menu
+// NOTE BY TRANSLATOR: string below should be "MENÜ"
+MAINMENU_TITLE              "MENUE"
+MAINMENU_PLAY               "SPIELEN"
+MAINMENU_CREATE             "ERSTELLEN"
+MAINMENU_SHARE              "TEILEN"
+MAINMENU_OPTIONS            "EINSTELLUNGEN"
+MAINMENU_QUIT               "ENDE"
+
+// Create Menu
+CREATEMENU_TITLE            "ERSTELLEN"
+CREATEMENU_PLAY             "DEMO SPIELEN"
+CREATEMENU_LEARN            "LERNEN"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+// NOTE BY TRANSLATOR: string below should be "ZURÜCK"
+CREATEMENU_BACK             "ZURUECK"
+
+// Congratulations Screen
+// NOTE BY TRANSLATOR: string below should be "DANKE FÜRS SPIELEN"
+CONGRATULATIONS_TITLE       "DANKE FUERS SPIELEN"
+CONGRATULATIONS_SHARE       "TEILEN"
