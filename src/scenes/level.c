@@ -214,7 +214,7 @@ static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
 
 /* Scripting */
-#define TRANSFORM_MAX_DEPTH 64
+#define TRANSFORM_MAX_DEPTH 128
 #define BRICKLIKE_MAX_COUNT 1024
 static surgescript_object_t* cached_level_ssobject = NULL;
 static void update_ssobjects();
@@ -2712,7 +2712,7 @@ void update_ssobject(surgescript_object_t* object, void* param)
             ((v2d_t*)param)[1 + depth] = origin;
     }
     else
-        fatal_error("Scripting Error: TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
+        scripting_error(object, "TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
 }
 
 void late_update_ssobject(surgescript_object_t* object, void* param)

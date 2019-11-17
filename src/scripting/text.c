@@ -105,7 +105,7 @@ font_t* scripting_text_fontptr(const surgescript_object_t* object)
     if(font == NULL) {
         surgescript_heap_t* heap = surgescript_object_heap(object);
         const char* text = surgescript_var_fast_get_string(surgescript_heap_at(heap, TEXT_ADDR));
-        fatal_error("Scripting Error: font not found for \"%s\"", text);
+        scripting_error(object, "Font not found for \"%s\"", text);
     }
     return font;
 }
