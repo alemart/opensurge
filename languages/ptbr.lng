@@ -113,10 +113,6 @@ CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TEXT        "Obrigado por jogar o Open Surge versão $GAME_VERSION.\nQuer jogar mais? Visite $GAME_WEBSITE p/ atualizações!\n\nCom o Open Surge, você joga e cria seus games. Sabia que ele é feito por gente como você? Conte para sua família, seus amigos e seus bichinhos e ajude a divulgar o jogo!"
 
-// Loading Screen
-LOADING_TEXT                "carregando..."
-
-
 
 
 //
@@ -229,3 +225,6 @@ CREATEMENU_BACK             "VOLTAR"
 // Congratulations Screen
 CONGRATULATIONS_TITLE       "OBRIGADO POR JOGAR"
 CONGRATULATIONS_SHARE       "COMPARTILHE"
+
+// Loading Screen
+LOADING_TEXT                "carregando..."
