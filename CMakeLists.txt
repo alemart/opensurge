@@ -119,6 +119,7 @@ IF(USE_A5)
     allegro_acodec
     allegro_audio
     allegro_dialog
+    allegro_memfile
   )
 
   # OSX requires allegro_main
@@ -437,7 +438,7 @@ SET(GAME_SRCS
   src/entities/renderqueue.c
 
   src/misc/icon.c
-  
+
   src/main.c
 )
 

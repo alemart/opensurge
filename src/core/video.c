@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * video.c - video manager
- * Copyright (C) 2008-2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_memfile.h>
 
 #define IMAGE2BITMAP(img) (*((ALLEGRO_BITMAP**)(img)))
 #define PRINT(x, y, flags, fmt, ...) do { \
@@ -50,6 +51,7 @@ static image_t* backbuffer = NULL;
 static ALLEGRO_FONT* font = NULL;
 static int suggested_bpp = 32;
 static void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer);
+static void set_display_icon(ALLEGRO_DISPLAY* display);
 
 #else
 
@@ -137,6 +139,9 @@ void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int 
 
     /* video message */
     videomsg = NULL;
+
+    /* set window icon */
+    set_display_icon(display);
 #else
     logfile_message("video_init()");
     setup_color_depth(bpp);
@@ -721,6 +726,22 @@ void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer)
     /* compute the transform */
     al_build_transform(&t, offset.x, offset.y, min(scale.x, scale.y), min(scale.x, scale.y), 0.0f);
     al_use_transform(&t);
+}
+
+/* sets the icon of the display to a built-in icon */
+void set_display_icon(ALLEGRO_DISPLAY* display)
+{
+#if !defined(_WIN32)
+    extern const unsigned char ICON_PNG[];
+    extern const size_t ICON_SIZE;
+    ALLEGRO_FILE* f = al_open_memfile((void*)ICON_PNG, ICON_SIZE, "r");
+    ALLEGRO_BITMAP* icon = al_load_bitmap_f(f, ".png");
+    al_set_display_icon(display, icon);
+    al_destroy_bitmap(icon);
+    al_fclose(f);
+#else
+    ; /* will use the .ico file */
+#endif
 }
 
 #else
