@@ -163,14 +163,16 @@ scene_t *scene_destroy(scene_t *scn)
 
 
 /* private */
+extern void quest_init(void*);
 
 /* Returns true if scn is already in the scene stack */
-extern void quest_init(void*); /* quest_* supports duplicates */
 bool is_duplicate_scene(const scene_t* scn)
 {
-    for(int i = 0; i < scenestack_size; i++) {
-        if(scenestack[i]->init == scn->init && scn->init != quest_init)
-            return true;
+    if(scn->init != quest_init) { /* quest_* supports duplicates */
+        for(int i = 0; i < scenestack_size; i++) {
+            if(scenestack[i]->init == scn->init)
+                return true;
+        }
     }
     return false;
 }
