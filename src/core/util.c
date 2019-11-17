@@ -157,7 +157,7 @@ void fatal_error(const char *fmt, ...)
     logfile_message("----- crash -----\n%s", buf);
 #if defined(A5BUILD)
     al_show_native_message_box(al_get_current_display(),
-        "Error",
+        "Surgexception Error",
         "Ooops...",
         buf,
     NULL, ALLEGRO_MESSAGEBOX_ERROR);
