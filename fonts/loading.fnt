@@ -1,0 +1,304 @@
+// -----------------------------------------------------------------------------
+// File: loading.fnt
+// Description: font script for the loading screen (using the Good Neighbors font by Clint Bellanger)
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Loading Text"
+{
+    bitmap
+    {
+        source_file             "fonts/good_neighbors.png"
+        spacing                 -1 1
+
+        char " " {
+            source_rect         1 1 8 16
+        }
+        char "!" {
+            source_rect         10 1 6 16
+        }
+        char "\"" {
+            source_rect         17 1 7 16
+        }
+        char "#" {
+            source_rect         25 1 10 16
+        }
+        char "$" {
+            source_rect         36 1 10 16
+        }
+        char "%" {
+            source_rect         47 1 11 16
+        }
+        char "&" {
+            source_rect         59 1 11 16
+        }
+        char "'" {
+            source_rect         71 1 4 16
+        }
+        char "(" {
+            source_rect         76 1 6 16
+        }
+        char ")" {
+            source_rect         83 1 6 16
+        }
+        char "*" {
+            source_rect         90 1 10 16
+        }
+        char "+" {
+            source_rect         101 1 8 16
+        }
+        char "," {
+            source_rect         110 1 4 16
+        }
+        char "-" {
+            source_rect         115 1 9 16
+        }
+        char "." {
+            source_rect         125 1 4 16
+        }
+        char "/" {
+            source_rect         130 1 8 16
+        }
+        char "0" {
+            source_rect         139 1 8 16
+        }
+        char "1" {
+            source_rect         148 1 6 16
+        }
+        char "2" {
+            source_rect         155 1 8 16
+        }
+        char "3" {
+            source_rect         164 1 8 16
+        }
+        char "4" {
+            source_rect         173 1 9 16
+        }
+        char "5" {
+            source_rect         183 1 8 16
+        }
+        char "6" {
+            source_rect         192 1 8 16
+        }
+        char "7" {
+            source_rect         201 1 8 16
+        }
+        char "8" {
+            source_rect         210 1 8 16
+        }
+        char "9" {
+            source_rect         219 1 8 16
+        }
+        char ":" {
+            source_rect         228 1 4 16
+        }
+        char ";" {
+            source_rect         233 1 4 16
+        }
+        char "<" {
+            source_rect         238 1 9 16
+        }
+        char "=" {
+            source_rect         248 1 7 16
+        }
+        char ">" {
+            source_rect         256 1 9 16
+        }
+        char "?" {
+            source_rect         266 1 8 16
+        }
+        char "@" {
+            source_rect         275 1 10 16
+        }
+        char "A" {
+            source_rect         286 1 8 16
+        }
+        char "B" {
+            source_rect         295 1 8 16
+        }
+        char "C" {
+            source_rect         304 1 8 16
+        }
+        char "D" {
+            source_rect         313 1 9 16
+        }
+        char "E" {
+            source_rect         323 1 8 16
+        }
+        char "F" {
+            source_rect         332 1 8 16
+        }
+        char "G" {
+            source_rect         341 1 8 16
+        }
+        char "H" {
+            source_rect         350 1 8 16
+        }
+        char "I" {
+            source_rect         359 1 6 16
+        }
+        char "J" {
+            source_rect         366 1 9 16
+        }
+        char "K" {
+            source_rect         376 1 8 16
+        }
+        char "L" {
+            source_rect         385 1 8 16
+        }
+        char "M" {
+            source_rect         394 1 10 16
+        }
+        char "N" {
+            source_rect         405 1 9 16
+        }
+        char "O" {
+            source_rect         415 1 8 16
+        }
+        char "P" {
+            source_rect         424 1 8 16
+        }
+        char "Q" {
+            source_rect         433 1 9 16
+        }
+        char "R" {
+            source_rect         443 1 9 16
+        }
+        char "S" {
+            source_rect         453 1 8 16
+        }
+        char "T" {
+            source_rect         462 1 8 16
+        }
+        char "U" {
+            source_rect         471 1 8 16
+        }
+        char "V" {
+            source_rect         480 1 8 16
+        }
+        char "W" {
+            source_rect         489 1 10 16
+        }
+        char "X" {
+            source_rect         500 1 9 16
+        }
+        char "Y" {
+            source_rect         510 1 8 16
+        }
+        char "Z" {
+            source_rect         519 1 8 16
+        }
+        char "[" {
+            source_rect         528 1 6 16
+        }
+        char "\\" {
+            source_rect         535 1 8 16
+        }
+        char "]" {
+            source_rect         544 1 6 16
+        }
+        char "^" {
+            source_rect         551 1 11 16
+        }
+        char "_" {
+            source_rect         563 1 8 16
+        }
+        char "`" {
+            source_rect         572 1 8 16
+        }
+        char "a" {
+            source_rect         579 1 8 16
+        }
+        char "b" {
+            source_rect         588 1 8 16
+        }
+        char "c" {
+            source_rect         597 1 8 16
+        }
+        char "d" {
+            source_rect         606 1 8 16
+        }
+        char "e" {
+            source_rect         615 1 8 16
+        }
+        char "f" {
+            source_rect         624 1 7 16
+        }
+        char "g" {
+            source_rect         632 1 8 16
+        }
+        char "h" {
+            source_rect         641 1 8 16
+        }
+        char "i" {
+            source_rect         650 1 6 16
+        }
+        char "j" {
+            source_rect         657 1 6 16
+        }
+        char "k" {
+            source_rect         664 1 8 16
+        }
+        char "l" {
+            source_rect         673 1 5 16
+        }
+        char "m" {
+            source_rect         679 1 10 16
+        }
+        char "n" {
+            source_rect         690 1 8 16
+        }
+        char "o" {
+            source_rect         699 1 8 16
+        }
+        char "p" {
+            source_rect         708 1 8 16
+        }
+        char "q" {
+            source_rect         717 1 9 16
+        }
+        char "r" {
+            source_rect         727 1 8 16
+        }
+        char "s" {
+            source_rect         736 1 8 16
+        }
+        char "t" {
+            source_rect         745 1 8 16
+        }
+        char "u" {
+            source_rect         754 1 8 16
+        }
+        char "v" {
+            source_rect         763 1 8 16
+        }
+        char "w" {
+            source_rect         772 1 10 16
+        }
+        char "x" {
+            source_rect         783 1 8 16
+        }
+        char "y" {
+            source_rect         792 1 8 16
+        }
+        char "z" {
+            source_rect         801 1 8 16
+        }
+        char "{" {
+            source_rect         810 1 7 16
+        }
+        char "|" {
+            source_rect         818 1 4 16
+        }
+        char "}" {
+            source_rect         823 1 7 16
+        }
+        char "~" {
+            source_rect         831 1 9 16
+        }
+        char "\x7f" {
+            source_rect         841 1 10 16
+        }
+    }
+}
