@@ -8,7 +8,7 @@ Get the game at [opensurge2d.org](http://opensurge2d.org)
 
 ## What is Open Surge?
 
-Open Surge is a fun 2D retro platformer inspired by old-school Sonic games. It is also a game creation system that lets you unleash your creativity! Play, create & share!
+Open Surge is a fun 2D retro platformer inspired by Sonic games. It is also a game creation system that lets you unleash your creativity! Play, create & share!
 
 Open Surge is currently available for Microsoft Windows and GNU/Linux. It is in active development!
 
@@ -40,7 +40,7 @@ Use Open Surge to create your own amazing games! Create new levels, items, bosse
 * Next, learn how to do [basic hacking](http://opensurge2d.org) (modify the images/sounds, create new scenery, new characters, etc.)
 * Finally, have fun with scripting! [SurgeScript](http://docs.opensurge2d.org), the scripting language featured in Open Surge, gives you ultimate power to create anything you desire and make your dreams come alive!
 
-To learn more, watch the [video tutorials](http://youtube.com/alemart88) made by the developer of the engine.
+To learn more, read the [project wiki](http://opensurge2d.org/wiki) and watch the [video tutorials](http://youtube.com/alemart88) made by the developer of the engine.
 
 ## Advanced users
 
@@ -74,6 +74,8 @@ sudo make install
 ```
 
 You may run `ccmake` or `cmake-gui` to know additional build options (e.g., set the path of the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
+
+**Note:** check the [project wiki](http://opensurge2d.org/wiki) for more detailed instructions.
 
 **Linux users:** game assets (images, sounds, etc.) can be stored globally or in user-space. Assets located in user-space take precedence over assets located in system directories. Open Surge uses the XDG Base Directory specification; look for the *opensurge2d* directory.
 
