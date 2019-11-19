@@ -2,7 +2,7 @@
 Type=Application
 Name=Open Surge
 GenericName=Game Engine
-Comment=A fun 2D retro platformer inspired by old-school Sonic games
+Comment=A fun 2D retro platformer inspired by Sonic games
 Exec=opensurge
 Icon=opensurge
 Terminal=false

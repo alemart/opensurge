@@ -1,9 +1,9 @@
 name: opensurge
 base: core18
 version: '0.5.0-2'
-summary: A fun 2D retro platformer inspired by old-school Sonic games
+summary: A fun 2D retro platformer inspired by Sonic games
 description: |
-  Open Surge is a fun 2D retro platformer inspired by old-school Sonic games.
+  Open Surge is a fun 2D retro platformer inspired by Sonic games.
   It is also a game creation system that lets you unleash your creativity!
   Play, create & share!
 
