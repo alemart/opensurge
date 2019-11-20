@@ -291,7 +291,6 @@ Mateus Reis
 --- samples/door1.wav
 --- samples/door2.wav
 --- samples/powerup.wav
---- samples/drown.wav
 --- samples/cannon.ogg
 --- samples/floorhit.wav
 --- samples/shot.wav
@@ -333,6 +332,7 @@ Alexandre Martins
 --- samples/impact.wav
 --- samples/slide.wav
 --- samples/jetpack.wav
+--- samples/underwater_tick.wav
 
 d1337r
 --- samples/deny.wav

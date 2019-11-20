@@ -190,9 +190,11 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
     transform = Transform();
     music = Music("musics/drowning.ogg");
     counter = Text("HUD Large");
+    tick = Sound("samples/underwater_tick.wav");
+    tickState = 0;
+
     seconds = 5; // when should we display the timer?
-    breathTime = { };
-    inf = 120000;
+    tickCount = 3; // how many warning ticks should we play when underwater?
 
     state "main"
     {
@@ -200,15 +202,14 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
         if(player.shield == "water")
             return;
         if(player.underwater) {
-            // prevent drowning if the head is not underwater
-            if(canBreathe(player)) {
-                if(player.breathTime < inf) {
-                    breathTime[player.name] = player.breathTime;
-                    player.breathTime = inf;
-                }
+            // underwater warning tick sound
+            c = Math.max(player.secondsToDrown - seconds, 0);
+            c /= Math.max(player.breathTime - seconds, 0);
+            c = Math.floor((1 - c) * (tickCount + 0.5));
+            if(c > tickState) {
+                tickState = c;
+                tick.play();
             }
-            else if(player.breathTime >= inf && (bt = breathTime[player.name]) !== null)
-                player.breathTime = bt;
 
             // breathing counter
             t = player.secondsToDrown;
@@ -229,16 +230,13 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
                     music.stop(); // got an air bubble
             }
         }
-        else if(music.playing) {
-            counter.visible = false;
-            music.stop();
+        else {
+            tickState = 0;
+            if(music.playing) {
+                counter.visible = false;
+                music.stop();
+            }
         }
-    }
-
-    fun canBreathe(player)
-    {
-        collider = player.collider;
-        return Math.lerp(collider.bottom, collider.top, 0.8) < Level.waterlevel;
     }
 
     fun constructor()
