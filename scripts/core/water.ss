@@ -206,9 +206,10 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
             c = Math.max(player.secondsToDrown - seconds, 0);
             c /= Math.max(player.breathTime - seconds, 0);
             c = Math.floor((1 - c) * (tickCount + 0.5));
-            if(c > tickState) {
+            if(c != tickState) {
+                if(c > 0)
+                    tick.play();
                 tickState = c;
-                tick.play();
             }
 
             // breathing counter
@@ -226,8 +227,11 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
                 counter.visible = false;
                 if(t <= 0)
                     Level.music.stop();
-                else if(music.playing)
-                    music.stop(); // got an air bubble
+                else if(music.playing) {
+                    // got an air bubble
+                    music.stop();
+                    tickState = 0;
+                }
             }
         }
         else {
