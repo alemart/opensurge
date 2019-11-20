@@ -168,7 +168,6 @@ static int *height_at, height_at_count; /* level height at different sample poin
 static float level_timer;
 static music_t *music;
 static sound_t *override_music;
-static int block_music;
 static int quit_level;
 static image_t *quit_level_img;
 static bgtheme_t *backgroundtheme;
@@ -505,7 +504,6 @@ void level_load(const char *filepath)
         fatal_error("Can\'t open level file \"%s\".", fullpath);
 
     /* load the music */
-    block_music = FALSE;
     music = *musicfile ? music_load(musicfile) : NULL;
 
     /* background */
@@ -1921,9 +1919,6 @@ void level_clear(actor_t *end_sign)
     for(i=0; i<team_size; i++)
         input_ignore(team[i]->actor->input);
 
-    /* block music */
-    block_music = TRUE;
-
     /* set the focus */
     if(end_sign != NULL)
         level_set_camera_focus(end_sign);
@@ -2339,7 +2334,7 @@ void update_music()
     if(override_music && !sound_is_playing(override_music))
         override_music = NULL;
 
-    if(music != NULL && !block_music) {
+    if(music != NULL && !level_cleared && !player_is_dying(player)) {
         if(!override_music && !music_is_playing()) {
             if(music_current() == NULL || (music_current() == music && !music_is_paused()))
                 music_play(music, true);
