@@ -100,6 +100,7 @@ static inline float ang_diff(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
 static int fixangle(int degrees, int threshold);
+static int is_head_underwater(const player_t* player);
 
 
 /*
@@ -274,21 +275,28 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         update_shield(player);
 
     /* underwater logic */
-    if(!(player->underwater) && act->position.y >= level_waterlevel())
+    if(!player->underwater && act->position.y >= level_waterlevel())
         player_enter_water(player);
     else if(player->underwater && act->position.y < level_waterlevel())
         player_leave_water(player);
     if(player->underwater) {
-        player->turbo_timer = max(player->turbo_timer, PLAYER_MAX_TURBO); /* disable turbo */
+        /* disable turbo */
+        player->turbo_timer = max(player->turbo_timer, PLAYER_MAX_TURBO);
 
-        if(player->shield_type != SH_WATERSHIELD)
+        /* disable some shields */
+        if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD)
+            player_hit(player, 0.0f);
+
+        /* timer countdown */
+        if(player->shield_type != SH_WATERSHIELD && (
+            act->position.y < level_waterlevel() || /* forced underwater via scripting OR... */
+            is_head_underwater(player)              /* the head of the player is underwater */
+        ))
             player->underwater_timer += dt;
         else
             player->underwater_timer = 0.0f;
 
-        if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD)
-            player_hit(player, 0.0f);
-
+        /* drowning */
         if(player_seconds_remaining_to_drown(player) <= 0.0f)
             player_drown(player);
     }
@@ -1639,4 +1647,21 @@ int fixangle(int degrees, int threshold)
         return 270;
     else
         return degrees;
+}
+
+/* is the head of the player underwater? */
+int is_head_underwater(const player_t* player)
+{
+    const float head_factor = 0.8f;
+    float top, bottom;
+    int player_box_width, player_box_height;
+    v2d_t player_box_center;
+
+    physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
+    if(player_is_frozen(player))
+        player_box_center = player->actor->position;
+
+    top = player_box_center.y - player_box_height / 2.0f;
+    bottom = player_box_center.y + player_box_height / 2.0f;
+    return (int)lerp(bottom, top, head_factor) >= level_waterlevel();
 }
