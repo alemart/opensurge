@@ -535,7 +535,7 @@ surgescript_var_t* fun_getdying(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
-    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_in_the_air(player));
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_midair(player));
 }
 
 /* is the player blinking? */
@@ -733,7 +733,7 @@ surgescript_var_t* fun_getspeed(surgescript_object_t* object, const surgescript_
 {
     player_t* player = get_player(object);
     if(player != NULL) {
-        if(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player))
+        if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
             return surgescript_var_set_number(surgescript_var_create(), physicsactor_get_xsp(player->pa));
         else
             return surgescript_var_set_number(surgescript_var_create(), physicsactor_get_gsp(player->pa));
@@ -749,7 +749,7 @@ surgescript_var_t* fun_setspeed(surgescript_object_t* object, const surgescript_
     if(player != NULL) {
         float speed = surgescript_var_get_number(param[0]);
         player->actor->speed.x = speed;
-        if(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player))
+        if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
             physicsactor_set_xsp(player->pa, speed);
         else
             physicsactor_set_gsp(player->pa, speed);
@@ -773,7 +773,7 @@ surgescript_var_t* fun_setgsp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     if(player != NULL) {
-        if(!(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player)))
+        if(!(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player)))
             player->actor->speed.x = surgescript_var_get_number(param[0]);
     }
     return NULL;
@@ -795,7 +795,7 @@ surgescript_var_t* fun_setxsp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     if(player != NULL) {
-        if(player_is_in_the_air(player) || player_is_getting_hit(player) || player_is_dying(player))
+        if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
             player->actor->speed.x = surgescript_var_get_number(param[0]);
     }
     return NULL;
@@ -820,7 +820,7 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
         player->actor->speed.y = ysp;
 
         /* hack */
-        if(ysp < 0.0f && !player_is_in_the_air(player)) {
+        if(ysp < 0.0f && !player_is_midair(player)) {
             if(!player_is_rolling(player))
                 player->actor->position.y -= 2;
             else
@@ -1249,7 +1249,7 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
         }
 
         /* error if player is midair, etc. */
-        if(player_is_in_the_air(player) || player_is_frozen(player) || player->on_movable_platform)
+        if(player_is_midair(player) || player_is_frozen(player) || player->on_movable_platform)
             return surgescript_var_set_bool(surgescript_var_create(), false);
 
         /* player inside locked area? */

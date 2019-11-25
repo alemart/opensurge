@@ -132,7 +132,7 @@ float player_seconds_remaining_to_drown(const player_t *player);
 void player_set_breath_time(player_t* player, float seconds);
 float player_breath_time(const player_t* player);
 
-int player_is_in_the_air(const player_t *player);
+int player_is_midair(const player_t *player);
 int player_is_attacking(const player_t *player);
 int player_is_blinking(const player_t *player);
 int player_is_turbocharged(const player_t *player);

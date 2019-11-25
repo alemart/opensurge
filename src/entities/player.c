@@ -354,7 +354,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         physicsactor_enable_winning_pose(pa);
 
     /* rolling misc */
-    if(!player_is_in_the_air(player))
+    if(!player_is_midair(player))
         player->thrown_while_rolling = FALSE;
     else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
         player->thrown_while_rolling = TRUE;
@@ -420,7 +420,7 @@ void player_render(player_t *player, v2d_t camera_position)
  */
 int player_bounce(player_t *player, float direction, int is_heavy_object)
 {
-    if(physicsactor_is_in_the_air(player->pa) && !player_is_dying(player)) {
+    if(player_is_midair(player) && !player_is_dying(player)) {
         actor_t *act = player->actor;
         
         if(direction <= 0.0f && act->speed.y >= 0.0f)
@@ -1001,12 +1001,12 @@ int player_is_winning(const player_t *player)
 }
 
 /*
- * player_is_in_the_air()
- * TRUE iff the player is in the air
+ * player_is_midair()
+ * TRUE iff the player is midair
  */
-int player_is_in_the_air(const player_t *player)
+int player_is_midair(const player_t *player)
 {
-    return physicsactor_is_in_the_air(player->pa);
+    return physicsactor_is_midair(player->pa);
 }
 
 /*
@@ -1337,9 +1337,9 @@ void update_animation(player_t *player)
 
         if(state == PAS_WALKING || state == PAS_RUNNING)
             actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, gsp));
-        else if(state == PAS_ROLLING && !physicsactor_is_in_the_air(player->pa))
+        else if(state == PAS_ROLLING && !physicsactor_is_midair(player->pa))
             actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
-        else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_in_the_air(player->pa))))
+        else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_midair(player->pa))))
             actor_change_animation_speed_factor(player->actor, 1.0f);
         else if(state == PAS_JUMPING && player->actor->animation_speed_factor < 1.0f)
             actor_change_animation_speed_factor(player->actor, 1.0f);
@@ -1391,7 +1391,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* converting variables */
     physicsactor_set_position(pa, act->position);
-    if(!(physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player)))
+    if(!(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player)))
         physicsactor_set_gsp(pa, act->speed.x);
     physicsactor_set_xsp(pa, act->speed.x);
     physicsactor_set_ysp(pa, act->speed.y);
@@ -1463,7 +1463,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* unconverting variables */
     act->position = physicsactor_get_position(pa);
-    if(physicsactor_is_in_the_air(pa) || player_is_getting_hit(player) || player_is_dying(player))
+    if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
         act->speed = v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa));
     else
         act->speed = v2d_new(physicsactor_get_gsp(pa), 0.0f);
@@ -1538,7 +1538,7 @@ void hotspot_magic(player_t* player)
                 case MM_CEILING: act->hot_spot.y += 2; break;
             }
         }
-        else if(!physicsactor_is_in_the_air(pa)) {
+        else if(!physicsactor_is_midair(pa)) {
             physicsactorstate_t state = physicsactor_get_state(pa);
             if(!(
                 state == PAS_STOPPED || state == PAS_WAITING ||

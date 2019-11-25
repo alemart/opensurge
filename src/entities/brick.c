@@ -370,7 +370,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
             /* move the player(s) */
             for(i=0; i<team_size; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
+                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
                             team[i]->on_movable_platform = TRUE;
@@ -462,7 +462,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
             /* check for collisions */
             for(i=0; i<team_size && !player; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
+                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height)))
                             player = team[i];
@@ -552,7 +552,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 
             /* move the player(s) */
             for(i=0; i<team_size; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_in_the_air(team[i])) {
+                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
                             team[i]->on_movable_platform = TRUE;

@@ -85,7 +85,7 @@ int physicsactor_get_angle(const physicsactor_t *pa); /* get the angle in degree
 v2d_t physicsactor_get_position(const physicsactor_t *pa); /* the position of the physics actor is the center of its sprite */
 void physicsactor_set_position(physicsactor_t *pa, v2d_t position);
 void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds); /* set the horizontal control lock timer */
-int physicsactor_is_in_the_air(const physicsactor_t *pa);
+int physicsactor_is_midair(const physicsactor_t *pa);
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(physicsactor_t *pa);
 int physicsactor_roll_delta(const physicsactor_t* pa); /* roll delta (sensors) */

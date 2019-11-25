@@ -65,7 +65,7 @@ struct physicsactor_t
     float chrgthreshold; /* charge intensity threshold */
     float waittime; /* wait time in seconds */
     int angle; /* angle (0-255 clockwise) */
-    int in_the_air; /* is the player in the air? */
+    int midair; /* is the player midair? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
     float jump_lock_timer; /* jump lock timer, in seconds */
     int facing_right; /* is the player facing right? */
@@ -225,7 +225,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->gsp = 0.0f;
     pa->angle = 0x0;
     pa->movmode = MM_FLOOR;
-    pa->in_the_air = TRUE;
+    pa->midair = TRUE;
     pa->state = PAS_STOPPED;
     pa->horizontal_control_lock_timer = 0.0f;
     pa->jump_lock_timer = 0.0f;
@@ -270,7 +270,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
     pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
-    pa->airdragxthreshold =    (8.0f/64.0f) * 1.0f   * 1.0f   ;
+    pa->airdragxthreshold =    (8.0f/64.0f) * fpsmul * 1.0f   ;
     pa->chrgthreshold =        (1.0f/64.0f) * 1.0f   * 1.0f   ;
     pa->waittime =              3.0f        * 1.0f   * 1.0f   ;
 
@@ -366,9 +366,9 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->horizontal_control_lock_timer = max(0.0f, pa->horizontal_control_lock_timer - dt);
         input_simulate_button_up(pa->input, IB_LEFT);
         input_simulate_button_up(pa->input, IB_RIGHT);
-        if(!pa->in_the_air && !nearly_equal(pa->gsp, 0.0f))
+        if(!pa->midair && !nearly_equal(pa->gsp, 0.0f))
             pa->facing_right = (pa->gsp > 0.0f);
-        else if(pa->in_the_air && !nearly_equal(pa->xsp, 0.0f))
+        else if(pa->midair && !nearly_equal(pa->xsp, 0.0f))
             pa->facing_right = (pa->xsp > 0.0f);
     }
 
@@ -379,9 +379,9 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* face left/right */
     if(pa->state != PAS_ROLLING) {
-        if((pa->gsp > 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_RIGHT))
+        if((pa->gsp > 0.0f || pa->midair) && input_button_down(pa->input, IB_RIGHT))
             pa->facing_right = TRUE;
-        else if((pa->gsp < 0.0f || pa->in_the_air) && input_button_down(pa->input, IB_LEFT))
+        else if((pa->gsp < 0.0f || pa->midair) && input_button_down(pa->input, IB_LEFT))
             pa->facing_right = FALSE;
     }
 
@@ -433,9 +433,9 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds)
     pa->horizontal_control_lock_timer = max(seconds, 0.0f);
 }
 
-int physicsactor_is_in_the_air(const physicsactor_t *pa)
+int physicsactor_is_midair(const physicsactor_t *pa)
 {
-    return pa->in_the_air;
+    return pa->midair;
 }
 
 void physicsactor_enable_winning_pose(physicsactor_t *pa)
@@ -592,7 +592,7 @@ const sensor_t* sensor_##x(const physicsactor_t *pa) \
 { \
     if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) \
         return pa->x##_jumproll; \
-    else if(pa->in_the_air || pa->state == PAS_SPRINGING) \
+    else if(pa->midair || pa->state == PAS_SPRINGING) \
         return pa->x##_intheair; \
     else \
         return pa->x##_normal; \
@@ -661,27 +661,27 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         if(at_A != NULL && !obstacle_is_solid(at_A)) { \
             int x, y; \
             sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
-            if(obstacle_got_collision(at_A, x, y, x, y) && pa->in_the_air) { \
+            if(obstacle_got_collision(at_A, x, y, x, y) && pa->midair) { \
                 int ygnd = obstacle_ground_position(at_A, x, y, GD_DOWN); \
                 at_A = (pa->ysp >= 0.0f && y < ygnd + 12) ? at_A : NULL; \
             } \
-            else if(pa->in_the_air || at_A == at_M) \
+            else if(pa->midair || at_A == at_M) \
                 at_A = NULL; \
         } \
         if(at_B != NULL && !obstacle_is_solid(at_B)) { \
             int x, y; \
             sensor_worldpos(sensor_B(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
-            if(obstacle_got_collision(at_B, x, y, x, y) && pa->in_the_air) { \
+            if(obstacle_got_collision(at_B, x, y, x, y) && pa->midair) { \
                 int ygnd = obstacle_ground_position(at_B, x, y, GD_DOWN); \
                 at_B = (pa->ysp >= 0.0f && y < ygnd + 12) ? at_B : NULL; \
             } \
-            else if(pa->in_the_air || at_B == at_M) \
+            else if(pa->midair || at_B == at_M) \
                 at_B = NULL; \
         } \
         at_C = (at_C != NULL && obstacle_is_solid(at_C)) ? at_C : NULL; \
         at_D = (at_D != NULL && obstacle_is_solid(at_D)) ? at_D : NULL; \
         at_M = (at_M != NULL && obstacle_is_solid(at_M)) ? at_M : NULL; \
-        pa->in_the_air = (at_A == NULL) && (at_B == NULL); \
+        pa->midair = (at_A == NULL) && (at_B == NULL); \
     } while(0)
 
 /* call UPDATE_MOVMODE whenever you update pa->angle */
@@ -709,7 +709,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         const int sensor_len = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
         int found_a = FALSE, found_b = FALSE; \
         int h, x, y, xa, ya, xb, yb, ang; \
-        int m = !pa->in_the_air && was_in_the_air ? 3 : 2; \
+        int m = !pa->midair && was_midair ? 3 : 2; \
         for(int i = 0; i < sensor_len * m && !(found_a && found_b); i++) { \
             h = i + sensor_len / 2; \
             x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
@@ -772,7 +772,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
     float dt = timer_get_delta();
-    int was_in_the_air;
+    int was_midair;
 
     UPDATE_SENSORS();
 
@@ -795,7 +795,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
-    if(!pa->in_the_air && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING) {
+    if(!pa->midair && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING) {
 
         /* acceleration */
         if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT) && pa->gsp >= 0.0f) {
@@ -881,13 +881,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      */
 
     /* start rolling */
-    if(!pa->in_the_air && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
+    if(!pa->midair && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
         if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
             pa->state = PAS_ROLLING;
     }
 
     /* roll */
-    if(!pa->in_the_air && pa->state == PAS_ROLLING) {
+    if(!pa->midair && pa->state == PAS_ROLLING) {
 
         /* slope factor */
         if(pa->gsp * SIN(pa->angle) >= 0.0f)
@@ -959,7 +959,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
-    if(!pa->in_the_air) {
+    if(!pa->midair) {
 
         /* you're way too fast... */
         pa->gsp = clip(pa->gsp, -2.67f * pa->topspeed, 2.67f * pa->topspeed);
@@ -988,7 +988,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      */
 
     /* falling off */
-    if(pa->in_the_air) {
+    if(pa->midair) {
 
         /* air acceleration */
         if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT)) {
@@ -1046,7 +1046,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      */
 
     if(pa->state == PAS_SPRINGING) {
-        if(pa->in_the_air && pa->ysp > 0.0f)
+        if(pa->midair && pa->ysp > 0.0f)
             pa->state = PAS_WALKING;
     }
 
@@ -1059,7 +1059,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->breathe_timer -= dt;
         pa->state = PAS_BREATHING;
     }
-    else if(pa->state == PAS_BREATHING && pa->in_the_air)
+    else if(pa->state == PAS_BREATHING && pa->midair)
         pa->state = PAS_WALKING;
 
     /*
@@ -1070,7 +1070,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* previous air state */
     UPDATE_SENSORS();
-    was_in_the_air = pa->in_the_air;
+    was_midair = pa->midair;
 
     /* moving */
     pa->position.x += pa->xsp * dt;
@@ -1096,7 +1096,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
                 /* set speed */
                 pa->gsp = 0.0f;
-                if(!pa->in_the_air) {
+                if(!pa->midair) {
                     pa->xsp = 0.0f;
                     if(pa->state != PAS_ROLLING) {
                         if(input_button_down(pa->input, IB_RIGHT)) {
@@ -1120,7 +1120,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
                 /* set speed */
                 pa->gsp = 0.0f;
-                if(!pa->in_the_air) {
+                if(!pa->midair) {
                     pa->xsp = 0.0f;
                     if(pa->state != PAS_ROLLING) {
                         if(input_button_down(pa->input, IB_LEFT)) {
@@ -1152,7 +1152,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
                     /* set speed */
                     pa->gsp = 0.0f;
-                    if(!pa->in_the_air) {
+                    if(!pa->midair) {
                         pa->xsp = 0.0f;
                         pa->state = PAS_STOPPED;
                     }
@@ -1169,7 +1169,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
                     /* set speed */
                     pa->gsp = 0.0f;
-                    if(!pa->in_the_air) {
+                    if(!pa->midair) {
                         pa->xsp = 0.0f;
                         pa->state = PAS_STOPPED;
                     }
@@ -1181,8 +1181,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* sticky physics */
-    if(pa->in_the_air && (
-        (!was_in_the_air && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) ||
+    if(pa->midair && (
+        (!was_midair && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) ||
         (pa->state == PAS_ROLLING && !pa->sticky_lock)
     )){
         v2d_t offset = v2d_new(0,0);
@@ -1230,14 +1230,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* offset the character */
         pa->position = v2d_add(pa->position, offset);
-        pa->in_the_air = FALSE; /* cloud bugfix for UPDATE_SENSORS */
+        pa->midair = FALSE; /* cloud bugfix for UPDATE_SENSORS */
         UPDATE_ANGLE();
         UPDATE_MOVMODE();
         UPDATE_SENSORS();
 
         /* if the player is still in the air,
            undo the offset */
-        if(pa->in_the_air) {
+        if(pa->midair) {
             pa->position = v2d_subtract(pa->position, offset);
             UPDATE_ANGLE();
             UPDATE_MOVMODE();
@@ -1248,13 +1248,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 pa->sticky_lock = TRUE;
         }
     }
-    else if(!pa->in_the_air && pa->state == PAS_ROLLING) {
+    else if(!pa->midair && pa->state == PAS_ROLLING) {
         /* undo sticky physics hack */
         pa->sticky_lock = FALSE;
     }
 
     /* stick to the ground */
-    if((!pa->in_the_air) && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT) && pa->ysp < 0.0f)) {
+    if((!pa->midair) && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT) && pa->ysp < 0.0f)) {
         const obstacle_t *ground = NULL;
         const sensor_t *ground_sensor = NULL;
         int offset = 0;
@@ -1269,7 +1269,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             ground_sensor = sensor_B(pa);
         }
 
-        /* computing the offset (note: if !pa->in_the_air, then ground_sensor != NULL) */
+        /* computing the offset (note: if !pa->midair, then ground_sensor != NULL) */
         offset = sensor_get_y2(ground_sensor) - sensor_get_y1(ground_sensor) - 1; /* need -1 */
 
         /* adjust position */
@@ -1289,7 +1289,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* reacquisition of the ground */
-    if(!pa->in_the_air && was_in_the_air) {
+    if(!pa->midair && was_midair) {
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
@@ -1303,7 +1303,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* bump into ceilings */
-    if(pa->in_the_air && (at_C != NULL || at_D != NULL) && pa->ysp < 0.0f) {
+    if(pa->midair && (at_C != NULL || at_D != NULL) && pa->ysp < 0.0f) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
 
@@ -1355,14 +1355,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      */
 
     /* reset the angle */
-    if(pa->in_the_air) {
+    if(pa->midair) {
         pa->angle = 0x0;
         UPDATE_MOVMODE();
     }
 
     /* I'm on the edge */
     if(
-        !pa->in_the_air && pa->movmode == MM_FLOOR && nearly_equal(pa->gsp, 0.0f) &&
+        !pa->midair && pa->movmode == MM_FLOOR && nearly_equal(pa->gsp, 0.0f) &&
         !(pa->state == PAS_LEDGE || pa->state == PAS_PUSHING)
     ) {
         const sensor_t* s = at_A ? sensor_A(pa) : sensor_B(pa);
@@ -1387,11 +1387,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         pa->wait_timer = 0.0f;
 
     /* winning */
-    if(pa->winning_pose && fabs(pa->gsp) < pa->walkthreshold && !pa->in_the_air)
+    if(pa->winning_pose && fabs(pa->gsp) < pa->walkthreshold && !pa->midair)
         pa->state = PAS_WINNING;
 
     /* animation bugfix */
-    if(pa->in_the_air && (pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP))
+    if(pa->midair && (pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP))
         pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
 }
 

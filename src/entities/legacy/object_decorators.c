@@ -3998,7 +3998,7 @@ static eventstrategy_t* onplayerduck_new() { return onplayerevent_new(player_is_
 static eventstrategy_t* onplayerlookup_new() { return onplayerevent_new(player_is_looking_up); }
 static eventstrategy_t* onplayerwait_new() { return onplayerevent_new(player_is_waiting); }
 static eventstrategy_t* onplayerwin_new() { return onplayerevent_new(player_is_winning); }
-static eventstrategy_t* onplayerintheair_new() { return onplayerevent_new(player_is_in_the_air); }
+static eventstrategy_t* onplayerintheair_new() { return onplayerevent_new(player_is_midair); }
 static eventstrategy_t* onplayerunderwater_new() { return onplayerevent_new(player_is_underwater); }
 static eventstrategy_t* onplayerspeedshoes_new() { return onplayerevent_new(player_is_turbocharged); }
 static eventstrategy_t* onplayerinvincible_new() { return onplayerevent_new(player_is_invincible); }
@@ -7593,7 +7593,7 @@ void switchcharacter_update(objectmachine_t *obj, player_t **team, int team_size
         for(i=0; i<team_size && !got_dying_player; i++)
             got_dying_player = player_is_dying(team[i]);
 
-        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_in_the_air(player) && !player->on_movable_platform && !player_is_frozen(player) && !in_locked_area;
+        allow_switching = !got_dying_player && !level_has_been_cleared() && !player_is_midair(player) && !player->on_movable_platform && !player_is_frozen(player) && !in_locked_area;
 
         if(allow_switching || me->force_switch)
             level_change_player(new_player);
