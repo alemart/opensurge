@@ -11,13 +11,13 @@ background
 {
     initial_position    0 0
     scroll_speed        0 0
-    behavior            LINEAR -30 -30
+    behavior            LINEAR -15 -15
     repeat_x            TRUE
     repeat_y            TRUE
 
     sprite
     {
-        source_file     images/squarebg.png
+        source_file     "images/surgebg.png"
         source_rect     0 0 48 48
         frame_size      48 48
 

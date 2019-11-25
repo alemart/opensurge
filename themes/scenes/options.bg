@@ -17,7 +17,7 @@ background
 
     sprite
     {
-        source_file     "images/squarebg.png"
+        source_file     "images/surgebg.png"
         source_rect     0 0 48 48
         frame_size      48 48
 
