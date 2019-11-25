@@ -188,7 +188,7 @@ sprite "Powerup Lucky Bonus"
 sprite "Item Box"
 {
     source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
+    source_rect     9 100 180 128
     frame_size      30 32
     hot_spot        15 32
 
@@ -335,12 +335,60 @@ sprite "Item Box"
         fps         24
         data        17 17 17 17 17 0 17 0 17 0 0 0 17 17 0 0 17 17 17 17 17 17 17 17
     }
+
+    // 1up (generic)
+    animation 18
+    {
+        repeat      TRUE
+        fps         24
+        data        18 18 18 18 18 0 18 0 18 0 0 0 18 18 0 0 18 18 18 18 18 18 18 18
+    }
+
+    // empty (add your item box here)
+    animation 19
+    {
+        repeat      TRUE
+        fps         24
+        data        19 19 19 19 19 0 19 0 19 0 0 0 19 19 0 0 19 19 19 19 19 19 19 19
+    }
+
+    // empty (add your item box here)
+    animation 20
+    {
+        repeat      TRUE
+        fps         24
+        data        20 20 20 20 20 0 20 0 20 0 0 0 20 20 0 0 20 20 20 20 20 20 20 20
+    }
+
+    // empty (add your item box here)
+    animation 21
+    {
+        repeat      TRUE
+        fps         24
+        data        21 21 21 21 21 0 21 0 21 0 0 0 21 21 0 0 21 21 21 21 21 21 21 21
+    }
+
+    // empty (add your item box here)
+    animation 22
+    {
+        repeat      TRUE
+        fps         24
+        data        22 22 22 22 22 0 22 0 22 0 0 0 22 22 0 0 22 22 22 22 22 22 22 22
+    }
+
+    // empty (add your item box here)
+    animation 23
+    {
+        repeat      TRUE
+        fps         24
+        data        23 23 23 23 23 0 23 0 23 0 0 0 23 23 0 0 23 23 23 23 23 23 23 23
+    }
 }
 
 sprite "Item Box Icon"
 {
     source_file     "images/item_boxes.png"
-    source_rect     200 100 96 42
+    source_rect     200 100 96 56
     frame_size      16 14
     hot_spot        8 7
 
@@ -486,5 +534,53 @@ sprite "Item Box Icon"
         repeat      TRUE
         fps         8
         data        17
+    }
+
+    // 1up (generic)
+    animation 18
+    {
+        repeat      TRUE
+        fps         8
+        data        18
+    }
+
+    // empty (add your item box here)
+    animation 19
+    {
+        repeat      TRUE
+        fps         8
+        data        19
+    }
+
+    // empty (add your item box here)
+    animation 20
+    {
+        repeat      TRUE
+        fps         8
+        data        20
+    }
+
+    // empty (add your item box here)
+    animation 21
+    {
+        repeat      TRUE
+        fps         8
+        data        21
+    }
+
+    // empty (add your item box here)
+    animation 22
+    {
+        repeat      TRUE
+        fps         8
+        data        22
+    }
+
+    // empty (add your item box here)
+    animation 23
+    {
+        repeat      TRUE
+        fps         8
+        data        23
     }
 }

@@ -72,23 +72,25 @@ object "Powerup Speed" is "entity", "basic", "powerup"
 object "Powerup 1up" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(1);
-    music = Music("samples/1up.ogg");
+    jingle = Music("samples/1up.ogg");
 
     state "main"
     {
         // the animation changes according
         // to the active player
-        anim = pickAnim(Player.active.name);
+        anim = animId(Player.active.name);
         itemBox.setAnimation(anim);
     }
 
     fun onItemBoxCrushed(player)
     {
         player.lives++;
-        music.play();
+        jingle.play();
     }
 
-    fun pickAnim(playerName)
+    // given a player name, get the corresponding
+    // animation ID of the "Item Box" sprite
+    fun animId(playerName)
     {
         if(playerName == "Surge")
             return 1;
@@ -97,7 +99,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         else if(playerName == "Charge")
             return 3;
         else
-            return 1;
+            return 18; // generic "1up" icon
     }
 }
 
