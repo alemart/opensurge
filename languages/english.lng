@@ -66,7 +66,7 @@ OPTIONS_BACK                "BACK"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEBUG MODE</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEVELOPER MODE</color>"
 STAGESELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
 STAGESELECT_ACT             "Zone"

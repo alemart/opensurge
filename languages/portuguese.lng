@@ -66,7 +66,7 @@ OPTIONS_BACK                "VOLTAR"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>MODO DEBUG</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>MODO DO DESENVOLVEDOR</color>"
 STAGESELECT_MSG             "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
 STAGESELECT_PAGE            "pág. $1/$2"
 STAGESELECT_ACT             "Zona"
