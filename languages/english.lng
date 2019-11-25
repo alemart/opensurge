@@ -225,6 +225,8 @@ CREATEMENU_BACK             "BACK"
 // Congratulations Screen
 CONGRATULATIONS_TITLE       "THANKS FOR PLAYING"
 CONGRATULATIONS_SHARE       "SHARE"
+CONGRATULATIONS_DONATE      "DONATE"
+CONGRATULATIONS_BACK        "BACK"
 
 // Loading Screen
 LOADING_TEXT                "loading..."
