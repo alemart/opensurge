@@ -37,7 +37,7 @@ object "Default HUD" is "entity", "detached", "awake", "private"
         score.transform.localPosition = Vector2.zero;
         timer.transform.localPosition = Vector2(0, 16);
         collectibles.transform.localPosition = Vector2(0, 32);
-        lives.transform.localPosition = Vector2(0, Screen.height - 34);
+        lives.transform.localPosition = Vector2(0, Screen.height - 29);
     }
 }
 
@@ -134,16 +134,18 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
-    icon = Actor("LifeCounter");
+    icon = Actor("Life Counter");
     value = Text("HUD");
 
     state "main"
     {
         value.text = Player.active.lives;
-        icon.anim = iconId(Player.active.name);
+        icon.anim = animId(Player.active.name);
     }
 
-    fun iconId(playerName)
+    // given a player name, get the corresponding
+    // animation ID of the "Life Counter" sprite
+    fun animId(playerName)
     {
         if(playerName == "Surge")
             return 0;
@@ -154,12 +156,13 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
         else if(playerName == "Tux")
             return 3;
         else
-            return 0;
+            return 14; // unknown player
     }
 
     fun constructor()
     {
+        value.offset = Vector2(24, 0);
+        icon.offset = Vector2(9, 4);
         icon.zindex = value.zindex = 1000.0;
-        value.offset = Vector2(24, 5);
     }
 }
