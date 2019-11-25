@@ -46,23 +46,9 @@ object "Goal" is "entity", "basic"
         // shows: level cleared!
     }
 
-    fun onCollision(otherCollider)
-    {
-        if(state == "not cleared" && otherCollider.entity.hasTag("player"))
-            goal(otherCollider.entity);
-    }
-
-    fun goal(player)
-    {
-        if(!player.dying) {
-            sfx.play();
-            Level.clear();
-            clearedAnim = pickAnim(player.name);
-            state = "rotating";
-        }
-    }
-
-    fun pickAnim(playerName)
+    // given a player name, get the corresponding
+    // animation ID of the "Goal" sprite
+    fun animId(playerName)
     {
         if(playerName == "Surge")
             return 3;
@@ -71,6 +57,22 @@ object "Goal" is "entity", "basic"
         else if(playerName == "Charge")
             return 5;
         else
-            return 6;
+            return 6; // generic "cleared" animation
+    }
+
+    fun goal(player)
+    {
+        if(!player.dying) {
+            sfx.play();
+            Level.clear();
+            clearedAnim = animId(player.name);
+            state = "rotating";
+        }
+    }
+
+    fun onCollision(otherCollider)
+    {
+        if(state == "not cleared" && otherCollider.entity.hasTag("player"))
+            goal(otherCollider.entity);
     }
 }

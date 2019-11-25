@@ -52,7 +52,7 @@ sprite "Life Counter"
         data        4
     }
 
-    // empty
+    // empty (add your character here)
     animation 5
     {
         repeat      TRUE
@@ -60,7 +60,7 @@ sprite "Life Counter"
         data        5
     }
 
-    // empty
+    // empty (add your character here)
     animation 6
     {
         repeat      TRUE
@@ -68,7 +68,7 @@ sprite "Life Counter"
         data        6
     }
 
-    // empty
+    // empty (add your character here)
     animation 7
     {
         repeat      TRUE
@@ -76,7 +76,7 @@ sprite "Life Counter"
         data        7
     }
 
-    // empty
+    // empty (add your character here)
     animation 8
     {
         repeat      TRUE
@@ -84,7 +84,7 @@ sprite "Life Counter"
         data        8
     }
 
-    // empty
+    // empty (add your character here)
     animation 9
     {
         repeat      TRUE
@@ -92,7 +92,7 @@ sprite "Life Counter"
         data        9
     }
 
-    // empty
+    // empty (add your character here)
     animation 10
     {
         repeat      TRUE
@@ -100,7 +100,7 @@ sprite "Life Counter"
         data        10
     }
 
-    // empty
+    // empty (add your character here)
     animation 11
     {
         repeat      TRUE
@@ -108,7 +108,7 @@ sprite "Life Counter"
         data        11
     }
 
-    // empty
+    // empty (add your character here)
     animation 12
     {
         repeat      TRUE
@@ -116,7 +116,7 @@ sprite "Life Counter"
         data        12
     }
 
-    // empty
+    // empty (add your character here)
     animation 13
     {
         repeat      TRUE

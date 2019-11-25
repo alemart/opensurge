@@ -8,7 +8,7 @@
 sprite "Goal"
 {
     source_file     "images/goal.png"
-    source_rect     0 0 184 108
+    source_rect     0 12 184 162
     frame_size      46 54
     hot_spot        23 54
 
@@ -66,5 +66,37 @@ sprite "Goal"
         repeat      TRUE
         fps         8
         data        7
+    }
+
+    // level cleared: empty (add your character here)
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        8
+    }
+
+    // level cleared: empty (add your character here)
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        9
+    }
+
+    // level cleared: empty (add your character here)
+    animation 9
+    {
+        repeat      TRUE
+        fps         8
+        data        10
+    }
+
+    // level cleared: empty (add your character here)
+    animation 10
+    {
+        repeat      TRUE
+        fps         8
+        data        11
     }
 }
