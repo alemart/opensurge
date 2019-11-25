@@ -10,7 +10,7 @@ sprite "UI Pointer"
     source_file     "images/core.png"
     source_rect     236 12 7 8
     frame_size      7 8
-    hot_spot        -5 -2
+    hot_spot        -5 -3
 
     animation 0
     {
