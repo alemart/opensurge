@@ -40,7 +40,7 @@ sprite "Charge"
     animation 3
     {
         repeat      TRUE
-        fps         26
+        fps         32
         data        16 17 18 19 20 21
     }
 
@@ -161,7 +161,7 @@ sprite "Charge"
     animation 18
     {
         repeat      TRUE
-        fps         26
+        fps         32
         data        16 17 18 19 20 21
     }
 

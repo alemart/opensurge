@@ -15,7 +15,7 @@ theme "themes/waterworks.brk"
 bgtheme "themes/template.bg"
 spawn_point 112 9904
 setup "Debug Setup" "Example Setup"
-players "Tux"
+players "Neon" "Tux"
 
 // bricks
 brick 1 896 9216
