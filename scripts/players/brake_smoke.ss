@@ -39,10 +39,10 @@ object "Brake Smoke" is "companion"
     fun spawnSmoke(scale)
     {
         if(!player.midair) {
-            Level.spawnEntity(
-                "Smoke",
-                Vector2(player.collider.center.x, player.collider.bottom)
-            ).setScale(scale);
+            feet = player.collider.center.plus(
+                Vector2(0, player.collider.height / 2).rotatedBy(-player.angle)
+            );
+            Level.spawnEntity("Smoke", feet).setScale(scale);
         }
     }
 }
