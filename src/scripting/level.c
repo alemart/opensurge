@@ -397,7 +397,7 @@ surgescript_var_t* fun_getfile(surgescript_object_t* object, const surgescript_v
 surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* TODO: grab value from the physics engine */
-    return surgescript_var_set_number(surgescript_var_create(), 828.0);
+    return surgescript_var_set_number(surgescript_var_create(), level_gravity());
 }
 
 /* level time, in seconds */

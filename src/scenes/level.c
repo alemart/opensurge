@@ -122,6 +122,7 @@ static bool is_setup_object(const char* object_name);
 #define TEAM_MAX                16
 #define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)
+#define DEFAULT_GRAVITY         787.5f
 #define PATH_MAXLEN             1024
 #define LINE_MAXLEN             1024
 
@@ -2107,6 +2108,15 @@ const struct bgtheme_t* level_background()
 float level_time()
 {
     return level_timer;
+}
+
+/*
+ * level_gravity()
+ * Gravity in px/s^2
+ */
+float level_gravity()
+{
+    return DEFAULT_GRAVITY;
 }
 
 /*

@@ -694,10 +694,10 @@ void animal_release(item_t* item)
 
 void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* brick_list, item_list_t* item_list, enemy_list_t* enemy_list)
 {
-    float dt = timer_get_delta();
     animal_t *me = (animal_t*)item;
     actor_t *act = item->actor;
     int animation_id = 2*me->animal_id + (me->is_running?1:0);
+    float dt = timer_get_delta(), g = level_gravity();
 
     /* in order to avoid too much processor load,
        we adopt this simplified platform system */
@@ -791,7 +791,7 @@ void animal_update(item_t* item, player_t** team, int team_size, brick_list_t* b
             break;
 
         default:
-            act->speed.y += (0.21875f * 60.0f * 60.0f) * dt;
+            act->speed.y += g * dt;
             break;
     }
 

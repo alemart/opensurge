@@ -54,7 +54,7 @@ static float f_collectibles() { return (float)player_get_collectibles(); } /* nu
 static float f_lives() { return (float)player_get_lives(); } /* number of lives */
 static float f_initial_lives() { return (float)PLAYER_INITIAL_LIVES; } /* initial number of lives */
 static float f_score() { return (float)player_get_score(); } /* returns the score */
-static float f_gravity() { return 828.0f; } /* returns the gravity */
+static float f_gravity() { return level_gravity(); } /* returns the gravity */
 static float f_act() { return (float)level_act(); } /* returns the current act number */
 static float f_xpos() { return target->actor->position.x; } /* x-position of the target object */
 static float f_ypos() { return target->actor->position.y; } /* x-position of the target object */

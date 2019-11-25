@@ -111,6 +111,7 @@ const struct bgtheme_t* level_background();
 v2d_t level_size();
 int level_height_at(int xpos);
 float level_time();
+float level_gravity();
 void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);
 void level_hide_dialogbox();
