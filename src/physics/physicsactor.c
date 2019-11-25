@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physicsactor.c - physics system: actor
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,9 @@ struct physicsactor_t
     float falloffthreshold; /* fall off threshold */
     float brakingthreshold; /* braking animation treshold */
     float airdragthreshold; /* air drag threshold */
+    float airdragxthreshold; /* air drag x-threshold */
+    float chrgthreshold; /* charge intensity threshold */
+    float waittime; /* wait time in seconds */
     int angle; /* angle (0-255 clockwise) */
     int in_the_air; /* is the player in the air? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
@@ -71,7 +74,7 @@ struct physicsactor_t
     float breathe_timer; /* if greater than zero, set animation to breathing */
     int sticky_lock; /* sticky physics lock */
     float charge_intensity; /* charge intensity */
-    float airdrag_exp; /* airdrag modifier */
+    float airdrag_coefficient[2]; /* airdrag approx. coefficient */
     physicsactorstate_t state; /* state */
     movmode_t movmode; /* current movement mode, based on the angle */
     input_t *input; /* input device */
@@ -233,39 +236,46 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->breathe_timer = 0.0f;
     pa->sticky_lock = FALSE;
     pa->charge_intensity = 0.0f;
-    pa->airdrag_exp = 0.0f;
+    pa->airdrag_coefficient[0] = 0.0f;
+    pa->airdrag_coefficient[1] = 1.0f;
 
     /* initializing some constants ;-) */
 
     /*
-      +----------------------+--------------+-----------------+
-      | name                 | magic number | fps multitplier |
-      +----------------------+--------------+-----------------+
+      +--------------------+----------------+-----------------+
+      | model parameter    |  magic number  | fps multitplier |
+      +--------------------+----------------+-----------------+
      */
-    pa->acc =                   0.05f       * fpsmul * fpsmul ;
-    pa->dec =                   0.5f        * fpsmul * fpsmul ;
-    pa->frc =                   0.05f       * fpsmul * fpsmul ;
+    pa->acc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
+    pa->dec =                 (32.0f/64.0f) * fpsmul * fpsmul ;
+    pa->frc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
-    pa->air =                   0.1f        * fpsmul * fpsmul ;
-    pa->airdrag =              (31.0f/32.0f)* 1.0f   * 1.0f   ;
-    pa->jmp =                   -6.7f       * fpsmul * 1.0f   ;
+    pa->air =                  (6.0f/64.0f) * fpsmul * fpsmul ;
+    pa->airdrag =             (31.0f/32.0f) * 1.0f   * 1.0f   ;
+    pa->jmp =                   -6.5f       * fpsmul * 1.0f   ;
     pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
     pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
     pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
-    pa->grv =                   0.23f       * fpsmul * fpsmul ;
-    pa->slp =                   0.14f       * fpsmul * fpsmul ;
+    pa->grv =                 (14.0f/64.0f) * fpsmul * fpsmul ;
+    pa->slp =                  (8.0f/64.0f) * fpsmul * fpsmul ;
     pa->chrg =                  12.0f       * fpsmul * 1.0f   ;
     pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
     pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
-    pa->rollfrc =               0.03f       * fpsmul * fpsmul ;
-    pa->rolldec =               0.125f      * fpsmul * fpsmul ;
-    pa->rolluphillslp =         0.078f      * fpsmul * fpsmul ;
-    pa->rolldownhillslp =       0.312f      * fpsmul * fpsmul ;
+    pa->rollfrc =              (1.5f/64.0f) * fpsmul * fpsmul ;
+    pa->rolldec =              (8.0f/64.0f) * fpsmul * fpsmul ;
+    pa->rolluphillslp =        (5.0f/64.0f) * fpsmul * fpsmul ;
+    pa->rolldownhillslp =     (20.0f/64.0f) * fpsmul * fpsmul ;
     pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
     pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
+    pa->airdragxthreshold =    (8.0f/64.0f) * 1.0f   * 1.0f   ;
+    pa->chrgthreshold =        (1.0f/64.0f) * 1.0f   * 1.0f   ;
+    pa->waittime =              3.0f        * 1.0f   * 1.0f   ;
+
+    /* recompute airdrag coefficients */
+    physicsactor_set_airdrag(pa, pa->airdrag);
     
     /* sensors */
     pa->A_normal = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
@@ -538,7 +548,6 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(frc)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(topspeed)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(topyspeed)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(air)
-GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(jmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(jmprel)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(diejmp)
@@ -546,21 +555,34 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(hitjmp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(grv)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(slp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(chrg)
-GENERATE_ACCESSOR_AND_MUTATOR_OF(walkthreshold)
-GENERATE_ACCESSOR_AND_MUTATOR_OF(unrollthreshold)
-GENERATE_ACCESSOR_AND_MUTATOR_OF(rollthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rollfrc)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rolldec)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rolluphillslp)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(rolldownhillslp)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(walkthreshold)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(rollthreshold)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(unrollthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(falloffthreshold)
 GENERATE_ACCESSOR_AND_MUTATOR_OF(brakingthreshold)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragthreshold)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(airdragxthreshold)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(chrgthreshold)
+GENERATE_ACCESSOR_AND_MUTATOR_OF(waittime)
 
 float physicsactor_get_airdrag(const physicsactor_t *pa) { return pa->airdrag; }
 void physicsactor_set_airdrag(physicsactor_t *pa, float value)
 {
     pa->airdrag = max(0.0f, value);
-    pa->airdrag_exp = (pa->airdrag >= 0.001f) ? -pa->airdrag * logf(pa->airdrag) : 0.0f;
+    if(pa->airdrag >= 0.1f) {
+        /* recompute airdrag coefficients */
+        pa->airdrag_coefficient[0] = 60.0f * pa->airdrag * logf(pa->airdrag);
+        pa->airdrag_coefficient[1] = pa->airdrag * (1.0f - logf(pa->airdrag));
+    }
+    else {
+        /* no airdrag */
+        pa->airdrag_coefficient[0] = 0.0f;
+        pa->airdrag_coefficient[1] = 1.0f;
+    }
 }
 
 
@@ -916,8 +938,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         /* charging more...! */
         if(input_button_pressed(pa->input, IB_FIRE1))
             pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
-        else if(fabs(pa->charge_intensity) >= 0.015625f)
-            pa->charge_intensity *= 0.99955f - 1.84845f * dt; /* attenuate charge intensity */
+        else if(fabs(pa->charge_intensity) >= pa->chrgthreshold)
+            pa->charge_intensity *= 0.999506551f - 1.84539309f * dt; /* attenuate charge intensity */
 
         /* release */
         if(!input_button_down(pa->input, IB_DOWN)) {
@@ -940,7 +962,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(!pa->in_the_air) {
 
         /* you're way too fast... */
-        pa->gsp = clip(pa->gsp, -2.5f * pa->topspeed, 2.5f * pa->topspeed);
+        pa->gsp = clip(pa->gsp, -2.67f * pa->topspeed, 2.67f * pa->topspeed);
 
         /* speed */
         pa->xsp = pa->gsp * COS(pa->angle);
@@ -951,6 +973,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             if(fabs(pa->gsp) < pa->falloffthreshold) {
                 pa->horizontal_control_lock_timer = 0.5f;
                 if(pa->angle >= 0x40 && pa->angle <= 0xC0) {
+                    pa->gsp = 0.0f;
                     pa->angle = 0x0;
                     UPDATE_MOVMODE();
                 }
@@ -980,9 +1003,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* air drag */
         if(pa->ysp < 0.0f && pa->ysp > pa->airdragthreshold) {
-            /*pa->xsp *= powf(31.0f / 32.0f, 60.0f * dt);*/
-            if(pa->airdrag_exp > 0.0f)
-                pa->xsp *= (pa->airdrag + pa->airdrag_exp) - 60.0f * pa->airdrag_exp * dt;
+            if(fabs(pa->xsp) >= pa->airdragxthreshold) {
+                /*pa->xsp *= powf(pa->airdrag, 60.0f * dt);*/
+                pa->xsp *= pa->airdrag_coefficient[0] * dt + pa->airdrag_coefficient[1];
+            }
         }
 
         /* jump sensitivity */
@@ -995,7 +1019,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->state != PAS_GETTINGHIT)
             pa->ysp = min(pa->ysp + pa->grv * dt, pa->topyspeed);
         else
-            pa->ysp = min(pa->ysp + (0.85f * pa->grv) * dt, pa->topyspeed);
+            pa->ysp = min(pa->ysp + (0.857f * pa->grv) * dt, pa->topyspeed);
     }
     else {
 
@@ -1356,7 +1380,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* waiting... */
     if(pa->state == PAS_STOPPED) {
-        if((pa->wait_timer += dt) >= 3.0f)
+        if((pa->wait_timer += dt) >= pa->waittime)
             pa->state = PAS_WAITING;
     }
     else

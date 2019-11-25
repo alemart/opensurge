@@ -127,8 +127,6 @@ float physicsactor_get_air(const physicsactor_t *pa); /* air acceleration */
 void physicsactor_set_air(physicsactor_t *pa, float value);
 float physicsactor_get_airdrag(const physicsactor_t *pa); /* air drag */
 void physicsactor_set_airdrag(physicsactor_t *pa, float value);
-float physicsactor_get_airdragthreshold(const physicsactor_t *pa); /* air drag threshold */
-void physicsactor_set_airdragthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_jmp(const physicsactor_t *pa); /* initial jump speed */
 void physicsactor_set_jmp(physicsactor_t *pa, float value);
 float physicsactor_get_jmprel(const physicsactor_t *pa); /* release jump speed */
@@ -143,12 +141,6 @@ float physicsactor_get_slp(const physicsactor_t *pa); /* slope */
 void physicsactor_set_slp(physicsactor_t *pa, float value);
 float physicsactor_get_chrg(const physicsactor_t *pa); /* charge-and-release max speed */
 void physicsactor_set_chrg(physicsactor_t *pa, float value);
-float physicsactor_get_walkthreshold(const physicsactor_t *pa); /* walk threshold */
-void physicsactor_set_walkthreshold(physicsactor_t *pa, float value);
-float physicsactor_get_unrollthreshold(const physicsactor_t *pa); /* unroll threshold */
-void physicsactor_set_unrollthreshold(physicsactor_t *pa, float value);
-float physicsactor_get_rollthreshold(const physicsactor_t *pa); /* roll threshold */
-void physicsactor_set_rollthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_rollfrc(const physicsactor_t *pa); /* roll friction */
 void physicsactor_set_rollfrc(physicsactor_t *pa, float value);
 float physicsactor_get_rolldec(const physicsactor_t *pa); /* roll deceleration */
@@ -157,9 +149,23 @@ float physicsactor_get_rolluphillslp(const physicsactor_t *pa); /* roll uphill s
 void physicsactor_set_rolluphillslp(physicsactor_t *pa, float value);
 float physicsactor_get_rolldownhillslp(const physicsactor_t *pa); /* roll downhill slope */
 void physicsactor_set_rolldownhillslp(physicsactor_t *pa, float value);
+float physicsactor_get_walkthreshold(const physicsactor_t *pa); /* walk threshold */
+void physicsactor_set_walkthreshold(physicsactor_t *pa, float value);
+float physicsactor_get_rollthreshold(const physicsactor_t *pa); /* roll threshold */
+void physicsactor_set_rollthreshold(physicsactor_t *pa, float value);
+float physicsactor_get_unrollthreshold(const physicsactor_t *pa); /* unroll threshold */
+void physicsactor_set_unrollthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_falloffthreshold(const physicsactor_t *pa); /* fall off threshold */
 void physicsactor_set_falloffthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_brakingthreshold(const physicsactor_t *pa); /* braking animation threshold */
 void physicsactor_set_brakingthreshold(physicsactor_t *pa, float value);
+float physicsactor_get_airdragthreshold(const physicsactor_t *pa); /* air drag threshold */
+void physicsactor_set_airdragthreshold(physicsactor_t *pa, float value);
+float physicsactor_get_airdragxthreshold(const physicsactor_t *pa); /* air drag x-threshold */
+void physicsactor_set_airdragxthreshold(physicsactor_t *pa, float value);
+float physicsactor_get_chrgthreshold(const physicsactor_t *pa); /* charge intensity threshold */
+void physicsactor_set_chrgthreshold(physicsactor_t *pa, float value);
+float physicsactor_get_waittime(const physicsactor_t *pa); /* wait time in seconds */
+void physicsactor_set_waittime(physicsactor_t *pa, float value);
 
 #endif
