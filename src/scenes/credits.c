@@ -42,7 +42,6 @@
 /* private data */
 #define CREDITS_FILE               "config/credits.dat"
 #define CREDITS_BGFILE             "themes/scenes/credits.bg"
-static image_t *box;
 static int quit;
 static font_t *title, *text, *back;
 static input_t *input;
@@ -85,8 +84,6 @@ void credits_init(void *foo)
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
 
-    box = image_create(VIDEO_SCREEN_W, 30);
-
     bgtheme = background_load(CREDITS_BGFILE);
 
     fadefx_in(color_rgb(0,0,0), 1.0);
@@ -103,7 +100,6 @@ void credits_init(void *foo)
 void credits_release()
 {
     bgtheme = background_unload(bgtheme);
-    image_destroy(box);
 
     font_destroy(title);
     font_destroy(text);
@@ -169,11 +165,8 @@ void credits_render()
     v2d_t cam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
     background_render_bg(bgtheme, cam);
-    background_render_fg(bgtheme, cam);
-
     font_render(text, cam);
-    image_blit(box, 0, 0, 0, 0, image_width(box), image_height(box));
-    image_blit(box, 0, 0, 0, VIDEO_SCREEN_H-20, image_width(box), image_height(box));
+    background_render_fg(bgtheme, cam);
     font_render(title, cam);
     font_render(back, cam);
 }
