@@ -184,7 +184,7 @@ player_t *player_create(const char *character_name)
     physicsactor_set_rollfrc(p->pa, physicsactor_get_rollfrc(p->pa) * c->multiplier.frc);
     physicsactor_set_rolldec(p->pa, physicsactor_get_rolldec(p->pa) * c->multiplier.dec);
     physicsactor_set_air(p->pa, physicsactor_get_air(p->pa) * c->multiplier.airacc);
-    physicsactor_set_airdrag(p->pa, c->multiplier.airdrag >= 1.0f ? physicsactor_get_airdrag(p->pa) / c->multiplier.airdrag : 0.0f);
+    physicsactor_set_airdrag(p->pa, physicsactor_get_airdrag(p->pa) / max(c->multiplier.airdrag, 0.001f));
 
     /* character system: configuring the abilities */
     if(!c->ability.roll)
