@@ -12,9 +12,15 @@ using SurgeEngine.Collisions.CollisionBox;
 object "Tube Out" is "entity", "special"
 {
     tube = spawn("Tube");
+    maxSpeed = 960;
 
     fun onTubeCollision(player)
     {
+        // cap the speed when entering the tube
+        if(player.input.enabled)
+            player.speed = Math.clamp(player.speed, -maxSpeed, maxSpeed);
+
+        // tube logic
         if(player.rolling) {
             // Tube In guarantees that
             // player.input.enabled == false
