@@ -966,7 +966,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     if(!pa->midair) {
 
         /* you're way too fast... */
-        pa->gsp = clip(pa->gsp, -2.67f * pa->topspeed, 2.67f * pa->topspeed);
+        pa->gsp = clip(pa->gsp, -2.5f * pa->topspeed, 2.5f * pa->topspeed);
 
         /* speed */
         pa->xsp = pa->gsp * COS(pa->angle);
