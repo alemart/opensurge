@@ -394,10 +394,8 @@ brick 133 14032 9920
 brick 133 13904 9872
 brick 134 13872 9808
 brick 134 14000 9856
-brick 132 14368 9504
 brick 132 14496 9504
 brick 133 14496 9456
-brick 134 14336 9456
 brick 134 14464 9408
 brick 134 14592 9424
 brick 135 14128 9520
@@ -438,6 +436,9 @@ brick 15 14160 9984
 brick 15 14288 9728
 brick 135 14232 9984
 brick 144 14304 10048
+brick 134 14336 9424
+brick 132 14368 9504
+brick 133 14368 9488
 brick 16 12928 9856
 brick 24 13056 9856
 brick 16 13184 9792
@@ -1800,8 +1801,6 @@ entity "Layer Green" 12544 9936 "d026d878c91b92bc"
 entity "Layer Green" 12512 9936 "2e8d8aac19088a99"
 entity "Spring Standard Up Right" 12400 9952 "1dc3f84b7a2794a1"
 entity "Spring Stronger Up Right" 10256 9824 "60d00eaa464c81d9"
-entity "Spring Stronger Right" 10272 9344 "9bc51e9809d672ec"
-entity "Spring Stronger Up Left" 10640 9584 "3b8b92d6ec98aa83"
 entity "Spring Standard Right" 9648 10464 "92f409adc4175b16"
 entity "Spring Standard Left" 10064 10464 "777cd01b916b7020"
 entity "Zipline Right" 11808 9424 "fe9f31607200d4e4"
@@ -2039,8 +2038,6 @@ entity "Collectible" 13936 9760 "86f9fbda9d1b7d6d"
 entity "Collectible" 13984 9728 "e2a3af8e60fdb0d7"
 entity "Collectible" 14016 9680 "18d12dc3c9a69e76"
 entity "Collectible" 14032 9632 "31ae6ee7e9c88eca"
-entity "Collectible" 14352 9104 "a4ff1bc58fe1912c"
-entity "Collectible" 14384 9104 "0dd33812fca3990e"
 entity "Collectible" 14720 9200 "95c390f36b8d85b8"
 entity "Collectible" 14736 9248 "6ae1fb603feaf0b3"
 entity "Collectible" 14768 9296 "9bee511a881b6992"
@@ -2049,12 +2046,8 @@ entity "Collectible" 14896 9328 "fe884e5e3ae96976"
 entity "Collectible" 14944 9296 "ea8f2dc15da02624"
 entity "Collectible" 14976 9248 "dfda0fd56d066f68"
 entity "Collectible" 14992 9200 "597e746438c6b9b6"
-entity "Collectible" 14352 9072 "bbe93ac524a59945"
-entity "Collectible" 14384 9072 "6752942972cc2337"
 entity "Collectible" 14496 9216 "db17e5651932340c"
 entity "Collectible" 14624 9184 "466b82d67fc4d364"
-entity "Collectible" 14368 9088 "cce27fac9210d8ff"
-entity "Collectible" 14368 9120 "067b6a0f1901268e"
 entity "Collectible" 14368 9056 "0b8532a0b0f6e717"
 entity "Lady Bugsy" 15616 9344 "76c516fd22c38dac"
 entity "Collectible" 16768 9936 "8db9883b80053507"
@@ -2244,5 +2237,13 @@ entity "Collectible" 8256 10352 "200652085dc8d652"
 entity "Collectible" 14368 9024 "6da8aea691dea3fe"
 entity "Collectible" 14352 9040 "70447a303d582139"
 entity "Collectible" 14384 9040 "0c3c677bf17bff3b"
+entity "Spring Stronger Up Left" 10640 9568 "014b159cd24e758c"
+entity "Spring Stronger Right" 10272 9328 "9eaa1346a2080a67"
+entity "Collectible" 14368 8992 "35190fb931594d9c"
+entity "Collectible" 14352 9008 "ff458c770cd51807"
+entity "Collectible" 14384 9008 "b83a1222d36453f7"
+entity "Collectible" 14352 8976 "1d0154b89e1b9d46"
+entity "Collectible" 14384 8976 "e0135f256d903bfc"
+entity "Collectible" 14368 8960 "b00495068d2c648b"
 
 // EOF

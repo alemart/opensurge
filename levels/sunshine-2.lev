@@ -683,7 +683,6 @@ brick 1 15856 11136
 brick 1 15984 11136
 brick 1 16112 11136
 brick 1 16240 11136
-brick 227 15504 10480
 brick 227 15712 10608
 brick 145 16064 10704
 brick 145 16128 10704
@@ -694,6 +693,7 @@ brick 255 15616 10880
 brick 255 15616 10912
 brick 255 15616 10944
 brick 255 15616 10976
+brick 227 15504 10448
 brick 50 14624 10160
 brick 48 14624 10288
 brick 16 15312 10624
@@ -1643,13 +1643,6 @@ brick 5 8144 10736
 brick 5 8144 10864
 brick 5 8144 10992
 brick 5 8144 11120
-brick 35 7824 10000
-brick 35 7952 10000
-brick 35 8080 10000
-brick 35 8208 10000
-brick 35 8336 10000
-brick 35 8400 10000
-brick 32 8464 10000
 brick 30 8448 10368
 brick 30 8448 10240
 brick 30 8448 10112
@@ -1665,23 +1658,11 @@ brick 41 8064 8960
 brick 18 8320 9152
 brick 18 8448 9184
 brick 18 8576 9216
-brick 2 7808 9856
-brick 2 7936 9856
-brick 2 8064 9856
-brick 2 8192 9856
-brick 2 8320 9856
-brick 1 7808 9888
-brick 1 7936 9888
-brick 1 8064 9888
-brick 1 8192 9888
-brick 1 8320 9888
-brick 1 8448 9888
 brick 1 8576 9856
 brick 1 8576 9728
 brick 1 8576 9600
 brick 1 8576 9472
 brick 1 8576 9344
-brick 1 8448 9856
 brick 15 7808 10752
 brick 15 7808 10880
 brick 15 7808 10624
@@ -1694,7 +1675,6 @@ brick 15 7808 9984
 brick 15 7936 9984
 brick 15 8064 9984
 brick 15 8192 9984
-brick 15 8320 9984
 brick 15 8448 9984
 brick 15 8448 10112
 brick 15 8448 10240
@@ -1764,12 +1744,6 @@ brick 230 7872 9664
 brick 230 7840 9712
 brick 230 7856 9712
 brick 230 7872 9712
-brick 230 7920 9616
-brick 230 7920 9632
-brick 230 7920 9648
-brick 230 7920 9664
-brick 230 7920 9680
-brick 230 7920 9712
 brick 1 8064 9600
 brick 1 8064 9728
 brick 1 8192 9600
@@ -1815,6 +1789,23 @@ brick 142 7856 9136
 brick 141 7920 9152
 brick 142 7984 9168
 brick 149 7936 10688
+brick 30 8448 10016
+brick 15 8320 9984
+brick 32 8464 9840
+brick 30 8448 9920
+brick 35 8368 9840
+brick 35 8240 9840
+brick 35 8112 9840
+brick 35 7984 9840
+brick 35 7856 9840
+brick 15 7808 9856
+brick 15 7936 9856
+brick 15 8064 9856
+brick 15 8192 9856
+brick 15 8320 9856
+brick 15 8448 9856
+brick 1 7808 9376
+brick 1 7936 9376
 brick 16 6912 10560
 brick 18 7040 10592
 brick 18 7168 10624
@@ -1848,13 +1839,6 @@ brick 9 7232 10624
 brick 8 7104 10624
 brick 22 7104 10496
 brick 23 7232 10496
-brick 35 6928 10000
-brick 35 7056 10000
-brick 35 7184 10000
-brick 35 7312 10000
-brick 35 7440 10000
-brick 35 7568 10000
-brick 35 7696 10000
 brick 16 6912 8992
 brick 16 7040 8992
 brick 16 7168 8992
@@ -1866,20 +1850,6 @@ brick 41 7296 8832
 brick 42 7424 8832
 brick 18 7552 9024
 brick 18 7680 9056
-brick 2 6912 9856
-brick 2 7040 9856
-brick 2 7168 9856
-brick 2 7296 9856
-brick 2 7424 9856
-brick 2 7552 9856
-brick 2 7680 9856
-brick 1 6912 9888
-brick 1 7040 9888
-brick 1 7168 9888
-brick 1 7296 9888
-brick 1 7424 9888
-brick 1 7552 9888
-brick 1 7680 9888
 brick 1 6912 9216
 brick 1 6912 9344
 brick 1 6912 9472
@@ -2072,6 +2042,25 @@ brick 144 7248 10576
 brick 141 7600 9072
 brick 149 7616 9088
 brick 141 7680 9088
+brick 35 7728 9840
+brick 35 7600 9840
+brick 35 7472 9840
+brick 35 7216 9840
+brick 35 7088 9840
+brick 35 6960 9840
+brick 35 7344 9840
+brick 15 6912 9856
+brick 15 7040 9856
+brick 15 7168 9856
+brick 15 7296 9856
+brick 15 7424 9856
+brick 15 7552 9856
+brick 15 7680 9856
+brick 1 7168 9376
+brick 1 7296 9376
+brick 1 7424 9376
+brick 1 7552 9376
+brick 1 7680 9376
 brick 31 6384 10704
 brick 16 6064 10608
 brick 16 6128 10608
@@ -2124,14 +2113,7 @@ brick 233 6656 10592
 brick 232 6656 10592
 brick 231 6656 10592
 brick 230 6656 10592
-brick 35 6416 10000
-brick 35 6288 10000
-brick 35 6160 10000
-brick 35 6096 10000
 brick 227 6288 10480
-brick 35 6544 10000
-brick 35 6672 10000
-brick 35 6800 10000
 brick 1 6112 9632
 brick 1 6032 9648
 brick 21 6096 9520
@@ -2150,19 +2132,6 @@ brick 28 6528 9024
 brick 30 6528 9152
 brick 16 6656 8992
 brick 16 6784 8992
-brick 2 6144 9856
-brick 2 6272 9856
-brick 2 6400 9856
-brick 2 6528 9856
-brick 2 6656 9856
-brick 2 6784 9856
-brick 1 6144 9888
-brick 1 6272 9888
-brick 1 6400 9888
-brick 1 6528 9888
-brick 1 6656 9888
-brick 1 6784 9888
-brick 1 6032 9776
 brick 1 6144 9600
 brick 1 6144 9728
 brick 1 6656 9472
@@ -2202,10 +2171,8 @@ brick 15 6144 10112
 brick 15 6272 10112
 brick 15 6144 9984
 brick 15 6272 9984
-brick 15 6400 9984
 brick 15 6528 9984
 brick 15 6656 9984
-brick 15 6784 9984
 brick 15 6784 10624
 brick 15 6400 10624
 brick 15 6400 10496
@@ -2264,6 +2231,22 @@ brick 15 6528 10496
 brick 15 6656 10496
 brick 15 6528 10624
 brick 15 6656 10624
+brick 15 6784 9984
+brick 15 6400 9984
+brick 35 6832 9840
+brick 35 6704 9840
+brick 35 6576 9840
+brick 35 6448 9840
+brick 1 6032 9712
+brick 35 6320 9840
+brick 35 6096 9840
+brick 15 6272 9856
+brick 15 6144 9856
+brick 35 6224 9840
+brick 15 6400 9856
+brick 15 6528 9856
+brick 15 6656 9856
+brick 15 6784 9856
 brick 46 5632 10368
 brick 18 5584 10352
 brick 18 5456 10320
@@ -2313,7 +2296,6 @@ brick 1 5888 10112
 brick 1 5776 9808
 brick 1 5904 9840
 brick 1 5264 9872
-brick 33 6000 10000
 brick 18 5648 9648
 brick 18 5520 9616
 brick 16 5392 9584
@@ -2349,7 +2331,6 @@ brick 22 5936 9520
 brick 1 5392 9776
 brick 1 5520 9776
 brick 1 5904 9808
-brick 1 6016 9888
 brick 15 5632 10368
 brick 15 5504 10368
 brick 15 5376 10368
@@ -2420,6 +2401,10 @@ brick 30 5936 9088
 brick 30 5936 8960
 brick 30 5936 8832
 brick 30 5936 8704
+brick 31 6016 10016
+brick 33 6000 9840
+brick 31 6016 9920
+brick 15 6016 9856
 brick 16 4384 10176
 brick 16 4480 10176
 brick 29 4576 10208
@@ -2976,12 +2961,6 @@ entity "Collectible" 6320 10176 "e8b9ff0438a91591"
 entity "Collectible" 6304 10192 "479921346519b62b"
 entity "Collectible" 6336 10192 "c6e0283aa2756f87"
 entity "Collectible" 6320 10208 "a7797db9eeaa8498"
-entity "Collectible" 6304 10224 "300712678867f791"
-entity "Collectible" 6336 10224 "3ab4345c5804fc3e"
-entity "Collectible" 6320 10240 "3d033c3a0a803a46"
-entity "Collectible" 6304 10256 "b110c6360eb76bb2"
-entity "Collectible" 6336 10256 "ff5befe271cca9e5"
-entity "Collectible" 6320 10272 "5e9248eb80d5e9f6"
 entity "Spring Standard" 8032 10720 "f65a4ae0b3b8ae5a"
 entity "Spring Booster Right" 8336 10576 "1e2542509a330986"
 entity "Tube Out" 8848 10304 "a86a225f4adfce15"
@@ -3049,7 +3028,6 @@ entity "Spring Standard" 7856 10976 "457fc4606852698c"
 entity "Spring Stronger" 11376 10112 "e7020ec8698b0ee6"
 entity "Spring Stronger Up Left" 17664 10624 "84f6ab5bd2ab0be6"
 entity "Spring Stronger Up Right" 17408 10448 "7c9b4a63df7bfcf9"
-entity "Spring Stronger Right" 17408 9776 "552f90376a0c95d3"
 entity "Bridge" 18400 9824 "decfa93bc1602d3f"
 entity "Zipline Grabber" 20160 9968 "d948750be68a23e6"
 entity "Zipline Right" 20160 9968 "61d4f4af0bf10e21"
@@ -3062,9 +3040,6 @@ entity "Zipline Right" 20928 10352 "e7131bc5b826e464"
 entity "Zipline Right" 21056 10416 "7252b75e873b30ac"
 entity "Powerup Collectibles" 16112 10720 "630b820e982ebddc"
 entity "Powerup Shield Thunder" 17040 10560 "8ad2df929bc31ac8"
-entity "Spring Stronger Up Right" 17408 10128 "626a9ae052fdf954"
-entity "Spring Stronger Up Left" 17664 10288 "e81d7fa586e97f89"
-entity "Spring Stronger Up Left" 17664 9952 "41ecfbe17b872e68"
 entity "Mosquito" 16832 10656 "d5459c529485a58e"
 entity "Spikes" 13648 10208 "c4bd19b7befe0d45"
 entity "Tube Out" 14224 10224 "825057e5d4f4cbdf"
@@ -3408,15 +3383,6 @@ entity "Collectible" 11408 9728 "c579435bd707155c"
 entity "Collectible" 11360 9696 "d7589a47db2bcc76"
 entity "Collectible" 11392 9696 "46598e206b3c466e"
 entity "Collectible" 15536 10208 "e8bf2bca2442fbd5"
-entity "Collectible" 15536 10240 "cae41c00a90a2b62"
-entity "Collectible" 15536 10272 "cb919e4ee0d6a7b4"
-entity "Collectible" 15536 10304 "1c09ca4053be67fb"
-entity "Collectible" 15552 10288 "78e5593cd0c157ff"
-entity "Collectible" 15552 10256 "5f20213726eaca90"
-entity "Collectible" 15552 10224 "cb739eeedd4dbb05"
-entity "Collectible" 15520 10288 "8a44d03f669f4133"
-entity "Collectible" 15520 10256 "654915ddf1465371"
-entity "Collectible" 15520 10224 "da38ec1e96702397"
 entity "Collectible" 18992 9648 "29739364f8334f9c"
 entity "Collectible" 18912 9728 "3f5d9bbcc8e54e03"
 entity "Collectible" 19072 9728 "2078156be959645f"
@@ -3604,6 +3570,25 @@ entity "Tube In" 14384 9904 "f2cf2d9813ab4546"
 entity "Tube In" 15248 10704 "b8379459a56d824c"
 entity "Powerup Invincibility" 13632 9536 "4ef005040677aea1"
 entity "Powerup 1up" 11312 10112 "b0e6f22540f3ed66"
-entity "Powerup 1up" 7648 9856 "dbfbd6c4dbd1d390"
+entity "Collectible" 6304 10160 "d76a7a761de3e845"
+entity "Collectible" 6336 10160 "786718ecc9809ed5"
+entity "Collectible" 6320 10144 "73f2b30276be8aa8"
+entity "Collectible" 6304 10128 "9693367aac63e830"
+entity "Collectible" 6336 10128 "47dea2bf7b0723e0"
+entity "Collectible" 6320 10112 "2c261fcf8b0bd5a7"
+entity "Collectible" 15520 10192 "3bc5d97d6b0d52d5"
+entity "Collectible" 15552 10192 "c002515e42b55d30"
+entity "Collectible" 15536 10176 "1f483bb80fd57b8a"
+entity "Collectible" 15520 10160 "90630ffcc21f73fd"
+entity "Collectible" 15552 10160 "ad5f0ae0768c125a"
+entity "Collectible" 15536 10144 "48e82c642ed2dcfe"
+entity "Collectible" 15520 10128 "c5a1c6320c26717f"
+entity "Collectible" 15552 10128 "6dee17a2ab37825d"
+entity "Collectible" 15536 10112 "42c7d1d467f8da19"
+entity "Powerup 1up" 7616 9840 "dbfbd6c4dbd1d390"
+entity "Spring Stronger Up Left" 17664 10272 "e81d7fa586e97f89"
+entity "Spring Stronger Up Right" 17408 10112 "996a669ef64bafaf"
+entity "Spring Stronger Up Left" 17664 9936 "425c92554ad93330"
+entity "Spring Stronger Right" 17408 9760 "ff46f7b4eaca4d56"
 
 // EOF

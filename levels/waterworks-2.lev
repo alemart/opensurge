@@ -1096,7 +1096,6 @@ brick 55 14096 9472
 brick 31 13952 9216
 brick 29 13952 9344
 brick 55 14096 9600
-brick 151 14144 9664
 brick 27 14208 9344
 brick 24 14208 9216
 brick 24 14208 9088
@@ -1189,6 +1188,7 @@ brick 1 14464 10368
 brick 1 14336 10368
 brick 255 14176 9376 yellow
 brick 255 14176 9408 yellow
+brick 151 14144 9696
 brick 40 12960 9872 yellow
 brick 40 13024 9936 yellow
 brick 40 13088 10000 yellow
@@ -3797,7 +3797,6 @@ entity "Pipe Right" 13584 10128 "7009e7aff6342217"
 entity "Pipe Up" 13840 10128 "8ed2a07fffb42f93"
 entity "Pipe Right" 13840 9840 "11043453eeaac30c"
 entity "Pipe Up" 14160 9840 "3c8a225810b2d58a"
-entity "Pipe Out" 14160 9680 "3c2d0f21f3d592a1"
 entity "Spring Booster Up" 14160 9568 "1fe8337602e45b4a"
 entity "Tube Out" 14768 9488 "bb58cd927190405f"
 entity "Spring Stronger Right" 15408 10320 "bd3c862e11b0c5d0"
@@ -4248,13 +4247,7 @@ entity "Collectible" 14768 9648 "a6f53b519d02842b"
 entity "Collectible" 15152 9920 "ca9ae3dca69849ba"
 entity "Collectible" 15088 9920 "fc0fd4011fa257a9"
 entity "Collectible" 15024 9920 "d6b797e10d71d946"
-entity "Collectible" 16208 9856 "4aae25f821498538"
-entity "Collectible" 16208 9824 "8828640803a95832"
 entity "Collectible" 16208 9792 "e8cb93495efa4602"
-entity "Collectible" 16224 9840 "361f3938cfbf256a"
-entity "Collectible" 16224 9808 "71873a06360441a0"
-entity "Collectible" 16192 9840 "8624c8f902061da1"
-entity "Collectible" 16192 9808 "21d4fb0a018559da"
 entity "Collectible" 15776 10320 "e0496cad98314d62"
 entity "Collectible" 15744 10320 "006eabe8880e3778"
 entity "Collectible" 15712 10320 "ef80a5657650f516"
@@ -4361,9 +4354,6 @@ entity "Layer Green" 6096 9616 "ec5d145e469ebb60"
 entity "RulerSalamander" 3104 10784 "4f1a6d016ab4638f"
 entity "Spikes" 2976 10784 "6b11a6c758180888"
 entity "Water Bubbles" 3024 10784 "a332b92c99283fec"
-entity "Collectible" 16208 9888 "03ac2a8800a40b0f"
-entity "Collectible" 16192 9872 "2663a145797460d9"
-entity "Collectible" 16224 9872 "6201dd7c1e359e58"
 entity "Collectible" 5824 10432 "c62e806a7221e0a2"
 entity "Collectible" 5824 10496 "056bace1856fcbe3"
 entity "Collectible" 5824 10560 "96ffbaa3fd838cb4"
@@ -4453,5 +4443,15 @@ entity "Layer Green" 7504 10384 "30980255c5919e6d"
 entity "Layer Green" 7504 10352 "0f976cf335928611"
 entity "Layer Green" 7504 10320 "f6bb3ba1023e3013"
 entity "Layer Green" 7504 10288 "a267fed8cb6332d2"
+entity "Collectible" 16208 9760 "631030db9fdfe83e"
+entity "Collectible" 16192 9776 "ce8d119d12c1986e"
+entity "Collectible" 16224 9776 "f12299bd2a33c0de"
+entity "Collectible" 16208 9728 "8e545f9a053250df"
+entity "Collectible" 16192 9744 "a7a83e6df0cbe3be"
+entity "Collectible" 16224 9744 "37cd803ed2575bf9"
+entity "Collectible" 16208 9696 "354eb36342ed4649"
+entity "Collectible" 16192 9712 "dff5b168cafa2e85"
+entity "Collectible" 16224 9712 "5bc4d90e5704db98"
+entity "Pipe Out" 14160 9712 "56f9461e6684bd87"
 
 // EOF
