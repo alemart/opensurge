@@ -160,7 +160,7 @@ QUIT_QUESTION               "¿SEGURO QUE QUIERES SALIR?"
 QUIT_OPTION1                "SÍ"
 QUIT_OPTION2                "NO"
 
-	
+
 
 //
 // Section: levels
@@ -225,8 +225,8 @@ CREATEMENU_BACK             "VOLVER"
 // Congratulations Screen
 CONGRATULATIONS_TITLE       "GRACIAS POR JUGAR"
 CONGRATULATIONS_SHARE       "COMPARTIR"
-CONGRATULATIONS_DONATE		"DONAR"
-CONGRALUTATIONS_BACK		"VOLVER"
+CONGRATULATIONS_DONATE      "DONAR"
+CONGRALUTATIONS_BACK        "VOLVER"
 
 // Loading Screen
 LOADING_TEXT                "Cargando..."
