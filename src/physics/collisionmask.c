@@ -257,7 +257,6 @@ uint16_t* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direc
     int x, y, p;
 
     /* compute the position of the ground */
-    /* here we use a dynamic programming approach: */
     switch(ground_direction)
     {
         /*
