@@ -164,3 +164,18 @@ sprite "Tux"
         data        15 16 17 18 19
     }
 }
+
+sprite "Life Icon Tux"
+{
+    source_file       "images/lifeicon.png"
+    source_rect       72 24 24 24
+    frame_size        24 24
+    hot_spot          12 12
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

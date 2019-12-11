@@ -173,3 +173,18 @@ sprite "Charge"
         data        22 23 24 25 26 27 28 29
     }    
 }
+
+sprite "Life Icon Charge"
+{
+    source_file       "images/lifeicon.png"
+    source_rect       48 24 24 24
+    frame_size        24 24
+    hot_spot          12 12
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

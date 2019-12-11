@@ -134,35 +134,40 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 {
     public transform = Transform();
-    icon = Actor("Life Counter");
     value = Text("HUD");
+    icon = null;
+    currentPlayer = null;
 
     state "main"
     {
         value.text = Player.active.lives;
-        icon.anim = animId(Player.active.name);
-    }
-
-    // given a player name, get the corresponding
-    // animation ID of the "Life Counter" sprite
-    fun animId(playerName)
-    {
-        if(playerName == "Surge")
-            return 0;
-        else if(playerName == "Neon")
-            return 1;
-        else if(playerName == "Charge")
-            return 2;
-        else if(playerName == "Tux")
-            return 3;
-        else
-            return 14; // unknown player
+        if(Player.active.name !== currentPlayer) {
+            currentPlayer = Player.active.name;
+            updateIcon(currentPlayer);
+        }
     }
 
     fun constructor()
     {
         value.offset = Vector2(24, 0);
+        value.zindex = 1000.0;
+    }
+
+    fun updateIcon(playerName)
+    {
+        // hide previous icon
+        if(icon != null)
+            icon.visible = false;
+
+        // create new icon
+        icon = Actor("Life Icon " + playerName);
+        if(!icon.animation.exists) {
+            icon.destroy();
+            icon = Actor("Life Icon None");
+        }
+
+        // adjust icon
         icon.offset = Vector2(9, 4);
-        icon.zindex = value.zindex = 1000.0;
+        icon.zindex = 1000.0;
     }
 }

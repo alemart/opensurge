@@ -285,3 +285,18 @@ sprite "Neon"
         data        90 91 92 93 94 95 96 97 98 99
     }
 }
+
+sprite "Life Icon Neon"
+{
+    source_file       "images/lifeicon.png"
+    source_rect       24 24 24 24
+    frame_size        24 24
+    hot_spot          12 12
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

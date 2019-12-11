@@ -20,3 +20,18 @@ sprite "None"
         data        0
     }
 }
+
+sprite "Life Icon None"
+{
+    source_file       "images/lifeicon.png"
+    source_rect       336 24 24 24
+    frame_size        24 24
+    hot_spot          12 12
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
