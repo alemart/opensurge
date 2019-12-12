@@ -300,7 +300,7 @@ Antifarea (opengameart.org) & Alexandre \n\
 --- images/hydra.png (CC-BY-SA 3.0) \n\
 \n\
 João Victor, Colin Beard, Constantin, Alexandre \n\
---- images/lifeicon.png \n\
+--- images/life_icon.png \n\
 \n\
 \n\
 $CREDITS_RES_SAMPLES \n\

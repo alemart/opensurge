@@ -16,7 +16,7 @@ object "Goal" is "entity", "basic"
     actor = Actor("Goal");
     collider = CollisionBox(actor.width, actor.height).setAnchor(0.5, 1.0);
     transform = Transform();
-    clearedAnim = 2;
+    clearedPlayer = "";
 
     state "main"
     {
@@ -35,7 +35,7 @@ object "Goal" is "entity", "basic"
     {
         actor.anim = 2;
         if(actor.animation.finished) {
-            actor.anim = clearedAnim;
+            updateSprite(clearedPlayer);
             state = "cleared";
         }
     }
@@ -46,18 +46,19 @@ object "Goal" is "entity", "basic"
         // shows: level cleared!
     }
 
-    // given a player name, get the corresponding
-    // animation ID of the "Goal" sprite
-    fun animId(playerName)
+    fun updateSprite(playerName)
     {
-        if(playerName == "Surge")
-            return 3;
-        else if(playerName == "Neon")
-            return 4;
-        else if(playerName == "Charge")
-            return 5;
-        else
-            return 6; // generic "cleared" animation
+        // check if a character-specific goal sign exists
+        newActor = Actor("Goal " + playerName);
+        if(!newActor.animation.exists) {
+            newActor.destroy();
+            actor.anim = 3; // "cleared"
+            return;
+        }
+
+        // if it does, replace it
+        actor.destroy();
+        actor = newActor;
     }
 
     fun goal(player)
@@ -65,7 +66,7 @@ object "Goal" is "entity", "basic"
         if(!player.dying) {
             sfx.play();
             Level.clear();
-            clearedAnim = animId(player.name);
+            clearedPlayer = player.name;
             state = "rotating";
         }
     }

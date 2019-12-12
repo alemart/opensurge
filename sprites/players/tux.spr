@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
+// Character Sprite
 sprite "Tux"
 {
     source_file     "images/tux.png"
@@ -165,10 +166,11 @@ sprite "Tux"
     }
 }
 
+// Life Icon corresponding to the character (Heads-Up Display)
 sprite "Life Icon Tux"
 {
-    source_file       "images/lifeicon.png"
-    source_rect       72 24 24 24
+    source_file       "images/life_icon.png"
+    source_rect       0 24 360 24
     frame_size        24 24
     hot_spot          12 12
 
@@ -176,6 +178,22 @@ sprite "Life Icon Tux"
     {
         repeat      TRUE
         fps         8
-        data        0
+        data        3
+    }
+}
+
+// Goal Sign corresponding to the character
+sprite "Goal Tux"
+{
+    source_file     "images/goal.png"
+    source_rect     0 12 184 162
+    frame_size      46 54
+    hot_spot        23 54
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        4
     }
 }

@@ -137,6 +137,7 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
     value = Text("HUD");
     icon = null;
     currentPlayer = null;
+    zindex = 1000;
 
     state "main"
     {
@@ -149,25 +150,25 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 
     fun constructor()
     {
-        value.offset = Vector2(24, 0);
-        value.zindex = 1000.0;
+        value.zindex = zindex;
     }
 
     fun updateIcon(playerName)
     {
-        // hide previous icon
+        // destroy previous icon
         if(icon != null)
-            icon.visible = false;
+            icon.destroy();
 
         // create new icon
         icon = Actor("Life Icon " + playerName);
         if(!icon.animation.exists) {
             icon.destroy();
-            icon = Actor("Life Icon None");
+            icon = Actor("Life Icon");
         }
 
         // adjust icon
         icon.offset = Vector2(9, 4);
-        icon.zindex = 1000.0;
+        icon.zindex = zindex;
+        value.offset = Vector2(icon.width, 0);
     }
 }

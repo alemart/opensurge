@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: none.spr
-// Description: sprite definition file (.spr) for "None"
+// Description: sprite definition file (.spr) for character "None"
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -12,21 +12,6 @@ sprite "None"
     source_rect     200 8 16 16
     frame_size      16 16
     hot_spot        8 8
-
-    animation 0
-    {
-        repeat      TRUE
-        fps         8
-        data        0
-    }
-}
-
-sprite "Life Icon None"
-{
-    source_file       "images/lifeicon.png"
-    source_rect       336 24 24 24
-    frame_size        24 24
-    hot_spot          12 12
 
     animation 0
     {

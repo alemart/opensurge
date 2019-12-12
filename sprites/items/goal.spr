@@ -17,7 +17,7 @@ sprite "Goal"
     {
         repeat      TRUE
         fps         8
-        data        4
+        data        5
     }
 
     // not cleared
@@ -36,67 +36,11 @@ sprite "Goal"
         data        1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
     }
 
-    // level cleared: Surge
+    // level cleared (generic)
     animation 3
     {
         repeat      TRUE
         fps         8
         data        4
-    }
-
-    // level cleared: Neon
-    animation 4
-    {
-        repeat      TRUE
-        fps         8
-        data        5
-    }
-
-    // level cleared: Charge
-    animation 5
-    {
-        repeat      TRUE
-        fps         8
-        data        6
-    }
-
-    // level cleared: generic
-    animation 6
-    {
-        repeat      TRUE
-        fps         8
-        data        7
-    }
-
-    // level cleared: empty (add your character here)
-    animation 7
-    {
-        repeat      TRUE
-        fps         8
-        data        8
-    }
-
-    // level cleared: empty (add your character here)
-    animation 8
-    {
-        repeat      TRUE
-        fps         8
-        data        9
-    }
-
-    // level cleared: empty (add your character here)
-    animation 9
-    {
-        repeat      TRUE
-        fps         8
-        data        10
-    }
-
-    // level cleared: empty (add your character here)
-    animation 10
-    {
-        repeat      TRUE
-        fps         8
-        data        11
     }
 }
