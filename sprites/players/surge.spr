@@ -9,7 +9,7 @@
 sprite "Surge"
 {
     source_file     "images/surge.png"
-    source_rect     0 0 512 704
+    source_rect     0 0 512 832
     frame_size      64 64
     hot_spot        32 44    // hot_spot.y is (frame_size.y - 20)
 
@@ -317,6 +317,22 @@ sprite "Surge"
         fps         8
         data        64 65
     }
+
+    // lighting attack
+    animation 39
+    {
+        repeat      FALSE
+        fps         16
+        data        74 75
+    }
+
+    // lighting attack (sustain)
+    animation 40
+    {
+        repeat      TRUE
+        fps         8
+        data        75
+    }
 }
 
 // Life Icon corresponding to the character (Heads-Up Display)
@@ -348,5 +364,30 @@ sprite "Goal Surge"
         repeat      TRUE
         fps         8
         data        5
+    }
+}
+
+
+
+
+
+//
+// The following sprites are
+// specific to Surge
+//
+
+// Special Move: Surge's Lighting Boom
+sprite "Surge's Lighting Boom"
+{
+    source_file     "images/surge.png"
+    source_rect     0 832 512 128
+    frame_size      128 128
+    hot_spot        64 64
+
+    animation 0
+    {
+        repeat      FALSE
+        fps         16
+        data        0 1 2 3
     }
 }

@@ -130,7 +130,6 @@ $CREDITS_RES_IMAGES \n\
 João Victor \n\
 --- surge.png (CC-0) \n\
 --- images/neon.png \n\
---- images/surge.png \n\
 --- images/animals.png \n\
 --- images/title.png \n\
 --- images/goal.png \n\
@@ -166,17 +165,14 @@ Cody Licorish \n\
 --- images/barrel.png \n\
 --- logo.png \n\
 \n\
-Brian Zablocky \n\
---- images/bumper.png \n\
---- images/checkpoint_orb.png \n\
---- images/grassland_template.png \n\
---- images/item_boxes.png (battery icons by Cody Licorish) \n\
---- images/lady_bugsy.png \n\
---- images/shields.png \n\
---- images/switches.png \n\
-\n\
-Brian Zablocky (Celdecea) & Alex V. (squirrel) & Alexandre Martins \n\
---- images/spring_pads.png \n\
+João Victor & Alexandre Martins \n\
+--- images/surge.png \n\
+--- images/loading.png \n\
+--- images/dialogs.png \n\
+--- images/jumping_fish.png \n\
+--- images/giant_wolf.png \n\
+--- images/surgebg.png \n\
+--- images/credits.png \n\
 \n\
 Alexandre Martins \n\
 --- images/core.png \n\
@@ -199,6 +195,18 @@ Alexandre Martins \n\
 --- images/zipline.png \n\
 --- images/bugsy.png \n\
 --- images/fish.png \n\
+\n\
+Brian Zablocky \n\
+--- images/bumper.png \n\
+--- images/checkpoint_orb.png \n\
+--- images/grassland_template.png \n\
+--- images/item_boxes.png (battery icons by Cody Licorish) \n\
+--- images/lady_bugsy.png \n\
+--- images/shields.png \n\
+--- images/switches.png \n\
+\n\
+Brian Zablocky (Celdecea) & Alex V. (squirrel) & Alexandre Martins \n\
+--- images/spring_pads.png \n\
 \n\
 Christopher Martinus \n\
 --- images/acts.png \n\
@@ -250,14 +258,6 @@ Colin Beard & Mateus Reis \n\
 \n\
 Alexandre Martins & Ste Pickford \n\
 --- images/water.png \n\
-\n\
-João Victor & Alexandre Martins \n\
---- images/loading.png \n\
---- images/dialogs.png \n\
---- images/jumping_fish.png \n\
---- images/giant_wolf.png \n\
---- images/surgebg.png \n\
---- images/credits.png \n\
 \n\
 Gaivota & Alexandre Martins \n\
 --- images/rings.png \n\
@@ -380,6 +380,7 @@ Alexandre Martins \n\
 --- samples/slide.wav \n\
 --- samples/jetpack.wav \n\
 --- samples/underwater_tick.wav \n\
+--- samples/lighting_boom.wav \n\
 \n\
 d1337r \n\
 --- samples/deny.wav \n\

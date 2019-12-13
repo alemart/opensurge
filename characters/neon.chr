@@ -9,7 +9,7 @@
 
 character "Neon"
 {
-    companions                      "Neon's Jetpack" "Dash Smoke" "Brake Smoke" ".neon_companion"
+    companions                      "Dash Smoke" "Brake Smoke" "Neon's Jetpack" ".neon_easter"
     
     multipliers
     {
