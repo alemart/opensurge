@@ -66,7 +66,7 @@ object "Jumping Fish" is "entity", "enemy"
         // reposition the fish & stop its movement
         if(transform.position.y >= spawnPoint.y) {
             actor.visible = enemy.enabled = false;
-            transform.move(0, spawnPoint.y - transform.position.y);
+            transform.translateBy(0, spawnPoint.y - transform.position.y);
             movement.speed = 0;
             state = "cooldown";
         }

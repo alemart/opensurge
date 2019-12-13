@@ -198,7 +198,7 @@ object "Lock Camera Ground Finder" is "private", "awake", "entity"
     {
         transform.position = position.translatedBy(0, -1);
         for(i = 0; i < maxAttempts; i++) {
-            transform.move(0, 1);
+            transform.translateBy(0, 1);
             sensor.onTransformChange();
             if(sensor.status !== null)
                 break;

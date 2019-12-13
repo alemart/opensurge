@@ -21,7 +21,7 @@ object ".compat_loopgreen" is "private", "entity"
     fun constructor()
     {
         transform = obj.child("Transform") || obj.spawn("Transform");
-        transform.move(16, 16);
+        transform.translateBy(16, 16);
     }
 }
 
@@ -36,7 +36,7 @@ object ".compat_loopyellow" is "private", "entity"
     fun constructor()
     {
         transform = obj.child("Transform") || obj.spawn("Transform");
-        transform.move(16, 16);
+        transform.translateBy(16, 16);
     }
 }
 

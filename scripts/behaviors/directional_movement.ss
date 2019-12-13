@@ -69,7 +69,7 @@ object "DirectionalMovement" is "behavior"
         // move
         if(speed != 0) {
             dt = Time.delta;
-            transform.move(speed * normalizedDirection.x * dt, speed * normalizedDirection.y * dt);
+            transform.translateBy(speed * normalizedDirection.x * dt, speed * normalizedDirection.y * dt);
         }
     }
 

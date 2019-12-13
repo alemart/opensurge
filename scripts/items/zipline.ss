@@ -52,7 +52,7 @@ object "Zipline Grabber" is "entity", "gimmick"
             dt = Time.delta;
             acc = Level.gravity * zipline.direction.y;
             speed = Math.min(speed + acc * dt, maxSpeed);
-            transform.move(zipline.direction.x * speed * dt, zipline.direction.y * speed * dt);
+            transform.translateBy(zipline.direction.x * speed * dt, zipline.direction.y * speed * dt);
 
             // store direction
             direction = Math.sign(zipline.direction.x);
@@ -77,7 +77,7 @@ object "Zipline Grabber" is "entity", "gimmick"
     state "falling"
     {
         speed += Level.gravity * Time.delta;
-        transform.move(0, speed * Time.delta);
+        transform.translateBy(0, speed * Time.delta);
     }
 
     fun startZipping(player)

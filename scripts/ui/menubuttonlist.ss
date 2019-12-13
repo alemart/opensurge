@@ -57,7 +57,7 @@ object "MenuButtonList"
 
     state "disappearing"
     {
-        transform.move(2.5 * Screen.width * Time.delta, 0);
+        transform.translateBy(2.5 * Screen.width * Time.delta, 0);
     }
 
     //

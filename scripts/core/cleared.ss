@@ -133,7 +133,7 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 
     state "appearing"
     {
-        transform.move(appearSpeed * Time.delta, 0);
+        transform.translateBy(appearSpeed * Time.delta, 0);
         if(appearSpeed > 0) {
             if(transform.localPosition.x >= Screen.width / 2) {
                 transform.localPosition = Vector2(Screen.width / 2, transform.localPosition.y);
@@ -150,7 +150,7 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 
     state "disappearing"
     {
-        transform.move(-appearSpeed * Time.delta, 0);
+        transform.translateBy(-appearSpeed * Time.delta, 0);
     }
 
     state "done"
@@ -212,7 +212,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
 
     state "appearing"
     {
-        transform.move(appearSpeed * Time.delta, 0);
+        transform.translateBy(appearSpeed * Time.delta, 0);
         if(transform.localPosition.x >= Screen.width / 2) {
             transform.localPosition = Vector2(Screen.width / 2, transform.localPosition.y);
             state = "wait";
@@ -221,7 +221,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
 
     state "disappearing"
     {
-        transform.move(-appearSpeed * Time.delta, 0);
+        transform.translateBy(-appearSpeed * Time.delta, 0);
     }
 
     state "wait"

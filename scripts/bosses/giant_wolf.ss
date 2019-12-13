@@ -359,7 +359,7 @@ object "Giant Wolf's Hand" is "private", "entity", "awake"
         else if(transform.localPosition.y >= Screen.height)
             state = "resting"; // no bricks outside the screen
         else
-            transform.move(0, punchSpeed * Time.delta);
+            transform.translateBy(0, punchSpeed * Time.delta);
     }
 
     state "resting"
@@ -370,7 +370,7 @@ object "Giant Wolf's Hand" is "private", "entity", "awake"
 
     state "lifting"
     {
-        transform.move(0, -liftSpeed * Time.delta);
+        transform.translateBy(0, -liftSpeed * Time.delta);
 
         // the hand has been lifted
         if(transform.localPosition.y <= offset.y) {

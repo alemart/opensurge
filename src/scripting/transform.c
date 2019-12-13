@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * transform.c - scripting system: Transform
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_translateby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_translate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_rotate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -72,8 +72,9 @@ void scripting_register_transform(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Transform", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Transform", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Transform", "spawn", fun_spawn, 1);
-    surgescript_vm_bind(vm, "Transform", "move", fun_move, 2);
     surgescript_vm_bind(vm, "Transform", "translate", fun_translate, 1);
+    surgescript_vm_bind(vm, "Transform", "translateBy", fun_translateby, 2);
+    surgescript_vm_bind(vm, "Transform", "move", fun_translateby, 2); /* deprecated */
     surgescript_vm_bind(vm, "Transform", "rotate", fun_rotate, 1);
     surgescript_vm_bind(vm, "Transform", "lookAt", fun_lookat, 1);
     surgescript_vm_bind(vm, "Transform", "get_position", fun_getposition, 0);
@@ -136,8 +137,8 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     return NULL;
 }
 
-/* move: translate by (x,y) */
-surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* translateBy: translate by (x,y) */
+surgescript_var_t* fun_translateby(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_transform_t* transform = surgescript_object_transform(target(object));
     double x = surgescript_var_get_number(param[0]);

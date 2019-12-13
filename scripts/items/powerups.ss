@@ -340,7 +340,7 @@ object "Item Box Icon" is "entity", "private", "disposable"
 
     state "main"
     {
-        transform.move(0, -speed * Time.delta);
+        transform.translateBy(0, -speed * Time.delta);
         if(timeout(timeToLive * 0.25))
             state = "wait";
     }

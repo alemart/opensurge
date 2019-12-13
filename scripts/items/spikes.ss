@@ -71,7 +71,7 @@ object "Spikes" is "entity", "basic"
             // adjust player position
             if(player.collider.bottom > collider.top) {
                 dy = player.collider.bottom - player.transform.position.y;
-                player.transform.move(0, collider.top - dy - player.transform.position.y);
+                player.transform.translateBy(0, collider.top - dy - player.transform.position.y);
             }
 
             // hit player
@@ -141,7 +141,7 @@ object "Spikes Down" is "entity", "basic"
             // adjust player position
             if(player.collider.top < collider.bottom) {
                 dy = player.transform.position.y - player.collider.top;
-                player.transform.move(0, collider.bottom + dy - player.transform.position.y);
+                player.transform.translateBy(0, collider.bottom + dy - player.transform.position.y);
             }
 
             // hit player

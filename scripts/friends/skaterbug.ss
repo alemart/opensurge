@@ -92,12 +92,12 @@ object "Skaterbug" is "entity", "friend", "gimmick"
             dt = Time.delta;
             xsp = noWall() ? jumpVelocity.x * dir : 0;
             ysp += Level.gravity * dt;
-            transform.move(xsp * dt, ysp * dt);
+            transform.translateBy(xsp * dt, ysp * dt);
             actor.anim = 1;
         }
         else if(ypos > baselevel) {
             xsp = ysp = 0;
-            transform.move(0, baselevel - ypos);
+            transform.translateBy(0, baselevel - ypos);
             actor.anim = 0;
         }
 
@@ -105,7 +105,7 @@ object "Skaterbug" is "entity", "friend", "gimmick"
         if(carrying) {
             dx = Math.floor(transform.position.x) - Math.floor(xpos);
             dy = Math.floor(transform.position.y) - Math.floor(ypos);
-            player.transform.move(dx, dy);
+            player.transform.translateBy(dx, dy);
         }
         else if(player != null && player.jumping && ysp != 0) {
             if(xsp > 0)

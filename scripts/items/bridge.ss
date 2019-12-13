@@ -212,7 +212,7 @@ object "Bridge Element" is "entity", "private"
     state "collapsing"
     {
         ysp += Level.gravity * Time.delta;
-        transform.move(0, ysp * Time.delta);
+        transform.translateBy(0, ysp * Time.delta);
     }
 
     fun setElement(idx, len, anim, layer)
@@ -269,7 +269,7 @@ object "Bridge Element" is "entity", "private"
             offy = maxDepth * Math.sin(ninety * factor);
             y = Math.smoothstep(0, offy, timer);
             dy = y - transform.localPosition.y;
-            transform.move(0, dy);
+            transform.translateBy(0, dy);
 
             // move player(s)
             if(dy > 0.0) {
@@ -277,7 +277,7 @@ object "Bridge Element" is "entity", "private"
                     player = Player[j];
                     if(player.ysp >= 0 && collider.collidesWith(player.collider)) {
                         ddy = player == Player.active ? Math.max(0, dy - 0.7) : dy;
-                        player.transform.move(0, ddy);
+                        player.transform.translateBy(0, ddy);
                     }
                 }
             }
@@ -295,7 +295,7 @@ object "Bridge Element" is "entity", "private"
             // update position
             y = Math.smoothstep(0, offy, timer);
             dy = y - transform.localPosition.y;
-            transform.move(0, dy);
+            transform.translateBy(0, dy);
         }
         else {
             // no movement

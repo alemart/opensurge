@@ -187,7 +187,7 @@ object "Goal Capsule Broken Part" is "entity", "private", "disposable"
         // move
         dt = Time.delta;
         ysp += Level.gravity * dt;
-        transform.move(xsp * dt, ysp * dt);
+        transform.translateBy(xsp * dt, ysp * dt);
         transform.rotate(phi * dt);
 
         // neat explosion ;)

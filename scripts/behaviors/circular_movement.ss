@@ -78,14 +78,14 @@ object "CircularMovement" is "behavior"
             angle += w * dt;
             if(center == null) {
                 rw = radius * w;
-                transform.move(
+                transform.translateBy(
                     -rw * Math.cos(angle + offset) * scale.x * dt,
                     rw * Math.sin(angle + offset) * scale.y * dt
                 );
             }
             else {
                 transform.position = center;
-                transform.move(
+                transform.translateBy(
                     radius * Math.cos(angle + offset) * scale.x,
                     radius * Math.sin(angle + offset) * scale.y
                 );

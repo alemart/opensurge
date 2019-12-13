@@ -36,7 +36,7 @@ object "Water Bubble" is "entity", "private", "disposable"
     {
         // move upwards
         dt = Time.delta; t += dt;
-        transform.move((amplitude * 6.2832) * Math.cos(6.2832 * t) * dt, -30 * dt); // chain rule
+        transform.translateBy((amplitude * 6.2832) * Math.cos(6.2832 * t) * dt, -30 * dt); // chain rule
 
         // got out of water?
         if(transform.position.y - hy < Level.waterlevel)

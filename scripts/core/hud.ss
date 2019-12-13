@@ -28,7 +28,7 @@ object "Default HUD" is "entity", "detached", "awake", "private"
 
     state "cleared"
     {
-        transform.move(-Screen.width * Time.delta, 0);
+        transform.translateBy(-Screen.width * Time.delta, 0);
     }
 
     fun constructor()

@@ -70,14 +70,14 @@ object "Elevator" is "entity", "gimmick"
 
         // move the elevator
         oldY = Math.floor(transform.localPosition.y);
-        transform.move(0, sign * speed * Time.delta);
+        transform.translateBy(0, sign * speed * Time.delta);
         dy = Math.floor(transform.localPosition.y) - oldY;
 
         // move the player(s)
         for(i = 0; i < Player.count; i++) {
             player = Player[i];
             if(collider.collidesWith(player.collider))
-                player.transform.move(0, dy);
+                player.transform.translateBy(0, dy);
         }
     }
 

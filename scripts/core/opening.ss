@@ -113,7 +113,7 @@ object "DefaultOpeningAnimation.LeftHalf" is "entity", "awake", "detached", "pri
 
     state "appearing"
     {
-        transform.move(speed * Time.delta, 0);
+        transform.translateBy(speed * Time.delta, 0);
         if(transform.position.x >= Screen.width) {
             transform.position = Vector2(Screen.width, 0);
             state = "main";
@@ -122,7 +122,7 @@ object "DefaultOpeningAnimation.LeftHalf" is "entity", "awake", "detached", "pri
 
     state "disappearing"
     {
-        transform.move(-speed * Time.delta, 0);
+        transform.translateBy(-speed * Time.delta, 0);
         if(transform.position.x < 0)
             destroy();
     }
@@ -156,7 +156,7 @@ object "DefaultOpeningAnimation.RightHalf" is "entity", "awake", "detached", "pr
 
     state "appearing"
     {
-        transform.move(-speed * Time.delta, 0);
+        transform.translateBy(-speed * Time.delta, 0);
         if(transform.position.x < 0) {
             transform.position = Vector2.zero;
             state = "main";
@@ -165,7 +165,7 @@ object "DefaultOpeningAnimation.RightHalf" is "entity", "awake", "detached", "pr
 
     state "disappearing"
     {
-        transform.move(speed * Time.delta, 0);
+        transform.translateBy(speed * Time.delta, 0);
         if(transform.position.x >= Screen.width)
             destroy();
     }
@@ -199,7 +199,7 @@ object "DefaultOpeningAnimation.Arrow" is "entity", "awake", "detached", "privat
 
     state "appearing"
     {
-        transform.move(speed * Time.delta, 0);
+        transform.translateBy(speed * Time.delta, 0);
         if(timeout(Screen.width / speed + 0.7))
             destroy();
     }
@@ -243,7 +243,7 @@ object "DefaultOpeningAnimation.Formula" is "entity", "awake", "detached", "priv
 
     state "visible"
     {
-        transform.move(speed * Time.delta, 0);
+        transform.translateBy(speed * Time.delta, 0);
         if(transform.position.x >= Screen.width)
             transform.position = Vector2(-actor.width - (Screen.width - transform.position.x), transform.position.y);
     }

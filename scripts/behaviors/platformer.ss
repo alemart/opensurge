@@ -98,7 +98,7 @@ object "Platformer" is "behavior"
         }
 
         // move
-        transform.move(xsp * dt, ysp * dt);
+        transform.translateBy(xsp * dt, ysp * dt);
         sensors.update();
 
         // wall collision
@@ -108,10 +108,10 @@ object "Platformer" is "behavior"
             wall = true;
             xsp = 0;
             dx = oldx - transform.position.x;
-            transform.move(dx, 0);
+            transform.translateBy(dx, 0);
             sensors.update();
             while(sensors.wall) {
-                transform.move(-direction, 0);
+                transform.translateBy(-direction, 0);
                 sensors.update();
             }
         }
@@ -123,7 +123,7 @@ object "Platformer" is "behavior"
             ceiling = true;
             ysp = Math.abs(ysp) * -0.25;
             while(sensors.ceiling) {
-                transform.move(0, 1);
+                transform.translateBy(0, 1);
                 sensors.update();
             }
         }
@@ -137,10 +137,10 @@ object "Platformer" is "behavior"
             lledge = sensors.lledge;
             rledge = sensors.rledge;
             while(!sensors.midair) {
-                transform.move(0, -1);
+                transform.translateBy(0, -1);
                 sensors.update();
             }
-            transform.move(0, 2);
+            transform.translateBy(0, 2);
         }
         else {
             midair = true;

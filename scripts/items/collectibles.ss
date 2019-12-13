@@ -112,7 +112,7 @@ object "Collectible" is "entity", "basic"
         ysp += 600 * ((sy == Math.sign(ysp)) ? 1 : -4) * sy * dt;
 
         // move towards the target
-        transform.move(ds.x * xsp * dt, ds.y * ysp * dt);
+        transform.translateBy(ds.x * xsp * dt, ds.y * ysp * dt);
 
         // demagnetize
         if(base.disappearing || target.shield != "thunder")
@@ -184,7 +184,7 @@ object "Bouncing Collectible" is "entity", "disposable", "private"
             ysp += 337.5 * dt; // gravity
 
         // move object
-        transform.move(xsp * dt, ysp * dt);
+        transform.translateBy(xsp * dt, ysp * dt);
         
         // timeout
         if(timeout(5.0))

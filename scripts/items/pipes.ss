@@ -361,28 +361,28 @@ object "Pipe Traveler" is "private", "awake", "entity"
 
     state "up"
     {
-        player.transform.move(0, -pipeManager.speed * Time.delta);
+        player.transform.translateBy(0, -pipeManager.speed * Time.delta);
         player.anim = rollAnimation;
         player.frozen = true;
     }
  
     state "right"
     {
-        player.transform.move(pipeManager.speed * Time.delta, 0);
+        player.transform.translateBy(pipeManager.speed * Time.delta, 0);
         player.anim = rollAnimation;
         player.frozen = true;
     }
  
     state "down"
     {
-        player.transform.move(0, pipeManager.speed * Time.delta);
+        player.transform.translateBy(0, pipeManager.speed * Time.delta);
         player.anim = rollAnimation;
         player.frozen = true;
     }
     
     state "left"
     {
-        player.transform.move(-pipeManager.speed * Time.delta, 0);
+        player.transform.translateBy(-pipeManager.speed * Time.delta, 0);
         player.anim = rollAnimation;
         player.frozen = true;
     }

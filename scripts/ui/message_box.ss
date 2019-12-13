@@ -49,7 +49,7 @@ object "Message Box" is "detached", "private", "entity"
     state "appearing"
     {
         // move
-        transform.move(0, -spd * Time.delta);
+        transform.translateBy(0, -spd * Time.delta);
 
         // are we done?
         ymin = Screen.height - box.height - pad;
@@ -68,7 +68,7 @@ object "Message Box" is "detached", "private", "entity"
     state "disappearing"
     {
         // move
-        transform.move(0, spd * Time.delta);
+        transform.translateBy(0, spd * Time.delta);
 
         // are we done?
         ymax = Screen.height;
