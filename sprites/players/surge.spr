@@ -310,15 +310,15 @@ sprite "Surge"
         data        59
     }
 
-    // crossing the arms
+    // waiting underwater
     animation 38
     {
-        repeat      FALSE
+        repeat      TRUE
         fps         8
-        data        64 65
+        data        64 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 64 59 59 59 59 59 59 59 59 59 59 59 59 60 60 59 59 60 60 59 59 59 59 59 59
     }
 
-    // lighting attack
+    // lighting boom
     animation 39
     {
         repeat      FALSE
@@ -326,7 +326,7 @@ sprite "Surge"
         data        74 75
     }
 
-    // lighting attack (sustain)
+    // lighting boom (sustain)
     animation 40
     {
         repeat      TRUE

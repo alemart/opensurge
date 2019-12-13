@@ -11,6 +11,20 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBall;
 
 //
+// Surge's waiting animation will be modified if he's underwater
+//
+object "Surge's Waiting Animation" is "companion"
+{
+    player = Player("Surge");
+
+    state "main"
+    {
+        if(player.underwater && player.waiting)
+            player.anim = 38;
+    }
+}
+
+//
 // Surge's sneakers won't be lit while he's midair
 //
 object "Surge's Light Sneakers" is "companion"
