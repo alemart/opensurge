@@ -146,7 +146,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
         // destroy enemies on touch
         if(otherCollider.entity.__name == "Enemy") {
             enemy = otherCollider.entity;
-            enemy.getDestroyed(player);
+            enemy.kill(player);
         }
     }
 }

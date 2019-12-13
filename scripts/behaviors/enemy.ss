@@ -143,7 +143,7 @@ object "Enemy" is "private", "entity", "behavior"
     {
     }
 
-    fun getDestroyed(player)
+    fun kill(player)
     {
         // add to score
         newScore = Math.floor(score);
@@ -163,6 +163,8 @@ object "Enemy" is "private", "entity", "behavior"
         entity.destroy();
     }
 
+    fun getDestroyed(player) { return kill(player); } // deprecated
+
     fun onCollision(otherCollider)
     {
         if(enabled && otherCollider.entity.hasTag("player")) {
@@ -177,7 +179,7 @@ object "Enemy" is "private", "entity", "behavior"
                 }
 
                 // destroy the enemy
-                getDestroyed(player);
+                kill(player);
             }
             else if(!player.invincible) {
                 // hit the player
