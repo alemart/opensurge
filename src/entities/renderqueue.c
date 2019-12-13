@@ -64,6 +64,7 @@ static renderqueue_t* queue = NULL;
 static int size = 0;
 static v2d_t camera;
 
+/* utilities */
 static int cmp_fun(const void *i, const void *j)
 {
     const renderqueue_cell_t *a = (const renderqueue_cell_t*)i;
@@ -81,33 +82,42 @@ static int cmp_fun(const void *i, const void *j)
         return 1;
 }
 
-static float brick_zindex_offset(const brick_t *b)
+static inline float brick_zindex_offset(const brick_t *brick)
 {
     float s = 0.0f;
 
     /* a hackish solution... */
-    switch(brick_type(b)) {
+    switch(brick_type(brick)) {
         case BRK_PASSABLE:  s -= 0.00002f;  break;
         case BRK_CLOUD:     s -= 0.00001f;  break;
         case BRK_SOLID:     break;
     }
 
-    switch(brick_layer(b)) {
+    switch(brick_layer(brick)) {
         case BRL_YELLOW:    s -= 0.00005f;  break;
         case BRL_GREEN:     s += 0.00005f;  break;
         case BRL_DEFAULT:   break;
     }
 
-    if(brick_behavior(b) == BRB_DEFAULT)
+    if(brick_behavior(brick) == BRB_DEFAULT)
         s -= 0.000001f;
     
     /* done */
     return s;
 }
 
+static inline float player_zindex_offset(const player_t *player)
+{
+    switch(player_layer(player)) {
+        case BRL_YELLOW:    return -0.000005f;
+        case BRL_GREEN:     return 0.000005f;
+        default:            return 0.0f;
+    }
+}
+
 /* private strategies */
 static float zindex_particles(renderable_t r) { return 1.0f; }
-static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 0.99999f : 0.5f; }
+static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 0.99999f : 0.5f + player_zindex_offset(r.player); }
 static float zindex_item(renderable_t r) { return r.item->bring_to_back ? 0.49999f : 0.5f; }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }

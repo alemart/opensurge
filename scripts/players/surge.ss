@@ -80,10 +80,13 @@ object "Surge's Lighting Boom" is "companion"
     {
         player.anim = 39;
         player.xsp = xsp;
-        if(player.animation.finished)
-            state = "sustaining";
-        else if(!player.midair)
+        if(!player.midair) {
+            if(player.angle != 0)
+                player.anim = 1;
             state = "main";
+        }
+        else if(player.animation.finished)
+            state = "sustaining";
     }
 
     state "sustaining"
@@ -93,8 +96,11 @@ object "Surge's Lighting Boom" is "companion"
             player.springify();
             state = "main";
         }
-        else if(!player.midair)
-            state = "main";       
+        else if(!player.midair) {
+            if(player.angle != 0)
+                player.anim = 1;
+            state = "main";
+        }
     }
 
     fun isReady(player)
@@ -114,14 +120,19 @@ object "Surge's Lighting Boom FX" is "private", "entity"
 {
     actor = Actor("Surge's Lighting Boom");
     sfx = Sound("samples/lighting_boom.wav");
-    collider = CollisionBall(16);
+    collider = CollisionBall(1);
     player = Player("Surge");
+    minRadius = 0;
+    maxRadius = 0;
     time = 0;
 
     state "main"
     {
         // initializing
-        actor.zindex = 0.75;
+        minRadius = collider.radius;
+        maxRadius = actor.width * 0.65;
+        //collider.visible = true;
+        actor.zindex = 0.50005;
         sfx.play();
 
         // done
@@ -133,8 +144,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
         // expand the collider radius
         time += Time.delta;
         timeToLive = actor.animation.frameCount / actor.animation.fps;
-        collider.radius = Math.lerp(0, actor.width * 0.65, time / timeToLive);
-        //collider.visible = true;
+        collider.radius = Math.lerp(minRadius, maxRadius, time / timeToLive);
 
         // destroy the object
         if(actor.animation.finished)
