@@ -27,7 +27,7 @@
 #define GAME_SUP_VERSION        0
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        0
-#define GAME_PATCH_VERSION      3 /* if defined, this is a patch version of a released build */
+#define GAME_PATCH_VERSION      3
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2019"
 
@@ -49,11 +49,11 @@
 #define GAME_VERSION_CODE       VERSION_CODE(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) /* must not include GAME_PATCH_VERSION (preserve compatibility) */
 
 /* Version string */
-#if !defined(GAME_BUILD_VERSION) && !defined(GAME_PATCH_VERSION) /* stable version */
+#if !defined(GAME_BUILD_VERSION) && GAME_PATCH_VERSION == 0 /* stable version */
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION)
-#elif !defined(GAME_BUILD_VERSION) && defined(GAME_PATCH_VERSION) /* stable version with patch */
+#elif !defined(GAME_BUILD_VERSION) && GAME_PATCH_VERSION != 0 /* stable version with patch */
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) "." STRINGIFY(GAME_PATCH_VERSION)
-#elif defined(GAME_BUILD_VERSION) && !defined(GAME_PATCH_VERSION) /* development version */
+#elif defined(GAME_BUILD_VERSION) && GAME_PATCH_VERSION == 0 /* development version */
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) "-" STRINGIFY(GAME_BUILD_VERSION)
 #else /* development version */
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_SUP_VERSION, GAME_SUB_VERSION, GAME_WIP_VERSION) "." STRINGIFY(GAME_PATCH_VERSION) "-" STRINGIFY(GAME_BUILD_VERSION)
