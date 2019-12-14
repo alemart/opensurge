@@ -177,25 +177,23 @@ surgescript_var_t* fun_rotate(surgescript_object_t* object, const surgescript_va
     return NULL;
 }
 
-/* will look at an object */
+/* will look at a given position */
 surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_object_t* looked = checked_target(surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(param[0])));
+    surgescript_objecthandle_t position_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* looked = surgescript_objectmanager_get(manager, position_handle);
+    surgescript_object_t* looker = target(object);
+    double looked_x, looked_y, looker_x, looker_y, angle;
 
-    if(looked != NULL) {
-        surgescript_object_t* looker = target(object);
-        double looked_x, looked_y, looker_x, looker_y, angle;
+    worldposition2d(looker, &looker_x, &looker_y);
+    scripting_vector2_read(looked, &looked_x, &looked_y);
 
-        worldposition2d(looker, &looker_x, &looker_y);
-        worldposition2d(looked, &looked_x, &looked_y);
-
-        errno = 0;
-        angle = atan2(looker_y - looked_y, looked_x - looker_x);
-        if(errno == 0) {
-            setworldangle2d(looker, angle * RAD2DEG);
-            notify_change(object);
-        }
+    errno = 0;
+    angle = atan2(looker_y - looked_y, looked_x - looker_x);
+    if(errno == 0) {
+        setworldangle2d(looker, angle * RAD2DEG);
+        notify_change(object);
     }
 
     return NULL;
