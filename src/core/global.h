@@ -31,6 +31,9 @@
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2019"
 
+/* Scripting */
+#define SURGESCRIPT_MIN_VERSION "0.5.4.1"
+
 /* if the following is defined, this is a development build */
 /*#define GAME_BUILD_VERSION      1337-dev*/
 

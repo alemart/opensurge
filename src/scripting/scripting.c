@@ -44,9 +44,6 @@ static int compile_script(const char* filepath, void* param);
 static bool found_test_script(const surgescript_vm_t* vm);
 static void check_if_compatible();
 
-/* minimum required version */
-static const char* min_surgescript_version = "0.5.4";
-
 /* SurgeEngine */
 static void setup_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_application(surgescript_vm_t* vm);
@@ -377,8 +374,8 @@ void scripting_error(const surgescript_object_t* object, const char* fmt, ...)
    to this build of Open Surge */
 void check_if_compatible()
 {
-    if(surgescript_util_versioncode(NULL) < surgescript_util_versioncode(min_surgescript_version))
-        fatal_error("This build requires at least SurgeScript %s (using: %s)", min_surgescript_version, surgescript_util_version());
+    if(surgescript_util_versioncode(NULL) < surgescript_util_versioncode(SURGESCRIPT_MIN_VERSION))
+        fatal_error("This build requires at least SurgeScript %s (using: %s)", SURGESCRIPT_MIN_VERSION, surgescript_util_version());
 }
 
 /* log function */
