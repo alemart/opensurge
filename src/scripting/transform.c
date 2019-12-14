@@ -60,6 +60,8 @@ static const char* ONCHANGE = "onTransformChange"; /* fun onTransformChange(tran
 static const surgescript_heapptr_t WORLDPOSITION_ADDR = 0;
 static const surgescript_heapptr_t LOCALPOSITION_ADDR = 1;
 static const surgescript_heapptr_t LOCALSCALE_ADDR = 2;
+static const surgescript_heapptr_t RIGHT_ADDR = 3;
+static const surgescript_heapptr_t UP_ADDR = 4;
 
 
 
@@ -105,20 +107,21 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t worldpos = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
-    surgescript_objecthandle_t localpos = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
-    surgescript_objecthandle_t localscale = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
 
-    /* allocate vectors */
+    /* allocate space for the vectors */
     ssassert(WORLDPOSITION_ADDR == surgescript_heap_malloc(heap));
     ssassert(LOCALPOSITION_ADDR == surgescript_heap_malloc(heap));
     ssassert(LOCALSCALE_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, WORLDPOSITION_ADDR), worldpos);
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, LOCALPOSITION_ADDR), localpos);
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, LOCALSCALE_ADDR), localscale);
+    ssassert(RIGHT_ADDR == surgescript_heap_malloc(heap));
+    ssassert(UP_ADDR == surgescript_heap_malloc(heap));
+
+    /* lazy allocation for the actual vectors */
+    surgescript_var_set_null(surgescript_heap_at(heap, WORLDPOSITION_ADDR));
+    surgescript_var_set_null(surgescript_heap_at(heap, LOCALPOSITION_ADDR));
+    surgescript_var_set_null(surgescript_heap_at(heap, LOCALSCALE_ADDR));
+    surgescript_var_set_null(surgescript_heap_at(heap, RIGHT_ADDR));
+    surgescript_var_set_null(surgescript_heap_at(heap, UP_ADDR));
 
     /* register target object for change notifications */
     if(surgescript_object_has_function(target(object), ONCHANGE))
@@ -341,6 +344,15 @@ surgescript_object_t* get_v2(surgescript_object_t* object, surgescript_heapptr_t
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* v2ptr = surgescript_heap_at(heap, addr);
+
+    /* lazy allocation */
+    if(surgescript_var_is_null(v2ptr)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        surgescript_objecthandle_t v2 = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(v2ptr, v2);
+    }
+
+    /* return the vector */
     return surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(v2ptr));
 }
 
