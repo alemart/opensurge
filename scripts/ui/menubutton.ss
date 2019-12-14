@@ -48,8 +48,8 @@ using SurgeEngine.Audio.Sound;
 //
 object "MenuButton" is "private", "entity", "awake"
 {
+    public readonly transform = Transform();
     public sound = Sound("samples/select.wav"); // may be changed
-    transform = Transform();
     actor = Actor("MenuButton");
     hand = Actor("SelectHand64");
     label = Text("GoodNeighborsLarge");
@@ -93,14 +93,6 @@ object "MenuButton" is "private", "entity", "awake"
                 sound.play();
             state = "pressing";
         }
-    }
-
-    //
-    // Property: transform (read-only)
-    //
-    fun get_transform()
-    {
-        return transform;
     }
 
     //

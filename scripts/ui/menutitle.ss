@@ -12,20 +12,12 @@ using SurgeEngine.Audio.Sound;
 
 object "MenuTitle" is "private", "entity", "awake"
 {
-    transform = Transform();
+    public readonly transform = Transform();
     actor = Actor("MenuButton");
     label = Text("GoodNeighborsLarge");
 
     state "main"
     {
-    }
-
-    //
-    // Property: transform (read-only)
-    //
-    fun get_transform()
-    {
-        return transform;
     }
 
     //

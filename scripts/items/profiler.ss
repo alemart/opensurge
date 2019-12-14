@@ -44,9 +44,9 @@ object "Profiler" is "entity", "awake", "special"
 
 object "Profiler.Stats"
 {
-    generic = {};
-    density = {};
-    timespent = {};
+    public readonly generic = {};
+    public readonly density = {};
+    public readonly timespent = {};
     frames = 0;
     lastRefresh = 0;
     prevObjectCount = 0;
@@ -61,21 +61,6 @@ object "Profiler.Stats"
         generic = {};
         density = {};
         timespent = {};
-    }
-
-    fun get_density()
-    {
-        return density;
-    }
-
-    fun get_timespent()
-    {
-        return timespent;
-    }
-
-    fun get_generic()
-    {
-        return generic;
     }
 
     fun refresh()
@@ -164,7 +149,7 @@ object "Profiler.Stats"
 
 object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
 {
-    transform = Transform();
+    public readonly transform = Transform();
     text = Text("sans");
 
     fun constructor()
@@ -184,11 +169,6 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
         }
         text.text = str;
         keys.destroy();
-    }
-
-    fun get_transform()
-    {
-        return transform;
     }
 }
 
