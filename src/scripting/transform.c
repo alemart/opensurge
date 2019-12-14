@@ -44,6 +44,8 @@ static surgescript_var_t* fun_getlocalangle(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setlocalangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlocalscale(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setlocalscale(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getright(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* misc */
 static inline surgescript_object_t* target(const surgescript_object_t* object);
@@ -89,6 +91,8 @@ void scripting_register_transform(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Transform", "set_localAngle", fun_setlocalangle, 1);
     surgescript_vm_bind(vm, "Transform", "get_localScale", fun_getlocalscale, 0);
     surgescript_vm_bind(vm, "Transform", "set_localScale", fun_setlocalscale, 1);
+    surgescript_vm_bind(vm, "Transform", "get_right", fun_getright, 0);
+    surgescript_vm_bind(vm, "Transform", "get_up", fun_getup, 0);
 }
 
 
@@ -193,7 +197,7 @@ surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_va
     scripting_vector2_read(looked, &looked_x, &looked_y);
 
     errno = 0;
-    angle = atan2(looker_y - looked_y, looked_x - looker_x);
+    angle = atan2(-(looked_y - looker_y), looked_x - looker_x);
     if(errno == 0) {
         setworldangle2d(looker, angle * RAD2DEG);
         notify_change(object);
@@ -311,6 +315,34 @@ surgescript_var_t* fun_setlocalscale(surgescript_object_t* object, const surgesc
 
     notify_change(object);
     return NULL;
+}
+
+/* get the right vector of the Transform in world space */
+surgescript_var_t* fun_getright(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_object_t* v2 = get_v2(object, RIGHT_ADDR);
+    double world_angle = worldangle2d(target(object)) / RAD2DEG; /* in radians */
+
+    /* the right vector of the Transform is
+       the unit right vector rotated by the
+       world angle of the Transform */
+    scripting_vector2_update(v2, cos(world_angle), -sin(world_angle)); /* the y axis grows downwards */
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(v2));
+}
+
+/* get the up vector of the Transform in world space */
+surgescript_var_t* fun_getup(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_object_t* v2 = get_v2(object, UP_ADDR);
+    double world_angle = worldangle2d(target(object)) / RAD2DEG; /* in radians */
+
+    /* the up vector of the Transform is
+       the unit up vector rotated by the
+       world angle of the Transform */
+    scripting_vector2_update(v2, -sin(world_angle), -cos(world_angle));
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(v2));
 }
 
 
