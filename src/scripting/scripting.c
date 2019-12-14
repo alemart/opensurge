@@ -393,6 +393,7 @@ void err_fun(const char* message)
 /* register SurgeEngine builtins */
 void setup_surgeengine(surgescript_vm_t* vm)
 {
+    surgescript_transform_use_inverted_y(true);
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
     scripting_register_animation(vm);
