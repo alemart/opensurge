@@ -120,7 +120,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
 {
     actor = Actor("Surge's Lighting Boom");
     sfx = Sound("samples/lighting_boom.wav");
-    collider = CollisionBall(1);
+    collider = CollisionBall(40);
     player = Player("Surge");
     minRadius = 0;
     maxRadius = 0;
@@ -130,7 +130,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
     {
         // initializing
         minRadius = collider.radius;
-        maxRadius = actor.width * 0.65;
+        maxRadius = actor.width * 0.6;
         //collider.visible = true;
         actor.zindex = 0.50005;
         sfx.play();

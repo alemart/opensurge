@@ -190,92 +190,27 @@ surgescript_objecthandle_t scripting_util_require_component(const surgescript_ob
 /* compute the world position of an object */
 v2d_t scripting_util_world_position(const surgescript_object_t* object)
 {
-    /* this gotta be fast */
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
-    surgescript_objecthandle_t handle = surgescript_object_handle(object);
-    surgescript_transform_t transform;
-    v2d_t world_position;
-
-    /* get local position */
-    surgescript_object_peek_transform(object, &transform);
-    world_position.x = transform.position.x;
-    world_position.y = transform.position.y;
-
-    /* compute world position */
-    while(handle != root) {
-        handle = surgescript_object_parent(object);
-        object = surgescript_objectmanager_get(manager, handle);
-        if(surgescript_object_transform_changed(object)) {
-            surgescript_object_peek_transform(object, &transform);
-            surgescript_transform_apply2d(&transform, &world_position.x, &world_position.y);
-        }
-    }
-
-    /* done! */
-    return world_position;
+    v2d_t position;
+    surgescript_transform_util_worldposition2d(object, &position.x, &position.y);
+    return position;
 }
 
 /* compute the world angle of an object */
 float scripting_util_world_angle(const surgescript_object_t* object)
 {
-    surgescript_transform_t transform;
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
-    float parent_angle = (parent != object) ? scripting_util_world_angle(parent) : 0.0f;
-    surgescript_object_peek_transform(object, &transform);
-    return parent_angle + transform.rotation.z;
-}
-
-/* auxiliary function to compute the inverse transform (world to local coordinates)
-   given n transforms T1, T2, ..., Tn,
-   (T1 T2 ... Tn)^-1 (pos) = (Tn^-1 ... T2^-1 T1^-1) (pos) */
-static void world2local(surgescript_objectmanager_t* manager, surgescript_objecthandle_t handle, surgescript_objecthandle_t root, v2d_t* position, float* angle)
-{
-    surgescript_object_t* object = surgescript_objectmanager_get(manager, handle);
-    surgescript_transform_t transform;
-
-    if(handle != root)
-        world2local(manager, surgescript_object_parent(object), root, position, angle);
-
-    surgescript_object_peek_transform(object, &transform);
-    if(position != NULL)
-        surgescript_transform_apply2dinverse(&transform, &(position->x), &(position->y));
-    if(angle != NULL)
-        *angle -= transform.rotation.z;
+    return surgescript_transform_util_worldangle2d(object);
 }
 
 /* set the world position of an object (teleport) */
 void scripting_util_set_world_position(surgescript_object_t* object, v2d_t position)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
-    surgescript_objecthandle_t handle = surgescript_object_handle(object);
-    surgescript_transform_t* transform = surgescript_object_transform(object);
-
-    /* compute local transform */
-    if(handle != root)
-        world2local(manager, surgescript_object_parent(object), root, &position, NULL);
-
-    /* set local transform */
-    transform->position.x = position.x;
-    transform->position.y = position.y;
+    surgescript_transform_util_setworldposition2d(object, position.x, position.y);
 }
 
 /* set the world angle of an object (in degrees) */
 void scripting_util_set_world_angle(surgescript_object_t* object, float angle)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
-    surgescript_objecthandle_t handle = surgescript_object_handle(object);
-    surgescript_transform_t* transform = surgescript_object_transform(object);
-
-    /* compute local transform */
-    if(handle != root)
-        world2local(manager, surgescript_object_parent(object), root, NULL, &angle);
-
-    /* set local transform */
-    transform->rotation.z = fmod(angle, 360.0f);
+    surgescript_transform_util_setworldangle2d(object, angle);
 }
 
 /* compute the proper camera position for an object (will check if it's detached or not) */

@@ -175,7 +175,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
     actor->position = scripting_util_world_position(object);
     actor->angle = scripting_util_world_angle(object) * DEG2RAD;
-    actor->scale = world_lossyscale(object);
+    actor->scale = world_lossyscale(object); /* FIXME: use A5 transformations */
 
     actor_render(actor, camera);
     return NULL;
@@ -371,22 +371,12 @@ surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript
 
 /* --- helpers --- */
 
-/* computes the approximate scale (not very accurate; does not account for shearing) */
+/* computes the approximate scale */
 v2d_t world_lossyscale(const surgescript_object_t* object)
 {
-    static const float eps = 1e-5;
-    surgescript_transform_t transform;
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);   
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, surgescript_object_parent(object));
-    v2d_t scale = (parent != object) ? world_lossyscale(parent) : v2d_new(1.0f, 1.0f);
-
-    surgescript_object_peek_transform(object, &transform);
-    if(transform.scale.x >= 1.0f - eps && transform.scale.x <= 1.0f + eps && transform.scale.y >= 1.0f - eps && transform.scale.y <= 1.0f + eps)
-        return scale;
-
-    scale.x *= transform.scale.x;
-    scale.y *= transform.scale.y;
-    return v2d_new(ssmax(scale.x, 0), ssmax(scale.y, 0));
+    v2d_t scale;
+    surgescript_transform_util_lossyscale2d(object, &scale.x, &scale.y);
+    return scale;
 }
 
 /* get the Animation SurgeScript object (child object) */
