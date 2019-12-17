@@ -228,7 +228,7 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
     errno = 0;
     degrees = atan2(me->y * y_axis, me->x) * RAD2DEG;
     if(degrees < 0.0)
-        degrees += 360.0f;
+        degrees += 360.0;
     return surgescript_var_set_number(surgescript_var_create(), (errno == 0) ? degrees : 0.0);
 }
 
