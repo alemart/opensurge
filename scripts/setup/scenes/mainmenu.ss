@@ -35,7 +35,7 @@ object "MainMenu"
             "$MAINMENU_QUIT"
         ])
         .withSpacing(132)
-        .withAxisAngle(37.3)
+        .withAxisAngle(-37.3)
         .at(
             Screen.width * 0.68,
             Screen.height / 2 - 9

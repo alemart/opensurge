@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * vector2.c - scripting system: immutable 2D Vector
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -66,6 +66,7 @@ static inline surgescript_objecthandle_t spawn_vector(surgescript_objectmanager_
 static const surgescript_vector2_t ZERO = { 0.0, 0.0 };
 static const double RAD2DEG = 57.2957795131;
 static const double EPS = DBL_EPSILON;
+static double y_axis = -1.0;
 
 /*
  * scripting_register_vector2()
@@ -73,6 +74,9 @@ static const double EPS = DBL_EPSILON;
  */
 void scripting_register_vector2(surgescript_vm_t* vm)
 {
+    /* make the y-axis compatible with SurgeScript's transforms */
+    y_axis = surgescript_transform_is_using_inverted_y() ? -1.0 : 1.0;
+
     /* Vector2 is immutable: do not use verbs as method names */
     surgescript_vm_bind(vm, "Vector2", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Vector2", "__init", fun_init, 2);
@@ -222,7 +226,7 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
     const surgescript_vector2_t* me = get_vector(object);
     double degrees = 0.0;
     errno = 0;
-    degrees = atan2(me->y, me->x) * RAD2DEG;
+    degrees = atan2(me->y * y_axis, me->x) * RAD2DEG;
     if(degrees < 0.0)
         degrees += 360.0f;
     return surgescript_var_set_number(surgescript_var_create(), (errno == 0) ? degrees : 0.0);
@@ -291,13 +295,13 @@ surgescript_var_t* fun_translatedby(surgescript_object_t* object, const surgescr
     return surgescript_var_set_objecthandle(surgescript_var_create(), result);
 }
 
-/* returns the vector rotated by a number of degrees */
+/* returns the vector rotated counterclockwise by a number of degrees */
 surgescript_var_t* fun_rotatedby(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_vector2_t* me = get_vector(object);
     double angle = surgescript_var_get_number(param[0]) / RAD2DEG;
-    double s = sin(angle), c = cos(angle);
+    double s = sin(angle) * y_axis, c = cos(angle);
     surgescript_objecthandle_t result = spawn_vector(manager,
         me->x * c - me->y * s,
         me->x * s + me->y * c
@@ -365,11 +369,11 @@ surgescript_var_t* fun_projectedon(surgescript_object_t* object, const surgescri
     const surgescript_vector2_t* me = get_vector(object);
     const surgescript_vector2_t* other = safe_get_vector(surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(param[0])));
     double dot = me->x * other->x + me->y * other->y;
-    double length = other->x * other->x + other->y * other->y;
-    length = max(length, EPS);
+    double length2 = other->x * other->x + other->y * other->y;
+    length2 = max(length2, EPS);
     surgescript_objecthandle_t result = spawn_vector(manager,
-        (dot / length) * other->x,
-        (dot / length) * other->y
+        (dot / length2) * other->x,
+        (dot / length2) * other->y
     );
     return surgescript_var_set_objecthandle(surgescript_var_create(), result);
 }

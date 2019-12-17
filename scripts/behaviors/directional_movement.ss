@@ -115,8 +115,8 @@ object "DirectionalMovement" is "behavior"
     fun set_angle(newAngle)
     {
         if(!Math.approximately(ccwAngle, newAngle)) {
-            this.direction = Vector2.right.rotatedBy(-ccwAngle);
             ccwAngle = newAngle;
+            set_direction(Vector2.right.rotatedBy(ccwAngle));
         }
     }
 

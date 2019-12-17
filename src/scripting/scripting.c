@@ -106,13 +106,13 @@ void scripting_init(int argc, const char** argv)
 void scripting_release()
 {
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-    surgescript_objecthandle_t app = surgescript_objectmanager_application(manager);
+    surgescript_objecthandle_t app_handle = surgescript_objectmanager_application(manager);
+    surgescript_object_t* app = surgescript_objectmanager_get(manager, app_handle);
+    const char* CALL_EXIT_FUNCTOR = "__callExitFunctor";
 
     /* call exit handler (similar to stdlib's atexit()) */
-    surgescript_object_call_function(
-        surgescript_objectmanager_get(manager, app),
-        "__callExitFunctor", NULL, 0, NULL
-    );
+    if(surgescript_object_has_function(app, CALL_EXIT_FUNCTOR))
+        surgescript_object_call_function(app, CALL_EXIT_FUNCTOR, NULL, 0, NULL);
 
     /* release command line arguments */
     while(vm_argc-- > 0)
@@ -336,7 +336,10 @@ void err_fun(const char* message)
 /* register SurgeEngine builtins */
 void setup_surgeengine(surgescript_vm_t* vm)
 {
+    /* first, we setup the coordinate system for SurgeScript */
     surgescript_transform_use_inverted_y(true);
+
+    /* next, we register the SurgeEngine builtins */
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
     scripting_register_animation(vm);

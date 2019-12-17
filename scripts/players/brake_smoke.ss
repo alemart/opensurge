@@ -40,7 +40,7 @@ object "Brake Smoke" is "companion"
     {
         if(!player.midair) {
             feet = player.collider.center.plus(
-                Vector2(0, player.collider.height / 2).rotatedBy(-player.angle)
+                Vector2(0, player.collider.height / 2).rotatedBy(player.angle)
             );
             Level.spawnEntity("Smoke", feet).setScale(scale);
         }
