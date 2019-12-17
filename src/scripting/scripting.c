@@ -288,6 +288,14 @@ surgescript_object_t* scripting_util_get_component(surgescript_object_t* object,
     return surgescript_objectmanager_get(manager, handle);
 }
 
+/* spawns an object as a child of System.__Temp */
+surgescript_object_t* scripting_util_spawn_temp(surgescript_vm_t* vm, const char* object_name)
+{
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    surgescript_objecthandle_t handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+    return surgescript_objectmanager_get(manager, handle);
+}
+
 /* display a scripting error and crash the application */
 void scripting_error(const surgescript_object_t* object, const char* fmt, ...)
 {

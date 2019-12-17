@@ -134,6 +134,7 @@ v2d_t scripting_vector2_to_v2d(const surgescript_object_t* object)
 }
 
 
+
 /* ---- Vector2 API ---- */
 
 /* main state */
@@ -152,21 +153,22 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     return NULL;
 }
 
-/* __init: pass the (x,y) components */
-surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_vector2_t* v = get_vector(object);
-    v->x = surgescript_var_get_number(param[0]);
-    v->y = surgescript_var_get_number(param[1]);
-    return NULL;
-}
-
 /* destructor */
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_vector2_t* v = get_vector(object);
     ssfree(v);
     return NULL;
+}
+
+/* __init: pass the (x,y) components
+   returns the Vector2 itself */
+surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_vector2_t* v = get_vector(object);
+    v->x = surgescript_var_get_number(param[0]);
+    v->y = surgescript_var_get_number(param[1]);
+    return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
 }
 
 /* spawn */

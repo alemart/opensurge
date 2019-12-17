@@ -224,27 +224,16 @@ object 'TransformFactory' \n\
 \n\
 object 'VectorFactory' \n\
 { \n\
+    public readonly up = spawn('Vector2').__init(0, -1); \n\
+    public readonly right = spawn('Vector2').__init(1, 0); \n\
+    public readonly down = spawn('Vector2').__init(0, 1); \n\
+    public readonly left = spawn('Vector2').__init(-1, 0); \n\
+    public readonly zero = spawn('Vector2').__init(0, 0); \n\
     temp = System.child('__Temp'); \n\
-    public readonly up = spawn('Vector2'); \n\
-    public readonly right = spawn('Vector2'); \n\
-    public readonly down = spawn('Vector2'); \n\
-    public readonly left = spawn('Vector2'); \n\
-    public readonly zero = spawn('Vector2'); \n\
 \n\
     fun call(x, y) \n\
     { \n\
-        v = temp.spawn('Vector2'); \n\
-        v.__init(x, y); \n\
-        return v; \n\
-    } \n\
-\n\
-    fun constructor() \n\
-    { \n\
-        up.__init(0, -1); \n\
-        right.__init(1, 0); \n\
-        down.__init(0, 1); \n\
-        left.__init(-1, 0); \n\
-        zero.__init(0, 0); \n\
+        return temp.spawn('Vector2').__init(x, y); \n\
     } \n\
 \n\
     fun destroy() { } \n\
