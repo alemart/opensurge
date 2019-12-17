@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * camera.c - scripting system: camera object
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include <surgescript.h>
 #include "scripting.h"
+#include "../core/video.h"
 #include "../entities/camera.h"
 
 /* private */
@@ -32,6 +33,8 @@ static surgescript_var_t* fun_setposition(surgescript_object_t* object, const su
 static surgescript_var_t* fun_getlocked(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_lock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_unlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_screentoworld(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_worldtoscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
 /*
@@ -49,6 +52,8 @@ void scripting_register_camera(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Camera", "get_locked", fun_getlocked, 0);
     surgescript_vm_bind(vm, "Camera", "lock", fun_lock, 4);
     surgescript_vm_bind(vm, "Camera", "unlock", fun_unlock, 0);
+    surgescript_vm_bind(vm, "Camera", "screenToWorld", fun_screentoworld, 1);
+    surgescript_vm_bind(vm, "Camera", "worldToScreen", fun_worldtoscreen, 1);
 }
 
 /* constructor */
@@ -136,4 +141,42 @@ surgescript_var_t* fun_unlock(surgescript_object_t* object, const surgescript_va
 {
     camera_unlock();
     return NULL;
+}
+
+/* converts a point from screen space to world space */
+surgescript_var_t* fun_screentoworld(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_objecthandle_t new_handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+    v2d_t point = scripting_vector2_to_v2d(surgescript_objectmanager_get(manager, handle));
+    v2d_t screen_center = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t camera_topleft = v2d_subtract(camera_get_position(), screen_center);
+
+    /* convert to world space */
+    scripting_vector2_update(
+        surgescript_objectmanager_get(manager, new_handle),
+        point.x + camera_topleft.x, point.y + camera_topleft.y
+    );
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), new_handle);
+}
+
+/* converts a point from world space to screen space */
+surgescript_var_t* fun_worldtoscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_objecthandle_t new_handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+    v2d_t point = scripting_vector2_to_v2d(surgescript_objectmanager_get(manager, handle));
+    v2d_t screen_center = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t camera_topleft = v2d_subtract(camera_get_position(), screen_center);
+
+    /* convert to screen space */
+    scripting_vector2_update(
+        surgescript_objectmanager_get(manager, new_handle),
+        point.x - camera_topleft.x, point.y - camera_topleft.y
+    );
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), new_handle);
 }
