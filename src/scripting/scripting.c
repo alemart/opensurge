@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * surgescript.c - scripting system
+ * scripting.c - scripting system
  * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
