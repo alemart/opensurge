@@ -2853,7 +2853,7 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point,
             /* sanity check for entities */
             if(surgescript_object_has_tag(object, "detached") && !surgescript_object_has_tag(object, "private")) {
                 surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
-                logfile_message("WARNING: object \"%s\" is tagged as detached, but not private. Fixing...");
+                logfile_message("WARNING: object \"%s\" is tagged detached, but not private. Fixing...", object_name);
                 surgescript_tagsystem_add_tag(tag_system, object_name, "private");
             }
         }
