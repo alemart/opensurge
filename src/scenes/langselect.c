@@ -288,11 +288,11 @@ int dirfill(const char *filename, void *param)
     int *c = (int*)param;
     int supver, subver, wipver;
 
-    lang_readcompatibility(filename, &supver, &subver, &wipver);
+    lang_compatibility(filename, &supver, &subver, &wipver);
     if(game_version_compare(supver, subver, wipver) >= 0) {
         str_cpy(lngdata[*c].filepath, filename, sizeof(lngdata[*c].filepath));
-        lang_readstring(filename, "LANG_NAME", lngdata[*c].title, sizeof( lngdata[*c].title ));
-        lang_readstring(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
+        lang_metadata(filename, "LANG_NAME", lngdata[*c].title, sizeof( lngdata[*c].title ));
+        lang_metadata(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
         (*c)++;
     }
     if(game_version_compare(supver, subver, wipver) != 0)
@@ -306,7 +306,7 @@ int dircount(const char *filename, void *param)
     int *lngcount = (int*)param;
     int supver, subver, wipver;
 
-    lang_readcompatibility(filename, &supver, &subver, &wipver);
+    lang_compatibility(filename, &supver, &subver, &wipver);
     if(game_version_compare(supver, subver, wipver) >= 0)
         (*lngcount)++;
 

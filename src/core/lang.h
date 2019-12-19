@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * lang.h - language/translation module
- * Copyright (C) 2009  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2009, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,12 +27,13 @@
 /* public functions */
 void lang_init();
 void lang_release();
-void lang_readstring(const char *filepath, const char *desired_key, char *str, size_t str_size);
 void lang_loadfile(const char *filepath);
 void lang_getstring(const char *desired_key, char *str, size_t str_size);
 const char *lang_get(const char *desired_key);
+const char *lang_getid();
 bool lang_haskey(const char *desired_key);
-void lang_readcompatibility(const char *filename, int *supver, int *subver, int *wipver);
+void lang_compatibility(const char *filename, int *supver, int *subver, int *wipver);
+void lang_metadata(const char *filepath, const char *desired_key, char *str, size_t str_size);
 
 /* public constants */
 extern const char* DEFAULT_LANGUAGE_FILEPATH;

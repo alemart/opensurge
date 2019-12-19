@@ -28,9 +28,6 @@
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
 
-/* default language file */
-const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
-
 /* fake string type */
 typedef struct { char *data; } stringadapter_t;
 static stringadapter_t* stringadapter_create(const char *data);
@@ -43,9 +40,16 @@ HASHTABLE_GENERATE_CODE(stringadapter_t, stringadapter_destroy);
 static HASHTABLE(stringadapter_t, strings);
 
 /* private stuff */
+#define NULL_STRING "null"
+static char lang_id[32] = NULL_STRING;
 typedef struct { const char *key; const char *value; } inout_t;
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
+
+/* default language file */
+const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
+
+
 
 
 /*
@@ -82,6 +86,7 @@ void lang_loadfile(const char *filepath)
     int supver, subver, wipver;
     parsetree_program_t *prog;
 
+    /* Check if file exists */
     logfile_message("Loading language file \"%s\"...", filepath);
     if(!assetfs_exists(filepath)) {
         if(0 != strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH)) {
@@ -93,23 +98,28 @@ void lang_loadfile(const char *filepath)
             fatal_error("Missing default language file: \"%s\". Please reinstall the game.", DEFAULT_LANGUAGE_FILEPATH);
     }
 
-    lang_readcompatibility(filepath, &supver, &subver, &wipver);
+    /* Compatibility check */
+    lang_compatibility(filepath, &supver, &subver, &wipver);
     if(game_version_compare(supver, subver, wipver) < 0) /* backwards compatibility */
         fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%s)!", filepath, supver, subver, wipver, GAME_VERSION_STRING);
 
+    /* Read language file to memory */
     fullpath = assetfs_fullpath(filepath);
     prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(prog, traverse);
     prog = nanoparser_deconstruct_tree(prog);
+
+    /* Update ID */
+    lang_getstring("LANG_ID", lang_id, sizeof(lang_id));
 }
 
 
 /*
- * lang_readstring()
+ * lang_metadata()
  * Reads the contents of the desired key directly from the
  * language file (without loading it into memory)
  */
-void lang_readstring(const char *filepath, const char *desired_key, char *str, size_t str_size)
+void lang_metadata(const char *filepath, const char *desired_key, char *str, size_t str_size)
 {
     inout_t param;
     parsetree_program_t *prog;
@@ -123,7 +133,7 @@ void lang_readstring(const char *filepath, const char *desired_key, char *str, s
     nanoparser_traverse_program_ex(prog, (void*)(&param), traverse_inout);
 
     if(param.value == NULL)
-        fatal_error("lang_readstring(\"%s\", \"%s\") failed", filepath, desired_key);
+        fatal_error("lang_metadata(\"%s\", \"%s\") failed", filepath, desired_key);
     else
         str_cpy(str, param.value, str_size);
 
@@ -142,7 +152,7 @@ void lang_getstring(const char *desired_key, char *str, size_t str_size)
     if(s != NULL)
         str_cpy(str, stringadapter_get_data(s), str_size);
     else
-        str_cpy(str, "null", str_size);
+        str_cpy(str, NULL_STRING, str_size);
 }
 
 
@@ -159,15 +169,24 @@ const char *lang_get(const char *desired_key)
 }
 
 
+/*
+ * lang_getid()
+ * Returns LANG_ID (fast)
+ */
+const char *lang_getid()
+{
+    return lang_id;
+}
+
 
 /*
- * lang_readcompatibility()
+ * lang_compatibility()
  * Language files are made for specific game versions
  */
-void lang_readcompatibility(const char *filename, int *supver, int *subver, int *wipver)
+void lang_compatibility(const char *filename, int *supver, int *subver, int *wipver)
 {
     char compat[32];
-    lang_readstring(filename, "LANG_COMPATIBILITY", compat, sizeof(compat));
+    lang_metadata(filename, "LANG_COMPATIBILITY", compat, sizeof(compat));
     if(sscanf(compat, "%d.%d.%d", supver, subver, wipver) < 3)
         *supver = *subver = *wipver = 0;
 }
