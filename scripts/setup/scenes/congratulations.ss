@@ -25,8 +25,6 @@ object "Congratulations"
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
         ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_DONATE", "$CONGRATULATIONS_BACK" ]
     ).withSpacing(211).withAxisAngle(0).build();
-    shareURL = "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
-    donateURL = "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     nextState = "";
 
     state "main"
@@ -62,12 +60,12 @@ object "Congratulations"
     {
         if(buttonIndex == 0) {
             // share
-            Web.launchURL(shareURL);
+            Web.launchURL(shareURL());
             fadeTo("back");
         }
         else if(buttonIndex == 1) {
             // donate
-            Web.launchURL(donateURL);
+            Web.launchURL(donateURL());
             fadeTo("back");
         }
         else if(buttonIndex == 2) {
@@ -80,6 +78,16 @@ object "Congratulations"
     {
         nextState = newState;
         state = "waitToFade";
+    }
+
+    fun shareURL()
+    {
+        return "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
+    }
+
+    fun donateURL()
+    {
+        return "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     }
 }
 

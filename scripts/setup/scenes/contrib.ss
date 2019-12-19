@@ -28,7 +28,6 @@ object "Contribute Page"
 // it's similar to atexit() from the C standard library
 object "On Exit"
 {
-    url = "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     contrib = "contrib-" + SurgeEngine.version;
     contribInterval = 31536000; // 1 year
 
@@ -37,7 +36,12 @@ object "On Exit"
         lastContrib = Number(Prefs[contrib] || 0);
         if(Date.unixtime >= lastContrib + contribInterval) {
             Prefs[contrib] = Date.unixtime;
-            Web.launchURL(url);
+            Web.launchURL(donateURL());
         }
+    }
+
+    fun donateURL()
+    {
+        return "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     }
 }

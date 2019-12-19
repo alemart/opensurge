@@ -44,7 +44,6 @@ object "MainMenu"
     camera = spawn("MainMenuCameraEffect")
         .startingAt(Screen.width * 0.7, Screen.height * 0.8)
         .during(0.7);
-    shareURL = "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     nextState = "";
 
     state "main"
@@ -108,7 +107,7 @@ object "MainMenu"
         }
         else if(buttonIndex == 2) {
             // share
-            Web.launchURL(shareURL);
+            Web.launchURL(shareURL());
             fadeTo("restart");
         }
         else if(buttonIndex == 3) {
@@ -132,6 +131,11 @@ object "MainMenu"
         player = Player.active;
         player.lives = Player.initialLives;
         player.score = 0;
+    }
+
+    fun shareURL()
+    {
+        return "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     }
 
     fun constructor()
