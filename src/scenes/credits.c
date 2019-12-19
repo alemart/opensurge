@@ -232,6 +232,10 @@ Dalton Maag / Canonical Ltd \n\
 --- fonts/Ubuntu-M.ttf (Ubuntu Font Licence 1.0) \n\
 --- fonts/Ubuntu-B.ttf (Ubuntu Font Licence 1.0) \n\
 \n\
+HanYang I&C Co Ltd \n\
+--- fonts/GothicA1-Medium.ttf (SIL Open Font License 1.1) \n\
+--- fonts/GothicA1-Bold.ttf (SIL Open Font License 1.1) \n\
+\n\
 Clint Bellanger \n\
 --- fonts/good_neighbors.png (CC-0) \n\
 \n\
