@@ -52,6 +52,7 @@
 #endif
 #define FONT_TEXTMAXSIZE           16384    /* maximum size for texts */
 #define FONT_STACKCAPACITY         8        /* color stack capacity */
+#define FONT_PATHMAX               1024     /* buffer size for multilingual paths */
 static bool allow_antialias = true; /* allow antialiasing for all TTF fonts? */
 
 /* ------------------------------- */
@@ -91,7 +92,7 @@ struct fontscript_t {
     union {
         /* bitmap */
         struct {
-            char source_file[1024]; /* source file (relative file path) */
+            char source_file[FONT_PATHMAX]; /* source file (relative file path) */
             int source_rect[4]; /* spritesheet rect: x, y, width, height */
             int spacing[2]; /* character spacing: x, y */
             charproperties_t chr[256]; /* properties of char x (0..255) */
@@ -99,7 +100,7 @@ struct fontscript_t {
 
         /* true-type */
         struct {
-            char source_file[1024]; /* source file (relative file path) */
+            char source_file[FONT_PATHMAX]; /* source file (relative file path) */
             int size; /* font size */
             bool antialias; /* enable antialiasing? */
             bool shadow; /* enable shadow? */
@@ -143,12 +144,13 @@ struct fontdrv_ttf_t { /* truetype font */
     int size; /* font size */
     bool antialias; /* enable antialiasing? */
     bool shadow; /* enable shadow? */
+    char source_file[FONT_PATHMAX]; /* multilingual paths */
 };
 static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt);
 static void fontdrv_ttf_release(fontdrv_t *fnt);
-static void load_ttf(fontdrv_ttf_t *fnt, const char *fullpath);
+static void load_ttf(fontdrv_ttf_t *fnt);
 static void unload_ttf(fontdrv_ttf_t *fnt);
 
 /* ------------------------------- */
@@ -1329,20 +1331,19 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t *fnt, const char *string)
 
 fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bool shadow)
 {
-    const char *fullpath = assetfs_fullpath(source_file);
-    fontdrv_ttf_t *f = mallocx(sizeof *f);
-
     /* basic setup */
+    fontdrv_ttf_t *f = mallocx(sizeof *f);
     ((fontdrv_t*)f)->textout = fontdrv_ttf_textout;
     ((fontdrv_t*)f)->textsize = fontdrv_ttf_textsize;
     ((fontdrv_t*)f)->charspacing = fontdrv_ttf_charspacing;
     ((fontdrv_t*)f)->release = fontdrv_ttf_release;
 
     /* load font */
+    str_cpy(f->source_file, source_file, sizeof(f->source_file));
     f->size = max(size, 0); /* height of glyphs in pixels */
     f->antialias = allow_antialias && antialias;
     f->shadow = shadow;
-    load_ttf(f, fullpath);
+    load_ttf(f);
 
     /* done! */
     return (fontdrv_t*)f;
@@ -1479,8 +1480,9 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
 #endif
 }
 
-void load_ttf(fontdrv_ttf_t *fnt, const char *fullpath)
+void load_ttf(fontdrv_ttf_t *fnt)
 {
+    const char* fullpath = assetfs_fullpath(fnt->source_file);
     logfile_message("Loading TrueType font \"%s\"...", fullpath);
 
 #if defined(A5BUILD)
