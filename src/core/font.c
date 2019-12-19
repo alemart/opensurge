@@ -144,14 +144,20 @@ struct fontdrv_ttf_t { /* truetype font */
     int size; /* font size */
     bool antialias; /* enable antialiasing? */
     bool shadow; /* enable shadow? */
-    char source_file[FONT_PATHMAX]; /* multilingual paths */
+    char *lang_id; /* current language */
+    char source_file[FONT_PATHMAX]; /* multilingual path */
 };
 static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt);
 static void fontdrv_ttf_release(fontdrv_t *fnt);
+
+/* multilingual support */
 static void load_ttf(fontdrv_ttf_t *fnt);
 static void unload_ttf(fontdrv_ttf_t *fnt);
+static bool must_reload_ttf(fontdrv_ttf_t *fnt);
+static void reload_ttf(fontdrv_ttf_t *fnt);
+static char* extract_language_specific_path(const char *multilingual_path, const char *lang_id, char *dest, size_t dest_size);
 
 /* ------------------------------- */
 
@@ -1343,6 +1349,7 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bo
     f->size = max(size, 0); /* height of glyphs in pixels */
     f->antialias = allow_antialias && antialias;
     f->shadow = shadow;
+    f->lang_id = str_dup(lang_getid());
     load_ttf(f);
 
     /* done! */
@@ -1351,9 +1358,13 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bo
 
 void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
-#if defined(A5BUILD)
-    const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
+    fontdrv_ttf_t *f = (fontdrv_ttf_t*)fnt;
 
+    /* reload TrueType font due to language change */
+    if(must_reload_ttf(f))
+        reload_ttf(f);
+
+#if defined(A5BUILD)
     /* draw shadow */
     if(f->shadow) {
         ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
@@ -1364,29 +1375,33 @@ void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, c
     /* draw text */
     al_draw_text(f->font, color._color, x, y, ALLEGRO_ALIGN_INTEGER, text);
 #else
-    const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
-    image_t *img = video_get_backbuffer();
+    do {
+        image_t *img = video_get_backbuffer();
 
-    /* draw shadow */
-    if(f->shadow) {
-        color_t black = color_rgb(0, 0, 0);
-        alfont_set_font_style(f->ttf, STYLE_BOLD);
-        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y+1, black._value, -1);
-        alfont_set_font_style(f->ttf, STYLE_STANDARD);
-    }
+        /* draw shadow */
+        if(f->shadow) {
+            color_t black = color_rgb(0, 0, 0);
+            alfont_set_font_style(f->ttf, STYLE_BOLD);
+            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y+1, black._value, -1);
+            alfont_set_font_style(f->ttf, STYLE_STANDARD);
+        }
 
-    /* draw text */
-    if(f->antialias)
-        alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
-    else
-        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
+        /* draw text */
+        if(f->antialias)
+            alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
+        else
+            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
+    } while(0);
 #endif
 }
 
 void fontdrv_ttf_release(fontdrv_t *fnt)
 {
-    unload_ttf((fontdrv_ttf_t*)fnt);
-    free(fnt);
+    fontdrv_ttf_t* f = (fontdrv_ttf_t*)fnt;
+
+    unload_ttf(f);
+    free(f->lang_id);
+    free(f);
 }
 
 v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt)
@@ -1480,9 +1495,13 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
 #endif
 }
 
+/* multilingual support for TrueType fonts */
 void load_ttf(fontdrv_ttf_t *fnt)
 {
-    const char* fullpath = assetfs_fullpath(fnt->source_file);
+    const char *fullpath;
+    char buf[FONT_PATHMAX];
+
+    fullpath = assetfs_fullpath(extract_language_specific_path(fnt->source_file, fnt->lang_id, buf, sizeof(buf)));
     logfile_message("Loading TrueType font \"%s\"...", fullpath);
 
 #if defined(A5BUILD)
@@ -1510,4 +1529,73 @@ void unload_ttf(fontdrv_ttf_t *fnt)
         fnt->ttf = NULL;
     }
 #endif
+}
+
+bool must_reload_ttf(fontdrv_ttf_t *fnt)
+{
+    /* there has been a language change */
+    if(0 != strcmp(fnt->lang_id, lang_getid())) {
+        static char buf[2][FONT_PATHMAX];
+        bool same_path = (0 == strcmp(
+            extract_language_specific_path(fnt->source_file, fnt->lang_id, buf[0], sizeof(buf[0])),
+            extract_language_specific_path(fnt->source_file, lang_getid(), buf[1], sizeof(buf[1]))
+        ));
+
+        /* the font hasn't changed;
+           just update the lang_id entry */
+        if(same_path) {
+            free(fnt->lang_id);
+            fnt->lang_id = str_dup(lang_getid());
+            return false;
+        }
+
+        /* we must reload the font */
+        return true;
+    }
+
+    /* the lang_id entries are the same;
+       no need to reload */
+    return false;
+}
+
+void reload_ttf(fontdrv_ttf_t *fnt)
+{
+    logfile_message("Will reload a TrueType font...");
+    unload_ttf(fnt);
+    free(fnt->lang_id);
+    fnt->lang_id = str_dup(lang_getid());
+    load_ttf(fnt);
+}
+
+char* extract_language_specific_path(const char *multilingual_path, const char *lang_id, char *dest, size_t dest_size)
+{
+    /*
+        this routine extracts to dest the appropriate font path from a string formatted as
+        "default_path;lang_id1=path_for_lang_id1;lang_id2=path_for_lang_id2"
+        (that's the multilingual path)
+    */
+    size_t limit, lang_key_length = 1 + strlen(lang_id);
+    char *lang_key = mallocx((lang_key_length + 1) * sizeof(char));
+    const char *base;
+
+    /* lang_key is "${lang_id}=" */
+    snprintf(lang_key, lang_key_length + 1, "%s=", lang_id);
+
+    /* find lang_key in multilingual_path (if it exists) */
+    base = strstr(multilingual_path, lang_key);
+    if(base == NULL)
+        base = multilingual_path;
+    else
+        base += lang_key_length;
+
+    /* find the limit of the path (';' or '\0') */
+    limit = strcspn(base, ";");
+
+    /* copy the appropriate path to dst */
+    strncpy(dest, base, min(dest_size, limit));
+    dest[min(dest_size-1,limit)] = '\0';
+
+    /* done! */
+    free(lang_key);
+    return dest;
 }
