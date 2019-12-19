@@ -29,10 +29,10 @@
 #include "nanoparser/nanoparser.h"
 
 /* fake string type */
-typedef struct { char *data; } stringadapter_t;
-static stringadapter_t* stringadapter_create(const char *data);
+typedef struct { char* data; } stringadapter_t;
+static stringadapter_t* stringadapter_create(const char* data);
 static const char* stringadapter_get_data(const stringadapter_t *s);
-static void stringadapter_set_data(stringadapter_t *s, const char *data);
+static void stringadapter_set_data(stringadapter_t *s, const char* data);
 static void stringadapter_destroy(stringadapter_t *s);
 
 /* hash table */
@@ -42,7 +42,7 @@ static HASHTABLE(stringadapter_t, strings);
 /* private stuff */
 #define NULL_STRING "null"
 static char lang_id[32] = NULL_STRING;
-typedef struct { const char *key; const char *value; } inout_t;
+typedef struct { const char* key; const char* value; } inout_t;
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
 
@@ -80,7 +80,7 @@ void lang_release()
  * lang_loadfile()
  * Loads a language definition file
  */
-void lang_loadfile(const char *filepath)
+void lang_loadfile(const char* filepath)
 {
     const char* fullpath;
     int supver, subver, wipver;
@@ -119,7 +119,7 @@ void lang_loadfile(const char *filepath)
  * Reads the contents of the desired key directly from the
  * language file (without loading it into memory)
  */
-void lang_metadata(const char *filepath, const char *desired_key, char *str, size_t str_size)
+void lang_metadata(const char* filepath, const char* desired_key, char* dest, size_t dest_size)
 {
     inout_t param;
     parsetree_program_t *prog;
@@ -135,7 +135,7 @@ void lang_metadata(const char *filepath, const char *desired_key, char *str, siz
     if(param.value == NULL)
         fatal_error("lang_metadata(\"%s\", \"%s\") failed", filepath, desired_key);
     else
-        str_cpy(str, param.value, str_size);
+        str_cpy(dest, param.value, dest_size);
 
     prog = nanoparser_deconstruct_tree(prog);
 }
@@ -145,14 +145,14 @@ void lang_metadata(const char *filepath, const char *desired_key, char *str, siz
  * lang_getstring()
  * Retrieves some string from the language definition file
  */
-void lang_getstring(const char *desired_key, char *str, size_t str_size)
+char* lang_getstring(const char* desired_key, char* dest, size_t dest_size)
 {
     const stringadapter_t *s = hashtable_stringadapter_t_find(strings, desired_key);
 
     if(s != NULL)
-        str_cpy(str, stringadapter_get_data(s), str_size);
+        str_cpy(dest, stringadapter_get_data(s), dest_size);
     else
-        str_cpy(str, NULL_STRING, str_size);
+        str_cpy(dest, NULL_STRING, dest_size);
 }
 
 
@@ -161,7 +161,7 @@ void lang_getstring(const char *desired_key, char *str, size_t str_size)
  * lang_get()
  * Like lang_getstring(), but returns the string as a static char*
  */
-const char *lang_get(const char *desired_key)
+const char* lang_get(const char* desired_key)
 {
     static char buf[1024];
     lang_getstring(desired_key, buf, sizeof(buf));
@@ -173,7 +173,7 @@ const char *lang_get(const char *desired_key)
  * lang_getid()
  * Returns LANG_ID (fast)
  */
-const char *lang_getid()
+const char* lang_getid()
 {
     return lang_id;
 }
@@ -183,7 +183,7 @@ const char *lang_getid()
  * lang_compatibility()
  * Language files are made for specific game versions
  */
-void lang_compatibility(const char *filename, int *supver, int *subver, int *wipver)
+void lang_compatibility(const char* filename, int* supver, int* subver, int* wipver)
 {
     char compat[32];
     lang_metadata(filename, "LANG_COMPATIBILITY", compat, sizeof(compat));
@@ -196,7 +196,7 @@ void lang_compatibility(const char *filename, int *supver, int *subver, int *wip
  * lang_haskey()
  * Checks if a key exists
  */
-bool lang_haskey(const char *desired_key)
+bool lang_haskey(const char* desired_key)
 {
     const stringadapter_t *s = hashtable_stringadapter_t_find(strings, desired_key);
     return s != NULL;
@@ -207,10 +207,10 @@ bool lang_haskey(const char *desired_key)
 
 int traverse(const parsetree_statement_t *stmt)
 {
-    const char *id = nanoparser_get_identifier(stmt);
+    const char* id = nanoparser_get_identifier(stmt);
     const parsetree_parameter_t *param_list = nanoparser_get_parameter_list(stmt);
     const parsetree_parameter_t *p = nanoparser_get_nth_parameter(param_list, 1);
-    const char *key, *value;
+    const char* key, *value;
     stringadapter_t *s;
 
     if(nanoparser_get_number_of_parameters(param_list) != 1) 
@@ -231,7 +231,7 @@ int traverse(const parsetree_statement_t *stmt)
 int traverse_inout(const parsetree_statement_t *stmt, void *inout)
 {
     inout_t *x = (inout_t*)inout;
-    const char *id = nanoparser_get_identifier(stmt);
+    const char* id = nanoparser_get_identifier(stmt);
     const parsetree_parameter_t *param_list = nanoparser_get_parameter_list(stmt);
     const parsetree_parameter_t *p = nanoparser_get_nth_parameter(param_list, 1);
 
@@ -247,7 +247,7 @@ int traverse_inout(const parsetree_statement_t *stmt, void *inout)
     return 0;
 }
 
-stringadapter_t* stringadapter_create(const char *data)
+stringadapter_t* stringadapter_create(const char* data)
 {
     stringadapter_t *s = mallocx(sizeof *s);
     s->data = str_dup(data);
@@ -265,7 +265,7 @@ const char* stringadapter_get_data(const stringadapter_t *s)
     return s->data;
 }
 
-void stringadapter_set_data(stringadapter_t *s, const char *data)
+void stringadapter_set_data(stringadapter_t *s, const char* data)
 {
     free(s->data);
     s->data = str_dup(data);
