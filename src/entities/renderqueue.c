@@ -65,21 +65,22 @@ static int size = 0;
 static v2d_t camera;
 
 /* utilities */
+#define ZINDEX_OFFSET(n) (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum offset */
+
 static int cmp_fun(const void *i, const void *j)
 {
     const renderqueue_cell_t *a = (const renderqueue_cell_t*)i;
     const renderqueue_cell_t *b = (const renderqueue_cell_t*)j;
+    float za = a->zindex(a->entity), zb = b->zindex(b->entity);
 
-    if(fabs(a->zindex(a->entity) - b->zindex(b->entity)) < 1e-7) {
+    if(fabs(za - zb) * 10.0f < ZINDEX_OFFSET(1)) {
         if(a->type(a->entity) == b->type(b->entity))
             return a->ypos(a->entity) - b->ypos(b->entity);
         else
             return 0;
     }
-    else if(a->zindex(a->entity) < b->zindex(b->entity))
-        return -1;
     else
-        return 1;
+        return (za > zb) - (za < zb);
 }
 
 static inline float brick_zindex_offset(const brick_t *brick)
@@ -88,19 +89,21 @@ static inline float brick_zindex_offset(const brick_t *brick)
 
     /* a hackish solution... */
     switch(brick_type(brick)) {
-        case BRK_PASSABLE:  s -= 0.00002f;  break;
-        case BRK_CLOUD:     s -= 0.00001f;  break;
+        case BRK_PASSABLE:  s -= ZINDEX_OFFSET(20); break;
+        case BRK_CLOUD:     s -= ZINDEX_OFFSET(10); break;
         case BRK_SOLID:     break;
     }
 
     switch(brick_layer(brick)) {
-        case BRL_YELLOW:    s -= 0.00005f;  break;
-        case BRL_GREEN:     s += 0.00005f;  break;
+        case BRL_YELLOW:    s -= ZINDEX_OFFSET(50); break;
+        case BRL_GREEN:     s += ZINDEX_OFFSET(50); break; /* |layer offset| > max |type offset| */
         case BRL_DEFAULT:   break;
     }
 
+    /* static bricks should appear behind moving bricks
+       if they share the same zindex, type and layer */
     if(brick_behavior(brick) == BRB_DEFAULT)
-        s -= 0.000001f;
+        s -= ZINDEX_OFFSET(1);
     
     /* done */
     return s;
@@ -109,21 +112,31 @@ static inline float brick_zindex_offset(const brick_t *brick)
 static inline float player_zindex_offset(const player_t *player)
 {
     switch(player_layer(player)) {
-        case BRL_YELLOW:    return -0.000005f;
-        case BRL_GREEN:     return 0.000005f;
+        case BRL_YELLOW:    return -ZINDEX_OFFSET(2);
+        case BRL_GREEN:     return ZINDEX_OFFSET(2);
         default:            return 0.0f;
     }
 }
 
+static inline float object_zindex_offset(const surgescript_object_t* object)
+{
+    return -ZINDEX_OFFSET(5); /* |object offset| > |player offset| */
+}
+
+static inline float legacy_zindex_offset()
+{
+    return -ZINDEX_OFFSET(5); /* |object offset| > |player offset| */
+}
+
 /* private strategies */
 static float zindex_particles(renderable_t r) { return 1.0f; }
-static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 0.99999f : 0.5f + player_zindex_offset(r.player); }
-static float zindex_item(renderable_t r) { return r.item->bring_to_back ? 0.49999f : 0.5f; }
-static float zindex_object(renderable_t r) { return r.object->zindex; }
+static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? (1.0f - ZINDEX_OFFSET(1)) : (0.5f + player_zindex_offset(r.player)); }
+static float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f) + legacy_zindex_offset(); }
+static float zindex_object(renderable_t r) { return r.object->zindex + legacy_zindex_offset(); }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
 static float zindex_brick_mask(renderable_t r) { return 99999.0f + brick_zindex_offset(r.brick); }
-static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
-static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
+static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject) + object_zindex_offset(r.ssobject); }
+static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject) + object_zindex_offset(r.ssobject); } /* TODO: check children */
 static float zindex_background(renderable_t r) { return 0.0f; }
 static float zindex_foreground(renderable_t r) { return 1.0f; }
 static float zindex_water(renderable_t r) { return 1.0f; }
