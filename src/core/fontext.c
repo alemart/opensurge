@@ -64,8 +64,6 @@ static const char* f_game_year() { return GAME_YEAR; }
  */
 void fontext_register_variables()
 {
-    font_register_variable("$", f_dollar);
-    font_register_variable("$$", f_dollar);
     font_register_variable("$DOLLAR", f_dollar);
     font_register_variable("$LT", f_lowerthan);
     font_register_variable("$GT", f_greaterthan);
