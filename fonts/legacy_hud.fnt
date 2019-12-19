@@ -6,7 +6,7 @@ font "hud_title"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf"
+        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
         size                    24
         antialias
     }
@@ -16,7 +16,7 @@ font "hud_subtext"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf"
+        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
         size                    13
     }
 }

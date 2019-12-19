@@ -8,7 +8,7 @@ font "menu.title"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf"
+        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
         size                    24
         antialias
         shadow
@@ -20,7 +20,7 @@ font "menu.text"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
         size                    13
         shadow
     }
@@ -31,7 +31,7 @@ font "menu.small"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
         size                    12
         shadow
     }
@@ -42,7 +42,7 @@ font "menu.bold"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf"
+        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
         size                    16
         shadow
         antialias

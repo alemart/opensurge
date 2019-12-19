@@ -18,7 +18,7 @@ font "sans"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
         size                    13
         shadow
     }
@@ -35,7 +35,7 @@ font "default_ttf"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
         size                    13
     }
 }
@@ -45,7 +45,7 @@ font "default_ttf_aa"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
         size                    13
         antialias
         shadow
