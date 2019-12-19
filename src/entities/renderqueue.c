@@ -118,26 +118,21 @@ static inline float player_zindex_offset(const player_t *player)
     }
 }
 
-static inline float object_zindex_offset(const surgescript_object_t* object)
+static inline float misc_zindex_offset()
 {
-    return -ZINDEX_OFFSET(5); /* |object offset| > |player offset| */
-}
-
-static inline float legacy_zindex_offset()
-{
-    return -ZINDEX_OFFSET(5); /* |object offset| > |player offset| */
+    return -ZINDEX_OFFSET(5); /* |this offset| > |player offset| */
 }
 
 /* private strategies */
 static float zindex_particles(renderable_t r) { return 1.0f; }
 static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? (1.0f - ZINDEX_OFFSET(1)) : (0.5f + player_zindex_offset(r.player)); }
-static float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f) + legacy_zindex_offset(); }
-static float zindex_object(renderable_t r) { return r.object->zindex + legacy_zindex_offset(); }
+static float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f) + misc_zindex_offset(); }
+static float zindex_object(renderable_t r) { return r.object->zindex + misc_zindex_offset(); }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
 static float zindex_brick_mask(renderable_t r) { return 99999.0f + brick_zindex_offset(r.brick); }
-static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject) + object_zindex_offset(r.ssobject); }
-static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject) + object_zindex_offset(r.ssobject); } /* TODO: check children */
-static float zindex_background(renderable_t r) { return 0.0f; }
+static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject) + misc_zindex_offset(); }
+static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject) + misc_zindex_offset(); } /* TODO: check children */
+static float zindex_background(renderable_t r) { return misc_zindex_offset(); }
 static float zindex_foreground(renderable_t r) { return 1.0f; }
 static float zindex_water(renderable_t r) { return 1.0f; }
 
