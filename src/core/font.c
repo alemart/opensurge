@@ -46,14 +46,19 @@
 
 /* private stuff */
 #if defined(A5BUILD)
-#define IMAGE2BITMAP(img)          (*((ALLEGRO_BITMAP**)(img)))
+#define IMAGE2BITMAP(img)           (*((ALLEGRO_BITMAP**)(img)))
 #else
-#define IMAGE2BITMAP(img)          (*((BITMAP**)(img)))   /* crazy stuff */
+#define IMAGE2BITMAP(img)           (*((BITMAP**)(img)))
 #endif
-#define FONT_TEXTMAXSIZE           16384    /* maximum size for texts */
-#define FONT_STACKCAPACITY         8        /* color stack capacity */
-#define FONT_PATHMAX               1024     /* buffer size for multilingual paths */
-static bool allow_antialias = true; /* allow antialiasing for all TTF fonts? */
+#define FONT_STACKCAPACITY          8        /* color stack capacity */
+#define FONT_TEXTMAXSIZE            16384    /* maximum size for texts */
+#define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
+static bool allow_antialias = true;          /* allow antialiasing for all TTF fonts? */
+
+/* macros */
+#define IS_VAR_ANYCHAR(c)           ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
+#define IS_VAR_1STCHAR(c)           ((c) != '\0' && ((isalpha((unsigned char)(c))) || ((c) == '_')))
+#define IS_TAG_1STCHAR(c)           ((c) != '\0' && ((isalpha((unsigned char)(c))) || ((c) == '/')))
 
 /* ------------------------------- */
 
@@ -69,7 +74,6 @@ static HASHTABLE(fontcallback_t, callback_table);
 /* ------------------------------- */
 
 /* font scripts (nanoparser) */
-#define IS_IDENTIFIER_CHAR(c)      ((c) != '\0' && ((isalnum((unsigned char)(c))) || ((c) == '_')))
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_block(const parsetree_statement_t *stmt, void *data);
 static int traverse_bmp(const parsetree_statement_t *stmt, void *data);
@@ -195,7 +199,7 @@ struct font_t {
 
 /* misc */
 static const char* get_variable(const char *key);
-static inline int has_variables_to_expand(const char *str, int *passes);
+static inline bool has_variables_to_expand(const char *str, int *passes);
 static void expand_variables(char *str, fontargs_t args, size_t size);
 static void convert_to_ascii(char *str);
 static int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t color_stack[], int* stack_top);
@@ -591,10 +595,12 @@ void font_set_maxlength(font_t* f, int maxlength)
 const char* get_variable(const char *key)
 {
     fontcallback_t fun = callbacktable_find(key);
+    static char buf[1024];
+
     if(fun != NULL)
         return fun();
     else
-        return lang_get(key+1); /* skip the '$' */
+        return lang_getstring(key+1, buf, sizeof(buf)); /* skip the '$' */
 }
 
 
@@ -615,8 +621,8 @@ void expand_variables(char *str, fontargs_t args, size_t size)
         while(*p && *p != '$' && (q - buf < sizeof(buf) - 1))
             *(q++) = *(p++);
 
-        /* found a variable! */
-        if(*p == '$') {
+        /* found a variable or a pattern ($1, $2...) */
+        if(*p == '$' && IS_VAR_ANYCHAR(p[1])) {
             char varname[64], *r;
             const char *value = NULL, *u;
 
@@ -624,19 +630,19 @@ void expand_variables(char *str, fontargs_t args, size_t size)
             r = varname;
             do {
                 *(r++) = *(p++);
-            } while(IS_IDENTIFIER_CHAR(*p) && (r - varname < sizeof(varname) - 1));
-            *r = 0;
+            } while(IS_VAR_ANYCHAR(*p) && (r - varname < sizeof(varname) - 1));
+            *r = '\0';
 
             /* get the contents of varname */
-            if(isdigit(varname[1]) && varname[2] == 0) {
+            if(!IS_VAR_1STCHAR(varname[1])) {
                 /* match $1, $2, ... */
                 if(varname[1] >= '1' && varname[1] <= '0' + FONTARGS_MAX)
                     value = args[ varname[1] - '1' ]; /* may be NULL */
                 if(value == NULL)
-                    value = varname; /* get the digit */
+                    value = varname; /* get the digit if there is no argument */
             }
             else {
-                /* match other variables */
+                /* match a variable */
                 value = get_variable(varname);
             }
 
@@ -646,28 +652,31 @@ void expand_variables(char *str, fontargs_t args, size_t size)
                     *(q++) = *(u++);
             }
         }
+        else if(*p == '$' && (q - buf < sizeof(buf) - 1))
+            *(q++) = *(p++); /* found a single dollar sign */
     }
-    *q = 0;
+    *q = '\0';
 
     /* copy back into str */
     str_cpy(str, buf, size);
 }
 
 
-/* has_variables_to_expand() */
-int has_variables_to_expand(const char *str, int *passes)
+/* does the string have variables or patterns ($1, $2...) to expand? */
+bool has_variables_to_expand(const char *str, int *passes)
 {
-    static const int MAX_PASSES = 3; /* won't expand more than this */
+    const int MAX_PASSES = 3; /* won't expand more than this */
+
     if(++(*passes) > MAX_PASSES)
-        return FALSE;
+        return false;
 
     while(*str) {
-        if(*str == '$' && IS_IDENTIFIER_CHAR(str[1]))
-            return TRUE;
+        if(*str == '$' && IS_VAR_ANYCHAR(str[1]))
+            return true;
         str++;
     }
 
-    return FALSE;
+    return false;
 }
 
 
@@ -690,7 +699,7 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t col
 {
     static char linebuf[FONT_TEXTMAXSIZE];
     char *p, *q;
-    size_t j = 0, prev_j = 0;
+    size_t j = 0;
     uint32_t chr, tag = 0;
     #define _print_linebuf() \
         do { \
@@ -703,15 +712,15 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t col
 
     *(p = linebuf) = 0;
     while((chr = u8_nextchar(text, &j)) != 0) {
-        if(!tag && chr == '<') {
+        if(!tag && chr == '<' && IS_TAG_1STCHAR(text[j])) {
             /* read tag */
-            const char* tag_name = text + prev_j + 1;
-            if(isalpha(tag_name[0])) {
+            const char* tag_name = text + j;
+            if(tag_name[0] != '/') {
                 /* open tag */
                 if(strncmp(tag_name, "color=", 6) == 0) {
                     /* color tag */
-                    char hex_code[7] = { 0 }; int i = 0;
                     const char* color_code = tag_name + 6;
+                    char hex_code[7] = { 0 }; int i = 0;
                     if(*color_code == '#') /* skip '#', if any */
                         ++color_code;
                     while(*color_code && *color_code != '>' && i < sizeof(hex_code) - 1) /* read color */
@@ -723,7 +732,7 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t col
                 }
                 tag = 1;
             }
-            else if(tag_name[0] == '/') {
+            else {
                 /* close tag */
                 if(strncmp(tag_name, "/color>", 7) == 0) {
                     if(*stack_top > 0) {
@@ -746,7 +755,6 @@ int print_line(const fontdrv_t *drv, const char* text, int x, int y, color_t col
             for(q = buf; *q && p - linebuf < sizeof(linebuf) - 1; *p = 0)
                 *(p++) = *(q++);
         }
-        prev_j = j;
     }
     _print_linebuf();
 
@@ -857,7 +865,7 @@ static char* tagged_text_offset(char* txt, int charnum)
 
     /* lookup */
     for(prev_i = i = 0; (chr = u8_nextchar(txt, &i)) != 0; prev_i = i) {
-        if(!tag && chr == '<' && (isalpha(txt[i]) || txt[i] == '/'))
+        if(!tag && chr == '<' && IS_TAG_1STCHAR(txt[i]))
             tag = 1;
         else if(tag && chr == '>')
             tag = 0;
@@ -1306,14 +1314,14 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t *fnt, const char *string)
     v2d_t sp = f->spacing;
     int width = 0, line_width = 0;
     int height = f->line_height;
-    int tag = FALSE;
+    bool tag = false;
     const char* p;
 
     for(p = string; *p; p++) {
-        if(!tag && *p == '<' && (isalpha(p[1]) || p[1] == '/'))
-            tag = TRUE;
+        if(!tag && *p == '<' && IS_TAG_1STCHAR(p[1]))
+            tag = true;
         else if(tag && *p == '>')
-            tag = FALSE;
+            tag = false;
         else if(tag)
             continue;
         else if(*p == '\n') {
@@ -1423,17 +1431,17 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
     int width = 0, line_width = 0;
     int line_height = al_get_font_line_height(f->font);
     int height = line_height;
-    int tag = FALSE;
+    bool tag = false;
     size_t i = 0;
     uint32_t ch;
 
     *(p = linebuf) = 0;
     while(string[i]) {
         ch = u8_nextchar(string, &i);
-        if(!tag && ch == '<' && (isalpha(string[i]) || string[i] == '/'))
-            tag = TRUE;
+        if(!tag && ch == '<' && IS_TAG_1STCHAR(string[i]))
+            tag = true;
         else if(tag && ch == '>')
-            tag = FALSE;
+            tag = false;
         else if(tag)
             continue;
         else if(ch == '\n') {
@@ -1461,17 +1469,17 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
     int width = 0, line_width = 0;
     int line_height = alfont_text_height(f->ttf);
     int height = line_height;
-    int tag = FALSE;
+    bool tag = false;
     size_t i = 0;
     uint32_t ch;
 
     *(p = linebuf) = 0;
     while(string[i]) {
         ch = u8_nextchar(string, &i);
-        if(!tag && ch == '<' && (isalpha(string[i]) || string[i] == '/'))
-            tag = TRUE;
+        if(!tag && ch == '<' && IS_TAG_1STCHAR(string[i]))
+            tag = true;
         else if(tag && ch == '>')
-            tag = FALSE;
+            tag = false;
         else if(tag)
             continue;
         else if(ch == '\n') {
