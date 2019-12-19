@@ -11,6 +11,7 @@
 //
 
 // Translation metadata
+// (use the English alphabet)
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
@@ -24,7 +25,7 @@ COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
 //
-// Note to translators:
+// Translators:
 //
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
@@ -32,8 +33,12 @@ COLOR_HUDDANGER             "ff0000"
 // you're translating is preserved!
 //
 // After translating, please make sure you test everything.
-// In the options screen, highlight "Stage select", press
-// right 3 times and enter. You'll see all .lev files.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
 //
 
 
@@ -180,12 +185,12 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow i
 //
 
 //
-// Note to translators:
+// Translators:
 //
 // Since the game uses bitmap fonts, parts of
 // the translation don't accept special characters.
 //
-// This section does not accept language-specific
+// This section doesn't accept language-specific
 // special characters.
 //
 // If a translation is not possible, you may
