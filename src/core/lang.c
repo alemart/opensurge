@@ -119,9 +119,9 @@ void lang_loadfile(const char* filepath)
 /*
  * lang_metadata()
  * Reads the contents of the desired key directly from the
- * language file (without loading it into memory)
+ * language file, without loading it in memory. Returns dest.
  */
-void lang_metadata(const char* filepath, const char* desired_key, char* dest, size_t dest_size)
+char* lang_metadata(const char* filepath, const char* desired_key, char* dest, size_t dest_size)
 {
     inout_t param;
     parsetree_program_t *prog;
@@ -140,6 +140,7 @@ void lang_metadata(const char* filepath, const char* desired_key, char* dest, si
         str_cpy(dest, param.value, dest_size);
 
     prog = nanoparser_deconstruct_tree(prog);
+    return dest;
 }
 
 

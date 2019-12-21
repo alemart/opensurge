@@ -33,6 +33,6 @@ const char* lang_get(const char* desired_key);
 const char* lang_getid();
 bool lang_haskey(const char* desired_key);
 void lang_compatibility(const char* filename, int* supver, int* subver, int* wipver);
-void lang_metadata(const char* filepath, const char* desired_key, char* dest, size_t dest_size);
+char* lang_metadata(const char* filepath, const char* desired_key, char* dest, size_t dest_size);
 
 #endif
