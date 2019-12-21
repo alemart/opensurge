@@ -148,20 +148,11 @@ struct fontdrv_ttf_t { /* truetype font */
     int size; /* font size */
     bool antialias; /* enable antialiasing? */
     bool shadow; /* enable shadow? */
-    char *lang_id; /* current language */
-    char source_file[FONT_PATHMAX]; /* multilingual path */
 };
 static void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t *fnt);
 static void fontdrv_ttf_release(fontdrv_t *fnt);
-
-/* multilingual support */
-static void load_ttf(fontdrv_ttf_t *fnt);
-static void unload_ttf(fontdrv_ttf_t *fnt);
-static bool must_reload_ttf(fontdrv_ttf_t *fnt);
-static void reload_ttf(fontdrv_ttf_t *fnt);
-static char* extract_language_specific_path(const char *multilingual_path, const char *lang_id, char *dest, size_t dest_size);
 
 /* ------------------------------- */
 
@@ -178,6 +169,7 @@ static void fontdrv_list_init();
 static void fontdrv_list_release();
 static void fontdrv_list_add(const char *name, fontdrv_t *drv);
 static fontdrv_t* fontdrv_list_find(const char *name);
+static fontdrv_t* fontdrv_list_find_ex(const char *name, const char *lang_id);
 
 /* ------------------------------- */
 
@@ -195,6 +187,8 @@ struct font_t {
     int index_of_first_char, length; /* substring (deprecated) */
     fontargs_t argument; /* text arguments: $1, $2 ... $<FONTARGS_MAX> */
     fontalign_t align; /* alignment */
+    char *lang_id; /* current language ID (multilingual support) */
+    char *name; /* font name (not language specific) */
 };
 
 /* misc */
@@ -207,6 +201,9 @@ static int print_aligned_line(const fontdrv_t *drv, const char* text, fontalign_
 static char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width);
 static int find_blanks(int blank[], size_t size, const char* text);
 static char* tagged_text_offset(char* txt, int charnum);
+static char* join_names(const char* name, const char* lang_id);
+static bool must_refresh_driver(const font_t* fnt);
+static void refresh_driver(font_t* fnt);
 
 /*
  * font_init()
@@ -309,10 +306,12 @@ font_t *font_create(const char *font_name)
     f->index_of_first_char = 0;
     f->length = FONT_TEXTMAXSIZE - 1;
     f->align = FONTALIGN_LEFT;
+    f->name = str_dup(font_name);
+    f->lang_id = str_dup(lang_getid());
 
-    f->drv = fontdrv_list_find(font_name);
+    f->drv = fontdrv_list_find_ex(f->name, f->lang_id);
     if(f->drv == NULL)
-        fatal_error("Can't find font \"%s\"", font_name);
+        fatal_error("Can't find font \"%s\"", f->name);
 
     for(i=0; i<FONTARGS_MAX; i++)
         f->argument[i] = NULL;
@@ -336,6 +335,8 @@ void font_destroy(font_t *f)
             free(f->argument[i]);
     }
 
+    free(f->lang_id);
+    free(f->name);
     free(f->text);
     free(f);
 }
@@ -428,7 +429,7 @@ void font_set_width(font_t *f, int w)
  * font_render()
  * Renders the text
  */
-void font_render(const font_t *f, v2d_t camera_position)
+void font_render(font_t *f, v2d_t camera_position)
 {
     color_t stack[FONT_STACKCAPACITY] = { color_rgb(255, 255, 255) }; /* color stack */
     int stack_top = 0, offset = -1;
@@ -439,6 +440,15 @@ void font_render(const font_t *f, v2d_t camera_position)
     /* not visible? */
     if(!f->visible)
         return;
+
+    /* multilingual support */
+    if(must_refresh_driver(f))
+        refresh_driver(f);
+
+    /* compute screen position */
+    pos = v2d_subtract(f->position, v2d_subtract(camera_position,
+        v2d_multiply(video_get_screen_size(), 0.5f)
+    ));
 
     /* use substring? */
     if(f->index_of_first_char > 0) {
@@ -454,11 +464,6 @@ void font_render(const font_t *f, v2d_t camera_position)
             text[offset] = 0;
         }
     }
-
-    /* compute screen position */
-    pos = v2d_subtract(f->position, v2d_subtract(camera_position,
-        v2d_multiply(video_get_screen_size(), 0.5f)
-    ));
 
     /* for each line p of text (split using '\n') */
     for(p = q = text; q != NULL; ) {
@@ -665,15 +670,14 @@ void expand_variables(char *str, fontargs_t args, size_t size)
 /* does the string have variables or patterns ($1, $2...) to expand? */
 bool has_variables_to_expand(const char *str, int *passes)
 {
-    const int MAX_PASSES = 3; /* won't expand more than this */
+    const int MAX_PASSES = 3; /* won't expand more times than this */
 
     if(++(*passes) > MAX_PASSES)
         return false;
 
-    while(*str) {
+    for(; *str; str++) {
         if(*str == '$' && IS_VAR_ANYCHAR(str[1]))
             return true;
-        str++;
     }
 
     return false;
@@ -877,6 +881,36 @@ static char* tagged_text_offset(char* txt, int charnum)
     return NULL;
 }
 
+/* join_names(): joins name and lang_id into a single string
+   you must free() the returned pointer after usage */
+char* join_names(const char* name, const char* lang_id)
+{
+    size_t size = (2 + strlen(name) + strlen(lang_id));
+    char* str = mallocx(size * sizeof(*str));
+    snprintf(str, size, "%s:%s", name, lang_id);
+    return str;
+}
+
+/* true if we must refresh the font driver
+   due to a language change */
+bool must_refresh_driver(const font_t* fnt)
+{
+    return (0 != strcmp(fnt->lang_id, lang_getid()));
+}
+
+/* refresh the font driver to match
+   the correct language */
+void refresh_driver(font_t* fnt)
+{
+    /* update fnt->lang_id to be the current language ID */
+    free(fnt->lang_id);
+    fnt->lang_id = str_dup(lang_getid());
+
+    /* update the driver */
+    fnt->drv = fontdrv_list_find_ex(fnt->name, fnt->lang_id);
+    if(fnt->drv == NULL)
+        fatal_error("Can't find font \"%s\"", fnt->name);
+}
 
 /* ------------------------------------------------- */
 /* read the font scripts */
@@ -890,16 +924,36 @@ int traverse(const parsetree_statement_t *stmt)
     if(str_icmp(id, "font") == 0) {
         const parsetree_parameter_t *p1 = nanoparser_get_nth_parameter(param_list, 1);
         const parsetree_parameter_t *p2 = nanoparser_get_nth_parameter(param_list, 2);
-        const char *name = NULL;
-        fontdrv_t *drv = NULL;
         fontscript_t header;
+        fontdrv_t *drv;
+        char *name;
 
         /* read the data */
         nanoparser_expect_string(p1, "Font script error: font name is expected");
-        name = nanoparser_get_string(p1);
-        logfile_message("Loading font \"%s\" defined in \"%s\"", name, nanoparser_get_file(stmt));
-        nanoparser_expect_program(p2, "Font script error: font block is expected after the font name");
-        nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)(&header), traverse_block);
+        name = str_dup(nanoparser_get_string(p1));
+        logfile_message("Loading font \"%s\" defined in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+        /* is this a language-specific font? */
+        if(nanoparser_get_number_of_parameters(param_list) > 2) {
+            const parsetree_parameter_t *opt_p2 = nanoparser_get_nth_parameter(param_list, 2);
+            const parsetree_parameter_t *opt_p3 = nanoparser_get_nth_parameter(param_list, 3);
+            const char *lang_id = NULL;
+            char *lang_specific_name = NULL;
+
+            /* read the language ID */
+            nanoparser_expect_string(opt_p2, "Font script error: expected \"for\"");
+            if(str_icmp(nanoparser_get_string(opt_p2), "for") != 0)
+                fatal_error("Font script error: invalid format at \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+            nanoparser_expect_string(opt_p3, "Font script error: language ID is expected");
+            lang_id = nanoparser_get_string(opt_p3);
+
+            /* update variables */
+            lang_specific_name = join_names(name, lang_id);
+            free(name);
+            name = lang_specific_name;
+            p2 = nanoparser_get_nth_parameter(param_list, 4); /* block */
+        }
 
         /* duplicate font? */
         if(NULL != fontdrv_list_find(name)) {
@@ -907,6 +961,10 @@ int traverse(const parsetree_statement_t *stmt)
             logfile_message("WARNING: can't redefine font \"%s\" in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
             return 0;
         }
+
+        /* read the block */
+        nanoparser_expect_program(p2, "Font script error: font block is expected after the font name");
+        nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)(&header), traverse_block);
 
         /* create the fontdrv_t */
         switch(header.type) {
@@ -928,13 +986,17 @@ int traverse(const parsetree_statement_t *stmt)
             break;
 
         default:
+            drv = NULL;
             fatal_error("Font script error: unknown font type");
             break;
         }
 
-        /* register the fontdrv_t */
-        fontdrv_list_add(name, drv);
+        /* register the driver */
+        if(drv != NULL)
+            fontdrv_list_add(name, drv);
 
+        /* done */
+        free(name);
     }
     else
         fatal_error("Font script error: unknown identifier \"%s\"\nin \"%s\" near line %d", id, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -1233,6 +1295,20 @@ fontdrv_t* fontdrv_list_find(const char *name)
     return NULL;
 }
 
+/* find the language-specific font driver, or
+   return the generic one if it doesn't exist */
+fontdrv_t* fontdrv_list_find_ex(const char *name, const char *lang_id)
+{
+    char* language_specific_font_name = join_names(name, lang_id);
+    fontdrv_t *drv = fontdrv_list_find(language_specific_font_name);
+
+    if(drv == NULL)
+        drv = fontdrv_list_find(name);
+
+    free(language_specific_font_name);
+    return drv;
+}
+
 
 /* ------------------------------------------------- */
 /* bitmap fonts */
@@ -1345,6 +1421,8 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t *fnt, const char *string)
 
 fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bool shadow)
 {
+    const char *fullpath = assetfs_fullpath(source_file);
+
     /* basic setup */
     fontdrv_ttf_t *f = mallocx(sizeof *f);
     ((fontdrv_t*)f)->textout = fontdrv_ttf_textout;
@@ -1353,12 +1431,22 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bo
     ((fontdrv_t*)f)->release = fontdrv_ttf_release;
 
     /* load font */
-    str_cpy(f->source_file, source_file, sizeof(f->source_file));
+    logfile_message("Loading TrueType font \"%s\"...", fullpath);
     f->size = max(size, 0); /* height of glyphs in pixels */
     f->antialias = allow_antialias && antialias;
     f->shadow = shadow;
-    f->lang_id = str_dup(lang_getid());
-    load_ttf(f);
+
+#if defined(A5BUILD)
+    f->font = al_load_ttf_font(fullpath, -(f->size), !(f->antialias) ? ALLEGRO_TTF_MONOCHROME : 0);
+    if(f->font == NULL)
+        fatal_error("Failed to load TrueType font \"%s\"", fullpath);
+#else
+    f->ttf = alfont_load_font(fullpath);
+    if(f->ttf != NULL)
+        alfont_set_font_size(f->ttf, f->size);
+    else
+        fatal_error("Couldn't load TrueType font \"%s\"", fullpath);
+#endif
 
     /* done! */
     return (fontdrv_t*)f;
@@ -1366,11 +1454,7 @@ fontdrv_t* fontdrv_ttf_new(const char *source_file, int size, bool antialias, bo
 
 void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, color_t color)
 {
-    fontdrv_ttf_t *f = (fontdrv_ttf_t*)fnt;
-
-    /* reload TrueType font due to language change */
-    if(must_reload_ttf(f))
-        reload_ttf(f);
+    const fontdrv_ttf_t *f = (const fontdrv_ttf_t*)fnt;
 
 #if defined(A5BUILD)
     /* draw shadow */
@@ -1406,9 +1490,11 @@ void fontdrv_ttf_textout(const fontdrv_t *fnt, const char* text, int x, int y, c
 void fontdrv_ttf_release(fontdrv_t *fnt)
 {
     fontdrv_ttf_t* f = (fontdrv_ttf_t*)fnt;
-
-    unload_ttf(f);
-    free(f->lang_id);
+#if defined(A5BUILD)
+    al_destroy_font(f->font);
+#else
+    alfont_destroy_font(f->ttf);
+#endif
     free(f);
 }
 
@@ -1501,109 +1587,4 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t *fnt, const char *string)
     width = max(width, line_width);
     return v2d_new(width, height);
 #endif
-}
-
-/* multilingual support for TrueType fonts */
-void load_ttf(fontdrv_ttf_t *fnt)
-{
-    const char *fullpath;
-    char buf[FONT_PATHMAX];
-
-    fullpath = assetfs_fullpath(extract_language_specific_path(fnt->source_file, fnt->lang_id, buf, sizeof(buf)));
-    logfile_message("Loading TrueType font \"%s\"...", fullpath);
-
-#if defined(A5BUILD)
-    if(NULL == (fnt->font = al_load_ttf_font(fullpath, -(fnt->size), !(fnt->antialias) ? ALLEGRO_TTF_MONOCHROME : 0)))
-        fatal_error("Failed to load TrueType font \"%s\"", fullpath);
-#else
-    fnt->ttf = alfont_load_font(fullpath);
-    if(NULL != fnt->ttf)
-        alfont_set_font_size(fnt->ttf, fnt->size);
-    else
-        fatal_error("Couldn't load TrueType font \"%s\"", fullpath);
-#endif
-}
-
-void unload_ttf(fontdrv_ttf_t *fnt)
-{
-#if defined(A5BUILD)
-    if(fnt->font != NULL) {
-        al_destroy_font(fnt->font);
-        fnt->font = NULL;
-    }
-#else
-    if(fnt->ttf != NULL) {
-        alfont_destroy_font(fnt->ttf);
-        fnt->ttf = NULL;
-    }
-#endif
-}
-
-bool must_reload_ttf(fontdrv_ttf_t *fnt)
-{
-    /* there has been a language change */
-    if(0 != strcmp(fnt->lang_id, lang_getid())) {
-        static char buf[2][FONT_PATHMAX];
-        bool same_path = (0 == strcmp(
-            extract_language_specific_path(fnt->source_file, fnt->lang_id, buf[0], sizeof(buf[0])),
-            extract_language_specific_path(fnt->source_file, lang_getid(), buf[1], sizeof(buf[1]))
-        ));
-
-        /* the font hasn't changed;
-           just update the lang_id entry */
-        if(same_path) {
-            free(fnt->lang_id);
-            fnt->lang_id = str_dup(lang_getid());
-            return false;
-        }
-
-        /* we must reload the font */
-        return true;
-    }
-
-    /* the lang_id entries are the same;
-       no need to reload */
-    return false;
-}
-
-void reload_ttf(fontdrv_ttf_t *fnt)
-{
-    logfile_message("Will reload a TrueType font...");
-    unload_ttf(fnt);
-    free(fnt->lang_id);
-    fnt->lang_id = str_dup(lang_getid());
-    load_ttf(fnt);
-}
-
-char* extract_language_specific_path(const char *multilingual_path, const char *lang_id, char *dest, size_t dest_size)
-{
-    /*
-        this routine extracts to dest the appropriate font path from a string formatted as
-        "default_path;lang_id1=path_for_lang_id1;lang_id2=path_for_lang_id2"
-        (that's the multilingual path)
-    */
-    size_t limit, lang_key_length = 1 + strlen(lang_id);
-    char *lang_key = mallocx((lang_key_length + 1) * sizeof(char));
-    const char *base;
-
-    /* lang_key is "${lang_id}=" */
-    snprintf(lang_key, lang_key_length + 1, "%s=", lang_id);
-
-    /* find lang_key in multilingual_path (if it exists) */
-    base = strstr(multilingual_path, lang_key);
-    if(base == NULL)
-        base = multilingual_path;
-    else
-        base += lang_key_length;
-
-    /* find the limit of the path (';' or '\0') */
-    limit = strcspn(base, ";");
-
-    /* copy the appropriate path to dst */
-    strncpy(dest, base, min(dest_size, limit));
-    dest[min(dest_size-1,limit)] = '\0';
-
-    /* done! */
-    free(lang_key);
-    return dest;
 }

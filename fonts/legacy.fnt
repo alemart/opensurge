@@ -1,12 +1,13 @@
 // Open Surge Engine
 // http://opensurge2d.org
-// HUD fonts for retrocompatibility
+// Legacy fonts for retrocompatibility
 
+// HUD fonts
 font "hud_title"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
         size                    24
         antialias
     }
@@ -16,7 +17,7 @@ font "hud_subtext"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
         size                    13
     }
 }
@@ -40,5 +41,26 @@ font "hud_levelend"
         source_rect             0 0 208 32
         frame_size              8 16
         keymap                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?: "
+    }
+}
+
+// general purpose truetype fonts
+font "default_ttf"
+{
+    truetype
+    {
+        source_file             "fonts/Ubuntu-M.ttf"
+        size                    13
+    }
+}
+
+font "default_ttf_aa"
+{
+    truetype
+    {
+        source_file             "fonts/Ubuntu-M.ttf"
+        size                    13
+        antialias
+        shadow
     }
 }

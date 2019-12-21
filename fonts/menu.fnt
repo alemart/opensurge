@@ -1,14 +1,24 @@
 // Open Surge Engine
 // http://opensurge2d.org
-
-// Engine menus
+// Fonts for the engine menus
 
 // menu: title
 font "menu.title"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
+        size                    24
+        antialias
+        shadow
+    }
+}
+
+font "menu.title" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Bold.ttf"
         size                    24
         antialias
         shadow
@@ -20,7 +30,17 @@ font "menu.text"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
+        size                    13
+        shadow
+    }
+}
+
+font "menu.text" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Medium.ttf"
         size                    13
         shadow
     }
@@ -31,7 +51,17 @@ font "menu.small"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf;ko_KR=fonts/GothicA1-Medium.ttf"
+        source_file             "fonts/Ubuntu-M.ttf"
+        size                    12
+        shadow
+    }
+}
+
+font "menu.small" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Medium.ttf"
         size                    12
         shadow
     }
@@ -42,7 +72,18 @@ font "menu.bold"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-B.ttf;ko_KR=fonts/GothicA1-Bold.ttf"
+        source_file             "fonts/Ubuntu-B.ttf"
+        size                    16
+        shadow
+        antialias
+    }
+}
+
+font "menu.bold" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Bold.ttf"
         size                    16
         shadow
         antialias
