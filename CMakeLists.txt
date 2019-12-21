@@ -437,6 +437,7 @@ SET(GAME_SRCS
   src/entities/particle.c
   src/entities/renderqueue.c
 
+  src/misc/credits.c
   src/misc/icon.c
 
   src/main.c
