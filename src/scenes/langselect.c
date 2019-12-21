@@ -169,7 +169,6 @@ void langselect_update()
         if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
             char *filepath = lngdata[option].filepath;
             logfile_message("Loading language \"%s\", \"%s\"", lngdata[option].title, filepath);
-            lang_loadfile(DEFAULT_LANGUAGE_FILEPATH); /* just in case of missing strings... */
             lang_loadfile(filepath);
             save_preferences(filepath);
             sound_play(SFX_CONFIRM);

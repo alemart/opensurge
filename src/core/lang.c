@@ -42,12 +42,10 @@ static HASHTABLE(stringadapter_t, strings);
 /* private stuff */
 #define NULL_STRING "null"
 static char lang_id[32] = NULL_STRING;
+static const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
 typedef struct { const char* key; const char* value; } inout_t;
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
-
-/* default language file */
-const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
 
 
 
@@ -103,6 +101,10 @@ void lang_loadfile(const char* filepath)
     if(game_version_compare(supver, subver, wipver) < 0) /* backwards compatibility */
         fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%s)!", filepath, supver, subver, wipver, GAME_VERSION_STRING);
 
+    /* Read the default language file to fill in any missing strings */
+    if(strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH) != 0)
+        lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
+
     /* Read language file to memory */
     fullpath = assetfs_fullpath(filepath);
     prog = nanoparser_construct_tree(fullpath);
@@ -150,9 +152,9 @@ char* lang_getstring(const char* desired_key, char* dest, size_t dest_size)
     const stringadapter_t *s = hashtable_stringadapter_t_find(strings, desired_key);
 
     if(s != NULL)
-        str_cpy(dest, stringadapter_get_data(s), dest_size);
+        return str_cpy(dest, stringadapter_get_data(s), dest_size);
     else
-        str_cpy(dest, NULL_STRING, dest_size);
+        return str_cpy(dest, NULL_STRING, dest_size);
 }
 
 
