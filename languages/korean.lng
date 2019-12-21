@@ -1,0 +1,232 @@
+// -----------------------------------------------------------------------------
+// File: languages/korean.lng
+// Description: Korean translation (encoding: utf-8)
+// Author: krumaska & AntsThatWander
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+//
+// Section: generic
+//
+
+// Translation metadata
+LANG_ID                     "ko_KR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Korean"                 // language name
+LANG_AUTHOR                 "krumaska & AntsThatWander"       // translation author
+LANG_LASTUPDATE             "2019-12-18"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.0"                   // required engine version
+
+// Colors
+COLOR_TITLE                 "ff8800"
+COLOR_HIGHLIGHT             "ffee11"
+COLOR_HUD                   "ffff00"
+COLOR_HUDDANGER             "ff0000"
+
+//
+// Note to translators:
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// In the options screen, highlight "Stage select", press
+// right 3 times and enter. You'll see all .lev files.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "<color=$COLOR_TITLE>옵션</color>" 
+OPTIONS_YES                 "네" 
+OPTIONS_NO                  "아니요" 
+OPTIONS_GRAPHICS            "그래픽" 
+OPTIONS_FULLSCREEN          "전체 화면" 
+OPTIONS_RESOLUTION          "화면 크기" 
+OPTIONS_RESOLUTION_OPT1     "1X"
+OPTIONS_RESOLUTION_OPT2     "2X"
+OPTIONS_RESOLUTION_OPT3     "3X"
+OPTIONS_RESOLUTION_OPT4     "4X"
+OPTIONS_SMOOTHGFX           "부드러운 화면"  
+OPTIONS_SMOOTHGFX_ERROR     "[32 bpp만 지원됨]" 
+OPTIONS_FPS                 "FPS 표시" 
+OPTIONS_GAME                "게임" 
+OPTIONS_GAMEPAD             "게임패드 사용" 
+OPTIONS_LANGUAGE            "언어 변경"  
+OPTIONS_STAGESELECT         "스테이지 선택"  
+OPTIONS_CREDITS             "Open Surge 크레딧" 
+OPTIONS_DONATE              "Open Surge에 후원" 
+OPTIONS_BACK                "뒤로"  
+
+// Stage Select
+STAGESELECT_TITLE           "<color=$COLOR_TITLE>스테이지 선택</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>개발자 모드</color>" 
+STAGESELECT_MSG             "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>를 눌러 뒤로 가기" 
+STAGESELECT_PAGE            "페이지 $1/$2" 
+STAGESELECT_ACT             "구역" 
+
+// Quest Select
+QUESTSELECT_TITLE           "<color=$COLOR_TITLE>퀘스트 선택</color>"
+QUESTSELECT_MSG             "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>를 눌러 뒤로 가기"
+QUESTSELECT_PAGE            "페이지 $1/$2"
+QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>버전:</color> $1\n<color=$COLOR_HIGHLIGHT>저자:</color> $2\n<color=$COLOR_HIGHLIGHT>설명:</color> $3"
+
+// Credits
+CREDITS_TITLE               "<color=$COLOR_TITLE>크레딧</color>"
+CREDITS_BACK                "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>를 눌러 뒤로 가기"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>스태프</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>도움을 주신 분들:</color>"
+CREDITS_ALEXANDRE           "프로젝트 지도자와 설립자\n프로젝트 개발자"
+CREDITS_JOAO                "아티스트"
+CREDITS_MATEUS              "사운드 효과"
+CREDITS_CODY                "컨셉 아트"
+CREDITS_JOHAN               "음향 담당 (삼가 고인의 명복을 빕니다)"
+CREDITS_DI                  "음향 담당"
+CREDITS_VICTOR              "음향 담당"
+CREDITS_COLIN               "스프라이트, 스토리 도입부 담당"
+CREDITS_BRIAN               "스프라이트 아티스트"
+CREDITS_TRANSLATOR          "번역자"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>개인자료 크레딧</color>" 
+CREDITS_RES_TEXT            "달리 명시되지 않은 한, 아래에 나열된 파일은 Creative Commons Attribution 3.0(CC-BY 3.0) 에 따라 라이센스가 부여됩니다."
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>이미지</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>음악</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>사운드 효과</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>스크립트</color>"
+CREDITS_RES_SCRIPTS_TEXT    "작성자는 스크립트 자체 내에서 인식됩니다."
+
+// Main Menu
+MAINMENU_DEVBUILD           "개발자 버전"
+MAINMENU_VERSION            "v." // abbreviated
+
+// Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TEXT             "오픈 서지에서 당신만의 멋진 게임을 만들어보세요! 상상의 나래를 펼쳐보세요! 당신만의 프로젝트를 시작해보세요! 새로운 레벨, 아이템, 캐릭터 그리고 더 많은 것들을 만들어보세요! 레벨 편집기를 사용해보고, 엔진 사용법을 배우며, 서지스크립트에 빠져들어 최대 전력을 내보세요!"
+
+// Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TEXT        "$GAME_VERSION. 버전을 플레이해주셔서 감사합니다.\n더 하고 싶으신가요? $GAME_WEBSITE로 가서 업데이트 해보세요!\n\n오픈 서지에서 당신만의 게임을 만들고 플레이할 수 있습니다. 이 멋진 사실을 널리널리 전하세요!
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "화살표 키"
+INPUT_KEYB_LEFT             "왼쪽 키"
+INPUT_KEYB_RIGHT            "오른쪽 키"
+INPUT_KEYB_UP               "위쪽 키"
+INPUT_KEYB_DOWN             "아래쪽 키"
+INPUT_KEYB_FIRE1            "Spacebar"
+INPUT_KEYB_FIRE2            "왼쪽 CTRL"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "W"
+INPUT_KEYB_FIRE6            "A"
+INPUT_KEYB_FIRE7            "S"
+INPUT_KEYB_FIRE8            "D"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "방향 버튼"
+INPUT_JOY_LEFT              "왼쪽 버튼"
+INPUT_JOY_RIGHT             "오른쪽 버튼"
+INPUT_JOY_UP                "위쪽 버튼"
+INPUT_JOY_DOWN              "아래쪽 버튼"
+INPUT_JOY_FIRE1             "버튼 1"
+INPUT_JOY_FIRE2             "버튼 2"
+INPUT_JOY_FIRE3             "버튼 3"
+INPUT_JOY_FIRE4             "버튼 4"
+INPUT_JOY_FIRE5             "버튼 5"
+INPUT_JOY_FIRE6             "버튼 6"
+INPUT_JOY_FIRE7             "버튼 7"
+INPUT_JOY_FIRE8             "버튼 8"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "그만 두시겠습니까?"
+QUIT_OPTION1                "네"
+QUIT_OPTION2                "아니요"
+
+	
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>플레이 방법</color>\n<color=$COLOR_HIGHLIGHT>오픈 서지 데모 레벨</color>에 오신 것을 환영합니다! $INPUT_DIRECTIONAL 를 눌러 이동하고 $INPUT_FIRE1 를 눌러 점프합니다. $INPUT_FIRE2 를 눌러 캐릭터를 변경합니다." 
+LEV_DEMO_2                  "<color=$COLOR_TITLE>알고 계셨나요?</color>\nOpen Surge에서는 모든 요소를 커스텀마이징 할 수 있습니다. 레벨, 아이템, 보스, 캐릭터 그리고 더 많은 것들을요! 오픈 서지는 100% <color=$COLOR_HIGHLIGHT>게임 창작 시스템</color>이랍니다." 
+LEV_DEMO_3                  "<color=$COLOR_TITLE>당신의 창의력을 마음껏 발휘하세요!</color>\n오픈 서지의 핵심적인 특징 중 하나는 <color=$COLOR_HIGHLIGHT>서지 스크립트</color>랍니다. 서지 스크립트는 오픈 서지의 스크립트입니다. 서지 스크립트를 써서 당신이 생각하는 모든 것을 만들어보세요!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>잘 하고 있군요!</color>\n여전히 흥미가 있으신가요? 가능성은 무궁무진하답니다! <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>에서 당신만의 멋진 게임을 만들어보세요!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>스스로 해보세요!</color>\n당신의 차례군요! <color=$COLOR_HIGHLIGHT>F12 버튼을 눌러 편집기를 열어 보세요</color>. 다음으로, 아이템 팔렛을 열고 당신만의 레벨을 만들어보세요! (도움말을 보려면 F1를 누르세요.))"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Note to translators:
+//
+// Since the game uses bitmap fonts, parts of
+// the translation don't accept special characters.
+//
+// This section does not accept language-specific
+// special characters.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Score" //"점수"
+HUD_TIME                    "Time" //"시간"
+HUD_COLLECTIBLES            "Power" //"파워"
+
+// Level Cleared animation
+CLEARED_LINE1               "YOU HAVE" //"당신은"
+CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT" //"구역 $LEVEL_ACT을 완료했습니다"
+CLEARED_POWER               "Power Bonus" //"파워 보너스"
+CLEARED_TIME                "Time Bonus" //"시간 보너스"
+CLEARED_SCORE               "Score" //"점수"
+
+// Main Menu
+MAINMENU_TITLE              "MENU" //"메뉴"
+MAINMENU_PLAY               "PLAY" //"게임하기"
+MAINMENU_CREATE             "CREATE" //"제작하기"
+MAINMENU_SHARE              "SHARE" //"공유하기"
+MAINMENU_OPTIONS            "OPTIONS" //"옵션"
+MAINMENU_QUIT               "QUIT" //"그만두기"
+
+// Create Menu
+CREATEMENU_TITLE            "CREATE" //"제작하기"
+CREATEMENU_PLAY             "PLAY DEMO" //"데모 플레이하기"
+CREATEMENU_LEARN            "LEARN" //"학습하기"
+CREATEMENU_SCRIPTING        "SURGESCRIPT" // "서지스크립트"
+CREATEMENU_BACK             "BACK" // "뒤로 가기"
+
+// Congratulations Screen
+CONGRATULATIONS_TITLE       "THANKS FOR PLAYING" //"플레이해주셔서 감사합니다."
+CONGRATULATIONS_SHARE       "SHARE" //"공유하기"
+CONGRATULATIONS_DONATE      "DONATE" //"후원하기"
+CONGRATULATIONS_BACK        "BACK" //"뒤로 가기"
+
+// Loading Screen
+LOADING_TEXT                "loading..." //"로딩 중"
