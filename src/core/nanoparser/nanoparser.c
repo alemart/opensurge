@@ -759,9 +759,9 @@ parsetree_statement_t* parsetree_statement_new(const char *str, parsetree_parame
     p->parameter = parameter;
     p->source_location = sourcelocation_new(line-1);
 
-    n = nanoparser_get_number_of_parameters(element = parameter);
+    n = nanoparser_get_number_of_parameters(parameter);
     for(j=1; j<=n; j++) {
-        element = (parsetree_parameter_t*)nanoparser_get_nth_parameter(element, 1);
+        element = (parsetree_parameter_t*)nanoparser_get_nth_parameter(parameter, j);
         element->stmt = p;
     }
 
