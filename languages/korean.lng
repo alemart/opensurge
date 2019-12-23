@@ -169,7 +169,7 @@ QUIT_OPTION2                "아니요"
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>플레이 방법</color>\n<color=$COLOR_HIGHLIGHT>오픈 서지 데모 레벨</color>에 오신 것을 환영합니다!\n$INPUT_DIRECTIONAL를 눌러 이동하고 $INPUT_FIRE1 를 눌러 점프합니다.\n$INPUT_FIRE2를 눌러 캐릭터를 변경합니다." 
 LEV_DEMO_2                  "<color=$COLOR_TITLE>알고 계셨나요?</color>\nOpen Surge에서는 모든 요소를 커스텀마이징 할 수 있습니다. 레벨, 아이템, 보스, 캐릭터 그리고 더 많은 것들을요! 오픈 서지는 100% <color=$COLOR_HIGHLIGHT>게임 창작 시스템</color>이랍니다." 
-LEV_DEMO_3                  "<color=$COLOR_TITLE>당신의 창의력을 마음껏 발휘하세요!</color>\n오픈 서지의 핵심적 특징 중 하나는 <color=$COLOR_HIGHLIGHT>서지스크립트</color>랍니다. 서지스크립트는 게임 제작을 위한 스크립트 언어입니다. 서지스크립트를 써서 당신이 생각하는 모든 것을 만들어보세요!"
+LEV_DEMO_3                  "<color=$COLOR_TITLE>당신의 창의력을 마음껏 발휘하세요!</color>\n오픈 서지의 핵심적 특징 중 하나는 <color=$COLOR_HIGHLIGHT>서지스크립트</color>랍니다. 서지스크립트는 게임 제작을 위한 스크립트 언어입니다. 서지스크립트로 당신이 생각하는 모든 걸 만들어보세요!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>잘 하고 있군요!</color>\n여전히 흥미가 있으신가요? 가능성은 무궁무진하답니다! <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>에서 당신만의 멋진 게임을 만들어보세요!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>스스로 해보세요!</color>\n당신의 차례군요! <color=$COLOR_HIGHLIGHT>F12 버튼을 눌러 편집기를 열어 보세요</color>. 다음으로, 아이템 팔렛을 열고 당신만의 레벨을 만들어보세요! (도움말을 보려면 F1를 누르세요.))"
 
