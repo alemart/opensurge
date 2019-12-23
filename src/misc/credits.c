@@ -41,6 +41,12 @@ $CREDITS_TRANSLATOR \n\
 Álvaro Bazán \n\
 $CREDITS_TRANSLATOR \n\
 \n\
+krumaska \n\
+$CREDITS_TRANSLATOR \n\
+\n\
+AntsThatWander \n\
+$CREDITS_TRANSLATOR \n\
+\n\
 Ruben Caceres \n\
 Lainz \n\
 allegro.cc \n\
