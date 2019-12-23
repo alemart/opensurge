@@ -49,6 +49,7 @@ static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getsize(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t FONT_ADDR = 0;
 static const surgescript_heapptr_t TEXT_ADDR = 1;
 static const surgescript_heapptr_t ALIGN_ADDR = 2;
@@ -57,6 +58,7 @@ static const surgescript_heapptr_t VISIBLE_ADDR = 4;
 static const surgescript_heapptr_t DETACHED_ADDR = 5;
 static const surgescript_heapptr_t OFFSET_ADDR = 6;
 static const surgescript_heapptr_t MAXWIDTH_ADDR = 7;
+static const surgescript_heapptr_t SIZE_ADDR = 8;
 static const char* DEFAULT_TEXT = "";
 static const char* DEFAULT_FONT = "default";
 static const char* DEFAULT_ALIGN = "left";
@@ -93,6 +95,7 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "get_maxLength", fun_getmaxlength, 0);
     surgescript_vm_bind(vm, "Text", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
+    surgescript_vm_bind(vm, "Text", "get_size", fun_getsize, 0);
 }
 
 /*
@@ -126,8 +129,6 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     bool is_detached = surgescript_object_has_tag(parent, "detached");
@@ -142,14 +143,16 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(DETACHED_ADDR == surgescript_heap_malloc(heap));
     ssassert(OFFSET_ADDR == surgescript_heap_malloc(heap));
     ssassert(MAXWIDTH_ADDR == surgescript_heap_malloc(heap));
+    ssassert(SIZE_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_null(surgescript_heap_at(heap, FONT_ADDR));
     surgescript_var_set_string(surgescript_heap_at(heap, TEXT_ADDR), DEFAULT_TEXT);
     surgescript_var_set_string(surgescript_heap_at(heap, ALIGN_ADDR), DEFAULT_ALIGN);
     surgescript_var_set_number(surgescript_heap_at(heap, ZINDEX_ADDR), DEFAULT_ZINDEX);
     surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), DEFAULT_VISIBILITY);
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR), offset);
+    surgescript_var_set_null(surgescript_heap_at(heap, OFFSET_ADDR)); /* lazy allocation */
     surgescript_var_set_bool(surgescript_heap_at(heap, DETACHED_ADDR), is_detached);
     surgescript_var_set_number(surgescript_heap_at(heap, MAXWIDTH_ADDR), DEFAULT_MAXWIDTH);
+    surgescript_var_set_null(surgescript_heap_at(heap, SIZE_ADDR)); /* lazy allocation */
 
     /* sanity check */
     if(!surgescript_object_has_tag(parent, "entity")) {
@@ -327,9 +330,19 @@ surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript
     surgescript_transform_t* transform = surgescript_object_transform(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR));
-    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    surgescript_var_t* v2ptr = surgescript_heap_at(heap, OFFSET_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
 
+    if(surgescript_var_is_null(v2ptr)) { /* lazy allocation */
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(v2ptr, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(v2ptr);
+
+    v2 = surgescript_objectmanager_get(manager, handle);
     scripting_vector2_update(v2, transform->position.x, transform->position.y);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
@@ -350,12 +363,14 @@ surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript
     return NULL;
 }
 
+/* get maxLength */
 surgescript_var_t* fun_getmaxlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     font_t* font = get_font(object);
     return surgescript_var_set_number(surgescript_var_create(), font != NULL ? font_get_maxlength(font) : 0);
 }
 
+/* set maxLength */
 surgescript_var_t* fun_setmaxlength(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     font_t* font = get_font(object);
@@ -364,6 +379,31 @@ surgescript_var_t* fun_setmaxlength(surgescript_object_t* object, const surgescr
         font_set_maxlength(font, maxlength);
     }
     return NULL;
+}
+
+/* get size, in pixels */
+surgescript_var_t* fun_getsize(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* v2ptr = surgescript_heap_at(heap, SIZE_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
+    font_t* font = get_font(object);
+    v2d_t size = font_get_boxsize(font);
+
+    if(surgescript_var_is_null(v2ptr)) { /* lazy allocation */
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(v2ptr, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(v2ptr);
+
+    v2 = surgescript_objectmanager_get(manager, handle);
+    scripting_vector2_update(v2, size.x, size.y);
+
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
 /* -- private -- */
