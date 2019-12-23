@@ -30,7 +30,7 @@ object "Message Box" is "detached", "private", "entity"
     public text = ""; // string to be displayed
     public time = 10.0; // time in seconds
 
-    box = Actor("Message Box");
+    box = spawn("Message Box Background");
     txt = Text("dialogbox");
     spd = Screen.height;
     pad = 8;
@@ -39,9 +39,11 @@ object "Message Box" is "detached", "private", "entity"
 
     state "main"
     {
+        transform.position = Vector2((Screen.width - box.width) / 2, Screen.height);
         box.visible = true;
         txt.text = String(text);
-        transform.position = Vector2((Screen.width - box.width) / 2, Screen.height);
+        if(txt.size.y + txt.offset.y > box.height)
+            box.expandHeight(box.height - txt.size.y + txt.offset.y * 2);
         controller.show(this);
         state = "appearing";
     }
@@ -114,6 +116,24 @@ object "Message Box" is "detached", "private", "entity"
             this.zindex -= 0.1;
             state = "disappearing";
         }
+    }
+}
+
+object "Message Box Background" is "detached", "private", "entity"
+{
+    transform = Transform();
+    actor = Actor("Message Box");
+
+    fun get_visible() { return actor.visible; }
+    fun set_visible(visible) { actor.visible = visible; }
+    fun get_zindex() { return actor.zindex; }
+    fun set_zindex(zindex) { actor.zindex = zindex; }
+    fun get_width() { return actor.width; }
+    fun get_height() { return actor.height; }
+
+    fun expandHeight(deltaHeight)
+    {
+        transform.localScale = Vector2(1, 1 + deltaHeight / actor.height);
     }
 }
 
