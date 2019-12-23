@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * confirmbox.c - confirm box
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,8 +36,8 @@
 
 
 /* private data */
-#define MAX_OPTIONS 5
-#define NO_OPTION   -1
+#define MAX_OPTIONS 2
+#define NO_OPTION -1
 static image_t *box, *background;
 static v2d_t boxpos;
 static font_t *textfnt;
@@ -79,7 +79,6 @@ void confirmbox_init(void *text_and_options)
 
     textfnt = font_create("dialogbox");
     font_set_text(textfnt, "%s", text);
-    font_set_width(textfnt, image_width(box) - 20);
 
     for(i=0; i<option_count; i++) {
         optionfnt[i][0] = font_create("dialogbox");
@@ -120,8 +119,9 @@ void confirmbox_release()
  */
 void confirmbox_update()
 {
+    float dt = timer_get_delta(), speed = 5 * VIDEO_SCREEN_H;
+    v2d_t size;
     int i;
-    float dt = timer_get_delta(), speed = 5*VIDEO_SCREEN_H;
 
     /* fade-in */
     if(fxfade_in) {
@@ -143,12 +143,20 @@ void confirmbox_update()
     }
 
     /* positioning stuff */
-    arrow->position = v2d_new(boxpos.x + current_option * image_width(box)/option_count + 10, boxpos.y + image_height(box) * 0.75 + 2);
-    font_set_position(textfnt, v2d_new(boxpos.x + 10 , boxpos.y + 10));
+    font_set_width(textfnt, image_width(box) - 16);
+    font_set_position(textfnt, v2d_new(boxpos.x + 8 , boxpos.y + 8));
     for(i=0; i<option_count; i++) {
-        font_set_position(optionfnt[i][0], v2d_new(boxpos.x + i * image_width(box)/option_count + 25, boxpos.y + image_height(box) * 0.75));
+        size = font_get_textsize(optionfnt[i][0]);
+        font_set_position(optionfnt[i][0], v2d_new(
+            boxpos.x + (2 * i + 1) * image_width(box) / (2 * option_count) - size.x / 2,
+            boxpos.y + image_height(box) - size.y - 8
+        ));
         font_set_position(optionfnt[i][1], font_get_position(optionfnt[i][0]));
     }
+    arrow->position = v2d_subtract(
+        v2d_add(font_get_position(optionfnt[current_option][0]), arrow->hot_spot),
+        v2d_new(image_width(actor_image(arrow)) * 1.4f, -image_height(actor_image(arrow)) * 0.5f)
+    );
 
     /* input */
     if(!fxfade_in && !fxfade_out) {
