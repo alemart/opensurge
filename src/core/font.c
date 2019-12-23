@@ -483,6 +483,54 @@ void font_render(font_t *f, v2d_t camera_position)
 }
 
 
+/*
+ * font_get_boxsize()
+ * Size, in pixels, of the rendered text (considering wordwrap, etc.)
+ */
+v2d_t font_get_boxsize(const font_t *f)
+{
+    int offset = -1;
+    char *p, *q, *s, *w, r = 0, t = 0;
+    char *text = f->text;
+    v2d_t size = v2d_new(0, 0), tmp;
+
+    /* use substring? */
+    if(f->index_of_first_char > 0) {
+        text = tagged_text_offset(text, f->index_of_first_char);
+        if(text == NULL)
+            return size;
+    }
+    if(f->length < FONT_TEXTMAXSIZE - 1) {
+        char* x = tagged_text_offset(text, f->length);
+        if(x != NULL) {
+            offset = x - text;
+            t = text[offset];
+            text[offset] = 0;
+        }
+    }
+
+    /* for each line p of text (split using '\n') */
+    for(p = q = text; q != NULL; ) {
+        if((q = strchr(p, '\n')) != NULL) { *q = 0; }
+        for(s = w = p; w != NULL; ) {
+            /* for each line s of text (split using wordwrap rules) */
+            if((w = find_wordwrap(f->drv, s, f->width)) != NULL) { r = *w; *w = 0; }
+            tmp = f->drv->textsize(f->drv, s);
+            size.x = max(size.x, tmp.x);
+            size.y += tmp.y;
+            if(w != NULL) { *w = r; s = w; }
+        }
+        if(q != NULL) { *q = '\n'; p = q+1; }
+    }
+
+    /* undo substring */
+    if(offset >= 0)
+        text[offset] = t;
+
+    /* done */
+    return size;
+}
+
 
 /*
  * font_get_textsize()
