@@ -89,8 +89,8 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Text", "set_maxWidth", fun_setmaxwidth, 1);
     surgescript_vm_bind(vm, "Text", "get_maxWidth", fun_getmaxwidth, 0);
-    surgescript_vm_bind(vm, "Text", "set_maxlength", fun_setmaxlength, 1);
-    surgescript_vm_bind(vm, "Text", "get_maxlength", fun_getmaxlength, 0);
+    surgescript_vm_bind(vm, "Text", "set_maxLength", fun_setmaxlength, 1);
+    surgescript_vm_bind(vm, "Text", "get_maxLength", fun_getmaxlength, 0);
     surgescript_vm_bind(vm, "Text", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
 }
