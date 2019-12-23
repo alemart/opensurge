@@ -42,8 +42,11 @@ object "Message Box" is "detached", "private", "entity"
         transform.position = Vector2((Screen.width - box.width) / 2, Screen.height);
         box.visible = true;
         txt.text = String(text);
-        if(txt.size.y + txt.offset.y > box.height)
-            box.expandHeight(box.height - txt.size.y + txt.offset.y * 2);
+        if(txt.size.y + txt.offset.y > box.height) {
+            delta = box.height - txt.size.y + txt.offset.y * 2;
+            box.expandHeight(delta);
+            pad += delta;
+        }
         controller.show(this);
         state = "appearing";
     }
