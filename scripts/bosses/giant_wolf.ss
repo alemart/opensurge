@@ -280,7 +280,7 @@ object "Giant Wolf's Head" is "private", "entity", "awake"
 
     fun onCollision(otherCollider)
     {
-        if(wolf.isActivated() && state != "defeated") {
+        if(wolf.isActivated() && state != "defeated" && state != "exploding") {
             if(otherCollider.entity.hasTag("player")) {
                 player = otherCollider.entity;
                 if(player.attacking) {
