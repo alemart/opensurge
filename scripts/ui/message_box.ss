@@ -56,7 +56,7 @@ object "Message Box" is "detached", "private", "entity"
         // move
         transform.translateBy(0, -spd * Time.delta);
 
-        // are we done?
+        // done?
         ymin = Screen.height - box.height - pad;
         if(transform.position.y <= ymin) {
             transform.position = Vector2(transform.position.x, ymin);
@@ -75,7 +75,7 @@ object "Message Box" is "detached", "private", "entity"
         // move
         transform.translateBy(0, spd * Time.delta);
 
-        // are we done?
+        // done?
         ymax = Screen.height;
         if(transform.position.y >= ymax)
             state = "done";
