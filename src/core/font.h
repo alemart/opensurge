@@ -38,9 +38,8 @@ void font_set_textarguments(font_t *f, int amount, ...); /* pass <amount> of con
 const char *font_get_text(const font_t *f); /* gets the text of the font */
 void font_set_position(font_t *f, v2d_t position); /* sets the position of the font in the scene */
 v2d_t font_get_position(const font_t *f); /* gets the position of the font in the scene */
-v2d_t font_get_textsize(const font_t *f); /* returns the text size, in pixels, of the font */
+v2d_t font_get_textsize(const font_t *f); /* returns the size, in pixels, of the rendered text */
 v2d_t font_get_charspacing(const font_t *f); /* character spacing */
-v2d_t font_get_boxsize(const font_t *f); /* size of the rendered text */
 void font_set_width(font_t *f, int w); /* wordwrap (w is given in pixels) */
 bool font_is_visible(const font_t *f); /* is the font visible? */
 void font_set_visible(font_t *f, bool is_visible); /* show/hide font */

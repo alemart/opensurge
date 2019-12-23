@@ -484,10 +484,11 @@ void font_render(font_t *f, v2d_t camera_position)
 
 
 /*
- * font_get_boxsize()
- * Size, in pixels, of the rendered text (considering wordwrap, etc.)
+ * font_get_textsize()
+ * Returns the size (in pixels) of the rendered text
+ * (considering wordwrap)
  */
-v2d_t font_get_boxsize(const font_t *f)
+v2d_t font_get_textsize(const font_t *f)
 {
     int offset = -1;
     char *p, *q, *s, *w, r = 0, t = 0;
@@ -531,15 +532,6 @@ v2d_t font_get_boxsize(const font_t *f)
     return size;
 }
 
-
-/*
- * font_get_textsize()
- * Returns the size (in pixels) of a given text
- */
-v2d_t font_get_textsize(const font_t *f)
-{
-    return f->drv->textsize(f->drv, f->text);
-}
 
 /*
  * font_get_charspacing()

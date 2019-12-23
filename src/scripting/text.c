@@ -390,7 +390,7 @@ surgescript_var_t* fun_getsize(surgescript_object_t* object, const surgescript_v
     surgescript_objecthandle_t handle;
     surgescript_object_t* v2;
     font_t* font = get_font(object);
-    v2d_t size = font_get_boxsize(font);
+    v2d_t size = font_get_textsize(font);
 
     if(surgescript_var_is_null(v2ptr)) { /* lazy allocation */
         surgescript_objecthandle_t me = surgescript_object_handle(object);
