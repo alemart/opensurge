@@ -17,7 +17,7 @@ font "dialogbox" for "ko_KR"
     truetype
     {
         source_file             "fonts/GothicA1-Medium.ttf"
-        size                    10
+        size                    11
         shadow
         antialias
     }
