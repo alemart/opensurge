@@ -3593,5 +3593,6 @@ entity "Collectible" 15552 10256 "f29d6df47f18cc95"
 entity "Collectible" 6304 10224 "2581ef2c5f9fa681"
 entity "Collectible" 6320 10240 "407884242701198c"
 entity "Collectible" 6336 10224 "a1d6e0b47d46f8bf"
+entity "Spikes" 6448 10976 "2ab627e40af8b0ad"
 
 // EOF
