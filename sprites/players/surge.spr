@@ -333,6 +333,15 @@ sprite "Surge"
         fps         8
         data        75
     }
+
+    // from lighting boom to ball
+    animation 41
+    {
+        repeat      TRUE
+        repeat_from 3
+        fps         24
+        data        75 74 74 11 12 13 14
+    }
 }
 
 // Life Icon corresponding to the character (Heads-Up Display)
@@ -389,5 +398,24 @@ sprite "Surge's Lighting Boom"
         repeat      FALSE
         fps         16
         data        0 1 2 3
+    }
+}
+
+// Special Move: Surge's Lighting Throw (spark)
+sprite "Surge's Lighting Spark"
+{
+    source_file     "images/surge.png"
+    //source_rect     352 960 160 32
+    //frame_size      32 32
+    //hot_spot        16 16
+    source_rect     432 976 80 16
+    frame_size      16 16
+    hot_spot        8 8
+
+    animation 0
+    {
+        repeat      FALSE
+        fps         16
+        data        0 1 2 3 4
     }
 }
