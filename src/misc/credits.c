@@ -94,7 +94,7 @@ Mateus Reis \n\
 $CREDITS_RES_IMAGES \n\
 \n\
 João Victor \n\
---- surge.png (CC-0) \n\
+--- surge.png (public domain) \n\
 --- images/neon.png \n\
 --- images/animals.png \n\
 --- images/title.png \n\
@@ -192,11 +192,11 @@ Ste Pickford \n\
 --- fonts/powerfest.png \n\
 \n\
 Kenney \n\
---- fonts/kenney.ttf (CC-0) \n\
+--- fonts/kenney.ttf (public domain) \n\
 \n\
-Dalton Maag / Canonical Ltd \n\
---- fonts/Ubuntu-M.ttf (Ubuntu Font Licence 1.0) \n\
---- fonts/Ubuntu-B.ttf (Ubuntu Font Licence 1.0) \n\
+Christian Robertson \n\
+--- fonts/Roboto-Medium.ttf (Apache License 2.0) \n\
+--- fonts/Roboto-Bold.ttf (Apache License 2.0) \n\
 \n\
 HanYang I&C Co Ltd \n\
 --- fonts/GothicA1-Medium.ttf (SIL Open Font License 1.1) \n\
@@ -244,7 +244,7 @@ creative commons (creativecommons.org) \n\
 Alex V. \n\
 --- images/crococopter.png \n\
 \n\
-Alexandre, Andrew Pociask, KZR \n\
+Alexandre Martins, Andrew Pociask, Mateus Reis \n\
 --- images/extra/big_sunshine.png \n\
 \n\
 thekingphoenix \n\
@@ -254,8 +254,8 @@ thekingphoenix \n\
 Luis Zuno aka ansimus (pixelgameart.org) \n\
 --- images/sunshine_bg.png \n\
 \n\
-Alexandre & Luis Zuno \n\
---- images/waterworks_bg.png (includes contributions by Mateus Reis) \n\
+Alexandre Martins & Luis Zuno \n\
+--- images/waterworks_bg.png (with contributions by Mateus Reis) \n\
 \n\
 klausdell \n\
 --- images/speed_smoke.png \n\
@@ -266,10 +266,10 @@ KnoblePersona \n\
 Master484 \n\
 --- images/mini_smoke.png \n\
 \n\
-Antifarea (opengameart.org) & Alexandre \n\
+Antifarea (opengameart.org) & Alexandre Martins \n\
 --- images/hydra.png (CC-BY-SA 3.0) \n\
 \n\
-João Victor, Colin Beard, Constantin, Alexandre \n\
+João Victor, Colin Beard, Constantin, Alexandre Martins \n\
 --- images/life_icon.png \n\
 \n\
 \n\
