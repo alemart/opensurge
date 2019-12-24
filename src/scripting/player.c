@@ -112,6 +112,8 @@ static surgescript_var_t* fun_getscore(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_setscore(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -240,6 +242,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_lives", fun_setlives, 1);
     surgescript_vm_bind(vm, "Player", "get_score", fun_getscore, 0);
     surgescript_vm_bind(vm, "Player", "set_score", fun_setscore, 1);
+    surgescript_vm_bind(vm, "Player", "get_aggressive", fun_getaggressive, 0);
+    surgescript_vm_bind(vm, "Player", "set_aggressive", fun_setaggressive, 1);
 
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
@@ -1123,6 +1127,24 @@ surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_
             player_set_layer(player, BRL_YELLOW);
         else
             player_set_layer(player, BRL_DEFAULT);
+    }
+    return NULL;
+}
+
+/* is the player aggressive? (i.e., able to hit baddies regardless if jumping or not) */
+surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_aggressive(player));
+}
+
+/* if set to true, player.attacking will be true and the player will be able to hit baddies regardless if jumping or not */
+surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool aggressive = surgescript_var_get_bool(param[0]);
+        player_set_aggressive(player, aggressive);
     }
     return NULL;
 }

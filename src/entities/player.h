@@ -67,7 +67,7 @@ struct player_t {
     int on_movable_platform;
     int disable_collectible_loss;
     int disable_animation_control;
-    int attacking; /* this is set by the user, and if it's true, player_is_attacking() will return true */
+    int aggressive;
     int got_glasses;
 
     /* shields */
@@ -147,6 +147,8 @@ bricklayer_t player_layer(const player_t* player);
 void player_set_layer(player_t* player, bricklayer_t layer);
 int player_is_visible(const player_t* player);
 void player_set_visible(player_t* player, int visible);
+int player_is_aggressive(const player_t* player);
+void player_set_aggressive(player_t* player, int aggressive);
 
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);

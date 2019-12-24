@@ -5472,12 +5472,12 @@ void disable_roll(player_t *player)
 
 void strong(player_t *player)
 {
-    player->attacking = TRUE;
+    player_set_aggressive(player, TRUE);
 }
 
 void weak(player_t *player)
 {
-    player->attacking = FALSE;
+    player_set_aggressive(player, FALSE);
 }
 
 void enterwater(player_t *player)

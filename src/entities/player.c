@@ -122,7 +122,7 @@ player_t *player_create(const char *character_name)
     p->disable_roll = FALSE;
     p->disable_collectible_loss = FALSE;
     p->disable_animation_control = FALSE;
-    p->attacking = FALSE;
+    p->aggressive = FALSE;
     p->visible = TRUE;
     p->actor = actor_create();
     p->actor->input = input_create_user(NULL);
@@ -552,7 +552,7 @@ void player_kill(player_t *player)
         player->turbo = FALSE;
         player->shield_type = SH_NONE;
         player->blinking = FALSE;
-        player->attacking = FALSE;
+        player->aggressive = FALSE;
 
         player->actor->position.y -= 2;
         player->actor->speed = v2d_new(0, physicsactor_get_diejmp(player->pa));
@@ -833,7 +833,7 @@ int player_senses_layer(const player_t* player, bricklayer_t layer)
  */
 int player_is_attacking(const player_t *player)
 {
-    return !player_is_dying(player) && (player->attacking || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING || physicsactor_get_state(player->pa) == PAS_CHARGING);
+    return !player_is_dying(player) && (player->aggressive || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING || physicsactor_get_state(player->pa) == PAS_CHARGING);
 }
 
 
@@ -1128,6 +1128,25 @@ int player_is_visible(const player_t* player)
 void player_set_visible(player_t* player, int visible)
 {
     player->visible = visible;
+}
+
+/*
+ * player_is_aggressive()
+ * Is the player aggressive? (i.e., it hits baddies regardless if jumping or not)
+ */
+int player_is_aggressive(const player_t* player)
+{
+    return player->aggressive;
+}
+
+/*
+ * player_set_aggressive()
+ * If set to true, player_is_attacking() will be true and the player
+ *  will be able to hit baddies regardless if jumping or not
+ */
+void player_set_aggressive(player_t* player, int aggressive)
+{
+    player->aggressive = aggressive;
 }
 
 /*
