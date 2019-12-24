@@ -19,8 +19,8 @@ font "sans"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
-        size                    13
+        source_file             "fonts/Roboto-Medium.ttf"
+        size                    15
         shadow
     }
 }

@@ -103,7 +103,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los prop
 
 // Main Menu
 MAINMENU_DEVBUILD           "Versión de Desarrollo"
-MAINMENU_VERSION            "v." // abbreviated
+MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)

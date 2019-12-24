@@ -5,7 +5,7 @@ font "dialogbox"
 {
     truetype
     {
-        source_file             "fonts/Ubuntu-M.ttf"
+        source_file             "fonts/Roboto-Medium.ttf"
         size                    14
         shadow
         antialias

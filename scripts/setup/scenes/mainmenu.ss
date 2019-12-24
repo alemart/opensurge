@@ -229,7 +229,7 @@ object "MainMenuGameVersion" is "private", "detached", "entity"
         }
         else {
             text[0].align = "right";
-            text[0].text = "$MAINMENU_VERSION " + SurgeEngine.version;
+            text[0].text = "$MAINMENU_VERSION";
             text[1].visible = false;
         }
     }
