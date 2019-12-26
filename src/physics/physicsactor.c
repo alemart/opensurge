@@ -764,7 +764,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
                         break; \
                 } \
                 x = xb - xa; y = yb - ya; \
-                ang = SLOPE(y, x); \
+                ang = (-10 <= y && y <= 10) ? SLOPE(y, x) : 0; \
                 if(ga == gb || ang_diff(ang, pa->angle) <= 0x25) \
                     pa->angle = ang; \
             } \
