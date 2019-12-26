@@ -185,7 +185,7 @@ static const float cos_table[256] = {
 
 /* slope table: stored angles */
 /* SLOPE(y,x) is the angle of the (y,x) slope, where -11 <= y,x <= 11 */
-#define SLOPE(y,x) slp_table[11 + ((y) + ((y)<-11)*(-11-(y)) + ((y)>11)*(11-(y)))][11 + ((x) + ((x)<-11)*(-11-(x)) + ((x)>11)*(11-(x)))]
+#define SLOPE(y,x) slp_table[11 + (y)][11 + (x)]
 static const int slp_table[23][23] = {
     { 0xA0, 0xA2, 0xA4, 0xA6, 0xA9, 0xAC, 0xAF, 0xB2, 0xB5, 0xB9, 0xBC, 0xC0, 0xC4, 0xC7, 0xCB, 0xCE, 0xD1, 0xD4, 0xD7, 0xDA, 0xDC, 0xDE, 0xE0 },
     { 0x9E, 0xA0, 0xA2, 0xA5, 0xA7, 0xAA, 0xAD, 0xB0, 0xB4, 0xB8, 0xBC, 0xC0, 0xC4, 0xC8, 0xCC, 0xD0, 0xD3, 0xD6, 0xD9, 0xDB, 0xDE, 0xE0, 0xE2 },
@@ -764,7 +764,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
                         break; \
                 } \
                 x = xb - xa; y = yb - ya; \
-                ang = (-10 <= y && y <= 10) ? SLOPE(y, x) : 0; \
+                ang = (-10 <= y && y <= 10 && -10 <= x && x <= 10) ? SLOPE(y, x) : 0x0; \
                 if(ga == gb || ang_diff(ang, pa->angle) <= 0x25) \
                     pa->angle = ang; \
             } \
