@@ -10,7 +10,6 @@ using SurgeEngine.Level;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBall;
 using SurgeEngine.Behaviors.DirectionalMovement;
-using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 
 //
@@ -37,19 +36,92 @@ object "Surge's Light Sneakers" is "companion"
     state "main"
     {
         if(player.midair) {
-            if(player.walking)
-                setAnim(20, player.animation.speedFactor);
-            else if(player.running)
-                setAnim(21, player.animation.speedFactor);
-            else if(player.braking)
-                setAnim(22, player.animation.speedFactor);
+            if(player.walking) {
+                if(player.anim == 1 || player.anim == 20)
+                    setAnim(20, player.animation.speedFactor);
+            }
+            else if(player.running) {
+                if(player.anim == 2 || player.anim == 21)
+                    setAnim(21, player.animation.speedFactor);
+            }
+            else if(player.braking) {
+                if(player.anim == 7 || player.anim == 22)
+                    setAnim(22, player.animation.speedFactor);
+            }
         }
     }
 
-    fun setAnim(id, f)
+    fun setAnim(id, factor)
     {
         player.anim = id;
-        player.animation.speedFactor = f;
+        player.animation.speedFactor = factor;
+    }
+}
+
+//
+// Surge's Shield Abilities performs an attack depending on the shield type
+//
+object "Surge's Shield Abilities" is "companion"
+{
+    player = Player("Surge");
+    shieldAbilities = player.spawn("Shield Abilities").setup({
+        "thunder": "Surge's Lighting Smash"
+    });
+}
+
+//
+// Surge's Lighting Smash (thunder shield)
+//
+object "Surge's Lighting Smash" is "shield ability"
+{
+    player = Player("Surge");
+    sfx = Sound("samples/lighting_smash.wav");
+    abilities = null;
+
+    state "main"
+    {
+    }
+
+    state "active"
+    {
+        // back to ball mode
+        player.anim = 41;
+        if(player.animation.finished)
+            state = "rolling";
+        if(player.underwater)
+            abilities.deactivate();
+    }
+
+    state "rolling"
+    {
+        player.roll();
+        if(player.underwater)
+            abilities.deactivate();
+    }
+
+    fun onActivate(shieldAbilities)
+    {
+        // smash!
+        player.ysp = Math.max(player.ysp, 480);
+
+        // create neat sparks
+        for(n = 8, i = 0; i < n; i++) {
+            Level.spawnEntity("Surge's Lighting Spark", player.collider.center)
+                 .setDirection(Vector2.up)
+                 .setId(i, n);
+        }
+        sfx.play();
+
+        // save the shieldAbilities object
+        abilities = shieldAbilities;
+
+        // done
+        state = "active";
+    }
+
+    fun onDeactivate(shieldAbilities)
+    {
+        state = "main";
     }
 }
 
@@ -64,11 +136,15 @@ object "Surge's Lighting Boom" is "companion"
     timeMidAir = 0;
     xsp = 0;
     fx = null;
-    shieldAttack = null;
+    shieldAbilities = null;
 
     state "main"
     {
-        shieldAttack = player.findObject("Surge's Shield Attack");
+        // find the Shield Abilities object
+        shieldAbilities = player.findObject("Shield Abilities") || 
+                          player.spawn("Shield Abilities").setup({ });
+
+        // done
         state = "watching";
     }
 
@@ -76,14 +152,18 @@ object "Surge's Lighting Boom" is "companion"
     {
         timeMidAir += (player.midair ? Time.delta : -timeMidAir);
         if(timeMidAir >= 0.1 && !player.underwater) {
-            if(isReady(player) && player.input.buttonPressed("fire1")) {
-                player.hlock(0.5);
-                player.ysp = jumpSpeed(player);
-                xsp = player.xsp;
-                fx = spawn("Surge's Lighting Boom FX");
-                state = "attacking";
+            if(player.input.buttonPressed("fire1") && isReady()) {
+                boom();
+                shieldAbilities.unlock();
+                shieldAbilities.getReadyToActivate();
+                return;
             }
         }
+
+        if(!player.underwater)
+            shieldAbilities.lock();
+        else
+            shieldAbilities.unlock();
     }
 
     state "attacking"
@@ -94,14 +174,13 @@ object "Surge's Lighting Boom" is "companion"
         if(player.animation.finished) {
             state = "sustaining";
         }
-        else if(mustStop(player)) {
+        else if(shieldAbilities.active) {
+            state = "waiting for shield attack";
+        }
+        else if(mustStop()) {
             if(player.angle != 0)
                 player.anim = 1;
-            state = "watching";
-        }
-        else if(player.input.buttonPressed("fire1")) {
-            if(shieldAttack != null && shieldAttack.attack())
-                state = "waiting for shield attack";
+            backToNormal();
         }
     }
 
@@ -109,41 +188,57 @@ object "Surge's Lighting Boom" is "companion"
     {
         player.anim = 40;
 
-        if(player.ysp >= 120) {
-            player.springify();
-            state = "watching";
+        if(shieldAbilities.active) {
+            state = "waiting for shield attack";
         }
-        else if(mustStop(player)) {
+        else if(mustStop()) {
             if(player.angle != 0)
                 player.anim = 1;
-            state = "watching";
+            backToNormal();
         }
-        else if(player.input.buttonPressed("fire1")) {
-            if(shieldAttack != null && shieldAttack.attack())
-                state = "waiting for shield attack";
+        else if(player.ysp >= 120) {
+            backToNormal();
         }
     }
 
     state "waiting for shield attack"
     {
-        if(!shieldAttack.active)
-            state = "watching";
+        if(!shieldAbilities.active)
+            backToNormal();
     }
 
-    fun isReady(player)
+    fun boom()
     {
-        return player.midair &&
-            (player.jumping || player.rolling || player.springing) &&
-            (shieldAttack == null || !shieldAttack.active);
+        player.hlock(0.5);
+        player.ysp = jumpSpeed();
+        player.springify(); // restore sensors
+        player.aggressive = true;
+        xsp = player.xsp;
+        fx = spawn("Surge's Lighting Boom FX");
+        state = "attacking";
     }
 
-    fun mustStop(player)
+    fun backToNormal()
+    {
+        if(state != "watching") {
+            player.aggressive = false;
+            state = "watching";
+        }
+    }
+
+    fun isReady()
+    {
+        return player.midair && !shieldAbilities.active &&
+               (player.jumping || player.rolling || player.springing);
+    }
+
+    fun mustStop()
     {
         return !player.midair || player.underwater ||
-            player.hit || player.dying || player.stopped || player.frozen;
+               player.hit || player.dying || player.frozen;
     }
 
-    fun jumpSpeed(player)
+    fun jumpSpeed()
     {
         jmp = (player.shield == "thunder") ? superJumpSpeed : normalJumpSpeed;
         return Math.min(player.ysp, jmp);
@@ -151,92 +246,8 @@ object "Surge's Lighting Boom" is "companion"
 }
 
 //
-// Surge's Shield Attack performs an attack depending on the shield type
+// Special effects
 //
-object "Surge's Shield Attack" is "companion"
-{
-    public readonly active = false;
-
-    player = Player("Surge");
-    lightingSmash = spawn("Surge's Lighting Smash");
-    enabled = true;
-
-    state "main"
-    {
-        if(!player.midair || player.springing || player.hit || player.dying || player.stopped || player.frozen)
-            stop();
-    }
-
-    fun attack()
-    {
-        // select attack depending on the shield type
-        if(enabled) {
-            if(player.shield == "thunder")
-                return perform(lightingSmash);
-        }
-
-        // no attack has been performed
-        return false;
-    }
-
-    fun stop()
-    {
-        enabled = true;
-        if(active) {
-            active = false;
-            player.aggressive = false;
-        }
-    }
-
-    fun perform(specialMove)
-    {
-        active = true;
-        player.aggressive = true;
-        player.roll();
-
-        // disable new shield attacks until
-        // the player touches the ground
-        enabled = false;
-
-        // perform the attack
-        specialMove.attack();
-
-        // done
-        return true;
-    }
-}
-
-//
-// Surge's Lighting Smash (thunder shield attack)
-//
-object "Surge's Lighting Smash"
-{
-    player = Player("Surge");
-    sfx = Sound("samples/lighting_smash.wav");
-    shieldAttack = parent;
-
-    state "main"
-    {
-    }
-
-    state "active"
-    {
-        player.anim = 41;
-        if(player.underwater)
-            shieldAttack.stop();
-        if(!shieldAttack.active)
-            state = "main";
-    }
-
-    fun attack()
-    {
-        sfx.play();
-        player.ysp = Math.max(player.ysp, 480);
-        for(n = 5, i = 0; i < n; i++)
-            Level.spawnEntity("Surge's Lighting Spark", player.collider.center).setId(i, n);
-        state = "active";
-    }
-}
 
 // Lighting Boom Effect
 object "Surge's Lighting Boom FX" is "private", "entity"
@@ -248,6 +259,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
     minRadius = 0;
     maxRadius = 0;
     time = 0;
+    sparks = [];
 
     state "main"
     {
@@ -255,8 +267,17 @@ object "Surge's Lighting Boom FX" is "private", "entity"
         minRadius = collider.radius;
         maxRadius = actor.width * 0.6;
         //collider.visible = true;
-        actor.zindex = 0.50005;
         sfx.play();
+
+        // add sparks
+        for(n = 16, i = 0; i < n; i++) {
+            spark = spawn("Surge's Lighting Spark").setId(i, n);
+            sparks.push(spark);
+        }
+
+        // configure the actor
+        actor.visible = (player.shield == "thunder");
+        actor.zindex = 0.50005;
 
         // done
         state = "expanding";
@@ -270,7 +291,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
         collider.radius = Math.lerp(minRadius, maxRadius, time / timeToLive);
 
         // destroy the object
-        if(actor.animation.finished)
+        if(time >= timeToLive)
             destroy();
     }
 
@@ -278,8 +299,10 @@ object "Surge's Lighting Boom FX" is "private", "entity"
     {
         // destroy enemies on touch
         if(otherCollider.entity.__name == "Enemy") {
-            enemy = otherCollider.entity;
-            enemy.kill(player);
+            if(player.ysp <= 0) { // player going up?
+                enemy = otherCollider.entity;
+                enemy.kill(player);
+            }
         }
     }
 }
@@ -291,13 +314,17 @@ object "Surge's Lighting Spark" is "private", "disposable", "entity"
     movement = DirectionalMovement();
     id = 0;
     count = 0;
+    baseAngle = null;
 
     state "main"
     {
         // initializing
-        movement.speed = 180;
-        movement.angle = 180 * id / (count - 1);
         actor.zindex = 0.50005;
+        movement.speed = 180;
+        if(baseAngle === null)
+            movement.angle = 360 * id / count; // all directions
+        else
+            movement.angle = 180 * id / (count - 1) + (baseAngle - 90); // specific direction
 
         // done
         state = "moving";
@@ -313,6 +340,12 @@ object "Surge's Lighting Spark" is "private", "disposable", "entity"
     {
         count = Math.max(2, sparkCount);
         id = Math.clamp(sparkId, 0, count - 1);
+        return this;
+    }
+
+    fun setDirection(direction)
+    {
+        baseAngle = direction !== null ? direction.angle : null;
         return this;
     }
 }

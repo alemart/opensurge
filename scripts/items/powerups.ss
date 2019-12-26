@@ -277,7 +277,7 @@ object "Item Box" is "entity", "private"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(player.attacking) {
+            if(player.jumping || player.rolling || player.charging || player.aggressive) {
                 player.bounceBack(actor);
                 crush(player);
             }
