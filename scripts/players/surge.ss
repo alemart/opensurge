@@ -263,20 +263,24 @@ object "Surge's Lighting Boom FX" is "private", "entity"
 
     state "main"
     {
+        stronger = (player.shield == "thunder");
+
         // initializing
         minRadius = collider.radius;
-        maxRadius = actor.width * 0.6;
+        maxRadius = actor.width * (stronger ? 0.6 : 0.4);
         //collider.visible = true;
         sfx.play();
 
         // add sparks
         for(n = 16, i = 0; i < n; i++) {
-            spark = spawn("Surge's Lighting Spark").setId(i, n);
+            spark = spawn("Surge's Lighting Spark")
+                   .setSpeed(stronger ? 240 : 180)
+                   .setId(i, n);
             sparks.push(spark);
         }
 
         // configure the actor
-        actor.visible = (player.shield == "thunder");
+        actor.visible = stronger;
         actor.zindex = 0.50005;
 
         // done
@@ -314,13 +318,14 @@ object "Surge's Lighting Spark" is "private", "disposable", "entity"
     movement = DirectionalMovement();
     id = 0;
     count = 0;
+    speed = 180;
     baseAngle = null;
 
     state "main"
     {
         // initializing
         actor.zindex = 0.50005;
-        movement.speed = 180;
+        movement.speed = speed;
         if(baseAngle === null)
             movement.angle = 360 * id / count; // all directions
         else
@@ -346,6 +351,12 @@ object "Surge's Lighting Spark" is "private", "disposable", "entity"
     fun setDirection(direction)
     {
         baseAngle = direction !== null ? direction.angle : null;
+        return this;
+    }
+
+    fun setSpeed(spd)
+    {
+        speed = spd;
         return this;
     }
 }
