@@ -15,7 +15,7 @@ LANG_ID                     "ko_KR"                   // language code & country
 LANG_NAME                   "Korean"                 // language name
 LANG_AUTHOR                 "krumaska & AntsThatWander"       // translation author
 LANG_LASTUPDATE             "2019-12-18"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.0"                   // required engine version
+LANG_COMPATIBILITY          "0.5.1"                   // required engine version
 
 // Colors
 COLOR_TITLE                 "ff8800"
