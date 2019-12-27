@@ -103,7 +103,7 @@ struct physicsactor_t
 
 /* private stuff ;-) */
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap);
-static void render_ball(v2d_t sensor_position, v2d_t camera_position, color_t color);
+static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
 static inline char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static inline char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
 static inline int angular_hoff(const physicsactor_t* pa);
@@ -406,9 +406,9 @@ void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position
     sensor_render(sensor_D(pa), pa->position, pa->movmode, camera_position);
     sensor_render(sensor_M(pa), pa->position, pa->movmode, camera_position);
     sensor_render(sensor_U(pa), pa->position, pa->movmode, camera_position);
-    render_ball(pa->angle_sensor[0], camera_position, sensor_get_color(sensor_A(pa)));
-    render_ball(pa->angle_sensor[1], camera_position, sensor_get_color(sensor_B(pa)));
-    render_ball(pa->position, camera_position, color_rgb(255, 255, 255));
+    render_ball(pa->angle_sensor[0], 2, sensor_get_color(sensor_A(pa)), camera_position);
+    render_ball(pa->angle_sensor[1], 2, sensor_get_color(sensor_B(pa)), camera_position);
+    render_ball(pa->position, 1, color_rgb(255, 255, 255), camera_position);
 }
 
 int physicsactor_is_facing_right(const physicsactor_t *pa)
@@ -716,6 +716,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 #define UPDATE_ANGLE() \
     do { \
         int hoff = angular_hoff(pa); \
+        int min_hoff = was_midair ? 1 : 0; \
         int max_delta = hoff * 2; \
         int current_angle = pa->angle; \
         int angular_tolerance = 0x14; \
@@ -723,8 +724,9 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         \
         do { \
             UPDATE_ANGLE_EX(hoff, dx, dy); \
-            hoff /= 2; /* increase precision */ \
-        } while(hoff > 1 && at_M == NULL && (dx < -max_delta || dx > max_delta || dy < -max_delta || dy > max_delta || delta_angle(pa->angle, current_angle) > angular_tolerance)); \
+            hoff -= 2; /* increase precision */ \
+        } while(hoff > min_hoff && at_M == NULL && (dx < -max_delta || dx > max_delta || dy < -max_delta || dy > max_delta || delta_angle(pa->angle, current_angle) > angular_tolerance)); \
+        video_showmessage(""); \
     } while(0)
 
 #define UPDATE_ANGLE_EX(hoff, out_dx, out_dy) \
@@ -735,7 +737,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         int found_a = FALSE, found_b = FALSE; \
         int sensor_height = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
         int base_height = sensor_height / 2; \
-        int length = sensor_height * (!pa->midair && was_midair ? 3 : 2); \
+        int length = sensor_height * 3; \
         \
         for(int i = 0; i < length && !(found_a && found_b); i++) { \
             h = i + base_height; \
@@ -766,7 +768,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         } \
         \
         out_dx = out_dy = 0; \
-        pa->angle_sensor[0] = pa->angle_sensor[1] = v2d_new(0, 0); \
+        pa->angle_sensor[0] = pa->angle_sensor[1] = pa->position; \
         if(found_a && found_b) { \
             const obstacle_t* ga = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode); \
             const obstacle_t* gb = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode); \
@@ -1542,12 +1544,11 @@ char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const 
 }
 
 /* renders an angle sensor */
-void render_ball(v2d_t sensor_position, v2d_t camera_position, color_t color)
+void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position)
 {
     v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
     v2d_t position = v2d_subtract(sensor_position, topleft);
     color_t border_color = color_rgb(0, 0, 0);
-    int radius = 2;
 
     image_ellipse(position.x, position.y, radius + 1, radius + 1, border_color);
     image_ellipse(position.x, position.y, radius, radius, color);
@@ -1556,6 +1557,7 @@ void render_ball(v2d_t sensor_position, v2d_t camera_position, color_t color)
 /* horizontal offset of the angular sensor */
 int angular_hoff(const physicsactor_t* pa)
 {
+    /* hoff is an odd number */
     const sensor_t* sensor = pa->A_normal; /* not sensor_A(pa), because varying the size makes it inconsistent */
     return (1 - sensor_get_x1(sensor)) / 2;
 }
