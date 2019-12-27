@@ -178,6 +178,7 @@ static int must_push_a_quest;
 static char quest_to_be_pushed[PATH_MAXLEN];
 static float dead_player_timeout;
 static actor_t *camera_focus; /* camera */
+static int must_render_brick_masks;
 
 /* scripting controlled variables */
 static int level_cleared; /* display the level cleared animation */
@@ -350,7 +351,6 @@ static int* editor_brick; /* an array of all valid brick numbers */
 static int editor_brick_count; /* length of editor_brick */
 static bricklayer_t editor_layer; /* current layer */
 static brickflip_t editor_flip; /* flip flags */
-static bool editor_should_render_masks; /* render brick masks? */
 static void editor_brick_init();
 static void editor_brick_release();
 static int editor_brick_index(int brick_id); /* index of brick_id at editor_brick[] */
@@ -1100,6 +1100,7 @@ void level_init(void *path_to_lev_file)
     must_load_another_level = FALSE;
     must_restart_this_level = FALSE;
     must_push_a_quest = FALSE;
+    must_render_brick_masks = FALSE;
     dead_player_timeout = 0.0f;
     team_size = 0;
     for(i=0; i<TEAM_MAX; i++)
@@ -2159,7 +2160,7 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
             renderqueue_enqueue_brick(bnode->data);
 
         /* render the masks of the bricks */
-        if(editor_is_enabled() && editor_should_render_masks) {
+        if(must_render_brick_masks) {
             for(bnode=major_bricks; bnode; bnode=bnode->next)
                 renderqueue_enqueue_brick_mask(bnode->data);
         }
@@ -3189,7 +3190,7 @@ void editor_update()
 
     /* show/hide brick masks */
     if(editorcmd_is_triggered(editor_cmd, "toggle-masks"))
-        editor_should_render_masks = !editor_should_render_masks;
+        must_render_brick_masks = !must_render_brick_masks;
 
     /* change spawn point */
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
@@ -4154,7 +4155,6 @@ void editor_brick_init()
     /* layer & flip flags */
     editor_layer = BRL_DEFAULT;
     editor_flip = BRF_NOFLIP;
-    editor_should_render_masks = false;
 
     /* which are the valid bricks? */
     if(brickset_loaded()) {
