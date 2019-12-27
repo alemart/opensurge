@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------
 
 LANG_ID                  "fr_FR"
-LANG_NAME                "Francais"
+LANG_NAME                "Français"
 LANG_AUTHOR              "SnickDev"
 LANG_LASTUPDATE          "2019-12-27"
 LANG_COMPATIBILITY       "0.5.1"

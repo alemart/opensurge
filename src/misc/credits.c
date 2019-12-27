@@ -47,6 +47,9 @@ $CREDITS_TRANSLATOR \n\
 AntsThatWander \n\
 $CREDITS_TRANSLATOR \n\
 \n\
+Nathanaël Fercocq \n\
+$CREDITS_TRANSLATOR \n\
+\n\
 Ruben Caceres \n\
 Lainz \n\
 allegro.cc \n\
