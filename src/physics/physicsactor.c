@@ -1420,10 +1420,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->state = PAS_LEDGE;
             pa->facing_right = FALSE;
         }
-
-        /* reset angle */
-        if(at_A == NULL || at_B == NULL)
-            FORCE_ANGLE(0x0);
     }
 
     /* waiting... */
