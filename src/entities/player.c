@@ -362,6 +362,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     /* active player can't get off camera */
     if(player == level_player()) {
         v2d_t clipped_position = camera_clip(act->position);
+
+        if(act->position.x > clipped_position.x && act->speed.x > 0.0f)
+            act->speed.x *= 0.5f;
+        else if(act->position.x < clipped_position.x && act->speed.x < 0.0f)
+            act->speed.x *= 0.5f;
+
         act->position.x = clipped_position.x;
         act->position.y = max(act->position.y, clipped_position.y); /* won't prevent pits */
     }
