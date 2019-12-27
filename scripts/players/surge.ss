@@ -172,6 +172,7 @@ object "Surge's Lighting Boom" is "companion"
         player.xsp = xsp;
 
         if(player.animation.finished) {
+            player.springify(); // restore sensors
             state = "sustaining";
         }
         else if(shieldAbilities.active) {
@@ -211,7 +212,6 @@ object "Surge's Lighting Boom" is "companion"
     {
         player.hlock(0.5);
         player.ysp = jumpSpeed();
-        player.springify(); // restore sensors
         player.aggressive = true;
         xsp = player.xsp;
         fx = spawn("Surge's Lighting Boom FX");

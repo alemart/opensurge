@@ -1315,7 +1315,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* computing the offset (note: if !pa->midair, then ground_sensor != NULL) */
-        offset = sensor_get_y2(ground_sensor) - sensor_get_y1(ground_sensor) - 1; /* need -1 */
+        offset = sensor_get_y2(ground_sensor) - 1; /* need -1 */
 
         /* adjust position */
         if(pa->movmode == MM_LEFTWALL)
@@ -1373,7 +1373,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
         else {
             /* won't reattach */
-            int offset = sensor_get_y2(ceiling_sensor) - sensor_get_y1(ceiling_sensor);
+            int offset = -sensor_get_y1(ceiling_sensor);
 
             /* adjust speed & angle */
             pa->ysp = 0.0f;
