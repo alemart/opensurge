@@ -699,16 +699,16 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 /* call UPDATE_MOVMODE whenever you update pa->angle */
 #define UPDATE_MOVMODE() \
     do { \
-        if(pa->angle < 0x20 || pa->angle >= 0xE0) { \
+        if(pa->angle < 0x20 || pa->angle > 0xE0) { \
             if(pa->movmode == MM_CEILING) \
                 pa->gsp = -pa->gsp; \
             pa->movmode = MM_FLOOR; \
         } \
-        else if(pa->angle >= 0x20 && pa->angle < 0x60) \
+        else if(pa->angle >= 0x20 && pa->angle <= 0x60) \
             pa->movmode = MM_LEFTWALL; \
-        else if(pa->angle >= 0x60 && pa->angle < 0xA0) \
+        else if(pa->angle > 0x60 && pa->angle < 0xA0) \
             pa->movmode = MM_CEILING; \
-        else if(pa->angle >= 0xA0 && pa->angle < 0xE0) \
+        else if(pa->angle >= 0xA0 && pa->angle <= 0xE0) \
             pa->movmode = MM_RIGHTWALL; \
     } while(0)
 
@@ -1328,8 +1328,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
 
         /* bugfix (near the edges) */
-        if(was_midair)
-            pa->gsp = pa->xsp; /* reacquisition of the ground comes next */
+        if(was_midair) {
+            if(pa->movmode == MM_FLOOR) {
+                /* reacquisition of the ground comes next */
+                pa->gsp = pa->xsp;
+            }
+        }
 
         /* update the angle */
         SET_AUTO_ANGLE();
