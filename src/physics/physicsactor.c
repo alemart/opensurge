@@ -736,13 +736,13 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         int h, x, y, xa, ya, xb, yb, ang; \
         int found_a = FALSE, found_b = FALSE; \
         int sensor_height = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
-        int base_height = sensor_height / 2; \
+        int base = sensor_get_y2(sensor) - 1; \
         int length = sensor_height * 3; \
         \
         for(int i = 0; i < length && !(found_a && found_b); i++) { \
-            h = i + base_height; \
-            x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
-            y = pa->position.y + h * COS(pa->angle) + 0.5f; \
+            h = base + i; \
+            x = pa->position.x + (float)h * SIN(pa->angle) + 0.5f; \
+            y = pa->position.y + (float)h * COS(pa->angle) + 0.5f; \
             if(!found_a) { \
                 xa = x - (hoff) * COS(pa->angle); \
                 ya = y + (hoff) * SIN(pa->angle); \
