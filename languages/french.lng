@@ -102,7 +102,7 @@ LEV_DEMO_1               "<color=$COLOR_TITLE>Comment jouer</color>\nBienvenue d
 LEV_DEMO_2               "<color=$COLOR_TITLE>Tu savais que...</color>\nTout dans Open Surge est personnalisable. Vous pouvez créer des niveaux, des objets, des boss, des personnages et plus encore ! C'est un <color=$COLOR_HIGHLIGHT>système de création de jeu</color>."
 LEV_DEMO_3               "<color=$COLOR_TITLE>Libérez votre créativité !</color>\nL'une des principales caractéristiques d'Open Surge est <color=$COLOR_HIGHLIGHT>SurgeScript</color>. C'est un script pour les jeux ! Utilisez-le pour construire tout ce que vous pouvez imaginer !"
 LEV_DEMO_4               "<color=$COLOR_TITLE>Cool !</color>\nTu te sens déjà excité ? Le ciel est la limite ! Visitez <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
-LEV_DEMO_5               "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color> Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
+LEV_DEMO_5               "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
 HUD_SCORE                "Score"
 HUD_TIME                 "Temps"
 HUD_COLLECTIBLES         "Pouvoir"

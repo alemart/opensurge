@@ -9,7 +9,7 @@ name "Waterworks Zone"
 author "Alexandre Martins"
 license "CC-BY 3.0"
 version "1.0"
-requires "0.5.0"
+requires "0.5.1"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/waterworks.bg"
@@ -1533,6 +1533,7 @@ brick 162 8944 10928
 brick 180 9024 11232
 brick 180 8960 11296
 brick 180 9024 11296
+brick 24 9088 11136 green
 brick 18 8544 9888
 brick 45 8320 10336
 brick 26 7808 10240 yellow
@@ -3832,9 +3833,6 @@ entity "Collectible" 19344 12368 "4f3a43b059ed3a85"
 entity "Collectible" 10320 9408 "1bebffe01084cc73"
 entity "Collectible" 10304 9424 "c0c9023a1a4eb92b"
 entity "Collectible" 10336 9424 "5aad081337c30e99"
-entity "Collectible" 10320 9376 "9a35314e9d340ec4"
-entity "Collectible" 10304 9392 "8a3f4287636757d9"
-entity "Collectible" 10336 9392 "81c7cca8c0e34f36"
 entity "Layer Yellow" 3008 9840 "5e01a4a5ea6d05eb"
 entity "Layer Yellow" 3008 9808 "0df707501005c520"
 entity "Layer Yellow" 3008 9776 "92732cbb04a486aa"
@@ -3852,8 +3850,12 @@ entity "Layer Yellow" 3008 9744 "5e47d21b4382975f"
 entity "Collectible" 2784 9840 "7d12a63be0149ef9"
 entity "Collectible" 2816 9840 "ca9c73d552242984"
 entity "Collectible" 2752 9840 "6c2afd57f51480d7"
-entity "Collectible" 8784 10368 "313a53d3df5fdb1a"
-entity "Collectible" 8768 10384 "2b660081902ce22c"
-entity "Collectible" 8800 10384 "5762d60265a1b0e8"
+entity "Collectible" 8768 10480 "a817a8d308dc8e29"
+entity "Collectible" 8784 10496 "f901c20c32c19d75"
+entity "Collectible" 8800 10480 "497b96076f73e30f"
+entity "Collectible" 10304 9488 "21f18f768f262709"
+entity "Collectible" 10320 9504 "d061be8e7d5e8907"
+entity "Collectible" 10336 9488 "c5f0df8acc8c95d5"
+entity "Crococopter" 11024 10928 "868e933113ab74e8"
 
 // EOF
