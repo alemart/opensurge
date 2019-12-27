@@ -96,10 +96,10 @@ static obstacle_t* item2obstacle(const item_t* item);
 static obstacle_t* object2obstacle(const object_t* object);
 static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
 static inline int ignore_obstacle(const player_t* player, bricklayer_t brick_layer);
-static inline float ang_diff(float alpha, float beta);
+static inline float delta_angle(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
-static int fixangle(int degrees, int threshold);
+static int fix_angle(int degrees, int threshold);
 static int is_head_underwater(const player_t* player);
 
 
@@ -241,7 +241,14 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 {
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
+    float padding = 16.0f, eps = 1e-5;
     float dt = timer_get_delta();
+
+    /* is it a CPU controlled player? */
+    if(player != level_player()) {
+        for(int i = 0; i < IB_MAX; i++)
+            input_simulate_button_up(act->input, (inputbutton_t)i);
+    }
 
     /* physics */
     if(!player->disable_movement) {
@@ -249,7 +256,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         physics_adapter(player, team, team_size, brick_list, item_list, enemy_list, get_bricklike_object);
     }
 
-    /* the player blinks */
+    /* the player is blinking */
     if(player->blinking) {
         player->blink_timer += timer_get_delta();
 
@@ -337,44 +344,62 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         }
     }
 
+    /* winning pose */
+    if(level_has_been_cleared())
+        physicsactor_enable_winning_pose(pa);
+
     /* animation */
     update_animation(player);
 
     /* play sounds */
     play_sounds(player);
 
-    /* is it a CPU controlled player? */
-    if(player != level_player()) {
-        for(int i = 0; i < IB_MAX; i++)
-            input_simulate_button_up(act->input, (inputbutton_t)i);
+    /* can't leave the world */
+    if(act->position.x < padding - eps) {
+        act->position.x = padding;
+        act->speed.x *= 0.5f;
+    }
+    else if(act->position.x > level_size().x - padding + eps) {
+        act->position.x = level_size().x - padding;
+        act->speed.x *= 0.5f;
     }
 
-    /* winning pose */
-    if(level_has_been_cleared())
-        physicsactor_enable_winning_pose(pa);
+    if(act->position.y < padding - eps) {
+        act->position.y = padding;
+        act->speed.y *= 0.5f;
+    }
+
+    /* active player can't get off camera */
+    if(player == level_player()) {
+        v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
+        v2d_t cam_bottomright = camera_clip(level_size());
+
+        /* lock horizontally */
+        if(act->position.x > cam_bottomright.x - padding + eps) {
+            act->position.x = cam_bottomright.x - padding;
+            act->speed.x *= 0.5f;
+        }
+        else if(act->position.x < cam_topleft.x + padding - eps) {
+            act->position.x = cam_topleft.x + padding;
+            act->speed.x *= 0.5f;
+        }
+
+        /* lock on top; won't prevent pits */
+        if(act->position.y < cam_topleft.y + padding - eps) {
+            act->position.y = cam_topleft.y + padding;
+            act->speed.y *= 0.5f;
+        }
+    }
+
+    /* pitfalls */
+    if(act->position.y >= level_height_at(act->position.x))
+        player_kill(player);
 
     /* rolling misc */
     if(!player_is_midair(player))
         player->thrown_while_rolling = FALSE;
     else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
         player->thrown_while_rolling = TRUE;
-
-    /* active player can't get off camera */
-    if(player == level_player()) {
-        v2d_t clipped_position = camera_clip(act->position);
-
-        if(act->position.x > clipped_position.x && act->speed.x > 0.0f)
-            act->speed.x *= 0.5f;
-        else if(act->position.x < clipped_position.x && act->speed.x < 0.0f)
-            act->speed.x *= 0.5f;
-
-        act->position.x = clipped_position.x;
-        act->position.y = max(act->position.y, clipped_position.y); /* won't prevent pits */
-    }
-
-    /* pitfalls */
-    if(act->position.y >= level_height_at(act->position.x))
-        player_kill(player);
 
     /* misc */
     player->on_movable_platform = FALSE;
@@ -1474,18 +1499,6 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
     /* updating the physics actor */
     physicsactor_update(pa, obstaclemap);
 
-    /* can't leave the screen */
-    if(physicsactor_get_position(pa).x < 10) {
-        physicsactor_set_position(pa, v2d_new(10, physicsactor_get_position(pa).y));
-        physicsactor_set_xsp(pa, 0.0f);
-        physicsactor_set_gsp(pa, 0.0f);
-    }
-    else if(physicsactor_get_position(pa).x > level_size().x - 10) {
-        physicsactor_set_position(pa, v2d_new(level_size().x - 10, physicsactor_get_position(pa).y));
-        physicsactor_set_xsp(pa, 0.0f);
-        physicsactor_set_gsp(pa, 0.0f);
-    }
-
     /* unconverting variables */
     act->position = physicsactor_get_position(pa);
     if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
@@ -1500,8 +1513,8 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
     )) && !player_is_dying(player)) {
-        float new_angle = DEG2RAD(fixangle(physicsactor_get_angle(pa), 15));
-        if(ang_diff(new_angle, act->angle) < 1.6f) {
+        float new_angle = DEG2RAD(fix_angle(physicsactor_get_angle(pa), 15));
+        if(delta_angle(new_angle, act->angle) < 1.6f) {
             float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
             act->angle = lerp_angle(act->angle, new_angle, t);
         }
@@ -1651,7 +1664,7 @@ void animate_invincibility_stars(player_t* player)
 
 
 /* given two angles in [0, 2pi], return their difference */
-float ang_diff(float alpha, float beta)
+float delta_angle(float alpha, float beta)
 {
     static const float twopi = PI * 2;
     float diff = fmod(fabs(alpha - beta), twopi);
@@ -1659,7 +1672,7 @@ float ang_diff(float alpha, float beta)
 }
 
 /* truncates the angle within a given threshold, assuming 0 <= degrees < 360 */
-int fixangle(int degrees, int threshold)
+int fix_angle(int degrees, int threshold)
 {
     int t = threshold / 2;
     if(degrees <= t || degrees >= 360 - t)
