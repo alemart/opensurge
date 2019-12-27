@@ -97,7 +97,6 @@ struct physicsactor_t
     sensor_t *D_jumproll;
     sensor_t *M_jumproll;
     sensor_t *U_jumproll;
-
     v2d_t angle_sensor[2];
 };
 
@@ -189,7 +188,8 @@ static const float cos_table[256] = {
 };
 
 /* slope table: stored angles */
-/* SLOPE(y,x) is the angle of the (y,x) slope, where -11 <= y,x <= 11 */
+/* SLOPE(y,x) is the angle of the (y,x) slope, where -SLOPE_LIMIT <= y,x <= SLOPE_LIMIT */
+#define SLOPE_LIMIT 11
 #define SLOPE(y,x) slp_table[11 + ((y) + ((y)<-11)*(-11-(y)) + ((y)>11)*(11-(y)))][11 + ((x) + ((x)<-11)*(-11-(x)) + ((x)>11)*(11-(x)))]
 static const int slp_table[23][23] = {
     { 0xA0, 0xA2, 0xA4, 0xA6, 0xA9, 0xAC, 0xAF, 0xB2, 0xB5, 0xB9, 0xBC, 0xC0, 0xC4, 0xC7, 0xCB, 0xCE, 0xD1, 0xD4, 0xD7, 0xDA, 0xDC, 0xDE, 0xE0 },
@@ -699,50 +699,52 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 /* call UPDATE_MOVMODE whenever you update pa->angle */
 #define UPDATE_MOVMODE() \
     do { \
-        if(pa->angle < 0x20 || pa->angle > 0xE0) { \
+        if(pa->angle < 0x20 || pa->angle >= 0xE0) { \
             if(pa->movmode == MM_CEILING) \
                 pa->gsp = -pa->gsp; \
             pa->movmode = MM_FLOOR; \
         } \
-        else if(pa->angle > 0x20 && pa->angle < 0x60) \
+        else if(pa->angle >= 0x20 && pa->angle < 0x60) \
             pa->movmode = MM_LEFTWALL; \
-        else if(pa->angle > 0x60 && pa->angle < 0xA0) \
+        else if(pa->angle >= 0x60 && pa->angle < 0xA0) \
             pa->movmode = MM_CEILING; \
-        else if(pa->angle > 0xA0 && pa->angle < 0xE0) \
+        else if(pa->angle >= 0xA0 && pa->angle < 0xE0) \
             pa->movmode = MM_RIGHTWALL; \
     } while(0)
 
 /* compute the current pa->angle */
 #define UPDATE_ANGLE() \
     do { \
+        const sensor_t* sensor = sensor_A(pa); \
+        int sensor_height = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
+        int search_base = sensor_get_y2(sensor) - 1; \
+        int max_iterations = sensor_height * 3; \
         int half_dist = distance_between_angle_sensors(pa) / 2; \
         int hoff = half_dist + (1 - half_dist % 2); /* odd number */ \
         int min_hoff = was_midair ? 3 : 1; \
-        int max_delta = hoff * 2; \
+        int max_delta = min(hoff * 2, SLOPE_LIMIT); \
         int current_angle = pa->angle; \
         int angular_tolerance = 0x14; \
         int dx = 0, dy = 0; \
         \
         do { \
-            UPDATE_ANGLE_EX(hoff, dx, dy); \
+            pa->angle = current_angle; /* assume continuity */ \
+            UPDATE_ANGLE_STEP(hoff, search_base, max_iterations, dx, dy); \
             hoff -= 2; /* increase precision */ \
         } while(hoff >= min_hoff && at_M == NULL && (dx < -max_delta || dx > max_delta || dy < -max_delta || dy > max_delta || delta_angle(pa->angle, current_angle) > angular_tolerance)); \
     } while(0)
 
-#define UPDATE_ANGLE_EX(hoff, out_dx, out_dy) \
+#define UPDATE_ANGLE_STEP(hoff, search_base, max_iterations, out_dx, out_dy) \
     do { \
         const obstacle_t* gnd = NULL; \
-        const sensor_t* sensor = sensor_A(pa); \
-        int h, x, y, xa, ya, xb, yb, ang; \
-        int found_a = FALSE, found_b = FALSE; \
-        int sensor_height = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
-        int base = sensor_get_y2(sensor) - 1; \
-        int length = sensor_height * 3; \
+        bool found_a = false, found_b = false; \
+        int x, y, xa, ya, xb, yb, ang; \
+        float h; \
         \
-        for(int i = 0; i < length && !(found_a && found_b); i++) { \
-            h = base + i; \
-            x = pa->position.x + (float)h * SIN(pa->angle) + 0.5f; \
-            y = pa->position.y + (float)h * COS(pa->angle) + 0.5f; \
+        for(int i = 0; i < (max_iterations) && !(found_a && found_b); i++) { \
+            h = (search_base) + i; \
+            x = pa->position.x + h * SIN(pa->angle) + 0.5f; \
+            y = pa->position.y + h * COS(pa->angle) + 0.5f; \
             if(!found_a) { \
                 xa = x - (hoff) * COS(pa->angle); \
                 ya = y + (hoff) * SIN(pa->angle); \
@@ -792,12 +794,14 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
                         break; \
                 } \
                 x = xb - xa; y = yb - ya; \
-                ang = SLOPE(y, x); \
-                if(ga == gb || delta_angle(ang, pa->angle) <= 0x25) { \
-                    pa->angle = ang; \
-                    pa->angle_sensor[0] = v2d_new(xa, ya); \
-                    pa->angle_sensor[1] = v2d_new(xb, yb); \
-                    out_dx = x; out_dy = y; \
+                if(x != 0 || y != 0) { \
+                    ang = SLOPE(y, x); \
+                    if(ga == gb || delta_angle(ang, pa->angle) <= 0x25) { \
+                        pa->angle = ang; \
+                        pa->angle_sensor[0] = v2d_new(xa, ya); \
+                        pa->angle_sensor[1] = v2d_new(xb, yb); \
+                        out_dx = x; out_dy = y; \
+                    } \
                 } \
             } \
         } \
@@ -947,29 +951,25 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else
             pa->gsp += pa->rolldownhillslp * -SIN(pa->angle) * dt;
 
-        /* velocity & control */
-        if(pa->angle % 0x40 == 0) {
+        /* deceleration */
+        if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f)
+            pa->gsp = min(0.0f, pa->gsp + pa->rolldec * dt);
+        else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f)
+            pa->gsp = max(0.0f, pa->gsp - pa->rolldec * dt);
 
-            /* deceleration */
-            if(pa->angle == 0x0) {
-                if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f)
-                    pa->gsp = min(0.0f, pa->gsp + pa->rolldec * dt);
-                else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f)
-                    pa->gsp = max(0.0f, pa->gsp - pa->rolldec * dt);
-            }
-
-            /* friction */
+        /* friction */
+        if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
             if(fabs(pa->gsp) > pa->rollfrc * dt)
                 pa->gsp -= pa->rollfrc * sign(pa->gsp) * dt;
             else
                 pa->gsp = 0.0f;
-
-            /* unroll */
-            if(fabs(pa->gsp) < pa->unrollthreshold)
-                pa->state = PAS_WALKING;
         }
 
-        /* face right? */
+        /* unroll */
+        if(fabs(pa->gsp) < pa->unrollthreshold)
+            pa->state = PAS_WALKING;
+
+        /* facing right? */
         pa->facing_right = (pa->gsp >= 0.0f);
     }
 
@@ -1327,6 +1327,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else if(pa->movmode == MM_FLOOR)
             pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
 
+        /* bugfix (near the edges) */
+        if(was_midair)
+            pa->gsp = 0.0f; /* reacquisition of the ground comes next */
+
         /* update the angle */
         SET_AUTO_ANGLE();
     }
@@ -1336,7 +1340,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 1.0f * -sign(SIN(pa->angle));
+            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 0.5f * -sign(SIN(pa->angle));
         else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
             pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
 
@@ -1346,7 +1350,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* bump into ceilings */
-    if(pa->midair && (at_C != NULL || at_D != NULL) && pa->ysp < 0.0f) {
+    if(pa->midair && (at_C != NULL || at_D != NULL)) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
 
@@ -1365,7 +1369,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         SET_AUTO_ANGLE();
 
         /* reattach to the ceiling */
-        if((pa->angle >= 0xA0 && pa->angle <= 0xC0) || (pa->angle >= 0x40 && pa->angle <= 0x60)) {
+        if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
             pa->gsp = (fabs(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
             pa->xsp = pa->ysp = 0.0f;
             if(pa->state != PAS_ROLLING)
@@ -1376,7 +1380,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             int offset = -sensor_get_y1(ceiling_sensor);
 
             /* adjust speed & angle */
-            pa->ysp = 0.0f;
+            pa->ysp = max(pa->ysp, 0.0f);
             FORCE_ANGLE(0x0);
 
             /* adjust position */
@@ -1392,8 +1396,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      */
 
     /* reset the angle */
-    if(pa->midair)
+    if(pa->midair) {
         FORCE_ANGLE(0x0);
+    }
 
     /* I'm on the edge */
     if(
