@@ -1329,7 +1329,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         /* bugfix (near the edges) */
         if(was_midair)
-            pa->gsp = 0.0f; /* reacquisition of the ground comes next */
+            pa->gsp = pa->xsp; /* reacquisition of the ground comes next */
 
         /* update the angle */
         SET_AUTO_ANGLE();
