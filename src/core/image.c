@@ -592,6 +592,7 @@ color_t image_getpixel(const image_t* img, int x, int y)
 #endif
 }
 
+
 /*
  * image_putpixel()
  * Puts a pixel on the target image. Make sure to lock it first
@@ -613,7 +614,7 @@ void image_putpixel(int x, int y, color_t color)
 void image_line(int x1, int y1, int x2, int y2, color_t color)
 {
 #if defined(A5BUILD)
-    al_draw_line(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 1.0f);
+    al_draw_line(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 0.0f);
 #else
     line(get_target()->data, x1, y1, x2, y2, color._value);
 #endif
@@ -627,9 +628,37 @@ void image_line(int x1, int y1, int x2, int y2, color_t color)
 void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color)
 {
 #if defined(A5BUILD)
-    al_draw_ellipse(cx + 0.5f, cy + 0.5f, radius_x, radius_y, color._color, 1.0f);
+    al_draw_ellipse(cx + 0.5f, cy + 0.5f, radius_x, radius_y, color._color, 0.0f);
 #else
     ellipse(get_target()->data, cx, cy, radius_x, radius_y, color._value);
+#endif
+}
+
+
+/*
+ * image_ellipsefill()
+ * Draws a filled ellipse with the specified centre, radius and color
+ */
+void image_ellipsefill(int cx, int cy, int radius_x, int radius_y, color_t color)
+{
+#if defined(A5BUILD)
+    al_draw_filled_ellipse(cx + 0.5f, cy + 0.5f, radius_x, radius_y, color._color);
+#else
+    ellipsefill(get_target()->data, cx, cy, radius_x, radius_y, color._value);
+#endif
+}
+
+
+/*
+ * image_rect()
+ * Draws a rectangle
+ */
+void image_rect(int x1, int y1, int x2, int y2, color_t color)
+{
+#if defined(A5BUILD)
+    al_draw_rectangle(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 0.0f);
+#else
+    rect(get_target()->data, x1, y1, x2, y2, color._value);
 #endif
 }
 
@@ -646,21 +675,6 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
     rectfill(get_target()->data, x1, y1, x2, y2, color._value);
 #endif
 }
-
-
-/*
- * image_rect()
- * Draws a rectangle
- */
-void image_rect(int x1, int y1, int x2, int y2, color_t color)
-{
-#if defined(A5BUILD)
-    al_draw_rectangle(x1 + 0.5f, y1 + 0.5f, x2 + 0.5f, y2 + 0.5f, color._color, 1.0f);
-#else
-    rect(get_target()->data, x1, y1, x2, y2, color._value);
-#endif
-}
-
 
 
 /*
