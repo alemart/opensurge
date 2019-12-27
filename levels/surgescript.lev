@@ -1,9 +1,9 @@
-// This is a blank canvas for
+// This is a blank template for
 // a SurgeScript Application
 
-// when copying this file, you may change
-// the parameters below
-name "SurgeScript Test"
+// Copy this file. Next, you may change
+// one or more of the parameters below:
+name "SurgeScript Application"
 author "YOUR NAME HERE"
 license "CC-BY 3.0"
 version "1.0"
@@ -13,9 +13,12 @@ theme "themes/none.brk"
 bgtheme "themes/template.bg"
 //music "musics/template.ogg"
 spawn_point 0 0
-setup "Pause and Quit" "SurgeScript MOTD"
 players "None"
 
-// when copying this file, you may remove
+// Setup objects are spawned the moment
+// the level is loaded. List them below:
+setup "Pause and Quit" "SurgeScript MOTD"
+
+// When copying this file, you may remove
 // the line below to access the level editor
 readonly
