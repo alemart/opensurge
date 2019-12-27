@@ -22,7 +22,7 @@ using SurgeEngine.Collisions.Sensor;
 object "Giant Wolf" is "entity", "boss", "awake"
 {
     public onDefeat = Event();
-    public hp = 4; // health points
+    public hp = 5; // health points
 
     actor = Actor("Giant Wolf's Body");
     head = spawn("Giant Wolf's Head");
