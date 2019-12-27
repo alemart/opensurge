@@ -260,7 +260,7 @@ object "Item Box" is "entity", "private"
 
     state "main"
     {
-        brick.enabled = !Player.active.attacking;
+        brick.enabled = !canCrush(Player.active);
     }
 
     state "crushed"
@@ -277,7 +277,7 @@ object "Item Box" is "entity", "private"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(player.jumping || player.rolling || player.charging || player.aggressive) {
+            if(canCrush(player)) {
                 player.bounceBack(actor);
                 crush(player);
             }
@@ -310,6 +310,13 @@ object "Item Box" is "entity", "private"
             // notify the parent
             parent.onItemBoxCrushed(player);
         }
+    }
+
+    // can the player crush the item box?
+    fun canCrush(player)
+    {
+        /* player.attacking won't cut it (it's true when invincible) */
+        return player.jumping || player.rolling || player.charging || player.aggressive;
     }
 
     // --- MODIFIERS ---
