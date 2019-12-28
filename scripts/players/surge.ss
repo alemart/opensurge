@@ -7,10 +7,11 @@
 using SurgeEngine.Player;
 using SurgeEngine.Actor;
 using SurgeEngine.Level;
+using SurgeEngine.Vector2;
 using SurgeEngine.Audio.Sound;
+using SurgeEngine.Collisions.Sensor;
 using SurgeEngine.Collisions.CollisionBall;
 using SurgeEngine.Behaviors.DirectionalMovement;
-using SurgeEngine.Vector2;
 
 //
 // Surge's waiting animation will be modified if he's underwater
@@ -137,6 +138,7 @@ object "Surge's Lighting Boom" is "companion"
     xsp = 0;
     fx = null;
     shieldAbilities = null;
+    ceilingSensor = Sensor(-player.collider.width * 0.4, -player.collider.height * 0.8, player.collider.width * 0.8, 1);
 
     state "main"
     {
@@ -152,7 +154,7 @@ object "Surge's Lighting Boom" is "companion"
     {
         timeMidAir += (player.midair ? Time.delta : -timeMidAir);
         if(timeMidAir >= 0.1 && !player.underwater) {
-            if(player.input.buttonPressed("fire1") && isReady()) {
+            if(player.input.buttonPressed("fire1") && isReady() && ceilingSensor.status == null) {
                 boom();
                 shieldAbilities.unlock();
                 shieldAbilities.getReadyToActivate();
