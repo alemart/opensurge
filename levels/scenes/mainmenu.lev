@@ -3,7 +3,7 @@ name "Main Menu"
 author "Alexandre Martins"
 license "CC-BY 3.0"
 version "1.0"
-requires "0.5.0"
+requires "0.5.1"
 act 1
 theme "themes/none.brk"
 bgtheme "themes/scenes/mainmenu.bg"

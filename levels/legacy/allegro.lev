@@ -7,7 +7,7 @@
 name "Allegro"
 author "Alexandre"
 version "1.0"
-requires 0.2.0
+requires "0.2.0"
 act 1
 theme "themes/none.brk"
 bgtheme "themes/none.bg"

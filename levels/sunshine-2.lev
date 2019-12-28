@@ -9,7 +9,7 @@ name "Sunshine Paradise"
 author "Alexandre Martins"
 license "CC-BY 3.0"
 version "1.0"
-requires "0.5.0"
+requires "0.5.1"
 act 2
 theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
