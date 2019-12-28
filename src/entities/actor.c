@@ -100,7 +100,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
         /* render */
         img = actor_image(act);
-        if(!nearly_equal(act->angle, 0.0f)) {
+        if(!nearly_zero(act->angle)) {
             if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f))
                 image_draw_scaled_rotated(img, (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
             else

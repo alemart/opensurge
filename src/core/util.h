@@ -54,7 +54,8 @@
 #define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
 #define atob(str)               ((str_icmp((str), "true") == 0) || (str_icmp((str), "yes") == 0))
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
-#define nearly_equal(a,b)       (((b)==0||(a)==0)?(fabs((a)+(b))<1e-5):(fabs((a)-(b))<=max(1e-5*max(fabs(a),fabs(b)),0)))
+#define nearly_zero(x)          (fabs(x)<=0.00001f)
+#define nearly_equal(a,b)       (fabs((a)-(b))<=0.00001f*max(fabs(a),fabs(b)))
 #define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" STRINGIFY(__LINE__))
 #define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" STRINGIFY(__LINE__))
 

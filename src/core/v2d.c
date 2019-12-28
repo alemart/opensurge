@@ -110,7 +110,7 @@ v2d_t v2d_normalize(v2d_t v)
 {
     float length = v2d_magnitude(v);
 
-    if(!nearly_equal(length, 0.0f))
+    if(!nearly_zero(length))
         return v2d_new(v.x / length, v.y / length);
     else
         return v2d_new(0, 0);
