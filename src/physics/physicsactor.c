@@ -1120,7 +1120,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
-    /* previous air state */
+    /* save previous midair state */
     UPDATE_SENSORS();
     was_midair = pa->midair;
 
@@ -1329,11 +1329,23 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else if(pa->movmode == MM_FLOOR)
             pa->position.y = obstacle_ground_position(ground, (int)pa->position.x + sensor_get_x2(ground_sensor), (int)pa->position.y + sensor_get_y2(ground_sensor), GD_DOWN) - offset;
 
-        /* bugfix (near the edges) */
+        /* additional adjustments when first touching the ground */
         if(was_midair) {
             if(pa->movmode == MM_FLOOR) {
-                /* reacquisition of the ground comes next */
+                /* fix the speed (reacquisition of the ground comes next) */
                 pa->gsp = pa->xsp;
+
+                /* unroll after rolling midair */
+                if(pa->state == PAS_ROLLING) {
+                    if(pa->ysp >= 60.0f && !input_button_down(pa->input, IB_DOWN)) {
+                        pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+                        pa->facing_right = (pa->gsp >= 0.0f);
+                    }
+                }
+                else {
+                    /* animation fix (e.g., when jumping near edges) */
+                    pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+                }
             }
         }
 
