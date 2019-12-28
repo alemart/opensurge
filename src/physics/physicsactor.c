@@ -66,11 +66,12 @@ struct physicsactor_t
     float waittime; /* wait time in seconds */
     int angle; /* angle (0-255 clockwise) */
     int midair; /* is the player midair? */
+    int facing_right; /* is the player facing right? */
+    int winning_pose; /* winning pose enabled? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
     float jump_lock_timer; /* jump lock timer, in seconds */
-    int facing_right; /* is the player facing right? */
-    float wait_timer; /* the time, in seconds, that the physics actor is stopped */
-    int winning_pose; /* winning pose enabled? */
+    float wait_timer; /* how long has the physics actor been stopped, in seconds */
+    float midair_timer; /* how long has the physics actor been midair, in second */
     float breathe_timer; /* if greater than zero, set animation to breathing */
     int sticky_lock; /* sticky physics lock */
     float charge_intensity; /* charge intensity */
@@ -237,6 +238,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->facing_right = TRUE;
     pa->input = input_create_computer();
     pa->wait_timer = 0.0f;
+    pa->midair_timer = 0.0f;
     pa->winning_pose = FALSE;
     pa->breathe_timer = 0.0f;
     pa->sticky_lock = FALSE;
@@ -1337,7 +1339,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
                 /* unroll after rolling midair */
                 if(pa->state == PAS_ROLLING) {
-                    if(pa->ysp >= 60.0f && !input_button_down(pa->input, IB_DOWN)) {
+                    if(pa->midair_timer >= 0.1f && !input_button_down(pa->input, IB_DOWN)) {
                         pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
                         pa->facing_right = (pa->gsp >= 0.0f);
                     }
@@ -1413,10 +1415,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
      *
      */
 
-    /* reset the angle */
+    /* reset the angle & update the midair_timer */
     if(pa->midair) {
+        pa->midair_timer += dt;
         FORCE_ANGLE(0x0);
     }
+    else
+        pa->midair_timer = 0.0f;
 
     /* I'm on the edge */
     if(
