@@ -50,7 +50,7 @@
 #define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define min(a,b)                ((a)<(b)?(a):(b))
 #define max(a,b)                ((a)>(b)?(a):(b))
-#define sign(x)                 (((x)>=0)?1.0f:-1.0f)
+#define sign(x)                 copysign(1.0f, (x))
 #define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
 #define atob(str)               ((str_icmp((str), "true") == 0) || (str_icmp((str), "yes") == 0))
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
