@@ -369,8 +369,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         act->speed.y *= 0.5f;
     }
 
+    /* pitfalls */
+    if(act->position.y >= level_height_at(act->position.x))
+        player_kill(player);
+
     /* active player can't get off camera */
-    if(player == level_player()) {
+    if(player == level_player() && !player->disable_movement) {
         v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
         v2d_t cam_bottomright = camera_clip(level_size());
 
@@ -390,10 +394,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             act->speed.y *= 0.5f;
         }
     }
-
-    /* pitfalls */
-    if(act->position.y >= level_height_at(act->position.x))
-        player_kill(player);
 
     /* rolling misc */
     if(!player_is_midair(player))
