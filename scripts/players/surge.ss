@@ -138,7 +138,7 @@ object "Surge's Lighting Boom" is "companion"
     xsp = 0;
     fx = null;
     shieldAbilities = null;
-    ceilingSensor = Sensor(-player.collider.width * 0.4, -player.collider.height * 0.8, player.collider.width * 0.8, 1);
+    ceilingSensor = Sensor(-player.collider.width * 0.4, -player.collider.height * 0.75, player.collider.width * 0.8, 1);
 
     state "main"
     {
@@ -154,7 +154,7 @@ object "Surge's Lighting Boom" is "companion"
     {
         timeMidAir += (player.midair ? Time.delta : -timeMidAir);
         if(timeMidAir >= 0.1 && !player.underwater) {
-            if(player.input.buttonPressed("fire1") && isReady() && ceilingSensor.status == null) {
+            if(player.input.buttonPressed("fire1") && isReady()) {
                 boom();
                 shieldAbilities.unlock();
                 shieldAbilities.getReadyToActivate();
@@ -185,6 +185,8 @@ object "Surge's Lighting Boom" is "companion"
                 player.anim = 1;
             backToNormal();
         }
+        else if(ceilingSensor.status == "solid")
+            adjustToCeiling();
     }
 
     state "sustaining"
@@ -202,6 +204,8 @@ object "Surge's Lighting Boom" is "companion"
         else if(player.ysp >= 120) {
             backToNormal();
         }
+        else if(ceilingSensor.status == "solid")
+            adjustToCeiling();
     }
 
     state "waiting for shield attack"
@@ -246,6 +250,15 @@ object "Surge's Lighting Boom" is "companion"
     {
         jmp = (player.shield == "thunder") ? superJumpSpeed : normalJumpSpeed;
         return Math.min(player.ysp, jmp);
+    }
+
+    fun adjustToCeiling()
+    {
+        player.ysp = Math.max(player.ysp, 0);
+        for(maxAttempts = 64, i = 0; ceilingSensor.status == "solid" && i < maxAttempts; i++) {
+            player.transform.translateBy(0, 1);
+            ceilingSensor.onTransformChange();
+        }
     }
 }
 
