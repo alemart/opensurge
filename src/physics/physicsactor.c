@@ -664,6 +664,9 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
  * ---------------------------------------
  */
 
+/* utility macros */
+#define WALKING_OR_RUNNING(pa)                ((fabs((pa)->gsp) >= (pa)->topspeed) ? PAS_RUNNING : PAS_WALKING)
+
 /* call UPDATE_SENSORS whenever you update pa->position or pa->angle */
 #define UPDATE_SENSORS() \
     do { \
@@ -741,7 +744,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 #define UPDATE_ANGLE_STEP(hoff, search_base, max_iterations, out_dx, out_dy) \
     do { \
         const obstacle_t* gnd = NULL; \
-        bool found_a = false, found_b = false; \
+        int found_a = FALSE, found_b = FALSE; \
         int x, y, xa, ya, xb, yb, ang; \
         float h; \
         \
@@ -928,7 +931,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
         else {
             if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
-                pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+                pa->state = WALKING_OR_RUNNING(pa);
             else if(pa->state == PAS_PUSHING)
                 pa->state = PAS_WALKING;
         }
@@ -1340,13 +1343,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 /* unroll after rolling midair */
                 if(pa->state == PAS_ROLLING) {
                     if(pa->midair_timer >= 0.1f && !input_button_down(pa->input, IB_DOWN)) {
-                        pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+                        pa->state = WALKING_OR_RUNNING(pa);
                         pa->facing_right = (pa->gsp >= 0.0f);
                     }
                 }
                 else {
                     /* animation fix (e.g., when jumping near edges) */
-                    pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+                    pa->state = WALKING_OR_RUNNING(pa);
                 }
             }
         }
@@ -1366,13 +1369,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
         pa->xsp = pa->ysp = 0.0f;
         if(pa->state != PAS_ROLLING)
-            pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+            pa->state = WALKING_OR_RUNNING(pa);
     }
 
     /* bump into ceilings */
     if(pa->midair && (at_C != NULL || at_D != NULL)) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
+        int must_reattach = FALSE;
 
         /* picking the ceiling */
         if(pick_the_best_ceiling(pa, at_C, at_D, sensor_C(pa), sensor_D(pa)) == 'c') {
@@ -1384,19 +1388,26 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             ceiling_sensor = sensor_D(pa);
         }
 
-        /* compute the angle */
-        FORCE_ANGLE(0x80);
-        SET_AUTO_ANGLE();
+        /* are we touching the ceiling for the first time? */
+        if(pa->ysp < 0.0f) {
+            /* compute the angle */
+            FORCE_ANGLE(0x80);
+            SET_AUTO_ANGLE();
 
-        /* reattach to the ceiling */
-        if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
-            pa->gsp = (fabs(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
-            pa->xsp = pa->ysp = 0.0f;
-            if(pa->state != PAS_ROLLING)
-                pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+            /* reattach to the ceiling */
+            if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
+                must_reattach = !pa->midair;
+                if(must_reattach) {
+                    pa->gsp = (fabs(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+                    pa->xsp = pa->ysp = 0.0f;
+                    if(pa->state != PAS_ROLLING)
+                        pa->state = WALKING_OR_RUNNING(pa);
+                }
+            }
         }
-        else {
-            /* won't reattach */
+
+        /* won't reattach to the ceiling */
+        if(!must_reattach) {
             int offset = -sensor_get_y1(ceiling_sensor);
 
             /* adjust speed & angle */
@@ -1455,7 +1466,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* animation bugfix */
     if(pa->midair && (pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP))
-        pa->state = (fabs(pa->gsp) >= pa->topspeed) ? PAS_RUNNING : PAS_WALKING;
+        pa->state = WALKING_OR_RUNNING(pa);
 }
 
 /* which one is the tallest obstacle, a or b? */

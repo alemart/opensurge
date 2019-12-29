@@ -185,7 +185,7 @@ object "Surge's Lighting Boom" is "companion"
                 player.anim = 1;
             backToNormal();
         }
-        else if(ceilingSensor.status == "solid")
+        else if(mustAdjustToCeiling())
             adjustToCeiling();
     }
 
@@ -204,7 +204,7 @@ object "Surge's Lighting Boom" is "companion"
         else if(player.ysp >= 120) {
             backToNormal();
         }
-        else if(ceilingSensor.status == "solid")
+        else if(mustAdjustToCeiling())
             adjustToCeiling();
     }
 
@@ -250,6 +250,11 @@ object "Surge's Lighting Boom" is "companion"
     {
         jmp = (player.shield == "thunder") ? superJumpSpeed : normalJumpSpeed;
         return Math.min(player.ysp, jmp);
+    }
+
+    fun mustAdjustToCeiling()
+    {
+        return ceilingSensor.status == "solid";
     }
 
     fun adjustToCeiling()
