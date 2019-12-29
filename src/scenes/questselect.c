@@ -99,21 +99,21 @@ void questselect_init(void *foo)
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
 
-    title = font_create("menu.title");
+    title = font_create("MenuTitle");
     font_set_text(title, "%s", "$QUESTSELECT_TITLE");
     font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 10));
     font_set_align(title, FONTALIGN_CENTER);
 
-    msg = font_create("menu.text");
+    msg = font_create("MenuText");
     font_set_text(msg, "%s", "$QUESTSELECT_MSG");
     font_set_position(msg, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(msg).y * 1.5f));
 
-    page = font_create("menu.text");
+    page = font_create("MenuText");
     font_set_textarguments(page, 2, "0", "0");
     font_set_text(page, "%s", "$QUESTSELECT_PAGE");
     font_set_position(page, v2d_new(VIDEO_SCREEN_W - font_get_textsize(page).x - 10, VIDEO_SCREEN_H - font_get_textsize(page).y * 1.5f));
 
-    info = font_create("menu.text");
+    info = font_create("MenuText");
     font_set_position(info, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(info).y * 5.0f));
     font_set_textarguments(info, 3, "null", "null", "null");
     font_set_text(info, "%s", "$QUESTSELECT_INFO");
@@ -322,7 +322,7 @@ void load_quest_list()
     /* other stuff */
     quest_label = mallocx(quest_count * sizeof(font_t**));
     for(i=0; i<quest_count; i++) {
-        quest_label[i] = font_create("menu.text");
+        quest_label[i] = font_create("MenuText");
         font_set_position(quest_label[i], v2d_new(25, 60 + 20 * (i % QUEST_MAXPERPAGE)));
     }
 }

@@ -210,7 +210,7 @@ object "SurgeCool" is "private", "detached", "entity"
 object "MainMenuGameVersion" is "private", "detached", "entity"
 {
     transform = Transform();
-    text = [ Text("menu.small"), Text("menu.small") ];
+    text = [ Text("MenuSmall"), Text("MenuSmall") ];
 
     state "main"
     {

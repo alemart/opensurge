@@ -154,6 +154,6 @@ object ".creativecommons_startup.disclaimer"
 
     state show_text
     {
-        textout_centre "menu.small" 0 0 ""
+        textout_centre "MenuSmall" 0 0 ""
     }
 }

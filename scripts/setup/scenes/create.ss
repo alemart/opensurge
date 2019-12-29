@@ -111,8 +111,8 @@ object "CreateMenu"
 object "CreateMenuText" is "private", "entity"
 {
     transform = Transform();
-    text = Text("menu.bold");
-    shadow = Text("menu.bold");
+    text = Text("MenuBold");
+    shadow = Text("MenuBold");
 
     fun constructor()
     {

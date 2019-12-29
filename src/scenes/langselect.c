@@ -96,10 +96,10 @@ void langselect_init(void *param)
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
 
-    page_label = font_create("menu.text");
-    author_label = font_create("menu.text");
+    page_label = font_create("MenuText");
+    author_label = font_create("MenuText");
 
-    title = font_create("menu.title");
+    title = font_create("MenuTitle");
     font_set_text(title, "%s", "<color=$COLOR_TITLE>SELECT YOUR\nLANGUAGE</color>");
     font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 5));
     font_set_align(title, FONTALIGN_CENTER);
@@ -273,8 +273,8 @@ void load_lang_list()
     lngfnt[0] = mallocx(lngcount * sizeof(font_t*));
     lngfnt[1] = mallocx(lngcount * sizeof(font_t*));
     for(i=0; i<lngcount; i++) {
-        lngfnt[0][i] = font_create("menu.text");
-        lngfnt[1][i] = font_create("menu.text");
+        lngfnt[0][i] = font_create("MenuText");
+        lngfnt[1][i] = font_create("MenuText");
         font_set_text(lngfnt[0][i], "%2d. %s", i+1, lngdata[i].title);
         font_set_text(lngfnt[1][i], "<color=$COLOR_HIGHLIGHT>% 2d. %s</color>", i+1, lngdata[i].title);
         font_set_position(lngfnt[0][i], v2d_new(25, 72 + 20*(i%LANG_MAXPERPAGE)));

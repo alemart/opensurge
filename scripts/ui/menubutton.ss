@@ -52,7 +52,7 @@ object "MenuButton" is "private", "entity", "awake"
     public sound = Sound("samples/select.wav"); // may be changed
     actor = Actor("MenuButton");
     hand = Actor("SelectHand64");
-    label = Text("menu.button");
+    label = Text("MenuButton");
 
     // main
     state "main"

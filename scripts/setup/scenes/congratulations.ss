@@ -94,7 +94,7 @@ object "Congratulations"
 object "CongratulationsTitle" is "private", "entity"
 {
     transform = Transform();
-    text = Text("menu.button");
+    text = Text("MenuButton");
 
     fun constructor()
     {
@@ -107,8 +107,8 @@ object "CongratulationsTitle" is "private", "entity"
 object "CongratulationsText" is "private", "entity"
 {
     transform = Transform();
-    text = Text("menu.bold");
-    shadow = Text("menu.bold");
+    text = Text("MenuBold");
+    shadow = Text("MenuBold");
 
     fun constructor()
     {

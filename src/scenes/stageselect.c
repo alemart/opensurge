@@ -115,16 +115,16 @@ void stageselect_init(void *should_enable_debug)
     level_to_be_loaded = NULL;
     music = music_load(OPTIONS_MUSICFILE);
 
-    title = font_create("menu.title");
+    title = font_create("MenuTitle");
     font_set_text(title, "%s", !enable_debug ? "$STAGESELECT_TITLE" : "$STAGESELECT_DEBUG");
     font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 10));
     font_set_align(title, FONTALIGN_CENTER);
 
-    msg = font_create("menu.text");
+    msg = font_create("MenuText");
     font_set_text(msg, "%s", "$STAGESELECT_MSG");
     font_set_position(msg, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(msg).y * 1.5f));
 
-    page = font_create("menu.text");
+    page = font_create("MenuText");
     font_set_textarguments(page, 2, "0", "0");
     font_set_text(page, "%s", "$STAGESELECT_PAGE");
     font_set_position(page, v2d_new(VIDEO_SCREEN_W - font_get_textsize(page).x - 10, font_get_position(msg).y));
@@ -327,7 +327,7 @@ void load_stage_list()
     /* other stuff */
     stage_label = mallocx(stage_count * sizeof(font_t**));
     for(i=0; i<stage_count; i++) {
-        stage_label[i] = font_create("menu.text");
+        stage_label[i] = font_create("MenuText");
         font_set_position(stage_label[i], v2d_new(25, 50 + 20 * (i % STAGE_MAXPERPAGE)));
     }
 }

@@ -66,16 +66,16 @@ void credits_init(void *foo)
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
 
-    title = font_create("menu.title");
+    title = font_create("MenuTitle");
     font_set_text(title, "%s", lang_get("CREDITS_TITLE"));
     font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 5));
     font_set_align(title, FONTALIGN_CENTER);
 
-    back = font_create("menu.text");
+    back = font_create("MenuText");
     font_set_text(back, "%s", lang_get("CREDITS_BACK"));
     font_set_position(back, v2d_new(10, VIDEO_SCREEN_H - font_get_textsize(back).y - 5));
 
-    text = font_create("menu.text");
+    text = font_create("MenuText");
     font_set_text(text, "%s", CREDITS_TEXT);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));

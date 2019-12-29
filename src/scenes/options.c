@@ -93,7 +93,7 @@ void options_init(void *foo)
 
     stageselect_enable_debug = false;
 
-    title = font_create("menu.title");
+    title = font_create("MenuTitle");
     font_set_text(title, "%s", "$OPTIONS_TITLE");
     font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 10));
     font_set_align(title, FONTALIGN_CENTER);
@@ -456,7 +456,7 @@ static void group_fullscreen_render(group_t *g, v2d_t camera_position)
     group_highlightable_render(g, camera_position);
 
     /* derived class */
-    f = font_create("menu.text");
+    f = font_create("MenuText");
     font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
@@ -532,7 +532,7 @@ static void group_smooth_render(group_t *g, v2d_t camera_position)
     group_highlightable_render(g, camera_position);
 
     /* derived class */
-    f = font_create("menu.text");
+    f = font_create("MenuText");
     font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
@@ -610,7 +610,7 @@ static void group_fps_render(group_t *g, v2d_t camera_position)
     group_highlightable_render(g, camera_position);
 
     /* derived class */
-    f = font_create("menu.text");
+    f = font_create("MenuText");
     font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
@@ -726,7 +726,7 @@ static void group_resolution_render(group_t *g, v2d_t camera_position)
     group_highlightable_render(g, camera_position);
 
     /* derived class */
-    f = font_create("menu.text");
+    f = font_create("MenuText");
     font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_RESOLUTION_OPT1"), sizeof(v[0]));
@@ -1082,7 +1082,7 @@ static void group_gamepad_render(group_t *g, v2d_t camera_position)
     group_highlightable_render(g, camera_position);
 
     /* derived class */
-    f = font_create("menu.text");
+    f = font_create("MenuText");
     font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
 
     str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));

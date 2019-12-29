@@ -208,7 +208,7 @@ void group_label_init(group_t *g)
 {
     v2d_t pos;
 
-    g->font = font_create("menu.text");
+    g->font = font_create("MenuText");
     font_set_text(g->font, "LABEL"); /* if you want a different text, please derive this class */
 
     /* calculating my position... */

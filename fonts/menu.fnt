@@ -3,7 +3,7 @@
 // Fonts used on various menus
 
 // menu: title
-font "menu.title"
+font "MenuTitle"
 {
     truetype
     {
@@ -14,7 +14,7 @@ font "menu.title"
     }
 }
 
-font "menu.title" for "ko_KR"
+font "MenuTitle" for "ko_KR"
 {
     truetype
     {
@@ -26,7 +26,7 @@ font "menu.title" for "ko_KR"
 }
 
 // menu: general texts
-font "menu.text"
+font "MenuText"
 {
     truetype
     {
@@ -37,7 +37,7 @@ font "menu.text"
     }
 }
 
-font "menu.text" for "ko_KR"
+font "MenuText" for "ko_KR"
 {
     truetype
     {
@@ -49,7 +49,7 @@ font "menu.text" for "ko_KR"
 }
 
 // menu: small
-font "menu.small"
+font "MenuSmall"
 {
     truetype
     {
@@ -59,7 +59,7 @@ font "menu.small"
     }
 }
 
-font "menu.small" for "ko_KR"
+font "MenuSmall" for "ko_KR"
 {
     truetype
     {
@@ -70,7 +70,7 @@ font "menu.small" for "ko_KR"
 }
 
 // menu: bold
-font "menu.bold"
+font "MenuBold"
 {
     truetype
     {
@@ -81,7 +81,7 @@ font "menu.bold"
     }
 }
 
-font "menu.bold" for "ko_KR"
+font "MenuBold" for "ko_KR"
 {
     truetype
     {
@@ -93,7 +93,7 @@ font "menu.bold" for "ko_KR"
 }
 
 // menu: button
-font "menu.button"
+font "MenuButton"
 {
     bitmap
     {
@@ -391,7 +391,7 @@ font "menu.button"
     }
 }
 
-font "menu.button" for "ko_KR"
+font "MenuButton" for "ko_KR"
 {
     truetype
     {
