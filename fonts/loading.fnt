@@ -5,7 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-font "Loading Text"
+font "Loading"
 {
     bitmap
     {
@@ -300,5 +300,16 @@ font "Loading Text"
         char "\x7f" {
             source_rect         841 1 10 16
         }
+    }
+}
+
+font "Loading" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Bold.ttf"
+        size                    16
+        antialias
+        shadow
     }
 }

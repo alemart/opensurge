@@ -208,25 +208,25 @@ CLEARED_TIME                "Time Bonus" //"시간 보너스"
 CLEARED_SCORE               "Score" //"점수"
 
 // Main Menu
-MAINMENU_TITLE              "MENU" //"메뉴"
-MAINMENU_PLAY               "PLAY" //"게임하기"
-MAINMENU_CREATE             "CREATE" //"제작하기"
-MAINMENU_SHARE              "SHARE" //"공유하기"
-MAINMENU_OPTIONS            "OPTIONS" //"옵션"
-MAINMENU_QUIT               "QUIT" //"그만두기"
+MAINMENU_TITLE              "메뉴"
+MAINMENU_PLAY               "게임하기"
+MAINMENU_CREATE             "제작하기"
+MAINMENU_SHARE              "공유하기"
+MAINMENU_OPTIONS            "옵션"
+MAINMENU_QUIT               "그만두기"
 
 // Create Menu
-CREATEMENU_TITLE            "CREATE" //"제작하기"
-CREATEMENU_PLAY             "PLAY DEMO" //"데모 플레이하기"
-CREATEMENU_LEARN            "LEARN" //"학습하기"
-CREATEMENU_SCRIPTING        "SURGESCRIPT" // "서지스크립트"
-CREATEMENU_BACK             "BACK" // "뒤로 가기"
+CREATEMENU_TITLE            "제작하기"
+CREATEMENU_PLAY             "데모 플레이하기"
+CREATEMENU_LEARN            "학습하기"
+CREATEMENU_SCRIPTING        "서지스크립트"
+CREATEMENU_BACK             "뒤로 가기"
 
 // Congratulations Screen
-CONGRATULATIONS_TITLE       "THANKS FOR PLAYING" //"플레이해주셔서 감사합니다."
-CONGRATULATIONS_SHARE       "SHARE" //"공유하기"
-CONGRATULATIONS_DONATE      "DONATE" //"후원하기"
-CONGRATULATIONS_BACK        "BACK" //"뒤로 가기"
+CONGRATULATIONS_TITLE       "플레이해주셔서 감사합니다."
+CONGRATULATIONS_SHARE       "공유하기"
+CONGRATULATIONS_DONATE      "후원하기"
+CONGRATULATIONS_BACK        "뒤로 가기"
 
 // Loading Screen
-LOADING_TEXT                "loading..." //"로딩 중"
+LOADING_TEXT                "로딩 중"

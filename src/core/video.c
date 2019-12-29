@@ -698,7 +698,7 @@ int video_fps()
 void video_display_loading_screen()
 {
     static const char* LOADING_IMAGE = "images/loading.png";
-    static const char* LOADING_FONT = "Loading Text";
+    static const char* LOADING_FONT = "Loading";
     image_t *img = image_load(LOADING_IMAGE);
     font_t* fnt = font_create(LOADING_FONT);
     v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
