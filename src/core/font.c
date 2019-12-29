@@ -75,11 +75,11 @@ static HASHTABLE(fontcallback_t, callback_table);
 
 /* font scripts (nanoparser) */
 static int traverse(const parsetree_statement_t* stmt);
-static int traverse_block(const parsetree_statement_t* stmt, void *data);
-static int traverse_bmp(const parsetree_statement_t* stmt, void *data);
-static int traverse_bmp_char(const parsetree_statement_t* stmt, void *data);
-static int traverse_ttf(const parsetree_statement_t* stmt, void *data);
-static int dirfill(const char* vpath, void *param);
+static int traverse_block(const parsetree_statement_t* stmt, void* data);
+static int traverse_bmp(const parsetree_statement_t* stmt, void* data);
+static int traverse_bmp_char(const parsetree_statement_t* stmt, void* data);
+static int traverse_ttf(const parsetree_statement_t* stmt, void* data);
+static int dirfill(const char* vpath, void* param);
 
 typedef struct charproperties_t charproperties_t;
 struct charproperties_t {
@@ -332,9 +332,7 @@ font_t* font_create(const char* font_name)
  */
 void font_destroy(font_t* f)
 {
-    int i;
-
-    for(i=0; i<FONTARGS_MAX; i++) {
+    for(int i = 0; i < FONTARGS_MAX; i++) {
         if(f->argument[i])
             free(f->argument[i]);
     }
@@ -392,11 +390,11 @@ void font_set_text(font_t* f, const char* fmt, ...)
  */
 void font_set_textarguments(font_t* f, int amount, ...)
 {
-    va_list ap;
     int i, m = min(FONTARGS_MAX, amount);
+    va_list ap;
     
     va_start(ap, amount);
-    for(i=0; i<m; i++) {
+    for(i = 0; i < m; i++) {
         if(f->argument[i])
             free(f->argument[i]);
         f->argument[i] = str_dup(va_arg(ap, const char*));
@@ -1048,7 +1046,7 @@ int traverse(const parsetree_statement_t* stmt)
     return 0;
 }
 
-int traverse_block(const parsetree_statement_t* stmt, void *data)
+int traverse_block(const parsetree_statement_t* stmt, void* data)
 {
     fontscript_t* header = (fontscript_t*)data;
     const char* id = nanoparser_get_identifier(stmt);
@@ -1107,7 +1105,7 @@ int traverse_block(const parsetree_statement_t* stmt, void *data)
     return 0;
 }
 
-int traverse_bmp(const parsetree_statement_t* stmt, void *data)
+int traverse_bmp(const parsetree_statement_t* stmt, void* data)
 {
     fontscript_t* header = (fontscript_t*)data;
     const char* id = nanoparser_get_identifier(stmt);
@@ -1198,7 +1196,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void *data)
     return 0;
 }
 
-int traverse_bmp_char(const parsetree_statement_t* stmt, void *data)
+int traverse_bmp_char(const parsetree_statement_t* stmt, void* data)
 {
     charproperties_t* chr = (charproperties_t*)data;
     const char* id = nanoparser_get_identifier(stmt);
@@ -1228,7 +1226,7 @@ int traverse_bmp_char(const parsetree_statement_t* stmt, void *data)
     return 0;
 }
 
-int traverse_ttf(const parsetree_statement_t* stmt, void *data)
+int traverse_ttf(const parsetree_statement_t* stmt, void* data)
 {
     fontscript_t* header = (fontscript_t*)data;
     const char* id = nanoparser_get_identifier(stmt);
@@ -1263,7 +1261,7 @@ int traverse_ttf(const parsetree_statement_t* stmt, void *data)
     return 0;
 }
 
-int dirfill(const char* vpath, void *param)
+int dirfill(const char* vpath, void* param)
 {
     const char* fullpath = assetfs_fullpath(vpath);
     parsetree_program_t** p = (parsetree_program_t**)param;
@@ -1319,7 +1317,7 @@ void fontdrv_list_release()
 {
     fontdrv_list_t *x, *next;
 
-    for(x=fontdrv_list; x; x=next) {
+    for(x = fontdrv_list; x; x = next) {
         next = x->next;
         free(x->name);
         x->data->release(x->data);
@@ -1331,7 +1329,7 @@ fontdrv_t* fontdrv_list_find(const char* name)
 {
     fontdrv_list_t* x;
 
-    for(x=fontdrv_list; x; x=x->next) {
+    for(x = fontdrv_list; x; x = x->next) {
         if(str_icmp(x->name, name) == 0)
             return x->data;
     }
@@ -1415,7 +1413,7 @@ void fontdrv_bmp_release(fontdrv_t* fnt)
     fontdrv_bmp_t* f = (fontdrv_bmp_t*)fnt;
     int i, n = sizeof(f->bmp) / sizeof(image_t*);
 
-    for(i=0; i<n; i++) {
+    for(i = 0; i < n; i++) {
         if(f->bmp[i] != NULL)
             image_destroy(f->bmp[i]);
     }
@@ -1465,7 +1463,6 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t* fnt, const char* string)
 
 fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bool shadow)
 {
-
     /* basic setup */
     fontdrv_ttf_t* f = mallocx(sizeof *f);
     ((fontdrv_t*)f)->textout = fontdrv_ttf_textout;
@@ -1494,7 +1491,9 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
 {
     const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
 
-    if(has_loaded_ttf(f)) {
+    if(!has_loaded_ttf(f))
+        load_ttf((fontdrv_ttf_t*)f);
+
 #if defined(A5BUILD)
     /* draw shadow */
     if(f->shadow) {
@@ -1508,29 +1507,22 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
     /* draw text */
     al_draw_text(f->font, color._color, x, y, ALLEGRO_ALIGN_INTEGER, text);
 #else
-    do {
-        image_t* img = video_get_backbuffer();
+    image_t* img = video_get_backbuffer();
 
-        /* draw shadow */
-        if(f->shadow) {
-            color_t black = color_rgb(0, 0, 0);
-            alfont_set_font_style(f->ttf, STYLE_BOLD);
-            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y+1, black._value, -1);
-            alfont_set_font_style(f->ttf, STYLE_STANDARD);
-        }
+    /* draw shadow */
+    if(f->shadow) {
+        color_t black = color_rgb(0, 0, 0);
+        alfont_set_font_style(f->ttf, STYLE_BOLD);
+        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y+1, black._value, -1);
+        alfont_set_font_style(f->ttf, STYLE_STANDARD);
+    }
 
-        /* draw text */
-        if(f->antialias)
-            alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
-        else
-            alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
-    } while(0);
+    /* draw text */
+    if(f->antialias)
+        alfont_textout_aa_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
+    else
+        alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
 #endif
-    }
-    else {
-        load_ttf((fontdrv_ttf_t*)f);
-        fontdrv_ttf_textout(fnt, text, x, y, color);
-    }
 }
 
 void fontdrv_ttf_release(fontdrv_t* fnt)
@@ -1546,19 +1538,16 @@ void fontdrv_ttf_release(fontdrv_t* fnt)
 
 v2d_t fontdrv_ttf_charspacing(const fontdrv_t* fnt)
 {
+    const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
+
+    if(!has_loaded_ttf(f))
+        load_ttf((fontdrv_ttf_t*)f);
+
 #if defined(A5BUILD)
     /* FIXME: is this function still needed? */
     return v2d_new(0, 0);
 #else
-    const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
-
-    if(has_loaded_ttf(f)) {
-        return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
-    }
-    else {
-        load_ttf((fontdrv_ttf_t*)f);
-        return fontdrv_ttf_charspacing(fnt);
-    }
+    return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
 #endif
 }
 
@@ -1566,7 +1555,9 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string)
 {
     const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
 
-    if(has_loaded_ttf(f)) {
+    if(!has_loaded_ttf(f))
+        load_ttf((fontdrv_ttf_t*)f);
+
 #if defined(A5BUILD)
     static char linebuf[FONT_TEXTMAXSIZE]; char *p, *q;
     int width = 0, line_width = 0;
@@ -1642,11 +1633,6 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string)
     width = max(width, line_width);
     return v2d_new(width, height);
 #endif
-    }
-    else {
-        load_ttf((fontdrv_ttf_t*)f);
-        return fontdrv_ttf_textsize(fnt, string);
-    }
 }
 
 bool has_loaded_ttf(const fontdrv_ttf_t* f)
