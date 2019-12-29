@@ -1502,6 +1502,8 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
         ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
         al_draw_text(f->font, black, x, y + 1.0f, ALLEGRO_ALIGN_INTEGER, text);
         al_draw_text(f->font, black, x + 1.0f, y + 1.0f, ALLEGRO_ALIGN_INTEGER, text);
+        if(f->size >= 18) /* TODO: configurable shadows */
+            al_draw_text(f->font, black, x + 2.0f, y + 2.0f, ALLEGRO_ALIGN_INTEGER, text);
     }
 
     /* draw text */
