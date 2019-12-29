@@ -141,13 +141,14 @@ typedef struct fontdrv_ttf_t fontdrv_ttf_t;
 struct fontdrv_ttf_t { /* truetype font */
     fontdrv_t base;
 #if defined(A5BUILD)
-    ALLEGRO_FONT *font;
+    ALLEGRO_FONT* font;
 #else
-    ALFONT_FONT *ttf;
+    ALFONT_FONT* ttf;
 #endif
     int size; /* font size */
     bool antialias; /* enable antialiasing? */
     bool shadow; /* enable shadow? */
+    char* source_file; /* relative path */
 };
 static void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string);
@@ -204,6 +205,9 @@ static char* tagged_text_offset(char* txt, int charnum);
 static char* join_names(const char* name, const char* lang_id);
 static bool must_refresh_driver(const font_t* fnt);
 static void refresh_driver(font_t* fnt);
+static inline bool has_loaded_ttf(const fontdrv_ttf_t* f);
+static void load_ttf(fontdrv_ttf_t* f);
+static void unload_ttf(fontdrv_ttf_t* f);
 
 /*
  * font_init()
@@ -971,7 +975,7 @@ int traverse(const parsetree_statement_t* stmt)
         /* read the data */
         nanoparser_expect_string(p1, "Font script error: font name is expected");
         name = str_dup(nanoparser_get_string(p1));
-        logfile_message("Loading font \"%s\" defined in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        logfile_message("Loading font script \"%s\" defined in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
         /* is this a language-specific font? */
         if(nanoparser_get_number_of_parameters(param_list) > 2) {
@@ -1461,7 +1465,6 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t* fnt, const char* string)
 
 fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bool shadow)
 {
-    const char* fullpath = assetfs_fullpath(source_file);
 
     /* basic setup */
     fontdrv_ttf_t* f = mallocx(sizeof *f);
@@ -1470,22 +1473,17 @@ fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bo
     ((fontdrv_t*)f)->charspacing = fontdrv_ttf_charspacing;
     ((fontdrv_t*)f)->release = fontdrv_ttf_release;
 
-    /* load font */
-    logfile_message("Loading TrueType font \"%s\"...", fullpath);
+    /* store font attributes */
+    f->source_file = str_dup(source_file);
     f->size = max(size, 0); /* height of glyphs in pixels */
     f->antialias = allow_antialias && antialias;
     f->shadow = shadow;
 
+    /* lazy loading */
 #if defined(A5BUILD)
-    f->font = al_load_ttf_font(fullpath, -(f->size), !(f->antialias) ? ALLEGRO_TTF_MONOCHROME : 0);
-    if(f->font == NULL)
-        fatal_error("Failed to load TrueType font \"%s\"", fullpath);
+    f->font = NULL;
 #else
-    f->ttf = alfont_load_font(fullpath);
-    if(f->ttf != NULL)
-        alfont_set_font_size(f->ttf, f->size);
-    else
-        fatal_error("Couldn't load TrueType font \"%s\"", fullpath);
+    f->ttf = NULL;
 #endif
 
     /* done! */
@@ -1496,6 +1494,7 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
 {
     const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
 
+    if(has_loaded_ttf(f)) {
 #if defined(A5BUILD)
     /* draw shadow */
     if(f->shadow) {
@@ -1527,16 +1526,21 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
             alfont_textout_ex(IMAGE2BITMAP(img), f->ttf, text, x, y, color._value, -1);
     } while(0);
 #endif
+    }
+    else {
+        load_ttf((fontdrv_ttf_t*)f);
+        fontdrv_ttf_textout(fnt, text, x, y, color);
+    }
 }
 
 void fontdrv_ttf_release(fontdrv_t* fnt)
 {
     fontdrv_ttf_t* f = (fontdrv_ttf_t*)fnt;
-#if defined(A5BUILD)
-    al_destroy_font(f->font);
-#else
-    alfont_destroy_font(f->ttf);
-#endif
+
+    if(has_loaded_ttf(f))
+        unload_ttf(f);
+
+    free(f->source_file);
     free(f);
 }
 
@@ -1547,15 +1551,24 @@ v2d_t fontdrv_ttf_charspacing(const fontdrv_t* fnt)
     return v2d_new(0, 0);
 #else
     const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
-    return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
+
+    if(has_loaded_ttf(f)) {
+        return v2d_new(alfont_get_char_extra_spacing(f->ttf), 0);
+    }
+    else {
+        load_ttf((fontdrv_ttf_t*)f);
+        return fontdrv_ttf_charspacing(fnt);
+    }
 #endif
 }
 
 v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string)
 {
+    const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
+
+    if(has_loaded_ttf(f)) {
 #if defined(A5BUILD)
     static char linebuf[FONT_TEXTMAXSIZE]; char *p, *q;
-    const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
     int width = 0, line_width = 0;
     int line_height = al_get_font_line_height(f->font);
     int height = line_height;
@@ -1628,5 +1641,47 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string)
     line_width += *linebuf ? alfont_text_length(f->ttf, linebuf) : 0;
     width = max(width, line_width);
     return v2d_new(width, height);
+#endif
+    }
+    else {
+        load_ttf((fontdrv_ttf_t*)f);
+        return fontdrv_ttf_textsize(fnt, string);
+    }
+}
+
+bool has_loaded_ttf(const fontdrv_ttf_t* f)
+{
+#if defined(A5BUILD)
+    return f->font != NULL;
+#else
+    return f->ttf != NULL;
+#endif
+}
+
+void load_ttf(fontdrv_ttf_t* f)
+{
+    const char* fullpath = assetfs_fullpath(f->source_file);
+
+    logfile_message("Loading TrueType font \"%s\"...", fullpath);
+
+#if defined(A5BUILD)
+    f->font = al_load_ttf_font(fullpath, -(f->size), !(f->antialias) ? ALLEGRO_TTF_MONOCHROME : 0);
+    if(f->font == NULL)
+        fatal_error("Failed to load TrueType font \"%s\"", fullpath);
+#else
+    f->ttf = alfont_load_font(fullpath);
+    if(f->ttf != NULL)
+        alfont_set_font_size(f->ttf, f->size);
+    else
+        fatal_error("Couldn't load TrueType font \"%s\"", fullpath);
+#endif
+}
+
+void unload_ttf(fontdrv_ttf_t* f)
+{
+#if defined(A5BUILD)
+    al_destroy_font(f->font);
+#else
+    alfont_destroy_font(f->ttf);
 #endif
 }
