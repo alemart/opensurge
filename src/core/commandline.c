@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * commandline.c - command line parser
- * Copyright (C) 2010-2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2013, 2018-2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <surgescript.h>
 #include "commandline.h"
 #include "global.h"
 #include "logfile.h"
@@ -84,7 +85,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "\n"
                 "where options include:\n"
                 "    --help -h                        display this message\n"
-                "    --version -v                     show the version of this program\n"
+                "    --version -v                     display the version of this program\n"
+                "    --ssversion                      display the version of the SurgeScript runtime\n"
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
@@ -113,6 +115,11 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             puts(GAME_VERSION_STRING);
+            exit(0);
+        }
+
+        else if(strcmp(argv[i], "--ssversion") == 0) {
+            puts(surgescript_util_version());
             exit(0);
         }
 
@@ -200,7 +207,6 @@ commandline_t commandline_parse(int argc, char **argv)
             else
                 crash("%s: missing --game-folder parameter", program);
         }
-
 
         else if(strcmp(argv[i], "--games") == 0) {
             foreach_installed_game(print_gameid, NULL);
