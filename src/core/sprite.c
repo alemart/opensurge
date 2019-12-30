@@ -40,7 +40,6 @@ static const int DEFAULT_ANIM = 0;
 static int dirfill(const char *vpath, void *param); /* file system callback */
 static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
 static void validate_animation(animation_t *anim); /* validates the animation */
-static void register_sprite(const char *sprite_name, spriteinfo_t *spr); /* adds spr to the hash table */
 static spriteinfo_t *spriteinfo_new(); /* creates a new spriteinfo_t instance */
 static animation_t *animation_new(int anim_id, v2d_t hot_spot); /* creates a new animation_t instance */
 static animation_t *animation_delete(animation_t *anim); /* deletes anim */
@@ -281,15 +280,6 @@ animation_t* animation_delete(animation_t *anim)
     return NULL;
 }
 
-/*
- * register_sprite()
- * Adds spr to the main hash. Please provide the internal name as the sprite_name.
- */
-void register_sprite(const char *sprite_name, spriteinfo_t *spr)
-{
-    hashtable_spriteinfo_t_add(sprites, sprite_name, spr);
-}
-
 
 /*
  * validate_sprite()
@@ -395,10 +385,10 @@ void fix_sprite_animations(spriteinfo_t *spr)
  */
 int traverse(const parsetree_statement_t *stmt)
 {
-    const char *identifier;
+    const char *identifier, *sprite_name;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2;
-    const char *s;
+    const spriteinfo_t *sprite;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
@@ -410,13 +400,26 @@ int traverse(const parsetree_statement_t *stmt)
         nanoparser_expect_string(p1, "Must provide sprite name");
         nanoparser_expect_program(p2, "Must provide sprite attributes");
 
-        s = nanoparser_get_string(p1);
-        logfile_message("Loading sprite \"%s\" defined in \"%s\"", s, nanoparser_get_file(stmt));
+        sprite_name = nanoparser_get_string(p1);
+        logfile_message("Loading sprite \"%s\" defined in \"%s\"", sprite_name, nanoparser_get_file(stmt));
 
-        if(NULL == hashtable_spriteinfo_t_find(sprites, s))
-            register_sprite(s, spriteinfo_create(nanoparser_get_program(p2)));
-        else
-            logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        if(NULL == (sprite = hashtable_spriteinfo_t_find(sprites, sprite_name))) {
+            /* register a new sprite */
+            spriteinfo_t *new_sprite = spriteinfo_create(nanoparser_get_program(p2));
+            hashtable_spriteinfo_t_add(sprites, sprite_name, new_sprite);
+        }
+        else {
+            /* solve conflicting definitions for the same sprite */
+            spriteinfo_t *new_sprite = spriteinfo_create(nanoparser_get_program(p2));
+            if(new_sprite->animation_count > sprite->animation_count) {
+                logfile_message("WARNING: redefining sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                hashtable_spriteinfo_t_replace(sprites, sprite_name, new_sprite);
+            }
+            else {
+                logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                spriteinfo_destroy(new_sprite);
+            }
+        }
     }
     else
         fatal_error("Can't load sprite. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
