@@ -35,6 +35,8 @@ static surgescript_var_t* fun_getposition(surgescript_object_t* object, const su
 static surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getscrollup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static uint64_t hash(const char *str);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
@@ -42,8 +44,6 @@ static const surgescript_heapptr_t POSITION_ADDR = 0;
 #define BUTTON_LEFT         UINT64_C(0x17C9A03B0)         /* hash("left") */
 #define BUTTON_RIGHT        UINT64_C(0x3110494163)        /* hash("right") */
 #define BUTTON_MIDDLE       UINT64_C(0x6530DC5EBD4)       /* hash("middle") */
-#define BUTTON_WHEELUP      UINT64_C(0xD0B7C607407F)      /* hash("wheelUp") */
-#define BUTTON_WHEELDOWN    UINT64_C(0x377DDC164D01552)   /* hash("wheelDown") */
 
 /*
  * scripting_register_mouse()
@@ -56,10 +56,12 @@ void scripting_register_mouse(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Mouse", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Mouse", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Mouse", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "Mouse", "get_position", fun_getposition, 0);
     surgescript_vm_bind(vm, "Mouse", "buttonDown", fun_buttondown, 1);
     surgescript_vm_bind(vm, "Mouse", "buttonPressed", fun_buttonpressed, 1);
     surgescript_vm_bind(vm, "Mouse", "buttonReleased", fun_buttonreleased, 1);
+    surgescript_vm_bind(vm, "Mouse", "get_position", fun_getposition, 0);
+    surgescript_vm_bind(vm, "Mouse", "get_scrollUp", fun_getscrollup, 0);
+    surgescript_vm_bind(vm, "Mouse", "get_scrollDown", fun_getscrolldown, 0);
 }
 
 /* Console routines */
@@ -142,19 +144,17 @@ surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescrip
 }
 
 /* buttonPressed(button): has the given button just been pressed?
- * valid button values are: "left", "right", "middle", "wheelUp", "wheelDown"
+ * valid button values are: "left", "right", "middle"
  * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
     switch(hash(button)) {
-        case BUTTON_LEFT:       return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
-        case BUTTON_RIGHT:      return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
-        case BUTTON_MIDDLE:     return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
-        case BUTTON_WHEELUP:    return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_UP));
-        case BUTTON_WHEELDOWN:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_DOWN));
-        default:                return surgescript_var_set_bool(surgescript_var_create(), false);
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
+        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
+        default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }
 
@@ -171,6 +171,20 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
         case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE3));
         default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
+}
+
+/* Will be true when the user scrolls up with the mouse wheel */
+surgescript_var_t* fun_getscrollup(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    input_t* input = (input_t*)surgescript_object_userdata(object);
+    return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_UP));
+}
+
+/* Will be true when the user scrolls down with the mouse wheel */
+surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    input_t* input = (input_t*)surgescript_object_userdata(object);
+    return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_DOWN));
 }
 
 
