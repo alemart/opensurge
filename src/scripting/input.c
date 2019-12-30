@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * input.c - scripting system: input object
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -35,18 +35,18 @@ static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
-#define BUTTON_UP             0x5979CA        /* hash("up") */
-#define BUTTON_DOWN           0x17C95CD5D     /* hash("down") */
-#define BUTTON_LEFT           0x17C9A03B0     /* and so on... */
-#define BUTTON_RIGHT          0x3110494163
-#define BUTTON_FIRE1          0x310F70497C
-#define BUTTON_FIRE2          0x310F70497D
-#define BUTTON_FIRE3          0x310F70497E
-#define BUTTON_FIRE4          0x310F70497F
-#define BUTTON_FIRE5          0x310F704980
-#define BUTTON_FIRE6          0x310F704981
-#define BUTTON_FIRE7          0x310F704982
-#define BUTTON_FIRE8          0x310F704983
+#define BUTTON_UP             UINT64_C(0x5979CA)        /* hash("up") */
+#define BUTTON_DOWN           UINT64_C(0x17C95CD5D)     /* hash("down") */
+#define BUTTON_LEFT           UINT64_C(0x17C9A03B0)     /* and so on... */
+#define BUTTON_RIGHT          UINT64_C(0x3110494163)
+#define BUTTON_FIRE1          UINT64_C(0x310F70497C)
+#define BUTTON_FIRE2          UINT64_C(0x310F70497D)
+#define BUTTON_FIRE3          UINT64_C(0x310F70497E)
+#define BUTTON_FIRE4          UINT64_C(0x310F70497F)
+#define BUTTON_FIRE5          UINT64_C(0x310F704980)
+#define BUTTON_FIRE6          UINT64_C(0x310F704981)
+#define BUTTON_FIRE7          UINT64_C(0x310F704982)
+#define BUTTON_FIRE8          UINT64_C(0x310F704983)
 
 /* misc */
 static uint64_t hash(const char *str);
