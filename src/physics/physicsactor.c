@@ -345,7 +345,8 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* getting hit & winning pose */
     if(pa->state == PAS_GETTINGHIT) {
         input_ignore(pa->input);
-        pa->facing_right = (pa->xsp < 0.0f);
+        if(!nearly_zero(pa->xsp))
+            pa->facing_right = (pa->xsp < 0.0f);
     }
     else if(pa->winning_pose) {
         /* brake on level clear */
@@ -385,7 +386,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         input_simulate_button_up(pa->input, IB_FIRE1);
 
     /* face left/right */
-    if(pa->state != PAS_ROLLING) {
+    if(pa->state != PAS_ROLLING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
         if((pa->gsp > 0.0f || pa->midair) && input_button_down(pa->input, IB_RIGHT))
             pa->facing_right = TRUE;
         else if((pa->gsp < 0.0f || pa->midair) && input_button_down(pa->input, IB_LEFT))
@@ -981,7 +982,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->state = PAS_WALKING;
 
         /* facing right? */
-        pa->facing_right = (pa->gsp >= 0.0f);
+        if(!nearly_zero(pa->gsp))
+            pa->facing_right = (pa->gsp > 0.0f);
     }
 
     /*
@@ -1348,7 +1350,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
                 if(pa->state == PAS_ROLLING) {
                     if(pa->midair_timer >= 0.1f && !input_button_down(pa->input, IB_DOWN)) {
                         pa->state = WALKING_OR_RUNNING(pa);
-                        pa->facing_right = (pa->gsp >= 0.0f);
+                        if(!nearly_zero(pa->gsp))
+                            pa->facing_right = (pa->gsp > 0.0f);
                     }
                 }
                 else {
