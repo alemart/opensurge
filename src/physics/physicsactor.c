@@ -887,13 +887,25 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         /* deceleration / braking */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
             pa->gsp += pa->dec * dt;
-            if(pa->movmode == MM_FLOOR && fabs(pa->gsp) >= pa->brakingthreshold)
-                pa->state = PAS_BRAKING;
+            if(pa->movmode == MM_FLOOR) {
+                if(fabs(pa->gsp) >= pa->brakingthreshold)
+                    pa->state = PAS_BRAKING;
+                else if(pa->gsp >= 0.0f) {
+                    pa->gsp = 0.0f;
+                    pa->state = PAS_STOPPED;
+                }
+            }
         }
         else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
             pa->gsp -= pa->dec * dt;
-            if(pa->movmode == MM_FLOOR && fabs(pa->gsp) >= pa->brakingthreshold)
-                pa->state = PAS_BRAKING;
+            if(pa->movmode == MM_FLOOR) {
+                if(fabs(pa->gsp) >= pa->brakingthreshold)
+                    pa->state = PAS_BRAKING;
+                else if(pa->gsp <= 0.0f) {
+                    pa->gsp = 0.0f;
+                    pa->state = PAS_STOPPED;
+                }
+            }
         }
 
         /* friction */
@@ -904,12 +916,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             }
             else
                 pa->gsp -= pa->frc * sign(pa->gsp) * dt;
-        }
-        else if(input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT)) {
-            if(fabs(pa->gsp) <= pa->frc * dt) {
-                pa->gsp = 0.0f;
-                pa->state = PAS_STOPPED;
-            }
         }
 
         /* slope factor */
