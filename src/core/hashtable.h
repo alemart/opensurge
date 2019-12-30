@@ -182,6 +182,22 @@ static void hashtable_##T##_remove(hashtable_##T *h, __H_CONST(KEY_TYPE) key) \
         } \
     } \
 } \
+static bool hashtable_##T##_replace(const hashtable_##T *h, __H_CONST(KEY_TYPE) key, T *new_value) \
+{ \
+    uint32_t k = __H_BUCKET(h, key); \
+    hashtable_list_##T *q = h->data[k]; \
+    while(q != NULL) { \
+        if(h->key_compare(q->key, key) == 0) { \
+            if(h->destructor != NULL) \
+                h->destructor(q->value); \
+            q->value = new_value; \
+            return true; \
+        } \
+        else \
+            q = q->next; \
+    } \
+    return false; \
+} \
 static int hashtable_##T##_foreach(hashtable_##T *h, void *data, void (*callback)(T*,void*)) \
 { \
     int i, count = 0; \
@@ -308,6 +324,7 @@ static void __h_unused_##T() \
     (void)hashtable_##T##_find; \
     (void)hashtable_##T##_add; \
     (void)hashtable_##T##_remove; \
+    (void)hashtable_##T##_replace; \
     (void)hashtable_##T##_foreach; \
     (void)hashtable_##T##_findsome; \
     (void)hashtable_##T##_ref; \
