@@ -1624,10 +1624,6 @@ brick 1 8240 10704
 brick 1 8496 10736
 brick 1 7872 11008
 brick 1 8064 10880
-brick 255 8064 10720
-brick 255 8064 10688
-brick 255 8064 10656
-brick 255 8064 10624
 brick 28 7984 10512
 brick 8 7984 10608
 brick 21 8064 10624
@@ -1806,6 +1802,10 @@ brick 15 8320 9856
 brick 15 8448 9856
 brick 1 7808 9376
 brick 1 7936 9376
+brick 255 8064 10720
+brick 255 8064 10688
+brick 255 8064 10624
+brick 255 8064 10656
 brick 16 6912 10560
 brick 18 7040 10592
 brick 18 7168 10624
@@ -2408,6 +2408,11 @@ brick 31 6016 10016
 brick 31 6016 9920
 brick 15 6016 9856
 brick 33 6000 9872
+brick 255 5376 9856
+brick 255 5376 9824
+brick 255 5376 9792
+brick 255 5376 9760
+brick 255 5376 9744
 brick 16 4384 10176
 brick 16 4480 10176
 brick 29 4576 10208
@@ -3120,7 +3125,6 @@ entity "Layer Yellow" 12064 10064 "27ac6193913f296f"
 entity "Layer Yellow" 12064 10032 "f5ef1666c500ecfd"
 entity "Layer Yellow" 12064 10000 "05bb2307b1e67264"
 entity "Powerup Shield Thunder" 4272 10272 "993410289923286b"
-entity "Powerup Collectibles" 2656 9856 "d912aaa6cc2014fb"
 entity "Spikes" 5200 9744 "e5d108651bf4c286"
 entity "Powerup Shield Thunder" 4832 9472 "e5cf790b21a54a83"
 entity "Layer Yellow" 14320 10224 "67a575599bac5e8e"
@@ -3562,7 +3566,6 @@ entity "Springfling" 10080 10080 "d229bcb9db2d31d8"
 entity "Collectible" 6048 9600 "23787e24b5c39e33"
 entity "Collectible" 6080 9600 "0e7e6e5e1417f5cf"
 entity "Collectible" 6016 9600 "4d386173c0b349e4"
-entity "Collectible" 2032 9856 "805d3dcb625abda7"
 entity "Tube In" 5776 10432 "61a37f6cdd064451"
 entity "Tube In" 6000 10688 "fc59624b74957c99"
 entity "Tube In" 8592 10560 "8830fda0c8f05020"
@@ -3594,5 +3597,8 @@ entity "Collectible" 6320 10240 "407884242701198c"
 entity "Collectible" 6336 10224 "a1d6e0b47d46f8bf"
 entity "Spikes" 6448 10976 "2ab627e40af8b0ad"
 entity "Wolfey" 4464 10256 "237c4fcf43fdccb6"
+entity "Collectible" 2624 9840 "d5ff1ffb0f7e7276"
+entity "Collectible" 2656 9840 "cbbdaf8d4e96d312"
+entity "Collectible" 2688 9840 "4216c9e9dfb57a34"
 
 // EOF

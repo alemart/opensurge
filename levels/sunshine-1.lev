@@ -1111,6 +1111,9 @@ brick 35 8272 10160
 brick 33 8176 10160
 brick 15 8320 10208
 brick 15 8192 10208
+brick 255 8176 10128
+brick 255 8176 10096
+brick 255 8176 10080
 brick 18 6912 10304
 brick 16 7040 10304
 brick 23 7552 9984
@@ -2286,5 +2289,8 @@ entity "Layer Green" 12640 9904 "f08283da6fe89274"
 entity "Layer Green" 12480 9904 "dace5b018ffd5e50"
 entity "Layer Green" 12448 9904 "7dda86d5b9a730ec"
 entity "Layer Green" 12448 9936 "4e5f0b89161fc58d"
+entity "Collectible" 15168 9232 "1c393efdc60683fe"
+entity "Collectible" 15168 9264 "adf3939a0ea7b179"
+entity "Collectible" 15168 9296 "79eb191965cf805b"
 
 // EOF

@@ -115,6 +115,9 @@ object "Spring Booster" is "private", "entity"
         if(boostSpeed > oldSpeed)
             player.speed = direction * boostSpeed;
 
+        // prevent braking
+        player.hlock(0.27);
+
         // misc
         boostSfx.play();
         changeAnimation(2);

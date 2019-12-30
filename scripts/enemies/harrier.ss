@@ -75,11 +75,11 @@ object "SwoopHarrier" is "entity", "enemy"
             movement.speed = velocity.length;
             if (ownDirectionX > 0) {
               /* compute right swoop angle */
-              transform.angle = -velocity.angle;
+              transform.angle = velocity.angle;
               actor.hflip = false;
             } else {
               /* compute left swoop angle */
-              transform.angle = 180-velocity.angle;
+              transform.angle = 180+velocity.angle;
               actor.hflip = true;
             }
         }

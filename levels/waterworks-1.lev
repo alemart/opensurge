@@ -349,6 +349,14 @@ brick 165 19712 11936
 brick 165 19648 11936
 brick 165 19584 11936
 brick 165 19520 11936
+brick 24 19648 10496
+brick 8 19520 10496
+brick 23 19328 10496
+brick 1 19456 10496
+brick 135 19712 10528
+brick 135 19760 10528
+brick 135 19712 10496
+brick 135 19760 10496
 brick 45 18176 11760
 brick 17 18080 11360
 brick 16 18432 12288
@@ -1545,7 +1553,6 @@ brick 26 8192 10240
 brick 26 8320 10240
 brick 44 8192 10336
 brick 151 7872 10080
-brick 18 7744 9984
 brick 18 7936 9984
 brick 17 7904 9984
 brick 23 7936 9952
@@ -1810,6 +1817,8 @@ brick 255 7840 10144
 brick 255 7840 10176
 brick 255 7840 10208
 brick 255 7904 10208
+brick 18 7744 9984 yellow
+brick 189 7872 10048
 brick 26 7296 9344
 brick 26 7168 9344
 brick 26 7040 9344
@@ -3234,12 +3243,6 @@ entity "Layer Green" 5760 9232 "3cc4beec885e3926"
 entity "Layer Green" 5792 9232 "913e1e70984c0cd4"
 entity "Layer Green" 5824 9232 "88923aa9a87f21cd"
 entity "Layer Green" 5856 9232 "cd2a800519420cce"
-entity "Layer Yellow" 5696 9168 "72c673bff4c47b57"
-entity "Layer Yellow" 5728 9168 "61b2848eb99bc661"
-entity "Layer Yellow" 5760 9168 "1b7460b0298f49ad"
-entity "Layer Yellow" 5792 9168 "d4d9273dfbc79c7e"
-entity "Layer Yellow" 5824 9168 "3b35e1c41bd4ccc6"
-entity "Layer Yellow" 5856 9168 "76f486ead6f694df"
 entity "Bridge" 5376 10208 "9d39f2e2b00a58b7"
 entity "Layer Yellow" 6416 10128 "b9c5e4ed22fdf6c9"
 entity "Layer Yellow" 6416 10096 "e535020ac7d49f64"
@@ -3613,16 +3616,6 @@ entity "Collectible" 7040 9040 "2db8d103e89c5571"
 entity "Collectible" 5600 9104 "ca244a907bc38656"
 entity "Collectible" 5600 9072 "11371f5d72ab54da"
 entity "Collectible" 5600 9040 "e3ed186ae1e674f3"
-entity "Collectible" 6320 8832 "8bbd498992730657"
-entity "Collectible" 6336 8880 "e4a99989566a959b"
-entity "Collectible" 6368 8928 "d2729b8200304670"
-entity "Collectible" 6544 8928 "c85a71bdc909959c"
-entity "Collectible" 6576 8880 "a17a9797012361b7"
-entity "Collectible" 6592 8832 "3cd770c35ea7aab4"
-entity "Collectible" 6576 8784 "d9298c6c1564c8e1"
-entity "Collectible" 6544 8736 "64cf5c1d3f001930"
-entity "Collectible" 6368 8736 "dd73db913bd364ea"
-entity "Collectible" 6336 8784 "5968fcd3f0a6b8a3"
 entity "Collectible" 6960 9600 "517bc8d6ee4b4907"
 entity "Collectible" 7120 9600 "865aa7ff44cf7e55"
 entity "Collectible" 7040 9520 "d8f0c95fcd81d5e9"
@@ -3763,7 +3756,6 @@ entity "Collectible" 15616 11504 "3ec3ab5d3621a3d5"
 entity "Collectible" 15584 11504 "62e8f74d2a02916a"
 entity "Collectible" 15552 11504 "ddab95167f4f8ec8"
 entity "Collectible" 15120 11472 "06c07f9f2b84a681"
-entity "Powerup Collectibles" 512 9824 "27faa46271f6d8ca"
 entity "RedMarmot" 7104 8800 "d29fa8c521297ed2"
 entity "Collectible" 7312 8816 "868ca9a82184ae5e"
 entity "Collectible" 7312 8784 "ae19d48c6423f082"
@@ -3809,9 +3801,6 @@ entity "Spikes" 10896 10976 "afec706e7faca4fa"
 entity "Collectible" 8768 10448 "eaa4a8b468e6c6c0"
 entity "Collectible" 8800 10448 "fc8a835e97c4bb4d"
 entity "Collectible" 8784 10432 "8bb20a5dce5a417b"
-entity "Collectible" 8768 10416 "4a8f16023d0bcb39"
-entity "Collectible" 8800 10416 "371fcac8673a32ef"
-entity "Collectible" 8784 10400 "589cb5e945b11d4a"
 entity "Layer Green" 19120 12208 "73766fcd03346df0"
 entity "Layer Green" 19152 12208 "1f9b631a2bc1792b"
 entity "Layer Green" 18960 12368 "df4257f562dfd119"
@@ -3857,5 +3846,36 @@ entity "Collectible" 10304 9488 "21f18f768f262709"
 entity "Collectible" 10320 9504 "d061be8e7d5e8907"
 entity "Collectible" 10336 9488 "c5f0df8acc8c95d5"
 entity "Crococopter" 11024 10928 "868e933113ab74e8"
+entity "Collectible" 8768 10512 "9260658a014b9ee2"
+entity "Collectible" 8784 10528 "903cef0dd6ccf15f"
+entity "Collectible" 8800 10512 "d3392f925e8cdf7d"
+entity "Collectible" 512 9808 "31a6dc04818b9912"
+entity "Collectible" 480 9808 "eaa932348c0c8aa0"
+entity "Collectible" 544 9808 "3492923600083bb5"
+entity "Powerup Lucky Bonus" 18608 11248 "6d9496a740c8e8d9"
+entity "Collectible" 6576 8816 "59842b0fa81f749d"
+entity "Collectible" 6576 8880 "f63ca9b3c469cd34"
+entity "Collectible" 6544 8752 "eaf5c4f52768d3ae"
+entity "Collectible" 6496 8720 "3f7fac165e752989"
+entity "Collectible" 6416 8720 "f14608724986819a"
+entity "Collectible" 6544 8944 "93a8e8cd48b4aa19"
+entity "Collectible" 6496 8976 "c91cf7c0a056650d"
+entity "Collectible" 6416 8976 "0350da51ad202a87"
+entity "Collectible" 6368 8944 "ac7e5c6a15042b12"
+entity "Collectible" 6336 8880 "96d2f27a4acea7c4"
+entity "Collectible" 6336 8816 "c9a732414e1c4b8b"
+entity "Collectible" 6368 8752 "a4db4072215bf1dc"
+entity "Layer Yellow" 5696 9136 "91ef75ec8fa0b13f"
+entity "Layer Yellow" 5728 9136 "fc0d10b8178e5f9d"
+entity "Layer Yellow" 5760 9136 "127cb9e747010462"
+entity "Layer Yellow" 5792 9136 "27000321d4965eea"
+entity "Layer Yellow" 5824 9136 "c4aa032b68db88d7"
+entity "Layer Yellow" 5856 9136 "641e0309adfeea06"
+entity "Layer Yellow" 5888 9136 "3481f065b0fb5652"
+entity "Layer Yellow" 5664 9136 "2b26106f7c095916"
+entity "Layer Yellow" 5920 9136 "f2d75cb2d0255cb8"
+entity "Layer Yellow" 5920 9168 "1005aa3167473801"
+entity "Layer Yellow" 5632 9136 "a7a1675b1f259631"
+entity "Layer Yellow" 5632 9168 "4cd1058af72b82ff"
 
 // EOF

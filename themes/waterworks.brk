@@ -2077,6 +2077,27 @@ brick 184
     }
 }
 
+brick 189
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/waterworks_mask.png"
+
+    sprite
+    {
+        source_file     "images/waterworks.png"
+        source_rect     576 960 64 64
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         16
+            data        0 1 2 3
+        }
+    }
+}
+
 //
 // Special
 //
@@ -2420,7 +2441,7 @@ brick 240
 brick 241
 {
     type                PASSABLE
-    behavior            CIRCULAR 16 16 0.25 0.25 180
+    behavior            CIRCULAR 16 16 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2441,7 +2462,7 @@ brick 241
 brick 242
 {
     type                PASSABLE
-    behavior            CIRCULAR 32 32 0.25 0.25 180
+    behavior            CIRCULAR 32 32 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2462,7 +2483,7 @@ brick 242
 brick 243
 {
     type                PASSABLE
-    behavior            CIRCULAR 48 48 0.25 0.25 180
+    behavior            CIRCULAR 48 48 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2483,7 +2504,7 @@ brick 243
 brick 244
 {
     type                PASSABLE
-    behavior            CIRCULAR 64 64 0.25 0.25 180
+    behavior            CIRCULAR 64 64 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2504,7 +2525,7 @@ brick 244
 brick 245
 {
     type                PASSABLE
-    behavior            CIRCULAR 80 80 0.25 0.25 180
+    behavior            CIRCULAR 80 80 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2525,7 +2546,7 @@ brick 245
 brick 246
 {
     type                PASSABLE
-    behavior            CIRCULAR 96 96 0.25 0.25 180
+    behavior            CIRCULAR 96 96 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2546,7 +2567,7 @@ brick 246
 brick 247
 {
     type                PASSABLE
-    behavior            CIRCULAR 112 112 0.25 0.25 180
+    behavior            CIRCULAR 112 112 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
 
     sprite
@@ -2567,7 +2588,7 @@ brick 247
 brick 248
 {
     type                CLOUD
-    behavior            CIRCULAR 128 128 0.25 0.25 180
+    behavior            CIRCULAR 128 128 -0.25 -0.25 180
     mask                "images/waterworks_mask.png"
     zindex              0.7
 
