@@ -887,24 +887,24 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         /* deceleration / braking */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
             pa->gsp += pa->dec * dt;
-            if(pa->movmode == MM_FLOOR) {
-                if(fabs(pa->gsp) >= pa->brakingthreshold)
+            if(fabs(pa->gsp) >= pa->brakingthreshold) {
+                if(pa->movmode == MM_FLOOR)
                     pa->state = PAS_BRAKING;
-                else if(pa->gsp >= 0.0f) {
-                    pa->gsp = 0.0f;
-                    pa->state = PAS_STOPPED;
-                }
+            }
+            else if(pa->gsp >= 0.0f) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
             }
         }
         else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
             pa->gsp -= pa->dec * dt;
-            if(pa->movmode == MM_FLOOR) {
-                if(fabs(pa->gsp) >= pa->brakingthreshold)
+            if(fabs(pa->gsp) >= pa->brakingthreshold) {
+                if(pa->movmode == MM_FLOOR)
                     pa->state = PAS_BRAKING;
-                else if(pa->gsp <= 0.0f) {
-                    pa->gsp = 0.0f;
-                    pa->state = PAS_STOPPED;
-                }
+            }
+            else if(pa->gsp <= 0.0f) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
             }
         }
 
@@ -971,12 +971,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->gsp = max(0.0f, pa->gsp - pa->rolldec * dt);
 
         /* friction */
-        if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
-            if(fabs(pa->gsp) > pa->rollfrc * dt)
-                pa->gsp -= pa->rollfrc * sign(pa->gsp) * dt;
-            else
-                pa->gsp = 0.0f;
-        }
+        if(fabs(pa->gsp) > pa->rollfrc * dt)
+            pa->gsp -= pa->rollfrc * sign(pa->gsp) * dt;
+        else
+            pa->gsp = 0.0f;
 
         /* unroll */
         if(fabs(pa->gsp) < pa->unrollthreshold)
