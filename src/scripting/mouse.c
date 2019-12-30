@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * mouse.c - scripting system: mouse input
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,10 +38,12 @@ static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const
 static uint64_t hash(const char *str);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
-/* button hashes: "left", "right", "middle" */
-#define BUTTON_LEFT         0x17C9A03B0
-#define BUTTON_RIGHT        0x3110494163
-#define BUTTON_MIDDLE       0x6530DC5EBD4
+/* button hashes */
+#define BUTTON_LEFT         UINT64_C(0x17C9A03B0)         /* hash("left") */
+#define BUTTON_RIGHT        UINT64_C(0x3110494163)        /* hash("right") */
+#define BUTTON_MIDDLE       UINT64_C(0x6530DC5EBD4)       /* hash("middle") */
+#define BUTTON_WHEELUP      UINT64_C(0xD0B7C607407F)      /* hash("wheelUp") */
+#define BUTTON_WHEELDOWN    UINT64_C(0x377DDC164D01552)   /* hash("wheelDown") */
 
 /*
  * scripting_register_mouse()
@@ -140,17 +142,19 @@ surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescrip
 }
 
 /* buttonPressed(button): has the given button just been pressed?
- * valid button values are: "left", "right", "middle"
+ * valid button values are: "left", "right", "middle", "wheelUp", "wheelDown"
  * for optimization reasons, it's mandatory: button must be of the string type */
 surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
     switch(hash(button)) {
-        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
-        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
-        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
-        default:            return surgescript_var_set_bool(surgescript_var_create(), false);
+        case BUTTON_LEFT:       return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
+        case BUTTON_RIGHT:      return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
+        case BUTTON_MIDDLE:     return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
+        case BUTTON_WHEELUP:    return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_UP));
+        case BUTTON_WHEELDOWN:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_DOWN));
+        default:                return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }
 
