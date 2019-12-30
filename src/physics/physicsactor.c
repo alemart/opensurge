@@ -275,7 +275,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->rolluphillslp =        (5.0f/64.0f) * fpsmul * fpsmul ;
     pa->rolldownhillslp =     (20.0f/64.0f) * fpsmul * fpsmul ;
     pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
-    pa->brakingthreshold =      4.5f        * fpsmul * 1.0f   ;
+    pa->brakingthreshold =      4.0f        * fpsmul * 1.0f   ;
     pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
     pa->airdragxthreshold =    (8.0f/64.0f) * fpsmul * 1.0f   ;
     pa->chrgthreshold =        (1.0f/64.0f) * 1.0f   * 1.0f   ;
@@ -441,7 +441,9 @@ void physicsactor_set_position(physicsactor_t *pa, v2d_t position)
 
 void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds)
 {
-    pa->horizontal_control_lock_timer = max(seconds, 0.0f);
+    seconds = max(seconds, 0.0f);
+    if(seconds > pa->horizontal_control_lock_timer)
+        pa->horizontal_control_lock_timer = seconds;
 }
 
 int physicsactor_is_midair(const physicsactor_t *pa)
@@ -910,7 +912,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
 
         /* friction */
-        if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
+        if(
+            (!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) ||
+            (pa->state == PAS_BRAKING)
+        ) {
             if(fabs(pa->gsp) <= pa->frc * dt) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
