@@ -887,41 +887,50 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             }
         }
 
-        /* deceleration / braking */
+        /* deceleration */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
             pa->gsp += pa->dec * dt;
-            if(fabs(pa->gsp) >= pa->brakingthreshold) {
-                if(pa->movmode == MM_FLOOR)
-                    pa->state = PAS_BRAKING;
-            }
-            else if(pa->gsp >= 0.0f) {
+            if(pa->gsp >= 0.0f) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
+            }
+            else if(fabs(pa->gsp) >= pa->brakingthreshold) {
+                if(pa->movmode == MM_FLOOR)
+                    pa->state = PAS_BRAKING;
             }
         }
         else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
             pa->gsp -= pa->dec * dt;
-            if(fabs(pa->gsp) >= pa->brakingthreshold) {
-                if(pa->movmode == MM_FLOOR)
-                    pa->state = PAS_BRAKING;
-            }
-            else if(pa->gsp <= 0.0f) {
+            if(pa->gsp <= 0.0f) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
             }
+            else if(fabs(pa->gsp) >= pa->brakingthreshold) {
+                if(pa->movmode == MM_FLOOR)
+                    pa->state = PAS_BRAKING;
+            }
         }
 
-        /* friction */
-        if(
-            (!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) ||
-            (pa->state == PAS_BRAKING)
-        ) {
-            if(fabs(pa->gsp) <= pa->frc * dt) {
+        if(pa->state != PAS_BRAKING) {
+            /* friction */
+            if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
+                if(fabs(pa->gsp) <= pa->frc * dt) {
+                    pa->gsp = 0.0f;
+                    pa->state = PAS_STOPPED;
+                }
+                else
+                    pa->gsp -= pa->frc * sign(pa->gsp) * dt;
+            }
+        }
+        else {
+            /* braking */
+            float brk = pa->frc + pa->frc * 5.0f * fabs(SIN(pa->angle));
+            if(fabs(pa->gsp) <= brk * dt) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
             }
             else
-                pa->gsp -= pa->frc * sign(pa->gsp) * dt;
+                pa->gsp -= brk * sign(pa->gsp) * dt;
         }
 
         /* slope factor */
