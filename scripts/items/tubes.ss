@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Level;
 using SurgeEngine.Player;
+using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
 // Tube Out unlocks the player
@@ -50,6 +51,7 @@ object "Tube" is "private", "special", "entity"
 {
     public rollSpeed = 600;
     collider = CollisionBox(32, 32);
+    sfx = Sound("samples/tube.wav");
     player = null;
 
     state "main"
@@ -58,7 +60,12 @@ object "Tube" is "private", "special", "entity"
 
     state "roll"
     {
+        // roll
+        if(!player.rolling)
+            sfx.play();
         player.roll();
+
+        // back to the main state
         state = "main";
     }
 

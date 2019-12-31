@@ -323,7 +323,8 @@ Mateus Reis \n\
 --- samples/secret.wav \n\
 --- samples/pipe_in.wav \n\
 --- samples/pipe_out.wav \n\
---- samples/jetpack2.wav (modified by Alexandre) \n\
+--- samples/tube.wav \n\
+--- samples/jetpack2.wav (modified by Alexandre Martins) \n\
 \n\
 Di Rodrigues \n\
 --- samples/1up.ogg \n\
@@ -382,8 +383,8 @@ Selector (freesound.org) \n\
 --- samples/discharge.wav (CC-0) \n\
 \n\
 little_dog4000 (freesound.org) \n\
---- samples/teleport_appear.wav (CC-0 - sound edited by Alexandre) \n\
---- samples/teleport_disappear.wav (CC-0 - sound edited by Alexandre) \n\
+--- samples/teleport_appear.wav (CC-0 - sound edited by Alexandre Martins) \n\
+--- samples/teleport_disappear.wav (CC-0 - sound edited by Alexandre Martins) \n\
 \n\
 \n\
 $CREDITS_RES_SCRIPTS \n\
