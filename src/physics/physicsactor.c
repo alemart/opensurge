@@ -863,75 +863,65 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     if(!pa->midair && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING) {
 
-        if(pa->state != PAS_BRAKING) {
-            /* acceleration */
-            if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT) && pa->gsp >= 0.0f) {
-                if(pa->gsp < pa->topspeed) {
-                    pa->gsp += pa->acc * dt;
-                    if(pa->gsp >= pa->topspeed) {
-                        pa->gsp = pa->topspeed;
-                        pa->state = PAS_RUNNING;
-                    }
-                    else if(!(pa->state == PAS_PUSHING && pa->facing_right))
-                        pa->state = PAS_WALKING;
+        /* acceleration */
+        if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT) && pa->gsp >= 0.0f) {
+            if(pa->gsp < pa->topspeed) {
+                pa->gsp += pa->acc * dt;
+                if(pa->gsp >= pa->topspeed) {
+                    pa->gsp = pa->topspeed;
+                    pa->state = PAS_RUNNING;
                 }
+                else if(!(pa->state == PAS_PUSHING && pa->facing_right))
+                    pa->state = PAS_WALKING;
             }
-            else if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT) && pa->gsp <= 0.0f) {
-                if(pa->gsp > -pa->topspeed) {
-                    pa->gsp -= pa->acc * dt;
-                    if(pa->gsp <= -pa->topspeed) {
-                        pa->gsp = -pa->topspeed;
-                        pa->state = PAS_RUNNING;
-                    }
-                    else if(!(pa->state == PAS_PUSHING && !pa->facing_right))
-                        pa->state = PAS_WALKING;
+        }
+        else if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT) && pa->gsp <= 0.0f) {
+            if(pa->gsp > -pa->topspeed) {
+                pa->gsp -= pa->acc * dt;
+                if(pa->gsp <= -pa->topspeed) {
+                    pa->gsp = -pa->topspeed;
+                    pa->state = PAS_RUNNING;
                 }
-            }
-
-            /* deceleration */
-            if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
-                pa->gsp += pa->dec * dt;
-                if(fabs(pa->gsp) >= pa->brakingthreshold) {
-                    if(pa->movmode == MM_FLOOR)
-                        pa->state = PAS_BRAKING;
-                }
-                else if(pa->gsp >= 0.0f) {
-                    pa->gsp = 0.0f;
-                    pa->state = PAS_STOPPED;
-                }
-            }
-            else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
-                pa->gsp -= pa->dec * dt;
-                if(fabs(pa->gsp) >= pa->brakingthreshold) {
-                    if(pa->movmode == MM_FLOOR)
-                        pa->state = PAS_BRAKING;
-                }
-                else if(pa->gsp <= 0.0f) {
-                    pa->gsp = 0.0f;
-                    pa->state = PAS_STOPPED;
-                }
-            }
-
-            /* friction */
-            if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
-                if(fabs(pa->gsp) <= pa->frc * dt) {
-                    pa->gsp = 0.0f;
-                    pa->state = PAS_STOPPED;
-                }
-                else
-                    pa->gsp -= pa->frc * sign(pa->gsp) * dt;
+                else if(!(pa->state == PAS_PUSHING && !pa->facing_right))
+                    pa->state = PAS_WALKING;
             }
         }
 
-        /* braking */
-        if(pa->state == PAS_BRAKING) {
-            float coef = pa->dec + pa->frc;
-            if(fabs(pa->gsp) <= coef * dt) {
+        /* deceleration / braking */
+        if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f) {
+            pa->gsp += pa->dec * dt;
+            if(fabs(pa->gsp) >= pa->brakingthreshold) {
+                if(pa->movmode == MM_FLOOR)
+                    pa->state = PAS_BRAKING;
+            }
+            else if(pa->gsp >= 0.0f) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
+            }
+        }
+        else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0f) {
+            pa->gsp -= pa->dec * dt;
+            if(fabs(pa->gsp) >= pa->brakingthreshold) {
+                if(pa->movmode == MM_FLOOR)
+                    pa->state = PAS_BRAKING;
+            }
+            else if(pa->gsp <= 0.0f) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
+            }
+        }
+
+        /* friction */
+        if(
+            (!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) ||
+            (pa->state == PAS_BRAKING)
+        ) {
+            if(fabs(pa->gsp) <= pa->frc * dt) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
             }
             else
-                pa->gsp -= coef * sign(pa->gsp) * dt;
+                pa->gsp -= pa->frc * sign(pa->gsp) * dt;
         }
 
         /* slope factor */
