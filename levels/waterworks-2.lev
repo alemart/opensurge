@@ -2778,7 +2778,6 @@ brick 255 1920 10208
 brick 255 1952 10208
 brick 255 1984 10208
 brick 255 2016 10208
-brick 170 1744 10144
 brick 255 1728 10208
 brick 1 1728 10208
 brick 255 1824 10208
@@ -2906,8 +2905,9 @@ brick 255 2048 10080
 brick 255 1760 10080
 brick 24 2048 9984
 brick 24 2048 9984 green
-brick 255 1760 10112
-brick 254 1744 10144
+brick 142 1728 10144
+brick 142 1728 10112
+brick 145 1728 10096
 brick 12 896 10112
 brick 12 1024 10112
 brick 12 1024 10240
@@ -2934,7 +2934,6 @@ brick 41 1568 10128
 brick 21 1600 10112
 brick 38 1680 10128
 brick 37 1328 10000
-brick 23 1664 9856
 brick 23 1664 9728
 brick 2 1280 10112
 brick 2 1152 10112
@@ -2977,7 +2976,7 @@ brick 23 1664 10112 green
 brick 23 1664 10208
 brick 23 1664 9984
 brick 23 1664 9984 green
-brick 23 1664 9856 green
+brick 23 1664 9856
 brick 16 0 9984
 brick 16 256 9984
 brick 16 384 9984
@@ -3676,8 +3675,6 @@ brick 241 5152 10688
 
 // entities
 entity "Bridge" 960 10080 "48bacb13be3c2c0f"
-entity "Layer Yellow" 1728 10192 "1d9daf24945ca668"
-entity "Layer Yellow" 1728 10160 "368172f554d88524"
 entity "Layer Yellow" 2096 10192 "d753563762a8fd2e"
 entity "Layer Yellow" 2096 10160 "9ec3e2f8f75f2754"
 entity "Layer Yellow" 2096 10128 "688faeceada6cc1a"
@@ -4468,5 +4465,8 @@ entity "Collectible" 16208 9824 "e939a7bbd6776a3b"
 entity "Collectible" 16192 9840 "5deae24305186a2f"
 entity "Collectible" 16224 9840 "8e6a577faa3b313b"
 entity "Collectible" 16208 9856 "97f5d2746eb66999"
+entity "Layer Yellow" 1744 10160 "063434f3f2b22bfc"
+entity "Layer Yellow" 1744 10192 "bdcae7749df430ab"
+entity "Layer Yellow" 1744 10128 "98a1238eabc2920a"
 
 // EOF
