@@ -924,7 +924,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         }
         else {
             /* braking */
-            float brk = pa->frc + pa->frc * 5.0f * fabs(SIN(pa->angle));
+            float brk = pa->frc * (1.5f + 3.0f * fabs(SIN(pa->angle)));
             if(fabs(pa->gsp) <= brk * dt) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
