@@ -1285,6 +1285,7 @@ brick 134 5920 10032
 brick 133 5952 10096
 brick 18 6016 10144
 brick 149 6016 10192
+brick 144 5232 10416
 brick 37 4608 9600
 brick 38 4736 9600
 brick 40 4736 9568 green
@@ -1851,7 +1852,6 @@ entity "Bridge" 14848 10112 "a8f66404e8ca6d3c"
 entity "Bridge" 14848 9568 "6160b07a29ec8598"
 entity "Checkpoint" 7104 10400 "8da30fada78753cb"
 entity "Zipline Right" 12608 9824 "24ece8587a7ed978"
-entity "Spring Standard" 5200 10432 "cfebdb7ac09b8c13"
 entity "Spikes" 15552 10112 "a1334e98ddeddfcb"
 entity "Spikes" 15296 10112 "e26fcc3e01b096b4"
 entity "Spikes" 14400 10112 "371212702023b96c"

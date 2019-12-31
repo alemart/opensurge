@@ -755,8 +755,6 @@ brick 142 6240 9952
 brick 141 6128 9920
 brick 149 6624 9920
 brick 152 6512 9920
-brick 149 6816 10208
-brick 151 6768 10208
 brick 180 6592 10240
 brick 180 6528 10240
 brick 180 6464 10240
@@ -766,6 +764,9 @@ brick 180 6272 10240
 brick 1 6272 10304
 brick 1 6400 10304
 brick 1 6528 10304
+brick 31 6656 9984 green
+brick 151 6816 10208
+brick 149 6848 10208
 brick 17 5248 9920
 brick 17 5376 9888
 brick 17 5504 9856
@@ -1432,7 +1433,6 @@ entity "Powerup Collectibles" 768 9776 "b4b51dc8a85f0840"
 entity "Mosquito" 7904 10576 "b6a5a4504466cfee"
 entity "Goal" 11776 10848 "33f5c6e21c4af6d8"
 entity "Mosquito" 9664 10432 "9cae445760afc5df"
-entity "Spring Stronger" 6736 10240 "31cc7ba47c6fa7c1"
 entity "Tube Out" 3696 10048 "c05dc2830658e0d6"
 entity "Tube Out" 4496 10048 "0ae4ade1c358a497"
 entity "Tube Out" 9232 10432 "d725a06a6259d01e"
@@ -1615,7 +1615,6 @@ entity "Wolfey" 1712 10064 "4935149b79e54088"
 entity "Event Trigger 7" 11280 10704 "d86559aa0e1f90d3"
 entity "Event Trigger 7" 11280 10672 "0304e7a2d999fb32"
 entity "Event Trigger 7" 11280 10640 "251ed78c4dba4444"
-
-// legacy objects
+entity "Spring Stronger" 6784 10240 "7647687fd8fbbbe3"
 
 // EOF
