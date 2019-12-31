@@ -411,14 +411,15 @@ int traverse(const parsetree_statement_t *stmt)
         else {
             /* solve conflicting definitions for the same sprite */
             spriteinfo_t *new_sprite = spriteinfo_create(nanoparser_get_program(p2));
+
             if(new_sprite->animation_count > sprite->animation_count) {
                 logfile_message("WARNING: redefining sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-                hashtable_spriteinfo_t_replace(sprites, sprite_name, new_sprite);
+                if(hashtable_spriteinfo_t_replace(sprites, sprite_name, new_sprite))
+                    return 0; /* the sprite has been successfully redefined */
             }
-            else {
-                logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-                spriteinfo_destroy(new_sprite);
-            }
+
+            logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            spriteinfo_destroy(new_sprite);
         }
     }
     else

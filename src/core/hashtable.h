@@ -188,10 +188,16 @@ static bool hashtable_##T##_replace(const hashtable_##T *h, __H_CONST(KEY_TYPE) 
     hashtable_list_##T *q = h->data[k]; \
     while(q != NULL) { \
         if(h->key_compare(q->key, key) == 0) { \
-            if(h->destructor != NULL) \
-                h->destructor(q->value); \
-            q->value = new_value; \
-            return true; \
+            if(q->reference_count <= 0) { \
+                if(h->destructor != NULL) \
+                    h->destructor(q->value); \
+                q->value = new_value; \
+                return true; \
+            } \
+            else { \
+                logfile_message("hashtable_" #T "_remove(): can't replace element with %d active references.", q->reference_count); \
+                return false; \
+            } \
         } \
         else \
             q = q->next; \
