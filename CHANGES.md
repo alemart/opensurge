@@ -21,7 +21,7 @@
 
 ## 0.5.0.1 - October 5th, 2019
 
-* Fixed details from the initial release
+* Fixed details of the initial release
 
 ## 0.5.0 - September 25th, 2019
 
