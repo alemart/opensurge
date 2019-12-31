@@ -389,9 +389,11 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         }
 
         /* lock on top; won't prevent pits */
-        if(act->position.y < cam_topleft.y + padding - eps) {
-            act->position.y = cam_topleft.y + padding;
-            act->speed.y *= 0.5f;
+        if(!player_is_dying(player)) {
+            if(act->position.y < cam_topleft.y + padding - eps) {
+                act->position.y = cam_topleft.y + padding;
+                act->speed.y *= 0.5f;
+            }
         }
     }
 
