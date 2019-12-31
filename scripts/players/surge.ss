@@ -138,7 +138,7 @@ object "Surge's Lighting Boom" is "companion"
     xsp = 0;
     fx = null;
     shieldAbilities = null;
-    ceilingSensor = Sensor(-player.collider.width * 0.4, -player.collider.height * 0.75, player.collider.width * 0.8, 1);
+    ceilingSensor = Sensor(-player.collider.width * 0.35, -player.collider.height * 0.75, player.collider.width * 0.7, 1);
 
     state "main"
     {
