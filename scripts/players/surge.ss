@@ -327,7 +327,8 @@ object "Surge's Lighting Boom FX" is "private", "entity"
         if(otherCollider.entity.__name == "Enemy") {
             if(player.ysp <= 0) { // player going up?
                 enemy = otherCollider.entity;
-                enemy.kill(player);
+                if(enemy.enabled)
+                    enemy.kill(player);
             }
         }
     }
