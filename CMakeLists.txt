@@ -652,7 +652,7 @@ SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CM
 IF(UNIX)
   INSTALL(CODE "MESSAGE(\"Installing ${GAME_NAME} ${GAME_VERSION}... Make sure that you have the appropriate privileges.\")")
   INSTALL(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}")
-  INSTALL(FILES LICENSE README.md logo.png surge.png surge.rocks DESTINATION "${GAME_DATADIR}")
+  INSTALL(FILES LICENSE README.md CHANGES.md logo.png surge.png surge.rocks DESTINATION "${GAME_DATADIR}")
   INSTALL(DIRECTORY characters scripts sprites config images levels musics quests samples scripts themes languages fonts licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
   IF(DESKTOP_INSTALL)
     INSTALL(FILES src/misc/opensurge.desktop DESTINATION "${DESKTOP_ENTRY_PATH}")
