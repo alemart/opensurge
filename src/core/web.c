@@ -143,7 +143,7 @@ bool file_exists(const char *filepath)
     struct stat st;
     return (stat(filepath, &st) == 0);
 #else
-    FILE* fp = fopen(filepath, "rb");
+    FILE* fp = fopen_utf8(filepath, "rb");
     bool valid = (fp != NULL);
     if(fp != NULL)
         fclose(fp);

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * util.c - utilities
- * Copyright (C) 2008-2010, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,10 @@
 #include <allegro.h>
 #endif
 
+#if defined(_WIN32)
+#include <windows.h>
+#include <wchar.h>
+#endif
 
 
 /* private stuff */
@@ -228,6 +232,39 @@ uint64_t random64()
     state ^= state >> 7;
     state ^= state << 17;
     return state;
+}
+
+/*
+ * fopen_utf8()
+ * fopen() with UTF-8 support for filenames
+ */
+FILE* fopen_utf8(const char* filepath, const char* mode)
+{
+#if defined(_WIN32)
+    FILE* fp;
+    int wpath_size = MultiByteToWideChar(CP_UTF8, 0, filepath, -1, NULL, 0);
+    int wmode_size = MultiByteToWideChar(CP_UTF8, 0, mode, -1, NULL, 0);
+
+    if(wpath_size > 0 && wmode_size > 0) {
+        wchar_t* wpath = mallocx(wpath_size * sizeof(*wpath));
+        wchar_t* wmode = mallocx(wmode_size * sizeof(*wmode));
+
+        MultiByteToWideChar(CP_UTF8, 0, filepath, -1, wpath, wpath_size);
+        MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, wmode_size);
+        fp = _wfopen(wpath, wmode);
+
+        free(wmode);
+        free(wpath);
+    }
+    else {
+        logfile_message("%s(\"%s\", \"%s\") ERROR %d", __func__, filepath, mode, GetLastError());
+        fp = fopen(filepath, mode);
+    }
+
+    return fp;
+#else
+    return fopen(filepath, mode);
+#endif
 }
 
 /*

@@ -1,7 +1,7 @@
 /*
- * nanoparser 1.1
+ * nanoparser 1.1.1
  * A tiny stand-alone easy-to-use parser written in C
- * Copyright (c) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (c) 2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
@@ -85,6 +85,11 @@ where:
 #include <string.h>
 #include <ctype.h>
 #include "nanoparser.h"
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <wchar.h>
+#endif
 
 #ifdef TRUE
 #undef TRUE
@@ -205,6 +210,7 @@ static void warning(const char *fmt, ...); /* warning */
 static char* dirpath(const char *filepath); /* dirpath("f/folder/file.txt") = "f/folder/" */
 static void* malloc_x(size_t bytes); /* our version of malloc */
 static void* realloc_x(void *ptr, size_t bytes); /* our version of realloc */
+static FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen with UTF-8 filename support */
 static char* str_dup(const char *s); /* our version of strdup: duplicates s */
 static char* r_trim(char *s); /* r_trim */
 
@@ -319,8 +325,8 @@ static int read_hex_char(); /* reads a token of the form \xAB */
 
 /* syntatic analyzer */
 static parsetree_program_t* parse(); /* main parsing routine */
-static int accept(symbol_t s); /* reads the next token and returns true iff s is found */
-static int expect(symbol_t s); /* throws an error if s doesn't get accepted */
+static int acceptsym(symbol_t s); /* reads the next token and returns true iff s is found */
+static int expectsym(symbol_t s); /* throws an error if s doesn't get accepted */
 
 
 
@@ -349,7 +355,7 @@ parsetree_program_t* nanoparser_construct_tree(const char *filepath)
     FILE *fp;
     parsetree_program_t *prog;
 
-    fp = fopen(filepath, "r");
+    fp = fopen_utf8(filepath, "r");
     if(fp != NULL) {
         /* creates the temporary virtual file */
         vfile_create(filepath);
@@ -522,7 +528,7 @@ void ungetsym()
     sym = oldsym;
 }
 
-int accept(symbol_t s)
+int acceptsym(symbol_t s)
 {
     if(sym == s) {
         getsym();
@@ -532,9 +538,9 @@ int accept(symbol_t s)
         return FALSE;
 }
 
-int expect(symbol_t s)
+int expectsym(symbol_t s)
 {
-    if(!accept(s)) {
+    if(!acceptsym(s)) {
         error(
             "Syntax error in \"%s\" on line %d: unexpected symbol \"%s\".",
             errorcontext_detect_file_name(line),
@@ -578,9 +584,9 @@ parsetree_program_t* parse()
 
     line = 1;
     getsym(); /* reads the first symbol */
-    while(accept(SYM_NEWLINE)); /* skips newlines */
+    while(acceptsym(SYM_NEWLINE)); /* skips newlines */
     prog = program(); /* generates the syntatic tree */
-    expect(SYM_EOF); /* expects an EOF character */
+    expectsym(SYM_EOF); /* expects an EOF character */
 
     return prog;
 }
@@ -615,7 +621,7 @@ parsetree_statement_t* statement()
     parsetree_statement_t *stmt = NULL;
     char *str = str_dup(symdata);
 
-    expect(SYM_STRING);
+    expectsym(SYM_STRING);
     stmt = parsetree_statement_new(
         str,
         parameter()
@@ -633,7 +639,7 @@ parsetree_parameter_t* parameter()
 
     if(sym == SYM_STRING) {
         char *str = str_dup(symdata);
-        accept(SYM_STRING);
+        acceptsym(SYM_STRING);
         param = parsetree_parameter_new_value(
             str,
             parameter()
@@ -670,23 +676,23 @@ parsetree_program_t* block()
     parsetree_program_t *prog = NULL;
 
     nq();
-    expect(SYM_BEGINBLOCK);
+    expectsym(SYM_BEGINBLOCK);
     nl();
     prog = program();
-    expect(SYM_ENDBLOCK);
+    expectsym(SYM_ENDBLOCK);
 
     return prog;
 }
 
 void nq()
 {
-    accept(SYM_NEWLINE);
+    acceptsym(SYM_NEWLINE);
 }
 
 void nl()
 {
-    expect(SYM_NEWLINE);
-    while(accept(SYM_NEWLINE));
+    expectsym(SYM_NEWLINE);
+    while(acceptsym(SYM_NEWLINE));
 }
 
 
@@ -1009,7 +1015,7 @@ void preprocessor_run(FILE *in, int depth)
                 strcpy(fullpath, dir);
                 strcat(fullpath, value);
 
-                if(strstr(value, "..") != NULL || !isalnum(value[0])) {
+                if(strstr(value, "..") != NULL || strstr(value, "\\\\") != NULL || !isalnum(value[0])) {
                     error(
                         "Preprocessor error in \"%s\" on line %d: couldn't include file \"%s\".",
                         errorcontext_detect_file_name(preprocessor_line),
@@ -1019,7 +1025,7 @@ void preprocessor_run(FILE *in, int depth)
                 }
 
                 if(!preprocessor_has_file_been_included(fullpath)) {
-                    FILE *fp = fopen(fullpath, "r");
+                    FILE *fp = fopen_utf8(fullpath, "r");
                     preprocessor_add_to_include_table(fullpath);
                     if(fp != NULL) {
                         char *old_vfile_name = vfile_name;
@@ -1438,6 +1444,35 @@ void* realloc_x(void *ptr, size_t bytes)
     }
 
     return m;
+}
+
+FILE* fopen_utf8(const char* filepath, const char* mode)
+{
+#if defined(_WIN32)
+    FILE* fp;
+    int wpath_size = MultiByteToWideChar(CP_UTF8, 0, filepath, -1, NULL, 0);
+    int wmode_size = MultiByteToWideChar(CP_UTF8, 0, mode, -1, NULL, 0);
+
+    if(wpath_size > 0 && wmode_size > 0) {
+        wchar_t* wpath = malloc_x(wpath_size * sizeof(*wpath));
+        wchar_t* wmode = malloc_x(wmode_size * sizeof(*wmode));
+
+        MultiByteToWideChar(CP_UTF8, 0, filepath, -1, wpath, wpath_size);
+        MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, wmode_size);
+        fp = _wfopen(wpath, wmode);
+
+        free(wmode);
+        free(wpath);
+    }
+    else {
+        warning("%s(\"%s\", \"%s\") ERROR %d", __func__, filepath, mode, GetLastError());
+        fp = fopen(filepath, mode);
+    }
+
+    return fp;
+#else
+    return fopen(filepath, mode);
+#endif
 }
 
 #ifdef __cplusplus

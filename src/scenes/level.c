@@ -489,7 +489,7 @@ void level_load(const char *filepath)
     init_setup_object_list();
 
     /* traversing the level file */
-    fp = fopen(fullpath, "r");
+    fp = fopen_utf8(fullpath, "r");
     if(fp != NULL) {
         int ln = 0;
         while(fgets(line, sizeof(line) / sizeof(char), fp)) {
@@ -626,7 +626,7 @@ int level_save(const char *filepath)
 
     /* open for writing */
     logfile_message("level_save(\"%s\")", fullpath);
-    if(NULL == (fp=fopen(fullpath, "w"))) {
+    if(NULL == (fp=fopen_utf8(fullpath, "w"))) {
         logfile_message("Warning: could not open \"%s\" for writing.", fullpath);
         video_showmessage("Could not open \"%s\" for writing.", fullpath);
         return FALSE;

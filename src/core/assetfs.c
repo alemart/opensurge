@@ -873,7 +873,7 @@ bool is_asset_folder(const char* fullpath)
     struct stat st;
     valid = (stat(fpath, &st) == 0);
 #else
-    FILE* fp = fopen(fpath, "rb");
+    FILE* fp = fopen_utf8(fpath, "rb");
     if(fp != NULL) {
         valid = true;
         fclose(fp);
@@ -888,7 +888,7 @@ bool is_asset_folder(const char* fullpath)
 /* checks if a certain file (given its absolute path) is writable */
 bool is_writable_file(const char* fullpath)
 {
-    FILE* fp = fopen(fullpath, "r+b");
+    FILE* fp = fopen_utf8(fullpath, "r+b");
     bool writable = false;
     if(fp != NULL) {
         writable = true;

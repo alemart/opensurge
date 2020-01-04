@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * util.h - utilities
- * Copyright (C) 2008-2010, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #define _UTIL_H
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "global.h"
@@ -69,10 +70,11 @@ void* __mallocx(size_t bytes, const char* location);
 void* __reallocx(void *ptr, size_t bytes, const char* location);
 
 /* Misc utilities */
-void fatal_error(const char *fmt, ...);
+void fatal_error(const char *fmt, ...); /* crash the program with a message */
 void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
 uint64_t random64(); /* pseudo-random 64-bit number */
+FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 filename support */
 
 #endif

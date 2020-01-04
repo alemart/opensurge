@@ -987,7 +987,7 @@ int write_header(FILE* fp, const prefs_t* prefs)
 int load(prefs_t* prefs)
 {
     const char* filename = assetfs_create_config_file(PREFS_FILE);
-    FILE* fp = fopen(filename, "rb");
+    FILE* fp = fopen_utf8(filename, "rb");
     int success = 0;
 
     prefs_log("Loading prefs from file \"%s\"...", filename);
@@ -1025,7 +1025,7 @@ int load(prefs_t* prefs)
 int save(const prefs_t* prefs)
 {
     const char* filename = assetfs_create_config_file(PREFS_FILE);
-    FILE* fp = fopen(filename, "wb");
+    FILE* fp = fopen_utf8(filename, "wb");
     int success = 0;
 
     prefs_log("Saving prefs to file \"%s\"...", filename);

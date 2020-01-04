@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * logfile.c - logfile module
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 #include "logfile.h"
 #include "global.h"
 #include "assetfs.h"
+#include "util.h"
 
 
 /* private stuff ;) */
@@ -37,7 +38,7 @@ static FILE* logfile = NULL;
 void logfile_init()
 {
     const char* fullpath = assetfs_create_cache_file(LOGFILE_PATH);
-    if(NULL != (logfile = fopen(fullpath, "w"))) {
+    if(NULL != (logfile = fopen_utf8(fullpath, "w"))) {
         logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
     }
     else {
