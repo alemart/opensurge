@@ -27,12 +27,12 @@
 #define GAME_SUP_VERSION        0
 #define GAME_SUB_VERSION        5
 #define GAME_WIP_VERSION        1
-#define GAME_PATCH_VERSION      0
+#define GAME_PATCH_VERSION      1
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2020"
 
 /* Scripting */
-#define SURGESCRIPT_MIN_VERSION "0.5.4.1"
+#define SURGESCRIPT_MIN_VERSION "0.5.4.2"
 
 /* if the following is defined, this is a development build */
 /*#define GAME_BUILD_VERSION      1337-dev*/
