@@ -194,9 +194,6 @@ Ste Pickford \n\
 --- fonts/default.png \n\
 --- fonts/powerfest.png \n\
 \n\
-Kenney \n\
---- fonts/kenney.ttf (public domain) \n\
-\n\
 Christian Robertson \n\
 --- fonts/Roboto-Medium.ttf (Apache License 2.0) \n\
 --- fonts/Roboto-Bold.ttf (Apache License 2.0) \n\
