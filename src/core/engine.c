@@ -334,7 +334,8 @@ void init_managers(const commandline_t* cmd)
         commandline_getint(cmd->color_depth, video_get_preferred_color_depth())
     );
     video_show_fps(
-        commandline_getint(cmd->show_fps, prefs_get_bool(prefs, ".showfps"))
+        commandline_getint(cmd->show_fps, prefs_get_bool(prefs, ".showfps")) &&
+        !commandline_getint(cmd->hide_fps, FALSE)
     );
     audio_init();
     input_init();

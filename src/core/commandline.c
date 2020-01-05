@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * commandline.c - command line parser
- * Copyright (C) 2010-2013, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2013, 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,6 +58,7 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
     cmd.color_depth = COMMANDLINE_UNDEFINED;
     cmd.show_fps = COMMANDLINE_UNDEFINED;
+    cmd.hide_fps = COMMANDLINE_UNDEFINED;
     cmd.custom_level_path[0] = '\0';
     cmd.custom_quest_path[0] = '\0';
     cmd.language_filepath[0] = '\0';
@@ -95,6 +96,7 @@ commandline_t commandline_parse(int argc, char **argv)
 #endif
                 "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
                 "    --show-fps                       show the FPS (frames per second) counter\n"
+                "    --hide-fps                       hide the FPS counter\n"
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/my_quest.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/lang.lng)\n"
@@ -169,6 +171,9 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--show-fps") == 0)
             cmd.show_fps = TRUE;
+
+        else if(strcmp(argv[i], "--hide-fps") == 0)
+            cmd.hide_fps = TRUE;
 
         else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;

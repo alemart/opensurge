@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * commandline.h - command line parser
- * Copyright (C) 2010-2013  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2013, 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ struct commandline_t {
     int fullscreen;
     int color_depth;
     int show_fps;
+    int hide_fps;
 
     /* filepaths */
     char custom_level_path[COMMANDLINE_PATHMAX];
