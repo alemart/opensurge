@@ -38,8 +38,8 @@
 /*#define GAME_BUILD_VERSION      1337-dev*/
 
 /* Data folder (game assets) */
-#ifndef GAME_DATADIR
-#define GAME_DATADIR            "/usr/local/share/games/" GAME_UNIXNAME
+#if !defined(GAME_DATADIR)
+#error "You must define GAME_DATADIR (path to the game data), e.g. /usr/share/games/opensurge"
 #endif
 
 /* Utilities */

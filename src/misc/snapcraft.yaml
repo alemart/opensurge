@@ -1,6 +1,6 @@
 name: opensurge
 base: core18
-version: '0.5.1'
+version: '0.5.1.1'
 summary: A fun 2D retro platformer inspired by Sonic games
 description: |
   Open Surge is a fun 2D retro platformer inspired by Sonic games
@@ -13,7 +13,7 @@ icon: opensurge.png
 
 apps:
   opensurge:
-    command: desktop-launch $SNAP/bin/opensurge --base "$SNAP/usr/local/share/games/opensurge"
+    command: desktop-launch $SNAP/bin/opensurge --base "$SNAP/usr/share/games/opensurge"
     desktop: usr/share/applications/opensurge.desktop
     environment:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
@@ -31,7 +31,7 @@ parts:
   opensurge:
     after: [desktop-glib-only, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.5.1
+    source-tag: v0.5.1.1
     plugin: cmake
     override-build: |
       set -eu
@@ -42,13 +42,13 @@ parts:
         "-DALLEGRO_MONOLITH=OFF" \
         "-DCMAKE_LIBRARY_PATH=$SNAPCRAFT_STAGE/lib" \
         "-DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/bin" \
-        "-DGAME_DATADIR=/usr/local/share/games/opensurge" \
+        "-DGAME_DATADIR=/usr/share/games/opensurge" \
         "-DDESKTOP_INSTALL=ON" \
         "-DDESKTOP_ENTRY_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/applications" \
         "-DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps"
       make -j2 && make install
-      mkdir -p "$SNAPCRAFT_PART_INSTALL/usr/local/share/games"
-      mv /usr/local/share/games/opensurge "$SNAPCRAFT_PART_INSTALL/usr/local/share/games"
+      mkdir -p "$SNAPCRAFT_PART_INSTALL/usr/share/games"
+      mv /usr/share/games/opensurge "$SNAPCRAFT_PART_INSTALL/usr/share/games"
       sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/opensurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
     build-packages:
       - build-essential
@@ -99,7 +99,7 @@ parts:
 
   surgescript:
     source: https://github.com/alemart/surgescript.git
-    source-tag: v0.5.4.1
+    source-tag: v0.5.4.2
     plugin: cmake
     configflags:
       - -DCMAKE_BUILD_TYPE=Release

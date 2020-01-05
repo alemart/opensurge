@@ -81,7 +81,7 @@ You may run `ccmake` or `cmake-gui` to know additional build options (e.g., set 
 
 | Files         | Usual locations       |
 | --------------|-----------------------|
-| Game assets   | /usr/local/share/games, ~/.local/share/opensurge2d |
+| Game assets   | /usr/share/games, ~/.local/share/opensurge2d |
 | Game config.  | ~/.config/opensurge2d |
 | Logs, etc.    | ~/.cache/opensurge2d  |
 
