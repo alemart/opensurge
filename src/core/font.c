@@ -747,15 +747,23 @@ int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t col
     char *p, *q;
     size_t j = 0;
     uint32_t chr, tag = 0;
+    v2d_t sp = drv->charspacing(drv);
+    int line_height = drv->textsize(drv, " ").y + sp.y;
+    const image_t* target = image_drawing_target();
     #define _print_linebuf() \
         do { \
             if(*linebuf) { \
                 drv->textout(drv, linebuf, x, y, color_stack[*stack_top]); \
-                x += drv->textsize(drv, linebuf).x + drv->charspacing(drv).x; \
+                x += drv->textsize(drv, linebuf).x + sp.x; \
             } \
             *(p = linebuf) = 0; \
         } while(0)
 
+    /* clip */
+    if(y < -line_height || y > image_height(target) + line_height || x > image_width(target) + sp.x)
+        return line_height;
+
+    /* print */
     *(p = linebuf) = 0;
     while((chr = u8_nextchar(text, &j)) != 0) {
         if(!tag && chr == '<' && IS_TAG_1STCHAR(text[j])) {
@@ -804,8 +812,8 @@ int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t col
     }
     _print_linebuf();
 
-    /* return the height of the printed line */
-    return drv->textsize(drv, " ").y + drv->charspacing(drv).y;
+    /* done */
+    return line_height;
 }
 
 /* print a line with a certain alignment, returning its height */
@@ -1498,14 +1506,14 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
     /* draw shadow */
     if(f->shadow) {
         ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
-        al_draw_text(f->font, black, x, y + 1.0f, ALLEGRO_ALIGN_INTEGER, text);
-        al_draw_text(f->font, black, x + 1.0f, y + 1.0f, ALLEGRO_ALIGN_INTEGER, text);
+        al_draw_text(f->font, black, x, y + 1.0f, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
+        al_draw_text(f->font, black, x + 1.0f, y + 1.0f, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
         if(f->size >= 18) /* TODO: configurable shadows */
-            al_draw_text(f->font, black, x + 2.0f, y + 2.0f, ALLEGRO_ALIGN_INTEGER, text);
+            al_draw_text(f->font, black, x + 2.0f, y + 2.0f, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
     }
 
     /* draw text */
-    al_draw_text(f->font, color._color, x, y, ALLEGRO_ALIGN_INTEGER, text);
+    al_draw_text(f->font, color._color, x, y, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
 #else
     image_t* img = video_get_backbuffer();
 
