@@ -39,7 +39,7 @@
 
 /* Data folder (game assets) */
 #if !defined(GAME_DATADIR)
-#error "You must define GAME_DATADIR (path to the game data), e.g. /usr/share/games/opensurge"
+#define GAME_DATADIR            "/usr/share/games/opensurge"
 #endif
 
 /* Utilities */
