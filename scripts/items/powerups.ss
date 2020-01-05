@@ -254,7 +254,7 @@ object "Item Box" is "entity", "private"
 {
     actor = Actor("Item Box");
     brick = Brick("Item Box");
-    collider = CollisionBox(36, 36).setAnchor(0.5, 1);
+    collider = CollisionBox(26, 36).setAnchor(0.5, 1);
     transform = Transform();
     score = 100;
 
