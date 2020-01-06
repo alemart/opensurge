@@ -4,7 +4,7 @@
 
 * Added support for UTF-8 filenames on Windows
 * Added the --hide-fps command line option
-* Optimized text rendering
+* Optimized the rendering of texts
 * Removed unused fonts
 
 ## 0.5.1 - December 31st, 2019
