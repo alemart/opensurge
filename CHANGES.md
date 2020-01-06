@@ -1,5 +1,12 @@
 # Release Notes
 
+## 0.5.1.1 - January 5th, 2020
+
+* Added support for UTF-8 filenames on Windows
+* Added the --hide-fps command line option
+* Optimized text rendering
+* Removed unused fonts
+
 ## 0.5.1 - December 31st, 2019
 
 * New special moves: Surge's Lighting Boom and Surge's Lighting Smash
