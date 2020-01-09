@@ -1,0 +1,237 @@
+// -----------------------------------------------------------------------------
+// File: languages/english.lng
+// Description: english translation (encoding: utf-8)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+//
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                     "nl_NL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Nederlands"              // language name
+LANG_AUTHOR                 "SecularSteve"	      // translation author
+LANG_LASTUPDATE             "2020-01-09"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.1.1"                   // required engine version
+
+// Colors
+COLOR_TITLE                 "ff8800"
+COLOR_HIGHLIGHT             "ffee11"
+COLOR_HUD                   "ffff00"
+COLOR_HUDDANGER             "ff0000"
+
+//
+// Translators:
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "<color=$COLOR_TITLE>INSTELLINGEN</color>"
+OPTIONS_YES                 "JA"
+OPTIONS_NO                  "NEE"
+OPTIONS_GRAPHICS            "GRAFIEKEN"
+OPTIONS_FULLSCREEN          "Volle Scherm"
+OPTIONS_RESOLUTION          "Scherm grootte"
+OPTIONS_RESOLUTION_OPT1     "1X"
+OPTIONS_RESOLUTION_OPT2     "2X"
+OPTIONS_RESOLUTION_OPT3     "3X"
+OPTIONS_RESOLUTION_OPT4     "4X"
+OPTIONS_SMOOTHGFX           "vloeiende grafieken"
+OPTIONS_SMOOTHGFX_ERROR     "[32 bpp alleen]"
+OPTIONS_FPS                 "FPS Weergeven"
+OPTIONS_GAME                "SPEEL"
+OPTIONS_GAMEPAD             "Gamepad gebruiken"
+OPTIONS_LANGUAGE            "Taal Veranderen"
+OPTIONS_STAGESELECT         "Level select"
+OPTIONS_CREDITS             "Open Surge Credits"
+OPTIONS_DONATE              "Aan Open Surge Doneren"
+OPTIONS_BACK                "TERUG"
+
+// Stage Select
+STAGESELECT_TITLE           "<color=$COLOR_TITLE>LEVEL SELECT</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>ONTWIKKELAARSMODUS</color>"
+STAGESELECT_MSG             "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
+STAGESELECT_PAGE            "pagina $1/$2"
+STAGESELECT_ACT             "Zone"
+
+// Quest Select
+QUESTSELECT_TITLE           "<color=$COLOR_TITLE>ZOEKTOCHT SELECT</color>"
+QUESTSELECT_MSG             "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
+QUESTSELECT_PAGE            "pagina $1/$2"
+QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Versie:</color> $1\n<color=$COLOR_HIGHLIGHT>Auteur:</color> $2\n<color=$COLOR_HIGHLIGHT>Beschrijving:</color> $3"
+
+// Credits
+CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
+CREDITS_BACK                "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versie $GAME_VERSION</color>\naangedreven door $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Mensen</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dankzij</color>"
+CREDITS_ALEXANDRE           "Projectleider & Oprichter\nProject Ontwikkelaar"
+CREDITS_JOAO                "Kunstenaar"
+CREDITS_MATEUS              "Geluidseffecten"
+CREDITS_CODY                "Concept kunst"
+CREDITS_JOHAN               "Musicus (R.I.P. vriend)"
+CREDITS_DI                  "Musicus"
+CREDITS_VICTOR              "Musicus"
+CREDITS_COLIN               "Sprites, eerste verhaal"
+CREDITS_BRIAN               "Sprite kunstenaar"
+CREDITS_TRANSLATOR          "Vertaler"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individuele middelen</color>"
+CREDITS_RES_TEXT            "Tenzij uitdrukkelijk anders vermeld, zijn de onderstaande bestanden gelicentieerd onder de Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Foto's</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muziek</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Geluidseffecten</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
+CREDITS_RES_SCRIPTS_TEXT    "De auteurs worden geïdentificeerd in de scripts zelf."
+
+// Main Menu
+MAINMENU_DEVBUILD           "Ontwikkelingsversie"
+MAINMENU_VERSION            "v. $GAME_VERSION" // afgekort
+
+// Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TEXT             "Met Open Surge kun je je eigen geweldige spellen maken! Laat uw creativiteit de vrije loop! Laat je creatieve sappen stromen!\n\nStart je eigen project! Maak nieuwe niveaus, items, specials, personages en meer! Proef de niveau-editor, leer de engine en duik in SurgeScript voor maximaal vermogen!"
+
+// Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TEXT        "Bedankt voor het spelen van de Open Surge-versie $GAME_VERSION.\nWil je meer spelen? Ga naar $GAME_WEBSITE voor updates!\n\nMet Open Surge kun je je eigen games spelen en maken. Het is ontwikkeld door mensen zoals jij. Deel nu de vreugde! Vertel het aan je familie, vrienden en huisdieren en vertel het verder!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "de PIJLTOETSEN"
+INPUT_KEYB_LEFT             "de LINKS-TOETS"
+INPUT_KEYB_RIGHT            "de RECHT-TOETS"
+INPUT_KEYB_UP               "de BOVEN-TOETS"
+INPUT_KEYB_DOWN             "de BENEDEN-TOETS"
+INPUT_KEYB_FIRE1            "SPATIEBALK"
+INPUT_KEYB_FIRE2            "LINKER CTRL"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "W"
+INPUT_KEYB_FIRE6            "A"
+INPUT_KEYB_FIRE7            "S"
+INPUT_KEYB_FIRE8            "D"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "de RICHTLIJNEN"
+INPUT_JOY_LEFT              "de LINKE-KNOP"
+INPUT_JOY_RIGHT             "de RECHTE-KNOP"
+INPUT_JOY_UP                "de BOVEN-KNOP"
+INPUT_JOY_DOWN              "de BENEDEN-KNOP"
+INPUT_JOY_FIRE1             "KNOP 1"
+INPUT_JOY_FIRE2             "KNOP 2"
+INPUT_JOY_FIRE3             "KNOP 3"
+INPUT_JOY_FIRE4             "KNOP 4"
+INPUT_JOY_FIRE5             "KNOP 5"
+INPUT_JOY_FIRE6             "KNOP 6"
+INPUT_JOY_FIRE7             "KNOP 7"
+INPUT_JOY_FIRE8             "KNOP 8"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "WIL JE ECHT STOPPEN?"
+QUIT_OPTION1                "JA"
+QUIT_OPTION2                "NEE"
+
+	
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Hoe te spellen</color>\nWelkom naar de <color=$COLOR_HIGHLIGHT>Open Surge Demo Level</color>! Gebruik $INPUT_DIRECTIONAL om te bewegen en $INPUT_FIRE1 om te springen. Gebruik $INPUT_FIRE2 om van karakter te wisselen."
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Wist je dat...?</color>\nAlles in Open Surge kan worden aangepast. Je kunt levels, items, bazen, personages en meer maken! Het is een volledige <color=$COLOR_HIGHLIGHT>spelcreatie systeem</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Laat uw creativiteit de vrije loop!</color>\nEen van de belangrijkste functies in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Het is scripting voor games! Gebruik het om alles te bouwen wat je maar kunt bedenken!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Koel!</color>\nVoel je je al opgewonden? De lucht is de limiet! Ga naar <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> om vandaag nog je eigen geweldige spellen te maken!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Probeer het zelf!</color>\nNu is het jouw beurt! <color=$COLOR_HIGHLIGHT>Druk op F12 om de editor te openen.</color> Open vervolgens het itempalet en begin met het opbouwen van je niveau! (gebruik F1 voor hulp)"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// Since the game uses bitmap fonts, parts of
+// the translation don't accept special characters.
+//
+// This section doesn't accept language-specific
+// special characters.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Punten"
+HUD_TIME                    "Tijd"
+HUD_COLLECTIBLES            "Energie"
+
+// Level Cleared animation
+CLEARED_LINE1               "U HEEFT ZONE $LEVEL_ACT"
+CLEARED_LINE2               "GEWIST"
+CLEARED_POWER               "Energie Bonus"
+CLEARED_TIME                "Tijd Bonus"
+CLEARED_SCORE               "Punten"
+
+// Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "SPEEL"
+MAINMENU_CREATE             "MAKEN"
+MAINMENU_SHARE              "DELEN"
+MAINMENU_OPTIONS            "INSTELLINGEN"
+MAINMENU_QUIT               "STOPPEN"
+
+// Create Menu
+CREATEMENU_TITLE            "MAKEN"
+CREATEMENU_PLAY             "DEMO SPELEN"
+CREATEMENU_LEARN            "LEREN"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "TERUG"
+
+// Congratulations Screen
+CONGRATULATIONS_TITLE       "BEDANKT VOOR HET SPELEN"
+CONGRATULATIONS_SHARE       "DELEN"
+CONGRATULATIONS_DONATE      "DONEREN"
+CONGRATULATIONS_BACK        "TERUG"
+
+// Loading Screen
+LOADING_TEXT                "laden..."
