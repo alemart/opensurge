@@ -214,7 +214,7 @@ CLEARED_SCORE               "Punten"
 
 // Main Menu
 MAINMENU_TITLE              "MENU"
-MAINMENU_PLAY               "SPEEL"
+MAINMENU_PLAY               "SPELEN"
 MAINMENU_CREATE             "MAKEN"
 MAINMENU_SHARE              "DELEN"
 MAINMENU_OPTIONS            "INSTELLINGEN"
