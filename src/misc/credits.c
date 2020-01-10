@@ -50,6 +50,9 @@ $CREDITS_TRANSLATOR \n\
 Nathanaël Fercocq \n\
 $CREDITS_TRANSLATOR \n\
 \n\
+SecularSteve \n\
+$CREDITS_TRANSLATOR \n\
+\n\
 Ruben Caceres \n\
 Lainz \n\
 allegro.cc \n\
