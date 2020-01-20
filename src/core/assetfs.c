@@ -1105,24 +1105,40 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type, 
         while((d = readdir(dir))) {
             bool is_dir = false;
             bool is_file = false;
+            bool is_link = false;
 
             /* check entry type */
             #ifdef _DIRENT_HAVE_D_TYPE
             if(d->d_type != DT_UNKNOWN) {
-                is_dir = (d->d_type == DT_DIR) && (d->d_type != DT_LNK); /* d'uh */
-                is_file = (d->d_type == DT_REG) && (d->d_type != DT_LNK);
+                is_dir = (d->d_type == DT_DIR);
+                is_file = (d->d_type == DT_REG);
+                is_link = (d->d_type == DT_LNK);
             }
             else {
             #endif
                 char* path = join_path(abspath, d->d_name);
                 struct stat st;
                 lstat(path, &st);
+                free(path);
                 is_dir = S_ISDIR(st.st_mode) && !(S_ISLNK(st.st_mode));
                 is_file = S_ISREG(st.st_mode) && !(S_ISLNK(st.st_mode));
-                free(path);
+                is_link = !(S_ISDIR(st.st_mode)) && S_ISLNK(st.st_mode);
             #ifdef _DIRENT_HAVE_D_TYPE
             }
             #endif
+
+            /* handle links */
+            if(is_link) {
+                char* path = join_path(abspath, d->d_name);
+                struct stat st;
+                stat(path, &st);                
+                free(path);
+
+                if(S_ISDIR(st.st_mode))
+                    continue; /* reject directories */
+                else if(S_ISREG(st.st_mode))
+                    is_file = true; /* accept links of regular files */
+            }
 
             /* recurse on directories */
             if(is_dir) {
