@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * gameover.c - "game over" scene
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2018, 2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,14 +29,20 @@
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/timer.h"
+#include "../core/lang.h"
 
 
 /* private data */
-#define GAMEOVER_TIMEOUT        7.0f
-#define GAMEOVER_MUSICFILE      "musics/gameover.ogg"
+static const float GAMEOVER_TIMEOUT = 7.0f;
+static const float GAMEOVER_FADETIME = 2.0f;
+static const float GAMEOVER_APPEARTIME = 1.0f;
+static const char* GAMEOVER_MUSICFILE = "musics/gameover.ogg";
 static font_t *gameover_fnt[2];
 static image_t *gameover_buf;
 static float gameover_timer;
+static float gameover_spacing;
+static float gameover_width[3];
+static float gameover_height;
 static music_t* music;
 
 
@@ -46,20 +52,31 @@ static music_t* music;
  */
 void gameover_init(void *foo)
 {
-    gameover_timer = 0;
+    /* get text size */
+    font_t* tmp_fnt = font_create("gameover");
+    font_set_text(tmp_fnt, "%s", lang_get("GAMEOVER_PART1"));
+    font_set_text(tmp_fnt, "%s %s", font_get_text(tmp_fnt), lang_get("GAMEOVER_PART2"));
+    gameover_width[2] = font_get_textsize(tmp_fnt).x;
+    gameover_height = font_get_textsize(tmp_fnt).y;
+    font_destroy(tmp_fnt);
 
+    /* create fonts */
     gameover_fnt[0] = font_create("gameover");
-    font_set_position(gameover_fnt[0], v2d_new(-64, 112));
-    font_set_align(gameover_fnt[0], FONTALIGN_RIGHT);
-    font_set_text(gameover_fnt[0], "GAME");
+    font_set_align(gameover_fnt[0], FONTALIGN_CENTER);
+    font_set_text(gameover_fnt[0], "%s", lang_get("GAMEOVER_PART1"));
+    gameover_width[0] = font_get_textsize(gameover_fnt[0]).x;
 
     gameover_fnt[1] = font_create("gameover");
-    font_set_position(gameover_fnt[1], v2d_new(VIDEO_SCREEN_W+64, 112));
-    font_set_align(gameover_fnt[1], FONTALIGN_LEFT);
-    font_set_text(gameover_fnt[1], "OVER");
+    font_set_align(gameover_fnt[1], FONTALIGN_CENTER);
+    font_set_text(gameover_fnt[1], "%s", lang_get("GAMEOVER_PART2"));
+    gameover_width[1] = font_get_textsize(gameover_fnt[1]).x;
 
+    /* misc */
+    gameover_spacing = gameover_width[2] - gameover_width[1] - gameover_width[0];
     gameover_buf = image_clone(video_get_backbuffer());
+    gameover_timer = 0;
 
+    /* music */
     music = music_load(GAMEOVER_MUSICFILE);
     music_play(music, false);
 }
@@ -72,10 +89,8 @@ void gameover_init(void *foo)
  */
 void gameover_update()
 {
-    float distance = 16.0f;
-    float speed = VIDEO_SCREEN_W / 2.0f;
-    float dt = timer_get_delta();
-    v2d_t pos;
+    float t, dt = timer_get_delta();
+    float center_x;
 
     /* timer */
     gameover_timer += dt;
@@ -85,17 +100,22 @@ void gameover_update()
             scenestack_pop();
             return;
         }
-        fadefx_out(color_rgb(0,0,0), 2);
+        fadefx_out(color_rgb(0,0,0), GAMEOVER_FADETIME);
     }
 
-    /* "game over" text */
-    pos = font_get_position(gameover_fnt[0]);
-    pos.x = min(pos.x + speed * dt, (VIDEO_SCREEN_W - distance) / 2.0f);
-    font_set_position(gameover_fnt[0], pos);
+    /* position the text */
+    center_x = (VIDEO_SCREEN_W + (gameover_width[0] - gameover_width[1])) / 2.0f;
+    t = gameover_timer / GAMEOVER_APPEARTIME;
 
-    pos = font_get_position(gameover_fnt[1]);
-    pos.x = max(pos.x - speed * dt, (VIDEO_SCREEN_W + distance) / 2.0f);
-    font_set_position(gameover_fnt[1], pos);
+    font_set_position(gameover_fnt[0], v2d_new(
+        lerp(-gameover_width[0], center_x - (gameover_width[0] + gameover_spacing) / 2.0f, t),
+        (VIDEO_SCREEN_H - gameover_height) / 2.0f
+    ));
+
+    font_set_position(gameover_fnt[1], v2d_new(
+        lerp(VIDEO_SCREEN_W + gameover_width[1], center_x + (gameover_width[1] + gameover_spacing) / 2.0f, t),
+        (VIDEO_SCREEN_H - gameover_height) / 2.0f
+    ));
 }
 
 

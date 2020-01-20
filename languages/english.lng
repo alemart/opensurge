@@ -15,8 +15,8 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2019-11-16"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1"                   // required engine version
+LANG_LASTUPDATE             "2020-01-19"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
 // Colors
 COLOR_TITLE                 "ff8800"
@@ -211,6 +211,10 @@ CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT"
 CLEARED_POWER               "Power Bonus"
 CLEARED_TIME                "Time Bonus"
 CLEARED_SCORE               "Score"
+
+// Game Over
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"
 
 // Main Menu
 MAINMENU_TITLE              "MENU"
