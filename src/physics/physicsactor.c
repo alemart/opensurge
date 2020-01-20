@@ -1362,7 +1362,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
                 /* unroll after rolling midair */
                 if(pa->state == PAS_ROLLING) {
-                    if(pa->midair_timer >= 0.1f && !input_button_down(pa->input, IB_DOWN)) {
+                    if(pa->midair_timer >= 0.2f && !input_button_down(pa->input, IB_DOWN)) {
                         pa->state = WALKING_OR_RUNNING(pa);
                         if(!nearly_zero(pa->gsp))
                             pa->facing_right = (pa->gsp > 0.0f);
