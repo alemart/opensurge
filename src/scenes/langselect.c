@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * langselect.c - language selection screen
- * Copyright (C) 2009-2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2009-2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,8 +44,9 @@
 
 
 /* private data */
-#define LANG_BGFILE             "themes/scenes/langselect.bg"
-#define LANG_MAXPERPAGE         7
+static const char* LANG_BGFILE = "themes/scenes/langselect.bg";
+static const int LANG_MAXPERCOL = 5;
+static const int LANG_MAXCOLS = 3;
 typedef struct {
     char title[128];
     char author[128];
@@ -54,7 +55,7 @@ typedef struct {
 
 static bool quit;
 static int lngcount;
-static font_t *title, **lngfnt[2], *page_label, *author_label;
+static font_t *title, **lngfnt[2], *author_label;
 static lngdata_t *lngdata;
 static int option; /* current option: 0..n-1 */
 static actor_t *arrow;
@@ -64,6 +65,8 @@ static bgtheme_t *bgtheme;
 static music_t *music;
 static bool fresh_install;
 static bool came_from_options;
+static v2d_t sliding_camera;
+static int column_width;
 
 /* private functions */
 static void save_preferences(const char *filepath);
@@ -95,8 +98,9 @@ void langselect_init(void *param)
     came_from_options = (param != NULL) && *((bool*)param);
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
+    sliding_camera = v2d_new(0, VIDEO_SCREEN_H / 2);
+    column_width = VIDEO_SCREEN_W / (LANG_MAXCOLS - 0.35f);
 
-    page_label = font_create("MenuText");
     author_label = font_create("MenuText");
 
     title = font_create("MenuTitle");
@@ -117,7 +121,7 @@ void langselect_init(void *param)
         return;
     }
 
-    fadefx_in(color_rgb(0,0,0), 1.0);
+    fadefx_in(color_rgb(0,0,0), 1.0f);
 }
 
 
@@ -133,7 +137,6 @@ void langselect_release()
     actor_destroy(arrow);
     font_destroy(title);
     font_destroy(author_label);
-    font_destroy(page_label);
     input_destroy(input);
     music_unref(music);
 }
@@ -145,10 +148,9 @@ void langselect_release()
  */
 void langselect_update()
 {
-    float dt = timer_get_delta();
-    int current_page, max_pages;
-    v2d_t pos;
+    float dest_x, dt = timer_get_delta();
 
+    /* update scene time */
     scene_time += dt;
 
     /* background movement */
@@ -156,18 +158,38 @@ void langselect_update()
 
     /* menu option */
     arrow->position = font_get_position(lngfnt[0][option]);
-    arrow->position.x += -20 + 5*cos(2*PI * scene_time);
+    arrow->position.x += -20 + 3*cos(2*PI * scene_time);
     if(!quit && !fadefx_is_fading()) {
         if(input_button_pressed(input, IB_DOWN)) {
-            option = (option+1)%lngcount;
-            sound_play(SFX_CHOOSE);
+            if(option / LANG_MAXPERCOL == (option + 1) / LANG_MAXPERCOL) {
+                if(option < lngcount - 1) {
+                    option++;
+                    sound_play(SFX_CHOOSE);
+                }
+            }
         }
         if(input_button_pressed(input, IB_UP)) {
-            option = (((option-1)%lngcount)+lngcount)%lngcount;
-            sound_play(SFX_CHOOSE);
+            if(option / LANG_MAXPERCOL == (option - 1) / LANG_MAXPERCOL) {
+                if(option > 0) {
+                    option--;
+                    sound_play(SFX_CHOOSE);
+                }
+            }
+        }
+        if(input_button_pressed(input, IB_LEFT)) {
+            if(option - LANG_MAXPERCOL >= 0) {
+                option -= LANG_MAXPERCOL;
+                sound_play(SFX_CHOOSE);
+            }
+        }
+        if(input_button_pressed(input, IB_RIGHT)) {
+            if(option + LANG_MAXPERCOL < lngcount) {
+                option += LANG_MAXPERCOL;
+                sound_play(SFX_CHOOSE);
+            }
         }
         if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-            char *filepath = lngdata[option].filepath;
+            const char *filepath = lngdata[option].filepath;
             logfile_message("Loading language \"%s\", \"%s\"", lngdata[option].title, filepath);
             lang_loadfile(filepath);
             save_preferences(filepath);
@@ -180,19 +202,18 @@ void langselect_update()
         }
     }
 
-    /* page label */
-    current_page = 1 + option / LANG_MAXPERPAGE;
-    max_pages = 1 + max(0, lngcount - 1) / LANG_MAXPERPAGE;
-    font_set_text(page_label, "page %d/%d", current_page, max_pages);
-    pos.x = VIDEO_SCREEN_W - font_get_textsize(page_label).x - 10;
-    pos.y = VIDEO_SCREEN_H - font_get_textsize(page_label).y - 5;
-    font_set_position(page_label, pos);
+    /* sliding camera */
+    dest_x = font_get_position(lngfnt[0][option]).x +
+             font_get_textsize(lngfnt[0][(option / LANG_MAXPERCOL) * LANG_MAXPERCOL]).x / 2;
+    if(fabs(sliding_camera.x - dest_x) > 0.2f)
+        sliding_camera.x = lerp(sliding_camera.x, dest_x, 10 * timer_get_delta());
+    else
+        sliding_camera.x = dest_x;
 
     /* author label */
     font_set_text(author_label, "<color=$COLOR_HIGHLIGHT>Translation by:</color> %s", lngdata[option].author);
-    pos.x = 10;
-    pos.y = VIDEO_SCREEN_H - font_get_textsize(author_label).y - 5;
-    font_set_position(author_label, pos);
+    font_set_position(author_label, v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H - font_get_textsize(author_label).y - 5));
+    font_set_align(author_label, FONTALIGN_CENTER);
 
     /* music */
     if(!music_is_playing() && !fresh_install)
@@ -204,7 +225,7 @@ void langselect_update()
             scenestack_pop();
             return;
         }
-        fadefx_out(color_rgb(0,0,0), 1.0);
+        fadefx_out(color_rgb(0,0,0), 1.0f);
     }
 }
 
@@ -223,15 +244,12 @@ void langselect_render()
     background_render_fg(bgtheme, cam);
 
     font_render(title, cam);
-    font_render(page_label, cam);
     font_render(author_label, cam);
 
-    for(i=0; i<lngcount; i++) {
-        if(i/LANG_MAXPERPAGE == option/LANG_MAXPERPAGE)
-            font_render(lngfnt[option==i ? 1 : 0][i], cam);
-    }
+    for(i=0; i<lngcount; i++)
+        font_render(lngfnt[option==i ? 1 : 0][i], sliding_camera);
 
-    actor_render(arrow, cam);
+    actor_render(arrow, sliding_camera);
 }
 
 
@@ -273,12 +291,13 @@ void load_lang_list()
     lngfnt[0] = mallocx(lngcount * sizeof(font_t*));
     lngfnt[1] = mallocx(lngcount * sizeof(font_t*));
     for(i=0; i<lngcount; i++) {
+        int col = i / LANG_MAXPERCOL, row = i % LANG_MAXPERCOL;
         lngfnt[0][i] = font_create("MenuText");
         lngfnt[1][i] = font_create("MenuText");
-        font_set_text(lngfnt[0][i], "%2d. %s", i+1, lngdata[i].title);
-        font_set_text(lngfnt[1][i], "<color=$COLOR_HIGHLIGHT>% 2d. %s</color>", i+1, lngdata[i].title);
-        font_set_position(lngfnt[0][i], v2d_new(25, 72 + 20*(i%LANG_MAXPERPAGE)));
-        font_set_position(lngfnt[1][i], v2d_new(25, 72 + 20*(i%LANG_MAXPERPAGE)));
+        font_set_text(lngfnt[0][i], "%s", lngdata[i].title);
+        font_set_text(lngfnt[1][i], "<color=$COLOR_HIGHLIGHT>%s</color>", lngdata[i].title);
+        font_set_position(lngfnt[0][i], v2d_new(25 + col * column_width, 88 + row * 1.35f * font_get_textsize(lngfnt[0][i]).y));
+        font_set_position(lngfnt[1][i], v2d_new(25 + col * column_width, 88 + row * 1.35f * font_get_textsize(lngfnt[1][i]).y));
     }
 }
 
