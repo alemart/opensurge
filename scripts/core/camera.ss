@@ -14,7 +14,7 @@ using SurgeEngine.Video.Screen;
 object "Default Camera" is "entity", "awake", "private"
 {
     public offset = Vector2.zero; // an adjustable offset
-    public enabled = true; // is this camera enbaled?
+    public enabled = true; // is this camera enabled?
 
     transform = Transform();
     upDown = spawn("Default Camera - Up/Down Logic");
