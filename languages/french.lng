@@ -1,20 +1,54 @@
 // -----------------------------------------------------------------------------
 // File: languages/francais.lng
 // Description: french translation (encoding: utf-8)
-// Author: David Demelier (last translator)
-//         Nathanaël Fercocq (SnickDev)
+// Authors: David Demelier (last translator)
+//          Nathanaël Fercocq (SnickDev)
 // License: MIT
 // -----------------------------------------------------------------------------
 
-LANG_ID                  "fr_FR"
-LANG_NAME                "Français"
-LANG_AUTHOR              "David Demelier"
-LANG_LASTUPDATE          "2020-01-23"
-LANG_COMPATIBILITY       "0.5.1"
+
+//
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                "Français"                       // language name
+LANG_AUTHOR              "SnickDev, David Demelier"       // translation author
+LANG_LASTUPDATE          "2020-01-23"                     // date format: yyyy-mm-dd
+LANG_COMPATIBILITY       "0.5.1"                          // required engine version
+
+// Colors
 COLOR_TITLE              "ff8800"
 COLOR_HIGHLIGHT          "ffee11"
 COLOR_HUD                "ffff00"
 COLOR_HUDDANGER          "ff0000"
+
+//
+// Translators:
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
 OPTIONS_TITLE            "<color=$COLOR_TITLE>OPTIONS</color>"
 OPTIONS_YES              "OUI"
 OPTIONS_NO               "NON"
@@ -35,15 +69,21 @@ OPTIONS_STAGESELECT      "Sélection de stage"
 OPTIONS_CREDITS          "Crédits d'Open Surge"
 OPTIONS_DONATE           "Faire un don pour Open Surge"
 OPTIONS_BACK             "RETOUR"
+
+// Stage Select
 STAGESELECT_TITLE        "<color=$COLOR_TITLE>SÉLECTION DE STAGE</color>"
 STAGESELECT_DEBUG        "<color=$COLOR_TITLE>MODE DÉVELOPPEUR</color>"
 STAGESELECT_MSG          "Appuyer sur <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> pour RETOUR"
 STAGESELECT_PAGE         "page $1/$2"
 STAGESELECT_ACT          "Zone"
+
+// Quest Select
 QUESTSELECT_TITLE        "<color=$COLOR_TITLE>SÉLECTION DE QUÊTE</color>"
 QUESTSELECT_MSG          "Appuyer sur <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> pour RETOUR"
 QUESTSELECT_PAGE         "page $1/$2"
 QUESTSELECT_INFO         "<color=$COLOR_HIGHLIGHT>Version :</color> $1\n<color=$COLOR_HIGHLIGHT>Auteur :</color> $2\n<color=$COLOR_HIGHLIGHT>Description :</color> $3"
+
+// Credits
 CREDITS_TITLE            "<color=$COLOR_TITLE>CRÉDITS</color>"
 CREDITS_BACK             "Appuyer sur <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> pour RETOUR"
 CREDITS_HEADER           "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\nbasée sur $ENGINE_NAME\n$ENGINE_WEBSITE"
@@ -66,10 +106,26 @@ CREDITS_RES_MUSICS       "<color=$COLOR_HIGHLIGHT>Musique</color>"
 CREDITS_RES_SAMPLES      "<color=$COLOR_HIGHLIGHT>Effets sonores</color>"
 CREDITS_RES_SCRIPTS      "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêmes."
+
+// Main Menu
 MAINMENU_DEVBUILD        "Version de développement"
 MAINMENU_VERSION         "v. $GAME_VERSION"
+
+// Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
 CREATEMENU_TEXT          "Open Surge vous permet de créer vos propres jeux étonnants ! Libère ta créativité ! Laissez votre créativité s'exprimer !\nDémarrez votre propre projet ! Créez de nouveaux niveaux, objets, spéciaux, personnages et plus encore ! Goûtez à l'éditeur de niveaux, apprenez le moteur et plongez dans SurgeScript pour un maximum de puissance !"
+
+// Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TEXT     "Merci d'avoir joué à Open Surge version $GAME_VERSION.\nVoulez-vous jouer plus ? Allez sur $GAME_WEBSITE pour des mises à jour !\nOpen Surge vous permet de jouer et de créer vos propres jeux. Il est développé par des gens comme vous. Maintenant, partagez la joie ! Parlez-en à votre famille, vos amis et vos animaux et faites passer le mot !"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
 INPUT_KEYB_DIRECTIONAL   "les TOUCHES DE DIRECTION"
 INPUT_KEYB_LEFT          "la TOUCHE GAUCHE"
 INPUT_KEYB_RIGHT         "la TOUCHE DROITE"
@@ -83,6 +139,8 @@ INPUT_KEYB_FIRE5         "W"
 INPUT_KEYB_FIRE6         "A"
 INPUT_KEYB_FIRE7         "S"
 INPUT_KEYB_FIRE8         "D"
+
+// joystick
 INPUT_JOY_DIRECTIONAL    "les DIRECTIONS"
 INPUT_JOY_LEFT           "la TOUCHE GAUCHE"
 INPUT_JOY_RIGHT          "la TOUCHE DROITE"
@@ -96,35 +154,89 @@ INPUT_JOY_FIRE5          "BOUTON 5"
 INPUT_JOY_FIRE6          "BOUTON 6"
 INPUT_JOY_FIRE7          "BOUTON 7"
 INPUT_JOY_FIRE8          "BOUTON 8"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
 QUIT_QUESTION            "VOULEZ-VOUS VRAIMENT QUITTER LE STAGE ?"
 QUIT_OPTION1             "OUI"
 QUIT_OPTION2             "NON"
+
+
+
+//
+// Section: levels
+//
+
+// Demo Level
 LEV_DEMO_1               "<color=$COLOR_TITLE>Comment jouer</color>\nBienvenue dans le <color=$COLOR_HIGHLIGHT>stage de démonstration Open Surge</color> ! Utilisez $INPUT_DIRECTIONAL pour bouger et $INPUT_FIRE1 pour sauter. Utilisez $INPUT_FIRE2 pour changer de personnage."
 LEV_DEMO_2               "<color=$COLOR_TITLE>Saviez-vous que...</color>\nTout dans Open Surge est personnalisable. Vous pouvez créer des niveaux, des objets, des boss, des personnages et plus encore ! C'est un <color=$COLOR_HIGHLIGHT>système de création de jeu</color>."
 LEV_DEMO_3               "<color=$COLOR_TITLE>Libérez votre créativité !</color>\nL'une des principales caractéristiques d'Open Surge est <color=$COLOR_HIGHLIGHT>SurgeScript</color>. C'est un script pour les jeux ! Utilisez-le pour construire tout ce que vous pouvez imaginer !"
 LEV_DEMO_4               "<color=$COLOR_TITLE>Cool !</color>\nÊtes-vous déjà excité ? Le ciel est la limite ! Visitez <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
 LEV_DEMO_5               "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// Since the game uses bitmap fonts, parts of
+// the translation don't accept special characters.
+//
+// This section doesn't accept language-specific
+// special characters.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
 HUD_SCORE                "Score"
 HUD_TIME                 "Temps"
 HUD_COLLECTIBLES         "Pouvoir"
+
+// Level Cleared animation
 CLEARED_LINE1            "VOUS AVEZ"
 CLEARED_LINE2            "PASSE L'ACT $LEVEL_ACT"
 CLEARED_POWER            "Pouvoir bonus"
 CLEARED_TIME             "Temps bonus"
 CLEARED_SCORE            "Score"
+
+// Game Over
+GAMEOVER_PART1           "GAME"
+GAMEOVER_PART2           "OVER"
+
+// Main Menu
 MAINMENU_TITLE           "MENU"
 MAINMENU_PLAY            "JOUER"
 MAINMENU_CREATE          "CRÉER"
 MAINMENU_SHARE           "PARTAGER"
 MAINMENU_OPTIONS         "OPTIONS"
 MAINMENU_QUIT            "QUITTER"
+
+// Create Menu
 CREATEMENU_TITLE         "CRÉER"
 CREATEMENU_PLAY          "JOUER DÉMO"
 CREATEMENU_LEARN         "APPRENDRE"
 CREATEMENU_SCRIPTING     "SURGESCRIPT"
 CREATEMENU_BACK          "RETOUR"
+
+// Congratulations Screen
 CONGRATULATIONS_TITLE    "MERCI D'AVOIR JOUÉ"
 CONGRATULATIONS_SHARE    "PARTAGER"
 CONGRATULATIONS_DONATE   "FAIRE UN DON"
 CONGRATULATIONS_BACK     "RETOUR"
+
+// Loading Screen
 LOADING_TEXT             "chargement..."
