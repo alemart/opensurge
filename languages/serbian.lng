@@ -107,12 +107,29 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипте</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у самим скриптама."
 
 // Main Menu
+MAINMENU_TITLE              "MENI"
+MAINMENU_PLAY               "IGRAJ"
+MAINMENU_CREATE             "PRAVI"
+MAINMENU_SHARE              "PODELI"
+MAINMENU_OPTIONS            "POSTAVKE"
+MAINMENU_QUIT               "NAZAD"
 MAINMENU_DEVBUILD           "Верзија саграде"
 MAINMENU_VERSION            "v. $GAME_VERSION" // ускраћено
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
-CREATEMENU_TEXT             "Open Surge вам омогућује да направите своје невероватне игре! Ослободите своју креативност! Нека вам креативни сокови теку!\n\nЗапочните свој властити пројект! Креирајте нове нивое, предмете, акције, ликове и још много тога! Окусите уредник нивоа, научите мотор и зароните у SurgeScript за максималну снагу!"
+CREATEMENU_TITLE            "PRAVI"
+CREATEMENU_PLAY             "IGRAJ DEMO"
+CREATEMENU_LEARN            "NAUČI"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "NAZAD"
+CREATEMENU_TEXT             "Open Surge вам омогућује да направите своје невероватне игре! Ослободите своју креативност! Нека вам креативни сокови теку!\nЗапочните свој властити пројект! Креирајте нове нивое, предмете, акције, ликове и још много тога! Окусите уредник нивоа, научите мотор и зароните у SurgeScript за максималну снагу!"
+
+// Congratulations Screen
+CONGRATULATIONS_TITLE       "HVALA ŠTO STE IGRALI"
+CONGRATULATIONS_SHARE       "PODELITE"
+CONGRATULATIONS_DONATE      "DONIRAJTE"
+CONGRATULATIONS_BACK        "NATRAG"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
@@ -165,7 +182,10 @@ QUIT_QUESTION               "ЖЕЛИТЕ ЛИ СТВАРНО ИЗИЋИ?"
 QUIT_OPTION1                "ДА"
 QUIT_OPTION2                "НЕ"
 
-	
+// Loading Screen
+LOADING_TEXT                "učitavanje..."
+
+
 
 //
 // Section: levels
@@ -218,29 +238,7 @@ CLEARED_POWER               "Bonus za Snagu"
 CLEARED_TIME                "Bonus za Vreme"
 CLEARED_SCORE               "Poeni"
 
-// Main Menu
-MAINMENU_TITLE              "MENI"
-MAINMENU_PLAY               "IGRAJ"
-MAINMENU_CREATE             "PRAVI"
-MAINMENU_SHARE              "PODELI"
-MAINMENU_OPTIONS            "POSTAVKE"
-MAINMENU_QUIT               "NAZAD"
-
-// Create Menu
-CREATEMENU_TITLE            "PRAVI"
-CREATEMENU_PLAY             "IGRAJ DEMO"
-// NOTE BY TRANSLATOR: string below should be "NAUČI"
-CREATEMENU_LEARN            "NAUCI"
-CREATEMENU_SCRIPTING        "SURGESCRIPT"
-CREATEMENU_BACK             "NAZAD"
-
-// Congratulations Screen
-// NOTE BY TRANSLATOR: string below should be "HVALA ŠTO STE IGRALI"
-CONGRATULATIONS_TITLE       "HVALA STO STE IGRALI"
-CONGRATULATIONS_SHARE       "PODELITE"
-CONGRATULATIONS_DONATE      "DONIRAJTE"
-CONGRATULATIONS_BACK        "NATRAG"
-
-// Loading Screen
-// NOTE BY TRANSLATOR: string below should be "učitavanje..."
-LOADING_TEXT                "ucitavanje..."
+// Game Over
+// -- FIXME --
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"

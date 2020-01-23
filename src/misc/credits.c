@@ -200,6 +200,7 @@ Ste Pickford \n\
 Christian Robertson \n\
 --- fonts/Roboto-Medium.ttf (Apache License 2.0) \n\
 --- fonts/Roboto-Bold.ttf (Apache License 2.0) \n\
+--- fonts/Roboto-Black.ttf (Apache License 2.0) \n\
 \n\
 HanYang I&C Co Ltd \n\
 --- fonts/GothicA1-Medium.ttf (SIL Open Font License 1.1) \n\

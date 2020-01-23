@@ -7,6 +7,28 @@
 
 font "Loading"
 {
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    18
+        antialias
+        shadow
+    }
+}
+
+font "Loading" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Bold.ttf"
+        size                    16
+        antialias
+        shadow
+    }
+}
+
+font "Loading" for "en_US"
+{
     bitmap
     {
         source_file             "fonts/good_neighbors.png"
@@ -300,16 +322,5 @@ font "Loading"
         char "\x7f" {
             source_rect         841 1 10 16
         }
-    }
-}
-
-font "Loading" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Bold.ttf"
-        size                    16
-        antialias
-        shadow
     }
 }

@@ -11,6 +11,7 @@
 //
 
 // Translation metadata
+// (use the English alphabet)
 LANG_ID                     "es_ES"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Español"                 // language name
 LANG_AUTHOR                 "Álvaro Bazán"            // translation author
@@ -24,7 +25,7 @@ COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
 //
-// Note to translators:
+// Translators:
 //
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
@@ -32,8 +33,12 @@ COLOR_HUDDANGER             "ff0000"
 // you're translating is preserved!
 //
 // After translating, please make sure you test everything.
-// In the options screen, highlight "Stage select", press
-// right 3 times and enter. You'll see all .lev files.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
 //
 
 
@@ -102,15 +107,30 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los propios scripts."
 
 // Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "JUGAR"
+MAINMENU_CREATE             "CREAR"
+MAINMENU_SHARE              "COMPARTIR"
+MAINMENU_OPTIONS            "OPCIONES"
+MAINMENU_QUIT               "SALIR"
 MAINMENU_DEVBUILD           "Versión de Desarrollo"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "CREAR"
+CREATEMENU_PLAY             "JUGAR DEMO"
+CREATEMENU_LEARN            "APRENDER"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "VOLVER"
 CREATEMENU_TEXT             "¡Open Surge te permite crear tus propios juegos increibles! ¡Desata tu creatividad! ¡Que fluya tu creatividad!\n\n¡Empieza tu propio proyecto! ¡Crea nuevos niveles, objectos, especiales, personajes y más! ¡Prueba el editor de niveles, domina el motor y sumergete en SurgeScript para el máximo poder!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "GRACIAS POR JUGAR"
+CONGRATULATIONS_SHARE       "COMPARTIR"
+CONGRATULATIONS_DONATE      "DONAR"
+CONGRALUTATIONS_BACK        "VOLVER"
 CONGRATULATIONS_TEXT        "Gracias por jugar a Open Surge versión $GAME_VERSION. ¿Quieres jugar más? ¡Ve a $GAME_WEBSITE para actualizaciones!\n\nOpen Surge te permite jugar y crear tus propios juegos. Esta desarrollado por gente como tú. ¡Comparte la alegria! ¡Cuentaselo a tu familia, amigos y mascotas y que corra la voz!"
 
 
@@ -160,6 +180,9 @@ QUIT_QUESTION               "¿SEGURO QUE QUIERES SALIR?"
 QUIT_OPTION1                "SÍ"
 QUIT_OPTION2                "NO"
 
+// Loading Screen
+LOADING_TEXT                "Cargando..."
+
 
 
 //
@@ -207,26 +230,6 @@ CLEARED_POWER               "Bonus de Energia"
 CLEARED_TIME                "Bonus de Tiempo"
 CLEARED_SCORE               "Puntos"
 
-// Main Menu
-MAINMENU_TITLE              "MENU"
-MAINMENU_PLAY               "JUGAR"
-MAINMENU_CREATE             "CREAR"
-MAINMENU_SHARE              "COMPARTIR"
-MAINMENU_OPTIONS            "OPCIONES"
-MAINMENU_QUIT               "SALIR"
-
-// Create Menu
-CREATEMENU_TITLE            "CREAR"
-CREATEMENU_PLAY             "JUGAR DEMO"
-CREATEMENU_LEARN            "APRENDER"
-CREATEMENU_SCRIPTING        "SURGESCRIPT"
-CREATEMENU_BACK             "VOLVER"
-
-// Congratulations Screen
-CONGRATULATIONS_TITLE       "GRACIAS POR JUGAR"
-CONGRATULATIONS_SHARE       "COMPARTIR"
-CONGRATULATIONS_DONATE      "DONAR"
-CONGRALUTATIONS_BACK        "VOLVER"
-
-// Loading Screen
-LOADING_TEXT                "Cargando..."
+// Game Over
+GAMEOVER_PART1              "FIN DEL"
+GAMEOVER_PART2              "JUEGO"

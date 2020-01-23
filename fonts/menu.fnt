@@ -7,7 +7,7 @@ font "MenuTitle"
 {
     truetype
     {
-        source_file             "fonts/Roboto-Bold.ttf"
+        source_file             "fonts/Roboto-Black.ttf"
         size                    28
         antialias
         shadow
@@ -94,6 +94,28 @@ font "MenuBold" for "ko_KR"
 
 // menu: button
 font "MenuButton"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    28
+        antialias
+        shadow
+    }
+}
+
+font "MenuButton" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Bold.ttf"
+        size                    24
+        antialias
+        shadow
+    }
+}
+
+font "MenuButton" for "en_US"
 {
     bitmap
     {
@@ -388,16 +410,5 @@ font "MenuButton"
         char "\x7f" {
             source_rect         1682 20 20 32
         }
-    }
-}
-
-font "MenuButton" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Bold.ttf"
-        size                    24
-        antialias
-        shadow
     }
 }

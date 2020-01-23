@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-01-19"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-01-23"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
 // Colors
@@ -107,15 +107,30 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "The authors are identified within the scripts themselves."
 
 // Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "PLAY"
+MAINMENU_CREATE             "CREATE"
+MAINMENU_SHARE              "SHARE"
+MAINMENU_OPTIONS            "OPTIONS"
+MAINMENU_QUIT               "QUIT"
 MAINMENU_DEVBUILD           "Development version"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "CREATE"
+CREATEMENU_PLAY             "PLAY DEMO"
+CREATEMENU_LEARN            "LEARN"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "BACK"
 CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nStart your own project! Create new levels, items, specials, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "THANKS FOR PLAYING"
+CONGRATULATIONS_SHARE       "SHARE"
+CONGRATULATIONS_DONATE      "DONATE"
+CONGRATULATIONS_BACK        "BACK"
 CONGRATULATIONS_TEXT        "Thanks for playing Open Surge version $GAME_VERSION.\nWanna play more? Go to $GAME_WEBSITE for updates!\n\nOpen Surge lets you play and create your own games. It's developed by people like you. Now share the joy! Tell your family, friends and pets about it and spread the word!"
 
 
@@ -165,7 +180,10 @@ QUIT_QUESTION               "DO YOU REALLY WANT TO QUIT?"
 QUIT_OPTION1                "YES"
 QUIT_OPTION2                "NO"
 
-	
+// Loading Screen
+LOADING_TEXT                "loading..."
+
+
 
 //
 // Section: levels
@@ -215,27 +233,3 @@ CLEARED_SCORE               "Score"
 // Game Over
 GAMEOVER_PART1              "GAME"
 GAMEOVER_PART2              "OVER"
-
-// Main Menu
-MAINMENU_TITLE              "MENU"
-MAINMENU_PLAY               "PLAY"
-MAINMENU_CREATE             "CREATE"
-MAINMENU_SHARE              "SHARE"
-MAINMENU_OPTIONS            "OPTIONS"
-MAINMENU_QUIT               "QUIT"
-
-// Create Menu
-CREATEMENU_TITLE            "CREATE"
-CREATEMENU_PLAY             "PLAY DEMO"
-CREATEMENU_LEARN            "LEARN"
-CREATEMENU_SCRIPTING        "SURGESCRIPT"
-CREATEMENU_BACK             "BACK"
-
-// Congratulations Screen
-CONGRATULATIONS_TITLE       "THANKS FOR PLAYING"
-CONGRATULATIONS_SHARE       "SHARE"
-CONGRATULATIONS_DONATE      "DONATE"
-CONGRATULATIONS_BACK        "BACK"
-
-// Loading Screen
-LOADING_TEXT                "loading..."

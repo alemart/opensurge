@@ -11,6 +11,7 @@
 //
 
 // Translation metadata
+// (use the English alphabet)
 LANG_ID                     "de_DE"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Deutsch"                 // language name
 LANG_AUTHOR                 "Wuzzy"                   // translation author
@@ -24,7 +25,7 @@ COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
 //
-// Note to translators:
+// Translators:
 //
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
@@ -32,8 +33,12 @@ COLOR_HUDDANGER             "ff0000"
 // you're translating is preserved!
 //
 // After translating, please make sure you test everything.
-// In the options screen, highlight "Stage select", press
-// right 3 times and enter. You'll see all .lev files.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
 //
 
 
@@ -102,15 +107,30 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skripte</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Die Autoren werden in den Skripten selbst genannt."
 
 // Main Menu
+MAINMENU_TITLE              "MENÜ"
+MAINMENU_PLAY               "SPIELEN"
+MAINMENU_CREATE             "ERSTELLEN"
+MAINMENU_SHARE              "TEILEN"
+MAINMENU_OPTIONS            "EINSTELLUNGEN"
+MAINMENU_QUIT               "ENDE"
 MAINMENU_DEVBUILD           "Entwicklungsversion"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "ERSTELLEN"
+CREATEMENU_PLAY             "DEMO SPIELEN"
+CREATEMENU_LEARN            "LERNEN"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "ZURÜCK"
 CREATEMENU_TEXT             "Open Surge lässt dich deine eigenen großartigen Spiele erstellen. Lass deiner Kreativität freien Lauf!\nStarte dein eigenes Projekt! Erstelle neue Levels, Dinge, Besonderheiten, Figuren und mehr! Lern den Level-Editor kennen, lern die Engine und tauch in SurgeScript ein, um tolle Sachen zu machen!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "DANKE FÜRS SPIELEN"
+CONGRATULATIONS_SHARE       "TEILEN"
+CONGRATULATIONS_DONATE      "SPENDEN"
+CONGRATULATIONS_BACK        "ZURÜCK"
 CONGRATULATIONS_TEXT        "Danke, dass du Open Surge Version $GAME_VERSION spielst. Willst du mehr spielen? Besuche $GAME_WEBSITE für Updates! Open Surge lässt dich deine eigenen Spiele spielen und erstellen. Es wird für Leute wie dich entwickelt. Und jetzt verbreite den Spaß! Erzähl deiner Famile, Freunden und Haustieren davon!"
 
 
@@ -160,7 +180,10 @@ QUIT_QUESTION               "WILLST DU WIRKLICH GEHEN?"
 QUIT_OPTION1                "JA"
 QUIT_OPTION2                "NEIN"
 
-	
+// Loading Screen
+LOADING_TEXT                "Laden ..."
+
+
 
 //
 // Section: levels
@@ -212,30 +235,7 @@ CLEARED_POWER               "Energiebonus"
 CLEARED_TIME                "Zeitbonus"
 CLEARED_SCORE               "Punkte"
 
-// Main Menu
-// NOTE BY TRANSLATOR: string below should be "MENÜ"
-MAINMENU_TITLE              "MENUE"
-MAINMENU_PLAY               "SPIELEN"
-MAINMENU_CREATE             "ERSTELLEN"
-MAINMENU_SHARE              "TEILEN"
-MAINMENU_OPTIONS            "EINSTELLUNGEN"
-MAINMENU_QUIT               "ENDE"
-
-// Create Menu
-CREATEMENU_TITLE            "ERSTELLEN"
-CREATEMENU_PLAY             "DEMO SPIELEN"
-CREATEMENU_LEARN            "LERNEN"
-CREATEMENU_SCRIPTING        "SURGESCRIPT"
-// NOTE BY TRANSLATOR: string below should be "ZURÜCK"
-CREATEMENU_BACK             "ZURUECK"
-
-// Congratulations Screen
-// NOTE BY TRANSLATOR: string below should be "DANKE FÜRS SPIELEN"
-CONGRATULATIONS_TITLE       "DANKE FUERS SPIELEN"
-CONGRATULATIONS_SHARE       "TEILEN"
-CONGRATULATIONS_DONATE      "SPENDEN"
-// NOTE BY TRANSLATOR: string below should be "ZURÜCK"
-CONGRATULATIONS_BACK        "ZURUECK"
-
-// Loading Screen
-LOADING_TEXT                "Laden ..."
+// Game Over
+// -- FIXME --
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"

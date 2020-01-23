@@ -107,15 +107,30 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "De auteurs worden geïdentificeerd in de scripts zelf."
 
 // Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "SPELEN"
+MAINMENU_CREATE             "MAKEN"
+MAINMENU_SHARE              "DELEN"
+MAINMENU_OPTIONS            "INSTELLINGEN"
+MAINMENU_QUIT               "STOPPEN"
 MAINMENU_DEVBUILD           "Ontwikkelingsversie"
 MAINMENU_VERSION            "v. $GAME_VERSION" // afgekort
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
-CREATEMENU_TEXT             "Met Open Surge kun je je eigen geweldige spellen maken! Laat uw creativiteit de vrije loop! Laat je creatieve sappen stromen!\n\nStart je eigen project! Maak nieuwe niveaus, items, specials, personages en meer! Proef de niveau-editor, leer de engine en duik in SurgeScript voor maximaal vermogen!"
+CREATEMENU_TITLE            "MAKEN"
+CREATEMENU_PLAY             "DEMO SPELEN"
+CREATEMENU_LEARN            "LEREN"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "TERUG"
+CREATEMENU_TEXT             "Met Open Surge kun je je eigen geweldige spellen maken! Laat uw creativiteit de vrije loop! Laat je creatieve sappen stromen!\nStart je eigen project! Maak nieuwe niveaus, items, specials, personages en meer! Proef de niveau-editor, leer de engine en duik in SurgeScript voor maximaal vermogen!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "BEDANKT VOOR HET SPELEN"
+CONGRATULATIONS_SHARE       "DELEN"
+CONGRATULATIONS_DONATE      "DONEREN"
+CONGRATULATIONS_BACK        "TERUG"
 CONGRATULATIONS_TEXT        "Bedankt voor het spelen van de Open Surge-versie $GAME_VERSION.\nWil je meer spelen? Ga naar $GAME_WEBSITE voor updates!\n\nMet Open Surge kun je je eigen games spelen en maken. Het is ontwikkeld door mensen zoals jij. Deel nu de vreugde! Vertel het aan je familie, vrienden en huisdieren en vertel het verder!"
 
 
@@ -165,7 +180,10 @@ QUIT_QUESTION               "WIL JE ECHT STOPPEN?"
 QUIT_OPTION1                "JA"
 QUIT_OPTION2                "NEE"
 
-	
+// Loading Screen
+LOADING_TEXT                "laden..."
+
+
 
 //
 // Section: levels
@@ -212,26 +230,7 @@ CLEARED_POWER               "Energie Bonus"
 CLEARED_TIME                "Tijd Bonus"
 CLEARED_SCORE               "Punten"
 
-// Main Menu
-MAINMENU_TITLE              "MENU"
-MAINMENU_PLAY               "SPELEN"
-MAINMENU_CREATE             "MAKEN"
-MAINMENU_SHARE              "DELEN"
-MAINMENU_OPTIONS            "INSTELLINGEN"
-MAINMENU_QUIT               "STOPPEN"
-
-// Create Menu
-CREATEMENU_TITLE            "MAKEN"
-CREATEMENU_PLAY             "DEMO SPELEN"
-CREATEMENU_LEARN            "LEREN"
-CREATEMENU_SCRIPTING        "SURGESCRIPT"
-CREATEMENU_BACK             "TERUG"
-
-// Congratulations Screen
-CONGRATULATIONS_TITLE       "BEDANKT VOOR HET SPELEN"
-CONGRATULATIONS_SHARE       "DELEN"
-CONGRATULATIONS_DONATE      "DONEREN"
-CONGRATULATIONS_BACK        "TERUG"
-
-// Loading Screen
-LOADING_TEXT                "laden..."
+// Game Over
+// -- FIXME --
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"

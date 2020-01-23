@@ -11,6 +11,7 @@
 //
 
 // Translation metadata
+// (use the English alphabet)
 LANG_ID                     "ko_KR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Korean"                 // language name
 LANG_AUTHOR                 "krumaska & AntsThatWander"       // translation author
@@ -24,7 +25,7 @@ COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
 //
-// Note to translators:
+// Translators:
 //
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
@@ -32,8 +33,12 @@ COLOR_HUDDANGER             "ff0000"
 // you're translating is preserved!
 //
 // After translating, please make sure you test everything.
-// In the options screen, highlight "Stage select", press
-// right 3 times and enter. You'll see all .lev files.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
 //
 
 
@@ -102,15 +107,30 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>스크립트</color>"
 CREDITS_RES_SCRIPTS_TEXT    "작성자는 스크립트 자체 내에서 인식됩니다."
 
 // Main Menu
+MAINMENU_TITLE              "메뉴"
+MAINMENU_PLAY               "게임하기"
+MAINMENU_CREATE             "제작하기"
+MAINMENU_SHARE              "공유하기"
+MAINMENU_OPTIONS            "옵션"
+MAINMENU_QUIT               "그만두기"
 MAINMENU_DEVBUILD           "개발자 버전"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "제작하기"
+CREATEMENU_PLAY             "데모 플레이하기"
+CREATEMENU_LEARN            "학습하기"
+CREATEMENU_SCRIPTING        "서지스크립트"
+CREATEMENU_BACK             "뒤로 가기"
 CREATEMENU_TEXT             "오픈 서지에서 당신만의 멋진 게임을 만들어보세요! 상상의 나래를 펼쳐보세요! 당신만의 프로젝트를 시작해보세요! 새로운 레벨, 아이템, 캐릭터 그리고 더 많은 것들을 만들어보세요! 레벨 편집기를 사용해보고, 엔진 사용법을 배우며, 서지스크립트에 빠져들어 최대 전력을 내보세요!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "플레이해주셔서 감사합니다."
+CONGRATULATIONS_SHARE       "공유하기"
+CONGRATULATIONS_DONATE      "후원하기"
+CONGRATULATIONS_BACK        "뒤로 가기"
 CONGRATULATIONS_TEXT        "$GAME_VERSION. 버전을 플레이해주셔서 감사합니다.\n더 하고 싶으신가요? $GAME_WEBSITE로 가서 업데이트 해보세요!\n\n오픈 서지에서 당신만의 게임을 만들고 플레이할 수 있습니다. 이 멋진 사실을 널리널리 전하세요!
 
 
@@ -160,7 +180,10 @@ QUIT_QUESTION               "그만 두시겠습니까?"
 QUIT_OPTION1                "네"
 QUIT_OPTION2                "아니요"
 
-	
+// Loading Screen
+LOADING_TEXT                "로딩 중"
+
+
 
 //
 // Section: levels
@@ -207,26 +230,6 @@ CLEARED_POWER               "Power Bonus" //"파워 보너스"
 CLEARED_TIME                "Time Bonus" //"시간 보너스"
 CLEARED_SCORE               "Score" //"점수"
 
-// Main Menu
-MAINMENU_TITLE              "메뉴"
-MAINMENU_PLAY               "게임하기"
-MAINMENU_CREATE             "제작하기"
-MAINMENU_SHARE              "공유하기"
-MAINMENU_OPTIONS            "옵션"
-MAINMENU_QUIT               "그만두기"
-
-// Create Menu
-CREATEMENU_TITLE            "제작하기"
-CREATEMENU_PLAY             "데모 플레이하기"
-CREATEMENU_LEARN            "학습하기"
-CREATEMENU_SCRIPTING        "서지스크립트"
-CREATEMENU_BACK             "뒤로 가기"
-
-// Congratulations Screen
-CONGRATULATIONS_TITLE       "플레이해주셔서 감사합니다."
-CONGRATULATIONS_SHARE       "공유하기"
-CONGRATULATIONS_DONATE      "후원하기"
-CONGRATULATIONS_BACK        "뒤로 가기"
-
-// Loading Screen
-LOADING_TEXT                "로딩 중"
+// Game Over
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"

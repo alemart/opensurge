@@ -11,10 +11,11 @@
 //
 
 // Translation metadata
+// (use the English alphabet)
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português (Brasil)"      // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-01-19"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-01-23"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
 // Colors
@@ -24,7 +25,7 @@ COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 
 //
-// Note to translators:
+// Translators:
 //
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
@@ -32,8 +33,12 @@ COLOR_HUDDANGER             "ff0000"
 // you're translating is preserved!
 //
 // After translating, please make sure you test everything.
-// In the options screen, highlight "Stage select", press
-// right 3 times and enter. You'll see all .lev files.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
 //
 
 
@@ -102,15 +107,30 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts."
 
 // Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "JOGAR"
+MAINMENU_CREATE             "CRIAR"
+MAINMENU_SHARE              "COMPARTILHAR"
+MAINMENU_OPTIONS            "CONFIGURAR"
+MAINMENU_QUIT               "SAIR"
 MAINMENU_DEVBUILD           "Versão de desenvolvimento"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "CRIAR"
+CREATEMENU_PLAY             "VER DEMO"
+CREATEMENU_LEARN            "APRENDA"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "VOLTAR"
 CREATEMENU_TEXT             "Com o Open Surge, você cria seus games incríveis!\nSolte sua criatividade! Crie tudo o que você imaginar!\n\nInicie seu projeto! Crie suas fases, cenários, personagens, itens e mais! Confira o editor de fases, conheça a engine e aprenda SurgeScript para ganhar super poderes criativos!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "OBRIGADO POR JOGAR"
+CONGRATULATIONS_SHARE       "COMPARTILHAR"
+CONGRATULATIONS_DONATE      "DOAR"
+CONGRATULATIONS_BACK        "VOLTAR"
 CONGRATULATIONS_TEXT        "Obrigado por jogar o Open Surge versão $GAME_VERSION.\nQuer jogar mais? Visite $GAME_WEBSITE p/ atualizações!\n\nCom o Open Surge, você joga e cria seus games. Sabia que ele é feito por gente como você? Conte para sua família, seus amigos e seus bichinhos e ajude a divulgar o jogo!"
 
 
@@ -160,7 +180,10 @@ QUIT_QUESTION               "Quer mesmo sair e perder seu progresso?"
 QUIT_OPTION1                "Sim"
 QUIT_OPTION2                "Não"
 
-	
+// Loading Screen
+LOADING_TEXT                "carregando..."
+
+
 
 //
 // Section: levels
@@ -210,27 +233,3 @@ CLEARED_SCORE               "Pontos"
 // Game Over
 GAMEOVER_PART1              "FIM DE"
 GAMEOVER_PART2              "JOGO"
-
-// Main Menu
-MAINMENU_TITLE              "MENU"
-MAINMENU_PLAY               "JOGAR"
-MAINMENU_CREATE             "CRIAR"
-MAINMENU_SHARE              "COMPARTILHAR"
-MAINMENU_OPTIONS            "CONFIGURAR"
-MAINMENU_QUIT               "SAIR"
-
-// Create Menu
-CREATEMENU_TITLE            "CRIAR"
-CREATEMENU_PLAY             "VER DEMO"
-CREATEMENU_LEARN            "APRENDA"
-CREATEMENU_SCRIPTING        "SURGESCRIPT"
-CREATEMENU_BACK             "VOLTAR"
-
-// Congratulations Screen
-CONGRATULATIONS_TITLE       "OBRIGADO POR JOGAR"
-CONGRATULATIONS_SHARE       "COMPARTILHAR"
-CONGRATULATIONS_DONATE      "DOAR"
-CONGRATULATIONS_BACK        "VOLTAR"
-
-// Loading Screen
-LOADING_TEXT                "carregando..."

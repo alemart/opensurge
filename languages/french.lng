@@ -108,15 +108,30 @@ CREDITS_RES_SCRIPTS      "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêmes."
 
 // Main Menu
+MAINMENU_TITLE           "MENU"
+MAINMENU_PLAY            "JOUER"
+MAINMENU_CREATE          "CRÉER"
+MAINMENU_SHARE           "PARTAGER"
+MAINMENU_OPTIONS         "OPTIONS"
+MAINMENU_QUIT            "QUITTER"
 MAINMENU_DEVBUILD        "Version de développement"
 MAINMENU_VERSION         "v. $GAME_VERSION"
 
 // Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE         "CRÉER"
+CREATEMENU_PLAY          "JOUER DÉMO"
+CREATEMENU_LEARN         "APPRENDRE"
+CREATEMENU_SCRIPTING     "SURGESCRIPT"
+CREATEMENU_BACK          "RETOUR"
 CREATEMENU_TEXT          "Open Surge vous permet de créer vos propres jeux étonnants ! Libère ta créativité ! Laissez votre créativité s'exprimer !\nDémarrez votre propre projet ! Créez de nouveaux niveaux, objets, spéciaux, personnages et plus encore ! Goûtez à l'éditeur de niveaux, apprenez le moteur et plongez dans SurgeScript pour un maximum de puissance !"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE    "MERCI D'AVOIR JOUÉ"
+CONGRATULATIONS_SHARE    "PARTAGER"
+CONGRATULATIONS_DONATE   "FAIRE UN DON"
+CONGRATULATIONS_BACK     "RETOUR"
 CONGRATULATIONS_TEXT     "Merci d'avoir joué à Open Surge version $GAME_VERSION.\nVoulez-vous jouer plus ? Allez sur $GAME_WEBSITE pour des mises à jour !\nOpen Surge vous permet de jouer et de créer vos propres jeux. Il est développé par des gens comme vous. Maintenant, partagez la joie ! Parlez-en à votre famille, vos amis et vos animaux et faites passer le mot !"
 
 
@@ -166,6 +181,9 @@ QUIT_QUESTION            "VOULEZ-VOUS VRAIMENT QUITTER LE STAGE ?"
 QUIT_OPTION1             "OUI"
 QUIT_OPTION2             "NON"
 
+// Loading Screen
+LOADING_TEXT             "chargement..."
+
 
 
 //
@@ -214,29 +232,6 @@ CLEARED_TIME             "Temps bonus"
 CLEARED_SCORE            "Score"
 
 // Game Over
+// -- FIXME --
 GAMEOVER_PART1           "GAME"
 GAMEOVER_PART2           "OVER"
-
-// Main Menu
-MAINMENU_TITLE           "MENU"
-MAINMENU_PLAY            "JOUER"
-MAINMENU_CREATE          "CRÉER"
-MAINMENU_SHARE           "PARTAGER"
-MAINMENU_OPTIONS         "OPTIONS"
-MAINMENU_QUIT            "QUITTER"
-
-// Create Menu
-CREATEMENU_TITLE         "CRÉER"
-CREATEMENU_PLAY          "JOUER DÉMO"
-CREATEMENU_LEARN         "APPRENDRE"
-CREATEMENU_SCRIPTING     "SURGESCRIPT"
-CREATEMENU_BACK          "RETOUR"
-
-// Congratulations Screen
-CONGRATULATIONS_TITLE    "MERCI D'AVOIR JOUÉ"
-CONGRATULATIONS_SHARE    "PARTAGER"
-CONGRATULATIONS_DONATE   "FAIRE UN DON"
-CONGRATULATIONS_BACK     "RETOUR"
-
-// Loading Screen
-LOADING_TEXT             "chargement..."
