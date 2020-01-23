@@ -48,7 +48,7 @@ static const char* LANG_BGFILE = "themes/scenes/langselect.bg";
 static const int LANG_MAXPERCOL = 5;
 static const int LANG_MAXCOLS = 3;
 typedef struct {
-    char title[128];
+    char name[128];
     char author[128];
     char filepath[1024];
 } lngdata_t;
@@ -77,6 +77,7 @@ static int dirfill(const char *filename, void *param);
 static int dircount(const char *filename, void *param);
 static int sort_cmp(const void *a, const void *b);
 static int change_option(int new_option);
+static int option_of(const char *language_name);
 
 
 
@@ -95,7 +96,7 @@ void langselect_init(void *param)
 
     quit = false;
     option = 0;
-    option_time = 0.0f;
+    option_time = 9999.0f;
     scene_time = 0.0f;
     fresh_install = !prefs_has_item(prefs, ".langpath");
     came_from_options = (param != NULL) && *((bool*)param);
@@ -123,6 +124,7 @@ void langselect_init(void *param)
         scenestack_pop();
         return;
     }
+    option = option_of(lang_get("LANG_NAME"));
 
     fadefx_in(color_rgb(0,0,0), 1.0f);
 }
@@ -186,7 +188,7 @@ void langselect_update()
         }
         if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
             const char *filepath = lngdata[option].filepath;
-            logfile_message("Loading language \"%s\", \"%s\"", lngdata[option].title, filepath);
+            logfile_message("Loading language \"%s\", \"%s\"", lngdata[option].name, filepath);
             lang_loadfile(filepath);
             save_preferences(filepath);
             sound_play(SFX_CONFIRM);
@@ -264,6 +266,18 @@ int change_option(int new_option)
     return option;
 }
 
+/* returns k such that lngdata[k].name is language_name,
+   or 0 if there is no such k */
+int option_of(const char *language_name)
+{
+    for(int k = 0; k < lngcount; k++) {
+        if(str_icmp(language_name, lngdata[k].name) == 0)
+            return k;
+    }
+
+    return 0;
+}
+
 /* saves the user preferences */
 void save_preferences(const char *filepath)
 {
@@ -299,8 +313,8 @@ void load_lang_list()
         int col = i / LANG_MAXPERCOL, row = i % LANG_MAXPERCOL;
         lngfnt[0][i] = font_create("MenuText");
         lngfnt[1][i] = font_create("MenuText");
-        font_set_text(lngfnt[0][i], "%s", lngdata[i].title);
-        font_set_text(lngfnt[1][i], "<color=$COLOR_HIGHLIGHT>%s</color>", lngdata[i].title);
+        font_set_text(lngfnt[0][i], "%s", lngdata[i].name);
+        font_set_text(lngfnt[1][i], "<color=$COLOR_HIGHLIGHT>%s</color>", lngdata[i].name);
         font_set_position(lngfnt[0][i], v2d_new(25 + col * column_width, 88 + row * 1.35f * font_get_textsize(lngfnt[0][i]).y));
         font_set_position(lngfnt[1][i], v2d_new(25 + col * column_width, 88 + row * 1.35f * font_get_textsize(lngfnt[1][i]).y));
     }
@@ -314,7 +328,7 @@ int dirfill(const char *filename, void *param)
     lang_compatibility(filename, &supver, &subver, &wipver);
     if(game_version_compare(supver, subver, wipver) >= 0) {
         str_cpy(lngdata[*c].filepath, filename, sizeof(lngdata[*c].filepath));
-        lang_metadata(filename, "LANG_NAME", lngdata[*c].title, sizeof( lngdata[*c].title ));
+        lang_metadata(filename, "LANG_NAME", lngdata[*c].name, sizeof( lngdata[*c].name ));
         lang_metadata(filename, "LANG_AUTHOR", lngdata[*c].author, sizeof( lngdata[*c].author ));
         (*c)++;
     }
@@ -359,7 +373,7 @@ void unload_lang_list()
 int sort_cmp(const void *a, const void *b)
 {
     lngdata_t *q[2] = { (lngdata_t*)a, (lngdata_t*)b };
-    if(str_icmp(q[0]->title, "English") == 0) return -1;
-    if(str_icmp(q[1]->title, "English") == 0) return 1;
-    return str_icmp(q[0]->title, q[1]->title);
+    if(str_icmp(q[0]->name, "English") == 0) return -1;
+    if(str_icmp(q[1]->name, "English") == 0) return 1;
+    return str_icmp(q[0]->name, q[1]->name);
 }
