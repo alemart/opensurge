@@ -98,6 +98,7 @@ CREDITS_VICTOR              "음향 담당"
 CREDITS_COLIN               "스프라이트, 스토리 도입부 담당"
 CREDITS_BRIAN               "스프라이트 아티스트"
 CREDITS_TRANSLATOR          "번역자"
+CREDITS_TRANSLATORS         "Translators" // -- FIXME --
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>개인자료 크레딧</color>" 
 CREDITS_RES_TEXT            "달리 명시되지 않은 한, 아래에 나열된 파일은 Creative Commons Attribution 3.0(CC-BY 3.0) 에 따라 라이센스가 부여됩니다."
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>이미지</color>"

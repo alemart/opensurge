@@ -98,6 +98,7 @@ CREDITS_VICTOR              "Muzičar"
 CREDITS_COLIN               "Sprajti, prva priča"
 CREDITS_BRIAN               "Umjetnik sprajta"
 CREDITS_TRANSLATOR          "Prijevodnik"
+CREDITS_TRANSLATORS         "Translators" // -- FIXME --
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Krediti po nezavisnim resursima</color>"
 CREDITS_RES_TEXT            "Ako nije izričito drugačije navedeno, dolje navedene datoteke licencirane su pod Creative Commons Attribution 3.0 (CC-BY 3.0)."
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Slike</color>"
