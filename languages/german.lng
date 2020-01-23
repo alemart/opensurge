@@ -41,6 +41,23 @@ COLOR_HUDDANGER             "ff0000"
 // of all the level files.
 //
 
+//
+// Updating translations:
+//
+// New strings get added from time to time. They are marked
+// as -- FIXME -- To find them, you may use a Find tool in
+// your text editor.
+//
+// Found something? Please search for it now.
+//
+// If you find that mark anywhere in the file, it means that
+// the translation needs to be updated. Please submit a patch
+// to keep it up to date.
+//
+// After translating the new strings, make sure to remove
+// that mark.
+//
+
 
 
 //
@@ -237,6 +254,9 @@ CLEARED_TIME                "Zeitbonus"
 CLEARED_SCORE               "Punkte"
 
 // Game Over
-// -- FIXME --
-GAMEOVER_PART1              "GAME"
-GAMEOVER_PART2              "OVER"
+GAMEOVER_PART1              "GAME" // -- FIXME --
+GAMEOVER_PART2              "OVER" // -- FIXME --
+
+// Time Over
+TIMEOVER_PART1              "TIME" // -- FIXME --
+TIMEOVER_PART2              "OVER" // -- FIXME --
