@@ -61,6 +61,7 @@ static int option; /* current option: 0..n-1 */
 static actor_t *arrow;
 static input_t *input;
 static float scene_time;
+static float option_time;
 static bgtheme_t *bgtheme;
 static music_t *music;
 static bool fresh_install;
@@ -75,6 +76,7 @@ static void unload_lang_list();
 static int dirfill(const char *filename, void *param);
 static int dircount(const char *filename, void *param);
 static int sort_cmp(const void *a, const void *b);
+static int change_option(int new_option);
 
 
 
@@ -91,9 +93,10 @@ void langselect_init(void *param)
 {
     prefs_t* prefs = modmanager_prefs();
 
-    option = 0;
     quit = false;
-    scene_time = 0;
+    option = 0;
+    option_time = 0.0f;
+    scene_time = 0.0f;
     fresh_install = !prefs_has_item(prefs, ".langpath");
     came_from_options = (param != NULL) && *((bool*)param);
     input = input_create_user(NULL);
@@ -150,8 +153,9 @@ void langselect_update()
 {
     float dest_x, dt = timer_get_delta();
 
-    /* update scene time */
+    /* update timers */
     scene_time += dt;
+    option_time += dt;
 
     /* background movement */
     background_update(bgtheme);
@@ -162,31 +166,23 @@ void langselect_update()
     if(!quit && !fadefx_is_fading()) {
         if(input_button_pressed(input, IB_DOWN)) {
             if(option / LANG_MAXPERCOL == (option + 1) / LANG_MAXPERCOL) {
-                if(option < lngcount - 1) {
-                    option++;
-                    sound_play(SFX_CHOOSE);
-                }
+                if(option < lngcount - 1)
+                    change_option(option + 1);
             }
         }
         if(input_button_pressed(input, IB_UP)) {
             if(option / LANG_MAXPERCOL == (option - 1) / LANG_MAXPERCOL) {
-                if(option > 0) {
-                    option--;
-                    sound_play(SFX_CHOOSE);
-                }
+                if(option > 0)
+                    change_option(option - 1);
             }
         }
         if(input_button_pressed(input, IB_LEFT)) {
-            if(option - LANG_MAXPERCOL >= 0) {
-                option -= LANG_MAXPERCOL;
-                sound_play(SFX_CHOOSE);
-            }
+            if(option - LANG_MAXPERCOL >= 0)
+                change_option(option - LANG_MAXPERCOL);
         }
         if(input_button_pressed(input, IB_RIGHT)) {
-            if(option + LANG_MAXPERCOL < lngcount) {
-                option += LANG_MAXPERCOL;
-                sound_play(SFX_CHOOSE);
-            }
+            if(option + LANG_MAXPERCOL < lngcount)
+                change_option(option + LANG_MAXPERCOL);
         }
         if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
             const char *filepath = lngdata[option].filepath;
@@ -205,10 +201,7 @@ void langselect_update()
     /* sliding camera */
     dest_x = font_get_position(lngfnt[0][option]).x +
              font_get_textsize(lngfnt[0][(option / LANG_MAXPERCOL) * LANG_MAXPERCOL]).x / 2;
-    if(fabs(sliding_camera.x - dest_x) > 0.2f)
-        sliding_camera.x = lerp(sliding_camera.x, dest_x, 10 * timer_get_delta());
-    else
-        sliding_camera.x = dest_x;
+    sliding_camera.x = lerp(sliding_camera.x, dest_x, option_time / 0.33f);
 
     /* author label */
     font_set_text(author_label, "<color=$COLOR_HIGHLIGHT>Translation by:</color> %s", lngdata[option].author);
@@ -258,6 +251,18 @@ void langselect_render()
 
 
 /* private methods */
+
+/* change the current option */
+int change_option(int new_option)
+{
+    if(new_option >= 0 && new_option < lngcount) {
+        option_time = 0.0f;
+        sound_play(SFX_CHOOSE);
+        option = new_option;
+    }
+
+    return option;
+}
 
 /* saves the user preferences */
 void save_preferences(const char *filepath)
