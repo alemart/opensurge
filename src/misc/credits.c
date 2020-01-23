@@ -53,6 +53,9 @@ $CREDITS_TRANSLATOR \n\
 SecularSteve \n\
 $CREDITS_TRANSLATOR \n\
 \n\
+David Demelier \n\
+$CREDITS_TRANSLATOR \n\
+\n\
 Ruben Caceres \n\
 Lainz \n\
 allegro.cc \n\
