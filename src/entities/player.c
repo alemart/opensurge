@@ -298,8 +298,10 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         if(player->shield_type != SH_WATERSHIELD && (
             act->position.y < level_waterlevel() || /* forced underwater via scripting OR... */
             is_head_underwater(player)              /* the head of the player is underwater */
-        ))
-            player->underwater_timer += dt;
+        )) {
+            if(!player_is_winning(player))
+                player->underwater_timer += dt;
+        }
         else
             player->underwater_timer = 0.0f;
 

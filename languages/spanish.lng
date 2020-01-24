@@ -15,7 +15,7 @@
 LANG_ID                     "es_ES"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Español"                 // language name
 LANG_AUTHOR                 "Álvaro Bazán"            // translation author
-LANG_LASTUPDATE             "2019-11-27"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-01-24"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1"                   // required engine version
 
 // Colors
@@ -253,5 +253,5 @@ GAMEOVER_PART1              "FIN DEL"
 GAMEOVER_PART2              "JUEGO"
 
 // Time Over
-TIMEOVER_PART1              "TIME" // -- FIXME --
-TIMEOVER_PART2              "OVER" // -- FIXME --
+TIMEOVER_PART1              "FIN DE"
+TIMEOVER_PART2              "TIEMPO"
