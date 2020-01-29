@@ -30,6 +30,6 @@
 
 * Fixed details of the initial release
 
-## 0.5.0 - September 25th, 2019
+## 0.5.0 - September 27th, 2019
 
 * Initial release
