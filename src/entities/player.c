@@ -520,12 +520,8 @@ void player_hit(player_t *player, float direction)
                     -sinf(DEG2RAD(a)) * spd * (1 - 2 * (i % 2)),
                     cosf(DEG2RAD(a)) * spd
                 );
-
-                #if 1
                 surgescript_object_t* collectible = level_create_object("Bouncing Collectible", player->actor->position);
-                #else
-                surgescript_object_t* collectible = NULL; /* faster (FIXME) */
-                #endif
+
                 if(collectible != NULL) {
                     surgescript_var_t* x = surgescript_var_create();
                     surgescript_var_t* y = surgescript_var_create();
@@ -603,9 +599,10 @@ void player_kill(player_t *player)
  */
 void player_roll(player_t *player)
 {
-    player->pa_old_state = physicsactor_get_state(player->pa);
-    if(!player_is_dying(player))
+    if(!player_is_dying(player)) {
+        player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_roll(player->pa);
+    }
 }
 
 /*
@@ -627,8 +624,8 @@ void player_enable_roll(player_t *player)
  */
 void player_disable_roll(player_t *player)
 {
-    physicsactor_t *pa = player->pa;
-    if(!(player->disable_roll)) {
+    if(!player->disable_roll) {
+        physicsactor_t *pa = player->pa;
         physicsactor_set_rollthreshold(pa, physicsactor_get_rollthreshold(pa) + 1000.0f);
         player->disable_roll = TRUE;
     }
@@ -640,9 +637,10 @@ void player_disable_roll(player_t *player)
  */
 void player_spring(player_t *player)
 {
-    player->pa_old_state = physicsactor_get_state(player->pa);
-    if(!player_is_dying(player))
+    if(!player_is_dying(player)) {
+        player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_spring(player->pa);
+    }
 }
 
 /*
