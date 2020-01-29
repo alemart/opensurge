@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 Alexandre Martins <alemartf@gmail.com> -->
+<component type="desktop-application">
+  <id>org.opensurge2d.OpenSurge</id> 
+  <name>Open Surge</name>
+  <developer_name>Alexandre Martins &amp; others</developer_name>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <summary>A fun 2D retro platformer inspired by Sonic games</summary>
+  <description>
+    <p>
+      Open Surge is a fun 2D retro platformer inspired by Sonic games.
+      It is also a game creation system that lets you unleash your creativity!
+    </p>
+    <p>
+      How do I play?
+    </p>
+    <p>
+      You can play using a keyboard or a joystick.
+    </p>
+    <ul>
+      <li>Arrows: Move</li>
+      <li>Space: Jump</li>
+      <li>Enter: Pause</li>
+      <li>Esc: Quit</li>
+      <li>Left Ctrl: Switch character</li>
+      <li>Equals: Take snapshot</li>
+      <li>F12: Open the editor</li>
+    </ul>
+    <p>
+      How do I create a game?
+    </p>
+    <p>
+      Use Open Surge to create your own amazing games!
+      Create new levels, items, bosses, gameplay mechanics,
+      playable characters, special abilities and more!
+    </p>
+    <ul>
+      <li>
+        First, learn how to create a level using the
+        built-in editor (press F12 during gameplay)
+      </li>
+      <li>
+        Next, learn how to do basic hacking (modify the
+        images/sounds, create new scenery, new characters, etc.)
+      </li>
+      <li>
+        Finally, have fun with scripting! SurgeScript, the
+        scripting language featured in Open Surge, gives you
+        ultimate power to create anything you desire and make
+        your dreams come alive!
+      </li>
+    </ul>
+  </description>
+  <url type="homepage">http://opensurge2d.org</url>
+  <url type="donation">http://opensurge2d.org/contribute</url>
+  <url type="help">http://opensurge2d.org/wiki</url>
+  <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
+  <launchable type="desktop-id">opensurge.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>http://opensurge2d.org/screenshots/1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://opensurge2d.org/screenshots/2.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://opensurge2d.org/screenshots/3.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://opensurge2d.org/screenshots/4.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://opensurge2d.org/screenshots/5.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://opensurge2d.org/screenshots/6.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://opensurge2d.org/screenshots/7.png</image>
+    </screenshot>
+    <screenshot>
+      <video>http://opensurge2d.org/screenshots/trailer.webm</video>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.0">
+    <content_attribute id="violence-cartoon">mild</content_attribute>
+    <content_attribute id="violence-fantasy">mild</content_attribute>
+  </content_rating>
+  <releases>
+    <release date="2020-01-05" version="0.5.1.1" />
+    <release date="2019-12-31" version="0.5.1" />
+    <release date="2019-11-01" version="0.5.0.2" />
+    <release date="2019-10-05" version="0.5.0.1" />
+    <release date="2019-09-27" version="0.5.0" />
+  </releases>
+  <provides>
+    <binary>opensurge</binary>
+  </provides>
+</component>

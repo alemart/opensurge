@@ -1,6 +1,6 @@
 name: opensurge
 base: core18
-version: '0.5.1.1'
+version: '0.5.1.2'
 summary: A fun 2D retro platformer inspired by Sonic games
 description: |
   Open Surge is a fun 2D retro platformer inspired by Sonic games
@@ -31,7 +31,7 @@ parts:
   opensurge:
     after: [desktop-glib-only, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.5.1.1
+    source-tag: v0.5.1.2
     plugin: cmake
     override-build: |
       set -eu
@@ -45,7 +45,8 @@ parts:
         "-DGAME_DATADIR=/usr/share/games/opensurge" \
         "-DDESKTOP_INSTALL=ON" \
         "-DDESKTOP_ENTRY_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/applications" \
-        "-DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps"
+        "-DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps" \
+        "-DDESKTOP_METAINFO_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/metainfo"
       make -j2 && make install
       mkdir -p "$SNAPCRAFT_PART_INSTALL/usr/share/games"
       mv /usr/share/games/opensurge "$SNAPCRAFT_PART_INSTALL/usr/share/games"

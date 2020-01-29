@@ -1,7 +1,7 @@
 #
 # Open Surge Engine
 # CMakeLists.txt - CMake script
-# Copyright (C) 2008-2019  Alexandre Martins <alemartf@gmail.com>
+# Copyright (C) 2008-2020  Alexandre Martins <alemartf@gmail.com>
 # http://opensurge2d.org
 #
 # This program is free software; you can redistribute it and/or modify
@@ -70,6 +70,7 @@ IF(UNIX)
   OPTION(DESKTOP_INSTALL "Add Open Surge to the Desktop menu (freedesktop.org) when installing" ON)
   SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to store the .desktop file when installing")
   SET(DESKTOP_ICON_PATH "/usr/share/pixmaps" CACHE PATH "Where to store the icon file when installing")
+  SET(DESKTOP_METAINFO_PATH "/usr/share/metainfo" CACHE PATH "Where to store the metainfo file when installing")
 ENDIF()
 
 # Compiling the development version?
@@ -654,9 +655,10 @@ IF(UNIX)
   INSTALL(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}")
   INSTALL(FILES LICENSE README.md CHANGES.md logo.png surge.png surge.rocks DESTINATION "${GAME_DATADIR}")
   INSTALL(DIRECTORY characters scripts sprites config images levels musics quests samples scripts themes languages fonts licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
+  INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
+  INSTALL(FILES src/misc/org.opensurge2d.OpenSurge.metainfo.xml DESTINATION "${DESKTOP_METAINFO_PATH}")
   IF(DESKTOP_INSTALL)
     INSTALL(FILES src/misc/opensurge.desktop DESTINATION "${DESKTOP_ENTRY_PATH}")
-    INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
   ENDIF()
   INSTALL(CODE "MESSAGE(\"Installed ${GAME_UNIXNAME} on ${CMAKE_INSTALL_PREFIX}. You may now start the game.\")")
 ENDIF()
