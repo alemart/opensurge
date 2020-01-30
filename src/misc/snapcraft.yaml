@@ -41,14 +41,12 @@ parts:
         "-DALLEGRO_MONOLITH=OFF" \
         "-DCMAKE_LIBRARY_PATH=$SNAPCRAFT_STAGE/lib" \
         "-DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/bin" \
-        "-DGAME_DATADIR=/usr/share/games/opensurge" \
+        "-DGAME_DATADIR=$SNAPCRAFT_PART_INSTALL/usr/share/games/opensurge" \
         "-DDESKTOP_INSTALL=ON" \
         "-DDESKTOP_ENTRY_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/applications" \
         "-DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps" \
         "-DDESKTOP_METAINFO_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/metainfo"
       make -j2 && make install
-      mkdir -p "$SNAPCRAFT_PART_INSTALL/usr/share/games"
-      mv /usr/share/games/opensurge "$SNAPCRAFT_PART_INSTALL/usr/share/games"
       sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/org.opensurge2d.OpenSurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/org.opensurge2d.OpenSurge.desktop"
     build-packages:
       - build-essential
