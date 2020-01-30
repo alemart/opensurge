@@ -8,12 +8,12 @@ description: |
 
 grade: stable
 confinement: strict
-icon: opensurge.png
+icon: org.opensurge2d.OpenSurge.png
 
 apps:
   opensurge:
     command: desktop-launch $SNAP/bin/opensurge --base "$SNAP/usr/share/games/opensurge"
-    desktop: usr/share/applications/opensurge.desktop
+    desktop: usr/share/applications/org.opensurge2d.OpenSurge.desktop
     environment:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       DISABLE_WAYLAND: 1
@@ -49,7 +49,7 @@ parts:
       make -j2 && make install
       mkdir -p "$SNAPCRAFT_PART_INSTALL/usr/share/games"
       mv /usr/share/games/opensurge "$SNAPCRAFT_PART_INSTALL/usr/share/games"
-      sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/opensurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
+      sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/org.opensurge2d.OpenSurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/org.opensurge2d.OpenSurge.desktop"
     build-packages:
       - build-essential
     stage-packages:

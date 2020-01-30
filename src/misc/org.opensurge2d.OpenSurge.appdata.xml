@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2020 Alexandre Martins <alemartf@gmail.com> -->
+<!-- Copyright 2020 Alexandre Martins -->
 <component type="desktop-application">
-  <id>org.opensurge2d.OpenSurge</id> 
+  <id>org.opensurge2d.OpenSurge</id>
   <name>Open Surge</name>
   <developer_name>Alexandre Martins &amp; others</developer_name>
+  <update_contact>alemartf_at_gmail.com</update_contact>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
+  <launchable type="desktop-id">org.opensurge2d.OpenSurge.desktop</launchable>
   <summary>A fun 2D retro platformer inspired by Sonic games</summary>
   <description>
     <p>
@@ -13,7 +15,7 @@
       and a game creation system that lets you unleash your creativity!
     </p>
     <p>
-      How do I play?
+      <em>How do I play?</em>
     </p>
     <p>
       You can play using a keyboard or a joystick.
@@ -28,7 +30,7 @@
       <li>F12: Open the editor</li>
     </ul>
     <p>
-      How do I create a game?
+      <em>How do I create a game?</em>
     </p>
     <p>
       Use Open Surge to create your own amazing games!
@@ -56,7 +58,7 @@
   <url type="donation">http://opensurge2d.org/contribute</url>
   <url type="help">http://opensurge2d.org/wiki</url>
   <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
-  <launchable type="desktop-id">opensurge.desktop</launchable>
+  <url type="translate">https://github.com/alemart/opensurge</url>
   <screenshots>
     <screenshot type="default">
       <image>http://opensurge2d.org/screenshots/1.png</image>
@@ -88,11 +90,55 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
-    <release date="2020-01-05" version="0.5.1.1" />
-    <release date="2019-12-31" version="0.5.1" />
-    <release date="2019-11-01" version="0.5.0.2" />
-    <release date="2019-10-05" version="0.5.0.1" />
-    <release date="2019-09-27" version="0.5.0" />
+    <release date="2020-01-05" version="0.5.1.1">
+      <description>
+        <ul>
+          <li>Added support for UTF-8 filenames on Windows</li>
+          <li>Added the --hide-fps command line option</li>
+          <li>Optimized the rendering of texts</li>
+          <li>Removed unused fonts</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2019-12-31" version="0.5.1">
+      <description>
+        <ul>
+          <li>New special moves: Surge's Lighting Boom and Surge's Lighting Smash</li>
+          <li>Improved the physics engine &amp; the auto-angles detection method</li>
+          <li>New translations: German, Spanish, Korean, French</li>
+          <li>Updates to the SurgeScript API</li>
+          <li>Included a SurgeScript template for creating your own shield abilities</li>
+          <li>Made Life Icons and Goal Signs easier to hack</li>
+          <li>Created an audible countdown that is played when Surge is underwater</li>
+          <li>Introduced multilingual support for font scripts</li>
+          <li>Aesthetic improvements to the menus</li>
+          <li>General improvements &amp; bugfixes</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2019-11-01" version="0.5.0.2">
+      <description>
+        <ul>
+          <li>Improved the jump and the charge-and-release move</li>
+          <li>Updated the icon</li>
+          <li>General improvements</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2019-10-05" version="0.5.0.1">
+      <description>
+        <ul>
+          <li>Fixed details of the initial release</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2019-09-27" version="0.5.0">
+      <description>
+        <ul>
+          <li>Initial release</li>
+        </ul>
+      </description>
+    </release>
   </releases>
   <provides>
     <binary>opensurge</binary>

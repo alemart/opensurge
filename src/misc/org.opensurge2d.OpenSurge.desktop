@@ -5,6 +5,6 @@ GenericName=Game Engine
 Comment=A fun 2D retro platformer inspired by Sonic games
 Keywords=game;gaming;game maker;fun;2d;retro;platformer;play;create;children;kids;teens;
 Exec=opensurge
-Icon=opensurge
+Icon=org.opensurge2d.OpenSurge
 Terminal=false
 Categories=Game;ActionGame;
