@@ -27,6 +27,9 @@ COLOR_HUDDANGER             "ff0000"
 //
 // Translators:
 //
+// Before starting the work, please check out the
+// Translation Guide at http://opensurge2d.org/wiki
+//
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
 // that it's innofensive and that the meaning of what
@@ -246,7 +249,7 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Пробајте сами!</col
 // Heads-Up Display
 HUD_SCORE                   "Poeni"
 HUD_TIME                    "Vreme"
-HUD_COLLECTIBLES            "Snaga"
+HUD_POWER                   "Snaga"
 
 // Level Cleared animation
 // NOTE BY TRANSLATOR: string below should be "DOVRŠILI STE"

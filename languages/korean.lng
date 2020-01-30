@@ -27,6 +27,9 @@ COLOR_HUDDANGER             "ff0000"
 //
 // Translators:
 //
+// Before starting the work, please check out the
+// Translation Guide at http://opensurge2d.org/wiki
+//
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
 // that it's innofensive and that the meaning of what
@@ -221,7 +224,7 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>스스로 해보세요!</color>
 //
 
 //
-// Note to translators:
+// Translators:
 //
 // Since the game uses bitmap fonts, parts of
 // the translation don't accept special characters.
@@ -239,7 +242,7 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>스스로 해보세요!</color>
 // Heads-Up Display
 HUD_SCORE                   "Score" //"점수"
 HUD_TIME                    "Time" //"시간"
-HUD_COLLECTIBLES            "Power" //"파워"
+HUD_POWER                   "Power" //"파워"
 
 // Level Cleared animation
 CLEARED_LINE1               "YOU HAVE" //"당신은"

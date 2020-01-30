@@ -107,7 +107,7 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 
     state "main"
     {
-        label.text = "<color=ffee11>$HUD_COLLECTIBLES</color>";
+        label.text = "<color=ffee11>$HUD_POWER</color>";
         value.text = Player.active.collectibles;
         if(Player.active.collectibles == 0) {
             if(timeout(blinkTime))
@@ -117,7 +117,7 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 
     state "blink"
     {
-        label.text = "<color=ff0055>$HUD_COLLECTIBLES</color>";
+        label.text = "<color=ff0055>$HUD_POWER</color>";
         value.text = Player.active.collectibles;
         if(timeout(blinkTime))
             state = "main";

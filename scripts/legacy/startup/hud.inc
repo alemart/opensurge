@@ -276,7 +276,7 @@ object ".default_startup.hud.collectibles"
 
         let "$collectibles = collectibles()"
         if "$collectibles == 0" "danger"
-        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_POWER</color> $collectibles"
     }
 
     state "danger"
@@ -287,7 +287,7 @@ object ".default_startup.hud.collectibles"
 
         let "$collectibles = collectibles()"
         if "$collectibles > 0" "normal"
-        textout "hud_legacy" 0 0 "<color=$COLOR_HUDDANGER>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUDDANGER>$HUD_POWER</color> $collectibles"
 
         on_timeout "$blink_interval" "blinking_danger"
     }
@@ -300,7 +300,7 @@ object ".default_startup.hud.collectibles"
 
         let "$collectibles = collectibles()"
         if "$collectibles > 0" "normal"
-        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_POWER</color> $collectibles"
 
         on_timeout "$blink_interval" "danger"
     }
@@ -311,7 +311,7 @@ object ".default_startup.hud.collectibles"
         set_absolute_position "xpos() - 500*dt()" "ypos()"
 
         let "$collectibles = collectibles()"
-        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_COLLECTIBLES</color> $collectibles"
+        textout "hud_legacy" 0 0 "<color=$COLOR_HUD>$HUD_POWER</color> $collectibles"
     }
 
     state "hidden"

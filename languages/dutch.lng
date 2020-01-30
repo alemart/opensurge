@@ -27,6 +27,9 @@ COLOR_HUDDANGER             "ff0000"
 //
 // Translators:
 //
+// Before starting the work, please check out the
+// Translation Guide at http://opensurge2d.org/wiki
+//
 // You don't need to translate everything exactly "as is".
 // You may use some "cool" slang that kids use, provided
 // that it's innofensive and that the meaning of what
@@ -239,7 +242,7 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Probeer het zelf!</color>\nNu i
 // Heads-Up Display
 HUD_SCORE                   "Punten"
 HUD_TIME                    "Tijd"
-HUD_COLLECTIBLES            "Energie"
+HUD_POWER                   "Energie"
 
 // Level Cleared animation
 CLEARED_LINE1               "U HEEFT ZONE $LEVEL_ACT"
