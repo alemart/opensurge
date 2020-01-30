@@ -249,9 +249,9 @@ CLEARED_TIME                "Tijd Bonus"
 CLEARED_SCORE               "Punten"
 
 // Game Over
-GAMEOVER_PART1              "GAME" // -- FIXME --
-GAMEOVER_PART2              "OVER" // -- FIXME --
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"
 
 // Time Over
-TIMEOVER_PART1              "TIME" // -- FIXME --
-TIMEOVER_PART2              "OVER" // -- FIXME --
+TIMEOVER_PART1              "TIJD"
+TIMEOVER_PART2              "IS OP"
