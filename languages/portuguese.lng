@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: languages/portuguese.lng
-// Description: brazilian portuguese translation (encoding: utf-8)
+// Description: brazilian portuguese translation (encoding: UTF-8)
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -18,16 +18,12 @@ LANG_AUTHOR                 "Alexandre Martins"       // translation author
 LANG_LASTUPDATE             "2020-01-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
-// Colors
-COLOR_TITLE                 "ff8800"
-COLOR_HIGHLIGHT             "ffee11"
-COLOR_HUD                   "ffff00"
-COLOR_HUDDANGER             "ff0000"
+
 
 //
 // Translators:
 //
-// Before starting the work, please check out the
+// Before starting your work, please check out the
 // Translation Guide at http://opensurge2d.org/wiki
 //
 // You don't need to translate everything exactly "as is".

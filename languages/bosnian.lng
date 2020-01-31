@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: languages/bosnian.lng
-// Description: bosnian translation (encoding: utf-8)
+// Description: bosnian translation (encoding: UTF-8)
 // Author: SecularSteve
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -18,16 +18,12 @@ LANG_AUTHOR                 "SecularSteve"            // translation author
 LANG_LASTUPDATE             "2020-01-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
-// Colors
-COLOR_TITLE                 "ff8800"
-COLOR_HIGHLIGHT             "ffee11"
-COLOR_HUD                   "ffff00"
-COLOR_HUDDANGER             "ff0000"
+
 
 //
 // Translators:
 //
-// Before starting the work, please check out the
+// Before starting your work, please check out the
 // Translation Guide at http://opensurge2d.org/wiki
 //
 // You don't need to translate everything exactly "as is".
