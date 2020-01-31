@@ -7,7 +7,6 @@
   <update_contact>alemartf_at_gmail.com</update_contact>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <launchable type="desktop-id">org.opensurge2d.OpenSurge.desktop</launchable>
   <summary>A fun 2D retro platformer inspired by Sonic games</summary>
   <description>
     <p>
@@ -61,30 +60,39 @@
   <url type="translate">https://github.com/alemart/opensurge</url>
   <screenshots>
     <screenshot type="default">
-      <image>http://opensurge2d.org/screenshots/1.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot1.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/screenshots/2.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot2.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/screenshots/3.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot3.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/screenshots/4.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot4.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/screenshots/5.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot5.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/screenshots/6.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot6.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/screenshots/7.png</image>
+      <image>http://opensurge2d.org/appdata/screenshot7.png</image>
     </screenshot>
     <screenshot>
-      <video>http://opensurge2d.org/screenshots/trailer.webm</video>
+      <video>http://opensurge2d.org/appdata/trailer.webm</video>
     </screenshot>
   </screenshots>
+  <categories>
+    <category>Game</category>
+    <category>ActionGame</category>
+    <category>ArcadeGame</category>
+  </categories>
+  <launchable type="desktop-id">opensurge.desktop</launchable>
+  <provides>
+    <binary>opensurge</binary>
+  </provides>
   <content_rating type="oars-1.0">
     <content_attribute id="violence-cartoon">mild</content_attribute>
     <content_attribute id="violence-fantasy">mild</content_attribute>
@@ -140,7 +148,4 @@
       </description>
     </release>
   </releases>
-  <provides>
-    <binary>opensurge</binary>
-  </provides>
 </component>

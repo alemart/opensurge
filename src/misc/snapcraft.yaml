@@ -8,12 +8,12 @@ description: |
 
 grade: stable
 confinement: strict
-icon: org.opensurge2d.OpenSurge.png
+icon: opensurge.png
 
 apps:
   opensurge:
     command: desktop-launch $SNAP/bin/opensurge --base "$SNAP/usr/share/games/opensurge"
-    desktop: usr/share/applications/org.opensurge2d.OpenSurge.desktop
+    desktop: usr/share/applications/opensurge.desktop
     environment:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       DISABLE_WAYLAND: 1
@@ -47,7 +47,7 @@ parts:
         "-DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps" \
         "-DDESKTOP_METAINFO_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/metainfo"
       make -j2 && make install
-      sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/org.opensurge2d.OpenSurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/org.opensurge2d.OpenSurge.desktop"
+      sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/opensurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
     build-packages:
       - build-essential
     stage-packages:
@@ -105,8 +105,9 @@ parts:
       - build-essential
 
   liballegro5:
-    source: https://github.com/liballeg/allegro5.git
-    source-tag: 5.2.5.0
+    source: https://github.com/liballeg/allegro5/releases/download/5.2.5.0/allegro-5.2.5.0.tar.gz
+    source-type: tar
+    source-checksum: sha256/59968da34a0353913868b8299aaff9520d19a3b0960c6406be8323a6ac9bb719
     plugin: cmake
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
