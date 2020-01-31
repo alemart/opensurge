@@ -254,9 +254,9 @@ CLEARED_TIME                "Bonus za Vrijeme"
 CLEARED_SCORE               "Poeni"
 
 // Game Over
-GAMEOVER_PART1              "GAME" // -- FIXME --
-GAMEOVER_PART2              "OVER" // -- FIXME --
+GAMEOVER_PART1              "KRAJ"
+GAMEOVER_PART2              "IGRE"
 
 // Time Over
-TIMEOVER_PART1              "TIME" // -- FIXME --
-TIMEOVER_PART2              "OVER" // -- FIXME --
+TIMEOVER_PART1              "VRIJEME"
+TIMEOVER_PART2              "JE ISTEKLO"
