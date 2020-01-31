@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * fontext.h - extensions for the font module
- * Copyright (C) 2010, 2012-2013, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2012-2013, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 #include "lang.h"
 #include "input.h"
 #include "stringutil.h"
+#include "../entities/player.h"
 #include "../scenes/level.h"
 
 static const char* f_dollar() { return "$"; }
@@ -34,6 +35,7 @@ static const char* f_level_name() { return level_name(); }
 static const char* f_level_version() { return level_version(); }
 static const char* f_level_author() { return level_author(); }
 static const char* f_level_act() { return str_from_int(level_act(), NULL, 0); }
+static const char* f_player_name() { return level_player() != NULL ? player_name(level_player()) : "null"; }
 static const char* f_input_directional() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_DIRECTIONAL" : "INPUT_KEYB_DIRECTIONAL"); }
 static const char* f_input_left() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_LEFT" : "INPUT_KEYB_LEFT"); }
 static const char* f_input_right() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_RIGHT" : "INPUT_KEYB_RIGHT"); }
@@ -72,6 +74,7 @@ void fontext_register_variables()
     font_register_variable("$LEVEL_VERSION", f_level_version);
     font_register_variable("$LEVEL_AUTHOR", f_level_author);
     font_register_variable("$LEVEL_ACT", f_level_act);
+    font_register_variable("$PLAYER_NAME", f_player_name);
     font_register_variable("$INPUT_DIRECTIONAL", f_input_directional);
     font_register_variable("$INPUT_LEFT", f_input_left);
     font_register_variable("$INPUT_RIGHT", f_input_right);
