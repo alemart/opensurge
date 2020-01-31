@@ -56,8 +56,8 @@
   <url type="homepage">http://opensurge2d.org</url>
   <url type="donation">http://opensurge2d.org/contribute</url>
   <url type="help">http://opensurge2d.org/wiki</url>
-  <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
-  <url type="translate">https://github.com/alemart/opensurge</url>
+  <url type="bugtracker">http://opensurge2d.org/appdata/bugtracker.html</url>
+  <url type="translate">http://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
     <screenshot type="default">
       <image>http://opensurge2d.org/appdata/screenshot1.png</image>
