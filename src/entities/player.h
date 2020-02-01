@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * player.h - player module
- * Copyright (C) 2008-2011, 2014, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2011, 2014, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -112,6 +112,7 @@ void player_hit(player_t *player, float direction);
 void player_hit_ex(player_t *player, const struct actor_t *hazard);
 int player_bounce(player_t *player, float direction, int is_heavy_object);
 int player_bounce_ex(player_t *player, const struct actor_t *hazard, int is_heavy_object);
+void player_detach_from_ground(player_t *player);
 void player_kill(player_t *player);
 void player_spring(player_t *player);
 void player_roll(player_t *player);

@@ -3659,7 +3659,7 @@ void activate_spring(spring_t *spring, player_t *player)
     actor_change_animation(item->actor, sprite_get_animation(spring->sprite_name, 1));
 
     if(spring->strength.y < 0.0f) {
-        player->actor->position.y -= 2; /* bugfix */
+        player_detach_from_ground(player);
         player_spring(player);
     }
 

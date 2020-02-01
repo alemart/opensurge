@@ -1258,7 +1258,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* sticky physics */
     if(pa->midair && (
-        (!was_midair && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT) ||
+        (!was_midair && pa->state != PAS_JUMPING && pa->state != PAS_GETTINGHIT && pa->state != PAS_SPRINGING && pa->state != PAS_DROWNED && pa->state != PAS_DEAD) ||
         (pa->state == PAS_ROLLING && !pa->sticky_lock)
     )){
         v2d_t offset = v2d_new(0,0);
@@ -1326,7 +1326,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* stick to the ground */
-    if(!pa->midair && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT) && pa->ysp < 0.0f)) {
+    if(!pa->midair && !((pa->state == PAS_JUMPING || pa->state == PAS_GETTINGHIT || pa->state == PAS_SPRINGING || pa->state == PAS_DROWNED || pa->state == PAS_DEAD) && pa->ysp < 0.0f)) {
         const obstacle_t *ground = NULL;
         const sensor_t *ground_sensor = NULL;
         int offset = 0;

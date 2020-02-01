@@ -831,12 +831,8 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
         physicsactor_set_ysp(player->pa, ysp);
 
         /* hack */
-        if(ysp < 0.0f && !player_is_midair(player)) {
-            if(!player_is_rolling(player))
-                player->actor->position.y -= 2;
-            else
-                player->actor->position.y -= 5;
-        }
+        if(ysp < 0.0f)
+            player_detach_from_ground(player);
     }
     return NULL;
 }

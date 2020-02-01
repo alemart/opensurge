@@ -488,6 +488,23 @@ int player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_objec
 
 
 /*
+ * player_detach_from_ground()
+ * Ensures the player is not touching the ground on the next frame
+ */
+void player_detach_from_ground(player_t *player)
+{
+    /* this is meant to counter the "sticky physics" */
+    if(!player_is_midair(player)) {
+        if(physicsactor_get_movmode(player->pa) == MM_FLOOR) {
+            if(!player_is_rolling(player))
+                player->actor->position.y -= 2;
+            else
+                player->actor->position.y -= 5;
+        }
+    }
+}
+
+/*
  * player_hit()
  * Hits a player. If it has no collectibles, then it must die.
  * tip: direction > 0 is right, < 0 is left, 0 is neutral
@@ -501,7 +518,7 @@ void player_hit(player_t *player, float direction)
         if(direction != 0.0f)
             player->actor->speed.x = fabs(physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
         player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
-        player->actor->position.y -= 2; /* bugfix */
+        player_detach_from_ground(player);
 
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_hit(player->pa);
@@ -582,8 +599,6 @@ void player_kill(player_t *player)
         player->shield_type = SH_NONE;
         player->blinking = FALSE;
         player->aggressive = FALSE;
-
-        player->actor->position.y -= 2;
         player->actor->speed = v2d_new(0, physicsactor_get_diejmp(player->pa));
 
         player->pa_old_state = physicsactor_get_state(player->pa);
