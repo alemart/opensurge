@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * input.c - input management
- * Copyright (C) 2008-2011, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2011, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -445,6 +445,18 @@ void input_simulate_button_up(input_t *in, inputbutton_t button)
 {
     in->oldstate[(int)button] = in->state[(int)button];
     in->state[(int)button] = false;
+}
+
+
+
+/*
+ * input_reset()
+ * Resets the input object like if nothing is being held down
+ */
+void input_reset(input_t *in)
+{
+    for(int i = 0; i < IB_MAX; i++)
+        input_simulate_button_up(in, (inputbutton_t)i);
 }
 
 

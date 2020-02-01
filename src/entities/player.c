@@ -245,10 +245,8 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     float dt = timer_get_delta();
 
     /* is it a CPU controlled player? */
-    if(player != level_player()) {
-        for(int i = 0; i < IB_MAX; i++)
-            input_simulate_button_up(act->input, (inputbutton_t)i);
-    }
+    if(player != level_player())
+        input_reset(act->input);
 
     /* physics */
     if(!player->disable_movement) {

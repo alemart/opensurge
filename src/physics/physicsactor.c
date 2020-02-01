@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * physicsactor.c - physics system: actor
- * Copyright (C) 2011, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -102,7 +102,7 @@ struct physicsactor_t
 };
 
 /* private stuff ;-) */
-static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap);
+static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt);
 static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
 static inline char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static inline char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
@@ -338,9 +338,7 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
 
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
-    int i;
     float dt = timer_get_delta();
-    const obstacle_t *at_U;
 
     /* getting hit & winning pose */
     if(pa->state == PAS_GETTINGHIT) {
@@ -351,9 +349,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     else if(pa->winning_pose) {
         /* brake on level clear */
         const float thr = 60.0f;
-
-        for(i=0; i<IB_MAX; i++)
-            input_simulate_button_up(pa->input, (inputbutton_t)i);
+        input_reset(pa->input);
 
         pa->gsp = clip(pa->gsp, -1.8f * pa->topspeed, 1.8f * pa->topspeed);
         if(pa->state == PAS_ROLLING)
@@ -381,9 +377,11 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* don't bother jumping */
-    at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
-    if(at_U != NULL && obstacle_is_solid(at_U))
-        input_simulate_button_up(pa->input, IB_FIRE1);
+    if(!pa->midair) {
+        const obstacle_t *at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
+        if(at_U != NULL && obstacle_is_solid(at_U))
+            input_simulate_button_up(pa->input, IB_FIRE1);
+    }
 
     /* face left/right */
     if(pa->state != PAS_ROLLING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
@@ -394,11 +392,10 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* get to the real physics... */
-    run_simulation(pa, obstaclemap);
+    run_simulation(pa, obstaclemap, dt);
 
     /* reset input */
-    for(i=0; i<IB_MAX; i++)
-        input_simulate_button_up(pa->input, (inputbutton_t)i);
+    input_reset(pa->input);
 }
 
 void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position)
@@ -834,10 +831,9 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
     } while(0)
 
 /* physics simulation */
-void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
+void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt)
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
-    float dt = timer_get_delta();
     int was_midair;
 
     UPDATE_SENSORS();

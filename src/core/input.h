@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * input.h - input management
- * Copyright (C) 2008-2011, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2011, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,6 +70,7 @@ bool input_button_pressed(input_t *in, inputbutton_t button);
 bool input_button_up(input_t *in, inputbutton_t button);
 void input_simulate_button_down(input_t *in, inputbutton_t button);
 void input_simulate_button_up(input_t *in, inputbutton_t button);
+void input_reset(input_t *in);
 void input_ignore(input_t *in);
 void input_restore(input_t *in);
 bool input_is_ignored(input_t *in);
