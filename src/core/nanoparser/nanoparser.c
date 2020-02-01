@@ -1,5 +1,5 @@
 /*
- * nanoparser 1.1.1
+ * nanoparser 1.1.2
  * A tiny stand-alone easy-to-use parser written in C
  * Copyright (c) 2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
@@ -996,74 +996,13 @@ void preprocessor_run(FILE *in, int depth)
 
             /* #include has been deprecated */
             if(strcmp(key, "#include") == 0) {
-                char *dir, *fullpath;
-                const char *ext = strrchr(value, '.');
-                const char *vfile_ext = strrchr(vfile_name, '.');
-                void (*deprecated_error)(const char*, ...) = error;
-
-                if(vfile_ext != NULL && ext != NULL && strcmp(vfile_ext, ".obj") == 0 && strcmp(ext, ".inc") == 0)
-                    deprecated_error = warning; /* soft error (legacy) */
-
-                deprecated_error(
-                    "The #include directive has been deprecated and must no longer be used (see %s:%d)",
+                warning(
+                    "The #include directive has been deprecated and removed. It must no longer be used (see %s:%d)",
                     errorcontext_detect_file_name(preprocessor_line),
                     errorcontext_detect_file_line(preprocessor_line)
                 );
-
-                dir = dirpath(vfile_name);
-                fullpath = malloc_x((1+strlen(value)+strlen(dir)) * sizeof(*fullpath));
-                strcpy(fullpath, dir);
-                strcat(fullpath, value);
-
-                if(strstr(value, "..") != NULL || strstr(value, "\\\\") != NULL || !isalnum(value[0])) {
-                    error(
-                        "Preprocessor error in \"%s\" on line %d: couldn't include file \"%s\".",
-                        errorcontext_detect_file_name(preprocessor_line),
-                        errorcontext_detect_file_line(preprocessor_line),
-                        fullpath
-                    );
-                }
-
-                if(!preprocessor_has_file_been_included(fullpath)) {
-                    FILE *fp = fopen_utf8(fullpath, "r");
-                    preprocessor_add_to_include_table(fullpath);
-                    if(fp != NULL) {
-                        char *old_vfile_name = vfile_name;
-                        const char *me = errorcontext_detect_file_name(preprocessor_line);
-                        int mel = errorcontext_detect_file_line(preprocessor_line);
-                        errorcontext_add_to_table(fullpath, preprocessor_line, 0);
-
-                        vfile_name = str_dup(fullpath);
-                        preprocessor_run(fp, depth+1);
-                        free(vfile_name);
-                        vfile_name = old_vfile_name;
-
-                        errorcontext_add_to_table(me, preprocessor_line, mel);
-                        fclose(fp);
-                    }
-                    else {
-                        error(
-                            "Preprocessor error in \"%s\" on line %d: couldn't include file \"%s\".",
-                            errorcontext_detect_file_name(preprocessor_line),
-                            errorcontext_detect_file_line(preprocessor_line),
-                            fullpath
-                        );
-                    }
-
-                    free(fullpath);
-                    free(dir);
-
-                    line_start = TRUE;
-                    continue;
-                }
-                else {
-                    error(
-                        "Preprocessor error in \"%s\" on line %d: file \"%s\" has already been included.",
-                        errorcontext_detect_file_name(preprocessor_line),
-                        errorcontext_detect_file_line(preprocessor_line),
-                        fullpath
-                    );
-                }
+                (void)preprocessor_has_file_been_included;
+                (void)dirpath;
             }
             else if(strcmp(key, "#") == 0) {
                 /* ignore comments */

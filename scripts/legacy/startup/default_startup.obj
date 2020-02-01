@@ -5,19 +5,11 @@
 // File:   objects/default_startup.obj
 // Desc:   default startup object. Takes care of the HUD and stuff.
 // Author: Alexandre
-// Date:   2010-12-20, 2010-12-21, 2011-01-01, 2011-08-21, 2012-01-01, 2012-01-15
+// Date:   2010-12-20, 2010-12-21, 2011-01-01, 2011-08-21, 2012-01-01, 2012-01-15, 2020-02-01
 // ---------------------------------------------------------------------------
 
 // You MUST NOT modify this script! If you need a different functionality
 // in a level you make, please create a different startup object script.
-
-#include "hud.inc"
-#include "opening_animation.inc"
-#include "level_cleared.inc"
-#include "switch_character.inc"
-#include "pause.inc"
-#include "quit.inc"
-#include "water.inc"
 
 // ----------------------------------------------
 // This object is created by default
@@ -55,6 +47,21 @@ object ".default_startup"
         create_child ".default_startup.pause"
         create_child ".default_startup.quit"
 
+        destroy
+    }
+}
+
+// The legacy .default_startup has been replaced using SurgeScript
+// This object spawns the legacy .default_startup
+object ".legacy_startup"
+{
+    requires 0.2.0
+    always_active
+
+    state "main"
+    {
+        hide
+        create_child ".default_startup"
         destroy
     }
 }

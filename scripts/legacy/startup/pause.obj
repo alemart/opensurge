@@ -2,13 +2,13 @@
 // Open Surge Engine
 // http://opensurge2d.org
 //
-// File:   objects/default_startup/quit.inc
-// Desc:   enables the player to leave the level
+// File:   objects/default_startup/pause.obj
+// Desc:   enables the player to pause the game
 // Author: Alexandre
 // Date:   2010-12-22
 // ---------------------------------------------------------------------------
 
-object ".default_startup.quit"
+object ".default_startup.pause"
 {
     requires 0.2.0
     always_active
@@ -16,12 +16,12 @@ object ".default_startup.quit"
     state "main"
     {
         hide
-        on_button_pressed "fire4" "quit"
+        on_button_pressed "fire3" "paused"
     }
 
-    state "quit"
+    state "paused"
     {
-        ask_to_leave
+        pause
         change_state "main"
     }
 }
