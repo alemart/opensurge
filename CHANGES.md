@@ -1,5 +1,13 @@
 # Release Notes
 
+## 0.5.1.2 - February 2nd, 2020
+
+* New translations: Serbian, Bosnian, Dutch
+* Updated the language selection screen
+* Included AppStream metadata for Linux and for the free software ecosystem
+* Physics engine: using a fixed timestep at 60 fps for improved precision
+* Bugfixes and general improvements
+
 ## 0.5.1.1 - January 5th, 2020
 
 * Added support for UTF-8 filenames on Windows
