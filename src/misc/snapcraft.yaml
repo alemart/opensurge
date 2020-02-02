@@ -12,7 +12,7 @@ icon: opensurge.png
 
 apps:
   opensurge:
-    command: desktop-launch $SNAP/bin/opensurge --base "$SNAP/usr/share/games/opensurge"
+    command: desktop-launch $SNAP/bin/opensurge --base $SNAP/usr/share/games/opensurge
     desktop: usr/share/applications/opensurge.desktop
     environment:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
