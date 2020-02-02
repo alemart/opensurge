@@ -7,6 +7,7 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Camera;
+using SurgeEngine.Actor;
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Video.Screen;
@@ -17,6 +18,7 @@ object "Default Camera" is "entity", "awake", "private"
     public enabled = true; // is this camera enabled?
 
     transform = Transform();
+    actor = Actor("Default Camera");
     upDown = spawn("Default Camera - Up/Down Logic");
     player = Player.active;
 
@@ -37,7 +39,7 @@ object "Default Camera" is "entity", "awake", "private"
                 transform.translateBy(0, Math.max(-16, delta.y + 32));
         }
         else {
-            dy = Math.abs(player.ysp) > 360 ? 16 : 6;
+            dy = Math.abs(player.gsp) >= 360 ? 16 : 6;
             if(delta.y >= 1)
                 transform.translateBy(0, Math.min(dy, delta.y - 1));
             else if(delta.y <= -1)
@@ -72,11 +74,23 @@ object "Default Camera" is "entity", "awake", "private"
     fun constructor()
     {
         centerCamera(player.transform.position);
+        actor.zindex = 9999;
+        actor.visible = false;
     }
 
     fun centerCamera(position)
     {
         transform.position = position;
+    }
+
+    fun showGizmo()
+    {
+        actor.visible = true;
+    }
+
+    fun hideGizmo()
+    {
+        actor.visible = false;
     }
 }
 
