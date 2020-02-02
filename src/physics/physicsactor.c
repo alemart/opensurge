@@ -99,16 +99,23 @@ struct physicsactor_t
     sensor_t *M_jumproll;
     sensor_t *U_jumproll;
     v2d_t angle_sensor[2];
+
+    float reference_time; /* used in fixed_update */
+    float fixed_time;
 };
 
 /* private stuff ;-) */
-static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt);
-static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
+static inline void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
 static inline char pick_the_best_ground(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static inline char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
 static inline int distance_between_angle_sensors(const physicsactor_t* pa);
 static inline int delta_angle(int alpha, int beta);
 static const int CLOUD_OFFSET = 12;
+
+/* physics simulation */
+#define USE_FIXED_TIMESTEP 1
+static const float FIXED_TIMESTEP = 0.0166667f; /* 60 fps */
+static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt);
 
 
 /*
@@ -245,6 +252,8 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->charge_intensity = 0.0f;
     pa->airdrag_coefficient[0] = 0.0f;
     pa->airdrag_coefficient[1] = 1.0f;
+    pa->reference_time = 0.0f;
+    pa->fixed_time = 0.0f;
 
     /* initializing some constants ;-) */
 
@@ -383,16 +392,23 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             input_simulate_button_up(pa->input, IB_FIRE1);
     }
 
-    /* face left/right */
-    if(pa->state != PAS_ROLLING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
-        if((pa->gsp > 0.0f || pa->midair) && input_button_down(pa->input, IB_RIGHT))
-            pa->facing_right = TRUE;
-        else if((pa->gsp < 0.0f || pa->midair) && input_button_down(pa->input, IB_LEFT))
-            pa->facing_right = FALSE;
+    /* run the physics simulation */
+#if USE_FIXED_TIMESTEP != 0
+    pa->reference_time += dt;
+    if(pa->reference_time - pa->fixed_time <= FIXED_TIMESTEP) {
+        /* will run with a fixed timestep at 60 fps only */
+        run_simulation(pa, obstaclemap, FIXED_TIMESTEP); /* improved precision */
+        pa->fixed_time += FIXED_TIMESTEP;
     }
-
-    /* get to the real physics... */
+    else {
+        /* prevent jittering at lower fps rates */
+        run_simulation(pa, obstaclemap, dt); /* can't use a fixed timestep */
+        pa->fixed_time = pa->reference_time;
+    }
+#else
     run_simulation(pa, obstaclemap, dt);
+    (void)FIXED_TIMESTEP;
+#endif
 
     /* reset input */
     input_reset(pa->input);
@@ -830,6 +846,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         UPDATE_SENSORS(); \
     } while(0)
 
+
 /* physics simulation */
 void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt)
 {
@@ -849,6 +866,19 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         pa->position.y += pa->ysp * dt;
         pa->facing_right = TRUE;
         return;
+    }
+
+    /*
+     *
+     * face left or right
+     *
+     */
+
+    if(pa->state != PAS_ROLLING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
+        if((pa->gsp > 0.0f || pa->midair) && input_button_down(pa->input, IB_RIGHT))
+            pa->facing_right = TRUE;
+        else if((pa->gsp < 0.0f || pa->midair) && input_button_down(pa->input, IB_LEFT))
+            pa->facing_right = FALSE;
     }
 
     /*

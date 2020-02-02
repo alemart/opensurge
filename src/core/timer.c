@@ -50,7 +50,7 @@ static uint32_t start_time;
 
 /* platform-specific code */
 static uint32_t get_tick_count(); /* tell me the time */
-static void yield_cpu(); /* we don't like using 100% of the cpu */
+static void yield_cpu(); /* we don't want to use 100% of the cpu */
 
 #endif
 
@@ -84,14 +84,14 @@ void timer_init()
 /*
  * timer_update()
  * Updates the Time Handler. This routine
- * must be called at every cycle of
- * the main loop
+ * must be called at every cycle of the
+ * main loop
  */
 void timer_update()
 {
 #if defined(A5BUILD)
-    static const float minimum_delta = 0.016f;
-    static const float maximum_delta = 0.018f;
+    static const float minimum_delta = 0.0166667f; /* 60 fps */
+    static const float maximum_delta = 0.02f; /* 50 fps */
     static double old_time = 0.0;
 
     /* compute delta time */
@@ -165,8 +165,8 @@ float timer_get_delta()
 uint32_t timer_get_ticks()
 {
 #if defined(A5BUILD)
-    /* FIXME: return in seconds */
-    return 1000 * current_time;
+    /* get the elapsed time at the beginning of the frame */
+    return 1000 * current_time; /* TODO: return in seconds */
 #else
     uint32_t ticks = get_tick_count();
     if(ticks < start_time)
