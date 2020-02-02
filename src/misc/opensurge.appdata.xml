@@ -98,6 +98,17 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.5.1.2" date="2020-02-02">
+      <description>
+        <ul>
+          <li>New translations: Serbian, Bosnian, Dutch</li>
+          <li>Updated the language selection screen</li>
+          <li>Included AppStream metadata for Linux and for the free software ecosystem</li>
+          <li>Physics engine: using a fixed timestep at 60 fps for improved precision</li>
+          <li>Bugfixes and general improvements</li>
+        </ul>
+      </description>
+    </release>
     <release date="2020-01-05" version="0.5.1.1">
       <description>
         <ul>
