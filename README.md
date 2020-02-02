@@ -85,4 +85,6 @@ You may run `ccmake` or `cmake-gui` to know additional build options (e.g., set 
 | Game config.  | ~/.config/opensurge2d |
 | Logs, etc.    | ~/.cache/opensurge2d  |
 
+If you're using Flatpak, user-space files are found at `~/.var/app/org.opensurge2d.OpenSurge`. If you're using Snap, they are found at: `~/snap/opensurge/current/.local/share/opensurge2d`, `~/snap/opensurge/current/.config/opensurge2d`, and `~/snap/opensurge/common/.cache/opensurge2d`.
+
 **Portable setup:** if you haven't done a system-wide installation, Open Surge can also read files from the folder of the executable.
