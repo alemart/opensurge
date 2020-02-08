@@ -26,8 +26,8 @@
 #define GAME_TITLE              "Open Surge Engine"
 #define GAME_MAIN_VERSION       0
 #define GAME_MAJOR_VERSION      5
-#define GAME_MINOR_VERSION      1
-#define GAME_PATCH_VERSION      2
+#define GAME_MINOR_VERSION      2
+#define GAME_PATCH_VERSION      0
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2020"
 
