@@ -57,8 +57,9 @@ SET(DEFS "") # #define'd stuff
 
 # User options
 OPTION(USE_A5 "Use the Allegro 5 backend" ON)
-OPTION(USE_STATIC "Use static libs whenever possible (legacy; Allegro 4 only)" ON)
-OPTION(USE_OPENAL "Use OpenAL for audio playback (deprecated; Allegro 4 only)" OFF)
+OPTION(LEGACY_USE_STATIC "Use static libs whenever possible (legacy; Allegro 4 only)" ON)
+OPTION(LEGACY_USE_OPENAL "Use OpenAL for audio playback (deprecated; Allegro 4 only)" OFF)
+OPTION(SURGESCRIPT_STATIC "Link SurgeScript statically" OFF)
 OPTION(ALLEGRO_STATIC "Use the static version of Allegro 5 (Windows only)" OFF)
 OPTION(ALLEGRO_MONOLITH "Use the monolith version of Allegro 5" OFF)
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
@@ -100,7 +101,7 @@ ELSE()
 ENDIF()
 
 # legacy option: prefer static libs
-IF(NOT USE_A5 AND USE_STATIC)
+IF(NOT USE_A5 AND LEGACY_USE_STATIC)
   IF(WIN32)
     SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
   ELSE()
@@ -197,7 +198,7 @@ IF(USE_A5)
     IF(NOT ${_A5_LIB})
       MESSAGE(FATAL_ERROR "Can't find Allegro 5 lib (lib${A5_LIB}). ${HELP}")
     ELSE()
-      MESSAGE(STATUS "Found ${A5_LIB} at ${${_A5_LIB}}...")
+      MESSAGE(STATUS "Found lib${A5_LIB} at ${${_A5_LIB}}...")
       SET(LALLEGRO5 "${LALLEGRO5}" "${${_A5_LIB}}")
     ENDIF()
   ENDFOREACH()
@@ -260,17 +261,17 @@ ELSE()
   ENDIF(NOT LVORBISFILE)
 
   # LOGG: liblogg
-  IF(NOT USE_OPENAL)
+  IF(NOT LEGACY_USE_OPENAL)
     MESSAGE(STATUS "Building using Allegro for audio playback...")
     FIND_LIBRARY(LLOGG NAMES logg PATHS ${ALLEGRO_LIBRARY_PATH})
     IF(NOT LLOGG)
       MESSAGE(FATAL_ERROR "Fatal error: liblogg not found! ${HELP}")
     ENDIF(NOT LLOGG)
     SET(AUDIO_LIBS logg vorbisfile vorbis ogg)
-  ENDIF(NOT USE_OPENAL)
+  ENDIF(NOT LEGACY_USE_OPENAL)
 
   # OpenAL & ALURE
-  IF(USE_OPENAL)
+  IF(LEGACY_USE_OPENAL)
     MESSAGE(STATUS "Building using OpenAL for audio playback...")
     FIND_LIBRARY(LOPENAL NAMES openal OpenAL OpenAL32 al PATHS ${ALLEGRO_LIBRARY_PATH})
     IF(NOT LOPENAL)
@@ -302,7 +303,7 @@ ELSE()
 
     SET(DEFS ${DEFS} __USE_OPENAL__ ALURE_STATIC_LIBRARY)
     SET(AUDIO_LIBS ${LALURE} ${LOPENAL} vorbisfile vorbis ogg stdc++ ${LPTHREAD} ${LDL})
-  ENDIF(USE_OPENAL)
+  ENDIF(LEGACY_USE_OPENAL)
 
   # Alfont: libalfont
   FIND_LIBRARY(LALFONT NAMES alfont PATHS ${ALLEGRO_LIBRARY_PATH})
@@ -313,11 +314,16 @@ ELSE()
 ENDIF()
 
 # SurgeScript: libsurgescript
-FIND_LIBRARY(LSURGESCRIPT NAMES surgescript PATHS ${SURGESCRIPT_LIBRARY_PATH})
+SET(LSURGESCRIPT_NAME surgescript)
+IF(SURGESCRIPT_STATIC)
+  SET(LSURGESCRIPT_NAME "${LSURGESCRIPT_NAME}-static")
+ENDIF()
+
+FIND_LIBRARY(LSURGESCRIPT NAMES "${LSURGESCRIPT_NAME}" PATHS ${SURGESCRIPT_LIBRARY_PATH})
 IF(NOT LSURGESCRIPT)
-  MESSAGE(FATAL_ERROR "Fatal error: can't find libsurgescript! ${HELP}")
+  MESSAGE(FATAL_ERROR "Fatal error: can't find lib${LSURGESCRIPT_NAME}! ${HELP}")
 ELSE()
-  MESSAGE(STATUS "Found surgescript at ${LSURGESCRIPT}...")
+  MESSAGE(STATUS "Found lib${LSURGESCRIPT_NAME} at ${LSURGESCRIPT}...")
 ENDIF()
 
 # setup preprocessor #define's
