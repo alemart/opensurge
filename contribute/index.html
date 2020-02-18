@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="plain">
   <head>
     <meta charset="utf-8">
     <title>Donate to Open Surge</title>
@@ -19,24 +19,40 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
     <link href="/style.css" rel="stylesheet">
-    <style>p { font-size: 16pt; }</style>
+    <style>p { font-size: 18pt; }</style>
   </head>
   <body>
     <!-- Page contents -->
     <div class="container">
       <header class="text-center my-2">
-        <img src="/icon.png" alt="Surge" class="my-3">
-        <h1 class="text-center font-weight-bold">Please donate to Open Surge</h1>
+        <div class="donate">
+          <img src="/icon.png" alt="Surge" class="my-3">
+          <h1 class="text-center font-weight-bold">Please donate to Open Surge</h1>
+        </div>
+        <div class="success d-none">
+          <img src="/icon.png" alt="Surge" class="my-3">
+          <h1 class="text-center font-weight-bold">Thank you for donating!</h1>
+        </div>
       </header>
-      <section id="contribute" class="p-3" style="font-size: 18pt">
+      <section class="p-3 donate">
         <div class="lang en_US">
           <p class="mb-4">Hi! I’m Alexandre. I develop Open Surge. I'm writing to ask you for a donation. With your support, I can keep creating this open-source game &amp; engine.</p>
-          <p class="my-4">Open Surge is an amazing open-source project that impacts you. You can play &amp; create your own games. It’s super cool, useful, and I trust that you see its value.</p>
-          <p class="my-4">Please support the project. Your donation will help me keep creating Open Surge and more awesome stuff, such as YouTube videos teaching game development using this engine and SurgeScript.</p>
-          <p class="text-center"><a href="https://flattr.com/@alemart" target="_blank" class="btn btn-primary cartoon m-3">Donate now</a></p>
-          <p class="text-center"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3WAZYYTB22KFG" target="_blank" class="font-weight-bold">Donate via PayPal</a></p>
-          <p class="text-center"><a href="mailto:alemartf@gmail.com" class="font-weight-bold">Contact me</a></p>
+          <p class="my-4">Open Surge is an amazing open-source project that is given as a gift. You can play &amp; create your own games. It’s super cool, useful, and I trust that you see its value.</p>
+          <p class="my-4">Your donation will help me keep creating Open Surge, SurgeScript, teaching game dev and doing more awesome stuff. Please give freely as you receive freely!</p>
+          <p class="text-center">
+            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VSCZ2CS2NNPWW&source=url" target="_blank" class="btn btn-primary cartoon m-3">Donate via PayPal</a>
+            <a href="https://flattr.com/@alemart" target="_blank" class="btn btn-primary cartoon m-3">Donate via Flattr</a>
+          </p>
         </div>
+      </section>
+      <section class="p-3 success d-none">
+        <div class="lang en_US">
+          <p class="mb-4">Thank you for your donation! Your donation helps me continue the development of this open-source game &amp; engine.</p>
+          <p class="my-4">The support of individuals like you is a gift, a true measure of appreciation that helps Open Surge.</p>
+          <p class="my-4">It is my wish that what you now gave freely comes back to you multiplied.</p>
+          <p class="my-4">Alexandre</p>
+        </div>
+        <p class="text-center lang en_US"><a href="https://youtube.com/alemart88" class="font-weight-bold">Check out Open Surge on YouTube!</a></p>
       </section>
     </div>
 
@@ -52,14 +68,21 @@
                 param[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
         }
         return param;
-    })(window.location.search.substr(1).split('&'));
-    window.lang = (window.qs || {})['lang'] || 'en_US';
+    })(window.location.search.substr(1).split('&')) || {};
+
     $(document).ready(function() {
-        var hasLang = $('.lang.' + window.lang).length > 0;
+        var success = window.qs['success'] == 1;
+        var lang = window.qs['lang'] || 'en_US';
+        var hasLang = $('.lang.' + lang).length > 0;
         if(hasLang)
-            $('.lang:not(.' + window.lang + ')').hide();
+            $('.lang:not(.' + lang + ')').hide();
         else
             $('.lang:not(.en_US)').hide();
+
+        if(success) {
+            $('.donate').hide();
+            $('.success').removeClass('d-none');
+        }
     });
     </script>
   </body>

@@ -2,6 +2,9 @@ html {
     background: #353e73 url('surge.png') no-repeat right fixed;
     background-size: contain;
 }
+html.plain {
+    background: #353e73 !important;
+}
 body {
     background: rgba(53, 62, 115, 0.9);
     min-height: calc(100vh - 32px);
