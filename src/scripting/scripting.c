@@ -19,7 +19,6 @@
  */
 
 #include <stdarg.h>
-#include <surgescript/compiler/parser.h>
 #include "scripting.h"
 #include "../core/logfile.h"
 #include "../core/assetfs.h"

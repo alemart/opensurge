@@ -32,7 +32,7 @@
 #define GAME_YEAR               "2008-2020"
 
 /* Scripting */
-#define SURGESCRIPT_MIN_VERSION "0.5.4.2"
+#define SURGESCRIPT_MIN_VERSION "0.5.4.3"
 
 /* if the following is defined, this is a development build */
 /*#define GAME_BUILD_VERSION      1337-dev*/
