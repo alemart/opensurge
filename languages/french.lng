@@ -16,7 +16,7 @@
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
 LANG_AUTHOR              "SnickDev, David Demelier"       // translation author
-LANG_LASTUPDATE          "2020-01-30"                     // date format: yyyy-mm-dd
+LANG_LASTUPDATE          "2020-02-17"                     // date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.5.1.2"                        // required engine version
 
 
@@ -115,7 +115,7 @@ CREDITS_VICTOR           "Musicien"
 CREDITS_COLIN            "Sprites, première histoire"
 CREDITS_BRIAN            "Spriteur"
 CREDITS_TRANSLATOR       "Traducteur"
-CREDITS_TRANSLATORS      "Translators" // -- FIXME --
+CREDITS_TRANSLATORS      "Traducteurs"
 CREDITS_RES_TITLE        "<color=$COLOR_HIGHLIGHT>Crédits par ressources individuelles</color>"
 CREDITS_RES_TEXT         "Sauf indication contraire explicite, les fichiers énumérés ci-dessous sont sous licence Creative Commons Attribution 3.0 (CC-BY 3.0)."
 CREDITS_RES_IMAGES       "<color=$COLOR_HIGHLIGHT>Images</color>"
@@ -249,9 +249,9 @@ CLEARED_TIME             "Temps bonus"
 CLEARED_SCORE            "Score"
 
 // Game Over
-GAMEOVER_PART1           "GAME" // -- FIXME --
-GAMEOVER_PART2           "OVER" // -- FIXME --
+GAMEOVER_PART1           "TU AS"
+GAMEOVER_PART2           "PERDU"
 
 // Time Over
-TIMEOVER_PART1           "TIME" // -- FIXME --
-TIMEOVER_PART2           "OVER" // -- FIXME --
+TIMEOVER_PART1           "TEMPS"
+TIMEOVER_PART2           "PERDU"
