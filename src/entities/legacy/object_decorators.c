@@ -684,7 +684,7 @@ void playsamplestrategy_update(audiostrategy_t *s)
     playsamplestrategy_t *me = (playsamplestrategy_t*)s;
     float vol, pan, freq;
 
-    vol = clip(expression_evaluate(me->vol), 0.0f, 1.0f);
+    vol = clip01(expression_evaluate(me->vol));
     pan = clip(expression_evaluate(me->pan), -1.0f, 1.0f);
     freq = expression_evaluate(me->freq);
     /*loop = expression_evaluate(me->loop);*/ /* deprecated */
@@ -771,7 +771,7 @@ void setmusicvolumestrategy_update(audiostrategy_t *s)
     setmusicvolumestrategy_t *me = (setmusicvolumestrategy_t*)s;
     float vol;
 
-    vol = clip(expression_evaluate(me->vol), 0.0f, 1.0f);
+    vol = clip01(expression_evaluate(me->vol));
     music_set_volume(vol);
 }
 
@@ -4618,7 +4618,7 @@ void onrandomevent_release(eventstrategy_t *event)
 int onrandomevent_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list)
 {
     onrandomevent_t *x = (onrandomevent_t*)event;
-    float probability = clip(expression_evaluate(x->probability), 0.0f, 1.0f);
+    float probability = clip01(expression_evaluate(x->probability));
     return (int)(100000 * probability) > random(100000);
 }
 
@@ -6231,7 +6231,7 @@ void setalpha_update(objectmachine_t *obj, player_t **team, int team_size, brick
     objectmachine_t *decorated_machine = dec->decorated_machine;
     objectdecorator_setalpha_t *me = (objectdecorator_setalpha_t*)obj;
     object_t *object = obj->get_object_instance(obj);
-    float alpha = clip(expression_evaluate(me->alpha), 0.0f, 1.0f);
+    float alpha = clip01(expression_evaluate(me->alpha));
 
     object->actor->alpha = alpha;
 

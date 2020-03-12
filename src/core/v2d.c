@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * v2d.c - 2D vectors
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2018, 2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,17 +22,6 @@
 #include "v2d.h"
 #include "util.h"
 #include "global.h"
-
-/*
- * v2d_new()
- * Creates a new 2D vector
- */
-v2d_t v2d_new(float x, float y)
-{
-    v2d_t v = { x , y };
-    return v;
-}
-
 
 /*
  * v2d_add()
@@ -121,13 +110,12 @@ v2d_t v2d_normalize(v2d_t v)
 /*
  * v2d_lerp()
  * Performs a linear interpolation
- * between u and v.
- * 0.0 <= weight <= 1.0
- * The same as: (1-weight)*u + weight*v
+ * between u and v (0.0 <= t <= 1.0)
+ * The same as: (1-t) * u + t * v
  */
-v2d_t v2d_lerp(v2d_t u, v2d_t v, float weight)
+v2d_t v2d_lerp(v2d_t u, v2d_t v, float t)
 {
-    float w = clip(weight, 0.0f, 1.0f);
-    return v2d_new(u.x + (v.x - u.x) * w, u.y + (v.y - u.y) * w);
+    t = clip01(t);
+    return v2d_new(u.x + (v.x - u.x) * t, u.y + (v.y - u.y) * t);
 }
 

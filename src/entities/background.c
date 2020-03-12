@@ -466,7 +466,7 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
     else if(str_icmp(identifier, "zindex") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "Can't read background attributes: zindex expects a number between 0.0 (far) and 1.0 (near)");
-        bg->zindex = clip(atof(nanoparser_get_string(p1)), 0.0f, 1.0f);
+        bg->zindex = clip01(atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "sprite") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);

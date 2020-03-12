@@ -534,7 +534,7 @@ void music_set_volume(float volume)
 void music_set_volume(float volume)
 {
     if(current_music != NULL) {
-        volume = clip(volume, 0.0f, 1.0f);
+        volume = clip01(volume);
         current_music->stream->volume = (int)(255.0f * volume);
         voice_set_volume(current_music->stream->audio_stream->voice, current_music->stream->volume);
     }
@@ -543,7 +543,7 @@ void music_set_volume(float volume)
 void music_set_volume(float volume)
 {
     if(current_music != NULL) {
-        volume = clip(volume, 0.0f, 1.0f);
+        volume = clip01(volume);
         alSourcef(srcmus, AL_GAIN, volume);
     }
 }
@@ -948,7 +948,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 
     if(sample != NULL) { /* important to check for NULL */
         /* ajusting parameters */
-        vol = clip(vol, 0.0f, 1.0f);
+        vol = clip01(vol);
         pan = clip(pan, -1.0f, 1.0f);
         freq = max(freq, 0.0f);
 
@@ -962,7 +962,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 {
     if(sample != NULL) { /* important to check for NULL */
         /* ajusting parameters */
-        vol = clip(vol, 0.0f, 1.0f);
+        vol = clip01(vol);
         pan = clip(pan, -1.0f, 1.0f);
         freq = max(freq, 0.0f);
 
@@ -1138,7 +1138,7 @@ void sound_set_volume(sound_t *sample, float volume)
 void sound_set_volume(sound_t *sample, float volume)
 {
     if(sample != NULL) {
-        sample->vol = clip(volume, 0.0f, 1.0f);
+        sample->vol = clip01(volume);
         if(sample->voice_id != SOUND_INVALID_VOICE)
             voice_set_volume(sample->voice_id, (int)(sample->vol * 255));
     }

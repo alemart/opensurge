@@ -598,7 +598,7 @@ GENERATE_ACCESSOR_AND_MUTATOR_OF(waittime)
 float physicsactor_get_airdrag(const physicsactor_t *pa) { return pa->airdrag; }
 void physicsactor_set_airdrag(physicsactor_t *pa, float value)
 {
-    pa->airdrag = clip(value, 0.0f, 1.0f);
+    pa->airdrag = clip01(value);
     if(pa->airdrag > 0.0f && pa->airdrag < 1.0f) {
         /* recompute airdrag coefficients */
         pa->airdrag_coefficient[0] = 60.0f * pa->airdrag * logf(pa->airdrag);

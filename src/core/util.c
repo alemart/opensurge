@@ -190,7 +190,7 @@ void fatal_error(const char *fmt, ...)
  */
 float lerp(float a, float b, float t)
 {
-    t = clip(t, 0.0f, 1.0f);
+    t = clip01(t);
     return a + (b - a) * t;
 }
 

@@ -288,7 +288,7 @@ surgescript_var_t* fun_setalpha(surgescript_object_t* object, const surgescript_
 {
     actor_t* actor = scripting_actor_ptr(object);
     float alpha = surgescript_var_get_number(param[0]);
-    actor->alpha = clip(alpha, 0.0f, 1.0f);
+    actor->alpha = clip01(alpha);
     return NULL;
 }
 

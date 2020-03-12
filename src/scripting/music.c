@@ -190,7 +190,7 @@ surgescript_var_t* fun_setvolume(surgescript_object_t* object, const surgescript
     double volume = surgescript_var_get_number(param[0]);
     music_t* music = get_music(object);
 
-    volume = clip(volume, 0.0, 1.0);
+    volume = clip01(volume);
     surgescript_var_set_number(surgescript_heap_at(heap, VOLUME_ADDR), volume);
     if(music != NULL && music_current() == music)
         music_set_volume(volume);

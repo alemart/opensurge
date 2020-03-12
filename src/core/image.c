@@ -866,13 +866,13 @@ void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy,
 void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags)
 {
 #if defined(A5BUILD)
-    float a = clip(alpha, 0.0f, 1.0f);
+    float a = clip01(alpha);
     al_draw_tinted_bitmap(src->data, al_map_rgba_f(a, a, a, a), x, y, FLIPPY(flags));
 #else
     image_t* target = get_target();
 
     if(video_get_color_depth() > 8) {
-        int a = 255 * clip(alpha, 0.0f, 1.0f);
+        int a = 255 * clip01(alpha);
         set_trans_blender(a, a, a, a);
 
         if(flags != IF_NONE) {

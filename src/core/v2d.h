@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * v2d.h - 2D vectors
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,10 @@ typedef struct {
     float x, y;
 } v2d_t;
 
+/* constructor */
+#define v2d_new(x, y)            (v2d_t){ (x), (y) }
+
 /* interface */
-v2d_t v2d_new(float x, float y); /* constructor */
 v2d_t v2d_add(v2d_t u, v2d_t v); /* returns u+v */
 v2d_t v2d_subtract(v2d_t u, v2d_t v); /* returns u-v */
 v2d_t v2d_multiply(v2d_t u, float h); /* returns h*u */
@@ -35,6 +37,6 @@ v2d_t v2d_rotate(v2d_t v, float ang); /* returns v rotated by ang radians */
 v2d_t v2d_normalize(v2d_t v); /* returns a normalized copy of v */
 float v2d_magnitude(v2d_t v); /* returns the length of v */
 float v2d_dotproduct(v2d_t u, v2d_t v); /* returns <u,v> */
-v2d_t v2d_lerp(v2d_t u, v2d_t v, float weight); /* linear interpolation; 0.0 <= weight <= 1.0 */
+v2d_t v2d_lerp(v2d_t u, v2d_t v, float t); /* linear interpolation; 0.0 <= t <= 1.0 */
 
 #endif
