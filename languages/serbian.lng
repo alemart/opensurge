@@ -2,6 +2,7 @@
 // File: languages/serbian.lng
 // Description: serbian translation (encoding: UTF-8)
 // Author: SecularSteve
+//         includes contributions by Aleksa
 // License: MIT
 // -----------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@
 LANG_ID                     "sr_RS"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Српски"                  // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
-LANG_LASTUPDATE             "2020-01-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-04-20"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
 
@@ -67,56 +68,56 @@ LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 OPTIONS_TITLE               "<color=$COLOR_TITLE>ПОСТАВКЕ</color>"
 OPTIONS_YES                 "ДА"
 OPTIONS_NO                  "НЕ"
-OPTIONS_GRAPHICS            "ИЗГЛЕД"
+OPTIONS_GRAPHICS            "ГРАФИКЕ"
 OPTIONS_FULLSCREEN          "Цели екран"
 OPTIONS_RESOLUTION          "Величина екрана"
 OPTIONS_RESOLUTION_OPT1     "1X"
 OPTIONS_RESOLUTION_OPT2     "2X"
 OPTIONS_RESOLUTION_OPT3     "3X"
 OPTIONS_RESOLUTION_OPT4     "4X"
-OPTIONS_SMOOTHGFX           "Глатке графике"
+OPTIONS_SMOOTHGFX           "Лепе графике"
 OPTIONS_SMOOTHGFX_ERROR     "[само 32 бпп]"
 OPTIONS_FPS                 "Прикажи FPS"
 OPTIONS_GAME                "ИГРА"
-OPTIONS_GAMEPAD             "Користи Джојистик"
+OPTIONS_GAMEPAD             "Користи Џојстик"
 OPTIONS_LANGUAGE            "Промени језик"
 OPTIONS_STAGESELECT         "Изабери ниво"
-OPTIONS_CREDITS             "Open Surge Кредити"
+OPTIONS_CREDITS             "Open Surge Заслуге"
 OPTIONS_DONATE              "Донирај Open Surge-u"
 OPTIONS_BACK                "Назад"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>ИЗАБЕРИ НИВО</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>САГРАДНИ МОД</color>"
-STAGESELECT_MSG             "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да назад идеш"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>НАПРАВИ МОД</color>"
+STAGESELECT_MSG             "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да идеш назад"
 STAGESELECT_PAGE            "страница $1/$2"
 STAGESELECT_ACT             "Зона"
 
 // Quest Select
 QUESTSELECT_TITLE           "<color=$COLOR_TITLE>ИЗАБЕРИ ПОТРАГУ</color>"
-QUESTSELECT_MSG             "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да назад идеш"
+QUESTSELECT_MSG             "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да идеш назад"
 QUESTSELECT_PAGE            "страница $1/$2"
 QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Верзија:</color> $1\n<color=$COLOR_HIGHLIGHT>Аутор:</color> $2\n<color=$COLOR_HIGHLIGHT>Запис:</color> $3"
 
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>Кредити</color>"
-CREDITS_BACK                "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да назад идеш"
+CREDITS_BACK                "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да идеш назад"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME верзија $GAME_VERSION</color>\nпокренуто помоћу $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Људи</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Захваљујући</color>"
-CREDITS_ALEXANDRE           "Водитељ и Оснивач Пројекта\nProject Програмер"
+CREDITS_ALEXANDRE           "Водитељ и Оснивач Пројекта\nКреатор Пројекта"
 CREDITS_JOAO                "Уметник"
 CREDITS_MATEUS              "Звучни ефекти"
-CREDITS_CODY                "Концептуална уметност"
-CREDITS_JOHAN               "Музичар (почивај у миру, другару)"
+CREDITS_CODY                "Концепти"
+CREDITS_JOHAN               "Музичар (почивај у миру, друже)"
 CREDITS_DI                  "Музичар"
 CREDITS_VICTOR              "Музичар"
 CREDITS_COLIN               "Спрајти, прва прича"
 CREDITS_BRIAN               "Уметник спрајта"
-CREDITS_TRANSLATOR          "Преводник"
-CREDITS_TRANSLATORS         "Translators" // -- FIXME --
-CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Кредити по независним ресурсима</color>"
-CREDITS_RES_TEXT            "Ако није изричито другачије наведено, наведене датотеке испод су лиценциране под Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_TRANSLATOR          "Преводилац"
+CREDITS_TRANSLATORS         "Преводиоци"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Кредити по појединачним ресурсима</color>"
+CREDITS_RES_TEXT            "Ако није изричито другачије наведено, датотеке наведене испод су лиценциране под Creative Commons Attribution 3.0 (CC-BY 3.0)."
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Слике</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музика</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звучни ефекти</color>"
@@ -130,7 +131,7 @@ MAINMENU_CREATE             "PRAVI"
 MAINMENU_SHARE              "PODELI"
 MAINMENU_OPTIONS            "POSTAVKE"
 MAINMENU_QUIT               "NAZAD"
-MAINMENU_DEVBUILD           "Верзија саграде"
+MAINMENU_DEVBUILD           "Верзија тестирања"
 MAINMENU_VERSION            "v. $GAME_VERSION" // ускраћено
 
 // Create Menu
@@ -140,17 +141,17 @@ CREATEMENU_PLAY             "IGRAJ DEMO"
 CREATEMENU_LEARN            "NAUČI"
 CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "NAZAD"
-CREATEMENU_TEXT             "Open Surge вам омогућује да направите своје невероватне игре! Ослободите своју креативност! Нека вам креативни сокови теку!\nЗапочните свој властити пројект! Креирајте нове нивое, предмете, акције, ликове и још много тога! Окусите уредник нивоа, научите мотор и зароните у SurgeScript за максималну снагу!"
+CREATEMENU_TEXT             "Open Surge вам омогућује да направите своје невероватне игре! Ослободите своју креативност! Нека вам креативни сокови теку!\nЗапочните свој властити пројекат! Креирајте нове нивое, предмете, акције, ликове и још много тога! Окусите уредник нивоа, научите мотор и зароните у SurgeScript за максималну снагу!"
 
 // Congratulations Screen
 CONGRATULATIONS_TITLE       "HVALA ŠTO STE IGRALI"
 CONGRATULATIONS_SHARE       "PODELITE"
 CONGRATULATIONS_DONATE      "DONIRAJTE"
-CONGRATULATIONS_BACK        "NATRAG"
+CONGRATULATIONS_BACK        "NAZAD"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
-CONGRATULATIONS_TEXT        "Хвала што сте играли Опен Сурге верзију $GAME_VERSION.\nЖелите ли играти више? Крените на $GAME_WEBSITE за упдејте!\n\nOpen Surge вам омогућује играње и креирање властитих игара. Развили су га људи попут вас. Сада поделите радост! Обавестите своју фамилију, другаре и кућне љубимце о томе и проширите реч!"
+CONGRATULATIONS_TEXT        "Хвала што сте играли Опен Сурге верзију $GAME_VERSION.\nЖелите ли играти више? Крените на $GAME_WEBSITE за апдејте!\n\nOpen Surge вам омогућује играње и креирање властитих игара. Развили су га људи попут вас. Сада поделите радост! Обавестите своју фамилију, другаре и кућне љубимце о томе и проширите реч!"
 
 
 
@@ -164,7 +165,7 @@ INPUT_KEYB_LEFT             "ЛЕВА СТРЕЛИЦА"
 INPUT_KEYB_RIGHT            "ДЕСНА СТРЕЛИЦА"
 INPUT_KEYB_UP               "ГОРЊА СТРЕЛИЦА"
 INPUT_KEYB_DOWN             "ДОЊА СТРЕЛИЦА"
-INPUT_KEYB_FIRE1            "РАЗМАКНИЦА"
+INPUT_KEYB_FIRE1            "РАЗМАК"
 INPUT_KEYB_FIRE2            "ЛЕВИ CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
@@ -195,7 +196,7 @@ INPUT_JOY_FIRE8             "ДУГМЕ 8"
 //
 
 // Quit game? confirm box
-QUIT_QUESTION               "ЖЕЛИТЕ ЛИ СТВАРНО ИЗИЋИ?"
+QUIT_QUESTION               "ЖЕЛИТЕ ЛИ СТВАРНО ИЗАЋИ?"
 QUIT_OPTION1                "ДА"
 QUIT_OPTION2                "НЕ"
 
@@ -210,8 +211,8 @@ LOADING_TEXT                "učitavanje..."
 
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Како играти</color>\nДобро дошли у <color=$COLOR_HIGHLIGHT>Open Surge Демо Ниво</color>! Користите $INPUT_DIRECTIONAL за покрет и $INPUT_FIRE1 за скакање. Користите $INPUT_FIRE2 да замените лика."
-LEV_DEMO_2                  "<color=$COLOR_TITLE>Јесте ли знали...?</color>\nСве у Open Surge-у је измениво. Можете правити нивое, предмете, шефове, ликове и више! Потпун је <color=$COLOR_HIGHLIGHT>систем за креирање игре</color>."
-LEV_DEMO_3                  "<color=$COLOR_TITLE>Ослободите своју креативност!</color>\nЈедна од кључних карактеристика у Open Surge-у је <color=$COLOR_HIGHLIGHT>SurgeScript</color>. То је скриптање за игре! Користите га да направите било што шта можете замислити!"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Јесте ли знали...?</color>\nСве у Open Surge-у је измењиво. Можете правити нивое, предмете, boss-ове, ликове и више! Потпун је <color=$COLOR_HIGHLIGHT>систем за креирање игре</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Ослободите своју креативност!</color>\nЈедна од кључних карактеристика у Open Surge-у је <color=$COLOR_HIGHLIGHT>SurgeScript</color>. То је скриптовање за игре! Користите то да направите било што шта можете замислити!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Кул!</color>\nЈесте ли већ узбуђени? Небо је граница! Идите на <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> да направите своје невероватне игре данас!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Пробајте сами!</color>\nСад је ваш ред! <color=$COLOR_HIGHLIGHT>Притисните F12 да бисте отворили креатор.</color> Онда отворите палету предмета и започните градити свој ниво! (за помоћ користите F1)"
 
