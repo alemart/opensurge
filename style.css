@@ -29,17 +29,5 @@ a, a:visited, a:hover, a:active, a:focus { color: #ffee11; }
 .btn-primary, .btn-primary:focus, .btn-primary:active, .btn-primary.active { background: #ff8800 !important; color: #fff !important; }
 .btn-primary { box-shadow: 8px 8px 0px 1px #2b2b56 !important; }
 .btn-primary:hover { background: #ffee11 !important; }
-h2 { font-weight: bold; margin-top: 1.5em; margin-bottom: 0.75em; }
-h2:before {
-    margin-right: 0.2em;
-    margin-bottom: -0.2em;
-    display: inline-block;
-    content: ' ';
-    background-image: url('thunder.svg');
-    background-size: 32px 32px;
-    height: 32px;
-    width: 32px;
-}
-@media(min-width:768px) { section p, section ul { margin-left: 1.9em; } }
 footer { font-size: 14pt; background: #2c2c2c; text-shadow: 0 0 0 #000; margin-top: 2em; }
 img.os-logo { max-width: 128px; margin: 32px 0 16px 0; }
