@@ -157,13 +157,11 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
  */
 void actor_change_animation(actor_t *act, const animation_t *anim)
 {
-    if(anim != NULL) {
-        if(act->animation != anim || actor_animation_finished(act)) {
-            act->animation = anim;
-            act->hot_spot = anim->hot_spot;
-            act->animation_frame = 0.0f;
-            act->animation_speed_factor = 1.0f;
-        }
+    if(act->animation != anim && anim != NULL) {
+        act->animation = anim;
+        act->hot_spot = anim->hot_spot;
+        act->animation_frame = 0.0f;
+        act->animation_speed_factor = 1.0f;
     }
 }
 
