@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // File: languages/francais.lng
 // Description: french translation (encoding: UTF-8)
-// Authors: David Demelier (last translator)
-//          Stylix58
+// Authors: Stylix58, David Demelier (last translator)
 // License: MIT
 // -----------------------------------------------------------------------------
 
@@ -15,7 +14,7 @@
 // (use the English alphabet)
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
-LANG_AUTHOR              "SnickDev, David Demelier"       // translation author
+LANG_AUTHOR              "Stylix58, David Demelier"       // translation author
 LANG_LASTUPDATE          "2020-02-17"                     // date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.5.1.2"                        // required engine version
 
