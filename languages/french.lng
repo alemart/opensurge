@@ -253,4 +253,4 @@ GAMEOVER_PART2           "PERDU"
 
 // Time Over
 TIMEOVER_PART1           "TEMPS"
-TIMEOVER_PART2           "PERDU"
+TIMEOVER_PART2           "DEPASSE"
