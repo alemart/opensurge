@@ -227,6 +227,22 @@ object "Platformer" is "behavior"
         return this;
     }
 
+    // show the sensor box
+    fun showSensorBox()
+    {
+        if(sensors != null)
+            sensors.visible = true;
+        return this;
+    }
+
+    // hide the sensor box
+    fun hideSensorBox()
+    {
+        if(sensors != null)
+            sensors.visible = true;
+        return this;
+    }
+
     // --- PROPERTIES ---
 
     // enable/disable movement
