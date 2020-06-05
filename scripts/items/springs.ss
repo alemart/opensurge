@@ -673,7 +673,7 @@ object "Spring Behavior" is "private", "entity"
                     player.springify();
                 }
                 else {
-                    player.gsp = -v.y;
+                    player.gsp = -v.y * player.direction;
                 }
             }
 
