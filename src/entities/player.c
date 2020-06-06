@@ -487,7 +487,8 @@ int player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_objec
 
 /*
  * player_detach_from_ground()
- * Ensures the player is not touching the ground on the next frame
+ * Ensures the player is not touching the ground
+ * (or ceiling if rotated) on the next frame
  */
 void player_detach_from_ground(player_t *player)
 {
@@ -498,6 +499,12 @@ void player_detach_from_ground(player_t *player)
                 player->actor->position.y -= 2;
             else
                 player->actor->position.y -= 5;
+        }
+        else if(physicsactor_get_movmode(player->pa) == MM_CEILING) {
+            if(!player_is_rolling(player))
+                player->actor->position.y += 2;
+            else
+                player->actor->position.y += 5;
         }
     }
 }

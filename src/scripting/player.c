@@ -831,7 +831,7 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
         physicsactor_set_ysp(player->pa, ysp);
 
         /* hack */
-        if(ysp < 0.0f)
+        if(!nearly_zero(ysp))
             player_detach_from_ground(player);
     }
     return NULL;

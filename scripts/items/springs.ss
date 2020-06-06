@@ -655,31 +655,46 @@ object "Spring Behavior" is "private", "entity"
             // compute the velocity
             v = direction.scaledBy(speed);
 
-            // boost player
-            if(direction.x != 0) {
-                if(v.x > 0 && v.x > player.speed)
-                    player.speed = v.x;
-                else if(v.x < 0 && v.x < player.speed)
-                    player.speed = v.x;
-            }
+            // spring logic
             if(direction.y != 0) {
-                if(player.midair || direction.x != 0 || direction.y < 0) {
+                playerAngle = Math.deg2rad(player.angle); // radians
+                wallRun = (Math.abs(Math.cos(playerAngle)) < 0.1) || // running on a wall
+                          (player.collider.width > player.collider.height); // hack. TODO: use "player.physicsAngle" (because of rolling)
+                ceilRun = (Math.cos(playerAngle) < -0.9) || // running on a ceiling
+                          (player.collider.width < player.collider.height && Math.cos(playerAngle) < -0.5); // hack. TODO: use "physicsAngle"
+
+                if(player.midair || direction.x != 0 || (direction.y < 0 && !wallRun) || (direction.y > 0 && (player.jumping || ceilRun))) {
+                    // regular spring (y-axis)
                     if(v.y > 0 && v.y > player.ysp)
                         player.ysp = v.y;
                     else if(v.y < 0 && v.y < player.ysp)
                         player.ysp = v.y;
 
+                    // velocity swap
+                    // (when running on the ceiling)
+                    if(direction.y > 0 && ceilRun)
+                        player.gsp = -player.gsp;
+
                     // change mode
                     player.springify();
                 }
                 else {
-                    player.gsp = -v.y * player.direction;
+                    // player is running on a wall
+                    player.gsp = -v.y * Math.sign(Math.sin(playerAngle));
                 }
             }
 
-            // prevent braking
-            if(direction.x != 0)
+            // boost player
+            if(direction.x != 0) {
+                // check if new speed is higher
+                if(v.x > 0 && v.x > player.speed)
+                    player.speed = v.x;
+                else if(v.x < 0 && v.x < player.speed)
+                    player.speed = v.x;
+
+                // prevent braking
                 player.hlock(0.27);
+            }
 
             // play sound
             if(sfx != null)
