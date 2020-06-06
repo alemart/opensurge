@@ -104,6 +104,7 @@ static surgescript_var_t* fun_getysp(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getslope(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -183,6 +184,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_transform", fun_gettransform, 0);
     surgescript_vm_bind(vm, "Player", "get_collider", fun_getcollider, 0);
     surgescript_vm_bind(vm, "Player", "get_direction", fun_getdirection, 0);
+    surgescript_vm_bind(vm, "Player", "get_slope", fun_getslope, 0);
     surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
@@ -855,6 +857,15 @@ surgescript_var_t* fun_setangle(surgescript_object_t* object, const surgescript_
     surgescript_object_t* transform = surgescript_objectmanager_get(manager, handle);
     surgescript_object_call_function(transform, "set_localAngle", param, 1, NULL);
     return NULL;
+}
+
+/* the angle detected by the physics system, in degrees */
+surgescript_var_t* fun_getslope(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(),
+        (player != NULL) ? physicsactor_get_angle(player->pa) : 0.0f
+    );
 }
 
 /* set animation number */
