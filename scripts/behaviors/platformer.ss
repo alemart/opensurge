@@ -227,16 +227,16 @@ object "Platformer" is "behavior"
         return this;
     }
 
-    // show the sensor box
-    fun showSensorBox()
+    // show the internal sensors
+    fun showSensors()
     {
         if(sensors != null)
             sensors.visible = true;
         return this;
     }
 
-    // hide the sensor box
-    fun hideSensorBox()
+    // hide the internal sensors
+    fun hideSensors()
     {
         if(sensors != null)
             sensors.visible = true;
