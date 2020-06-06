@@ -659,9 +659,9 @@ object "Spring Behavior" is "private", "entity"
             if(direction.y != 0) {
                 playerAngle = Math.deg2rad(player.angle); // radians
                 wallRun = (Math.abs(Math.cos(playerAngle)) < 0.1) || // running on a wall
-                          (player.collider.width > player.collider.height); // hack. TODO: use "player.physicsAngle" (because of rolling)
+                          (player.collider.width > player.collider.height); // hack. TODO: use "player.slope" (because of rolling)
                 ceilRun = (Math.cos(playerAngle) < -0.9) || // running on a ceiling
-                          (player.collider.width < player.collider.height && Math.cos(playerAngle) < -0.5); // hack. TODO: use "physicsAngle"
+                          (player.collider.width < player.collider.height && Math.cos(playerAngle) < -0.5); // hack. TODO: use player.slope ("physicsAngle")
 
                 if(player.midair || direction.x != 0 || (direction.y < 0 && !wallRun) || (direction.y > 0 && (player.jumping || ceilRun))) {
                     // regular spring (y-axis)
