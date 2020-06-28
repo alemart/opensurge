@@ -5,7 +5,10 @@
         <title>Open Surge Wiki</title>
         <meta name="robots" content="index, follow">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta http-equiv="refresh" content="0; url=http://opensnc.sf.net/wiki">
+	<script>
+	var page = location.hash.substr(1);
+	location.href = 'http://opensnc.sf.net/wiki/index.php/' + page;
+	</script>
     </head>
     <body>
         Redirecting to the <a href="http://opensnc.sf.net/wiki">Open Surge Wiki</a>...
