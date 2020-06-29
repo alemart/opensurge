@@ -136,6 +136,7 @@ float player_breath_time(const player_t* player);
 int player_is_midair(const player_t *player);
 int player_is_attacking(const player_t *player);
 int player_is_blinking(const player_t *player);
+void player_set_blinking(player_t* player, int blink);
 int player_is_turbocharged(const player_t *player);
 void player_set_turbo(player_t* player, int turbo);
 int player_is_invincible(const player_t *player);

@@ -145,7 +145,7 @@ player_t *player_create(const char *character_name)
 
     /* invincibility */
     p->invincible = FALSE;
-    p->invincibility_timer = 0;
+    p->invincibility_timer = 0.0f;
     p->star = mallocx(PLAYER_MAX_STARS * sizeof(actor_t*));
     for(i = 0; i < PLAYER_MAX_STARS; i++) {
         p->star[i] = actor_create();
@@ -264,17 +264,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             act->visible = !act->visible;
         }
 
-        if(player->blink_timer >= PLAYER_MAX_BLINK) {
-            player->blinking = FALSE;
-            act->visible = TRUE;
-        }
+        if(player->blink_timer >= PLAYER_MAX_BLINK)
+            player_set_blinking(player, FALSE);
     }
 
-    if(physicsactor_get_state(pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT) {
-        player->blinking = TRUE;
-        player->blink_timer = 0.0f;
-        player->blink_visibility_timer = 0.0f;
-    }
+    if(physicsactor_get_state(pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT)
+        player_set_blinking(player, TRUE);
 
     /* shield */
     if(player->shield_type != SH_NONE)
@@ -315,7 +310,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         /* update timer & finish */
         player->invincibility_timer += dt;
         if(player->invincibility_timer >= PLAYER_MAX_INVINCIBILITY)
-            player->invincible = FALSE;
+            player_set_invincible(player, FALSE);
     }
 
     /* turbo speed */
@@ -583,11 +578,11 @@ void player_hit_ex(player_t *player, const actor_t *hazard)
 void player_kill(player_t *player)
 {
     if(!player_is_dying(player)) {
-        player->invincible = FALSE;
+        player_set_invincible(player, FALSE);
         player_set_turbo(player, FALSE);
+        player_set_blinking(player, FALSE);
+        player_set_aggressive(player, FALSE);
         player->shield_type = SH_NONE;
-        player->blinking = FALSE;
-        player->aggressive = FALSE;
         player->actor->speed = v2d_new(0, physicsactor_get_diejmp(player->pa));
 
         player->pa_old_state = physicsactor_get_state(player->pa);
@@ -1063,7 +1058,7 @@ void player_set_turbo(player_t* player, int turbo)
     if(player_is_dying(player))
         return;
 
-    if(turbo == player_is_turbocharged(player)) {
+    if(turbo == player->turbo) {
         if(turbo)
             player->turbo_timer = 0.0f;
         return; /* nothing to do */
@@ -1098,10 +1093,10 @@ void player_set_invincible(player_t* player, int invincible)
     if(player_is_dying(player))
         return;
 
-    if(invincible || player_is_invincible(player)) {
-        player->invincible = invincible;
+    if(invincible)
         player->invincibility_timer = 0.0f;
-    }
+
+    player->invincible = invincible;
 }
 
 /*
@@ -1204,6 +1199,22 @@ int player_is_blinking(const player_t *player)
     return player->blinking;
 }
 
+/*
+ * player_set_blinking()
+ * Will make the player blink (or stop blinking)
+ */
+void player_set_blinking(player_t* player, int blink)
+{
+    if(blink) {
+        player->blinking = TRUE;
+        player->blink_timer = 0.0f;
+        player->blink_visibility_timer = 0.0f;
+    }
+    else {
+        player->blinking = FALSE;
+        player->actor->visible = TRUE;
+    }
+}
 
 
 
