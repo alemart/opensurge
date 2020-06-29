@@ -101,6 +101,7 @@ static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
 static int fix_angle(int degrees, int threshold);
 static int is_head_underwater(const player_t* player);
+static void turbinate_player(player_t* player, float multiplier);
 
 
 /*
@@ -286,7 +287,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         player_leave_water(player);
     if(player->underwater) {
         /* disable turbo */
-        player->turbo_timer = max(player->turbo_timer, PLAYER_MAX_TURBO);
+        player_set_turbo(player, FALSE);
 
         /* disable some shields */
         if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD)
@@ -317,29 +318,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
             player->invincible = FALSE;
     }
 
-    /* turbo */
+    /* turbo speed */
     if(player->turbo) {
-        /* set turbo */
-        if(player->turbo_timer == 0) {
-            physicsactor_set_acc(pa, physicsactor_get_acc(pa) * 2.0f);
-            physicsactor_set_frc(pa, physicsactor_get_frc(pa) * 2.0f);
-            physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * 2.0f);
-            physicsactor_set_air(pa, physicsactor_get_air(pa) * 2.0f);
-            physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * 2.0f);
-        }
-        
-        /* update timer */
+        /* update timer & finish */
         player->turbo_timer += dt;
-
-        /* unset turbo */
-        if(player->turbo_timer >= PLAYER_MAX_TURBO) {
-            physicsactor_set_acc(pa, physicsactor_get_acc(pa) / 2.0f);
-            physicsactor_set_frc(pa, physicsactor_get_frc(pa) / 2.0f);
-            physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) / 2.0f);
-            physicsactor_set_air(pa, physicsactor_get_air(pa) / 2.0f);
-            physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) / 2.0f);
-            player->turbo = FALSE;
-        }
+        if(player->turbo_timer >= PLAYER_MAX_TURBO)
+            player_set_turbo(player, FALSE);
     }
 
     /* winning pose */
@@ -600,7 +584,7 @@ void player_kill(player_t *player)
 {
     if(!player_is_dying(player)) {
         player->invincible = FALSE;
-        player->turbo = FALSE;
+        player_set_turbo(player, FALSE);
         player->shield_type = SH_NONE;
         player->blinking = FALSE;
         player->aggressive = FALSE;
@@ -1079,9 +1063,20 @@ void player_set_turbo(player_t* player, int turbo)
     if(player_is_dying(player))
         return;
 
-    if(turbo || player_is_turbocharged(player)) {
-        player->turbo = turbo;
+    if(turbo == player_is_turbocharged(player)) {
+        if(turbo)
+            player->turbo_timer = 0.0f;
+        return; /* nothing to do */
+    }
+
+    if(turbo) {
+        player->turbo = TRUE;
         player->turbo_timer = 0.0f;
+        turbinate_player(player, 2.0f);
+    }
+    else {
+        player->turbo = FALSE;
+        turbinate_player(player, 0.5f);
     }
 }
 
@@ -1722,4 +1717,17 @@ int is_head_underwater(const player_t* player)
     top = player_box_center.y - player_box_height / 2.0f;
     bottom = player_box_center.y + player_box_height / 2.0f;
     return (int)lerp(bottom, top, head_factor) >= level_waterlevel();
+}
+
+/* turbinate player physics based on some multiplier */
+void turbinate_player(player_t* player, float multiplier)
+{
+    physicsactor_t* pa = player->pa;
+    multiplier = max(0.0f, multiplier);
+
+    physicsactor_set_acc(pa, physicsactor_get_acc(pa) * multiplier);
+    physicsactor_set_frc(pa, physicsactor_get_frc(pa) * multiplier);
+    physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
+    physicsactor_set_air(pa, physicsactor_get_air(pa) * multiplier);
+    physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * multiplier);
 }
