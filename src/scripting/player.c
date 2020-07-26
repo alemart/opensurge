@@ -422,7 +422,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
                 else {
                     /* the companion doesn't exist */
                     surgescript_var_set_null(surgescript_heap_at(heap, addr));
-                    scripting_error(object, "Can't find companion \"%s\" of player \"%s\"", companion_name, player_name(player));
+                    scripting_warning(object, "Can't find companion \"%s\" of player \"%s\"", companion_name, player_name(player));
                 }
             }
         }
@@ -1180,7 +1180,7 @@ surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_va
                 player_bounce_ex(player, hazard_actor, FALSE);
             }
             else
-                scripting_error(object, "%s.bounce(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_warning(object, "%s.bounce(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else
             player_bounce(player, -1.0f, FALSE);
@@ -1202,10 +1202,10 @@ surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescrip
                 player_bounce_ex(player, hazard_actor, TRUE);
             }
             else
-                scripting_error(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_warning(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else
-            scripting_error(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is null.", surgescript_object_name(object));
+            scripting_warning(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is null.", surgescript_object_name(object));
     }
     return NULL;
 }
@@ -1224,7 +1224,7 @@ surgescript_var_t* fun_ouch(surgescript_object_t* object, const surgescript_var_
                 player_hit_ex(player, hazard_actor);
             }
             else
-                scripting_error(object, "%s.getHit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
+                scripting_warning(object, "%s.getHit(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else {
             float direction = physicsactor_is_facing_right(player->pa) ? -1.0f : 1.0f;

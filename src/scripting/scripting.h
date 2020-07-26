@@ -48,6 +48,7 @@ surgescript_object_t* scripting_util_surgeengine_component(surgescript_vm_t* vm,
 surgescript_object_t* scripting_util_get_component(surgescript_object_t* object, const char* component_name);
 surgescript_object_t* scripting_util_spawn_temp(surgescript_vm_t* vm, const char* object_name);
 void scripting_error(const surgescript_object_t* object, const char* fmt, ...);
+void scripting_warning(const surgescript_object_t* object, const char* fmt, ...);
 
 /* obtain data from objects */
 struct actor_t;

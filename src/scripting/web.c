@@ -68,14 +68,16 @@ surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* url = surgescript_var_get_string(param[0], manager);
+
     if(!(strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0 || strncmp(url, "mailto:", 7) == 0)) {
         if(strstr(url, "://") != NULL)
-            scripting_error(object, "Can't launch URL. Unsupported protocol: %s", url);
+            scripting_warning(object, "Can't launch URL. Unsupported protocol for %s", url);
         else
-            scripting_error(object, "Can't launch URL. Please specify a protocol (e.g., https://) to launch %s", url);
+            scripting_warning(object, "Can't launch URL. Please specify a protocol (e.g., https://) to launch %s", url);
     }
     else
         launch_url(url);
+
     ssfree(url);
     return NULL;
 }

@@ -318,6 +318,21 @@ void scripting_error(const surgescript_object_t* object, const char* fmt, ...)
     fatal_error("A scripting error was triggered in \"%s\".\n\n%s", object_name, buf);
 }
 
+/* display a scripting error without crashing the application */
+void scripting_warning(const surgescript_object_t* object, const char* fmt, ...)
+{
+    const char* object_name = surgescript_object_name(object);
+    char buf[1024];
+    va_list args;
+
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    video_showmessage("%s: %s", object_name, buf);
+    logfile_message("A scripting warning was triggered in \"%s\": %s", object_name, buf);
+}
+
 
 /* private stuff */
 
