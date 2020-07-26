@@ -26,9 +26,6 @@
 #include "sfx.h"
 #include "legacy/item.h"
 #include "legacy/enemy.h"
-#include "../physics/collisionmask.h"
-#include "../physics/obstacle.h"
-#include "../physics/physicsactor.h"
 #include "../core/global.h"
 #include "../core/video.h"
 #include "../core/image.h"
@@ -40,6 +37,10 @@
 #include "../core/audio.h"
 #include "../core/sprite.h"
 #include "../core/nanoparser/nanoparser.h"
+#include "../scenes/level.h"
+#include "../physics/collisionmask.h"
+#include "../physics/obstacle.h"
+#include "../physics/physicsactor.h"
 
 /* constants */
 #define BRKDATA_MAX             16384 /* up to BRKDATA_MAX bricks per theme are supported */

@@ -67,6 +67,7 @@ struct physicsactor_t
     int angle; /* angle (0-255 clockwise) */
     int midair; /* is the player midair? */
     int facing_right; /* is the player facing right? */
+    int touching_ceiling; /* is the player touching a ceiling? */
     int winning_pose; /* winning pose enabled? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
     float jump_lock_timer; /* jump lock timer, in seconds */
@@ -198,7 +199,7 @@ static const float cos_table[256] = {
 /* slope table: stored angles */
 /* SLOPE(y,x) is the angle of the (y,x) slope, where -SLOPE_LIMIT <= y,x <= SLOPE_LIMIT */
 #define SLOPE_LIMIT 11
-#define SLOPE(y,x) slp_table[11 + ((y) + ((y)<-11)*(-11-(y)) + ((y)>11)*(11-(y)))][11 + ((x) + ((x)<-11)*(-11-(x)) + ((x)>11)*(11-(x)))]
+#define SLOPE(y,x) slp_table[(SLOPE_LIMIT) + ((y) + ((y)<-(SLOPE_LIMIT))*(-(SLOPE_LIMIT)-(y)) + ((y)>(SLOPE_LIMIT))*((SLOPE_LIMIT)-(y)))][(SLOPE_LIMIT) + ((x) + ((x)<-(SLOPE_LIMIT))*(-(SLOPE_LIMIT)-(x)) + ((x)>(SLOPE_LIMIT))*((SLOPE_LIMIT)-(x)))]
 static const int slp_table[23][23] = {
     { 0xA0, 0xA2, 0xA4, 0xA6, 0xA9, 0xAC, 0xAF, 0xB2, 0xB5, 0xB9, 0xBC, 0xC0, 0xC4, 0xC7, 0xCB, 0xCE, 0xD1, 0xD4, 0xD7, 0xDA, 0xDC, 0xDE, 0xE0 },
     { 0x9E, 0xA0, 0xA2, 0xA5, 0xA7, 0xAA, 0xAD, 0xB0, 0xB4, 0xB8, 0xBC, 0xC0, 0xC4, 0xC8, 0xCC, 0xD0, 0xD3, 0xD6, 0xD9, 0xDB, 0xDE, 0xE0, 0xE2 },
@@ -243,6 +244,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->horizontal_control_lock_timer = 0.0f;
     pa->jump_lock_timer = 0.0f;
     pa->facing_right = TRUE;
+    pa->touching_ceiling = FALSE;
     pa->input = input_create_computer();
     pa->wait_timer = 0.0f;
     pa->midair_timer = 0.0f;
@@ -348,6 +350,7 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
     float dt = timer_get_delta();
+    const obstacle_t *at_U = NULL;
 
     /* getting hit & winning pose */
     if(pa->state == PAS_GETTINGHIT) {
@@ -385,12 +388,11 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->facing_right = (pa->xsp > 0.0f);
     }
 
-    /* don't bother jumping */
-    if(!pa->midair) {
-        const obstacle_t *at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
-        if(at_U != NULL && obstacle_is_solid(at_U))
-            input_simulate_button_up(pa->input, IB_FIRE1);
-    }
+    /* touching the ceiling? */
+    at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
+    pa->touching_ceiling = (at_U != NULL && obstacle_is_solid(at_U));
+    if(pa->touching_ceiling && !pa->midair)
+        input_simulate_button_up(pa->input, IB_FIRE1); /* don't bother jumping */
 
     /* run the physics simulation */
 #if USE_FIXED_TIMESTEP != 0
@@ -427,11 +429,6 @@ void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position
     render_ball(pa->position, 1, color_rgb(255, 255, 255), camera_position);
 }
 
-int physicsactor_is_facing_right(const physicsactor_t *pa)
-{
-    return pa->facing_right;
-}
-
 physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa)
 {
     return pa->state;
@@ -462,6 +459,16 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds)
 int physicsactor_is_midair(const physicsactor_t *pa)
 {
     return pa->midair;
+}
+
+int physicsactor_is_touching_ceiling(const physicsactor_t *pa)
+{
+    return pa->touching_ceiling;
+}
+
+int physicsactor_is_facing_right(const physicsactor_t *pa)
+{
+    return pa->facing_right;
 }
 
 void physicsactor_enable_winning_pose(physicsactor_t *pa)
