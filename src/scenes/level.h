@@ -77,9 +77,6 @@ void level_set_camera_focus(struct actor_t *act);
 struct actor_t* level_get_camera_focus();
 int level_inside_screen(int x, int y, int w, int h);
 
-/* editor */
-int level_editmode(); /* active editor? */
-
 /* music */
 void level_override_music(struct sound_t *sample);
 struct music_t* level_music();
@@ -116,5 +113,8 @@ void level_add_to_score(int score);
 void level_call_dialogbox(const char *title, const char *message);
 void level_hide_dialogbox();
 
+/* editor & development */
+int level_editmode(); /* active editor? */
+int level_is_displaying_gizmos(); /* are we displaying gizmos for visual debugging? */
 
 #endif

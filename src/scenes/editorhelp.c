@@ -52,7 +52,7 @@ static const char text[] =
 "Ctrl + Z | Ctrl + Y                Undo | Redo\n"
 "F1                                 Show help\n"
 "G                                  Snap to grid\n"
-"M                                  Show collision masks\n"
+"M                                  Show collision masks & gizmos\n"
 "\n\n"
 "<color=ff8060>Item placement</color>\n\n"
 "Left mouse button                  Put item\n"

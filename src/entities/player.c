@@ -51,9 +51,6 @@
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 3
 
-/* render the collision sensors? */
-#define SHOW_SENSORS 0
-
 /* macros */
 #define ON_STATE(player, s) \
     if((player)->pa_old_state != (s) && physicsactor_get_state((player)->pa) == (s))
@@ -414,10 +411,9 @@ void player_render(player_t *player, v2d_t camera_position)
             actor_render(player->star[i], camera_position);
     }
 
-#if SHOW_SENSORS != 0
     /* sensors */
-    physicsactor_render_sensors(player->pa, camera_position);
-#endif
+    if(level_is_displaying_gizmos())
+        physicsactor_render_sensors(player->pa, camera_position);
 
     /* restore hot spot */
     act->hot_spot = hot_spot;

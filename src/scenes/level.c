@@ -179,6 +179,7 @@ static char quest_to_be_pushed[PATH_MAXLEN];
 static float dead_player_timeout;
 static actor_t *camera_focus; /* camera */
 static int must_render_brick_masks;
+static int must_display_gizmos;
 
 /* scripting controlled variables */
 static int level_cleared; /* display the level cleared animation */
@@ -1101,6 +1102,7 @@ void level_init(void *path_to_lev_file)
     must_restart_this_level = FALSE;
     must_push_a_quest = FALSE;
     must_render_brick_masks = FALSE;
+    must_display_gizmos = FALSE;
     dead_player_timeout = 0.0f;
     team_size = 0;
     for(i=0; i<TEAM_MAX; i++)
@@ -1810,14 +1812,6 @@ actor_t* level_get_camera_focus()
 }
 
 
-/*
- * level_editmode()
- * Is the level editor activated?
- */
-int level_editmode()
-{
-    return editor_is_enabled();
-}
 
 
 /*
@@ -2131,6 +2125,29 @@ void level_save_state()
     save_level_state(&saved_state);
 }
 
+
+
+/*
+ * level_editmode()
+ * Is the level editor activated?
+ */
+int level_editmode()
+{
+    return editor_is_enabled();
+}
+
+
+
+/*
+ * level_is_displaying_gizmos()
+ * Are we displaying gizmos for visual debugging?
+ * This may be activated/deactivated in the editor and
+ * serves as a clue to objects in the code
+ */
+int level_is_displaying_gizmos()
+{
+    return must_display_gizmos;
+}
 
 
 
@@ -3189,8 +3206,10 @@ void editor_update()
     }
 
     /* show/hide brick masks */
-    if(editorcmd_is_triggered(editor_cmd, "toggle-masks"))
+    if(editorcmd_is_triggered(editor_cmd, "toggle-masks")) {
         must_render_brick_masks = !must_render_brick_masks;
+        must_display_gizmos = !must_display_gizmos; /* NOTE: should we give gizmos their own hotkey? */
+    }
 
     /* change spawn point */
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
