@@ -45,7 +45,7 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettype(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_settype(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -75,7 +75,6 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Brick", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Brick", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Brick", "__init", fun_init, 1);
-    surgescript_vm_bind(vm, "Brick", "render", fun_render, 0);
     surgescript_vm_bind(vm, "Brick", "get_type", fun_gettype, 0);
     surgescript_vm_bind(vm, "Brick", "set_type", fun_settype, 1);
     surgescript_vm_bind(vm, "Brick", "get_layer", fun_getlayer, 0);
@@ -84,6 +83,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Brick", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Brick", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Brick", "set_offset", fun_setoffset, 1);
+    surgescript_vm_bind(vm, "Brick", "onRender", fun_onrender, 0);
 }
 
 /*
@@ -237,7 +237,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 }
 
 /* render (debugging only) */
-surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     bricklike_data_t* data = get_data(object);
     bool visible = level_is_displaying_gizmos();

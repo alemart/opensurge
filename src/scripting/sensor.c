@@ -35,7 +35,7 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -68,13 +68,13 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Sensor", "__init", fun_init, 5);
     surgescript_vm_bind(vm, "Sensor", "get_zindex", fun_getzindex, 0);
-    surgescript_vm_bind(vm, "Sensor", "render", fun_render, 0);
     surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
     surgescript_vm_bind(vm, "Sensor", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Sensor", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Sensor", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Sensor", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Sensor", "onTransformChange", fun_ontransformchange, 0);
+    surgescript_vm_bind(vm, "Sensor", "onRender", fun_onrender, 0);
 }
 
 
@@ -172,7 +172,7 @@ surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const sur
 }
 
 /* render */
-surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bool visible = surgescript_var_get_bool(surgescript_heap_at(heap, VISIBLE_ADDR));

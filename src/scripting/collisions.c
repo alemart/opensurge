@@ -94,8 +94,8 @@ static surgescript_var_t* fun_collisionbox_getwidth(surgescript_object_t* object
 static surgescript_var_t* fun_collisionbox_setheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_getcenter(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_collisionbox_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -105,8 +105,8 @@ static surgescript_var_t* fun_collisionball_setanchor(surgescript_object_t* obje
 static surgescript_var_t* fun_collisionball_getcenter(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_setradius(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_getradius(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_collisionball_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_collisionball_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_manager_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -150,8 +150,8 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBox", "set_width", fun_collisionbox_setwidth, 1);
     surgescript_vm_bind(vm, "CollisionBox", "set_height", fun_collisionbox_setheight, 1);
     surgescript_vm_bind(vm, "CollisionBox", "get_center", fun_collisionbox_getcenter, 0);
-    surgescript_vm_bind(vm, "CollisionBox", "render", fun_collisionbox_render, 0);
     surgescript_vm_bind(vm, "CollisionBox", "zindex", fun_collisionbox_zindex, 0);
+    surgescript_vm_bind(vm, "CollisionBox", "onRender", fun_collisionbox_onrender, 0);
 
     surgescript_vm_bind(vm, "CollisionBall", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "CollisionBall", "destructor", fun_destructor, 0);
@@ -169,8 +169,8 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBall", "get_center", fun_collisionball_getcenter, 0);
     surgescript_vm_bind(vm, "CollisionBall", "get_radius", fun_collisionball_getradius, 0);
     surgescript_vm_bind(vm, "CollisionBall", "set_radius", fun_collisionball_setradius, 1);
-    surgescript_vm_bind(vm, "CollisionBall", "render", fun_collisionball_render, 0);
     surgescript_vm_bind(vm, "CollisionBall", "zindex", fun_collisionball_zindex, 0);
+    surgescript_vm_bind(vm, "CollisionBall", "onRender", fun_collisionball_onrender, 0);
 
     surgescript_vm_bind(vm, "CollisionManager", "state:main", fun_manager_main, 0);
     surgescript_vm_bind(vm, "CollisionManager", "constructor", fun_manager_constructor, 0);
@@ -650,7 +650,7 @@ surgescript_var_t* fun_collisionbox_getcenter(surgescript_object_t* object, cons
 }
 
 /* render */
-surgescript_var_t* fun_collisionbox_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_collisionbox_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     boxcollider_t* collider = surgescript_object_userdata(object);
     int debug = ((collider_t*)collider)->flags & COLLIDER_FLAG_ISVISIBLE;
@@ -872,7 +872,7 @@ surgescript_var_t* fun_collisionball_getradius(surgescript_object_t* object, con
 }
 
 /* render */
-surgescript_var_t* fun_collisionball_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_collisionball_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     ballcollider_t* collider = surgescript_object_userdata(object);
     int debug = ((collider_t*)collider)->flags & COLLIDER_FLAG_ISVISIBLE;

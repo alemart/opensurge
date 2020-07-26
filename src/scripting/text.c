@@ -33,7 +33,7 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfont(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_settext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -84,7 +84,6 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Text", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Text", "__init", fun_init, 1);
-    surgescript_vm_bind(vm, "Text", "render", fun_render, 0);
     surgescript_vm_bind(vm, "Text", "set_zindex", fun_setzindex, 1);
     surgescript_vm_bind(vm, "Text", "get_zindex", fun_getzindex, 0);
     surgescript_vm_bind(vm, "Text", "get_font", fun_getfont, 0);
@@ -101,6 +100,7 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Text", "get_size", fun_getsize, 0);
+    surgescript_vm_bind(vm, "Text", "onRender", fun_onrender, 0);
 }
 
 /*
@@ -204,7 +204,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 }
 
 /* render */
-surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     font_t* font = get_font(object);
     if(font != NULL) {

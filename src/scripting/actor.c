@@ -33,7 +33,7 @@
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -79,7 +79,6 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Actor", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Actor", "destructor", fun_destructor, 0);
-    surgescript_vm_bind(vm, "Actor", "render", fun_render, 0);
     surgescript_vm_bind(vm, "Actor", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Actor", "set_zindex", fun_setzindex, 1);
     surgescript_vm_bind(vm, "Actor", "get_zindex", fun_getzindex, 0);
@@ -101,6 +100,7 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Actor", "onAnimationChange", fun_onanimationchange, 1);
+    surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
 }
 
 /*
@@ -171,7 +171,7 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 }
 
 /* render */
-surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));

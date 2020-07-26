@@ -128,16 +128,20 @@ static void render_item(renderable_t r, v2d_t camera_position) { item_render(r.i
 static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(r.object, camera_position); }
 static void render_brick(renderable_t r, v2d_t camera_position) { brick_render(r.brick, camera_position); }
 static void render_brick_mask(renderable_t r, v2d_t camera_position) { brick_render_mask(r.brick, camera_position); }
-static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "render", NULL, 0, NULL); }
+static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "onRender", NULL, 0, NULL); }
 static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
 {
+    /* in render_ssobject_debug(), we don't call the "onRender"
+       method of the SurgeScript object, so we don't provoke
+       any changes within its state or data */
     const char* name = surgescript_object_name(r.ssobject);
     const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
     const image_t* img = sprite_get_image(anim, 0);
     v2d_t hot_spot = anim->hot_spot;
     v2d_t position = scripting_util_world_position(r.ssobject);
     if(level_inside_screen(position.x - hot_spot.x, position.y - hot_spot.y, image_width(img), image_height(img))) {
-        v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+        v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+        v2d_t topleft = v2d_subtract(camera_position, half_screen);
         image_draw(img, position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
     }
 }
