@@ -432,10 +432,12 @@ int write_to_zip(const char* vpath, void* param)
     if(vpath[0] != '.' && strstr(vpath, "/.") == NULL) { /* skip files */
         if(assetfs_is_data_file(vpath) && !is_suffix(vpath, ".zip")) { /* very important to skip the .zip */
             if(!(is_prefix(vpath, "screenshots/") && is_suffix(vpath, ".png"))) {
-                zip_entry_open(zip, vpath);
-                if(0 != zip_entry_fwrite(zip, assetfs_fullpath(vpath)))
-                    console_print("Can't pack \"%s\"", vpath);
-                zip_entry_close(zip);
+                if(!is_suffix(vpath, ".prefs")) {
+                    zip_entry_open(zip, vpath);
+                    if(0 != zip_entry_fwrite(zip, assetfs_fullpath(vpath)))
+                        console_print("Can't pack \"%s\"", vpath);
+                    zip_entry_close(zip);
+                }
             }
         }
     }

@@ -349,7 +349,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
     /* smashed / crushed */
     if(!player->disable_movement) {
-        if(!physicsactor_is_midair(player->pa) && physicsactor_is_inside_wall(player->pa))
+        if(!physicsactor_is_midair(player->pa) && physicsactor_is_touching_ceiling(player->pa) && physicsactor_is_inside_wall(player->pa))
             player_kill(player);
     }
 

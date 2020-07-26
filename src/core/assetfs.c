@@ -45,14 +45,16 @@
 #include <unistd.h>
 #endif
 
-/* Base folder */
-#define ASSETS_BASEDIR    "opensurge2d"
+/* constants */
+#define ASSETS_BASEDIR    "opensurge2d" /* base folder */
+#define ASSETS_MAXPATH    4096 /* buffer size for paths */
 
 /* aliases */
+/*#define assetfs_log(...)  do { printf(__VA_ARGS__); printf("\n"); } while(0)*/
 #define assetfs_log       logfile_message
 #define assetfs_fatal     fatal_error
 
-/* Defining the filesystem */
+/* defining the filesystem */
 typedef enum assetfiletype_t assetfiletype_t;
 typedef enum assetpriority_t assetpriority_t;
 typedef struct assetfile_t assetfile_t;
@@ -69,7 +71,7 @@ enum assetfiletype_t
 enum assetpriority_t
 {
     ASSET_PRIMARY,    /* asset comes from a primary source */
-    ASSET_SECONDARY   /* complimentary asset for compatibility purposes */
+    ASSET_SECONDARY   /* complementary asset for compatibility purposes */
 };
 
 struct assetfile_t
@@ -208,7 +210,7 @@ void assetfs_release()
 const char* assetfs_fullpath(const char* vpath)
 {
     assetfile_t* file = afs_findfile(root, vpath);
-    static char path[4096] = { 0 };
+    static char path[ASSETS_MAXPATH] = { 0 };
 
     if(file == NULL) {
         assetfs_log("Can't find asset \"%s\"", vpath);
@@ -274,7 +276,7 @@ bool assetfs_use_strict(bool strict)
 /*
  * assetfs_is_primary_file()
  * Checks if the file is primary, i.e., not
- * gathered from a complimentary source
+ * gathered from a complementary source
  */
 bool assetfs_is_primary_file(const char* vpath)
 {
@@ -972,8 +974,10 @@ void scan_default_folders(const char* gameid, const char* basedir)
     }
 
     /* scan primary asset folder: <exedir> */
-    if(scan_exedir(root, ASSET_PRIMARY))
-        must_scan_basedir = false;
+    if(strcmp(gameid, GAME_UNIXNAME) == 0) {
+        if(scan_exedir(root, ASSET_PRIMARY))
+            must_scan_basedir = false;
+    }
 
     /* scan additional asset folder: $XDG_DATA_HOME/<basedir>/<gameid> */
     if(userdatadir != NULL) {
