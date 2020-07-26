@@ -2762,10 +2762,10 @@ bool render_ssobject(surgescript_object_t* object, void* param)
             if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
                 renderqueue_enqueue_ssobject_debug(object);
 
-            /* objects tagged "gizmo" SHOULD NOT provoke
-               any data or state changes within SurgeScript */
-            if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-                renderqueue_enqueue_ssobject_gizmo(object);
+            /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
+               provoke any data or state changes within SurgeScript */
+            /*if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
+                renderqueue_enqueue_ssobject_gizmo(object);*/
 
             return true;
         }
