@@ -344,12 +344,14 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     }
 
     /* pitfalls */
-    if(act->position.y >= level_height_at(act->position.x))
+    if(act->position.y >= level_height_at(act->position.x) && !player->disable_movement)
         player_kill(player);
 
     /* smashed / crushed */
-    if(!physicsactor_is_midair(player->pa) && physicsactor_is_inside_wall(player->pa))
-        player_kill(player);
+    if(!player->disable_movement) {
+        if(!physicsactor_is_midair(player->pa) && physicsactor_is_inside_wall(player->pa))
+            player_kill(player);
+    }
 
     /* active player can't get off camera */
     if(player == level_player() && !player->disable_movement) {
