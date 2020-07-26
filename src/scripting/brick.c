@@ -68,6 +68,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     surgescript_tagsystem_add_tag(tag_system, "Brick", "entity");
     surgescript_tagsystem_add_tag(tag_system, "Brick", "private");
+    surgescript_tagsystem_add_tag(tag_system, "Brick", "renderable");
 
     /* methods */
     surgescript_vm_bind(vm, "Brick", "state:main", fun_main, 0);

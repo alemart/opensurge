@@ -123,7 +123,9 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     /* tags */
     surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     surgescript_tagsystem_add_tag(tag_system, "CollisionBox", "collider");
+    surgescript_tagsystem_add_tag(tag_system, "CollisionBox", "renderable");
     surgescript_tagsystem_add_tag(tag_system, "CollisionBall", "collider");
+    surgescript_tagsystem_add_tag(tag_system, "CollisionBall", "renderable");
 
     /* methods */
     surgescript_vm_bind(vm, "CollisionBox", "state:main", fun_main, 0);

@@ -71,6 +71,11 @@ static inline surgescript_object_t* get_animation(surgescript_object_t* object);
  */
 void scripting_register_actor(surgescript_vm_t* vm)
 {
+    /* tags */
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+    surgescript_tagsystem_add_tag(tag_system, "Actor", "renderable");
+
+    /* methods */
     surgescript_vm_bind(vm, "Actor", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Actor", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Actor", "destructor", fun_destructor, 0);

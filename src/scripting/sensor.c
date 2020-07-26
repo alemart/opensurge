@@ -58,6 +58,11 @@ static const surgescript_heapptr_t ENABLED_ADDR = 3;
  */
 void scripting_register_sensor(surgescript_vm_t* vm)
 {
+    /* tags */
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+    surgescript_tagsystem_add_tag(tag_system, "Sensor", "renderable");
+
+    /* methods */
     surgescript_vm_bind(vm, "Sensor", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Sensor", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Sensor", "destructor", fun_destructor, 0);

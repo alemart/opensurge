@@ -75,6 +75,11 @@ static inline const char* align2str(fontalign_t align);
  */
 void scripting_register_text(surgescript_vm_t* vm)
 {
+    /* tags */
+    surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
+    surgescript_tagsystem_add_tag(tag_system, "Text", "renderable");
+
+    /* methods */
     surgescript_vm_bind(vm, "Text", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Text", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Text", "destructor", fun_destructor, 0);

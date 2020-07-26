@@ -2757,19 +2757,27 @@ void render_ssobjects()
 
 bool render_ssobject(surgescript_object_t* object, void* param)
 {
-    surgescript_programpool_t* pool = (surgescript_programpool_t*)param;
     if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
         if(editor_is_enabled()) {
+            /* level editor */
             if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
                 renderqueue_enqueue_ssobject_debug(object);
+
             return true;
         }
         else {
+            /* gameplay */
             ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-            if(obj_data && obj_data->sleeping)
-                return false;
-            else if(surgescript_programpool_exists(pool, surgescript_object_name(object), "render"))
-                renderqueue_enqueue_ssobject(object);
+            if(obj_data && obj_data->sleeping) {
+                /* no need to render sleeping objects */
+                return false; /* won't render their children */
+            }
+            else {
+                /* will render objects tagged "renderable" */
+                if(surgescript_object_has_tag(object, "renderable"))
+                    renderqueue_enqueue_ssobject(object);
+            }
+
             return true;
         }
     }
