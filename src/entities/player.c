@@ -347,9 +347,9 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     if(act->position.y >= level_height_at(act->position.x))
         player_kill(player);
 
-    /* smashed */
-    if(player->on_movable_platform) {
-        if(!physicsactor_is_midair(player->pa) && physicsactor_is_touching_ceiling(player->pa))
+    /* smashed / crushed */
+    if(player->on_movable_platform /* tubes... */ ) {
+        if(!physicsactor_is_midair(player->pa) && physicsactor_is_inside_wall(player->pa))
             player_kill(player);
     }
 

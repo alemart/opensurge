@@ -68,6 +68,7 @@ struct physicsactor_t
     int midair; /* is the player midair? */
     int facing_right; /* is the player facing right? */
     int touching_ceiling; /* is the player touching a ceiling? */
+    int inside_wall; /* inside a solid brick, possibly smashed */
     int winning_pose; /* winning pose enabled? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
     float jump_lock_timer; /* jump lock timer, in seconds */
@@ -301,21 +302,21 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->C_normal = sensor_create_vertical(-9, -24, 0, color_rgb(0,128,0));
     pa->D_normal = sensor_create_vertical(9, -24, 0, color_rgb(128,128,0));
     pa->M_normal = sensor_create_horizontal(4, -10, 10, color_rgb(255,0,0)); /* use 9 (sensor A) + 1 */
-    pa->U_normal = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
+    pa->U_normal = sensor_create_horizontal(-8, -7, 7, color_rgb(255,255,255));
 
     pa->A_intheair = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
     pa->B_intheair = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
     pa->C_intheair = sensor_create_vertical(-9, -24, 0, color_rgb(0,128,0));
     pa->D_intheair = sensor_create_vertical(9, -24, 0, color_rgb(128,128,0));
     pa->M_intheair = sensor_create_horizontal(0, -11, 11, color_rgb(255,0,0)); /* use 10 (sensor M_normal) + 1 */
-    pa->U_intheair = sensor_create_horizontal(-24, -9, 9, color_rgb(255,255,255));
+    pa->U_intheair = sensor_create_horizontal(-8, -7, 7, color_rgb(255,255,255));
 
     pa->A_jumproll = sensor_create_vertical(-5, 0, 19, color_rgb(0,255,0));
     pa->B_jumproll = sensor_create_vertical(5, 0, 19, color_rgb(255,255,0));
     pa->C_jumproll = sensor_create_vertical(-5, -10, 0, color_rgb(0,128,0));
     pa->D_jumproll = sensor_create_vertical(5, -10, 0, color_rgb(128,128,0));
     pa->M_jumproll = sensor_create_horizontal(0, -11, 11, color_rgb(255,0,0));
-    pa->U_jumproll = sensor_create_horizontal(-10, -5, 5, color_rgb(255,255,255));
+    pa->U_jumproll = sensor_create_horizontal(-4, -3, 3, color_rgb(255,255,255));
 
     /* success!!! ;-) */
     return pa;
@@ -388,11 +389,13 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->facing_right = (pa->xsp > 0.0f);
     }
 
-    /* touching the ceiling? */
+    /* don't bother jumping */
+    if(!pa->midair && pa->touching_ceiling)
+        input_simulate_button_up(pa->input, IB_FIRE1);
+
+    /* inside a solid brick? */
     at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
-    pa->touching_ceiling = (at_U != NULL && obstacle_is_solid(at_U));
-    if(pa->touching_ceiling && !pa->midair)
-        input_simulate_button_up(pa->input, IB_FIRE1); /* don't bother jumping */
+    pa->inside_wall = (at_U != NULL && obstacle_is_solid(at_U));
 
     /* run the physics simulation */
 #if USE_FIXED_TIMESTEP != 0
@@ -469,6 +472,11 @@ int physicsactor_is_touching_ceiling(const physicsactor_t *pa)
 int physicsactor_is_facing_right(const physicsactor_t *pa)
 {
     return pa->facing_right;
+}
+
+int physicsactor_is_inside_wall(const physicsactor_t *pa)
+{
+    return pa->inside_wall;
 }
 
 void physicsactor_enable_winning_pose(physicsactor_t *pa)
@@ -722,6 +730,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         at_D = (at_D != NULL && obstacle_is_solid(at_D)) ? at_D : NULL; \
         at_M = (at_M != NULL && obstacle_is_solid(at_M)) ? at_M : NULL; \
         pa->midair = (at_A == NULL) && (at_B == NULL); \
+        pa->touching_ceiling = (at_C != NULL) || (at_D != NULL); \
     } while(0)
 
 /* call UPDATE_MOVMODE whenever you update pa->angle */
@@ -1432,7 +1441,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     }
 
     /* bump into ceilings */
-    if(pa->midair && (at_C != NULL || at_D != NULL)) {
+    if(pa->midair && pa->touching_ceiling) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
         int must_reattach = FALSE;
