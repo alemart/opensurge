@@ -4,7 +4,7 @@ Welcome to **Open Surge**!
 
 Get the game at [opensurge2d.org](http://opensurge2d.org)
 
-<img src="surge.png" alt="Surge" width="384" align="right">
+<img src="surge.png" alt="Surge" width="320" align="right">
 
 ## What is Open Surge?
 
@@ -69,15 +69,15 @@ cmake ..
 make
 ```
 
-You can perform a system-wide installation on Linux by running:
+To perform a system-wide installation on Linux, run:
 
 ```
 sudo make install
 ```
 
-You may run `ccmake` or `cmake-gui` to know additional build options (e.g., set the path of the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
+You may run `ccmake` or `cmake-gui` to change the build options (e.g., set the path of the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
 
-**Note:** read the [project wiki](http://opensurge2d.org/wiki) for more detailed instructions.
+**Note:** read the [project wiki](http://opensurge2d.org/wiki) for detailed instructions.
 
 **Linux users:** game assets (images, sounds, etc.) can be stored globally or in user-space. Assets located in user-space take precedence over assets located in system directories. Open Surge uses the XDG Base Directory specification; look for the *opensurge2d* directory.
 
