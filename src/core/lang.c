@@ -135,7 +135,7 @@ char* lang_metadata(const char* filepath, const char* desired_key, char* dest, s
     nanoparser_traverse_program_ex(prog, (void*)(&param), traverse_inout);
 
     if(param.value == NULL)
-        fatal_error("lang_metadata(\"%s\", \"%s\") failed", filepath, desired_key);
+        str_cpy(dest, NULL_STRING, dest_size);
     else
         str_cpy(dest, param.value, dest_size);
 

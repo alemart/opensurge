@@ -896,17 +896,20 @@ void sound_destroy(sound_t *sample)
 #if defined(A5BUILD)
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, sample->volume, 0.0f, 1.0f);
+    if(sample != NULL)
+        sound_play_ex(sample, sample->volume, 0.0f, 1.0f);
 }
 #elif !defined(__USE_OPENAL__)
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, sample->vol, 0.0, 1.0);
+    if(sample != NULL)
+        sound_play_ex(sample, sample->vol, 0.0, 1.0);
 }
 #else
 void sound_play(sound_t *sample)
 {
-    sound_play_ex(sample, 1.0, 0.0, 1.0);
+    if(sample != NULL)
+        sound_play_ex(sample, 1.0, 0.0, 1.0);
 }
 #endif
 

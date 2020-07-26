@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_decorators.c - Legacy scripting API: commands
- * Copyright (C) 2010-2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2013, 2018, 2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include "../sfx.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
+#include "../../core/assetfs.h"
 #include "../../core/audio.h"
 #include "../../core/timer.h"
 #include "../../core/web.h"
@@ -670,7 +671,19 @@ audiostrategy_t* playsamplestrategy_new(const char *sample_name, expression_t *v
     ((audiostrategy_t*)s)->update = playsamplestrategy_update;
     ((audiostrategy_t*)s)->release = playsamplestrategy_release;
 
-    s->sfx = sound_load(sample_name);
+    /* backwards compatibility */
+    sound_t *sfx = NULL;
+    if(!assetfs_exists(sample_name)) {
+        char *compat_path = mallocx((12 + strlen(sample_name) + 1) * sizeof(char));
+        sprintf(compat_path, "samples/%s.wav", sample_name);
+        if(assetfs_exists(compat_path))
+            sfx = sound_load(compat_path);
+        free(compat_path);
+    }
+    else
+        sfx = sound_load(sample_name);
+
+    s->sfx = sfx;
     s->vol = vol;
     s->pan = pan;
     s->freq = freq;
@@ -683,6 +696,9 @@ void playsamplestrategy_update(audiostrategy_t *s)
 {
     playsamplestrategy_t *me = (playsamplestrategy_t*)s;
     float vol, pan, freq;
+
+    if(me->sfx == NULL)
+        return;
 
     vol = clip01(expression_evaluate(me->vol));
     pan = clip(expression_evaluate(me->pan), -1.0f, 1.0f);
@@ -789,8 +805,19 @@ audiostrategy_t* stopsamplestrategy_new(const char *sample_name)
     ((audiostrategy_t*)s)->update = stopsamplestrategy_update;
     ((audiostrategy_t*)s)->release = stopsamplestrategy_release;
 
-    s->sfx = sound_load(sample_name);
+    /* backwards compatibility */
+    sound_t *sfx = NULL;
+    if(!assetfs_exists(sample_name)) {
+        char *compat_path = mallocx((12 + strlen(sample_name) + 1) * sizeof(char));
+        sprintf(compat_path, "samples/%s.wav", sample_name);
+        if(assetfs_exists(compat_path))
+            sfx = sound_load(compat_path);
+        free(compat_path);
+    }
+    else
+        sfx = sound_load(sample_name);
 
+    s->sfx = sfx;
     return (audiostrategy_t*)s;
 }
 
