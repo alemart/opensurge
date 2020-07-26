@@ -39,6 +39,7 @@ float scripting_util_world_angle(const surgescript_object_t* object);
 void scripting_util_set_world_position(surgescript_object_t* object, v2d_t position);
 void scripting_util_set_world_angle(surgescript_object_t* object, float angle);
 v2d_t scripting_util_object_camera(const surgescript_object_t* object);
+v2d_t scripting_util_parent_camera(const surgescript_object_t* object);
 int scripting_util_is_object_inside_screen(const surgescript_object_t* object);
 float scripting_util_object_zindex(surgescript_object_t* object);
 const char* scripting_util_parent_name(const surgescript_object_t* object);

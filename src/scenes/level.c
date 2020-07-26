@@ -3205,10 +3205,10 @@ void editor_update()
             sound_play(SFX_DENY);
     }
 
-    /* show/hide brick masks */
+    /* show/hide brick masks & gizmos */
     if(editorcmd_is_triggered(editor_cmd, "toggle-masks")) {
         must_render_brick_masks = !must_render_brick_masks;
-        must_display_gizmos = !must_display_gizmos; /* NOTE: should we give gizmos their own hotkey? */
+        must_display_gizmos = must_render_brick_masks; /* NOTE: should we give gizmos their own hotkey? */
     }
 
     /* change spawn point */

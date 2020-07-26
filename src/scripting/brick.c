@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * brick.c - scripting system: brick-like object
- * Copyright (C) 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2019, 2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,11 @@
 #include <surgescript.h>
 #include "scripting.h"
 #include "../core/util.h"
+#include "../core/video.h"
+#include "../core/image.h"
 #include "../core/sprite.h"
 #include "../entities/brick.h"
+#include "../scenes/level.h"
 #include "../physics/collisionmask.h"
 
 /* brick-like object structure */
@@ -32,6 +35,7 @@ struct bricklike_data_t {
     bricktype_t type;
     bricklayer_t layer;
     collisionmask_t* mask;
+    image_t* maskimg;
     v2d_t hot_spot;
     bool enabled;
 };
@@ -41,6 +45,7 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettype(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_settype(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -69,6 +74,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Brick", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Brick", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Brick", "__init", fun_init, 1);
+    surgescript_vm_bind(vm, "Brick", "render", fun_render, 0);
     surgescript_vm_bind(vm, "Brick", "get_type", fun_gettype, 0);
     surgescript_vm_bind(vm, "Brick", "set_type", fun_settype, 1);
     surgescript_vm_bind(vm, "Brick", "get_layer", fun_getlayer, 0);
@@ -178,6 +184,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     data->type = BRK_SOLID;
     data->layer = BRL_DEFAULT;
     data->mask = NULL;
+    data->maskimg = NULL;
     data->hot_spot = v2d_new(0, 0);
     data->enabled = true;
     surgescript_object_set_userdata(object, data);
@@ -191,8 +198,11 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 {
     bricklike_data_t* data = get_data(object);
 
-    if(data->mask != NULL)
+    if(data->mask != NULL) {
         collisionmask_destroy(data->mask);
+        if(data->maskimg != NULL)
+            image_destroy(data->maskimg);
+    }
 
     free(data);
     surgescript_object_set_userdata(object, NULL);
@@ -209,15 +219,45 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     image_t* brick_image = sprite_get_image(animation, 0); /* get the first frame of the animation */
     bricklike_data_t* data = get_data(object);
 
-    if(data->mask != NULL)
+    if(data->mask != NULL) {
         collisionmask_destroy(data->mask);
+        if(data->maskimg != NULL)
+            image_destroy(data->maskimg);
+    }
 
     image_lock(brick_image);
     data->mask = collisionmask_create(brick_image, 0, 0, image_width(brick_image), image_height(brick_image));
+    data->maskimg = NULL;
     data->hot_spot = animation->hot_spot;
     image_unlock(brick_image);
 
     ssfree(sprite_name);
+    return NULL;
+}
+
+/* render (debugging only) */
+surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    bricklike_data_t* data = get_data(object);
+    bool visible = level_is_displaying_gizmos();
+
+    if(data->mask != NULL && visible) {
+        /* lazy creation of the mask image */
+        if(data->maskimg == NULL) {
+            color_t color = (data->type == BRK_SOLID) ? color_rgb(255, 0, 0) : color_rgb(255, 255, 255);
+            data->maskimg = collisionmask_to_image(data->mask, color);
+        }
+
+        /* compute the position */
+        v2d_t world_pos = v2d_subtract(scripting_util_world_position(object), data->hot_spot);
+        v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+        v2d_t camera_offset = v2d_subtract(scripting_util_parent_camera(object), half_screen);
+        v2d_t screen_pos = v2d_subtract(world_pos, camera_offset);
+
+        /* render mask */
+        image_draw(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, IF_NONE);
+    }
+
     return NULL;
 }
 

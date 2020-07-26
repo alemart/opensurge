@@ -46,7 +46,6 @@ static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, co
 static inline const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object);
 static inline sensor_t* get_sensor(const surgescript_object_t* object);
 static inline void update(surgescript_object_t* object);
-static v2d_t parent_camera(const surgescript_object_t* object);
 static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
@@ -175,7 +174,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
     if(visible) {
         sensor_t* sensor = get_sensor(object);
-        sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, parent_camera(object));
+        sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, scripting_util_parent_camera(object));
     }
 
     return NULL;
@@ -283,13 +282,4 @@ void update(surgescript_object_t* object)
     }
     else
         surgescript_var_set_null(status);
-}
-
-/* get the camera of the parent object (is it detached?) */
-v2d_t parent_camera(const surgescript_object_t* object)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    return scripting_util_object_camera(parent);
 }

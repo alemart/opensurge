@@ -212,11 +212,20 @@ void scripting_util_set_world_angle(surgescript_object_t* object, float angle)
     surgescript_transform_util_setworldangle2d(object, angle);
 }
 
-/* compute the proper camera position for an object (will check if it's detached or not) */
+/* compute the proper camera position of an object (will check if it's detached or not) */
 v2d_t scripting_util_object_camera(const surgescript_object_t* object)
 {
     bool is_detached = surgescript_object_has_tag(object, "detached");
     return !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
+}
+
+/* compute the camera position of the parent of an object */
+v2d_t scripting_util_parent_camera(const surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    return scripting_util_object_camera(parent);
 }
 
 /* checks if the object is inside the visible part of the screen */
