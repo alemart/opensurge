@@ -348,10 +348,8 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         player_kill(player);
 
     /* smashed / crushed */
-    if(player->on_movable_platform /* tubes... */ ) {
-        if(!physicsactor_is_midair(player->pa) && physicsactor_is_inside_wall(player->pa))
-            player_kill(player);
-    }
+    if(!physicsactor_is_midair(player->pa) && physicsactor_is_inside_wall(player->pa))
+        player_kill(player);
 
     /* active player can't get off camera */
     if(player == level_player() && !player->disable_movement) {
