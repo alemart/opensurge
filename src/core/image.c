@@ -46,7 +46,7 @@ struct image_t {
 
 /* misc */
 static image_t* target = NULL; /* drawing target */
-static const int MAX_IMAGE_SIZE = 2048; /* maximum image size for broad compatibility with video cards */
+static const int MAX_IMAGE_SIZE = 4096; /* maximum image size for broad compatibility with video cards */
 
 #else
 
