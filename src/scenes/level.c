@@ -1221,9 +1221,6 @@ void level_update()
         char op[3][512];
         confirmboxdata_t cbd = { op[0], op[1], op[2] };
 
-        music_pause();
-        wants_to_leave = FALSE;
-
         if(quit_level_img != NULL)
             image_destroy(quit_level_img);
         quit_level_img = image_clone(video_get_backbuffer());
@@ -1232,6 +1229,8 @@ void level_update()
         lang_getstring("QUIT_OPTION1", op[1], sizeof(op[1]));
         lang_getstring("QUIT_OPTION2", op[2], sizeof(op[2]));
 
+        wants_to_leave = FALSE;
+        music_pause();
         scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
         return;
     }
@@ -1278,12 +1277,6 @@ void level_update()
             editor_enable();
             return;
         }
-    }
-
-    /* got dying player? */
-    for(i = 0; i < team_size; i++) {
-        if(player_is_dying(team[i]))
-            got_dying_player = TRUE;
     }
 
     /* -------------------------------------- */
@@ -1355,6 +1348,12 @@ void level_update()
             else if(!inside_screen(enode->data->actor->spawn_point.x, enode->data->actor->spawn_point.y, w, h, DEFAULT_MARGIN))
                 enode->data->actor->position = enode->data->actor->spawn_point;
         }
+    }
+
+    /* got dying player? */
+    for(i = 0; i < team_size; i++) {
+        if(player_is_dying(team[i]))
+            got_dying_player = TRUE;
     }
 
     /* update players */
@@ -2763,6 +2762,11 @@ bool render_ssobject(surgescript_object_t* object, void* param)
             if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
                 renderqueue_enqueue_ssobject_debug(object);
 
+            /* objects tagged "gizmo" SHOULD NOT provoke
+               any data or state changes within SurgeScript */
+            if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
+                renderqueue_enqueue_ssobject_gizmo(object);
+
             return true;
         }
         else {
@@ -2776,6 +2780,10 @@ bool render_ssobject(surgescript_object_t* object, void* param)
                 /* will render objects tagged "renderable" */
                 if(surgescript_object_has_tag(object, "renderable"))
                     renderqueue_enqueue_ssobject(object);
+
+                /* will render objects tagged "gizmo" */
+                if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
+                    renderqueue_enqueue_ssobject_gizmo(object);
             }
 
             return true;

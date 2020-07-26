@@ -41,6 +41,7 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-only properties */
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -173,6 +174,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_tagsystem_add_tag(tag_system, "Player", "private");
     surgescript_tagsystem_add_tag(tag_system, "Player", "awake");
     surgescript_tagsystem_add_tag(tag_system, "Player", "player");
+    surgescript_tagsystem_add_tag(tag_system, "Player", "gizmo");
 
     /* read-only properties */
     surgescript_vm_bind(vm, "Player", "get_name", fun_getname, 0);
@@ -266,6 +268,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
     surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
+    surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 0);
 
     /* misc */
     surgescript_vm_bind(vm, "PlayerManager", "state:main", fun_manager_main, 0);
@@ -1323,6 +1326,21 @@ surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescript_var
 
     return NULL;
 }
+
+/* render gizmos */
+surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+
+    if(player != NULL) {
+        v2d_t camera = scripting_util_object_camera(object);
+        physicsactor_render_sensors(player->pa, camera);
+    }
+
+    return NULL;
+}
+
+
 
 
 /* internals */

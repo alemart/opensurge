@@ -45,7 +45,7 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettype(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_settype(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -68,7 +68,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     surgescript_tagsystem_add_tag(tag_system, "Brick", "entity");
     surgescript_tagsystem_add_tag(tag_system, "Brick", "private");
-    surgescript_tagsystem_add_tag(tag_system, "Brick", "renderable");
+    surgescript_tagsystem_add_tag(tag_system, "Brick", "gizmo");
 
     /* methods */
     surgescript_vm_bind(vm, "Brick", "state:main", fun_main, 0);
@@ -83,7 +83,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Brick", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Brick", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Brick", "set_offset", fun_setoffset, 1);
-    surgescript_vm_bind(vm, "Brick", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Brick", "onRenderGizmos", fun_onrendergizmos, 0);
 }
 
 /*
@@ -236,13 +236,12 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     return NULL;
 }
 
-/* render (debugging only) */
-surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* render gizmos */
+surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     bricklike_data_t* data = get_data(object);
-    bool visible = level_is_displaying_gizmos();
 
-    if(data->mask != NULL && visible) {
+    if(data->mask != NULL && scripting_util_is_object_inside_screen(object)) {
         /* lazy creation of the mask image */
         if(data->maskimg == NULL) {
             color_t color = (data->type == BRK_SOLID) ? color_rgb(255, 0, 0) : color_rgb(255, 255, 255);
@@ -256,7 +255,10 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
         v2d_t screen_pos = v2d_subtract(world_pos, camera_offset);
 
         /* render mask */
-        image_draw(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, IF_NONE);
+        if(data->enabled)
+            image_draw(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, IF_NONE);
+        else
+            image_draw_trans(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, 0.5f, IF_NONE);
     }
 
     return NULL;

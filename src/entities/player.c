@@ -411,10 +411,6 @@ void player_render(player_t *player, v2d_t camera_position)
             actor_render(player->star[i], camera_position);
     }
 
-    /* sensors */
-    if(level_is_displaying_gizmos())
-        physicsactor_render_sensors(player->pa, camera_position);
-
     /* restore hot spot */
     act->hot_spot = hot_spot;
 }

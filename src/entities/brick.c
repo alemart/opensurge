@@ -29,7 +29,6 @@
 #include "../physics/collisionmask.h"
 #include "../physics/obstacle.h"
 #include "../physics/physicsactor.h"
-#include "../scenes/level.h"
 #include "../core/global.h"
 #include "../core/video.h"
 #include "../core/image.h"

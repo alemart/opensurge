@@ -96,6 +96,7 @@ static surgescript_var_t* fun_collisionbox_getheight(surgescript_object_t* objec
 static surgescript_var_t* fun_collisionbox_getcenter(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionbox_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_collisionbox_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -107,6 +108,7 @@ static surgescript_var_t* fun_collisionball_setradius(surgescript_object_t* obje
 static surgescript_var_t* fun_collisionball_getradius(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_zindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_collisionball_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_collisionball_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_manager_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -124,8 +126,10 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     surgescript_tagsystem_add_tag(tag_system, "CollisionBox", "collider");
     surgescript_tagsystem_add_tag(tag_system, "CollisionBox", "renderable");
+    surgescript_tagsystem_add_tag(tag_system, "CollisionBox", "gizmo");
     surgescript_tagsystem_add_tag(tag_system, "CollisionBall", "collider");
     surgescript_tagsystem_add_tag(tag_system, "CollisionBall", "renderable");
+    surgescript_tagsystem_add_tag(tag_system, "CollisionBall", "gizmo");
 
     /* methods */
     surgescript_vm_bind(vm, "CollisionBox", "state:main", fun_main, 0);
@@ -152,6 +156,7 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBox", "get_center", fun_collisionbox_getcenter, 0);
     surgescript_vm_bind(vm, "CollisionBox", "zindex", fun_collisionbox_zindex, 0);
     surgescript_vm_bind(vm, "CollisionBox", "onRender", fun_collisionbox_onrender, 0);
+    surgescript_vm_bind(vm, "CollisionBox", "onRenderGizmos", fun_collisionbox_onrendergizmos, 0);
 
     surgescript_vm_bind(vm, "CollisionBall", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "CollisionBall", "destructor", fun_destructor, 0);
@@ -171,6 +176,7 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBall", "set_radius", fun_collisionball_setradius, 1);
     surgescript_vm_bind(vm, "CollisionBall", "zindex", fun_collisionball_zindex, 0);
     surgescript_vm_bind(vm, "CollisionBall", "onRender", fun_collisionball_onrender, 0);
+    surgescript_vm_bind(vm, "CollisionBall", "onRenderGizmos", fun_collisionball_onrendergizmos, 0);
 
     surgescript_vm_bind(vm, "CollisionManager", "state:main", fun_manager_main, 0);
     surgescript_vm_bind(vm, "CollisionManager", "constructor", fun_manager_constructor, 0);
@@ -653,21 +659,34 @@ surgescript_var_t* fun_collisionbox_getcenter(surgescript_object_t* object, cons
 surgescript_var_t* fun_collisionbox_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     boxcollider_t* collider = surgescript_object_userdata(object);
-    int debug = ((collider_t*)collider)->flags & COLLIDER_FLAG_ISVISIBLE;
+    int visible = ((collider_t*)collider)->flags & COLLIDER_FLAG_ISVISIBLE;
 
-    if(debug && scripting_util_is_object_inside_screen(object)) {
+    if(visible)
+        fun_collisionbox_onrendergizmos(object, param, num_params);
+
+    return NULL;
+}
+
+/* render gizmos */
+surgescript_var_t* fun_collisionbox_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    boxcollider_t* collider = surgescript_object_userdata(object);
+
+    if(scripting_util_is_object_inside_screen(object)) {
         color_t color = COLLIDER_COLOR();
-        v2d_t camera = scripting_util_object_camera(object);
         v2d_t center = ((collider_t*)collider)->worldpos;
-        double left = center.x - collider->width / 2.0;
-        double right = center.x + collider->width / 2.0;
-        double top = center.y - collider->height / 2.0;
-        double bottom = center.y + collider->height / 2.0;
+        v2d_t camera = scripting_util_object_camera(object);
+        v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
 
-        int l = left - (camera.x - VIDEO_SCREEN_W / 2);
-        int r = right - (camera.x - VIDEO_SCREEN_W / 2) - 1;
-        int t = top - (camera.y - VIDEO_SCREEN_H / 2);
-        int b = bottom - (camera.y - VIDEO_SCREEN_H / 2) - 1;
+        double left = center.x - floor(collider->width / 2.0);
+        double right = center.x + ceil(collider->width / 2.0);
+        double top = center.y - ceil(collider->height / 2.0);
+        double bottom = center.y + floor(collider->height / 2.0);
+
+        int l = left - (camera.x - half_screen.x);
+        int r = right - (camera.x - half_screen.x) - 1;
+        int t = top - (camera.y - half_screen.y);
+        int b = bottom - (camera.y - half_screen.y) - 1;
         
         image_rect(l, t, r, b, color);
     }
@@ -875,14 +894,26 @@ surgescript_var_t* fun_collisionball_getradius(surgescript_object_t* object, con
 surgescript_var_t* fun_collisionball_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     ballcollider_t* collider = surgescript_object_userdata(object);
-    int debug = ((collider_t*)collider)->flags & COLLIDER_FLAG_ISVISIBLE;
+    int visible = ((collider_t*)collider)->flags & COLLIDER_FLAG_ISVISIBLE;
 
-    if(debug && scripting_util_is_object_inside_screen(object)) {
-        v2d_t camera = scripting_util_object_camera(object);
+    if(visible)
+        fun_collisionball_onrendergizmos(object, param, num_params);
+
+    return NULL;
+}
+
+/* render gizmos */
+surgescript_var_t* fun_collisionball_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    ballcollider_t* collider = surgescript_object_userdata(object);
+
+    if(scripting_util_is_object_inside_screen(object)) {
         v2d_t center = ((collider_t*)collider)->worldpos;
+        v2d_t camera = scripting_util_object_camera(object);
+        v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
         double r = collider->radius;
-        center.x -= (camera.x - VIDEO_SCREEN_W / 2);
-        center.y -= (camera.y - VIDEO_SCREEN_H / 2);
+        center.x -= (camera.x - half_screen.x);
+        center.y -= (camera.y - half_screen.y);
         image_ellipse(center.x, center.y, r, r, COLLIDER_COLOR());
     }
 

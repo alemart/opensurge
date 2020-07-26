@@ -36,6 +36,7 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -61,6 +62,7 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     /* tags */
     surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     surgescript_tagsystem_add_tag(tag_system, "Sensor", "renderable");
+    surgescript_tagsystem_add_tag(tag_system, "Sensor", "gizmo");
 
     /* methods */
     surgescript_vm_bind(vm, "Sensor", "state:main", fun_main, 0);
@@ -75,6 +77,7 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Sensor", "onTransformChange", fun_ontransformchange, 0);
     surgescript_vm_bind(vm, "Sensor", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Sensor", "onRenderGizmos", fun_onrendergizmos, 0);
 }
 
 
@@ -177,11 +180,17 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bool visible = surgescript_var_get_bool(surgescript_heap_at(heap, VISIBLE_ADDR));
 
-    if(visible) {
-        sensor_t* sensor = get_sensor(object);
-        sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, scripting_util_parent_camera(object));
-    }
+    if(visible)
+        fun_onrendergizmos(object, param, num_params);
 
+    return NULL;
+}
+
+/* render gizmos */
+surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    sensor_t* sensor = get_sensor(object);
+    sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, scripting_util_parent_camera(object));
     return NULL;
 }
 

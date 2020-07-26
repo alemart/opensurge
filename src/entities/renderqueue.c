@@ -66,6 +66,7 @@ static v2d_t camera;
 
 /* utilities */
 #define ZINDEX_OFFSET(n) (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum offset */
+#define ZINDEX_LARGE     (99999.0f) /* will be displayed in front of others */
 
 static int cmp_fun(const void *i, const void *j)
 {
@@ -115,9 +116,10 @@ static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? 
 static float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f); }
 static float zindex_object(renderable_t r) { return r.object->zindex; }
 static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
-static float zindex_brick_mask(renderable_t r) { return 99999.0f + brick_zindex_offset(r.brick); }
+static float zindex_brick_mask(renderable_t r) { return ZINDEX_LARGE + brick_zindex_offset(r.brick); }
 static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
 static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
+static float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE; }
 static float zindex_background(renderable_t r) { return 0.0f; }
 static float zindex_foreground(renderable_t r) { return 1.0f; }
 static float zindex_water(renderable_t r) { return 1.0f; }
@@ -129,6 +131,7 @@ static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(
 static void render_brick(renderable_t r, v2d_t camera_position) { brick_render(r.brick, camera_position); }
 static void render_brick_mask(renderable_t r, v2d_t camera_position) { brick_render_mask(r.brick, camera_position); }
 static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "onRender", NULL, 0, NULL); }
+static void render_ssobject_gizmo(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "onRenderGizmos", NULL, 0, NULL); }
 static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
 {
     /* in render_ssobject_debug(), we don't call the "onRender"
@@ -316,6 +319,19 @@ void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
     node->cell.entity.ssobject = object;
     node->cell.zindex = zindex_ssobject_debug;
     node->cell.render = render_ssobject_debug;
+    node->cell.ypos = ypos_ssobject;
+    node->cell.type = type_ssobject;
+    node->next = queue;
+    queue = node;
+    size++;
+}
+
+void renderqueue_enqueue_ssobject_gizmo(surgescript_object_t* object)
+{
+    renderqueue_t *node = mallocx(sizeof *node);
+    node->cell.entity.ssobject = object;
+    node->cell.zindex = zindex_ssobject_gizmo;
+    node->cell.render = render_ssobject_gizmo;
     node->cell.ypos = ypos_ssobject;
     node->cell.type = type_ssobject;
     node->next = queue;
