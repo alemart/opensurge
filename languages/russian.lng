@@ -1,0 +1,256 @@
+// -----------------------------------------------------------------------------
+// File: languages/russian.lng
+// Description: russian translation (version 1) (encoding: UTF-8)
+// Author: Haltnikov (halatnikov.github.io)
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+// 
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Русский"                 // language name
+LANG_AUTHOR                 "Halatnikov"              // translation author
+LANG_LASTUPDATE             "2020-08-30"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
+
+
+
+//
+// Translators:
+//
+// Before starting your work, please check out the
+// Translation Guide at http://opensurge2d.org/wiki
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// In the options screen, highlight the Stage select option.
+// Next, press RIGHT 3 times and enter. You'll see a list
+// of all the level files.
+//
+
+//
+// Updating translations:
+//
+// New strings get added from time to time. They are marked
+// as -- FIXME -- To find them, you may use a Find tool in
+// your text editor.
+//
+// Found something? Please search for it now.
+//
+// If you find that mark anywhere in the file, it means that
+// the translation needs to be updated. Please submit a patch
+// to keep it up to date.
+//
+// After translating the new strings, make sure to remove
+// that mark.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "<color=$COLOR_TITLE>НАСТРОЙКИ</color>"
+OPTIONS_YES                 "ДА"
+OPTIONS_NO                  "НЕТ"
+OPTIONS_GRAPHICS            "ГРАФИКА"
+OPTIONS_FULLSCREEN          "На весь экран"
+OPTIONS_RESOLUTION          "Размер окна"
+OPTIONS_RESOLUTION_OPT1     "1X"
+OPTIONS_RESOLUTION_OPT2     "2X"
+OPTIONS_RESOLUTION_OPT3     "3X"
+OPTIONS_RESOLUTION_OPT4     "4X"
+OPTIONS_SMOOTHGFX           "Сглаживание графики"
+OPTIONS_SMOOTHGFX_ERROR     "[только 32 bpp]"
+OPTIONS_FPS                 "Отображать FPS"
+OPTIONS_GAME                "ИГРА"
+OPTIONS_GAMEPAD             "Геймпад"
+OPTIONS_LANGUAGE            "Сменить язык"
+OPTIONS_STAGESELECT         "Выбор уровня"
+OPTIONS_CREDITS             "Титры Open Surge"
+OPTIONS_DONATE              "Поддержать Open Surge"
+OPTIONS_BACK                "НАЗАД"
+
+// Stage Select
+STAGESELECT_TITLE           "<color=$COLOR_TITLE>ВЫБОР УРОВНЯ</color>"
+STAGESELECT_DEBUG           "<color=$COLOR_TITLE>РЕЖИМ РАЗРАБОТЧИКА</color>"
+STAGESELECT_MSG             "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
+STAGESELECT_PAGE            "страница $1/$2"
+STAGESELECT_ACT             "Зона"
+
+// Quest Select
+QUESTSELECT_TITLE           "<color=$COLOR_TITLE>ВЫБОР КВЕСТА</color>"
+QUESTSELECT_MSG             "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
+QUESTSELECT_PAGE            "страница $1/$2"
+QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Версия:</color> $1\n<color=$COLOR_HIGHLIGHT>Автор:</color> $2\n<color=$COLOR_HIGHLIGHT>Описание:</color> $3"
+
+// Credits
+CREDITS_TITLE               "<color=$COLOR_TITLE>ТИТРЫ</color>"
+CREDITS_BACK                "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME версия $GAME_VERSION</color>\nиспользует $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Активные участники</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Прочие участники</color>"
+CREDITS_ALEXANDRE           "Основатель проекта\nРазработчик"
+CREDITS_JOAO                "Художник"
+CREDITS_MATEUS              "Звуковые эффекты"
+CREDITS_CODY                "Концепт-арт"
+CREDITS_JOHAN               "Композитор (покойся с миром, друг)"
+CREDITS_DI                  "Композитор"
+CREDITS_VICTOR              "Композитор"
+CREDITS_COLIN               "Художник спрайтов, первый вариант сюжета"
+CREDITS_BRIAN               "Художник спрайтов"
+CREDITS_TRANSLATOR          "Переводчик"
+CREDITS_TRANSLATORS         "Переводчики"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Авторы каждого ресурса</color>"
+CREDITS_RES_TEXT            "Если не указано иначе, файлы, перечисленные ниже, лицензированы под Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Графика</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музыка</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звуковые эффекты</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипты</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих скриптов."
+
+// Main Menu
+MAINMENU_TITLE              "МЕНЮ"
+MAINMENU_PLAY               "ИГРАТЬ"
+MAINMENU_CREATE             "СОЗДАТЬ"
+MAINMENU_SHARE              "ПОДЕЛИТЬСЯ"
+MAINMENU_OPTIONS            "НАСТРОЙКИ"
+MAINMENU_QUIT               "ВЫХОД"
+MAINMENU_DEVBUILD           "Версия в разработке"
+MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+
+// Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "СОЗДАТЬ"
+CREATEMENU_PLAY             "ДЕМО УРОВЕНЬ"
+CREATEMENU_LEARN            "ПОСЕТИТЬ САЙТ"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "НАЗАД"
+CREATEMENU_TEXT             "Open Surge позволяет вам создавать свои собственные игры! Выпустите свою креативность!\n\nНачните свой проект! Создавайте новые уровни, предметы, персонажей и многое другое! Попробуйте редактор уровней, изучите движок и окунитесь в SurgeScript для максимальной мощности!"
+
+// Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "СПАСИБО ЗА ИГРУ"
+CONGRATULATIONS_SHARE       "ПОДЕЛИТЬСЯ"
+CONGRATULATIONS_DONATE      "ПОДДЕРЖАТЬ"
+CONGRATULATIONS_BACK        "НАЗАД В МЕНЮ"
+CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версия $GAME_VERSION\nХотите ещё? Следите за обновлениями на $GAME_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "КЛАВИШИ СО СТРЕЛКАМИ"
+INPUT_KEYB_LEFT             "ВЛЕВО"
+INPUT_KEYB_RIGHT            "ВПРАВО"
+INPUT_KEYB_UP               "ВВЕРХ"
+INPUT_KEYB_DOWN             "ВНИЗ"
+INPUT_KEYB_FIRE1            "ПРОБЕЛ"
+INPUT_KEYB_FIRE2            "ЛЕВЫЙ CTRL"
+INPUT_KEYB_FIRE3            "ВВОД"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "W"
+INPUT_KEYB_FIRE6            "A"
+INPUT_KEYB_FIRE7            "S"
+INPUT_KEYB_FIRE8            "D"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "КНОПКИ НАПРАВЛЕНИЙ"
+INPUT_JOY_LEFT              "ВЛЕВО"
+INPUT_JOY_RIGHT             "ВПРАВО"
+INPUT_JOY_UP                "ВВЕРХ"
+INPUT_JOY_DOWN              "ВНИЗ"
+INPUT_JOY_FIRE1             "КНОПКА 1"
+INPUT_JOY_FIRE2             "КНОПКА 2"
+INPUT_JOY_FIRE3             "КНОПКА 3"
+INPUT_JOY_FIRE4             "КНОПКА 4"
+INPUT_JOY_FIRE5             "КНОПКА 5"
+INPUT_JOY_FIRE6             "КНОПКА 6"
+INPUT_JOY_FIRE7             "КНОПКА 7"
+INPUT_JOY_FIRE8             "КНОПКА 8"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "ВЫ УВЕРЕНЫ ЧТО ХОТИТЕ ВЫЙТИ?"
+QUIT_OPTION1                "ДА"
+QUIT_OPTION2                "НЕТ"
+
+// Loading Screen
+LOADING_TEXT                "Загрузка..."
+
+
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Добро пожаловать в Open Surge!</color>\nИспользуйте $INPUT_DIRECTIONAL чтобы двигаться и $INPUT_FIRE1 для прыжка. Нажмите $INPUT_FIRE2 чтобы поменять персонажей."
+LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценный <color=$COLOR_HIGHLIGHT>движок для создания игр</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдной из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже заинтересованы? Посетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> чтобы начать создавать свои собственные игры!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните делать свой уровень! (нажмите F1 для помощи)"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// Since the game uses bitmap fonts, parts of
+// the translation don't accept special characters.
+//
+// This section doesn't accept language-specific
+// special characters.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Score"
+HUD_TIME                    "Time"
+HUD_POWER                   "Power"
+
+// Level Cleared animation
+CLEARED_LINE1               "YOU HAVE"
+CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT"
+CLEARED_POWER               "Power Bonus"
+CLEARED_TIME                "Time Bonus"
+CLEARED_SCORE               "Score"
+
+// Game Over
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"
+
+// Time Over
+TIMEOVER_PART1              "TIME"
+TIMEOVER_PART2              "OVER"
