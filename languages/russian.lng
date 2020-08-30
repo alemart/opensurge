@@ -164,7 +164,7 @@ INPUT_KEYB_UP               "ВВЕРХ"
 INPUT_KEYB_DOWN             "ВНИЗ"
 INPUT_KEYB_FIRE1            "ПРОБЕЛ"
 INPUT_KEYB_FIRE2            "ЛЕВЫЙ CTRL"
-INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE3            "ENTER"  //v2: i don't think anyone actually calls this key ВВОД, so i untranslated it
 INPUT_KEYB_FIRE4            "ESC"
 INPUT_KEYB_FIRE5            "W"
 INPUT_KEYB_FIRE6            "A"
@@ -193,7 +193,7 @@ INPUT_JOY_FIRE8             "КНОПКА 8"
 //
 
 // Quit game? confirm box
-QUIT_QUESTION               "Вы уверены что хотите выйти?"
+QUIT_QUESTION               "Вы уверены что хотите выйти?"  //v2: it looks a bit too "intimidating" if all caps lol
 QUIT_OPTION1                "ДА"
 QUIT_OPTION2                "НЕТ"
 
