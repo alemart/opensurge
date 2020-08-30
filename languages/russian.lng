@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: languages/russian.lng
-// Description: russian translation (version 1) (encoding: UTF-8)
+// Description: russian translation (version 2) (encoding: UTF-8)
 // Author: Haltnikov (halatnikov.github.io)
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ OPTIONS_GAME                "ИГРА"
 OPTIONS_GAMEPAD             "Геймпад"
 OPTIONS_LANGUAGE            "Сменить язык"
 OPTIONS_STAGESELECT         "Выбор уровня"
-OPTIONS_CREDITS             "Титры Open Surge"
+OPTIONS_CREDITS             "Авторы Open Surge"
 OPTIONS_DONATE              "Поддержать Open Surge"
 OPTIONS_BACK                "НАЗАД"
 
@@ -99,7 +99,7 @@ QUESTSELECT_PAGE            "страница $1/$2"
 QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Версия:</color> $1\n<color=$COLOR_HIGHLIGHT>Автор:</color> $2\n<color=$COLOR_HIGHLIGHT>Описание:</color> $3"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>ТИТРЫ</color>"
+CREDITS_TITLE               "<color=$COLOR_TITLE>АВТОРЫ</color>"
 CREDITS_BACK                "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME версия $GAME_VERSION</color>\nиспользует $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Активные участники</color>"
@@ -140,7 +140,7 @@ CREATEMENU_PLAY             "ДЕМО УРОВЕНЬ"
 CREATEMENU_LEARN            "ПОСЕТИТЬ САЙТ"
 CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "НАЗАД"
-CREATEMENU_TEXT             "Open Surge позволяет вам создавать свои собственные игры! Выпустите свою креативность!\n\nНачните свой проект! Создавайте новые уровни, предметы, персонажей и многое другое! Попробуйте редактор уровней, изучите движок и окунитесь в SurgeScript для максимальной мощности!"
+CREATEMENU_TEXT             "Open Surge позволяет вам создавать свои собственные игры! Выпустите свою креативность!\n\nНачните свой проект! Создавайте новые уровни, предметы, боссов, персонажей и многое другое! Попробуйте редактор уровней, изучите движок и окунитесь в SurgeScript для максимальной мощности!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
@@ -148,7 +148,7 @@ CONGRATULATIONS_TITLE       "СПАСИБО ЗА ИГРУ"
 CONGRATULATIONS_SHARE       "ПОДЕЛИТЬСЯ"
 CONGRATULATIONS_DONATE      "ПОДДЕРЖАТЬ"
 CONGRATULATIONS_BACK        "НАЗАД В МЕНЮ"
-CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версия $GAME_VERSION\nХотите ещё? Следите за обновлениями на $GAME_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"
+CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версия $GAME_VERSION!\nХотите ещё? Следите за обновлениями на $GAME_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"
 
 
 
@@ -164,7 +164,7 @@ INPUT_KEYB_UP               "ВВЕРХ"
 INPUT_KEYB_DOWN             "ВНИЗ"
 INPUT_KEYB_FIRE1            "ПРОБЕЛ"
 INPUT_KEYB_FIRE2            "ЛЕВЫЙ CTRL"
-INPUT_KEYB_FIRE3            "ВВОД"
+INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
 INPUT_KEYB_FIRE5            "W"
 INPUT_KEYB_FIRE6            "A"
@@ -193,7 +193,7 @@ INPUT_JOY_FIRE8             "КНОПКА 8"
 //
 
 // Quit game? confirm box
-QUIT_QUESTION               "ВЫ УВЕРЕНЫ ЧТО ХОТИТЕ ВЫЙТИ?"
+QUIT_QUESTION               "Вы уверены что хотите выйти?"
 QUIT_OPTION1                "ДА"
 QUIT_OPTION2                "НЕТ"
 
@@ -207,9 +207,9 @@ LOADING_TEXT                "Загрузка..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Добро пожаловать в Open Surge!</color>\nИспользуйте $INPUT_DIRECTIONAL чтобы двигаться и $INPUT_FIRE1 для прыжка. Нажмите $INPUT_FIRE2 чтобы поменять персонажей."
-LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценный <color=$COLOR_HIGHLIGHT>движок для создания игр</color>."
-LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдной из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Добро пожаловать в Open Surge!</color>\nИспользуйте $INPUT_DIRECTIONAL чтобы двигаться и $INPUT_FIRE1 для прыжка. Нажмите $INPUT_FIRE2 чтобы поменять персонажа."
+LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали...?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценный <color=$COLOR_HIGHLIGHT>движок для создания игр</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдна из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже заинтересованы? Посетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> чтобы начать создавать свои собственные игры!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните делать свой уровень! (нажмите F1 для помощи)"
 
