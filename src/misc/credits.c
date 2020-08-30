@@ -35,30 +35,23 @@ $CREDITS_COLIN \n\
 Brian Zablocky \n\
 $CREDITS_BRIAN \n\
 \n\
-Wuzzy \n\
-$CREDITS_TRANSLATOR \n\
-\n\
-Álvaro Bazán \n\
-$CREDITS_TRANSLATOR \n\
-\n\
-krumaska \n\
-$CREDITS_TRANSLATOR \n\
-\n\
-AntsThatWander \n\
-$CREDITS_TRANSLATOR \n\
-\n\
-Nathanaël Fercocq \n\
-$CREDITS_TRANSLATOR \n\
-\n\
-SecularSteve \n\
-$CREDITS_TRANSLATOR \n\
-\n\
-David Demelier \n\
-$CREDITS_TRANSLATOR \n\
-\n\
 Ruben Caceres \n\
 Lainz \n\
-allegro.cc \n\
+Allegro gamedev community \n\
+\n\
+\n\
+$CREDITS_TRANSLATORS \n\
+\n\
+Wuzzy \n\
+Álvaro Bazán \n\
+krumaska \n\
+AntsThatWander \n\
+Stylix58 \n\
+SecularSteve \n\
+David Demelier \n\
+Artur \"suve\" Iwicki \n\
+Aleska \n\
+Halatnikov \n\
 \n\
 \n\
 $CREDITS_RES_TITLE \n\
