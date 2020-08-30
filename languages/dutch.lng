@@ -114,7 +114,7 @@ CREDITS_VICTOR              "Musicus"
 CREDITS_COLIN               "Sprites, eerste verhaal"
 CREDITS_BRIAN               "Sprite kunstenaar"
 CREDITS_TRANSLATOR          "Vertaler"
-CREDITS_TRANSLATORS         "Translators" // -- FIXME --
+CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>" // -- FIXME --
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individuele middelen</color>"
 CREDITS_RES_TEXT            "Tenzij uitdrukkelijk anders vermeld, zijn de onderstaande bestanden gelicentieerd onder de Creative Commons Attribution 3.0 (CC-BY 3.0)."
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Foto's</color>"
