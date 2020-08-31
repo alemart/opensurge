@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-01-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-08-31"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
 
 
@@ -193,9 +193,9 @@ INPUT_JOY_FIRE8             "BUTTON 8"
 //
 
 // Quit game? confirm box
-QUIT_QUESTION               "DO YOU REALLY WANT TO QUIT?"
-QUIT_OPTION1                "YES"
-QUIT_OPTION2                "NO"
+QUIT_QUESTION               "Do you really want to quit?"
+QUIT_OPTION1                "Yes"
+QUIT_OPTION2                "No"
 
 // Loading Screen
 LOADING_TEXT                "loading..."
