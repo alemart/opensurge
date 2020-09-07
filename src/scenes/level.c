@@ -1218,16 +1218,11 @@ void level_update()
         block_quit = player_is_dying(team[i]);
 
     if(wants_to_leave && !block_quit) {
-        char op[3][512];
-        confirmboxdata_t cbd = { op[0], op[1], op[2] };
+        confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2" };
 
         if(quit_level_img != NULL)
             image_destroy(quit_level_img);
         quit_level_img = image_clone(video_get_backbuffer());
-
-        lang_getstring("QUIT_QUESTION", op[0], sizeof(op[0]));
-        lang_getstring("QUIT_OPTION1", op[1], sizeof(op[1]));
-        lang_getstring("QUIT_OPTION2", op[2], sizeof(op[2]));
 
         wants_to_leave = FALSE;
         music_pause();
@@ -1783,7 +1778,7 @@ surgescript_object_t* level_get_entity_by_id(const char* entity_id)
  */
 void level_add_to_score(int score)
 {
-    // legacy item
+    /* legacy item */
     item_t *flyingtext = level_create_legacy_item(IT_FLYINGTEXT, player->actor->position);
     flyingtext_set_text(flyingtext, "%d", score);
     player_set_score(player_get_score() + score);
@@ -3092,7 +3087,7 @@ void editor_update()
 
     /* reload level */
     if(editorcmd_is_triggered(editor_cmd, "reload")) {
-        confirmboxdata_t cbd = { "Reload the level?", "YES", "NO" };
+        confirmboxdata_t cbd = { "$EDITOR_CONFIRM_RELOAD", "$EDITOR_CONFIRM_YES", "$EDITOR_CONFIRM_NO" };
         scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
         return;
     }
@@ -3520,7 +3515,6 @@ void editor_enable()
     editor_camera.x = (int)camera_get_position().x;
     editor_camera.y = (int)camera_get_position().y;
     editor_cursor = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-    video_showmessage("Welcome to the Level Editor!");
 
     /* changing the video resolution */
     editor_previous_video_resolution = video_get_resolution();
