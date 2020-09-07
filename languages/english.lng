@@ -230,7 +230,7 @@ EDITOR_UI_LEGACYOBJECT      "legacy object"
 EDITOR_UI_MISSING           "<missing>"
 
 // Palette
-EDITOR_PALETTE_EMPTY        "No items found. Press ESC."
+EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color>."
 
 // Bricks - scenery elements
 // Translators: please keep the names below succint. See the comments for their meaning.
@@ -255,7 +255,47 @@ EDITOR_BRICK_FLIP_VFLIP     "vflip"  // vertical flip
 EDITOR_BRICK_FLIP_VHFLIP    "vhflip" // horizontal & vertical flip
 
 // Help screen
-// TODO
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>General</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item placement</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Layer system</color>"
+EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color> to go back"
+EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color> to go back."
+EDITOR_HELP_LAYERSTUTORIAL "1. Yellow L (see palette) enables the yellow layer and disables the green layer.\n2. Green L enables the green layer and disables the yellow layer.\n3. The green layer appears in front of the yellow layer.\n4. Press L to change the layer in which you'll place the bricks."
+
+EDITOR_HELP_CMD_RETURN      "Return to the game"
+EDITOR_HELP_CMD_PALETTE     "Open palette of items"
+EDITOR_HELP_CMD_SAVE        "Save the level"
+EDITOR_HELP_CMD_RELOAD      "Reload the level"
+EDITOR_HELP_CMD_MOVE        "Move the camera"
+EDITOR_HELP_CMD_MOVEFASTER  "Move the camera (faster)"
+EDITOR_HELP_CMD_UNDO        "Undo"
+EDITOR_HELP_CMD_REDO        "Redo"
+EDITOR_HELP_CMD_HELP        "Show help"
+EDITOR_HELP_CMD_GRID        "Snap to grid"
+EDITOR_HELP_CMD_MASKS       "Show collision masks"
+EDITOR_HELP_CMD_PUTITEM     "Put item"
+EDITOR_HELP_CMD_PICKITEM    "Pick item"
+EDITOR_HELP_CMD_DELETEITEM  "Delete item (hold to use the eraser)"
+EDITOR_HELP_CMD_CHANGEITEM  "Change item"
+EDITOR_HELP_CMD_CHANGETYPE  "Change item type"
+EDITOR_HELP_CMD_WATERLEVEL  "Change the level of the water"
+EDITOR_HELP_CMD_SPAWNPOINT  "Change the spawn point"
+EDITOR_HELP_CMD_BRICKLAYER  "Change the brick layer"
+EDITOR_HELP_CMD_FLIPBRICK   "Flip the current brick"
+
+EDITOR_HELP_INPUT_ARROWS        "Arrow keys"
+EDITOR_HELP_INPUT_SHIFT         "Shift" // Shift key
+EDITOR_HELP_INPUT_CTRL          "Ctrl"  // Ctrl key
+EDITOR_HELP_INPUT_ESC           "ESC"   // ESC key
+EDITOR_HELP_INPUT_LEFTCLICK     "Left mouse button"
+EDITOR_HELP_INPUT_RIGHTCLICK    "Right mouse button"
+EDITOR_HELP_INPUT_MIDDLECLICK   "Middle mouse button"
+EDITOR_HELP_INPUT_MOUSEWHEEL    "Mouse wheel"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Reload the level?"
+EDITOR_CONFIRM_YES          "Yes"
+EDITOR_CONFIRM_NO           "No"
 
 
 
