@@ -28,6 +28,7 @@
 #include "../core/image.h"
 #include "../core/sprite.h"
 #include "../core/input.h"
+#include "../core/lang.h"
 #include "../entities/brick.h"
 #include "../entities/sfx.h"
 
@@ -98,7 +99,7 @@ void editorpal_init(void *config_ptr)
     /* configure the mouse cursor */
     cursor_image = sprite_get_image(sprite_get_animation(CURSOR_SPRITE, 0), 0);
     cursor_input = input_create_mouse();
-    cursor_font = font_create("default");
+    cursor_font = font_create("EditorUI");
     cursor_position = v2d_new(0, 0);
 
     /* configure the background */
@@ -110,7 +111,7 @@ void editorpal_init(void *config_ptr)
     scroll_max = (int)((item_count - 1) / (int)((VIDEO_SCREEN_W - SCROLLBAR_WIDTH) / ITEM_BOX_SIZE)) * ITEM_BOX_SIZE - (int)(VIDEO_SCREEN_H / ITEM_BOX_SIZE) * ITEM_BOX_SIZE + ITEM_BOX_SIZE;
     scroll_y = clip(scroll_y, 0, scroll_max); /* preserve previous value */
     pal_input = input_create_user("editorpal");
-    error_font = font_create("default");
+    error_font = font_create("EditorUI");
     font_set_position(error_font, v2d_new(8, 8));
 }
 
@@ -146,7 +147,7 @@ void editorpal_update()
 
     /* no items? */
     if(item_count == 0) {
-        font_set_text(error_font, "%s", "No items found. [press ESC]");
+        font_set_text(error_font, "%s", "$EDITOR_PALETTE_EMPTY");
         font_set_visible(error_font, TRUE);
     }
     else
@@ -156,18 +157,26 @@ void editorpal_update()
     cursor_position.x = clip(input_get_xy((inputmouse_t*)cursor_input).x, 0, VIDEO_SCREEN_W - image_width(cursor_image)/2);
     cursor_position.y = clip(input_get_xy((inputmouse_t*)cursor_input).y, 0, VIDEO_SCREEN_H - image_height(cursor_image)/2);
     cursor_font_pos.x = clip((int)cursor_position.x, 10, VIDEO_SCREEN_W - font_get_textsize(cursor_font).x - 10);
-    cursor_font_pos.y = clip((int)cursor_position.y - 3 * font_get_textsize(cursor_font).y, 10, VIDEO_SCREEN_H - 10);
+    cursor_font_pos.y = clip((int)cursor_position.y - font_get_textsize(cursor_font).y, 10, VIDEO_SCREEN_H - 10);
     font_set_position(cursor_font, cursor_font_pos);
 
     /* cursor text */
     if(item_at(cursor_position) >= 0) {
         font_set_visible(cursor_font, TRUE);
-        if(config.type == EDITORPAL_SSOBJ)
+        if(config.type == EDITORPAL_BRICK) {
+            static char tmp[2][256];
+            int brick_id = config.brick.id[item_at(cursor_position)];
+            snprintf(tmp[0], sizeof(tmp[0]), "EDITOR_BRICK_TYPE_%s", brick_util_typename(brick_type_preview(brick_id)));
+            snprintf(tmp[1], sizeof(tmp[1]), "EDITOR_BRICK_BEHAVIOR_%s", brick_util_behaviorname(brick_behavior_preview(brick_id)));
+            font_set_text(cursor_font, "$EDITOR_UI_BRICK %d\n%s\n%s", brick_id,
+                lang_getstring(tmp[0], tmp[0], sizeof(tmp[0])),
+                brick_behavior_preview(brick_id) != BRB_DEFAULT ? lang_getstring(tmp[1], tmp[1], sizeof(tmp[1])) : ""
+            );
+        }
+        else if(config.type == EDITORPAL_SSOBJ)
             font_set_text(cursor_font, "%s", config.ssobj.name[item_at(cursor_position)]);
-        else if(config.type == EDITORPAL_BRICK)
-            font_set_text(cursor_font, "brick %d", config.brick.id[item_at(cursor_position)]);
         else
-            font_set_text(cursor_font, "item %d", item_at(cursor_position));
+            font_set_text(cursor_font, "$EDITOR_UI_MISSING %d", item_at(cursor_position));
     }
     else
         font_set_visible(cursor_font, FALSE);
