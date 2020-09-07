@@ -262,7 +262,7 @@ EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item placement</colo
 EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Layer system</color>"
 EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back"
 EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back."
-EDITOR_HELP_LAYERSTUTORIAL  "The player will switch layers by touching the Green/Yellow L objects (see the palette)\nThe Green L enables the green layer and disables the yellow layer\nThe Yellow L enables the yellow layer and disables the green layer\nPress the L key to change the layer in which you'll place the bricks\nThe green layer appears in front of the yellow layer"
+EDITOR_HELP_LAYERSTUTORIAL  "The player will switch layers by touching the Green/Yellow L objects (see the palette)\nThe Green L object enables the green layer and disables the yellow layer\nThe Yellow L object enables the yellow layer and disables the green layer\nPress the L key to change the layer in which you'll place the bricks\nThe green layer appears in front of the yellow layer"
 
 EDITOR_HELP_CMD_RETURN      "Return to the game"
 EDITOR_HELP_CMD_PALETTE     "Open palette of items"
