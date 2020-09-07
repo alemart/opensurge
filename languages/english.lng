@@ -254,7 +254,7 @@ EDITOR_BRICK_FLIP_VHFLIP    "vhflip" // horizontal & vertical flip
 // Palette
 EDITOR_PALETTE_BRICK        "brick"
 EDITOR_PALETTE_MISSING      "missing"
-EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color>."
+EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back."
 
 // Help screen
 EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>General</color>"
