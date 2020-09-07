@@ -260,7 +260,7 @@ EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item placement</colo
 EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Layer system</color>"
 EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color> to go back"
 EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color> to go back."
-EDITOR_HELP_LAYERSTUTORIAL "1. Yellow L (see palette) enables the yellow layer and disables the green layer.\n2. Green L enables the green layer and disables the yellow layer.\n3. The green layer appears in front of the yellow layer.\n4. Press L to change the layer in which you'll place the bricks."
+EDITOR_HELP_LAYERSTUTORIAL  "1. Yellow L (see palette) enables the yellow layer and disables the green layer.\n2. Green L enables the green layer and disables the yellow layer.\n3. The green layer appears in front of the yellow layer.\n4. Press L to change the layer in which you'll place the bricks."
 
 EDITOR_HELP_CMD_RETURN      "Return to the game"
 EDITOR_HELP_CMD_PALETTE     "Open palette of items"
@@ -283,14 +283,14 @@ EDITOR_HELP_CMD_SPAWNPOINT  "Change the spawn point"
 EDITOR_HELP_CMD_BRICKLAYER  "Change the brick layer"
 EDITOR_HELP_CMD_FLIPBRICK   "Flip the current brick"
 
-EDITOR_HELP_INPUT_ARROWS        "Arrow keys"
-EDITOR_HELP_INPUT_SHIFT         "Shift" // Shift key
-EDITOR_HELP_INPUT_CTRL          "Ctrl"  // Ctrl key
-EDITOR_HELP_INPUT_ESC           "ESC"   // ESC key
-EDITOR_HELP_INPUT_LEFTCLICK     "Left mouse button"
-EDITOR_HELP_INPUT_RIGHTCLICK    "Right mouse button"
-EDITOR_HELP_INPUT_MIDDLECLICK   "Middle mouse button"
-EDITOR_HELP_INPUT_MOUSEWHEEL    "Mouse wheel"
+EDITOR_HELP_INPUT_ARROWS         "Arrow keys"
+EDITOR_HELP_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_HELP_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_HELP_INPUT_ESC            "ESC"   // ESC key
+EDITOR_HELP_INPUT_LEFTCLICK      "Left mouse button"
+EDITOR_HELP_INPUT_RIGHTCLICK     "Right mouse button"
+EDITOR_HELP_INPUT_MIDDLECLICK    "Middle mouse button"
+EDITOR_HELP_INPUT_MOUSEWHEEL     "Mouse wheel"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Reload the level?"
