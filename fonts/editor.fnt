@@ -19,7 +19,7 @@ font "EditorUI" for "ko_KR"
     truetype
     {
         source_file             "fonts/GothicA1-Bold.ttf"
-        size                    16
+        size                    14
         shadow
         antialias
     }

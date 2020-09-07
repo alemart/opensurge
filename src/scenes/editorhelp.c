@@ -31,8 +31,8 @@
 #include "../entities/sfx.h"
 
 /* private stuff */
-const int COLUMN_SPACING = 96;
-const int MAX_COLUMN_WIDTH = 256;
+const int COLUMN_SPACING = -180;
+const int MAX_COLUMN_WIDTH = 360;
 const int MIN_PREFERRED_WINDOW_HEIGHT = 720;
 const int MIN_WINDOW_HEIGHT = 480;
 
@@ -45,26 +45,26 @@ static const char text[] =
 "\n"
 "F12                                  $EDITOR_HELP_CMD_RETURN\n"
 "1 | 2                                $EDITOR_HELP_CMD_PALETTE\n"
-"$EDITOR_HELP_INPUT_CTRL + S          $EDITOR_HELP_CMD_SAVE\n"
-"$EDITOR_HELP_INPUT_CTRL + R          $EDITOR_HELP_CMD_RELOAD\n"
-"$EDITOR_HELP_INPUT_ARROWS | WASD     $EDITOR_HELP_CMD_MOVE\n"
-"$EDITOR_HELP_INPUT_SHIFT + $EDITOR_HELP_INPUT_ARROWS | $EDITOR_HELP_INPUT_SHIFT + WASD     $EDITOR_HELP_CMD_MOVEFASTER\n"
-"$EDITOR_HELP_INPUT_CTRL + Z | $EDITOR_HELP_INPUT_CTRL + Y                                  $EDITOR_HELP_CMD_UNDO | $EDITOR_HELP_CMD_REDO\n"
+"$EDITOR_INPUT_CTRL + S               $EDITOR_HELP_CMD_SAVE\n"
+"$EDITOR_INPUT_CTRL + R               $EDITOR_HELP_CMD_RELOAD\n"
+"$EDITOR_INPUT_ARROWS | WASD          $EDITOR_HELP_CMD_MOVE\n"
+"$EDITOR_INPUT_SHIFT + $EDITOR_INPUT_ARROWS | $EDITOR_INPUT_SHIFT + WASD     $EDITOR_HELP_CMD_MOVEFASTER\n"
+"$EDITOR_INPUT_CTRL + Z | $EDITOR_INPUT_CTRL + Y                             $EDITOR_HELP_CMD_UNDO | $EDITOR_HELP_CMD_REDO\n"
 "F1                                   $EDITOR_HELP_CMD_HELP\n"
 "G                                    $EDITOR_HELP_CMD_GRID\n"
 "M                                    $EDITOR_HELP_CMD_MASKS\n"
 "\n"
 "$EDITOR_HELP_ITEMS\n"
 "\n"
-"$EDITOR_HELP_INPUT_LEFTCLICK                                     $EDITOR_HELP_CMD_PUTITEM\n"
-"$EDITOR_HELP_INPUT_MIDDLECLICK                                   $EDITOR_HELP_CMD_PICKITEM\n"
-"$EDITOR_HELP_INPUT_RIGHTCLICK                                    $EDITOR_HELP_CMD_DELETEITEM\n"
-"$EDITOR_HELP_INPUT_MOUSEWHEEL                                    $EDITOR_HELP_CMD_CHANGEITEM\n"
-"$EDITOR_HELP_INPUT_SHIFT + $EDITOR_HELP_INPUT_LEFTCLICK          $EDITOR_HELP_CMD_WATERLEVEL\n"
-"$EDITOR_HELP_INPUT_CTRL + $EDITOR_HELP_INPUT_LEFTCLICK           $EDITOR_HELP_CMD_SPAWNPOINT\n"
-"L | $EDITOR_HELP_INPUT_SHIFT + L                                 $EDITOR_HELP_CMD_BRICKLAYER\n"
-"F | $EDITOR_HELP_INPUT_SHIFT + F                                 $EDITOR_HELP_CMD_FLIPBRICK\n"
-"$EDITOR_HELP_INPUT_SHIFT + $EDITOR_HELP_INPUT_MOUSEWHEEL         $EDITOR_HELP_CMD_CHANGETYPE\n"
+"$EDITOR_INPUT_LEFTCLICK                                $EDITOR_HELP_CMD_PUTITEM\n"
+"$EDITOR_INPUT_MIDDLECLICK                              $EDITOR_HELP_CMD_PICKITEM\n"
+"$EDITOR_INPUT_RIGHTCLICK                               $EDITOR_HELP_CMD_DELETEITEM\n"
+"$EDITOR_INPUT_MOUSEWHEEL                               $EDITOR_HELP_CMD_CHANGEITEM\n"
+"$EDITOR_INPUT_SHIFT + $EDITOR_INPUT_LEFTCLICK          $EDITOR_HELP_CMD_WATERLEVEL\n"
+"$EDITOR_INPUT_CTRL + $EDITOR_INPUT_LEFTCLICK           $EDITOR_HELP_CMD_SPAWNPOINT\n"
+"L | $EDITOR_INPUT_SHIFT + L                            $EDITOR_HELP_CMD_BRICKLAYER\n"
+"F | $EDITOR_INPUT_SHIFT + F                            $EDITOR_HELP_CMD_FLIPBRICK\n"
+"$EDITOR_INPUT_SHIFT + $EDITOR_INPUT_MOUSEWHEEL         $EDITOR_HELP_CMD_CHANGETYPE\n"
 "\n"
 "$EDITOR_HELP_LAYERS\n"
 "\n"
@@ -97,8 +97,8 @@ void editorhelp_init(void *foo)
     split_columns(text, text_column[0], text_column[1], (int)window_size.y < MIN_PREFERRED_WINDOW_HEIGHT);
     font_set_text(columnfnt[0], "%s", text_column[0]);
     font_set_text(columnfnt[1], "%s", text_column[1]);
-    font_set_width(columnfnt[0], MAX_COLUMN_WIDTH * 3);
     font_set_width(columnfnt[1], MAX_COLUMN_WIDTH);
+    font_set_align(columnfnt[1], FONTALIGN_RIGHT);
 
     /* position the columns */
     compute_box_dimensions(
@@ -110,7 +110,7 @@ void editorhelp_init(void *foo)
         box_ypos
     ));
     font_set_position(columnfnt[1], v2d_new(
-        box_xpos + MAX_COLUMN_WIDTH + COLUMN_SPACING,
+        box_xpos + box_width,
         box_ypos
     ));
 

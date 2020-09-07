@@ -229,9 +229,6 @@ EDITOR_UI_LEGACYITEM        "legacy item"
 EDITOR_UI_LEGACYOBJECT      "legacy object"
 EDITOR_UI_MISSING           "<missing>"
 
-// Palette
-EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color>."
-
 // Bricks - scenery elements
 // Translators: please keep the names below succint. See the comments for their meaning.
 EDITOR_BRICK_TYPE_SOLID     "SOLID"     // a solid brick (you can't get inside them)
@@ -254,12 +251,17 @@ EDITOR_BRICK_FLIP_HFLIP     "hflip"  // horizontal flip
 EDITOR_BRICK_FLIP_VFLIP     "vflip"  // vertical flip
 EDITOR_BRICK_FLIP_VHFLIP    "vhflip" // horizontal & vertical flip
 
+// Palette
+EDITOR_PALETTE_BRICK        "brick"
+EDITOR_PALETTE_MISSING      "missing"
+EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color>."
+
 // Help screen
 EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>General</color>"
 EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item placement</color>"
 EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Layer system</color>"
-EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color> to go back"
-EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_HELP_INPUT_ESC</color> to go back."
+EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back"
+EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back."
 EDITOR_HELP_LAYERSTUTORIAL  "The player will switch layers by touching the Green/Yellow L objects (see the palette)\nThe Green L enables the green layer and disables the yellow layer\nThe Yellow L enables the yellow layer and disables the green layer\nPress the L key to change the layer in which you'll place the bricks\nThe green layer appears in front of the yellow layer"
 
 EDITOR_HELP_CMD_RETURN      "Return to the game"
@@ -283,14 +285,15 @@ EDITOR_HELP_CMD_SPAWNPOINT  "Change the spawn point"
 EDITOR_HELP_CMD_BRICKLAYER  "Change the brick layer"
 EDITOR_HELP_CMD_FLIPBRICK   "Flip the current brick"
 
-EDITOR_HELP_INPUT_ARROWS         "Arrow keys"
-EDITOR_HELP_INPUT_SHIFT          "Shift" // Shift key
-EDITOR_HELP_INPUT_CTRL           "Ctrl"  // Ctrl key
-EDITOR_HELP_INPUT_ESC            "ESC"   // ESC key
-EDITOR_HELP_INPUT_LEFTCLICK      "Left mouse button"
-EDITOR_HELP_INPUT_RIGHTCLICK     "Right mouse button"
-EDITOR_HELP_INPUT_MIDDLECLICK    "Middle mouse button"
-EDITOR_HELP_INPUT_MOUSEWHEEL     "Mouse wheel"
+// Input keys
+EDITOR_INPUT_ARROWS         "Arrow keys"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Left mouse button"
+EDITOR_INPUT_RIGHTCLICK     "Right mouse button"
+EDITOR_INPUT_MIDDLECLICK    "Middle mouse button"
+EDITOR_INPUT_MOUSEWHEEL     "Mouse wheel"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Reload the level?"
