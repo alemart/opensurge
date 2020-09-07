@@ -300,6 +300,12 @@ EDITOR_CONFIRM_RELOAD       "Reload the level?"
 EDITOR_CONFIRM_YES          "Yes"
 EDITOR_CONFIRM_NO           "No"
 
+// Warnings
+EDITOR_WARNING_CANTUNDO     "Already at the oldest change"
+EDITOR_WARNING_CANTREDO     "Already at the newest change"
+EDITOR_WARNING_SAVESUCCESS  "Saved to $1"
+EDITOR_WARNING_SAVEERROR    "Can't save the level"
+
 
 
 //
