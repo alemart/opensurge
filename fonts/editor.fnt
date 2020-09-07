@@ -1,0 +1,38 @@
+// Open Surge Engine
+// http://opensurge2d.org
+// Fonts used in the Level Editor
+
+// User Interface
+font "EditorUI"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Bold.ttf"
+        size                    17
+        shadow
+        antialias
+    }
+}
+
+font "EditorUI" for "ko_KR"
+{
+    truetype
+    {
+        source_file             "fonts/GothicA1-Bold.ttf"
+        size                    16
+        shadow
+        antialias
+    }
+}
+
+// Mouse cursor
+font "EditorCursor"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    14
+        shadow
+        antialias
+    }
+}
