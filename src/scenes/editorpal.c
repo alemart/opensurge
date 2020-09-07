@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorpal.c - level editor: item palette
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -168,7 +168,7 @@ void editorpal_update()
             int brick_id = config.brick.id[item_at(cursor_position)];
             snprintf(tmp[0], sizeof(tmp[0]), "EDITOR_BRICK_TYPE_%s", brick_util_typename(brick_type_preview(brick_id)));
             snprintf(tmp[1], sizeof(tmp[1]), "EDITOR_BRICK_BEHAVIOR_%s", brick_util_behaviorname(brick_behavior_preview(brick_id)));
-            font_set_text(cursor_font, "$EDITOR_UI_BRICK %d\n%s\n%s", brick_id,
+            font_set_text(cursor_font, "<color=$COLOR_HIGHLIGHT>$EDITOR_UI_BRICK %d</color>\n%s\n%s", brick_id,
                 lang_getstring(tmp[0], tmp[0], sizeof(tmp[0])),
                 brick_behavior_preview(brick_id) != BRB_DEFAULT ? lang_getstring(tmp[1], tmp[1], sizeof(tmp[1])) : ""
             );

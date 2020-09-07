@@ -795,7 +795,7 @@ const char* brick_util_typename(bricktype_t type)
             return "CLOUD";
     }
 
-    return "Unknown";
+    return "UNKNOWN";
 }
 
 
@@ -832,7 +832,7 @@ const char* brick_util_behaviorname(brickbehavior_t behavior)
             return "MARKER";
     }
 
-    return "Unknown";
+    return "UNKNOWN";
 }
 
 /* utilities */

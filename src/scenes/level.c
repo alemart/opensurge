@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - code for the game levels
- * Copyright (C) 2008-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2999,9 +2999,10 @@ void editor_init()
 
     /* creating objects */
     editor_cmd = editorcmd_create();
-    editor_cursor_font = font_create("default");
-    editor_properties_font = font_create("default");
-    editor_help_font = font_create("default");
+    editor_cursor_font = font_create("EditorCursor");
+    editor_properties_font = font_create("EditorUI");
+    editor_help_font = font_create("EditorUI");
+    editor_tooltip_font = font_create("EditorUI");
 
     /* grid */
     editor_grid_init();
@@ -3048,6 +3049,7 @@ void editor_release()
 
     /* destroying objects */
     editorcmd_destroy(editor_cmd);
+    font_destroy(editor_tooltip_font);
     font_destroy(editor_properties_font);
     font_destroy(editor_cursor_font);
     font_destroy(editor_help_font);
@@ -3071,6 +3073,7 @@ void editor_update()
     int pick_object, delete_object = FALSE;
     int selected_item;
     v2d_t pos;
+    char text_buf[32];
 
     /* mouse cursor */
     editor_cursor = editorcmd_mousepos(editor_cmd);
@@ -3417,18 +3420,18 @@ void editor_update()
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
-    font_set_text(editor_help_font, "<color=ff8060>F1</color>: help");
+    font_set_text(editor_help_font, "$EDITOR_UI_HELP");
     font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 8, 8));
     font_set_visible(editor_help_font, video_get_window_size().x > 512);
 
     /* object properties */
+    snprintf(text_buf, sizeof(text_buf), "$EDITOR_UI_%s ", editor_entity_class(editor_cursor_entity_type));
     font_set_position(editor_properties_font, v2d_new(8, 8));
-    font_set_text(
-        editor_properties_font,
-        "<color=ff8060>%s</color> %s",
-        editor_entity_class(editor_cursor_entity_type),
+    font_set_textarguments(editor_properties_font, 2,
+        text_buf,
         editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
     );
+    font_set_text(editor_properties_font, "$EDITOR_UI_TOOL");
 
     /* "ungetting" major entities */
     entitymanager_release_retrieved_brick_list(major_bricks);
@@ -3467,7 +3470,7 @@ void editor_render()
     editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
 
     /* top bar */
-    image_rectfill(0, 0, VIDEO_SCREEN_W, 24, color_rgb(40, 44, 52));
+    image_rectfill(0, 0, VIDEO_SCREEN_W, 32, color_rgba(40, 44, 52, 128));
     font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
@@ -3697,22 +3700,22 @@ const char *editor_entity_class(enum editor_entity_type objtype)
 {
     switch(objtype) {
         case EDT_BRICK:
-            return "brick";
+            return "BRICK";
 
         case EDT_GROUP:
-            return "brick group";
+            return "GROUP";
 
         case EDT_SSOBJ:
-            return "entity";
+            return "ENTITY";
 
         case EDT_ITEM:
-            return "legacy item";
+            return "LEGACYITEM";
 
         case EDT_ENEMY:
-            return "legacy object";
+            return "LEGACYOBJECT";
     }
 
-    return "unknown";
+    return "UNKNOWN";
 }
 
 
@@ -3720,24 +3723,28 @@ const char *editor_entity_class(enum editor_entity_type objtype)
  * about a given object */
 const char *editor_entity_info(enum editor_entity_type objtype, int objid)
 {
-    static char buf[128];
+    static char buf[256];
     *buf = 0;
 
     switch(objtype) {
         case EDT_BRICK:
             if(brick_exists(objid)) {
+                static char tmp[3][128];
+                snprintf(tmp[0], sizeof(tmp[0]), "EDITOR_BRICK_TYPE_%s", brick_util_typename(brick_type_preview(objid)));
+                snprintf(tmp[1], sizeof(tmp[1]), "EDITOR_BRICK_BEHAVIOR_%s", brick_util_behaviorname(brick_behavior_preview(objid)));
+                snprintf(tmp[2], sizeof(tmp[2]), "EDITOR_BRICK_FLIP_%s", str_to_upper(brick_util_flipstr(editor_flip)));
                 snprintf(buf, sizeof(buf),
                     "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s", objid,
-                    brick_util_typename(brick_type_preview(objid)),
-                    brick_util_behaviorname(brick_behavior_preview(objid)),
+                    lang_getstring(tmp[0], tmp[0], sizeof(tmp[0])),
+                    lang_getstring(tmp[1], tmp[1], sizeof(tmp[1])),
                     image_width(brick_image_preview(objid)),
                     image_height(brick_image_preview(objid)),
                     brick_zindex_preview(objid),
-                    brick_util_flipstr(editor_flip)
+                    lang_getstring(tmp[2], tmp[2], sizeof(tmp[2]))
                 );
             }
             else
-                str_cpy(buf, "<missing>", sizeof(buf));
+                str_cpy(buf, "$EDITOR_UI_MISSING", sizeof(buf));
             break;
 
         case EDT_ITEM:
@@ -4347,14 +4354,13 @@ bool editor_grid_is_enabled()
 /* initializes the tooltip */
 void editor_tooltip_init()
 {
-    editor_tooltip_font = font_create("default");
     font_set_visible(editor_tooltip_font, false);
 }
 
 /* releases the tooltip */
 void editor_tooltip_release()
 {
-    font_destroy(editor_tooltip_font);
+    ;
 }
 
 /* updates the tooltip */
@@ -4380,7 +4386,7 @@ void editor_tooltip_update()
             ssobj_extradata_t* data = get_ssobj_extradata(target);
             const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
             v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
-            font_set_text(editor_tooltip_font, "<color=ffee11>%s</color>\n%d,%d\n%s\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
+            font_set_text(editor_tooltip_font, "<color=$COLOR_HIGHLIGHT>%s</color>\n%d,%d\n%s\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
             font_set_position(editor_tooltip_font, scripting_util_world_position(target));
             font_set_visible(editor_tooltip_font, true);
         }
