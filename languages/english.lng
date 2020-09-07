@@ -223,7 +223,7 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow i
 EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: help"
 EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
 EDITOR_UI_BRICK             "brick"
-EDITOR_UI_GROUP             "brick group"
+EDITOR_UI_GROUP             "group"
 EDITOR_UI_ENTITY            "entity"
 EDITOR_UI_LEGACYITEM        "legacy item"
 EDITOR_UI_LEGACYOBJECT      "legacy object"
