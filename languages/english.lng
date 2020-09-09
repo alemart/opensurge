@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-09-07"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-09-09"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 
 
@@ -246,10 +246,10 @@ EDITOR_BRICK_BEHAVIOR_FLOAT      "FLOAT"     // a floating platform
 EDITOR_BRICK_BEHAVIOR_MARKER     "MARKER"    // special brick only rendered in the editor
 EDITOR_BRICK_BEHAVIOR_UNKNOWN    "UNKNOWN"
 
-EDITOR_BRICK_FLIP_NOFLIP    "noflip" // the brick is not flipped
-EDITOR_BRICK_FLIP_HFLIP     "hflip"  // horizontal flip
-EDITOR_BRICK_FLIP_VFLIP     "vflip"  // vertical flip
-EDITOR_BRICK_FLIP_VHFLIP    "vhflip" // horizontal & vertical flip
+EDITOR_BRICK_FLIP_NOFLIP    "unflipped"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "flipped horizontally" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "flipped vertically"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "rotated by 180°"      // flip horizontally & vertically
 
 // Palette
 EDITOR_PALETTE_BRICK        "brick"
@@ -307,8 +307,11 @@ EDITOR_MESSAGE_SAVEERROR    "Can't save the level. Please check the logs"
 EDITOR_MESSAGE_RELOADED     "The level has been reloaded"
 EDITOR_MESSAGE_UNDOERROR    "Already at the oldest change"
 EDITOR_MESSAGE_REDOERROR    "Already at the newest change"
-EDITOR_MESSAGE_SNAP2GRIDON  "Snap to grid: $1 x $2"
+EDITOR_MESSAGE_SNAP2GRIDON  "Snap to grid: using a $1 x $2 grid"
 EDITOR_MESSAGE_SNAP2GRIDOFF "Snap to grid: disabled"
+EDITOR_MESSAGE_DEFAULTLAYER "Switched to the <color=$1>default</color> layer"
+EDITOR_MESSAGE_GREENLAYER   "Switched to the <color=$1>green</color> layer"
+EDITOR_MESSAGE_YELLOWLAYER  "Switched to the <color=$1>yellow</color> layer"
 
 
 
