@@ -12,7 +12,7 @@ version "1.0"
 requires "0.5.1"
 act 1
 theme "themes/waterworks.brk"
-bgtheme "themes/template.bg"
+bgtheme "themes/sunshine.bg"
 spawn_point 112 9904
 setup "Debug Setup" "Example Setup"
 players "Neon" "Tux"
