@@ -23,6 +23,7 @@
 #endif
 
 #include <string.h>
+#include "stringutil.h"
 #include "color.h"
 
 /*
@@ -89,6 +90,45 @@ color_t color_hex(const char* hex_string)
 
     /* done! */
     return color_rgba(r, g, b, a);
+}
+
+/*
+ * color_to_hex()
+ * Converts a color to an equivalent hex string, e.g.,
+ * color_rgba(255, 255, 0, 128) becomes "ffff0080"
+ * color_rgb(255, 255, 255) becomes "ffffff"
+ * If dest is set to NULL, a static buffer is returned.
+ * Otherwise, dest is returned with the hex string.
+ * Note: dest_size should be >= 9 (or 0 if dest is NULL)
+ */
+const char* color_to_hex(color_t color, char* dest, size_t dest_size)
+{
+    static const char table[] = "0123456789abcdef";
+    static char buf[16];
+    uint8_t r, g, b, a;
+    char *p = buf;
+
+    /* get the RGBA components of the input color */
+    color_unmap(color, &r, &g, &b, &a);
+
+    /* write the hex string to the internal buffer */
+    *(p++) = table[(r >> 4) & 15];
+    *(p++) = table[r & 15];
+    *(p++) = table[(g >> 4) & 15];
+    *(p++) = table[g & 15];
+    *(p++) = table[(b >> 4) & 15];
+    *(p++) = table[b & 15];
+    if(a < 255) {
+        *(p++) = table[(a >> 4) & 15];
+        *(p++) = table[a & 15];
+    }
+    *p = '\0';
+
+    /* return the hex string */
+    if(dest != NULL)
+        return str_cpy(dest, buf, dest_size);
+    else
+        return buf;
 }
 
 /*
