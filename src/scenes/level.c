@@ -298,8 +298,8 @@ static v2d_t editor_camera, editor_cursor;
 static enum editor_entity_type editor_cursor_entity_type;
 static int editor_cursor_entity_id, editor_cursor_itemid;
 static font_t *editor_cursor_font;
-static font_t *editor_properties_font;
-static font_t *editor_help_font;
+static font_t *editor_properties_font; /* top bar */
+static font_t *editor_help_font; /* top bar */
 static const char* editor_entity_class(enum editor_entity_type objtype);
 static const char* editor_entity_info(enum editor_entity_type objtype, int objid);
 static void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t position);
@@ -357,6 +357,10 @@ static void editor_brick_release();
 static int editor_brick_index(int brick_id); /* index of brick_id at editor_brick[] */
 static int editor_brick_id(int index); /* the index-th valid brick - at editor_brick[] */
 
+/* editor: UI */
+#define EDITOR_UI_COLOR()              color_rgb(40, 44, 52)
+#define EDITOR_UI_COLOR_TRANS(alpha)   color_rgba(40, 44, 52, (alpha))
+
 /* editor: grid */
 static int editor_grid_size = 1;
 static void editor_grid_init();
@@ -376,6 +380,16 @@ static void editor_tooltip_render();
 static const char* editor_tooltip_ssproperties(surgescript_object_t* object);
 static void editor_tooltip_ssproperties_add(const char* object_name, void* data);
 static const char* editor_tooltip_ssproperties_file(surgescript_object_t* object);
+
+/* editor: status bar */
+#define EDITOR_STATUS_TIMEOUT 5.0f /* how long does a status message last on screen, in seconds */
+static font_t *editor_status_font; /* status bar */
+static float editor_status_timer;
+static void editor_status_init();
+static void editor_status_release();
+static void editor_status_update();
+static void editor_status_render();
+static void editor_status_display(const char* message, int argc, const char** argv);
 
 /* implementing UNDO and REDO */
 
@@ -2997,13 +3011,15 @@ void editor_init()
     editor_cursor_font = font_create("EditorCursor");
     editor_properties_font = font_create("EditorUI");
     editor_help_font = font_create("EditorUI");
-    editor_tooltip_font = font_create("EditorUI");
 
     /* grid */
     editor_grid_init();
 
     /* tooltip */
     editor_tooltip_init();
+
+    /* status bar */
+    editor_status_init();
 
     /* bricks */
     editor_brick_init();
@@ -3036,6 +3052,9 @@ void editor_release()
     /* bricks */
     editor_brick_release();
 
+    /* status bar */
+    editor_status_release();
+
     /* tooltip */
     editor_tooltip_release();
     
@@ -3044,7 +3063,6 @@ void editor_release()
 
     /* destroying objects */
     editorcmd_destroy(editor_cmd);
-    font_destroy(editor_tooltip_font);
     font_destroy(editor_properties_font);
     font_destroy(editor_cursor_font);
     font_destroy(editor_help_font);
@@ -3101,6 +3119,7 @@ void editor_update()
         level_load(file);
         editor_init();
         editor_enable();
+        editor_status_display("$EDITOR_MESSAGE_RELOADED", 0, NULL);
         editor_camera = cam;
         level_cleared = FALSE;
         jump_to_next_stage = FALSE;
@@ -3404,6 +3423,9 @@ void editor_update()
     /* scrolling */
     editor_scroll();
 
+    /* status bar */
+    editor_status_update();
+
     /* tooltop */
     editor_tooltip_update();
 
@@ -3465,7 +3487,7 @@ void editor_render()
     editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
 
     /* top bar */
-    image_rectfill(0, 0, VIDEO_SCREEN_W, 32, color_rgba(40, 44, 52, 128));
+    image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
     font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
 
@@ -3492,6 +3514,9 @@ void editor_render()
 
     /* tooltip */
     editor_tooltip_render();
+
+    /* status bar */
+    editor_status_render();
 
     /* done */
     entitymanager_release_retrieved_brick_list(major_bricks);
@@ -3520,6 +3545,9 @@ void editor_enable()
     editor_previous_video_resolution = video_get_resolution();
     editor_previous_video_smooth = video_is_smooth();
     video_changemode(VIDEORESOLUTION_EDT, FALSE, video_is_fullscreen());
+
+    /* display a warm, welcome message */
+    editor_status_display("$EDITOR_MESSAGE_WELCOME", 0, NULL);
 }
 
 
@@ -3579,7 +3607,7 @@ void editor_update_background()
  */
 void editor_render_background()
 {
-    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(40, 44, 52));
+    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, EDITOR_UI_COLOR());
     background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
 }
 
@@ -3606,11 +3634,11 @@ void editor_save()
 {
     if(level_save(file)) {
         sound_play(SFX_SAVE);
-        video_showmessage("Level saved to %s", file);
+        editor_status_display("$EDITOR_MESSAGE_SAVED", 1, (const char*[]){ file });
     }
     else {
         sound_play(SFX_DENY);
-        video_showmessage("Can't save the level. Please check the logs...");
+        editor_status_display("$EDITOR_MESSAGE_SAVEERROR", 0, NULL);
     }
 }
 
@@ -4286,10 +4314,12 @@ void editor_grid_update()
             }
         }
 
-        if(editor_grid_is_enabled())
-            video_showmessage("Snap to grid: %dx%d", editor_grid_size, editor_grid_size);
+        if(editor_grid_is_enabled()) {
+            const char* grid_size_str = str_from_int(editor_grid_size, NULL, 0);
+            editor_status_display("$EDITOR_MESSAGE_SNAP2GRIDON", 2, (const char*[]){ grid_size_str, grid_size_str });
+        }
         else
-            video_showmessage("Snap to grid: disabled");
+            editor_status_display("$EDITOR_MESSAGE_SNAP2GRIDOFF", 0, NULL);
     }
 }
 
@@ -4348,13 +4378,14 @@ bool editor_grid_is_enabled()
 /* initializes the tooltip */
 void editor_tooltip_init()
 {
+    editor_tooltip_font = font_create("EditorUI");
     font_set_visible(editor_tooltip_font, false);
 }
 
 /* releases the tooltip */
 void editor_tooltip_release()
 {
-    ;
+    font_destroy(editor_tooltip_font);
 }
 
 /* updates the tooltip */
@@ -4394,8 +4425,8 @@ void editor_tooltip_render()
         v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
         v2d_t rectpos = v2d_subtract(font_get_position(editor_tooltip_font), v2d_add(topleft, v2d_new(8, 8)));
         v2d_t rectsize = v2d_add(font_get_textsize(editor_tooltip_font), v2d_new(16, 16));
-        image_rectfill(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgba(40, 44, 52, 160));
-        image_rect(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, color_rgb(40, 44, 52));
+        image_rectfill(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, EDITOR_UI_COLOR_TRANS(160));
+        image_rect(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, EDITOR_UI_COLOR());
         font_render(editor_tooltip_font, editor_camera);
     }
 }
@@ -4504,6 +4535,62 @@ const char* editor_tooltip_ssproperties_file(surgescript_object_t* object)
     surgescript_var_destroy(ret);
 
     return file;
+}
+
+
+
+
+/* level editor: status bar */
+
+/* initialize the status bar */
+void editor_status_init()
+{
+    const int padding = 8;
+    int h = 0;
+
+    editor_status_timer = 0.0f;
+    editor_status_font = font_create("EditorUI");
+
+    font_set_text(editor_status_font, " ");
+    h = (int)(font_get_textsize(editor_status_font).y);
+
+    font_set_visible(editor_status_font, false);
+    font_set_position(editor_status_font, v2d_new(padding, video_get_window_size().y - h - padding));
+}
+
+/* release the status bar */
+void editor_status_release()
+{
+    font_destroy(editor_status_font);
+    editor_status_timer = 0.0f;
+}
+
+/* update the status bar */
+void editor_status_update()
+{
+    float dt = timer_get_delta();
+
+    editor_status_timer = max(0.0f, editor_status_timer - dt);
+    font_set_visible(editor_status_font, editor_status_timer > 0.0f);
+}
+
+/* render the status bar */
+void editor_status_render()
+{
+    if(font_is_visible(editor_status_font)) {
+        v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
+
+        image_rectfill(0, VIDEO_SCREEN_H - 32, VIDEO_SCREEN_W, VIDEO_SCREEN_H, EDITOR_UI_COLOR_TRANS(160));
+        font_render(editor_status_font, cam);
+    }
+}
+
+/* display a message on the status bar */
+void editor_status_display(const char* message, int argc, const char** argv)
+{
+    font_set_textargumentsv(editor_status_font, argc, argv);
+    font_set_text(editor_status_font, "%s", message);
+    editor_status_timer = EDITOR_STATUS_TIMEOUT;
 }
 
 
@@ -4688,7 +4775,7 @@ void editor_action_undo()
         editor_action_commit(a);
     }
     else
-        video_showmessage("Already at the oldest change.");
+        editor_status_display("$EDITOR_MESSAGE_UNDOERROR", 0, NULL);
 }
 
 
@@ -4712,7 +4799,7 @@ void editor_action_redo()
         editor_action_commit(a);
     }
     else
-        video_showmessage("Already at the newest change.");
+        editor_status_display("$EDITOR_MESSAGE_REDOERROR", 0, NULL);
 }
 
 /* commit action */

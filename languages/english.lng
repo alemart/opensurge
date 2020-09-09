@@ -300,12 +300,15 @@ EDITOR_CONFIRM_RELOAD       "Reload the level?"
 EDITOR_CONFIRM_YES          "Yes"
 EDITOR_CONFIRM_NO           "No"
 
-// Warnings
-EDITOR_WARNING_SAVED        "Saved to $1"
-EDITOR_WARNING_RELOADED     "The level has been reloaded"
-EDITOR_WARNING_UNDOERROR    "Already at the oldest change"
-EDITOR_WARNING_REDOERROR    "Already at the newest change"
-EDITOR_WARNING_SAVEERROR    "Can't save the level"
+// Messages
+EDITOR_MESSAGE_WELCOME      "Welcome to the Level Editor!"
+EDITOR_MESSAGE_SAVED        "Saved to <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Can't save the level. Please check the logs"
+EDITOR_MESSAGE_RELOADED     "The level has been reloaded"
+EDITOR_MESSAGE_UNDOERROR    "Already at the oldest change"
+EDITOR_MESSAGE_REDOERROR    "Already at the newest change"
+EDITOR_MESSAGE_SNAP2GRIDON  "Snap to grid: $1 x $2"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Snap to grid: disabled"
 
 
 
@@ -368,7 +371,7 @@ COLOR_TITLE                 "ff8800"
 COLOR_HIGHLIGHT             "ffee11"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
-COLOR_EDITOR_HIGHLIGHT      "ff8060"
+COLOR_EDITOR_HIGHLIGHT      "ffa060"
 
 // Backward compatibility
 HUD_COLLECTIBLES            "$HUD_POWER"
