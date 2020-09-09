@@ -3092,7 +3092,7 @@ void editor_update()
     editor_cursor = editorcmd_mousepos(editor_cmd);
 
     /* disable the level editor */
-    if(editorcmd_is_triggered(editor_cmd, "quit")) {
+    if(editorcmd_is_triggered(editor_cmd, "quit") || editorcmd_is_triggered(editor_cmd, "quit-alt")) {
         editor_disable();
         return;
     }

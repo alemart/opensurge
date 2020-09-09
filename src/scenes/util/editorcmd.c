@@ -48,6 +48,7 @@ static const command_t command[] = {
     { "LEFT", "Shift+A" },
     { "enter", "F12" },
     { "quit", "F12" },
+    { "quit-alt", "ESC" },
     { "save", "Ctrl+S" },
     { "reload", "Ctrl+R" },
     { "put-item", "LeftClick" },
@@ -179,6 +180,8 @@ bool hotkey_is_triggered(const editorcmd_t* cmd, const char* hotkey)
         return input_button_pressed(cmd->keyboard[0], IB_FIRE7);
     else if(0 == strcmp(hotkey, "F12"))
         return input_button_pressed(cmd->keyboard[0], IB_FIRE8);
+    else if(0 == strcmp(hotkey, "ESC"))
+        return input_button_pressed(cmd->keyboard[0], IB_FIRE5);
     else if(0 == strcmp(hotkey, "LeftClick"))
         return input_button_pressed(cmd->mouse, IB_FIRE1);
     else if(0 == strcmp(hotkey, "RightClick"))
@@ -192,7 +195,7 @@ bool hotkey_is_triggered(const editorcmd_t* cmd, const char* hotkey)
     else if(0 == strcmp(hotkey, "HoldRightClick"))
         return input_button_down(cmd->mouse, IB_FIRE2);
     else switch(*hotkey) {
-        case 'S': return input_button_pressed(cmd->keyboard[0], IB_FIRE5);
+        case 'S': return input_button_pressed(cmd->keyboard[1], IB_DOWN);
         case 'R': return input_button_pressed(cmd->keyboard[0], IB_FIRE6);
         case '1': return input_button_pressed(cmd->keyboard[1], IB_FIRE1);
         case '2': return input_button_pressed(cmd->keyboard[1], IB_FIRE2);

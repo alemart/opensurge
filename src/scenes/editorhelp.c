@@ -43,7 +43,7 @@ static input_t *in;
 static const char text[] = 
 "$EDITOR_HELP_GENERAL                 [ $EDITOR_HELP_BACK ]\n"
 "\n"
-"F12                                  $EDITOR_HELP_CMD_RETURN\n"
+"F12 | ESC                            $EDITOR_HELP_CMD_RETURN\n"
 "1 | 2                                $EDITOR_HELP_CMD_PALETTE\n"
 "$EDITOR_INPUT_CTRL + S               $EDITOR_HELP_CMD_SAVE\n"
 "$EDITOR_INPUT_CTRL + R               $EDITOR_HELP_CMD_RELOAD\n"

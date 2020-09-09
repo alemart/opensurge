@@ -217,7 +217,7 @@ inputmap "editorcmd1"
         fire2           KEY_RCONTROL
         fire3           KEY_LSHIFT
         fire4           KEY_RSHIFT
-        fire5           KEY_S
+        fire5           KEY_ESC
         fire6           KEY_R
         fire7           KEY_F1
         fire8           KEY_F12
