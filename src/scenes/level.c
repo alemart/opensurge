@@ -3207,15 +3207,24 @@ void editor_update()
         editor_previous_entity();
 
     /* change brick layer */
+    static const char* layer_message[3] = {
+        [BRL_DEFAULT] = "$EDITOR_MESSAGE_DEFAULTLAYER",
+        [BRL_GREEN] = "$EDITOR_MESSAGE_GREENLAYER",
+        [BRL_YELLOW] = "$EDITOR_MESSAGE_YELLOWLAYER"
+    };
     if(editorcmd_is_triggered(editor_cmd, "layer-next")) {
-        if(editor_cursor_entity_type == EDT_BRICK)
+        if(editor_cursor_entity_type == EDT_BRICK) {
             editor_layer = (editor_layer + 1) % 3;
+            editor_status_display(layer_message[editor_layer], 1, (const char*[]){ color_to_hex(brick_util_layercolor(editor_layer), NULL, 0) });
+        }
         else
             sound_play(SFX_DENY);
     }
     else if(editorcmd_is_triggered(editor_cmd, "layer-previous")) {
-        if(editor_cursor_entity_type == EDT_BRICK)
+        if(editor_cursor_entity_type == EDT_BRICK) {
             editor_layer = (editor_layer + 2) % 3;
+            editor_status_display(layer_message[editor_layer], 1, (const char*[]){ color_to_hex(brick_util_layercolor(editor_layer), NULL, 0) });
+        }
         else
             sound_play(SFX_DENY);
     }
