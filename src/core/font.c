@@ -186,7 +186,7 @@ struct font_t {
     int width; /* width (in pixels) for wordwrap */
     bool visible; /* is this font visible? */
     int index_of_first_char, length; /* substring (deprecated) */
-    fontargs_t argument; /* text arguments: $1, $2 ... $<FONTARGS_MAX> */
+    fontargs_t argument; /* text arguments: $1, $2 ... ${FONTARGS_MAX} */
     fontalign_t align; /* alignment */
     char* lang_id; /* current language ID (multilingual support) */
     char* name; /* font name (not language specific) */
@@ -386,7 +386,7 @@ void font_set_text(font_t* f, const char* fmt, ...)
  * font_set_textarguments()
  * Kinda like a safe, sanitazed printf-format stuff.
  * pass <amount> of const char*'s; they'll be stored
- * in $1, $2, ... up to $<FONTARGS_MAX>
+ * in $1, $2, ... up to ${FONTARGS_MAX}
  */
 void font_set_textarguments(font_t* f, int amount, ...)
 {
@@ -400,6 +400,23 @@ void font_set_textarguments(font_t* f, int amount, ...)
         f->argument[i] = str_dup(va_arg(ap, const char*));
     }
     va_end(ap);
+}
+
+
+/*
+ * font_set_textargumentsv()
+ * An alternative to font_set_textarguments().
+ * Pass an array of strings instead of a variadic argument
+ */
+void font_set_textargumentsv(font_t* f, int argc, const char** argv)
+{
+    int m = min(FONTARGS_MAX, argc);
+
+    for(int i = 0; i < m; i++) {
+        if(f->argument[i])
+            free(f->argument[i]);
+        f->argument[i] = str_dup(argv[i]);
+    }
 }
 
 
