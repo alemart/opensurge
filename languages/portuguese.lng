@@ -262,7 +262,7 @@ EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Itens</color>"
 EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Sistema de camadas</color>"
 EDITOR_HELP_BACK            "Pressione <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> para voltar"
 EDITOR_HELP_TINYWINDOW      "Falta espaço para exibir os comandos. Por favor, ajuste o tamanho da janela na tela de opções.\n\nPressione <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> para voltar."
-EDITOR_HELP_LAYERSTUTORIAL  "O jogador trocará de camada ao encostar nos objetos \"L\" verde e amarelo (veja a paleta)\nO L verde ativa a camada verde e desativa a amarela\nO L amarelo ativa a camada amarela e desativa a verde\nPressione a tecla L para trocar a camada na qual você colocará os bricks\nA camada verde sempre aparece na frente da amarela"
+EDITOR_HELP_LAYERSTUTORIAL  "O jogador trocará de camada ao encostar nos objetos \"L\" verde e amarelo\n(Layer Green e Layer Yellow - veja a paleta pressionando a tecla 2 no editor)\nO L verde ativa a camada verde e desativa a amarela\nO L amarelo ativa a camada amarela e desativa a verde\nPressione a tecla L para trocar a camada na qual você colocará os bricks\nA camada verde sempre aparece na frente da amarela"
 
 EDITOR_HELP_CMD_RETURN      "Retornar ao jogo"
 EDITOR_HELP_CMD_PALETTE     "Abrir paleta de itens"
