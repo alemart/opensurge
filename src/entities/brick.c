@@ -839,9 +839,9 @@ const char* brick_util_behaviorname(brickbehavior_t behavior)
 color_t brick_util_layercolor(bricklayer_t layer)
 {
     switch(layer) {
-        case BRL_GREEN:     return color_rgba(0, 255, 0, 128);
-        case BRL_YELLOW:    return color_rgba(255, 255, 0, 128);
-        default:            return color_rgba(255, 255, 255, 0);
+        case BRL_GREEN:     return color_rgb(0, 255, 0);
+        case BRL_YELLOW:    return color_rgb(255, 255, 0);
+        default:            return color_rgb(255, 255, 255);
     }
 }
 
