@@ -75,12 +75,12 @@ static struct {
 
 /* joysticks */
 #define MAX_JOYS 8 /* maximum number of joysticks */
-#define MAX_AXIS 2 /* maximum number of axis */
+#define MAX_AXES 2 /* maximum number of axes */
 typedef char __joy_max[-(!(MAX_JOYS && !(MAX_JOYS & (MAX_JOYS-1))))]; /* MAX_JOYS must be a power of 2 */
-typedef char __joy_axis[-(MAX_AXIS < 2)]; /* MAX_AXIS must be at least 2 */
+typedef char __joy_axis[-(MAX_AXES < 2)]; /* MAX_AXES must be at least 2 */
 static bool ignore_joystick = false;
 static struct {
-    float axis[MAX_AXIS]; /* -1.0 <= axis <= 1.0 */
+    float axis[MAX_AXES]; /* -1.0 <= axis <= 1.0 */
     uint32_t button; /* bit vector */
 } joy[MAX_JOYS];
 static ALLEGRO_JOYSTICK* joymap[MAX_JOYS] = { NULL };
@@ -99,6 +99,8 @@ static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
 
 /* private data */
 static const char* DEFAULT_INPUTMAP_NAME = "default";
+static const float joy_threshold = 0.4f;
+static bool joystick_experimental = false; /* experiment with joystick input based on ALLEGRO_JOYSTICK_STATE */
 static input_list_t *inlist;
 
 /* private methods */
@@ -130,6 +132,10 @@ void input_init()
     if(!al_install_joystick())
         fatal_error("Can't initialize the joystick subsystem");
     al_register_event_source(a5_event_queue, al_get_joystick_event_source());
+
+    /* use experimental joystick routines? */
+    const char* joystick_experimental_entry = al_get_config_value(al_get_system_config(), "joystick", "experimental");
+    joystick_experimental = (joystick_experimental_entry != NULL) && atob(joystick_experimental_entry);
 
     /* joystick config */
     if(input_is_joystick_available()) {
@@ -207,6 +213,40 @@ void input_update()
     a5_mouse.y = state.y;
     a5_mouse.z = state.z;
     a5_mouse.b = a5_mouse_b; /* received from the event queue */
+
+    /* joystick input based on ALLEGRO_JOYSTICK_STATE
+       (experimental) will this improve joystick input? */
+    if(joystick_experimental) {
+        int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
+        for(int j = 0; j < num_joys; j++) {
+            ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
+            ALLEGRO_JOYSTICK_STATE state;
+
+            al_get_joystick_state(joystick, &state);
+
+            /* read sticks */
+            for(int a = 0; a < MAX_AXES; a++)
+                joy[j].axis[a] = 0.0f;
+
+            int num_sticks = al_get_joystick_num_sticks(joystick);
+            for(int stick_id = 0; stick_id < num_sticks; stick_id++) {
+                int num_axes = min(MAX_AXES, al_get_joystick_num_axes(joystick, stick_id));
+                for(int a = 0; a < num_axes; a++) {
+                    if(fabs(state.stick[stick_id].axis[a]) >= joy_threshold)
+                        joy[j].axis[a] += state.stick[stick_id].axis[a];
+                }
+            }
+
+            for(int a = 0; a < MAX_AXES; a++)
+                joy[j].axis[a] = clip(joy[j].axis[a], -1.0f, 1.0f);
+
+            /* read buttons */
+            int num_buttons = min(al_get_joystick_num_buttons(joystick), MAX_JOYSTICK_BUTTONS);
+            joy[j].button = 0;
+            for(int b = 0; b < num_buttons; b++)
+                joy[j].button |= (state.button[b] ? 1 : 0) << b;
+        }
+    }
 
     /* updating the input objects */
     for(input_list_t* it = inlist; it; it = it->next) {
@@ -665,7 +705,6 @@ void inputuserdefined_update(input_t* in)
 #if defined(A5BUILD)
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
-    const float joy_threshold = 0.2f;
     extern bool a5_key[];
     inputbutton_t button;
 
@@ -683,8 +722,10 @@ void inputuserdefined_update(input_t* in)
             in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[1] >= joy_threshold);
             in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[0] <= -joy_threshold);
             in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[0] >= joy_threshold);
-            for(button = IB_FIRE1; button <= IB_FIRE8; button++)
-                in->state[button] = in->state[button] || ((joy[im->joystick.id].button >> (button - IB_FIRE1)) & 1);
+            for(button = IB_FIRE1; button <= IB_FIRE8; button++) {
+                int mapped_button = im->joystick.button[(int)button];
+                in->state[button] = in->state[button] || ((joy[im->joystick.id].button >> mapped_button) & 1);
+            }
         }
     }
 #else
@@ -756,15 +797,18 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
 {
     switch(event->type) {
         case ALLEGRO_EVENT_JOYSTICK_AXIS:
-            if(event->joystick.axis < MAX_AXIS)
+            if(joystick_experimental) break;
+            if(event->joystick.axis < MAX_AXES)
                 joy[joy2id(event->joystick.id)].axis[event->joystick.axis] = event->joystick.pos;
             break;
 
         case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+            if(joystick_experimental) break;
             joy[joy2id(event->joystick.id)].button |= 1 << event->joystick.button;
             break;
 
         case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
+            if(joystick_experimental) break;
             joy[joy2id(event->joystick.id)].button &= ~(1 << event->joystick.button);
             break;
 

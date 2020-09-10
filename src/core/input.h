@@ -31,6 +31,9 @@ typedef struct inputmouse_t inputmouse_t; /* the following are derived from inpu
 typedef struct inputcomputer_t inputcomputer_t;
 typedef struct inputuserdefined_t inputuserdefined_t;
 
+/* constants */
+#define MAX_JOYSTICK_BUTTONS 32 /* bit vector uint32_t */
+
 /* available buttons */
 enum inputbutton_t {
     IB_UP,      /* up */
