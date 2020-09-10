@@ -88,6 +88,27 @@ int str_icmp(const char* s1, const char* s2)
 
 
 /*
+ * str_incmp()
+ * Works like str_icmp(), except that this
+ * function compares up to n characters
+ */
+int str_incmp(const char* s1, const char* s2, size_t n)
+{
+    const char *p, *q;
+    int a, b;
+
+    for(p=s1,q=s2; *p && *q && n--; p++,q++) {
+        a = tolower(*p);
+        b = tolower(*q);
+        if(a != b)
+            return a - b;
+    }
+
+    return 0;
+}
+
+
+/*
  * str_cpy()
  * Safe version of strcpy(). Returns dest.
  * If we have something like char str[32], then

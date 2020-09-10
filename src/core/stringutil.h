@@ -27,6 +27,7 @@
 const char* str_to_upper(const char* str); /* returns a pointer to a static variable */
 const char* str_to_lower(const char* str); /* returns a pointer to a static variable */
 int str_icmp(const char* s1, const char* s2); /* case-insensitive compare function */
+int str_incmp(const char* s1, const char* s2, size_t n); /* case-insensitive compare up to n characters */
 char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of strcpy() */
 char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */
 char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */
