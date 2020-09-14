@@ -15,8 +15,8 @@
 LANG_ID                     "nl_NL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Nederlands"              // language name
 LANG_AUTHOR                 "SecularSteve"	          // translation author
-LANG_LASTUPDATE             "2020-01-30"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
+LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 
 
 
@@ -199,6 +199,106 @@ QUIT_OPTION2                "NEE"
 
 // Loading Screen
 LOADING_TEXT                "laden..."
+
+
+
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: hulp"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "blok"
+EDITOR_UI_GROUP             "groep"
+EDITOR_UI_ENTITY            "entiteit"
+EDITOR_UI_LEGACYITEM        "erfenis item"
+EDITOR_UI_LEGACYOBJECT      "erfenis object"
+EDITOR_UI_MISSING           "<missend>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "VAST"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "WOLK"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "PASBAAR"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "ONBEKEND"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "STANDAARD"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "RONDGAAND"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "HANGEND"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "BREEKBAAR" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "SLAANBAAR" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "VALLEN"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "VLOT"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "MERKSTIFT"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "ONBEKEND"
+
+EDITOR_BRICK_FLIP_NOFLIP    "onomgedraaid"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "horizontaal omgedraaid" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "verticaal omgedraaid"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "180° gedraaid"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "blok"
+EDITOR_PALETTE_MISSING      "missend"
+EDITOR_PALETTE_EMPTY        "Geen items gevonden. Druk op <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> om terug te gaan."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Algemeen</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item plaatsing</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Leggersysteem</color>"
+EDITOR_HELP_BACK            "Druk op <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> om terug te gaan"
+EDITOR_HELP_TINYWINDOW      "Er is onvoldoende ruimte om de opdrachtreferentie weer te geven. Vergroot de grootte van het venster op het optiescherm a.u.b..\n\nDruk op <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> om terug te gaan."
+EDITOR_HELP_LAYERSTUTORIAL  "De speler zal van laag wisselen door de Groen/Gele L-objecten aan te raken (zie het palet)\nHet Groene L-object activeert de groene laag en schakelt de gele laag uit\nHet gele L-object activeert de gele laag en schakelt de groene laag uit\nDruk op de L-toets om de laag te wijzigen waarin u de stenen plaatst\nDe groene laag verschijnt voor de gele laag"
+
+EDITOR_HELP_CMD_RETURN      "Keer terug naar het spel"
+EDITOR_HELP_CMD_PALETTE     "Open het palet met items"
+EDITOR_HELP_CMD_SAVE        "Sla het level op"
+EDITOR_HELP_CMD_RELOAD      "Herlaad het level"
+EDITOR_HELP_CMD_MOVE        "Beweeg de camera"
+EDITOR_HELP_CMD_MOVEFASTER  "Beweeg de camera (sneller)"
+EDITOR_HELP_CMD_UNDO        "Ongedaan maken"
+EDITOR_HELP_CMD_REDO        "Opnieuw maken"
+EDITOR_HELP_CMD_HELP        "Hulp laten zien"
+EDITOR_HELP_CMD_GRID        "Vangen aan raster"
+EDITOR_HELP_CMD_MASKS       "Toon botsingsmaskers"
+EDITOR_HELP_CMD_PUTITEM     "Plaats item"
+EDITOR_HELP_CMD_PICKITEM    "Kies een item"
+EDITOR_HELP_CMD_DELETEITEM  "Item verwijderen (vasthouden: gum)"
+EDITOR_HELP_CMD_CHANGEITEM  "Wijzig item"
+EDITOR_HELP_CMD_CHANGETYPE  "Wijzig het itemtype"
+EDITOR_HELP_CMD_WATERLEVEL  "Wijzig het waterstand"
+EDITOR_HELP_CMD_SPAWNPOINT  "Verander het spawn-punt"
+EDITOR_HELP_CMD_BRICKLAYER  "Verander de bloklaag"
+EDITOR_HELP_CMD_FLIPBRICK   "Draai de huidige blok om"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Pijltjestoetsen"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Linkermuisknop"
+EDITOR_INPUT_RIGHTCLICK     "Rechtermuisknop"
+EDITOR_INPUT_MIDDLECLICK    "Middelmuisknop"
+EDITOR_INPUT_MOUSEWHEEL     "Muis wiel"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Herlaad het level?"
+EDITOR_CONFIRM_YES          "Ja"
+EDITOR_CONFIRM_NO           "Nee"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Welkom bij de Level Editor!"
+EDITOR_MESSAGE_SAVED        "Opgeslagen in <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Als u kunt het level niet opslaan. Controleer de logboeken"
+EDITOR_MESSAGE_RELOADED     "Het level is opnieuw geladen"
+EDITOR_MESSAGE_UNDOERROR    "Al bij de oudste verandering"
+EDITOR_MESSAGE_REDOERROR    "Al bij de nieuwste verandering"
+EDITOR_MESSAGE_SNAP2GRIDON  "Vangen aan raster: door gebruik van een $1 x $2 raster"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Vangen aan raster: uitgeschakeld"
+EDITOR_MESSAGE_DEFAULTLAYER "Overgeschakeld naar de <color=$1>standaard</color> laag"
+EDITOR_MESSAGE_GREENLAYER   "Overgeschakeld naar de <color=$1>groene</color> laag"
+EDITOR_MESSAGE_YELLOWLAYER  "Overgeschakeld naar de <color=$1>gele</color> laag"
 
 
 
