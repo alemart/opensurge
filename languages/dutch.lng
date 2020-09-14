@@ -214,7 +214,7 @@ EDITOR_UI_GROUP             "groep"
 EDITOR_UI_ENTITY            "entiteit"
 EDITOR_UI_LEGACYITEM        "erfenis item"
 EDITOR_UI_LEGACYOBJECT      "erfenis object"
-EDITOR_UI_MISSING           "<missend>"
+EDITOR_UI_MISSING           "<missing>"
 
 // Bricks - scenery elements
 // Translators: please keep the names below succint. See the comments for their meaning.
