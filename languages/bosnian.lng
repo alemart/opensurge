@@ -266,9 +266,9 @@ EDITOR_HELP_CMD_PICKITEM    "Odaberi predmet"
 EDITOR_HELP_CMD_DELETEITEM  "Izbriši predmet (drži: gumicu)"
 EDITOR_HELP_CMD_CHANGEITEM  "Promjeni predmet"
 EDITOR_HELP_CMD_CHANGETYPE  "Promjeni vrstu predmeta"
-EDITOR_HELP_CMD_WATERLEVEL  "Promjeni nivo vode"
+EDITOR_HELP_CMD_WATERLEVEL  "Promjeni visinu vode"
 EDITOR_HELP_CMD_SPAWNPOINT  "Promjeni tačku mrijesta"
-EDITOR_HELP_CMD_BRICKLAYER  "Promjeni sloj blocka"
+EDITOR_HELP_CMD_BRICKLAYER  "Promjeni sloj bloka"
 EDITOR_HELP_CMD_FLIPBRICK   "Preokrenite trenutni blok"
 
 // Input keys
