@@ -249,7 +249,7 @@ EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item plaatsing</colo
 EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Leggersysteem</color>"
 EDITOR_HELP_BACK            "Druk op <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> om terug te gaan"
 EDITOR_HELP_TINYWINDOW      "Er is onvoldoende ruimte om de opdrachtreferentie weer te geven. Vergroot de grootte van het venster op het optiescherm a.u.b..\n\nDruk op <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> om terug te gaan."
-EDITOR_HELP_LAYERSTUTORIAL  "De speler zal van laag wisselen door de Groen/Gele L-objecten aan te raken (zie het palet)\nHet Groene L-object activeert de groene laag en schakelt de gele laag uit\nHet gele L-object activeert de gele laag en schakelt de groene laag uit\nDruk op de L-toets om de laag te wijzigen waarin u de stenen plaatst\nDe groene laag verschijnt voor de gele laag"
+EDITOR_HELP_LAYERSTUTORIAL  "De speler zal van laag wisselen door de Groen/Gele L-objecten aan te raken (zie het palet)\nHet Groene L-object activeert de groene laag en schakelt de gele laag uit\nHet gele L-object activeert de gele laag en schakelt de groene laag uit\nDruk op de L-toets om de laag te wijzigen waarin u de blokken plaatst\nDe groene laag verschijnt voor de gele laag"
 
 EDITOR_HELP_CMD_RETURN      "Keer terug naar het spel"
 EDITOR_HELP_CMD_PALETTE     "Open het palet met items"
@@ -290,7 +290,7 @@ EDITOR_CONFIRM_NO           "Nee"
 // Messages
 EDITOR_MESSAGE_WELCOME      "Welkom bij de Level Editor!"
 EDITOR_MESSAGE_SAVED        "Opgeslagen in <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
-EDITOR_MESSAGE_SAVEERROR    "Als u kunt het level niet opslaan. Controleer de logboeken"
+EDITOR_MESSAGE_SAVEERROR    "Kan het level niet opslaan. Controleer de logboeken"
 EDITOR_MESSAGE_RELOADED     "Het level is opnieuw geladen"
 EDITOR_MESSAGE_UNDOERROR    "Al bij de oudste verandering"
 EDITOR_MESSAGE_REDOERROR    "Al bij de nieuwste verandering"
