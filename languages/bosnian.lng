@@ -15,8 +15,8 @@
 LANG_ID                     "bs_BA"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Bosanski"                // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
-LANG_LASTUPDATE             "2020-01-30"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
+LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 
 
 
@@ -199,6 +199,105 @@ QUIT_OPTION2                "NE"
 
 // Loading Screen
 LOADING_TEXT                "učitavanje..."
+
+
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: pomoć"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "blok"
+EDITOR_UI_GROUP             "grupa"
+EDITOR_UI_ENTITY            "entitet"
+EDITOR_UI_LEGACYITEM        "naslijeđeni predmet"
+EDITOR_UI_LEGACYOBJECT      "naslijeđeni objekat"
+EDITOR_UI_MISSING           "<missing>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "ČVRST"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "OBLAK"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "PROLAZAN"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "NEPOZNAT"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "STANDARDAN"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "KRUŽEĆI"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "KLATAN"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "KRHAK" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "LOMLJIV" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "PADAJUĆI"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "LEBDEĆI"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "MARKER"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "NEPOZNAT"
+
+EDITOR_BRICK_FLIP_NOFLIP    "nepreokrenut"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "okrenut vodoravno" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "okrenut vertikalno"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "okrenut za 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "blok"
+EDITOR_PALETTE_MISSING      "nedostaje"
+EDITOR_PALETTE_EMPTY        "Predmeti nisu pronađeni. Pritisnite <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> da odete natrag."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Generalno</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Postavljanje predmeta</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Sistem slojeva</color>"
+EDITOR_HELP_BACK            "Pritisnite <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> da odete natrag"
+EDITOR_HELP_TINYWINDOW      "Nemate dovoljno prostora za prikažete nagovještaj naredbe. Molim vas povećajte veličinu prozora na opcijskom ekranu.\n\nPritisnite <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> da odete natrag."
+EDITOR_HELP_LAYERSTUTORIAL  "Igrač će promjeniti slojeve ako dodirne Zelene/Žute L objekte (vidite paletu)\nZeleni L objekat uključuje zeleni sloj i isključuje žuti sloj\nŽuti L objekat uključuje žuti sloj i isključuje zeleni sloj\nPritisnite L tipku da biste promjenili sloj u koji ćete staviti blokove\nZeleni sloj se pojavio ispred žutog sloja"
+
+EDITOR_HELP_CMD_RETURN      "Vratite se u igru"
+EDITOR_HELP_CMD_PALETTE     "Otvorite paletu predmeta"
+EDITOR_HELP_CMD_SAVE        "Spasite nivo"
+EDITOR_HELP_CMD_RELOAD      "Ponovo učitajte nivo"
+EDITOR_HELP_CMD_MOVE        "Pomaknite kameru"
+EDITOR_HELP_CMD_MOVEFASTER  "Pomaknite kameru (brže)"
+EDITOR_HELP_CMD_UNDO        "Poništi"
+EDITOR_HELP_CMD_REDO        "Ponovi"
+EDITOR_HELP_CMD_HELP        "Pokažite pomoć"
+EDITOR_HELP_CMD_GRID        "Prikvači na mrežu"
+EDITOR_HELP_CMD_MASKS       "Pokaži maske sudara"
+EDITOR_HELP_CMD_PUTITEM     "Stavi predmet"
+EDITOR_HELP_CMD_PICKITEM    "Odaberi predmet"
+EDITOR_HELP_CMD_DELETEITEM  "Izbriši predmet (drži: gumicu)"
+EDITOR_HELP_CMD_CHANGEITEM  "Promjeni predmet"
+EDITOR_HELP_CMD_CHANGETYPE  "Promjeni vrstu predmeta"
+EDITOR_HELP_CMD_WATERLEVEL  "Promjeni nivo vode"
+EDITOR_HELP_CMD_SPAWNPOINT  "Promjeni tačku mrijesta"
+EDITOR_HELP_CMD_BRICKLAYER  "Promjeni sloj blocka"
+EDITOR_HELP_CMD_FLIPBRICK   "Preokrenite trenutni blok"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Tipke sa strelicama"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Lijeva tipka miša"
+EDITOR_INPUT_RIGHTCLICK     "Desna tipka miša"
+EDITOR_INPUT_MIDDLECLICK    "Srednja tipka miša"
+EDITOR_INPUT_MOUSEWHEEL     "Točak miša"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Ponovo učitati nivo?"
+EDITOR_CONFIRM_YES          "Da"
+EDITOR_CONFIRM_NO           "Ne"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Dobrodošli u Level Editor!"
+EDITOR_MESSAGE_SAVED        "Spašeno u <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Nije moguće sačuvati nivo. Molimo vas provjerite zapisnike"
+EDITOR_MESSAGE_RELOADED     "Nivo je ponovo učitan"
+EDITOR_MESSAGE_UNDOERROR    "Već kod najstarije promjene"
+EDITOR_MESSAGE_REDOERROR    "Već kod najnovije promjene"
+EDITOR_MESSAGE_SNAP2GRIDON  "Prikvači na mrežu: koristeći $1 x $2 mrežu"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Prikvači na mrežu: isključeno"
+EDITOR_MESSAGE_DEFAULTLAYER "Prebačeno na <color=$1>standardni</color> sloj"
+EDITOR_MESSAGE_GREENLAYER   "Prebačeno na <color=$1>zeleni</color> sloj"
+EDITOR_MESSAGE_YELLOWLAYER  "Prebačeno na <color=$1>žuti</color> sloj"
 
 
 
