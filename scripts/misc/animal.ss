@@ -16,7 +16,7 @@ object "Animal" is "entity", "private", "disposable"
 
     actor = Actor("Animal");
     platformer = Platformer();
-    animalCount = 12; // max animals; see the sprite
+    animalCount = 18; // max animals; see the sprite
     t = 0;
 
     state "main"
