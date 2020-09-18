@@ -214,6 +214,105 @@ LEV_DEMO_4               "<color=$COLOR_TITLE>Cool !</color>\nÊtes-vous déjà 
 LEV_DEMO_5               "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
 
 
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: aide"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "brique"
+EDITOR_UI_GROUP             "groupe"
+EDITOR_UI_ENTITY            "entité"
+EDITOR_UI_LEGACYITEM        "item obsolète"
+EDITOR_UI_LEGACYOBJECT      "objet obsolète"
+EDITOR_UI_MISSING           "<non trouvé(é)>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "SOLIDE"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "NUAGE"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "PASSABLE"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "INCONNU"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "DEFAUT"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "CIRCULAIRE"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "PENDULAIRE"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "CASSABLE" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "CASSABLE PAR SAUT" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "TOMBE"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "FLOTANT"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "MARQUEUR"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "INCONNU"
+
+EDITOR_BRICK_FLIP_NOFLIP    "non retournée"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "retournée horizontalement" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "retournée verticalement"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "retournée à 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "brique"
+EDITOR_PALETTE_MISSING      "non trouvée"
+EDITOR_PALETTE_EMPTY        "Pas d'item trouvé. Appuyez sur <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> pour retourner en arrière."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Géneral</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Placement d'item</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Système de calque</color>"
+EDITOR_HELP_BACK            "Appuyez sur <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> pour retourner en arrière."
+EDITOR_HELP_TINYWINDOW      "Pas assez d'espace pour afficher la référence de la commande. Veuillez augmenter la taille de la fenêtre dans l'écran des options.\n\nAppuyez sur <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> pour retourner en arrière."
+EDITOR_HELP_LAYERSTUTORIAL  "Le joueur changera de calque en touchant les objets Green L / Yellow L (voir la palette)\nL'objet Green L active le calque vert et désactive le calque jaune\nL'objet L jaune active le calque jaune et désactive le calque vert\nAppuyez sur la touche L pour changer la calque dans lequel vous placerez les briques\nLa calque verte apparaît devant la calque jaune"
+
+EDITOR_HELP_CMD_RETURN      "Retourner dans le jeu"
+EDITOR_HELP_CMD_PALETTE     "Ouvrir la palette d'items"
+EDITOR_HELP_CMD_SAVE        "Sauvegarder le niveau"
+EDITOR_HELP_CMD_RELOAD      "Recharger le niveau"
+EDITOR_HELP_CMD_MOVE        "Déplacer la caméra"
+EDITOR_HELP_CMD_MOVEFASTER  "Déplacer la caméra rapidement"
+EDITOR_HELP_CMD_UNDO        "Annuler"
+EDITOR_HELP_CMD_REDO        "Refaire"
+EDITOR_HELP_CMD_HELP        "Montrer l'aide"
+EDITOR_HELP_CMD_GRID        "Accrocher à la grille"
+EDITOR_HELP_CMD_MASKS       "Montrer les masques de collisions"
+EDITOR_HELP_CMD_PUTITEM     "Ajouter un item"
+EDITOR_HELP_CMD_PICKITEM    "Choisir un item"
+EDITOR_HELP_CMD_DELETEITEM  "Détruire un item (maintenu : effacer)"
+EDITOR_HELP_CMD_CHANGEITEM  "Changer d'item"
+EDITOR_HELP_CMD_CHANGETYPE  "Changer de type d'item"
+EDITOR_HELP_CMD_WATERLEVEL  "Changer le niveau de l'eau"
+EDITOR_HELP_CMD_SPAWNPOINT  "Changer le point de départ"
+EDITOR_HELP_CMD_BRICKLAYER  "Changer le calque des briques"
+EDITOR_HELP_CMD_FLIPBRICK   "Tourner la brique courante"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Flèches de directions"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Bouton de gauche de la souris"
+EDITOR_INPUT_RIGHTCLICK     "Bouton de droite de la souris"
+EDITOR_INPUT_MIDDLECLICK    "Bouton du milieu de la souris"
+EDITOR_INPUT_MOUSEWHEEL     "Molette de la souris"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Recharger le niveau ?"
+EDITOR_CONFIRM_YES          "Oui"
+EDITOR_CONFIRM_NO           "Non"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Bienvenue dans l'Editeur de Niveau !"
+EDITOR_MESSAGE_SAVED        "Sauvegardé dans <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Le niveau ne peut pas être sauvegardé. Veuillez regarder les logs."
+EDITOR_MESSAGE_RELOADED     "Le niveau a été rechargé"
+EDITOR_MESSAGE_UNDOERROR    "Déjà sur le changement le plus ancien"
+EDITOR_MESSAGE_REDOERROR    "Déjà sur le changement le plus récent"
+EDITOR_MESSAGE_SNAP2GRIDON  "Accrocher à la grille : en utilisant une grille $1 x $2"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Accrocher à la grille : désactivé"
+EDITOR_MESSAGE_DEFAULTLAYER "Switché sur le calque par <color=$1>défaut</color>"
+EDITOR_MESSAGE_GREENLAYER   "Switché sur le calque <color=$1>vert</color>"
+EDITOR_MESSAGE_YELLOWLAYER  "Switché sur le calque <color=$1>jaune</color>"
+
+
 
 //
 // Section: bitmap fonts
