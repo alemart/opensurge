@@ -1,22 +1,20 @@
-// ---------------------------------------------------------------------------
-// Open Surge Engine
-// http://opensurge2d.org
+// -----------------------------------------------------------------------------
+// File: input.def
+// Description: configuration of input controls
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
 //
-// File:   config/input.def
-// Desc:   configuration of the input controls
-// Author: script by Alexandre
-// ---------------------------------------------------------------------------
+// +--------------------------------------------------------+
+// | To reconfigure the controls of the game, scroll down   |
+// | and modify the inputmap "default" { ... } block below. |
+// +--------------------------------------------------------+
 //
-// +-------------------------------------------------------------------------------+
-// | If you are a regular player who wants to reconfigure the buttons of the game, |
-// | please scroll down and modify the inputmap "default" { ... } block below.     |
-// +-------------------------------------------------------------------------------+
-//
-// this files contains a series of input mappings. Syntax:
+// This file specifies the input controls as a set of input mappings. Syntax:
 //
 // inputmap <name_of_the_inputmap>
 // {
-//     keyboard // optional: declare it if you want keyboard access
+//     keyboard // declare it if you want keyboard controls
 //     {
 //         <button_name>     <key_name> // a list of lines like this
 //                                      // <button_name> may be: up, right, down, left, right, fire1, fire2, ..., fire7, fire8
@@ -27,15 +25,11 @@
 //     {
 //         <button_name>     <joystick_button_name> // a list of lines like this
 //                                                  // <button_name> may be: fire1, fire2, ..., fire7, fire8
-//                                                  // <joystick_button_name> may be: BUTTON_1, BUTTON_2, ..., BUTTON_8
+//                                                  // <joystick_button_name> may be: BUTTON_1, BUTTON_2, ..., BUTTON_32
 //     }
 // }
 //
-// Please remember that, in order to make the joysticks work correctly, you need to enable them at the
-// options screen of the game! Also, make sure to have connected all joysticks you want BEFORE you
-// start the application.
-//
-// List of valid key names (based on liballeg):
+// When configuring keyboard controls, you may use the following key names (based on liballeg):
 //
 //      KEY_A ... KEY_Z,
 //      KEY_0 ... KEY_9,
@@ -73,8 +67,9 @@
 
 
 
-// this inputmap is used by Open Surge by default.
-// this will accept commands issued from the keyboard and from the first joystick (joystick 0), if it is connected.
+// This is the default inputmap used by Open Surge.
+// It accepts input from the keyboard and from the
+// first joystick (joystick 0), if it is connected.
 // DO NOT ERASE THIS INPUTMAP!
 inputmap "default"
 {
@@ -170,9 +165,8 @@ inputmap "default"
 //      unless you know what you are doing ;)
 // ====================================================
 
-// this is a backup of the "default" inputmap,
-// in case you lose the original configuration.
-// DO NOT CHANGE THIS INPUTMAP, EVER!
+// This is a backup of the "default" inputmap.
+// You may use it to restore the original configuration.
 inputmap "backup"
 {
     keyboard
