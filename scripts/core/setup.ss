@@ -7,6 +7,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
+using SurgeEngine.Level;
 
 //
 // Need to hack this?
@@ -21,6 +22,7 @@ object "Default Setup"
     waterController = spawn("Water Controller");
     clearedAnim = spawn("Default Cleared Animation");
     openingAnim = spawn("Default Opening Animation");
+    animalManager = Level.spawn("Animals");
     hud = null;
     player = null;
 
@@ -58,6 +60,7 @@ object "Debug Setup"
     waterController = spawn("Water Controller");
     clearedAnim = spawn("Default Cleared Animation");
     hud = spawn("Default HUD");
+    animalManager = Level.spawn("Animals");
 }
 
 // this is for retro-compatibility
