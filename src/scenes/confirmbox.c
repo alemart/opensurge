@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * confirmbox.c - confirm box
- * Copyright (C) 2008-2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,8 +36,11 @@
 
 
 /* private data */
-#define MAX_OPTIONS 2
-#define NO_OPTION -1
+#define NO_OPTION    -1
+#define OPTION_1      0
+#define OPTION_2      1
+#define MAX_OPTIONS   2
+
 static image_t *box, *background;
 static v2d_t boxpos;
 static font_t *textfnt;
@@ -87,7 +90,7 @@ void confirmbox_init(void *text_and_options)
         font_set_text(optionfnt[i][1], "<color=$COLOR_HIGHLIGHT>%s</color>", option[i]);
     }
 
-    current_option = 0;
+    current_option = OPTION_2;
     fxfade_in = TRUE;
     fxfade_out = FALSE;
 }
@@ -232,7 +235,7 @@ int confirmbox_selected_option()
  */
 void setup(const char *ptext, const char *option1, const char *option2)
 {
-    current_option = -1;
+    current_option = NO_OPTION;
     str_cpy(text, ptext, sizeof(text));
     str_cpy(option[0], option1, sizeof(option[0]));
 
