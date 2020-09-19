@@ -92,8 +92,8 @@ inputmap "default"
     joystick 0
     {
         fire1           BUTTON_3       // jump
-        fire2           BUTTON_4       // switch character
-        fire3           BUTTON_2       // pause, confirm
+        fire2           BUTTON_2       // switch character
+        fire3           BUTTON_4       // pause, confirm
         fire4           BUTTON_1       // quit, cancel
         fire5           BUTTON_5
         fire6           BUTTON_6
@@ -188,8 +188,8 @@ inputmap "backup"
     joystick 0
     {
         fire1           BUTTON_3       // jump
-        fire2           BUTTON_4       // switch character
-        fire3           BUTTON_2       // pause, confirm
+        fire2           BUTTON_2       // switch character
+        fire3           BUTTON_4       // pause, confirm
         fire4           BUTTON_1       // quit, cancel
         fire5           BUTTON_5
         fire6           BUTTON_6
