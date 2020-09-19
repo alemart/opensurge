@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------
 // File: languages/russian.lng
-// Description: russian translation (version 2) (encoding: UTF-8)
+// Description: russian translation (version 3) (encoding: UTF-8)
 // Author: Halatnikov (halatnikov.github.io)
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// Translation fixes look like "//v2: fix reason"
+// Translation fixes look like "//v3: fix reason"
 
 // 
 // Section: generic
@@ -16,8 +16,8 @@
 LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
-LANG_LASTUPDATE             "2020-08-30"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.2"                 // required engine version
+LANG_LASTUPDATE             "2020-09-20"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 
 
 
@@ -212,13 +212,112 @@ LEV_DEMO_1                  "<color=$COLOR_TITLE>Добро пожаловать
 LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали...?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценный <color=$COLOR_HIGHLIGHT>движок для создания игр</color>."  //v2
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдна из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"  //v2
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже заинтересованы? Посетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> чтобы начать создавать свои собственные игры!"
-LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните делать свой уровень! (нажмите F1 для помощи)"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните делать свой уровень! (нажмите F1 для справки)" //v3
+
+
+//
+// Section: level editor
+// v3
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: справка"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "деталь"
+EDITOR_UI_GROUP             "группа"
+EDITOR_UI_ENTITY            "сущность"
+EDITOR_UI_LEGACYITEM        "устаревший предмет"
+EDITOR_UI_LEGACYOBJECT      "устаревший объект"
+EDITOR_UI_MISSING           "<отсутствует>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "ТВЁРДОЕ"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "ПЛАТФОРМА"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "ПРОХОДИМОЕ"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "НЕИЗВЕСТНО"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "БЕЗ ПОВЕДЕНИЯ"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "КРУГОВОЕ"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "РАСКАЧИВАЮЩЕЕСЯ"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "ЛОМАЮЩЕЕСЯ" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "РАЗРУШАЕМОЕ" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "ПАДАЮЩЕЕ"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "ПАРЯЩЕЕ"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "МАРКЕР"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "НЕИЗВЕСТНО"
+
+EDITOR_BRICK_FLIP_NOFLIP    "не повёрнуто"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "повёрнуто горизонтально" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "повёрнуто вертикально"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "повёрнуто на 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "деталь"
+EDITOR_PALETTE_MISSING      "отсутствует"
+EDITOR_PALETTE_EMPTY        "Не найдено предметов. Нажмите <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> чтобы вернуться."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Основное</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Размещение предметов</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Система слоёв</color>"
+EDITOR_HELP_BACK            "Нажмите <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> чтобы вернуться"
+EDITOR_HELP_TINYWINDOW      "Недостаточно места чтобы показать справку. Увеличьте размер окна в настройках игры.\n\nНажмите <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> чтобы вернуться."
+EDITOR_HELP_LAYERSTUTORIAL  "Игрок поменяет текущий слой если прикоснётся\nк зелёным/жёлтым L объектам (смотрите палитру сущностей).\nЗелёный L объект включает зелёный слой и выключает жёлтый\nЖёлтый L объект включает жёлтый слой и выключает зелёный\nНажмите L чтобы поменять слой с которым вы размещаете детали\nЗелёный слой находится поверх жёлтого"
+
+EDITOR_HELP_CMD_RETURN      "Вернуться в игру"
+EDITOR_HELP_CMD_PALETTE     "Открыть палитру деталей|сущностей"
+EDITOR_HELP_CMD_SAVE        "Сохранить уровень"
+EDITOR_HELP_CMD_RELOAD      "Перезагрузить уровень"
+EDITOR_HELP_CMD_MOVE        "Управлять камерой"
+EDITOR_HELP_CMD_MOVEFASTER  "Управлять камерой (быстрее)"
+EDITOR_HELP_CMD_UNDO        "Отменить действие"
+EDITOR_HELP_CMD_REDO        "Вернуть действие"
+EDITOR_HELP_CMD_HELP        "Показать справку"
+EDITOR_HELP_CMD_GRID        "Выровнять по сетке"
+EDITOR_HELP_CMD_MASKS       "Показать коллизии"
+EDITOR_HELP_CMD_PUTITEM     "Разместить предмет"
+EDITOR_HELP_CMD_PICKITEM    "Выбрать предмет"
+EDITOR_HELP_CMD_DELETEITEM  "Удалить предмет (удержание: ластик)"
+EDITOR_HELP_CMD_CHANGEITEM  "Листать предметы"
+EDITOR_HELP_CMD_CHANGETYPE  "Листать типы предметов"
+EDITOR_HELP_CMD_WATERLEVEL  "Задать уровень воды"
+EDITOR_HELP_CMD_SPAWNPOINT  "Задать точку возрождения"
+EDITOR_HELP_CMD_BRICKLAYER  "Изменить слой размещения деталей"
+EDITOR_HELP_CMD_FLIPBRICK   "Повернуть текущую деталь"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Клавиши со стрелками"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Левая кнопка мыши"
+EDITOR_INPUT_RIGHTCLICK     "Правая кнопка мыши"
+EDITOR_INPUT_MIDDLECLICK    "Средняя кнопка мыши"
+EDITOR_INPUT_MOUSEWHEEL     "Колёсико мыши"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Перезагрузить уровень?"
+EDITOR_CONFIRM_YES          "ДА"
+EDITOR_CONFIRM_NO           "НЕТ"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Добро пожаловать в редактор уровней!"
+EDITOR_MESSAGE_SAVED        "Сохранено в <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Не удалось сохранить уровень. Смотрите в logfile.txt"
+EDITOR_MESSAGE_RELOADED     "Уровень перезагружен"
+EDITOR_MESSAGE_UNDOERROR    "Невозможно отменить дальше"
+EDITOR_MESSAGE_REDOERROR    "Невозможно вернуть дальше"
+EDITOR_MESSAGE_SNAP2GRIDON  "Выровнять по сетке: используется сетка $1 x $2"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Выровнять по сетке: выключено"
+EDITOR_MESSAGE_DEFAULTLAYER "Слой изменён на <color=$1>стандартный</color>"
+EDITOR_MESSAGE_GREENLAYER   "Слой изменён на <color=$1>ЗЕЛЁНЫЙ</color>"
+EDITOR_MESSAGE_YELLOWLAYER  "Слой изменён на <color=$1>ЖЁЛТЫЙ</color>"
 
 
 
 //
 // Section: bitmap fonts
-//
+// v3
 
 //
 // Translators:
@@ -236,22 +335,25 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!<
 // sentences as necessary.
 //
 
+// Soon enough (maybe) i'll make a edit to the fonts to include russian characters
+// For now i'll just leave translation in comments
+
 // Heads-Up Display
-HUD_SCORE                   "Score"
-HUD_TIME                    "Time"
-HUD_POWER                   "Power"
+HUD_SCORE                   "Score" //Счёт
+HUD_TIME                    "Time" //Время
+HUD_POWER                   "Power" //Энергия
 
 // Level Cleared animation
-CLEARED_LINE1               "YOU HAVE"
-CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT"
-CLEARED_POWER               "Power Bonus"
-CLEARED_TIME                "Time Bonus"
-CLEARED_SCORE               "Score"
+CLEARED_LINE1               "YOU HAVE" //ВЫ ПРОШЛИ
+CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT" //ЗОНУ $LEVEL_ACT
+CLEARED_POWER               "Power Bonus" //Бонус за Энергию
+CLEARED_TIME                "Time Bonus" //Бонус за Время
+CLEARED_SCORE               "Score" //Общий Счёт
 
 // Game Over
-GAMEOVER_PART1              "GAME"
-GAMEOVER_PART2              "OVER"
+GAMEOVER_PART1              "GAME" //КОНЕЦ
+GAMEOVER_PART2              "OVER" //ИГРЫ
 
 // Time Over
-TIMEOVER_PART1              "TIME"
-TIMEOVER_PART2              "OVER"
+TIMEOVER_PART1              "TIME" //ВРЕМЯ
+TIMEOVER_PART2              "OVER" //ВЫШЛО
