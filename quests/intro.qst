@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: intro.qst
-// Description: this is the Introduction quest, the first one to be opened
+// Description: this is the Introduction quest, the first one to be executed
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -12,6 +12,6 @@
 name            "Introduction"
 
 // level list (in order of appearance)
-level           "levels/scenes/contrib.lev" // opens a "contribute" web page at the end
+level           "levels/scenes/contribute.lev" // opens a donation web page when exiting the game
 level           "levels/scenes/allegro.lev"
 level           "levels/scenes/mainmenu.lev"
