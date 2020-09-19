@@ -24,6 +24,9 @@ object "Waterworks Setup"
         // all zones / acts
         //
         "*": {
+            "Animals": {
+                "theme": "waterworks"
+            },
             "Elevator": {
                 "anim": 2
             },

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: contrib.ss
-// Description: sets up the launching of a contribution page on exit
+// File: contribute.ss
+// Description: sets up the launching of a donation page when exiting the game
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -10,11 +10,12 @@ using SurgeEngine.Prefs;
 using SurgeEngine.Lang;
 using SurgeEngine.Web;
 
-object "Contribute Page"
+// Setup object
+object "Setup contribute web page"
 {
     state "main"
     {
-        Application.onExit = Application.spawn("On Exit");
+        Application.onExit = Application.spawn("Open Contribute web page");
         Level.loadNext();
         state = "done";
     }
@@ -24,9 +25,9 @@ object "Contribute Page"
     }
 }
 
-// this is a function object called on exit
-// it's similar to atexit() from the C standard library
-object "On Exit"
+// this is a function object called when exiting the game
+// it's a bit like using atexit() from the C standard library
+object "Open Contribute web page"
 {
     contrib = "contrib-" + SurgeEngine.version;
     contribInterval = 31536000; // 1 year

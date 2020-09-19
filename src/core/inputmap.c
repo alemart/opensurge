@@ -811,22 +811,12 @@ int keycode_of(const char* key_name)
 /* given a joystick button name, return its button code */
 int joybtncode_of(const char* joybtn_name)
 {
-    if(str_icmp(joybtn_name, "BUTTON_1") == 0)
-        return 0;
-    else if(str_icmp(joybtn_name, "BUTTON_2") == 0)
-        return 1;
-    else if(str_icmp(joybtn_name, "BUTTON_3") == 0)
-        return 2;
-    else if(str_icmp(joybtn_name, "BUTTON_4") == 0)
-        return 3;
-    else if(str_icmp(joybtn_name, "BUTTON_5") == 0)
-        return 4;
-    else if(str_icmp(joybtn_name, "BUTTON_6") == 0)
-        return 5;
-    else if(str_icmp(joybtn_name, "BUTTON_7") == 0)
-        return 6;
-    else if(str_icmp(joybtn_name, "BUTTON_8") == 0)
-        return 7;
+    if(str_incmp(joybtn_name, "BUTTON_", 7) == 0) {
+        int joybtn_number = atoi(joybtn_name + 7);
+
+        if(joybtn_number >= 1 && joybtn_number <= MAX_JOYSTICK_BUTTONS)
+            return joybtn_number - 1;
+    }
 
     fatal_error("Failed to setup inputmap: unrecognized joystick button \"%s\"", joybtn_name);
     return 0;

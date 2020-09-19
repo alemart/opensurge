@@ -5,7 +5,9 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
+using SurgeEngine.Level;
 using SurgeEngine.Behaviors.Platformer;
+using SurgeEngine.Behaviors.DirectionalMovement;
 
 // a generic little animal (usually spawned when defeating baddies)
 object "Animal" is "entity", "private", "disposable"
@@ -15,14 +17,15 @@ object "Animal" is "entity", "private", "disposable"
     public zindex = 0.5;
 
     actor = Actor("Animal");
-    platformer = Platformer();
-    animalCount = 12; // max animals; see the sprite
+    movement = null;
+    activationState = null;
+    maxAnimals = 1;
     t = 0;
 
     state "main"
     {
         // play "appearing" animation
-        actor.anim = 2 * Math.clamp(id, 0, animalCount - 1);
+        actor.anim = 2 * Math.clamp(id, 0, maxAnimals - 1);
         actor.zindex = zindex;
 
         // wait a bit
@@ -32,14 +35,15 @@ object "Animal" is "entity", "private", "disposable"
     state "wait"
     {
         if((t += Time.delta) >= secondsBeforeMoving) {
-            platformer.enabled = true;
-            platformer.forceJump(220);
-            state = "initial jump";
+            movement.enabled = true;
+            state = activationState;
         }
     }
 
     state "initial jump"
     {
+        platformer = movement;
+
         // when touching the ground, run!
         if(!platformer.midair) {
             if(Math.random() < 0.5)
@@ -54,6 +58,8 @@ object "Animal" is "entity", "private", "disposable"
 
     state "running"
     {
+        platformer = movement;
+
         if(platformer.wall) {
             if(platformer.direction > 0)
                 platformer.walkLeft();
@@ -64,14 +70,132 @@ object "Animal" is "entity", "private", "disposable"
             platformer.jump();
     }
 
+    state "start flying"
+    {
+        birdMovement = movement;
+
+        actor.anim++; // play "flying" animation
+        actor.hflip = (birdMovement.direction.x < 0);
+        state = "flying";
+    }
+
+    state "flying"
+    {
+    }
+
     fun constructor()
     {
-        // select a random animal => id: 0, 1, ..., animalCount - 1
-        id = Math.floor(animalCount * Math.random());
+        // find the Animal theme manager
+        animalManager = Level.child("Animals") || Level.spawn("Animals");
 
-        // setup the platformer
-        platformer.speed = 64;
-        platformer.jumpSpeed = 200;
-        platformer.enabled = false;
+        // pick a random animal
+        id = animalManager.pickAnimal();
+
+        // read maxAnimals
+        maxAnimals = animalManager.maxAnimals;
+
+        // select the proper movement
+        if(animalManager.animalType(id) == "bird") {
+            // setup the bird movement
+            birdMovement = DirectionalMovement();
+            birdMovement.speed = 64;
+            birdMovement.angle = 30 * Math.random() + 15;
+            birdMovement.angle = (Math.random() > 0.5) ? 180 - birdMovement.angle : birdMovement.angle;
+
+            movement = birdMovement;
+            activationState = "start flying";
+        }
+        else {
+            // setup the platformer
+            platformer = Platformer();
+            platformer.speed = 64;
+            platformer.jumpSpeed = 200;
+            platformer.forceJump(220);
+
+            movement = platformer;
+            activationState = "initial jump";
+        }
+
+        // won't move initially
+        movement.enabled = false;
+    }
+}
+
+// Object Animals (plural) is responsible for managing the animal theme
+// for the current level (i.e., which group of animals can be spawned
+// in the current level). The theme can be defined in a setup script
+object "Animals"
+{
+    // maximum number of animals (see the sprite)
+    public readonly maxAnimals = 18;
+
+    // define a set of animals for each theme
+    animalsByTheme = {
+        "default":    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        "sunshine":   [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 15],
+        "waterworks": [0, 1, 2, 3, 4, 5, 6, 8, 11, 12],
+    };
+
+    // type of each animal (jumper, bird, etc.)
+    indexedType = [
+        "jumper",   // 0
+        "jumper",   // 1
+        "jumper",   // 2
+        "jumper",   // 3
+        "jumper",   // 4
+        "jumper",   // 5
+        "jumper",   // 6
+        "jumper",   // 7
+        "jumper",   // 8
+        "jumper",   // 9
+        "jumper",   // 10
+        "jumper",   // 11
+        "jumper",   // 12
+        "jumper",   // 13
+        "jumper",   // 14
+        "bird",     // 15
+        "jumper",   // 16
+        "bird",     // 17
+    ];
+
+    // the current theme
+    theme = "default";
+    animals = [0];
+
+    // constructor
+    fun constructor()
+    {
+        animals = animalsByTheme[theme];
+    }
+
+    // give me a random animal ID
+    fun pickAnimal()
+    {
+        index = Math.floor(Math.random() * animals.length);
+        return animals[index];
+    }
+
+    // given an animal ID, return its type
+    fun animalType(id)
+    {
+        if(id >= 0 && id < indexedType.length)
+            return indexedType[id];
+        else
+            return indexedType[0];
+    }
+
+    // get theme
+    fun get_theme()
+    {
+        return theme;
+    }
+
+    // set theme
+    fun set_theme(newTheme)
+    {
+        if(newTheme != theme && animalsByTheme.has(newTheme)) {
+            theme = newTheme;
+            animals = animalsByTheme[theme];
+        }
     }
 }

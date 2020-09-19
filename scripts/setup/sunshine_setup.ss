@@ -24,6 +24,9 @@ object "Sunshine Setup"
         // all zones / acts
         //
         "*": {
+            "Animals": {
+                "theme": "sunshine"
+            },
             "Audio Source": {
                 "sound": "samples/waterfall.wav"
             },

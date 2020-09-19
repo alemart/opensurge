@@ -9,7 +9,7 @@
 sprite "Animal"
 {
     source_file     "images/animals.png"
-    source_rect     0 0 180 180
+    source_rect     0 0 180 275
     frame_size      30 30
     hot_spot        15 30
 
@@ -204,5 +204,103 @@ sprite "Animal"
         fps         8
         data        34 35
     }
+	
+	// animal 12: appearing
+    animation 24
+    {
+        repeat      TRUE
+        fps         8
+        data        36
+    }
+	
+	// animal 12: running
+    animation 25
+    {
+        repeat      TRUE
+        fps         8
+        data        37 38
+    }
+	
+	// animal 13: appearing
+    animation 26
+    {
+        repeat      TRUE
+        fps         8
+        data        39
+    }
+	
+	// animal 13: running
+    animation 27
+    {
+        repeat      TRUE
+        fps         8
+        data        40 41
+    }
+	
+	// animal 14: appearing
+    animation 28
+    {
+        repeat      TRUE
+        fps         8
+        data        42
+    }
+	
+	// animal 14: running
+    animation 29
+    {
+        repeat      TRUE
+        fps         8
+        data        43 44
+    }
+	
+	// animal 15: appearing
+    animation 30
+    {
+        repeat      TRUE
+        fps         8
+        data        45
+    }
+	
+	// animal 15: running
+    animation 31
+    {
+        repeat      TRUE
+        fps         8
+        data        46 47
+    }
+	
+	// animal 16: appearing
+    animation 32
+    {
+        repeat      TRUE
+        fps         8
+        data        48
+    }
+	
+	// animal 16: running
+    animation 33
+    {
+        repeat      TRUE
+        fps         8
+        data        49 50
+    }
+	
+	// animal 17: appearing
+    animation 34
+    {
+        repeat      TRUE
+        fps         8
+        data        51
+    }
+	
+	// animal 17: running
+    animation 35
+    {
+        repeat      TRUE
+        fps         8
+        data        52 53
+    }
+	
+	
 }
 
