@@ -101,7 +101,7 @@ object "DirectionalMovement" is "behavior"
         if(direction != newDirection) {
             direction = newDirection;
             normalizedDirection = direction.normalized();
-            ccwAngle = 360 - direction.angle;
+            ccwAngle = direction.angle;
         }
     }
 
