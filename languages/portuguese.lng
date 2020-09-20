@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-09-09"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2020-09-20"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -177,14 +177,14 @@ INPUT_JOY_LEFT              "ESQUERDA"
 INPUT_JOY_RIGHT             "DIREITA"
 INPUT_JOY_UP                "CIMA"
 INPUT_JOY_DOWN              "BAIXO"
-FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
-FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
-FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
-FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
+INPUT_JOY_FIRE1             "PULO"
+INPUT_JOY_FIRE2             "TROCAR"
+INPUT_JOY_FIRE3             "PAUSE"
+INPUT_JOY_FIRE4             "VOLTAR"
+INPUT_JOY_FIRE5             "<disponível>"
+INPUT_JOY_FIRE6             "<disponível>"
+INPUT_JOY_FIRE7             "<disponível>"
+INPUT_JOY_FIRE8             "<disponível>"
 
 
 
