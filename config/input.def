@@ -16,16 +16,18 @@
 // {
 //     keyboard // declare it if you want keyboard controls
 //     {
-//         <button_name>     <key_name> // a list of lines like this
-//                                      // <button_name> may be: up, right, down, left, right, fire1, fire2, ..., fire7, fire8
+//         <button_name>     <key_name> // a sequence of lines specifying:
+//                                      // <button_name>: up, right, down, left, right, fire1, fire2, ..., fire7, fire8
 //                                      // <key_name>: see the list of valid key names below
 //     }
 //
-//     joystick <id_joystick> // optional. id_joystick may be: 0, 1, 2, ... 7, where 0 is the first joystick, 1 the second one, and so on.
+//     joystick <id_joystick> // optional. id_joystick may be: 0, 1, 2, ..., where 0 is the first joystick, 1 the second one, and so on.
 //     {
-//         <button_name>     <joystick_button_name> // a list of lines like this
-//                                                  // <button_name> may be: fire1, fire2, ..., fire7, fire8
-//                                                  // <joystick_button_name> may be: BUTTON_1, BUTTON_2, ..., BUTTON_32
+//         <button_name>     <joystick_button_name> // a sequence of lines specifying:
+//                                                  // <button_name>: fire1, fire2, ..., fire7, fire8
+//                                                  // <joystick_button_name>: BUTTON_1, BUTTON_2, ..., BUTTON_32
+//                                                  // you may optionally specify multiple joystick buttons with a '|' (OR symbol)
+//                                                  // e.g., fire1  BUTTON_1 | BUTTON_2 (both BUTTON_1 and BUTTON_2 are mapped to fire1)
 //     }
 // }
 //
@@ -91,14 +93,14 @@ inputmap "default"
 
     joystick 0
     {
-        fire1           BUTTON_3       // jump
-        fire2           BUTTON_2       // switch character
-        fire3           BUTTON_4       // pause, confirm
-        fire4           BUTTON_1       // quit, cancel
-        fire5           BUTTON_5
-        fire6           BUTTON_6
-        fire7           BUTTON_7
-        fire8           BUTTON_8
+        fire1           BUTTON_2 | BUTTON_3 | BUTTON_4  // jump
+        fire2           BUTTON_5 | BUTTON_6  // switch character
+        fire3           BUTTON_10    // pause, confirm
+        fire4           BUTTON_1     // quit, cancel
+        fire5           BUTTON_NONE  // available
+        fire6           BUTTON_NONE  // available
+        fire7           BUTTON_NONE  // available
+        fire8           BUTTON_NONE  // available
     }
 }
 
@@ -187,14 +189,14 @@ inputmap "backup"
 
     joystick 0
     {
-        fire1           BUTTON_3       // jump
-        fire2           BUTTON_2       // switch character
-        fire3           BUTTON_4       // pause, confirm
-        fire4           BUTTON_1       // quit, cancel
-        fire5           BUTTON_5
-        fire6           BUTTON_6
-        fire7           BUTTON_7
-        fire8           BUTTON_8
+        fire1           BUTTON_2 | BUTTON_3 | BUTTON_4  // jump
+        fire2           BUTTON_5 | BUTTON_6  // switch character
+        fire3           BUTTON_10    // pause, confirm
+        fire4           BUTTON_1     // quit, cancel
+        fire5           BUTTON_NONE  // available
+        fire6           BUTTON_NONE  // available
+        fire7           BUTTON_NONE  // available
+        fire8           BUTTON_NONE  // available
     }
 }
 
