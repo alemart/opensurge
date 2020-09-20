@@ -17,7 +17,7 @@ LANG_ID                     "ru_RU"                   // language code & country
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
 LANG_LASTUPDATE             "2020-09-20"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -45,8 +45,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -178,14 +178,14 @@ INPUT_JOY_LEFT              "ВЛЕВО"
 INPUT_JOY_RIGHT             "ВПРАВО"
 INPUT_JOY_UP                "ВВЕРХ"
 INPUT_JOY_DOWN              "ВНИЗ"
-INPUT_JOY_FIRE1             "КНОПКА 1"
-INPUT_JOY_FIRE2             "КНОПКА 2"
-INPUT_JOY_FIRE3             "КНОПКА 3"
-INPUT_JOY_FIRE4             "КНОПКА 4"
-INPUT_JOY_FIRE5             "КНОПКА 5"
-INPUT_JOY_FIRE6             "КНОПКА 6"
-INPUT_JOY_FIRE7             "КНОПКА 7"
-INPUT_JOY_FIRE8             "КНОПКА 8"
+FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
+FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
+FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
+FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
+FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
 
 
 

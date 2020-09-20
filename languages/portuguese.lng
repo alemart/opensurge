@@ -16,7 +16,7 @@ LANG_ID                     "pt_BR"                   // language code & country
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
 LANG_LASTUPDATE             "2020-09-09"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -44,8 +44,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -177,14 +177,14 @@ INPUT_JOY_LEFT              "ESQUERDA"
 INPUT_JOY_RIGHT             "DIREITA"
 INPUT_JOY_UP                "CIMA"
 INPUT_JOY_DOWN              "BAIXO"
-INPUT_JOY_FIRE1             "o BOTÃO 1"
-INPUT_JOY_FIRE2             "o BOTÃO 2"
-INPUT_JOY_FIRE3             "o BOTÃO 3"
-INPUT_JOY_FIRE4             "o BOTÃO 4"
-INPUT_JOY_FIRE5             "o BOTÃO 5"
-INPUT_JOY_FIRE6             "o BOTÃO 6"
-INPUT_JOY_FIRE7             "o BOTÃO 7"
-INPUT_JOY_FIRE8             "o BOTÃO 8"
+FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
+FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
+FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
+FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
+FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
 
 
 

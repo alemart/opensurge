@@ -16,7 +16,7 @@ LANG_ID                     "nl_NL"                   // language code & country
 LANG_NAME                   "Nederlands"              // language name
 LANG_AUTHOR                 "SecularSteve"	          // translation author
 LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -44,8 +44,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -114,7 +114,7 @@ CREDITS_VICTOR              "Musicus"
 CREDITS_COLIN               "Sprites, eerste verhaal"
 CREDITS_BRIAN               "Sprite kunstenaar"
 CREDITS_TRANSLATOR          "Vertaler"
-CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>" // -- FIXME --
+FIXME (untranslated) // CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individuele middelen</color>"
 CREDITS_RES_TEXT            "Tenzij uitdrukkelijk anders vermeld, zijn de onderstaande bestanden gelicentieerd onder de Creative Commons Attribution 3.0 (CC-BY 3.0)."
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Foto's</color>"
@@ -177,14 +177,14 @@ INPUT_JOY_LEFT              "de LINKE-KNOP"
 INPUT_JOY_RIGHT             "de RECHTE-KNOP"
 INPUT_JOY_UP                "de BOVEN-KNOP"
 INPUT_JOY_DOWN              "de BENEDEN-KNOP"
-INPUT_JOY_FIRE1             "KNOP 1"
-INPUT_JOY_FIRE2             "KNOP 2"
-INPUT_JOY_FIRE3             "KNOP 3"
-INPUT_JOY_FIRE4             "KNOP 4"
-INPUT_JOY_FIRE5             "KNOP 5"
-INPUT_JOY_FIRE6             "KNOP 6"
-INPUT_JOY_FIRE7             "KNOP 7"
-INPUT_JOY_FIRE8             "KNOP 8"
+FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
+FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
+FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
+FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
+FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
 
 
 

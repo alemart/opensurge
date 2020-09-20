@@ -17,7 +17,7 @@ LANG_ID                     "sr_RS"                   // language code & country
 LANG_NAME                   "Српски"                  // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
 LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -45,8 +45,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -180,14 +180,14 @@ INPUT_JOY_LEFT              "ЛЕВО ДУГМЕ"
 INPUT_JOY_RIGHT             "ДЕСНО ДУГМЕ"
 INPUT_JOY_UP                "ГОРЊЕ ДУГМЕ"
 INPUT_JOY_DOWN              "ДОЊЕ ДУГМЕ"
-INPUT_JOY_FIRE1             "ДУГМЕ 1"
-INPUT_JOY_FIRE2             "ДУГМЕ 2"
-INPUT_JOY_FIRE3             "ДУГМЕ 3"
-INPUT_JOY_FIRE4             "ДУГМЕ 4"
-INPUT_JOY_FIRE5             "ДУГМЕ 5"
-INPUT_JOY_FIRE6             "ДУГМЕ 6"
-INPUT_JOY_FIRE7             "ДУГМЕ 7"
-INPUT_JOY_FIRE8             "ДУГМЕ 8"
+FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
+FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
+FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
+FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
+FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
 
 
 

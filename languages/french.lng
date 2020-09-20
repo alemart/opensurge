@@ -16,7 +16,7 @@ LANG_ID                  "fr_FR"                          // language code & cou
 LANG_NAME                "Français"                       // language name
 LANG_AUTHOR              "Stylix58, David Demelier"       // translation author
 LANG_LASTUPDATE          "2020-02-17"                     // date format: yyyy-mm-dd
-LANG_COMPATIBILITY       "0.5.1.2"                        // required engine version
+LANG_COMPATIBILITY       "0.5.2"                          // required engine version
 
 
 
@@ -44,8 +44,8 @@ LANG_COMPATIBILITY       "0.5.1.2"                        // required engine ver
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -177,14 +177,14 @@ INPUT_JOY_LEFT           "la TOUCHE GAUCHE"
 INPUT_JOY_RIGHT          "la TOUCHE DROITE"
 INPUT_JOY_UP             "la TOUCHE HAUT"
 INPUT_JOY_DOWN           "la TOUCHE BAS"
-INPUT_JOY_FIRE1          "BOUTON 1"
-INPUT_JOY_FIRE2          "BOUTON 2"
-INPUT_JOY_FIRE3          "BOUTON 3"
-INPUT_JOY_FIRE4          "BOUTON 4"
-INPUT_JOY_FIRE5          "BOUTON 5"
-INPUT_JOY_FIRE6          "BOUTON 6"
-INPUT_JOY_FIRE7          "BOUTON 7"
-INPUT_JOY_FIRE8          "BOUTON 8"
+FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
+FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
+FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
+FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
+FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
 
 
 
