@@ -138,6 +138,11 @@ object "Message Box Background" is "detached", "private", "entity"
     {
         transform.localScale = Vector2(1, 1 + deltaHeight / actor.height);
     }
+
+    fun constructor()
+    {
+        actor.alpha = 0.85;
+    }
 }
 
 // Only one Message Box should be
