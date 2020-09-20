@@ -775,9 +775,10 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
 #endif
         /* hot plugging */
         case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION: {
-            int num_joysticks = al_get_num_joysticks();
+            int num_joysticks;
             al_reconfigure_joysticks();
 
+            num_joysticks = al_get_num_joysticks();
             if(num_joysticks > 0) {
                 /* display message as soon as new joysticks are plugged */
                 video_showmessage("Found %d joystick%s:", num_joysticks, num_joysticks == 1 ? "" : "s");
@@ -790,7 +791,7 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
                 input_ignore_joystick(false); /* the user probably wants this (automatic joystick detection) */
             }
             else {
-                video_showmessage("The joystick has been unplugged");
+                video_showmessage("No joysticks have been detected");
                 input_ignore_joystick(true);
             }
 
