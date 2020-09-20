@@ -97,7 +97,7 @@ static void get_mouse_mickeys_ex(int *mickey_x, int *mickey_y, int *mickey_z);
 
 /* private data */
 static const char* DEFAULT_INPUTMAP_NAME = "default";
-static const float joy_analog_threshold = 0.6f; /* pressing up + jump won't make the player jump */
+static const float joy_analog_threshold[MAX_AXES] = { 0.4f, 0.8f }; /* (x,y) axes. Pressing up + jump won't make the player jump */
 static input_list_t *inlist;
 
 /* private methods */
@@ -225,7 +225,7 @@ void input_update()
         for(int stick_id = 0; stick_id < num_sticks; stick_id++) {
             int num_axes = min(MAX_AXES, al_get_joystick_num_axes(joystick, stick_id));
             for(int a = 0; a < num_axes; a++) {
-                if(fabs(state.stick[stick_id].axis[a]) >= joy_analog_threshold)
+                if(fabs(state.stick[stick_id].axis[a]) >= joy_analog_threshold[a])
                     joy[j].axis[a] += state.stick[stick_id].axis[a];
             }
         }
@@ -707,10 +707,10 @@ void inputuserdefined_update(input_t* in)
     if(im->joystick.enabled) {
         int num_joysticks = min(input_number_of_joysticks(), MAX_JOYS);
         if(input_is_joystick_enabled() && im->joystick.id < num_joysticks) {
-            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[1] <= -joy_analog_threshold);
-            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[1] >= joy_analog_threshold);
-            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[0] <= -joy_analog_threshold);
-            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[0] >= joy_analog_threshold);
+            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[1] <= -joy_analog_threshold[1]);
+            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[1] >= joy_analog_threshold[1]);
+            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[0] <= -joy_analog_threshold[0]);
+            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[0] >= joy_analog_threshold[0]);
             for(button = IB_FIRE1; button <= IB_FIRE8; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
                 in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
