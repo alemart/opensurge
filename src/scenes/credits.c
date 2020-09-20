@@ -43,7 +43,7 @@
 /* private data */
 static const char* CREDITS_BGFILE = "themes/scenes/credits.bg";
 extern const char CREDITS_TEXT[];
-static const int scroll_speed = 24;
+static const int scroll_speed = 30;
 static int quit;
 static font_t *title, *text, *back;
 static input_t *input;
@@ -109,15 +109,20 @@ void credits_release()
  */
 void credits_update()
 {
+    float scroll_speed_multiplier = 1.0f;
     float dt = timer_get_delta();
     v2d_t textpos;
 
     /* background movement */
     background_update(bgtheme);
 
+    /* scroll the text faster */
+    if(input_button_down(input, IB_FIRE1))
+        scroll_speed_multiplier = 5.0f;
+
     /* text movement */
     textpos = font_get_position(text);
-    textpos.y -= scroll_speed * dt;
+    textpos.y -= scroll_speed_multiplier * scroll_speed * dt;
     if(textpos.y < -font_get_textsize(text).y)
         textpos.y = VIDEO_SCREEN_H;
     font_set_position(text, textpos);
