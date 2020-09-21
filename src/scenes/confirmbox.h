@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * confirmbox.h - confirm box
- * Copyright (C) 2008-2009  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2009, 2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,10 +22,15 @@
 #define _CONFIRMBOX_H
 
 /* confirm box data structure */
-typedef const char* confirmboxdata_t[3]; /* an array of 3 strings: text, option 1, option 2. ps: option 2 may be null. */
+typedef struct confirmboxdata_t {
+    const char* message;
+    const char* option1;
+    const char* option2; /* set it to NULL if you want only one option */
+    int default_option;  /* default option: 1 or 2 */
+} confirmboxdata_t;
 
 /* public functions */
-void confirmbox_init(void *text_and_options); /* pass a pointer to a confirmboxdata_t */
+void confirmbox_init(void* confirmbox);
 void confirmbox_release();
 void confirmbox_update();
 void confirmbox_render();

@@ -1232,7 +1232,7 @@ void level_update()
         block_quit = player_is_dying(team[i]);
 
     if(wants_to_leave && !block_quit) {
-        confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2" };
+        confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2", 2 };
 
         if(quit_level_img != NULL)
             image_destroy(quit_level_img);
@@ -1240,7 +1240,7 @@ void level_update()
 
         wants_to_leave = FALSE;
         music_pause();
-        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), &cbd);
         return;
     }
 
@@ -3105,8 +3105,8 @@ void editor_update()
 
     /* reload level */
     if(editorcmd_is_triggered(editor_cmd, "reload")) {
-        confirmboxdata_t cbd = { "$EDITOR_CONFIRM_RELOAD", "$EDITOR_CONFIRM_YES", "$EDITOR_CONFIRM_NO" };
-        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+        confirmboxdata_t cbd = { "$EDITOR_CONFIRM_RELOAD", "$EDITOR_CONFIRM_YES", "$EDITOR_CONFIRM_NO", 1 };
+        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), &cbd);
         return;
     }
 
