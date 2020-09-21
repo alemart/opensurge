@@ -122,21 +122,15 @@ object "Animal" is "entity", "private", "disposable"
 }
 
 // Object Animals (plural) is responsible for managing the animal theme
-// for the current level (i.e., which group of animals can be spawned
-// in the current level). The theme can be defined in a setup script
+// for the current level (i.e., which animals can be spawned in the
+// current level). The theme can be defined in a setup script.
 object "Animals"
 {
-    // maximum number of animals (see the sprite)
-    public readonly maxAnimals = 18;
+    // The theme is an array of indices indicating
+    // which animals can be spawned (see the sprite)
+    theme = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // default theme
 
-    // define a set of animals for each theme
-    animalsByTheme = {
-        "default":    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        "sunshine":   [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 15],
-        "waterworks": [0, 1, 2, 3, 4, 5, 6, 8, 11, 12],
-    };
-
-    // type of each animal (jumper, bird, etc.)
+    // the type of each animal (jumper, bird, etc.)
     indexedType = [
         "jumper",   // 0
         "jumper",   // 1
@@ -158,21 +152,11 @@ object "Animals"
         "bird",     // 17
     ];
 
-    // the current theme
-    theme = "default";
-    animals = [0];
-
-    // constructor
-    fun constructor()
-    {
-        animals = animalsByTheme[theme];
-    }
-
     // give me a random animal ID
     fun pickAnimal()
     {
-        index = Math.floor(Math.random() * animals.length);
-        return animals[index];
+        index = Math.floor(Math.random() * theme.length);
+        return theme[index];
     }
 
     // given an animal ID, return its type
@@ -184,6 +168,12 @@ object "Animals"
             return indexedType[0];
     }
 
+    // how many animals are available?
+    fun get_maxAnimals()
+    {
+        return indexedType.length;
+    }
+
     // get theme
     fun get_theme()
     {
@@ -193,9 +183,7 @@ object "Animals"
     // set theme
     fun set_theme(newTheme)
     {
-        if(newTheme != theme && animalsByTheme.has(newTheme)) {
+        if(typeof newTheme == "object" && newTheme.__name == "Array" && newTheme.length > 0)
             theme = newTheme;
-            animals = animalsByTheme[theme];
-        }
     }
 }

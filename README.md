@@ -2,7 +2,7 @@
 
 Welcome to **Open Surge**!
 
-Get the game at [opensurge2d.org](http://opensurge2d.org)
+Download the game at [opensurge2d.org](http://opensurge2d.org)
 
 <img src="surge.png" alt="Surge" width="320" align="right">
 
@@ -18,7 +18,7 @@ Open Surge is currently available for Microsoft Windows and GNU/Linux. It is in 
 
 Open Surge is two projects in one: a game and a game creation system (game engine). It is released as [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software).
 
-Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a developer from Brazil. Nowadays, Open Surge has contributors all over the world!
+Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a computer scientist from Brazil. Nowadays, Open Surge has contributors all over the world!
 
 ## How do I play?
 

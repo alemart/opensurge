@@ -24,9 +24,6 @@ object "Sunshine Setup"
         // all zones / acts
         //
         "*": {
-            "Animals": {
-                "theme": "sunshine"
-            },
             "Audio Source": {
                 "sound": "samples/waterfall.wav"
             },
@@ -44,7 +41,10 @@ object "Sunshine Setup"
             },
             "Event Trigger 7": {
                 "onTrigger": FunctionEvent("Lock Camera").withArgument(2048)
-            }
+            },
+            "Animals": {
+                "theme": [0, 1, 2, 3, 5, 6, 7, 9, 13, 15]
+            },
         },
 
         //

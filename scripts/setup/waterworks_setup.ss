@@ -24,9 +24,6 @@ object "Waterworks Setup"
         // all zones / acts
         //
         "*": {
-            "Animals": {
-                "theme": "waterworks"
-            },
             "Elevator": {
                 "anim": 2
             },
@@ -41,7 +38,10 @@ object "Waterworks Setup"
             },
             "Event Trigger 7": {
                 "onTrigger": FunctionEvent("Lock Camera").withArgument(2048)
-            }
+            },
+            "Animals": {
+                "theme": [0, 1, 2, 4, 5, 6, 8, 8, 11, 12]
+            },
         },
 
         //
