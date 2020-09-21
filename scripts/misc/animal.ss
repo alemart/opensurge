@@ -185,5 +185,7 @@ object "Animals"
     {
         if(typeof newTheme == "object" && newTheme.__name == "Array" && newTheme.length > 0)
             theme = newTheme;
+        else
+            Console.print("Animals.theme must be an array of indices");
     }
 }
