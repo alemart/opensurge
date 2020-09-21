@@ -8,6 +8,7 @@ using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Player;
 using SurgeEngine.Level;
+using SurgeEngine.Input;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
@@ -200,6 +201,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
     transform = Transform();
     text = Text("HUD");
     value = Text("HUD");
+    input = Input("default");
     counter = null;
     appearSpeed = 3 * Screen.width; // in px/s
     isMaster = false;
@@ -234,7 +236,11 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
     state "count"
     {
         if(timeout(0.03)) {
-            value.text = counter.count(100);
+            // accelerate the counter by holding FIRE1
+            multiplier = input.buttonDown("fire1") ? 4 : 1;
+
+            // count
+            value.text = counter.count(100 * multiplier);
             state = "repeat";
         }
     }
