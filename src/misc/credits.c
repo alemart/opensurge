@@ -62,11 +62,9 @@ $CREDITS_RES_TEXT \n\
 $CREDITS_RES_MUSICS \n\
 \n\
 Di Rodrigues \n\
---- musics/options.ogg \n\
 --- musics/speed.ogg \n\
 --- musics/invincible.ogg \n\
 --- musics/gameover.ogg \n\
---- musics/waterworks.ogg \n\
 --- musics/goal.ogg \n\
 --- musics/drowning.ogg \n\
 \n\
@@ -90,6 +88,12 @@ Colin Beard \n\
 \n\
 Mateus Reis \n\
 --- musics/citychill.ogg \n\
+\n\
+cynicmusic (cynicmusic.com, pixelsphere.org) \n\
+--- musics/waterworks.ogg (CC-0) \n\
+\n\
+Viktor Kraus \n\
+--- musics/options.ogg \n\
 \n\
 \n\
 \n\
