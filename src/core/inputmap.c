@@ -671,7 +671,8 @@ int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmap
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2;
     enum inputbutton_t btn = IB_FIRE1;
-    int i, n, joybtn_code;
+    int joybtn_code = -1;
+    int i, n;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
@@ -791,7 +792,7 @@ int keycode_of(const char* key_name)
     return 0;
 }
 
-/* given a joystick button name, return its button code.
+/* given a joystick button name, retrieve its button code.
    e.g., BUTTON_1 becomes 0; BUTTON_2 becomes 1, etc.
    BUTTON_NONE becomes -1. Returns true on success */
 bool parse_joystick_button_name(const char* joybtn_name, int* result)
@@ -809,6 +810,7 @@ bool parse_joystick_button_name(const char* joybtn_name, int* result)
         }
     }
 
+    *result = -1;
     return false;
 }
 
