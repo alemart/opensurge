@@ -43,8 +43,8 @@
         <img src="/icon.png" alt="Surge" class="my-3 float-right">
         <div class="lang en_US">
           <p class="my-4">Hi! I'm Alexandre Martins. I develop the Open Surge game engine.</p>
-          <p class="my-4">Open Surge is an amazing game &amp; engine given to you as a gift. It's always been open-source, and <a href="/wiki/#Introduction_to_Modding" target="_blank">did you know that you can use it to create your own games</a>?</p>
-          <p class="my-4">If 1 out of 100 people reading this would donate $5 USD or more, more time could be used to develop this game.</p>
+          <p class="my-4">Open Surge is an amazing game &amp; engine given to you as a gift. It's always been open-source, and <a href="//wiki.opensurge2d.org/Introduction_to_Modding" target="_blank">did you know that you can use it to create your own games</a>?</p>
+          <p class="my-4">If 5 out of 100 people reading this would donate $15 USD or more, more time could be used to develop this project.</p>
           <p class="my-4">Please support Open Surge with a donation. Your donation helps its growth and its entire community of makers to thrive.</p>
           <p class="my-4 pt-3">
             <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VSCZ2CS2NNPWW&source=url" class="btn btn-primary cartoon">
@@ -66,9 +66,9 @@
               contributed to open-source ;-)
             </p>
           </div>
-          <p class="my-4">May what you gave come back to you a hundred-fold!</p>
+          <p class="my-4">May what you just gave come back to you a hundred-fold!</p>
           <p class="my-4 pt-3">
-            <a href="http://opensurge2d.org" class="btn btn-primary cartoon">
+            <a href="//opensurge2d.org" class="btn btn-primary cartoon">
                 Visit Open Surge
                 <span class="btn-sub">on the web</span>
             </a>
@@ -92,7 +92,6 @@
     })(window.location.search.substr(1).split('&')) || {};
 
     $(document).ready(function() {
-        var success = window.qs['success'] == 1;
         var lang = window.qs['lang'] || 'en_US';
         var hasLang = $('.lang.' + lang).length > 0;
         if(hasLang)
@@ -100,6 +99,7 @@
         else
             $('.lang:not(.en_US)').hide();
 
+        var success = window.qs['success'] == 1;
         if(success) {
             $('.donate').hide();
             $('.success').removeClass('d-none');
