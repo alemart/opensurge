@@ -61,23 +61,21 @@ $CREDITS_RES_TEXT \n\
 \n\
 $CREDITS_RES_MUSICS \n\
 \n\
-Di Rodrigues \n\
---- musics/speed.ogg \n\
---- musics/invincible.ogg \n\
---- musics/gameover.ogg \n\
---- musics/goal.ogg \n\
---- musics/drowning.ogg \n\
-\n\
 Johan Brodd (jobromedia) \n\
 --- musics/theme.ogg (public domain) \n\
 --- musics/template.ogg (public domain) \n\
 --- musics/silence.ogg (public domain) \n\
 --- musics/intro.ogg (public domain) \n\
 --- musics/sharp.ogg (public domain) \n\
+--- musics/invincible.ogg (public domain - edited by Alexandre)\n\
 --- musics/winning.ogg \n\
 --- musics/winning_plus.ogg \n\
 --- musics/winning_plusplus.ogg \n\
 --- musics/menu.ogg \n\
+\n\
+Di Rodrigues \n\
+--- musics/gameover.ogg \n\
+--- musics/drowning.ogg \n\
 \n\
 Victor Seven \n\
 --- musics/sunshine.ogg \n\
@@ -95,6 +93,8 @@ cynicmusic (cynicmusic.com, pixelsphere.org) \n\
 Viktor Kraus \n\
 --- musics/options.ogg \n\
 \n\
+Ville Nousiainen (soundcloud.com/mutkanto) \n\
+--- musics/speed.ogg (CC-0) \n\
 \n\
 \n\
 $CREDITS_RES_IMAGES \n\

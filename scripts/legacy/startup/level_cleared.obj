@@ -96,7 +96,7 @@ object ".default_startup.level_cleared.handle_music"
     state "goal"
     {
         set_music_volume "$vol"
-        play_music "musics/goal.ogg"
+        play_music "musics/winning.ogg"
         change_state "wait"
     }
 
