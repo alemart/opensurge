@@ -76,7 +76,7 @@ object "Surge's Shield Abilities" is "companion"
 object "Surge's Lighting Smash" is "shield ability"
 {
     player = Player("Surge");
-    sfx = Sound("samples/lighting_smash.wav");
+    sfx = Sound("samples/lightning_smash.wav");
     abilities = null;
 
     state "main"
@@ -275,7 +275,7 @@ object "Surge's Lighting Boom" is "companion"
 object "Surge's Lighting Boom FX" is "private", "entity"
 {
     actor = Actor("Surge's Lighting Boom");
-    sfx = Sound("samples/lighting_boom.wav");
+    sfx = Sound("samples/lightning_boom.wav");
     collider = CollisionBall(40);
     player = Player("Surge");
     minRadius = 0;

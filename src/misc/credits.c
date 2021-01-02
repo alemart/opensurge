@@ -347,8 +347,8 @@ Alexandre Martins \n\
 --- samples/slide.wav \n\
 --- samples/jetpack.wav \n\
 --- samples/underwater_tick.wav \n\
---- samples/lighting_boom.wav \n\
---- samples/lighting_smash.wav \n\
+--- samples/lightning_boom.wav \n\
+--- samples/lightning_smash.wav \n\
 \n\
 d1337r \n\
 --- samples/deny.wav \n\
