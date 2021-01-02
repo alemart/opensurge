@@ -325,8 +325,6 @@ Mateus Reis \n\
 \n\
 Di Rodrigues \n\
 --- samples/1up.ogg \n\
---- samples/push_stone.ogg \n\
---- samples/creativecommons.ogg \n\
 \n\
 Colin Beard \n\
 --- samples/shield.wav \n\
@@ -362,7 +360,7 @@ CGEffex (freesound.org) \n\
 \n\
 Johan Brodd \n\
 --- samples/allegro.ogg (public domain) \n\
---- samples/creativecommons2.ogg (public domain) \n\
+--- samples/creativecommons.ogg (public domain) \n\
 \n\
 InspectorJ (www.jshaw.co.uk) of freesound.org \n\
 --- samples/waterlevel.wav \n\
