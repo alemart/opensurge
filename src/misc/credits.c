@@ -67,6 +67,8 @@ Johan Brodd (jobromedia) \n\
 --- musics/silence.ogg (public domain) \n\
 --- musics/intro.ogg (public domain) \n\
 --- musics/sharp.ogg (public domain) \n\
+--- musics/allegro.ogg (public domain) \n\
+--- musics/creativecommons.ogg (public domain) \n\
 --- musics/invincible.ogg (public domain - edited by Alexandre)\n\
 --- musics/winning.ogg \n\
 --- musics/winning_plus.ogg \n\
@@ -355,10 +357,6 @@ d1337r \n\
 \n\
 CGEffex (freesound.org) \n\
 --- samples/roar.ogg \n\
-\n\
-Johan Brodd \n\
---- samples/allegro.ogg (public domain) \n\
---- samples/creativecommons.ogg (public domain) \n\
 \n\
 InspectorJ (www.jshaw.co.uk) of freesound.org \n\
 --- samples/waterlevel.wav \n\

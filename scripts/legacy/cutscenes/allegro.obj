@@ -12,7 +12,7 @@ object ".allegro_startup"
         create_child .cutscene_skipper[pedantic]
         set_absolute_position screen_width()/2 screen_height()/2
         set_animation SD_ALLEGRO 0
-        play_sample samples/allegro.ogg
+        play_sample musics/allegro.ogg
         change_state wait
     }
 
@@ -23,7 +23,7 @@ object ".allegro_startup"
 
     state stop
     {
-        stop_sample samples/allegro.ogg
+        stop_sample musics/allegro.ogg
         change_state fadeout_fast
     }
 
