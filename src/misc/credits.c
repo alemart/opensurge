@@ -193,10 +193,6 @@ d1337r \n\
 MTK358 \n\
 --- images/goal_sign.png \n\
 \n\
-Ste Pickford \n\
---- fonts/default.png \n\
---- fonts/powerfest.png \n\
-\n\
 Christian Robertson \n\
 --- fonts/Roboto-Medium.ttf (Apache License 2.0) \n\
 --- fonts/Roboto-Bold.ttf (Apache License 2.0) \n\
@@ -208,6 +204,7 @@ HanYang I&C Co Ltd \n\
 \n\
 Clint Bellanger \n\
 --- fonts/good_neighbors.png (CC-0) \n\
+--- fonts/default.png (CC-0) \n\
 \n\
 Robey Pointer \n\
 --- fonts/tiny.png \n\
