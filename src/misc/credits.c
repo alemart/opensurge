@@ -74,6 +74,7 @@ Johan Brodd (jobromedia) \n\
 --- musics/menu.ogg \n\
 \n\
 Di Rodrigues \n\
+--- musics/1up.ogg \n\
 --- musics/gameover.ogg \n\
 --- musics/drowning.ogg \n\
 \n\
@@ -322,9 +323,6 @@ Mateus Reis \n\
 --- samples/pipe_out.wav \n\
 --- samples/tube.wav \n\
 --- samples/jetpack2.wav (modified by Alexandre Martins) \n\
-\n\
-Di Rodrigues \n\
---- samples/1up.ogg \n\
 \n\
 Colin Beard \n\
 --- samples/shield.wav \n\

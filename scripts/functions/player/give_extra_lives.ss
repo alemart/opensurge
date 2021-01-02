@@ -16,7 +16,7 @@ using SurgeEngine.Audio.Music;
 //
 object "Give Extra Lives"
 {
-    jingle = Music("samples/1up.ogg");
+    jingle = Music("musics/1up.ogg");
 
     fun call(lives)
     {
