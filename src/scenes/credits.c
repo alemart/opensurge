@@ -203,7 +203,7 @@ void credits_render()
 
 /* private stuff */
 
-/* CSV pcallback */
+/* CSV callback */
 void aggregate_artwork(int field_count, const char** fields, int line_number, void* user_data)
 {
     const int FIELD_TYPE = 0, FIELD_FILE = 1, FIELD_LICENSE = 2,
