@@ -207,7 +207,10 @@ void credits_render()
 void aggregate_artwork(int field_count, const char** fields, int line_number, void* user_data)
 {
     const int FIELD_TYPE = 0, FIELD_FILE = 1, FIELD_LICENSE = 2,
-              FIELD_AUTHOR = 3, FIELD_WEBSITE = 4, FIELD_NOTES = 5;
+              FIELD_AUTHOR = 3, FIELD_WEBSITE = 4, FIELD_NOTES = 5,
+              NUMBER_OF_FIELDS = 6;
+
+    /* get the helper structure */
     artwork_aggregator_t* helper = (artwork_aggregator_t*)user_data;
     const int capacity = sizeof(helper->text_buffer) - 1;
 
@@ -218,6 +221,12 @@ void aggregate_artwork(int field_count, const char** fields, int line_number, vo
             helper->text_buffer[helper->text_length++] = *(p++); \
         helper->text_buffer[helper->text_length] = 0; \
     } while(0)
+
+    /* this entry does not have the expected number of fields */
+    if(field_count < NUMBER_OF_FIELDS) {
+        logfile_message("Error when reading the artwork csv: line %d has %d fields, but %d fields are expected", line_number+1, field_count, NUMBER_OF_FIELDS);
+        return;
+    }
 
     /* this entry is not of the desired type */
     if(strcmp(fields[FIELD_TYPE], helper->desired_type) != 0)
