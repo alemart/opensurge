@@ -78,7 +78,6 @@ struct actor_t* level_get_camera_focus();
 int level_inside_screen(int x, int y, int w, int h);
 
 /* music */
-void level_override_music(struct sound_t *sample);
 struct music_t* level_music();
 
 /* management */

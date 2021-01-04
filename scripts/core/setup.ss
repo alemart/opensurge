@@ -23,6 +23,7 @@ object "Default Setup"
     clearedAnim = spawn("Default Cleared Animation");
     openingAnim = spawn("Default Opening Animation");
     animalManager = Level.spawn("Animals");
+    collectiblesListener = spawn("Collectibles Listener").triggers("Give Extra Life").every(100);
     hud = null;
     player = null;
 
@@ -61,6 +62,7 @@ object "Debug Setup"
     clearedAnim = spawn("Default Cleared Animation");
     hud = spawn("Default HUD");
     animalManager = Level.spawn("Animals");
+    collectiblesListener = spawn("Collectibles Listener").triggers("Give Extra Life").every(100);
 }
 
 // this is for retro-compatibility

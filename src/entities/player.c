@@ -79,7 +79,6 @@ static const float PLAYER_MAX_BLINK = 2.0f;          /* how many seconds does th
 static const float PLAYER_UNDERWATER_BREATH = 30.0f; /* how many seconds can the player stay underwater before drowning? */
 
 /* private data */
-static int hundred_collectibles; /* counter (extra lives) */
 static int collectibles;         /* shared collectibles */
 static int lives;                /* shared lives */
 static int score;                /* shared score */
@@ -193,7 +192,7 @@ player_t *player_create(const char *character_name)
         physicsactor_set_chrg(p->pa, 0.0f);
 
     /* success! */
-    hundred_collectibles = collectibles = 0;
+    collectibles = 0;
     logfile_message("Created player \"%s\"", p->name);
     return p;
 }
@@ -1238,14 +1237,7 @@ int player_get_collectibles()
  */
 void player_set_collectibles(int c)
 {
-    collectibles = clip(c, 0, 999);
-
-    /* (100+) * k collectibles (k integer) = new life! */
-    if(c/100 > hundred_collectibles) {
-        hundred_collectibles = c/100;
-        player_set_lives( player_get_lives()+1 );
-        level_override_music(SFX_1UP);
-    }
+    collectibles = max(c, 0);
 }
 
 
