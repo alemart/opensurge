@@ -24,7 +24,7 @@
 #include "csv.h"
 
 /* Maximum supported number of fields per line */
-static const int CSV_MAX_FIELDS = 64;
+#define CSV_MAX_FIELDS 64
 
 /*
  * csv_parse()
