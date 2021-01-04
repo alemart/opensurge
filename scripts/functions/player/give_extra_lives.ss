@@ -5,7 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
-using SurgeEngine.Audio.Music;
+using SurgeEngine.Audio.Sound;
 
 //
 // Give Extra Lives is a function object that gives
