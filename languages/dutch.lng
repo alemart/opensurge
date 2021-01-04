@@ -120,6 +120,8 @@ CREDITS_RES_TEXT            "Tenzij uitdrukkelijk anders vermeld, zijn de onders
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Foto's</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muziek</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Geluidseffecten</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "De auteurs worden geïdentificeerd in de scripts zelf."
 

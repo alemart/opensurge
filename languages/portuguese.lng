@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-09-20"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2021-01-04"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -120,6 +120,8 @@ CREDITS_RES_TEXT            "A não ser quando dito explicitamente, os arquivos 
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Imagens</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Músicas</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efeitos sonoros</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fontes</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Fases</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts."
 

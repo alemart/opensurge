@@ -120,6 +120,8 @@ CREDITS_RES_TEXT         "Sauf indication contraire explicite, les fichiers énu
 CREDITS_RES_IMAGES       "<color=$COLOR_HIGHLIGHT>Images</color>"
 CREDITS_RES_MUSICS       "<color=$COLOR_HIGHLIGHT>Musique</color>"
 CREDITS_RES_SAMPLES      "<color=$COLOR_HIGHLIGHT>Effets sonores</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
 CREDITS_RES_SCRIPTS      "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêmes."
 

@@ -121,6 +121,8 @@ CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Imágenes</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Música</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efectos de Sonido</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los propios scripts."
 
 // Main Menu

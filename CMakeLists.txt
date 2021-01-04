@@ -107,6 +107,19 @@ IF(NOT USE_A5 AND LEGACY_USE_STATIC)
   ENDIF()
 ENDIF()
 
+# Generate files from templates
+FUNCTION(generate_file TEMPLATE)
+  CONFIGURE_FILE("src/misc/${TEMPLATE}.in" "misc/${TEMPLATE}" @ONLY)
+ENDFUNCTION()
+
+# Generate the content of the credits screen
+SET(CREDITS_ARTWORK_CSV "")
+FILE(STRINGS "src/misc/copyright-artwork.csv" CREDITS_ARTWORK_CSV_LIST ENCODING UTF-8)
+FOREACH(line IN LISTS CREDITS_ARTWORK_CSV_LIST)
+  SET(CREDITS_ARTWORK_CSV "${CREDITS_ARTWORK_CSV}\n\"${line}\\n\"")
+ENDFOREACH()
+generate_file("credits.c")
+
 # ------------------------------------------
 # Finding the required libraries
 # ------------------------------------------
@@ -349,6 +362,7 @@ SET(GAME_SRCS
   src/core/audio.c
   src/core/color.c
   src/core/commandline.c
+  src/core/csv.c
   src/core/engine.c
   src/core/font.c
   src/core/fontext.c
@@ -445,8 +459,8 @@ SET(GAME_SRCS
   src/entities/particle.c
   src/entities/renderqueue.c
 
-  src/misc/credits.c
   src/misc/icon.c
+  ${CMAKE_CURRENT_BINARY_DIR}/misc/credits.c
 
   src/main.c
 )
@@ -461,6 +475,7 @@ SET(GAME_HEADERS
   src/core/audio.h
   src/core/color.h
   src/core/commandline.h
+  src/core/csv.h
   src/core/engine.h
   src/core/fasthash.h
   src/core/font.h

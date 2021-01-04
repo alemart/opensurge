@@ -51,7 +51,7 @@
 #define IMAGE2BITMAP(img)           (*((BITMAP**)(img)))
 #endif
 #define FONT_STACKCAPACITY          8        /* color stack capacity */
-#define FONT_TEXTMAXSIZE            16384    /* maximum size for texts */
+#define FONT_TEXTMAXSIZE            65536    /* maximum size for texts */
 #define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
 static bool allow_antialias = true;          /* allow antialiasing for all TTF fonts? */
 
@@ -175,7 +175,7 @@ static fontdrv_t* fontdrv_list_find_ex(const char* name, const char* lang_id);
 /* ------------------------------- */
 
 /* font arguments: for a safe printf-like alternative (when dealing with user-provided format strings) */
-#define FONTARGS_MAX 3 /* can go up to 9 in the current expand algorithm */
+#define FONTARGS_MAX 8 /* can go up to 9 in the current expand algorithm */
 typedef char* fontargs_t[FONTARGS_MAX];
 
 /* font struct: this struct is used by the external world */

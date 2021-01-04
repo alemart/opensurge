@@ -120,6 +120,8 @@ CREDITS_RES_TEXT            "Ako nije izričito drugačije navedeno, dolje naved
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Slike</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzika</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Zvučni efekti</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skripte</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autori su prepoznati u samim skriptama."
 

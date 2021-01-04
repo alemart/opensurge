@@ -1,0 +1,196 @@
+Type;File;License;Author;Website;Notes
+music;musics/theme.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/template.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/intro.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/sharp.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/invincible.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;Edited by Alexandre Martins
+music;musics/winning.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/winning_plus.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/winning_plusplus.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/menu.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
+music;musics/allegro.ogg;CC0;Johan Brodd (jobromedia);;
+music;musics/creativecommons.ogg;CC0;Johan Brodd (jobromedia);;
+music;musics/silence.ogg;CC0;Johan Brodd (jobromedia);;
+music;musics/gameover.ogg;CC-BY 3.0;Di Rodrigues;;
+music;musics/drowning.ogg;CC-BY 3.0;Di Rodrigues;;
+music;musics/sunshine.ogg;CC-BY 3.0;Victor Seven;;
+music;musics/boss.ogg;CC-BY 3.0;Colin Beard (SilverstepP);;
+music;musics/gimacian.ogg;CC-BY 3.0;Colin Beard (SilverstepP);;
+music;musics/citychill.ogg;CC-BY 3.0;Mateus Reis (KZR);;
+music;musics/waterworks.ogg;CC0;cynicmusic;cynicmusic.com, pixelsphere.ogg;
+music;musics/options.ogg;CC-BY 3.0;Viktor Kraus;opengameart.org;'Birthday Cake' composed, performed, mixed and mastered by Viktor Kraus
+music;musics/speed.ogg;CC0;Ville Nousiainen;soundcloud.com/mutkanto;
+image;surge.png;CC0;João Victor (Race the Hedgehog);;
+image;images/neon.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/animals.png;CC-BY 3.0;João Victor (Race the Hedgehog);;Includes additional animals by 'SecularSteve'
+image;images/title.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/goal.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/heroes.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/surge_entrance.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/wolfey.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/mosquito.png;CC-BY 3.0;João Victor (Race the Hedgehog);;
+image;images/giant_wolf.png;CC-BY 3.0;João Victor (Race the Hedgehog);;Edited by Alexandre Martins
+image;images/charge.png;CC-BY 3.0;Colin Beard (SilverstepP);;
+image;images/more_shields.png;CC-BY 3.0;Colin Beard (SilverstepP);;
+image;images/even_more_shields.png;CC-BY 3.0;Colin Beard (SilverstepP);;
+image;images/pause.png;CC-BY 3.0;Colin Beard (SilverstepP);;
+image;images/eraser.png;CC-BY 3.0;Colin Beard (SilverstepP);;
+image;images/springfling.png;CC-BY 3.0;Colin Beard (SilverstepP);;Includes improvements by Cody Licorish (svgmovement)
+image;images/dnadoors.png;CC-BY 3.0;Colin Beard (SilverstepP);;Edited by Christopher Martinus (SurgeChris)
+image;images/collectibles.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/marmot-green.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/marmotred.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/harrier-swoop.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/skaterbug.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/ruler-salamander.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/barrel.png;CC-BY 3.0;Cody Licorish (svgmovement);;
+image;images/logo.png;CC0;Cody Licorish (svgmovement);;Additional thanks to João Victor (Race the Hedgehog)
+image;logo.png;CC0;Cody Licorish (svgmovement);;
+image;images/surge.png;CC-BY 3.0;João Victor (Race the Hedgehog) & Alexandre Martins;;
+image;images/dialogs.png;CC-BY 3.0;João Victor (Race the Hedgehog) & Alexandre Martins;;
+image;images/jumping_fish.png;CC-BY 3.0;João Victor (Race the Hedgehog) & Alexandre Martins;;
+image;images/core.png;CC0;Alexandre Martins;;
+image;images/fade_effect.png;CC-BY 3.0;Alexandre Martins;;
+image;images/hud.png;CC-BY 3.0;Alexandre Martins;;
+image;images/null.png;CC-BY 3.0;Alexandre Martins;;
+image;images/special.png;CC-BY 3.0;Alexandre Martins;;
+image;images/stars.png;CC-BY 3.0;Alexandre Martins;;
+image;images/pixel.png;CC0;Alexandre Martins;;
+image;images/impact.png;CC-BY 3.0;Alexandre Martins;;
+image;images/dialogbox.png;CC-BY 3.0;Alexandre Martins;;
+image;images/sunshine.png;CC-BY 3.0;Alexandre Martins;;Includes contributions by João Victor (Race the Hedgehog), Alex V. (squirrel) and Carl Olsson (surt)
+image;images/waterworks.png;CC-BY 3.0;Alexandre Martins;;Includes contributions by João Victor (Race the Hedgehog) and Carl Olsson (surt)
+image;images/capsule.png;CC-BY 3.0;Alexandre Martins;;
+image;images/elevators.png;CC-BY 3.0;Alexandre Martins;;
+image;images/bridges.png;CC-BY 3.0;Alexandre Martins;;
+image;images/watersurface.png;CC-BY 3.0;Alexandre Martins;;
+image;images/zipline.png;CC-BY 3.0;Alexandre Martins;;Additional thanks to Sascha de Waal (ssdw)
+image;images/bugsy.png;CC-BY 3.0;Alexandre Martins;;Based on Brian Zablocky's Lady Bugsy
+image;images/fish.png;CC-BY 3.0;Alexandre Martins;;
+image;images/loading.png;CC-BY 3.0;Alexandre Martins;;Additional thanks to João Victor (Race the Hedgehog)
+image;images/surgebg.png;CC-BY 3.0;Alexandre Martins;;Additional thanks to João Victor (Race the Hedgehog)
+image;images/credits.png;CC-BY 3.0;Alexandre Martins;;Additional thanks to João Victor (Race the Hedgehog)
+image;images/water.png;CC-BY 3.0;Alexandre Martins;;Includes numbers font by Ste Pickford
+image;images/bumper.png;CC-BY 3.0;Brian Zablocky (Celdecea);;
+image;images/checkpoint_orb.png;CC-BY 3.0;Brian Zablocky (Celdecea);;
+image;images/item_boxes.png;CC-BY 3.0;Brian Zablocky (Celdecea);;Includes contributions by Cody Licorish (svgmovement), João Victor (Race the Hedgehog), Colin Beard (SilverstepP) and Alexandre Martins
+image;images/lady_bugsy.png;CC-BY 3.0;Brian Zablocky (Celdecea);;
+image;images/shields.png;CC-BY 3.0;Brian Zablocky (Celdecea);;
+image;images/switches.png;CC-BY 3.0;Brian Zablocky (Celdecea);;Edited by Alexandre Martins
+image;images/spring_pads.png;CC-BY 3.0;Brian Zablocky (Celdecea), Alex V. (squirrel) & Alexandre Martins;;
+image;images/acts.png;CC-BY 3.0;Christopher Martinus;;
+image;images/surge_cool.png;CC-BY 3.0;Mateus Reis (KZR);;
+image;images/watersplash.png;CC-BY 3.0;Mateus Reis (KZR);;
+image;images/animalprison.png;CC-BY 3.0;Mateus Reis (KZR) & Colin Beard (SilverstepP);;
+image;images/teleporter.png;CC-BY 3.0;d1337r;;
+image;images/goal_sign.png;CC-BY 3.0;MTK358;;
+image;images/tux.png;CC-BY 3.0;Constantin Pelikan;;
+image;images/spikes.png;CC0;Carl Olsson (surt);opengameart.org;Edited by Alexandre Martins
+image;images/explosion.png;CC-BY 3.0;Daniel Cook;lostgarden.com;
+image;images/cursor.png;CC0;qubodup;opengameart.org;
+image;images/rings.png;CC-BY 3.0;Gaivota;;Edited by Alexandre Martins
+image;images/violet.png;CC0;treeform;opengameart.org;
+image;images/allegro.png;Giftware license;Shawn Hargreaves;liballeg.org;
+image;images/creativecommons.png;CC0;Creative Commons;creativecommons.org;
+image;images/crococopter.png;CC-BY 3.0;Alex V. (squirrel);;
+image;images/explode.png;CC0;thekingphoenix;opengameart.org;
+image;images/hand.png;CC0;thekingphoenix;opengameart.org;
+image;images/sunshine_bg.png;CC0;Luis Zuno (ansimuz);pixelgameart.org;Edited by Alexandre Martins
+image;images/waterworks_bg.png;CC-BY 3.0;Alexandre Martins & Luis Zuno (ansimuz);pixelgameart.org;Includes contributions by Mateus Reis (KZR)
+image;images/speed_spoke.png;CC-BY 3.0;klausdell;opengameart.org;Edited by Alexandre Martins
+image;images/smoke.png;CC-BY 3.0;KnoblePersona;opengameart.org;Edited by Alexandre Martins
+image;images/mini_smoke.png;CC-BY 3.0;Master484;opengameart.org/users/master484;
+image;images/hydra.png;CC-BY-SA 3.0;Antifarea;opengameart.org;Expanded by Alexandre Martins
+image;images/life_icon.png;CC-BY 3.0;João Victor (Race the Hedgehog), Colin Beard (SilverstepP), Constantin Pelikan, Alexandre Martins;;
+font;fonts/default.png;CC0;Clint Bellanger;opengameart.org;
+font;fonts/good_neighbors.png;CC0;Clint Bellanger;opengameart.org;Expanded by Alexandre Martins
+font;fonts/tiny.png;CC0;Robey Pointer;opengameart.org;
+font;fonts/Roboto-Medium.ttf;Apache-2.0;Christian Robertson;;
+font;fonts/Roboto-Bold.ttf;Apache-2.0;Christian Robertson;;
+font;fonts/Roboto-Black.ttf;Apache-2.0;Christian Robertson;;
+font;fonts/GothicA1-Medium.ttf;SIL Open Font License 1.1;HanYang I&C Co Ltd;;
+font;fonts/GothicA1-Bold.ttf;SIL Open Font License 1.1;HanYang I&C Co Ltd;;
+sound;samples/break.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/checkpoint.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/jump.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/spring.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/bosshit.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/brake.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/drown.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/collectible.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/collectible_loss.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/collectible_count.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/select.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/select_2.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/return.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/roll.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/charge.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/release.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/choose.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/bigring.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/endsign.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/glasses.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/teleporter.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/teleporter_backwards.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/water_in.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/water_out.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/death.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/spikes.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/switch.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/door1.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/door2.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/powerup.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/cannon.ogg;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/floorhit.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/shot.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/growlmod.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/trotada.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/help.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/crococopter.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/crococopter_swoop_up.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/crococopter_swoop_down.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/secret.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/pipe_in.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/pipe_out.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/tube.wav;CC-BY 3.0;Mateus Reis (KZR);;
+sound;samples/jetpack2.wav;CC-BY 3.0;Mateus Reis (KZR);;Edited by Alexandre Martins
+sound;samples/shield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/acidshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/fireshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/thundershield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/watershield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/windshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/bubbleget.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/bumper.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/cash.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/1up.ogg;CC-BY 3.0;Di Rodrigues;;
+sound;samples/spikes_appearing.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/spikes_disappearing.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/destroy.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/damaged.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/talk.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/zipline.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/zipline2.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/impact.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/slide.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/jetpack.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/underwater_tick.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/lightning_boom.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/lightning_smash.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/deny.wav;CC-BY 3.0;d1337r;;
+sound;samples/roar.ogg;CC-BY 3.0;CGEffex;freesound.org;
+sound;samples/waterlevel.wav;CC-BY 3.0;InspectorJ;www.jshaw.co.uk, freesound.org;
+sound;samples/waterfall.wav;CC0;mas123456;freesound.org;
+sound;samples/charging_up.wav;CC-BY 3.0;LG;freesound.org;
+sound;samples/electric_bulb.wav;CC-BY 3.0;Eddy Bergman;youtube.com/ededitz, freesound.org;
+sound;samples/discharge.wav;CC0;Selector;freesound.org;
+sound;samples/teleport_appear.wav;CC0;little_dog4000;freesound.org;Edited by Alexandre Martins
+sound;samples/teleport_disappear.wav;CC0;little_dog4000;freesound.org;Edited by Alexandre Martins
+level;levels/sunshine-1.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/sunshine-2.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/sunshine-3.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/waterworks-1.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/waterworks-2.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/waterworks-3.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/demo-1.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/demo-2.lev;CC-BY 3.0;Alexandre Martins;;

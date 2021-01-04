@@ -120,6 +120,8 @@ CREDITS_RES_TEXT            "Wenn nicht anders vermerkt, sind die folgenden Date
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Bilder</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Musik</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Toneffekte</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skripte</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Die Autoren werden in den Skripten selbst genannt."
 

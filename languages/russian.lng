@@ -121,6 +121,8 @@ CREDITS_RES_TEXT            "Если не указано иначе, файлы
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Графика</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музыка</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звуковые эффекты</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипты</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих скриптов."
 
