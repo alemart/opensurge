@@ -4,8 +4,6 @@ Welcome to **Open Surge**!
 
 Download the game at [opensurge2d.org](http://opensurge2d.org)
 
-<img src="surge.png" alt="Surge" width="320" align="right">
-
 ## What is Open Surge?
 
 Open Surge is a fun 2D retro platformer inspired by Sonic games and a game creation system that lets you unleash your creativity!
@@ -13,6 +11,8 @@ Open Surge is a fun 2D retro platformer inspired by Sonic games and a game creat
 <img src="https://opensurge2d.org/surge-demo.gif" alt="Open Surge demo" width="480">
 
 Open Surge is currently available for Microsoft Windows and GNU/Linux. It is in active development!
+
+<img src="surge.png" alt="Surge" width="256" align="right">
 
 ## About Open Surge
 
