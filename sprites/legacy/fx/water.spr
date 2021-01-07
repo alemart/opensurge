@@ -16,6 +16,7 @@ sprite SD_WATERLEVEL
     }
 }
 
+// no longer used!
 sprite SD_WATERCOUNTER
 {
     source_file     "images/water.png"
