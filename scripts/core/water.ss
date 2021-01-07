@@ -237,8 +237,7 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
         }
         else if(music.playing) {
             counter.visible = false;
-            if(music.playing)
-                music.stop();
+            music.stop();
         }
     }
 
