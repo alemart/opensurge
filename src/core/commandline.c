@@ -39,10 +39,23 @@
 #define crash(...) do { console_print(__VA_ARGS__); exit(1); } while(0)
 static void console_print(char *fmt, ...);
 static int concat_gameid(const char* gameid, void* data);
-static const char* COPYRIGHT = GAME_TITLE " version " GAME_VERSION_STRING "\n"
-                               "Copyright (C) " GAME_YEAR " Alexandre Martins\n"
-                               "http://" GAME_WEBSITE;
 static int COMMANDLINE_UNDEFINED = -1;
+static const char COPYRIGHT[] = GAME_TITLE " version " GAME_VERSION_STRING "\n"
+                                "Copyright (C) " GAME_YEAR " Alexandre Martins\n"
+                                "http://" GAME_WEBSITE;
+static const char LICENSE[] = ""
+"This program is free software; you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation; either version 3 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program.  If not, see <http://www.gnu.org/licenses/>.";
 
 
 
@@ -94,6 +107,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --help -h                        display this message\n"
                 "    --version -v                     display the version of this program\n"
                 "    --ssversion                      display the version of the SurgeScript runtime\n"
+                "    --license                        display the license of this game engine\n"
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
@@ -113,7 +127,9 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --uninstall \"gameid\"             uninstall an Open Surge game package\n"
                 "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --game-folder \"/path/to/data\"    use game assets only from the specified folder\n"
+#ifndef _WIN32
                 "    --base \"/path/to/data\"           set a custom base folder for the assets (*nix only)\n"
+#endif
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
                 COPYRIGHT, program
@@ -128,6 +144,11 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--ssversion") == 0) {
             console_print("%s", surgescript_util_version());
+            exit(0);
+        }
+
+        else if(strcmp(argv[i], "--license") == 0) {
+            console_print("%s\n\n%s", COPYRIGHT, LICENSE);
             exit(0);
         }
 
