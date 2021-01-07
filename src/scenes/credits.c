@@ -55,18 +55,18 @@ static bgtheme_t *bgtheme;
 static music_t *music;
 static scene_t *next_scene;
 
-#define ARTWORK_CATEGORIES 5
-#define ARTWORK_TEXT_MAXLEN 65536
-extern const char CREDITS_ARTWORK_CSV[];
-static char artwork_text_buffer[ARTWORK_CATEGORIES * ARTWORK_TEXT_MAXLEN];
-static const char* artwork_filter[ARTWORK_CATEGORIES] = { "music", "level", "image", "sound", "font" };
-static void aggregate_artwork(int field_count, const char** fields, int line_number, void* user_data);
+#define ASSETS_CATEGORIES 6
+#define ASSETS_TEXT_MAXLEN 65536
+extern const char CREDITS_ASSETS_CSV[];
+static char assets_text_buffer[ASSETS_CATEGORIES * ASSETS_TEXT_MAXLEN];
+static const char* assets_filter[ASSETS_CATEGORIES] = { "music", "level", "image", "translation", "sound", "font" };
+static void aggregate_assets(int field_count, const char** fields, int line_number, void* user_data);
 typedef struct {
     const char* desired_type; /* used as a filter */
     char last_author[256];
-    char text_buffer[ARTWORK_TEXT_MAXLEN];
+    char text_buffer[ASSETS_TEXT_MAXLEN];
     int text_length;
-} artwork_aggregator_t;
+} assets_aggregator_t;
 
 
 
@@ -78,15 +78,15 @@ typedef struct {
  */
 void credits_init(void *foo)
 {
-    const char* artwork_arguments[ARTWORK_CATEGORIES];
+    const char* assets_arguments[ASSETS_CATEGORIES];
 
-    /* parse the text from the artwork CSV file */
-    for(int i = 0; i < ARTWORK_CATEGORIES; i++) {
-        char* text_buffer = artwork_text_buffer + i * ARTWORK_TEXT_MAXLEN;
-        artwork_aggregator_t helper = { artwork_filter[i], "", "", 0 };
-        csv_parse(CREDITS_ARTWORK_CSV, ";", aggregate_artwork, &helper);
-        str_cpy(text_buffer, helper.text_buffer, ARTWORK_TEXT_MAXLEN);
-        artwork_arguments[i] = text_buffer;
+    /* parse the text from the assets CSV file */
+    for(int i = 0; i < ASSETS_CATEGORIES; i++) {
+        char* text_buffer = assets_text_buffer + i * ASSETS_TEXT_MAXLEN;
+        assets_aggregator_t helper = { assets_filter[i], "", "", 0 };
+        csv_parse(CREDITS_ASSETS_CSV, ";", aggregate_assets, &helper);
+        str_cpy(text_buffer, helper.text_buffer, ASSETS_TEXT_MAXLEN);
+        assets_arguments[i] = text_buffer;
     }
 
     /* load components */
@@ -109,7 +109,7 @@ void credits_init(void *foo)
 
     /* load the font that will display the credits */
     text = font_create("MenuText");
-    font_set_textargumentsv(text, ARTWORK_CATEGORIES, artwork_arguments);
+    font_set_textargumentsv(text, ASSETS_CATEGORIES, assets_arguments);
     font_set_text(text, "%s", CREDITS_TEXT);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
@@ -149,13 +149,15 @@ void credits_update()
     background_update(bgtheme);
 
     /* scroll the text faster */
-    if(input_button_down(input, IB_FIRE1))
+    if(input_button_down(input, IB_UP) || input_button_down(input, IB_FIRE1))
         scroll_speed_multiplier = 5.0f;
+    else if(input_button_down(input, IB_DOWN))
+        scroll_speed_multiplier = -5.0f;
 
     /* text movement */
     textpos = font_get_position(text);
     textpos.y -= (scroll_speed_multiplier * SCROLL_SPEED) * dt;
-    if(textpos.y < -font_get_textsize(text).y)
+    if(textpos.y < -font_get_textsize(text).y || textpos.y > VIDEO_SCREEN_H)
         textpos.y = VIDEO_SCREEN_H;
     font_set_position(text, textpos);
 
@@ -204,14 +206,14 @@ void credits_render()
 /* private stuff */
 
 /* CSV callback */
-void aggregate_artwork(int field_count, const char** fields, int line_number, void* user_data)
+void aggregate_assets(int field_count, const char** fields, int line_number, void* user_data)
 {
     const int FIELD_TYPE = 0, FIELD_FILE = 1, FIELD_LICENSE = 2,
               FIELD_AUTHOR = 3, FIELD_WEBSITE = 4, FIELD_NOTES = 5,
               NUMBER_OF_FIELDS = 6;
 
     /* get the helper structure */
-    artwork_aggregator_t* helper = (artwork_aggregator_t*)user_data;
+    assets_aggregator_t* helper = (assets_aggregator_t*)user_data;
     const int capacity = sizeof(helper->text_buffer) - 1;
 
     /* this macro appends a string to the text buffer */
@@ -224,7 +226,7 @@ void aggregate_artwork(int field_count, const char** fields, int line_number, vo
 
     /* this entry does not have the expected number of fields */
     if(field_count < NUMBER_OF_FIELDS) {
-        logfile_message("Error when reading the artwork csv: line %d has %d fields, but %d fields are expected", line_number+1, field_count, NUMBER_OF_FIELDS);
+        logfile_message("Error when reading the credits csv file: line %d has %d fields, but %d fields are expected", line_number+1, field_count, NUMBER_OF_FIELDS);
         return;
     }
 

@@ -1,5 +1,5 @@
 /* these strings show up in the credits screen */
-const char CREDITS_ARTWORK_CSV[] = "" @CREDITS_ARTWORK_CSV@ ;
+const char CREDITS_ASSETS_CSV[] = "" @COPYRIGHT_DATA_CSV@ ;
 const char CREDITS_TEXT[] = "\n\
 $CREDITS_HEADER \n\
 \n\
@@ -46,8 +46,8 @@ Allegro gamedev community \n\
 $CREDITS_TRANSLATORS \n\
 \n\
 Wuzzy \n\
-Álvaro Bazán \n\
-krumaska \n\
+Álvaro Bazán (reaperplayer91) \n\
+Jinwoong Yoo (krumaska) \n\
 AntsThatWander \n\
 Stylix58 \n\
 SecularSteve \n\
@@ -59,16 +59,20 @@ Halatnikov \n\
 \n\
 $CREDITS_RES_TITLE \n\
 \n\
+$CREDITS_RES_TEXT \n\
+\n\
 $CREDITS_RES_MUSICS \n\
 $1 \n\
 $CREDITS_RES_LEVELS \n\
 $2 \n\
 $CREDITS_RES_IMAGES \n\
 $3 \n\
-$CREDITS_RES_SAMPLES \n\
+$CREDITS_RES_TRANSLATIONS \n\
 $4 \n\
-$CREDITS_RES_FONTS \n\
+$CREDITS_RES_SAMPLES \n\
 $5 \n\
+$CREDITS_RES_FONTS \n\
+$6 \n\
 $CREDITS_RES_SCRIPTS \n\
 \n\
 $CREDITS_RES_SCRIPTS_TEXT \n\
