@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // File: languages/serbian.lng
 // Description: serbian translation (encoding: UTF-8)
-// Author: SecularSteve
-//         includes contributions by Aleksa
+// Author: SecularSteve (includes contributions by Aleksa)
 // License: MIT
 // -----------------------------------------------------------------------------
 
@@ -123,6 +122,7 @@ CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музика</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звучни ефекти</color>"
 FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
 FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
+FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипте</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у самим скриптама."
 

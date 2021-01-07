@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // File: languages/francais.lng
 // Description: french translation (encoding: UTF-8)
-// Authors: Stylix58, David Demelier (last translator)
+// Author: Stylix58 (includes contributions by David Demelier)
 // License: MIT
 // -----------------------------------------------------------------------------
 
@@ -14,8 +14,8 @@
 // (use the English alphabet)
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
-LANG_AUTHOR              "Stylix58, David Demelier"       // translation author
-LANG_LASTUPDATE          "2020-02-17"                     // date format: yyyy-mm-dd
+LANG_AUTHOR              "Stylix58"                       // translation author
+LANG_LASTUPDATE          "2020-02-17"                     // FIXME <-- this date is incorrect! date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.5.2"                          // required engine version
 
 
@@ -122,6 +122,7 @@ CREDITS_RES_MUSICS       "<color=$COLOR_HIGHLIGHT>Musique</color>"
 CREDITS_RES_SAMPLES      "<color=$COLOR_HIGHLIGHT>Effets sonores</color>"
 FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
 FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
+FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
 CREDITS_RES_SCRIPTS      "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêmes."
 

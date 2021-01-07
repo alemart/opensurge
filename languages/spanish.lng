@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // File: languages/spanish.lng
 // Description: spanish translation (encoding: UTF-8)
-// Author: Álvaro Bazán (SynfigMaster91)
+// Author: Álvaro Bazán (SynfigMaster91 / reaperplayer91)
 // License: MIT
 // -----------------------------------------------------------------------------
 
@@ -123,6 +123,7 @@ CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efectos de Sonido</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
 FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
+FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los propios scripts."
 
 // Main Menu
