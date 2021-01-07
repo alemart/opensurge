@@ -29,14 +29,13 @@ object "Setup contribute web page"
 // it's a bit like using atexit() from the C standard library
 object "Open Contribute web page"
 {
-    contrib = "contrib-" + SurgeEngine.version;
-    contribInterval = 31536000; // 1 year
+    key = "contrib-" + SurgeEngine.version;
 
     fun call()
     {
-        lastContrib = Number(Prefs[contrib] || 0);
-        if(Date.unixtime >= lastContrib + contribInterval) {
-            Prefs[contrib] = Date.unixtime;
+        asked = Prefs[key] || false;
+        if(!asked) {
+            Prefs[key] = true;
             Web.launchURL(donateURL());
         }
     }

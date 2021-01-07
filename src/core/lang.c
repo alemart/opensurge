@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * lang.c - language/translation module
- * Copyright (C) 2009-2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2009-2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,11 +41,14 @@ static HASHTABLE(stringadapter_t, strings);
 
 /* private stuff */
 #define NULL_STRING "null"
+#define UNTRANSLATED_STRING "FIXME" /* indicates that a language string hasn't been translated */
 static char lang_id[32] = NULL_STRING;
 static const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
 typedef struct { const char* key; const char* value; } inout_t;
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
+static int traverse_count(const parsetree_statement_t *stmt, void *counters);
+static bool is_untranslated_entry(const parsetree_statement_t *stmt);
 
 
 
@@ -60,6 +63,8 @@ void lang_init()
     strings = hashtable_stringadapter_t_create();
     lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
     logfile_message("The language module has been initialized");
+
+    (void)traverse_count; /* TODO */
 }
 
 
@@ -186,10 +191,10 @@ const char* lang_getid()
  * lang_compatibility()
  * Language files are made for specific game versions
  */
-void lang_compatibility(const char* filename, int* supver, int* subver, int* wipver)
+void lang_compatibility(const char* filepath, int* supver, int* subver, int* wipver)
 {
     char compat[32];
-    lang_metadata(filename, "LANG_COMPATIBILITY", compat, sizeof(compat));
+    lang_metadata(filepath, "LANG_COMPATIBILITY", compat, sizeof(compat));
     if(sscanf(compat, "%d.%d.%d", supver, subver, wipver) < 3)
         *supver = *subver = *wipver = 0;
 }
@@ -216,6 +221,9 @@ int traverse(const parsetree_statement_t *stmt)
     const char* key, *value;
     stringadapter_t *s;
 
+    if(is_untranslated_entry(stmt))
+        return 0;
+
     if(nanoparser_get_number_of_parameters(param_list) != 1) 
         fatal_error("Language file error: invalid syntax at line %d in\n\"%s\"", nanoparser_get_line_number(stmt), nanoparser_get_file(stmt));
 
@@ -238,6 +246,9 @@ int traverse_inout(const parsetree_statement_t *stmt, void *inout)
     const parsetree_parameter_t *param_list = nanoparser_get_parameter_list(stmt);
     const parsetree_parameter_t *p = nanoparser_get_nth_parameter(param_list, 1);
 
+    if(is_untranslated_entry(stmt))
+        return 0;
+
     if(nanoparser_get_number_of_parameters(param_list) != 1) 
         fatal_error("Language file error: invalid syntax at line %d in\n\"%s\"", nanoparser_get_line_number(stmt), nanoparser_get_file(stmt));
 
@@ -248,6 +259,24 @@ int traverse_inout(const parsetree_statement_t *stmt, void *inout)
     }
 
     return 0;
+}
+
+int traverse_count(const parsetree_statement_t *stmt, void *counters)
+{
+    int *counter = (int*)counters;
+
+    if(!is_untranslated_entry(stmt))
+        counter[0]++;
+    else
+        counter[1]++;
+
+    return 0;
+}
+
+bool is_untranslated_entry(const parsetree_statement_t *stmt)
+{
+    const char* id = nanoparser_get_identifier(stmt);
+    return (0 == str_icmp(id, UNTRANSLATED_STRING));
 }
 
 stringadapter_t* stringadapter_create(const char* data)
@@ -273,4 +302,3 @@ void stringadapter_set_data(stringadapter_t *s, const char* data)
     free(s->data);
     s->data = str_dup(data);
 }
-

@@ -16,7 +16,7 @@ bgtheme "themes/template.bg"
 spawn_point 128 9920
 music "musics/template.ogg"
 setup "Default Setup"
-players "Surge" "Neon"
+players "Surge"
 
 // bricks
 brick 17 0 9856

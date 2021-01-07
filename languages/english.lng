@@ -15,8 +15,8 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-09-09"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_LASTUPDATE             "2021-01-07"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -44,8 +44,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -116,10 +116,13 @@ CREDITS_BRIAN               "Sprite artist"
 CREDITS_TRANSLATOR          "Translator"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individual resources</color>"
-CREDITS_RES_TEXT            "Unless explicitly told otherwise, the files listed below are licensed under the Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Images</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Music</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Sound effects</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "The authors are identified within the scripts themselves."
 
@@ -177,14 +180,14 @@ INPUT_JOY_LEFT              "the LEFT BUTTON"
 INPUT_JOY_RIGHT             "the RIGHT BUTTON"
 INPUT_JOY_UP                "the UP BUTTON"
 INPUT_JOY_DOWN              "the DOWN BUTTON"
-INPUT_JOY_FIRE1             "BUTTON 1"
-INPUT_JOY_FIRE2             "BUTTON 2"
-INPUT_JOY_FIRE3             "BUTTON 3"
-INPUT_JOY_FIRE4             "BUTTON 4"
-INPUT_JOY_FIRE5             "BUTTON 5"
-INPUT_JOY_FIRE6             "BUTTON 6"
-INPUT_JOY_FIRE7             "BUTTON 7"
-INPUT_JOY_FIRE8             "BUTTON 8"
+INPUT_JOY_FIRE1             "JUMP"
+INPUT_JOY_FIRE2             "SWITCH"
+INPUT_JOY_FIRE3             "PAUSE"
+INPUT_JOY_FIRE4             "BACK"
+INPUT_JOY_FIRE5             "<available>"
+INPUT_JOY_FIRE6             "<available>"
+INPUT_JOY_FIRE7             "<available>"
+INPUT_JOY_FIRE8             "<available>"
 
 
 
@@ -207,7 +210,7 @@ LOADING_TEXT                "loading..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>How to play</color>\nWelcome to the <color=$COLOR_HIGHLIGHT>Open Surge Demo Level</color>! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. Use $INPUT_FIRE2 to switch character."
+LEV_DEMO_1                  "<color=$COLOR_TITLE>How to play</color>\nWelcome to the <color=$COLOR_HIGHLIGHT>Open Surge Demo Level</color>! Use $INPUT_DIRECTIONAL to move and $INPUT_FIRE1 to jump. Press $INPUT_FIRE2 to switch character."
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Did you know...?</color>\nEverything in Open Surge is customizable. You can make levels, items, bosses, characters and more! It's a full <color=$COLOR_HIGHLIGHT>game creation system</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Unleash your creativity!</color>\nOne of the key features in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. It's scripting for games! Use it to build anything you can imagine!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> to create your own awesome games today!"

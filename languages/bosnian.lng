@@ -16,7 +16,7 @@ LANG_ID                     "bs_BA"                   // language code & country
 LANG_NAME                   "Bosanski"                // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
 LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -44,8 +44,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -114,12 +114,15 @@ CREDITS_VICTOR              "Muzičar"
 CREDITS_COLIN               "Sprajti, prva priča"
 CREDITS_BRIAN               "Umjetnik sprajta"
 CREDITS_TRANSLATOR          "Prijevodnik"
-CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>" // -- FIXME --
+FIXME (untranslated) CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>" // FIXME
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Krediti po nezavisnim resursima</color>"
-CREDITS_RES_TEXT            "Ako nije izričito drugačije navedeno, dolje navedene datoteke licencirane su pod Creative Commons Attribution 3.0 (CC-BY 3.0)."
+FIXME (untranslated) CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Slike</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzika</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Zvučni efekti</color>"
+FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
+FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
+FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skripte</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autori su prepoznati u samim skriptama."
 
@@ -177,14 +180,14 @@ INPUT_JOY_LEFT              "LIJEVO DUGME"
 INPUT_JOY_RIGHT             "DESNO DUGME"
 INPUT_JOY_UP                "GORNJE DUGME"
 INPUT_JOY_DOWN              "DONJE DUGME"
-INPUT_JOY_FIRE1             "DUGME 1"
-INPUT_JOY_FIRE2             "DUGME 2"
-INPUT_JOY_FIRE3             "DUGME 3"
-INPUT_JOY_FIRE4             "DUGME 4"
-INPUT_JOY_FIRE5             "DUGME 5"
-INPUT_JOY_FIRE6             "DUGME 6"
-INPUT_JOY_FIRE7             "DUGME 7"
-INPUT_JOY_FIRE8             "DUGME 8"
+FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
+FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
+FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
+FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
+FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
+FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
 
 
 

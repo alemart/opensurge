@@ -72,7 +72,7 @@ object "Powerup Speed" is "entity", "basic", "powerup"
 object "Powerup 1up" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(1);
-    jingle = Music("samples/1up.ogg");
+    jingle = Sound("samples/1up.ogg");
 
     state "main"
     {

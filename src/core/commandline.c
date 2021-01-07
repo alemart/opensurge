@@ -30,9 +30,15 @@
 #include "video.h"
 #include "install.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /* private stuff ;) */
-static void crash(char *fmt, ...);
-static int print_gameid(const char* gameid, void* data);
+#define BUFFER_CAPACITY 8192
+#define crash(...) do { console_print(__VA_ARGS__); exit(1); } while(0)
+static void console_print(char *fmt, ...);
+static int concat_gameid(const char* gameid, void* data);
 static const char* COPYRIGHT = GAME_TITLE " version " GAME_VERSION_STRING "\n"
                                "Copyright (C) " GAME_YEAR " Alexandre Martins\n"
                                "http://" GAME_WEBSITE;
@@ -79,7 +85,7 @@ commandline_t commandline_parse(int argc, char **argv)
     for(i=1; i<argc; i++) {
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            printf(
+            console_print(
                 "%s\n\n"
                 "usage:\n"
                 "    %s [options ...]\n"
@@ -109,19 +115,19 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --game-folder \"/path/to/data\"    use game assets only from the specified folder\n"
                 "    --base \"/path/to/data\"           set a custom base folder for the assets (*nix only)\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
-                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)\n",
+                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
                 COPYRIGHT, program
             );
             exit(0);
         }
 
         else if(strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
-            puts(GAME_VERSION_STRING);
+            console_print("%s", GAME_VERSION_STRING);
             exit(0);
         }
 
         else if(strcmp(argv[i], "--ssversion") == 0) {
-            puts(surgescript_util_version());
+            console_print("%s", surgescript_util_version());
             exit(0);
         }
 
@@ -214,7 +220,9 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--games") == 0) {
-            foreach_installed_game(print_gameid, NULL);
+            char games[BUFFER_CAPACITY] = "";
+            foreach_installed_game(concat_gameid, games);
+            console_print("%s", games);
             exit(0);
         }
 
@@ -268,7 +276,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else { /* unknown option */
-            crash("%s: bad command line option \"%s\"\nRun %s --help to get more information", program, argv[i], program);
+            crash("%s: bad command line option \"%s\"\nRun %s --help for more information", program, argv[i], program);
         }
 
     }
@@ -301,10 +309,10 @@ const char* commandline_getstring(const char* value, const char* default_string)
 /* private functions */
 
 
-/* Displays a message to the user (printf format) and exists */
-void crash(char *fmt, ...)
+/* Displays a message to the user (printf format) */
+void console_print(char *fmt, ...)
 {
-    char buf[1024];
+    char buf[BUFFER_CAPACITY];
     va_list args;
 
     va_start(args, fmt);
@@ -312,14 +320,25 @@ void crash(char *fmt, ...)
     va_end(args);
 
     puts(buf);
-    exit(1);
+
+#ifdef _WIN32
+    /* Display a message box on Windows. Because this is
+       a GUI application, the text will not show up in the
+       console, but stdout may be redirected to a file */
+    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK);
+#endif
 }
 
 
 
-/* prints gameid */
-int print_gameid(const char* gameid, void* data)
+/* concatenates gameid into a string buffer */
+int concat_gameid(const char* gameid, void* data)
 {
-    printf("- %s\n", gameid);
+    char* str = (char*)data;
+
+    if(*str)
+        strncat(str, "\n", BUFFER_CAPACITY - strlen(str) - 1);
+    strncat(str, gameid, BUFFER_CAPACITY - strlen(str) - 1);
+
     return 0;
 }

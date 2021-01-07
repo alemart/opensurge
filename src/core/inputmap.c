@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * inputmap.c - custom input mapping
- * Copyright (C) 2011, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,7 +54,9 @@ static int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *i
 static const char* INPUTMAP_FILE = "config/input.def";
 static const char* NULL_INPUTMAP = "null";
 static int keycode_of(const char* key_name);
-static int joybtncode_of(const char* joybtn_name);
+static bool parse_joystick_button_name(const char* joybtn_name, int* result);
+static bool parse_button_name(const char* button_name, inputbutton_t* result);
+static bool digits_only(const char* str);
 
 #if defined(A5BUILD)
 
@@ -511,7 +513,7 @@ static const int key_codes[] = {
 /* initializes the module */
 void inputmap_init()
 {
-    logfile_message("inputmap_init()");
+    logfile_message("Initializing inputmaps");
     mappings = hashtable_inputmapnode_t_create();
     load_inputmap_table();
 }
@@ -519,7 +521,7 @@ void inputmap_init()
 /* releases the module */
 void inputmap_release()
 {
-    logfile_message("inputmap_release()");
+    logfile_message("Releasing inputmaps");
     mappings = hashtable_inputmapnode_t_destroy(mappings);
 }
 
@@ -570,12 +572,12 @@ int traverse(const parsetree_statement_t *stmt)
             hashtable_inputmapnode_t_add(mappings, name, f);
         }
         else
-            fatal_error("inputmap: redefinition of inputmap '%s'", name);
+            fatal_error("inputmap: redefinition of inputmap '%s' in %s:%d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
         logfile_message("inputmap: loaded input map '%s'", name);
     }
     else
-        fatal_error("inputmap: unknown identifier '%s' at the input map definition file. Valid keywords: 'inputmap'", identifier);
+        fatal_error("inputmap: unknown identifier '%s' in %s:%d. Valid keywords: 'inputmap'", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }
@@ -599,13 +601,13 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
             nanoparser_expect_program(p1, "inputmap: must provide the keyboard mappings");
 
             if(f->data->keyboard.enabled)
-                fatal_error("inputmap: can't define multiple keyboard mappings for inputmap '%s'", f->data->name);
+                fatal_error("inputmap: can't define multiple keyboard mappings for inputmap '%s' in %s:%d", f->data->name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
             f->data->keyboard.enabled = true;
             nanoparser_traverse_program_ex(nanoparser_get_program(p1), (void*)f, traverse_inputmap_keyboard);
         }
         else
-            fatal_error("inputmap: 'keyboard' accepts only one parameter: a block.");
+            fatal_error("inputmap: 'keyboard' accepts only one parameter: a block (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_file(stmt));
     }
     else if(str_icmp(identifier, "joystick") == 0) {
         n = nanoparser_get_number_of_parameters(param_list);
@@ -616,17 +618,17 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
             nanoparser_expect_program(p2, "inputmap: must provide the joystick mappings");
 
             if(f->data->joystick.enabled)
-                fatal_error("inputmap: can't define multiple joysticks for inputmap '%s'", f->data->name);
+                fatal_error("inputmap: can't define multiple joysticks for inputmap '%s' in %s:%d", f->data->name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
             f->data->joystick.enabled = true;
             f->data->joystick.id = max(0, atoi(nanoparser_get_string(p1)));
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)f, traverse_inputmap_joystick);
         }
         else
-            fatal_error("inputmap: 'joystick' requires two parameters: joystick_id and a block containing the mappings.");
+            fatal_error("inputmap: 'joystick' requires two parameters: joystick_id and a block containing the mappings (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
-        fatal_error("inputmap: unknown identifier '%s' defined at a inputmap block. Valid keywords: 'keyboard', 'joystick'", identifier);
+        fatal_error("inputmap: unknown identifier '%s' defined at inputmap block in %s:%d. Valid keywords: 'keyboard', 'joystick'", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }
@@ -647,34 +649,10 @@ int traverse_inputmap_keyboard(const parsetree_statement_t *stmt, void *inputmap
 
     n = nanoparser_get_number_of_parameters(param_list);
     if(n != 1)
-        fatal_error("inputmap: commands inside a 'keyboard' block should have two items: button_name, key_name");
+        fatal_error("inputmap: commands inside a 'keyboard' block must have two items: button_name, key_name (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
-    if(str_icmp(identifier, "up") == 0)
-        btn = IB_UP;
-    else if(str_icmp(identifier, "right") == 0)
-        btn = IB_RIGHT;
-    else if(str_icmp(identifier, "down") == 0)
-        btn = IB_DOWN;
-    else if(str_icmp(identifier, "left") == 0)
-        btn = IB_LEFT;
-    else if(str_icmp(identifier, "fire1") == 0)
-        btn = IB_FIRE1;
-    else if(str_icmp(identifier, "fire2") == 0)
-        btn = IB_FIRE2;
-    else if(str_icmp(identifier, "fire3") == 0)
-        btn = IB_FIRE3;
-    else if(str_icmp(identifier, "fire4") == 0)
-        btn = IB_FIRE4;
-    else if(str_icmp(identifier, "fire5") == 0)
-        btn = IB_FIRE5;
-    else if(str_icmp(identifier, "fire6") == 0)
-        btn = IB_FIRE6;
-    else if(str_icmp(identifier, "fire7") == 0)
-        btn = IB_FIRE7;
-    else if(str_icmp(identifier, "fire8") == 0)
-        btn = IB_FIRE8;
-    else
-        fatal_error("inputmap: invalid button name '%s' inside the 'keyboard' block", identifier);
+    if(!parse_button_name(identifier, &btn))
+        fatal_error("inputmap: invalid button name '%s' inside the 'keyboard' block in %s:%d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     p1 = nanoparser_get_nth_parameter(param_list, 1);
     nanoparser_expect_string(p1, "inputmap: must provide a key name");
@@ -689,41 +667,42 @@ int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmap
 {
     inputmapnode_t* f = (inputmapnode_t*)inputmapnode;
     inputmap_t* im = f->data;
-    const char *identifier;
+    const char *identifier, *joybtn_name;
     const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1;
+    const parsetree_parameter_t *p1, *p2;
     enum inputbutton_t btn = IB_FIRE1;
-    int n;
+    int joybtn_code = -1;
+    int i, n;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
 
     n = nanoparser_get_number_of_parameters(param_list);
-    if(n != 1)
-        fatal_error("inputmap: commands inside a 'joystick' block should have two items: button_name, joystick_button_name");
+    if(n < 1)
+        fatal_error("inputmap: declarations inside a 'joystick' block must have at least two items: button_name, joystick_button_name (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
-    if(str_icmp(identifier, "fire1") == 0)
-        btn = IB_FIRE1;
-    else if(str_icmp(identifier, "fire2") == 0)
-        btn = IB_FIRE2;
-    else if(str_icmp(identifier, "fire3") == 0)
-        btn = IB_FIRE3;
-    else if(str_icmp(identifier, "fire4") == 0)
-        btn = IB_FIRE4;
-    else if(str_icmp(identifier, "fire5") == 0)
-        btn = IB_FIRE5;
-    else if(str_icmp(identifier, "fire6") == 0)
-        btn = IB_FIRE6;
-    else if(str_icmp(identifier, "fire7") == 0)
-        btn = IB_FIRE7;
-    else if(str_icmp(identifier, "fire8") == 0)
-        btn = IB_FIRE8;
-    else
-        fatal_error("inputmap: invalid button name '%s' inside the 'joystick' block", identifier);
+    if(!parse_button_name(identifier, &btn))
+        fatal_error("inputmap: invalid button name '%s' inside the 'joystick' block in %s:%d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
-    p1 = nanoparser_get_nth_parameter(param_list, 1);
-    nanoparser_expect_string(p1, "inputmap: must provide a joystick button name");
-    im->joystick.button[(int)btn] = joybtncode_of(nanoparser_get_string(p1));
+    for(i = 1; i <= n; i += 2) {
+        p1 = nanoparser_get_nth_parameter(param_list, i);
+        nanoparser_expect_string(p1, "inputmap: must provide a joystick button name");
+        joybtn_name = nanoparser_get_string(p1);
+
+        if(!parse_joystick_button_name(joybtn_name, &joybtn_code))
+            fatal_error("Failed to setup inputmap: unrecognized joystick button \"%s\" in %s:%d", joybtn_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+        if(joybtn_code >= 0 && joybtn_code < MAX_JOYSTICK_BUTTONS)
+            im->joystick.button_mask[(int)btn] |= (1 << joybtn_code);
+        
+        /* expect the "OR" symbol or the end of the list */
+        if(i < n) {
+            p2 = nanoparser_get_nth_parameter(param_list, i+1);
+            nanoparser_expect_string(p2, "inputmap: expected additional buttons or the end of the list");
+            if(strcmp(nanoparser_get_string(p2), "|") != 0 || i+1 == n)
+                fatal_error("Failed to setup inputmap: you must write '|' (OR symbol) __between__ joystick buttons in %s:%d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        }
+    }
 
     return 0;
 }
@@ -743,7 +722,7 @@ void load_inputmap_table()
     parsetree_program_t *s = NULL;
     const char* fullpath = assetfs_fullpath(INPUTMAP_FILE);
 
-    logfile_message("inputmap: loading the input mappings...");
+    logfile_message("inputmap: loading the inputmaps...");
     hashtable_inputmapnode_t_add(mappings, NULL_INPUTMAP, inputmapnode_create(NULL_INPUTMAP));
 
     s = nanoparser_construct_tree(fullpath);
@@ -754,41 +733,46 @@ void load_inputmap_table()
 /* creates a new inputmapnode object */
 inputmapnode_t* inputmapnode_create(const char* name)
 {
-    static const int NO_BUTTON = LARGE_INT;
+    const int NO_KEY = keycode_of("KEY_NONE");
+    const int NO_BUTTONS = 0; /* empty mask */
+
+    /* allocate structure */
     inputmapnode_t* f = mallocx(sizeof *f);
     f->data = mallocx(sizeof *(f->data));
     f->data->name = str_dup(name);
 
-    /* defaults */
+    /* keyboard defaults */
     f->data->keyboard.enabled = false;
-    f->data->keyboard.scancode[IB_UP] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_RIGHT] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_DOWN] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_LEFT] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE1] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE2] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE3] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE4] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE5] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE6] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE7] = keycode_of("KEY_NONE");
-    f->data->keyboard.scancode[IB_FIRE8] = keycode_of("KEY_NONE");
+    f->data->keyboard.scancode[IB_UP] = NO_KEY;
+    f->data->keyboard.scancode[IB_RIGHT] = NO_KEY;
+    f->data->keyboard.scancode[IB_DOWN] = NO_KEY;
+    f->data->keyboard.scancode[IB_LEFT] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE1] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE2] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE3] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE4] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE5] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE6] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE7] = NO_KEY;
+    f->data->keyboard.scancode[IB_FIRE8] = NO_KEY;
 
+    /* joystick defaults */
     f->data->joystick.enabled = false;
     f->data->joystick.id = 0;
-    f->data->joystick.button[IB_FIRE1] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE2] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE3] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE4] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE5] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE6] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE7] = NO_BUTTON;
-    f->data->joystick.button[IB_FIRE8] = NO_BUTTON;
+    f->data->joystick.button_mask[IB_FIRE1] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE2] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE3] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE4] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE5] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE6] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE7] = NO_BUTTONS;
+    f->data->joystick.button_mask[IB_FIRE8] = NO_BUTTONS;
 
+    /* done! */
     return f;
 }
 
-/* destroys a factory sound */
+/* destroys a inputmapnode object */
 void inputmapnode_destroy(inputmapnode_t *f)
 {
     free(f->data->name);
@@ -808,16 +792,75 @@ int keycode_of(const char* key_name)
     return 0;
 }
 
-/* given a joystick button name, return its button code */
-int joybtncode_of(const char* joybtn_name)
+/* given a joystick button name, retrieve its button code.
+   e.g., BUTTON_1 becomes 0; BUTTON_2 becomes 1, etc.
+   BUTTON_NONE becomes -1. Returns true on success */
+bool parse_joystick_button_name(const char* joybtn_name, int* result)
 {
-    if(str_incmp(joybtn_name, "BUTTON_", 7) == 0) {
-        int joybtn_number = atoi(joybtn_name + 7);
-
-        if(joybtn_number >= 1 && joybtn_number <= MAX_JOYSTICK_BUTTONS)
-            return joybtn_number - 1;
+    if(str_icmp(joybtn_name, "BUTTON_NONE") == 0) {
+        *result = -1;
+        return true;
     }
 
-    fatal_error("Failed to setup inputmap: unrecognized joystick button \"%s\"", joybtn_name);
-    return 0;
+    if(str_incmp(joybtn_name, "BUTTON_", 7) == 0 && digits_only(joybtn_name + 7)) {
+        int joybtn_number = atoi(joybtn_name + 7);
+        if(joybtn_number >= 1 && joybtn_number <= MAX_JOYSTICK_BUTTONS) {
+            *result = joybtn_number - 1;
+            return true;
+        }
+    }
+
+    *result = -1;
+    return false;
+}
+
+/* convert fire1, fire2, ... to IB_FIRE1, IB_FIRE2 ...
+   respectively. Returns true on success */
+bool parse_button_name(const char* button_name, inputbutton_t* result)
+{
+    /* fire buttons */
+    if(str_incmp(button_name, "fire", 4) == 0 && digits_only(button_name + 4)) {
+        int fire_number = atoi(button_name + 4);
+        if(fire_number >= 1 && fire_number <= 8) {
+            *result = IB_FIRE1 + (fire_number - 1);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /* directionals */
+    if(str_icmp(button_name, "left") == 0) {
+        *result = IB_LEFT;
+        return true;
+    }
+
+    if(str_icmp(button_name, "right") == 0) {
+        *result = IB_RIGHT;
+        return true;
+    }
+
+    if(str_icmp(button_name, "up") == 0) {
+        *result = IB_UP;
+        return true;
+    }
+
+    if(str_icmp(button_name, "down") == 0) {
+        *result = IB_DOWN;
+        return true;
+    }
+
+    /* unrecognized button name */
+    return false;
+}
+
+/* does the given string contain only digits? */
+bool digits_only(const char* str)
+{
+    while(*str) {
+        if(!isdigit(*(str++)))
+            return false;
+    }
+
+    return true;
 }

@@ -52,45 +52,41 @@ static int option_count;
 static int current_option = NO_OPTION;
 static int fxfade_in, fxfade_out;
 
-static void setup(const char *ptext, const char *option1, const char *option2);
+static void setup_message(const confirmboxdata_t* confirmbox);
 
 
 /* public functions */
 
 /*
  * confirmbox_init()
- * Receives an array of 3 strings:
- * - text
- * - option 1
- * - option 2 (may be null)
+ * Receives a pointer to a confirmboxdata_t
  */
-void confirmbox_init(void *text_and_options)
+void confirmbox_init(void *confirmbox)
 {
-    confirmboxdata_t *p = (confirmboxdata_t*)text_and_options;
     int i;
 
-    setup((*p)[0], (*p)[1], (*p)[2]);
+    /* setup message & options */
+    setup_message((confirmboxdata_t*)confirmbox);
 
+    /* setup gfx */
     background = image_clone(video_get_backbuffer());
-
     box = sprite_get_image(sprite_get_animation("Confirm Box", 0), 0);
     boxpos = v2d_new( (VIDEO_SCREEN_W - image_width(box))/2 , VIDEO_SCREEN_H );
-
-    input = input_create_user(NULL);
     arrow = actor_create();
     actor_change_animation(arrow, sprite_get_animation("UI Pointer", 0));
 
+    /* setup fonts */
     textfnt = font_create("dialogbox");
     font_set_text(textfnt, "%s", text);
-
-    for(i=0; i<option_count; i++) {
+    for(i = 0; i < option_count; i++) {
         optionfnt[i][0] = font_create("dialogbox");
         optionfnt[i][1] = font_create("dialogbox");
         font_set_text(optionfnt[i][0], "%s", option[i]);
         font_set_text(optionfnt[i][1], "<color=$COLOR_HIGHLIGHT>%s</color>", option[i]);
     }
 
-    current_option = OPTION_2;
+    /* misc */
+    input = input_create_user(NULL);
     fxfade_in = TRUE;
     fxfade_out = FALSE;
 }
@@ -102,9 +98,7 @@ void confirmbox_init(void *text_and_options)
  */
 void confirmbox_release()
 {
-    int i;
-
-    for(i=0; i<option_count; i++) {
+    for(int i = 0; i < option_count; i++) {
         font_destroy(optionfnt[i][0]);
         font_destroy(optionfnt[i][1]);
     }
@@ -189,8 +183,8 @@ void confirmbox_update()
  */
 void confirmbox_render()
 {
-    int i, k;
     v2d_t cam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
+    int i, k;
 
     image_blit(background, 0, 0, 0, 0, image_width(background), image_height(background));
     image_draw(box, boxpos.x, boxpos.y, IF_NONE);
@@ -230,19 +224,22 @@ int confirmbox_selected_option()
 /* ------------ private -------------- */
 
 /*
- * setup()
- * PS: option2 may be NULL
+ * setup_message()
+ * Sets up the message to be displayed
+ * Note: confirmbox->option2 may be NULL
  */
-void setup(const char *ptext, const char *option1, const char *option2)
+void setup_message(const confirmboxdata_t* confirmbox)
 {
-    current_option = NO_OPTION;
-    str_cpy(text, ptext, sizeof(text));
-    str_cpy(option[0], option1, sizeof(option[0]));
+    /* copy text fields */
+    str_cpy(text, confirmbox->message, sizeof(text));
+    str_cpy(option[0], confirmbox->option1, sizeof(option[0]));
+    str_cpy(option[1], confirmbox->option2 != NULL ? confirmbox->option2 : "", sizeof(option[1]));
 
-    if(option2) {
-        str_cpy(option[1], option2, sizeof(option[1]));
-        option_count = 2;
-    }
-    else
-        option_count = 1;
+    /* number of options */
+    option_count = (confirmbox->option2 != NULL) ? 2 : 1;
+
+    /* default option */
+    current_option = OPTION_1;
+    if(option_count > 1 && confirmbox->default_option == 2)
+        current_option = OPTION_2;
 }

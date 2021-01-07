@@ -2704,7 +2704,7 @@ void lifebox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
     player_set_lives( player_get_lives()+1 );
-    level_override_music(SFX_1UP);
+    sound_play(SFX_1UP);
 }
 
 void collectiblebox_strategy(item_t *item, player_t *player)

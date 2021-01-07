@@ -5,7 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
-using SurgeEngine.Audio.Music;
+using SurgeEngine.Audio.Sound;
 
 //
 // Give Extra Lives is a function object that gives
@@ -16,7 +16,7 @@ using SurgeEngine.Audio.Music;
 //
 object "Give Extra Lives"
 {
-    jingle = Music("samples/1up.ogg");
+    jingle = Sound("samples/1up.ogg");
 
     fun call(lives)
     {

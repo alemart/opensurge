@@ -15,8 +15,8 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2020-09-09"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
+LANG_LASTUPDATE             "2021-01-07"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
 
@@ -44,8 +44,8 @@ LANG_COMPATIBILITY          "0.5.1.3"                 // required engine version
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as -- FIXME -- To find them, you may use a Find tool in
-// your text editor.
+// as FIXME To find them, you may use a Find tool in your
+// text editor.
 //
 // Found something? Please search for it now.
 //
@@ -116,10 +116,13 @@ CREDITS_BRIAN               "Sprites"
 CREDITS_TRANSLATOR          "Tradutor"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tradutores</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Créditos dos assets</color>"
-CREDITS_RES_TEXT            "A não ser quando dito explicitamente, os arquivos a seguir estão sob a Creative Commons Attribution 3.0 (CC-BY 3.0)."
+CREDITS_RES_TEXT            "Todos os arquivos listados abaixo estão sob licenças livres. A seguir, apresentamos os respectivos autores:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Imagens</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Músicas</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efeitos sonoros</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fontes</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Fases</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Traduções</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts."
 
@@ -177,14 +180,14 @@ INPUT_JOY_LEFT              "ESQUERDA"
 INPUT_JOY_RIGHT             "DIREITA"
 INPUT_JOY_UP                "CIMA"
 INPUT_JOY_DOWN              "BAIXO"
-INPUT_JOY_FIRE1             "o BOTÃO 1"
-INPUT_JOY_FIRE2             "o BOTÃO 2"
-INPUT_JOY_FIRE3             "o BOTÃO 3"
-INPUT_JOY_FIRE4             "o BOTÃO 4"
-INPUT_JOY_FIRE5             "o BOTÃO 5"
-INPUT_JOY_FIRE6             "o BOTÃO 6"
-INPUT_JOY_FIRE7             "o BOTÃO 7"
-INPUT_JOY_FIRE8             "o BOTÃO 8"
+INPUT_JOY_FIRE1             "PULO"
+INPUT_JOY_FIRE2             "TROCAR"
+INPUT_JOY_FIRE3             "PAUSE"
+INPUT_JOY_FIRE4             "VOLTAR"
+INPUT_JOY_FIRE5             "<disponível>"
+INPUT_JOY_FIRE6             "<disponível>"
+INPUT_JOY_FIRE7             "<disponível>"
+INPUT_JOY_FIRE8             "<disponível>"
 
 
 

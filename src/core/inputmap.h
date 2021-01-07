@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * inputmap.h - customized input mappings
- * Copyright (C) 2011, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2019-2020  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #define _INPUTMAP_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "input.h"
 
 /* public methods */
@@ -42,7 +43,7 @@ struct inputmap_t {
     struct inputmap_joystick_t {
         bool enabled;
         int id;
-        int button[IB_MAX];
+        uint32_t button_mask[IB_MAX]; /* multiple joystick buttons may be mapped to the same inputbutton_t */
     } joystick; /* joystick mapping */
 };
 

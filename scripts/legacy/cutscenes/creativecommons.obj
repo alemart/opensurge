@@ -27,7 +27,7 @@ object ".creativecommons_startup"
 
     state create_logo
     {
-        play_sample samples/creativecommons2.ogg
+        play_sample musics/creativecommons.ogg
         create_child .creativecommons_startup.logo
         change_state wait_some_more
     }
@@ -39,7 +39,7 @@ object ".creativecommons_startup"
 
     state fadeout
     {
-        stop_sample samples/creativecommons2.ogg
+        stop_sample musics/creativecommons.ogg
         let $_fade_in=0
         let $_fade_duration=0.5
         create_child .fade_effect
@@ -54,7 +54,7 @@ object ".creativecommons_startup"
 
     state fadeout2
     {
-        stop_sample samples/creativecommons2.ogg
+        stop_sample musics/creativecommons.ogg
         let $_fade_in=0
         let $_fade_duration=0.5
         create_child .fade_effect

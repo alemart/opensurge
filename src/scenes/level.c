@@ -168,7 +168,6 @@ static int level_height; /* height of this level (in pixels) */
 static int *height_at, height_at_count; /* level height at different sample points */
 static float level_timer;
 static music_t *music;
-static sound_t *override_music;
 static int quit_level;
 static image_t *quit_level_img;
 static bgtheme_t *backgroundtheme;
@@ -1108,7 +1107,6 @@ void level_init(void *path_to_lev_file)
     level_width = level_height = 0;
     level_timer = 0.0f;
     dialogregion_size = 0;
-    override_music = NULL;
     quit_level = FALSE;
     quit_level_img = NULL;
     backgroundtheme = NULL;
@@ -1232,7 +1230,7 @@ void level_update()
         block_quit = player_is_dying(team[i]);
 
     if(wants_to_leave && !block_quit) {
-        confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2" };
+        confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2", 2 };
 
         if(quit_level_img != NULL)
             image_destroy(quit_level_img);
@@ -1240,7 +1238,7 @@ void level_update()
 
         wants_to_leave = FALSE;
         music_pause();
-        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), &cbd);
         return;
     }
 
@@ -1862,17 +1860,6 @@ int level_height_at(int xpos)
     return level_height;
 }
 
-/*
- * level_override_music()
- * Stops the music while the given sample is playing.
- * After it gets finished, the music gets played again.
- */
-void level_override_music(sound_t *sample)
-{
-    music_stop();
-    override_music = sample;
-    sound_play(override_music);
-}
 
 /*
  * level_music()
@@ -2367,12 +2354,9 @@ void render_players()
 /* updates the music */
 void update_music()
 {
-    if(override_music && !sound_is_playing(override_music))
-        override_music = NULL;
-
-    if(music != NULL && !level_cleared && !player_is_dying(player)) {
-        if(!override_music && !music_is_playing()) {
-            if(music_current() == NULL || (music_current() == music && !music_is_paused()))
+    if(music != NULL && !music_is_playing()) {
+        if(music_current() == NULL || (music_current() == music && !music_is_paused())) {
+            if(!level_cleared && !player_is_dying(player))
                 music_play(music, true);
         }
     }
@@ -3105,8 +3089,8 @@ void editor_update()
 
     /* reload level */
     if(editorcmd_is_triggered(editor_cmd, "reload")) {
-        confirmboxdata_t cbd = { "$EDITOR_CONFIRM_RELOAD", "$EDITOR_CONFIRM_YES", "$EDITOR_CONFIRM_NO" };
-        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), (void*)&cbd);
+        confirmboxdata_t cbd = { "$EDITOR_CONFIRM_RELOAD", "$EDITOR_CONFIRM_YES", "$EDITOR_CONFIRM_NO", 1 };
+        scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), &cbd);
         return;
     }
 

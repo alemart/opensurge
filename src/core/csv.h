@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * confirmbox.h - confirm box
- * Copyright (C) 2008-2009, 2020  Alexandre Martins <alemartf@gmail.com>
+ * csv.h - A simple utility for parsing CSV files
+ * Copyright (C) 2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,24 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _CONFIRMBOX_H
-#define _CONFIRMBOX_H
+#ifndef _CSV_H
+#define _CSV_H
 
-/* confirm box data structure */
-typedef struct confirmboxdata_t {
-    const char* message;
-    const char* option1;
-    const char* option2; /* set it to NULL if you want only one option */
-    int default_option;  /* default option: 1 or 2 */
-} confirmboxdata_t;
+/*
+ * A CSV callback has the following signature:
+ * void callback(int field_count, const char** fields, int line_number, void* user_data)
+ * 
+ * The callback is called for each line of the CSV file
+ * Note: line_number starts counting from 0 - this is the CSV header
+ */
+typedef void (*csv_callback_t)(int,const char**,int,void*);
 
-/* public functions */
-void confirmbox_init(void* confirmbox);
-void confirmbox_release();
-void confirmbox_update();
-void confirmbox_render();
-
-/* interface */
-int confirmbox_selected_option(); /* returns 1 or 2 (or 0 if nothing has been selected) */
+/* Parse a CSV file stored in memory */
+void csv_parse(const char* csv_content, const char* delimiters, csv_callback_t callback, void* user_data);
 
 #endif
