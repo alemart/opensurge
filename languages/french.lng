@@ -15,7 +15,7 @@
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
 LANG_AUTHOR              "Stylix58"                       // translation author
-LANG_LASTUPDATE          "2020-02-17"                     // FIXME <-- this date is incorrect! date format: yyyy-mm-dd
+LANG_LASTUPDATE          "2021-01-07"                     // date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.5.2"                          // required engine version
 
 
@@ -116,13 +116,13 @@ CREDITS_BRIAN            "Spriteur"
 CREDITS_TRANSLATOR       "Traducteur"
 CREDITS_TRANSLATORS      "<color=$COLOR_HIGHLIGHT>Traducteurs</color>"
 CREDITS_RES_TITLE        "<color=$COLOR_HIGHLIGHT>Crédits par ressources individuelles</color>"
-FIXME (untranslated) CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
+CREDITS_RES_TEXT            "Les fichiers listées ci-dessus sont tous disponibles en licenses libres. Leurs auteurs respectifs sont présentées :"
 CREDITS_RES_IMAGES       "<color=$COLOR_HIGHLIGHT>Images</color>"
 CREDITS_RES_MUSICS       "<color=$COLOR_HIGHLIGHT>Musique</color>"
 CREDITS_RES_SAMPLES      "<color=$COLOR_HIGHLIGHT>Effets sonores</color>"
-FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
-FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
-FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Polices</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Niveaux</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Traductions</color>"
 CREDITS_RES_SCRIPTS      "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêmes."
 
@@ -180,14 +180,14 @@ INPUT_JOY_LEFT           "la TOUCHE GAUCHE"
 INPUT_JOY_RIGHT          "la TOUCHE DROITE"
 INPUT_JOY_UP             "la TOUCHE HAUT"
 INPUT_JOY_DOWN           "la TOUCHE BAS"
-FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
-FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
-FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
-FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
+INPUT_JOY_FIRE1             "SAUT"
+INPUT_JOY_FIRE2             "SWITCH"
+INPUT_JOY_FIRE3             "PAUSE"
+INPUT_JOY_FIRE4             "RETOUR"
+INPUT_JOY_FIRE5             "<disponible>"
+INPUT_JOY_FIRE6             "<disponible>"
+INPUT_JOY_FIRE7             "<disponible>"
+INPUT_JOY_FIRE8             "<disponible>"
 
 
 
