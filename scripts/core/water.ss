@@ -193,18 +193,22 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
     tick = Sound("samples/underwater_tick.wav");
     tickCount = 0;
 
-    seconds = 5; // when should we display the timer?
+    duration = 12; // display the timer for this amount of seconds before the player drowns
     warningTicks = 3; // how many warning ticks should we play when underwater?
+    maxCounterValue = 5; // start counting from this number
 
     state "main"
     {
         player = Player.active;
+
+        // do nothing if the player is protected by the water shield
         if(player.shield == "water")
             return;
+
         if(player.underwater) {
             // underwater warning tick sound
-            c = Math.max(player.secondsToDrown - seconds, 0);
-            c /= Math.max(player.breathTime - seconds, 0);
+            c = Math.max(player.secondsToDrown - duration, 0);
+            c /= Math.max(player.breathTime - duration, 0);
             c = Math.floor((1 - c) * (warningTicks + 0.5));
             if(c != tickCount) {
                 if(c > 0)
@@ -214,9 +218,9 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
 
             // breathing counter
             t = player.secondsToDrown;
-            if(t > 0 && t <= seconds) {
+            if(t > 0 && t <= duration) {
                 // show counter
-                counter.text = "<color=ff0055>" + Math.ceil(t) + "</color>";
+                counter.text = "<color=ff0055>" + Math.ceil(t * maxCounterValue / duration) + "</color>";
                 counter.visible = true;
 
                 // music
