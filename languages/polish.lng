@@ -15,7 +15,7 @@
 LANG_ID                     "pl_PL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
-LANG_LASTUPDATE             "2020-05-10"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2021-01-09"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -116,13 +116,13 @@ CREDITS_BRIAN               "Rysownik sprite'ów"
 CREDITS_TRANSLATOR          "Tłumacz"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tłumaczenia</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Autorzy poszczególnych plików</color>"
-FIXME (untranslated) CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
+CREDITS_RES_TEXT            "Wszystkie pliki wypisane poniżej objęte są wolnościowymi licencjami. Autorami poszczególnych plików są:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Grafika</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzyka</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Dźwięki</color>"
-FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
-FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
-FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Czcionki</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Poziomy</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Tłumaczenia</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skrypty</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autorzy wymienieni zostali wewnątrz skryptów."
 
@@ -180,14 +180,14 @@ INPUT_JOY_LEFT              "przycisk W LEWO"
 INPUT_JOY_RIGHT             "przycisk W PRAWO"
 INPUT_JOY_UP                "przycisk W GÓRĘ"
 INPUT_JOY_DOWN              "przycisk W DÓŁ"
-FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
-FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
-FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
-FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
+INPUT_JOY_FIRE1             "SKOK"
+INPUT_JOY_FIRE2             "PRZEŁĄCZ"
+INPUT_JOY_FIRE3             "PAUZA"
+INPUT_JOY_FIRE4             "WSTECZ"
+INPUT_JOY_FIRE5             "<dostępny>"
+INPUT_JOY_FIRE6             "<dostępny>"
+INPUT_JOY_FIRE7             "<dostępny>"
+INPUT_JOY_FIRE8             "<dostępny>"
 
 
 
