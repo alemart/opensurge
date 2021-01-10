@@ -281,8 +281,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         player_set_turbo(player, FALSE);
 
         /* disable some shields */
-        if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD)
-            player_hit(player, 0.0f);
+        if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD) {
+            if(!player_is_invincible(player))
+                player_hit(player, 0.0f);
+            else
+                player->shield_type = SH_NONE;
+        }
 
         /* timer countdown */
         if(player->shield_type != SH_WATERSHIELD && !player_is_winning(player) && (
