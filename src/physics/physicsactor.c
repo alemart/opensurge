@@ -427,9 +427,12 @@ void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position
     sensor_render(sensor_D(pa), pa->position, pa->movmode, camera_position);
     sensor_render(sensor_M(pa), pa->position, pa->movmode, camera_position);
     sensor_render(sensor_U(pa), pa->position, pa->movmode, camera_position);
-    render_ball(pa->angle_sensor[0], 2, sensor_get_color(sensor_A(pa)), camera_position);
-    render_ball(pa->angle_sensor[1], 2, sensor_get_color(sensor_B(pa)), camera_position);
     render_ball(pa->position, 1, color_rgb(255, 255, 255), camera_position);
+
+    if(!pa->midair) {
+        render_ball(pa->angle_sensor[0], 2, sensor_get_color(sensor_A(pa)), camera_position);
+        render_ball(pa->angle_sensor[1], 2, sensor_get_color(sensor_B(pa)), camera_position);
+    }
 }
 
 physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa)
