@@ -33,12 +33,11 @@
 
 
 /* private data */
-static const float GAMEOVER_TIMEOUT = 7.0f;
 static const float GAMEOVER_FADETIME = 2.0f;
 static const float GAMEOVER_APPEARTIME = 1.0f;
 static const char* GAMEOVER_MUSICFILE = "musics/gameover.ogg";
-static font_t *gameover_fnt[2];
-static image_t *gameover_buf;
+static font_t* gameover_fnt[2];
+static image_t* gameover_bg;
 static float gameover_timer;
 static float gameover_spacing;
 static float gameover_width[3];
@@ -73,7 +72,7 @@ void gameover_init(void *foo)
 
     /* misc */
     gameover_spacing = gameover_width[2] - gameover_width[1] - gameover_width[0];
-    gameover_buf = image_clone(video_get_backbuffer());
+    gameover_bg = image_clone(video_get_backbuffer());
     gameover_timer = 0;
 
     /* music */
@@ -92,9 +91,8 @@ void gameover_update()
     float t, dt = timer_get_delta();
     float center_x;
 
-    /* timer */
-    gameover_timer += dt;
-    if(gameover_timer >= GAMEOVER_TIMEOUT) {
+    /* fade out */
+    if(!music_is_playing(music)) {
         if(fadefx_is_over()) {
             quest_abort();
             scenestack_pop();
@@ -104,8 +102,9 @@ void gameover_update()
     }
 
     /* position the text */
-    center_x = (VIDEO_SCREEN_W + (gameover_width[0] - gameover_width[1])) / 2.0f;
+    gameover_timer += dt;
     t = gameover_timer / GAMEOVER_APPEARTIME;
+    center_x = (VIDEO_SCREEN_W + (gameover_width[0] - gameover_width[1])) / 2.0f;
 
     font_set_position(gameover_fnt[0], v2d_new(
         lerp(-gameover_width[0], center_x - (gameover_width[0] + gameover_spacing) / 2.0f, t),
@@ -128,7 +127,7 @@ void gameover_render()
 {
     v2d_t v = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
-    image_blit(gameover_buf, 0, 0, 0, 0, image_width(gameover_buf), image_height(gameover_buf));
+    image_blit(gameover_bg, 0, 0, 0, 0, image_width(gameover_bg), image_height(gameover_bg));
     font_render(gameover_fnt[0], v);
     font_render(gameover_fnt[1], v);
 }
@@ -143,8 +142,9 @@ void gameover_release()
 {
     music_stop();
     music_unref(music);
-    image_destroy(gameover_buf);
+    image_destroy(gameover_bg);
     font_destroy(gameover_fnt[1]);
     font_destroy(gameover_fnt[0]);
+
     quest_abort();
 }
