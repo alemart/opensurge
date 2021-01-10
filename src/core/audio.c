@@ -53,7 +53,7 @@ struct sound_t {
 };
 
 /* private stuff */
-static const int PREFERRED_NUMBER_OF_SAMPLES = 16; /* how many samples can be played at the same time */
+static const int PREFERRED_NUMBER_OF_SAMPLES = 32; /* how many samples can be played at the same time */
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
 
 #elif !defined(__USE_OPENAL__)
