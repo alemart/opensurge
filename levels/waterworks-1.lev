@@ -3059,7 +3059,6 @@ brick 135 1200 9248
 brick 135 1200 9184
 brick 135 1200 9120
 brick 41 928 9968 hflip
-brick 255 1152 9632
 brick 18 384 9856
 brick 2 0 9984
 brick 2 128 9984
@@ -3914,7 +3913,8 @@ entity "Layer Yellow" 1056 9616 "6028a21474bd2c6c"
 entity "Layer Green" 1072 9712 "19fd015cd26d8ccc"
 entity "Layer Green" 1104 9712 "8954c6603c3e19fb"
 entity "Layer Green" 1136 9712 "f173919ac6ef7b08"
-entity "Layer Green" 1168 9680 "2e9bfd992ed98a3d"
 entity "Layer Green" 1168 9712 "84d948451749ed95"
+entity "Layer Green" 1200 9712 "c9b394085ae54a05"
+entity "Layer Green" 1232 9712 "4e904eef19e0a1d1"
 
 // EOF
