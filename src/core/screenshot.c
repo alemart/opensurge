@@ -27,10 +27,10 @@
 #include "input.h"
 
 /* private data */
-#define MAX_SCREENSHOTS     (1 << 30)
-static input_t *in;
 static const char* screenshot_filename(int screenshot_id);
+static const int MAX_SCREENSHOTS = 1000000;
 static int next_screenshot_id = 0;
+static input_t *in;
 
 /*
  * screenshot_init()
