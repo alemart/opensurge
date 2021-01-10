@@ -1169,7 +1169,7 @@ void audio_init()
 {
     int samples;
 
-    logfile_message("Initializing the audio...");
+    logfile_message("Initializing the audio system...");
     current_music = NULL;
 
     if(!al_install_audio())
