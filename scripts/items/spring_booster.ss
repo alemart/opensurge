@@ -196,11 +196,28 @@ object "Spring Booster Up" is "entity", "basic"
 
     fun boost(player)
     {
-        if(player.ysp > 0 && !player.hit && !player.dying) {
-            player.ysp = -boostSpeed;
-            player.springify();
-            boostSfx.play();
-            state = "boosting";
+        // nothing to do
+        if(state == "boosting")
+            return;
+
+        // check if we need to activate the spring
+        if(!player.hit && !player.dying) {
+            slope = Math.deg2rad(player.slope);
+            if(Math.abs(Math.cos(slope)) < 0.1) {
+                // we're running on a wall
+                speed = boostSpeed * Math.sign(Math.sin(slope));
+                if((speed > 0 && speed > player.gsp) || (speed < 0 && speed < player.gsp))
+                    player.gsp = speed; // change gsp only if the spring increases the speed
+                boostSfx.play();
+                state = "boosting";
+            }
+            else if(player.midair && player.ysp > 0) {
+                // we're midair
+                player.ysp = -boostSpeed;
+                player.springify();
+                boostSfx.play();
+                state = "boosting";
+            }
         }
     }
 
