@@ -758,6 +758,7 @@ surgescript_var_t* fun_setspeed(surgescript_object_t* object, const surgescript_
     if(player != NULL) {
         float speed = surgescript_var_get_number(param[0]);
         player->actor->speed.x = speed;
+
         if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
             physicsactor_set_xsp(player->pa, speed);
         else
@@ -807,10 +808,19 @@ surgescript_var_t* fun_setxsp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     if(player != NULL) {
+        float xsp = surgescript_var_get_number(param[0]);
         if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player)) {
-            float xsp = surgescript_var_get_number(param[0]);
             player->actor->speed.x = xsp;
             physicsactor_set_xsp(player->pa, xsp);
+        }
+        else if(!player_is_midair(player) && !nearly_zero(xsp)) {
+            /* hack */
+            movmode_t movmode = physicsactor_get_movmode(player->pa);
+            if(movmode == MM_LEFTWALL || movmode == MM_RIGHTWALL) {
+                player_detach_from_ground(player);
+                player->actor->speed.x = xsp;
+                physicsactor_set_xsp(player->pa, xsp);
+            }
         }
     }
     return NULL;
@@ -836,8 +846,11 @@ surgescript_var_t* fun_setysp(surgescript_object_t* object, const surgescript_va
         physicsactor_set_ysp(player->pa, ysp);
 
         /* hack */
-        if(!nearly_zero(ysp))
-            player_detach_from_ground(player);
+        if(!player_is_midair(player) && !nearly_zero(ysp)) {
+            movmode_t movmode = physicsactor_get_movmode(player->pa);
+            if(movmode == MM_FLOOR || movmode == MM_CEILING)
+                player_detach_from_ground(player);
+        }
     }
     return NULL;
 }

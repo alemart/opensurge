@@ -655,12 +655,14 @@ object "Spring Behavior" is "private", "entity"
             // compute the velocity
             v = direction.scaledBy(speed);
 
-            // spring logic
-            if(direction.y != 0) {
-                slope = Math.deg2rad(player.slope);
-                wallRun = (Math.abs(Math.cos(slope)) < 0.1); // running on a wall
-                ceilRun = (Math.cos(slope) < -0.9); // running on a ceiling
+            // check if we're running on a wall or on a ceiling
+            slope = Math.deg2rad(player.slope);
+            wallRun = (Math.abs(Math.cos(slope)) < 0.1); // running on a wall
+            ceilRun = (Math.cos(slope) < -0.9); // running on a ceiling
 
+            // spring logic
+            /*
+            if(direction.y != 0) {
                 if(player.midair || direction.x != 0 || (direction.y < 0 && !wallRun) || (direction.y > 0 && (player.jumping || ceilRun))) {
                     // regular spring (y-axis)
                     if(v.y > 0 && v.y > player.ysp)
@@ -686,13 +688,15 @@ object "Spring Behavior" is "private", "entity"
             if(direction.x != 0) {
                 // check if new speed is higher
                 if(v.x > 0 && v.x > player.speed)
-                    player.speed = v.x;
+                    player.speed = v.x * Math.sign(Math.cos(slope));
                 else if(v.x < 0 && v.x < player.speed)
-                    player.speed = v.x;
+                    player.speed = v.x * Math.sign(Math.cos(slope));
 
                 // prevent braking
                 player.hlock(0.27);
             }
+            */
+            player.xsp = 400;
 
             // play sound
             if(sfx != null)

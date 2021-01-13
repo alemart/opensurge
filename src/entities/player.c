@@ -468,23 +468,36 @@ int player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_objec
 /*
  * player_detach_from_ground()
  * Ensures the player is not touching the ground
- * (or ceiling if rotated) on the next frame
+ * (or ceiling/wall if rotated) on the next frame
  */
 void player_detach_from_ground(player_t *player)
 {
     /* this is meant to counter the "sticky physics" */
     if(!player_is_midair(player)) {
-        if(physicsactor_get_movmode(player->pa) == MM_FLOOR) {
+        movmode_t movmode = physicsactor_get_movmode(player->pa);
+        if(movmode == MM_FLOOR) {
             if(!player_is_rolling(player))
                 player->actor->position.y -= 2;
             else
                 player->actor->position.y -= 5;
         }
-        else if(physicsactor_get_movmode(player->pa) == MM_CEILING) {
+        else if(movmode == MM_CEILING) {
             if(!player_is_rolling(player))
                 player->actor->position.y += 2;
             else
                 player->actor->position.y += 5;
+        }
+        else if(movmode == MM_LEFTWALL) {
+            if(!player_is_rolling(player))
+                player->actor->position.x += 2;
+            else
+                player->actor->position.x += 5;
+        }
+        else if(movmode == MM_RIGHTWALL) {
+            if(!player_is_rolling(player))
+                player->actor->position.x -= 2;
+            else
+                player->actor->position.x -= 5;
         }
     }
 }
