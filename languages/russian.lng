@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------
 // File: languages/russian.lng
-// Description: russian translation (version 3) (encoding: UTF-8)
+// Description: russian translation (version 4) (encoding: UTF-8)
 // Author: Halatnikov (halatnikov.github.io)
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// Translation fixes look like "//v3: fix reason"
+// Translation fixes look like "//v4: fix reason"
 
 // 
 // Section: generic
@@ -16,7 +16,7 @@
 LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
-LANG_LASTUPDATE             "2020-09-20"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2021-01-09"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -117,13 +117,13 @@ CREDITS_BRIAN               "Художник спрайтов"
 CREDITS_TRANSLATOR          "Переводчик"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Переводчики</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Авторы каждого ресурса</color>"
-FIXME (untranslated) CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
+CREDITS_RES_TEXT            "Все перечисленные ниже файлы находятся под свободными лицензиями. Представлены их соответствующие авторы:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Графика</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музыка</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звуковые эффекты</color>"
-FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
-FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
-FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Шрифты</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Уровни</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Переводы</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипты</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих скриптов."
 
@@ -181,14 +181,14 @@ INPUT_JOY_LEFT              "ВЛЕВО"
 INPUT_JOY_RIGHT             "ВПРАВО"
 INPUT_JOY_UP                "ВВЕРХ"
 INPUT_JOY_DOWN              "ВНИЗ"
-FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
-FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
-FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
-FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
+INPUT_JOY_FIRE1             "ПРЫЖОК"
+INPUT_JOY_FIRE2             "ПЕРЕКЛЮЧИТЬ"
+INPUT_JOY_FIRE3             "ПАУЗА"
+INPUT_JOY_FIRE4             "НАЗАД"
+INPUT_JOY_FIRE5             "<доступно>"
+INPUT_JOY_FIRE6             "<доступно>"
+INPUT_JOY_FIRE7             "<доступно>"
+INPUT_JOY_FIRE8             "<доступно>"
 
 
 
