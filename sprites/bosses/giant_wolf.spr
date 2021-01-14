@@ -120,3 +120,42 @@ sprite "Giant Wolf's Hand Impact"
         data        0 1 2
     }
 }
+
+sprite "Giant Wolf's Moving Eye"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     368 352 32 16
+    frame_size      16 16
+    hot_spot        8 8
+
+    // left eye
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // right eye
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Giant Wolf's Eyeballs"
+{
+    source_file     "images/giant_wolf.png"
+    source_rect     432 352 80 24
+    frame_size      80 24
+    hot_spot        41 10
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

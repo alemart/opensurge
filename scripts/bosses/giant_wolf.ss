@@ -198,6 +198,7 @@ object "Giant Wolf" is "entity", "boss", "awake"
 object "Giant Wolf's Head" is "private", "entity", "awake"
 {
     wolf = parent;
+    eyes = spawn("Giant Wolf's Eyes");
     actor = Actor("Giant Wolf's Head");
     collider = CollisionBall(64);
     transform = Transform();
@@ -210,16 +211,12 @@ object "Giant Wolf's Head" is "private", "entity", "awake"
 
     state "main"
     {
+        //collider.visible = true; // debug
         actor.zindex = 0.41;
         actor.anim = 0;
         transform.localPosition = Vector2(0, -216);
         nextState = "eyes open";
         state = nextState;
-
-        // debug
-        /*
-        collider.visible = true;
-        */
     }
 
     state "eyes open"
@@ -276,6 +273,11 @@ object "Giant Wolf's Head" is "private", "entity", "awake"
             "Explosion Combo",
             transform.position.translatedBy(0, diameter / 4)
         ).setSize(diameter, diameter).setDuration(explosionTime);
+    }
+
+    fun eyesOpened()
+    {
+        return state == "eyes open" && actor.animation.frame < actor.animation.frameCount - 1;
     }
 
     fun onCollision(otherCollider)
@@ -460,5 +462,80 @@ object "Giant Wolf's Hand Impact" is "private", "entity", "disposable"
     {
         if(actor.animation.finished)
             destroy();
+    }
+}
+
+// the midpoint between the two eyes
+object "Giant Wolf's Eyes" is "private", "entity", "awake"
+{
+    //actor = Actor("test"); // debug
+    transform = Transform();
+    eyeballs = spawn("Giant Wolf's Eyeballs");
+    leftEye = spawn("Giant Wolf's Moving Eye").setLeft();
+    rightEye = spawn("Giant Wolf's Moving Eye").setRight();
+
+    // check if the eyes of the Giant Wolf are opened
+    fun eyesOpened()
+    {
+        return parent.eyesOpened();
+    }
+
+    // direction: eyes looking at a target
+    fun directionTo(target)
+    {
+        return transform.position.directionTo(target);
+    }
+}
+
+// eyeballs
+object "Giant Wolf's Eyeballs" is "private", "entity", "awake"
+{
+    actor = Actor("Giant Wolf's Eyeballs");
+
+    fun constructor()
+    {
+        actor.zindex = 0.39;
+    }
+}
+
+// moving eye
+object "Giant Wolf's Moving Eye" is "private", "entity", "awake"
+{
+    actor = Actor("Giant Wolf's Moving Eye");
+    transform = Transform();
+    sign = 1;
+    distance = 26;
+    maxOffset = Vector2(8, 6);
+
+    state "main"
+    {
+        player = Player.active;
+
+        // look at the player
+        direction = parent.directionTo(player.transform.position);
+        offset = Vector2(direction.x * maxOffset.x, direction.y * maxOffset.y);
+        transform.localPosition = Vector2(sign * distance, 0).plus(offset);
+
+        // hide the sprite if the eyes of the Giant Wolf are closed
+        actor.visible = parent.eyesOpened();
+    }
+
+    fun constructor()
+    {
+        actor.zindex = 0.40;
+    }
+
+    fun setLeft()
+    {
+        sign = -1;
+        actor.anim = 0;
+        return this;
+    }
+
+    fun setRight()
+    {
+        sign = 1;
+        actor.anim = 1;
+        return this;
     }
 }
