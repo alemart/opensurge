@@ -111,28 +111,30 @@ object "Giant Wolf" is "entity", "boss", "awake"
     // the boss got hit
     fun getHit()
     {
-        if(hp > 0) {
-            // lift hands
-            leftHand.lift();
-            rightHand.lift();
+        // the boss has been defeated
+        if(hp == 0)
+            return;
 
-            // deciding the next state
-            // according to the hp
-            hp--;
-            if(hp == 0) {
-                chase.enabled = false;
-                leftHand.stop();
-                rightHand.stop();
-                head.explode(explosionTime);
-                state = "exploding";
-            }
-            else if(hp <= angryHp) {
-                head.getAngry();
-                state = "angry";
-            }
-            else
-                state = "chasing player";
+        // lift hands
+        leftHand.lift();
+        rightHand.lift();
+
+        // deciding the next state
+        // according to the hp
+        hp--;
+        if(hp == 0) {
+            chase.enabled = false;
+            leftHand.stop();
+            rightHand.stop();
+            head.explode(explosionTime);
+            state = "exploding";
         }
+        else if(hp <= angryHp) {
+            head.getAngry();
+            state = "angry";
+        }
+        else
+            state = "chasing player";
     }
 
     // is the boss angry?
@@ -260,6 +262,11 @@ object "Giant Wolf's Head" is "private", "entity", "awake"
             state = nextState;
     }
 
+    fun isVulnerable()
+    {
+        return state == "eyes open" || state == "angry";
+    }
+
     fun explode(durationInSeconds)
     {
         // get hit & explode
@@ -275,14 +282,9 @@ object "Giant Wolf's Head" is "private", "entity", "awake"
         ).setSize(diameter, diameter).setDuration(explosionTime);
     }
 
-    fun eyesOpened()
-    {
-        return state == "eyes open" && actor.animation.frame < actor.animation.frameCount - 1;
-    }
-
     fun onCollision(otherCollider)
     {
-        if(wolf.isActivated() && state != "defeated" && state != "exploding") {
+        if(wolf.isActivated() && isVulnerable()) {
             if(otherCollider.entity.hasTag("player")) {
                 player = otherCollider.entity;
                 if(player.attacking) {
@@ -474,12 +476,6 @@ object "Giant Wolf's Eyes" is "private", "entity", "awake"
     leftEye = spawn("Giant Wolf's Moving Eye").setLeft();
     rightEye = spawn("Giant Wolf's Moving Eye").setRight();
 
-    // check if the eyes of the Giant Wolf are opened
-    fun eyesOpened()
-    {
-        return parent.eyesOpened();
-    }
-
     // direction: eyes looking at a target
     fun directionTo(target)
     {
@@ -509,15 +505,11 @@ object "Giant Wolf's Moving Eye" is "private", "entity", "awake"
 
     state "main"
     {
-        player = Player.active;
-
         // look at the player
+        player = Player.active;
         direction = parent.directionTo(player.transform.position);
         offset = Vector2(direction.x * maxOffset.x, direction.y * maxOffset.y);
         transform.localPosition = Vector2(sign * distance, 0).plus(offset);
-
-        // hide the sprite if the eyes of the Giant Wolf are closed
-        actor.visible = parent.eyesOpened();
     }
 
     fun constructor()
