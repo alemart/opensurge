@@ -149,10 +149,10 @@ void credits_update()
     background_update(bgtheme);
 
     /* scroll the text faster */
-    if(input_button_down(input, IB_UP) || input_button_down(input, IB_FIRE1))
-        scroll_speed_multiplier = 5.0f;
-    else if(input_button_down(input, IB_DOWN))
+    if(input_button_down(input, IB_DOWN))
         scroll_speed_multiplier = -5.0f;
+    else if(input_button_down(input, IB_UP) || input_button_down(input, IB_FIRE1))
+        scroll_speed_multiplier = 5.0f;
 
     /* text movement */
     textpos = font_get_position(text);
