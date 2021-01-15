@@ -470,17 +470,11 @@ object "Giant Wolf's Hand Impact" is "private", "entity", "disposable"
 // the midpoint between the two eyes
 object "Giant Wolf's Eyes" is "private", "entity", "awake"
 {
-    //actor = Actor("test"); // debug
-    transform = Transform();
+    public readonly transform = Transform();
     eyeballs = spawn("Giant Wolf's Eyeballs");
     leftEye = spawn("Giant Wolf's Moving Eye").setLeft();
     rightEye = spawn("Giant Wolf's Moving Eye").setRight();
-
-    // direction: eyes looking at a target
-    fun directionTo(target)
-    {
-        return transform.position.directionTo(target);
-    }
+    //actor = Actor("test"); // debug
 }
 
 // eyeballs
@@ -507,7 +501,7 @@ object "Giant Wolf's Moving Eye" is "private", "entity", "awake"
     {
         // look at the player
         player = Player.active;
-        direction = parent.directionTo(player.transform.position);
+        direction = parent.transform.position.directionTo(player.transform.position);
         offset = Vector2(direction.x * maxOffset.x, direction.y * maxOffset.y);
         transform.localPosition = Vector2(sign * distance, 0).plus(offset);
     }
