@@ -91,8 +91,11 @@ void gameover_update()
     float t, dt = timer_get_delta();
     float center_x;
 
+    /* timer */
+    gameover_timer += dt;
+
     /* fade out */
-    if(!music_is_playing(music)) {
+    if(gameover_timer >= GAMEOVER_APPEARTIME && !music_is_playing(music)) {
         if(fadefx_is_over()) {
             quest_abort();
             scenestack_pop();
@@ -102,7 +105,6 @@ void gameover_update()
     }
 
     /* position the text */
-    gameover_timer += dt;
     t = gameover_timer / GAMEOVER_APPEARTIME;
     center_x = (VIDEO_SCREEN_W + (gameover_width[0] - gameover_width[1])) / 2.0f;
 
