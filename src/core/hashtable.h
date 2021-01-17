@@ -33,7 +33,7 @@
 #include "logfile.h"
 
 /* utilities */
-#define __H_CAPACITY               727 /* prime number (must be a compile-time constant for compiler optimization) */
+#define __H_CAPACITY               727 /* prime number */
 #define __H_BUCKET(h, key)         ((h)->hash_function(key) % __H_CAPACITY)
 #define __H_CONST(KEY_TYPE)        const KEY_TYPE
 
@@ -277,7 +277,7 @@ static void hashtable_##T##_release_unreferenced_entries(hashtable_##T *h) \
         for(q = h->data[i]; q != NULL; q = q->next) { \
             if(q->reference_count <= 0) { \
                 hashtable_##T##_remove(h, q->key); \
-                return; /* fast hack */ \
+                break; /* fast hack */ \
             } \
         } \
     } \
