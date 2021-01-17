@@ -166,7 +166,7 @@ uint32_t timer_get_ticks()
 {
 #if defined(A5BUILD)
     /* get the elapsed time at the beginning of the frame */
-    return 1000 * current_time; /* TODO: return in seconds */
+    return (uint32_t)(1000.0 * current_time);
 #else
     uint32_t ticks = get_tick_count();
     if(ticks < start_time)
