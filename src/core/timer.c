@@ -91,7 +91,7 @@ void timer_update()
 {
 #if defined(A5BUILD)
     static const float minimum_delta = 0.0166667f; /* 60 fps */
-    static const float maximum_delta = 0.0166667f; /* 60 fps; for consistent physics, may change up to 0.017? */
+    static const float maximum_delta = 0.017f; /* if 0.0166667f, you don't get physics with the fixed timestep; if too large (0.20f), there may be issues with collisions */
     static double old_time = 0.0;
 
     /* compute delta time */
