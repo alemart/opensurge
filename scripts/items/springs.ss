@@ -632,6 +632,7 @@ object "Spring Behavior" is "private", "entity"
     direction = Vector2.up;
     speed = 600; // 960;
     sensitive = false;
+    hlockTime = 0.27; // used to prevent braking
 
     state "main"
     {
@@ -673,7 +674,7 @@ object "Spring Behavior" is "private", "entity"
                 }
 
                 // prevent braking
-                player.hlock(0.27);
+                player.hlock(hlockTime);
             }
 
             // vertical spring
@@ -693,6 +694,7 @@ object "Spring Behavior" is "private", "entity"
                 else {
                     // the player is running on a wall
                     player.gsp = -v.y * Math.sign(Math.sin(slope));
+                    player.hlock(hlockTime);
                 }
             }
 
@@ -709,7 +711,7 @@ object "Spring Behavior" is "private", "entity"
 
                 // springify & prevent braking
                 player.springify();
-                player.hlock(0.27);
+                player.hlock(hlockTime);
             }
 
             // debug
