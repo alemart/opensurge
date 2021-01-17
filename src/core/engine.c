@@ -90,7 +90,8 @@ static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
-static const double TARGET_FPS = 60.0;
+static const double TARGET_FPS = 60.0; /* frames per second */
+static const uint32_t GC_INTERVAL = 10000; /* in ms (garbage collector) */
 
 #if defined(A5BUILD)
 /* public variables */
@@ -264,12 +265,15 @@ void engine_release()
 void clean_garbage()
 {
     static uint32_t last = 0;
-    uint32_t t = timer_get_ticks();
+    uint32_t now = timer_get_ticks();
 
-    if(t >= last + 2000) { /* every 2 seconds */
-        last = t;
+    /* run the GC every GC_INTERVAL milliseconds (approximately) */
+    if(now >= last + GC_INTERVAL) {
+        last = now;
         resourcemanager_release_unused_resources();
     }
+    else if(now < last)
+        last = now; /* time overflow... really?! */
 }
 
 
