@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * engine.c - game engine facade
- * Copyright (C) 2010, 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2011, 2018, 2020-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@
 /* minimum Allegro version */
 #define AL_MIN_MAJOR       5
 #define AL_MIN_MINOR       2
-#define AL_MIN_REVISION    0
+#define AL_MIN_REVISION    3
 #if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
 #error "This build requires a newer version of Allegro"
 #endif
@@ -90,6 +90,7 @@ static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
+static const double TARGET_FPS = 60.0;
 
 #if defined(A5BUILD)
 /* public variables */
@@ -127,7 +128,7 @@ void engine_init(int argc, char **argv)
 void engine_mainloop()
 {
 #if defined(A5BUILD)
-    ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / TARGET_FPS);
     scene_t *current_scene = NULL;
     bool redraw = false;
 
