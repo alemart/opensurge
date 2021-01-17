@@ -14,12 +14,12 @@ Say you intend to submit some artwork to Open Surge. You may contribute as long 
 
 Open Surge uses a few different licenses for its content. All such licenses are considered to be free by the [Free Software Foundation](http://www.fsf.org). We use the following licenses for our game data:
 
-* Most graphics, audio files and levels are released under the [CC-BY](licenses/CC-BY-3.0-legalcode.txt) (Creative Commons Attribution) International license.
-    * Generally speaking, this license gives everyone permission to freely use, share and remix your work as long as they give you credit. The Creative Commons website has a nice [human-readable summary](https://creativecommons.org/licenses/by/3.0/).
-    * Works licensed under the [CC0](licenses/CC0-1.0-legalcode.txt) (Creative Commons Zero / public domain) or under the [CC-BY-SA](licenses/CC-BY-SA-3.0-legalcode.txt) (Creative Commons Attribution ShareAlike) may also be accepted.
+* Most graphics, audio files and levels are released under the [CC-BY](licenses/CC-BY-4.0-legalcode.txt) (Creative Commons Attribution) International license.
+    * Generally speaking, this license gives everyone permission to freely use, share and remix your work as long as they give you credit. The Creative Commons website has a nice [human-readable summary](https://creativecommons.org/licenses/by/4.0/).
+    * Works licensed under the [CC0](licenses/CC0-1.0-legalcode.txt) (Creative Commons Zero / public domain) or under the [CC-BY-SA](licenses/CC-BY-SA-4.0-legalcode.txt) (Creative Commons Attribution ShareAlike) may also be accepted.
 * Scripts and configuration files in general are released under the [MIT license](licenses/MIT-license.txt).
 
-If your contribution is an image or a text-based file, please specify your name and the license of your work (e.g., CC-BY 3.0) in the file itself. If it's an audio file, you may use a metadata field to specify this information.
+If your contribution is an image or a text-based file, please specify your name and the license of your work (e.g., CC-BY 4.0) in the file itself. If it's an audio file, you may use a metadata field to specify this information.
 
 ### Submit it for review
 
