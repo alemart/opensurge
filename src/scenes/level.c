@@ -266,14 +266,14 @@ static void editor_enable();
 static void editor_disable();
 static void editor_update();
 static void editor_render();
-static int editor_is_enabled();
-static int editor_want_to_activate();
+static bool editor_is_enabled();
+static bool editor_want_to_activate();
 static void editor_update_background();
 static void editor_render_background();
 static void editor_waterline_render(int ycoord, color_t color);
 static void editor_save();
 static void editor_scroll();
-static int editor_is_eraser_enabled();
+static bool editor_is_eraser_enabled();
 
 /* object type */
 enum editor_entity_type {
@@ -289,9 +289,9 @@ enum editor_entity_type {
                 EDT_ENEMY );
 
 /* internal stuff */
-static int editor_enabled; /* is the level editor enabled? */
-static int editor_previous_video_resolution;
-static int editor_previous_video_smooth;
+static bool editor_enabled; /* is the level editor enabled? */
+static videoresolution_t editor_previous_video_resolution;
+static bool editor_previous_video_smooth;
 static editorcmd_t* editor_cmd;
 static v2d_t editor_camera, editor_cursor;
 static enum editor_entity_type editor_cursor_entity_type;
@@ -2979,7 +2979,7 @@ void editor_init()
     logfile_message("editor_init()");
 
     /* intializing... */
-    editor_enabled = FALSE;
+    editor_enabled = false;
     editor_item_list_size = -1;
     while(editor_item_list[++editor_item_list_size] >= 0);
     editor_cursor_entity_type = EDT_BRICK;
@@ -3052,7 +3052,7 @@ void editor_release()
     font_destroy(editor_help_font);
 
     /* releasing... */
-    editor_enabled = FALSE;
+    editor_enabled = false;
     logfile_message("editor_release() ok");
 }
 
@@ -3530,17 +3530,17 @@ void editor_enable()
     /* pause the SurgeScript VM */
     scripting_pause_vm();
 
-    /* activating the editor */
-    editor_action_init();
-    editor_enabled = TRUE;
-    editor_camera.x = (int)camera_get_position().x;
-    editor_camera.y = (int)camera_get_position().y;
-    editor_cursor = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-
     /* changing the video resolution */
     editor_previous_video_resolution = video_get_resolution();
     editor_previous_video_smooth = video_is_smooth();
-    video_changemode(VIDEORESOLUTION_EDT, FALSE, video_is_fullscreen());
+    video_changemode(VIDEORESOLUTION_EDT, false, video_is_fullscreen());
+
+    /* activating the editor */
+    editor_action_init();
+    editor_enabled = true;
+    editor_camera.x = (int)camera_get_position().x;
+    editor_camera.y = (int)camera_get_position().y;
+    editor_cursor = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
     /* display a warm, welcome message */
     editor_status_display("$EDITOR_MESSAGE_WELCOME", 0, NULL);
@@ -3557,7 +3557,7 @@ void editor_disable()
 
     /* disabling the level editor */
     editor_action_release();
-    editor_enabled = FALSE;
+    editor_enabled = false;
 
     /* restoring the video resolution */
     video_changemode(editor_previous_video_resolution, editor_previous_video_smooth, video_is_fullscreen());
@@ -3577,7 +3577,7 @@ void editor_disable()
  * editor_is_enabled()
  * Is the level editor activated?
  */
-int editor_is_enabled()
+bool editor_is_enabled()
 {
     return editor_enabled;
 }
@@ -3586,7 +3586,7 @@ int editor_is_enabled()
  * editor_want_to_activate()
  * The level editor wants to be activated!
  */
-int editor_want_to_activate()
+bool editor_want_to_activate()
 {
     return editorcmd_is_triggered(editor_cmd, "enter");
 }
@@ -3685,7 +3685,7 @@ void editor_scroll()
  * editor_is_eraser_enabled()
  * Is the eraser enabled?
  */
-int editor_is_eraser_enabled()
+bool editor_is_eraser_enabled()
 {
     const float hold_time = 0.57f; /* the eraser is activated after this amount of seconds */
     static float timer = 0.0f;
@@ -3705,7 +3705,7 @@ int editor_is_eraser_enabled()
     }
     else {
         timer = 0.0f;
-        return FALSE;
+        return false;
     }
 }
 
@@ -4544,17 +4544,10 @@ const char* editor_tooltip_ssproperties_file(surgescript_object_t* object)
 /* initialize the status bar */
 void editor_status_init()
 {
-    const int padding = 8;
-    int h = 0;
-
     editor_status_timer = 0.0f;
     editor_status_font = font_create("EditorUI");
-
     font_set_text(editor_status_font, " ");
-    h = (int)(font_get_textsize(editor_status_font).y);
-
     font_set_visible(editor_status_font, false);
-    font_set_position(editor_status_font, v2d_new(padding, video_get_window_size().y - h - padding));
 }
 
 /* release the status bar */
@@ -4578,8 +4571,11 @@ void editor_status_render()
 {
     if(font_is_visible(editor_status_font)) {
         v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
+        int h = (int)(font_get_textsize(editor_status_font).y);
+        const int padding = 8;
 
         image_rectfill(0, VIDEO_SCREEN_H - 32, VIDEO_SCREEN_W, VIDEO_SCREEN_H, EDITOR_UI_COLOR_TRANS(160));
+        font_set_position(editor_status_font, v2d_new(padding, VIDEO_SCREEN_H - h - padding));
         font_render(editor_status_font, cam);
     }
 }
