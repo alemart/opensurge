@@ -18,6 +18,7 @@ object "Default HUD" is "entity", "detached", "awake", "private"
     timer = spawn("DefaultHUD.Time");
     collectibles = spawn("DefaultHUD.Collectibles");
     lives = spawn("DefaultHUD.Lives");
+    powerups = spawn("DefaultHUD.Powerups");
     transform = Transform();
 
     state "main"
@@ -38,12 +39,13 @@ object "Default HUD" is "entity", "detached", "awake", "private"
         timer.transform.localPosition = Vector2(0, 16);
         collectibles.transform.localPosition = Vector2(0, 32);
         lives.transform.localPosition = Vector2(0, Screen.height - 29);
+        powerups.transform.localPosition = Vector2(Screen.width - 32, 0);
     }
 }
 
 object "DefaultHUD.Score" is "entity", "detached", "awake", "private"
 {
-    public transform = Transform();
+    public readonly transform = Transform();
     label = Text("HUD");
     value = Text("HUD");
 
@@ -63,7 +65,7 @@ object "DefaultHUD.Score" is "entity", "detached", "awake", "private"
 
 object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
 {
-    public transform = Transform();
+    public readonly transform = Transform();
     label = Text("HUD");
     value = Text("HUD");
     timer = 0.0;
@@ -100,7 +102,7 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
 
 object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 {
-    public transform = Transform();
+    public readonly transform = Transform();
     label = Text("HUD");
     value = Text("HUD");
     blinkTime = 0.35;
@@ -133,7 +135,7 @@ object "DefaultHUD.Collectibles" is "entity", "detached", "awake", "private"
 
 object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
 {
-    public transform = Transform();
+    public readonly transform = Transform();
     value = Text("HUD");
     icon = null;
     currentPlayer = null;
@@ -170,5 +172,83 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
         icon.offset = Vector2(9, 4);
         icon.zindex = zindex;
         value.offset = Vector2(icon.width, 0);
+    }
+}
+
+object "DefaultHUD.Powerups" is "entity", "detached", "awake", "private"
+{
+    public readonly transform = Transform();
+    icons = [
+        spawn("DefaultHUD.Powerups.Icon").setIndex(0),
+        spawn("DefaultHUD.Powerups.Icon").setIndex(1),
+        spawn("DefaultHUD.Powerups.Icon").setIndex(2)
+    ];
+
+    state "main"
+    {
+        player = Player.active;
+
+        // hide icons
+        icons[0].hide();
+        icons[1].hide();
+        icons[2].hide();
+
+        // show relevant icons
+        c = 0;
+        if(player.turbo)
+            icons[c++].show("turbo");
+        if(player.invincible)
+            icons[c++].show("invincible");
+        if(player.shield !== null)
+            icons[c++].show(player.shield);
+    }
+}
+
+object "DefaultHUD.Powerups.Icon" is "entity", "detached", "awake", "private"
+{
+    actor = Actor("Item Box Icon");
+    transform = Transform();
+    name2anim = {
+        "invincible": 5,
+        "turbo": 6,
+        "shield": 8,
+        "fire": 12,
+        "thunder": 13,
+        "water": 14,
+        "acid": 15,
+        "wind": 16
+    };
+
+    state "main"
+    {
+        if(Level.cleared)
+            hide();
+    }
+
+    fun constructor()
+    {
+        actor.visible = false;
+        actor.zindex = 1000.0;
+    }
+
+    fun setIndex(index)
+    {
+        hotspot = actor.animation.hotspot;
+        offset = Vector2(-hotspot.x, hotspot.y);
+        transform.localPosition = Vector2(1.25 * actor.width * -index, 0).plus(offset);
+        return this;
+    }
+
+    fun show(iconName)
+    {
+        if(name2anim.has(iconName)) {
+            actor.anim = name2anim[iconName];
+            actor.visible = !Level.cleared;
+        }
+    }
+
+    fun hide()
+    {
+        actor.visible = false;
     }
 }

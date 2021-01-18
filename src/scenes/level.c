@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - code for the game levels
- * Copyright (C) 2008-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -208,8 +208,7 @@ static void render_players();
 static void update_music();
 static void spawn_players();
 static void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
-static void render_hud(enemy_list_t *major_enemies); /* gui / hud related */
-static void render_powerups(); /* gui / hud related */
+static void render_hud(); /* gui / hud related */
 static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
@@ -1500,7 +1499,7 @@ void level_render()
     render_level(major_bricks, major_items, major_enemies);
 
     /* render the built-in HUD */
-    render_hud(major_enemies);
+    render_hud();
 
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);
@@ -2378,13 +2377,9 @@ void spawn_players()
 
 
 /* renders the built-in hud */
-void render_hud(enemy_list_t *major_enemies)
+void render_hud()
 {
     v2d_t fixedcam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-
-    /* powerups */
-    if(!level_cleared)
-        render_powerups();
 
     /* dialog box */
     render_dlgbox(fixedcam);
@@ -2543,74 +2538,6 @@ bool is_setup_object(const char* object_name)
         return true;
 
     return false;
-}
-
-
-/* misc */
-
-/* render powerups */
-void render_powerups()
-{
-    const char *sprite_name = "Item Box Icon";
-    image_t *icon[MAX_POWERUPS]; /* icons */
-    int visible[MAX_POWERUPS]; /* is icon[i] visible? */
-    int i, c = 0; /* c is the icon count */
-    float t = timer_get_ticks() * 0.001f;
-
-    for(i=0; i<MAX_POWERUPS; i++)
-        visible[i] = TRUE;
-
-    if(player) {
-        if(player->got_glasses)
-            icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 7) , 0 );
-
-        switch(player_shield_type(player))
-        {
-            case SH_SHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 8) , 0 );
-                break;
-            case SH_FIRESHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 12) , 0 );
-                break;
-            case SH_THUNDERSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 13) , 0 );
-                break;
-            case SH_WATERSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 14) , 0 );
-                break;
-            case SH_ACIDSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 15) , 0 );
-                break;
-            case SH_WINDSHIELD:
-                icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 16) , 0 );
-                break;
-            case SH_NONE:
-                break;
-        }
-
-        if(player_is_invincible(player)) {
-            icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 5) , 0 );
-            if(player->invincibility_timer >= PLAYER_MAX_INVINCIBILITY * 0.75f) { /* it blinks */
-                /* we want something that blinks faster as player->invincibility_timer tends to PLAYER_MAX_INVINCIBLITY */
-                float x = (PLAYER_MAX_INVINCIBILITY - player->invincibility_timer) / (PLAYER_MAX_INVINCIBILITY * 0.25f);
-                visible[c-1] = sinf( (0.5f*PI*t) / (x+0.1f) ) >= 0.0f;
-            }
-        }
-
-        if(player_is_turbocharged(player)) {
-            icon[c++] = sprite_get_image( sprite_get_animation(sprite_name, 6) , 0 );
-            if(player->turbo_timer >= PLAYER_MAX_TURBO * 0.75f) { /* it blinks */
-                /* we want something that blinks faster as player->turbo_timer tends to PLAYER_MAX_TURBO */
-                float x = (PLAYER_MAX_TURBO - player->turbo_timer) / (PLAYER_MAX_TURBO * 0.25f);
-                visible[c-1] = sinf( (0.5f*PI*t) / (x+0.1f) ) >= 0.0f;
-            }
-        }
-    }
-
-    for(i=0; i<c; i++) {
-        if(visible[i])
-            image_draw(icon[i], VIDEO_SCREEN_W - image_width(icon[i]) * (i+1) - 5*i - 15, 10, IF_NONE);
-    }
 }
 
 
