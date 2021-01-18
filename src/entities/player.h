@@ -30,8 +30,6 @@
 
 /* constants */
 extern const int PLAYER_INITIAL_LIVES;       /* initial lives */
-extern const float PLAYER_MAX_INVINCIBILITY; /* invincibility timer */
-extern const float PLAYER_MAX_TURBO;         /* turbo timer */
 
 /* shield types */
 enum playershield_t {
