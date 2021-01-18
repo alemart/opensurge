@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * confirmbox.c - confirm box
- * Copyright (C) 2008-2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2019-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 #include "confirmbox.h"
@@ -33,6 +34,7 @@
 #include "../core/timer.h"
 #include "../core/scene.h"
 #include "../core/stringutil.h"
+#include "../scripting/scripting.h"
 
 
 /* private data */
@@ -50,7 +52,7 @@ static input_t *input;
 static char text[1024], option[MAX_OPTIONS][128];
 static int option_count;
 static int current_option = NO_OPTION;
-static int fxfade_in, fxfade_out;
+static bool fxfade_in, fxfade_out;
 
 static void setup_message(const confirmboxdata_t* confirmbox);
 
@@ -63,8 +65,6 @@ static void setup_message(const confirmboxdata_t* confirmbox);
  */
 void confirmbox_init(void *confirmbox)
 {
-    int i;
-
     /* setup message & options */
     setup_message((confirmboxdata_t*)confirmbox);
 
@@ -75,20 +75,25 @@ void confirmbox_init(void *confirmbox)
     arrow = actor_create();
     actor_change_animation(arrow, sprite_get_animation("UI Pointer", 0));
 
+    /* initialize variables related to the fade effect */
+    fxfade_in = true;
+    fxfade_out = false;
+
     /* setup fonts */
     textfnt = font_create("dialogbox");
     font_set_text(textfnt, "%s", text);
-    for(i = 0; i < option_count; i++) {
+    for(int i = 0; i < option_count; i++) {
         optionfnt[i][0] = font_create("dialogbox");
         optionfnt[i][1] = font_create("dialogbox");
         font_set_text(optionfnt[i][0], "%s", option[i]);
         font_set_text(optionfnt[i][1], "<color=$COLOR_HIGHLIGHT>%s</color>", option[i]);
     }
 
-    /* misc */
+    /* setup input device */
     input = input_create_user(NULL);
-    fxfade_in = TRUE;
-    fxfade_out = FALSE;
+
+    /* pause the SurgeScript VM */
+    scripting_pause_vm();
 }
 
 
@@ -98,14 +103,21 @@ void confirmbox_init(void *confirmbox)
  */
 void confirmbox_release()
 {
+    /* unpause the SurgeScript VM */
+    scripting_resume_vm();
+
+    /* release input device */
+    input_destroy(input);
+
+    /* release fonts */
     for(int i = 0; i < option_count; i++) {
         font_destroy(optionfnt[i][0]);
         font_destroy(optionfnt[i][1]);
     }
-
-    actor_destroy(arrow);
-    input_destroy(input);
     font_destroy(textfnt);
+
+    /* release gfx */
+    actor_destroy(arrow);
     image_destroy(background);
 }
 
@@ -123,7 +135,7 @@ void confirmbox_update()
     /* fade-in */
     if(fxfade_in) {
         if( boxpos.y <= (VIDEO_SCREEN_H - image_height(box))/2 )
-            fxfade_in = FALSE;
+            fxfade_in = false;
         else
             boxpos.y -= speed*dt;
     }
@@ -131,7 +143,7 @@ void confirmbox_update()
     /* fade-out */
     if(fxfade_out) {
         if( boxpos.y >= VIDEO_SCREEN_H ) {
-            fxfade_out = FALSE;
+            fxfade_out = false;
             scenestack_pop();
             return;
         }
@@ -170,7 +182,7 @@ void confirmbox_update()
         else if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
             /* confirm */
             sound_play(SFX_CONFIRM);
-            fxfade_out = TRUE;
+            fxfade_out = true;
         }
     }
 }

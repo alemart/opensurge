@@ -3527,6 +3527,9 @@ void editor_enable()
 {
     logfile_message("Entering the level editor");
 
+    /* pause the SurgeScript VM */
+    scripting_pause_vm();
+
     /* activating the editor */
     editor_action_init();
     editor_enabled = TRUE;
@@ -3556,14 +3559,17 @@ void editor_disable()
     editor_action_release();
     editor_enabled = FALSE;
 
-    /* notify the SurgeScript entities */
-    notify_ssobjects("onLeaveEditor");
-
     /* restoring the video resolution */
     video_changemode(editor_previous_video_resolution, editor_previous_video_smooth, video_is_fullscreen());
 
     /* updating the level size */
     update_level_size();
+
+    /* unpause the SurgeScript VM */
+    scripting_resume_vm();
+
+    /* notify the SurgeScript entities */
+    notify_ssobjects("onLeaveEditor");
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * scripting.c - scripting system
- * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ static surgescript_vm_t* vm = NULL;
 static char** vm_argv = NULL;
 static int vm_argc = 0;
 static bool test_mode = false;
+static int pause_counter = 0;
 static void log_fun(const char* message);
 static void err_fun(const char* message);
 static void compile_scripts(surgescript_vm_t* vm);
@@ -166,6 +167,39 @@ void scripting_reload()
 
     /* done */
     logfile_message("The scripts have been reloaded!");
+}
+
+/*
+ * scripting_pause_vm()
+ * Pause the SurgeScript VM
+ */
+void scripting_pause_vm()
+{
+#ifdef SURGESCRIPT_VERSION_IS_AT_LEAST
+#if SURGESCRIPT_VERSION_IS_AT_LEAST(0,5,5,0)
+    if(pause_counter++ == 0) {
+        logfile_message("Pausing the SurgeScript VM");
+        surgescript_vm_pause(vm);
+    }
+#endif
+#endif
+}
+
+/*
+ * scripting_resume_vm()
+ * Unpause the SurgeScript VM
+ */
+void scripting_resume_vm()
+{
+#ifdef SURGESCRIPT_VERSION_IS_AT_LEAST
+#if SURGESCRIPT_VERSION_IS_AT_LEAST(0,5,5,0)
+    if(--pause_counter == 0) {
+        logfile_message("Resuming the SurgeScript VM");
+        surgescript_vm_resume(vm);
+    }
+#endif
+#endif
+    pause_counter = max(pause_counter, 0); /* safeguard */
 }
 
 
