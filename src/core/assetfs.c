@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * assetfs.c - assetfs virtual filesystem
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -552,10 +552,10 @@ char* join_path(const char* path, const char* basename)
         char *s = mallocx((2 + strlen(path) + strlen(basename)) * sizeof(*s));
         strcpy(s, path);
 #if !defined(_WIN32)
-        if(s[strlen(s)-1] != '/')
+        if(*s && s[strlen(s)-1] != '/')
             strcat(s, "/");
 #else
-        if(s[strlen(s)-1] != '\\')
+        if(*s && s[strlen(s)-1] != '\\')
             strcat(s, "\\");
 #endif
         strcat(s, basename);
@@ -1124,6 +1124,7 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type, 
                 struct stat st;
                 lstat(path, &st);
                 free(path);
+
                 is_dir = S_ISDIR(st.st_mode) && !(S_ISLNK(st.st_mode));
                 is_file = S_ISREG(st.st_mode) && !(S_ISLNK(st.st_mode));
                 is_link = !(S_ISDIR(st.st_mode)) && S_ISLNK(st.st_mode);
@@ -1138,10 +1139,15 @@ void scan_folder(assetdir_t* folder, const char* abspath, assetfiletype_t type, 
                 stat(path, &st);                
                 free(path);
 
-                if(S_ISDIR(st.st_mode))
-                    continue; /* reject directories */
-                else if(S_ISREG(st.st_mode))
-                    is_file = true; /* accept links of regular files */
+                if(S_ISDIR(st.st_mode)) {
+                    /* reject links to directories */
+                    is_dir = false;
+                    continue;
+                }
+                else if(S_ISREG(st.st_mode)) {
+                    /* accept links to regular files */
+                    is_file = true;
+                }
             }
 
             /* recurse on directories */
