@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * video.c - video manager
- * Copyright (C) 2008-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -80,6 +80,7 @@ static void setup_color_depth(int bpp);
 
 /* private stuff */
 #define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
+static const char WINDOW_TITLE[] = GAME_TITLE " " GAME_VERSION_STRING;
 
 /* video manager */
 static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
@@ -161,7 +162,7 @@ void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int 
     /* window properties */
     LOCK_FUNCTION(game_quit);
     set_close_button_callback(game_quit);
-    set_window_title(GAME_TITLE " " GAME_VERSION_STRING);
+    set_window_title(WINDOW_TITLE);
 
     /* window callbacks */
     window_active = true;
@@ -223,7 +224,7 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
         if(NULL == (display = al_create_display(window_size.x, window_size.y)))
             fatal_error("Failed to create a %dx%d display", (int)window_size.x, (int)window_size.y);
         al_register_event_source(a5_event_queue, al_get_display_event_source(display));
-        al_set_window_title(display, GAME_TITLE " " GAME_VERSION_STRING);
+        al_set_window_title(display, WINDOW_TITLE);
         al_hide_mouse_cursor(display);
     }
     else {
