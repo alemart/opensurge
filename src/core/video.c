@@ -227,25 +227,25 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
         al_set_window_title(display, WINDOW_TITLE);
         al_hide_mouse_cursor(display);
     }
-    else {
-        v2d_t window_size = video_get_window_size();
-
-        /* toggle fullscreen */
-        if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, video_fullscreen)) {
-            logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
-            video_fullscreen = prev_fullscreen;
-        }
-
-        /* resize the display */
-        if(!video_fullscreen && !al_resize_display(display, window_size.x, window_size.y))
-            logfile_message("Failed to resize the display to %dx%d", (int)window_size.x, (int)window_size.y);
-    }
 
     /* Compute the dimensions of the screen (gameplay area) */
     screen_size = DEFAULT_SCREEN_SIZE;
     if(resolution == VIDEORESOLUTION_EDT) {
         /* in the level editor, we set screen_size to the dimensions of the display */
         screen_size = v2d_new(al_get_display_width(display), al_get_display_height(display));
+    }
+
+    /* toggle fullscreen */
+    if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, video_fullscreen)) {
+        logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
+        video_fullscreen = prev_fullscreen;
+    }
+
+    /* resize the display */
+    if(!video_fullscreen) {
+        v2d_t window_size = video_get_window_size();
+        if(!al_resize_display(display, window_size.x, window_size.y))
+            logfile_message("Failed to resize the display to %dx%d", (int)window_size.x, (int)window_size.y);
     }
 
     /* Create the backbuffer */
