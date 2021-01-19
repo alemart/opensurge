@@ -65,6 +65,41 @@ object "Powerup Speed" is "entity", "basic", "powerup"
     {
         player.turbo = true;
         music.play();
+        Level.spawn("Powerup Speed - Music Watcher").setPlayer(player).setMusic(music);
+    }
+}
+
+// Stop the "speed" music if the turbo powerup is lost
+object "Powerup Speed - Music Watcher"
+{
+    player = null;
+    music = null;
+
+    state "main"
+    {
+        if(player !== null && music !== null) {
+            if(music.playing) {
+                if(player.turbo)
+                    return; // keep playing the music
+                else if(player.underwater)
+                    music.stop();
+            }
+        }
+
+        // discard this music watcher
+        destroy();
+    }
+
+    fun setPlayer(p)
+    {
+        player = p;
+        return this;
+    }
+
+    fun setMusic(m)
+    {
+        music = m;
+        return this;
     }
 }
 
