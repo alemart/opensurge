@@ -572,8 +572,6 @@ void level_unload()
         music_stop();
         music_unref(music);
     }
-    /*music_unref("musics/invincible.ogg");
-    music_unref("musics/speed.ogg");*/
 
     /* destroy extradata */
     ssobj_extradata = fasthash_destroy(ssobj_extradata);
