@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sprite.c - code for the sprites/animations
- * Copyright (C) 2008-2010, 2012, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2012, 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,11 +33,13 @@
 #define SPRITE_MAX_ANIM         1024 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
 HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
 static HASHTABLE(spriteinfo_t, sprites);
-static const char* DEFAULT_SPRITE = "null";
 static const int DEFAULT_ANIM = 0;
+static const char DEFAULT_SPRITE[] = "null";
+static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
+static const int OVERRIDE_PREFIX_LENGTH = sizeof(OVERRIDE_PREFIX) - 1;
 
 /* private functions */
-static int dirfill(const char *vpath, void *param); /* file system callback */
+static int scanfile(const char* vpath, void* param); /* file system callback */
 static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
 static void validate_animation(animation_t *anim); /* validates the animation */
 static spriteinfo_t *spriteinfo_new(); /* creates a new spriteinfo_t instance */
@@ -45,7 +47,7 @@ static animation_t *animation_new(int anim_id, v2d_t hot_spot); /* creates a new
 static animation_t *animation_delete(animation_t *anim); /* deletes anim */
 static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by reading the spritesheet */
 static void fix_sprite_animations(spriteinfo_t *spr); /* fixes the animations of the given sprite */
-static int traverse(const parsetree_statement_t *stmt);
+static int traverse(const parsetree_statement_t *stmt, void *vpath);
 static int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo);
 static int traverse_animation_attributes(const parsetree_statement_t *stmt, void *animation);
 
@@ -58,6 +60,7 @@ static int traverse_animation_attributes(const parsetree_statement_t *stmt, void
  */
 void sprite_init()
 {
+    #if 0
     parsetree_program_t *prog = NULL;
 
     logfile_message("Loading sprites...");
@@ -74,6 +77,15 @@ void sprite_init()
     /* we're done! */
     prog = nanoparser_deconstruct_tree(prog);
     logfile_message("All sprites have been loaded!");
+    #else
+    logfile_message("Loading sprites...");
+    sprites = hashtable_spriteinfo_t_create();
+
+    /* scan the sprites/ folder */
+    assetfs_foreach_file("sprites", ".spr", scanfile, NULL, true);
+
+    logfile_message("All sprites have been loaded!");
+    #endif
 }
 
 
@@ -222,6 +234,23 @@ int dirfill(const char *vpath, void *param)
 }
 
 /*
+ * scanfile()
+ * Called for each .spr file in sprites/
+ */
+int scanfile(const char *vpath, void *param)
+{
+    const char* fullpath = assetfs_fullpath(vpath);
+
+    /* read the .spr file */
+    parsetree_program_t* p = nanoparser_construct_tree(fullpath);
+    nanoparser_traverse_program_ex(p, (void*)vpath, traverse);
+    nanoparser_deconstruct_tree(p);
+
+    /* done! */
+    return 0;
+}
+
+/*
  * spriteinfo_new()
  * Creates a new empty spriteinfo_t instance
  */
@@ -253,7 +282,7 @@ animation_t *animation_new(int anim_id, v2d_t hot_spot)
     animation_t *anim = mallocx(sizeof *anim);
 
     anim->id = anim_id;
-    anim->repeat = FALSE;
+    anim->repeat = false;
     anim->fps = 8.0f;
     anim->frame_count = 0;
     anim->data = NULL; /* this will be malloc'd later */
@@ -383,7 +412,7 @@ void fix_sprite_animations(spriteinfo_t *spr)
  * traverse()
  * Sprite list traversal
  */
-int traverse(const parsetree_statement_t *stmt)
+int traverse(const parsetree_statement_t *stmt, void *vpath)
 {
     const char *identifier, *sprite_name;
     const parsetree_parameter_t *param_list;
@@ -410,16 +439,20 @@ int traverse(const parsetree_statement_t *stmt)
         }
         else {
             /* solve conflicting definitions for the same sprite */
-            spriteinfo_t *new_sprite = spriteinfo_create(nanoparser_get_program(p2));
+            bool must_override = (str_incmp((const char*)vpath, OVERRIDE_PREFIX, OVERRIDE_PREFIX_LENGTH) == 0);
 
-            if(new_sprite->animation_count > sprite->animation_count) {
-                logfile_message("WARNING: redefining sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            if(must_override) {
+                logfile_message("OVERRIDE: redefining sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+                spriteinfo_t *new_sprite = spriteinfo_create(nanoparser_get_program(p2));
                 if(hashtable_spriteinfo_t_replace(sprites, sprite_name, new_sprite))
                     return 0; /* the sprite has been successfully redefined */
+
+                logfile_message("Can't override sprite \"%s\"", sprite_name); /* shouldn't happen */
+                spriteinfo_destroy(new_sprite);
             }
 
             logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-            spriteinfo_destroy(new_sprite);
         }
     }
     else
