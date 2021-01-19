@@ -30,9 +30,9 @@
 #include "nanoparser/nanoparser.h"
 
 /* private stuff ;) */
-#define SPRITE_MAX_ANIM         1024 /* sprites can have at most SPRITE_MAX_ANIM animations (numbered 0 .. SPRITE_MAX_ANIM-1) */
 HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
 static HASHTABLE(spriteinfo_t, sprites);
+static const int MAX_ANIMATIONS = 1024; /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
 static const int DEFAULT_ANIM = 0;
 static const char DEFAULT_SPRITE[] = "null";
 static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
@@ -410,7 +410,7 @@ void fix_sprite_animations(spriteinfo_t *spr)
 
 /*
  * traverse()
- * Sprite list traversal
+ * Sprite block traversal
  */
 int traverse(const parsetree_statement_t *stmt, void *vpath)
 {
@@ -528,8 +528,8 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
             nanoparser_expect_string(p1, "Must provide animation number");
             nanoparser_expect_program(p2, "Must provide animation attributes");
             anim_id = atoi(nanoparser_get_string(p1));
-            if(anim_id < 0 || anim_id >= SPRITE_MAX_ANIM)
-                fatal_error("Can't load sprites. Animation number must be in range 0..%d\nin \"%s\" near line %d", SPRITE_MAX_ANIM-1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            if(anim_id < 0 || anim_id >= MAX_ANIMATIONS)
+                fatal_error("Can't load sprites. Animation number must be in range 0..%d\nin \"%s\" near line %d", MAX_ANIMATIONS-1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         }
         else if(p1) {
             nanoparser_expect_program(p1, "Must provide animation attributes");
@@ -544,8 +544,8 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
 
         old_count = s->animation_count;
         s->animation_count = max(s->animation_count, anim_id+1);
-        if(s->animation_count > SPRITE_MAX_ANIM) /* sanity check */
-            fatal_error("Can't exceed %d animations\nin \"%s\" near line %d", SPRITE_MAX_ANIM, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        if(s->animation_count > MAX_ANIMATIONS) /* sanity check */
+            fatal_error("Can't exceed %d animations\nin \"%s\" near line %d", MAX_ANIMATIONS, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         s->animation_data = reallocx(s->animation_data, sizeof(animation_t*) * s->animation_count); /* watch this! It may generate garbage in the middle. */
         for(i = old_count; i < s->animation_count; i++)
             s->animation_data[i] = NULL;
