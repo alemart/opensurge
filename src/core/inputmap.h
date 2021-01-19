@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * inputmap.h - customized input mappings
- * Copyright (C) 2011, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * inputmap.h - custom input mappings
+ * Copyright (C) 2011, 2019-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,10 +25,6 @@
 #include <stdint.h>
 #include "input.h"
 
-/* public methods */
-void inputmap_init();
-void inputmap_release();
-
 /* controllers: custom key mapping */
 /* they're scripts located at the config/ folder */
 typedef struct inputmap_t inputmap_t;
@@ -47,7 +43,9 @@ struct inputmap_t {
     } joystick; /* joystick mapping */
 };
 
-/* gets an inputmap */
+/* public API */
+void inputmap_init();
+void inputmap_release();
 const inputmap_t* inputmap_get(const char* name);
 
 #endif

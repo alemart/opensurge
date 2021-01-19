@@ -1,0 +1,89 @@
+// -----------------------------------------------------------------------------
+// File: editor.in
+// Description: key bindings used in the level editor
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// ====================================================
+// 
+//             uuuuuuuuuuuuuuuuuuuu                                    
+//           u" uuuuuuuuuuuuuuuuuu "u                                  
+//         u" u####################u "u 
+//       u" u########################u "u                              
+//     u" u############################u "u                            
+//   u" u################################u "u                          
+// u" u####################################u "u                        
+// # ######################################## #                        
+// # ######################################## #                        
+// # ###" ... "#...  ...#" ... "###  ... "### #                        
+// # ###u `"#######  ###  #####  ##  ###  ### #                        
+// # ######uu "####  ###  #####  ##  """ u### #                        
+// # ###""###  ####  ###u "###" u##  ######## #                        
+// # ####....,#####..#####....,####..######## #                        
+// # ######################################## #                        
+// "u "####################################" u"                        
+//   "u "################################" u"                          
+//     "u "############################" u"                            
+//       "u "########################" u"                              
+//         "u "####################" u"                                
+//           "u """""""""""""""""" u"                                  
+//             """"""""""""""""""""             
+// 
+//       DO NOT MODIFY THE INPUTMAPS BELOW!!!
+//      unless you know what you are doing ;)
+// ====================================================
+
+inputmap "editorcmd1"
+{
+    keyboard
+    {
+        up              KEY_UP
+        right           KEY_RIGHT
+        down            KEY_DOWN
+        left            KEY_LEFT
+        fire1           KEY_LCONTROL
+        fire2           KEY_RCONTROL
+        fire3           KEY_LSHIFT
+        fire4           KEY_RSHIFT
+        fire5           KEY_ESC
+        fire6           KEY_R
+        fire7           KEY_F1
+        fire8           KEY_F12
+    }
+}
+
+inputmap "editorcmd2"
+{
+    keyboard
+    {
+        up              KEY_W
+        right           KEY_D
+        down            KEY_S
+        left            KEY_A
+        fire1           KEY_1
+        fire2           KEY_2
+        fire3           KEY_M
+        fire4           KEY_G
+        fire5           KEY_L
+        fire6           KEY_F
+        fire7           KEY_Z
+        fire8           KEY_Y
+    }
+}
+
+inputmap "editorhelp"
+{
+    keyboard
+    {
+        fire1           KEY_ESC
+    }
+}
+
+inputmap "editorpal"
+{
+    keyboard
+    {
+        fire1           KEY_ESC
+    }
+}

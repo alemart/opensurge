@@ -1,0 +1,15 @@
+// -----------------------------------------------------------------------------
+// File: screenshots.in
+// Description: key bindings used for capturing screenshots
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+inputmap "screenshots"
+{
+    keyboard
+    {
+        fire1           KEY_EQUALS
+        fire2           KEY_PRTSCR
+    }
+}

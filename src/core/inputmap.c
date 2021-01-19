@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * inputmap.c - custom input mapping
- * Copyright (C) 2011, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * inputmap.c - custom input mappings
+ * Copyright (C) 2011, 2019-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,14 +44,13 @@ HASHTABLE_GENERATE_CODE(inputmapnode_t, inputmapnode_destroy);
 static HASHTABLE(inputmapnode_t, mappings);
 
 /* file reader stuff (nanoparser) */
-static void load_inputmap_table();
-static int traverse(const parsetree_statement_t *stmt);
-static int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode);
-static int traverse_inputmap_keyboard(const parsetree_statement_t *stmt, void *inputmapnode);
-static int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmapnode);
+static int read_script(const char* vpath, void* param);
+static int traverse(const parsetree_statement_t* stmt, void* vpath);
+static int traverse_inputmap(const parsetree_statement_t* stmt, void* inputmapnode);
+static int traverse_inputmap_keyboard(const parsetree_statement_t* stmt, void* inputmapnode);
+static int traverse_inputmap_joystick(const parsetree_statement_t* stmt, void* inputmapnode);
 
 /* misc */
-static const char* INPUTMAP_FILE = "config/input.def";
 static const char* NULL_INPUTMAP = "null";
 static int keycode_of(const char* key_name);
 static bool parse_joystick_button_name(const char* joybtn_name, int* result);
@@ -510,30 +509,47 @@ static const int key_codes[] = {
 
 /* public functions */
 
-/* initializes the module */
+/*
+ * inputmap_init()
+ * Loads the inputmaps
+ */
 void inputmap_init()
 {
-    logfile_message("Initializing inputmaps");
+    logfile_message("Initializing inputmaps...");
+
+    /* create table */
     mappings = hashtable_inputmapnode_t_create();
-    load_inputmap_table();
+
+    /* read the inputmap scripts */
+    assetfs_foreach_file("inputs/", ".in", read_script, NULL, true);
+
+    /* read the legacy script AFTER you read all the regular scripts */
+    if(assetfs_exists("config/input.def"))
+        read_script("config/input.def", NULL);
 }
 
-/* releases the module */
+/*
+ * inputmap_release()
+ * Unloads the inputmaps
+ */
 void inputmap_release()
 {
-    logfile_message("Releasing inputmaps");
+    logfile_message("Releasing inputmaps...");
     mappings = hashtable_inputmapnode_t_destroy(mappings);
 }
 
-/* returns an input mapping */
-const inputmap_t *inputmap_get(const char *name)
+/*
+ * inputmap_get()
+ * Get an inputmap given its name
+ */
+const inputmap_t* inputmap_get(const char* name)
 {
-    inputmapnode_t *f = hashtable_inputmapnode_t_find(mappings, name);
+    inputmapnode_t* f = hashtable_inputmapnode_t_find(mappings, name);
 
     if(f == NULL) {
-        logfile_message("Can't find inputmap '%s' in '%s'", name, INPUTMAP_FILE);
+        logfile_message("WARNING: Can't find inputmap '%s'", name);
         if((f = hashtable_inputmapnode_t_find(mappings, NULL_INPUTMAP)) == NULL) { /* fail silently */
-            fatal_error("Can't find inputmap '%s' in '%s'", name, INPUTMAP_FILE);
+            fatal_error("Can't find inputmap '%s'", name); /* shouldn't happen */
             return NULL;
         }
     }
@@ -546,14 +562,28 @@ const inputmap_t *inputmap_get(const char *name)
 
 /* private functions */
 
-/* traverses an inputmap configuration file */
-int traverse(const parsetree_statement_t *stmt)
+/* read an inputmap script */
+int read_script(const char* vpath, void* param)
 {
-    const char *identifier;
+    /* load the script */
+    const char* fullpath = assetfs_fullpath(vpath);
+    parsetree_program_t* prog = nanoparser_construct_tree(fullpath);
+
+    /* traverse the script */
+    nanoparser_traverse_program_ex(prog, (void*)vpath, traverse);
+
+    /* done! */
+    nanoparser_deconstruct_tree(prog);
+    return 0;
+}
+
+/* traverses an inputmap configuration file */
+int traverse(const parsetree_statement_t* stmt, void* vpath)
+{
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2;
-    const char *name = "null";
-    inputmapnode_t *f = NULL;
+    const char *identifier;
+    const char *name;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
@@ -567,14 +597,14 @@ int traverse(const parsetree_statement_t *stmt)
 
         name = nanoparser_get_string(p1);
         if(NULL == hashtable_inputmapnode_t_find(mappings, name)) {
-            f = inputmapnode_create(name);
+            inputmapnode_t* f = inputmapnode_create(name);
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)f, traverse_inputmap);
             hashtable_inputmapnode_t_add(mappings, name, f);
+            logfile_message("inputmap: loaded inputmap '%s' from %s", name, nanoparser_get_file(stmt));
         }
         else
-            fatal_error("inputmap: redefinition of inputmap '%s' in %s:%d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            logfile_message("WARNING: can't redefine inputmap '%s' in %s:%d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
-        logfile_message("inputmap: loaded input map '%s'", name);
     }
     else
         fatal_error("inputmap: unknown identifier '%s' in %s:%d. Valid keywords: 'inputmap'", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -583,7 +613,7 @@ int traverse(const parsetree_statement_t *stmt)
 }
 
 /* traverses an inputmap block */
-int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
+int traverse_inputmap(const parsetree_statement_t* stmt, void* inputmapnode)
 {
     inputmapnode_t* f = (inputmapnode_t*)inputmapnode;
     const char *identifier;
@@ -604,7 +634,7 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
                 fatal_error("inputmap: can't define multiple keyboard mappings for inputmap '%s' in %s:%d", f->data->name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
             f->data->keyboard.enabled = true;
-            nanoparser_traverse_program_ex(nanoparser_get_program(p1), (void*)f, traverse_inputmap_keyboard);
+            nanoparser_traverse_program_ex(nanoparser_get_program(p1), inputmapnode, traverse_inputmap_keyboard);
         }
         else
             fatal_error("inputmap: 'keyboard' accepts only one parameter: a block (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_file(stmt));
@@ -622,7 +652,7 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
 
             f->data->joystick.enabled = true;
             f->data->joystick.id = max(0, atoi(nanoparser_get_string(p1)));
-            nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)f, traverse_inputmap_joystick);
+            nanoparser_traverse_program_ex(nanoparser_get_program(p2), inputmapnode, traverse_inputmap_joystick);
         }
         else
             fatal_error("inputmap: 'joystick' requires two parameters: joystick_id and a block containing the mappings (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -634,14 +664,13 @@ int traverse_inputmap(const parsetree_statement_t *stmt, void *inputmapnode)
 }
 
 /* traverses an inputmap.keyboard block */
-int traverse_inputmap_keyboard(const parsetree_statement_t *stmt, void *inputmapnode)
+int traverse_inputmap_keyboard(const parsetree_statement_t* stmt, void* inputmapnode)
 {
-    inputmapnode_t* f = (inputmapnode_t*)inputmapnode;
-    inputmap_t* im = f->data;
-    const char *identifier;
+    inputmap_t* im = ((inputmapnode_t*)inputmapnode)->data;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1;
     enum inputbutton_t btn = IB_FIRE1;
+    const char *identifier;
     int n;
 
     identifier = nanoparser_get_identifier(stmt);
@@ -663,14 +692,13 @@ int traverse_inputmap_keyboard(const parsetree_statement_t *stmt, void *inputmap
 
 
 /* traverses an inputmap.joystick block */
-int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmapnode)
+int traverse_inputmap_joystick(const parsetree_statement_t* stmt, void* inputmapnode)
 {
-    inputmapnode_t* f = (inputmapnode_t*)inputmapnode;
-    inputmap_t* im = f->data;
-    const char *identifier, *joybtn_name;
+    inputmap_t* im = ((inputmapnode_t*)inputmapnode)->data;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2;
     enum inputbutton_t btn = IB_FIRE1;
+    const char *identifier, *joybtn_name;
     int joybtn_code = -1;
     int i, n;
 
@@ -715,20 +743,6 @@ int traverse_inputmap_joystick(const parsetree_statement_t *stmt, void *inputmap
 
 
 
-
-/* loads the inputmap table */
-void load_inputmap_table()
-{
-    parsetree_program_t *s = NULL;
-    const char* fullpath = assetfs_fullpath(INPUTMAP_FILE);
-
-    logfile_message("inputmap: loading the inputmaps...");
-    hashtable_inputmapnode_t_add(mappings, NULL_INPUTMAP, inputmapnode_create(NULL_INPUTMAP));
-
-    s = nanoparser_construct_tree(fullpath);
-    nanoparser_traverse_program(s, traverse);
-    s = nanoparser_deconstruct_tree(s);
-}
 
 /* creates a new inputmapnode object */
 inputmapnode_t* inputmapnode_create(const char* name)

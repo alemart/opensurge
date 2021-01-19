@@ -1,7 +1,7 @@
 #
 # Open Surge Engine
 # CMakeLists.txt - CMake script
-# Copyright (C) 2008-2020  Alexandre Martins <alemartf@gmail.com>
+# Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
 # http://opensurge2d.org
 #
 # This program is free software; you can redistribute it and/or modify
@@ -676,7 +676,7 @@ IF(UNIX)
   INSTALL(CODE "MESSAGE(\"Installing ${GAME_NAME} ${GAME_VERSION}... Make sure that you have the appropriate privileges.\")")
   INSTALL(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${GAME_BINDIR}")
   INSTALL(FILES LICENSE README.md CHANGES.md logo.png surge.png surge.rocks DESTINATION "${GAME_DATADIR}")
-  INSTALL(DIRECTORY characters scripts sprites config images levels musics quests samples scripts themes languages fonts licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
+  INSTALL(DIRECTORY characters scripts sprites images levels musics quests samples scripts themes languages fonts inputs licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
   INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
   INSTALL(FILES src/misc/opensurge.appdata.xml DESTINATION "${DESKTOP_METAINFO_PATH}")
   IF(DESKTOP_INSTALL)
