@@ -296,12 +296,10 @@ void init_basic_stuff(const commandline_t* cmd)
     init_nanoparser();
 
     /* initialize Allegro */
-    logfile_message("Initializing Allegro...");
-    
-    if(!al_init())
+    if(al_init())
+        logfile_message("Initialized Allegro version %s", a5_version_string());
+    else
         fatal_error("Can't initialize Allegro");
-
-    logfile_message("Initialized Allegro version %s", a5_version_string());
 
     if(NULL == (a5_event_queue = al_create_event_queue()))
         fatal_error("Can't create Allegro's event queue");
