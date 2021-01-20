@@ -100,6 +100,7 @@ bool a5_key[ALLEGRO_KEY_MAX] = { false };
 int a5_mouse_b = 0;
 bool a5_display_active = true;
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
+static const char* a5_version_string();
 #endif
 
 
@@ -295,10 +296,12 @@ void init_basic_stuff(const commandline_t* cmd)
     init_nanoparser();
 
     /* initialize Allegro */
-    logfile_message("Initializing Allegro 5...");
+    logfile_message("Initializing Allegro...");
     
     if(!al_init())
         fatal_error("Can't initialize Allegro");
+
+    logfile_message("Initialized Allegro version %s", a5_version_string());
 
     if(NULL == (a5_event_queue = al_create_event_queue()))
         fatal_error("Can't create Allegro's event queue");
@@ -529,3 +532,24 @@ void calc_error(const char *msg)
 {
     fatal_error("%s", msg);
 }
+
+#if defined(A5BUILD)
+/*
+ * a5_version_string()
+ * Returns the Allegro version as a static char[]
+ */
+const char* a5_version_string()
+{
+    static char str[17];
+    uint32_t version = al_get_allegro_version();
+
+    snprintf(str, sizeof(str), "%u.%u.%u[%u]",
+        (version & 0xFF000000) >> 24,
+        (version & 0xFF0000) >> 16,
+        (version & 0xFF00) >> 8,
+        (version & 0xFF)
+    );
+
+    return str;
+}
+#endif
