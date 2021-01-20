@@ -297,7 +297,7 @@ void init_basic_stuff(const commandline_t* cmd)
 
     /* initialize Allegro */
     if(al_init())
-        logfile_message("Initialized Allegro version %s", a5_version_string());
+        logfile_message("Using Allegro version %s", a5_version_string());
     else
         fatal_error("Can't initialize Allegro");
 
