@@ -483,9 +483,9 @@ void level_load(const char *filepath)
     spawn_point = v2d_new(0,0);
     dialogregion_size = 0;
     act = 1;
-    requires[0] = GAME_MAIN_VERSION;
-    requires[1] = GAME_MAJOR_VERSION;
-    requires[2] = GAME_MINOR_VERSION;
+    requires[0] = GAME_VERSION_SUP;
+    requires[1] = GAME_VERSION_SUB;
+    requires[2] = GAME_VERSION_WIP;
     readonly = FALSE;
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR();
@@ -672,7 +672,7 @@ int level_save(const char *filepath)
     "bgtheme \"%s\"\n"
     "spawn_point %d %d\n",
     version,
-    GAME_MAIN_VERSION, GAME_MAJOR_VERSION, GAME_MINOR_VERSION,
+    GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP,
     act, theme, bgtheme,
     (int)spawn_point.x, (int)spawn_point.y);
 
