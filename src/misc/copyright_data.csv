@@ -54,7 +54,7 @@ image;images/dialogs.png;CC-BY 3.0;João Victor (Race the Hedgehog) & Alexandre 
 image;images/jumping_fish.png;CC-BY 3.0;João Victor (Race the Hedgehog) & Alexandre Martins;;
 image;images/core.png;CC0;Alexandre Martins;;
 image;images/fade_effect.png;CC-BY 3.0;Alexandre Martins;;
-image;images/hud.png;CC-BY 3.0;Alexandre Martins;;
+image;images/hud.png;CC-BY 3.0;Alexandre Martins;;Additional thanks to João Victor (Race the Hedgehog), Colin Beard (SilverstepP), Constantin Pelikan
 image;images/null.png;CC-BY 3.0;Alexandre Martins;;
 image;images/special.png;CC-BY 3.0;Alexandre Martins;;
 image;images/stars.png;CC-BY 3.0;Alexandre Martins;;
@@ -166,12 +166,12 @@ sound;samples/jetpack2.wav;CC-BY 3.0;Mateus Reis (KZR);;Edited by Alexandre Mart
 sound;samples/springfling.wav;CC-BY 3.0;Mateus Reis (KZR);;
 sound;samples/skaterbug.wav;CC-BY 3.0;Mateus Reis (KZR);;
 sound;samples/fish.wav;CC-BY 3.0;Mateus Reis (KZR);;
-sound;samples/shield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
-sound;samples/acidshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
-sound;samples/fireshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
-sound;samples/thundershield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
-sound;samples/watershield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
-sound;samples/windshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
+sound;samples/shield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by Mateus Reis (KZR)
+sound;samples/acidshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by Mateus Reis (KZR)
+sound;samples/fireshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by Mateus Reis (KZR)
+sound;samples/thundershield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by Mateus Reis (KZR)
+sound;samples/watershield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by Mateus Reis (KZR)
+sound;samples/windshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by Mateus Reis (KZR)
 sound;samples/bubbleget.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
 sound;samples/bumper.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
 sound;samples/cash.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
