@@ -24,6 +24,7 @@ object "Crococopter" is "entity", "enemy"
     state "main"
     {
         // setup movement
+        movement.center = transform.position; // don't let it get off its path
         movement.radius = 24;
         movement.rate = 0.5;
         movement.scale = Vector2.up; // move only on the y-axis
