@@ -1,6 +1,6 @@
 name: opensurge
 base: core18
-version: '0.5.1.2'
+version: '0.5.2'
 summary: A fun 2D retro platformer inspired by Sonic games and a game creation system
 description: |
   Open Surge is a fun 2D retro platformer inspired by Sonic games
@@ -30,7 +30,7 @@ parts:
   opensurge:
     after: [desktop-glib-only, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.5.1.2
+    source-tag: v0.5.2
     plugin: cmake
     override-build: |
       set -eu
@@ -97,7 +97,7 @@ parts:
 
   surgescript:
     source: https://github.com/alemart/surgescript.git
-    source-tag: v0.5.4.2
+    source-tag: v0.5.5
     plugin: cmake
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
@@ -105,8 +105,8 @@ parts:
       - build-essential
 
   liballegro5:
-    source: https://github.com/liballeg/allegro5/releases/download/5.2.5.0/allegro-5.2.5.0.tar.gz
-    source-checksum: sha256/59968da34a0353913868b8299aaff9520d19a3b0960c6406be8323a6ac9bb719
+    source: https://github.com/liballeg/allegro5/releases/download/5.2.6.0/allegro-5.2.6.0.tar.gz
+    source-checksum: sha256/5de8189ec051e1865f359654f86ec68e2a12a94edd00ad06d1106caa5ff27763
     plugin: cmake
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
