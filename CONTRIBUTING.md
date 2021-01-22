@@ -40,6 +40,7 @@ You may also contribute to Open Surge as a user, without getting directly involv
 If you love Open Surge, [make a donation](http://opensurge2d.org/contribute)! Open Surge is loved by its fans. Some really like the game and appreciate the fact that it is given as a gift. Others love the fact that they can [create their own games](https://wiki.opensurge2d.org/Introduction_to_Modding) with it: it teaches them how to code, how to do game design, how to have fun while expressing their creativity, and more. It provides them with the joy of seeing their own ideas come to life! By making a donation, you are showing your appreciation.
 
 Other ways to contribute as a user include:
+
 * Create your own games with Open Surge and tell people about the engine. It's a great and highly flexible engine. Its possibilities are endless!
 * [Share Open Surge in your social media](http://opensurge2d.org/share). Write about it in your blog. Tell your friends. Spread the word!
 * Create videos in which you play Open Surge and other games made with it. Tell your viewers that they too can make their own amazing games with this engine.
