@@ -289,7 +289,7 @@ object "Hydra's Aim" is "private", "entity", "awake"
 
     state "attacking"
     {
-        Level.spawnEntity("Hydra's Lighting Strike", transform.position);
+        Level.spawnEntity("Hydra's Lightning Strike", transform.position);
         hydra.restAndTeleport();
         state = "resting";
     }
@@ -443,11 +443,11 @@ object "Hydra's Orb" is "private", "entity", "awake"
     }
 }
 
-// Hydra's Lighting Strike
+// Hydra's Lightning Strike
 // damages the player if touched
-object "Hydra's Lighting Strike" is "private", "entity", "awake"
+object "Hydra's Lightning Strike" is "private", "entity", "awake"
 {
-    actor = Actor("Hydra's Lighting Strike");
+    actor = Actor("Hydra's Lightning Strike");
     collider = CollisionBox(128, 480);
     transform = Transform();
     discharge = Sound("samples/discharge.wav");

@@ -318,7 +318,7 @@ sprite "Surge"
         data        64 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 64 59 59 59 59 59 59 59 59 59 59 59 59 60 60 59 59 60 60 59 59 59 59 59 59
     }
 
-    // lighting boom
+    // lightning boom
     animation 39
     {
         repeat      FALSE
@@ -326,7 +326,7 @@ sprite "Surge"
         data        74 75
     }
 
-    // lighting boom (sustain)
+    // lightning boom (sustain)
     animation 40
     {
         repeat      TRUE
@@ -334,7 +334,7 @@ sprite "Surge"
         data        75
     }
 
-    // from lighting boom to ball
+    // from lightning boom to ball
     animation 41
     {
         repeat      FALSE
@@ -384,8 +384,8 @@ sprite "Goal Surge"
 // specific to Surge
 //
 
-// Special Move: Surge's Lighting Boom
-sprite "Surge's Lighting Boom"
+// Special Move: Surge's Lightning Boom
+sprite "Surge's Lightning Boom"
 {
     source_file     "images/surge.png"
     source_rect     0 832 512 128
@@ -400,8 +400,8 @@ sprite "Surge's Lighting Boom"
     }
 }
 
-// Special Move: Surge's Lighting Throw (spark)
-sprite "Surge's Lighting Spark"
+// Surge's Lightning Spark (special effect)
+sprite "Surge's Lightning Spark"
 {
     source_file     "images/surge.png"
     source_rect     432 976 80 16

@@ -19,7 +19,7 @@ object ".surge_companion"
     }
 }
 
-object ".surge_nolightwalk_controller" // his lighting sneakers can't shine when in the air
+object ".surge_nolightwalk_controller" // his light sneakers can't shine when in the air
 {
     requires 0.2.0
     always_active

@@ -79,7 +79,7 @@ sprite "Hydra's Orb"
     }
 }
 
-sprite "Hydra's Lighting Strike"
+sprite "Hydra's Lightning Strike"
 {
     source_file     "images/hydra.png"
     source_rect     384 32 128 480

@@ -21,7 +21,7 @@ object "Default Opening Animation" is "entity", "awake", "detached", "private"
     act = spawn("DefaultOpeningAnimation.Act");
     title = spawn("DefaultOpeningAnimation.Title");
     game = spawn("DefaultOpeningAnimation.Game");
-    lighting = spawn("DefaultOpeningAnimation.Lighting");
+    lightning = spawn("DefaultOpeningAnimation.Lightning");
     formulas = [
         spawn("DefaultOpeningAnimation.Formula").atColumn(0),
         spawn("DefaultOpeningAnimation.Formula").atColumn(1),
@@ -50,7 +50,7 @@ object "Default Opening Animation" is "entity", "awake", "detached", "private"
             game.appear();
             title.appear();
             act.appear();
-            lighting.appear();
+            lightning.appear();
             foreach(formula in formulas)
                 formula.appear();
             state = "displaying info";
@@ -65,7 +65,7 @@ object "Default Opening Animation" is "entity", "awake", "detached", "private"
             rightHalf.disappear();
             foreach(formula in formulas)
                 formula.disappear();
-            lighting.disappear();
+            lightning.disappear();
             act.disappear();
             title.disappear();
             game.disappear();
@@ -394,10 +394,10 @@ object "DefaultOpeningAnimation.Game" is "entity", "awake", "detached", "private
     }
 }
 
-object "DefaultOpeningAnimation.Lighting" is "entity", "awake", "detached", "private"
+object "DefaultOpeningAnimation.Lightning" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    actor = Actor("DefaultOpeningAnimation.Lighting");
+    actor = Actor("DefaultOpeningAnimation.Lightning");
 
     state "main"
     {

@@ -63,7 +63,7 @@ sprite "DefaultOpeningAnimation.Formula"
     }
 }
 
-sprite "DefaultOpeningAnimation.Lighting"
+sprite "DefaultOpeningAnimation.Lightning"
 {
     source_file     "images/opening.png"
     source_rect     576 32 64 64

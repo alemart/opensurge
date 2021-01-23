@@ -66,14 +66,14 @@ object "Surge's Shield Abilities" is "companion"
 {
     player = Player("Surge");
     shieldAbilities = player.spawn("Shield Abilities").setup({
-        "thunder": "Surge's Lighting Smash"
+        "thunder": "Surge's Lightning Smash"
     });
 }
 
 //
-// Surge's Lighting Smash (thunder shield)
+// Surge's Lightning Smash (thunder shield)
 //
-object "Surge's Lighting Smash" is "shield ability"
+object "Surge's Lightning Smash" is "shield ability"
 {
     player = Player("Surge");
     sfx = Sound("samples/lightning_smash.wav");
@@ -107,7 +107,7 @@ object "Surge's Lighting Smash" is "shield ability"
 
         // create neat sparks
         for(n = 8, i = 0; i < n; i++) {
-            Level.spawnEntity("Surge's Lighting Spark", player.collider.center)
+            Level.spawnEntity("Surge's Lightning Spark", player.collider.center)
                  .setDirection(Vector2.up)
                  .setId(i, n);
         }
@@ -127,9 +127,9 @@ object "Surge's Lighting Smash" is "shield ability"
 }
 
 //
-// Surge's Lighting Boom (double jump)
+// Surge's Lightning Boom (double jump)
 //
-object "Surge's Lighting Boom" is "companion"
+object "Surge's Lightning Boom" is "companion"
 {
     player = Player("Surge");
     normalJumpSpeed = -240; // pixels per second
@@ -222,7 +222,7 @@ object "Surge's Lighting Boom" is "companion"
         if(player.rolling)
             player.springify(); // adjust sensors
         xsp = player.xsp;
-        fx = spawn("Surge's Lighting Boom FX");
+        fx = spawn("Surge's Lightning Boom FX");
         state = "attacking";
     }
 
@@ -271,10 +271,10 @@ object "Surge's Lighting Boom" is "companion"
 // Special effects
 //
 
-// Lighting Boom Effect
-object "Surge's Lighting Boom FX" is "private", "entity"
+// Lightning Boom Effect
+object "Surge's Lightning Boom FX" is "private", "entity"
 {
-    actor = Actor("Surge's Lighting Boom");
+    actor = Actor("Surge's Lightning Boom");
     sfx = Sound("samples/lightning_boom.wav");
     collider = CollisionBall(40);
     player = Player("Surge");
@@ -295,7 +295,7 @@ object "Surge's Lighting Boom FX" is "private", "entity"
 
         // add sparks
         for(n = 16, i = 0; i < n; i++) {
-            spark = spawn("Surge's Lighting Spark")
+            spark = spawn("Surge's Lightning Spark")
                    .setSpeed(stronger ? 240 : 180)
                    .setId(i, n);
             sparks.push(spark);
@@ -334,10 +334,10 @@ object "Surge's Lighting Boom FX" is "private", "entity"
     }
 }
 
-// Lighting Spark
-object "Surge's Lighting Spark" is "private", "disposable", "entity"
+// Lightning Spark
+object "Surge's Lightning Spark" is "private", "disposable", "entity"
 {
-    actor = Actor("Surge's Lighting Spark");
+    actor = Actor("Surge's Lightning Spark");
     movement = DirectionalMovement();
     id = 0;
     count = 0;

@@ -43,7 +43,7 @@
 
 ## 0.5.1 - December 31st, 2019
 
-* New special moves: Surge's Lighting Boom and Surge's Lighting Smash
+* New special moves: Surge's Lightning Boom and Surge's Lightning Smash
 * Improved the physics engine & the auto-angles detection method
 * New translations: German, Spanish, Korean, French
 * Updates to the SurgeScript API
