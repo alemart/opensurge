@@ -53,35 +53,35 @@
       </li>
     </ul>
   </description>
-  <url type="homepage">http://opensurge2d.org</url>
-  <url type="donation">http://opensurge2d.org/contribute</url>
-  <url type="help">http://wiki.opensurge2d.org</url>
-  <url type="bugtracker">http://opensurge2d.org/appdata/bugtracker.html</url>
-  <url type="translate">http://opensurge2d.org/appdata/translate.html</url>
+  <url type="homepage">https://opensurge2d.org</url>
+  <url type="donation">https://opensurge2d.org/contribute</url>
+  <url type="help">https://wiki.opensurge2d.org</url>
+  <url type="bugtracker">https://opensurge2d.org/appdata/bugtracker.html</url>
+  <url type="translate">https://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
     <screenshot type="default">
-      <image>http://opensurge2d.org/appdata/screenshot1.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot1.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/appdata/screenshot2.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot2.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/appdata/screenshot3.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot3.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/appdata/screenshot4.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot4.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/appdata/screenshot5.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot5.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/appdata/screenshot6.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot6.png</image>
     </screenshot>
     <screenshot>
-      <image>http://opensurge2d.org/appdata/screenshot7.png</image>
+      <image>https://opensurge2d.org/appdata/screenshot7.png</image>
     </screenshot>
     <screenshot>
-      <video>http://opensurge2d.org/appdata/trailer.webm</video>
+      <video>https://opensurge2d.org/appdata/trailer.webm</video>
     </screenshot>
   </screenshots>
   <categories>
