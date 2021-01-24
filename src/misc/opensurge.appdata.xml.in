@@ -90,7 +90,9 @@
     <category>ArcadeGame</category>
   </categories>
   <launchable type="desktop-id">opensurge.desktop</launchable>
+  <!--
   <icon type="local">@DESKTOP_ICON_FULLPATH@</icon>
+  -->
   <provides>
     <binary>opensurge</binary>
   </provides>
