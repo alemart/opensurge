@@ -2,8 +2,8 @@
 Type=Application
 Name=Open Surge
 GenericName=Game Engine
-Comment=A fun 2D retro platformer inspired by Sonic games
-Keywords=game;gaming;maker;fun;2d;retro;platform;jump;run;action;arcade;play;create;children;kids;teens;
+Comment=A fun 2D retro platformer inspired by Sonic games and a game creation system
+Keywords=game;gaming;maker;fun;2d;retro;platform;platformer;jump;run;action;arcade;side-scroller;play;create;children;kids;teens;
 Exec=opensurge
 Icon=opensurge
 Terminal=false
