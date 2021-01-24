@@ -49,7 +49,7 @@ parts:
         "-DDESKTOP_METAINFO_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/metainfo"
       make -j2 && make install
       sed -i "s|^Icon=.*|Icon=/usr/share/pixmaps/opensurge.png|" "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
-      sed -i "s|^\s*<icon \([^>]*\)>\([^<]*\)</icon>$|<icon \\1>/usr/share/pixmaps/opensurge.png</icon>|" "$SNAPCRAFT_PART_INSTALL/usr/share/metainfo/opensurge.appdata.xml"
+      sed -i "s|^\s*<icon \([^>]*\)>\([^<]*\)</icon>\s*$|<icon \\1>/usr/share/pixmaps/opensurge.png</icon>|" "$SNAPCRAFT_PART_INSTALL/usr/share/metainfo/opensurge.appdata.xml"
     build-packages:
       - build-essential
     stage-packages:
