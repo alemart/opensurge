@@ -15,7 +15,7 @@
 LANG_ID                     "pl_PL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
-LANG_LASTUPDATE             "2021-01-09"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2021-01-24"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -357,26 +357,3 @@ GAMEOVER_PART2              "OVER"
 // Time Over
 TIMEOVER_PART1              "KONIEC"
 TIMEOVER_PART2              "CZASU"
-
-
-
-//
-// Section: special codes
-//
-
-//
-// Translators:
-//
-// Erase this section from your translation.
-// Language files other than English should
-// NOT include the codes below.
-//
-
-// Colors
-COLOR_TITLE                 "ff8800"
-COLOR_HIGHLIGHT             "ffee11"
-COLOR_HUD                   "ffff00"
-COLOR_HUDDANGER             "ff0000"
-
-// Backward compatibility
-HUD_COLLECTIBLES            "$HUD_POWER"
