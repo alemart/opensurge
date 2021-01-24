@@ -77,8 +77,8 @@ ENDIF()
 IF(UNIX)
   SET(GAME_BINDIR "games" CACHE PATH "Directory in which the game executable will be stored when installing")
   SET(GAME_DATADIR "share/games/${GAME_UNIXNAME}" CACHE PATH "Directory in which the game data will be stored when installing")
-  SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to store the .desktop file when installing")
   SET(DESKTOP_ICON_PATH "/usr/share/pixmaps" CACHE PATH "Where to store the icon file when installing")
+  SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to store the .desktop file when installing")
   SET(DESKTOP_METAINFO_PATH "/usr/share/metainfo" CACHE PATH "Where to store the metainfo file. You shouldn't change this (check the AppStream spec).")
 ENDIF()
 
@@ -130,9 +130,11 @@ FOREACH(line IN LISTS COPYRIGHT_DATA_CSV_LIST)
 ENDFOREACH()
 generate_file("credits.c")
 
-# Generate metadata file
-IF(DEFINED DESKTOP_METAINFO_PATH)
+# Generate desktop & metadata files
+# They require the absolute path of the icon
+IF(DEFINED DESKTOP_ICON_PATH)
   SET(DESKTOP_ICON_FULLPATH "${DESKTOP_ICON_PATH}/opensurge.png")
+  generate_file("opensurge.desktop")
   generate_file("opensurge.appdata.xml")
 ENDIF()
 
@@ -695,7 +697,7 @@ IF(UNIX)
   INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
   INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.appdata.xml" DESTINATION "${DESKTOP_METAINFO_PATH}")
   IF(DESKTOP_INSTALL)
-    INSTALL(FILES src/misc/opensurge.desktop DESTINATION "${DESKTOP_ENTRY_PATH}")
+    INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.desktop" DESTINATION "${DESKTOP_ENTRY_PATH}")
   ENDIF()
   INSTALL(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${GAME_BINDIR}")
 
