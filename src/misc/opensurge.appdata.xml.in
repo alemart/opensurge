@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2020 Alexandre Martins -->
+<!-- Copyright 2020-2021 Alexandre Martins -->
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
   <name>Open Surge</name>
@@ -14,7 +14,7 @@
       and a game creation system that lets you unleash your creativity!
     </p>
     <p>
-      <em>How do I play?</em>
+      How do I play?
     </p>
     <p>
       You can play using a keyboard or a joystick.
@@ -29,7 +29,7 @@
       <li>F12: Open the editor</li>
     </ul>
     <p>
-      <em>How do I create a game?</em>
+      How do I create a game?
     </p>
     <p>
       Use Open Surge to create your own amazing games!
@@ -55,7 +55,7 @@
   </description>
   <url type="homepage">http://opensurge2d.org</url>
   <url type="donation">http://opensurge2d.org/contribute</url>
-  <url type="help">http://opensurge2d.org/wiki</url>
+  <url type="help">http://wiki.opensurge2d.org</url>
   <url type="bugtracker">http://opensurge2d.org/appdata/bugtracker.html</url>
   <url type="translate">http://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
@@ -90,6 +90,7 @@
     <category>ArcadeGame</category>
   </categories>
   <launchable type="desktop-id">opensurge.desktop</launchable>
+  <icon type="local">@DESKTOP_ICON_FULLPATH@</icon>
   <provides>
     <binary>opensurge</binary>
   </provides>
@@ -98,6 +99,33 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.5.2" date="">
+      <ul>
+        <li>Improved joystick support</li>
+        <li>New translations: Polish, Russian</li>
+        <li>New musics</li>
+        <li>Updated the Giant Wolf Boss</li>
+        <li>Added new little animals - different animals will appear in different levels</li>
+        <li>Increased the drowning time to 12 seconds</li>
+        <li>Updated the turbo/invincibility time to 20 seconds</li>
+        <li>Improved the springs: they now behave as expected when the player is running on the walls or on the ceiling</li>
+        <li>Level Editor: users can now create levels in fullscreen mode</li>
+        <li>Level Editor: users can now display collision gizmos by pressing a key</li>
+        <li>Level Editor: the interface has been translated into multiple languages</li>
+        <li>Fix: the engine will pause the SurgeScript VM when the game is paused</li>
+        <li>Fix: consistent physics in slow computers</li>
+        <li>Fix: the player can be smashed by solid moving platforms </li>
+        <li>Improvements to the SurgeScript API</li>
+        <li>Updated the credits screen: it now extracts data from a csv file</li>
+        <li>Introduced CONTRIBUTING file with guidelines for contributors</li>
+        <li>Introduced special folder sprites/overrides/ for ease of sprite hacking</li>
+        <li>Input maps are now read from the (new) inputs/ folder</li>
+        <li>The HUD is now entirely controlled via scripting</li>
+        <li>The 1up jingle no longer stops the level music</li>
+        <li>Increased the maximum supported image size to 4096x4096 pixels</li>
+        <li>Bugfixes and general improvements</li>
+      </ul>
+    </release>
     <release version="0.5.1.2" date="2020-02-02">
       <description>
         <ul>

@@ -116,7 +116,7 @@ ENDIF()
 
 # Generate files from templates
 FUNCTION(generate_file TEMPLATE)
-  CONFIGURE_FILE("src/misc/${TEMPLATE}.in" "misc/${TEMPLATE}" @ONLY)
+  CONFIGURE_FILE("src/misc/${TEMPLATE}.in" "src/misc/${TEMPLATE}" @ONLY)
 ENDFUNCTION()
 
 # Generate the content of the credits screen
@@ -126,6 +126,12 @@ FOREACH(line IN LISTS COPYRIGHT_DATA_CSV_LIST)
   SET(COPYRIGHT_DATA_CSV "${COPYRIGHT_DATA_CSV}\n\"${line}\\n\"")
 ENDFOREACH()
 generate_file("credits.c")
+
+# Generate metadata file
+IF(DEFINED DESKTOP_METAINFO_PATH)
+  SET(DESKTOP_ICON_FULLPATH "${DESKTOP_ICON_PATH}/opensurge.png")
+  generate_file("opensurge.appdata.xml")
+ENDIF()
 
 # ------------------------------------------
 # Finding the required libraries
@@ -467,7 +473,7 @@ SET(GAME_SRCS
   src/entities/renderqueue.c
 
   src/misc/icon.c
-  ${CMAKE_CURRENT_BINARY_DIR}/misc/credits.c
+  ${CMAKE_CURRENT_BINARY_DIR}/src/misc/credits.c
 
   src/main.c
 )
@@ -685,7 +691,7 @@ IF(UNIX)
   INSTALL(FILES LICENSE README.md CHANGES.md CONTRIBUTING.md logo.png surge.png surge.rocks DESTINATION "${CMAKE_INSTALL_PREFIX}/${GAME_DATADIR}")
   INSTALL(DIRECTORY characters scripts sprites images levels musics quests samples scripts themes languages fonts inputs licenses DESTINATION "${CMAKE_INSTALL_PREFIX}/${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
   INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
-  INSTALL(FILES src/misc/opensurge.appdata.xml DESTINATION "${DESKTOP_METAINFO_PATH}")
+  INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.appdata.xml" DESTINATION "${DESKTOP_METAINFO_PATH}")
   IF(DESKTOP_INSTALL)
     INSTALL(FILES src/misc/opensurge.desktop DESTINATION "${DESKTOP_ENTRY_PATH}")
   ENDIF()
