@@ -119,6 +119,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
 
     fun onItemBoxCrushed(player)
     {
+        // this will play the 1up jingle for us
         giveExtraLife.call();
     }
 
