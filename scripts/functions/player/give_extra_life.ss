@@ -13,11 +13,10 @@ using SurgeEngine.Audio.Sound;
 //
 object "Give Extra Life"
 {
-    jingle = Sound("samples/1up.ogg");
+    functor = spawn("Give Extra Lives");
 
     fun call()
     {
-        Player.active.lives += 1;
-        jingle.play();
+        functor.call(1);
     }
 }
