@@ -15,7 +15,7 @@
 LANG_ID                     "pl_PL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
-LANG_LASTUPDATE             "2020-05-10"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2021-01-24"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -117,13 +117,13 @@ CREDITS_BRIAN               "Rysownik sprite'ów"
 CREDITS_TRANSLATOR          "Tłumacz"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tłumaczenia</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Autorzy poszczególnych plików</color>"
-FIXME (untranslated) CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
+CREDITS_RES_TEXT            "Wszystkie pliki wypisane poniżej objęte są wolnościowymi licencjami. Autorami poszczególnych plików są:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Grafika</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzyka</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Dźwięki</color>"
-FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
-FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
-FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Czcionki</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Poziomy</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Tłumaczenia</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skrypty</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autorzy wymienieni zostali wewnątrz skryptów."
 
@@ -181,14 +181,14 @@ INPUT_JOY_LEFT              "przycisk W LEWO"
 INPUT_JOY_RIGHT             "przycisk W PRAWO"
 INPUT_JOY_UP                "przycisk W GÓRĘ"
 INPUT_JOY_DOWN              "przycisk W DÓŁ"
-FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
-FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
-FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
-FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
+INPUT_JOY_FIRE1             "SKOK"
+INPUT_JOY_FIRE2             "PRZEŁĄCZ"
+INPUT_JOY_FIRE3             "PAUZA"
+INPUT_JOY_FIRE4             "WSTECZ"
+INPUT_JOY_FIRE5             "<dostępny>"
+INPUT_JOY_FIRE6             "<dostępny>"
+INPUT_JOY_FIRE7             "<dostępny>"
+INPUT_JOY_FIRE8             "<dostępny>"
 
 
 
@@ -224,98 +224,98 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Spróbuj!</color>\nTeraz twoja 
 //
 
 // Main UI
-FIXME (untranslated) // EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: help"
-FIXME (untranslated) // EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
-FIXME (untranslated) // EDITOR_UI_BRICK             "brick"
-FIXME (untranslated) // EDITOR_UI_GROUP             "group"
-FIXME (untranslated) // EDITOR_UI_ENTITY            "entity"
-FIXME (untranslated) // EDITOR_UI_LEGACYITEM        "legacy item"
-FIXME (untranslated) // EDITOR_UI_LEGACYOBJECT      "legacy object"
-FIXME (untranslated) // EDITOR_UI_MISSING           "<missing>"
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: pomoc"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "teren"
+EDITOR_UI_GROUP             "grupa"
+EDITOR_UI_ENTITY            "jednostka"
+EDITOR_UI_LEGACYITEM        "przedmiot (kompat. wstecz.)"
+EDITOR_UI_LEGACYOBJECT      "obiekt (kompat. wstecz.)"
+EDITOR_UI_MISSING           "<zaginiony>"
 
 // Bricks - scenery elements
 // Translators: please keep the names below succint. See the comments for their meaning.
-FIXME (untranslated) // EDITOR_BRICK_TYPE_SOLID     "SOLID"     // a solid brick (you can't get inside them)
-FIXME (untranslated) // EDITOR_BRICK_TYPE_CLOUD     "CLOUD"     // "jump-through" platforms (you can step on top of them)
-FIXME (untranslated) // EDITOR_BRICK_TYPE_PASSABLE  "PASSABLE"  // a brick with no effect on collisions (decorative elements)
-FIXME (untranslated) // EDITOR_BRICK_TYPE_UNKNOWN   "UNKNOWN"
+EDITOR_BRICK_TYPE_SOLID     "SOLIDNE"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "CHMUROWE"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "PRZEPUSZCZ"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "NIEZNANE"
 
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_DEFAULT    "DEFAULT"   // a brick that stands still
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_CIRCULAR   "CIRCULAR"  // circular motion / elliptic orbit
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_PENDULAR   "PENDULAR"  // a brick with pendular motion
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_BREAKABLE  "BREAKABLE" // breakable when rolling and colliding with it
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_SMASHABLE  "SMASHABLE" // will break when the player jumps on top of it
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_FALL       "FALL"      // falls as soon as the player steps on it
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_FLOAT      "FLOAT"     // a floating platform
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_MARKER     "MARKER"    // special brick only rendered in the editor
-FIXME (untranslated) // EDITOR_BRICK_BEHAVIOR_UNKNOWN    "UNKNOWN"
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "DOMYŚLNE"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "PO OKRĘGU"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "WAHADŁOWO"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "ZNISZCZALNE" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "ŁAMLIWE"    // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "SPADAJĄCE"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "PŁYWAJĄCE"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "ZNACZNIK"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "NIEZNANE"
 
-FIXME (untranslated) // EDITOR_BRICK_FLIP_NOFLIP    "unflipped"            // the brick is not flipped (this is the default)
-FIXME (untranslated) // EDITOR_BRICK_FLIP_HFLIP     "flipped horizontally" // flip horizontally
-FIXME (untranslated) // EDITOR_BRICK_FLIP_VFLIP     "flipped vertically"   // flip vertically
-FIXME (untranslated) // EDITOR_BRICK_FLIP_VHFLIP    "rotated by 180°"      // flip horizontally & vertically
+EDITOR_BRICK_FLIP_NOFLIP    "brak odbicia"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "odbicie w poziomie" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "odbicie w pionie"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "obrót o 180°"      // flip horizontally & vertically
 
 // Palette
-FIXME (untranslated) // EDITOR_PALETTE_BRICK        "brick"
-FIXME (untranslated) // EDITOR_PALETTE_MISSING      "missing"
-FIXME (untranslated) // EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$FIXME (untranslated) // EDITOR_INPUT_ESC</color> to go back."
+EDITOR_PALETTE_BRICK        "teren"
+EDITOR_PALETTE_MISSING      "zaginione"
+EDITOR_PALETTE_EMPTY        "Nie znaleziono żadnych przedmiotów. Naciśnij <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color>, by wrócić."
 
 // Help screen
-FIXME (untranslated) // EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>General</color>"
-FIXME (untranslated) // EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item placement</color>"
-FIXME (untranslated) // EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Layer system</color>"
-FIXME (untranslated) // EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$FIXME (untranslated) // EDITOR_INPUT_ESC</color> to go back"
-FIXME (untranslated) // EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$FIXME (untranslated) // EDITOR_INPUT_ESC</color> to go back."
-FIXME (untranslated) // EDITOR_HELP_LAYERSTUTORIAL  "The player will switch layers by touching the Green/Yellow L objects (see the palette)\nThe Green L object enables the green layer and disables the yellow layer\nThe Yellow L object enables the yellow layer and disables the green layer\nPress the L key to change the layer in which you'll place the bricks\nThe green layer appears in front of the yellow layer"
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Ogólne</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Umieszczanie przedmiotów</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Warstwy</color>"
+EDITOR_HELP_BACK            "Naciśnij <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color>, by wrócić"
+EDITOR_HELP_TINYWINDOW      "Za mało miejsca, aby wyświetlić opis komend. Zwiększ rozmiar okna w opcjach gry.\n\nNaciśnij <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color>, by wrócić."
+EDITOR_HELP_LAYERSTUTORIAL  "Gracz przełącza się między warstwami, dotykając Zielonych/Żółtych L (sprawdż paletę).\nZielone L włącza zieloną warstwę i wyłącza żółtą.\nŻółte L włącza żółtą warstwę i wyłącza zieloną.\nNaciśnij L, aby zmienić warstwę, którą obecnie edytujesz.\nZielona warstwa znajduje się przed żółtą warstwą."
 
-FIXME (untranslated) // EDITOR_HELP_CMD_RETURN      "Return to the game"
-FIXME (untranslated) // EDITOR_HELP_CMD_PALETTE     "Open palette of items"
-FIXME (untranslated) // EDITOR_HELP_CMD_SAVE        "Save the level"
-FIXME (untranslated) // EDITOR_HELP_CMD_RELOAD      "Reload the level"
-FIXME (untranslated) // EDITOR_HELP_CMD_MOVE        "Move the camera"
-FIXME (untranslated) // EDITOR_HELP_CMD_MOVEFASTER  "Move the camera (faster)"
-FIXME (untranslated) // EDITOR_HELP_CMD_UNDO        "Undo"
-FIXME (untranslated) // EDITOR_HELP_CMD_REDO        "Redo"
-FIXME (untranslated) // EDITOR_HELP_CMD_HELP        "Show help"
-FIXME (untranslated) // EDITOR_HELP_CMD_GRID        "Snap to grid"
-FIXME (untranslated) // EDITOR_HELP_CMD_MASKS       "Show collision masks"
-FIXME (untranslated) // EDITOR_HELP_CMD_PUTITEM     "Put item"
-FIXME (untranslated) // EDITOR_HELP_CMD_PICKITEM    "Pick item"
-FIXME (untranslated) // EDITOR_HELP_CMD_DELETEITEM  "Delete item (hold: eraser)"
-FIXME (untranslated) // EDITOR_HELP_CMD_CHANGEITEM  "Change item"
-FIXME (untranslated) // EDITOR_HELP_CMD_CHANGETYPE  "Change item type"
-FIXME (untranslated) // EDITOR_HELP_CMD_WATERLEVEL  "Change the water level"
-FIXME (untranslated) // EDITOR_HELP_CMD_SPAWNPOINT  "Change the spawn point"
-FIXME (untranslated) // EDITOR_HELP_CMD_BRICKLAYER  "Change the brick layer"
-FIXME (untranslated) // EDITOR_HELP_CMD_FLIPBRICK   "Flip the current brick"
+EDITOR_HELP_CMD_RETURN      "Wróć do gry"
+EDITOR_HELP_CMD_PALETTE     "Otwórz paletę przedmiotów"
+EDITOR_HELP_CMD_SAVE        "Zapisz poziom"
+EDITOR_HELP_CMD_RELOAD      "Przeładuj poziom"
+EDITOR_HELP_CMD_MOVE        "Przesuń kamerę"
+EDITOR_HELP_CMD_MOVEFASTER  "Przesuń kamerę (szybciej)"
+EDITOR_HELP_CMD_UNDO        "Cofnij"
+EDITOR_HELP_CMD_REDO        "Ponów"
+EDITOR_HELP_CMD_HELP        "Pokaż pomoc"
+EDITOR_HELP_CMD_GRID        "Wyrównaj do siatki"
+EDITOR_HELP_CMD_MASKS       "Włącz maski kolizji"
+EDITOR_HELP_CMD_PUTITEM     "Umieść przedmiot"
+EDITOR_HELP_CMD_PICKITEM    "Podnieś przedmiot"
+EDITOR_HELP_CMD_DELETEITEM  "Usuń przedmiot (przytrzymaj: gumka)"
+EDITOR_HELP_CMD_CHANGEITEM  "Zmień przedmiot"
+EDITOR_HELP_CMD_CHANGETYPE  "Zmień typ przedmiotu"
+EDITOR_HELP_CMD_WATERLEVEL  "Zmień poziom wody"
+EDITOR_HELP_CMD_SPAWNPOINT  "Zmień pozychę startową"
+EDITOR_HELP_CMD_BRICKLAYER  "Zmień edytowaną warstwę"
+EDITOR_HELP_CMD_FLIPBRICK   "Obróć obecny klocek"
 
 // Input keys
-FIXME (untranslated) // EDITOR_INPUT_ARROWS         "Arrow keys"
-FIXME (untranslated) // EDITOR_INPUT_SHIFT          "Shift" // Shift key
-FIXME (untranslated) // EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
-FIXME (untranslated) // EDITOR_INPUT_ESC            "ESC"   // ESC key
-FIXME (untranslated) // EDITOR_INPUT_LEFTCLICK      "Left mouse button"
-FIXME (untranslated) // EDITOR_INPUT_RIGHTCLICK     "Right mouse button"
-FIXME (untranslated) // EDITOR_INPUT_MIDDLECLICK    "Middle mouse button"
-FIXME (untranslated) // EDITOR_INPUT_MOUSEWHEEL     "Mouse wheel"
+EDITOR_INPUT_ARROWS         "Strzałki"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Lewy przycisk myszy"
+EDITOR_INPUT_RIGHTCLICK     "Prawy przycisk myszy"
+EDITOR_INPUT_MIDDLECLICK    "Środkowy przycisk myszy"
+EDITOR_INPUT_MOUSEWHEEL     "Rolka myszy"
 
 // Confirm boxes
-FIXME (untranslated) // EDITOR_CONFIRM_RELOAD       "Reload the level?"
-FIXME (untranslated) // EDITOR_CONFIRM_YES          "Yes"
-FIXME (untranslated) // EDITOR_CONFIRM_NO           "No"
+EDITOR_CONFIRM_RELOAD       "Przeładować poziom?"
+EDITOR_CONFIRM_YES          "Tak"
+EDITOR_CONFIRM_NO           "Nie"
 
 // Messages
-FIXME (untranslated) // EDITOR_MESSAGE_WELCOME      "Welcome to the Level Editor!"
-FIXME (untranslated) // EDITOR_MESSAGE_SAVED        "Saved to <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
-FIXME (untranslated) // EDITOR_MESSAGE_SAVEERROR    "Can't save the level. Please check the logs"
-FIXME (untranslated) // EDITOR_MESSAGE_RELOADED     "The level has been reloaded"
-FIXME (untranslated) // EDITOR_MESSAGE_UNDOERROR    "Already at the oldest change"
-FIXME (untranslated) // EDITOR_MESSAGE_REDOERROR    "Already at the newest change"
-FIXME (untranslated) // EDITOR_MESSAGE_SNAP2GRIDON  "Snap to grid: using a $1 x $2 grid"
-FIXME (untranslated) // EDITOR_MESSAGE_SNAP2GRIDOFF "Snap to grid: disabled"
-FIXME (untranslated) // EDITOR_MESSAGE_DEFAULTLAYER "Switched to the <color=$1>default</color> layer"
-FIXME (untranslated) // EDITOR_MESSAGE_GREENLAYER   "Switched to the <color=$1>green</color> layer"
-FIXME (untranslated) // EDITOR_MESSAGE_YELLOWLAYER  "Switched to the <color=$1>yellow</color> layer"
+EDITOR_MESSAGE_WELCOME      "Witaj w Edytorze Poziomów!"
+EDITOR_MESSAGE_SAVED        "Zapisano w <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Zapis nie powiódł się. Sprawdź logi programu"
+EDITOR_MESSAGE_RELOADED     "Poziom już został przeładowany"
+EDITOR_MESSAGE_UNDOERROR    "Jest to najstarsza wersja"
+EDITOR_MESSAGE_REDOERROR    "Jest to najnowsza wersja"
+EDITOR_MESSAGE_SNAP2GRIDON  "Dopasowanie do siatki: włączone, siatka $1 x $2"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Dopasowanie do siatki: wyłączone"
+EDITOR_MESSAGE_DEFAULTLAYER "Przełączono na <color=$1>domyślną</color> warstwę"
+EDITOR_MESSAGE_GREENLAYER   "Przełączono na <color=$1>zieloną</color> warstwę"
+EDITOR_MESSAGE_YELLOWLAYER  "Przełączono na <color=$1>żółtą</color> warstwę"
 
 
 
@@ -358,26 +358,3 @@ GAMEOVER_PART2              "OVER"
 // Time Over
 TIMEOVER_PART1              "KONIEC"
 TIMEOVER_PART2              "CZASU"
-
-
-
-//
-// Section: special codes
-//
-
-//
-// Translators:
-//
-// Erase this section from your translation.
-// Language files other than English should
-// NOT include the codes below.
-//
-
-// Colors
-COLOR_TITLE                 "ff8800"
-COLOR_HIGHLIGHT             "ffee11"
-COLOR_HUD                   "ffff00"
-COLOR_HUDDANGER             "ff0000"
-
-// Backward compatibility
-HUD_COLLECTIBLES            "$HUD_POWER"
