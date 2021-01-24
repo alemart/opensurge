@@ -12,10 +12,10 @@ icon: opensurge.png
 
 apps:
   opensurge:
-    command: desktop-launch $SNAP/bin/opensurge --base $SNAP/usr/share/games/opensurge
+    command: bin/desktop-launch $SNAP/games/opensurge --base $SNAP/share/games/opensurge
     desktop: usr/share/applications/opensurge.desktop
     environment:
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       DISABLE_WAYLAND: 1
     plugs:
       - home
@@ -40,14 +40,16 @@ parts:
         "-DBLEEDING_EDGE=OFF" \
         "-DALLEGRO_MONOLITH=OFF" \
         "-DCMAKE_LIBRARY_PATH=$SNAPCRAFT_STAGE/lib" \
-        "-DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/bin" \
-        "-DGAME_DATADIR=$SNAPCRAFT_PART_INSTALL/usr/share/games/opensurge" \
+        "-DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL" \
+        "-DGAME_DATADIR=$SNAPCRAFT_PART_INSTALL/share/games/opensurge" \
+        "-DGAME_BINDIR=$SNAPCRAFT_PART_INSTALL/games" \
         "-DDESKTOP_INSTALL=ON" \
         "-DDESKTOP_ENTRY_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/applications" \
         "-DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps" \
         "-DDESKTOP_METAINFO_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/metainfo"
       make -j2 && make install
-      sed -i 's|^Icon=.*|Icon=\${SNAP}/usr/share/pixmaps/opensurge\.png|' "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
+      sed -i "s|^Icon=.*|Icon=/usr/share/pixmaps/opensurge.png|" "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
+      sed -i "s|^\s*<icon \([^>]*\)>\([^<]*\)</icon>$|<icon \\1>/usr/share/pixmaps/opensurge.png</icon>|" "$SNAPCRAFT_PART_INSTALL/usr/share/metainfo/opensurge.appdata.xml"
     build-packages:
       - build-essential
     stage-packages:
@@ -101,6 +103,8 @@ parts:
     plugin: cmake
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
+      - -DWANT_EXECUTABLE=OFF
+      - -DWANT_STATIC=OFF
     build-packages:
       - build-essential
 
