@@ -114,7 +114,7 @@
         <li>Level Editor: the interface has been translated into multiple languages</li>
         <li>Fix: the engine will pause the SurgeScript VM when the game is paused</li>
         <li>Fix: consistent physics in slow computers</li>
-        <li>Fix: the player can be smashed by solid moving platforms </li>
+        <li>Fix: the player can be smashed by solid moving platforms</li>
         <li>Improvements to the SurgeScript API</li>
         <li>Updated the credits screen: it now extracts data from a csv file</li>
         <li>Introduced CONTRIBUTING file with guidelines for contributors</li>

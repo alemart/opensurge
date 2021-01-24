@@ -15,7 +15,7 @@
 * Level Editor: the interface has been translated into multiple languages
 * Fix: the engine will pause the SurgeScript VM when the game is paused
 * Fix: consistent physics in slow computers
-* Fix: the player can be smashed by solid moving platforms 
+* Fix: the player can be smashed by solid moving platforms
 * Improvements to the SurgeScript API
 * Updated the credits screen: it now extracts data from a csv file
 * Introduced CONTRIBUTING file with guidelines for contributors
