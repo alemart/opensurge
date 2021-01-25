@@ -1,6 +1,6 @@
 # Release Notes
 
-## 0.5.2 - January ??th, 2021
+## 0.5.2 - January 25th, 2021
 
 * Improved joystick support
 * New translations: Polish, Russian
