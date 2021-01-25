@@ -120,7 +120,7 @@
         <li>Improvements to the SurgeScript API</li>
         <li>Updated the credits screen: it now extracts data from a csv file</li>
         <li>Introduced CONTRIBUTING file with guidelines for contributors</li>
-        <li>Introduced special folder sprites/overrides/ for ease of sprite hacking</li>
+        <li>Introduced special folder sprites/overrides/ to ease sprite hacking</li>
         <li>Input maps are now read from the (new) inputs/ folder</li>
         <li>The HUD is now entirely controlled via scripting</li>
         <li>The 1up jingle no longer stops the level music</li>
