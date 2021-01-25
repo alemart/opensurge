@@ -107,7 +107,7 @@ object "Powerup Speed - Music Watcher"
 object "Powerup 1up" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(1);
-    giveExtraLife = spawn("Give Extra Life"); // function object stored in the functions/ folder
+    extraLife = spawn("Give Extra Life"); // function object stored in the functions/ folder
 
     state "main"
     {
@@ -120,7 +120,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
     fun onItemBoxCrushed(player)
     {
         // this will play the 1up jingle for us
-        giveExtraLife.call();
+        extraLife.call();
     }
 
     // given a player name, get the corresponding
