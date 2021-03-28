@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * actor.c - actor module
- * Copyright (C) 2008-2012  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2012, 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,9 @@
 #include "../core/timer.h"
 #include "../physics/obstacle.h"
 
+
+/* private stuff */
+static void update_animation(actor_t *act);
 
 
 /*
@@ -82,21 +85,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
     if(act->visible && act->animation) {
         /* update animation */
-        if(!(act->synchronized_animation) || !(act->animation->repeat)) {
-            /* the animation isn't synchronized: every object updates its animation at its own pace */
-            act->animation_frame += (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
-            if((int)act->animation_frame >= act->animation->frame_count) {
-                if(act->animation->repeat)
-                    act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
-                else
-                    act->animation_frame = act->animation->frame_count-1;
-            }
-        }
-        else {
-            /* the animation is synchronized: this only makes sense if the animation does repeat */
-            act->animation_frame = (act->animation->fps * act->animation_speed_factor) * (0.001f * timer_get_ticks());
-            act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
-        }
+        update_animation(act);
 
         /* render */
         img = actor_image(act);
@@ -119,7 +108,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
 /*
  * actor_render_repeat_xy()
- * Rendering / repeat xy
+ * Tiled rendering
  */
 void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, int repeat_y)
 {
@@ -132,13 +121,7 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
 
     if(act->visible && act->animation) {
         /* update animation */
-        act->animation_frame += (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
-        if((int)act->animation_frame >= act->animation->frame_count) {
-            if(act->animation->repeat)
-                act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
-            else
-                act->animation_frame = act->animation->frame_count - 1;
-        }
+        update_animation(act);
 
         /* render */
         w = repeat_x ? (VIDEO_SCREEN_W/image_width(img) + 3) : 1;
@@ -157,12 +140,29 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
  */
 void actor_change_animation(actor_t *act, const animation_t *anim)
 {
-    if(act->animation != anim && anim != NULL) {
-        act->animation = anim;
-        act->hot_spot = anim->hot_spot;
-        act->animation_frame = 0.0f;
-        act->animation_speed_factor = 1.0f;
+    /* no need to change */
+    if(act->animation == anim || anim == NULL)
+        return;
+
+    /* are we playing a transition to anim? If so,
+       we wait until the end of the transition */
+    if(act->animation != NULL && act->animation->next == anim) {
+        if(!actor_animation_finished(act))
+            return;
     }
+
+    /* is there a transition from act->animation to anim? */
+    animation_t* transition = sprite_get_transition(act->animation, anim);
+    if(transition != NULL) {
+        transition->next = anim; /* handy pointer */
+        anim = transition;
+    }
+
+    /* change & reset the animation */
+    act->animation = anim;
+    act->hot_spot = anim->hot_spot;
+    act->animation_frame = 0.0f;
+    act->animation_speed_factor = 1.0f;
 }
 
 
@@ -233,6 +233,37 @@ image_t* actor_image(const actor_t *act)
     return sprite_get_image(act->animation, (int)(act->animation_frame));
 }
 
+
+
+
+/* private stuff */
+
+/* this logic updates the animation of an actor */
+void update_animation(actor_t *act)
+{
+    if(!(act->synchronized_animation) || !(act->animation->repeat)) {
+        /* the animation isn't synchronized: every object updates its animation at its own pace */
+        act->animation_frame += (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
+        if((int)act->animation_frame >= act->animation->frame_count) {
+            /* the animation has finished playing */
+            if(act->animation->repeat) {
+                act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
+            }
+            else {
+                act->animation_frame = act->animation->frame_count - 1;
+
+                /* is the current animation a transition? */
+                if(act->animation->next != NULL)
+                    actor_change_animation(act, act->animation->next);
+            }
+        }
+    }
+    else {
+        /* the animation is synchronized: this only makes sense if the animation does repeat */
+        act->animation_frame = (act->animation->fps * act->animation_speed_factor) * (0.001f * timer_get_ticks());
+        act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
+    }
+}
 
 
 

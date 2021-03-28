@@ -25,22 +25,28 @@
 #include <stdio.h>
 #include "v2d.h"
 #include "image.h"
+#include "darray.h"
 #include "nanoparser/nanoparser.h"
 
 typedef struct animation_t animation_t;
 typedef struct spriteinfo_t spriteinfo_t;
 
+/* animtransition */
+/* a helper struct representing a transition from one animation to another */
+struct animtransition_t;
+
 /* animation */
 /* this represents an animation */
 struct animation_t {
+    const spriteinfo_t* sprite; /* this animation belongs to this sprite */
     int id; /* id of the animation */
     bool repeat; /* repeat animation? */
     float fps; /* frames per second */
     int frame_count; /* how many frames does this animation have? */
     int* data; /* frame vector */
     v2d_t hot_spot; /* hot spot */
-    image_t **frame_data; /* reference to spriteinfo->frame_data */
     int repeat_from; /* if repeat is true, jump back to this frame of the animation. Defaults to zero */
+    const animation_t *next; /* will be NULL, unless this is a transition */
 };
 
 /* sprite info */
@@ -55,7 +61,9 @@ struct spriteinfo_t {
     image_t **frame_data; /* image_t* vector */
 
     int animation_count;
-    animation_t **animation_data; /* animation_t* vector */
+    animation_t **animation_data; /* vector of animation_t* */
+
+    DARRAY(struct animtransition_t*, transition); /* transitions */
 };
 
 
@@ -68,14 +76,17 @@ void sprite_init();
 /* releases the sprite module */
 void sprite_release();
 
-/* returns the required animation */
+/* gets the required animation - crashes if not found */
 animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
+
+/* checks if an animation exists */
+int sprite_animation_exists(const char* sprite_name, int anim_id);
 
 /* returns the specified frame of the given animation */
 struct image_t* sprite_get_image(const animation_t* anim, int frame_id);
 
-/* checks if an animation exists */
-int sprite_animation_exists(const char* sprite_name, int anim_id);
+/* gets a transition animation - returns NULL if there is no such transition */
+animation_t* sprite_get_transition(const animation_t* from, const animation_t* to);
 
 
 

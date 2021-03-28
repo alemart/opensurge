@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * actor.h - actor module
- * Copyright (C) 2008-2012  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2012, 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,17 +53,19 @@ typedef struct actor_t {
 } actor_t;
 
 
-/* actor functions */
+/* instantiation */
 actor_t* actor_create();
 void actor_destroy(actor_t *act);
+
+/* rendering */
+image_t* actor_image(const actor_t *act);
 void actor_render(actor_t *act, v2d_t camera_position);
 void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, int repeat_y);
 
 /* animation */
-image_t* actor_image(const actor_t *act);
+void actor_change_animation(actor_t *act, const animation_t *anim);
 void actor_change_animation_frame(actor_t *act, int frame);
 void actor_change_animation_speed_factor(actor_t *act, float factor); /* default factor: 1.0 */
-void actor_change_animation(actor_t *act, const animation_t *anim);
 int actor_animation_finished(const actor_t *act); /* true if the current animation has finished */
 void actor_synchronize_animation(actor_t *act, int sync); /* should I use a shared animation frame? */
 int actor_animation_frame(const actor_t* act);
