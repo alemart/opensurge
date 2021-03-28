@@ -1538,6 +1538,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     /* animation bugfix */
     if(pa->midair && (pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP))
         pa->state = WALKING_OR_RUNNING(pa);
+    if(!pa->midair && pa->state == PAS_WALKING && nearly_zero(pa->gsp))
+        pa->state = PAS_STOPPED;
 }
 
 /* which one is the tallest obstacle, a or b? */
