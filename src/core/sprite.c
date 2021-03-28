@@ -48,7 +48,7 @@ static spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite); /* deletes an exis
 static animation_t *allocate_sprite_anim(spriteinfo_t *sprite, int anim_id); /* allocate an animation ID in a spriteinfo_t instance */
 static animation_t *animation_new(const spriteinfo_t *sprite, int anim_id); /* creates a new animation_t instance */
 static animation_t *animation_delete(animation_t *anim); /* deletes anim */
-static animtransition_t *transition_new(const animation_t *anim, int from_id, int to_id); /* creates a transition */
+static animtransition_t *transition_new(int anim_id, int from_id, int to_id); /* creates a transition */
 static animtransition_t *transition_delete(animtransition_t *transition); /* deletes transition */
 static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by reading the spritesheet */
 static int scanfile(const char* vpath, void* param); /* file system callback */
@@ -60,7 +60,7 @@ static int traverse_animation_attributes(const parsetree_statement_t *stmt, void
 /* it's an animation that plays between two other animations: from anim[from_id] to anim[to_id] */
 struct animtransition_t
 {
-    const animation_t *anim; /* transition animation */
+    int anim_id; /* ID of the transition animation */
     int from_id; /* ID of the previous animation */
     int to_id; /* ID of the next animation */
 };
@@ -175,7 +175,7 @@ animation_t* sprite_get_transition(const animation_t* from, const animation_t* t
     const spriteinfo_t* sprite = from->sprite;
     for(int i = 0; i < darray_length(sprite->transition); i++) {
         if(sprite->transition[i]->from_id == from->id && sprite->transition[i]->to_id == to->id)
-            return (animation_t*)(sprite->transition[i]->anim);
+            return sprite->animation_data[ sprite->transition[i]->anim_id ];
     }
 
     /* not found */
@@ -393,11 +393,11 @@ animation_t* animation_delete(animation_t *anim)
  * transition_new()
  * Creates a transition
  */
-animtransition_t *transition_new(const animation_t *anim, int from_id, int to_id)
+animtransition_t *transition_new(int anim_id, int from_id, int to_id)
 {
     animtransition_t *transition = mallocx(sizeof *transition);
 
-    transition->anim = anim; /* transition animation */
+    transition->anim_id = anim_id;
     transition->from_id = from_id;
     transition->to_id = to_id;
 
@@ -643,7 +643,7 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         validate_animation(s->animation_data[anim_id]);
     }
     else if(str_icmp(identifier, "transition") == 0) {
-        int from_id, to_id, transition_id;
+        int anim_id, from_id, to_id;
 
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         p2 = nanoparser_get_nth_parameter(param_list, 2);
@@ -668,19 +668,16 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
             fatal_error("Syntax error: expected keyword \"to\"\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
         /* allocate transition animation */
-        transition_id = MAX_ANIMATIONS + darray_length(s->transition); /* allocate after MAX_ANIMATIONS */
-        darray_push(s->transition, transition_new(
-            allocate_sprite_anim(s, transition_id),
-            from_id,
-            to_id
-        ));
+        anim_id = MAX_ANIMATIONS + darray_length(s->transition); /* allocate after MAX_ANIMATIONS */
+        allocate_sprite_anim(s, anim_id);
+        darray_push(s->transition, transition_new(anim_id, from_id, to_id)); /* register the transition */
 
         /* read & validate animation */
-        nanoparser_traverse_program_ex(nanoparser_get_program(p4), s->animation_data[transition_id], traverse_animation_attributes);
-        validate_animation(s->animation_data[transition_id]);
+        nanoparser_traverse_program_ex(nanoparser_get_program(p4), s->animation_data[anim_id], traverse_animation_attributes);
+        validate_animation(s->animation_data[anim_id]);
 
         /* transition animations shouldn't repeat... */
-        if(s->animation_data[transition_id]->repeat)
+        if(s->animation_data[anim_id]->repeat)
             logfile_message("WARNING: a transition animation is set to repeat\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
