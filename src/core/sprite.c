@@ -118,13 +118,17 @@ animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
     /* find the corresponding spriteinfo_t* instance */
     info = hashtable_spriteinfo_t_find(sprites, sprite_name);
     if(info != NULL) {
-        anim_id = clip(anim_id, 0, info->animation_count-1);
-        return info->animation_data[anim_id];
+        if(anim_id >= 0 && anim_id < info->animation_count) {
+            if(info->animation_data[anim_id] != NULL)
+                return info->animation_data[anim_id];
+        }
+
+        fatal_error("Can't find animation %d of sprite \"%s\"", anim_id, sprite_name);
     }
-    else {
-        fatal_error("Can't find sprite '%s' (animation %d)", sprite_name, anim_id);
-        return NULL;
-    }
+
+    /* can't find the required animation */
+    fatal_error("Can't find sprite \"%s\"", sprite_name);
+    return NULL;
 }
 
 
