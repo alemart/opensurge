@@ -587,7 +587,7 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
     else if(str_icmp(identifier, "repeat_from") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "repeat_from must be a non-negative number");
-        anim->repeat_from = atoi(nanoparser_get_string(p1));
+        anim->repeat_from = max(0, atoi(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "hot_spot") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
