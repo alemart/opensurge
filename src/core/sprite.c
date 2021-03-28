@@ -147,7 +147,10 @@ image_t *sprite_get_image(const animation_t *anim, int frame_id)
 int sprite_animation_exists(const char* sprite_name, int anim_id)
 {
     spriteinfo_t *info = hashtable_spriteinfo_t_find(sprites, sprite_name);
-    return info != NULL;
+    return info != NULL && (
+        anim_id >= 0 && anim_id < info->animation_count &&
+        info->animation_data[anim_id] != NULL
+    );
 }
 
 
