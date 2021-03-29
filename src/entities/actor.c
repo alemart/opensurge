@@ -32,6 +32,7 @@
 
 
 /* private stuff */
+#define is_transition_animation(anim) ((anim)->next != NULL) /* is anim a transition animation? */
 static void update_animation(actor_t *act);
 
 
@@ -69,8 +70,9 @@ actor_t* actor_create()
  */
 void actor_destroy(actor_t *act)
 {
-    if(act->input)
+    if(act->input != NULL)
         input_destroy(act->input);
+
     free(act);
 }
 
@@ -83,7 +85,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
 {
     image_t *img;
 
-    if(act->visible && act->animation) {
+    if(act->visible && act->animation != NULL) {
         /* update animation */
         update_animation(act);
 
@@ -119,7 +121,7 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
     final_pos.x = (int)act->position.x%(repeat_x?image_width(img):INT_MAX) - act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2) - (repeat_x?image_width(img):0);
     final_pos.y = (int)act->position.y%(repeat_y?image_height(img):INT_MAX) - act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2) - (repeat_y?image_height(img):0);
 
-    if(act->visible && act->animation) {
+    if(act->visible && act->animation != NULL) {
         /* update animation */
         update_animation(act);
 
@@ -145,16 +147,18 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
         return;
 
     /* are we playing a transition to anim? If so,
-       we wait until the end of the transition */
+       we wait until the end of the transition,
+       unless anim is also a transition (in
+       which case we change the animation) */
     if(act->animation != NULL && act->animation->next == anim) {
-        if(!actor_animation_finished(act))
+        if(!(actor_animation_finished(act) || is_transition_animation(anim)))
             return;
     }
 
     /* is there a transition from act->animation to anim? */
     animation_t* transition = sprite_get_transition(act->animation, anim);
     if(transition != NULL) {
-        transition->next = anim; /* handy pointer */
+        transition->next = anim; /* this may be a transition to "any" animation */
         anim = transition;
     }
 
@@ -241,6 +245,9 @@ image_t* actor_image(const actor_t *act)
 /* this logic updates the animation of an actor */
 void update_animation(actor_t *act)
 {
+    if(act->animation == NULL)
+        return;
+
     if(!(act->synchronized_animation) || !(act->animation->repeat)) {
         /* the animation isn't synchronized: every object updates its animation at its own pace */
         act->animation_frame += (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
@@ -253,7 +260,7 @@ void update_animation(actor_t *act)
                 act->animation_frame = act->animation->frame_count - 1;
 
                 /* is the current animation a transition? */
-                if(act->animation->next != NULL)
+                if(is_transition_animation(act->animation))
                     actor_change_animation(act, act->animation->next);
             }
         }
