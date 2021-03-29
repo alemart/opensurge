@@ -729,7 +729,7 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
         if(anim->frame_count < 1)
             fatal_error("Can't load sprites. Animation 'data' field is missing\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
         
-        anim->data = mallocx(anim->frame_count * sizeof(*(anim->data)));
+        anim->data = reallocx(anim->data, anim->frame_count * sizeof(*(anim->data)));
         for(j=1; j<=anim->frame_count; j++) {
             pj = nanoparser_get_nth_parameter(param_list, j);
             nanoparser_expect_string(pj, "Animation 'data' field is a list of frame numbers");
