@@ -683,15 +683,20 @@ int afs_foreach(assetdir_t* dir, const char* extension_filter, int (*callback)(c
     for(int i = 0; i < darray_length(dir->file); i++) {
         if(!extension_filter || ((q = strrchr(dir->file[i]->name, '.')) && 0 == vpathcmp(q, extension_filter))) {
             char* vpath = join_path(dirpath, dir->file[i]->name);
+            char* fixed_vpath = pathify(vpath);
             count++;
-            if(0 != callback(vpath, param)) {
+
+            if(0 != callback(fixed_vpath, param)) {
                 /* stop the enumeration */
                 if(stop != NULL)
                     *stop = true;
+                free(fixed_vpath);
                 free(vpath);
                 free(dirpath);
                 return count;
             }
+
+            free(fixed_vpath);
             free(vpath);
         }
     }
