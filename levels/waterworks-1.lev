@@ -3965,5 +3965,8 @@ entity "Crococopter" 19696 11056 "0d82c145f145a633"
 entity "Crococopter" 19696 11264 "3456c1339a31a3fc"
 entity "Crococopter" 19792 11344 "4b8ad9343a64bfbb"
 entity "Crococopter" 19744 11296 "24d7fc1c32488be4"
+entity "Collectible" 1424 9776 "c0d960a3ee268b5c"
+entity "Collectible" 1392 9744 "52046d3f5659cd71"
+entity "Collectible" 1456 9808 "cdf1aee6b805f2dd"
 
 // EOF
