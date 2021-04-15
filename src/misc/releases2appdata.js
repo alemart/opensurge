@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // -----------------------------------------------------------------------------
 // File: releases2appdata.js
-// Description: converts a Release Notes file to an appdata XML block
+// Description: converts a Release Notes file into an appdata XML block
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
