@@ -30,7 +30,7 @@ parts:
   opensurge:
     after: [desktop-glib-only, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.5.2
+    source-tag: v0.5.2.1
     plugin: cmake
     override-build: |
       set -eu
