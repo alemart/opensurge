@@ -14,12 +14,12 @@ Say you intend to submit some artwork to Open Surge. You may contribute as long 
 
 Open Surge uses a few different licenses for its content. All such licenses are considered to be free by the [Free Software Foundation](http://www.fsf.org). We use the following licenses for our game data:
 
-* Most graphics, audio files and levels are released under the [CC-BY](licenses/CC-BY-4.0-legalcode.txt) (Creative Commons Attribution) International license.
-    * Generally speaking, this license gives everyone permission to freely use, share and remix your work as long as they give you credit. The Creative Commons website has a nice [human-readable summary](https://creativecommons.org/licenses/by/4.0/).
-    * Works licensed under the [CC0](licenses/CC0-1.0-legalcode.txt) (Creative Commons Zero / public domain) or under the [CC-BY-SA](licenses/CC-BY-SA-4.0-legalcode.txt) (Creative Commons Attribution ShareAlike) may also be accepted.
+* Most graphics, audio files and levels are released under the [CC-BY](licenses/CC-BY-3.0-legalcode.txt) (Creative Commons Attribution) International license.
+    * Generally speaking, this license gives everyone permission to freely use, share and remix your work as long as they give you credit. The Creative Commons website has a nice [human-readable summary](https://creativecommons.org/licenses/by/3.0/).
+    * Works licensed under the [CC0](licenses/CC0-1.0-legalcode.txt) (Creative Commons Zero / public domain) or under the [CC-BY-SA](licenses/CC-BY-SA-3.0-legalcode.txt) (Creative Commons Attribution ShareAlike) may also be accepted.
 * Scripts and configuration files in general are released under the [MIT license](licenses/MIT-license.txt).
 
-If your contribution is an image or a text-based file, please specify your name and the license of your work (e.g., CC-BY 4.0) in the file itself. If it's an audio file, you may use a metadata field to specify this information.
+If your contribution is an image or a text-based file, please specify your name and the license of your work in the file itself. If it's an audio file, you may use a metadata field to specify this information.
 
 ### Submit it for review
 
@@ -37,12 +37,12 @@ Contributors who get their work approved are mentioned in the credits screen of 
 
 You may also contribute to Open Surge as a user, without getting directly involved in its development.
 
-If you love Open Surge, [make a donation](http://opensurge2d.org/contribute)! Open Surge is loved by its fans. Some really like the game and appreciate the fact that it is given as a gift. Others love the fact that they can [create their own games](https://wiki.opensurge2d.org/Introduction_to_Modding) with it: it teaches them how to code, how to do game design, how to have fun while expressing their creativity, and more. It provides them with the joy of seeing their own ideas come to life! By making a donation, you are showing your appreciation.
+If you love Open Surge, [make a donation](http://opensurge2d.org/contribute)! Open Surge is loved by its fans. Some of them really like the game and appreciate the fact that it is given as a gift. Others love the fact that they can [create their own games](https://wiki.opensurge2d.org/Introduction_to_Modding) with it: it teaches them how to code, how to do game design, how to have fun while expressing their creativity, and more. It provides them with the joy of seeing their own ideas come to life! By making a donation, you are showing your appreciation.
 
 Other ways to contribute as a user include:
 
 * Create your own games with Open Surge and tell people about the engine. It's a great and highly flexible engine. Its possibilities are endless!
-* [Share Open Surge in your social media](http://opensurge2d.org/share). Write about it in your blog. Tell your friends. Spread the word!
+* [Share Open Surge on social media](http://opensurge2d.org/share). Write about it in your blog. Tell your friends. Spread the word!
 * Create videos in which you play Open Surge and other games made with it. Tell your viewers that they too can make their own amazing games with this engine.
 * Teach people how to create games with Open Surge. Help others in our [forum](http://forum.opensurge2d.org), in our Discord server and in other places. Create video tutorials, write blog posts.
 * Contribute to our [wiki](http://wiki.opensurge2d.org) by adding or fixing content. Our wiki has excellent content that helps people learn how to use the engine. Its pages must be neat, instructive and accurate.
