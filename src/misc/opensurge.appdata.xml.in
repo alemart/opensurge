@@ -106,7 +106,7 @@
         <li>Fix sprites/overrides/ detection bug on Windows</li>
         <li>Include LMMS source files (1up, speed, drowning, gameover)</li>
         <li>Player: reduce jump_lock_timer after charging</li>
-        <li>Small fixes & adjustments</li>
+        <li>Small fixes &amp; adjustments</li>
       </ul>
     </release>
     <release version="0.5.2" date="2021-01-25">
