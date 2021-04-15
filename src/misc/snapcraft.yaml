@@ -64,7 +64,7 @@ parts:
       - libglvnd0
       - libglx0
       - libgraphite2-3
-      - libgtk2.0-0
+      - libgtk-3-0
       - libharfbuzz0b
       - libjpeg-turbo8
       - libogg0
@@ -128,7 +128,7 @@ parts:
       - libjpeg8-dev
       - libfreetype6-dev
       - libphysfs-dev
-      - libgtk2.0-dev
+      - libgtk-3-dev
       - libglu1-mesa-dev
       - libgl1-mesa-dev
 
