@@ -101,6 +101,14 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.5.2.1" date="2021-04-15">
+      <ul>
+        <li>Fix sprites/overrides/ detection bug on Windows</li>
+        <li>Include LMMS source files (1up, speed, drowning, gameover)</li>
+        <li>Player: reduce jump_lock_timer after charging</li>
+        <li>Small fixes & adjustments</li>
+      </ul>
+    </release>
     <release version="0.5.2" date="2021-01-25">
       <ul>
         <li>Improved joystick support</li>
