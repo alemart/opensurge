@@ -8,7 +8,7 @@
 // Character Sprite
 sprite "Surge"
 {
-    source_file     "images/surge.png"
+    source_file     "images/new-surge.png"
     source_rect     0 0 512 832
     frame_size      64 64
     hot_spot        32 44    // hot_spot.y is (frame_size.y - 20)
@@ -21,108 +21,216 @@ sprite "Surge"
         data        0
     }
 
+    // stopped to jumping
+    transition 0 to 3
+    {
+        repeat      FALSE
+        fps         20
+        data        17 18
+    }
+
+    // stopped to rolling
+    transition 0 to 18
+    {
+        repeat      FALSE
+        fps         20
+        data        17 18
+    }
+
     // walking
     animation 1
     {
         repeat      TRUE
-        fps         16
-        data        1 2 3 4 5 4 3 2
+        fps         20
+        data        1 2 3 4 5 6 7 8
+    }
+
+    // walking to jumping
+    transition 1 to 3
+    {
+        repeat      FALSE
+        fps         20
+        data        17 18
+    }
+
+    // walking to rolling
+    transition 1 to 18
+    {
+        repeat      FALSE
+        fps         20
+        data        17 18
     }
 
     // running
     animation 2
     {
         repeat      TRUE
-        fps         16
-        data        6 7 8 9 10 9 8 7   
+        fps         20
+        data        9 10 11 12 13 14 15 16
+    }
+
+    // running to jumping
+    transition 2 to 3
+    {
+        repeat      FALSE
+        fps         20
+        data        17 18
+    }
+
+    // running to rolling
+    transition 2 to 18
+    {
+        repeat      FALSE
+        fps         20
+        data        17 18
     }
 
     // jumping
     animation 3
     {
         repeat      TRUE
-        fps         16
-        data        11 12 13 14
+        fps         40
+        data        19 20 20 21 22 22 23 24 24 25 26 26
+    }
+
+    // jumping to stopped
+    transition 3 to 0
+    {
+        repeat      FALSE
+        fps         8
+        data        28
+    }
+
+    // jumping to walking
+    transition 3 to 1
+    {
+        repeat      FALSE
+        fps         24
+        data        28
+    }
+
+    // jumping to running
+    transition 3 to 2
+    {
+        repeat      FALSE
+        fps         24
+        data        28
     }
 
     // ducking
     animation 4
     {
         repeat      FALSE
-        fps         12
-        data        19
+        fps         20
+        data        37 38 39
+    }
+
+    // ducking to stopped
+    transition 4 to 0
+    {
+        repeat      FALSE
+        fps         20
+        data        38 37
     }
 
     // looking up
     animation 5
     {
         repeat      FALSE
-        fps         8
-        data        16 
+        fps         20
+        data        34 35 36
+    }
+
+    // looking up to stopped
+    transition 5 to 0
+    {
+        repeat      FALSE
+        fps         20
+        data        35 34
     }
 
     // charging
     animation 6
     {
         repeat      TRUE
-        fps         32
-        data        11 12 13 14
+        fps         40
+        data        20 22 24 26
     }
 
     // braking
     animation 7
     {
+        repeat      TRUE
+        fps         16
+        data        29 30 31 32
+        repeat_from 2
+    }
+
+    // braking to stopped
+    transition 7 to 0
+    {
         repeat      FALSE
-        fps         8
-        data        15
+        fps         16
+        data        33 34
     }
 
     // dead
     animation 8
     {
-        repeat      FALSE
-        fps         8
-        data        18
+        repeat      TRUE
+        fps         10
+        data        50 51 52 53
+        repeat_from 2
     }
 
     // drowned
     animation 9
     {
-        repeat      FALSE
-        fps         8
-        data        20
+        repeat      TRUE
+        fps         10
+        data        54 55 56 56 57 57
+        repeat_from 2
     }
 
     // ledge
     animation 10
     {
         repeat      TRUE
-        fps         5
-        data        23 24
+        fps         12
+        data        60 61 62 63
     }
 
     // getting hit
     animation 11
     {
-        repeat      FALSE
-        fps         8
-        data        20
+        repeat      TRUE
+        fps         12
+        data        46 47 48 48 49 49
+        repeat_from 2
     }
 
     // breathing
     animation 12
     {
+        repeat      TRUE
+        fps         16
+        data        58
+    }
+
+    // from breathing to falling
+    transition 12 to 32
+    {
         repeat      FALSE
-        fps         8
-        data        21
+        fps         16
+        data        58 58 58 58 58 59
     }
 
     // springing
     animation 13
     {
         repeat      TRUE
-        fps         8
-        data        17
+        fps         16
+        data        40 41
     }
 
     // pushing
@@ -130,7 +238,8 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        data        36 37 36 38
+        //data        36 37 36 38
+        data        80
     }
 
     // waiting
@@ -138,7 +247,8 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         6
-        data        30 31 32 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 35 35 35 35 35 35 35 32 31 0 0 0 0 0 0 0 0 0 0
+        //data        30 31 32 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 35 35 35 35 35 35 35 32 31 0 0 0 0 0 0 0 0 0 0
+        data        80
     }
 
     // ceiling (being carried)
@@ -146,7 +256,8 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        data        22
+        //data        22
+        data        80
     }
 
     // winning (victory)
@@ -154,160 +265,78 @@ sprite "Surge"
     {
         repeat      FALSE
         fps         8
-        data        30 39 40 42 43 44
+        //data        30 39 40 42 43 44
+        data        80
     }
 
     // rolling
     animation 18
     {
         repeat      TRUE
+        fps         40
+        data        19 20 20 21 22 22 23 24 24 25 26 26
+    }
+
+    // rolling to stopped
+    transition 18 to 0
+    {
+        repeat      FALSE
+        fps         16
+        data        27 28
+    }
+
+    // rolling to walking
+    transition 18 to 1
+    {
+        repeat      FALSE
+        fps         32
+        data        27 28
+    }
+
+    // rolling to running
+    transition 18 to 2
+    {
+        repeat      FALSE
         fps         24
-        data        11 12 13 14
+        data        28
     }
 
-    // walking (no lights in the shoes)
-    animation 20
+
+
+
+
+
+    // falling
+    animation 32
     {
         repeat      TRUE
-        fps         16
-        data        25 26 27 28 29 28 27 26
-    }
-
-    // running (no lights in the shoes)
-    animation 21
-    {
-        repeat      TRUE
-        fps         16
-        data        6 7 45 9 10 9 45 7   
-    }
-
-    // braking (no lights in the shoes)
-    animation 22
-    {
-        repeat      FALSE
-        fps         8
-        data        46
-    }
-
-    // with sun glasses
-    animation 23
-    {
-        repeat      TRUE
-        fps         8
-        data        42
-    }
-    
-    // holding his sun glasses
-    animation 24
-    {
-        repeat      FALSE
-        fps         8
-        data        42 41 40
+        fps         20
+        data        42 43 44 45
         repeat_from 2
     }
 
-    // relaxing, talking and smiling
-    animation 25
+    // falling to stopped
+    transition 32 to 0
     {
         repeat      FALSE
         fps         8
-        data        47 48 49 47 48 49 47 48 49 47 48 49 47
+        data        28
     }
 
-    // relaxing, talking, smiling and looking to his side
-    animation 26
+    // falling to walking
+    transition 32 to 1
     {
         repeat      FALSE
-        fps         8
-        data        50 51 52 53 51 52 53 51 52 53 51 52 53 51 52 53
+        fps         24
+        data        28
     }
 
-    // relaxing, but no longer smiling
-    animation 27
+    // falling to running
+    transition 32 to 2
     {
         repeat      FALSE
-        fps         8
-        data        54 55 56
-    }
-
-    // standing up
-    animation 28
-    {
-        repeat      FALSE
-        fps         8
-        data        57 58 59
-    }
-
-    // protesting!
-    animation 29
-    {
-        repeat      FALSE
-        fps         8
-        data        60 61 62 63 61 62 63 61 62 63 61
-    }
-
-    // criticism
-    animation 30
-    {
-        repeat      FALSE
-        fps         8
-        data        64 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65 66 67 65
-    }
-
-    // relaxing
-    animation 31
-    {
-        repeat      TRUE
-        fps         8
-        data        49
-    }
-
-    // confident talking
-    animation 32
-    {
-        repeat      FALSE
-        fps         8
-        data        68 69 70 68 69 70 68 69 70 68 69 70 68 69 70
-    }
-
-    // pointing the finger
-    animation 33
-    {
-        repeat      TRUE
-        fps         8
-        data        71
-    }
-
-    // looking up, very shocked
-    animation 34
-    {
-        repeat      TRUE
-        fps         8
-        data        72
-    }
-
-    // looking up, a bit shocked
-    animation 35
-    {
-        repeat      TRUE
-        fps         8
-        data        73
-    }
-
-    // taking off his glasses
-    animation 36
-    {
-        repeat      FALSE
-        fps         8
-        data        42 41 40 39 0
-    }
-
-    // listening, a bit worried
-    animation 37
-    {
-        repeat      TRUE
-        fps         8
-        data        59
+        fps         24
+        data        28
     }
 
     // waiting underwater
@@ -315,7 +344,8 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        data        64 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 64 59 59 59 59 59 59 59 59 59 59 59 59 60 60 59 59 60 60 59 59 59 59 59 59
+        //data        64 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 64 59 59 59 59 59 59 59 59 59 59 59 59 60 60 59 59 60 60 59 59 59 59 59 59
+        data        80
     }
 
     // lightning boom
@@ -323,7 +353,8 @@ sprite "Surge"
     {
         repeat      FALSE
         fps         16
-        data        74 75
+        //data        74 75
+        data        80
     }
 
     // lightning boom (sustain)
@@ -331,7 +362,8 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        data        75
+        //data        75
+        data        80
     }
 
     // from lightning boom to ball
@@ -339,7 +371,8 @@ sprite "Surge"
     {
         repeat      FALSE
         fps         24
-        data        75 74 74
+        //data        75 74 74
+        data        80
     }
 }
 

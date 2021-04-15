@@ -9,7 +9,7 @@
 
 character "Surge"
 {
-    companions                      "Dash Smoke" "Brake Smoke" "Surge's Light Sneakers" "Surge's Waiting Animation" "Surge's Lightning Boom" "Surge's Shield Abilities"
+    companions                      "Dash Smoke" "Brake Smoke" "Surge's Waiting Animation" "Surge's Falling Animation" "Surge's Lightning Boom" "Surge's Shield Abilities"
     
     multipliers
     {

@@ -28,34 +28,48 @@ object "Surge's Waiting Animation" is "companion"
 }
 
 //
-// Surge's sneakers won't be lit while he's midair
+// We modify Surge's animation:
+// 1. when he falls down after hitting a spring
+// 2. after breathing an air bubble
 //
-object "Surge's Light Sneakers" is "companion"
+object "Surge's Falling Animation" is "companion"
 {
     player = Player("Surge");
+    falling = 32;
+    springing = 13;
 
     state "main"
     {
-        if(player.midair) {
-            if(player.walking) {
-                if(player.anim == 1 || player.anim == 20)
-                    setAnim(20, player.animation.speedFactor);
-            }
-            else if(player.running) {
-                if(player.anim == 2 || player.anim == 21)
-                    setAnim(21, player.animation.speedFactor);
-            }
-            else if(player.braking) {
-                if(player.anim == 7 || player.anim == 22)
-                    setAnim(22, player.animation.speedFactor);
-            }
+        // The player may be in the springing state,
+        // but that alone doesn't mean he has just
+        // been hit by a spring. We use the springing
+        // state to create other things, like the double
+        // jump, so we need to check player.anim as well
+        if(player.springing && player.anim == springing)
+            state = "watching";
+
+        // From breathing to falling
+        else if(player.breathing)
+            state = "watching";
+    }
+
+    state "watching"
+    {
+        // Now the player is midair and will fall
+        // down. We'll capture this event and
+        // change the animation accordingly
+        if(player.ysp >= 0 && player.midair) {
+            player.anim = falling;
+            state = "falling";
         }
     }
 
-    fun setAnim(id, factor)
+    state "falling"
     {
-        player.anim = id;
-        player.animation.speedFactor = factor;
+        if(player.ysp >= 0 && player.midair)
+            player.anim = falling;
+        else
+            state = "main";
     }
 }
 

@@ -1038,7 +1038,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
         /* unroll */
         if(fabs(pa->gsp) < pa->unrollthreshold)
-            pa->state = PAS_WALKING;
+            pa->state = PAS_STOPPED; /*PAS_WALKING;*/ /* anim transition: rolling -> stopped */
 
         /* facing right? */
         if(!nearly_zero(pa->gsp))
@@ -1186,8 +1186,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         pa->breathe_timer -= dt;
         pa->state = PAS_BREATHING;
     }
-    else if(pa->state == PAS_BREATHING && pa->midair)
+    else if(pa->state == PAS_BREATHING && pa->midair) {
+        pa->breathe_timer = 0.0f;
         pa->state = PAS_WALKING;
+    }
 
     /*
      *
