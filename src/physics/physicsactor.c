@@ -1071,7 +1071,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             pa->gsp = (s * pa->chrg) * (0.67f + pa->charge_intensity * 0.33f);
             pa->state = PAS_ROLLING;
             pa->charge_intensity = 0.0f;
-            pa->jump_lock_timer = 0.125f;
+            pa->jump_lock_timer = 0.09375f;
         }
         else
             pa->gsp = 0.0f;
