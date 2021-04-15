@@ -1,5 +1,12 @@
 # Release Notes
 
+## 0.5.2.1 - April 15th, 2021
+
+* Fix sprites/overrides/ detection bug on Windows
+* Include LMMS source files (1up, speed, drowning, gameover)
+* Player: reduce jump_lock_timer after charging
+* Small fixes & adjustments
+
 ## 0.5.2 - January 25th, 2021
 
 * Improved joystick support
