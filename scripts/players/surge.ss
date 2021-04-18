@@ -62,6 +62,8 @@ object "Surge's Falling Animation" is "companion"
             player.anim = falling;
             state = "falling";
         }
+        else if(!player.springing && !player.breathing)
+            state = "main";
     }
 
     state "falling"
