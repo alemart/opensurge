@@ -238,8 +238,7 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        //data        36 37 36 38
-        data        80
+        data        101 102 101 103
     }
 
     // waiting
@@ -247,17 +246,15 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         6
-        //data        30 31 32 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 33 34 35 35 35 35 35 35 35 32 31 0 0 0 0 0 0 0 0 0 0
-        data        80
+        data        88 89 90 91 92 91 92 91 92 91 92 91 92 91 92 91 92 91 92 91 92 91 92 91 92 91 92 91 92 93 93 93 93 93 93 93 93 91 0 0 0 0 0 0 0 0 0 0
     }
 
-    // ceiling (being carried)
+    // zipline
     animation 16
     {
         repeat      TRUE
         fps         8
-        //data        22
-        data        80
+        data        87
     }
 
     // winning (victory)
@@ -265,8 +262,7 @@ sprite "Surge"
     {
         repeat      FALSE
         fps         8
-        //data        30 39 40 42 43 44
-        data        80
+        data        80 81 82 83 84 85
     }
 
     // rolling
@@ -344,8 +340,7 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        //data        64 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 65 64 59 59 59 59 59 59 59 59 59 59 59 59 60 60 59 59 60 60 59 59 59 59 59 59
-        data        80
+        data        96 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 97 98 98 98 98 98 98 98 98 98 98 98 98 99 99 98 98 99 99 98 98 98 98 98 98
     }
 
     // lightning boom
@@ -353,8 +348,7 @@ sprite "Surge"
     {
         repeat      FALSE
         fps         16
-        //data        74 75
-        data        80
+        data        78 79
     }
 
     // lightning boom (sustain)
@@ -362,8 +356,7 @@ sprite "Surge"
     {
         repeat      TRUE
         fps         8
-        //data        75
-        data        80
+        data        79
     }
 
     // from lightning boom to ball
@@ -371,8 +364,7 @@ sprite "Surge"
     {
         repeat      FALSE
         fps         24
-        //data        75 74 74
-        data        80
+        data        79 78 78
     }
 }
 
