@@ -201,9 +201,19 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
     {
         player = Player.active;
 
-        // do nothing if the player is protected by the water shield
-        if(player.shield == "water")
+        // the player is protected by the water shield
+        if(player.shield == "water") {
+
+            // if the player gets the water shield while the timer
+            // is active, we hide the counter and stop the music
+            if(music.playing || counter.visible) {
+                counter.visible = false;
+                music.stop();
+            }
+
+            // nothing to do
             return;
+        }
 
         if(player.underwater) {
             // underwater warning tick sound
@@ -230,7 +240,7 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
             else {
                 counter.visible = false;
                 if(t <= 0)
-                    Level.music.stop();
+                    Level.music.stop(); // drown
                 else if(music.playing)
                     music.stop(); // got an air bubble
             }
