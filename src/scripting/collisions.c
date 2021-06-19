@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * collisions.c - scripting system: collision system
- * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,7 @@ struct collider_t
     DARRAY(surgescript_objecthandle_t, prev_collisions);
     DARRAY(surgescript_objecthandle_t, curr_collisions);
     v2d_t worldpos;
+    v2d_t anchor;
     uint8_t flags;
 };
 
@@ -69,6 +70,7 @@ struct collisionmanager_t
 #define COLLIDER_COLOR()                    (color_rgb(255, 255, 0))
 static const surgescript_heapptr_t BOX_CENTER_ADDR = 0;
 static const surgescript_heapptr_t BALL_CENTER_ADDR = 0;
+static const surgescript_heapptr_t ANCHOR_ADDR = 1;
 static inline collider_t* safe_get_collider(surgescript_object_t* object);
 
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -78,6 +80,8 @@ static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -139,6 +143,8 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBox", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "CollisionBox", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "CollisionBox", "set_enabled", fun_setenabled, 1);
+    surgescript_vm_bind(vm, "CollisionBox", "get_anchor", fun_getanchor, 0);
+    surgescript_vm_bind(vm, "CollisionBox", "set_anchor", fun_setanchor, 1);
     surgescript_vm_bind(vm, "CollisionBox", "__notify", fun_notify, 1);
     surgescript_vm_bind(vm, "CollisionBox", "__init", fun_collisionbox_init, 3);
     surgescript_vm_bind(vm, "CollisionBox", "constructor", fun_collisionbox_constructor, 0);
@@ -165,6 +171,8 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionBall", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "CollisionBall", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "CollisionBall", "set_enabled", fun_setenabled, 1);
+    surgescript_vm_bind(vm, "CollisionBall", "get_anchor", fun_getanchor, 0);
+    surgescript_vm_bind(vm, "CollisionBall", "set_anchor", fun_setanchor, 1);
     surgescript_vm_bind(vm, "CollisionBall", "__notify", fun_notify, 1);
     surgescript_vm_bind(vm, "CollisionBall", "__init", fun_collisionball_init, 2);
     surgescript_vm_bind(vm, "CollisionBall", "constructor", fun_collisionball_constructor, 0);
@@ -416,6 +424,57 @@ surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_va
     return NULL;
 }
 
+/* get anchor: Vector2 */
+surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* anchor = (0.5, 0.5) is the default (i.e., the anchor is at the center of the collider) */
+    collider_t* collider = surgescript_object_userdata(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_var_t* anchor = surgescript_heap_at(heap, ANCHOR_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
+
+    /* lazy evaluation */
+    if(surgescript_var_is_null(anchor)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(anchor, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(anchor);
+
+    /* get anchor */
+    v2 = surgescript_objectmanager_get(manager, handle);
+    scripting_vector2_update(v2, collider->anchor.x, collider->anchor.y);
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+}
+
+/* set anchor (Vector2) */
+surgescript_var_t* fun_setanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2h);
+    surgescript_var_t* x = surgescript_var_create();
+    surgescript_var_t* y = surgescript_var_create();
+    const surgescript_var_t* p[2] = { x, y };
+    double v2x = 0.0, v2y = 0.0;
+
+    /* read the Vector2 parameter */
+    scripting_vector2_read(v2, &v2x, &v2y);
+
+    /* call subclass.setAnchor(x, y) */
+    surgescript_var_set_number(x, v2x);
+    surgescript_var_set_number(y, v2y);
+    surgescript_object_call_function(object, "setAnchor", p, 2, NULL);
+
+    /* done! */
+    surgescript_var_destroy(y);
+    surgescript_var_destroy(x);
+    return NULL;
+}
+
 
 
 /* ----------------------------- CollisionBox routines ------------------------------- */
@@ -434,7 +493,8 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
     collider->type = COLLIDER_TYPE_BOX;
     collider->entity = surgescript_objectmanager_null(manager);
     collider->colmgr = surgescript_objectmanager_null(manager);
-    collider->worldpos = v2d_new(0, 0);
+    collider->worldpos = v2d_new(0.0f, 0.0f); /* the center of the collider in world coordinates */
+    collider->anchor = v2d_new(0.5f, 0.5f); /* default anchor: at the center of the collider */
     collider->flags = 0;
     darray_init(collider->prev_collisions);
     darray_init(collider->curr_collisions);
@@ -445,6 +505,10 @@ surgescript_var_t* fun_collisionbox_constructor(surgescript_object_t* object, co
     /* box center (lazy evaluation) */
     ssassert(BOX_CENTER_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_null(surgescript_heap_at(heap, BOX_CENTER_ADDR));
+
+    /* anchor (lazy evaluation) */
+    ssassert(ANCHOR_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, ANCHOR_ADDR));
 
     /* get entity */
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
@@ -507,6 +571,7 @@ surgescript_var_t* fun_collisionbox_setanchor(surgescript_object_t* object, cons
     double y = surgescript_var_get_number(param[1]);
     surgescript_transform_setposition2d(transform, (0.5 - x) * width, (0.5 - y) * height);
     ((collider_t*)collider)->worldpos = scripting_util_world_position(object); /* update worldpos */
+    ((collider_t*)collider)->anchor = v2d_new(x, y);
 
     /* return the object itself (this) */
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
@@ -718,7 +783,8 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
     collider->type = COLLIDER_TYPE_BALL;
     collider->entity = surgescript_objectmanager_null(manager);
     collider->colmgr = surgescript_objectmanager_null(manager);
-    collider->worldpos = v2d_new(0, 0);
+    collider->worldpos = v2d_new(0.0f, 0.0f); /* the center of the collider in world coordinates */
+    collider->anchor = v2d_new(0.5f, 0.5f); /* default anchor: at the center of the collider */
     collider->flags = 0;
     darray_init(collider->prev_collisions);
     darray_init(collider->curr_collisions);
@@ -728,6 +794,10 @@ surgescript_var_t* fun_collisionball_constructor(surgescript_object_t* object, c
     /* ball center (lazy evaluation) */
     ssassert(BALL_CENTER_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_null(surgescript_heap_at(heap, BALL_CENTER_ADDR));
+
+    /* anchor (lazy evaluation) */
+    ssassert(ANCHOR_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, ANCHOR_ADDR));
 
     /* get entity */
     while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
@@ -844,6 +914,7 @@ surgescript_var_t* fun_collisionball_setanchor(surgescript_object_t* object, con
     double y = surgescript_var_get_number(param[1]);
     surgescript_transform_setposition2d(transform, (0.5 - x) * size, (0.5 - y) * size);
     ((collider_t*)collider)->worldpos = scripting_util_world_position(object); /* update worldpos */
+    ((collider_t*)collider)->anchor = v2d_new(x, y);
 
     /* return the object itself (this) */
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
