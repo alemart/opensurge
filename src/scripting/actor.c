@@ -54,6 +54,8 @@ static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static v2d_t world_lossyscale(const surgescript_object_t* object);
 static const surgescript_heapptr_t ZINDEX_ADDR = 0;
@@ -99,6 +101,8 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
+    surgescript_vm_bind(vm, "Actor", "get_hotspot", fun_gethotspot, 0);
+    surgescript_vm_bind(vm, "Actor", "get_anchor", fun_getanchor, 0);
     surgescript_vm_bind(vm, "Actor", "onAnimationChange", fun_onanimationchange, 1);
     surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
 }
@@ -367,6 +371,26 @@ surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript
     transform->position.y = y;
 
     return NULL;
+}
+
+/* get animation hotspot */
+surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_hotspot */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* anim_hotspot = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_hotspot", NULL, 0, anim_hotspot);
+    return anim_hotspot;
+}
+
+/* get animation anchor */
+surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_anchor */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* anim_anchor = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_anchor", NULL, 0, anim_anchor);
+    return anim_anchor;
 }
 
 
