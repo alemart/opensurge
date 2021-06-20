@@ -129,7 +129,6 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
@@ -149,7 +148,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR),
         surgescript_objectmanager_spawn(manager, me, "Animation", NULL)
     );
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR), offset);
+    surgescript_var_set_null(surgescript_heap_at(heap, OFFSET_ADDR)); /* lazy evaluation */
 
     /* initial configuration */
     surgescript_object_set_userdata(object, actor);
@@ -350,11 +349,22 @@ surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript
     surgescript_transform_t* transform = surgescript_object_transform(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR));
-    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    surgescript_var_t* offset = surgescript_heap_at(heap, OFFSET_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
 
+    /* lazy evaluation */
+    if(surgescript_var_is_null(offset)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(offset, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(offset);
+
+    /* get offset */
+    v2 = surgescript_objectmanager_get(manager, handle);
     scripting_vector2_update(v2, transform->position.x, transform->position.y);
-
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
