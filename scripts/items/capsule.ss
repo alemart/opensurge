@@ -12,7 +12,7 @@ using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 
-object "Goal Capsule" is "entity", "basic"
+object "Goal Capsule" is "entity", "basic", "awake"
 {
     actor = Actor("Goal Capsule");
     brick = [ Brick("Goal Capsule Mask 1"), Brick("Goal Capsule Mask 2") ];
