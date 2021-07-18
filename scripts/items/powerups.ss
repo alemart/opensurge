@@ -288,7 +288,7 @@ object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
 object "Item Box" is "entity", "private"
 {
     actor = Actor("Item Box");
-    brick = Brick("Item Box");
+    brick = Brick("Item Box Mask");
     collider = CollisionBox(24, 30).setAnchor(0.5, 1.2);
     transform = Transform();
     score = 100;
