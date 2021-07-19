@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * stageselect.c - stage selection screen
- * Copyright (C) 2010, 2012  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2012, 2019-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "stageselect.h"
 #include "options.h"
 #include "level.h"
@@ -40,6 +41,8 @@
 #include "../core/timer.h"
 #include "../core/nanoparser/nanoparser.h"
 #include "../core/font.h"
+#include "../core/modmanager.h"
+#include "../core/prefs.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/player.h"
@@ -51,7 +54,7 @@
 
 /* stage data */
 typedef struct {
-    char* filepath; /* absolute filepath */
+    char* filepath; /* relative path */
     char name[128]; /* stage name */
     int act; /* act number */
     int requires[3]; /* required version */
@@ -67,6 +70,7 @@ static int traverse(const parsetree_statement_t *stmt, void *stagedata);
 #define STAGE_BGFILE             "themes/scenes/levelselect.bg"
 #define STAGE_MAXPERPAGE         (VIDEO_SCREEN_H / 30)
 #define STAGE_MAX                2048 /* can't have more than STAGE_MAX levels installed */
+#define STAGE_PREFSENTRY         ".lastselectedlevel"
 static font_t *title; /* title */
 static font_t *msg; /* message */
 static font_t *page; /* page number */
@@ -79,8 +83,8 @@ static stagedata_t *stage_data[STAGE_MAX]; /* vector of stagedata_t* */
 static int stage_count; /* length of stage_data[] */
 static int option; /* current option: 0 .. stage_count - 1 */
 static font_t **stage_label; /* vector */
-static int enable_debug = FALSE; /* debug mode? must start out as false. */
-static int can_play_music = FALSE; /* can play music? */
+static bool enable_debug; /* debug mode? must start out as false. */
+static bool can_play_music; /* can play music? */
 static music_t* music = NULL; /* background music */
 static char* level_to_be_loaded;
 
@@ -91,6 +95,8 @@ static void load_stage_list();
 static void unload_stage_list();
 static int dirfill(const char *vpath, void *param);
 static int sort_cmp(const void *a, const void *b);
+static int load_selection();
+static void save_selection(int option);
 
 
 
@@ -105,15 +111,16 @@ static int sort_cmp(const void *a, const void *b);
  */
 void stageselect_init(void *should_enable_debug)
 {
-    enable_debug = *((int*)should_enable_debug) ? TRUE : FALSE;
-    can_play_music = (!enable_debug || timer_get_ticks() >= 10000);
+    enable_debug = (*((int*)should_enable_debug) != 0);
+    load_stage_list();
 
-    option = 0;
     scene_time = 0;
+    option = enable_debug ? load_selection() : 0;
     state = STAGESTATE_NORMAL;
     input = input_create_user(NULL);
     level_to_be_loaded = NULL;
     music = music_load(OPTIONS_MUSICFILE);
+    can_play_music = (!enable_debug || timer_get_ticks() >= 10000);
 
     title = font_create("MenuTitle");
     font_set_text(title, "%s", !enable_debug ? "$STAGESELECT_TITLE" : "$STAGESELECT_DEBUG");
@@ -132,9 +139,7 @@ void stageselect_init(void *should_enable_debug)
     icon = actor_create();
     actor_change_animation(icon, sprite_get_animation("UI Pointer", 0));
 
-    load_stage_list();
     bgtheme = background_load(STAGE_BGFILE);
-
     fadefx_in(color_rgb(0,0,0), 1.0);
 }
 
@@ -145,8 +150,6 @@ void stageselect_init(void *should_enable_debug)
  */
 void stageselect_release()
 {
-    enable_debug = FALSE;
-
     if(level_to_be_loaded != NULL) {
         free(level_to_be_loaded);
         level_to_be_loaded = NULL;
@@ -207,18 +210,23 @@ void stageselect_update()
         case STAGESTATE_NORMAL: {
             if(!fadefx_is_fading()) {
                 if(input_button_pressed(input, IB_DOWN)) {
-                    option = (option+1) % stage_count;
+                    option = (option + 1) % stage_count;
                     sound_play(SFX_CHOOSE);
                 }
                 if(input_button_pressed(input, IB_UP)) {
-                    option = (((option-1) % stage_count) + stage_count) % stage_count;
+                    option = (option + (stage_count - 1)) % stage_count;
                     sound_play(SFX_CHOOSE);
                 }
                 if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                     logfile_message("Loading level \"%s\" (\"%s\")...", stage_data[option]->name, stage_data[option]->filepath);
+
                     if(level_to_be_loaded != NULL)
                         free(level_to_be_loaded);
                     level_to_be_loaded = str_dup(stage_data[option]->filepath);
+
+                    if(enable_debug)
+                        save_selection(option);
+
                     sound_play(SFX_CONFIRM);
                     state = STAGESTATE_PLAY;
                 }
@@ -451,4 +459,35 @@ int traverse(const parsetree_statement_t *stmt, void *stagedata)
         return 1; /* stop the enumeration */
 
     return 0;
+}
+
+/* load a level that was previously selected by the user */
+int load_selection()
+{
+    prefs_t* prefs = modmanager_prefs();
+    const char* last_selection;
+    int i;
+
+    /* first run? */
+    if(!prefs_has_item(prefs, STAGE_PREFSENTRY))
+        return 0; /* not found; pick the 1st entry */
+
+    /* find i such that stage_data[i]->filepath == last_selection */
+    last_selection = prefs_get_string(prefs, STAGE_PREFSENTRY);
+    for(i = 0; i < stage_count; i++) {
+        if(strcmp(last_selection, stage_data[i]->filepath) == 0)
+            return i;
+    }
+
+    /* not found */
+    return 0;
+}
+
+/* save a level selected by the user */
+void save_selection(int option)
+{
+    prefs_t* prefs = modmanager_prefs();
+
+    if(option >= 0 && option < stage_count)
+        prefs_set_string(prefs, STAGE_PREFSENTRY, stage_data[option]->filepath);
 }
