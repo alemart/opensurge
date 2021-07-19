@@ -160,6 +160,7 @@ static void update_transform(surgescript_object_t* object, v2d_t position, float
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
 static const double RAD2DEG = 57.2957795131;
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
+#define STAY_MIDAIR(player) (player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
 
 
 /*
@@ -742,7 +743,7 @@ surgescript_var_t* fun_getspeed(surgescript_object_t* object, const surgescript_
 {
     player_t* player = get_player(object);
     if(player != NULL) {
-        if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
+        if(STAY_MIDAIR(player))
             return surgescript_var_set_number(surgescript_var_create(), physicsactor_get_xsp(player->pa));
         else
             return surgescript_var_set_number(surgescript_var_create(), physicsactor_get_gsp(player->pa));
@@ -759,7 +760,7 @@ surgescript_var_t* fun_setspeed(surgescript_object_t* object, const surgescript_
         float speed = surgescript_var_get_number(param[0]);
         player->actor->speed.x = speed;
 
-        if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
+        if(STAY_MIDAIR(player))
             physicsactor_set_xsp(player->pa, speed);
         else
             physicsactor_set_gsp(player->pa, speed);
@@ -783,7 +784,7 @@ surgescript_var_t* fun_setgsp(surgescript_object_t* object, const surgescript_va
     /* TODO: fix adapter */
     player_t* player = get_player(object);
     if(player != NULL) {
-        if(!(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))) {
+        if(!STAY_MIDAIR(player)) {
             float gsp = surgescript_var_get_number(param[0]);
             player->actor->speed.x = gsp;
             physicsactor_set_gsp(player->pa, gsp);
@@ -809,7 +810,7 @@ surgescript_var_t* fun_setxsp(surgescript_object_t* object, const surgescript_va
     player_t* player = get_player(object);
     if(player != NULL) {
         float xsp = surgescript_var_get_number(param[0]);
-        if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player)) {
+        if(STAY_MIDAIR(player)) {
             player->actor->speed.x = xsp;
             physicsactor_set_xsp(player->pa, xsp);
         }
