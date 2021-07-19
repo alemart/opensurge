@@ -115,7 +115,7 @@ void stageselect_init(void *should_enable_debug)
     load_stage_list();
 
     scene_time = 0;
-    option = enable_debug ? load_selection() : 0;
+    option = load_selection();
     state = STAGESTATE_NORMAL;
     input = input_create_user(NULL);
     level_to_be_loaded = NULL;
