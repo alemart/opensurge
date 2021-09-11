@@ -16,7 +16,7 @@ object "Water Bubbles" is "entity", "basic"
 {
     transform = Transform();
     bubbles = Actor("Water Bubbles");
-    hy = 16; cnt = 0;
+    hy = 16; cnt = 10;
 
     state "main"
     {
