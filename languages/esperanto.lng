@@ -213,9 +213,9 @@ LOADING_TEXT                "ŝarĝante..."
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Kiel ludi</color>\nBonvenon al la <color=$COLOR_HIGHLIGHT>Pruva Nivelo de Open Surge</color>! Uzu $INPUT_DIRECTIONAL por moviĝi kaj $INPUT_FIRE1 por salti. Premu $INPUT_FIRE2 por ŝanĝi rolulon."
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio en Open Surge estas agordebla. Vi povas krei nivelojn, erojn, ĉefojn, rolulojn kaj plu! Ĝi estas plena <color=$COLOR_HIGHLIGHT>sistemo de kreado de ludoj</color>."
-LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nOne of the key features in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. It's scripting for games! Use it to build anything you can imagine!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> to create your own awesome games today!"
-LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! <color=$COLOR_HIGHLIGHT>Press F12 to open the editor.</color> Next, open the item palette and start building your level! (use F1 for help)"
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Provu ĝin vi!</color>\nNun estas via vico! <color=$COLOR_HIGHLIGHT>Premu F12-n por malfermi la redaktilon.</color> Poste malfermu la paletron de eroj kaj komencu konstrui vian nivelon! (uzu F1-n por helpo)"
 
 
 
@@ -224,80 +224,80 @@ LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow i
 //
 
 // Main UI
-EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: help"
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: helpo"
 EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
-EDITOR_UI_BRICK             "brick"
-EDITOR_UI_GROUP             "group"
-EDITOR_UI_ENTITY            "entity"
-EDITOR_UI_LEGACYITEM        "legacy item"
-EDITOR_UI_LEGACYOBJECT      "legacy object"
-EDITOR_UI_MISSING           "<missing>"
+EDITOR_UI_BRICK             "briko"
+EDITOR_UI_GROUP             "grupo"
+EDITOR_UI_ENTITY            "estaĵo"
+EDITOR_UI_LEGACYITEM        "malnova ero"
+EDITOR_UI_LEGACYOBJECT      "malnova aĵo"
+EDITOR_UI_MISSING           "<mankante>"
 
 // Bricks - scenery elements
 // Translators: please keep the names below succint. See the comments for their meaning.
-EDITOR_BRICK_TYPE_SOLID     "SOLID"     // a solid brick (you can't get inside them)
-EDITOR_BRICK_TYPE_CLOUD     "CLOUD"     // "jump-through" platforms (you can step on top of them)
-EDITOR_BRICK_TYPE_PASSABLE  "PASSABLE"  // a brick with no effect on collisions (decorative elements)
-EDITOR_BRICK_TYPE_UNKNOWN   "UNKNOWN"
+EDITOR_BRICK_TYPE_SOLID     "SOLIDA"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "NUBA"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "PASEBLA"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "NEKONATA"
 
-EDITOR_BRICK_BEHAVIOR_DEFAULT    "DEFAULT"   // a brick that stands still
-EDITOR_BRICK_BEHAVIOR_CIRCULAR   "CIRCULAR"  // circular motion / elliptic orbit
-EDITOR_BRICK_BEHAVIOR_PENDULAR   "PENDULAR"  // a brick with pendular motion
-EDITOR_BRICK_BEHAVIOR_BREAKABLE  "BREAKABLE" // breakable when rolling and colliding with it
-EDITOR_BRICK_BEHAVIOR_SMASHABLE  "SMASHABLE" // will break when the player jumps on top of it
-EDITOR_BRICK_BEHAVIOR_FALL       "FALL"      // falls as soon as the player steps on it
-EDITOR_BRICK_BEHAVIOR_FLOAT      "FLOAT"     // a floating platform
-EDITOR_BRICK_BEHAVIOR_MARKER     "MARKER"    // special brick only rendered in the editor
-EDITOR_BRICK_BEHAVIOR_UNKNOWN    "UNKNOWN"
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "DEFAŬLTA"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "CIRKLA"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "PENDOLA"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "ROMPEBLA" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "SUPRE ROMPEBLE" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "FALI"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "ŜVEBI"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "MARKILO"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "NEKONATA"
 
-EDITOR_BRICK_FLIP_NOFLIP    "unflipped"            // the brick is not flipped (this is the default)
-EDITOR_BRICK_FLIP_HFLIP     "flipped horizontally" // flip horizontally
-EDITOR_BRICK_FLIP_VFLIP     "flipped vertically"   // flip vertically
-EDITOR_BRICK_FLIP_VHFLIP    "rotated by 180°"      // flip horizontally & vertically
+EDITOR_BRICK_FLIP_NOFLIP    "ne renversita"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "horizontale renversita" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "vertikale renversita"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "turnita 180°"      // flip horizontally & vertically
 
 // Palette
-EDITOR_PALETTE_BRICK        "brick"
-EDITOR_PALETTE_MISSING      "missing"
-EDITOR_PALETTE_EMPTY        "No items found. Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back."
+EDITOR_PALETTE_BRICK        "briko"
+EDITOR_PALETTE_MISSING      "mankante"
+EDITOR_PALETTE_EMPTY        "Neniu ero trovita. Premu <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> por iri reen."
 
 // Help screen
-EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>General</color>"
-EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Item placement</color>"
-EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Layer system</color>"
-EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back"
-EDITOR_HELP_TINYWINDOW      "Not enough space to display the command reference. Please increase the size of the window on the options screen.\n\nPress <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> to go back."
-EDITOR_HELP_LAYERSTUTORIAL  "The player will switch layers by touching the Green/Yellow L objects (see the palette)\nThe Green L object enables the green layer and disables the yellow layer\nThe Yellow L object enables the yellow layer and disables the green layer\nPress the L key to change the layer in which you'll place the bricks\nThe green layer appears in front of the yellow layer"
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Ĝenerala</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Lokigo de eroj</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Sistemo de tavoloj</color>"
+EDITOR_HELP_BACK            "Press <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> por iri reen"
+EDITOR_HELP_TINYWINDOW      "Ne estas sufiĉe da spaco por montri la liston de komandoj. Bonvolu pligrandigi la ekranon en la ekrano de agordoj.\n\nPremu <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> por iri reen."
+EDITOR_HELP_LAYERSTUTORIAL  "La ludanto ŝanĝos tavolojn tuŝante la Verdajn/Amarelajn aĵojn (vidu la paletron)\nLa Verda L aĵo ebligas la verdan tavolon kaj malebligas la amarelan tavolon\nLa Amarela L aĵo ebligas la amarelan tavolon kaj malebligas la verdan tavolon\nPremu la L-klavon por ŝanĝi la tavolon, en kiu vi metos la brikojn\nLa verda tavolo aperas antaŭ la amarela tavolo"
 
-EDITOR_HELP_CMD_RETURN      "Return to the game"
-EDITOR_HELP_CMD_PALETTE     "Open palette of items"
-EDITOR_HELP_CMD_SAVE        "Save the level"
-EDITOR_HELP_CMD_RELOAD      "Reload the level"
-EDITOR_HELP_CMD_MOVE        "Move the camera"
-EDITOR_HELP_CMD_MOVEFASTER  "Move the camera (faster)"
-EDITOR_HELP_CMD_UNDO        "Undo"
-EDITOR_HELP_CMD_REDO        "Redo"
-EDITOR_HELP_CMD_HELP        "Show help"
-EDITOR_HELP_CMD_GRID        "Snap to grid"
-EDITOR_HELP_CMD_MASKS       "Show collision masks"
-EDITOR_HELP_CMD_PUTITEM     "Put item"
-EDITOR_HELP_CMD_PICKITEM    "Pick item"
-EDITOR_HELP_CMD_DELETEITEM  "Delete item (hold: eraser)"
-EDITOR_HELP_CMD_CHANGEITEM  "Change item"
-EDITOR_HELP_CMD_CHANGETYPE  "Change item type"
-EDITOR_HELP_CMD_WATERLEVEL  "Change the water level"
-EDITOR_HELP_CMD_SPAWNPOINT  "Change the spawn point"
-EDITOR_HELP_CMD_BRICKLAYER  "Change the brick layer"
-EDITOR_HELP_CMD_FLIPBRICK   "Flip the current brick"
+EDITOR_HELP_CMD_RETURN      "Reiri al la ludo"
+EDITOR_HELP_CMD_PALETTE     "Malfermi paletron de eroj"
+EDITOR_HELP_CMD_SAVE        "Konservi la nivelon"
+EDITOR_HELP_CMD_RELOAD      "Reŝarĝi la nivelon"
+EDITOR_HELP_CMD_MOVE        "Movi la kameraon"
+EDITOR_HELP_CMD_MOVEFASTER  "Movi la kameraon (pli rapide)"
+EDITOR_HELP_CMD_UNDO        "Malfari"
+EDITOR_HELP_CMD_REDO        "Refari"
+EDITOR_HELP_CMD_HELP        "Montri helpon"
+EDITOR_HELP_CMD_GRID        "Alĝustigi al la kadro"
+EDITOR_HELP_CMD_MASKS       "Montri maskon de kolizio"
+EDITOR_HELP_CMD_PUTITEM     "Meti eron"
+EDITOR_HELP_CMD_PICKITEM    "Elekti eron"
+EDITOR_HELP_CMD_DELETEITEM  "Forigi eron (teni: forigilo)"
+EDITOR_HELP_CMD_CHANGEITEM  "Ŝanĝi eron"
+EDITOR_HELP_CMD_CHANGETYPE  "Ŝanĝi specon de ero"
+EDITOR_HELP_CMD_WATERLEVEL  "Ŝanĝi la akvan nivelon"
+EDITOR_HELP_CMD_SPAWNPOINT  "Ŝanĝi la generan lokon"
+EDITOR_HELP_CMD_BRICKLAYER  "Ŝangi la brikan tavolon"
+EDITOR_HELP_CMD_FLIPBRICK   "Renversi la nunan brikon"
 
 // Input keys
-EDITOR_INPUT_ARROWS         "Arrow keys"
-EDITOR_INPUT_SHIFT          "Shift" // Shift key
-EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ARROWS         "Sagaj klavoj"
+EDITOR_INPUT_SHIFT          "Majuskliga klavo" // Shift key
+EDITOR_INPUT_CTRL           "Stirklavo"  // Ctrl key
 EDITOR_INPUT_ESC            "ESC"   // ESC key
-EDITOR_INPUT_LEFTCLICK      "Left mouse button"
-EDITOR_INPUT_RIGHTCLICK     "Right mouse button"
-EDITOR_INPUT_MIDDLECLICK    "Middle mouse button"
-EDITOR_INPUT_MOUSEWHEEL     "Mouse wheel"
+EDITOR_INPUT_LEFTCLICK      "Maldekstra musa butono"
+EDITOR_INPUT_RIGHTCLICK     "Dekstra musa butono"
+EDITOR_INPUT_MIDDLECLICK    "Meza musa mutono"
+EDITOR_INPUT_MOUSEWHEEL     "Musa rado"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Reŝarĝi la nivelon?"
