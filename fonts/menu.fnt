@@ -14,17 +14,6 @@ font "MenuTitle"
     }
 }
 
-font "MenuTitle" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Bold.ttf"
-        size                    24
-        antialias
-        shadow
-    }
-}
-
 // menu: general texts
 font "MenuText"
 {
@@ -37,33 +26,12 @@ font "MenuText"
     }
 }
 
-font "MenuText" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Medium.ttf"
-        size                    13
-        shadow
-        antialias
-    }
-}
-
 // menu: small
 font "MenuSmall"
 {
     truetype
     {
-        source_file             "fonts/GothicA1-Medium.ttf"
-        size                    10
-        shadow
-    }
-}
-
-font "MenuSmall" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Medium.ttf"
+        source_file             "fonts/Roboto-Medium.ttf"
         size                    10
         shadow
     }
@@ -81,17 +49,6 @@ font "MenuBold"
     }
 }
 
-font "MenuBold" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Bold.ttf"
-        size                    16
-        shadow
-        antialias
-    }
-}
-
 // menu: button
 font "MenuButton"
 {
@@ -99,17 +56,6 @@ font "MenuButton"
     {
         source_file             "fonts/Roboto-Black.ttf"
         size                    28
-        antialias
-        shadow
-    }
-}
-
-font "MenuButton" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Bold.ttf"
-        size                    24
         antialias
         shadow
     }

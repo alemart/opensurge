@@ -117,8 +117,6 @@ font;fonts/tiny.png;CC0;Robey Pointer;opengameart.org;
 font;fonts/Roboto-Medium.ttf;Apache-2.0;Christian Robertson;;
 font;fonts/Roboto-Bold.ttf;Apache-2.0;Christian Robertson;;
 font;fonts/Roboto-Black.ttf;Apache-2.0;Christian Robertson;;
-font;fonts/GothicA1-Medium.ttf;SIL Open Font License 1.1;HanYang I&C Co Ltd;;
-font;fonts/GothicA1-Bold.ttf;SIL Open Font License 1.1;HanYang I&C Co Ltd;;
 sound;samples/break.wav;CC-BY 3.0;Mateus Reis (KZR);;
 sound;samples/checkpoint.wav;CC-BY 3.0;Mateus Reis (KZR);;
 sound;samples/jump.wav;CC-BY 3.0;Mateus Reis (KZR);;

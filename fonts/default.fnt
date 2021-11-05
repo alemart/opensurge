@@ -24,13 +24,3 @@ font "sans"
         shadow
     }
 }
-
-font "sans" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Medium.ttf"
-        size                    13
-        shadow
-    }
-}

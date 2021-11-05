@@ -11,14 +11,3 @@ font "dialogbox"
         antialias
     }
 }
-
-font "dialogbox" for "ko_KR"
-{
-    truetype
-    {
-        source_file             "fonts/GothicA1-Medium.ttf"
-        size                    11
-        shadow
-        antialias
-    }
-}
