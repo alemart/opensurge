@@ -76,7 +76,7 @@ OPTIONS_RESOLUTION_OPT3     "3X"
 OPTIONS_RESOLUTION_OPT4     "4X"
 OPTIONS_SMOOTHGFX           "Glataj grafikoj"
 OPTIONS_SMOOTHGFX_ERROR     "[nur 32 bpp]"
-OPTIONS_FPS                 "Montri bildojn por sekundo"
+OPTIONS_FPS                 "Montri FPS-jn"
 OPTIONS_GAME                "LUDO"
 OPTIONS_GAMEPAD             "Uzi ludregilon"
 OPTIONS_LANGUAGE            "Ŝanĝi lingvon"
@@ -152,7 +152,7 @@ CONGRATULATIONS_TITLE       "DANKE POR LUDI"
 CONGRATULATIONS_SHARE       "DISKONIGI"
 CONGRATULATIONS_DONATE      "DONACI"
 CONGRATULATIONS_BACK        "REEN"
-CONGRATULATIONS_TEXT        "Danke por ludi la version $GAME_VERSION de Open Surge.\nĈu volas ludi pli? Iru al $GAME_WEBSITE por ĝisdatigoj!\n\nOpen Surge lasas al vi ludi kaj krei viajn proprajn ludojn. Ĝi estas programita de homoj kiel vi. Nun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!"
+CONGRATULATIONS_TEXT        "Danke por ludi la version $GAME_VERSION de Open Surge.\nĈu volas ludi pli? Iru al $GAME_WEBSITE por ĝisdatigoj!\nOpen Surge lasas al vi ludi kaj krei viajn proprajn ludojn. Ĝi estas programita de homoj kiel vi. Nun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!"
 
 
 
@@ -291,7 +291,7 @@ EDITOR_HELP_CMD_FLIPBRICK   "Renversi la nunan brikon"
 
 // Input keys
 EDITOR_INPUT_ARROWS         "Sagaj klavoj"
-EDITOR_INPUT_SHIFT          "Majuskliga klavo" // Shift key
+EDITOR_INPUT_SHIFT          "Majus. klavo" // Shift key
 EDITOR_INPUT_CTRL           "Stirklavo"  // Ctrl key
 EDITOR_INPUT_ESC            "ESC"   // ESC key
 EDITOR_INPUT_LEFTCLICK      "Maldekstra musa butono"
@@ -340,7 +340,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Ŝanĝita al la <color=$1>flava</color> tavolo"
 //
 
 // Heads-Up Display
-HUD_SCORE                   "Poentaro"
+HUD_SCORE                   "Poentoj"
 HUD_TIME                    "Tempo"
 HUD_POWER                   "Forto"
 
