@@ -35,7 +35,7 @@ object "Base Collectible" is "private", "entity"
 
     fun pickup(player)
     {
-        if(state != "disappearing") {
+        if(state != "disappearing" && !player.dying) {
             player.collectibles += value;
             sfx.play();
             actor.anim = 1;
@@ -94,7 +94,7 @@ object "Collectible" is "entity", "basic"
     state "main"
     {
         // magnetism check
-        for(i = 0; i < Player.count; i++) {
+        for(i = Player.count - 1; i >= 0; i--) {
             if(shouldMagnetize(Player[i]))
                 magnetize(Player[i]);
         }
@@ -107,7 +107,8 @@ object "Collectible" is "entity", "basic"
 
         // compute speed
         ds = transform.position.directionTo(target.transform.position);
-        sx = Math.sign(ds.x); sy = Math.sign(ds.y);
+        sx = Math.sign(ds.x);
+        sy = Math.sign(ds.y);
         xsp += 600 * ((sx == Math.sign(xsp)) ? 1 : -4) * sx * dt;
         ysp += 600 * ((sy == Math.sign(ysp)) ? 1 : -4) * sy * dt;
 
@@ -121,8 +122,10 @@ object "Collectible" is "entity", "basic"
 
     fun onCollision(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player"))
-            base.pickup(otherCollider.entity);
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            base.pickup(player);
+        }
     }
 
     fun shouldMagnetize(player)
@@ -154,6 +157,7 @@ object "Bouncing Collectible" is "entity", "disposable", "private"
     hlock = 0.0; vlock = 0.0;
     xsp = 0.0; ysp = 0.0;
     startTime = Time.time;
+    timeToLive = 5.0; // in seconds
 
     state "main"
     {
@@ -187,7 +191,7 @@ object "Bouncing Collectible" is "entity", "disposable", "private"
         transform.translateBy(xsp * dt, ysp * dt);
         
         // timeout
-        if(timeout(5.0))
+        if(timeout(timeToLive))
             destroy();
     }
 
@@ -199,7 +203,8 @@ object "Bouncing Collectible" is "entity", "disposable", "private"
     {
         if(Time.time >= startTime + 1.0) {
             if(otherCollider.entity.hasTag("player")) {
-                base.pickup(otherCollider.entity);
+                player = otherCollider.entity;
+                base.pickup(player);
                 state = "stopped";
             }
         }
@@ -236,6 +241,12 @@ object "Lucky Collectible" is "private", "entity", "awake"
         // collision check
         if(t >= 1) {
             base.pickup(luckyPlayer);
+            state = "done";
+            return;
+        }
+
+        // stop if dying player
+        if(luckyPlayer.dying) {
             state = "done";
             return;
         }
