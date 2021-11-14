@@ -116,8 +116,8 @@ CREDITS_COLIN               "Bildetoj, unua historio"
 CREDITS_BRIAN               "Bildeta artisto"
 CREDITS_TRANSLATOR          "Tradukisto"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tradukistoj</color>"
-CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Atribuoj al solaj iloj</color>"
-CREDITS_RES_TEXT            "La dosieroj listigitaj malsupre estas ĉiu sub liberaj licencoj. Ilia respektitaj aŭtoroj estas montritaj:"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Atribuoj laŭ unuopaj iloj</color>"
+CREDITS_RES_TEXT            "La dosieroj listigitaj malsupre estas ĉiuj sub liberaj licencoj. Ilia respektitaj aŭtoroj estas montritaj:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Bildoj</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muziko</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Sonefektoj</color>"
@@ -144,7 +144,7 @@ CREATEMENU_PLAY             "LUDI PRUVON"
 CREATEMENU_LEARN            "LERNI"
 CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "REEN"
-CREATEMENU_TEXT             "Open Surge ebligas al vi krei viajn proprajn malaĉajn ludojn! Uzu vian kreemon! Aperigu viajn kreemajn fruktojn!\n\nKomencu vian propran projekton! Kreu novajn nivelojn, erojn, specialaĵojn, rolulojn kaj plu! Provu la nivelan redaktilon, lerni la motoron kaj eniĝi en la mondo de SurgeScript por uzi ĝia plej granda povo!"
+CREATEMENU_TEXT             "Open Surge ebligas al vi krei viajn proprajn malaĉajn ludojn! Uzu vian kreemon! Aperigu viajn kreemajn fruktojn!\n\nKomencu vian propran projekton! Kreu novajn nivelojn, erojn, specialaĵojn, rolulojn kaj plu! Provu la nivelan redaktilon, lernu la motoron kaj eniĝu en la mondo de SurgeScript por uzi ĝia plej granda povo!"
 
 // Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
@@ -211,7 +211,7 @@ LOADING_TEXT                "ŝarĝante..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Kiel ludi</color>\nBonvenon al la <color=$COLOR_HIGHLIGHT>Pruva Nivelo de Open Surge</color>! Uzu $INPUT_DIRECTIONAL por moviĝi kaj $INPUT_FIRE1 por salti. Premu $INPUT_FIRE2 por ŝanĝi rolulon."
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Kiel ludi</color>\nBonvenon al la <color=$COLOR_HIGHLIGHT>Pruva Nivelo de Open Surge</color>! Uzu $INPUT_DIRECTIONAL-n por moviĝi kaj $INPUT_FIRE1-n por salti. Premu $INPUT_FIRE2-n por ŝanĝi rolulon."
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio en Open Surge estas agordebla. Vi povas krei nivelojn, erojn, ĉefojn, rolulojn kaj plu! Ĝi estas plena <color=$COLOR_HIGHLIGHT>sistemo de kreado de ludoj</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
