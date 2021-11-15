@@ -193,9 +193,9 @@ struct font_t {
 };
 
 /* misc */
-static const char* get_variable(const char* key);
-static inline bool has_variables_to_expand(const char* str, int *passes);
-static void expand_variables(char* str, fontargs_t args, size_t size);
+static const char* read_variable(const char* key, void* data);
+static int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*callback)(const char*,void*), void* data);
+static inline bool has_vars_to_expand(const char* str);
 static void convert_to_ascii(char* str);
 static int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t color_stack[], int* stack_top);
 static int print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, color_t color_stack[], int* stack_top);
@@ -283,14 +283,18 @@ void font_release()
 
 /*
  * font_register_variable()
- * Variable/text interpolation. Example: font_add_variable("$LEVEL_NAME", level_name) 
- * will replace every occurrence of $LEVEL_NAME in the text of any fonts by the
- * result of level_name()
+ * Variable/text interpolation.
+ *
+ * Example: font_register_variable("LEVEL_NAME", level_name)
+ * will replace every occurrence of $LEVEL_NAME when
+ * rendering any font by the result of level_name()
+ *
  * Call this AFTER font_init()
  */
 void font_register_variable(const char* variable_name, const char* (*callback)())
 {
-    callbacktable_add(variable_name, (fontcallback_t)callback);
+    if(callback_table != NULL)
+        callbacktable_add(variable_name, (fontcallback_t)callback);
 }
 
 
@@ -352,18 +356,20 @@ void font_destroy(font_t* f)
  */
 void font_set_text(font_t* f, const char* fmt, ...)
 {
-    static char buf[FONT_TEXTMAXSIZE];
+    const int MAX_PASSES = 2;
+    static char buf[FONT_TEXTMAXSIZE], pre[FONT_TEXTMAXSIZE];
     va_list args;
-    int passes = 0;
 
     /* printf */
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    /* expand variables (AFTER printf) */
-    while(has_variables_to_expand(buf, &passes))
-        expand_variables(buf, f->argument, sizeof(buf));
+    /* expand variables (call AFTER printf) */
+    for(int k = 0; k < MAX_PASSES && has_vars_to_expand(buf); k++) {
+        str_cpy(pre, buf, sizeof(pre));
+        expand_vars(buf, pre, sizeof(buf), read_variable, f->argument);
+    }
 
     /* utf8 check */
     if(!u8_isvalid(buf, strlen(buf)))
@@ -656,86 +662,168 @@ void font_set_maxlength(font_t* f, int maxlength)
 /* ------------------------------------------------- */
 
 /* returns a static char* (case insensitive search) */
-const char* get_variable(const char* key)
+const char* read_variable(const char* key, void* data)
 {
-    fontcallback_t fun = callbacktable_find(key);
-    static char buf[1024];
+    const char* value = NULL;
 
-    if(fun != NULL)
-        return fun();
-    else
-        return lang_getstring(key+1, buf, sizeof(buf)); /* skip the '$' */
+    if(!isdigit(key[0])) {
+        /* read $IDENTIFIER */
+        fontcallback_t fun = callbacktable_find(key);
+        static char buf[1024];
+
+        if(fun != NULL)
+            value = fun();
+        else
+            value = lang_getstring(key, buf, sizeof(buf));
+    }
+    else {
+        /* read $1, $2 ... $9 */
+        const char** args = (const char**)data;
+        int index = key[0] - '1';
+
+        if(index >= 0 && index < FONTARGS_MAX)
+            value = args[index]; /* may be NULL */
+    }
+
+    return value != NULL ? value : "null";
 }
 
+/*
 
-/* expands the variables, e.g.,
+expands the variables, e.g.,
 
-   "Please press the $INPUT_LEFT to go left"
+   "Welcome to $LEVEL_NAME"
             ... becomes ...
-   "Please press the LEFT CTRL KEY to go left"
+   "Welcome to Sunshine Paradise"
+
 */
-void expand_variables(char* str, fontargs_t args, size_t size)
+int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*callback)(const char*,void*), void* data)
 {
-    static char buf[FONT_TEXTMAXSIZE];
-    char *p = str, *q = buf;
+    char acc[256];
+    enum { COPYING, ACCUMULATING_DIGIT, ACCUMULATING_IDENTIFIER, ACCUMULATING_EXPRESSION } state = COPYING;
+    int curly_counter = 0, number_of_substitutions = 0;
+    int m = (int)dest_size - 1, accsize = sizeof(acc) - 1;
+    int a, i, j;
 
-    /* expand into buf */
-    while(*p && (q - buf < sizeof(buf) - 1)) {
-        /* scanning... */
-        while(*p && *p != '$' && (q - buf < sizeof(buf) - 1))
-            *(q++) = *(p++);
+    #define APPEND(str) do { \
+        const char* p = (str); \
+        while(*p && j < m) \
+            dest[j++] = *(p++); \
+        number_of_substitutions++; \
+    } while(0);
 
-        /* found a variable or a pattern ($1, $2...) */
-        if(*p == '$' && IS_VAR_ANYCHAR(p[1])) {
-            char varname[64], *r;
-            const char *value = NULL, *u;
+    for(i = j = 0; '\0' != src[i] && j < m; i++) {
+        char curr_char = src[i], next_char = src[i+1];
 
-            /* detect the name of this variable */
-            r = varname;
-            do {
-                *(r++) = *(p++);
-            } while(IS_VAR_ANYCHAR(*p) && (r - varname < sizeof(varname) - 1));
-            *r = '\0';
+        switch(state) {
+            /* copy char */
+            case COPYING: {
+                if(curr_char == '$') {
+                    a = 0; /* initialize the accumulator */
 
-            /* get the contents of varname */
-            if(!IS_VAR_1STCHAR(varname[1])) {
-                /* match $1, $2, ... */
-                if(varname[1] >= '1' && varname[1] <= '0' + FONTARGS_MAX)
-                    value = args[ varname[1] - '1' ]; /* may be NULL */
-                if(value == NULL)
-                    value = varname; /* get the digit if there is no argument */
+                    if(next_char == '{') {
+                        state = ACCUMULATING_EXPRESSION;
+                        curly_counter = 0; /* reset curly counter */
+                        i++; /* skip this curly brace */
+                        break;
+                    }
+                    else if(next_char >= '1' && next_char <= '9') {
+                        state = ACCUMULATING_DIGIT;
+                        break;
+                    }
+                    else if(isalpha(next_char) || next_char == '_') {
+                        state = ACCUMULATING_IDENTIFIER;
+                        break;
+                    }
+                }
+
+                /* copy 'til the end */
+                dest[j++] = curr_char;
+                break;
             }
-            else {
-                /* match a variable */
-                value = get_variable(varname);
+
+
+
+            /* match $1, $2 ... $9 */
+            case ACCUMULATING_DIGIT: {
+                bool match = (curr_char >= '1' && curr_char <= '9'); /* true, redundant */
+
+                if(match) {
+                    acc[0] = curr_char;
+                    acc[1] = '\0';
+                }
+
+                APPEND(callback(acc, data));
+                state = COPYING;
+                break;
             }
 
-            /* put it into buf */
-            if((u = value) != NULL) {
-                while(*u && (q - buf < sizeof(buf) - 1))
-                    *(q++) = *(u++);
+
+
+            /* match $IDENTIFIER */
+            case ACCUMULATING_IDENTIFIER: {
+                bool match = (isalnum(curr_char) || curr_char == '_');
+                bool last_char = ('\0' == next_char);
+
+                if(match) {
+                    if(a < accsize)
+                        acc[a++] = curr_char;
+                }
+
+                if(last_char || !match) {
+                    acc[a] = '\0';
+                    if(!match)
+                        i--; /* put back */
+
+                    APPEND(callback(acc, data));
+                    state = COPYING;
+                }
+
+                break;
+            }
+
+
+
+            /* match ${EXPRESSION} */
+            case ACCUMULATING_EXPRESSION: {
+                bool match = ((curr_char != '}' || curly_counter > 0) && curr_char != '\0');
+                bool last_char = ('\0' == next_char);
+
+                if(match) {
+                    if(a < accsize)
+                        acc[a++] = curr_char;
+
+                    if(src[i] == '{')
+                        ++curly_counter;
+                    else if(src[i] == '}')
+                        --curly_counter;
+                }
+
+                if(last_char || !match) {
+                    char expr[256];
+                    acc[a] = '\0';
+
+                    number_of_substitutions += expand_vars(expr, acc, sizeof(expr), callback, data);
+                    APPEND(callback(expr, data));
+                    state = COPYING;
+                }
+
+                break;
             }
         }
-        else if(*p == '$' && (q - buf < sizeof(buf) - 1))
-            *(q++) = *(p++); /* found a single dollar sign */
     }
-    *q = '\0';
 
-    /* copy back into str */
-    str_cpy(str, buf, size);
+    dest[j] = '\0';
+    return number_of_substitutions;
 }
 
-
 /* does the string have variables or patterns ($1, $2...) to expand? */
-bool has_variables_to_expand(const char* str, int *passes)
+bool has_vars_to_expand(const char* str)
 {
-    const int MAX_PASSES = 3; /* won't expand more times than this */
+    #define MATCH1(c) (isalnum(c) || (c) == '_' || (c) == '{')
 
-    if(++(*passes) > MAX_PASSES)
-        return false;
-
-    for(; *str; str++) {
-        if(*str == '$' && IS_VAR_ANYCHAR(str[1]))
+    for(const char *p = str; *p; p++) {
+        if(*p == '$' && MATCH1(p[1]))
             return true;
     }
 

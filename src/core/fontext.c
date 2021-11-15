@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * fontext.h - extensions for the font module
- * Copyright (C) 2010, 2012-2013, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2012-2013, 2019-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -66,34 +66,34 @@ static const char* f_game_year() { return GAME_YEAR; }
  */
 void fontext_register_variables()
 {
-    font_register_variable("$DOLLAR", f_dollar);
-    font_register_variable("$LT", f_lowerthan);
-    font_register_variable("$GT", f_greaterthan);
-    font_register_variable("$EMPTY", f_empty);
-    font_register_variable("$LEVEL_NAME", f_level_name);
-    font_register_variable("$LEVEL_VERSION", f_level_version);
-    font_register_variable("$LEVEL_AUTHOR", f_level_author);
-    font_register_variable("$LEVEL_ACT", f_level_act);
-    font_register_variable("$PLAYER_NAME", f_player_name);
-    font_register_variable("$INPUT_DIRECTIONAL", f_input_directional);
-    font_register_variable("$INPUT_LEFT", f_input_left);
-    font_register_variable("$INPUT_RIGHT", f_input_right);
-    font_register_variable("$INPUT_UP", f_input_up);
-    font_register_variable("$INPUT_DOWN", f_input_down);
-    font_register_variable("$INPUT_FIRE1", f_input_fire1);
-    font_register_variable("$INPUT_FIRE2", f_input_fire2);
-    font_register_variable("$INPUT_FIRE3", f_input_fire3);
-    font_register_variable("$INPUT_FIRE4", f_input_fire4);
-    font_register_variable("$INPUT_FIRE5", f_input_fire5);
-    font_register_variable("$INPUT_FIRE6", f_input_fire6);
-    font_register_variable("$INPUT_FIRE7", f_input_fire7);
-    font_register_variable("$INPUT_FIRE8", f_input_fire8);
-    font_register_variable("$ENGINE_NAME", f_engine_name);
-    font_register_variable("$ENGINE_VERSION", f_engine_version);
-    font_register_variable("$ENGINE_WEBSITE", f_engine_website);
-    font_register_variable("$ENGINE_YEAR", f_engine_year);
-    font_register_variable("$GAME_NAME", f_game_name);
-    font_register_variable("$GAME_VERSION", f_game_version);
-    font_register_variable("$GAME_WEBSITE", f_game_website);
-    font_register_variable("$GAME_YEAR", f_game_year);
+    font_register_variable("DOLLAR", f_dollar);
+    font_register_variable("LT", f_lowerthan);
+    font_register_variable("GT", f_greaterthan);
+    font_register_variable("EMPTY", f_empty);
+    font_register_variable("LEVEL_NAME", f_level_name);
+    font_register_variable("LEVEL_VERSION", f_level_version);
+    font_register_variable("LEVEL_AUTHOR", f_level_author);
+    font_register_variable("LEVEL_ACT", f_level_act);
+    font_register_variable("PLAYER_NAME", f_player_name);
+    font_register_variable("INPUT_DIRECTIONAL", f_input_directional);
+    font_register_variable("INPUT_LEFT", f_input_left);
+    font_register_variable("INPUT_RIGHT", f_input_right);
+    font_register_variable("INPUT_UP", f_input_up);
+    font_register_variable("INPUT_DOWN", f_input_down);
+    font_register_variable("INPUT_FIRE1", f_input_fire1);
+    font_register_variable("INPUT_FIRE2", f_input_fire2);
+    font_register_variable("INPUT_FIRE3", f_input_fire3);
+    font_register_variable("INPUT_FIRE4", f_input_fire4);
+    font_register_variable("INPUT_FIRE5", f_input_fire5);
+    font_register_variable("INPUT_FIRE6", f_input_fire6);
+    font_register_variable("INPUT_FIRE7", f_input_fire7);
+    font_register_variable("INPUT_FIRE8", f_input_fire8);
+    font_register_variable("ENGINE_NAME", f_engine_name);
+    font_register_variable("ENGINE_VERSION", f_engine_version);
+    font_register_variable("ENGINE_WEBSITE", f_engine_website);
+    font_register_variable("ENGINE_YEAR", f_engine_year);
+    font_register_variable("GAME_NAME", f_game_name);
+    font_register_variable("GAME_VERSION", f_game_version);
+    font_register_variable("GAME_WEBSITE", f_game_website);
+    font_register_variable("GAME_YEAR", f_game_year);
 }
