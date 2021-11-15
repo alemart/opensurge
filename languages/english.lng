@@ -15,8 +15,8 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2021-01-07"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.2"                   // required engine version
+LANG_LASTUPDATE             "2021-11-15"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
 
@@ -379,6 +379,21 @@ COLOR_HIGHLIGHT             "ffee11"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 COLOR_EDITOR_HIGHLIGHT      "ffa060"
+
+// Input
+INPUT_DIRECTIONAL           "${INPUT_${INPUT_TYPE}_DIRECTIONAL}"
+INPUT_UP                    "${INPUT_${INPUT_TYPE}_UP}"
+INPUT_RIGHT                 "${INPUT_${INPUT_TYPE}_RIGHT}"
+INPUT_DOWN                  "${INPUT_${INPUT_TYPE}_DOWN}"
+INPUT_LEFT                  "${INPUT_${INPUT_TYPE}_LEFT}"
+INPUT_FIRE1                 "${INPUT_${INPUT_TYPE}_FIRE1}"
+INPUT_FIRE2                 "${INPUT_${INPUT_TYPE}_FIRE2}"
+INPUT_FIRE3                 "${INPUT_${INPUT_TYPE}_FIRE3}"
+INPUT_FIRE4                 "${INPUT_${INPUT_TYPE}_FIRE4}"
+INPUT_FIRE5                 "${INPUT_${INPUT_TYPE}_FIRE5}"
+INPUT_FIRE6                 "${INPUT_${INPUT_TYPE}_FIRE6}"
+INPUT_FIRE7                 "${INPUT_${INPUT_TYPE}_FIRE7}"
+INPUT_FIRE8                 "${INPUT_${INPUT_TYPE}_FIRE8}"
 
 // Backward compatibility
 HUD_COLLECTIBLES            "$HUD_POWER"

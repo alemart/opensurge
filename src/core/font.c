@@ -361,7 +361,7 @@ void font_destroy(font_t* f)
  */
 void font_set_text(font_t* f, const char* fmt, ...)
 {
-    const int MAX_PASSES = 2;
+    const int MAX_PASSES = 3;
     static char buf[FONT_TEXTMAXSIZE], pre[FONT_TEXTMAXSIZE];
     va_list args;
 
@@ -1791,7 +1791,7 @@ fontcallback_t callbacktable_find(const char* variable_name)
 
 
 /* ------------------------------------------------- */
-/* global vars */
+/* predefined vars */
 /* ------------------------------------------------- */
 static const char* f_dollar() { return "$"; }
 static const char* f_lowerthan() { return "<"; }
@@ -1802,19 +1802,7 @@ static const char* f_level_version() { return level_version(); }
 static const char* f_level_author() { return level_author(); }
 static const char* f_level_act() { return str_from_int(level_act(), NULL, 0); }
 static const char* f_player_name() { return level_player() != NULL ? player_name(level_player()) : "null"; }
-static const char* f_input_directional() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_DIRECTIONAL" : "INPUT_KEYB_DIRECTIONAL"); }
-static const char* f_input_left() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_LEFT" : "INPUT_KEYB_LEFT"); }
-static const char* f_input_right() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_RIGHT" : "INPUT_KEYB_RIGHT"); }
-static const char* f_input_up() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_UP" : "INPUT_KEYB_UP"); }
-static const char* f_input_down() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_DOWN" : "INPUT_KEYB_DOWN"); }
-static const char* f_input_fire1() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE1" : "INPUT_KEYB_FIRE1"); }
-static const char* f_input_fire2() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE2" : "INPUT_KEYB_FIRE2"); }
-static const char* f_input_fire3() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE3" : "INPUT_KEYB_FIRE3"); }
-static const char* f_input_fire4() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE4" : "INPUT_KEYB_FIRE4"); }
-static const char* f_input_fire5() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE5" : "INPUT_KEYB_FIRE5"); }
-static const char* f_input_fire6() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE6" : "INPUT_KEYB_FIRE6"); }
-static const char* f_input_fire7() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE7" : "INPUT_KEYB_FIRE7"); }
-static const char* f_input_fire8() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE8" : "INPUT_KEYB_FIRE8"); }
+static const char* f_input_type() { return input_is_joystick_enabled() ? "JOY" : "KEYB"; }
 static const char* f_engine_name() { return GAME_TITLE; }
 static const char* f_engine_version() { return GAME_VERSION_STRING; }
 static const char* f_engine_website() { return GAME_WEBSITE; }
@@ -1840,19 +1828,7 @@ void register_predefined_vars()
     font_register_variable("LEVEL_AUTHOR", f_level_author);
     font_register_variable("LEVEL_ACT", f_level_act);
     font_register_variable("PLAYER_NAME", f_player_name);
-    font_register_variable("INPUT_DIRECTIONAL", f_input_directional);
-    font_register_variable("INPUT_LEFT", f_input_left);
-    font_register_variable("INPUT_RIGHT", f_input_right);
-    font_register_variable("INPUT_UP", f_input_up);
-    font_register_variable("INPUT_DOWN", f_input_down);
-    font_register_variable("INPUT_FIRE1", f_input_fire1);
-    font_register_variable("INPUT_FIRE2", f_input_fire2);
-    font_register_variable("INPUT_FIRE3", f_input_fire3);
-    font_register_variable("INPUT_FIRE4", f_input_fire4);
-    font_register_variable("INPUT_FIRE5", f_input_fire5);
-    font_register_variable("INPUT_FIRE6", f_input_fire6);
-    font_register_variable("INPUT_FIRE7", f_input_fire7);
-    font_register_variable("INPUT_FIRE8", f_input_fire8);
+    font_register_variable("INPUT_TYPE", f_input_type);
     font_register_variable("ENGINE_NAME", f_engine_name);
     font_register_variable("ENGINE_VERSION", f_engine_version);
     font_register_variable("ENGINE_WEBSITE", f_engine_website);
@@ -1862,5 +1838,3 @@ void register_predefined_vars()
     font_register_variable("GAME_WEBSITE", f_game_website);
     font_register_variable("GAME_YEAR", f_game_year);
 }
-
-
