@@ -383,7 +383,6 @@ SET(GAME_SRCS
   src/core/csv.c
   src/core/engine.c
   src/core/font.c
-  src/core/fontext.c
   src/core/image.c
   src/core/input.c
   src/core/inputmap.c
@@ -497,7 +496,6 @@ SET(GAME_HEADERS
   src/core/engine.h
   src/core/fasthash.h
   src/core/font.h
-  src/core/fontext.h
   src/core/global.h
   src/core/hashtable.h
   src/core/image.h

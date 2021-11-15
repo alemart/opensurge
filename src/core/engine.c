@@ -50,7 +50,6 @@
 #include "prefs.h"
 #include "commandline.h"
 #include "font.h"
-#include "fontext.h"
 #include "nanoparser/nanoparser.h"
 #include "../entities/legacy/enemy.h"
 #include "../entities/legacy/nanocalc/nanocalc.h"
@@ -370,7 +369,6 @@ void init_accessories(const commandline_t* cmd)
     video_display_loading_screen();
 
     sprite_init();
-    fontext_register_variables();
     charactersystem_init();
     objects_init();
     storyboard_init();

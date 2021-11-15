@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * font.c - font module
- * Copyright (C) 2008-2011, 2013, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "font.h"
+#include "global.h"
 #include "video.h"
 #include "image.h"
 #include "color.h"
@@ -43,6 +44,9 @@
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
 #include "utf8/utf8.h"
+#include "input.h"
+#include "../entities/player.h"
+#include "../scenes/level.h"
 
 /* private stuff */
 #if defined(A5BUILD)
@@ -193,6 +197,7 @@ struct font_t {
 };
 
 /* misc */
+static void register_predefined_vars();
 static const char* read_variable(const char* key, void* data);
 static int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*callback)(const char*,void*), void* data);
 static inline bool has_vars_to_expand(const char* str);
@@ -216,8 +221,6 @@ static void unload_ttf(fontdrv_ttf_t* f);
 void font_init(bool allow_font_smoothing)
 {
 #if defined(A5BUILD)
-    parsetree_program_t* fonts = NULL;
-
     /* initializing Allegro's TTF addon */
     if(!al_init_ttf_addon())
         fatal_error("Can't initialize Allegro's TTF addon");
@@ -227,19 +230,19 @@ void font_init(bool allow_font_smoothing)
     fontdrv_list_init();
 
     /* reading the parse tree */
+    parsetree_program_t* fonts = NULL;
     logfile_message("Loading fonts...");
     assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
     nanoparser_traverse_program(fonts, traverse);
     logfile_message("All fonts have been loaded.");
+    fonts = nanoparser_deconstruct_tree(fonts);
 
     /* initializing the font callback table */
     callbacktable_init();
 
-    /* done */
-    fonts = nanoparser_deconstruct_tree(fonts);
+    /* register predefined vars */
+    register_predefined_vars();
 #else
-    parsetree_program_t* fonts = NULL;
-
     allow_antialias = allow_font_smoothing; /* this comes first */
     logfile_message("Initializing alfont...");
     if(0 != alfont_init())
@@ -249,15 +252,17 @@ void font_init(bool allow_font_smoothing)
     fontdrv_list_init();
 
     /* reading the parse tree */
+    parsetree_program_t* fonts = NULL;
     assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
     nanoparser_traverse_program(fonts, traverse);
     logfile_message("All fonts have been loaded.");
+    fonts = nanoparser_deconstruct_tree(fonts);
 
     /* initializing the font callback table */
     callbacktable_init();
 
-    /* done */
-    fonts = nanoparser_deconstruct_tree(fonts);
+    /* register predefined vars */
+    register_predefined_vars();
 #endif
 }
 
@@ -1384,31 +1389,6 @@ int dirfill(const char* vpath, void* param)
 
 
 /* ------------------------------------------------- */
-/* callback table */
-/* ------------------------------------------------- */
-
-void callbacktable_init()
-{
-    callback_table = hashtable_fontcallback_t_create();
-}
-
-void callbacktable_release()
-{
-    callback_table = hashtable_fontcallback_t_destroy(callback_table);
-}
-
-void callbacktable_add(const char* variable_name, fontcallback_t callback)
-{
-    hashtable_fontcallback_t_add(callback_table, variable_name, (fontcallback_t*)callback);
-}
-
-fontcallback_t callbacktable_find(const char* variable_name)
-{
-    return (fontcallback_t)hashtable_fontcallback_t_find(callback_table, variable_name);
-}
-
-
-/* ------------------------------------------------- */
 /* list of fontdrv_t */
 /* ------------------------------------------------- */
 
@@ -1784,3 +1764,103 @@ void unload_ttf(fontdrv_ttf_t* f)
     alfont_destroy_font(f->ttf);
 #endif
 }
+
+/* ------------------------------------------------- */
+/* callback table */
+/* ------------------------------------------------- */
+
+void callbacktable_init()
+{
+    callback_table = hashtable_fontcallback_t_create();
+}
+
+void callbacktable_release()
+{
+    callback_table = hashtable_fontcallback_t_destroy(callback_table);
+}
+
+void callbacktable_add(const char* variable_name, fontcallback_t callback)
+{
+    hashtable_fontcallback_t_add(callback_table, variable_name, (fontcallback_t*)callback);
+}
+
+fontcallback_t callbacktable_find(const char* variable_name)
+{
+    return (fontcallback_t)hashtable_fontcallback_t_find(callback_table, variable_name);
+}
+
+
+/* ------------------------------------------------- */
+/* global vars */
+/* ------------------------------------------------- */
+static const char* f_dollar() { return "$"; }
+static const char* f_lowerthan() { return "<"; }
+static const char* f_greaterthan() { return ">"; }
+static const char* f_empty() { return ""; }
+static const char* f_level_name() { return level_name(); }
+static const char* f_level_version() { return level_version(); }
+static const char* f_level_author() { return level_author(); }
+static const char* f_level_act() { return str_from_int(level_act(), NULL, 0); }
+static const char* f_player_name() { return level_player() != NULL ? player_name(level_player()) : "null"; }
+static const char* f_input_directional() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_DIRECTIONAL" : "INPUT_KEYB_DIRECTIONAL"); }
+static const char* f_input_left() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_LEFT" : "INPUT_KEYB_LEFT"); }
+static const char* f_input_right() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_RIGHT" : "INPUT_KEYB_RIGHT"); }
+static const char* f_input_up() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_UP" : "INPUT_KEYB_UP"); }
+static const char* f_input_down() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_DOWN" : "INPUT_KEYB_DOWN"); }
+static const char* f_input_fire1() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE1" : "INPUT_KEYB_FIRE1"); }
+static const char* f_input_fire2() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE2" : "INPUT_KEYB_FIRE2"); }
+static const char* f_input_fire3() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE3" : "INPUT_KEYB_FIRE3"); }
+static const char* f_input_fire4() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE4" : "INPUT_KEYB_FIRE4"); }
+static const char* f_input_fire5() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE5" : "INPUT_KEYB_FIRE5"); }
+static const char* f_input_fire6() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE6" : "INPUT_KEYB_FIRE6"); }
+static const char* f_input_fire7() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE7" : "INPUT_KEYB_FIRE7"); }
+static const char* f_input_fire8() { return lang_get(input_is_joystick_enabled() ? "INPUT_JOY_FIRE8" : "INPUT_KEYB_FIRE8"); }
+static const char* f_engine_name() { return GAME_TITLE; }
+static const char* f_engine_version() { return GAME_VERSION_STRING; }
+static const char* f_engine_website() { return GAME_WEBSITE; }
+static const char* f_engine_year() { return GAME_YEAR; }
+static const char* f_game_name() { return "Open Surge"; }
+static const char* f_game_version() { return GAME_VERSION_STRING; }
+static const char* f_game_website() { return GAME_WEBSITE; }
+static const char* f_game_year() { return GAME_YEAR; }
+
+
+/*
+ * register_predefined_vars()
+ * Registers lots of useful predefined variables
+ */
+void register_predefined_vars()
+{
+    font_register_variable("DOLLAR", f_dollar);
+    font_register_variable("LT", f_lowerthan);
+    font_register_variable("GT", f_greaterthan);
+    font_register_variable("EMPTY", f_empty);
+    font_register_variable("LEVEL_NAME", f_level_name);
+    font_register_variable("LEVEL_VERSION", f_level_version);
+    font_register_variable("LEVEL_AUTHOR", f_level_author);
+    font_register_variable("LEVEL_ACT", f_level_act);
+    font_register_variable("PLAYER_NAME", f_player_name);
+    font_register_variable("INPUT_DIRECTIONAL", f_input_directional);
+    font_register_variable("INPUT_LEFT", f_input_left);
+    font_register_variable("INPUT_RIGHT", f_input_right);
+    font_register_variable("INPUT_UP", f_input_up);
+    font_register_variable("INPUT_DOWN", f_input_down);
+    font_register_variable("INPUT_FIRE1", f_input_fire1);
+    font_register_variable("INPUT_FIRE2", f_input_fire2);
+    font_register_variable("INPUT_FIRE3", f_input_fire3);
+    font_register_variable("INPUT_FIRE4", f_input_fire4);
+    font_register_variable("INPUT_FIRE5", f_input_fire5);
+    font_register_variable("INPUT_FIRE6", f_input_fire6);
+    font_register_variable("INPUT_FIRE7", f_input_fire7);
+    font_register_variable("INPUT_FIRE8", f_input_fire8);
+    font_register_variable("ENGINE_NAME", f_engine_name);
+    font_register_variable("ENGINE_VERSION", f_engine_version);
+    font_register_variable("ENGINE_WEBSITE", f_engine_website);
+    font_register_variable("ENGINE_YEAR", f_engine_year);
+    font_register_variable("GAME_NAME", f_game_name);
+    font_register_variable("GAME_VERSION", f_game_version);
+    font_register_variable("GAME_WEBSITE", f_game_website);
+    font_register_variable("GAME_YEAR", f_game_year);
+}
+
+
