@@ -671,7 +671,15 @@ const char* read_variable(const char* key, void* data)
 {
     const char* value = NULL;
 
-    if(!isdigit(key[0])) {
+    if(key[0] >= '1' && key[0] <= '9') {
+        /* read $1, $2 ... $9 */
+        const char** args = (const char**)data;
+        int index = key[0] - '1';
+
+        if(index >= 0 && index < FONTARGS_MAX)
+            value = args[index]; /* may be NULL */
+    }
+    else {
         /* read $IDENTIFIER */
         fontcallback_t fun = callbacktable_find(key);
         static char buf[1024];
@@ -680,14 +688,6 @@ const char* read_variable(const char* key, void* data)
             value = fun();
         else
             value = lang_getstring(key, buf, sizeof(buf));
-    }
-    else {
-        /* read $1, $2 ... $9 */
-        const char** args = (const char**)data;
-        int index = key[0] - '1';
-
-        if(index >= 0 && index < FONTARGS_MAX)
-            value = args[index]; /* may be NULL */
     }
 
     return value != NULL ? value : "null";
