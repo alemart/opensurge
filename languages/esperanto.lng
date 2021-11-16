@@ -15,8 +15,8 @@
 LANG_ID                     "eo"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Esperanto"                 // language name
 LANG_AUTHOR                 "Jorge Maldonado Ventura"       // translation author
-LANG_LASTUPDATE             "2021-11-03"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.2"                   // required engine version
+LANG_LASTUPDATE             "2021-11-16"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
 
@@ -162,12 +162,14 @@ CONGRATULATIONS_TEXT        "Danke por ludi la version $GAME_VERSION de Open Sur
 
 // keyboard
 INPUT_KEYB_DIRECTIONAL      "la SAGAJ KLAVOJ"
+INPUT_KEYB_DIRECTIONAL__EO  "la SAGAJN KLAVOJN"
 INPUT_KEYB_LEFT             "la MALDEKSTRA KLAVO"
 INPUT_KEYB_RIGHT            "la DEKSTRA KLAVO"
 INPUT_KEYB_UP               "la SUPRA KLAVO"
 INPUT_KEYB_DOWN             "la MALSUPRA KLAVO"
 INPUT_KEYB_FIRE1            "SPACETO"
 INPUT_KEYB_FIRE2            "MALDEKSTRA STIRKLAVO"
+INPUT_KEYB_FIRE2__EO        "MALDEKSTRAN STIRKLAVON"
 INPUT_KEYB_FIRE3            "ENIGA KLAVO"
 INPUT_KEYB_FIRE4            "ESC"
 INPUT_KEYB_FIRE5            "W"
@@ -177,12 +179,14 @@ INPUT_KEYB_FIRE8            "D"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "la STIRSTANGO"
+INPUT_JOY_DIRECTIONAL__EO   "la STIRSTANGON"
 INPUT_JOY_LEFT              "the MALDEKSTRA BUTONO"
 INPUT_JOY_RIGHT             "the DEKSTRA BUTONO"
 INPUT_JOY_UP                "the SUPRA BUTONO"
 INPUT_JOY_DOWN              "the MALSUPRA BUTONO"
 INPUT_JOY_FIRE1             "SALTI"
 INPUT_JOY_FIRE2             "ŜANĜI"
+INPUT_JOY_FIRE2__EO         "ŜANĜI"
 INPUT_JOY_FIRE3             "PAŬZI"
 INPUT_JOY_FIRE4             "REEN"
 INPUT_JOY_FIRE5             "<disponebla>"
@@ -190,6 +194,8 @@ INPUT_JOY_FIRE6             "<disponebla>"
 INPUT_JOY_FIRE7             "<disponebla>"
 INPUT_JOY_FIRE8             "<disponebla>"
 
+INPUT_DIRECTIONAL__EO       "${INPUT_${INPUT_TYPE}_DIRECTIONAL__EO}"
+INPUT_FIRE2__EO             "${INPUT_${INPUT_TYPE}_FIRE2__EO}"
 
 
 //
@@ -211,7 +217,7 @@ LOADING_TEXT                "ŝarĝante..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Kiel ludi</color>\nBonvenon al la <color=$COLOR_HIGHLIGHT>Pruva Nivelo de Open Surge</color>! Uzu $INPUT_DIRECTIONAL-n por moviĝi kaj $INPUT_FIRE1-n por salti. Premu $INPUT_FIRE2-n por ŝanĝi rolulon."
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Kiel ludi</color>\nBonvenon al la <color=$COLOR_HIGHLIGHT>Pruva Nivelo de Open Surge</color>! Uzu $INPUT_DIRECTIONAL__EO por moviĝi kaj ${INPUT_FIRE1}N por salti. Premu $INPUT_FIRE2__EO por ŝanĝi rolulon."
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio en Open Surge estas agordebla. Vi povas krei nivelojn, erojn, ĉefojn, rolulojn kaj plu! Ĝi estas plena <color=$COLOR_HIGHLIGHT>sistemo de kreado de ludoj</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
