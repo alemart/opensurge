@@ -42,7 +42,10 @@ object "Dash Smoke" is "companion"
 
     state "cool out"
     {
-        state = "charging";
+        if(!player.midair)
+            state = "charging";
+        else
+            state = "main";
     }
 
     fun spawnSmoke(scale)
