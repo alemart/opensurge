@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * collisionmask.h - collision mask
- * Copyright (C) 2012, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2012, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@ typedef struct collisionmask_t collisionmask_t;
 collisionmask_t* collisionmask_create(const struct image_t* image, int x, int y, int width, int height);
 collisionmask_t* collisionmask_create_box(int width, int height);
 collisionmask_t* collisionmask_destroy(collisionmask_t *mask);
+collisionmask_t* collisionmask_clone(const collisionmask_t* mask);
 
 /* retrieve dimensions */
 int collisionmask_width(const collisionmask_t* mask);

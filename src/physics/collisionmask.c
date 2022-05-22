@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * collisionmask.h - collision mask
- * Copyright (C) 2012, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2012, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include <stdint.h>
 #include "collisionmask.h"
 #include "../core/video.h"
@@ -43,6 +44,7 @@ typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ];
 static const int MASK_MAXSIZE = UINT16_MAX; /* masks cannot be larger than this */
 static uint16_t* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
 static inline uint16_t* destroy_groundmap(uint16_t* gmap);
+static inline uint16_t* clone_groundmap(uint16_t* gmap, int width, int height, grounddir_t ground_direction);
 
 /* public methods */
 
@@ -119,6 +121,28 @@ collisionmask_t *collisionmask_create_box(int width, int height)
 
     /* done! */
     return mask;
+}
+
+/*
+ * collisionmask_clone()
+ * Clones a collision mask
+ */
+collisionmask_t* collisionmask_clone(const collisionmask_t* mask)
+{
+    collisionmask_t* clone = mallocx(sizeof *clone);
+    size_t mask_size = (mask->pitch * mask->height) * sizeof(*(mask->mask));
+
+    *clone = *mask;
+
+    clone->mask = mallocx(mask_size);
+    memcpy(clone->mask, mask->mask, mask_size);
+
+    clone->gmap[0] = clone_groundmap(mask->gmap[0], mask->width, mask->height, GD_DOWN);
+    clone->gmap[1] = clone_groundmap(mask->gmap[1], mask->width, mask->height, GD_LEFT);
+    clone->gmap[2] = clone_groundmap(mask->gmap[2], mask->width, mask->height, GD_UP);
+    clone->gmap[3] = clone_groundmap(mask->gmap[3], mask->width, mask->height, GD_RIGHT);
+
+    return clone;
 }
 
 /*
@@ -373,4 +397,31 @@ uint16_t* destroy_groundmap(uint16_t* gmap)
     if(gmap != NULL)
         free(gmap);
     return NULL;
+}
+
+/* Clones an existing ground map */
+uint16_t* clone_groundmap(uint16_t* gmap, int width, int height, grounddir_t ground_direction)
+{
+    uint16_t* clone = NULL;
+    size_t size = 0;
+    int pitch = 0;
+
+    switch(ground_direction)
+    {
+        case GD_DOWN:
+        case GD_UP:
+            pitch = MASK_ALIGN(width);
+            size = (pitch * height) * sizeof(*clone);
+            break;
+
+        case GD_LEFT:
+        case GD_RIGHT:
+            pitch = MASK_ALIGN(height);
+            size = (pitch *  width) * sizeof(*clone);
+            break;
+    }
+
+    clone = mallocx(size);
+    memcpy(clone, gmap, size);
+    return clone;
 }
