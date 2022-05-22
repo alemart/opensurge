@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * obstacle.h - physics system: obstacles
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@ extern const int OF_HFLIP, OF_VFLIP;
 
 /* create and destroy */
 obstacle_t* obstacle_create(const collisionmask_t *mask, int xpos, int ypos, int flags);
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, int flags, void (*dtor)(void*), void *dtor_userdata);
 obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 
 /* public methods */

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * obstacle.c - physics system: obstacles
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,10 +34,16 @@ struct obstacle_t
 {
     int xpos;
     int ypos;
+
     uint16_t width;
     uint16_t height;
+
     uint8_t flags;
+
     const collisionmask_t* mask;
+
+    void (*dtor)(void*); /* optional destructor */
+    void *dtor_userdata;
 };
 
 /* private utilities */
@@ -46,6 +52,11 @@ static inline grounddir_t flip_grounddir(grounddir_t ground_direction);
 
 /* public methods */
 obstacle_t* obstacle_create(const collisionmask_t* mask, int xpos, int ypos, int flags)
+{
+    return obstacle_create_ex(mask, xpos, ypos, flags, NULL, NULL);
+}
+
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, int flags, void (*dtor)(void*), void *dtor_userdata)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
@@ -56,11 +67,17 @@ obstacle_t* obstacle_create(const collisionmask_t* mask, int xpos, int ypos, int
     o->flags = flags;
     o->mask = mask;
 
+    o->dtor = dtor;
+    o->dtor_userdata = dtor_userdata;
+
     return o;
 }
 
 obstacle_t* obstacle_destroy(obstacle_t *obstacle)
 {
+    if(obstacle->dtor != NULL)
+        obstacle->dtor(obstacle->dtor_userdata);
+
     free(obstacle);
     return NULL;
 }
