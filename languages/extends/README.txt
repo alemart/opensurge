@@ -11,19 +11,19 @@
 // you intend to extend. Example: if you want to extend languages/english.lng,
 // then you need to write your entries to langugages/extends/english.lng.
 //
-// The key benefit of using language extensions is the fact that your
+// The key benefit of using language extensions reside in the fact that your
 // modifications are kept separated from the files that are shipped with the
 // engine. When upgrading the engine, you will typically overwrite the default
-// .lng files. If you use language extensions however, you will be able to keep
-// your modifications!
+// .lng files. However, if you use language extensions, you will be able to
+// keep your modifications!
 //
 //
 // HOW TO USE
 //
-// Suppose you want to extend the english.lng file.
+// Suppose that you want to extend english.lng (the default language file).
 //
 // 1. Copy this README to languages/extends/english.lng
-// 2. Add or modify entries as in the examples below
+// 2. Add and/or modify the entries you wish as in the examples below
 // 3. Launch the engine and select the English language
 //
 //
