@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - code for the game levels
- * Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -245,7 +245,7 @@ static void free_ssobj_extradata(void* data);
 static bool match_ssobj_id(const void* value, void* data);
 static fasthash_t* ssobj_extradata;
 static void add_bricklike_ssobject(surgescript_object_t* object);
-static inline surgescript_object_t* get_bricklike_ssobject(int index);
+static surgescript_object_t* get_bricklike_ssobject(int index);
 static inline void clear_bricklike_ssobjects();
 static surgescript_objecthandle_t bricklike_ssobject[BRICKLIKE_MAX_COUNT];
 static int bricklike_ssobject_count = 0;
@@ -2715,8 +2715,10 @@ bool render_ssobject(surgescript_object_t* object, void* param)
 void add_bricklike_ssobject(surgescript_object_t* object)
 {
     /* add it to the bricklike_ssobject array */
-    if(bricklike_ssobject_count < BRICKLIKE_MAX_COUNT)
-        bricklike_ssobject[bricklike_ssobject_count++] = surgescript_object_handle(object);
+    if(bricklike_ssobject_count < BRICKLIKE_MAX_COUNT) {
+        if(!surgescript_object_is_killed(object))
+            bricklike_ssobject[bricklike_ssobject_count++] = surgescript_object_handle(object);
+    }
 }
 
 surgescript_object_t* get_bricklike_ssobject(int index)

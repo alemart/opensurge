@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * brick.c - scripting system: brick-like object
- * Copyright (C) 2019, 2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2019, 2020, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -199,10 +199,14 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 {
     bricklike_data_t* data = get_data(object);
 
+    /* this block of code would crash the application, as it would
+       invalidate pointers from a valid obstacle map. However, we
+       clone the collision mask of this brick-like object and use
+       the clone in the obstacle map instead. */
     if(data->mask != NULL) {
         collisionmask_destroy(data->mask);
         if(data->maskimg != NULL)
-            image_destroy(data->maskimg);
+            image_destroy(data->maskimg); /* What about this image? It's not cloned, but it's only displayed in the editor */
     }
 
     free(data);
