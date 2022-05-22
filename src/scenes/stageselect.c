@@ -234,7 +234,7 @@ void stageselect_update()
                     if(level_to_be_loaded != NULL)
                         free(level_to_be_loaded);
                     level_to_be_loaded = str_dup(stage_data[option]->filepath);
-                    
+
                     save_selection(option);
 
                     sound_play(SFX_CONFIRM);
