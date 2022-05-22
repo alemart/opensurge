@@ -42,13 +42,19 @@ static HASHTABLE(stringadapter_t, strings);
 /* private stuff */
 #define NULL_STRING "null"
 #define UNTRANSLATED_STRING "FIXME" /* indicates that a language string hasn't been translated */
+
+static const char DEFAULT_LANGUAGE_FILEPATH[] = "languages/english.lng";
+static const char LANGUAGES_FOLDER[] = "languages/";
+static const char EXTENDS_FOLDER[] = "extends/";
+
 static char lang_id[32] = NULL_STRING;
-static const char* DEFAULT_LANGUAGE_FILEPATH = "languages/english.lng";
 typedef struct { const char* key; const char* value; } inout_t;
 static int traverse(const parsetree_statement_t *stmt);
 static int traverse_inout(const parsetree_statement_t *stmt, void *inout);
 static int traverse_count(const parsetree_statement_t *stmt, void *counters);
 static bool is_untranslated_entry(const parsetree_statement_t *stmt);
+static char* pathify(const char* path);
+static char* path_to_language_extension(const char* path);
 
 
 
@@ -81,43 +87,88 @@ void lang_release()
 
 /*
  * lang_loadfile()
- * Loads a language definition file
+ * Loads a language definition file, given its relative path
  */
 void lang_loadfile(const char* filepath)
 {
-    const char* fullpath;
+    char* path = pathify(filepath);
     int supver, subver, wipver;
-    parsetree_program_t *prog;
 
-    /* Check if file exists */
-    logfile_message("Loading language file \"%s\"...", filepath);
-    if(!assetfs_exists(filepath)) {
-        if(0 != strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH)) {
-            logfile_message("File \"%s\" doesn't exist.", filepath);
-            lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
-            return;
-        }
-        else
+    #define READ_LANGUAGE_FILE(path_to_lng_file) do { \
+        const char* fullpath = assetfs_fullpath(path_to_lng_file); \
+        parsetree_program_t* prog = nanoparser_construct_tree(fullpath); \
+        nanoparser_traverse_program(prog, traverse); \
+        prog = nanoparser_deconstruct_tree(prog); \
+    } while(0)
+
+
+
+    /* log */
+    logfile_message("Loading language file \"%s\"...", path);
+
+    /* Check if the path is in the languages/ folder */
+    if(str_incmp(path, LANGUAGES_FOLDER, strlen(LANGUAGES_FOLDER)) != 0)
+        fatal_error("Won't load \"%s\". Language files are expected to be in the %s folder.", path, LANGUAGES_FOLDER);
+
+    /* Check if the path exists */
+    if(!assetfs_exists(path)) {
+
+        /* Crash if the default language file is missing */
+        if(0 == str_icmp(path, DEFAULT_LANGUAGE_FILEPATH))
             fatal_error("Missing default language file: \"%s\". Please reinstall the game.", DEFAULT_LANGUAGE_FILEPATH);
+
+        /* If some other language file is missing, we don't crash the application,
+           otherwise the player may get locked due to a corrupted save state */
+        logfile_message("Missing language file: \"%s\"", path);
+        lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
+        return;
+
     }
 
+    /* Check if the path points to a language extension */
+    bool is_language_extension = (
+        0 == str_incmp(path, LANGUAGES_FOLDER, strlen(LANGUAGES_FOLDER)) && /* already checked */
+        0 == str_incmp(path + strlen(LANGUAGES_FOLDER), EXTENDS_FOLDER, strlen(EXTENDS_FOLDER))
+    );
+    if(is_language_extension)
+        logfile_message("\"%s\" is a language extension", path);
+
     /* Compatibility check */
-    lang_compatibility(filepath, &supver, &subver, &wipver);
+    lang_compatibility(path, &supver, &subver, &wipver);
     if(game_version_compare(supver, subver, wipver) < 0) /* backwards compatibility */
-        fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%s)!", filepath, supver, subver, wipver, GAME_VERSION_STRING);
+        fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%s)!", path, supver, subver, wipver, GAME_VERSION_STRING);
 
     /* Read the default language file to fill in any missing strings */
-    if(strcmp(filepath, DEFAULT_LANGUAGE_FILEPATH) != 0)
+    if(str_icmp(path, DEFAULT_LANGUAGE_FILEPATH) != 0)
         lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
 
     /* Read language file to memory */
-    fullpath = assetfs_fullpath(filepath);
-    prog = nanoparser_construct_tree(fullpath);
-    nanoparser_traverse_program(prog, traverse);
-    prog = nanoparser_deconstruct_tree(prog);
+    READ_LANGUAGE_FILE(path);
 
-    /* Update ID */
+    /* Check if there is a language extension available */
+    if(!is_language_extension) {
+        char* extpath = path_to_language_extension(path);
+
+        /* There is a language extension */
+        if(assetfs_exists(extpath)) {
+
+            /* Load language extension */
+            logfile_message("Loading language extension at \"%s\"...", extpath);
+            READ_LANGUAGE_FILE(extpath);
+
+        }
+        else
+            logfile_message("No language extension found at \"%s\"", extpath);
+
+        free(extpath);
+    }
+
+    /* Update language ID */
     lang_getstring("LANG_ID", lang_id, sizeof(lang_id));
+
+    /* done! */
+    logfile_message("Language file \"%s\" has been loaded successfully!", path);
+    free(path);
 }
 
 
@@ -301,4 +352,35 @@ void stringadapter_set_data(stringadapter_t *s, const char* data)
 {
     free(s->data);
     s->data = str_dup(data);
+}
+
+/* replace backslashes by slashes; you'll have to free this string afterwards */
+char* pathify(const char* path)
+{
+    const char* p = path;
+    char* buf = mallocx((1 + strlen(path)) * sizeof(*buf));
+    char* q = buf, c;
+
+    while((c = *(p++)))
+        *(q++) = (c == '\\') ? '/' : c;
+    *q = '\0';
+
+    return buf;
+}
+
+/* path of the language extension (e.g., "languages/english.lng" becomes "languages/extends/english.lng")
+   it's assumed that the language file is located in the root of the languages folder
+   you'll have to free this string afterwards */
+char* path_to_language_extension(const char* path)
+{
+    const char* basename = str_basename(path);
+    size_t pathsize = strlen(LANGUAGES_FOLDER) + strlen(EXTENDS_FOLDER) + strlen(basename) + 1;
+    char* extpath = mallocx(pathsize);
+
+    *extpath = '\0';
+    strcpy(extpath, LANGUAGES_FOLDER);
+    strcat(extpath, EXTENDS_FOLDER);
+    strcat(extpath, basename);
+
+    return extpath;
 }

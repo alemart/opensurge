@@ -293,7 +293,7 @@ void load_lang_list()
 
     /* loading language data */
     lngcount = 0;
-    assetfs_foreach_file("languages", ".lng", dircount, (void*)&lngcount, true);
+    assetfs_foreach_file("languages", ".lng", dircount, (void*)&lngcount, false);
 
     /* fatal error */
     if(lngcount == 0)
@@ -303,7 +303,7 @@ void load_lang_list()
 
     /* grabbing language data */
     lngdata = mallocx(lngcount * sizeof(lngdata_t));
-    assetfs_foreach_file("languages", ".lng", dirfill, (void*)&c, true);
+    assetfs_foreach_file("languages", ".lng", dirfill, (void*)&c, false);
     qsort(lngdata, lngcount, sizeof(lngdata_t), sort_cmp);
 
     /* other stuff */
