@@ -65,17 +65,17 @@ struct physicsactor_t
     float chrgthreshold; /* charge intensity threshold */
     float waittime; /* wait time in seconds */
     int angle; /* angle (0-255 clockwise) */
-    int midair; /* is the player midair? */
-    int facing_right; /* is the player facing right? */
-    int touching_ceiling; /* is the player touching a ceiling? */
-    int inside_wall; /* inside a solid brick, possibly smashed */
-    int winning_pose; /* winning pose enabled? */
+    bool midair; /* is the player midair? */
+    bool facing_right; /* is the player facing right? */
+    bool touching_ceiling; /* is the player touching a ceiling? */
+    bool inside_wall; /* inside a solid brick, possibly smashed */
+    bool winning_pose; /* winning pose enabled? */
     float horizontal_control_lock_timer; /* lock timer, in seconds */
     float jump_lock_timer; /* jump lock timer, in seconds */
     float wait_timer; /* how long has the physics actor been stopped, in seconds */
     float midair_timer; /* how long has the physics actor been midair, in second */
     float breathe_timer; /* if greater than zero, set animation to breathing */
-    int sticky_lock; /* sticky physics lock */
+    bool sticky_lock; /* sticky physics lock */
     float charge_intensity; /* charge intensity */
     float airdrag_coefficient[2]; /* airdrag approx. coefficient */
     physicsactorstate_t state; /* state */
@@ -240,18 +240,18 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->gsp = 0.0f;
     pa->angle = 0x0;
     pa->movmode = MM_FLOOR;
-    pa->midair = TRUE;
+    pa->midair = true;
     pa->state = PAS_STOPPED;
     pa->horizontal_control_lock_timer = 0.0f;
     pa->jump_lock_timer = 0.0f;
-    pa->facing_right = TRUE;
-    pa->touching_ceiling = FALSE;
+    pa->facing_right = true;
+    pa->touching_ceiling = false;
     pa->input = input_create_computer();
     pa->wait_timer = 0.0f;
     pa->midair_timer = 0.0f;
-    pa->winning_pose = FALSE;
+    pa->winning_pose = false;
     pa->breathe_timer = 0.0f;
-    pa->sticky_lock = FALSE;
+    pa->sticky_lock = false;
     pa->charge_intensity = 0.0f;
     pa->airdrag_coefficient[0] = 0.0f;
     pa->airdrag_coefficient[1] = 1.0f;
@@ -462,29 +462,29 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds)
         pa->horizontal_control_lock_timer = seconds;
 }
 
-int physicsactor_is_midair(const physicsactor_t *pa)
+bool physicsactor_is_midair(const physicsactor_t *pa)
 {
     return pa->midair;
 }
 
-int physicsactor_is_touching_ceiling(const physicsactor_t *pa)
+bool physicsactor_is_touching_ceiling(const physicsactor_t *pa)
 {
     return pa->touching_ceiling;
 }
 
-int physicsactor_is_facing_right(const physicsactor_t *pa)
+bool physicsactor_is_facing_right(const physicsactor_t *pa)
 {
     return pa->facing_right;
 }
 
-int physicsactor_is_inside_wall(const physicsactor_t *pa)
+bool physicsactor_is_inside_wall(const physicsactor_t *pa)
 {
     return pa->inside_wall;
 }
 
 void physicsactor_enable_winning_pose(physicsactor_t *pa)
 {
-    pa->winning_pose = TRUE;
+    pa->winning_pose = true;
 }
 
 movmode_t physicsactor_get_movmode(physicsactor_t *pa)
@@ -779,7 +779,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 #define UPDATE_ANGLE_STEP(hoff, search_base, max_iterations, out_dx, out_dy) \
     do { \
         const obstacle_t* gnd = NULL; \
-        int found_a = FALSE, found_b = FALSE; \
+        bool found_a = false, found_b = false; \
         int x, y, xa, ya, xb, yb, ang; \
         float h; \
         \
@@ -883,7 +883,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED) {
         pa->ysp = min(pa->ysp + pa->grv * dt, pa->topyspeed);
         pa->position.y += pa->ysp * dt;
-        pa->facing_right = TRUE;
+        pa->facing_right = true;
         return;
     }
 
@@ -895,9 +895,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     if(pa->state != PAS_ROLLING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
         if((pa->gsp > 0.0f || pa->midair) && input_button_down(pa->input, IB_RIGHT))
-            pa->facing_right = TRUE;
+            pa->facing_right = true;
         else if((pa->gsp < 0.0f || pa->midair) && input_button_down(pa->input, IB_LEFT))
-            pa->facing_right = FALSE;
+            pa->facing_right = false;
     }
 
     /*
@@ -1230,7 +1230,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                     if(pa->state != PAS_ROLLING) {
                         if(input_button_down(pa->input, IB_RIGHT)) {
                             pa->state = PAS_PUSHING;
-                            pa->facing_right = TRUE;
+                            pa->facing_right = true;
                         }
                         else
                             pa->state = PAS_STOPPED;
@@ -1254,7 +1254,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                     if(pa->state != PAS_ROLLING) {
                         if(input_button_down(pa->input, IB_LEFT)) {
                             pa->state = PAS_PUSHING;
-                            pa->facing_right = FALSE;
+                            pa->facing_right = false;
                         }
                         else
                             pa->state = PAS_STOPPED;
@@ -1358,7 +1358,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
         /* offset the character */
         pa->position = v2d_add(pa->position, offset);
-        pa->midair = FALSE; /* cloud bugfix for UPDATE_SENSORS */
+        pa->midair = false; /* cloud bugfix for UPDATE_SENSORS */
         SET_AUTO_ANGLE();
 
         /* if the player is still in the air,
@@ -1369,12 +1369,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
             /* sticky physics hack */
             if(pa->state == PAS_ROLLING)
-                pa->sticky_lock = TRUE;
+                pa->sticky_lock = true;
         }
     }
     else if(!pa->midair && pa->state == PAS_ROLLING) {
         /* undo sticky physics hack */
-        pa->sticky_lock = FALSE;
+        pa->sticky_lock = false;
     }
 
     /* stick to the ground */
@@ -1449,7 +1449,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(pa->midair && pa->touching_ceiling) {
         const obstacle_t *ceiling = NULL;
         const sensor_t *ceiling_sensor = NULL;
-        int must_reattach = FALSE;
+        bool must_reattach = false;
 
         /* picking the ceiling */
         if(pick_the_best_ceiling(pa, at_C, at_D, sensor_C(pa), sensor_D(pa)) == 'c') {
@@ -1517,11 +1517,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         int y = (int)pa->position.y + sensor_get_y2(s) + 8;
         if(at_A != NULL && at_B == NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
             pa->state = PAS_LEDGE;
-            pa->facing_right = TRUE;
+            pa->facing_right = true;
         }
         else if(at_A == NULL && at_B != NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
             pa->state = PAS_LEDGE;
-            pa->facing_right = FALSE;
+            pa->facing_right = false;
         }
     }
 
