@@ -107,6 +107,7 @@ static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
+static bool is_player_standing_on_platform(const player_t *player, const brick_t *brk);
 static int brickdata_count = 0; /* size of brickdata[] */
 static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
 
@@ -306,9 +307,11 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
         case BRB_FALL: {
             int collision = FALSE;
 
-            for(i=0; i<team_size && !collision; i++) {
-                if(player_senses_layer(team[i], brk->layer))
-                    collision = player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height));
+            for(i = 0; i < team_size && !collision; i++) {
+                if(player_senses_layer(team[i], brk->layer)) {
+                    if(is_player_standing_on_platform(team[i], brk))
+                        collision = TRUE;
+                }
             }
             
             if(brk->state == BRS_IDLE && collision)
@@ -364,15 +367,11 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             if(brk->brick_ref->type == BRK_PASSABLE)
                 break;
 
-            /* set the obstacle */
-            if(brk->obstacle != NULL)
-                obstacle_set_position(brk->obstacle, brk->x, brk->y);
-
             /* move the player(s) */
-            for(i=0; i<team_size; i++) {
+            for(i = 0; i < team_size; i++) {
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
-                        if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
+                        if(is_player_standing_on_platform(team[i], brk)) {
                             team[i]->on_movable_platform = TRUE;
                             team[i]->actor->position.x += dx;
                             team[i]->actor->position.y += dy;
@@ -380,6 +379,56 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     }
                 }
             }
+
+            /* move the obstacle after moving the player(s) */
+            if(brk->obstacle != NULL)
+                obstacle_set_position(brk->obstacle, brk->x, brk->y);
+
+            /* done */
+            break;
+        }
+
+        /* pendular bricks */
+        case BRB_PENDULAR: {
+            int dx, dy, old_x, old_y;
+
+            /* get the parameters */
+            float t = (brk->value[0] = level_time()); /* elapsed time */
+            float r = max(brk->brick_ref->behavior_arg[0], 0.0f); /* radius */
+            float f = TWO_PI * brk->brick_ref->behavior_arg[1]; /* cycles per second */
+            float ph = DEG2RAD(brk->brick_ref->behavior_arg[2]); /* initial phase */
+            float off = DEG2RAD(90.0f + brk->brick_ref->behavior_arg[3]); /* angular offset */
+            float a = DEG2RAD(fmodf(180.0f + brk->brick_ref->behavior_arg[4], 360.0f)); /* angular amplitude */
+
+            /* compute the angle */
+            float ang = (a / 2.0f) * cosf(f * t + ph) + off;
+
+            /* compute the position */
+            old_x = brk->x; old_y = brk->y;
+            brk->x = brk->sx + ROUND(r * cosf(ang));
+            brk->y = brk->sy + ROUND(r * sinf(ang));
+            dx = brk->x - old_x; dy = brk->y - old_y;
+
+            /* passable bricks do not affect the player */
+            if(brk->brick_ref->type == BRK_PASSABLE)
+                break;
+
+            /* move the player(s) */
+            for(i = 0; i < team_size; i++) {
+                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
+                    if(player_senses_layer(team[i], brk->layer)) {
+                        if(is_player_standing_on_platform(team[i], brk)) {
+                            team[i]->on_movable_platform = TRUE;
+                            team[i]->actor->position.x += dx;
+                            team[i]->actor->position.y += dy;
+                        }
+                    }
+                }
+            }
+
+            /* move the obstacle after moving the player(s) */
+            if(brk->obstacle != NULL)
+                obstacle_set_position(brk->obstacle, brk->x, brk->y);
 
             /* done */
             break;
@@ -461,10 +510,10 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 break;
 
             /* check for collisions */
-            for(i=0; i<team_size && !player; i++) {
+            for(i = 0; i < team_size && !player; i++) {
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
-                        if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height)))
+                        if(is_player_standing_on_platform(team[i], brk))
                             player = team[i];
                     }
                 }
@@ -517,52 +566,6 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                 brk->state = BRS_DEAD;
             }
             
-            /* done */
-            break;
-        }
-
-        /* pendular bricks */
-        case BRB_PENDULAR: {
-            int dx, dy, old_x, old_y;
-
-            /* get the parameters */
-            float t = (brk->value[0] = level_time()); /* elapsed time */
-            float r = max(brk->brick_ref->behavior_arg[0], 0.0f); /* radius */
-            float f = TWO_PI * brk->brick_ref->behavior_arg[1]; /* cycles per second */
-            float ph = DEG2RAD(brk->brick_ref->behavior_arg[2]); /* initial phase */
-            float off = DEG2RAD(90.0f + brk->brick_ref->behavior_arg[3]); /* angular offset */
-            float a = DEG2RAD(fmodf(180.0f + brk->brick_ref->behavior_arg[4], 360.0f)); /* angular amplitude */
-
-            /* compute the angle */
-            float ang = (a / 2.0f) * cosf(f * t + ph) + off;
-
-            /* compute the position */
-            old_x = brk->x; old_y = brk->y;
-            brk->x = brk->sx + ROUND(r * cosf(ang));
-            brk->y = brk->sy + ROUND(r * sinf(ang));
-            dx = brk->x - old_x; dy = brk->y - old_y;
-
-            /* passable bricks do not affect the player */
-            if(brk->brick_ref->type == BRK_PASSABLE)
-                break;
-
-            /* set the obstacle */
-            if(brk->obstacle != NULL)
-                obstacle_set_position(brk->obstacle, brk->x, brk->y);
-
-            /* move the player(s) */
-            for(i=0; i<team_size; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
-                    if(player_senses_layer(team[i], brk->layer)) {
-                        if(player_overlaps(team[i], brk->x, brk->y - 4, brk_width, min(8, brk_height))) {
-                            team[i]->on_movable_platform = TRUE;
-                            team[i]->actor->position.x += dx;
-                            team[i]->actor->position.y += dy;
-                        }
-                    }
-                }
-            }
-
             /* done */
             break;
         }
@@ -984,6 +987,16 @@ void brick_animate(brick_t *brk)
         brk->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
     }
 }
+
+/* Checks if the player is standing on top of a platform */
+bool is_player_standing_on_platform(const player_t *player, const brick_t *brk)
+{
+    if(brk->obstacle == NULL)
+        return false;
+
+    return physicsactor_is_standing_on_platform(player->pa, brk->obstacle);
+}
+
 
 
 
