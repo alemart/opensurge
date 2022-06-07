@@ -689,6 +689,26 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
         *center = pa->position;
 }
 
+/* check if the physicsactor is standing on a specific platform (obstacle) */
+bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstacle_t *obstacle)
+{
+    int x1, y1, x2, y2;
+    const sensor_t *a = sensor_A(pa);
+    const sensor_t *b = sensor_B(pa);
+
+    /* check sensor A */
+    sensor_worldpos(a, pa->position, pa->movmode, &x1, &y1, &x2, &y2);
+    if(obstacle_got_collision(obstacle, x1, y1, x2, y2))
+        return true;
+
+    /* check sensor B */
+    sensor_worldpos(b, pa->position, pa->movmode, &x1, &y1, &x2, &y2);
+    if(obstacle_got_collision(obstacle, x1, y1, x2, y2))
+        return true;
+
+    /* no collision */
+    return false;
+}
 
 
 
