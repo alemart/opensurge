@@ -121,7 +121,7 @@ static bool is_setup_object(const char* object_name);
 #define DLGBOX_MAXTIME          10000
 #define TEAM_MAX                16
 #define DEFAULT_WATERLEVEL      LARGE_INT
-#define DEFAULT_WATERCOLOR()    color_rgb(0,32,192)
+#define DEFAULT_WATERCOLOR()    color_rgba(0,64,255,128)
 #define DEFAULT_GRAVITY         787.5f
 #define PATH_MAXLEN             1024
 #define LINE_MAXLEN             1024
@@ -704,9 +704,9 @@ int level_save(const char *filepath)
     if(waterlevel != DEFAULT_WATERLEVEL)
         fprintf(fp, "waterlevel %d\n", waterlevel);
     if(!color_equals(watercolor, DEFAULT_WATERCOLOR())) {
-        uint8_t r, g, b;
-        color_unmap(watercolor, &r, &g, &b, NULL);
-        fprintf(fp, "watercolor %d %d %d\n", r, g, b);
+        uint8_t r, g, b, a;
+        color_unmap(watercolor, &r, &g, &b, &a);
+        fprintf(fp, "watercolor %d %d %d %d\n", r, g, b, a);
     }
 
     /* dialog regions */
@@ -906,14 +906,23 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
     }
     else if(str_icmp(identifier, "watercolor") == 0) {
         if(param_count == 3) {
-            watercolor = color_rgb(
+            watercolor = color_rgba(
                 clip(atoi(param[0]), 0, 255),
                 clip(atoi(param[1]), 0, 255),
-                clip(atoi(param[2]), 0, 255)
+                clip(atoi(param[2]), 0, 255),
+                128
+            );
+        }
+        else if(param_count == 4) {
+            watercolor = color_rgba(
+                clip(atoi(param[0]), 0, 255),
+                clip(atoi(param[1]), 0, 255),
+                clip(atoi(param[2]), 0, 255),
+                clip(atoi(param[3]), 0, 255)
             );
         }
         else
-            logfile_message("Level loader - command 'watercolor' expects three parameters: red, green, blue");
+            logfile_message("Level loader - command 'watercolor' expects parameters: red, green, blue [, alpha]");
     }
     else if(str_icmp(identifier, "spawn_point") == 0) {
         if(param_count == 2) {
