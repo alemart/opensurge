@@ -202,7 +202,7 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
         player = Player.active;
 
         // the player is protected by the water shield
-        if(player.shield == "water") {
+        if(player.shield == "water" || player.dying) {
 
             // if the player gets the water shield while the timer
             // is active, we hide the counter and stop the music
