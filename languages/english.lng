@@ -395,3 +395,5 @@ INPUT_FIRE8                 "${INPUT_${INPUT_TYPE}_FIRE8}"
 
 // Backward compatibility
 HUD_COLLECTIBLES            "$HUD_POWER"
+
+// EOF
