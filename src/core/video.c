@@ -41,7 +41,6 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_memfile.h>
 
-#define IMAGE2BITMAP(img) (*((ALLEGRO_BITMAP**)(img)))
 #define PRINT(x, y, flags, fmt, ...) do { \
     al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
     al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
@@ -63,7 +62,6 @@ static void set_display_icon(ALLEGRO_DISPLAY* display);
 #include <jpgalleg.h>
 #include "hqx/hqx.h"
 
-#define IMAGE2BITMAP(img)       (*((BITMAP**)(img)))   /* whoooa, this is crazy stuff */
 static image_t *video_buffer;
 static image_t *window_surface;
 static void fast2x_blit(image_t *src, image_t *dest);

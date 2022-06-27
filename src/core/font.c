@@ -49,11 +49,6 @@
 #include "../scenes/level.h"
 
 /* private stuff */
-#if defined(A5BUILD)
-#define IMAGE2BITMAP(img)           (*((ALLEGRO_BITMAP**)(img)))
-#else
-#define IMAGE2BITMAP(img)           (*((BITMAP**)(img)))
-#endif
 #define FONT_STACKCAPACITY          8        /* color stack capacity */
 #define FONT_TEXTMAXSIZE            65536    /* maximum size for texts */
 #define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
