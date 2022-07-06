@@ -359,7 +359,7 @@ void push_initial_scene(const commandline_t* cmd)
     }
     else if(custom_quest) {
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)(commandline_getstring(cmd->custom_quest_path, "")));
-        scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
+        /*scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);*/
     }
     else if(scripting_testmode()) {
         scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)(SSAPP_LEVEL));
