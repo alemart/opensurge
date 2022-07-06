@@ -2166,6 +2166,9 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
     item_list_t *inode;
     enemy_list_t *enode;
 
+    /* clear the screen */
+    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(0,0,0));
+
     /* starting up the render queue... */
     renderqueue_begin( camera_get_position() );
 
