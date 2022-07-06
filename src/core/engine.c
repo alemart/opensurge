@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * engine.c - game engine facade
- * Copyright (C) 2010-2011, 2018, 2020-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010-2011, 2018, 2020-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -61,7 +61,7 @@
 /* minimum Allegro version */
 #define AL_MIN_MAJOR       5
 #define AL_MIN_MINOR       2
-#define AL_MIN_REVISION    3
+#define AL_MIN_REVISION    7
 #if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
 #error "This build requires a newer version of Allegro"
 #endif
@@ -81,6 +81,7 @@ static void release_nanoparser();
 static void parser_error(const char *msg);
 static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
+static const char* a5_version_string();
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
@@ -89,11 +90,9 @@ static bool force_quit = false;
 
 /* public variables */
 ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
-bool a5_display_active = true;
 extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
-static const char* a5_version_string();
 
 
 
@@ -174,14 +173,6 @@ void engine_mainloop()
             case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
             case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
                 a5_handle_joystick_event(&event);
-                break;
-
-            case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-                a5_display_active = true;
-                break;
-
-            case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
-                a5_display_active = false;
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -499,7 +490,7 @@ const char* a5_version_string()
     static char str[17];
     uint32_t version = al_get_allegro_version();
 
-    snprintf(str, sizeof(str), "%u.%u.%u[%u]",
+    snprintf(str, sizeof(str), "%u.%u.%u-%u",
         (version & 0xFF000000) >> 24,
         (version & 0xFF0000) >> 16,
         (version & 0xFF00) >> 8,

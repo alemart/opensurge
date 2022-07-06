@@ -42,7 +42,6 @@ void video_release();
 void video_render();
 int video_get_preferred_color_depth();
 int video_get_color_depth();
-bool video_is_window_active();
 void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen);
 videoresolution_t video_get_resolution();
 videoresolution_t video_initial_resolution();

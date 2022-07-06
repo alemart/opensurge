@@ -1271,9 +1271,6 @@ void level_update()
     for(i=0; i<team_size; i++)
         block_pause = block_pause || player_is_dying(team[i]);
 
-    /*if(!video_is_window_active())
-        wants_to_pause = TRUE;*/
-
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
         sound_play(SFX_PAUSE);

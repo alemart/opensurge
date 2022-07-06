@@ -411,18 +411,6 @@ int video_get_preferred_color_depth()
 
 
 /*
- * video_is_window_active()
- * Checks if the game window is active
- */
-bool video_is_window_active()
-{
-    extern bool a5_display_active;
-    return a5_display_active;
-}
-
-
-
-/*
  * video_show_fps()
  * Shows/hides the FPS counter
  */
