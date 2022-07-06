@@ -89,9 +89,9 @@ static bool force_quit = false;
 
 /* public variables */
 ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
-bool a5_key[ALLEGRO_KEY_MAX] = { false };
-int a5_mouse_b = 0;
 bool a5_display_active = true;
+extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
+extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
 static const char* a5_version_string();
 
@@ -160,19 +160,13 @@ void engine_mainloop()
             }
 
             case ALLEGRO_EVENT_KEY_DOWN:
-                a5_key[event.keyboard.keycode] = true;
-                break;
-
             case ALLEGRO_EVENT_KEY_UP:
-                a5_key[event.keyboard.keycode] = false;
+                a5_handle_keyboard_event(&event);
                 break;
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                a5_mouse_b |= 1 << (event.mouse.button - 1);
-                break;
-
             case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-                a5_mouse_b &= ~(1 << (event.mouse.button - 1));
+                a5_handle_mouse_event(&event);
                 break;
 
             case ALLEGRO_EVENT_JOYSTICK_AXIS:

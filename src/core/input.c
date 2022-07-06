@@ -63,9 +63,17 @@ struct input_list_t {
     input_list_t *next;
 };
 
-/* mouse struct */
+/* keyboard input */
+static bool a5_key[ALLEGRO_KEY_MAX] = { false };
+
+/* mouse input */
+#define LEFT_MOUSE_BUTTON   1 /* primary button, 1 << 0 */
+#define RIGHT_MOUSE_BUTTON  2 /* secondary button, 1 << 1 */
+#define MIDDLE_MOUSE_BUTTON 4 /* tertiary button, 1 << 2 */
 static struct {
-    int x, y, z, dx, dy, dz, b;
+    int x, y, z; /* position of the cursor */
+    int dx, dy, dz; /* deltas */
+    int b; /* bit vector of active buttons */
 } a5_mouse = { 0 };
 
 /* joysticks */
@@ -83,7 +91,7 @@ static struct {
 /* private data */
 static const char* DEFAULT_INPUTMAP_NAME = "default";
 static const float joy_analog_threshold[MAX_AXES] = { 0.4f, 0.8f }; /* (x,y) axes. Pressing up + jump won't make the player jump */
-static input_list_t *inlist;
+static input_list_t *inlist = NULL;
 
 /* private methods */
 static void input_register(input_t *in);
@@ -127,6 +135,15 @@ void input_init()
     /* initializing the input list */
     inlist = NULL;
 
+    /* initialize mouse input */
+    a5_mouse.b = 0;
+    a5_mouse.x = a5_mouse.y = a5_mouse.z = 0;
+    a5_mouse.dx = a5_mouse.dy = a5_mouse.dz = 0;
+
+    /* initialize keyboard input */
+    for(int i = 0; i < ALLEGRO_KEY_MAX; i++)
+        a5_key[i] = false;
+
     /* loading custom input mappings */
     inputmap_init();
 }
@@ -137,9 +154,8 @@ void input_init()
  */
 void input_update()
 {
-    int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
-    extern int a5_mouse_b;
     ALLEGRO_MOUSE_STATE state;
+    int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
 
     /* read mouse input */
     al_get_mouse_state(&state);
@@ -149,7 +165,7 @@ void input_update()
     a5_mouse.x = state.x;
     a5_mouse.y = state.y;
     a5_mouse.z = state.z;
-    a5_mouse.b = a5_mouse_b; /* received from the event queue */
+    /*a5_mouse.b is received from the event queue */
 
     /* read joystick input */
     for(int j = 0; j < num_joys; j++) {
@@ -550,9 +566,9 @@ void inputmouse_update(input_t* in)
     in->state[IB_DOWN] = (mouse->dz < 0);
     in->state[IB_LEFT] = false;
     in->state[IB_RIGHT] = false;
-    in->state[IB_FIRE1] = (a5_mouse.b & 1);
-    in->state[IB_FIRE2] = (a5_mouse.b & 2);
-    in->state[IB_FIRE3] = (a5_mouse.b & 4);
+    in->state[IB_FIRE1] = (a5_mouse.b & LEFT_MOUSE_BUTTON);
+    in->state[IB_FIRE2] = (a5_mouse.b & RIGHT_MOUSE_BUTTON);
+    in->state[IB_FIRE3] = (a5_mouse.b & MIDDLE_MOUSE_BUTTON);
     in->state[IB_FIRE4] = false;
     in->state[IB_FIRE5] = false;
     in->state[IB_FIRE6] = false;
@@ -569,7 +585,6 @@ void inputuserdefined_update(input_t* in)
 {
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
-    extern bool a5_key[];
     inputbutton_t button;
 
     for(button = 0; button < IB_MAX; button++)
@@ -592,6 +607,38 @@ void inputuserdefined_update(input_t* in)
                 in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
             }
         }
+    }
+}
+
+/* handle an ALLEGRO_KEYBOARD_EVENT */
+void a5_handle_keyboard_event(const ALLEGRO_EVENT* event)
+{
+    switch(event->type) {
+
+        case ALLEGRO_EVENT_KEY_DOWN:
+            a5_key[event->keyboard.keycode] = true;
+            break;
+
+        case ALLEGRO_EVENT_KEY_UP:
+            a5_key[event->keyboard.keycode] = false;
+            break;
+
+    }
+}
+
+/* handle an ALLEGRO_MOUSE_EVENT */
+void a5_handle_mouse_event(const ALLEGRO_EVENT* event)
+{
+    switch(event->type) {
+
+        case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+            a5_mouse.b |= 1 << (event->mouse.button - 1);
+            break;
+
+        case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+            a5_mouse.b &= ~(1 << (event->mouse.button - 1));
+            break;
+
     }
 }
 
