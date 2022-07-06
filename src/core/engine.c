@@ -85,6 +85,7 @@ static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
 static const uint32_t GC_INTERVAL = 10000; /* in ms (garbage collector) */
+static bool force_quit = false;
 
 /* public variables */
 ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
@@ -131,7 +132,7 @@ void engine_mainloop()
     al_start_timer(timer);
 
     /* main loop */
-    while(!game_is_over() && !scenestack_empty()) {
+    while(!force_quit && !scenestack_empty()) {
         ALLEGRO_EVENT event;
         al_wait_for_event(a5_event_queue, &event);
 
@@ -190,7 +191,7 @@ void engine_mainloop()
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                game_quit();
+                engine_quit();
                 break;
         }
 
@@ -219,6 +220,16 @@ void engine_release()
     release_accessories();
     release_managers();
     release_basic_stuff();
+}
+
+
+/*
+ * engine_quit()
+ * Quit the application
+ */
+void engine_quit()
+{
+    force_quit = true;
 }
 
 
@@ -255,6 +266,7 @@ void init_basic_stuff(const commandline_t* cmd)
     const char* basedir = commandline_getstring(cmd->basedir, NULL);
     const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
 
+    force_quit = false;
     srand(time(NULL));
     assetfs_init(gameid, basedir, gamedir);
     logfile_init();

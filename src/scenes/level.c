@@ -32,6 +32,7 @@
 #include "quest.h"
 #include "util/editorgrp.h"
 #include "util/editorcmd.h"
+#include "../core/engine.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/global.h"
@@ -1226,7 +1227,7 @@ void level_update()
 
     /* should we quit due to scripting? */
     if(!surgescript_vm_is_active(surgescript_vm())) {
-        game_quit();
+        engine_quit();
         return;
     }
 

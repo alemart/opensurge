@@ -35,7 +35,6 @@
 #include <allegro5/allegro_native_dialog.h>
 
 /* private stuff */
-static bool game_over = false;
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
 
@@ -78,25 +77,7 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
 
 
 
-/* Game routines */
-
-/*
- * game_quit()
- * Quit game?
- */
-void game_quit()
-{
-    game_over = true;
-}
-
-/*
- * game_is_over()
- * Game over?
- */
-int game_is_over()
-{
-    return game_over;
-}
+/* General utilities */
 
 
 /*
@@ -112,9 +93,6 @@ int game_version_compare(int sup_version, int sub_version, int wip_version)
     int version_code = VERSION_CODE(max(0, sup_version), max(0, sub_version), max(0, wip_version));
     return GAME_VERSION_CODE - version_code;
 }
-
-
-/* Misc */
 
 /*
  * fatal_error()

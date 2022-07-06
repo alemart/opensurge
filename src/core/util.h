@@ -61,16 +61,12 @@
 #define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" STRINGIFY(__LINE__))
 #define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" STRINGIFY(__LINE__))
 
-/* Game routines */
-void game_quit(); /* quit */
-int game_is_over(); /* game over? */
-int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game */
-
 /* Memory management */
 void* __mallocx(size_t bytes, const char* location);
 void* __reallocx(void *ptr, size_t bytes, const char* location);
 
-/* Misc utilities */
+/* General utilities */
+int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game engine */
 void fatal_error(const char *fmt, ...); /* crash the program with a message */
 void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 float lerp(float a, float b, float t); /* linear interpolation */

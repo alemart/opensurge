@@ -25,5 +25,7 @@ void engine_init(int argc, char **argv);
 void engine_mainloop();
 void engine_release();
 
+void engine_quit();
+
 #endif
 
