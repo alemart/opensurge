@@ -88,8 +88,8 @@ static const double TARGET_FPS = 60.0; /* frames per second */
 static const uint32_t GC_INTERVAL = 10000; /* in ms (garbage collector) */
 static bool force_quit = false;
 
-/* public variables */
-ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
+/* Allegro 5 events */
+ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL; /* public */
 extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
