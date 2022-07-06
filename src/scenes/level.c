@@ -1481,7 +1481,7 @@ void level_render()
     item_list_t *major_items;
     enemy_list_t *major_enemies;
 
-    /* very important, if we restart the level */
+    /* very important (if we restart the level) */
     if(level_timer < 0.05f)
         return;
 
@@ -1502,6 +1502,9 @@ void level_render()
     major_bricks = entitymanager_retrieve_active_bricks();
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
+
+    /* clear the screen */
+    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(0,0,0));
 
     /* render level */
     render_level(major_bricks, major_items, major_enemies);
@@ -2166,9 +2169,6 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
     brick_list_t *bnode;
     item_list_t *inode;
     enemy_list_t *enode;
-
-    /* clear the screen */
-    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(0,0,0));
 
     /* starting up the render queue... */
     renderqueue_begin( camera_get_position() );
