@@ -1,7 +1,7 @@
 #
 # Open Surge Engine
 # CMakeLists.txt - CMake script
-# Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
+# Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
 # http://opensurge2d.org
 #
 # This program is free software; you can redistribute it and/or modify
@@ -56,9 +56,6 @@ ENDIF()
 SET(DEFS "") # #define'd stuff
 
 # User options
-OPTION(USE_A5 "Use the Allegro 5 backend" ON)
-OPTION(LEGACY_USE_STATIC "Use static libs whenever possible (legacy; Allegro 4 only)" ON)
-OPTION(LEGACY_USE_OPENAL "Use OpenAL for audio playback (deprecated; Allegro 4 only)" OFF)
 OPTION(SURGESCRIPT_STATIC "Link SurgeScript statically" OFF)
 OPTION(ALLEGRO_STATIC "Use the static version of Allegro 5 (Windows only)" OFF)
 OPTION(ALLEGRO_MONOLITH "Use the monolith version of Allegro 5" OFF)
@@ -100,23 +97,6 @@ IF(UNIX)
   ENDIF()
 ENDIF()
 
-# Use the Allegro 5 backend
-IF(USE_A5)
-  SET(DEFS ${DEFS} "A5BUILD")
-  MESSAGE(STATUS "Building using the Allegro 5 backend...")
-ELSE()
-  MESSAGE(STATUS "Building using the legacy Allegro 4 backend...")
-ENDIF()
-
-# legacy option: prefer static libs
-IF(NOT USE_A5 AND LEGACY_USE_STATIC)
-  IF(WIN32)
-    SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-  ELSE()
-    SET(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-  ENDIF()
-ENDIF()
-
 # Generate files from templates
 FUNCTION(generate_file TEMPLATE)
   CONFIGURE_FILE("src/misc/${TEMPLATE}.in" "src/misc/${TEMPLATE}" @ONLY)
@@ -141,37 +121,37 @@ ENDIF()
 # ------------------------------------------
 # Finding the required libraries
 # ------------------------------------------
-IF(USE_A5)
 
-  # Find Allegro 5 & addons
-  SET(REQUIRED_A5_LIBS
-    allegro
-    allegro_image
-    allegro_primitives
-    allegro_font
-    allegro_ttf
-    allegro_acodec
-    allegro_audio
-    allegro_dialog
-    allegro_memfile
-  )
+# Find Allegro 5 & addons
+SET(REQUIRED_A5_LIBS
+allegro
+allegro_image
+allegro_primitives
+allegro_font
+allegro_ttf
+allegro_acodec
+allegro_audio
+allegro_dialog
+allegro_memfile
+)
 
-  # OSX requires allegro_main
-  IF(APPLE)
+# OSX requires allegro_main
+IF(APPLE)
     LIST(APPEND REQUIRED_A5_LIBS allegro_main)
-  ENDIF()
+ENDIF()
 
-  # Use the monolith version
-  IF(ALLEGRO_MONOLITH)
+# Use the monolith version
+IF(ALLEGRO_MONOLITH)
     SET(REQUIRED_A5_LIBS allegro_monolith)
-  ENDIF()
+ENDIF()
 
-  # Use static libs
-  IF(ALLEGRO_STATIC)
+# Use static libs
+IF(ALLEGRO_STATIC)
+
     # add -static suffix
     SET(A5_LIBS "")
     FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
-      LIST(APPEND A5_LIBS "${A5_LIB}-static")
+        LIST(APPEND A5_LIBS "${A5_LIB}-static")
     ENDFOREACH()
     SET(REQUIRED_A5_LIBS ${A5_LIBS})
 
@@ -180,7 +160,7 @@ IF(USE_A5)
 
     # require Win32 libs
     IF(WIN32)
-      LIST(APPEND REQUIRED_A5_LIBS
+        LIST(APPEND REQUIRED_A5_LIBS
         mingw32
         #dumb
         #FLAC
@@ -213,134 +193,25 @@ IF(USE_A5)
         #opusfile
         #opus
         #webp
-      )
+        )
     ELSE()
-      MESSAGE(FATAL_ERROR "Static linking is currently unavailable for this platform.")
+        MESSAGE(FATAL_ERROR "Static linking is currently unavailable for this platform.")
     ENDIF()
-  ENDIF()
-
-  # Write to LALLEGRO5
-  SET(LALLEGRO5 "")
-  FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
-    STRING(TOUPPER "L${A5_LIB}" _A5_LIB)
-    FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATHS ${ALLEGRO_LIBRARY_PATH})
-    IF(NOT ${_A5_LIB})
-      MESSAGE(FATAL_ERROR "Can't find Allegro 5 lib (lib${A5_LIB}). ${HELP}")
-    ELSE()
-      MESSAGE(STATUS "Found lib${A5_LIB} at ${${_A5_LIB}}...")
-      SET(LALLEGRO5 "${LALLEGRO5}" "${${_A5_LIB}}")
-    ENDIF()
-  ENDFOREACH()
-
-ELSE()
-  
-  # Allegro 4: liballeg
-  FIND_LIBRARY(LALLEG NAMES alleg PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LALLEG)
-    MESSAGE(FATAL_ERROR "Fatal error: couldn't find the Allegro game programming library (liballeg)! ${HELP}")
-  ELSE(NOT LALLEG)
-    IF(UNIX)
-      SET(ALLEGRO_RECOMMENDED_VERSION "4.4.3")
-      EXECUTE_PROCESS(COMMAND allegro-config --version OUTPUT_VARIABLE ALLEGRO_UNIX_VERSION)
-      IF(ALLEGRO_UNIX_VERSION)
-        STRING(REGEX REPLACE "[ \r\n\t]+$" "" ALLEGRO_UNIX_VERSION ${ALLEGRO_UNIX_VERSION})
-      ENDIF(ALLEGRO_UNIX_VERSION)
-      IF(NOT ALLEGRO_UNIX_VERSION STREQUAL ALLEGRO_RECOMMENDED_VERSION)
-        MESSAGE("\nWARNING: your Allegro version is ${ALLEGRO_UNIX_VERSION}. The recommended version is ${ALLEGRO_RECOMMENDED_VERSION}.\n         ${GAME_NAME} may not compile properly!\n")
-      ENDIF(NOT ALLEGRO_UNIX_VERSION STREQUAL ALLEGRO_RECOMMENDED_VERSION)
-    ENDIF(UNIX)
-  ENDIF(NOT LALLEG)
-
-  # loadpng: libloadpng, libpng and zlib
-  FIND_LIBRARY(LLOADPNG NAMES loadpng PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LLOADPNG)
-    MESSAGE(FATAL_ERROR "Fatal error: libloadpng not found! ${HELP}")
-  ENDIF(NOT LLOADPNG)
-
-  FIND_LIBRARY(LPNG NAMES png PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LPNG)
-    MESSAGE(FATAL_ERROR "Fatal error: libpng not found! ${HELP}")
-  ENDIF(NOT LPNG)
-
-  FIND_LIBRARY(LZ NAMES z PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LZ)
-    MESSAGE(FATAL_ERROR "Fatal error: zlib not found! ${HELP}")
-  ENDIF(NOT LZ)
-
-  # JPGalleg: libjpgalleg
-  FIND_LIBRARY(LJPGALLEG NAMES jpgalleg PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LJPGALLEG)
-    MESSAGE(FATAL_ERROR "Fatal error: libjpgalleg not found! ${HELP}")
-  ENDIF(NOT LJPGALLEG)
-
-  # Ogg/Vorbis: libogg, libvorbis, libvorbisfile
-  FIND_LIBRARY(LOGG NAMES ogg PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LOGG)
-    MESSAGE(FATAL_ERROR "Fatal error: libogg not found! ${HELP}")
-  ENDIF(NOT LOGG)
-
-  FIND_LIBRARY(LVORBIS NAMES vorbis PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LVORBIS)
-    MESSAGE(FATAL_ERROR "Fatal error: libvorbis not found! ${HELP}")
-  ENDIF(NOT LVORBIS)
-
-  FIND_LIBRARY(LVORBISFILE NAMES vorbisfile PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LVORBISFILE)
-    MESSAGE(FATAL_ERROR "Fatal error: libvorbisfile not found! ${HELP}")
-  ENDIF(NOT LVORBISFILE)
-
-  # LOGG: liblogg
-  IF(NOT LEGACY_USE_OPENAL)
-    MESSAGE(STATUS "Building using Allegro for audio playback...")
-    FIND_LIBRARY(LLOGG NAMES logg PATHS ${ALLEGRO_LIBRARY_PATH})
-    IF(NOT LLOGG)
-      MESSAGE(FATAL_ERROR "Fatal error: liblogg not found! ${HELP}")
-    ENDIF(NOT LLOGG)
-    SET(AUDIO_LIBS logg vorbisfile vorbis ogg)
-  ENDIF(NOT LEGACY_USE_OPENAL)
-
-  # OpenAL & ALURE
-  IF(LEGACY_USE_OPENAL)
-    MESSAGE(STATUS "Building using OpenAL for audio playback...")
-    FIND_LIBRARY(LOPENAL NAMES openal OpenAL OpenAL32 al PATHS ${ALLEGRO_LIBRARY_PATH})
-    IF(NOT LOPENAL)
-      MESSAGE(FATAL_ERROR "Fatal error: can't find OpenAL! ${HELP}")
-    ENDIF(NOT LOPENAL)
-    FIND_LIBRARY(LALURE NAMES alure-static ALURE32-static PATHS ${ALLEGRO_LIBRARY_PATH}) # try the static version first
-    IF(NOT LALURE)
-      FIND_LIBRARY(LALURE NAMES alure PATHS ${ALLEGRO_LIBRARY_PATH})
-      IF(NOT LALURE)
-        MESSAGE(FATAL_ERROR "Fatal error: can't find ALURE! ${HELP}")
-      ENDIF(NOT LALURE)
-    ENDIF(NOT LALURE)
-
-    IF(UNIX)
-      FIND_LIBRARY(LPTHREAD NAMES pthread PATHS ${ALLEGRO_LIBRARY_PATH})
-      IF(NOT LPTHREAD)
-        MESSAGE(FATAL_ERROR "Fatal error: can't find libpthread! ${HELP}")
-      ENDIF(NOT LPTHREAD)
-      IF(NOT ${CMAKE_SYSTEM_NAME} MATCHES ".*BSD|DragonFly.*")
-        FIND_LIBRARY(LDL NAMES dl PATHS ${ALLEGRO_LIBRARY_PATH})
-        IF(NOT LDL)
-          MESSAGE(FATAL_ERROR "Fatal error: can't find libdl! ${HELP}")
-        ENDIF(NOT LDL)
-      ENDIF(NOT ${CMAKE_SYSTEM_NAME} MATCHES ".*BSD|DragonFly.*")
-    ELSE(UNIX)
-      SET(LPTHREAD "") # TODO?
-      SET(LDL "")
-    ENDIF(UNIX)
-
-    SET(DEFS ${DEFS} __USE_OPENAL__ ALURE_STATIC_LIBRARY)
-    SET(AUDIO_LIBS ${LALURE} ${LOPENAL} vorbisfile vorbis ogg stdc++ ${LPTHREAD} ${LDL})
-  ENDIF(LEGACY_USE_OPENAL)
-
-  # Alfont: libalfont
-  FIND_LIBRARY(LALFONT NAMES alfont PATHS ${ALLEGRO_LIBRARY_PATH})
-  IF(NOT LALFONT)
-    MESSAGE(FATAL_ERROR "Fatal error: modified alfont not found! ${HELP}")
-  ENDIF(NOT LALFONT)
 
 ENDIF()
+
+# Write to LALLEGRO5
+SET(LALLEGRO5 "")
+FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
+STRING(TOUPPER "L${A5_LIB}" _A5_LIB)
+FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATHS ${ALLEGRO_LIBRARY_PATH})
+IF(NOT ${_A5_LIB})
+    MESSAGE(FATAL_ERROR "Can't find Allegro 5 lib (lib${A5_LIB}). ${HELP}")
+ELSE()
+    MESSAGE(STATUS "Found lib${A5_LIB} at ${${_A5_LIB}}...")
+    SET(LALLEGRO5 "${LALLEGRO5}" "${${_A5_LIB}}")
+ENDIF()
+ENDFOREACH()
 
 # SurgeScript: libsurgescript
 SET(LSURGESCRIPT_NAME surgescript)
@@ -572,23 +443,11 @@ SET(GAME_HEADERS
   src/misc/iconwin.rc
 )
 
-# Allegro 4 specifics
-IF(NOT USE_A5)
-  IF(UNIX)
-    SET(GAME_SRCS ${GAME_SRCS} src/misc/icon_a4.c)
-  ENDIF()
-  SET(GAME_SRCS ${GAME_SRCS} src/core/hqx/hqx.c)
-  SET(GAME_HEADERS ${GAME_HEADERS} src/core/hqx/hqx.h)
-ENDIF()
-
 # ------------------------------------------
 # Creating the executable
 # ------------------------------------------
 
-# A5 build
-IF(USE_A5)
-
-  IF(WIN32)
+IF(WIN32)
 
     # Windows executable
     IF(MINGW)
@@ -619,7 +478,7 @@ IF(USE_A5)
       SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINKER_LANGUAGE CXX)
     ENDIF()
 
-  ELSEIF(APPLE)
+ELSEIF(APPLE)
 
     # OSX executable
     ADD_EXECUTABLE(${GAME_UNIXNAME} MACOSX_BUNDLE ${GAME_SRCS})
@@ -627,59 +486,13 @@ IF(USE_A5)
     TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCLUDE_PATH} ${ALLEGRO_INCLUDE_PATH})
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
 
-  ELSEIF(UNIX)
+ELSEIF(UNIX)
 
     # *nix executable
     ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
     TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
     TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCLUDE_PATH} ${ALLEGRO_INCLUDE_PATH})
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
-
-  ENDIF()
-
-ELSE()
-
-  IF(UNIX)
-
-    # *nix executable (A4)
-    ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
-    EXECUTE_PROCESS(COMMAND allegro-config --libs OUTPUT_VARIABLE ALLEGRO_UNIX_LIBS)
-    IF(ALLEGRO_UNIX_LIBS)
-      STRING(REGEX REPLACE "[ \r\n\t]+$" "" ALLEGRO_UNIX_LIBS ${ALLEGRO_UNIX_LIBS})
-    ELSE()
-      MESSAGE(FATAL_ERROR "Couldn't run \"allegro-config --libs\"")
-    ENDIF()
-    SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS ${ALLEGRO_UNIX_LIBS})
-    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${AUDIO_LIBS} ${LSURGESCRIPT} ${LJPGALLEG} ${LLOADPNG} ${LPNG} ${LZ} ${LALFONT} ${LALLEG})
-    TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCLUDE_PATH} ${ALLEGRO_INCLUDE_PATH})
-    SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall -O2 ${CMAKE_C_FLAGS}")
-
-  ELSEIF(WIN32)
-
-    # Windows executable (A4)
-    IF(MSVC)
-      ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS} ${GAME_HEADERS})
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "/D_CRT_SECURE_NO_DEPRECATE /D__WIN32__ /D__MSVC__ ${CMAKE_C_FLAGS}")
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} ${LSURGESCRIPT} ${LJPGALLEG} ${LLOADPNG} ${LALFONT} ${LALLEG} ${LPNG} ${LZ})
-      TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCLUDE_PATH} ${ALLEGRO_INCLUDE_PATH})
-    ELSEIF(MINGW)
-      ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall -O2 -D__WIN32__ ${CMAKE_C_FLAGS}")
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} ${LSURGESCRIPT} ${LJPGALLEG} ${LLOADPNG} ${LALFONT} ${LALLEG} ${LPNG} ${LZ} m)
-      TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCLUDE_PATH} ${ALLEGRO_INCLUDE_PATH})
-      IF(NOT CMAKE_RC_COMPILER)
-        SET(CMAKE_RC_COMPILER windres)
-      ENDIF()
-      EXECUTE_PROCESS(COMMAND ${CMAKE_RC_COMPILER} -O coff -o "${CMAKE_CURRENT_BINARY_DIR}/iconwin.res" -i "${CMAKE_SOURCE_DIR}/src/misc/iconwin.rc" -I "${CMAKE_SOURCE_DIR}")
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS "-static-libgcc \"${CMAKE_CURRENT_BINARY_DIR}/iconwin.res\"")
-    ELSE()
-      ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-D__WIN32__ ${CMAKE_C_FLAGS}")
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${AUDIO_LIBS} ${LSURGESCRIPT} ${LJPGALLEG} ${LLOADPNG} ${LALFONT} ${LALLEG} ${LPNG} ${LZ} m)
-      TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCLUDE_PATH} ${ALLEGRO_INCLUDE_PATH})
-    ENDIF()
-
-  ENDIF()
 
 ENDIF()
 

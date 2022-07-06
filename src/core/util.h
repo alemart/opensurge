@@ -62,7 +62,7 @@
 #define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" STRINGIFY(__LINE__))
 
 /* Game routines */
-void game_quit(void); /* quit */
+void game_quit(); /* quit */
 int game_is_over(); /* game over? */
 int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game */
 

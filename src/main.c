@@ -18,10 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(A5BUILD)
-#include <allegro.h>
-#endif
-
 #include "core/engine.h"
 
 /*
@@ -36,8 +32,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
-#if !defined(A5BUILD)
-END_OF_MAIN()
-#endif
-

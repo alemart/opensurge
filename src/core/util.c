@@ -31,28 +31,11 @@
 #include "logfile.h"
 #include "resourcemanager.h"
 
-#if defined(A5BUILD)
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
-#elif defined(_WIN32)
-#include <allegro.h>
-#include <winalleg.h>
-#else
-#include <allegro.h>
-#endif
-
-#if defined(_WIN32)
-#include <windows.h>
-#include <wchar.h>
-#endif
-
 
 /* private stuff */
-#if defined(A5BUILD)
 static bool game_over = false;
-#else
-static volatile int game_over = FALSE;
-#endif
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
 
@@ -101,19 +84,10 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
  * game_quit()
  * Quit game?
  */
-#if defined(A5BUILD)
-void game_quit(void)
+void game_quit()
 {
     game_over = true;
 }
-#else
-void game_quit(void)
-{
-    game_over = TRUE;
-}
-END_OF_FUNCTION(game_quit)
-#endif
-
 
 /*
  * game_is_over()
@@ -159,20 +133,11 @@ void fatal_error(const char *fmt, ...)
 
     /* display an error */
     logfile_message("----- crash -----\n%s", buf);
-#if defined(A5BUILD)
     al_show_native_message_box(al_get_current_display(),
         "Surgexception Error",
         "Ooops... Surgexception!",
         buf,
     NULL, ALLEGRO_MESSAGEBOX_ERROR);
-#else
-    set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-#ifdef _WIN32
-    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK | MB_ICONERROR);
-#else
-    allegro_message("%s", buf);
-#endif
-#endif
 
     /* clear up resources */
     if(resourcemanager_is_initialized())

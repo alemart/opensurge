@@ -18,12 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(A5BUILD)
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
-#else
-#include <allegro.h>
-#endif
 
 #include <stdint.h>
 #include <string.h>
@@ -62,14 +58,12 @@
 #include "../scenes/quest.h"
 #include "../scenes/level.h"
 
-#if defined(A5BUILD)
 /* minimum Allegro version */
 #define AL_MIN_MAJOR       5
 #define AL_MIN_MINOR       2
 #define AL_MIN_REVISION    3
 #if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
 #error "This build requires a newer version of Allegro"
-#endif
 #endif
 
 /* private stuff ;) */
@@ -92,7 +86,6 @@ static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
 static const uint32_t GC_INTERVAL = 10000; /* in ms (garbage collector) */
 
-#if defined(A5BUILD)
 /* public variables */
 ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
 bool a5_key[ALLEGRO_KEY_MAX] = { false };
@@ -100,7 +93,6 @@ int a5_mouse_b = 0;
 bool a5_display_active = true;
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
 static const char* a5_version_string();
-#endif
 
 
 
@@ -128,7 +120,6 @@ void engine_init(int argc, char **argv)
  */
 void engine_mainloop()
 {
-#if defined(A5BUILD)
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / TARGET_FPS);
     scene_t *current_scene = NULL;
     bool redraw = false;
@@ -215,30 +206,6 @@ void engine_mainloop()
 
     /* done */
     al_destroy_timer(timer);
-#else
-    scene_t *scn;
-
-    while(!game_is_over() && !scenestack_empty()) {
-        /* updating the managers */
-        timer_update();
-        input_update();
-        audio_update();
-
-        /* current scene: logic & rendering */
-        scn = scenestack_top();
-        scn->update();
-        if(scn == scenestack_top()) /* scn may have been 'popped' out */
-            scn->render();
-
-        /* more rendering */
-        screenshot_update();
-        fadefx_update();
-        video_render();
-
-        /* calling the garbage collector */
-        clean_garbage();
-    }
-#endif
 }
 
 
@@ -288,7 +255,6 @@ void init_basic_stuff(const commandline_t* cmd)
     const char* basedir = commandline_getstring(cmd->basedir, NULL);
     const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
 
-#if defined(A5BUILD)
     srand(time(NULL));
     assetfs_init(gameid, basedir, gamedir);
     logfile_init();
@@ -305,14 +271,6 @@ void init_basic_stuff(const commandline_t* cmd)
 
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");
-#else
-    set_uformat(U_UTF8);
-    allegro_init();
-    srand(time(NULL));
-    assetfs_init(gameid, basedir, gamedir);
-    logfile_init();
-    init_nanoparser();
-#endif
 }
 
 
@@ -462,13 +420,10 @@ void release_basic_stuff()
     release_nanoparser();
     logfile_release();
     assetfs_release();
-#if defined(A5BUILD)
+
     /* Release Allegro */
     al_destroy_event_queue(a5_event_queue);
     a5_event_queue = NULL;
-#else
-    allegro_exit();
-#endif
 }
 
 /*
@@ -529,7 +484,6 @@ void calc_error(const char *msg)
     fatal_error("%s", msg);
 }
 
-#if defined(A5BUILD)
 /*
  * a5_version_string()
  * Returns the Allegro version as a static char[]
@@ -548,4 +502,3 @@ const char* a5_version_string()
 
     return str;
 }
-#endif

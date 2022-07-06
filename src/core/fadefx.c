@@ -18,9 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(A5BUILD)
-#include <allegro.h>
-#endif
 #include "fadefx.h"
 #include "video.h"
 #include "image.h"
@@ -61,7 +58,6 @@ void fadefx_release()
  */
 void fadefx_update()
 {
-#if defined(A5BUILD)
     just_ended = false;
     if(type != FADEFX_NONE) {
         uint8_t r, g, b;
@@ -72,7 +68,7 @@ void fadefx_update()
         just_ended = (elapsed_time >= total_time);
 
         /* render */
-        alpha = (int)(255.0f * ((elapsed_time * 1.25f) / total_time));
+        alpha = (int)(255.0f * (elapsed_time / (total_time * 0.8f)));
         alpha = clip(alpha, 0, 255);
         alpha = (type == FADEFX_IN) ? (255 - alpha) : alpha;
         color_unmap(fade_color, &r, &g, &b, NULL);
@@ -84,32 +80,6 @@ void fadefx_update()
            type = FADEFX_NONE;
         }
     }
-#else
-    just_ended = false;
-    if(type != FADEFX_NONE) {
-        BITMAP *backbuffer = *((BITMAP**)video_get_backbuffer());
-        int n;
-
-        /* elapsed time */
-        elapsed_time += timer_get_delta();
-        just_ended = (elapsed_time >= total_time);
-
-        /* render */
-        n = (int)( 255.0f * ((elapsed_time * 1.25f) / total_time) );
-        n = clip(n, 0, 255);
-        n = (type == FADEFX_IN) ? (255 - n) : n;
-        drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
-        set_trans_blender(0, 0, 0, n);
-        rectfill(backbuffer, 0, 0, backbuffer->w, backbuffer->h, fade_color._value);
-        drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
-
-        /* the fade effect is over */
-        if(just_ended) {
-           total_time = elapsed_time = 0.0f;
-           type = FADEFX_NONE;
-        }
-    }
-#endif
 }
 
 /*

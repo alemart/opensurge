@@ -33,8 +33,6 @@
 #include "font.h"
 #include "lang.h"
 
-#if defined(A5BUILD)
-
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
@@ -54,28 +52,6 @@ static int suggested_bpp = 32;
 static void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer);
 static void set_display_icon(ALLEGRO_DISPLAY* display);
 
-#else
-
-#include <png.h>
-#include <allegro.h>
-#include <loadpng.h>
-#include <jpgalleg.h>
-#include "hqx/hqx.h"
-
-static image_t *video_buffer;
-static image_t *window_surface;
-static void fast2x_blit(image_t *src, image_t *dest);
-static void smooth2x_blit(image_t *src, image_t *dest);
-static void smooth3x_blit(image_t *src, image_t *dest);
-static void smooth4x_blit(image_t *src, image_t *dest);
-static void window_switch_in();
-static void window_switch_out();
-static bool window_active = true;
-static void draw_to_screen(image_t *img);
-static void setup_color_depth(int bpp);
-
-#endif
-
 /* private stuff */
 #define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
 static const char WINDOW_TITLE[] = GAME_TITLE " " GAME_VERSION_STRING;
@@ -91,11 +67,13 @@ static int fps_rate = 0;
 /* Video Message */
 static const uint32_t VIDEOMSG_TIMEOUT = 5000; /* milliseconds */
 static const int VIDEOMSG_MAXLINES = 30;
+
 typedef struct videomsg_t {
     char* message;
     uint32_t endtime;
     struct videomsg_t* next;
 } videomsg_t;
+
 static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
 static videomsg_t* videomsg_delete(videomsg_t* videomsg);
 static videomsg_t* videomsg_render(videomsg_t* videomsg, int line);
@@ -111,7 +89,6 @@ static videomsg_t* videomsg = NULL;
  */
 void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int bpp)
 {
-#if defined(A5BUILD)
     logfile_message("Initializing the video...");
 
     /* initializing Allegro */
@@ -142,41 +119,6 @@ void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int 
 
     /* set window icon */
     set_display_icon(display);
-#else
-    logfile_message("video_init()");
-    setup_color_depth(bpp);
-
-    /* initializing addons */
-    logfile_message("Initializing JPGalleg...");
-    jpgalleg_init();
-    logfile_message("Initializing loadpng...");
-    loadpng_init();
-
-    /* video init */
-    video_buffer = NULL;
-    window_surface = NULL;
-    video_changemode(resolution, smooth, fullscreen);
-
-    /* window properties */
-    LOCK_FUNCTION(game_quit);
-    set_close_button_callback(game_quit);
-    set_window_title(WINDOW_TITLE);
-
-    /* window callbacks */
-    window_active = true;
-    if(set_display_switch_mode(SWITCH_BACKGROUND) == 0) {
-        if(set_display_switch_callback(SWITCH_IN, window_switch_in) != 0)
-            logfile_message("can't set_display_switch_callback(SWTICH_IN, window_switch_in)");
-
-        if(set_display_switch_callback(SWITCH_OUT, window_switch_out) != 0)
-            logfile_message("can't set_display_switch_callback(SWTICH_OUT, window_switch_out)");
-    }
-    else
-        logfile_message("can't set_display_switch_mode(SWITCH_BACKGROUND)");
-
-    /* video message */
-    videomsg = NULL;
-#endif
 }
 
 /*
@@ -185,7 +127,6 @@ void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int 
  */
 void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen)
 {
-#if defined(A5BUILD)
     extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
     bool prev_fullscreen = video_fullscreen;
     
@@ -254,63 +195,6 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
         fatal_error("Failed to create a %dx%d backbuffer", (int)screen_size.x, (int)screen_size.y);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
     al_clear_to_color(al_map_rgb(0, 0, 0));
-#else
-    int width, height;
-    int mode;
-
-    logfile_message("video_changemode(%d,%d,%d)", (int)resolution, smooth, fullscreen);
-
-    /* resolution */
-    screen_size = (resolution == VIDEORESOLUTION_EDT) ? video_get_window_size() : DEFAULT_SCREEN_SIZE;
-    video_resolution = resolution;
-
-    /* fullscreen */
-    video_fullscreen = fullscreen;
-
-    /* smooth graphics? */
-    video_smooth = smooth;
-    if(video_smooth) {
-        if(video_get_color_depth() != 32) {
-            logfile_message("smooth graphics can only be enabled when using 32 bits per pixel (currently, we're using %d bpp)", video_get_color_depth());
-            video_smooth = false;
-        }
-        else if(video_resolution == VIDEORESOLUTION_1X || video_resolution == VIDEORESOLUTION_EDT) {
-            logfile_message("can't enable smooth graphics using resolution %d", (int)video_resolution);
-            video_smooth = false;
-        }
-        else {
-            logfile_message("initializing hqx...");
-            hqxInit();
-        }
-    }
-
-    /* creating the backbuffer... */
-    logfile_message("creating the backbuffer...");
-    if(video_buffer != NULL)
-        image_destroy(video_buffer);
-    video_buffer = image_create(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
-
-    /* creating the window surface... */
-    logfile_message("creating the window surface...");
-    if(window_surface != NULL)
-        image_destroy(window_surface);
-    window_surface = image_create((int)(video_get_window_size().x), (int)(video_get_window_size().y));
-
-    /* setting up the window... */
-    logfile_message("setting up the window...");
-    mode = video_fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED;
-    #ifdef _WIN32
-    width = (int)(video_get_window_size().x) - (int)(video_get_window_size().x) % 4; /* A4 bug? let width be a multiple of 4 */
-    #else
-    width = (int)(video_get_window_size().x);
-    #endif
-    height = (int)(video_get_window_size().y);
-    if(set_gfx_mode(mode, width, height, 0, 0) < 0)
-        fatal_error("video_changemode(): couldn't set the graphic mode (%dx%d)!\n%s", width, height, allegro_error);
-
-    /* done! */
-    logfile_message("video_changemode() ok");
-#endif
 }
 
 
@@ -330,7 +214,6 @@ videoresolution_t video_get_resolution()
  */
 videoresolution_t video_initial_resolution()
 {
-#if defined(A5BUILD)
     ALLEGRO_MONITOR_INFO info;
 
     if(al_get_monitor_info(0, &info)) {
@@ -344,9 +227,6 @@ videoresolution_t video_initial_resolution()
     }
     else
         return VIDEORESOLUTION_2X;
-#else
-    return VIDEORESOLUTION_2X;
-#endif
 }
 
 
@@ -425,14 +305,7 @@ v2d_t video_get_window_size()
  */
 image_t* video_get_backbuffer()
 {
-#if defined(A5BUILD)
     return backbuffer;
-#else
-    if(video_buffer == NULL)
-        fatal_error("FATAL ERROR: video_get_backbuffer() returned NULL!");
-
-    return video_buffer;
-#endif
 }
 
 /*
@@ -441,7 +314,6 @@ image_t* video_get_backbuffer()
  */
 void video_render()
 {
-#if defined(A5BUILD)
     ALLEGRO_STATE state;
     uint32_t current_time;
     static uint32_t fps_timer = 0, frame_count = 0;
@@ -470,88 +342,6 @@ void video_render()
     al_flip_display();
     al_restore_state(&state);
     /*al_set_target_bitmap(IMAGE2BITMAP(backbuffer));*/
-#else
-    static uint32_t fps_timer = 0, frame_count = 0;
-    uint32_t current_time;
-
-    /* video message */
-    videomsg = videomsg_render(videomsg, 0);
-
-    /* compute fps rate */
-    ++frame_count;
-    if((current_time = timer_get_ticks()) >= fps_timer + 1000) {
-        fps_timer = current_time;
-        fps_rate = frame_count;
-        frame_count = 0;
-    }
-
-    /* fps counter */
-    if(video_is_fps_visible())
-        textprintf_right_ex(IMAGE2BITMAP(video_get_backbuffer()), font, VIDEO_SCREEN_W, 0, makecol(255,255,255), makecol(0,0,0),"FPS:%3d", fps_rate);
-
-    /* render */
-    switch(video_get_resolution()) {
-        /* tiny window */
-        case VIDEORESOLUTION_1X:
-        {
-            draw_to_screen(video_get_backbuffer());
-            break;
-        }
-
-        /* double size */
-        case VIDEORESOLUTION_2X:
-        {
-            image_t *tmp = window_surface;
-
-            if(!video_is_smooth())
-                fast2x_blit(video_get_backbuffer(), tmp);
-            else
-                smooth2x_blit(video_get_backbuffer(), tmp);
-
-            draw_to_screen(tmp);
-            break;
-        }
-
-        /* triple size */
-        case VIDEORESOLUTION_3X:
-        {
-            image_t *tmp = window_surface;
-
-            if(!video_is_smooth()) {
-                image_t *src = video_get_backbuffer();
-                stretch_blit(IMAGE2BITMAP(src), IMAGE2BITMAP(tmp), 0, 0, image_width(src), image_height(src), 0, 0, image_width(tmp), image_height(tmp));
-            }
-            else
-                smooth3x_blit(video_get_backbuffer(), tmp);
-
-            draw_to_screen(tmp);
-            break;
-        }
-
-        /* quadruple size */
-        case VIDEORESOLUTION_4X:
-        {
-            image_t *tmp = window_surface;
-
-            if(!video_is_smooth()) {
-                image_t *src = video_get_backbuffer();
-                stretch_blit(IMAGE2BITMAP(src), IMAGE2BITMAP(tmp), 0, 0, image_width(src), image_height(src), 0, 0, image_width(tmp), image_height(tmp));
-            }
-            else
-                smooth4x_blit(video_get_backbuffer(), tmp);
-
-            draw_to_screen(tmp);
-            break;
-        }
-
-        /* level editor */
-        case VIDEORESOLUTION_EDT:
-        {
-            draw_to_screen(video_get_backbuffer());
-            break;
-        }
-    }
-#endif
 }
 
 
@@ -561,7 +351,6 @@ void video_render()
  */
 void video_release()
 {
-#if defined(A5BUILD)
     logfile_message("Releasing the video...");
 
     if(videomsg != NULL)
@@ -581,27 +370,6 @@ void video_release()
         al_destroy_display(display);
         display = NULL;
     }
-#else
-    logfile_message("video_release()");
-
-    if(video_buffer != NULL) {
-        image_destroy(video_buffer);
-        video_buffer = NULL;
-    }
-
-    if(window_surface != NULL) {
-        image_destroy(window_surface);
-        window_surface = NULL;
-    }
-
-    if(videomsg != NULL)
-        videomsg = videomsg_delete(videomsg);
-
-    if(videomsg != NULL)
-        videomsg_delete(videomsg);
-
-    logfile_message("video_release() ok");
-#endif
 }
 
 
@@ -628,11 +396,7 @@ void video_showmessage(const char *fmt, ...)
  */
 int video_get_color_depth()
 {
-#if defined(A5BUILD)
     return display ? al_get_display_option(display, ALLEGRO_COLOR_SIZE) : 0;
-#else
-    return get_color_depth();
-#endif
 }
 
 
@@ -642,12 +406,7 @@ int video_get_color_depth()
  */
 int video_get_preferred_color_depth()
 {
-#if defined(A5BUILD)
     return 32;
-#else
-    int depth = desktop_color_depth();
-    return depth != 0 ? depth : 32;
-#endif
 }
 
 
@@ -657,12 +416,8 @@ int video_get_preferred_color_depth()
  */
 bool video_is_window_active()
 {
-#if defined(A5BUILD)
     extern bool a5_display_active;
     return a5_display_active;
-#else
-    return window_active;
-#endif
 }
 
 
@@ -722,7 +477,6 @@ void video_display_loading_screen()
 
 
 /* private stuff */
-#if defined(A5BUILD)
 
 /* apply a transform when rendering, so that we have a resized
    screen that maintains the original aspect ratio of the game */
@@ -762,108 +516,6 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 #endif
 }
 
-#else
-
-/* fast2x_blit resizes the src image by a
- * factor of 2. It assumes that:
- *
- * src is a memory bitmap
- * dest is a previously created memory bitmap
- * ---- width of dest = 2 * width of src
- * ---- height of dest = 2 * height of src */
-void fast2x_blit(image_t *src, image_t *dest)
-{
-    int i, j;
-
-    if(IMAGE2BITMAP(src) == NULL || IMAGE2BITMAP(dest) == NULL)
-        return;
-
-    switch(video_get_color_depth())
-    {
-        case 16: {
-            int w = image_width(dest), h = image_height(dest);
-            for(j=0; j<h; j++) {
-                for(i=0; i<w; i++)
-                    ((uint16_t*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint16_t*)IMAGE2BITMAP(src)->line[j/2])[i/2];
-            }
-            break;
-        }
-
-        case 24: {
-            stretch_blit(IMAGE2BITMAP(src), IMAGE2BITMAP(dest), 0, 0, image_width(src), image_height(src), 0, 0, image_width(dest), image_height(dest));
-            break;
-        }
-
-        case 32: {
-            int w = image_width(dest), h = image_height(dest);
-            for(j=0; j<h; j++) {
-                for(i=0; i<w; i++)
-                    ((uint32_t*)IMAGE2BITMAP(dest)->line[j])[i] = ((uint32_t*)IMAGE2BITMAP(src)->line[j/2])[i/2];
-            }
-            break;
-        }
-
-        default:
-            break;
-    }
-}
-
-/* applies the hqx algorithm */
-void smooth2x_blit(image_t *src, image_t *dest)
-{
-    if(video_get_color_depth() == 32)
-        hq2x_32((uint32_t*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32_t*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
-}
-
-void smooth3x_blit(image_t *src, image_t *dest)
-{
-    if(video_get_color_depth() == 32)
-        hq3x_32((uint32_t*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32_t*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
-}
-
-void smooth4x_blit(image_t *src, image_t *dest)
-{
-    if(video_get_color_depth() == 32)
-        hq4x_32((uint32_t*)(&(IMAGE2BITMAP(src)->line[0][0])), (uint32_t*)(&(IMAGE2BITMAP(dest)->line[0][0])), image_width(src), image_height(src));
-}
-
-
-/* draws img to the screen */
-void draw_to_screen(image_t *img)
-{
-    if(IMAGE2BITMAP(img) == NULL) {
-        logfile_message("Can't use video resolution %d", (int)video_get_resolution());
-        video_showmessage("Can't use video resolution %d", (int)video_get_resolution());
-        video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
-    }
-    else
-        blit(IMAGE2BITMAP(img), screen, 0, 0, 0, 0, image_width(img), image_height(img));
-}
-
-/* this window is active */
-void window_switch_in()
-{
-    window_active = true;
-}
-
-
-/* this window is not active */
-void window_switch_out()
-{
-    window_active = false;
-}
-
-/* setups the color depth */
-void setup_color_depth(int bpp)
-{
-    if(!(bpp == 16 || bpp == 24 || bpp == 32))
-        fatal_error("Invalid color depth: %d. Valid modes are: 16, 24, 32.", bpp);
-
-    set_color_depth(bpp);
-    set_color_conversion(COLORCONV_TOTAL);
-}
-#endif
-
 /* creates a new videomsg_t node */
 videomsg_t* videomsg_new(const char* message, videomsg_t* next)
 {
@@ -893,11 +545,7 @@ videomsg_t* videomsg_render(videomsg_t* videomsg, int line)
             return videomsg_delete(videomsg);
 
         /* render current message */
-#if defined(A5BUILD)
         PRINT(0.0f, image_height(backbuffer) - al_get_font_line_height(font) * (line + 1), ALLEGRO_ALIGN_LEFT, "%s", videomsg->message);
-#else
-        textout_ex(IMAGE2BITMAP(video_buffer), font, videomsg->message, 0, image_height(video_buffer) - text_height(font) * (line + 1), makecol(255,255,255), makecol(0,0,0));
-#endif
 
         /* render next message */
         videomsg->next = videomsg_render(videomsg->next, line + 1);

@@ -78,11 +78,7 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
 void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags);
 void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags);
 
-/* Allegro bitmap */
-#if defined(A5BUILD)
+/* retrieve Allegro bitmap */
 #define IMAGE2BITMAP(img)           (*((ALLEGRO_BITMAP**)(img)))
-#else
-#define IMAGE2BITMAP(img)           (*((BITMAP**)(img)))
-#endif
 
 #endif

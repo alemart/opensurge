@@ -22,38 +22,11 @@
 #include "timer.h"
 #include "logfile.h"
 
-#if defined(A5BUILD)
 #include <allegro5/allegro.h>
-#elif defined(_WIN32)
-#include <allegro.h>
-#include <winalleg.h>
-#else
-#include <allegro.h>
-#include <sys/time.h>
-#endif
-
-#if defined(A5BUILD)
-static float delta_time = 0.0f;
-static double current_time = 0.0;
-#else
-
-/* constants */
-#define MIN_FRAME_INTERVAL 15 /* (1/15) * 1000 ~ 67 fps max */
-#define MAX_FRAME_INTERVAL 17 /* (1/17) * 1000 ~ 58 fps min */
-
 
 /* internal data */
-static uint32_t last_time;
-static float delta;
-static volatile uint32_t elapsed_time;
-static uint32_t start_time;
-
-/* platform-specific code */
-static uint32_t get_tick_count(); /* tell me the time */
-static void yield_cpu(); /* we don't want to use 100% of the cpu */
-
-#endif
-
+static float delta_time = 0.0f;
+static double current_time = 0.0;
 
 /*
  * timer_init()
@@ -63,21 +36,8 @@ void timer_init()
 {
     logfile_message("timer_init()");
 
-#if defined(A5BUILD)
-    /* do nothing */
-#else
-    /* installing Allegro stuff */
-    logfile_message("Installing Allegro timers...");
-    if(install_timer() != 0)
-        logfile_message("install_timer() failed: %s", allegro_error);
-
-    /* initializing... */
-    start_time = get_tick_count();
-    delta = 0.0f;
-
-    /* done! */
-    last_time = timer_get_ticks();
-#endif
+    current_time = 0.0f;
+    delta_time = 0.0;
 }
 
 
@@ -89,7 +49,6 @@ void timer_init()
  */
 void timer_update()
 {
-#if defined(A5BUILD)
     static const float minimum_delta = 0.0166667f; /* 60 fps */
     static const float maximum_delta = 0.017f; /* if 0.0166667f, you don't get physics with the fixed timestep; if too large (0.20f), there may be issues with collisions */
     static double old_time = 0.0;
@@ -105,29 +64,6 @@ void timer_update()
         delta_time = maximum_delta;
 
     old_time = current_time;
-#else
-    uint32_t current_time, delta_time; /* both in milliseconds */
-
-    /* time control */
-    for(delta_time = 0 ;;) {
-        current_time = timer_get_ticks();
-        delta_time = (current_time > last_time) ? (current_time - last_time) : 0;
-        last_time = (current_time >= last_time) ? last_time : current_time;
-
-        if(delta_time < MIN_FRAME_INTERVAL) {
-            /* we don't want the cpu usage at 100% */
-            /* will the OS make our process active again on time? */
-            yield_cpu();
-        }
-        else
-            break;
-    }
-    delta_time = min(delta_time, MAX_FRAME_INTERVAL);
-    delta = (float)delta_time * 0.001f;
-
-    /* done! */
-    last_time = timer_get_ticks();
-#endif
 }
 
 
@@ -149,11 +85,7 @@ void timer_release()
  */
 float timer_get_delta()
 {
-#if defined(A5BUILD)
     return delta_time;
-#else
-    return delta;
-#endif
 }
 
 
@@ -164,48 +96,6 @@ float timer_get_delta()
  */
 uint32_t timer_get_ticks()
 {
-#if defined(A5BUILD)
     /* get the elapsed time at the beginning of the frame */
     return (uint32_t)(1000.0 * current_time);
-#else
-    uint32_t ticks = get_tick_count();
-    if(ticks < start_time)
-        start_time = ticks;
-    return ticks - start_time;
-#endif
 }
-
-
-#if !defined(A5BUILD)
-
-/* -------- Utilities -------- */
-#if !defined(_WIN32)
-
-uint32_t get_tick_count()
-{
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec * 1000) + (now.tv_usec / 1000);
-}
-
-
-void yield_cpu()
-{
-    rest(1); /* don't use rest(0) */
-}
-
-#else
-
-uint32_t get_tick_count()
-{
-    return GetTickCount();
-}
-
-void yield_cpu()
-{
-    Sleep(1);
-}
-
-#endif
-
-#endif
