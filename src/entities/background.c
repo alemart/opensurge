@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * background.c - level background/foreground
- * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2010, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -314,13 +314,16 @@ void render(const bgtheme_t *bgtheme, v2d_t camera_position, int foreground)
     for(i=0; i<bgtheme->length; i++) {
         bg = bgtheme->data[i];
         if((!foreground && bg->zindex <= 0.5f) || (foreground && bg->zindex > 0.5f)) {
+            v2d_t prev = bg->actor->position;
+
             bg->actor->position.x += topleft.x * bg->actor->speed.x;
             bg->actor->position.y += topleft.y * bg->actor->speed.y;
+            bg->actor->position.x = floorf(0.5 + bg->actor->position.x); /* round to nearest integer */
+            bg->actor->position.y = floorf(0.5 + bg->actor->position.y);
 
             actor_render_repeat_xy(bg->actor, halfscreen, bg->repeat_x, bg->repeat_y);
 
-            bg->actor->position.y -= topleft.y * bg->actor->speed.y;
-            bg->actor->position.x -= topleft.x * bg->actor->speed.x;
+            bg->actor->position = prev;
         }
     }
 }
