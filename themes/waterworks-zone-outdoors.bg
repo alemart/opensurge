@@ -104,9 +104,8 @@ background
 // mountains
 background
 {
-    initial_position    0 0
-    scroll_speed        -0.01 0
-    //scroll_speed        -0.005 0
+    initial_position    0 4
+    scroll_speed        -0.01 -0.001
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -134,8 +133,8 @@ background
 // top water layer 0
 background
 {
-    initial_position    120 134111
-    scroll_speed        -0.035 -0.004
+    initial_position    120 123
+    scroll_speed        -0.03 -0.003
     behavior            LINEAR -4 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -157,8 +156,8 @@ background
 
 background
 {
-    initial_position    120 134111
-    scroll_speed        -0.035 -0.004
+    initial_position    120 123
+    scroll_speed        -0.03 -0.003
     behavior            CIRCULAR 1 0 0.5 0 180
     repeat_x            TRUE
     repeat_y            FALSE
@@ -181,8 +180,8 @@ background
 // top water layer 1
 background
 {
-    initial_position    0 135111
-    scroll_speed        -0.035 -0.004
+    initial_position    0 111
+    scroll_speed        -0.02 -0.002
     behavior            LINEAR -8 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -204,8 +203,8 @@ background
 
 background
 {
-    initial_position    120 135111
-    scroll_speed        -0.035 -0.004
+    initial_position    120 111
+    scroll_speed        -0.02 -0.002
     behavior            CIRCULAR 2 0 0.5 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -214,55 +213,6 @@ background
     {
         source_file     "images/backgrounds/waterworks-zone/water-thinmask.png"
         source_rect     0 8 256 4
-        frame_size      256 4
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-// top water layer 2
-background
-{
-    initial_position    0 137111
-    scroll_speed        -0.035 -0.004
-    behavior            LINEAR -8 0
-    repeat_x            TRUE
-    repeat_y            FALSE
-    zindex 0.3
-
-    sprite
-    {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 80 256 4
-        frame_size      256 4
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-background
-{
-    initial_position    0 137111
-    scroll_speed        -0.035 -0.004
-    behavior            CIRCULAR 2 0 0.5 0
-    repeat_x            TRUE
-    repeat_y            FALSE
-    zindex 0.3
-
-    sprite
-    {
-        source_file     "images/backgrounds/waterworks-zone/water-thinmask.png"
-        source_rect     0 0 256 4
         frame_size      256 4
 
         animation
@@ -285,7 +235,6 @@ background
 {
     initial_position    0 128 // initial_y of water layer 1 below - height of this layer
     scroll_speed        -0.04 -0.004
-    //scroll_speed        -0.02 -0.004
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -300,7 +249,7 @@ background
         {
             repeat      TRUE
             fps         12
-            data        0// 1 2 3
+            data        0 1 2 3
         }
     }
 }
