@@ -57,7 +57,7 @@ background
 background
 {
     initial_position    0 36
-    scroll_speed        -0.006 0
+    scroll_speed        -0.01 0
     behavior            LINEAR -1 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -80,7 +80,7 @@ background
 background
 {
     initial_position    0 8
-    scroll_speed        -0.008 0
+    scroll_speed        -0.02 0
     behavior            LINEAR -4 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -105,7 +105,8 @@ background
 background
 {
     initial_position    0 0
-    scroll_speed        -0.001 0
+    scroll_speed        -0.01 0
+    //scroll_speed        -0.005 0
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -133,8 +134,8 @@ background
 // top water layer 0
 background
 {
-    initial_position    120 107
-    scroll_speed        -0.001 -0.001
+    initial_position    120 134111
+    scroll_speed        -0.035 -0.004
     behavior            LINEAR -4 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -156,8 +157,8 @@ background
 
 background
 {
-    initial_position    120 107
-    scroll_speed        -0.001 -0.001
+    initial_position    120 134111
+    scroll_speed        -0.035 -0.004
     behavior            CIRCULAR 1 0 0.5 0 180
     repeat_x            TRUE
     repeat_y            FALSE
@@ -180,8 +181,8 @@ background
 // top water layer 1
 background
 {
-    initial_position    0 110
-    scroll_speed        -0.001 -0.001
+    initial_position    0 135111
+    scroll_speed        -0.035 -0.004
     behavior            LINEAR -8 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -203,8 +204,8 @@ background
 
 background
 {
-    initial_position    120 110
-    scroll_speed        -0.001 -0.001
+    initial_position    120 135111
+    scroll_speed        -0.035 -0.004
     behavior            CIRCULAR 2 0 0.5 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -227,11 +228,12 @@ background
 // top water layer 2
 background
 {
-    initial_position    0 120
-    scroll_speed        -0.002 -0.002
+    initial_position    0 137111
+    scroll_speed        -0.035 -0.004
     behavior            LINEAR -8 0
     repeat_x            TRUE
     repeat_y            FALSE
+    zindex 0.3
 
     sprite
     {
@@ -250,11 +252,12 @@ background
 
 background
 {
-    initial_position    0 120
-    scroll_speed        -0.002 -0.002
+    initial_position    0 137111
+    scroll_speed        -0.035 -0.004
     behavior            CIRCULAR 2 0 0.5 0
     repeat_x            TRUE
     repeat_y            FALSE
+    zindex 0.3
 
     sprite
     {
@@ -281,7 +284,8 @@ background
 background
 {
     initial_position    0 128 // initial_y of water layer 1 below - height of this layer
-    scroll_speed        -0.004 -0.004
+    scroll_speed        -0.04 -0.004
+    //scroll_speed        -0.02 -0.004
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -296,7 +300,7 @@ background
         {
             repeat      TRUE
             fps         12
-            data        0 1 2 3
+            data        0// 1 2 3
         }
     }
 }
@@ -436,12 +440,21 @@ background
 // c) water flows at 1.0 m/s (when scroll_speed = -1, we get a linear speed of -40 px/s)
 // d) the vertical field-of-view of the camera is 45 degrees (pinhole model)
 //
+// Formula for the scroll_speed of a layer:
+//
+//                       -7.25
+// scroll_speed =  --------------------
+//                   depth in meters
+//
+// The scroll_speed of the layers follow this formula in the y-axis. In the x-axis, different
+// values were picked in order to make them scroll faster.
+//
 
 // water layer 1
 background
 {
     initial_position    0 160
-    scroll_speed        -0.004 -0.004
+    scroll_speed        -0.04 -0.004
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -464,7 +477,7 @@ background
 background
 {
     initial_position    16 160
-    scroll_speed        -0.004 -0.004
+    scroll_speed        -0.04 -0.004
     behavior            LINEAR -0.16 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -487,8 +500,8 @@ background
 // water layer 2
 background
 {
-    initial_position    0 259
-    scroll_speed        -0.0166 -0.01408
+    initial_position    0 284
+    scroll_speed        -0.0522 -0.0166
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -510,8 +523,8 @@ background
 
 background
 {
-    initial_position    32 259
-    scroll_speed        -0.0166 -0.01408
+    initial_position    32 284
+    scroll_speed        -0.0522 -0.0166
     behavior            LINEAR -0.66 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -534,8 +547,8 @@ background
 // water layer 3
 background
 {
-    initial_position    0 359
-    scroll_speed        -0.0292 -0.02415
+    initial_position    0 408
+    scroll_speed        -0.0643 -0.0292
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -557,8 +570,8 @@ background
 
 background
 {
-    initial_position    48 359
-    scroll_speed        -0.0292 -0.02415
+    initial_position    48 408
+    scroll_speed        -0.0643 -0.0292
     behavior            LINEAR -1.17 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -581,8 +594,8 @@ background
 // water layer 4
 background
 {
-    initial_position    0 458
-    scroll_speed        -0.0418 -0.03423
+    initial_position    0 533
+    scroll_speed        -0.0765 -0.0418
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -604,8 +617,8 @@ background
 
 background
 {
-    initial_position    64 458
-    scroll_speed        -0.0418 -0.03423
+    initial_position    64 533
+    scroll_speed        -0.0765 -0.0418
     behavior            LINEAR -1.67 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -628,8 +641,8 @@ background
 // water layer 5
 background
 {
-    initial_position    0 558
-    scroll_speed        -0.0544 -0.0443
+    initial_position    0 657
+    scroll_speed        -0.0886 -0.0544
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -651,8 +664,8 @@ background
 
 background
 {
-    initial_position    80 558
-    scroll_speed        -0.0544 -0.0443
+    initial_position    80 657
+    scroll_speed        -0.0886 -0.0544
     behavior            LINEAR -2.18 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -675,8 +688,8 @@ background
 // water layer 6
 background
 {
-    initial_position    0 657
-    scroll_speed        -0.067 -0.05438
+    initial_position    0 782
+    scroll_speed        -0.1008 -0.067
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -698,8 +711,8 @@ background
 
 background
 {
-    initial_position    96 657
-    scroll_speed        -0.067 -0.05438
+    initial_position    96 782
+    scroll_speed        -0.1008 -0.067
     behavior            LINEAR -2.68 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -722,8 +735,8 @@ background
 // water layer 7
 background
 {
-    initial_position    0 757
-    scroll_speed        -0.0796 -0.06446
+    initial_position    0 906
+    scroll_speed        -0.1129 -0.0796
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -745,8 +758,8 @@ background
 
 background
 {
-    initial_position    112 757
-    scroll_speed        -0.0796 -0.06446
+    initial_position    112 906
+    scroll_speed        -0.1129 -0.0796
     behavior            LINEAR -3.18 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -769,8 +782,8 @@ background
 // water layer 8
 background
 {
-    initial_position    0 856
-    scroll_speed        -0.0923 -0.07453
+    initial_position    0 1032
+    scroll_speed        -0.1251 -0.0923
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -792,8 +805,8 @@ background
 
 background
 {
-    initial_position    128 856
-    scroll_speed        -0.0923 -0.07453
+    initial_position    128 1032
+    scroll_speed        -0.1251 -0.0923
     behavior            LINEAR -3.69 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -816,8 +829,8 @@ background
 // water layer 9
 background
 {
-    initial_position    0 956
-    scroll_speed        -0.1049 -0.08461
+    initial_position    0 1156
+    scroll_speed        -0.1372 -0.1049
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -839,8 +852,8 @@ background
 
 background
 {
-    initial_position    144 956
-    scroll_speed        -0.1049 -0.08461
+    initial_position    144 1156
+    scroll_speed        -0.1372 -0.1049
     behavior            LINEAR -4.2 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -863,8 +876,8 @@ background
 // water layer 10
 background
 {
-    initial_position    0 1055
-    scroll_speed        -0.1175 -0.09468
+    initial_position    0 1281
+    scroll_speed        -0.1494 -0.1175
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -886,8 +899,8 @@ background
 
 background
 {
-    initial_position    160 1055
-    scroll_speed        -0.1175 -0.09468
+    initial_position    160 1281
+    scroll_speed        -0.1494 -0.1175
     behavior            LINEAR -4.7 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -910,8 +923,8 @@ background
 // water layer 11
 background
 {
-    initial_position    0 1155
-    scroll_speed        -0.1301 -0.10476
+    initial_position    0 1405
+    scroll_speed        -0.1615 -0.1301
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -933,8 +946,8 @@ background
 
 background
 {
-    initial_position    176 1155
-    scroll_speed        -0.1301 -0.10476
+    initial_position    176 1405
+    scroll_speed        -0.1615 -0.1301
     behavior            LINEAR -5.2 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -957,8 +970,8 @@ background
 // water layer 12
 background
 {
-    initial_position    0 1255
-    scroll_speed        -0.1427 -0.11484
+    initial_position    0 1530
+    scroll_speed        -0.1737 -0.1427
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -980,8 +993,8 @@ background
 
 background
 {
-    initial_position    192 1255
-    scroll_speed        -0.1427 -0.11484
+    initial_position    192 1530
+    scroll_speed        -0.1737 -0.1427
     behavior            LINEAR -5.71 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1004,8 +1017,8 @@ background
 // water layer 13
 background
 {
-    initial_position    0 1354
-    scroll_speed        -0.1553 -0.12491
+    initial_position    0 1654
+    scroll_speed        -0.1858 -0.1553
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1027,8 +1040,8 @@ background
 
 background
 {
-    initial_position    208 1354
-    scroll_speed        -0.1553 -0.12491
+    initial_position    208 1654
+    scroll_speed        -0.1858 -0.1553
     behavior            LINEAR -6.21 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1051,8 +1064,8 @@ background
 // water layer 14
 background
 {
-    initial_position    0 1454
-    scroll_speed        -0.1679 -0.13499
+    initial_position    0 1779
+    scroll_speed        -0.198 -0.1679
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1074,8 +1087,8 @@ background
 
 background
 {
-    initial_position    224 1454
-    scroll_speed        -0.1679 -0.13499
+    initial_position    224 1779
+    scroll_speed        -0.198 -0.1679
     behavior            LINEAR -6.72 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1098,8 +1111,8 @@ background
 // water layer 15
 background
 {
-    initial_position    0 1553
-    scroll_speed        -0.1805 -0.14506
+    initial_position    0 1903
+    scroll_speed        -0.2101 -0.1805
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1121,8 +1134,8 @@ background
 
 background
 {
-    initial_position    240 1553
-    scroll_speed        -0.1805 -0.14506
+    initial_position    240 1903
+    scroll_speed        -0.2101 -0.1805
     behavior            LINEAR -7.22 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1145,8 +1158,8 @@ background
 // water layer 16
 background
 {
-    initial_position    0 1653
-    scroll_speed        -0.1931 -0.15514
+    initial_position    0 2028
+    scroll_speed        -0.2223 -0.1931
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1168,8 +1181,8 @@ background
 
 background
 {
-    initial_position    256 1653
-    scroll_speed        -0.1931 -0.15514
+    initial_position    256 2028
+    scroll_speed        -0.2223 -0.1931
     behavior            LINEAR -7.72 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1192,8 +1205,8 @@ background
 // water layer 17
 background
 {
-    initial_position    0 1752
-    scroll_speed        -0.2057 -0.16522
+    initial_position    0 2152
+    scroll_speed        -0.2344 -0.2057
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1215,8 +1228,8 @@ background
 
 background
 {
-    initial_position    272 1752
-    scroll_speed        -0.2057 -0.16522
+    initial_position    272 2152
+    scroll_speed        -0.2344 -0.2057
     behavior            LINEAR -8.23 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1239,8 +1252,8 @@ background
 // water layer 18
 background
 {
-    initial_position    0 1852
-    scroll_speed        -0.2183 -0.17529
+    initial_position    0 2277
+    scroll_speed        -0.2466 -0.2183
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1262,8 +1275,8 @@ background
 
 background
 {
-    initial_position    288 1852
-    scroll_speed        -0.2183 -0.17529
+    initial_position    288 2277
+    scroll_speed        -0.2466 -0.2183
     behavior            LINEAR -8.73 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1286,8 +1299,8 @@ background
 // water layer 19
 background
 {
-    initial_position    0 1951
-    scroll_speed        -0.2309 -0.18537
+    initial_position    0 2401
+    scroll_speed        -0.2587 -0.2309
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1309,8 +1322,8 @@ background
 
 background
 {
-    initial_position    304 1951
-    scroll_speed        -0.2309 -0.18537
+    initial_position    304 2401
+    scroll_speed        -0.2587 -0.2309
     behavior            LINEAR -9.24 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1333,8 +1346,8 @@ background
 // water layer 20
 background
 {
-    initial_position    0 2051
-    scroll_speed        -0.2435 -0.19544
+    initial_position    0 2526
+    scroll_speed        -0.2709 -0.2435
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1356,8 +1369,8 @@ background
 
 background
 {
-    initial_position    320 2051
-    scroll_speed        -0.2435 -0.19544
+    initial_position    320 2526
+    scroll_speed        -0.2709 -0.2435
     behavior            LINEAR -9.74 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1380,8 +1393,8 @@ background
 // water layer 21
 background
 {
-    initial_position    0 2151
-    scroll_speed        -0.2562 -0.20552
+    initial_position    0 2651
+    scroll_speed        -0.283 -0.2562
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1403,8 +1416,8 @@ background
 
 background
 {
-    initial_position    336 2151
-    scroll_speed        -0.2562 -0.20552
+    initial_position    336 2651
+    scroll_speed        -0.283 -0.2562
     behavior            LINEAR -10.25 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1427,8 +1440,8 @@ background
 // water layer 22
 background
 {
-    initial_position    0 2250
-    scroll_speed        -0.2688 -0.21559
+    initial_position    0 2776
+    scroll_speed        -0.2952 -0.2688
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1450,8 +1463,8 @@ background
 
 background
 {
-    initial_position    352 2250
-    scroll_speed        -0.2688 -0.21559
+    initial_position    352 2776
+    scroll_speed        -0.2952 -0.2688
     behavior            LINEAR -10.75 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1474,8 +1487,8 @@ background
 // water layer 23
 background
 {
-    initial_position    0 2350
-    scroll_speed        -0.2814 -0.22567
+    initial_position    0 2900
+    scroll_speed        -0.3073 -0.2814
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1497,8 +1510,8 @@ background
 
 background
 {
-    initial_position    368 2350
-    scroll_speed        -0.2814 -0.22567
+    initial_position    368 2900
+    scroll_speed        -0.3073 -0.2814
     behavior            LINEAR -11.26 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1521,8 +1534,8 @@ background
 // water layer 24
 background
 {
-    initial_position    0 2449
-    scroll_speed        -0.294 -0.23575
+    initial_position    0 3025
+    scroll_speed        -0.3195 -0.294
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1544,8 +1557,8 @@ background
 
 background
 {
-    initial_position    384 2449
-    scroll_speed        -0.294 -0.23575
+    initial_position    384 3025
+    scroll_speed        -0.3195 -0.294
     behavior            LINEAR -11.76 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1568,8 +1581,8 @@ background
 // water layer 25
 background
 {
-    initial_position    0 2549
-    scroll_speed        -0.3066 -0.24582
+    initial_position    0 3149
+    scroll_speed        -0.3316 -0.3066
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1591,8 +1604,8 @@ background
 
 background
 {
-    initial_position    400 2549
-    scroll_speed        -0.3066 -0.24582
+    initial_position    400 3149
+    scroll_speed        -0.3316 -0.3066
     behavior            LINEAR -12.26 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1615,8 +1628,8 @@ background
 // water layer 26
 background
 {
-    initial_position    0 2648
-    scroll_speed        -0.3192 -0.2559
+    initial_position    0 3274
+    scroll_speed        -0.3438 -0.3192
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1638,8 +1651,8 @@ background
 
 background
 {
-    initial_position    416 2648
-    scroll_speed        -0.3192 -0.2559
+    initial_position    416 3274
+    scroll_speed        -0.3438 -0.3192
     behavior            LINEAR -12.77 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1662,8 +1675,8 @@ background
 // water layer 27
 background
 {
-    initial_position    0 2748
-    scroll_speed        -0.3318 -0.26597
+    initial_position    0 3398
+    scroll_speed        -0.356 -0.3318
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1685,8 +1698,8 @@ background
 
 background
 {
-    initial_position    432 2748
-    scroll_speed        -0.3318 -0.26597
+    initial_position    432 3398
+    scroll_speed        -0.356 -0.3318
     behavior            LINEAR -13.27 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1709,8 +1722,8 @@ background
 // water layer 28
 background
 {
-    initial_position    0 2847
-    scroll_speed        -0.3444 -0.27605
+    initial_position    0 3523
+    scroll_speed        -0.3681 -0.3444
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1732,8 +1745,8 @@ background
 
 background
 {
-    initial_position    448 2847
-    scroll_speed        -0.3444 -0.27605
+    initial_position    448 3523
+    scroll_speed        -0.3681 -0.3444
     behavior            LINEAR -13.78 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1756,8 +1769,8 @@ background
 // water layer 29
 background
 {
-    initial_position    0 2947
-    scroll_speed        -0.357 -0.28613
+    initial_position    0 3647
+    scroll_speed        -0.3803 -0.357
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1779,8 +1792,8 @@ background
 
 background
 {
-    initial_position    464 2947
-    scroll_speed        -0.357 -0.28613
+    initial_position    464 3647
+    scroll_speed        -0.3803 -0.357
     behavior            LINEAR -14.28 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1803,8 +1816,8 @@ background
 // water layer 30
 background
 {
-    initial_position    0 3046
-    scroll_speed        -0.3696 -0.2962
+    initial_position    0 3772
+    scroll_speed        -0.3924 -0.3696
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1826,8 +1839,8 @@ background
 
 background
 {
-    initial_position    480 3046
-    scroll_speed        -0.3696 -0.2962
+    initial_position    480 3772
+    scroll_speed        -0.3924 -0.3696
     behavior            LINEAR -14.78 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1850,8 +1863,8 @@ background
 // water layer 31
 background
 {
-    initial_position    0 3146
-    scroll_speed        -0.3822 -0.30628
+    initial_position    0 3896
+    scroll_speed        -0.4046 -0.3822
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1873,8 +1886,8 @@ background
 
 background
 {
-    initial_position    496 3146
-    scroll_speed        -0.3822 -0.30628
+    initial_position    496 3896
+    scroll_speed        -0.4046 -0.3822
     behavior            LINEAR -15.29 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1897,8 +1910,8 @@ background
 // water layer 32
 background
 {
-    initial_position    0 3246
-    scroll_speed        -0.3948 -0.31635
+    initial_position    0 4021
+    scroll_speed        -0.4167 -0.3948
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1920,8 +1933,8 @@ background
 
 background
 {
-    initial_position    512 3246
-    scroll_speed        -0.3948 -0.31635
+    initial_position    512 4021
+    scroll_speed        -0.4167 -0.3948
     behavior            LINEAR -15.79 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1944,8 +1957,8 @@ background
 // water layer 33
 background
 {
-    initial_position    0 3345
-    scroll_speed        -0.4074 -0.32643
+    initial_position    0 4145
+    scroll_speed        -0.4289 -0.4074
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1967,8 +1980,8 @@ background
 
 background
 {
-    initial_position    528 3345
-    scroll_speed        -0.4074 -0.32643
+    initial_position    528 4145
+    scroll_speed        -0.4289 -0.4074
     behavior            LINEAR -16.3 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -1991,8 +2004,8 @@ background
 // water layer 34
 background
 {
-    initial_position    0 3445
-    scroll_speed        -0.4201 -0.33651
+    initial_position    0 4271
+    scroll_speed        -0.441 -0.4201
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2014,8 +2027,8 @@ background
 
 background
 {
-    initial_position    544 3445
-    scroll_speed        -0.4201 -0.33651
+    initial_position    544 4271
+    scroll_speed        -0.441 -0.4201
     behavior            LINEAR -16.8 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2038,8 +2051,8 @@ background
 // water layer 35
 background
 {
-    initial_position    0 3544
-    scroll_speed        -0.4327 -0.34658
+    initial_position    0 4395
+    scroll_speed        -0.4532 -0.4327
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2061,8 +2074,8 @@ background
 
 background
 {
-    initial_position    560 3544
-    scroll_speed        -0.4327 -0.34658
+    initial_position    560 4395
+    scroll_speed        -0.4532 -0.4327
     behavior            LINEAR -17.31 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2085,8 +2098,8 @@ background
 // water layer 36
 background
 {
-    initial_position    0 3644
-    scroll_speed        -0.4453 -0.35666
+    initial_position    0 4520
+    scroll_speed        -0.4653 -0.4453
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2108,8 +2121,8 @@ background
 
 background
 {
-    initial_position    576 3644
-    scroll_speed        -0.4453 -0.35666
+    initial_position    576 4520
+    scroll_speed        -0.4653 -0.4453
     behavior            LINEAR -17.81 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2132,8 +2145,8 @@ background
 // water layer 37
 background
 {
-    initial_position    0 3743
-    scroll_speed        -0.4579 -0.36673
+    initial_position    0 4644
+    scroll_speed        -0.4775 -0.4579
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2155,8 +2168,8 @@ background
 
 background
 {
-    initial_position    592 3743
-    scroll_speed        -0.4579 -0.36673
+    initial_position    592 4644
+    scroll_speed        -0.4775 -0.4579
     behavior            LINEAR -18.32 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2179,8 +2192,8 @@ background
 // water layer 38
 background
 {
-    initial_position    0 3843
-    scroll_speed        -0.4705 -0.37681
+    initial_position    0 4769
+    scroll_speed        -0.4896 -0.4705
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2202,8 +2215,8 @@ background
 
 background
 {
-    initial_position    608 3843
-    scroll_speed        -0.4705 -0.37681
+    initial_position    608 4769
+    scroll_speed        -0.4896 -0.4705
     behavior            LINEAR -18.82 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2226,8 +2239,8 @@ background
 // water layer 39
 background
 {
-    initial_position    0 3942
-    scroll_speed        -0.4831 -0.38689
+    initial_position    0 4893
+    scroll_speed        -0.5018 -0.4831
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2249,8 +2262,8 @@ background
 
 background
 {
-    initial_position    624 3942
-    scroll_speed        -0.4831 -0.38689
+    initial_position    624 4893
+    scroll_speed        -0.5018 -0.4831
     behavior            LINEAR -19.32 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2273,8 +2286,8 @@ background
 // water layer 40
 background
 {
-    initial_position    0 4042
-    scroll_speed        -0.4957 -0.39696
+    initial_position    0 5018
+    scroll_speed        -0.5139 -0.4957
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2296,8 +2309,8 @@ background
 
 background
 {
-    initial_position    640 4042
-    scroll_speed        -0.4957 -0.39696
+    initial_position    640 5018
+    scroll_speed        -0.5139 -0.4957
     behavior            LINEAR -19.83 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2320,8 +2333,8 @@ background
 // water layer 41
 background
 {
-    initial_position    0 4142
-    scroll_speed        -0.5083 -0.40704
+    initial_position    0 5142
+    scroll_speed        -0.5261 -0.5083
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2343,8 +2356,8 @@ background
 
 background
 {
-    initial_position    656 4142
-    scroll_speed        -0.5083 -0.40704
+    initial_position    656 5142
+    scroll_speed        -0.5261 -0.5083
     behavior            LINEAR -20.33 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2367,8 +2380,8 @@ background
 // water layer 42
 background
 {
-    initial_position    0 4241
-    scroll_speed        -0.5209 -0.41711
+    initial_position    0 5266
+    scroll_speed        -0.5382 -0.5209
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2390,8 +2403,8 @@ background
 
 background
 {
-    initial_position    672 4241
-    scroll_speed        -0.5209 -0.41711
+    initial_position    672 5266
+    scroll_speed        -0.5382 -0.5209
     behavior            LINEAR -20.84 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2414,8 +2427,8 @@ background
 // water layer 43
 background
 {
-    initial_position    0 4341
-    scroll_speed        -0.5335 -0.42719
+    initial_position    0 5391
+    scroll_speed        -0.5504 -0.5335
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2437,8 +2450,8 @@ background
 
 background
 {
-    initial_position    688 4341
-    scroll_speed        -0.5335 -0.42719
+    initial_position    688 5391
+    scroll_speed        -0.5504 -0.5335
     behavior            LINEAR -21.34 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2461,8 +2474,8 @@ background
 // water layer 44
 background
 {
-    initial_position    0 4440
-    scroll_speed        -0.5461 -0.43727
+    initial_position    0 5515
+    scroll_speed        -0.5625 -0.5461
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2484,8 +2497,8 @@ background
 
 background
 {
-    initial_position    704 4440
-    scroll_speed        -0.5461 -0.43727
+    initial_position    704 5515
+    scroll_speed        -0.5625 -0.5461
     behavior            LINEAR -21.84 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2508,8 +2521,8 @@ background
 // water layer 45
 background
 {
-    initial_position    0 4540
-    scroll_speed        -0.5587 -0.44734
+    initial_position    0 5640
+    scroll_speed        -0.5747 -0.5587
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2531,8 +2544,8 @@ background
 
 background
 {
-    initial_position    720 4540
-    scroll_speed        -0.5587 -0.44734
+    initial_position    720 5640
+    scroll_speed        -0.5747 -0.5587
     behavior            LINEAR -22.35 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2555,8 +2568,8 @@ background
 // water layer 46
 background
 {
-    initial_position    0 4639
-    scroll_speed        -0.5713 -0.45742
+    initial_position    0 5764
+    scroll_speed        -0.5868 -0.5713
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2578,8 +2591,8 @@ background
 
 background
 {
-    initial_position    736 4639
-    scroll_speed        -0.5713 -0.45742
+    initial_position    736 5764
+    scroll_speed        -0.5868 -0.5713
     behavior            LINEAR -22.85 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2602,8 +2615,8 @@ background
 // water layer 47
 background
 {
-    initial_position    0 4739
-    scroll_speed        -0.5839 -0.46749
+    initial_position    0 5889
+    scroll_speed        -0.599 -0.5839
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2625,8 +2638,8 @@ background
 
 background
 {
-    initial_position    752 4739
-    scroll_speed        -0.5839 -0.46749
+    initial_position    752 5889
+    scroll_speed        -0.599 -0.5839
     behavior            LINEAR -23.36 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2649,8 +2662,8 @@ background
 // water layer 48
 background
 {
-    initial_position    0 4838
-    scroll_speed        -0.5966 -0.47757
+    initial_position    0 6014
+    scroll_speed        -0.6111 -0.5966
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2672,8 +2685,8 @@ background
 
 background
 {
-    initial_position    768 4838
-    scroll_speed        -0.5966 -0.47757
+    initial_position    768 6014
+    scroll_speed        -0.6111 -0.5966
     behavior            LINEAR -23.86 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2696,8 +2709,8 @@ background
 // water layer 49
 background
 {
-    initial_position    0 4938
-    scroll_speed        -0.6092 -0.48765
+    initial_position    0 6139
+    scroll_speed        -0.6233 -0.6092
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2719,8 +2732,8 @@ background
 
 background
 {
-    initial_position    784 4938
-    scroll_speed        -0.6092 -0.48765
+    initial_position    784 6139
+    scroll_speed        -0.6233 -0.6092
     behavior            LINEAR -24.37 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2743,8 +2756,8 @@ background
 // water layer 50
 background
 {
-    initial_position    0 5037
-    scroll_speed        -0.6218 -0.49772
+    initial_position    0 6263
+    scroll_speed        -0.6354 -0.6218
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2766,8 +2779,8 @@ background
 
 background
 {
-    initial_position    800 5037
-    scroll_speed        -0.6218 -0.49772
+    initial_position    800 6263
+    scroll_speed        -0.6354 -0.6218
     behavior            LINEAR -24.87 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2790,8 +2803,8 @@ background
 // water layer 51
 background
 {
-    initial_position    0 5137
-    scroll_speed        -0.6344 -0.5078
+    initial_position    0 6388
+    scroll_speed        -0.6476 -0.6344
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2813,8 +2826,8 @@ background
 
 background
 {
-    initial_position    816 5137
-    scroll_speed        -0.6344 -0.5078
+    initial_position    816 6388
+    scroll_speed        -0.6476 -0.6344
     behavior            LINEAR -25.38 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2837,8 +2850,8 @@ background
 // water layer 52
 background
 {
-    initial_position    0 5237
-    scroll_speed        -0.647 -0.51787
+    initial_position    0 6512
+    scroll_speed        -0.6597 -0.647
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2860,8 +2873,8 @@ background
 
 background
 {
-    initial_position    832 5237
-    scroll_speed        -0.647 -0.51787
+    initial_position    832 6512
+    scroll_speed        -0.6597 -0.647
     behavior            LINEAR -25.88 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2884,8 +2897,8 @@ background
 // water layer 53
 background
 {
-    initial_position    0 5336
-    scroll_speed        -0.6596 -0.52795
+    initial_position    0 6637
+    scroll_speed        -0.6719 -0.6596
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2907,8 +2920,8 @@ background
 
 background
 {
-    initial_position    848 5336
-    scroll_speed        -0.6596 -0.52795
+    initial_position    848 6637
+    scroll_speed        -0.6719 -0.6596
     behavior            LINEAR -26.38 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2931,8 +2944,8 @@ background
 // water layer 54
 background
 {
-    initial_position    0 5436
-    scroll_speed        -0.6722 -0.53803
+    initial_position    0 6761
+    scroll_speed        -0.6841 -0.6722
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2954,8 +2967,8 @@ background
 
 background
 {
-    initial_position    864 5436
-    scroll_speed        -0.6722 -0.53803
+    initial_position    864 6761
+    scroll_speed        -0.6841 -0.6722
     behavior            LINEAR -26.89 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -2978,8 +2991,8 @@ background
 // water layer 55
 background
 {
-    initial_position    0 5535
-    scroll_speed        -0.6848 -0.5481
+    initial_position    0 6886
+    scroll_speed        -0.6962 -0.6848
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3001,8 +3014,8 @@ background
 
 background
 {
-    initial_position    880 5535
-    scroll_speed        -0.6848 -0.5481
+    initial_position    880 6886
+    scroll_speed        -0.6962 -0.6848
     behavior            LINEAR -27.39 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3025,8 +3038,8 @@ background
 // water layer 56
 background
 {
-    initial_position    0 5635
-    scroll_speed        -0.6974 -0.55818
+    initial_position    0 7010
+    scroll_speed        -0.7084 -0.6974
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3048,8 +3061,8 @@ background
 
 background
 {
-    initial_position    896 5635
-    scroll_speed        -0.6974 -0.55818
+    initial_position    896 7010
+    scroll_speed        -0.7084 -0.6974
     behavior            LINEAR -27.9 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3072,8 +3085,8 @@ background
 // water layer 57
 background
 {
-    initial_position    0 5734
-    scroll_speed        -0.71 -0.56825
+    initial_position    0 7135
+    scroll_speed        -0.7205 -0.71
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3095,8 +3108,8 @@ background
 
 background
 {
-    initial_position    912 5734
-    scroll_speed        -0.71 -0.56825
+    initial_position    912 7135
+    scroll_speed        -0.7205 -0.71
     behavior            LINEAR -28.4 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3119,8 +3132,8 @@ background
 // water layer 58
 background
 {
-    initial_position    0 5834
-    scroll_speed        -0.7226 -0.57833
+    initial_position    0 7259
+    scroll_speed        -0.7327 -0.7226
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3142,8 +3155,8 @@ background
 
 background
 {
-    initial_position    928 5834
-    scroll_speed        -0.7226 -0.57833
+    initial_position    928 7259
+    scroll_speed        -0.7327 -0.7226
     behavior            LINEAR -28.9 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3166,8 +3179,8 @@ background
 // water layer 59
 background
 {
-    initial_position    0 5933
-    scroll_speed        -0.7352 -0.58841
+    initial_position    0 7384
+    scroll_speed        -0.7448 -0.7352
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3189,8 +3202,8 @@ background
 
 background
 {
-    initial_position    944 5933
-    scroll_speed        -0.7352 -0.58841
+    initial_position    944 7384
+    scroll_speed        -0.7448 -0.7352
     behavior            LINEAR -29.41 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3213,8 +3226,8 @@ background
 // water layer 60
 background
 {
-    initial_position    0 6033
-    scroll_speed        -0.7478 -0.59848
+    initial_position    0 7508
+    scroll_speed        -0.757 -0.7478
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3236,8 +3249,8 @@ background
 
 background
 {
-    initial_position    960 6033
-    scroll_speed        -0.7478 -0.59848
+    initial_position    960 7508
+    scroll_speed        -0.757 -0.7478
     behavior            LINEAR -29.91 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3260,8 +3273,8 @@ background
 // water layer 61
 background
 {
-    initial_position    0 6133
-    scroll_speed        -0.7605 -0.60856
+    initial_position    0 7634
+    scroll_speed        -0.7691 -0.7605
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3283,8 +3296,8 @@ background
 
 background
 {
-    initial_position    976 6133
-    scroll_speed        -0.7605 -0.60856
+    initial_position    976 7634
+    scroll_speed        -0.7691 -0.7605
     behavior            LINEAR -30.42 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3307,8 +3320,8 @@ background
 // water layer 62
 background
 {
-    initial_position    0 6232
-    scroll_speed        -0.7731 -0.61863
+    initial_position    0 7758
+    scroll_speed        -0.7813 -0.7731
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3330,8 +3343,8 @@ background
 
 background
 {
-    initial_position    992 6232
-    scroll_speed        -0.7731 -0.61863
+    initial_position    992 7758
+    scroll_speed        -0.7813 -0.7731
     behavior            LINEAR -30.92 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3354,8 +3367,8 @@ background
 // water layer 63
 background
 {
-    initial_position    0 6332
-    scroll_speed        -0.7857 -0.62871
+    initial_position    0 7883
+    scroll_speed        -0.7934 -0.7857
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3377,8 +3390,8 @@ background
 
 background
 {
-    initial_position    1008 6332
-    scroll_speed        -0.7857 -0.62871
+    initial_position    1008 7883
+    scroll_speed        -0.7934 -0.7857
     behavior            LINEAR -31.43 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3401,8 +3414,8 @@ background
 // water layer 64
 background
 {
-    initial_position    0 6431
-    scroll_speed        -0.7983 -0.63878
+    initial_position    0 8007
+    scroll_speed        -0.8056 -0.7983
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3424,8 +3437,8 @@ background
 
 background
 {
-    initial_position    1024 6431
-    scroll_speed        -0.7983 -0.63878
+    initial_position    1024 8007
+    scroll_speed        -0.8056 -0.7983
     behavior            LINEAR -31.93 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3448,8 +3461,8 @@ background
 // water layer 65
 background
 {
-    initial_position    0 6531
-    scroll_speed        -0.8109 -0.64886
+    initial_position    0 8132
+    scroll_speed        -0.8177 -0.8109
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3471,8 +3484,8 @@ background
 
 background
 {
-    initial_position    1040 6531
-    scroll_speed        -0.8109 -0.64886
+    initial_position    1040 8132
+    scroll_speed        -0.8177 -0.8109
     behavior            LINEAR -32.44 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3495,8 +3508,8 @@ background
 // water layer 66
 background
 {
-    initial_position    0 6630
-    scroll_speed        -0.8235 -0.65894
+    initial_position    0 8256
+    scroll_speed        -0.8299 -0.8235
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3518,8 +3531,8 @@ background
 
 background
 {
-    initial_position    1056 6630
-    scroll_speed        -0.8235 -0.65894
+    initial_position    1056 8256
+    scroll_speed        -0.8299 -0.8235
     behavior            LINEAR -32.94 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3542,8 +3555,8 @@ background
 // water layer 67
 background
 {
-    initial_position    0 6730
-    scroll_speed        -0.8361 -0.66901
+    initial_position    0 8381
+    scroll_speed        -0.842 -0.8361
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3565,8 +3578,8 @@ background
 
 background
 {
-    initial_position    1072 6730
-    scroll_speed        -0.8361 -0.66901
+    initial_position    1072 8381
+    scroll_speed        -0.842 -0.8361
     behavior            LINEAR -33.44 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3589,8 +3602,8 @@ background
 // water layer 68
 background
 {
-    initial_position    0 6829
-    scroll_speed        -0.8487 -0.67909
+    initial_position    0 8505
+    scroll_speed        -0.8542 -0.8487
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3612,8 +3625,8 @@ background
 
 background
 {
-    initial_position    1088 6829
-    scroll_speed        -0.8487 -0.67909
+    initial_position    1088 8505
+    scroll_speed        -0.8542 -0.8487
     behavior            LINEAR -33.95 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3636,8 +3649,8 @@ background
 // water layer 69
 background
 {
-    initial_position    0 6929
-    scroll_speed        -0.8613 -0.68916
+    initial_position    0 8630
+    scroll_speed        -0.8663 -0.8613
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3659,8 +3672,8 @@ background
 
 background
 {
-    initial_position    1104 6929
-    scroll_speed        -0.8613 -0.68916
+    initial_position    1104 8630
+    scroll_speed        -0.8663 -0.8613
     behavior            LINEAR -34.45 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3683,8 +3696,8 @@ background
 // water layer 70
 background
 {
-    initial_position    0 7028
-    scroll_speed        -0.8739 -0.69924
+    initial_position    0 8754
+    scroll_speed        -0.8785 -0.8739
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3706,8 +3719,8 @@ background
 
 background
 {
-    initial_position    1120 7028
-    scroll_speed        -0.8739 -0.69924
+    initial_position    1120 8754
+    scroll_speed        -0.8785 -0.8739
     behavior            LINEAR -34.96 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3730,8 +3743,8 @@ background
 // water layer 71
 background
 {
-    initial_position    0 7128
-    scroll_speed        -0.8865 -0.70932
+    initial_position    0 8879
+    scroll_speed        -0.8906 -0.8865
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3753,8 +3766,8 @@ background
 
 background
 {
-    initial_position    1136 7128
-    scroll_speed        -0.8865 -0.70932
+    initial_position    1136 8879
+    scroll_speed        -0.8906 -0.8865
     behavior            LINEAR -35.46 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3777,8 +3790,8 @@ background
 // water layer 72
 background
 {
-    initial_position    0 7228
-    scroll_speed        -0.8991 -0.71939
+    initial_position    0 9003
+    scroll_speed        -0.9028 -0.8991
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3800,8 +3813,8 @@ background
 
 background
 {
-    initial_position    1152 7228
-    scroll_speed        -0.8991 -0.71939
+    initial_position    1152 9003
+    scroll_speed        -0.9028 -0.8991
     behavior            LINEAR -35.96 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3824,8 +3837,8 @@ background
 // water layer 73
 background
 {
-    initial_position    0 7327
-    scroll_speed        -0.9117 -0.72947
+    initial_position    0 9128
+    scroll_speed        -0.9149 -0.9117
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3847,8 +3860,8 @@ background
 
 background
 {
-    initial_position    1168 7327
-    scroll_speed        -0.9117 -0.72947
+    initial_position    1168 9128
+    scroll_speed        -0.9149 -0.9117
     behavior            LINEAR -36.47 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3871,8 +3884,8 @@ background
 // water layer 74
 background
 {
-    initial_position    0 7427
-    scroll_speed        -0.9244 -0.73954
+    initial_position    0 9253
+    scroll_speed        -0.9271 -0.9244
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3894,8 +3907,8 @@ background
 
 background
 {
-    initial_position    1184 7427
-    scroll_speed        -0.9244 -0.73954
+    initial_position    1184 9253
+    scroll_speed        -0.9271 -0.9244
     behavior            LINEAR -36.98 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3918,8 +3931,8 @@ background
 // water layer 75
 background
 {
-    initial_position    0 7526
-    scroll_speed        -0.937 -0.74962
+    initial_position    0 9378
+    scroll_speed        -0.9392 -0.937
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3941,8 +3954,8 @@ background
 
 background
 {
-    initial_position    1200 7526
-    scroll_speed        -0.937 -0.74962
+    initial_position    1200 9378
+    scroll_speed        -0.9392 -0.937
     behavior            LINEAR -37.48 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3965,8 +3978,8 @@ background
 // water layer 76
 background
 {
-    initial_position    0 7626
-    scroll_speed        -0.9496 -0.7597
+    initial_position    0 9502
+    scroll_speed        -0.9514 -0.9496
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -3988,8 +4001,8 @@ background
 
 background
 {
-    initial_position    1216 7626
-    scroll_speed        -0.9496 -0.7597
+    initial_position    1216 9502
+    scroll_speed        -0.9514 -0.9496
     behavior            LINEAR -37.98 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4012,8 +4025,8 @@ background
 // water layer 77
 background
 {
-    initial_position    0 7725
-    scroll_speed        -0.9622 -0.76977
+    initial_position    0 9627
+    scroll_speed        -0.9635 -0.9622
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4035,8 +4048,8 @@ background
 
 background
 {
-    initial_position    1232 7725
-    scroll_speed        -0.9622 -0.76977
+    initial_position    1232 9627
+    scroll_speed        -0.9635 -0.9622
     behavior            LINEAR -38.49 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4059,8 +4072,8 @@ background
 // water layer 78
 background
 {
-    initial_position    0 7825
-    scroll_speed        -0.9748 -0.77985
+    initial_position    0 9751
+    scroll_speed        -0.9757 -0.9748
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4082,8 +4095,8 @@ background
 
 background
 {
-    initial_position    1248 7825
-    scroll_speed        -0.9748 -0.77985
+    initial_position    1248 9751
+    scroll_speed        -0.9757 -0.9748
     behavior            LINEAR -38.99 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4106,8 +4119,8 @@ background
 // water layer 79
 background
 {
-    initial_position    0 7924
-    scroll_speed        -0.9874 -0.78992
+    initial_position    0 9876
+    scroll_speed        -0.9878 -0.9874
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4129,8 +4142,8 @@ background
 
 background
 {
-    initial_position    1264 7924
-    scroll_speed        -0.9874 -0.78992
+    initial_position    1264 9876
+    scroll_speed        -0.9878 -0.9874
     behavior            LINEAR -39.5 0
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4153,8 +4166,8 @@ background
 // water layer 80
 background
 {
-    initial_position    0 8024
-    scroll_speed        -1 -0.8
+    initial_position    0 10000
+    scroll_speed        -1 -1
     behavior            DEFAULT
     repeat_x            TRUE
     repeat_y            FALSE
@@ -4176,8 +4189,8 @@ background
 
 background
 {
-    initial_position    1280 8024
-    scroll_speed        -1 -0.8
+    initial_position    1280 10000
+    scroll_speed        -1 -1
     behavior            LINEAR -40 0
     repeat_x            TRUE
     repeat_y            FALSE

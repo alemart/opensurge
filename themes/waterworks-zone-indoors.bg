@@ -1,0 +1,5293 @@
+// -----------------------------------------------------------------------------
+// File: waterworks-zone-indoors.bg
+// Description: background script for Waterworks Zone (outdoors)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+//
+// clear to color
+//
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-clear.png"
+        source_rect     0 0 256 256
+        frame_size      256 256
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// main background (the wall that appears when out of water)
+//
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-background.png"
+        source_rect     0 0 768 192
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// waterfall
+//
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-waterfall.png"
+        source_rect     0 0 768 768
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         12
+            data        0 1 2 3
+        }
+    }
+}
+
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-waterfall-splash.png"
+        source_rect     0 0 768 768
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         12
+            data        0 1 2 3
+        }
+    }
+}
+
+
+//
+// TV
+//
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-tv.png"
+        source_rect     0 0 1536 1920
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         16
+            data        0 0 0 0            1 2 3 4            5 5 5 6 6 6 7 7 7 8 8 8            9 9 9 9 4 4 4 4 9 9 9 9 4 4 4 4 9 9 9 9 4 4 4 4 9 9 9 9 4 4 4 4            9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9      4 3 2 1 0 0 0 0     11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 11 11     11 11 11 11     19 19 19 19
+        }
+    }
+}
+
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex 0.3
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-tv-trans50.png"
+        source_rect     0 0 1536 1920
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         16
+            data        0 0 0 0            1 2 3 4            5 5 5 6 6 6 7 7 7 8 8 8            9 9 9 9 4 4 4 4 9 9 9 9 4 4 4 4 9 9 9 9 4 4 4 4 9 9 9 9 4 4 4 4            9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9      4 3 2 1 0 0 0 0     11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 11 11     11 11 11 11     19 19 19 19
+        }
+    }
+}
+
+
+//
+// magic portal
+//
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-magic.png"
+        source_rect     768 0 768 1728
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         12
+            data        0 1 2 0 1 2 0 1 2 0 1 2 3 4 5 3 4 5 3 4 5 6 7 8 6 7 8 6 7 8 3 4 5 3 4 5 6 7 8 6 7 8
+        }
+    }
+}
+
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex 0.3
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-magic.png"
+        source_rect     0 0 768 1728
+        frame_size      768 192
+
+        animation
+        {
+            repeat      TRUE
+            fps         12
+            data        0 1 2 0 1 2 0 1 2 0 1 2 3 4 5 3 4 5 3 4 5 6 7 8 6 7 8 6 7 8 3 4 5 3 4 5 6 7 8 6 7 8
+        }
+    }
+}
+
+
+
+
+//
+// ceiling (small)
+//
+// y0 = (240-16) - (7000-240/2)*scrollspeed_y - 10
+// 240: screen height
+// 16: tile height (16, 24 or 32)
+// 10: offset found by visual inspection
+// 7000: world reference
+//
+
+background
+{
+    initial_position    0 902
+    scroll_speed        -0.1 -0.1 // follows the main background
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 224 960 16
+        frame_size      960 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 950
+    scroll_speed        -0.107 -0.107
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 208 960 16
+        frame_size      960 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 998
+    scroll_speed        -0.114 -0.114
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 192 960 16
+        frame_size      960 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// ceiling (medium)
+//
+
+background
+{
+    initial_position    0 1038
+    scroll_speed        -0.121 -0.121
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 168 960 24
+        frame_size      960 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1107
+    scroll_speed        -0.131 -0.131
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 144 960 24
+        frame_size      960 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+//
+// ceiling (large)
+//
+
+background
+{
+    initial_position    0 1195
+    scroll_speed        -0.145 -0.145
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex -1
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 0 960 32
+        frame_size      960 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+
+//
+// underwater fill
+//
+background
+{
+    initial_position    0 1108
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 2048
+        frame_size      256 2048
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1108
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex 0.3
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-background-underwater-trans50.png"
+        source_rect     0 0 768 1920
+        frame_size      768 1920
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 980 // 916+64
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex 0.3
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-background-trans50.png"
+        source_rect     0 64 768 128
+        frame_size      768 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+
+
+
+
+//
+// water layers
+// (adapted from the "Waterworks outdoors" background script)
+//
+
+background
+{
+    initial_position    0 1108
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1108
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    16 1108
+    scroll_speed        -0.1 -0.1
+    behavior            LINEAR -4 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1236
+    scroll_speed        -0.113 -0.113
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1236
+    scroll_speed        -0.113 -0.113
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    32 1236
+    scroll_speed        -0.113 -0.113
+    behavior            LINEAR -4.52 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1366
+    scroll_speed        -0.1261 -0.1261
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1366
+    scroll_speed        -0.1261 -0.1261
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    48 1366
+    scroll_speed        -0.1261 -0.1261
+    behavior            LINEAR -5.04 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1494
+    scroll_speed        -0.1391 -0.1391
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1494
+    scroll_speed        -0.1391 -0.1391
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    64 1494
+    scroll_speed        -0.1391 -0.1391
+    behavior            LINEAR -5.56 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1624
+    scroll_speed        -0.1522 -0.1522
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1624
+    scroll_speed        -0.1522 -0.1522
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    80 1624
+    scroll_speed        -0.1522 -0.1522
+    behavior            LINEAR -6.09 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1752
+    scroll_speed        -0.1652 -0.1652
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1752
+    scroll_speed        -0.1652 -0.1652
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    96 1752
+    scroll_speed        -0.1652 -0.1652
+    behavior            LINEAR -6.61 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1882
+    scroll_speed        -0.1783 -0.1783
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1882
+    scroll_speed        -0.1783 -0.1783
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    112 1882
+    scroll_speed        -0.1783 -0.1783
+    behavior            LINEAR -7.13 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2010
+    scroll_speed        -0.1913 -0.1913
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2010
+    scroll_speed        -0.1913 -0.1913
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    128 2010
+    scroll_speed        -0.1913 -0.1913
+    behavior            LINEAR -7.65 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2138
+    scroll_speed        -0.2043 -0.2043
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2138
+    scroll_speed        -0.2043 -0.2043
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    144 2138
+    scroll_speed        -0.2043 -0.2043
+    behavior            LINEAR -8.17 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2268
+    scroll_speed        -0.2174 -0.2174
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2268
+    scroll_speed        -0.2174 -0.2174
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    160 2268
+    scroll_speed        -0.2174 -0.2174
+    behavior            LINEAR -8.7 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2396
+    scroll_speed        -0.2304 -0.2304
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2396
+    scroll_speed        -0.2304 -0.2304
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 176 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    176 2396
+    scroll_speed        -0.2304 -0.2304
+    behavior            LINEAR -9.22 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 176 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2526
+    scroll_speed        -0.2435 -0.2435
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2526
+    scroll_speed        -0.2435 -0.2435
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 192 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    192 2526
+    scroll_speed        -0.2435 -0.2435
+    behavior            LINEAR -9.74 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 192 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2654
+    scroll_speed        -0.2565 -0.2565
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2654
+    scroll_speed        -0.2565 -0.2565
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 208 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    208 2654
+    scroll_speed        -0.2565 -0.2565
+    behavior            LINEAR -10.26 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 208 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2784
+    scroll_speed        -0.2696 -0.2696
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2784
+    scroll_speed        -0.2696 -0.2696
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 224 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    224 2784
+    scroll_speed        -0.2696 -0.2696
+    behavior            LINEAR -10.78 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 224 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2912
+    scroll_speed        -0.2826 -0.2826
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 2912
+    scroll_speed        -0.2826 -0.2826
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 240 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    240 2912
+    scroll_speed        -0.2826 -0.2826
+    behavior            LINEAR -11.3 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 240 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3042
+    scroll_speed        -0.2957 -0.2957
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3042
+    scroll_speed        -0.2957 -0.2957
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 256 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    256 3042
+    scroll_speed        -0.2957 -0.2957
+    behavior            LINEAR -11.83 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 256 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3170
+    scroll_speed        -0.3087 -0.3087
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3170
+    scroll_speed        -0.3087 -0.3087
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 272 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    272 3170
+    scroll_speed        -0.3087 -0.3087
+    behavior            LINEAR -12.35 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 272 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3298
+    scroll_speed        -0.3217 -0.3217
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3298
+    scroll_speed        -0.3217 -0.3217
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 288 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    288 3298
+    scroll_speed        -0.3217 -0.3217
+    behavior            LINEAR -12.87 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 288 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3428
+    scroll_speed        -0.3348 -0.3348
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3428
+    scroll_speed        -0.3348 -0.3348
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 304 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    304 3428
+    scroll_speed        -0.3348 -0.3348
+    behavior            LINEAR -13.39 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 304 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3556
+    scroll_speed        -0.3478 -0.3478
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3556
+    scroll_speed        -0.3478 -0.3478
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    320 3556
+    scroll_speed        -0.3478 -0.3478
+    behavior            LINEAR -13.91 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3686
+    scroll_speed        -0.3609 -0.3609
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3686
+    scroll_speed        -0.3609 -0.3609
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    336 3686
+    scroll_speed        -0.3609 -0.3609
+    behavior            LINEAR -14.44 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3814
+    scroll_speed        -0.3739 -0.3739
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3814
+    scroll_speed        -0.3739 -0.3739
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    352 3814
+    scroll_speed        -0.3739 -0.3739
+    behavior            LINEAR -14.96 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3944
+    scroll_speed        -0.387 -0.387
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 3944
+    scroll_speed        -0.387 -0.387
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    368 3944
+    scroll_speed        -0.387 -0.387
+    behavior            LINEAR -15.48 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4072
+    scroll_speed        -0.4 -0.4
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4072
+    scroll_speed        -0.4 -0.4
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    384 4072
+    scroll_speed        -0.4 -0.4
+    behavior            LINEAR -16 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4200
+    scroll_speed        -0.413 -0.413
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4200
+    scroll_speed        -0.413 -0.413
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    400 4200
+    scroll_speed        -0.413 -0.413
+    behavior            LINEAR -16.52 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4330
+    scroll_speed        -0.4261 -0.4261
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4330
+    scroll_speed        -0.4261 -0.4261
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    416 4330
+    scroll_speed        -0.4261 -0.4261
+    behavior            LINEAR -17.04 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4458
+    scroll_speed        -0.4391 -0.4391
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4458
+    scroll_speed        -0.4391 -0.4391
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    432 4458
+    scroll_speed        -0.4391 -0.4391
+    behavior            LINEAR -17.56 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4588
+    scroll_speed        -0.4522 -0.4522
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4588
+    scroll_speed        -0.4522 -0.4522
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    448 4588
+    scroll_speed        -0.4522 -0.4522
+    behavior            LINEAR -18.09 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4716
+    scroll_speed        -0.4652 -0.4652
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4716
+    scroll_speed        -0.4652 -0.4652
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    464 4716
+    scroll_speed        -0.4652 -0.4652
+    behavior            LINEAR -18.61 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4846
+    scroll_speed        -0.4783 -0.4783
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4846
+    scroll_speed        -0.4783 -0.4783
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    480 4846
+    scroll_speed        -0.4783 -0.4783
+    behavior            LINEAR -19.13 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4974
+    scroll_speed        -0.4913 -0.4913
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 4974
+    scroll_speed        -0.4913 -0.4913
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 176 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    496 4974
+    scroll_speed        -0.4913 -0.4913
+    behavior            LINEAR -19.65 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 176 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5102
+    scroll_speed        -0.5043 -0.5043
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5102
+    scroll_speed        -0.5043 -0.5043
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 192 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    512 5102
+    scroll_speed        -0.5043 -0.5043
+    behavior            LINEAR -20.17 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 192 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5232
+    scroll_speed        -0.5174 -0.5174
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5232
+    scroll_speed        -0.5174 -0.5174
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 208 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    528 5232
+    scroll_speed        -0.5174 -0.5174
+    behavior            LINEAR -20.7 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 208 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5360
+    scroll_speed        -0.5304 -0.5304
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5360
+    scroll_speed        -0.5304 -0.5304
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 224 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    544 5360
+    scroll_speed        -0.5304 -0.5304
+    behavior            LINEAR -21.22 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 224 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5490
+    scroll_speed        -0.5435 -0.5435
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5490
+    scroll_speed        -0.5435 -0.5435
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 240 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    560 5490
+    scroll_speed        -0.5435 -0.5435
+    behavior            LINEAR -21.74 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 240 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5618
+    scroll_speed        -0.5565 -0.5565
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5618
+    scroll_speed        -0.5565 -0.5565
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 256 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    576 5618
+    scroll_speed        -0.5565 -0.5565
+    behavior            LINEAR -22.26 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 256 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5748
+    scroll_speed        -0.5696 -0.5696
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5748
+    scroll_speed        -0.5696 -0.5696
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 272 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    592 5748
+    scroll_speed        -0.5696 -0.5696
+    behavior            LINEAR -22.78 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 272 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5876
+    scroll_speed        -0.5826 -0.5826
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 5876
+    scroll_speed        -0.5826 -0.5826
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 288 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    608 5876
+    scroll_speed        -0.5826 -0.5826
+    behavior            LINEAR -23.3 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 288 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6006
+    scroll_speed        -0.5957 -0.5957
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6006
+    scroll_speed        -0.5957 -0.5957
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 304 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    624 6006
+    scroll_speed        -0.5957 -0.5957
+    behavior            LINEAR -23.83 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 304 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6134
+    scroll_speed        -0.6087 -0.6087
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6134
+    scroll_speed        -0.6087 -0.6087
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    640 6134
+    scroll_speed        -0.6087 -0.6087
+    behavior            LINEAR -24.35 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6262
+    scroll_speed        -0.6217 -0.6217
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6262
+    scroll_speed        -0.6217 -0.6217
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    656 6262
+    scroll_speed        -0.6217 -0.6217
+    behavior            LINEAR -24.87 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6392
+    scroll_speed        -0.6348 -0.6348
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6392
+    scroll_speed        -0.6348 -0.6348
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    672 6392
+    scroll_speed        -0.6348 -0.6348
+    behavior            LINEAR -25.39 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6520
+    scroll_speed        -0.6478 -0.6478
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6520
+    scroll_speed        -0.6478 -0.6478
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    688 6520
+    scroll_speed        -0.6478 -0.6478
+    behavior            LINEAR -25.91 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6650
+    scroll_speed        -0.6609 -0.6609
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6650
+    scroll_speed        -0.6609 -0.6609
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    704 6650
+    scroll_speed        -0.6609 -0.6609
+    behavior            LINEAR -26.44 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6778
+    scroll_speed        -0.6739 -0.6739
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6778
+    scroll_speed        -0.6739 -0.6739
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    720 6778
+    scroll_speed        -0.6739 -0.6739
+    behavior            LINEAR -26.96 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6908
+    scroll_speed        -0.687 -0.687
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 6908
+    scroll_speed        -0.687 -0.687
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    736 6908
+    scroll_speed        -0.687 -0.687
+    behavior            LINEAR -27.48 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7036
+    scroll_speed        -0.7 -0.7
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7036
+    scroll_speed        -0.7 -0.7
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    752 7036
+    scroll_speed        -0.7 -0.7
+    behavior            LINEAR -28 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7164
+    scroll_speed        -0.713 -0.713
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7164
+    scroll_speed        -0.713 -0.713
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    768 7164
+    scroll_speed        -0.713 -0.713
+    behavior            LINEAR -28.52 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7294
+    scroll_speed        -0.7261 -0.7261
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7294
+    scroll_speed        -0.7261 -0.7261
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    784 7294
+    scroll_speed        -0.7261 -0.7261
+    behavior            LINEAR -29.04 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7422
+    scroll_speed        -0.7391 -0.7391
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7422
+    scroll_speed        -0.7391 -0.7391
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    800 7422
+    scroll_speed        -0.7391 -0.7391
+    behavior            LINEAR -29.56 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7552
+    scroll_speed        -0.7522 -0.7522
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7552
+    scroll_speed        -0.7522 -0.7522
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 176 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    816 7552
+    scroll_speed        -0.7522 -0.7522
+    behavior            LINEAR -30.09 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 176 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7680
+    scroll_speed        -0.7652 -0.7652
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7680
+    scroll_speed        -0.7652 -0.7652
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 192 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    832 7680
+    scroll_speed        -0.7652 -0.7652
+    behavior            LINEAR -30.61 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 192 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7810
+    scroll_speed        -0.7783 -0.7783
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7810
+    scroll_speed        -0.7783 -0.7783
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 208 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    848 7810
+    scroll_speed        -0.7783 -0.7783
+    behavior            LINEAR -31.13 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 208 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7938
+    scroll_speed        -0.7913 -0.7913
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 7938
+    scroll_speed        -0.7913 -0.7913
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 224 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    864 7938
+    scroll_speed        -0.7913 -0.7913
+    behavior            LINEAR -31.65 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 224 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8066
+    scroll_speed        -0.8043 -0.8043
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8066
+    scroll_speed        -0.8043 -0.8043
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 240 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    880 8066
+    scroll_speed        -0.8043 -0.8043
+    behavior            LINEAR -32.17 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 240 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8196
+    scroll_speed        -0.8174 -0.8174
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8196
+    scroll_speed        -0.8174 -0.8174
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 256 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    896 8196
+    scroll_speed        -0.8174 -0.8174
+    behavior            LINEAR -32.7 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 256 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8324
+    scroll_speed        -0.8304 -0.8304
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8324
+    scroll_speed        -0.8304 -0.8304
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 272 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    912 8324
+    scroll_speed        -0.8304 -0.8304
+    behavior            LINEAR -33.22 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 272 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8454
+    scroll_speed        -0.8435 -0.8435
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8454
+    scroll_speed        -0.8435 -0.8435
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 288 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    928 8454
+    scroll_speed        -0.8435 -0.8435
+    behavior            LINEAR -33.74 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 288 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8582
+    scroll_speed        -0.8565 -0.8565
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8582
+    scroll_speed        -0.8565 -0.8565
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 304 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    944 8582
+    scroll_speed        -0.8565 -0.8565
+    behavior            LINEAR -34.26 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 304 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8712
+    scroll_speed        -0.8696 -0.8696
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8712
+    scroll_speed        -0.8696 -0.8696
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    960 8712
+    scroll_speed        -0.8696 -0.8696
+    behavior            LINEAR -34.78 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8840
+    scroll_speed        -0.8826 -0.8826
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8840
+    scroll_speed        -0.8826 -0.8826
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    976 8840
+    scroll_speed        -0.8826 -0.8826
+    behavior            LINEAR -35.3 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 16 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8970
+    scroll_speed        -0.8957 -0.8957
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 8970
+    scroll_speed        -0.8957 -0.8957
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    992 8970
+    scroll_speed        -0.8957 -0.8957
+    behavior            LINEAR -35.83 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 32 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9098
+    scroll_speed        -0.9087 -0.9087
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9098
+    scroll_speed        -0.9087 -0.9087
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1008 9098
+    scroll_speed        -0.9087 -0.9087
+    behavior            LINEAR -36.35 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 48 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9226
+    scroll_speed        -0.9217 -0.9217
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9226
+    scroll_speed        -0.9217 -0.9217
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1024 9226
+    scroll_speed        -0.9217 -0.9217
+    behavior            LINEAR -36.87 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 64 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9356
+    scroll_speed        -0.9348 -0.9348
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9356
+    scroll_speed        -0.9348 -0.9348
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1040 9356
+    scroll_speed        -0.9348 -0.9348
+    behavior            LINEAR -37.39 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 80 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9484
+    scroll_speed        -0.9478 -0.9478
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9484
+    scroll_speed        -0.9478 -0.9478
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1056 9484
+    scroll_speed        -0.9478 -0.9478
+    behavior            LINEAR -37.91 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 96 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9614
+    scroll_speed        -0.9609 -0.9609
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9614
+    scroll_speed        -0.9609 -0.9609
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1072 9614
+    scroll_speed        -0.9609 -0.9609
+    behavior            LINEAR -38.44 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 112 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9742
+    scroll_speed        -0.9739 -0.9739
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9742
+    scroll_speed        -0.9739 -0.9739
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1088 9742
+    scroll_speed        -0.9739 -0.9739
+    behavior            LINEAR -38.96 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 128 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9872
+    scroll_speed        -0.987 -0.987
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 9872
+    scroll_speed        -0.987 -0.987
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1104 9872
+    scroll_speed        -0.987 -0.987
+    behavior            LINEAR -39.48 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 144 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 10000
+    scroll_speed        -1 -1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
+        source_rect     0 0 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 10000
+    scroll_speed        -1 -1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    1120 10000
+    scroll_speed        -1 -1
+    behavior            LINEAR -40 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
+        source_rect     0 160 256 16
+        frame_size      256 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
