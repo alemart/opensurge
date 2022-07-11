@@ -22,9 +22,10 @@ using SurgeEngine.Collisions.CollisionBox;
 //
 // When an Event Trigger is touched, all other
 // objects belonging to the same group will no
-// longer be able to be triggered. Only the
+// longer be able to be triggered*. Only the
 // touched object will trigger the event. It
-// happens once, unless the level restarts.
+// happens once, unless the level restarts
+// (* unless you reactivate the group!)
 //
 // To define the specific events, you may use
 // a level setup script that runs on the level
@@ -45,6 +46,28 @@ using SurgeEngine.Collisions.CollisionBox;
 // when the player first touches a group 1
 // Event Trigger.
 //
+// If you want to reactivate an Event Trigger,
+// so that it can be triggered multiple times,
+// use a DelayedEvent in an EventList. Example:
+//
+// using SurgeEngine.Level;
+// using SurgeEngine.Events.EventList;
+// using SurgeEngine.Events.EntityEvent;
+// using SurgeEngine.Events.DelayedEvent;
+// using SurgeEngine.Events.FunctionEvent;
+//
+// /* in your setup script... */
+// Level.setup({
+//   "Event Trigger 1": {
+//     "onTrigger": EventList([
+//       FunctionEvent("Print").withArgument("Hello from Event!"),
+//       DelayedEvent(
+//         EntityEvent("Event Trigger 1").willCall("reactivate")
+//       ).willWait(2.0)
+//     ])
+//   }
+// });
+//
 
 // Event Trigger 1
 object "Event Trigger 1" is "entity", "special"
@@ -55,6 +78,11 @@ object "Event Trigger 1" is "entity", "special"
     fun trigger()
     {
         onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate(); // delegate
     }
 }
 
@@ -68,6 +96,11 @@ object "Event Trigger 2" is "entity", "special"
     {
         onTrigger();
     }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
 }
 
 // Event Trigger 3
@@ -79,6 +112,11 @@ object "Event Trigger 3" is "entity", "special"
     fun trigger()
     {
         onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
     }
 }
 
@@ -92,6 +130,11 @@ object "Event Trigger 4" is "entity", "special"
     {
         onTrigger();
     }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
 }
 
 // Event Trigger 5
@@ -103,6 +146,11 @@ object "Event Trigger 5" is "entity", "special"
     fun trigger()
     {
         onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
     }
 }
 
@@ -116,6 +164,11 @@ object "Event Trigger 6" is "entity", "special"
     {
         onTrigger();
     }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
 }
 
 // Event Trigger 7
@@ -128,6 +181,11 @@ object "Event Trigger 7" is "entity", "special"
     {
         onTrigger();
     }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
 }
 
 // Event Trigger 8
@@ -139,6 +197,11 @@ object "Event Trigger 8" is "entity", "special"
     fun trigger()
     {
         onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
     }
 }
 
@@ -158,6 +221,11 @@ object "Event Trigger Base" is "private", "entity", "special"
     {
         group = Number(groupId);
         return this;
+    }
+
+    fun reactivate()
+    {
+        manager.reactivate(group);
     }
 
     fun onCollision(otherCollider)
@@ -198,5 +266,11 @@ object "Event Trigger Manager" is "private", "awake", "entity"
     {
         if(groupId >= 0 && groupId < triggers.length)
             triggers[groupId] = player.name;
+    }
+
+    fun reactivate(groupId)
+    {
+        if(groupId >= 0 && groupId < triggers.length)
+            triggers[groupId] = null;
     }
 }
