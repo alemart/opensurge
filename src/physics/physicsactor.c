@@ -389,10 +389,6 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
             pa->facing_right = (pa->xsp > 0.0f);
     }
 
-    /* don't bother jumping */
-    if(!pa->midair && pa->touching_ceiling)
-        input_simulate_button_up(pa->input, IB_FIRE1);
-
     /* inside a solid brick? */
     at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
     pa->inside_wall = (at_U != NULL && obstacle_is_solid(at_U));
@@ -1106,7 +1102,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(!pa->midair) {
 
         /* you're way too fast... */
-        pa->gsp = clip(pa->gsp, -2.5f * pa->topspeed, 2.5f * pa->topspeed);
+        /*pa->gsp = clip(pa->gsp, -2.5f * pa->topspeed, 2.5f * pa->topspeed);*/
+        /* topspeed is halved when underwater. This creates the quirk of significantly reducing speed
+           when landing on the ground with high speed if underwater */
 
         /* speed */
         pa->xsp = pa->gsp * COS(pa->angle);
@@ -1173,7 +1171,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 input_button_pressed(pa->input, IB_FIRE1) && (
                     (!input_button_down(pa->input, IB_UP) && !input_button_down(pa->input, IB_DOWN)) ||
                     pa->state == PAS_ROLLING
-                )
+                ) &&
+                !pa->touching_ceiling /* don't bother jumping if near a ceiling */
             ) {
                 float grv_attenuation = (pa->gsp * SIN(pa->angle) < 0.0f) ? 1.0f : 0.5f;
                 pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
