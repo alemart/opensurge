@@ -7,8 +7,8 @@
 
 sprite "Goal Capsule"
 {
-    source_file     "images/capsule.png"
-    source_rect     0 48 256 160
+    source_file     "images/items/capsule.png"
+    source_rect     0 32 512 240
     frame_size      64 80
     hot_spot        32 80
 
@@ -16,16 +16,17 @@ sprite "Goal Capsule"
     animation 0
     {
         repeat      TRUE
-        fps         8
-        data        0 1
+        fps         12
+        data        0 1 2 3 4 5 6 7
     }
 
     // pressing
     animation 1
     {
-        repeat      FALSE
+        repeat      TRUE
         fps         24
-        data        2 3 4 5 6
+        data        8 9 10 11 12 13 14 15
+        repeat_from 4
     }
 
     // open
@@ -33,14 +34,14 @@ sprite "Goal Capsule"
     {
         repeat      TRUE
         fps         8
-        data        7
+        data        16
     }
 }
 
 sprite "Goal Capsule Mask 1"
 {
-    source_file     "images/capsule.png"
-    source_rect     256 48 64 80
+    source_file     "images/items/capsule.png"
+    source_rect     384 192 64 80
     frame_size      64 80
     hot_spot        32 80
 
@@ -54,8 +55,8 @@ sprite "Goal Capsule Mask 1"
 
 sprite "Goal Capsule Mask 2"
 {
-    source_file     "images/capsule.png"
-    source_rect     256 128 64 80
+    source_file     "images/items/capsule.png"
+    source_rect     448 192 64 80
     frame_size      64 80
     hot_spot        32 80
 
@@ -69,8 +70,8 @@ sprite "Goal Capsule Mask 2"
 
 sprite "Goal Capsule Broken Lateral"
 {
-    source_file     "images/capsule.png"
-    source_rect     0 80 64 32
+    source_file     "images/items/capsule.png"
+    source_rect     64 224 64 32
     frame_size      16 32
     hot_spot        8 16
 
@@ -93,8 +94,8 @@ sprite "Goal Capsule Broken Lateral"
 
 sprite "Goal Capsule Broken Core"
 {
-    source_file     "images/capsule.png"
-    source_rect     16 80 32 32
+    source_file     "images/items/capsule.png"
+    source_rect     80 224 32 32
     frame_size      32 32
     hot_spot        16 16
 
