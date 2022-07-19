@@ -599,6 +599,50 @@ brick 55
 }
 
 
+brick 56
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask056.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick056.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 57
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask057.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick057.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
 brick 60
 {
     type                PASSABLE
@@ -1611,6 +1655,50 @@ brick 191
 }
 
 
+brick 192
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask192.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick192.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 193
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask193.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick193.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
 brick 201
 {
     type                PASSABLE
@@ -1860,9 +1948,10 @@ brick 233
 
 brick 250
 {
-    type                PASSABLE
+    type                CLOUD
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask250.png"
+    zindex              0.7
 
     sprite
     {
@@ -1882,7 +1971,7 @@ brick 250
 
 brick 251
 {
-    type                PASSABLE
+    type                CLOUD
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask251.png"
 
@@ -2101,6 +2190,7 @@ brick 272
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask272.png"
+    zindex              0.7
 
     sprite
     {
@@ -2123,6 +2213,7 @@ brick 273
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask273.png"
+    zindex              0.7
 
     sprite
     {
@@ -2145,6 +2236,7 @@ brick 274
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask274.png"
+    zindex              0.7
 
     sprite
     {
@@ -2167,6 +2259,7 @@ brick 275
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask275.png"
+    zindex              0.7
 
     sprite
     {
