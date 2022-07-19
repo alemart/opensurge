@@ -7,8 +7,8 @@
 
 sprite "Spring Booster"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 338 384 64 
+    source_file     "images/items/spring_booster.png"
+    source_rect     0 32 640 64
     frame_size      64 32
     hot_spot        32 32
 
@@ -21,15 +21,15 @@ sprite "Spring Booster"
     {
         repeat      TRUE
         fps         8
-        data        3
+        data        8
     }
 
     // appearing
     animation 1
     {
         repeat      FALSE
-        fps         48
-        data        0 1 2 3
+        fps         96
+        data        1 2 3 4 5 6 7 8
     }
 
     // action!
@@ -37,7 +37,7 @@ sprite "Spring Booster"
     {
         repeat      FALSE
         fps         8
-        data        4 4 4 3
+        data        9 9 9 8
     }
 
     // invisible
@@ -45,7 +45,7 @@ sprite "Spring Booster"
     {
         repeat      TRUE
         fps         8
-        data        5
+        data        0
     }
 
     //
@@ -57,15 +57,15 @@ sprite "Spring Booster"
     {
         repeat      TRUE
         fps         8
-        data        9
+        data        18
     }
 
     // appearing
     animation 6
     {
         repeat      FALSE
-        fps         48
-        data        6 7 8 9
+        fps         96
+        data        11 12 13 14 15 16 17 18
     }
 
     // action!
@@ -73,7 +73,7 @@ sprite "Spring Booster"
     {
         repeat      FALSE
         fps         8
-        data        10 10 10 9
+        data        19 19 19 18
     }
 
     // invisible
@@ -81,14 +81,14 @@ sprite "Spring Booster"
     {
         repeat      TRUE
         fps         8
-        data        11
+        data        10
     }
 }
 
 sprite "Spring Booster Block"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     208 338 32 32
+    source_file     "images/items/spring_booster.png"
+    source_rect     608 224 32 32
     frame_size      32 32
     hot_spot        16 32
 
@@ -102,8 +102,8 @@ sprite "Spring Booster Block"
 
 sprite "Spring Booster Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 338 384 32
+    source_file     "images/items/spring_booster.png"
+    source_rect     0 32 640 64
     frame_size      64 32
     hot_spot        32 32
 
@@ -111,14 +111,14 @@ sprite "Spring Booster Right"
     {
         repeat      TRUE
         fps         8
-        data        3
+        data        8
     }
 }
 
 sprite "Spring Booster Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 370 384 32
+    source_file     "images/items/spring_booster.png"
+    source_rect     0 32 640 64
     frame_size      64 32
     hot_spot        32 32
 
@@ -126,14 +126,14 @@ sprite "Spring Booster Left"
     {
         repeat      TRUE
         fps         8
-        data        3
+        data        18
     }
 }
 
 sprite "Spring Booster Up"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 448 192 48
+    source_file     "images/items/spring_booster.png"
+    source_rect     0 128 640 48
     frame_size      32 48
     hot_spot        16 48
 
@@ -142,7 +142,7 @@ sprite "Spring Booster Up"
     {
         repeat      TRUE
         fps         8
-        data        3
+        data        8
     }
 
     // appearing
@@ -150,7 +150,7 @@ sprite "Spring Booster Up"
     {
         repeat      FALSE
         fps         48
-        data        0 1 2 3
+        data        1 2 3 4 5 6 7 8
     }
 
     // action!
@@ -158,7 +158,7 @@ sprite "Spring Booster Up"
     {
         repeat      FALSE
         fps         8
-        data        4 4 4 3
+        data        9 9 9 8
     }
 
     // invisible
@@ -166,6 +166,6 @@ sprite "Spring Booster Up"
     {
         repeat      TRUE
         fps         8
-        data        5
+        data        0
     }
 }

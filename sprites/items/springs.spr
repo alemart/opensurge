@@ -7,8 +7,8 @@
 
 sprite "Spring Standard"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 82 64 32
+    source_file     "images/items/springs.png"
+    source_rect     0 32 64 32
     frame_size      32 32
     hot_spot        16 32
 
@@ -31,10 +31,10 @@ sprite "Spring Standard"
 
 sprite "Spring Standard Up Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 195 78 39
-    frame_size      39 39
-    hot_spot        0 39
+    source_file     "images/items/springs.png"
+    source_rect     0 152 80 40
+    frame_size      40 40
+    hot_spot        0 40
 
     // idle
     animation 0
@@ -55,8 +55,8 @@ sprite "Spring Standard Up Right"
 
 sprite "Spring Standard Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     144 82 64 32
+    source_file     "images/items/springs.png"
+    source_rect     128 32 64 32
     frame_size      32 32
     hot_spot        0 16
 
@@ -79,9 +79,9 @@ sprite "Spring Standard Right"
 
 sprite "Spring Standard Down Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     190 195 78 39
-    frame_size      39 39
+    source_file     "images/items/springs.png"
+    source_rect     160 152 80 40
+    frame_size      40 40
     hot_spot        0 0
 
     // idle
@@ -103,8 +103,8 @@ sprite "Spring Standard Down Right"
 
 sprite "Spring Standard Down"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     80 82 64 32
+    source_file     "images/items/springs.png"
+    source_rect     64 32 64 32
     frame_size      32 32
     hot_spot        16 0
 
@@ -127,10 +127,10 @@ sprite "Spring Standard Down"
 
 sprite "Spring Standard Down Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     274 195 78 39
-    frame_size      39 39
-    hot_spot        39 0
+    source_file     "images/items/springs.png"
+    source_rect     240 152 80 40
+    frame_size      40 40
+    hot_spot        40 0
 
     // idle
     animation 0
@@ -151,8 +151,8 @@ sprite "Spring Standard Down Left"
 
 sprite "Spring Standard Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     208 82 64 32
+    source_file     "images/items/springs.png"
+    source_rect     192 32 64 32
     frame_size      32 32
     hot_spot        32 16
 
@@ -175,10 +175,10 @@ sprite "Spring Standard Left"
 
 sprite "Spring Standard Up Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     100 195 78 39
-    frame_size      39 39
-    hot_spot        39 39
+    source_file     "images/items/springs.png"
+    source_rect     80 152 80 40
+    frame_size      40 40
+    hot_spot        40 40
 
     // idle
     animation 0
@@ -199,8 +199,8 @@ sprite "Spring Standard Up Left"
 
 sprite "Spring Standard Hidden"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     272 98 64 16
+    source_file     "images/items/springs.png"
+    source_rect     256 48 64 16
     frame_size      32 16
     hot_spot        16 16
 
@@ -231,8 +231,8 @@ sprite "Spring Standard Hidden"
 
 sprite "Spring Stronger"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 50 64 32
+    source_file     "images/items/springs.png"
+    source_rect     0 64 64 32
     frame_size      32 32
     hot_spot        16 32
 
@@ -255,10 +255,10 @@ sprite "Spring Stronger"
 
 sprite "Spring Stronger Up Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 150 78 39
-    frame_size      39 39
-    hot_spot        0 39
+    source_file     "images/items/springs.png"
+    source_rect     0 192 80 40
+    frame_size      40 40
+    hot_spot        0 40
 
     // idle
     animation 0
@@ -279,8 +279,8 @@ sprite "Spring Stronger Up Right"
 
 sprite "Spring Stronger Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     144 50 64 32
+    source_file     "images/items/springs.png"
+    source_rect     128 64 64 32
     frame_size      32 32
     hot_spot        0 16
 
@@ -303,9 +303,9 @@ sprite "Spring Stronger Right"
 
 sprite "Spring Stronger Down Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     190 150 78 39
-    frame_size      39 39
+    source_file     "images/items/springs.png"
+    source_rect     160 192 80 40
+    frame_size      40 40
     hot_spot        0 0
 
     // idle
@@ -327,8 +327,8 @@ sprite "Spring Stronger Down Right"
 
 sprite "Spring Stronger Down"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     80 50 64 32
+    source_file     "images/items/springs.png"
+    source_rect     64 64 64 32
     frame_size      32 32
     hot_spot        16 0
 
@@ -351,10 +351,10 @@ sprite "Spring Stronger Down"
 
 sprite "Spring Stronger Down Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     274 150 78 39
-    frame_size      39 39
-    hot_spot        39 0
+    source_file     "images/items/springs.png"
+    source_rect     240 192 80 40
+    frame_size      40 40
+    hot_spot        40 0
 
     // idle
     animation 0
@@ -375,8 +375,8 @@ sprite "Spring Stronger Down Left"
 
 sprite "Spring Stronger Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     208 50 64 32
+    source_file     "images/items/springs.png"
+    source_rect     192 64 64 32
     frame_size      32 32
     hot_spot        32 16
 
@@ -399,10 +399,10 @@ sprite "Spring Stronger Left"
 
 sprite "Spring Stronger Up Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     100 150 78 39
-    frame_size      39 39
-    hot_spot        39 39
+    source_file     "images/items/springs.png"
+    source_rect     80 192 80 40
+    frame_size      40 40
+    hot_spot        40 40
 
     // idle
     animation 0
@@ -423,8 +423,8 @@ sprite "Spring Stronger Up Left"
 
 sprite "Spring Stronger Hidden"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     272 66 64 16
+    source_file     "images/items/springs.png"
+    source_rect     256 80 64 16
     frame_size      32 16
     hot_spot        16 16
 
@@ -455,8 +455,8 @@ sprite "Spring Stronger Hidden"
 
 sprite "Spring Strongest"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 114 64 32
+    source_file     "images/items/springs.png"
+    source_rect     0 96 64 32
     frame_size      32 32
     hot_spot        16 32
 
@@ -479,10 +479,10 @@ sprite "Spring Strongest"
 
 sprite "Spring Strongest Up Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     16 240 78 39
-    frame_size      39 39
-    hot_spot        0 39
+    source_file     "images/items/springs.png"
+    source_rect     0 232 80 40
+    frame_size      40 40
+    hot_spot        0 40
 
     // idle
     animation 0
@@ -503,8 +503,8 @@ sprite "Spring Strongest Up Right"
 
 sprite "Spring Strongest Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     144 114 64 32
+    source_file     "images/items/springs.png"
+    source_rect     128 96 64 32
     frame_size      32 32
     hot_spot        0 16
 
@@ -527,9 +527,9 @@ sprite "Spring Strongest Right"
 
 sprite "Spring Strongest Down Right"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     190 240 78 39
-    frame_size      39 39
+    source_file     "images/items/springs.png"
+    source_rect     160 232 80 40
+    frame_size      40 40
     hot_spot        0 0
 
     // idle
@@ -551,8 +551,8 @@ sprite "Spring Strongest Down Right"
 
 sprite "Spring Strongest Down"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     80 114 64 32
+    source_file     "images/items/springs.png"
+    source_rect     64 96 64 32
     frame_size      32 32
     hot_spot        16 0
 
@@ -575,10 +575,10 @@ sprite "Spring Strongest Down"
 
 sprite "Spring Strongest Down Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     274 240 78 39
-    frame_size      39 39
-    hot_spot        39 0
+    source_file     "images/items/springs.png"
+    source_rect     240 232 80 40
+    frame_size      40 40
+    hot_spot        40 0
 
     // idle
     animation 0
@@ -599,8 +599,8 @@ sprite "Spring Strongest Down Left"
 
 sprite "Spring Strongest Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     208 114 64 32
+    source_file     "images/items/springs.png"
+    source_rect     192 96 64 32
     frame_size      32 32
     hot_spot        32 16
 
@@ -623,10 +623,10 @@ sprite "Spring Strongest Left"
 
 sprite "Spring Strongest Up Left"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     100 240 78 39
-    frame_size      39 39
-    hot_spot        39 39
+    source_file     "images/items/springs.png"
+    source_rect     80 232 80 40
+    frame_size      40 40
+    hot_spot        40 40
 
     // idle
     animation 0
@@ -647,8 +647,8 @@ sprite "Spring Strongest Up Left"
 
 sprite "Spring Strongest Hidden"
 {
-    source_file     "images/spring_pads.png"
-    source_rect     272 130 64 16
+    source_file     "images/items/springs.png"
+    source_rect     256 112 64 16
     frame_size      32 16
     hot_spot        16 16
 
