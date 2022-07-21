@@ -23,6 +23,7 @@ using SurgeEngine.Collisions.CollisionBox;
 object "Powerup Collectibles" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(4);
+    sfx = Sound("samples/collectible.wav");
 
     state "main"
     {
@@ -31,6 +32,7 @@ object "Powerup Collectibles" is "entity", "basic", "powerup"
     fun onItemBoxCrushed(player)
     {
         player.collectibles += 10;
+        sfx.play();
     }
 }
 
@@ -55,7 +57,6 @@ object "Powerup Invincibility" is "entity", "basic", "powerup"
 object "Powerup Speed" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(6);
-    music = Music("musics/speed.ogg");
 
     state "main"
     {
@@ -64,21 +65,29 @@ object "Powerup Speed" is "entity", "basic", "powerup"
     fun onItemBoxCrushed(player)
     {
         player.turbo = true;
-        music.play();
-        Level.spawn("Powerup Speed - Music Watcher").setPlayer(player).setMusic(music);
+        Level.spawn("Powerup Speed - Music Watcher").setPlayer(player);
     }
 }
 
 // Stop the "speed" music if the turbo powerup is lost
 object "Powerup Speed - Music Watcher"
 {
+    music = Music("musics/speed.ogg");
     player = null;
-    music = null;
 
     state "main"
     {
-        if(player !== null && music !== null) {
-            if(music.playing) {
+        if(player === null)
+            Application.crash(this.__name + ": unset player");
+
+        music.play();
+        state = "watch";
+    }
+
+    state "watch"
+    {
+        if(music.playing) {
+            if(player !== null) {
                 if(player.turbo)
                     return; // keep playing the music
                 else if(player.underwater)
@@ -95,26 +104,22 @@ object "Powerup Speed - Music Watcher"
         player = p;
         return this;
     }
-
-    fun setMusic(m)
-    {
-        music = m;
-        return this;
-    }
 }
 
 // 1up
 object "Powerup 1up" is "entity", "basic", "powerup"
 {
-    itemBox = spawn("Item Box").setAnimation(1);
+    itemBox = spawn("Item Box").setAnimation(18);
     extraLife = spawn("Give Extra Life"); // function object stored in the functions/ folder
 
     state "main"
     {
+        /*
         // the animation changes according
         // to the active player
         anim = animId(Player.active.name);
         itemBox.setAnimation(anim);
+        */
     }
 
     fun onItemBoxCrushed(player)
@@ -123,6 +128,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         extraLife.call();
     }
 
+    /*
     // given a player name, get the corresponding
     // animation ID of the "Item Box" sprite
     fun animId(playerName)
@@ -136,6 +142,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         else
             return 18; // generic "1up" icon
     }
+    */
 }
 
 // Regular shield
@@ -292,6 +299,7 @@ object "Item Box" is "entity", "private"
     collider = CollisionBox(24, 30).setAnchor(0.5, 1.2);
     transform = Transform();
     score = 100;
+    crushed = 11;
 
     state "main"
     {
@@ -300,7 +308,7 @@ object "Item Box" is "entity", "private"
 
     state "crushed"
     {
-        actor.anim = 11; // can't change the animation if the item box is crushed
+        actor.anim = crushed; // can't change the animation if the item box is crushed
     }
 
     fun constructor()
@@ -339,7 +347,7 @@ object "Item Box" is "entity", "private"
             // crush the item box
             collider.enabled = false;
             brick.enabled = false;
-            actor.anim = 11;
+            actor.anim = crushed;
             state = "crushed";
 
             // notify the parent

@@ -7,190 +7,190 @@
 
 sprite "Powerup 1up"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 1 1 1 1 1 1
+        fps         16
+        data        20 21 22 23 20 8 22 8 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23
     }
 }
 
 sprite "Powerup Collectibles"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        4 4 4 4 4 0 4 0 4 0 0 0 4 4 0 0 4 4 4 4 4 4 4 4
+        fps         16
+        data        12 13 14 15 12 8 14 8 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15
     }
 }
 
 sprite "Powerup Invincibility"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        5 5 5 5 5 0 5 0 5 0 0 0 5 5 0 0 5 5 5 5 5 5 5 5
+        fps         16
+        data        28 29 30 31 28 8 30 8 28 29 30 31 28 29 30 31 28 29 30 31 28 29 30 31
     }
 }
 
 sprite "Powerup Speed"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        6 6 6 6 6 0 6 0 6 0 0 0 6 6 0 0 6 6 6 6 6 6 6 6
+        fps         16
+        data        32 33 34 35 32 8 34 8 32 33 34 35 32 33 34 35 32 33 34 35 32 33 34 35
     }
 }
 
 sprite "Powerup Shield"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        8 8 8 8 8 0 8 0 8 0 0 0 8 8 0 0 8 8 8 8 8 8 8 8
+        fps         16
+        data        36 37 38 39 36 8 38 8 36 37 38 39 36 37 38 39 36 37 38 39 36 37 38 39
     }
 }
 
 sprite "Powerup Shield Water"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        14 14 14 14 14 0 14 0 14 0 0 0 14 14 0 0 14 14 14 14 14 14 14 14
+        fps         16
+        data        48 49 50 51 48 8 50 8 48 49 50 51 48 49 50 51 48 49 50 51 48 49 50 51
     }
 }
 
 sprite "Powerup Shield Fire"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        12 12 12 12 12 0 12 0 12 0 0 0 12 12 0 0 12 12 12 12 12 12 12 12
+        fps         16
+        data        44 45 46 47 44 8 46 8 44 45 46 47 44 45 46 47 44 45 46 47 44 45 46 47
     }
 }
 
 sprite "Powerup Shield Thunder"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        13 13 13 13 13 0 13 0 13 0 0 0 13 13 0 0 13 13 13 13 13 13 13 13
+        fps         16
+        data        40 41 42 43 40 8 42 8 40 41 42 43 40 41 42 43 40 41 42 43 40 41 42 43
     }
 }
 
 sprite "Powerup Shield Acid"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        15 15 15 15 15 0 15 0 15 0 0 0 15 15 0 0 15 15 15 15 15 15 15 15
+        fps         16
+        data        52 53 54 55 52 8 54 8 52 53 54 55 52 53 54 55 52 53 54 55 52 53 54 55
     }
 }
 
 sprite "Powerup Shield Wind"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        16 16 16 16 16 0 16 0 16 0 0 0 16 16 0 0 16 16 16 16 16 16 16 16
+        fps         16
+        data        56 57 58 59 56 8 58 8 56 57 58 59 56 57 58 59 56 57 58 59 56 57 58 59
     }
 }
 
 sprite "Powerup Trap"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        9 9 9 9 9 0 9 0 9 0 0 0 9 9 0 0 9 9 9 9 9 9 9 9
+        fps         16
+        data        24 25 26 27 24 8 26 8 24 25 26 27 24 25 26 27 24 25 26 27 24 25 26 27
     }
 }
 
 sprite "Powerup Lucky Bonus"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 96
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        17 17 17 17 17 0 17 0 17 0 0 0 17 17 0 0 17 17 17 17 17 17 17 17
+        fps         16
+        data        16 17 18 19 16 8 18 8 16 17 18 19 16 17 18 19 16 17 18 19 16 17 18 19
     }
 }
 
 sprite "Item Box Mask"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     267 32 30 32
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     256 96 32 32
+    frame_size      32 32
+    hot_spot        16 32
 
     // collision mask
     animation 0
@@ -203,210 +203,170 @@ sprite "Item Box Mask"
 
 sprite "Item Box"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     9 100 180 128
-    frame_size      30 32
-    hot_spot        15 32
+    source_file     "images/items/powerups.png"
+    source_rect     0 32 128 480
+    frame_size      32 32
+    hot_spot        16 32
 
     // empty box
     animation 0
     {
         repeat      TRUE
-        fps         24
-        data        0
+        fps         16
+        data        0 1 2 3 0 8 2 8 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
     }
 
-    // Surge life box
+    // (legacy, dropped animation) Surge life box
     animation 1
     {
         repeat      TRUE
-        fps         24
-        data        1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 1 1 1 1 1 1
+        fps         16
+        data        20 21 22 23 20 8 22 8 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23
     }
 
-    // Neon life box
+    // (legacy, dropped animation) Neon life box
     animation 2
     {
         repeat      TRUE
-        fps         24
-        data        2 2 2 2 2 0 2 0 2 0 0 0 2 2 0 0 2 2 2 2 2 2 2 2
+        fps         16
+        data        20 21 22 23 20 8 22 8 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23
     }
 
-    // Charge life box
+    // (legacy, dropped animation) Charge life box
     animation 3
     {
         repeat      TRUE
-        fps         24
-        data        3 3 3 3 3 0 3 0 3 0 0 0 3 3 0 0 3 3 3 3 3 3 3 3
+        fps         16
+        data        20 21 22 23 20 8 22 8 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23
     }
 
     // collectible box
     animation 4
     {
         repeat      TRUE
-        fps         24
-        data        4 4 4 4 4 0 4 0 4 0 0 0 4 4 0 0 4 4 4 4 4 4 4 4
+        fps         16
+        data        12 13 14 15 12 8 14 8 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15
     }
 
     // invincibility box
     animation 5
     {
         repeat      TRUE
-        fps         24
-        data        5 5 5 5 5 0 5 0 5 0 0 0 5 5 0 0 5 5 5 5 5 5 5 5
+        fps         16
+        data        28 29 30 31 28 8 30 8 28 29 30 31 28 29 30 31 28 29 30 31 28 29 30 31
     }
 
-    // turbo box
+    // turbo / super speed box
     animation 6
     {
         repeat      TRUE
-        fps         24
-        data        6 6 6 6 6 0 6 0 6 0 0 0 6 6 0 0 6 6 6 6 6 6 6 6
+        fps         16
+        data        32 33 34 35 32 8 34 8 32 33 34 35 32 33 34 35 32 33 34 35 32 33 34 35
     }
 
-    // glasses box
+    // (legacy, dropped animation) magic glasses box
     animation 7
     {
         repeat      TRUE
-        fps         24
-        data        7 7 7 7 7 0 7 0 7 0 0 0 7 7 0 0 7 7 7 7 7 7 7 7
+        fps         16
+        data        0 1 2 3 0 8 2 8 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
     }
 
     // shield box
     animation 8
     {
         repeat      TRUE
-        fps         24
-        data        8 8 8 8 8 0 8 0 8 0 0 0 8 8 0 0 8 8 8 8 8 8 8 8
+        fps         16
+        data        36 37 38 39 36 8 38 8 36 37 38 39 36 37 38 39 36 37 38 39 36 37 38 39
     }
 
     // trap box
     animation 9
     {
         repeat      TRUE
-        fps         24
-        data        9 9 9 9 9 0 9 0 9 0 0 0 9 9 0 0 9 9 9 9 9 9 9 9
+        fps         16
+        data        24 25 26 27 24 8 26 8 24 25 26 27 24 25 26 27 24 25 26 27 24 25 26 27
     }
 
-    // special collectible box
+    // (legacy, dropped animation) special collectible box (blue collectibles)
     animation 10
     {
         repeat      TRUE
-        fps         24
-        data        10 10 10 10 10 0 10 0 10 0 0 0 10 10 0 0 10 10 10 10 10 10 10 10
+        fps         16
+        data        0 1 2 3 0 8 2 8 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
     }
 
     // crushed box
     animation 11
     {
         repeat      TRUE
-        fps         24
-        data        11
+        fps         16
+        data        4
     }
     
     // fire shield box
     animation 12
     {
         repeat      TRUE
-        fps         24
-        data        12 12 12 12 12 0 12 0 12 0 0 0 12 12 0 0 12 12 12 12 12 12 12 12
+        fps         16
+        data        44 45 46 47 44 8 46 8 44 45 46 47 44 45 46 47 44 45 46 47 44 45 46 47
     }
 
     // thunder shield box
     animation 13
     {
         repeat      TRUE
-        fps         24
-        data        13 13 13 13 13 0 13 0 13 0 0 0 13 13 0 0 13 13 13 13 13 13 13 13
+        fps         16
+        data        40 41 42 43 40 8 42 8 40 41 42 43 40 41 42 43 40 41 42 43 40 41 42 43
     }
 
     // water shield box
     animation 14
     {
         repeat      TRUE
-        fps         24
-        data        14 14 14 14 14 0 14 0 14 0 0 0 14 14 0 0 14 14 14 14 14 14 14 14
+        fps         16
+        data        48 49 50 51 48 8 50 8 48 49 50 51 48 49 50 51 48 49 50 51 48 49 50 51
     }
 
     // acid shield box
     animation 15
     {
         repeat      TRUE
-        fps         24
-        data        15 15 15 15 15 0 15 0 15 0 0 0 15 15 0 0 15 15 15 15 15 15 15 15
+        fps         16
+        data        52 53 54 55 52 8 54 8 52 53 54 55 52 53 54 55 52 53 54 55 52 53 54 55
     }
 
     // wind shield box
     animation 16
     {
         repeat      TRUE
-        fps         24
-        data        16 16 16 16 16 0 16 0 16 0 0 0 16 16 0 0 16 16 16 16 16 16 16 16
+        fps         16
+        data        56 57 58 59 56 8 58 8 56 57 58 59 56 57 58 59 56 57 58 59 56 57 58 59
     }
 
-    // super bonus box
+    // lucky bonus box
     animation 17
     {
         repeat      TRUE
-        fps         24
-        data        17 17 17 17 17 0 17 0 17 0 0 0 17 17 0 0 17 17 17 17 17 17 17 17
+        fps         16
+        data        16 17 18 19 16 8 18 8 16 17 18 19 16 17 18 19 16 17 18 19 16 17 18 19
     }
 
-    // 1up (generic)
+    // 1up / extra life box
     animation 18
     {
         repeat      TRUE
-        fps         24
-        data        18 18 18 18 18 0 18 0 18 0 0 0 18 18 0 0 18 18 18 18 18 18 18 18
-    }
-
-    // empty (add your item box here)
-    animation 19
-    {
-        repeat      TRUE
-        fps         24
-        data        19 19 19 19 19 0 19 0 19 0 0 0 19 19 0 0 19 19 19 19 19 19 19 19
-    }
-
-    // empty (add your item box here)
-    animation 20
-    {
-        repeat      TRUE
-        fps         24
-        data        20 20 20 20 20 0 20 0 20 0 0 0 20 20 0 0 20 20 20 20 20 20 20 20
-    }
-
-    // empty (add your item box here)
-    animation 21
-    {
-        repeat      TRUE
-        fps         24
-        data        21 21 21 21 21 0 21 0 21 0 0 0 21 21 0 0 21 21 21 21 21 21 21 21
-    }
-
-    // empty (add your item box here)
-    animation 22
-    {
-        repeat      TRUE
-        fps         24
-        data        22 22 22 22 22 0 22 0 22 0 0 0 22 22 0 0 22 22 22 22 22 22 22 22
-    }
-
-    // empty (add your item box here)
-    animation 23
-    {
-        repeat      TRUE
-        fps         24
-        data        23 23 23 23 23 0 23 0 23 0 0 0 23 23 0 0 23 23 23 23 23 23 23 23
+        fps         16
+        data        20 21 22 23 20 8 22 8 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23
     }
 }
 
 sprite "Item Box Icon"
 {
-    source_file     "images/item_boxes.png"
-    source_rect     200 100 96 56
-    frame_size      16 14
-    hot_spot        8 7
+    source_file     "images/items/powerups.png"
+    source_rect     256 32 32 480
+    frame_size      32 32
+    hot_spot        16 13
 
     // empty icon
     animation 0
@@ -416,68 +376,68 @@ sprite "Item Box Icon"
         data        0
     }
 
-    // Surge life icon
+    // (legacy, dropped animation) Surge life icon
     animation 1
     {
         repeat      TRUE
         fps         8
-        data        1
+        data        0
     }
 
-    // Neon life icon
+    // (legacy, dropped animation) Neon life icon
     animation 2
     {
         repeat      TRUE
         fps         8
-        data        2
+        data        0
     }
 
-    // Charge life icon
+    // (legacy, dropped animation) Charge life icon
     animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // collectible
+    animation 4
     {
         repeat      TRUE
         fps         8
         data        3
     }
 
-    // collectible icon
-    animation 4
-    {
-        repeat      TRUE
-        fps         8
-        data        4
-    }
-
-    // invincibility icon
+    // invincibility
     animation 5
-    {
-        repeat      TRUE
-        fps         8
-        data        5
-    }
-
-    // turbo icon
-    animation 6
-    {
-        repeat      TRUE
-        fps         8
-        data        6
-    }
-
-    // glasses icon
-    animation 7
     {
         repeat      TRUE
         fps         8
         data        7
     }
 
-    // shield icon
-    animation 8
+    // turbo / super speed
+    animation 6
     {
         repeat      TRUE
         fps         8
         data        8
+    }
+
+    // (legacy, dropped animation) magic glasses
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // shield
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        9
     }
 
     // trap
@@ -485,15 +445,15 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        9
+        data        6
     }
 
-    // special collectible
+    // (legacy, dropped animation) special collectible
     animation 10
     {
         repeat      TRUE
         fps         8
-        data        10
+        data        0
     }
 
     // none
@@ -501,7 +461,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        11
+        data        0
     }
     
     // fire shield
@@ -509,7 +469,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        12
+        data        11
     }
 
     // thunder shield
@@ -517,7 +477,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        13
+        data        10
     }
 
     // water shield
@@ -525,7 +485,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        14
+        data        12
     }
 
     // acid shield
@@ -533,7 +493,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        15
+        data        13
     }
 
     // wind shield
@@ -541,62 +501,22 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        16
+        data        14
     }
 
-    // super bonus
+    // lucky bonus
     animation 17
     {
         repeat      TRUE
         fps         8
-        data        17
+        data        4
     }
 
-    // 1up (generic)
+    // 1up / extra life
     animation 18
     {
         repeat      TRUE
         fps         8
-        data        18
-    }
-
-    // empty (add your item box here)
-    animation 19
-    {
-        repeat      TRUE
-        fps         8
-        data        19
-    }
-
-    // empty (add your item box here)
-    animation 20
-    {
-        repeat      TRUE
-        fps         8
-        data        20
-    }
-
-    // empty (add your item box here)
-    animation 21
-    {
-        repeat      TRUE
-        fps         8
-        data        21
-    }
-
-    // empty (add your item box here)
-    animation 22
-    {
-        repeat      TRUE
-        fps         8
-        data        22
-    }
-
-    // empty (add your item box here)
-    animation 23
-    {
-        repeat      TRUE
-        fps         8
-        data        23
+        data        5
     }
 }
