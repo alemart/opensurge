@@ -44,8 +44,9 @@ object "Surge's Falling Animation" is "companion"
         // but that alone doesn't mean he has just
         // been hit by a spring. We use the springing
         // state to create other things, like the double
-        // jump, so we need to check player.anim as well
-        if(player.springing && player.anim == springing)
+        // jump, so we need to check player.anim as well.
+        // We also check if regular physics are enabled.
+        if(player.springing && player.anim == springing && !player.frozen)
             state = "watching";
 
         // From breathing to falling
