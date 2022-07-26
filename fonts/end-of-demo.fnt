@@ -1,0 +1,17 @@
+// -----------------------------------------------------------------------------
+// File: end-of-demo.fnt
+// Description: scripts for the fonts used at the End of Demo scene
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "End of Demo - Text"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Bold.ttf"
+        size                    13
+        antialias
+    }
+}
+
