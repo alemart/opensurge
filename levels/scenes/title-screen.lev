@@ -1,0 +1,17 @@
+//
+// Title screen
+//
+
+name "Title Screen"
+author "Alexandre Martins"
+license "CC BY 4.0"
+version "1.0"
+requires "0.6.0"
+act 1
+theme "themes/none.brk"
+bgtheme "themes/waterworks-zone-outdoors.bg"
+//music "musics/menu.ogg"
+spawn_point 0 9500
+setup "Title Screen"
+players "None"
+readonly

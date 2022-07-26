@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2021-11-15"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2022-07-25"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
@@ -125,7 +125,14 @@ CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "The authors are identified within the scripts themselves."
 
-// Main Menu
+// Title Screen
+TITLESCREEN_PLAY            "START GAME"
+TITLESCREEN_OPTIONS         "OPTIONS"
+TITLESCREEN_QUIT            "QUIT"
+TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+
+// (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
 MAINMENU_PLAY               "PLAY"
 MAINMENU_CREATE             "CREATE"
@@ -135,7 +142,7 @@ MAINMENU_QUIT               "QUIT"
 MAINMENU_DEVBUILD           "Development version"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
-// Create Menu
+// (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
 CREATEMENU_TITLE            "CREATE"
 CREATEMENU_PLAY             "PLAY DEMO"
@@ -144,7 +151,7 @@ CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "BACK"
 CREATEMENU_TEXT             "Open Surge lets you create your own amazing games! Unleash your creativity! Let your creative juices flow!\n\nStart your own project! Create new levels, items, specials, characters and more! Get a taste of the level editor, learn the engine and dive into SurgeScript for maximum power!"
 
-// Congratulations Screen
+// (legacy) Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TITLE       "THANKS FOR PLAYING"
 CONGRATULATIONS_SHARE       "SHARE"
