@@ -1,0 +1,396 @@
+// -----------------------------------------------------------------------------
+// File: boxy_bold.fnt
+// Description: script for the Boxy Bold font by Clint Bellanger
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// BoxyBold font by Clint Bellanger with additions of lowecase letters by devurandom
+font "BoxyBold"
+{
+    bitmap
+    {
+        source_file             "fonts/boxy_bold.png"
+        spacing                 -1 1
+
+        char " " {
+            source_rect         78 9 4 8
+        }
+
+        char "!" {
+            source_rect         1 0 4 8
+        }
+
+        char "\"" {
+            source_rect         6 0 7 8
+        }
+
+        char "#" {
+            source_rect         14 0 9 8
+        }
+
+        char "$" {
+            source_rect         24 0 7 8
+        }
+
+        char "%" {
+            source_rect         32 0 10 8
+        }
+
+        char "&" {
+            source_rect         43 0 9 8
+        }
+
+        char "'" {
+            source_rect         53 0 4 8
+        }
+
+        char "(" {
+            source_rect         58 0 5 8
+        }
+
+        char ")" {
+            source_rect         64 0 5 8
+        }
+
+        char "*" {
+            source_rect         70 0 6 8
+        }
+
+        char "+" {
+            source_rect         77 0 8 8
+        }
+
+        char "," {
+            source_rect         86 0 5 8
+        }
+
+        char "-" {
+            source_rect         92 0 6 8
+        }
+
+        char "." {
+            source_rect         99 0 4 8
+        }
+
+        char "/" {
+            source_rect         104 0 6 8
+        }
+
+        char "0" {
+            source_rect         1 9 7 8
+        }
+
+        char "1" {
+            source_rect         9 9 4 8
+        }
+
+        char "2" {
+            source_rect         14 9 7 8
+        }
+
+        char "3" {
+            source_rect         22 9 7 8
+        }
+
+        char "4" {
+            source_rect         30 9 7 8
+        }
+
+        char "5" {
+            source_rect         38 9 7 8
+        }
+
+        char "6" {
+            source_rect         46 9 7 8
+        }
+
+        char "7" {
+            source_rect         54 9 7 8
+        }
+
+        char "8" {
+            source_rect         62 9 7 8
+        }
+
+        char "9" {
+            source_rect         70 9 7 8
+        }
+
+        char ":" {
+            source_rect         1 18 4 8
+        }
+
+        char ";" {
+            source_rect         6 18 4 8
+        }
+
+        char "<" {
+            source_rect         11 18 6 8
+        }
+
+        char "=" {
+            source_rect         18 18 6 8
+        }
+
+        char ">" {
+            source_rect         25 18 6 8
+        }
+
+        char "?" {
+            source_rect         32 18 8 8
+        }
+
+        char "@" {
+            source_rect         41 18 8 8
+        }
+
+        char "A" {
+            source_rect         1 27 7 8
+        }
+
+        char "B" {
+            source_rect         9 27 7 8
+        }
+
+        char "C" {
+            source_rect         17 27 7 8
+        }
+
+        char "D" {
+            source_rect         25 27 7 8
+        }
+
+        char "E" {
+            source_rect         33 27 7 8
+        }
+
+        char "F" {
+            source_rect         41 27 7 8
+        }
+
+        char "G" {
+            source_rect         49 27 7 8
+        }
+
+        char "H" {
+            source_rect         57 27 7 8
+        }
+
+        char "I" {
+            source_rect         65 27 4 8
+        }
+
+        char "J" {
+            source_rect         70 27 7 8
+        }
+
+        char "K" {
+            source_rect         78 27 7 8
+        }
+
+        char "L" {
+            source_rect         86 27 7 8
+        }
+
+        char "M" {
+            source_rect         94 27 9 8
+        }
+
+        char "N" {
+            source_rect         1 36 8 8
+        }
+
+        char "O" {
+            source_rect         10 36 7 8
+        }
+
+        char "P" {
+            source_rect         18 36 7 8
+        }
+
+        char "Q" {
+            source_rect         26 36 8 8
+        }
+
+        char "R" {
+            source_rect         35 36 7 8
+        }
+
+        char "S" {
+            source_rect         43 36 7 8
+        }
+
+        char "T" {
+            source_rect         51 36 8 8
+        }
+
+        char "U" {
+            source_rect         60 36 7 8
+        }
+
+        char "V" {
+            source_rect         68 36 7 8
+        }
+
+        char "W" {
+            source_rect         76 36 9 8
+        }
+
+        char "X" {
+            source_rect         86 36 7 8
+        }
+
+        char "Y" {
+            source_rect         94 36 8 8
+        }
+
+        char "Z" {
+            source_rect         103 36 7 8
+        }
+
+        char "[" {
+            source_rect         1 45 5 8
+        }
+
+        char "\\" {
+            source_rect         7 45 6 8
+        }
+
+        char "]" {
+            source_rect         14 45 5 8
+        }
+
+        char "^" {
+            source_rect         20 45 8 8
+        }
+
+        char "_" {
+            source_rect         29 45 6 8
+        }
+
+        char "`" {
+            source_rect         36 45 5 8
+        }
+
+        char "{" {
+            source_rect         42 45 5 8
+        }
+
+        char "|" {
+            source_rect         48 45 4 8
+        }
+
+        char "}" {
+            source_rect         53 45 5 8
+        }
+
+        char "~" {
+            source_rect         59 45 9 8
+        }
+
+        char "a" {
+            source_rect         1 54 7 9
+        }
+
+        char "b" {
+            source_rect         9 54 7 9
+        }
+
+        char "c" {
+            source_rect         17 54 6 9
+        }
+
+        char "d" {
+            source_rect         24 54 7 9
+        }
+
+        char "e" {
+            source_rect         32 54 7 9
+        }
+
+        char "f" {
+            source_rect         40 54 6 9
+        }
+
+        char "g" {
+            source_rect         47 54 7 9
+        }
+
+        char "h" {
+            source_rect         55 54 7 9
+        }
+
+        char "i" {
+            source_rect         63 54 5 9
+        }
+
+        char "j" {
+            source_rect         69 54 6 9
+        }
+
+        char "k" {
+            source_rect         76 54 7 9
+        }
+
+        char "l" {
+            source_rect         84 54 5 9
+        }
+
+        char "m" {
+            source_rect         90 54 9 9
+        }
+
+        char "n" {
+            source_rect         100 54 7 9
+        }
+
+        char "o" {
+            source_rect         1 63 7 9
+        }
+
+        char "p" {
+            source_rect         9 63 7 9
+        }
+
+        char "q" {
+            source_rect         17 63 7 9
+        }
+
+        char "r" {
+            source_rect         25 63 7 9
+        }
+
+        char "s" {
+            source_rect         33 63 7 9
+        }
+
+        char "t" {
+            source_rect         41 63 6 9
+        }
+
+        char "u" {
+            source_rect         48 63 7 9
+        }
+
+        char "v" {
+            source_rect         56 63 7 9
+        }
+
+        char "w" {
+            source_rect         64 63 9 9
+        }
+
+        char "x" {
+            source_rect         74 63 7 9
+        }
+
+        char "y" {
+            source_rect         82 63 7 9
+        }
+
+        char "z" {
+            source_rect         90 63 7 9
+        }
+    }
+}
