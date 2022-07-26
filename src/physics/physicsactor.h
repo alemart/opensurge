@@ -124,6 +124,8 @@ float physicsactor_get_dec(const physicsactor_t *pa); /* deceleration */
 void physicsactor_set_dec(physicsactor_t *pa, float value);
 float physicsactor_get_frc(const physicsactor_t *pa); /* friction */
 void physicsactor_set_frc(physicsactor_t *pa, float value);
+float physicsactor_get_initialtopspeed(const physicsactor_t *pa); /* initial top speed */
+void physicsactor_set_initialtopspeed(physicsactor_t *pa, float value);
 float physicsactor_get_topspeed(const physicsactor_t *pa); /* top speed */
 void physicsactor_set_topspeed(physicsactor_t *pa, float value);
 float physicsactor_get_topyspeed(const physicsactor_t *pa); /* top y speed */

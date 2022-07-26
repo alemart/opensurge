@@ -177,6 +177,7 @@ player_t *player_create(const char *character_name)
     physicsactor_set_jmp(p->pa, physicsactor_get_jmp(p->pa) * c->multiplier.jmp);
     physicsactor_set_chrg(p->pa, physicsactor_get_chrg(p->pa) * c->multiplier.chrg);
     physicsactor_set_jmprel(p->pa, physicsactor_get_jmprel(p->pa) * c->multiplier.jmp);
+    physicsactor_set_initialtopspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
     physicsactor_set_topspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
     physicsactor_set_rolluphillslp(p->pa, physicsactor_get_rolluphillslp(p->pa) * c->multiplier.slp);
     physicsactor_set_rolldownhillslp(p->pa, physicsactor_get_rolldownhillslp(p->pa) * c->multiplier.slp);
