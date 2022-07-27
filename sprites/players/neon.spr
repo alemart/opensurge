@@ -303,19 +303,3 @@ sprite "Life Icon Neon"
         data        1
     }
 }
-
-// Goal Sign corresponding to the character
-sprite "Goal Neon"
-{
-    source_file     "images/goal.png"
-    source_rect     0 12 184 162
-    frame_size      46 54
-    hot_spot        23 54
-
-    animation 0
-    {
-        repeat      TRUE
-        fps         8
-        data        6
-    }
-}
