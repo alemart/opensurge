@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * intro.c - introduction screen
- * Copyright (C) 2008-2011, 2013, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2011, 2013, 2018, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,8 @@
 #define INTRO_FADETIME      0.5f
 #define INTRO_FONT          "GoodNeighbors"
 #define INTRO_TEXT          "Open Surge Engine\nopensurge2d.org"
+#define PRIMARY_COLOR       "424c6e"
+#define SECONDARY_COLOR     "657392"
 static float elapsed_time;
 static int debug_mode;
 static font_t* fnt;
@@ -67,7 +69,7 @@ void intro_init(void *foo)
     box = image_create(VIDEO_SCREEN_W * 3 / 2, VIDEO_SCREEN_H * 9 / 10);
     target = image_drawing_target();
     image_set_drawing_target(box);
-    image_clear(color_hex("ffee11"));
+    image_clear(color_hex(SECONDARY_COLOR));
     image_set_drawing_target(target);
 
     /* create font */
@@ -145,7 +147,7 @@ void intro_render()
     v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
     const float angle = 18.45f / 57.2957795131f;
 
-    image_clear(color_hex("ff8800"));
+    image_clear(color_hex(PRIMARY_COLOR));
     image_draw_rotated(box, VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2, image_width(box)/2, image_height(box)/2, angle, IF_NONE);
     font_render(fnt, camera);
 }
