@@ -491,7 +491,6 @@ void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer)
 /* sets the icon of the display to a built-in icon */
 void set_display_icon(ALLEGRO_DISPLAY* display)
 {
-#if !defined(_WIN32)
     extern const unsigned char ICON_PNG[];
     extern const size_t ICON_SIZE;
     ALLEGRO_FILE* f = al_open_memfile((void*)ICON_PNG, ICON_SIZE, "r");
@@ -499,9 +498,6 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
     al_set_display_icon(display, icon);
     al_destroy_bitmap(icon);
     al_fclose(f);
-#else
-    ; /* will use the .ico file */
-#endif
 }
 
 /* creates a new videomsg_t node */
