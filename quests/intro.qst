@@ -14,4 +14,4 @@ name            "Introduction"
 // level list (in order of appearance)
 level           "levels/scenes/contribute.lev" // opens a donation web page when exiting the game
 level           "levels/scenes/allegro.lev"
-level           "levels/scenes/mainmenu.lev"
+level           "levels/scenes/title-screen.lev"

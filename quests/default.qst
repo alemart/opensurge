@@ -9,10 +9,6 @@
 name            "Default quest"
 
 // level list (in order of appearance)
-level           "levels/sunshine-1.lev"
-level           "levels/sunshine-2.lev"
-level           "levels/sunshine-3.lev"
-level           "levels/waterworks-1.lev"
-level           "levels/waterworks-2.lev"
-level           "levels/waterworks-3.lev"
-level           "levels/scenes/congratulations.lev"
+level           "levels/scenes/end-of-demo.lev"
+level           "levels/demo-1.lev"
+level           "levels/demo-2.lev"
