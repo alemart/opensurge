@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * global.h - global definitions
- * Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,10 +29,10 @@
 #define GAME_VERSION_WIP        0
 #define GAME_VERSION_FIX        0
 #define GAME_WEBSITE            "opensurge2d.org"
-#define GAME_YEAR               "2008-2021"
+#define GAME_YEAR               "2008-2022"
 
 /* Scripting */
-#define SURGESCRIPT_MIN_VERSION "0.5.4.3"
+#define SURGESCRIPT_MIN_VERSION "0.5.5"
 
 /* if the following is defined, this is a development build */
 /*#define GAME_BUILD_VERSION      1337-dev*/
