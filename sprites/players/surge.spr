@@ -371,8 +371,8 @@ sprite "Surge"
 // Life Icon corresponding to the character (Heads-Up Display)
 sprite "Life Icon Surge"
 {
-    source_file       "images/life_icon.png"
-    source_rect       0 24 360 24
+    source_file       "images/players/surge_icon.png"
+    source_rect       0 0 24 24
     frame_size        24 24
     hot_spot          12 12
 
