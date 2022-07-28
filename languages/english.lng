@@ -221,7 +221,7 @@ LOADING_TEXT                "loading..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nSurge the Rabbit is created with the <color=$COLOR_HIGHLIGHT>Open Surge Engine</color>, a very flexible open-source 2D game engine that is now in your hands!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nSurge the Rabbit is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Did you know...?</color>\nEverything in Open Surge is customizable. You can make levels, items, bosses, characters and more! It's a full <color=$COLOR_HIGHLIGHT>game creation system</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Unleash your creativity!</color>\nOne of the key features in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. It's scripting for games! Use it to build anything you can imagine!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> to create your own awesome games today!"
