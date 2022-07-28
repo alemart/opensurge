@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sprite.c - code for the sprites/animations
- * Copyright (C) 2008-2010, 2012, 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2012, 2018-2019, 2021-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -205,6 +205,15 @@ animation_t* sprite_get_transition(const animation_t* from, const animation_t* t
 }
 
 
+/*
+ * animation_is_transition()
+ * is anim a transition animation?
+ */
+bool animation_is_transition(const animation_t* anim)
+{
+    return anim != NULL && is_transition_animation(anim);
+    /*return anim != NULL && anim->id >= MAX_ANIMATIONS;*/
+}
 
 
 
@@ -391,6 +400,7 @@ animation_t *animation_new(const spriteinfo_t *sprite, int anim_id)
     anim->frame_count = 0;
     anim->data = NULL; /* this will be malloc'd later */
     anim->hot_spot = sprite->hot_spot; /* default hot spot */
+    anim->action_spot = v2d_new(0, 0);
     anim->repeat_from = 0;
     anim->next = NULL;
 
@@ -819,6 +829,14 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
         nanoparser_expect_string(p2, "hot_spot receives two numbers: xpos, ypos");
         anim->hot_spot.x = (float)atoi(nanoparser_get_string(p1));
         anim->hot_spot.y = (float)atoi(nanoparser_get_string(p2));
+    }
+    else if(str_icmp(identifier, "action_spot") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "action_spot receives two numbers: xpos, ypos");
+        nanoparser_expect_string(p2, "action_spot receives two numbers: xpos, ypos");
+        anim->action_spot.x = (float)atoi(nanoparser_get_string(p1));
+        anim->action_spot.y = (float)atoi(nanoparser_get_string(p2));
     }
     else if(str_icmp(identifier, "data") == 0) {
         anim->frame_count = nanoparser_get_number_of_parameters(param_list);

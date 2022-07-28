@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * player.c - scripting system: player bridge
- * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -155,7 +155,7 @@ static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 static void update_player(surgescript_object_t* object);
 static void update_collider(surgescript_object_t* object, int width, int height);
-static void update_animation(surgescript_object_t* object, int anim_id);
+static void update_animation(surgescript_object_t* object, const animation_t* animation);
 static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
 static const double RAD2DEG = 57.2957795131;
@@ -1422,9 +1422,9 @@ void update_player(surgescript_object_t* object)
 
     /* update the animation */
     if(player != NULL)
-        update_animation(object, player_animation(player)->id);
+        update_animation(object, player_animation(player));
     else
-        update_animation(object, 0);
+        update_animation(object, sprite_get_animation(NULL, 0));
 
     /* update player pointer */
     surgescript_object_set_userdata(object, player);
@@ -1466,10 +1466,10 @@ void update_collider(surgescript_object_t* object, int width, int height)
 }
 
 /* update the animation */
-void update_animation(surgescript_object_t* object, int anim_id)
+void update_animation(surgescript_object_t* object, const animation_t* animation)
 {
-    surgescript_object_t* animation = get_animation(object);
-    scripting_animation_overwrite_id(animation, anim_id);
+    surgescript_object_t* animation_object = get_animation(object);
+    scripting_animation_overwrite_ptr(animation_object, animation);
 }
 
 /* PlayerManager: main state */

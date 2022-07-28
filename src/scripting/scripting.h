@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * scripting.h - scripting system
- * Copyright (C) 2018-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ extern struct player_t* scripting_player_ptr(const surgescript_object_t* object)
 extern struct music_t* scripting_music_ptr(const surgescript_object_t* object);
 
 extern const struct animation_t* scripting_animation_ptr(const surgescript_object_t* object);
-extern void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id);
+extern void scripting_animation_overwrite_ptr(surgescript_object_t* object, const struct animation_t* animation);
 
 extern bricktype_t scripting_brick_type(const surgescript_object_t* object);
 extern bricklayer_t scripting_brick_layer(const surgescript_object_t* object);

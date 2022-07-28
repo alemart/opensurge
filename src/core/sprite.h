@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sprite.h - code for the sprites/animations
- * Copyright (C) 2008-2009, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2009, 2018-2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ struct animation_t {
     int frame_count; /* how many frames does this animation have? */
     int* data; /* frame vector */
     v2d_t hot_spot; /* hot spot */
+    v2d_t action_spot; /* action spot */
     int repeat_from; /* if repeat is true, jump back to this frame of the animation. Defaults to zero */
     const animation_t *next; /* will be NULL, unless this is a transition */
 };
@@ -87,6 +88,9 @@ struct image_t* sprite_get_image(const animation_t* anim, int frame_id);
 
 /* gets a transition animation - returns NULL if there is no such transition */
 animation_t* sprite_get_transition(const animation_t* from, const animation_t* to);
+
+/* is anim a transition animation? */
+bool animation_is_transition(const animation_t* anim);
 
 
 

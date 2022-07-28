@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * animation.c - scripting system: animation object
- * Copyright (C) 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018-2019, 2021-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,7 @@ static surgescript_var_t* fun_getfps(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_getfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getactionspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getframe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -52,6 +53,7 @@ static const surgescript_heapptr_t ANIMID_ADDR = 0;
 static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
 static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
 static const surgescript_heapptr_t ANCHOR_ADDR = 3;
+static const surgescript_heapptr_t ACTIONSPOT_ADDR = 4;
 static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
 static void notify_change(const surgescript_object_t* object);
 static actor_t* get_animation_actor(const surgescript_object_t* object);
@@ -74,6 +76,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_finished", fun_getfinished, 0);
     surgescript_vm_bind(vm, "Animation", "get_repeats", fun_getrepeats, 0);
     surgescript_vm_bind(vm, "Animation", "get_hotspot", fun_gethotspot, 0);
+    surgescript_vm_bind(vm, "Animation", "get_actionSpot", fun_getactionspot, 0);
     surgescript_vm_bind(vm, "Animation", "get_anchor", fun_getanchor, 0);
     surgescript_vm_bind(vm, "Animation", "get_sprite", fun_getsprite, 0);
     surgescript_vm_bind(vm, "Animation", "get_frame", fun_getframe, 0);
@@ -97,13 +100,22 @@ const animation_t* scripting_animation_ptr(const surgescript_object_t* object)
 }
 
 /*
- * scripting_animation_overwrite_id()
- * Forces a new animation id without notifying changes
+ * scripting_animation_overwrite_ptr()
+ * Forces a new animation without notifying changes
  */
-void scripting_animation_overwrite_id(const surgescript_object_t* object, int anim_id)
+void scripting_animation_overwrite_ptr(surgescript_object_t* object, const animation_t* animation)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), anim_id);
+    surgescript_var_t* anim_id = surgescript_heap_at(heap, ANIMID_ADDR);
+
+    /* transitions won't show up in scripting */
+    if(animation_is_transition(animation))
+        return;
+
+    if(surgescript_var_get_number(anim_id) != animation->id) {
+        surgescript_var_set_number(anim_id, animation->id);
+        surgescript_object_set_userdata(object, (void*)animation);
+    }
 }
 
 /* private */
@@ -126,10 +138,12 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(SPRITENAME_ADDR == surgescript_heap_malloc(heap));
     ssassert(HOTSPOT_ADDR == surgescript_heap_malloc(heap));
     ssassert(ANCHOR_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ACTIONSPOT_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), 0);
     surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), "");
     surgescript_var_set_null(surgescript_heap_at(heap, HOTSPOT_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ANCHOR_ADDR)); /* lazy evaluation */
+    surgescript_var_set_null(surgescript_heap_at(heap, ACTIONSPOT_ADDR)); /* lazy evaluation */
     surgescript_object_set_userdata(object, animation);
 
     /* sanity check */
@@ -162,17 +176,18 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     int anim_id = (int)surgescript_var_get_number(surgescript_heap_at(heap, ANIMID_ADDR));
-    char* sprite_name = surgescript_var_get_string(param[0], manager);
 
-    /* update data */
+    /* set sprite name */
+    char* sprite_name = surgescript_var_get_string(param[0], manager);
+    surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), sprite_name);
+
+    /* update animation pointer */
     if(sprite_animation_exists(sprite_name, anim_id)) {
         animation_t* animation = sprite_get_animation(sprite_name, anim_id);
-        surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), sprite_name);
         surgescript_object_set_userdata(object, animation);
     }
     else {
         animation_t* animation = null_animation();
-        surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), sprite_name);
         surgescript_object_set_userdata(object, animation);
     }
 
@@ -187,21 +202,25 @@ surgescript_var_t* fun_setid(surgescript_object_t* object, const surgescript_var
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* anim_ref = surgescript_heap_at(heap, ANIMID_ADDR);
-    const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITENAME_ADDR));
     int anim_id = (int)surgescript_var_get_number(param[0]);
 
+    /* no need to update? */
+    if((int)surgescript_var_get_number(anim_ref) == anim_id) {
+        notify_change(object); /* will enable custom player animation for this frame */
+        return NULL;
+    }
+
     /* update data */
-    if((int)surgescript_var_get_number(anim_ref) != anim_id) {
-        if(sprite_animation_exists(sprite_name, anim_id)) {
-            animation_t* animation = sprite_get_animation(sprite_name, anim_id);
-            surgescript_var_set_number(anim_ref, anim_id);
-            surgescript_object_set_userdata(object, animation);
-        }
-        else {
-            animation_t* animation = null_animation();
-            surgescript_var_set_number(anim_ref, anim_id);
-            surgescript_object_set_userdata(object, animation);
-        }
+    const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITENAME_ADDR));
+    if(sprite_animation_exists(sprite_name, anim_id)) {
+        animation_t* animation = sprite_get_animation(sprite_name, anim_id);
+        surgescript_var_set_number(anim_ref, anim_id);
+        surgescript_object_set_userdata(object, animation);
+    }
+    else {
+        animation_t* animation = null_animation();
+        surgescript_var_set_number(anim_ref, anim_id);
+        surgescript_object_set_userdata(object, animation);
     }
 
     /* done! */
@@ -293,6 +312,34 @@ surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript
     /* get anchor */
     v2 = surgescript_objectmanager_get(manager, handle);
     scripting_vector2_update(v2, animation->hot_spot.x / width, animation->hot_spot.y / height);
+    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
+}
+
+/* the (x,y) coordinates of the action spot */
+surgescript_var_t* fun_getactionspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* action_spot = surgescript_heap_at(heap, ACTIONSPOT_ADDR);
+    surgescript_objecthandle_t handle;
+    surgescript_object_t* v2;
+
+    /* get the action spot */
+    const actor_t* actor = get_animation_actor(object);
+    v2d_t spot = actor != NULL ? actor_action_spot(actor) : v2d_new(0, 0);
+
+    /* lazy evaluation */
+    if(surgescript_var_is_null(action_spot)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(action_spot, handle);
+    }
+    else
+        handle = surgescript_var_get_objecthandle(action_spot);
+
+    /* return the action spot */
+    v2 = surgescript_objectmanager_get(manager, handle);
+    scripting_vector2_update(v2, spot.x, spot.y);
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 

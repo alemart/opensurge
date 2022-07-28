@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * actor.h - actor module
- * Copyright (C) 2008-2012, 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2012, 2018-2019, 2021-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _ACTOR_H
 #define _ACTOR_H
 
+#include <stdbool.h>
 #include "../core/v2d.h"
 #include "../core/sprite.h"
 #include "../core/input.h"
@@ -66,9 +67,10 @@ void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, i
 void actor_change_animation(actor_t *act, const animation_t *anim);
 void actor_change_animation_frame(actor_t *act, int frame);
 void actor_change_animation_speed_factor(actor_t *act, float factor); /* default factor: 1.0 */
-int actor_animation_finished(const actor_t *act); /* true if the current animation has finished */
+bool actor_animation_finished(const actor_t *act); /* true if the current animation has finished */
 void actor_synchronize_animation(actor_t *act, int sync); /* should I use a shared animation frame? */
 int actor_animation_frame(const actor_t* act);
+v2d_t actor_action_spot(const actor_t* act); /* action spot appropriately flipped */
 
 /* legacy */
 int actor_collision(const actor_t *a, const actor_t *b); /* tests bounding-box collision between a and b */

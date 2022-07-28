@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * actor.c - actor module
- * Copyright (C) 2008-2012, 2018-2019, 2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2012, 2018-2019, 2021-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -199,8 +199,11 @@ void actor_change_animation_speed_factor(actor_t *act, float factor)
  * actor_animation_finished()
  * Returns true if the current animation has finished
  */
-int actor_animation_finished(const actor_t *act)
+bool actor_animation_finished(const actor_t *act)
 {
+    if(!act->animation)
+        return false;
+
     float frame = act->animation_frame + (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
     return (!act->animation->repeat && (int)frame >= act->animation->frame_count);
 }
@@ -234,9 +237,32 @@ int actor_animation_frame(const actor_t* act)
  */
 image_t* actor_image(const actor_t *act)
 {
+    if(!act->animation)
+        fatal_error("actor_image(): no animation is playing");
+
     return sprite_get_image(act->animation, (int)(act->animation_frame));
 }
 
+/*
+ * actor_action_spot()
+ * The action spot of the current animation, appropriately flipped
+ */
+v2d_t actor_action_spot(const actor_t* act)
+{
+    if(!act->animation)
+        return v2d_new(0, 0);
+
+    const spriteinfo_t* sprite = act->animation->sprite;
+    v2d_t center = v2d_new(sprite->frame_w / 2, sprite->frame_h / 2);
+    v2d_t offset = v2d_subtract(act->animation->action_spot, center);
+    v2d_t sign = v2d_new(
+        act->mirror & IF_HFLIP ? -1.0f : 1.0f,
+        act->mirror & IF_VFLIP ? -1.0f : 1.0f
+    );
+
+    /* flip the action spot relative to the center of the animation frame */
+    return v2d_add(center, v2d_new(offset.x * sign.x, offset.y * sign.y));
+}
 
 
 
