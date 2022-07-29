@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * main.c - entry point
- * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <allegro5/allegro.h> /* included for cross-platform compatibility; see https://liballeg.org/a5docs/5.2.7/getting_started.html#the-main-function */
 #include "core/engine.h"
 
 /*
