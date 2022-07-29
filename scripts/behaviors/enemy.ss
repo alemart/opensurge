@@ -126,12 +126,12 @@ object "Enemy" is "private", "entity", "behavior"
     {
         // autodetect collider size
         if(actor != null) {
-            hotspot = actor.animation.hotspot;
+            hotSpot = actor.animation.hotSpot;
             collider.width = actor.width * 0.8;
             collider.height = actor.height * 0.8;
             collider.setAnchor(
-                hotspot.x / actor.width,
-                hotspot.y / actor.height
+                hotSpot.x / actor.width,
+                hotSpot.y / actor.height
             );
         }
 

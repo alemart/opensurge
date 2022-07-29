@@ -75,9 +75,10 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_fps", fun_getfps, 0);
     surgescript_vm_bind(vm, "Animation", "get_finished", fun_getfinished, 0);
     surgescript_vm_bind(vm, "Animation", "get_repeats", fun_getrepeats, 0);
-    surgescript_vm_bind(vm, "Animation", "get_hotspot", fun_gethotspot, 0);
-    surgescript_vm_bind(vm, "Animation", "get_actionSpot", fun_getactionspot, 0);
     surgescript_vm_bind(vm, "Animation", "get_anchor", fun_getanchor, 0);
+    surgescript_vm_bind(vm, "Animation", "get_hotspot", fun_gethotspot, 0); /* legacy name kept for retro-compatibility with Open Surge 0.5.x */
+    surgescript_vm_bind(vm, "Animation", "get_hotSpot", fun_gethotspot, 0);
+    surgescript_vm_bind(vm, "Animation", "get_actionSpot", fun_getactionspot, 0);
     surgescript_vm_bind(vm, "Animation", "get_sprite", fun_getsprite, 0);
     surgescript_vm_bind(vm, "Animation", "get_frame", fun_getframe, 0);
     surgescript_vm_bind(vm, "Animation", "set_frame", fun_setframe, 1);

@@ -54,7 +54,7 @@ object "Water Bubble" is "entity", "private", "disposable"
         bubble.alpha = 0.5;
         bubble.zindex = 0.99;
         bubble.anim = 0;
-        hy = bubble.animation.hotspot.y / 2;
+        hy = bubble.animation.hotSpot.y / 2;
     }
 
     fun burst()
@@ -68,19 +68,19 @@ object "Water Bubble" is "entity", "private", "disposable"
     {
         if(size == "xs") {
             bubble.anim = 4;
-            hy = bubble.animation.hotspot.y / 2;
+            hy = bubble.animation.hotSpot.y / 2;
         }
         else if(size == "sm") {
             bubble.anim = 0;
-            hy = bubble.animation.hotspot.y / 2;
+            hy = bubble.animation.hotSpot.y / 2;
         }
         else if(size == "md") {
             bubble.anim = 3;
-            hy = bubble.animation.hotspot.y / 2;
+            hy = bubble.animation.hotSpot.y / 2;
         }
         else if(size == "lg") {
             bubble.anim = 1;
-            hy = bubble.animation.hotspot.y;
+            hy = bubble.animation.hotSpot.y;
         }
         return this;
     }

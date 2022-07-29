@@ -18,8 +18,8 @@ object "Zipline Grabber" is "entity", "gimmick"
 
     actor = Actor("Zipline Grabber");
     collider = CollisionBox(8, 1.5 * actor.height).setAnchor(
-        actor.animation.hotspot.x / actor.width,
-        actor.animation.hotspot.y / (1.5 * actor.height)
+        actor.animation.hotSpot.x / actor.width,
+        actor.animation.hotSpot.y / (1.5 * actor.height)
     );
     transform = Transform();
     grab = Sound("samples/zipline.wav");

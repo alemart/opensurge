@@ -222,7 +222,7 @@ object "Pipe Sensor" is "private", "entity"
             insidePipe = pipeManager.isInsidePipe(player);
             if((entrance && !insidePipe) || (!entrance && insidePipe)) {
                 player.transform.position = transform.position
-                    .plus(player.animation.hotspot)
+                    .plus(player.animation.hotSpot)
                     .minus(ballCenter(player))
                 ;
                 parent.onPipeActivate(player);

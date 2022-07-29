@@ -102,8 +102,9 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
-    surgescript_vm_bind(vm, "Actor", "get_hotspot", fun_gethotspot, 0);
     surgescript_vm_bind(vm, "Actor", "get_anchor", fun_getanchor, 0);
+    surgescript_vm_bind(vm, "Actor", "get_hotspot", fun_gethotspot, 0); /* legacy name kept for retro-compatibility with Open Surge 0.5.x */
+    surgescript_vm_bind(vm, "Actor", "get_hotSpot", fun_gethotspot, 0);
     surgescript_vm_bind(vm, "Actor", "get_actionSpot", fun_getactionspot, 0);
     surgescript_vm_bind(vm, "Actor", "onAnimationChange", fun_onanimationchange, 1);
     surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);

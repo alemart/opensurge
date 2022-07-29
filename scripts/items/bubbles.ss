@@ -62,7 +62,7 @@ object "Water Bubbles" is "entity", "basic"
         bubbles.alpha = 0.5;
         bubbles.zindex = 0.99;
         bubbles.anim = 0;
-        hy = bubbles.animation.hotspot.y / 2;
+        hy = bubbles.animation.hotSpot.y / 2;
     }
 }
 

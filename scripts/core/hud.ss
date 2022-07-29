@@ -233,7 +233,7 @@ object "DefaultHUD.Powerups.Icon" is "entity", "detached", "awake", "private"
 
     fun setIndex(index)
     {
-        hotspot = actor.animation.hotspot;
+        hotspot = actor.animation.hotSpot;
         offset = Vector2(-hotspot.x, hotspot.y);
         transform.localPosition = Vector2(1.25 * actor.width * -index, 0).plus(offset);
         return this;
