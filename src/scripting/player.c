@@ -40,12 +40,10 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-only properties */
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getattacking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmidair(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -79,8 +77,6 @@ static surgescript_var_t* fun_getlookingup(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getwinning(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-write properties */
-static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getturbo(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -116,6 +112,16 @@ static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
+/* animation methods */
+static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getactionspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getactionoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -190,7 +196,6 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_slope", fun_getslope, 0);
     surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
-    surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
     surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
     surgescript_vm_bind(vm, "Player", "get_input", fun_getinput, 0);
     surgescript_vm_bind(vm, "Player", "get_dying", fun_getdying, 0);
@@ -213,8 +218,6 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_winning", fun_getwinning, 0);
 
     /* read-write properties */
-    surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
-    surgescript_vm_bind(vm, "Player", "set_anim", fun_setanim, 1);
     surgescript_vm_bind(vm, "Player", "get_shield", fun_getshield, 0);
     surgescript_vm_bind(vm, "Player", "set_shield", fun_setshield, 1);
     surgescript_vm_bind(vm, "Player", "get_invincible", fun_getinvincible, 0);
@@ -261,6 +264,16 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "focus", fun_focus, 0);
     surgescript_vm_bind(vm, "Player", "hasFocus", fun_hasfocus, 0);
     surgescript_vm_bind(vm, "Player", "hlock", fun_hlock, 1);
+
+    /* animation methods */
+    surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
+    surgescript_vm_bind(vm, "Player", "get_anim", fun_getanim, 0);
+    surgescript_vm_bind(vm, "Player", "set_anim", fun_setanim, 1);
+    surgescript_vm_bind(vm, "Player", "get_anchor", fun_getanchor, 0);
+    surgescript_vm_bind(vm, "Player", "get_hotSpot", fun_gethotspot, 0);
+    surgescript_vm_bind(vm, "Player", "get_actionSpot", fun_getactionspot, 0);
+    surgescript_vm_bind(vm, "Player", "get_actionOffset", fun_getactionoffset, 0);
+    surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
     
     /* general-purpose methods */
     surgescript_vm_bind(vm, "Player", "constructor", fun_constructor, 0);
@@ -268,7 +281,6 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
-    surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
     surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 0);
 
     /* misc */
@@ -903,6 +915,46 @@ surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_v
     surgescript_var_t* anim_id = surgescript_var_create();
     surgescript_object_call_function(animation, "get_id", NULL, 0, anim_id);
     return anim_id;
+}
+
+/* get animation hotspot */
+surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_hotspot */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* anim_hotspot = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_hotSpot", NULL, 0, anim_hotspot);
+    return anim_hotspot;
+}
+
+/* get animation anchor */
+surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_anchor */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* anim_anchor = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_anchor", NULL, 0, anim_anchor);
+    return anim_anchor;
+}
+
+/* get animation action spot */
+surgescript_var_t* fun_getactionspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_actionSpot */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* action_spot = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_actionSpot", NULL, 0, action_spot);
+    return action_spot;
+}
+
+/* get animation action offset */
+surgescript_var_t* fun_getactionoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call animation.get_actionOffset */
+    surgescript_object_t* animation = get_animation(object);
+    surgescript_var_t* action_offset = surgescript_var_create();
+    surgescript_object_call_function(animation, "get_actionOffset", NULL, 0, action_offset);
+    return action_offset;
 }
 
 /* get animation object */
