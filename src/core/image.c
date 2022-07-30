@@ -120,7 +120,7 @@ image_t* image_create(int width, int height)
 {
     image_t* img;
 
-    if(width <= 0 || height <= 0 || width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE) {
+    if(width <= 0 || height <= 0) {
         fatal_error("Can't create image of size %d x %d", width, height);
         return NULL;
     }
