@@ -2391,7 +2391,7 @@ void flyingtext_init(item_t *item)
     flyingtext_set_text(item, "0");
 
     actor_change_animation(item->actor, sprite_get_animation(NULL, 0));
-    item->actor->visible = FALSE;
+    item->actor->visible = false;
 }
 
 

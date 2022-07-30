@@ -1229,7 +1229,7 @@ void player_set_blinking(player_t* player, int blink)
     }
     else {
         player->blinking = FALSE;
-        player->actor->visible = TRUE;
+        player->actor->visible = true;
     }
 }
 

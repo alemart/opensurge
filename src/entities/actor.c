@@ -44,7 +44,7 @@ actor_t* actor_create()
 {
     actor_t *act = mallocx(sizeof *act);
 
-    act->spawn_point = v2d_new(0,0);
+    act->spawn_point = v2d_new(0, 0);
     act->position = act->spawn_point;
     act->angle = 0.0f;
     act->speed = v2d_new(0,0);
@@ -53,12 +53,13 @@ actor_t* actor_create()
     act->animation = NULL;
     act->animation_frame = 0.0f;
     act->animation_speed_factor = 1.0f;
-    act->synchronized_animation = FALSE;
+    act->synchronized_animation = false;
     act->mirror = IF_NONE;
-    act->visible = TRUE;
+    act->visible = true;
     act->alpha = 1.0f;
-    act->hot_spot = v2d_new(0,0);
+    act->hot_spot = v2d_new(0, 0);
     act->scale = v2d_new(1.0f, 1.0f);
+    act->default_action_spot = v2d_new(0, 0);
 
     return act;
 }
@@ -214,7 +215,7 @@ bool actor_animation_finished(const actor_t *act)
  * actor_synchronize_animation()
  * should I use a shared animation frame?
  */
-void actor_synchronize_animation(actor_t *act, int sync)
+void actor_synchronize_animation(actor_t *act, bool sync)
 {
     act->synchronized_animation = sync;
 }
