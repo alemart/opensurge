@@ -252,16 +252,15 @@ v2d_t actor_action_spot(const actor_t* act)
     if(!act->animation)
         return v2d_new(0, 0);
 
-    const spriteinfo_t* sprite = act->animation->sprite;
-    v2d_t center = v2d_new(sprite->frame_w / 2, sprite->frame_h / 2);
-    v2d_t offset = v2d_subtract(act->animation->action_spot, center);
+    v2d_t hot_spot = act->animation->hot_spot;
+    v2d_t offset = v2d_subtract(act->animation->action_spot, hot_spot);
     v2d_t sign = v2d_new(
         act->mirror & IF_HFLIP ? -1.0f : 1.0f,
         act->mirror & IF_VFLIP ? -1.0f : 1.0f
     );
 
-    /* flip the action spot relative to the center of the animation frame */
-    return v2d_add(center, v2d_new(offset.x * sign.x, offset.y * sign.y));
+    /* flip the action spot relative to the hot spot */
+    return v2d_add(hot_spot, v2d_new(offset.x * sign.x, offset.y * sign.y));
 }
 
 
