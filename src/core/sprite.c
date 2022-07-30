@@ -292,7 +292,8 @@ spriteinfo_t *spriteinfo_new()
     sprite->rect_h = 0;
     sprite->frame_w = 0;
     sprite->frame_h = 0;
-    sprite->hot_spot = v2d_new(0, 0);
+    sprite->default_hot_spot = v2d_new(0, 0);
+    sprite->default_action_spot = v2d_new(0, 0);
     sprite->frame_count = 0;
     sprite->frame_data = NULL;
     sprite->animation_count = 0;
@@ -399,8 +400,8 @@ animation_t *animation_new(const spriteinfo_t *sprite, int anim_id)
     anim->fps = 8.0f;
     anim->frame_count = 0;
     anim->data = NULL; /* this will be malloc'd later */
-    anim->hot_spot = sprite->hot_spot; /* default hot spot */
-    anim->action_spot = v2d_new(0, 0);
+    anim->hot_spot = sprite->default_hot_spot;
+    anim->action_spot = sprite->default_action_spot;
     anim->repeat_from = 0;
     anim->next = NULL;
 
@@ -703,8 +704,16 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         p2 = nanoparser_get_nth_parameter(param_list, 2);
         nanoparser_expect_string(p1, "Must provide two numbers to hot_spot: xpos, ypos");
         nanoparser_expect_string(p2, "Must provide two numbers to hot_spot: xpos, ypos");
-        s->hot_spot.x = (float)atoi(nanoparser_get_string(p1));
-        s->hot_spot.y = (float)atoi(nanoparser_get_string(p2));
+        s->default_hot_spot.x = (float)atoi(nanoparser_get_string(p1));
+        s->default_hot_spot.y = (float)atoi(nanoparser_get_string(p2));
+    }
+    else if(str_icmp(identifier, "action_spot") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "Must provide two numbers to action_spot: xpos, ypos");
+        nanoparser_expect_string(p2, "Must provide two numbers to action_spot: xpos, ypos");
+        s->default_action_spot.x = (float)atoi(nanoparser_get_string(p1));
+        s->default_action_spot.y = (float)atoi(nanoparser_get_string(p2));
     }
     else if(str_icmp(identifier, "animation") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);

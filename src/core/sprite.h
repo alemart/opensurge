@@ -53,10 +53,15 @@ struct animation_t {
 /* sprite info */
 /* spriteinfo_t represents only ONE sprite (meta data), with several animations */
 struct spriteinfo_t {
-    char* source_file;
-    int rect_x, rect_y, rect_w, rect_h;
-    int frame_w, frame_h;
-    v2d_t hot_spot;
+    char* source_file; /* path to image file */
+    int rect_x; /* source rectangle: xpos */
+    int rect_y; /* source rectangle: ypos */
+    int rect_w; /* source rectangle: width */
+    int rect_h; /* source rectangle: height */
+    int frame_w; /* frame width */
+    int frame_h; /* frame height */
+    v2d_t default_hot_spot; /* default hot spot for all animations */
+    v2d_t default_action_spot; /* default unflipped action spot for all animations */
 
     int frame_count; /* every frame related to this sprite */
     image_t **frame_data; /* image_t* vector */

@@ -59,7 +59,6 @@ actor_t* actor_create()
     act->alpha = 1.0f;
     act->hot_spot = v2d_new(0, 0);
     act->scale = v2d_new(1.0f, 1.0f);
-    act->default_action_spot = v2d_new(0, 0);
 
     return act;
 }
