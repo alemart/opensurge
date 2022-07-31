@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - scripting system: Level object
- * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 #include "scripting.h"
 #include "../core/util.h"
 #include "../core/audio.h"
+#include "../core/timer.h"
 #include "../core/stringutil.h"
 #include "../scenes/level.h"
 #include "../scenes/quest.h"
@@ -52,6 +53,7 @@ static surgescript_var_t* fun_setbackground(surgescript_object_t* object, const 
 static surgescript_var_t* fun_getmusic(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_settime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -70,9 +72,11 @@ static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
 static const surgescript_heapptr_t SETUP_ADDR = 2;
 static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3;
-static const surgescript_heapptr_t IDX_ADDR = 4; /* must be the last address */
+static const surgescript_heapptr_t TIME_ADDR = 4;
+static const surgescript_heapptr_t IDX_ADDR = 5; /* must be the last address */
 static const char code_in_surgescript[];
 static void update_music(surgescript_object_t* object);
+static void update_time(surgescript_object_t* object);
 
 /*
  * scripting_register_level()
@@ -95,6 +99,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "get_cleared", fun_getcleared, 0);
     surgescript_vm_bind(vm, "Level", "get_gravity", fun_getgravity, 0);
     surgescript_vm_bind(vm, "Level", "get_time", fun_gettime, 0);
+    surgescript_vm_bind(vm, "Level", "set_time", fun_settime, 1);
     surgescript_vm_bind(vm, "Level", "get_bgtheme", fun_getbgtheme, 0);
     surgescript_vm_bind(vm, "Level", "set_waterlevel", fun_setwaterlevel, 1);
     surgescript_vm_bind(vm, "Level", "get_waterlevel", fun_getwaterlevel, 0);
@@ -144,6 +149,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(UNLOADFUNCTOR_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_null(surgescript_heap_at(heap, UNLOADFUNCTOR_ADDR));
 
+    /* Level time */
+    ssassert(TIME_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_number(surgescript_heap_at(heap, TIME_ADDR), 0.0);
+
     /*
      * Memory layout:
      * [ ... | IDX | obj_1 | obj_2 | ... | obj_N ]
@@ -181,6 +190,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     
     /* misc */
     update_music(object);
+    update_time(object);
 
     /* done */
     return NULL;
@@ -400,10 +410,27 @@ surgescript_var_t* fun_getgravity(surgescript_object_t* object, const surgescrip
     return surgescript_var_set_number(surgescript_var_create(), level_gravity());
 }
 
-/* level time, in seconds */
+/* get elapsed time in the level, given in seconds */
 surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return surgescript_var_set_number(surgescript_var_create(), level_time());
+    /* Usage of level_time() is obsolete. It's better to keep track of time independently.
+       In this way, we can make Level.time a read-write property */
+    /*return surgescript_var_set_number(surgescript_var_create(), level_time());*/
+
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, TIME_ADDR));
+}
+
+/* set elapsed time in the level, given in seconds */
+surgescript_var_t* fun_settime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* level_time = surgescript_heap_at(heap, TIME_ADDR);
+
+    double elapsed_time = surgescript_var_get_number(param[0]);
+    surgescript_var_set_number(level_time, elapsed_time);
+
+    return NULL;
 }
 
 /* clears the level (will show the level cleared animation) */
@@ -550,6 +577,18 @@ void update_music(surgescript_object_t* object)
         surgescript_var_destroy(tmp[1]);
         surgescript_var_destroy(tmp[0]);
     }
+}
+
+/* update the elapsed Level.time */
+void update_time(surgescript_object_t* object)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* level_time = surgescript_heap_at(heap, TIME_ADDR);
+
+    double elapsed_time = surgescript_var_get_number(level_time);
+    elapsed_time += timer_get_delta();
+
+    surgescript_var_set_number(level_time, elapsed_time);
 }
 
 /* SurgeScript code */

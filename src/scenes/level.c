@@ -2100,7 +2100,7 @@ const struct bgtheme_t* level_background()
 
 /*
  * level_time()
- * The number of seconds since the level has started
+ * Elapsed time since the level has started, in seconds
  */
 float level_time()
 {
