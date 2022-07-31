@@ -68,18 +68,16 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
     public readonly transform = Transform();
     label = Text("HUD");
     value = Text("HUD");
-    timer = 0.0;
 
     state "main"
     {
-        // update timer
-        timer += Time.delta;
+        time = Level.time;
 
-        // update HUD
-        seconds = Math.floor(timer);
+        seconds = Math.floor(time);
         minutes = Math.floor(seconds / 60);
         sec = Math.mod(seconds, 60);
-        dsec = Math.floor((timer - seconds) * 100);
+        dsec = Math.floor((time - seconds) * 100);
+
         value.text = minutes + "' " + pad(sec) + "\" " + pad(dsec);
         label.text = "<color=ffee11>$HUD_TIME</color>";
     }

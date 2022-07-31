@@ -22,9 +22,9 @@ object "Default Setup"
     waterController = spawn("Water Controller");
     clearedAnim = spawn("Default Cleared Animation");
     openingAnim = spawn("Default Opening Animation");
+    hud = spawn("Default HUD");
     animalManager = Level.spawn("Animals");
     collectiblesListener = spawn("Collectibles Listener").triggers("Give Extra Life").every(100);
-    hud = null;
     player = null;
 
     state "main"
@@ -37,8 +37,8 @@ object "Default Setup"
     // wait for the completion of the opening animation
     state "wait"
     {
+        Level.time = 0.0;
         if(timeout(3.0)) {
-            hud = spawn("Default HUD");
             player.input.enabled = true;
             state = "done";
         }
