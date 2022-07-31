@@ -428,7 +428,7 @@ surgescript_var_t* fun_settime(surgescript_object_t* object, const surgescript_v
     surgescript_var_t* level_time = surgescript_heap_at(heap, TIME_ADDR);
 
     double elapsed_time = surgescript_var_get_number(param[0]);
-    surgescript_var_set_number(level_time, elapsed_time);
+    surgescript_var_set_number(level_time, max(elapsed_time, 0.0));
 
     return NULL;
 }
