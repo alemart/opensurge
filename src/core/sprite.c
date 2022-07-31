@@ -34,6 +34,7 @@ HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
 static HASHTABLE(spriteinfo_t, sprites);
 static const int MAX_ANIMATIONS = 256; /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
 static const int DEFAULT_ANIM = 0;
+static const float DEFAULT_FPS = 8.0f;
 static const char DEFAULT_SPRITE[] = "null";
 static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
 static const int OVERRIDE_PREFIX_LENGTH = sizeof(OVERRIDE_PREFIX) - 1;
@@ -288,10 +289,10 @@ spriteinfo_t *spriteinfo_new()
     sprite->source_file = NULL;
     sprite->rect_x = 0;
     sprite->rect_y = 0;
-    sprite->rect_w = 0;
-    sprite->rect_h = 0;
-    sprite->frame_w = 0;
-    sprite->frame_h = 0;
+    sprite->rect_w = 1;
+    sprite->rect_h = 1;
+    sprite->frame_w = 1;
+    sprite->frame_h = 1;
     sprite->default_hot_spot = v2d_new(0, 0);
     sprite->default_action_spot = v2d_new(0, 0);
     sprite->frame_count = 0;
@@ -397,7 +398,7 @@ animation_t *animation_new(const spriteinfo_t *sprite, int anim_id)
     anim->sprite = sprite;
     anim->id = anim_id;
     anim->repeat = false;
-    anim->fps = 8.0f;
+    anim->fps = DEFAULT_FPS;
     anim->frame_count = 0;
     anim->data = NULL; /* this will be malloc'd later */
     anim->hot_spot = sprite->default_hot_spot;
