@@ -371,7 +371,7 @@ sprite "Surge"
 // Life Icon corresponding to the character (Heads-Up Display)
 sprite "Life Icon Surge"
 {
-    source_file       "images/players/surge-life-icon.png"
+    source_file       "images/players/surge_life_icon.png"
     source_rect       0 0 24 24
     frame_size        24 24
     hot_spot          12 12
@@ -387,7 +387,7 @@ sprite "Life Icon Surge"
 // Goal Sign corresponding to the character
 sprite "Goal Surge"
 {
-    source_file     "images/players/surge-goal.png"
+    source_file     "images/players/surge_goal.png"
     source_rect     0 0 48 56
     frame_size      48 56
     hot_spot        24 56
