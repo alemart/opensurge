@@ -72,6 +72,8 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
     state "main"
     {
         time = Level.time;
+        if(time < 0.1) // apparently blocked on level start
+            time = 0.0;
 
         seconds = Math.floor(time);
         minutes = Math.floor(seconds / 60);
