@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// File: title-screen.ss
+// File: title_screen.ss
 // Description: title screen script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT

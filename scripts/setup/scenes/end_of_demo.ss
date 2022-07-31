@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// File: end-of-demo.ss
+// File: end_of_demo.ss
 // Description: end of demo script
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT

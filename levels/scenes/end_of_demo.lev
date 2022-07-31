@@ -9,7 +9,7 @@ version "1.0"
 requires "0.6.0"
 act 1
 theme "themes/none.brk"
-bgtheme "themes/scenes/end-of-demo.bg"
+bgtheme "themes/scenes/end_of_demo.bg"
 spawn_point 0 0
 setup "End of Demo"
 players "None"
