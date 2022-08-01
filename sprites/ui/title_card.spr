@@ -72,7 +72,91 @@ sprite "Default Title Card"
     }
 }
 
-//sprite "Default Title Card - Zone Number"
-//{
-//
-//}
+sprite "Default Title Card - Zone Number"
+{
+
+    source_file     "images/ui/title_card_zone_numbers.png"
+    source_rect     0 0 426 640
+    frame_size      426 64
+    hot_spot        40 0
+
+    // zone 0
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // zone 1
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // zone 2
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // zone 3
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // zone 4
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // zone 5
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    // zone 6
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+
+    // zone 7
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+
+    // zone 8
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        8
+    }
+
+    // zone 9
+    animation 9
+    {
+        repeat      TRUE
+        fps         8
+        data        9
+    }
+}

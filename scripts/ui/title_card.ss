@@ -17,7 +17,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     public readonly zindex = 1001.0;
     transform = Transform();
     actor = Actor("Default Title Card");
-    levelInfo = spawn("Default Title Card - Level Info").setTargetPosition(actor.animation.actionSpot);
+    levelInfo = spawn("Default Title Card - Level Info").setTargetPosition(actor.animation.actionOffset);
     timeBlocker = spawn("Default Title Card - Time Blocker");
     player = null;
 
@@ -79,12 +79,11 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         }
     }
 
+    // how long does it take for the current animation to complete?
     fun animationTime()
     {
-        // how long does it take for the current animation to complete?
-        return actor.animation.frameCount / actor.animation.fps;
-
         // note: actor.animation.speedFactor is 1
+        return actor.animation.frameCount / actor.animation.fps;
     }
 
     fun constructor()
@@ -94,10 +93,11 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     }
 }
 
+// Level Info: Level Name & Zone Number
 object "Default Title Card - Level Info" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    levelName = Text("HUD Large");
+    levelName = Text("Default Title Card - Level Name");
     zoneNumber = Actor("Default Title Card - Zone Number");
     initialPosition = Vector2.zero;
     targetPosition = Vector2.zero;
@@ -176,6 +176,7 @@ object "Default Title Card - Level Info" is "entity", "awake", "detached", "priv
     }
 }
 
+// Do not advance time until we are finished with the Title Card animation
 object "Default Title Card - Time Blocker"
 {
     state "main"
