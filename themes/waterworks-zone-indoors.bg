@@ -416,8 +416,8 @@ background
     sprite
     {
         source_file     "images/backgrounds/waterworks-zone/indoors-background-underwater-trans50.png"
-        source_rect     0 0 768 1920
-        frame_size      768 1920
+        source_rect     0 0 768 1536
+        frame_size      768 1536
 
         animation
         {
