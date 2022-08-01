@@ -56,19 +56,18 @@ object "Default Camera" is "entity", "awake", "private"
         if(delta.length > 2 * Screen.width)
             centerCamera(player.transform.position);
 
-        // stop camera
+        // freeze camera
         if(player.dying || Level.cleared)
             state = "frozen";
 
         // update camera
-        if(enabled)
-            Camera.position = transform.position.translatedBy(offset.x, offset.y + upDown.offset);
+        refresh();
     }
 
     state "frozen"
     {
-        if(enabled)
-            Camera.position = transform.position.plus(offset);
+        // update camera
+        refresh();
     }
 
     fun constructor()
@@ -91,6 +90,24 @@ object "Default Camera" is "entity", "awake", "private"
     fun hideGizmo()
     {
         actor.visible = false;
+    }
+
+    fun translate(offset)
+    {
+        transform.translate(offset);
+    }
+
+    fun refresh()
+    {
+        if(!enabled)
+            return;
+
+        if(state == "frozen") {
+            Camera.position = transform.position.plus(offset);
+            return;
+        }
+
+        Camera.position = transform.position.translatedBy(offset.x, offset.y + upDown.offset);
     }
 }
 
