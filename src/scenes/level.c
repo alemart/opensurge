@@ -1496,6 +1496,18 @@ void level_render()
 
     /* --------------------------- */
 
+    /* FIX: the camera position may have been changed since the last time
+       entitymanager_set_active_region() was called (i.e., via scripting).
+       Let's make sure that we keep our active region updated. */
+    v2d_t cam = camera_get_position(); /* we're not in editor mode */
+    entitymanager_set_active_region(
+        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
+        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
+        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
+        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+    );
+
+    /* retrieve lists of active entities */
     major_bricks = entitymanager_retrieve_active_bricks();
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
@@ -1509,6 +1521,7 @@ void level_render()
     /* render the built-in HUD */
     render_hud();
 
+    /* release lists of active entites */
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);
     entitymanager_release_retrieved_object_list(major_enemies);
