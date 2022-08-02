@@ -113,6 +113,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
 // Level Info: Level Name & Zone Number
 object "Default Title Card - Level Info" is "entity", "awake", "detached", "private"
 {
+    public readonly zindex = parent.zindex;
     transform = Transform();
     levelName = spawn("Default Title Card - Level Name");
     zoneNumber = spawn("Default Title Card - Zone Number");
@@ -175,11 +176,6 @@ object "Default Title Card - Level Info" is "entity", "awake", "detached", "priv
         duration = Math.max(0.01, seconds);
         time = 0.0;
         state = "disappearing";
-    }
-
-    fun get_zindex()
-    {
-        return parent.zindex;
     }
 
     fun setTargetPosition(target)
