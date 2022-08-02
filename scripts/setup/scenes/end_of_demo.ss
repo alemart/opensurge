@@ -84,7 +84,7 @@ object "End of Demo - Music"
 
     state "watching"
     {
-        if(!jingle.playing) {
+        if(!jingle.playing || timeout(10.0)) {
             parent.onMusicEnded();
             state = "done";
         }
