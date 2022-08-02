@@ -121,9 +121,10 @@ object "End of Demo - Text" is "private", "detached", "entity"
 
     fun constructor()
     {
-        transform.position = Vector2(213, 120);
+        transform.position = Vector2(Screen.width / 2, Screen.height / 2);
         label.align = "center";
         label.text = "$ENDOFDEMO_TEXT";
+        label.maxWidth = Screen.width - 16;
     }
 }
 
