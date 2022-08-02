@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * util.c - utilities
- * Copyright (C) 2008-2010, 2018-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2018-2020, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,11 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <wchar.h>
+#endif
 
 /* private stuff */
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
