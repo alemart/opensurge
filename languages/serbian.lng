@@ -16,7 +16,8 @@ LANG_ID                     "sr_RS"                   // language code & country
 LANG_NAME                   "Српски"                  // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
 LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.2"                   // required engine version
+LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+
 
 
 
@@ -35,18 +36,16 @@ LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 // All texts should fit within their graphical boundaries.
 // To help you with the testing, use the developer mode.
 //
-// In the options screen, highlight the Stage select option.
-// Next, press RIGHT 3 times and enter. You'll see a list
-// of all the level files.
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
 //
 
 //
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as FIXME To find them, you may use a Find tool in your
-// text editor.
-//
+// as FIXME. To find them, use the Find tool in your editor.
 // Found something? Please search for it now.
 //
 // If you find that mark anywhere in the file, it means that
@@ -104,16 +103,17 @@ CREDITS_BACK                "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIR
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME верзија $GAME_VERSION</color>\nпокренуто помоћу $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Људи</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Захваљујући</color>"
-CREDITS_ALEXANDRE           "Водитељ и Оснивач Пројекта\nКреатор Пројекта"
+FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
 CREDITS_JOAO                "Уметник"
 CREDITS_MATEUS              "Звучни ефекти"
-CREDITS_CODY                "Концепти"
+FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
 CREDITS_JOHAN               "Музичар (почивај у миру, друже)"
 CREDITS_DI                  "Музичар"
 CREDITS_VICTOR              "Музичар"
 CREDITS_M374LX              "Музичар"
 CREDITS_COLIN               "Спрајти, прва прича"
 CREDITS_BRIAN               "Уметник спрајта"
+FIXME (untranslated) CREDITS_LEMON               "Illustrator"
 CREDITS_TRANSLATOR          "Преводилац"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Преводиоци</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Кредити по појединачним ресурсима</color>"
@@ -127,7 +127,19 @@ FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Transl
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипте</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у самим скриптама."
 
-// Main Menu
+// Title Screen
+FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
+FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
+FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
+FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
+FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
+FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+
+// (legacy) Main Menu
 MAINMENU_TITLE              "MENI"
 MAINMENU_PLAY               "IGRAJ"
 MAINMENU_CREATE             "PRAVI"
@@ -137,7 +149,7 @@ MAINMENU_QUIT               "NAZAD"
 MAINMENU_DEVBUILD           "Верзија тестирања"
 MAINMENU_VERSION            "v. $GAME_VERSION" // ускраћено
 
-// Create Menu
+// (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
 CREATEMENU_TITLE            "PRAVI"
 CREATEMENU_PLAY             "IGRAJ DEMO"
@@ -146,14 +158,12 @@ CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "NAZAD"
 CREATEMENU_TEXT             "Open Surge вам омогућује да направите своје невероватне игре! Ослободите своју креативност! Нека вам креативни сокови теку!\nЗапочните свој властити пројекат! Креирајте нове нивое, предмете, акције, ликове и још много тога! Окусите уредник нивоа, научите мотор и зароните у SurgeScript за максималну снагу!"
 
-// Congratulations Screen
+// (legacy) Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TITLE       "HVALA ŠTO STE IGRALI"
 CONGRATULATIONS_SHARE       "PODELITE"
 CONGRATULATIONS_DONATE      "DONIRAJTE"
 CONGRATULATIONS_BACK        "NAZAD"
-
-// Congratulations Screen
-// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TEXT        "Хвала што сте играли Опен Сурге верзију $GAME_VERSION.\nЖелите ли играти више? Крените на $GAME_WEBSITE за апдејте!\n\nOpen Surge вам омогућује играње и креирање властитих игара. Развили су га људи попут вас. Сада поделите радост! Обавестите своју фамилију, другаре и кућне љубимце о томе и проширите реч!"
 
 
@@ -312,7 +322,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Пребачено на <color=$1>жути</color> 
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Како играти</color>\nДобро дошли у <color=$COLOR_HIGHLIGHT>Open Surge Демо Ниво</color>! Користите $INPUT_DIRECTIONAL за покрет и $INPUT_FIRE1 за скакање. Користите $INPUT_FIRE2 да замените лика."
+FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Јесте ли знали...?</color>\nСве у Open Surge-у је измењиво. Можете правити нивое, предмете, boss-ове, ликове и више! Потпун је <color=$COLOR_HIGHLIGHT>систем за креирање игре</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Ослободите своју креативност!</color>\nЈедна од кључних карактеристика у Open Surge-у је <color=$COLOR_HIGHLIGHT>SurgeScript</color>. То је скриптовање за игре! Користите то да направите било што шта можете замислити!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Кул!</color>\nЈесте ли већ узбуђени? Небо је граница! Идите на <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> да направите своје невероватне игре данас!"

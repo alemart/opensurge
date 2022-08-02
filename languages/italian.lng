@@ -16,7 +16,8 @@ LANG_ID                     "it_IT"                   // language code & country
 LANG_NAME                   "Italiano"                // language name
 LANG_AUTHOR                 "Nicolò Patanè"           // translation author
 LANG_LASTUPDATE             "2021-05-23"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.2"                   // required engine version
+LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+
 
 
 
@@ -35,18 +36,16 @@ LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 // All texts should fit within their graphical boundaries.
 // To help you with the testing, use the developer mode.
 //
-// In the options screen, highlight the Stage select option.
-// Next, press RIGHT 3 times and enter. You'll see a list
-// of all the level files.
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
 //
 
 //
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as FIXME To find them, you may use a Find tool in your
-// text editor.
-//
+// as FIXME. To find them, use the Find tool in your editor.
 // Found something? Please search for it now.
 //
 // If you find that mark anywhere in the file, it means that
@@ -104,16 +103,17 @@ CREDITS_BACK                "Premi <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> 
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versione $GAME_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Persone</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Grazie a</color>"
-CREDITS_ALEXANDRE           "Capo Progetto e Fondatore\nSviluppatore del Progetto"
+FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
 CREDITS_JOAO                "Artista"
 CREDITS_MATEUS              "Effetti sonori"
-CREDITS_CODY                "Concetto artistico"
+FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
 CREDITS_JOHAN               "Musicista (riposa in pace, amico)"
 CREDITS_DI                  "Musicista"
 CREDITS_VICTOR              "Musicista"
 CREDITS_M374LX              "Musicista"
 CREDITS_COLIN               "Sprites, prima storia"
 CREDITS_BRIAN               "Artista di Sprite"
+FIXME (untranslated) CREDITS_LEMON               "Illustrator"
 CREDITS_TRANSLATOR          "Traduttore"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Traduttori</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Crediti per risorse individuali</color>"
@@ -127,7 +127,19 @@ CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Traduzioni</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Gli autori sono identificati all'interno degli stessi script."
 
-// Main Menu
+// Title Screen
+FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
+FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
+FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
+FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
+FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
+FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+
+// (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
 MAINMENU_PLAY               "GIOCA"
 MAINMENU_CREATE             "CREA"
@@ -137,7 +149,7 @@ MAINMENU_QUIT               "ESCI"
 MAINMENU_DEVBUILD           "Versione di sviluppo"
 MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
 
-// Create Menu
+// (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
 CREATEMENU_TITLE            "CREA"
 CREATEMENU_PLAY             "GIOCA DEMO"
@@ -146,7 +158,7 @@ CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "INDIETRO"
 CREATEMENU_TEXT             "Open Surge ti permette di creare i tuoi giochi incredibili! Scatena e lascia fluire la tua creatività\n\nInizia il tuo progetto! Crea nuovi livelli, oggetti, speciali, personaggi e molto altro! Prova l'editor di livelli, impara il motore e immergiti in SurgeScript per la massima potenza!"
 
-// Congratulations Screen
+// (legacy) Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TITLE       "GRAZIE PER AVER GIOCATO"
 CONGRATULATIONS_SHARE       "CONDIVIDI"
@@ -211,7 +223,7 @@ LOADING_TEXT                "caricamento..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Come giocare</color>\nBenvenuti al <color=$COLOR_HIGHLIGHT>Livello Demo di Open Surge</color>! Usa $INPUT_DIRECTIONAL per muoverti e $INPUT_FIRE1 per saltare. Premi $INPUT_FIRE2 cambiare giocatore."
+FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Lo sapevi che...?</color>\nOgni cosa in Open Surge è personalizzabile. Puoi creare livelli, oggetti, boss, personaggi e altro! È un completo <color=$COLOR_HIGHLIGHT>sistema di creazione di giochi</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Libera la tua creatività!</color>\nUna delle caratteristiche chiave di Open Surge è <color=$COLOR_HIGHLIGHT>SurgeScript</color>. È lo scripting per i giochi! Usalo per costruire qualsiasi cosa tu possa immaginare!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Bello!</color>\nTi senti già eccitato? Il cielo è il limite! Visita <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> per creare i tuoi fantastici giochi oggi stesso!"

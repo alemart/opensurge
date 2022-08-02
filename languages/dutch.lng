@@ -16,7 +16,7 @@ LANG_ID                     "nl_NL"                   // language code & country
 LANG_NAME                   "Nederlands"              // language name
 LANG_AUTHOR                 "SecularSteve"	          // translation author
 LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.2"                   // required engine version
+LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
 
@@ -35,18 +35,16 @@ LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 // All texts should fit within their graphical boundaries.
 // To help you with the testing, use the developer mode.
 //
-// In the options screen, highlight the Stage select option.
-// Next, press RIGHT 3 times and enter. You'll see a list
-// of all the level files.
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
 //
 
 //
 // Updating translations:
 //
 // New strings get added from time to time. They are marked
-// as FIXME To find them, you may use a Find tool in your
-// text editor.
-//
+// as FIXME. To find them, use the Find tool in your editor.
 // Found something? Please search for it now.
 //
 // If you find that mark anywhere in the file, it means that
@@ -104,16 +102,17 @@ CREDITS_BACK                "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> o
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versie $GAME_VERSION</color>\naangedreven door $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Mensen</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dankzij</color>"
-CREDITS_ALEXANDRE           "Projectleider & Oprichter\nProject Ontwikkelaar"
+FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
 CREDITS_JOAO                "Kunstenaar"
 CREDITS_MATEUS              "Geluidseffecten"
-CREDITS_CODY                "Concept kunst"
+FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
 CREDITS_JOHAN               "Musicus (R.I.P. vriend)"
 CREDITS_DI                  "Musicus"
 CREDITS_VICTOR              "Musicus"
 CREDITS_M374LX              "Musicus"
 CREDITS_COLIN               "Sprites, eerste verhaal"
 CREDITS_BRIAN               "Sprite kunstenaar"
+FIXME (untranslated) CREDITS_LEMON               "Illustrator"
 CREDITS_TRANSLATOR          "Vertaler"
 FIXME (untranslated) // CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individuele middelen</color>"
@@ -127,7 +126,19 @@ FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Transl
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "De auteurs worden geïdentificeerd in de scripts zelf."
 
-// Main Menu
+// Title Screen
+FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
+FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
+FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
+FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
+FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
+FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+
+// (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
 MAINMENU_PLAY               "SPELEN"
 MAINMENU_CREATE             "MAKEN"
@@ -137,7 +148,7 @@ MAINMENU_QUIT               "STOPPEN"
 MAINMENU_DEVBUILD           "Ontwikkelingsversie"
 MAINMENU_VERSION            "v. $GAME_VERSION" // afgekort
 
-// Create Menu
+// (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
 CREATEMENU_TITLE            "MAKEN"
 CREATEMENU_PLAY             "DEMO SPELEN"
@@ -146,7 +157,7 @@ CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "TERUG"
 CREATEMENU_TEXT             "Met Open Surge kun je je eigen geweldige spellen maken! Laat uw creativiteit de vrije loop! Laat je creatieve sappen stromen!\nStart je eigen project! Maak nieuwe niveaus, items, specials, personages en meer! Proef de niveau-editor, leer de engine en duik in SurgeScript voor maximaal vermogen!"
 
-// Congratulations Screen
+// (legacy) Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
 CONGRATULATIONS_TITLE       "BEDANKT VOOR HET SPELEN"
 CONGRATULATIONS_SHARE       "DELEN"
@@ -311,7 +322,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Overgeschakeld naar de <color=$1>gele</color> laag"
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Hoe te spellen</color>\nWelkom naar de <color=$COLOR_HIGHLIGHT>Open Surge Demo Level</color>! Gebruik $INPUT_DIRECTIONAL om te bewegen en $INPUT_FIRE1 om te springen. Gebruik $INPUT_FIRE2 om van karakter te wisselen."
+FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Wist je dat...?</color>\nAlles in Open Surge kan worden aangepast. Je kunt levels, items, bazen, personages en meer maken! Het is een volledige <color=$COLOR_HIGHLIGHT>spelcreatie systeem</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Laat uw creativiteit de vrije loop!</color>\nEen van de belangrijkste functies in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Het is scripting voor games! Gebruik het om alles te bouwen wat je maar kunt bedenken!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Koel!</color>\nVoel je je al opgewonden? De lucht is de limiet! Ga naar <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> om vandaag nog je eigen geweldige spellen te maken!"
