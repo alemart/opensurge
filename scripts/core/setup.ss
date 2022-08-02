@@ -9,6 +9,17 @@
 using SurgeEngine.Player;
 using SurgeEngine.Level;
 
+
+// -----------------------------------------------------------------------------
+// ATTENTION
+//
+// "Default Setup" is considered obsolete since Open Surge 0.6.0. Its usage
+// is no longer recommended, but it has been kept for retro-compatibility.
+// Multiple setup objects are used for ease of customization (see the .lev
+// files for details)
+// -----------------------------------------------------------------------------
+
+
 //
 // Need to hack this?
 // It's not recommended to change this object. Instead, copy this object, give

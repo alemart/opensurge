@@ -11,6 +11,14 @@ using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 
+// -----------------------------------------------------------------------------
+// ATTENTION
+//
+// "Default Opening Animation" is considered obsolete since Open Surge 0.6.0,
+// but it has been kept for retro-compatibility. Object "Default Title Card" is
+// a suitable replacement.
+// -----------------------------------------------------------------------------
+
 object "Default Opening Animation" is "entity", "awake", "detached", "private"
 {
     theVoid = spawn("DefaultOpeningAnimation.Void");
