@@ -1449,7 +1449,7 @@ void fontdrv_bmp_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
        can be expanded in the future */
 
     for(size_t i = 0; (chr = u8_nextchar(text, &i)) != 0; ) {
-        if(chr < n && (chimg = f->bmp[chr]) != NULL) {
+        if(chr < n && (chimg = f->bmp[chr & 0xFF]) != NULL) {
             if(!color_equals(color, white))
                 image_draw_tinted(chimg, x, y + f->line_height - image_height(chimg), color, IF_NONE);
             else
