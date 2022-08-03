@@ -136,7 +136,7 @@ FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font:
 // End of Demo
 FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
 FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -322,7 +322,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Overgeschakeld naar de <color=$1>gele</color> laag"
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Wist je dat...?</color>\nAlles in Open Surge kan worden aangepast. Je kunt levels, items, bazen, personages en meer maken! Het is een volledige <color=$COLOR_HIGHLIGHT>spelcreatie systeem</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Laat uw creativiteit de vrije loop!</color>\nEen van de belangrijkste functies in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Het is scripting voor games! Gebruik het om alles te bouwen wat je maar kunt bedenken!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Koel!</color>\nVoel je je al opgewonden? De lucht is de limiet! Ga naar <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> om vandaag nog je eigen geweldige spellen te maken!"

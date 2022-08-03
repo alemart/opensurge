@@ -137,7 +137,7 @@ FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font:
 // End of Demo
 FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
 FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -223,7 +223,7 @@ LOADING_TEXT                "wczytywanie..."
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Czy wiesz, że...?</color>\nWszystko w Open Surge jest edytowalne! Możesz tworzyć poziomy, przedmioty, postacie, wrogów - i więcej!\nTo pełny <color=$COLOR_HIGHLIGHT>system tworzenia gier</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uwolnij swoją kreatywność!</color>\nJedną z kluczowych zalet Open Surge jest <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To język skryptowy dla gier - za jego pomocą możesz zbudować co tylko zdołasz sobie wyobrazić!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nCzujesz ekscytację? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"

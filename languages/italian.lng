@@ -137,7 +137,7 @@ FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font:
 // End of Demo
 FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
 FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -223,7 +223,7 @@ LOADING_TEXT                "caricamento..."
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Lo sapevi che...?</color>\nOgni cosa in Open Surge è personalizzabile. Puoi creare livelli, oggetti, boss, personaggi e altro! È un completo <color=$COLOR_HIGHLIGHT>sistema di creazione di giochi</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Libera la tua creatività!</color>\nUna delle caratteristiche chiave di Open Surge è <color=$COLOR_HIGHLIGHT>SurgeScript</color>. È lo scripting per i giochi! Usalo per costruire qualsiasi cosa tu possa immaginare!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Bello!</color>\nTi senti già eccitato? Il cielo è il limite! Visita <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> per creare i tuoi fantastici giochi oggi stesso!"

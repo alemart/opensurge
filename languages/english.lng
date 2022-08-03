@@ -136,7 +136,7 @@ TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special character
 // End of Demo
 ENDOFDEMO_CONTINUE          "CONTINUE"
 ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>opensurge2d.org</color> for updates!\n\nNow let's see how you too can create your own games!"
+ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -222,7 +222,7 @@ LOADING_TEXT                "loading..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Did you know...?</color>\nEverything in Open Surge is customizable. You can make levels, items, bosses, characters and more! It's a full <color=$COLOR_HIGHLIGHT>game creation system</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Unleash your creativity!</color>\nOne of the key features in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. It's scripting for games! Use it to build anything you can imagine!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> to create your own awesome games today!"
