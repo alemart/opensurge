@@ -1730,8 +1730,8 @@ brick 202
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick202.png"
-        source_rect     0 0 128 128
-        frame_size      64 64
+        source_rect     0 0 256 256
+        frame_size      128 128
 
         animation
         {
@@ -1752,8 +1752,8 @@ brick 203
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick203.png"
-        source_rect     0 0 128 128
-        frame_size      64 64
+        source_rect     0 0 256 256
+        frame_size      128 128
 
         animation
         {
