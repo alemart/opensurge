@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------
 // File: languages/russian.lng
-// Description: russian translation (version 4) (encoding: UTF-8)
+// Description: russian translation (version 5) (encoding: UTF-8)
 // Author: Halatnikov (halatnikov.github.io)
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// Translation fixes look like "//v4: fix reason"
+// Translation fixes look like "//v5: fix reason"
 
 // 
 // Section: generic
@@ -16,7 +16,7 @@
 LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
-LANG_LASTUPDATE             "2021-01-09"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2022-08-04"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
@@ -105,22 +105,22 @@ CREDITS_BACK                "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME версия $GAME_VERSION</color>\nиспользует $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Активные участники</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Прочие участники</color>"
-FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
+CREDITS_ALEXANDRE           "Лидер и основатель проекта\nРазработчик проекта\nХудожник"  //v5
 CREDITS_JOAO                "Художник"
 CREDITS_MATEUS              "Звуковые эффекты"
-FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
+CREDITS_CODY                "Художник концепт-артов\nДизайнер врагов"  //v5
 CREDITS_JOHAN               "Композитор (покойся с миром, друг)"
 CREDITS_DI                  "Композитор"
 CREDITS_VICTOR              "Композитор"
 CREDITS_M374LX              "Композитор"
 CREDITS_COLIN               "Художник спрайтов, первый вариант сюжета"
 CREDITS_BRIAN               "Художник спрайтов"
-FIXME (untranslated) CREDITS_LEMON               "Illustrator"
+CREDITS_LEMON               "Иллюстратор"  //v5
 CREDITS_TRANSLATOR          "Переводчик"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Переводчики</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Авторы каждого ресурса</color>"
 CREDITS_RES_TEXT            "Все перечисленные ниже файлы находятся под свободными лицензиями. Представлены их соответствующие авторы:"
-CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Графика</color>"
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Изображения</color>"  //v5
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музыка</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звуковые эффекты</color>"
 CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Шрифты</color>"
@@ -130,16 +130,18 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипты</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих скриптов."
 
 // Title Screen
-FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
-FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
-FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
-FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+// v5
+TITLESCREEN_PLAY            "НАЧАТЬ ИГРУ"
+TITLESCREEN_OPTIONS         "НАСТРОЙКИ"
+TITLESCREEN_QUIT            "ВЫХОД"
+TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
-FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
-FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
+// v5
+ENDOFDEMO_CONTINUE          "ПРОДОЛЖИТЬ"
+ENDOFDEMO_VERSION           "ДЕМО 1\n20220902"
+ENDOFDEMO_TEXT              "Спасибо за игру! Surge the Rabbit находится в разработке.\n\nСледите за обновлениями на <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> !\n\nТеперь посмотрим как вы тоже можете создать свою игру!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "МЕНЮ"
@@ -166,7 +168,7 @@ CONGRATULATIONS_TITLE       "СПАСИБО ЗА ИГРУ"
 CONGRATULATIONS_SHARE       "ПОДЕЛИТЬСЯ"
 CONGRATULATIONS_DONATE      "ПОДДЕРЖАТЬ"
 CONGRATULATIONS_BACK        "НАЗАД В МЕНЮ"
-CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версия $GAME_VERSION!\nХотите ещё? Следите за обновлениями на $GAME_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"  //v2
+CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версии $GAME_VERSION!\nХотите ещё? Следите за обновлениями на $GAME_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"  //v5
 
 
 
@@ -175,7 +177,7 @@ CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge 
 //
 
 // keyboard
-INPUT_KEYB_DIRECTIONAL      "КЛАВИШИ СО СТРЕЛКАМИ"
+INPUT_KEYB_DIRECTIONAL      "КЛАВИШИ НАПРАВЛЕНИЙ"  //v5
 INPUT_KEYB_LEFT             "ВЛЕВО"
 INPUT_KEYB_RIGHT            "ВПРАВО"
 INPUT_KEYB_UP               "ВВЕРХ"
@@ -196,7 +198,7 @@ INPUT_JOY_RIGHT             "ВПРАВО"
 INPUT_JOY_UP                "ВВЕРХ"
 INPUT_JOY_DOWN              "ВНИЗ"
 INPUT_JOY_FIRE1             "ПРЫЖОК"
-INPUT_JOY_FIRE2             "ПЕРЕКЛЮЧИТЬ"
+INPUT_JOY_FIRE2             "СМЕНИТЬ"  //v5
 INPUT_JOY_FIRE3             "ПАУЗА"
 INPUT_JOY_FIRE4             "НАЗАД"
 INPUT_JOY_FIRE5             "<доступно>"
@@ -212,8 +214,8 @@ INPUT_JOY_FIRE8             "<доступно>"
 
 // Quit game? confirm box
 QUIT_QUESTION               "Вы уверены что хотите выйти?"  //v2: it looks a bit too "intimidating" if all caps lol
-QUIT_OPTION1                "ДА"
-QUIT_OPTION2                "НЕТ"
+QUIT_OPTION1                "Да"  //v5
+QUIT_OPTION2                "Нет"  //v5
 
 // Loading Screen
 LOADING_TEXT                "Загрузка..."
@@ -225,11 +227,12 @@ LOADING_TEXT                "Загрузка..."
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
-LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали...?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценный <color=$COLOR_HIGHLIGHT>движок для создания игр</color>."  //v2
-LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдна из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"  //v2
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже заинтересованы? Посетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> чтобы начать создавать свои собственные игры!"
-LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните делать свой уровень! (нажмите F1 для справки)" //v3
+// v5
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Создайте свою удивительную игру!</color>\nЭта игра создана с использованием <color=$COLOR_HIGHLIGHT>Open Surge</color>, очень гибкий 2D движок с открытым исходным кодом, который теперь в ваших руках!"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали...?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценная <color=$COLOR_HIGHLIGHT>система для создания игр</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдна из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже заинтересованы? Предел - только небо! Посетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> чтобы начать создавать свои собственные игры уже сегодня!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните собирать свой уровень! (нажмите F1 для справки)"
 
 
 //
@@ -303,7 +306,7 @@ EDITOR_HELP_CMD_BRICKLAYER  "Изменить слой размещения де
 EDITOR_HELP_CMD_FLIPBRICK   "Повернуть текущую деталь"
 
 // Input keys
-EDITOR_INPUT_ARROWS         "Клавиши со стрелками"
+EDITOR_INPUT_ARROWS         "Клавиши направлений" //v5
 EDITOR_INPUT_SHIFT          "Shift" // Shift key
 EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
 EDITOR_INPUT_ESC            "ESC"   // ESC key
@@ -314,14 +317,14 @@ EDITOR_INPUT_MOUSEWHEEL     "Колёсико мыши"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Перезагрузить уровень?"
-EDITOR_CONFIRM_YES          "ДА"
-EDITOR_CONFIRM_NO           "НЕТ"
+EDITOR_CONFIRM_YES          "Да"  //v5
+EDITOR_CONFIRM_NO           "Нет"  //v5
 
 // Messages
 EDITOR_MESSAGE_WELCOME      "Добро пожаловать в редактор уровней!"
 EDITOR_MESSAGE_SAVED        "Сохранено в <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
-EDITOR_MESSAGE_SAVEERROR    "Не удалось сохранить уровень. Смотрите в logfile.txt"
-EDITOR_MESSAGE_RELOADED     "Уровень перезагружен"
+EDITOR_MESSAGE_SAVEERROR    "Не удалось сохранить уровень. Смотрите logfile.txt" //v5
+EDITOR_MESSAGE_RELOADED     "Уровень был перезагружен"  //v5
 EDITOR_MESSAGE_UNDOERROR    "Невозможно отменить дальше"
 EDITOR_MESSAGE_REDOERROR    "Невозможно вернуть дальше"
 EDITOR_MESSAGE_SNAP2GRIDON  "Выровнять по сетке: используется сетка $1 × $2"
@@ -334,7 +337,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Слой изменён на <color=$1>ЖЁЛТЫЙ
 
 //
 // Section: bitmap fonts
-// v3
+// v5
 
 //
 // Translators:
@@ -356,16 +359,16 @@ EDITOR_MESSAGE_YELLOWLAYER  "Слой изменён на <color=$1>ЖЁЛТЫЙ
 // For now i'll just leave translation in comments
 
 // Heads-Up Display
-HUD_SCORE                   "Score" //Счёт
-HUD_TIME                    "Time" //Время
-HUD_POWER                   "Power" //Энергия
+HUD_SCORE                   "Score" //Счёт СЧЁТ
+HUD_TIME                    "Time" //Время ВРЕМЯ
+HUD_POWER                   "Power" //Энергия ЭНЕРГИЯ
 
 // Level Cleared animation
 CLEARED_LINE1               "YOU HAVE" //ВЫ ПРОШЛИ
 CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT" //ЗОНУ $LEVEL_ACT
-CLEARED_POWER               "Power Bonus" //Бонус за Энергию
-CLEARED_TIME                "Time Bonus" //Бонус за Время
-CLEARED_SCORE               "Score" //Общий Счёт
+CLEARED_POWER               "Power Bonus" //Бонус за Энергию БОНУС ЗА ЭНЕРГИЮ
+CLEARED_TIME                "Time Bonus" //Бонус за Время БОНУС ЗА ВРЕМЯ
+CLEARED_SCORE               "Score" //Общий Счёт ОБЩИЙ СЧЁТ
 
 // Game Over
 GAMEOVER_PART1              "GAME" //КОНЕЦ
@@ -374,3 +377,5 @@ GAMEOVER_PART2              "OVER" //ИГРЫ
 // Time Over
 TIMEOVER_PART1              "TIME" //ВРЕМЯ
 TIMEOVER_PART2              "OVER" //ВЫШЛО
+
+// EOF
