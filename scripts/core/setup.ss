@@ -36,28 +36,6 @@ object "Default Setup"
     hud = spawn("Default HUD");
     animalManager = Level.spawn("Animals");
     collectiblesListener = spawn("Collectibles Listener").triggers("Give Extra Life").every(100);
-    player = null;
-
-    state "main"
-    {
-        player = Player.active;
-        player.input.enabled = false;
-        state = "wait";
-    }
-
-    // wait for the completion of the opening animation
-    state "wait"
-    {
-        Level.time = 0.0;
-        if(timeout(3.0)) {
-            player.input.enabled = true;
-            state = "done";
-        }
-    }
-
-    state "done"
-    {
-    }
 }
 
 //

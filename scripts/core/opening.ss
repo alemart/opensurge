@@ -7,6 +7,7 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Level;
+using SurgeEngine.Player;
 using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
@@ -35,6 +36,7 @@ object "Default Opening Animation" is "entity", "awake", "detached", "private"
         spawn("DefaultOpeningAnimation.Formula").atColumn(1),
         spawn("DefaultOpeningAnimation.Formula").atColumn(2)
     ];
+    blocker = spawn("DefaultOpeningAnimation.Blocker");
 
     state "main"
     {
@@ -424,6 +426,32 @@ object "DefaultOpeningAnimation.Lightning" is "entity", "awake", "detached", "pr
     }
 
     fun disappear()
+    {
+        destroy();
+    }
+}
+
+object "DefaultOpeningAnimation.Blocker"
+{
+    player = null;
+
+    state "main"
+    {
+        player = Player.active;
+        player.input.enabled = false;
+        state = "waiting";
+    }
+
+    state "waiting"
+    {
+        Level.time = 0.0;
+        if(timeout(3.0)) {
+            player.input.enabled = true;
+            state = "done";
+        }
+    }
+
+    state "done"
     {
         destroy();
     }
