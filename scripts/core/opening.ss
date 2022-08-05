@@ -437,22 +437,19 @@ object "DefaultOpeningAnimation.Blocker"
 
     state "main"
     {
+        Level.time = 0.0;
+        if(timeout(3.0))
+            destroy();
+    }
+
+    fun constructor()
+    {
         player = Player.active;
         player.input.enabled = false;
-        state = "waiting";
     }
 
-    state "waiting"
+    fun destructor()
     {
-        Level.time = 0.0;
-        if(timeout(3.0)) {
-            player.input.enabled = true;
-            state = "done";
-        }
-    }
-
-    state "done"
-    {
-        destroy();
+        player.input.enabled = true;
     }
 }

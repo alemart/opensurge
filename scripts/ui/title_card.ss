@@ -36,15 +36,10 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     actor = Actor("Default Title Card");
     levelInfo = spawn("Default Title Card - Level Info").setTargetPosition(actor.animation.actionOffset);
     timeBlocker = spawn("Default Title Card - Time Blocker");
-    player = null;
+    playerBlocker = spawn("Default Title Card - Player Blocker");
 
     state "main"
     {
-        // ignore controls
-        player = Player.active;
-        player.input.enabled = false;
-
-        // warm up
         actor.anim = 0;
         state = "warming up";
     }
@@ -86,9 +81,6 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     state "finishing up"
     {
         if(actor.animation.finished) {
-
-            // restore controls
-            player.input.enabled = true;
 
             // we're done with this Title Card!
             destroy();
@@ -221,5 +213,22 @@ object "Default Title Card - Time Blocker"
     state "main"
     {
         Level.time = 0.0;
+    }
+}
+
+// Block player control until we are finished with the Title Card animation
+object "Default Title Card - Player Blocker"
+{
+    player = null;
+
+    fun constructor()
+    {
+        player = Player.active;
+        player.input.enabled = false;
+    }
+
+    fun destructor()
+    {
+        player.input.enabled = true;
     }
 }
