@@ -2957,6 +2957,8 @@ void editor_init()
 
     /* bricks */
     editor_brick_init();
+    editor_cursor_entity_type = EDT_BRICK;
+    editor_cursor_entity_id = editor_brick_id(0);
 
     /* SurgeScript entities */
     editor_ssobj_init();
