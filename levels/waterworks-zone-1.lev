@@ -13,7 +13,7 @@ requires "0.6.0"
 act 1
 theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-outdoors.bg"
-spawn_point 176 8896
+spawn_point 96 8896
 setup "Surge Gameplay" "Default Camera" "Default HUD" "Default Title Card" "Default Cleared Animation"
 players "Surge"
 waterlevel 10016
@@ -67,6 +67,8 @@ brick 1 8960 9984
 brick 1 8832 9984
 brick 503 8896 9904
 brick 1 8768 9904
+brick 261 8768 9824
+brick 260 8736 9824
 brick 233 8064 10464
 brick 101 7776 10496
 brick 110 7904 10592
@@ -198,6 +200,25 @@ brick 113 8064 9312
 brick 112 8032 9312
 brick 113 8448 9312
 brick 113 8576 9312
+brick 276 8352 9600
+brick 276 8016 9600
+brick 277 8016 9536
+brick 277 8016 9472
+brick 277 8016 9408
+brick 277 8016 9344
+brick 277 8016 9280
+brick 277 8352 9536
+brick 277 8352 9472
+brick 277 8352 9408
+brick 277 8352 9344
+brick 280 7872 10224
+brick 268 7936 9984
+brick 901 8576 9648
+brick 998 7760 10016 yellow
+brick 998 7792 10016 yellow
+brick 998 7824 10016 yellow
+brick 998 7856 10016 yellow
+brick 998 7872 10016 yellow
 brick 193 6912 10016
 brick 101 6912 10496
 brick 101 7040 10496
@@ -232,15 +253,43 @@ brick 28 7584 10624
 brick 23 7712 10624
 brick 275 7408 10016
 brick 998 7408 10016
+brick 250 7360 10496
+brick 251 7296 10496
+brick 270 7584 10560
+brick 271 7616 10560
+brick 261 6912 9984
+brick 998 6928 10016 yellow
+brick 998 6960 10016 yellow
+brick 998 6992 10016 yellow
+brick 998 7024 10016 yellow
+brick 998 7056 10016 yellow
+brick 998 7088 10016 yellow
+brick 998 7120 10016 yellow
+brick 998 7152 10016 yellow
+brick 998 7184 10016 yellow
+brick 998 7216 10016 yellow
+brick 998 7248 10016 yellow
+brick 998 7280 10016 yellow
+brick 998 7312 10016 yellow
+brick 998 7344 10016 yellow
+brick 998 7376 10016 yellow
+brick 998 7440 10016 yellow
+brick 998 7472 10016 yellow
+brick 998 7504 10016 yellow
+brick 998 7536 10016 yellow
+brick 998 7568 10016 yellow
+brick 998 7600 10016 yellow
+brick 998 7632 10016 yellow
+brick 998 7664 10016 yellow
+brick 998 7696 10016 yellow
+brick 998 7728 10016 yellow
 brick 180 6080 9952
 brick 180 6144 9952
 brick 180 6208 9952
 brick 180 6272 9952
 brick 180 6336 9952
-brick 162 6272 9824
 brick 161 6272 9696
 brick 160 6144 9696
-brick 163 6144 9824
 brick 180 6400 9952
 brick 180 6464 9952
 brick 180 6528 9952
@@ -316,10 +365,30 @@ brick 222 6624 10016
 brick 222 6480 10032
 brick 222 6544 10032
 brick 222 6144 10032
+brick 250 6752 10176
+brick 251 6688 10176
+brick 201 6432 10432
+brick 926 6544 10336
+brick 926 6352 10336
+brick 926 6352 10400
+brick 926 6544 10400
+brick 275 6352 10464
+brick 275 6544 10464
+brick 271 6528 9920
+brick 270 6656 9920
+brick 261 6592 9920
+brick 271 6720 10560
+brick 270 6848 10560
+brick 270 6224 10208
+brick 270 6368 10208
+brick 282 6048 10448
+brick 276 6064 10384
+brick 278 6064 10336
+brick 163 6144 9824 yellow
+brick 162 6272 9824 green
 brick 162 5376 9376
 brick 161 5376 9248
 brick 160 5248 9248
-brick 165 5248 9376
 brick 512 5232 9504
 brick 101 5344 9408
 brick 507 5232 9616
@@ -421,15 +490,29 @@ brick 222 5840 10016
 brick 221 5904 9984
 brick 274 5280 9504
 brick 251 5984 10176
-brick 250 5680 10304
 brick 260 5728 10368
 brick 102 5504 10304
-brick 261 5584 10368
-brick 251 5616 10304
+brick 275 5168 10304
+brick 271 5888 9920
+brick 270 6016 9920
+brick 261 5952 9920
+brick 280 5952 10448
+brick 281 5984 10448
+brick 281 6016 10448
+brick 276 5952 10384
+brick 278 5952 10336
+brick 926 5168 10112
+brick 926 5168 10176
+brick 926 5168 10240
+brick 270 5792 9888
+brick 165 5248 9376 yellow
+brick 999 5280 9504 green
+brick 261 5696 10368
+brick 251 5584 10304
+brick 250 5648 10304
 brick 103 4320 9472
 brick 110 4320 9600
 brick 130 4864 9440
-brick 130 4736 9472
 brick 104 4608 9472
 brick 101 4448 9472
 brick 101 4480 9472
@@ -507,6 +590,44 @@ brick 1 4736 9952
 brick 1 4864 9952
 brick 1 4992 9952
 brick 1 5104 9952
+brick 926 4336 10112
+brick 926 4336 10176
+brick 926 4336 10240
+brick 926 4336 10304
+brick 926 4464 10112
+brick 926 4464 10176
+brick 926 4464 10240
+brick 926 4464 10304
+brick 926 4592 10112
+brick 926 4592 10176
+brick 926 4592 10240
+brick 926 4592 10304
+brick 275 4336 10352
+brick 275 4592 10352
+brick 275 4464 10352
+brick 201 4832 10304
+brick 270 4784 10400
+brick 271 4928 10400
+brick 201 4512 9440
+brick 268 4336 9536
+brick 270 4480 9536
+brick 271 4592 9536
+brick 268 5152 9472
+brick 268 5024 9472
+brick 270 5120 9472
+brick 926 5040 10112
+brick 926 5040 10176
+brick 926 5040 10240
+brick 926 5040 10304
+brick 926 5104 10112
+brick 926 5104 10176
+brick 926 5104 10240
+brick 926 5104 10272
+brick 275 5040 10368
+brick 275 5104 10336
+brick 271 4864 9504
+brick 271 4800 9520
+brick 130 4736 9472
 brick 102 3456 10144
 brick 231 3584 10112
 brick 230 3616 10112
@@ -561,7 +682,6 @@ brick 110 3584 10368
 brick 1 3616 10368
 brick 1 3744 10368
 brick 1 3872 10368
-brick 282 4160 9424
 brick 101 4160 10368
 brick 101 4288 10368
 brick 232 4128 10112
@@ -664,6 +784,26 @@ brick 221 3504 8944
 brick 221 3504 8800
 brick 270 3712 8736
 brick 271 3744 8736
+brick 268 3616 9792
+brick 268 4000 9792
+brick 220 4160 10400
+brick 220 4128 10336
+brick 220 4224 10432
+brick 220 4288 10448
+brick 220 4112 10272
+brick 222 4192 10352
+brick 221 4240 10368
+brick 222 4176 10320
+brick 221 4288 10384
+brick 268 3744 9792
+brick 268 4000 9312
+brick 270 4128 9312
+brick 271 4096 9312
+brick 268 3504 9248
+brick 282 4160 9392
+brick 270 3872 9792
+brick 271 3936 9792
+brick 282 4160 10080
 brick 117 2688 9280
 brick 111 2688 9312
 brick 111 2688 9376
@@ -683,7 +823,6 @@ brick 114 3072 9504
 brick 111 3072 9376
 brick 924 2768 10000
 brick 924 2960 10000
-brick 924 3152 10000
 brick 131 2688 10176
 brick 130 2816 10176
 brick 102 2944 10144
@@ -786,6 +925,42 @@ brick 926 3280 8864
 brick 926 3280 8800
 brick 925 3312 8832
 brick 925 3280 8768
+brick 269 3040 9248
+brick 926 2672 9888
+brick 275 2672 9936
+brick 261 2704 9248
+brick 268 3328 9248
+brick 201 3040 10112
+brick 270 2640 10208
+brick 271 2608 10208
+brick 270 3008 10208
+brick 271 3120 10208
+brick 222 2768 8608
+brick 222 2864 8608
+brick 222 2816 8624
+brick 221 2784 8608
+brick 221 2896 8608
+brick 222 2848 8640
+brick 222 2768 8656
+brick 220 2592 8864
+brick 221 2656 8880
+brick 221 2592 8816
+brick 222 2672 8896
+brick 222 2720 8912
+brick 222 2608 8832
+brick 221 2688 8848
+brick 222 2656 8816
+brick 221 2704 8816
+brick 221 2720 8848
+brick 221 2624 8800
+brick 221 2688 8896
+brick 201 2976 8800
+brick 268 3104 8896
+brick 270 3056 8896
+brick 271 2944 8896
+brick 268 2832 8896
+brick 269 2848 9248
+brick 924 3168 10000
 brick 511 1728 9840
 brick 111 1760 9712
 brick 111 1760 9584
@@ -800,19 +975,14 @@ brick 103 2144 9568
 brick 101 2272 9568
 brick 105 2400 9568
 brick 111 2496 9696
-brick 923 1888 9664
 brick 281 1792 9600
 brick 282 1824 9600
 brick 110 2144 9376
 brick 112 2144 9504
-brick 281 2112 9472
-brick 280 2080 9472
-brick 103 2144 9248
 brick 113 2176 9504
 brick 113 2304 9504
 brick 113 2432 9504
 brick 113 2560 9504
-brick 101 2176 9248
 brick 104 2304 9248
 brick 130 2432 9248
 brick 111 1760 8816
@@ -915,17 +1085,91 @@ brick 221 2560 9808
 brick 221 2528 9696
 brick 222 2560 9872
 brick 221 2544 9920
+brick 115 2144 9312
+brick 117 2176 9312
+brick 110 2144 9344
+brick 102 2176 9248
+brick 220 1856 9856
+brick 220 1920 9856
+brick 220 1984 9856
+brick 221 1856 9776
+brick 221 1872 9824
+brick 221 1888 9792
+brick 221 1904 9760
+brick 221 1920 9824
+brick 221 1952 9808
+brick 221 1968 9776
+brick 221 1984 9808
+brick 221 2000 9824
+brick 222 1792 9760
+brick 222 1984 9792
+brick 222 1824 9744
+brick 222 1936 9760
+brick 221 1808 9696
+brick 221 1968 9712
+brick 222 1792 9792
+brick 221 1792 9808
+brick 222 1792 9872
+brick 221 1808 9888
+brick 221 1936 9776
+brick 221 1824 9808
+brick 221 1840 9728
+brick 220 2080 9760
+brick 221 2128 9712
+brick 222 2048 9776
+brick 269 2144 9280
 brick 221 2576 9888
+brick 202 1792 8704
+brick 202 1920 8704
+brick 202 2048 8704
+brick 202 2176 8704
+brick 202 2304 8704
+brick 202 1792 8832
+brick 202 1920 8832
+brick 202 2048 8832
+brick 202 2176 8832
+brick 202 2304 8832
+brick 202 1792 8960
+brick 202 1920 8960
+brick 202 2048 8960
+brick 202 2176 8960
+brick 202 2304 8960
+brick 202 1792 9088
+brick 202 1920 9088
+brick 202 2048 9088
+brick 202 2176 9088
+brick 202 2304 9088
+brick 202 1792 9216
+brick 202 1920 9216
+brick 202 2048 9216
+brick 202 2176 9216
+brick 202 2304 9216
+brick 202 1792 9344
+brick 202 1920 9344
+brick 202 1792 9472
+brick 202 1920 9472
+brick 202 1792 9600
+brick 202 1920 9600
+brick 202 2048 9600
+brick 202 1792 9728
+brick 202 1920 9728
+brick 202 2048 9728
+brick 202 1792 9856
+brick 202 1920 9856
+brick 271 1824 8624
+brick 270 1856 8624
+brick 261 2560 10208
+brick 923 1888 9664
+brick 202 2048 9472
+brick 280 2112 9440
+brick 202 2048 9344
+brick 262 2512 9632
 brick 183 896 8960
 brick 184 1024 8960
 brick 508 1088 8944
 brick 501 1216 8944
 brick 501 1344 8944
 brick 502 1472 8944
-brick 507 1472 9072
-brick 507 1472 9200
-brick 507 1472 9328
-brick 507 1472 9456
 brick 507 1472 9584
 brick 507 1472 9712
 brick 503 1472 9840
@@ -954,14 +1198,10 @@ brick 113 1312 10208
 brick 113 1440 10208
 brick 113 1568 10208
 brick 113 1696 10208
-brick 9 1344 9200
-brick 9 1344 9328
-brick 9 1344 9456
 brick 3 1344 9584
 brick 3 1344 9712
 brick 1 1216 9072
 brick 1 1184 9072
-brick 4 1344 9072
 brick 1 1216 9200
 brick 1 1216 9328
 brick 1 1216 9456
@@ -1007,6 +1247,18 @@ brick 111 864 8992
 brick 111 864 9088
 brick 111 864 9216
 brick 114 864 9344
+brick 268 1168 8624
+brick 271 1280 8624
+brick 507 1472 9456
+brick 8 1344 9456
+brick 504 1472 9072
+brick 505 1344 9072
+brick 503 1344 9200
+brick 502 1472 9200
+brick 507 1472 9328
+brick 8 1344 9328
+brick 270 1392 8624
+brick 261 1584 8624
 brick 101 0 8832
 brick 2 0 8960
 brick 101 128 8832
@@ -1014,15 +1266,6 @@ brick 104 256 8832
 brick 131 384 8864
 brick 102 512 8864
 brick 101 640 8864
-brick 220 640 8896
-brick 220 704 8896
-brick 220 624 8896
-brick 180 640 8864
-brick 180 704 8864
-brick 193 768 8864
-brick 192 624 8864
-brick 923 480 8896
-brick 220 720 8896
 brick 105 768 8864
 brick 2 128 8960
 brick 2 256 8960
@@ -1051,6 +1294,17 @@ brick 113 384 9344
 brick 113 256 9344
 brick 113 128 9344
 brick 113 0 9344
+brick 180 640 8880
+brick 180 704 8880
+brick 192 624 8880
+brick 193 768 8880
+brick 220 672 8928
+brick 270 640 8928
+brick 271 752 8928
+brick 268 16 8896
+brick 270 352 8896
+brick 271 320 8896
+brick 268 112 8896
 brick 110 3808 8560
 brick 110 3808 8448
 brick 110 3808 8320
@@ -1088,6 +1342,25 @@ brick 1 2880 8240
 brick 1 2880 8320
 brick 1 2752 8320
 brick 1 2624 8320
+brick 270 2688 8176
+brick 271 2816 8176
+brick 268 2720 8176
+brick 268 2592 8176
+brick 220 3040 8384
+brick 222 3008 8512
+brick 222 3088 8336
+brick 222 3104 8416
+brick 222 3056 8448
+brick 222 3024 8464
+brick 221 3072 8480
+brick 221 3072 8320
+brick 222 3040 8320
+brick 222 3040 8288
+brick 221 3056 8304
+brick 221 3120 8352
+brick 223 2816 8592
+brick 223 2880 8592
+brick 223 2752 8592
 brick 186 2016 8560 green
 brick 186 2064 8512 green
 brick 186 2112 8464 green
@@ -1123,6 +1396,33 @@ brick 2 2560 8240
 brick 1 2496 8320
 brick 1 2432 8320
 brick 192 1776 8208
+brick 202 1792 8576
+brick 202 1920 8576
+brick 202 2048 8576
+brick 202 2176 8576
+brick 202 2304 8576
+brick 202 1792 8448
+brick 202 1920 8448
+brick 202 2048 8448
+brick 202 2176 8448
+brick 202 2304 8448
+brick 202 1792 8320
+brick 202 1920 8320
+brick 202 2048 8320
+brick 202 2176 8320
+brick 202 2304 8320
+brick 202 1792 8192
+brick 202 1920 8192
+brick 202 2048 8192
+brick 202 2176 8192
+brick 202 2304 8192
+brick 271 1920 8176
+brick 271 2048 8176
+brick 271 2176 8176
+brick 270 2304 8176
+brick 271 2432 8176
+brick 270 2560 8176
+brick 268 2464 8176
 brick 103 1152 8560
 brick 101 1280 8560
 brick 101 1408 8560
@@ -1132,8 +1432,18 @@ brick 117 1008 8208
 brick 116 880 8208
 brick 114 1008 8240
 brick 113 880 8240
-brick 901 1568 8208
-brick 911 1232 8208
+brick 202 1664 8576
+brick 202 1664 8448
+brick 202 1664 8320
+brick 202 1664 8192
+brick 202 1536 8576
+brick 202 1536 8448
+brick 202 1536 8320
+brick 269 976 8176
+brick 201 1312 8528
+brick 901 1232 8208
+brick 911 1568 8208
+brick 202 1536 8192
 brick 112 816 8240
 brick 114 848 8240
 brick 110 3808 8064
@@ -1155,8 +1465,31 @@ brick 101 2656 8112
 brick 101 2784 8112
 brick 104 2848 8112
 brick 151 2976 8144
+brick 250 2928 8112
+brick 251 2864 8112
 brick 103 2400 8112
 brick 101 2528 8112
+brick 202 1792 8064
+brick 202 1920 8064
+brick 202 2048 8064
+brick 202 2176 8064
+brick 202 2304 8064
+brick 202 1792 7936
+brick 202 1920 7936
+brick 202 2048 7936
+brick 202 2176 7936
+brick 202 2304 7936
+brick 202 1792 7808
+brick 202 1920 7808
+brick 202 2048 7808
+brick 202 2176 7808
+brick 202 2304 7808
+brick 202 1664 8064
+brick 202 1664 7936
+brick 202 1664 7808
+brick 202 1536 7936
+brick 202 1536 7808
+brick 202 1536 8064
 brick 110 816 8112
 brick 111 848 8112
 brick 111 848 7984
@@ -1180,6 +1513,20 @@ brick 1 4096 7552
 brick 1 4096 7424
 brick 1 3968 7552
 brick 1 3968 7424
+brick 202 1792 7680
+brick 202 1920 7680
+brick 202 2048 7680
+brick 202 2176 7680
+brick 202 2304 7680
+brick 202 1792 7552
+brick 202 1920 7552
+brick 202 2048 7552
+brick 202 2176 7552
+brick 202 2304 7552
+brick 202 1664 7680
+brick 202 1664 7552
+brick 202 1536 7680
+brick 202 1536 7552
 brick 111 848 7680
 brick 110 816 7680
 brick 117 848 7648
@@ -1192,24 +1539,31 @@ brick 1 3968 7296
 brick 921 3408 9856
 brick 921 4176 9696
 brick 909 8560 9648
-brick 909 1552 8208
-brick 902 1568 8208
-brick 903 1568 8208
-brick 904 1568 8208
-brick 905 1568 8208
-brick 906 1568 8208
-brick 907 1568 8208
-brick 908 1568 8208
-brick 919 1216 8208
-brick 912 1232 8208
-brick 913 1232 8208
-brick 914 1232 8208
-brick 915 1232 8208
-brick 916 1232 8208
-brick 917 1232 8208
-brick 918 1232 8208
 brick 921 816 8720
-brick 922 976 8720
+brick 902 8576 9648
+brick 903 8576 9648
+brick 904 8576 9648
+brick 905 8576 9648
+brick 906 8576 9648
+brick 907 8576 9648
+brick 908 8576 9648
+brick 921 976 8720
+brick 919 1552 8208
+brick 909 1216 8208
+brick 902 1232 8208
+brick 903 1232 8208
+brick 904 1232 8208
+brick 905 1232 8208
+brick 906 1232 8208
+brick 907 1232 8208
+brick 908 1232 8208
+brick 912 1568 8208
+brick 913 1568 8208
+brick 914 1568 8208
+brick 915 1568 8208
+brick 916 1568 8208
+brick 917 1568 8208
+brick 918 1568 8208
 
 // entities
 entity "Powerup Lucky Bonus" 3936 10240 "81f951fb539204be"
@@ -1221,21 +1575,14 @@ entity "Spikes" 7504 10656 "2e610185f695b1aa"
 entity "Spikes" 7536 10656 "361ec06a8eb3b049"
 entity "Spring Stronger Hidden" 8128 10592 "5fb268256b82dc66"
 entity "Spring Stronger Up Right" 880 8208 "c64515787ee793df"
-entity "Powerup 1up" 960 8208 "f900459b53f54b38"
-entity "Powerup Collectibles" 4176 9424 "63242b74ee3b6fae"
 entity "Powerup Lucky Bonus" 5568 9568 "a03bea4c812b32f1"
-entity "Spring Booster Right" 1744 8656 "de5de6ecff376a25"
 entity "Spring Stronger Left" 2400 8416 "91b575565d352db1"
-entity "Powerup Collectibles" 704 8864 "3c7bb3690e260baa"
 entity "Layer Green" 1168 8640 "5e91b3d5b899cc25"
 entity "Layer Green" 1168 8608 "cda4caf1a1e556fd"
 entity "Layer Green" 1168 8576 "42322969970c8310"
 entity "Layer Green" 1168 8544 "4c6f0b7fab4c5e16"
 entity "Layer Green" 1168 8512 "538ee6750a9b832a"
 entity "Layer Green" 1168 8480 "010eabbe4b533eac"
-entity "Layer Green" 1200 8480 "f5f299aee37db3d1"
-entity "Layer Green" 1232 8480 "311f6411ee419cf6"
-entity "Layer Green" 1264 8480 "1af2bfa3aafae24f"
 entity "Layer Yellow" 2352 8416 "0b99ac419e518643"
 entity "Layer Yellow" 2352 8384 "4704cf3d12dad58f"
 entity "Layer Yellow" 2352 8352 "8827a24b4333e3e4"
@@ -1246,10 +1593,8 @@ entity "Layer Green" 1872 8128 "aca4dffc28a9d04f"
 entity "Layer Green" 1872 8096 "ef8c6d5620db702f"
 entity "Layer Green" 1872 8064 "aadd4c998e5d2d0f"
 entity "Spring Booster Right" 1840 8208 "e1f2f7eac513f8d4"
-entity "Spring Standard" 2112 9472 "70acfb4eba330bdb"
 entity "Spring Standard" 3520 10240 "d77409996bb475fa"
 entity "Powerup Shield Water" 4176 10464 "03a7df247de32391"
-entity "Powerup Collectibles" 4176 9904 "55c1857d6a8e2196"
 entity "Collectible" 4304 9968 "8d5d1bbfc74b9855"
 entity "Collectible" 5712 9840 "52a907336d0b9bdc"
 entity "Collectible" 5648 9728 "9a2580decd9afbeb"
@@ -1275,5 +1620,278 @@ entity "Powerup Collectibles" 6304 10240 "49aa1f2776af1c2e"
 entity "Checkpoint" 7424 10016 "3ef9b9fcedd538a9"
 entity "Bridge" 3584 8768 "59c824a5f7659898"
 entity "Checkpoint" 7808 10592 "1b1d8e813dac75a9"
+entity "Spikes" 2400 9344 "f002b4b08c84a33b"
+entity "Spikes" 6992 10592 "e7b59b008cb45ea6"
+entity "Spikes" 5216 10464 "177a775f94585f9b"
+entity "Spikes" 4416 10464 "149ccbf7e55c69e4"
+entity "Powerup 1up" 944 8208 "bd8c00eb241d79a7"
+entity "Powerup Lucky Bonus" 7888 10224 "b0aaf2dfcf17ca94"
+entity "Spring Standard Up Left" 3296 9328 "3d7a7178cc2bc001"
+entity "Spring Standard" 2128 9440 "0c9cc992c1000fad"
+entity "Powerup Collectibles" 4176 9392 "63242b74ee3b6fae"
+entity "Spring Standard Up Right" 3616 9328 "72740e51a4c5800f"
+entity "Collectible" 4176 10064 "3abe1d2c07e6c899"
+entity "Powerup Collectibles" 4176 9904 "55c1857d6a8e2196"
+entity "Collectible" 704 8864 "5bdb980bac6c5534"
+entity "Collectible" 880 8768 "de7f3206c2257217"
+entity "Collectible" 880 8704 "136244e852d95d33"
+entity "Collectible" 880 8640 "3b148f35991fc349"
+entity "Collectible" 880 8576 "1b7b430650aa0e8f"
+entity "Collectible" 1040 8768 "32db1c59505af7e0"
+entity "Collectible" 1040 8704 "7d8fc349dea5ba0f"
+entity "Collectible" 1040 8640 "ee359303764192bb"
+entity "Collectible" 1040 8576 "f08cf30d6c22df5e"
+entity "Collectible" 816 8944 "cb043712f1fc9252"
+entity "Collectible" 592 8944 "c188749055aea75c"
+entity "Spikes" 1488 8656 "369e1a7fee99abcf"
+entity "Spring Booster Right" 1680 8656 "de5de6ecff376a25"
+entity "Layer Green" 5232 9488 "0fab6e8cf4e91c2f"
+entity "Layer Green" 5232 9456 "695dec75bf6c25d7"
+entity "Layer Green" 5232 9424 "2f24ea6ddb19685c"
+entity "Layer Green" 5232 9392 "b454545170e6cd8c"
+entity "Layer Green" 5392 9328 "b3d1a2b2f42be317"
+entity "Layer Green" 5424 9328 "61173d7cc57b9111"
+entity "Layer Yellow" 5360 9328 "2e85f4f614d10273"
+entity "Layer Yellow" 5328 9328 "913ad9ec55985cb7"
+entity "Layer Yellow" 5296 9616 "541756e76b40ead3"
+entity "Tube Out" 5296 9552 "e646fd15177abfc6"
+entity "Tube In" 5296 9584 "171cff4342717b39"
+entity "Tube Out" 5536 9936 "75a391bb98d2778f"
+entity "Tube In" 5504 9936 "9152e07b34cfd0a0"
+entity "Layer Green" 6128 9936 "b7192b63c5446701"
+entity "Layer Green" 6128 9904 "e1880702c0290f8f"
+entity "Layer Green" 6128 9872 "ffd9538f52bb5e50"
+entity "Layer Green" 6128 9840 "0554faacf0dbbcec"
+entity "Layer Yellow" 6416 9936 "57c8b6ef8962b095"
+entity "Layer Yellow" 6416 9904 "9b0fdcd1b9a6f0b4"
+entity "Layer Yellow" 6416 9872 "e0319acc8dd51055"
+entity "Layer Yellow" 6416 9840 "640f5c60ddea0f35"
+entity "Layer Yellow" 6256 9776 "0c380f3b4be2b66b"
+entity "Layer Yellow" 6224 9776 "bcd3fea0809b89c7"
+entity "Layer Green" 6288 9776 "005ccdeec8682f14"
+entity "Layer Green" 6320 9776 "3546c2e97e85ba4a"
+entity "Tube Out" 3824 8752 "5906ae5d7d2363be"
+entity "Tube In" 3856 8752 "ba215d16f6840af9"
+entity "Tube Out" 3936 8976 "992372a8c26c9cac"
+entity "Tube In" 3936 8944 "faf9b0854670ee95"
+entity "Tube Out" 1168 9008 "59875051d9050a08"
+entity "Tube In" 1200 9008 "51a544ce9e8c821c"
+entity "Tube Out" 1776 9904 "24ac8f9408e29c18"
+entity "Tube In" 1744 9904 "d11e253bf5975f20"
+entity "Layer Green" 1136 8480 "47ee31a17f73b99e"
+entity "Layer Green" 1104 8480 "d43e86d2648af96d"
+entity "Layer Green" 1072 8480 "03427877926e17df"
+entity "Layer Green" 1040 8480 "6a885b479c54dc30"
+entity "Layer Green" 1008 8480 "b21a52266ecd7988"
+entity "Layer Green" 1008 8448 "bc2e5e3f3c89817b"
+entity "Layer Green" 1008 8416 "a2bccba209cdacb9"
+entity "Layer Green" 1008 8384 "0ca20dcaf86239a0"
+entity "Layer Green" 1008 8352 "85470032198e95d3"
+entity "Layer Green" 1008 8320 "e68058c0f4d29c38"
+entity "Layer Green" 1008 8288 "01ef52e07c1b3700"
+entity "Collectible" 3328 8832 "9dd782445e12c16e"
+entity "Collectible" 3296 8768 "026e23f3f4eb7f6c"
+entity "Layer Yellow" 5296 9648 "d42bb29042d27bbe"
+entity "RulerSalamander" 1296 8640 "2c31919fcb95f10a"
+entity "SwoopHarrier" 3616 8688 "c64732831f8fd868"
+entity "RulerSalamander" 2272 9328 "5f4a75b2344ebe32"
+entity "Spikes" 3168 10240 "1d5d59cb4a267726"
+entity "Spikes" 2976 10240 "46d5cf78ff5b3248"
+entity "RulerSalamander" 3056 10224 "a6c74312319ced00"
+entity "RulerSalamander" 3536 9280 "d06f91e2c6d094da"
+entity "RulerSalamander" 3904 9824 "46055ab57817f535"
+entity "RulerSalamander" 3712 9824 "ff42256c23054373"
+entity "RulerSalamander" 4592 10464 "2b0a6a3541913430"
+entity "RulerSalamander" 5120 10464 "d18688315d691a58"
+entity "GreenMarmot" 6400 10560 "6e9498d7ec0849d0"
+entity "RulerSalamander" 6752 10592 "0f4de86c127e2d43"
+entity "RulerSalamander" 2080 9792 "6b3356aac2264d0e"
+entity "Crococopter" 5584 9648 "47be5731645df610"
+entity "Collectible" 1296 9008 "0ebdc7e917d559aa"
+entity "Collectible" 1328 9008 "7e9f53ea28abd999"
+entity "Collectible" 1360 9008 "306e88ad3debc86a"
+entity "Collectible" 1392 9008 "52251190ee9b457a"
+entity "Collectible" 1536 9360 "b541202bdbd86d70"
+entity "Collectible" 1536 9392 "37aa3c53748e81aa"
+entity "Collectible" 1536 9424 "540e51824da0b629"
+entity "Collectible" 1536 9456 "570e0ba08dd95d05"
+entity "Collectible" 1536 9792 "4b09cc458ccb0eff"
+entity "Collectible" 1536 9760 "8c2ad6bada8ac722"
+entity "Collectible" 1536 9728 "3ab0dc24e1325a2c"
+entity "Collectible" 1536 9696 "707376c4c4133598"
+entity "Collectible" 1952 9648 "6da2e650c40375f3"
+entity "Collectible" 2128 9712 "6f5038fdd4586fd8"
+entity "Collectible" 2336 9648 "527b7552661e2907"
+entity "Collectible" 2304 9648 "0b6d9b13e952b495"
+entity "Collectible" 2368 9648 "4a94608ae5c794bc"
+entity "Collectible" 560 8944 "62367f86a7c1788d"
+entity "Collectible" 624 8944 "e0cdcdaa87b9793c"
+entity "Collectible" 672 8864 "81044bf89a53c4ce"
+entity "Collectible" 736 8864 "546ca01ca68190c7"
+entity "Collectible" 784 8944 "14a5f1c589fc4226"
+entity "Collectible" 848 8944 "5f3f910c13fff322"
+entity "Collectible" 288 8912 "1cc64090b6358811"
+entity "Collectible" 2352 8416 "2888a88925bbc741"
+entity "Collectible" 2320 8416 "43aefcf4a0f7408f"
+entity "Collectible" 2288 8416 "8d7f30d547eb6dce"
+entity "Collectible" 2208 8192 "cd83a7146b2c0895"
+entity "Collectible" 2240 8192 "6859fbf0a262d5c4"
+entity "Collectible" 2272 8192 "174ea23443f5e16f"
+entity "Collectible" 3056 8352 "b6b2ee5108fdb16d"
+entity "Collectible" 3056 8384 "970e798b4133b14f"
+entity "Collectible" 3056 8416 "8793b566a6ae65ed"
+entity "Collectible" 3056 8448 "ce3d06ffc80be266"
+entity "Collectible" 2608 8768 "1a3da85e116bac22"
+entity "Collectible" 2608 8736 "a32702ebe5d233fa"
+entity "Collectible" 2608 8704 "56a68b7952d0291d"
+entity "Collectible" 2608 8800 "e20410d9cd426e0f"
+entity "Collectible" 2608 8192 "4e99d02671a48913"
+entity "Collectible" 2640 8192 "3c29aea10cc5e4c1"
+entity "Collectible" 2672 8192 "e1a1f25d3dad7f48"
+entity "Collectible" 5120 9488 "8993cd62167b651e"
+entity "Collectible" 5152 9488 "10bbb0e808851454"
+entity "Collectible" 5088 9488 "9f5d4a2c4da38b7c"
+entity "Collectible" 2592 9680 "d24aeb742a61936a"
+entity "Collectible" 2592 9712 "c3f2f69dfda4cacc"
+entity "Collectible" 2592 9744 "8b6d67d25686b059"
+entity "Collectible" 2592 9776 "21690841937e8b79"
+entity "Collectible" 2592 9808 "f0d5c5710ecb882f"
+entity "Collectible" 3568 9936 "6e294d02c6cff4ff"
+entity "Collectible" 3472 9712 "48e71bb1e78cb4d6"
+entity "Collectible" 3472 9776 "a0dbe6e6418a583f"
+entity "Collectible" 3472 9840 "9caa69bbe206a34f"
+entity "Collectible" 3472 9904 "8f9fafd7fb919dc9"
+entity "Collectible" 4240 9552 "4e989d755adcecb2"
+entity "Collectible" 4240 9616 "e9096fcae91239eb"
+entity "Collectible" 4240 9680 "60632c6b71c30758"
+entity "Collectible" 4240 9744 "384af0c319a65756"
+entity "Collectible" 4864 10416 "0b3e4f04201a0e78"
+entity "Collectible" 4832 10416 "2e79a8bc27dea464"
+entity "Collectible" 4896 10416 "fb6609767cec802c"
+entity "Water Bubbles" 4960 10432 "94f021079f68d22c"
+entity "Water Bubbles" 6304 10560 "776fd30141370888"
+entity "Collectible" 7488 10512 "4e2aef075f3bef78"
+entity "Collectible" 7456 10512 "323e55cb6fdd46a6"
+entity "Collectible" 7520 10512 "95f77b4f8dd195ab"
+entity "Collectible" 8128 10528 "fd6c8d7bffd8e0f4"
+entity "Collectible" 8128 10496 "86d1b1663a6bec35"
+entity "Collectible" 7888 10496 "a812ae023c3896ad"
+entity "Collectible" 7888 10528 "64850537fd30ecc0"
+entity "Collectible" 7888 10560 "bf623bb7b95bbd19"
+entity "Collectible" 8128 10432 "54ddebb39054423b"
+entity "Collectible" 8128 10400 "756c1acc62dd047f"
+entity "Collectible" 8128 10368 "0cac26166eb841b7"
+entity "Collectible" 5296 9680 "e553fe919dabbcf4"
+entity "Collectible" 5296 9712 "06c9897c0efb568d"
+entity "Collectible" 5296 9744 "beed81776422a360"
+entity "Collectible" 5296 9776 "d88f4774aa623e26"
+entity "Collectible" 7936 10000 "13382967fbc9b3da"
+entity "Collectible" 7968 10000 "e95d1fe1dc53963d"
+entity "Collectible" 8000 10000 "867295b1456b1e51"
+entity "Collectible" 8032 10000 "bda109bee6b67c2d"
+entity "Collectible" 1488 8576 "5ad49b31e5920c58"
+entity "Collectible" 256 8912 "cffe5261d0754498"
+entity "Collectible" 224 8912 "ce6e7838dc156aec"
+entity "Collectible" 1840 8640 "0ec99fd61258258f"
+entity "Collectible" 1872 8640 "4b0562ae00cc1604"
+entity "Collectible" 1904 8640 "e17bd9e3f3588f28"
+entity "Collectible" 2784 9216 "cafcce361b14f436"
+entity "Collectible" 2976 9216 "a100207c0c25105e"
+entity "Collectible" 3728 9216 "d933005e448e8dfe"
+entity "Collectible" 3760 9216 "caf6ad6854d12f65"
+entity "Collectible" 3792 9216 "3e1e3b027d29f47b"
+entity "Collectible" 3824 9216 "e810920dbf87d953"
+entity "Collectible" 3744 9184 "f4c8fbff7a66e221"
+entity "Collectible" 3776 9184 "1f55f847ce2487a5"
+entity "Collectible" 3808 9184 "d61d0b5b57b987ea"
+entity "Collectible" 5936 10160 "629d0b32b361bb4a"
+entity "Collectible" 6000 10160 "95b4d9e5ec78eabc"
+entity "Collectible" 6016 10432 "e7d13d384c1f3469"
+entity "Collectible" 5984 10432 "7053635cbd453041"
+entity "Collectible" 6048 10432 "163b63eae7b98a61"
+entity "RulerSalamander" 6016 10592 "1c7569d36f324135"
+entity "SwoopHarrier" 8320 9568 "66cbca0453cbe1d9"
+entity "Collectible" 3200 9216 "6dd001e5a20c6880"
+entity "Water Bubbles" 7696 10592 "b4a9a24bc7e05051"
+entity "Collectible" 7696 10000 "b7e45fe1eb13a4b1"
+entity "Collectible" 7664 10000 "98ed633387ca8fb8"
+entity "Collectible" 7632 10000 "3f3882ceaadff4a7"
+entity "Collectible" 4544 9552 "b49f737fb2af1e0b"
+entity "Collectible" 4512 9552 "92056fb94022a2f7"
+entity "Collectible" 4576 9552 "79e97f9b1ab0ba72"
+entity "SwoopHarrier" 4544 9472 "075f073e98e90786"
+entity "Layer Yellow" 6912 10000 "ad605b58177bf409"
+entity "Layer Yellow" 6912 9968 "394f4156446b21a1"
+entity "Layer Yellow" 6912 9936 "55566ef7e95bbfa2"
+entity "Layer Yellow" 6912 9904 "9c4fcdde6728a05d"
+entity "Layer Yellow" 6912 9872 "b74de2b3897f465d"
+entity "Layer Yellow" 6912 9840 "427b165446558f91"
+entity "Layer Yellow" 6912 9808 "dbb769320bd4e0ce"
+entity "Layer Yellow" 6912 9776 "22cc07dd73fcba8f"
+entity "Layer Yellow" 7920 10000 "f6613043660504c3"
+entity "Layer Yellow" 7920 9968 "cdbc0c1a7d045e0a"
+entity "Layer Yellow" 7920 9936 "36dc3b6cab449436"
+entity "Layer Yellow" 7920 9904 "2a62ae3b908dd09e"
+entity "Layer Yellow" 7920 9872 "507e6a0427b52cbf"
+entity "Layer Yellow" 7920 9840 "ba5a5d62756a8926"
+entity "Layer Yellow" 7920 9808 "0fc48be5116ed5b4"
+entity "Layer Yellow" 7920 9776 "2cb3ed049071e51f"
+entity "Layer Green" 8016 9328 "e2582ae3fba1a115"
+entity "Layer Green" 8016 9360 "5cb39d04ee320717"
+entity "Layer Green" 8016 9392 "62cb71d9a63f46d9"
+entity "Layer Green" 8016 9424 "47c141672e51ae14"
+entity "Layer Green" 8016 9456 "90fafcac51340848"
+entity "Layer Green" 8016 9488 "9e3e235d212d7258"
+entity "Layer Green" 8016 9520 "020dd0870300bebc"
+entity "Layer Green" 8016 9552 "ac60bf7bfb7c90c1"
+entity "Layer Green" 8016 9584 "05d05cf8b2f679a0"
+entity "Layer Green" 8016 9616 "a635b640cb9ffd53"
+entity "Layer Green" 8016 9648 "b806f0d6be8ff669"
+entity "Collectible" 3408 8448 "4e67bc7c95d9114c"
+entity "Collectible" 3408 8416 "45af8fa4d843706e"
+entity "Collectible" 3408 8384 "f0387cc1b53e2d0e"
+entity "Collectible" 3408 8352 "ebba720f19d6d2d4"
+entity "Collectible" 3392 8368 "689f36013ce94a71"
+entity "Collectible" 3424 8368 "d03df4a764c624a5"
+entity "Collectible" 3392 8400 "fa6bf42b9c4a21ac"
+entity "Collectible" 3424 8400 "30bc613320115eef"
+entity "Collectible" 3392 8432 "df95e28d26ff2792"
+entity "Collectible" 3424 8432 "febf01cc9d337d5d"
+entity "Collectible" 1616 8080 "577cae377d10dd4b"
+entity "Collectible" 1664 8112 "a913adffd016ce31"
+entity "Collectible" 1696 8176 "c3b0e8d46c194fed"
+entity "Collectible" 1696 8240 "bc2ce743a70b2632"
+entity "Collectible" 1664 8288 "158e16107fb6fcfe"
+entity "Collectible" 1616 8320 "d5485b07b0676e87"
+entity "Collectible" 1536 8320 "27366a488838e19a"
+entity "Collectible" 1488 8288 "e0d993fe6691b6d9"
+entity "Collectible" 1456 8240 "f42702460f0203f4"
+entity "Collectible" 1456 8176 "2c051be5f6047af3"
+entity "Collectible" 1488 8112 "22b9313e6e24aec6"
+entity "Collectible" 1536 8080 "8691dd14223d961b"
+entity "Collectible" 1280 8080 "230780f24126c84e"
+entity "Collectible" 1328 8112 "2431917999a3565e"
+entity "Collectible" 1360 8176 "28204e15e66a4772"
+entity "Collectible" 1360 8240 "4fdb088f01210f7c"
+entity "Collectible" 1328 8288 "d4639064524b1262"
+entity "Collectible" 1280 8320 "2f1110d7d3eb5cc6"
+entity "Collectible" 1200 8320 "f7ee27791afd7bff"
+entity "Collectible" 1152 8288 "3f3af7fdc5799ec8"
+entity "Collectible" 1120 8240 "ea9e6357eca7dff5"
+entity "Collectible" 1120 8176 "c94455110b63cd0a"
+entity "Collectible" 1152 8112 "324aa8db98070810"
+entity "Collectible" 1200 8080 "9746e782cbf70200"
+entity "Collectible" 8624 9520 "ec2274410be86c04"
+entity "Collectible" 8672 9552 "a0c3fd5e05dc3ddc"
+entity "Collectible" 8704 9616 "05ea7f58ac2d72a7"
+entity "Collectible" 8704 9680 "9a8418f27b796182"
+entity "Collectible" 8672 9728 "dfcdb8fd0a65b3c1"
+entity "Collectible" 8624 9760 "130603498ea9a8e6"
+entity "Collectible" 8544 9760 "0b3ae97d86ac0237"
+entity "Collectible" 8496 9728 "b08fded5390137f3"
+entity "Collectible" 8464 9680 "edce3887a778a95c"
+entity "Collectible" 8464 9616 "c96bb79f7d2b8f0e"
+entity "Collectible" 8496 9552 "6ff3992dcff3db90"
+entity "Collectible" 8544 9520 "05cbab43a3a6d827"
 
 // EOF
