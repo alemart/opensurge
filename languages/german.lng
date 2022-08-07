@@ -102,7 +102,6 @@ CREDITS_BACK                "<color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> drück
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME Version $GAME_VERSION</color>\nbasierend auf $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Leute</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dank an</color>"
-CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
 CREDITS_ALEXANDRE           "Projektleiter u. Gründer\nProjektentwickler\nKünstler"
 CREDITS_JOAO                "Künstler"
 CREDITS_MATEUS              "Toneffekte"
