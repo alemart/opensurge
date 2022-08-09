@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * time.c - scripting system: time object
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,8 @@
 
 /* private */
 static surgescript_var_t* fun_getdelta(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getnow(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
  * scripting_register_time()
@@ -31,6 +33,8 @@ static surgescript_var_t* fun_getdelta(surgescript_object_t* object, const surge
 void scripting_register_time(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "Time", "get_delta", fun_getdelta, 0);
+    surgescript_vm_bind(vm, "Time", "get_time", fun_gettime, 0);
+    surgescript_vm_bind(vm, "Time", "get_now", fun_getnow, 0);
 }
 
 /* Time routines */
@@ -40,4 +44,18 @@ surgescript_var_t* fun_getdelta(surgescript_object_t* object, const surgescript_
 {
     /* get the engine delta, rather than the SurgeScript delta, for synchronized results */
     return surgescript_var_set_number(surgescript_var_create(), timer_get_delta());
+}
+
+/* elapsed time (in seconds) since the application has started and at the beginning of the current frame */
+surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* get the engine time, rather than the SurgeScript time, for synchronized results */
+    return surgescript_var_set_number(surgescript_var_create(), timer_get_elapsed());
+}
+
+/* elapsed time (in seconds) since the application has started and at the moment of the function call */
+surgescript_var_t* fun_getnow(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* get the engine time, rather than the SurgeScript time, for synchronized results */
+    return surgescript_var_set_number(surgescript_var_create(), timer_get_now());
 }
