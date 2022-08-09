@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
- * timer.c - time handler
- * Copyright (C) 2010, 2012, 2019  Alexandre Martins <alemartf@gmail.com>
+ * timer.c - time manager
+ * Copyright (C) 2010, 2012, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,8 +25,10 @@
 #include <allegro5/allegro.h>
 
 /* internal data */
-static float delta_time = 0.0f;
+static double start_time = 0.0;
 static double current_time = 0.0;
+static float delta_time = 0.0f;
+static int64_t frames = 0;
 
 /*
  * timer_init()
@@ -36,8 +38,14 @@ void timer_init()
 {
     logfile_message("timer_init()");
 
+    /* Allegro must be initialized before we can call al_get_time() */
+    if(!al_is_system_installed())
+        fatal_error("Allegro is not initialized");
+
+    start_time = al_get_time();
     current_time = 0.0f;
     delta_time = 0.0;
+    frames = 0;
 }
 
 
@@ -53,8 +61,10 @@ void timer_update()
     static const float maximum_delta = 0.017f; /* if 0.0166667f, you don't get physics with the fixed timestep; if too large (0.20f), there may be issues with collisions */
     static double old_time = 0.0;
 
-    /* compute delta time */
-    current_time = al_get_time();
+    /* read the time at the beginning of this framestep */
+    current_time = al_get_time() - start_time;
+
+    /* compute the delta time */
     delta_time = current_time - old_time;
 
     if(delta_time < minimum_delta)
@@ -64,6 +74,9 @@ void timer_update()
         delta_time = maximum_delta;
 
     old_time = current_time;
+
+    /* increment counter */
+    ++frames;
 }
 
 
@@ -79,9 +92,8 @@ void timer_release()
 
 /*
  * timer_get_delta()
- * Returns the time interval, in seconds,
- * between the last two cycles of the
- * main loop
+ * Returns the time interval, in seconds, between the
+ * last two cycles of the main loop
  */
 float timer_get_delta()
 {
@@ -91,11 +103,42 @@ float timer_get_delta()
 
 /*
  * timer_get_ticks()
- * Elapsed milliseconds since
- * the application has started
+ * Elapsed milliseconds since the application has started,
+ * measured at the beginning of the current framestep
  */
 uint32_t timer_get_ticks()
 {
-    /* get the elapsed time at the beginning of the frame */
     return (uint32_t)(1000.0 * current_time);
+}
+
+
+/*
+ * timer_get_elapsed()
+ * Elapsed seconds since the application has started,
+ * measured at the beginning of the current framestep
+ */
+float timer_get_elapsed()
+{
+    return (float)current_time;
+}
+
+
+/*
+ * timer_get_frames()
+ * Number of framesteps since the application has started
+ */
+int64_t timer_get_frames()
+{
+    return frames;
+}
+
+
+/*
+ * timer_get_now()
+ * Elapsed of seconds since the application has started
+ * and at the moment of the function call
+ */
+float timer_get_now()
+{
+    return (float)(al_get_time() - start_time);
 }
