@@ -143,36 +143,42 @@ object "Conveyor Belt Controller"
 {
     public speed = -60; // movement speed, given in pixels per second
     public fps = 15; // frames per second of the animation of the bricks
-    currentFrame = -1;
-    oldFrame = -1;
     players = []; // players on the conveyor belt
+    gspThreshold = 1.0;
+    currentFrame = -1;
 
     state "main"
     {
-        // the movement of the players must be synchronized
-        // with the animation of the bricks
-        oldFrame = currentFrame;
-        currentFrame = Math.floor(Time.time * fps);// % frameCount;
-        if(currentFrame == oldFrame) {
-            players.clear();
-            return;
-        }
-
         // move the players
         for(i = players.length - 1; i >= 0; i--) {
             player = players[i];
-            move(player);
+            if(!player.midair && !player.frozen) {
+                if(Math.abs(player.gsp) < gspThreshold || speed * player.gsp > 0)
+                    moveSynchronously(player);
+                else
+                    moveContinuously(player);
+            }
         }
 
         players.clear();
     }
 
-    fun move(player)
+    fun moveSynchronously(player)
     {
-        if(!player.midair && !player.frozen) {
+        // synchronize the movement of the player with the animation of the bricks
+        oldFrame = currentFrame;
+        currentFrame = Math.floor(Time.time * fps);// % frameCount;
+
+        if(currentFrame != oldFrame) {
             dx = speed / fps;
             player.transform.translateBy(dx, 0);
         }
+    }
+
+    fun moveContinuously(player)
+    {
+        dx = speed * Time.delta;
+        player.transform.translateBy(dx, 0);
     }
 
     fun register(player)
