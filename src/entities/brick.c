@@ -981,7 +981,7 @@ void brick_animate(brick_t *brk)
         if(!loop)
             brk->animation_frame = min(c-1, brk->animation_frame + sprite->animation_data[0]->fps * timer_get_delta());
         else
-            brk->animation_frame = (int)(sprite->animation_data[0]->fps * (timer_get_ticks() * 0.001f)) % c;
+            brk->animation_frame = (int)(sprite->animation_data[0]->fps * timer_get_elapsed()) % c;
 
         f = clip((int)brk->animation_frame, 0, c-1);
         brk->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
