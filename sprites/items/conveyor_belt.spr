@@ -1,0 +1,36 @@
+// -----------------------------------------------------------------------------
+// File: conveyor_belt.spr
+// Description: conveyor belt sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Conveyor Belt A"
+{
+    source_file     "images/items/conveyor_belt.png"
+    source_rect     0 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Conveyor Belt B"
+{
+    source_file     "images/items/conveyor_belt.png"
+    source_rect     32 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
