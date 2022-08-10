@@ -141,8 +141,8 @@ object "Conveyor Belt Controller B"
 
 object "Conveyor Belt Controller"
 {
-    public speed = -60; // movement speed, given in pixels per second
-    public fps = 15; // frames per second of the animation of the bricks
+    public speed = -120; // movement speed, given in pixels per second
+    public fps = 30; // frames per second of the animation of the bricks
     players = []; // players on the conveyor belt
     gspThreshold = 1.0;
     currentFrame = -1;
@@ -152,15 +152,37 @@ object "Conveyor Belt Controller"
         // move the players
         for(i = players.length - 1; i >= 0; i--) {
             player = players[i];
-            if(!player.midair && !player.frozen) {
-                if(Math.abs(player.gsp) < gspThreshold || speed * player.gsp > 0)
-                    moveSynchronously(player);
-                else
-                    moveContinuously(player);
-            }
+            move(player);
         }
 
         players.clear();
+    }
+
+    fun move(player)
+    {
+        if(!player.midair && !player.frozen) {
+            // move the player synchronously if stopped or if moving in the
+            // direction of the conveyor belt. Otherwise, move continuously
+            if(Math.abs(player.gsp) < gspThreshold || speed * player.gsp > 0)
+                moveSynchronously(player);
+            else
+                moveContinuously(player);
+
+            // throw off the player when reaching the ledge that is at the
+            // side that the conveyor belt is moving to
+            if(speed * player.gsp <= 0) {
+                if(player.balancing && player.direction * speed > 0) {
+                    throwOff(player);
+                }
+                else {
+                    slope = player.slope;
+                    if(speed < 0 && slope > 0 && slope < 90)
+                        throwOff(player);
+                    else if(speed > 0 && slope > 270)
+                        throwOff(player);
+                }
+            }
+        }
     }
 
     fun moveSynchronously(player)
@@ -177,8 +199,22 @@ object "Conveyor Belt Controller"
 
     fun moveContinuously(player)
     {
+        player.gsp += speed * Time.delta;
+
+        /*
+        // FIXME when using the logic below, there is a corner case in which the
+        // player will get stuck if walking slowly against the direction of the
+        // conveyor belt. A constant player.gsp will move the player in one
+        // direction, but the logic below will move it in the opposite direction
+        // by approximately the same amount.
         dx = speed * Time.delta;
         player.transform.translateBy(dx, 0);
+        */
+    }
+
+    fun throwOff(player)
+    {
+        player.gsp = speed;
     }
 
     fun register(player)

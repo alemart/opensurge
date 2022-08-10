@@ -2427,6 +2427,12 @@ brick 282
 }
 
 
+
+
+//
+// Tubes
+//
+
 brick 501
 {
     type                SOLID
@@ -2715,8 +2721,135 @@ brick 513
 
 
 
+//
+// Conveyor Belt
+//
 
+brick 801
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask801.png"
 
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick801.png"
+        source_rect     0 0 32 96
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         30
+            data        0 1 2
+        }
+    }
+}
+
+brick 802
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask802.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick802.png"
+        source_rect     0 0 48 96
+        frame_size      48 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         30
+            data        0 1 2
+        }
+    }
+}
+
+brick 803
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask803.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick803.png"
+        source_rect     0 0 32 96
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         30
+            data        0 1 2
+        }
+    }
+}
+
+brick 804
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask804.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick804.png"
+        source_rect     0 0 32 96
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         30
+            data        0 1 2
+        }
+    }
+}
+
+brick 805
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask805.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick805.png"
+        source_rect     0 0 48 96
+        frame_size      48 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         30
+            data        0 1 2
+        }
+    }
+}
+
+brick 806
+{
+    type                CLOUD
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask806.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick806.png"
+        source_rect     0 0 32 96
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         30
+            data        0 1 2
+        }
+    }
+}
 
 
 //
