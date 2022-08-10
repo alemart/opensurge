@@ -43,6 +43,7 @@ object "Tube In" is "entity", "special"
     fun onTubeCollision(player)
     {
         player.input.enabled = false;
+        Level.spawn("Tube - Player Watcher").setPlayer(player);
     }
 }
 
@@ -91,5 +92,32 @@ object "Tube" is "private", "special", "entity"
     fun shouldBoost(player)
     {
         return player.ysp >= 0;
+    }
+}
+
+// An object that watches the player while inside the tube
+object "Tube - Player Watcher" // it's like an awake entity
+{
+    player = null;
+
+    state "main"
+    {
+        // prevent soft lock
+        if(Math.abs(player.gsp) < 30 && !player.rolling)
+            player.gsp = 300 * player.direction;
+
+        // the character may get unrolled if it falls inside the tube
+        if(!player.rolling)
+            player.roll();
+
+        // the player is out of the tube: we're done
+        if(player.input.enabled)
+            destroy();
+    }
+
+    fun setPlayer(p)
+    {
+        player = p;
+        return this;
     }
 }
