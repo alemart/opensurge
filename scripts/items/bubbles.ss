@@ -69,7 +69,7 @@ object "Water Bubbles" is "entity", "basic"
 // breathable behavior: bubble that the player can use to breathe
 object "BreathableBubble"
 {
-    collider = CollisionBall(16);
+    collider = CollisionBall(10);
     bubble = parent;
 
     state "main"
