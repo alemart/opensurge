@@ -13,8 +13,8 @@ requires "0.6.0"
 act 1
 theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-outdoors.bg"
-spawn_point 96 8896
-setup "Surge Gameplay" "Default Camera" "Default HUD" "Default Title Card" "Default Cleared Animation"
+spawn_point 5200 9280
+setup "Surge Gameplay" "Default Camera" "Default HUD" "Default Cleared Animation"
 players "Surge"
 waterlevel 10016
 watercolor 144 99 255 128
@@ -258,7 +258,6 @@ brick 251 7296 10496
 brick 270 7584 10560
 brick 271 7616 10560
 brick 261 6912 9984
-brick 998 6928 10016 yellow
 brick 998 6960 10016 yellow
 brick 998 6992 10016 yellow
 brick 998 7024 10016 yellow
@@ -283,6 +282,8 @@ brick 998 7632 10016 yellow
 brick 998 7664 10016 yellow
 brick 998 7696 10016 yellow
 brick 998 7728 10016 yellow
+brick 998 6928 10016 yellow
+brick 998 6896 10016
 brick 180 6080 9952
 brick 180 6144 9952
 brick 180 6208 9952
@@ -1251,18 +1252,17 @@ brick 268 1168 8624
 brick 271 1280 8624
 brick 507 1472 9456
 brick 8 1344 9456
-brick 504 1472 9072
-brick 505 1344 9072
-brick 503 1344 9200
-brick 502 1472 9200
 brick 507 1472 9328
 brick 8 1344 9328
 brick 270 1392 8624
 brick 261 1584 8624
+brick 504 1472 9072
+brick 505 1344 9072
+brick 503 1344 9200
+brick 502 1472 9200
 brick 101 0 8832
 brick 2 0 8960
 brick 101 128 8832
-brick 104 256 8832
 brick 131 384 8864
 brick 102 512 8864
 brick 101 640 8864
@@ -1305,6 +1305,19 @@ brick 268 16 8896
 brick 270 352 8896
 brick 271 320 8896
 brick 268 112 8896
+brick 104 256 8832
+brick 802 192 8832
+brick 801 160 8832
+brick 802 240 8832
+brick 802 288 8832
+brick 802 336 8832
+brick 802 384 8832
+brick 803 432 8832
+brick 804 416 8752
+brick 805 448 8752
+brick 805 496 8752
+brick 806 544 8752
+brick 925 480 8864
 brick 110 3808 8560
 brick 110 3808 8448
 brick 110 3808 8320
@@ -1656,8 +1669,6 @@ entity "Layer Yellow" 5328 9328 "913ad9ec55985cb7"
 entity "Layer Yellow" 5296 9616 "541756e76b40ead3"
 entity "Tube Out" 5296 9552 "e646fd15177abfc6"
 entity "Tube In" 5296 9584 "171cff4342717b39"
-entity "Tube Out" 5536 9936 "75a391bb98d2778f"
-entity "Tube In" 5504 9936 "9152e07b34cfd0a0"
 entity "Layer Green" 6128 9936 "b7192b63c5446701"
 entity "Layer Green" 6128 9904 "e1880702c0290f8f"
 entity "Layer Green" 6128 9872 "ffd9538f52bb5e50"
@@ -1670,14 +1681,6 @@ entity "Layer Yellow" 6256 9776 "0c380f3b4be2b66b"
 entity "Layer Yellow" 6224 9776 "bcd3fea0809b89c7"
 entity "Layer Green" 6288 9776 "005ccdeec8682f14"
 entity "Layer Green" 6320 9776 "3546c2e97e85ba4a"
-entity "Tube Out" 3824 8752 "5906ae5d7d2363be"
-entity "Tube In" 3856 8752 "ba215d16f6840af9"
-entity "Tube Out" 3936 8976 "992372a8c26c9cac"
-entity "Tube In" 3936 8944 "faf9b0854670ee95"
-entity "Tube Out" 1168 9008 "59875051d9050a08"
-entity "Tube In" 1200 9008 "51a544ce9e8c821c"
-entity "Tube Out" 1776 9904 "24ac8f9408e29c18"
-entity "Tube In" 1744 9904 "d11e253bf5975f20"
 entity "Layer Green" 1136 8480 "47ee31a17f73b99e"
 entity "Layer Green" 1104 8480 "d43e86d2648af96d"
 entity "Layer Green" 1072 8480 "03427877926e17df"
@@ -1730,7 +1733,6 @@ entity "Collectible" 672 8864 "81044bf89a53c4ce"
 entity "Collectible" 736 8864 "546ca01ca68190c7"
 entity "Collectible" 784 8944 "14a5f1c589fc4226"
 entity "Collectible" 848 8944 "5f3f910c13fff322"
-entity "Collectible" 288 8912 "1cc64090b6358811"
 entity "Collectible" 2352 8416 "2888a88925bbc741"
 entity "Collectible" 2320 8416 "43aefcf4a0f7408f"
 entity "Collectible" 2288 8416 "8d7f30d547eb6dce"
@@ -1790,8 +1792,6 @@ entity "Collectible" 7968 10000 "e95d1fe1dc53963d"
 entity "Collectible" 8000 10000 "867295b1456b1e51"
 entity "Collectible" 8032 10000 "bda109bee6b67c2d"
 entity "Collectible" 1488 8576 "5ad49b31e5920c58"
-entity "Collectible" 256 8912 "cffe5261d0754498"
-entity "Collectible" 224 8912 "ce6e7838dc156aec"
 entity "Collectible" 1840 8640 "0ec99fd61258258f"
 entity "Collectible" 1872 8640 "4b0562ae00cc1604"
 entity "Collectible" 1904 8640 "e17bd9e3f3588f28"
@@ -1813,29 +1813,10 @@ entity "RulerSalamander" 6016 10592 "1c7569d36f324135"
 entity "SwoopHarrier" 8320 9568 "66cbca0453cbe1d9"
 entity "Collectible" 3200 9216 "6dd001e5a20c6880"
 entity "Water Bubbles" 7696 10592 "b4a9a24bc7e05051"
-entity "Collectible" 7696 10000 "b7e45fe1eb13a4b1"
-entity "Collectible" 7664 10000 "98ed633387ca8fb8"
-entity "Collectible" 7632 10000 "3f3882ceaadff4a7"
 entity "Collectible" 4544 9552 "b49f737fb2af1e0b"
 entity "Collectible" 4512 9552 "92056fb94022a2f7"
 entity "Collectible" 4576 9552 "79e97f9b1ab0ba72"
 entity "SwoopHarrier" 4544 9472 "075f073e98e90786"
-entity "Layer Yellow" 6912 10000 "ad605b58177bf409"
-entity "Layer Yellow" 6912 9968 "394f4156446b21a1"
-entity "Layer Yellow" 6912 9936 "55566ef7e95bbfa2"
-entity "Layer Yellow" 6912 9904 "9c4fcdde6728a05d"
-entity "Layer Yellow" 6912 9872 "b74de2b3897f465d"
-entity "Layer Yellow" 6912 9840 "427b165446558f91"
-entity "Layer Yellow" 6912 9808 "dbb769320bd4e0ce"
-entity "Layer Yellow" 6912 9776 "22cc07dd73fcba8f"
-entity "Layer Yellow" 7920 10000 "f6613043660504c3"
-entity "Layer Yellow" 7920 9968 "cdbc0c1a7d045e0a"
-entity "Layer Yellow" 7920 9936 "36dc3b6cab449436"
-entity "Layer Yellow" 7920 9904 "2a62ae3b908dd09e"
-entity "Layer Yellow" 7920 9872 "507e6a0427b52cbf"
-entity "Layer Yellow" 7920 9840 "ba5a5d62756a8926"
-entity "Layer Yellow" 7920 9808 "0fc48be5116ed5b4"
-entity "Layer Yellow" 7920 9776 "2cb3ed049071e51f"
 entity "Layer Green" 8016 9328 "e2582ae3fba1a115"
 entity "Layer Green" 8016 9360 "5cb39d04ee320717"
 entity "Layer Green" 8016 9392 "62cb71d9a63f46d9"
@@ -1893,5 +1874,87 @@ entity "Collectible" 8464 9680 "edce3887a778a95c"
 entity "Collectible" 8464 9616 "c96bb79f7d2b8f0e"
 entity "Collectible" 8496 9552 "6ff3992dcff3db90"
 entity "Collectible" 8544 9520 "05cbab43a3a6d827"
+entity "Conveyor Belt B" 432 8736 "f489294fed722393"
+entity "Conveyor Belt B" 464 8736 "fa9341ecec7a4314"
+entity "Conveyor Belt B" 496 8736 "903d477a8674f292"
+entity "Conveyor Belt B" 528 8736 "5f9553b68ff8fff7"
+entity "Conveyor Belt B" 560 8736 "7e92430124b613c8"
+entity "Conveyor Belt A" 208 8816 "1ccba08d69a3a9a3"
+entity "Conveyor Belt A" 240 8816 "1b4f64ffa2cee630"
+entity "Conveyor Belt A" 272 8816 "9531546edd0cf7fc"
+entity "Conveyor Belt A" 304 8816 "53624c39ff529113"
+entity "Conveyor Belt A" 336 8816 "68b8ad602bc810f1"
+entity "Conveyor Belt A" 368 8816 "7f7cb64222a59c90"
+entity "Conveyor Belt A" 400 8816 "df82e3d95b47f3a9"
+entity "Conveyor Belt A" 432 8816 "cd28c62abc579433"
+entity "Conveyor Belt A" 176 8816 "f23f1d3e1643741b"
+entity "Conveyor Belt A" 448 8816 "74946b4f23d75ed0"
+entity "Tube In" 1216 9008 "51a544ce9e8c821c"
+entity "Tube Out" 1184 9008 "59875051d9050a08"
+entity "Tube Out" 1760 9904 "cada76e0cc3a9a80"
+entity "Tube In" 1728 9904 "427cc311cf3e4fb5"
+entity "Tube Out" 5520 9936 "55ad128916117e6a"
+entity "Tube In" 5488 9936 "66449774a3838616"
+entity "Tube Out" 3936 8960 "5b46e2cd53d3c49a"
+entity "Tube In" 3936 8928 "6a5dfc0a4e300593"
+entity "Tube Out" 3840 8752 "cd38a09914af6158"
+entity "Tube In" 3872 8752 "728817e23241699a"
+entity "Layer Green" 6912 10000 "233a4441236361e3"
+entity "Layer Green" 6912 9968 "62bf2f6e6a01bfe0"
+entity "Layer Green" 6912 9936 "098845668878449f"
+entity "Layer Green" 6912 9904 "bba47a95b44673d6"
+entity "Layer Green" 6912 9872 "7795a014d5aacab1"
+entity "Layer Green" 6912 9840 "ebb98b1ee92d1364"
+entity "Layer Green" 6912 9808 "c2f0c4ad9461e6e2"
+entity "Layer Green" 6912 9776 "a24a6b1450b2ddaf"
+entity "Layer Green" 6912 9744 "8f76aee268b933d4"
+entity "Walk on Water Left" 6944 10000 "367afe8ecd3834b3"
+entity "Layer Green" 7920 10000 "8bb74115880d081a"
+entity "Layer Green" 7920 9968 "d4bad94ca848548a"
+entity "Layer Green" 7920 9936 "5b3639e464daa6a3"
+entity "Layer Green" 7920 9904 "9c264d8ad521b518"
+entity "Layer Green" 7920 9872 "273d458bdea1b072"
+entity "Layer Green" 7920 9840 "c2d588de085aaf92"
+entity "Layer Green" 7920 9808 "d9a43b618b89be4d"
+entity "Layer Green" 7920 9776 "6a7ca075a1da9e71"
+entity "Layer Green" 7920 9744 "1f422f8741ea970d"
+entity "Walk on Water Right" 7888 10000 "2173f00cc671258a"
+entity "Collectible" 7120 10000 "2b01d5856d45e79a"
+entity "Collectible" 7088 10000 "24290ef61fbfcad5"
+entity "Collectible" 7056 10000 "cd0225564534e74b"
+entity "Collectible" 7568 10000 "f0edccf740e43c45"
+entity "Collectible" 7600 10000 "cca5e3669a18457d"
+entity "Collectible" 7632 10000 "34a31160ccfc8ab7"
+entity "Layer Green" 7888 10064 "a9e8f3c72887784e"
+entity "Layer Green" 7856 10064 "db0be6f9227da53e"
+entity "Layer Green" 7824 10064 "70fc9cdc581fd1f4"
+entity "Layer Green" 7792 10064 "5141e33a3bcb1357"
+entity "Layer Green" 7760 10064 "bfeb572ebe70b0b1"
+entity "Layer Green" 7728 10064 "ef664f8dd2165d90"
+entity "Layer Green" 7696 10064 "9293d50aadc1152b"
+entity "Layer Green" 7664 10064 "2285314691f8bdc1"
+entity "Layer Green" 7632 10064 "f4da52274cb81cfa"
+entity "Layer Green" 7600 10064 "b26dd9b50b3f1243"
+entity "Layer Green" 7568 10064 "950f576875eb9ca7"
+entity "Layer Green" 7536 10064 "45d0c581a8cf825e"
+entity "Layer Green" 7504 10064 "3f28e113fd814ada"
+entity "Layer Green" 7472 10064 "3471ad79eeedbecf"
+entity "Layer Green" 7440 10064 "5ad70e897d623672"
+entity "Layer Green" 7408 10064 "e0beced12ce72e9e"
+entity "Layer Green" 7376 10064 "7c2087d65c208743"
+entity "Layer Green" 7344 10064 "9d962868054b768d"
+entity "Layer Green" 7312 10064 "650bcc0b2f0de320"
+entity "Layer Green" 7280 10064 "65c13027278330e6"
+entity "Layer Green" 7248 10064 "fdbf81477112cf07"
+entity "Layer Green" 7216 10064 "8efb84fc7411cb59"
+entity "Layer Green" 7184 10064 "7b4da1aa8cfe1e8f"
+entity "Layer Green" 7152 10064 "cd4c4ab66755a172"
+entity "Layer Green" 7120 10064 "223266ea47bd16b0"
+entity "Layer Green" 7088 10064 "8eb14d025f9bc09d"
+entity "Layer Green" 7056 10064 "efa6af72257f705c"
+entity "Layer Green" 7024 10064 "ce289bce439a19bc"
+entity "Layer Green" 6992 10064 "3edf0443ffb2c28f"
+entity "Layer Green" 6960 10064 "756e4c1b0538e4ca"
+entity "Layer Green" 6928 10064 "505e35c0ae94e783"
 
 // EOF
