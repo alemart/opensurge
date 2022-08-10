@@ -15,7 +15,7 @@
 LANG_ID                     "es_ES"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Español"                 // language name
 LANG_AUTHOR                 "Álvaro Bazán"            // translation author
-LANG_LASTUPDATE             "2021-01-13"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2022-08-09"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
@@ -102,17 +102,17 @@ CREDITS_BACK                "Pulsa <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> 
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versión $GAME_VERSION</color>\npotenciado por $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Gente</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Agradecimientos a</color>"
-FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
+CREDITS_ALEXANDRE           "Líder de proyecto y fundador\nDesarrollador de proyecto\nArtista"
 CREDITS_JOAO                "Artista"
 CREDITS_MATEUS              "Efectos de sonido"
-FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
+CREDITS_CODY                "Artista conceptual\nDiseñador de enemigos"
 CREDITS_JOHAN               "Músico (descansa en paz, amigo)"
 CREDITS_DI                  "Músico"
 CREDITS_VICTOR              "Músico"
 CREDITS_M374LX              "Músico"
 CREDITS_COLIN               "Sprites, primera historia"
 CREDITS_BRIAN               "Artista de Sprites"
-FIXME (untranslated) CREDITS_LEMON               "Illustrator"
+CREDITS_LEMON               "Ilustrador"
 CREDITS_TRANSLATOR          "Traductor"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Traductores</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Créditos por recursos individuales</color>"
@@ -127,16 +127,16 @@ CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Traducciones</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los propios scripts."
 
 // Title Screen
-FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
-FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
-FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
-FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_PLAY            "EMPEZAR PARTIDA"
+TITLESCREEN_OPTIONS         "OPCIONES"
+TITLESCREEN_QUIT            "SALIR"
+TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
-FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
-FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
+ENDOFDEMO_CONTINUE          "CONTINUAR"
+ENDOFDEMO_VERSION           "DEMO 1\n20220902"
+ENDOFDEMO_TEXT              "¡Gracias por jugar! Surge the Rabbit está en desarrollo.\n\n¡Visita <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> para ver actualizaciones!\n\nAhora vamos a ver cómo tú también puedes crear tus propios juegos."
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -222,7 +222,7 @@ LOADING_TEXT                "Cargando..."
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>¡Crea tus increíbles juegos!</color>\n¡Este juego está creado con <color=$COLOR_HIGHLIGHT>Open Surge</color>, un motor de juegos 2D muy flexible y de código abierto que ahora está en tus manos!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>¿Sabías que...?</color> Todo en Open Surge es personalizable. Puedes hacer niveles, objectos, jefes, personajes y más! Es un completo <color=$COLOR_HIGHLIGHT>sistema de creación de juegos</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>¡Desata tu creatividad!</color>\nUna de las funciones en Open Surge es <color=$COLOR_HIGHLIGHT>SurgeScript</color>. ¡Es scripting para juegos! ¡Úsalo para construir lo que te puedas imaginar!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>¡Guay!</color>\n¿Aún estas excitado? ¡El cielo es el limite! Visita <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> para crear tus propios juegos alucinantes hoy!"
