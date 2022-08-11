@@ -59,7 +59,7 @@ object "Walk on Water Right" is "special", "entity"
 object "Walk on Water" is "private", "special", "entity"
 {
     public minSpeed = 600; // pixels per second
-    collider = CollisionBox(32, 32);
+    collider = CollisionBox(28, 32);
     watchers = []; // keep the references to prevent garbage collection
     enteringDirection = 1; // +1 or -1
 
