@@ -214,12 +214,6 @@ brick 277 8352 9344
 brick 280 7872 10224
 brick 268 7936 9984
 brick 901 8576 9648
-brick 998 7760 10016 yellow
-brick 998 7792 10016 yellow
-brick 998 7824 10016 yellow
-brick 998 7856 10016 yellow
-brick 998 7872 10016 yellow
-brick 193 6912 10016
 brick 101 6912 10496
 brick 101 7040 10496
 brick 101 7168 10496
@@ -251,38 +245,12 @@ brick 1 7584 10752
 brick 1 7696 10752
 brick 28 7584 10624
 brick 23 7712 10624
-brick 275 7408 10016
 brick 998 7408 10016
 brick 250 7360 10496
 brick 251 7296 10496
 brick 270 7584 10560
 brick 271 7616 10560
 brick 261 6912 9984
-brick 998 6960 10016 yellow
-brick 998 6992 10016 yellow
-brick 998 7024 10016 yellow
-brick 998 7056 10016 yellow
-brick 998 7088 10016 yellow
-brick 998 7120 10016 yellow
-brick 998 7152 10016 yellow
-brick 998 7184 10016 yellow
-brick 998 7216 10016 yellow
-brick 998 7248 10016 yellow
-brick 998 7280 10016 yellow
-brick 998 7312 10016 yellow
-brick 998 7344 10016 yellow
-brick 998 7376 10016 yellow
-brick 998 7440 10016 yellow
-brick 998 7472 10016 yellow
-brick 998 7504 10016 yellow
-brick 998 7536 10016 yellow
-brick 998 7568 10016 yellow
-brick 998 7600 10016 yellow
-brick 998 7632 10016 yellow
-brick 998 7664 10016 yellow
-brick 998 7696 10016 yellow
-brick 998 7728 10016 yellow
-brick 998 6928 10016 yellow
 brick 998 6896 10016
 brick 180 6080 9952
 brick 180 6144 9952
@@ -1899,62 +1867,14 @@ entity "Tube Out" 3936 8960 "5b46e2cd53d3c49a"
 entity "Tube In" 3936 8928 "6a5dfc0a4e300593"
 entity "Tube Out" 3840 8752 "cd38a09914af6158"
 entity "Tube In" 3872 8752 "728817e23241699a"
-entity "Layer Green" 6912 10000 "233a4441236361e3"
-entity "Layer Green" 6912 9968 "62bf2f6e6a01bfe0"
-entity "Layer Green" 6912 9936 "098845668878449f"
-entity "Layer Green" 6912 9904 "bba47a95b44673d6"
-entity "Layer Green" 6912 9872 "7795a014d5aacab1"
-entity "Layer Green" 6912 9840 "ebb98b1ee92d1364"
-entity "Layer Green" 6912 9808 "c2f0c4ad9461e6e2"
-entity "Layer Green" 6912 9776 "a24a6b1450b2ddaf"
-entity "Layer Green" 6912 9744 "8f76aee268b933d4"
-entity "Walk on Water Left" 6944 10000 "367afe8ecd3834b3"
-entity "Layer Green" 7920 10000 "8bb74115880d081a"
-entity "Layer Green" 7920 9968 "d4bad94ca848548a"
-entity "Layer Green" 7920 9936 "5b3639e464daa6a3"
-entity "Layer Green" 7920 9904 "9c264d8ad521b518"
-entity "Layer Green" 7920 9872 "273d458bdea1b072"
-entity "Layer Green" 7920 9840 "c2d588de085aaf92"
-entity "Layer Green" 7920 9808 "d9a43b618b89be4d"
-entity "Layer Green" 7920 9776 "6a7ca075a1da9e71"
-entity "Layer Green" 7920 9744 "1f422f8741ea970d"
-entity "Walk on Water Right" 7888 10000 "2173f00cc671258a"
 entity "Collectible" 7120 10000 "2b01d5856d45e79a"
 entity "Collectible" 7088 10000 "24290ef61fbfcad5"
 entity "Collectible" 7056 10000 "cd0225564534e74b"
 entity "Collectible" 7568 10000 "f0edccf740e43c45"
 entity "Collectible" 7600 10000 "cca5e3669a18457d"
 entity "Collectible" 7632 10000 "34a31160ccfc8ab7"
-entity "Layer Green" 7888 10064 "a9e8f3c72887784e"
-entity "Layer Green" 7856 10064 "db0be6f9227da53e"
-entity "Layer Green" 7824 10064 "70fc9cdc581fd1f4"
-entity "Layer Green" 7792 10064 "5141e33a3bcb1357"
-entity "Layer Green" 7760 10064 "bfeb572ebe70b0b1"
-entity "Layer Green" 7728 10064 "ef664f8dd2165d90"
-entity "Layer Green" 7696 10064 "9293d50aadc1152b"
-entity "Layer Green" 7664 10064 "2285314691f8bdc1"
-entity "Layer Green" 7632 10064 "f4da52274cb81cfa"
-entity "Layer Green" 7600 10064 "b26dd9b50b3f1243"
-entity "Layer Green" 7568 10064 "950f576875eb9ca7"
-entity "Layer Green" 7536 10064 "45d0c581a8cf825e"
-entity "Layer Green" 7504 10064 "3f28e113fd814ada"
-entity "Layer Green" 7472 10064 "3471ad79eeedbecf"
-entity "Layer Green" 7440 10064 "5ad70e897d623672"
-entity "Layer Green" 7408 10064 "e0beced12ce72e9e"
-entity "Layer Green" 7376 10064 "7c2087d65c208743"
-entity "Layer Green" 7344 10064 "9d962868054b768d"
-entity "Layer Green" 7312 10064 "650bcc0b2f0de320"
-entity "Layer Green" 7280 10064 "65c13027278330e6"
-entity "Layer Green" 7248 10064 "fdbf81477112cf07"
-entity "Layer Green" 7216 10064 "8efb84fc7411cb59"
-entity "Layer Green" 7184 10064 "7b4da1aa8cfe1e8f"
-entity "Layer Green" 7152 10064 "cd4c4ab66755a172"
-entity "Layer Green" 7120 10064 "223266ea47bd16b0"
-entity "Layer Green" 7088 10064 "8eb14d025f9bc09d"
-entity "Layer Green" 7056 10064 "efa6af72257f705c"
-entity "Layer Green" 7024 10064 "ce289bce439a19bc"
-entity "Layer Green" 6992 10064 "3edf0443ffb2c28f"
-entity "Layer Green" 6960 10064 "756e4c1b0538e4ca"
-entity "Layer Green" 6928 10064 "505e35c0ae94e783"
+entity "Spring Stronger Right" 5808 9936 "014c77dc35568ecc"
+entity "Walk on Water Left" 6912 10000 "367afe8ecd3834b3"
+entity "Walk on Water Right" 7920 10000 "2173f00cc671258a"
 
 // EOF
