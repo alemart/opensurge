@@ -141,7 +141,7 @@ object "Walk on Water Watcher" is "companion", "private", "entity"
     }
 }
 
-object "Walk on Water Brick" is "private", "entity"
+object "Walk on Water Brick" is "private", "awake", "entity"
 {
     //actor = Actor("Walk on Water Brick");
     brick = Brick("Walk on Water Brick");
@@ -152,6 +152,11 @@ object "Walk on Water Brick" is "private", "entity"
         dy = Level.waterlevel - transform.position.y;
         transform.translateBy(0, dy);
         //transform.angle = 0;
+    }
+
+    fun constructor()
+    {
+        brick.type = "solid";
     }
 }
 
