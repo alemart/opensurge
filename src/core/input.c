@@ -595,14 +595,14 @@ void inputuserdefined_update(input_t* in)
             in->state[button] = (im->keyboard.scancode[button] > 0) && a5_key[im->keyboard.scancode[button]];
     }
 
-    if(im->joystick.enabled) {
+    if(im->joystick.enabled && input_is_joystick_enabled()) {
         int num_joysticks = min(input_number_of_joysticks(), MAX_JOYS);
-        if(input_is_joystick_enabled() && im->joystick.id < num_joysticks) {
+        if(im->joystick.id < num_joysticks) {
             in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[1] <= -joy_analog_threshold[1]);
             in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[1] >= joy_analog_threshold[1]);
             in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[0] <= -joy_analog_threshold[0]);
             in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[0] >= joy_analog_threshold[0]);
-            for(button = IB_FIRE1; button <= IB_FIRE8; button++) {
+            for(button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
                 in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
             }

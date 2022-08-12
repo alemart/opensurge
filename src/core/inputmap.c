@@ -465,6 +465,7 @@ inputmapnode_t* inputmapnode_create(const char* name)
 {
     const int NO_KEY = keycode_of("KEY_NONE");
     const int NO_BUTTONS = 0; /* empty mask */
+    inputbutton_t button;
 
     /* allocate structure */
     inputmapnode_t* f = mallocx(sizeof *f);
@@ -473,30 +474,14 @@ inputmapnode_t* inputmapnode_create(const char* name)
 
     /* keyboard defaults */
     f->data->keyboard.enabled = false;
-    f->data->keyboard.scancode[IB_UP] = NO_KEY;
-    f->data->keyboard.scancode[IB_RIGHT] = NO_KEY;
-    f->data->keyboard.scancode[IB_DOWN] = NO_KEY;
-    f->data->keyboard.scancode[IB_LEFT] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE1] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE2] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE3] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE4] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE5] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE6] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE7] = NO_KEY;
-    f->data->keyboard.scancode[IB_FIRE8] = NO_KEY;
+    for(button = 0; button < IB_MAX; button++)
+        f->data->keyboard.scancode[(int)button] = NO_KEY;
 
     /* joystick defaults */
     f->data->joystick.enabled = false;
     f->data->joystick.id = 0;
-    f->data->joystick.button_mask[IB_FIRE1] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE2] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE3] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE4] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE5] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE6] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE7] = NO_BUTTONS;
-    f->data->joystick.button_mask[IB_FIRE8] = NO_BUTTONS;
+    for(button = 0; button < IB_MAX; button++)
+        f->data->joystick.button_mask[(int)button] = NO_BUTTONS;
 
     /* done! */
     return f;
