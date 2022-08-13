@@ -10,7 +10,9 @@ Open Surge is a fun 2D retro platformer inspired by Sonic games and a game creat
 
 <img src="https://opensurge2d.org/surge-demo.gif" alt="Open Surge demo" width="480">
 
-Open Surge is currently available for Microsoft Windows and GNU/Linux. It is in active development!
+Open Surge is currently available for Microsoft Windows, GNU/Linux and macOS. It's in active development!
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/opensurge.svg)](https://repology.org/project/opensurge/versions)
 
 <img src="surge.png" alt="Surge" width="256" align="right">
 
