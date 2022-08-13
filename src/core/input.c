@@ -195,7 +195,7 @@ void input_update()
         /* read buttons */
         joy[j].button = 0;
         for(int b = 0; b < num_buttons; b++)
-            joy[j].button |= (state.button[b] ? 1 : 0) << b;
+            joy[j].button |= (state.button[b] != 0) << b;
     }
 
     /* updating the input objects */
