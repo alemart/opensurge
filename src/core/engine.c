@@ -257,6 +257,9 @@ void init_basic_stuff(const commandline_t* cmd)
     logfile_init();
     init_nanoparser();
 
+    /* show SurgeScript version */
+    logfile_message("Using SurgeScript version %s", surgescript_util_version());
+
     /* initialize Allegro */
     if(al_init())
         logfile_message("Using Allegro version %s", a5_version_string());
