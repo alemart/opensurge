@@ -96,14 +96,18 @@ inputmap "default"
 
     joystick 0
     {
+        up              BUTTON_14      // d-pad (xbox controllers)
+        right           BUTTON_11
+        down            BUTTON_13
+        left            BUTTON_12
         fire1           BUTTON_2 | BUTTON_3 | BUTTON_4  // jump
         fire2           BUTTON_5 | BUTTON_6  // switch character
-        fire3           BUTTON_10    // pause, confirm
-        fire4           BUTTON_1     // quit, cancel
-        fire5           BUTTON_NONE  // available
-        fire6           BUTTON_NONE  // available
-        fire7           BUTTON_NONE  // available
-        fire8           BUTTON_NONE  // available
+        fire3           BUTTON_10      // pause, confirm
+        fire4           BUTTON_1       // quit, cancel
+        fire5           BUTTON_NONE    // available
+        fire6           BUTTON_NONE    // available
+        fire7           BUTTON_NONE    // available
+        fire8           BUTTON_NONE    // available
     }
 }
 
@@ -160,13 +164,17 @@ inputmap "default.backup"
 
     joystick 0
     {
+        up              BUTTON_14      // d-pad (xbox controllers)
+        right           BUTTON_11
+        down            BUTTON_13
+        left            BUTTON_12
         fire1           BUTTON_2 | BUTTON_3 | BUTTON_4  // jump
         fire2           BUTTON_5 | BUTTON_6  // switch character
-        fire3           BUTTON_10    // pause, confirm
-        fire4           BUTTON_1     // quit, cancel
-        fire5           BUTTON_NONE  // available
-        fire6           BUTTON_NONE  // available
-        fire7           BUTTON_NONE  // available
-        fire8           BUTTON_NONE  // available
+        fire3           BUTTON_10      // pause, confirm
+        fire4           BUTTON_1       // quit, cancel
+        fire5           BUTTON_NONE    // available
+        fire6           BUTTON_NONE    // available
+        fire7           BUTTON_NONE    // available
+        fire8           BUTTON_NONE    // available
     }
 }
