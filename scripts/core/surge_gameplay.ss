@@ -11,9 +11,6 @@ object "Surge Gameplay"
     // handles character switching
     switchController = spawn("Switch Controller");
 
-    // handles pausing & quitting
-    pauseController = spawn("Pause and Quit");
-
     // handles water-related stuff
     waterController = spawn("Water Controller");
 

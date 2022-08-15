@@ -29,7 +29,7 @@ object "Default Setup"
 {
     cam = spawn("Default Camera");
     switchController = spawn("Switch Controller");
-    pauseController = spawn("Pause and Quit");
+    pauseController = spawn("Default Pause and Quit");
     waterController = spawn("Water Controller");
     clearedAnim = spawn("Default Cleared Animation");
     openingAnim = spawn("Default Opening Animation");
@@ -46,7 +46,7 @@ object "Debug Setup"
 {
     cam = spawn("Default Camera");
     switchController = spawn("Switch Controller");
-    pauseController = spawn("Pause and Quit");
+    pauseController = spawn("Default Pause and Quit");
     waterController = spawn("Water Controller");
     clearedAnim = spawn("Default Cleared Animation");
     hud = spawn("Default HUD");

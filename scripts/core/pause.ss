@@ -7,7 +7,7 @@
 using SurgeEngine.Level;
 using SurgeEngine.Input;
 
-object "Pause and Quit"
+object "Default Pause and Quit"
 {
     input = Input("default");
 
@@ -20,4 +20,10 @@ object "Pause and Quit"
                 Level.quit();
         }
     }
+}
+
+// an alias kept for retro-compatiblity with Open Surge 0.5.x
+object "Pause and Quit"
+{
+    obj = spawn("Default Pause and Quit");
 }

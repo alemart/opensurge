@@ -15,7 +15,7 @@ theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 176 9920
 music "musics/sunshine.ogg"
-setup "Surge Gameplay" "Default Camera" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Sunshine Setup"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Sunshine Setup"
 players "Surge"
 
 // bricks

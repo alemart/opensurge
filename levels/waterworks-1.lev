@@ -15,7 +15,7 @@ theme "themes/waterworks.brk"
 bgtheme "themes/waterworks.bg"
 spawn_point 176 9920
 music "musics/waterworks.ogg"
-setup "Surge Gameplay" "Default Camera" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Waterworks Setup"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Waterworks Setup"
 players "Surge"
 waterlevel 11008
 
