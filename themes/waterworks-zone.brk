@@ -1787,6 +1787,7 @@ brick 220
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask220.png"
+    zindex              0.4
 
     sprite
     {
@@ -1809,6 +1810,7 @@ brick 221
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask221.png"
+    zindex              0.4
 
     sprite
     {
@@ -1831,6 +1833,7 @@ brick 222
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask222.png"
+    zindex              0.4
 
     sprite
     {
@@ -1853,6 +1856,7 @@ brick 223
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask223.png"
+    zindex              0.4
 
     sprite
     {
