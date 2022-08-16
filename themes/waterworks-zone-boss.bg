@@ -1,0 +1,215 @@
+// -----------------------------------------------------------------------------
+// File: waterworks-zone-boss.bg
+// Description: background script for Waterworks Zone (boss)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+//
+// clear to color
+//
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-clear.png"
+        source_rect     0 0 256 256
+        frame_size      256 256
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// main background
+//
+background
+{
+    initial_position    0 916
+    scroll_speed        -0.1 -0.1
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-background-underwater.png"
+        source_rect     0 0 768 1536
+        frame_size      768 1536
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// ceiling (small)
+//
+// y0 = (240-16) - (7000-240/2)*scrollspeed_y - 10
+// 240: screen height
+// 16: tile height (16, 24 or 32)
+// 10: offset found by visual inspection
+// 7000: world reference
+//
+
+background
+{
+    initial_position    0 902
+    scroll_speed        -0.1 -0.1 // follows the main background
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 224 960 16
+        frame_size      960 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 950
+    scroll_speed        -0.107 -0.107
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 208 960 16
+        frame_size      960 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 998
+    scroll_speed        -0.114 -0.114
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 192 960 16
+        frame_size      960 16
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// ceiling (medium)
+//
+
+background
+{
+    initial_position    0 1038
+    scroll_speed        -0.121 -0.121
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 168 960 24
+        frame_size      960 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+background
+{
+    initial_position    0 1107
+    scroll_speed        -0.131 -0.131
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 144 960 24
+        frame_size      960 24
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+//
+// ceiling (large)
+//
+
+background
+{
+    initial_position    0 1195
+    scroll_speed        -0.145 -0.145
+    behavior            DEFAULT
+    repeat_x            TRUE
+    repeat_y            FALSE
+    zindex -1
+
+    sprite
+    {
+        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
+        source_rect     0 0 960 32
+        frame_size      960 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
