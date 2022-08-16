@@ -23,7 +23,7 @@ using SurgeEngine.Collisions.CollisionBox;
 //   synchronize the movement with the animation.
 //
 
-object "Conveyor Belt A" is "special", "entity"
+object "Conveyor Belt A" is "gimmick", "entity"
 {
     controller = Level.child("Conveyor Belt Controller A") || Level.spawn("Conveyor Belt Controller A");
     roi = spawn("Conveyor Belt ROI").setController(controller);
@@ -49,7 +49,7 @@ object "Conveyor Belt A" is "special", "entity"
     }
 }
 
-object "Conveyor Belt B" is "special", "entity"
+object "Conveyor Belt B" is "gimmick", "entity"
 {
     controller = Level.child("Conveyor Belt Controller B") || Level.spawn("Conveyor Belt Controller B");
     roi = spawn("Conveyor Belt ROI").setController(controller);
@@ -228,7 +228,7 @@ object "Conveyor Belt Controller"
 
 
 
-object "Conveyor Belt ROI" is "private", "special", "entity" // ROI = Region of Interest
+object "Conveyor Belt ROI" is "private", "gimmick", "entity" // ROI = Region of Interest
 {
     collider = CollisionBox(32, 32);
     controller = null;

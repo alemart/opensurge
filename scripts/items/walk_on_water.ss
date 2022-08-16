@@ -25,7 +25,7 @@ using SurgeEngine.Collisions.CollisionBox;
 //
 
 // this object should be placed on the left side of the surface of the water
-object "Walk on Water Left" is "special", "entity"
+object "Walk on Water Left" is "gimmick", "entity"
 {
     wow = spawn("Walk on Water").setEnteringDirection(1);
 
@@ -41,7 +41,7 @@ object "Walk on Water Left" is "special", "entity"
 }
 
 // this object should be placed on the right side of the surface of the water
-object "Walk on Water Right" is "special", "entity"
+object "Walk on Water Right" is "gimmick", "entity"
 {
     wow = spawn("Walk on Water").setEnteringDirection(-1);
 
@@ -56,7 +56,7 @@ object "Walk on Water Right" is "special", "entity"
     }
 }
 
-object "Walk on Water" is "private", "special", "entity"
+object "Walk on Water" is "private", "gimmick", "entity"
 {
     public minSpeed = 600; // pixels per second
     collider = CollisionBox(28, 32);
