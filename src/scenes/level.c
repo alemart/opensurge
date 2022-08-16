@@ -3047,19 +3047,17 @@ void editor_update()
     }
 
     if(1 == confirmbox_selected_option()) {
-        v2d_t cam = editor_camera;
+        char path[PATH_MAXLEN];
+        logfile_message("Reloading the level via the editor...");
+
         editor_disable();
-        editor_release();
-        level_unload();
+        scenestack_pop();
         scripting_reload();
-        level_load(file);
-        editor_init();
-        editor_enable();
-        editor_status_display("$EDITOR_MESSAGE_RELOADED", 0, NULL);
-        editor_camera = cam;
-        level_cleared = FALSE;
-        jump_to_next_stage = FALSE;
-        spawn_players();
+        scenestack_push(
+            storyboard_get_scene(SCENE_LEVEL),
+            str_cpy(path, file, sizeof(path))
+        );
+
         return;
     }
 
