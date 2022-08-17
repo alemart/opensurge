@@ -9,6 +9,11 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# msvc
+.vs/
+CMakeSettings.json
+out/
+
 # vim
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
