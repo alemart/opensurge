@@ -433,8 +433,6 @@ SET(GAME_HEADERS
   src/entities/camera.h
   src/entities/character.h
   src/entities/entitymanager.h
-  src/entities/object_compiler.h
-  src/entities/object_vm.h
   src/entities/player.h
   src/entities/particle.h
   src/entities/renderqueue.h
