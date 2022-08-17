@@ -34,3 +34,4 @@ surge.prefs
 !src/**
 screenshots/*.png
 iconwin.res
+*.pdb
