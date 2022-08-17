@@ -433,7 +433,7 @@ object "DefaultOpeningAnimation.Lightning" is "entity", "awake", "detached", "pr
 
 object "DefaultOpeningAnimation.Blocker"
 {
-    player = null;
+    player = Player.active;
 
     state "main"
     {
@@ -444,7 +444,6 @@ object "DefaultOpeningAnimation.Blocker"
 
     fun constructor()
     {
-        player = Player.active;
         player.input.enabled = false;
     }
 

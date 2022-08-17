@@ -565,8 +565,12 @@ void level_unload()
     logfile_message("Unloading the level...");
 
     /* scripting */
-    if(surgescript_vm_is_active(surgescript_vm()))
+    if(surgescript_vm_is_active(surgescript_vm())) {
+        logfile_message("Clearing up level scripts...");
         surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
+        update_ssobjects(); /* run an update cycle in order to call object destructors before releasing other pointers (e.g., player_t*) */
+        logfile_message("The level scripts have been cleared.");
+    }
 
     /* music */
     if(music != NULL) {

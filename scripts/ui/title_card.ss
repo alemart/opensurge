@@ -219,11 +219,10 @@ object "Default Title Card - Time Blocker"
 // Block player control until we are finished with the Title Card animation
 object "Default Title Card - Player Blocker"
 {
-    player = null;
+    player = Player.active;
 
     fun constructor()
     {
-        player = Player.active;
         player.input.enabled = false;
     }
 

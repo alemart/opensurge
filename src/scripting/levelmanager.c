@@ -108,10 +108,39 @@ surgescript_var_t* fun_onlevelunload(surgescript_object_t* object, const surgesc
     surgescript_object_t* level = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, LEVEL_ADDR)));
     surgescript_object_t* playermanager = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, PLAYERMANAGER_ADDR)));
     surgescript_object_call_function(level, "__callUnloadFunctor", NULL, 0, NULL); /* call Level.onUnload(), if applicable */
+
     surgescript_object_kill(level); /* destroy the Level, as well as its objects */
-    surgescript_var_set_null(surgescript_heap_at(heap, LEVEL_ADDR)); /* nobody can access the Level now */
-    surgescript_object_kill(playermanager);
-    surgescript_var_set_null(surgescript_heap_at(heap, PLAYERMANAGER_ADDR));
+    surgescript_var_set_null(surgescript_heap_at(heap, LEVEL_ADDR)); /* nobody can access the Level now (*) */
+
+    /*
+
+    (*) including object destructors!!! Is this desirable?
+    It's reasonable, because object "Level" is being destroyed.
+    We don't know the state of its descendants, meaning: whether
+    they are still valid objects or not.
+
+    Maybe implement a new unload callback for all entities
+    that is called before actually destroying the "Level" object?
+    What if the object is destroyed by itself, by some ascendant,
+    or by some other object?
+
+    */
+
+    /*
+    BUG: if we destroy the PlayerManager now, we can't use any Player instance in an
+    object destructor when unloading the level. We get a crash. Player instances are
+    children of PlayerManager.
+
+    Let the garbage collector take care of the PlayerManager? This reference will be
+    lost when loading a new level.
+
+    Since PlayerManager is not a child of the Level object, it won't be affected when
+    the latter is destroyed.
+
+    //surgescript_object_kill(playermanager);
+    //surgescript_var_set_null(surgescript_heap_at(heap, PLAYERMANAGER_ADDR));
+    */
+
     return NULL;
 }
 
