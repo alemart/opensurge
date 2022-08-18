@@ -568,7 +568,6 @@ void level_unload()
     if(surgescript_vm_is_active(surgescript_vm())) {
         logfile_message("Clearing up level scripts...");
         surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelUnload", NULL, 0, NULL);
-        update_ssobjects(); /* run an update cycle in order to call object destructors before releasing other pointers (e.g., player_t*) */
         logfile_message("The level scripts have been cleared.");
     }
 
@@ -2606,6 +2605,7 @@ void clear_level_state(levelstate_t* state)
 void update_ssobjects()
 {
     surgescript_vm_t* vm = surgescript_vm();
+
     if(surgescript_vm_is_active(vm)) {
         v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
         surgescript_vm_update_ex(vm, origin, update_ssobject, late_update_ssobject);

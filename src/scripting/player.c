@@ -36,7 +36,9 @@
 
 /* generic */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -137,6 +139,8 @@ static surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescr
 
 /* PlayerManager */
 static surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_manager_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_manager_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_manager_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_manager_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_manager_getactive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -155,7 +159,7 @@ static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static const surgescript_heapptr_t INPUT_ADDR = 4;
-static const surgescript_heapptr_t COMPANION_BASE_ADDR = 5;
+static const surgescript_heapptr_t COMPANION_BASE_ADDR = 5; /* should be the last address */
 static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
@@ -164,6 +168,7 @@ static void update_collider(surgescript_object_t* object, int width, int height)
 static void update_animation(surgescript_object_t* object, const animation_t* animation);
 static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
+static void release_children(surgescript_objecthandle_t handle, void* mgr);
 static const double RAD2DEG = 57.2957795131;
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 #define STAY_MIDAIR(player) (player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
@@ -277,7 +282,9 @@ void scripting_register_player(surgescript_vm_t* vm)
     
     /* general-purpose methods */
     surgescript_vm_bind(vm, "Player", "constructor", fun_constructor, 0);
+    surgescript_vm_bind(vm, "Player", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
+    surgescript_vm_bind(vm, "Player", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
@@ -286,6 +293,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     /* misc */
     surgescript_vm_bind(vm, "PlayerManager", "state:main", fun_manager_main, 0);
     surgescript_vm_bind(vm, "PlayerManager", "destroy", fun_manager_destroy, 0);
+    surgescript_vm_bind(vm, "PlayerManager", "destructor", fun_manager_destructor, 0);
+    surgescript_vm_bind(vm, "PlayerManager", "__releaseChildren", fun_manager_releasechildren, 0);
     surgescript_vm_bind(vm, "PlayerManager", "__spawnPlayers", fun_manager_spawnplayers, 0);
     surgescript_vm_bind(vm, "PlayerManager", "get_count", fun_manager_getcount, 0);
     surgescript_vm_bind(vm, "PlayerManager", "get_active", fun_manager_getactive, 0);
@@ -380,6 +389,13 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     return NULL;
 }
 
+/* destructor */
+surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /*video_showmessage("Called Player.destructor()");*/
+    return NULL;
+}
+
 /* __init: pass a character name */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -445,6 +461,46 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
     /* done! */
     return surgescript_var_set_bool(surgescript_var_create(), true);
+}
+
+/* __releaseChildren: release all user-added children of this instance of Player (e.g., companions, added on init or not) */
+surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    DARRAY(surgescript_objecthandle_t, handles);
+    darray_init(handles);
+
+    /* for each child of Player */
+    int child_count = surgescript_object_child_count(object);
+    for(int i = child_count - 1; i >= 0; i--) {
+        surgescript_objecthandle_t child_handle = surgescript_object_nth_child(object, i);
+
+        /* is the child a built-in child of Player? TODO make this more efficient? */
+        bool is_builtin = false;
+        for(surgescript_heapptr_t j = 0; j < COMPANION_BASE_ADDR; j++) {
+            surgescript_var_t* builtin_var = surgescript_heap_at(heap, j);
+            surgescript_objecthandle_t builtin_handle = surgescript_var_get_objecthandle(builtin_var);
+            is_builtin = is_builtin || (child_handle == builtin_handle /*&& surgescript_var_is_objecthandle(builtin_var)*/);
+        }
+
+        /* the child is not a built-in */
+        if(!is_builtin) {
+            darray_push(handles, child_handle);
+        }
+    }
+
+    /* release children immediately and call their destructors (if any) */
+    for(int j = 0; j < darray_length(handles); j++) {
+        surgescript_objecthandle_t child_handle = handles[j];
+        surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
+        surgescript_object_kill(child);
+        surgescript_objectmanager_delete(manager, child_handle); /* release immediately */
+    }
+
+    /* done */
+    darray_release(handles);
+    return NULL;
 }
 
 /* main state */
@@ -1529,6 +1585,29 @@ surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescr
 {
     /* do nothing */
     return NULL;
+}
+
+/* PlayerManager: destructor */
+surgescript_var_t* fun_manager_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /*video_showmessage("Called PlayerManager.destructor()");*/
+    return NULL;
+}
+
+/* PlayerManager: release all user-added children of all instances of Player */
+surgescript_var_t* fun_manager_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_object_children(object, "Player", manager, release_children);
+    return NULL;
+}
+
+/* Helper: call player.__releaseChildren() */
+void release_children(surgescript_objecthandle_t handle, void* mgr)
+{
+    surgescript_objectmanager_t* manager = (surgescript_objectmanager_t*)mgr;
+    surgescript_object_t* player = surgescript_objectmanager_get(manager, handle);
+    surgescript_object_call_function(player, "__releaseChildren", NULL, 0, NULL);
 }
 
 /* can't destroy the PlayerManager */

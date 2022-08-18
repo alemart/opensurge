@@ -106,9 +106,16 @@ surgescript_var_t* fun_onlevelunload(surgescript_object_t* object, const surgesc
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* level = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, LEVEL_ADDR)));
+    surgescript_object_t* player_manager = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, PLAYERMANAGER_ADDR)));
 
-    surgescript_object_call_function(level, "__callUnloadFunctor", NULL, 0, NULL); /* call Level.onUnload(), if applicable */
-    surgescript_object_call_function(level, "__releaseChildren", NULL, 0, NULL); /* release all children of the Level, but not the Level object itself */
+    /* call Level.onUnload(), if applicable */
+    surgescript_object_call_function(level, "__callUnloadFunctor", NULL, 0, NULL);
+
+    /* release all user-added children of all instances of Player, but not any Player instance, nor the PlayerManager itself */
+    surgescript_object_call_function(player_manager, "__releaseChildren", NULL, 0, NULL);
+
+    /* release all user-added children of the Level, but not the Level object itself */
+    surgescript_object_call_function(level, "__releaseChildren", NULL, 0, NULL);
 
     #if 0
     /*

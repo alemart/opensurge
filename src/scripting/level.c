@@ -32,6 +32,7 @@
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -87,6 +88,7 @@ void scripting_register_level(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "Level", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Level", "constructor", fun_constructor, 0);
+    surgescript_vm_bind(vm, "Level", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "Level", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Level", "spawnEntity", fun_spawnentity, 2);
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
@@ -164,6 +166,13 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), 1 + IDX_ADDR);
 
     /* done */
+    return NULL;
+}
+
+/* destructor */
+surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /*video_showmessage("Called Level.destructor()");*/
     return NULL;
 }
 
@@ -551,9 +560,11 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    int child_count = surgescript_object_child_count(object);
+    DARRAY(surgescript_objecthandle_t, handles);
+    darray_init(handles);
 
     /* for each child of Level */
+    int child_count = surgescript_object_child_count(object);
     for(int i = child_count - 1; i >= 0; i--) {
         surgescript_objecthandle_t child_handle = surgescript_object_nth_child(object, i);
 
@@ -565,13 +576,22 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
             is_builtin = is_builtin || (child_handle == builtin_handle /*&& surgescript_var_is_objecthandle(builtin_var)*/);
         }
 
-        /* release if the child is not a built-in */
+        /* the child is not a built-in */
         if(!is_builtin) {
-            surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
-            surgescript_object_kill(child);
+            darray_push(handles, child_handle);
         }
     }
 
+    /* release children immediately and call their destructors (if any) */
+    for(int j = 0; j < darray_length(handles); j++) {
+        surgescript_objecthandle_t child_handle = handles[j];
+        surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
+        surgescript_object_kill(child);
+        surgescript_objectmanager_delete(manager, child_handle); /* release immediately */
+    }
+
+    /* done */
+    darray_release(handles);
     return NULL;
 }
 
