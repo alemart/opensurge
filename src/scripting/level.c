@@ -68,6 +68,7 @@ static surgescript_var_t* fun_setnext(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_getonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0;
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
 static const surgescript_heapptr_t SETUP_ADDR = 2;
@@ -121,6 +122,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
     surgescript_vm_bind(vm, "Level", "__callUnloadFunctor", fun_callunloadfunctor, 0);
+    surgescript_vm_bind(vm, "Level", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
 }
 
@@ -538,6 +540,35 @@ surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const sur
             surgescript_object_t* functor = surgescript_objectmanager_get(manager, handle);
             if(surgescript_object_has_function(functor, "call"))
                 surgescript_object_call_function(functor, "call", NULL, 0, NULL);
+        }
+    }
+
+    return NULL;
+}
+
+/* release all children, which will call their destructors on the next update cycle */
+surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    int child_count = surgescript_object_child_count(object);
+
+    /* for each child of Level */
+    for(int i = child_count - 1; i >= 0; i--) {
+        surgescript_objecthandle_t child_handle = surgescript_object_nth_child(object, i);
+
+        /* is the child a built-in child of Level? TODO make this more efficient? */
+        bool is_builtin = false;
+        for(surgescript_heapptr_t j = 0; j < IDX_ADDR; j++) {
+            surgescript_var_t* builtin_var = surgescript_heap_at(heap, j);
+            surgescript_objecthandle_t builtin_handle = surgescript_var_get_objecthandle(builtin_var);
+            is_builtin = is_builtin || (child_handle == builtin_handle /*&& surgescript_var_is_objecthandle(builtin_var)*/);
+        }
+
+        /* release if the child is not a built-in */
+        if(!is_builtin) {
+            surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
+            surgescript_object_kill(child);
         }
     }
 
