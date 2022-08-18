@@ -38,7 +38,7 @@ sprite "Walk on Water Right"
 sprite "Walk on Water Brick"
 {
     source_file     "images/items/walk_on_water.png"
-    source_rect     0 0 32 32
+    source_rect     64 0 32 32
     frame_size      32 32
     hot_spot        16 0
 
