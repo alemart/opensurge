@@ -9,6 +9,11 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# msvc
+.vs/
+CMakeSettings.json
+out/
+
 # vim
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
@@ -29,3 +34,4 @@ surge.prefs
 !src/**
 screenshots/*.png
 iconwin.res
+*.pdb
