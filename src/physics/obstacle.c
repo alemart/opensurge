@@ -97,7 +97,7 @@ void obstacle_set_position(obstacle_t* obstacle, int xpos, int ypos)
     obstacle->ypos = ypos;
 }
 
-int obstacle_is_solid(const obstacle_t *obstacle)
+bool obstacle_is_solid(const obstacle_t *obstacle)
 {
     return !(obstacle->flags & OF_CLOUD);
 }

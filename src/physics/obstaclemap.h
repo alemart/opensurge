@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * obstaclemap.h - physics system: obstacle map
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _OBSTACLEMAP_H
 #define _OBSTACLEMAP_H
 
+#include <stdbool.h>
 #include "../core/v2d.h"
 
 /*
@@ -38,8 +39,8 @@ obstaclemap_t* obstaclemap_destroy(obstaclemap_t *obstaclemap);
 
 /* public methods */
 void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, const struct obstacle_t *obstacle); /* adds an obstacle to the map (you have to release it) */
-int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if an obstacle exists at (x,y) */
-int obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if a solid obstacle exists at (x,y) */
+bool obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if an obstacle exists at (x,y) */
+bool obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y); /* checks if a solid obstacle exists at (x,y) */
 const struct obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, enum movmode_t mm); /* x2 > x1 && y2 > y1; NULL may be returned */
 void obstaclemap_clear(obstaclemap_t* obstaclemap); /* removes all obstacles from the obstacle map */
 

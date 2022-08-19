@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * obstaclemap.c - physics system: obstacle map
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -66,24 +66,24 @@ const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstacle
     return best;
 }
 
-int obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y)
+bool obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y)
 {
     for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
         if(obstacle_got_collision(obstaclemap->obstacle[i], x, y, x, y))
-            return TRUE;
+            return true;
     }
 
-    return FALSE;
+    return false;
 }
 
-int obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y)
+bool obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y)
 {
     for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
         if(obstacle_got_collision(obstaclemap->obstacle[i], x, y, x, y) && obstacle_is_solid(obstaclemap->obstacle[i]))
-            return TRUE;
+            return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 /* removes all obstacles from the obstacle map */
@@ -106,14 +106,60 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     if(b == NULL)
         return a;
 
-    #if 0
-    /* solid obstacles are better than one-way platforms */
+    #if 1
+    /* solid obstacles are preferable than one-way platforms
+       if they have the same height */
+    if(
+        (!obstacle_is_solid(a) && obstacle_is_solid(b)) ||
+        (obstacle_is_solid(a) && !obstacle_is_solid(b))
+    ) {
+        /* find the solid obstacle */
+        const obstacle_t* solid = obstacle_is_solid(a) ? a : b;
+
+        /* check if they have the same height */
+        switch(mm) {
+            case MM_FLOOR:
+                x = x2; /* x1 == x2 */
+                y = y2; /* y2 == max(y1, y2) */
+                ha = obstacle_ground_position(a, x, y, GD_DOWN);
+                hb = obstacle_ground_position(b, x, y, GD_DOWN);
+                if(ha == hb)
+                    return solid;
+
+            case MM_LEFTWALL:
+                x = x1; /* x1 == min(x1, x2) */
+                y = y2; /* y1 == y2 */
+                ha = obstacle_ground_position(a, x, y, GD_LEFT);
+                hb = obstacle_ground_position(b, x, y, GD_LEFT);
+                if(ha == hb)
+                    return solid;
+
+            case MM_CEILING:
+                x = x2; /* x1 == x2 */
+                y = y1; /* y1 == min(y1, y2) */
+                ha = obstacle_ground_position(a, x, y, GD_UP);
+                hb = obstacle_ground_position(b, x, y, GD_UP);
+                if(ha == hb)
+                    return solid;
+
+            case MM_RIGHTWALL:
+                x = x2; /* x2 == max(x1, x2) */
+                y = y2; /* y1 == y2 */
+                ha = obstacle_ground_position(a, x, y, GD_RIGHT);
+                hb = obstacle_ground_position(b, x, y, GD_RIGHT);
+                if(ha == hb)
+                    return solid;
+        }
+    }
+    #else
+    /* solid obstacles are preferable than one-way platforms */
     if(!obstacle_is_solid(a) && obstacle_is_solid(b))
         return b;
     if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
     #endif
 
+    #if 1
     /* one-way platforms only: get the shortest obstacle */
     if(!obstacle_is_solid(a) && !obstacle_is_solid(b)) {
         switch(mm) {
@@ -138,8 +184,9 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
                 return ha < hb ? a : b;
         }
     }
+    #endif
 
-    /* solid obstacles: get the tallest one */
+    /* get the tallest obstacle */
     switch(mm) {
         case MM_FLOOR:
             x = x2; /* x1 == x2 */

@@ -21,6 +21,7 @@
 #ifndef _OBSTACLE_H
 #define _OBSTACLE_H
 
+#include <stdbool.h>
 #include "collisionmask.h"
 
 /*
@@ -43,7 +44,7 @@ obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 /* public methods */
 void obstacle_get_position(const obstacle_t *obstacle, int *xpos, int *ypos); /* get position (in world coordinates) */
 void obstacle_set_position(obstacle_t* obstacle, int xpos, int ypos); /* set position (in world coordinates) */
-int obstacle_is_solid(const obstacle_t *obstacle); /* is it solid or oneway? */
+bool obstacle_is_solid(const obstacle_t *obstacle); /* is it solid or oneway? */
 int obstacle_get_width(const obstacle_t *obstacle); /* width of the bounding box */
 int obstacle_get_height(const obstacle_t *obstacle); /* height of the bounding box */
 int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2); /* check for collision with sensor (x1,y1,x2,y2); x1<=x2, y1<=y2 */
