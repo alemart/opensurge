@@ -1432,7 +1432,7 @@ brick 180
 
 brick 181
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask181.png"
 
@@ -1454,7 +1454,7 @@ brick 181
 
 brick 182
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask182.png"
 
@@ -1476,7 +1476,7 @@ brick 182
 
 brick 183
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask183.png"
 
@@ -1498,7 +1498,7 @@ brick 183
 
 brick 184
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask184.png"
 
@@ -1520,7 +1520,7 @@ brick 184
 
 brick 185
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask185.png"
 
@@ -1564,7 +1564,7 @@ brick 186
 
 brick 187
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask187.png"
 
@@ -1586,7 +1586,7 @@ brick 187
 
 brick 188
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask188.png"
 
@@ -1630,7 +1630,7 @@ brick 189
 
 brick 190
 {
-    type                CLOUD
+    type                SOLID
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask190.png"
 

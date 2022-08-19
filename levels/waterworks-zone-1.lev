@@ -13,7 +13,7 @@ requires "0.6.0"
 act 1
 theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-outdoors.bg"
-spawn_point 23472 8672
+spawn_point 26272 8704
 setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Cleared Animation"
 players "Surge"
 waterlevel 10016
@@ -143,7 +143,8 @@ brick 1 29440 9216
 brick 110 29312 8608
 brick 1 29456 8688
 brick 1 29344 8688
-brick 280 29280 8672
+brick 115 29824 9184
+brick 280 29280 8688
 brick 511 28480 8944
 brick 104 28544 8928
 brick 111 28512 8848
@@ -275,7 +276,6 @@ brick 189 27504 8928 green
 brick 180 27456 8704 yellow
 brick 115 26752 9312
 brick 115 27136 9312
-brick 192 26480 8704 yellow
 brick 188 26496 8704 yellow
 brick 189 26592 8736 yellow
 brick 190 26640 8784 yellow
@@ -299,6 +299,8 @@ brick 180 25920 8848
 brick 271 25904 8816
 brick 270 25936 8816
 brick 261 26320 8752
+brick 180 26432 8704 yellow
+brick 192 26416 8704 yellow
 brick 115 25216 9312
 brick 115 25600 9312
 brick 180 24960 8848
@@ -4943,17 +4945,6 @@ entity "Spring Stronger Right" 24448 8656 "e060296cf591ff3c"
 entity "Spring Stronger Left" 24816 8272 "845449b43db2354f"
 entity "Spring Stronger Left" 24816 8528 "1a44f445ba27e2e5"
 entity "Spring Stronger Right" 24448 8400 "32cb52682c37b460"
-entity "Layer Green" 26368 8768 "6591e8b55baa8b32"
-entity "Layer Green" 26368 8736 "c2b958f52f9152a4"
-entity "Layer Green" 26368 8704 "8d8ea561b9cc5901"
-entity "Layer Green" 26368 8672 "f769d26fc16fa1f3"
-entity "Layer Green" 26368 8640 "0893006075db6270"
-entity "Layer Green" 26368 8608 "09c36f8a3ece48b4"
-entity "Layer Green" 26368 8576 "fcfcec6da27d7925"
-entity "Layer Yellow" 26496 8672 "d1aa9655e859f582"
-entity "Layer Yellow" 26496 8640 "54763d80a69666e9"
-entity "Layer Yellow" 26496 8608 "d8e0383f6e57d064"
-entity "Layer Yellow" 26496 8576 "eae4e4b9b2fbe6c4"
 entity "Tube Out" 28528 9008 "1f1ebac65ccbe3e7"
 entity "Tube In" 28496 9008 "32adc05145366de0"
 entity "Tube Out" 27664 9008 "c5fe681095ed793b"
@@ -5092,7 +5083,6 @@ entity "Layer Yellow" 27664 8272 "e65eb14445aca6b8"
 entity "Layer Yellow" 27664 8240 "9b12b030913351f5"
 entity "Layer Yellow" 27664 8208 "da2b26a502d7ea16"
 entity "Spring Standard Up Right" 29056 8592 "02bab4ab77254c05"
-entity "Spring Standard Up Left" 29312 8672 "4241f878bb4bddf9"
 entity "Spring Standard" 29296 8864 "f6fa988a1758c37b"
 entity "Powerup Collectibles" 28416 8400 "71a44c58b8a468e4"
 entity "Spikes" 22176 9056 "ac7cefc1f7fcca32"
@@ -5139,14 +5129,6 @@ entity "Layer Yellow" 24768 9136 "e58922780b5c5d22"
 entity "Layer Yellow" 24768 9104 "9eeee0a67dc9ed18"
 entity "Layer Yellow" 24768 9072 "f4fd26950f6e38c2"
 entity "Layer Yellow" 24768 9040 "e063abbb11809433"
-entity "Layer Green" 24800 8832 "540eca19e6b6f9db"
-entity "Layer Green" 24800 8800 "561222dfa22e82e8"
-entity "Layer Green" 24800 8768 "9803c8198d4d65ed"
-entity "Layer Green" 24800 8736 "10447b25097f2466"
-entity "Layer Green" 24800 8704 "a9636beeff7403ae"
-entity "Layer Green" 24800 8672 "d7467697ffadc029"
-entity "Layer Green" 24800 8640 "5946a63fe0f5b1e9"
-entity "Layer Green" 24800 8608 "3db0705f15f100ca"
 entity "Layer Green" 23824 8464 "281e80876beb1577"
 entity "Layer Green" 23856 8464 "1bbd8b8f006d7e9d"
 entity "Conveyor Belt B" 23728 8272 "69501cc1dcc981b6"
@@ -5161,5 +5143,36 @@ entity "Conveyor Belt A" 23536 8304 "9654bed357f09393"
 entity "Conveyor Belt A" 23504 8304 "9287f796f3e1f674"
 entity "Layer Green" 23888 8464 "ebdff2d349852898"
 entity "Layer Green" 23920 8464 "3406c64a22dd04c9"
+entity "Layer Yellow" 24800 8832 "c0e6360197b51394"
+entity "Layer Yellow" 24800 8800 "97d7ffa6e2ca1cb3"
+entity "Layer Yellow" 24800 8768 "a383d985d68ac44a"
+entity "Layer Yellow" 24800 8736 "d2264bad219b8342"
+entity "Layer Yellow" 24800 8704 "8be792e124d824c4"
+entity "Layer Yellow" 24800 8672 "fb6569169f1a258d"
+entity "Layer Yellow" 24800 8640 "3deb55b99510d286"
+entity "Layer Yellow" 24800 8608 "e859af689d1892a3"
+entity "Spring Standard Up Left" 29312 8688 "de6a1eee3d47d336"
+entity "Layer Green" 26400 8784 "9eae12de2b5340f5"
+entity "Layer Green" 26400 8816 "247a6b8ddda37b34"
+entity "Layer Green" 26432 8816 "ab15a8dc842648a3"
+entity "Layer Green" 26464 8816 "5663df78644c4cf2"
+entity "Layer Green" 26496 8816 "b97bd6455fdfa8eb"
+entity "Layer Green" 26528 8816 "f799cd68767d7856"
+entity "Layer Green" 26368 8560 "756785ee3acd8871"
+entity "Layer Green" 26368 8592 "68b43f9aba962f21"
+entity "Layer Green" 26368 8624 "22aa390039f2eb3f"
+entity "Layer Green" 26368 8656 "31c51afa5a0e2129"
+entity "Layer Green" 26368 8688 "598eb7364741572b"
+entity "Layer Green" 26368 8720 "d0350ddf2ff57f45"
+entity "Layer Yellow" 26400 8560 "9a8e73ca0aebe4fb"
+entity "Layer Yellow" 26400 8592 "edba6dc2837c6df2"
+entity "Layer Yellow" 26400 8624 "d2ee9069078da9a9"
+entity "Layer Yellow" 26400 8656 "ef11704272a9f8ba"
+entity "Layer Yellow" 26400 8688 "d84dca20e8b3c5cb"
+entity "Layer Green" 26400 8720 "e8fa3ecd9c2ab080"
+entity "Layer Green" 26400 8752 "3ad97d0fd06cc5e1"
+entity "Layer Green" 26368 8752 "f94aee8ec415442a"
+entity "Layer Green" 26528 8784 "a512e8f23c0d2422"
+entity "Layer Green" 26528 8752 "95a6495d926c76ea"
 
 // EOF
