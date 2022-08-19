@@ -106,11 +106,13 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     if(b == NULL)
         return a;
 
+    #if 0
     /* solid obstacles are better than one-way platforms */
     if(!obstacle_is_solid(a) && obstacle_is_solid(b))
         return b;
     if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
+    #endif
 
     /* one-way platforms only: get the shortest obstacle */
     if(!obstacle_is_solid(a) && !obstacle_is_solid(b)) {
