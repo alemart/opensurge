@@ -190,17 +190,17 @@ object "Surge's Lightning Boom" is "companion"
         player.anim = 39;
         player.xsp = xsp;
 
-        if(player.animation.finished) {
+        if(mustStop()) {
+            if(player.angle != 0)
+                player.anim = 1;
+            backToNormal();
+        }
+        else if(player.animation.finished) {
             player.springify(); // adjust sensors
             state = "sustaining";
         }
         else if(shieldAbilities.active) {
             state = "waiting for shield attack";
-        }
-        else if(mustStop()) {
-            if(player.angle != 0)
-                player.anim = 1;
-            backToNormal();
         }
         else if(mustAdjustToCeiling())
             adjustToCeiling();
@@ -210,13 +210,13 @@ object "Surge's Lightning Boom" is "companion"
     {
         player.anim = 40;
 
-        if(shieldAbilities.active) {
-            state = "waiting for shield attack";
-        }
-        else if(mustStop()) {
+        if(mustStop()) {
             if(player.angle != 0)
                 player.anim = 1;
             backToNormal();
+        }
+        else if(shieldAbilities.active) {
+            state = "waiting for shield attack";
         }
         else if(player.ysp >= 120) {
             backToNormal();
