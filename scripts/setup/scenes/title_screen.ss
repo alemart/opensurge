@@ -15,20 +15,21 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Camera;
-using SurgeEngine.Web;
+using SurgeEngine.Behaviors.DirectionalMovement;
 
 // ----------------------------------------------------------------------------
 // TITLE SCREEN: SETUP OBJECT
 // ----------------------------------------------------------------------------
 
-object "Title Screen"
+object "Title Screen" is "setup"
 {
     fader = spawn("Fader");
-    logo = spawn("Title Screen - Logo");
+    //logo = spawn("Title Screen - Logo");
     version = spawn("Title Screen - Version");
     website = spawn("Title Screen - Website");
     music = spawn("Title Screen - Music");
     menu = spawn("Title Screen - Menu").setFader(fader);
+    scroller = spawn("Title Screen - Scroller");
 
     fun constructor()
     {
@@ -73,6 +74,37 @@ object "Title Screen - Music"
 }
 
 
+
+// ----------------------------------------------------------------------------
+// CAMERA SCROLLER
+// ----------------------------------------------------------------------------
+object "Title Screen - Scroller" is "private", "entity", "awake"
+{
+    transform = Transform();
+    movement = DirectionalMovement();
+    scrollSpeed = 800; // in pixels per second
+    wrapThreshold = 1000000;
+
+    state "main"
+    {
+        // wrap around
+        if(transform.position.x >= wrapThreshold)
+            transform.position = Level.spawnpoint;
+
+        // update the position of the camera
+        Camera.position = transform.position;
+    }
+
+    fun constructor()
+    {
+        // set the initial position of this entity
+        transform.position = Level.spawnpoint;
+
+        // setup the directional movement
+        movement.speed = scrollSpeed;
+        movement.direction = Vector2.right;
+    }
+}
 
 
 
