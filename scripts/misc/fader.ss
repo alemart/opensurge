@@ -99,6 +99,12 @@ object "Fader" is "entity", "detached", "awake", "private"
         fadeTime = Math.max(seconds, 0.001);
     }
 
+    fun setFadeTime(seconds)
+    {
+        this.set_fadeTime(seconds);
+        return this;
+    }
+
     fun constructor()
     {
         actor.zindex = Math.infinity;
