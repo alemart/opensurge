@@ -3723,6 +3723,7 @@ brick 233 3872 10112
 brick 231 3584 10240
 brick 230 3616 10240
 brick 230 3744 10240
+brick 261 3968 10208
 brick 117 2688 9280
 brick 111 2688 9312
 brick 111 2688 9376
@@ -4849,7 +4850,6 @@ entity "Spikes" 3168 10240 "1d5d59cb4a267726"
 entity "Spikes" 2976 10240 "46d5cf78ff5b3248"
 entity "RulerSalamander" 3056 10224 "a6c74312319ced00"
 entity "RulerSalamander" 3904 9824 "46055ab57817f535"
-entity "RulerSalamander" 3712 9824 "ff42256c23054373"
 entity "RulerSalamander" 4592 10464 "2b0a6a3541913430"
 entity "RulerSalamander" 5120 10464 "d18688315d691a58"
 entity "GreenMarmot" 6400 10560 "6e9498d7ec0849d0"
@@ -4897,7 +4897,6 @@ entity "Collectible" 2592 9712 "c3f2f69dfda4cacc"
 entity "Collectible" 2592 9744 "8b6d67d25686b059"
 entity "Collectible" 2592 9776 "21690841937e8b79"
 entity "Collectible" 2592 9808 "f0d5c5710ecb882f"
-entity "Collectible" 3568 9936 "6e294d02c6cff4ff"
 entity "Collectible" 3472 9712 "48e71bb1e78cb4d6"
 entity "Collectible" 3472 9776 "a0dbe6e6418a583f"
 entity "Collectible" 3472 9840 "9caa69bbe206a34f"
@@ -5779,9 +5778,6 @@ entity "Audio Source" 21760 9600 "866c319c6bc57a6f"
 entity "Audio Source" 21760 9344 "0765199e1bb78b5b"
 entity "Audio Source" 21760 9088 "4ba4014f9e13528d"
 entity "Audio Source" 21760 8832 "47d0ddc0b74d7623"
-entity "Collectible" 256 8912 "cd33bde6975f4afd"
-entity "Collectible" 288 8912 "585cb82ab2aceb28"
-entity "Collectible" 320 8912 "7580fe8f206a78fe"
 entity "Powerup Shield" 8688 9584 "04361415c8b18d78"
 entity "Spring Standard Left" 9664 9552 "7479ef73fb457576"
 entity "Collectible" 9920 9552 "377279bba778621c"
@@ -5836,5 +5832,6 @@ entity "Collectible" 6216 9800 "adf9f6863176b56a"
 entity "Collectible" 3056 10000 "f68d396816141a6f"
 entity "Collectible" 3088 10000 "a6b8fb3b5345499b"
 entity "Powerup Shield Water" 9632 10368 "e44e9574d612c5c8"
+entity "Collectible" 3568 9936 "6e294d02c6cff4ff"
 
 // EOF
