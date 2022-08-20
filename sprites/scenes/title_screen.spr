@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: logo.spr
-// Description: Sprite script related to the Logo displayed on the Title Screen
+// File: title_screen.spr
+// Description: script describing the sprites displayed on the Title Screen
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
