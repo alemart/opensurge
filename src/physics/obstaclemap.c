@@ -106,58 +106,11 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     if(b == NULL)
         return a;
 
-    #if 1
-    /* solid obstacles are preferable than one-way platforms
-       if they have the same height */
-    if(
-        (!obstacle_is_solid(a) && obstacle_is_solid(b)) ||
-        (obstacle_is_solid(a) && !obstacle_is_solid(b))
-    ) {
-        /* find the solid obstacle */
-        const obstacle_t* solid = obstacle_is_solid(a) ? a : b;
-
-        /* check if they have the same height */
-        switch(mm) {
-            case MM_FLOOR:
-                x = x2; /* x1 == x2 */
-                y = y2; /* y2 == max(y1, y2) */
-                ha = obstacle_ground_position(a, x, y, GD_DOWN);
-                hb = obstacle_ground_position(b, x, y, GD_DOWN);
-                if(ha == hb)
-                    return solid;
-
-            case MM_LEFTWALL:
-                x = x1; /* x1 == min(x1, x2) */
-                y = y2; /* y1 == y2 */
-                ha = obstacle_ground_position(a, x, y, GD_LEFT);
-                hb = obstacle_ground_position(b, x, y, GD_LEFT);
-                if(ha == hb)
-                    return solid;
-
-            case MM_CEILING:
-                x = x2; /* x1 == x2 */
-                y = y1; /* y1 == min(y1, y2) */
-                ha = obstacle_ground_position(a, x, y, GD_UP);
-                hb = obstacle_ground_position(b, x, y, GD_UP);
-                if(ha == hb)
-                    return solid;
-
-            case MM_RIGHTWALL:
-                x = x2; /* x2 == max(x1, x2) */
-                y = y2; /* y1 == y2 */
-                ha = obstacle_ground_position(a, x, y, GD_RIGHT);
-                hb = obstacle_ground_position(b, x, y, GD_RIGHT);
-                if(ha == hb)
-                    return solid;
-        }
-    }
-    #else
-    /* solid obstacles are preferable than one-way platforms */
+    /* solid obstacles are more preferable than one-way platforms */
     if(!obstacle_is_solid(a) && obstacle_is_solid(b))
         return b;
     if(!obstacle_is_solid(b) && obstacle_is_solid(a))
         return a;
-    #endif
 
     #if 1
     /* one-way platforms only: get the shortest obstacle */
