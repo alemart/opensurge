@@ -1789,7 +1789,7 @@ brick 220
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask220.png"
-    zindex              0.4
+    zindex              0.1
 
     sprite
     {
@@ -1812,7 +1812,7 @@ brick 221
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask221.png"
-    zindex              0.4
+    zindex              0.1
 
     sprite
     {
@@ -1835,7 +1835,7 @@ brick 222
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask222.png"
-    zindex              0.4
+    zindex              0.1
 
     sprite
     {
@@ -1858,7 +1858,7 @@ brick 223
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask223.png"
-    zindex              0.4
+    zindex              0.1
 
     sprite
     {
@@ -1966,6 +1966,99 @@ brick 233
         }
     }
 }
+
+
+brick 234
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask234.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick234.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 235
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask235.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick235.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 236
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask236.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick236.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
+brick 237
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask237.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick237.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
 
 
 
@@ -2214,7 +2307,6 @@ brick 272
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask272.png"
-    zindex              0.7
 
     sprite
     {
@@ -2237,7 +2329,6 @@ brick 273
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask273.png"
-    zindex              0.7
 
     sprite
     {
@@ -2260,7 +2351,6 @@ brick 274
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask274.png"
-    zindex              0.7
 
     sprite
     {
@@ -2283,7 +2373,6 @@ brick 275
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask275.png"
-    zindex              0.7
 
     sprite
     {
