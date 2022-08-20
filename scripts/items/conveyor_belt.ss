@@ -199,14 +199,22 @@ object "Conveyor Belt Controller"
 
     fun moveContinuously(player)
     {
-        player.gsp += speed * Time.delta;
+        if(player.underwater && Math.abs(player.gsp) < Math.abs(speed)) {
+            // fix: try stopping and then walking underwater
+            // when underwater, the acceleration of the player is half the usual value
+            player.gsp += (speed / 2) * Time.delta;
+        }
+        else {
+            // regular movement
+            player.gsp += speed * Time.delta;
+        }
 
         /*
-        // FIXME when using the logic below, there is a corner case in which the
-        // player will get stuck if walking slowly against the direction of the
-        // conveyor belt. A constant player.gsp will move the player in one
-        // direction, but the logic below will move it in the opposite direction
-        // by approximately the same amount.
+        // when using the logic below, there is a corner case in which the
+        // player will get stuck if walking slowly against the direction of
+        // the conveyor belt. A constant player.gsp will move the player in
+        // one direction, but the logic below will move it in the opposite
+        // direction by approximately the same amount.
         dx = speed * Time.delta;
         player.transform.translateBy(dx, 0);
         */
