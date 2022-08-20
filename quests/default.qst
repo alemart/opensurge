@@ -9,6 +9,7 @@
 name            "Default quest"
 
 // level list (in order of appearance)
+level           "levels/waterworks-zone-1.lev"
 level           "levels/scenes/end_of_demo.lev"
 level           "levels/demo-1.lev"
 level           "levels/demo-2.lev"
