@@ -6,32 +6,6 @@
 // -----------------------------------------------------------------------------
 
 //
-// clear to color
-//
-background
-{
-    initial_position    0 0
-    scroll_speed        0 0
-    behavior            DEFAULT
-    repeat_x            TRUE
-    repeat_y            TRUE
-
-    sprite
-    {
-        source_file     "images/backgrounds/waterworks-zone/indoors-clear.png"
-        source_rect     0 0 256 256
-        frame_size      256 256
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-//
 // main background
 //
 background
@@ -40,13 +14,13 @@ background
     scroll_speed        -0.1 -0.1
     behavior            DEFAULT
     repeat_x            TRUE
-    repeat_y            FALSE
+    repeat_y            TRUE
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-background-underwater.png"
-        source_rect     0 0 768 1536
-        frame_size      768 1536
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 128 512 192
+        frame_size      512 192
 
         animation
         {
@@ -77,9 +51,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
-        source_rect     0 224 960 16
-        frame_size      960 16
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 112 512 16
+        frame_size      512 16
 
         animation
         {
@@ -100,9 +74,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
-        source_rect     0 208 960 16
-        frame_size      960 16
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 96 512 16
+        frame_size      512 16
 
         animation
         {
@@ -123,9 +97,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
-        source_rect     0 192 960 16
-        frame_size      960 16
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 80 512 16
+        frame_size      512 16
 
         animation
         {
@@ -150,9 +124,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
-        source_rect     0 168 960 24
-        frame_size      960 24
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 56 512 24
+        frame_size      512 24
 
         animation
         {
@@ -173,9 +147,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
-        source_rect     0 144 960 24
-        frame_size      960 24
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 32 512 24
+        frame_size      512 24
 
         animation
         {
@@ -201,9 +175,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/indoors-ceiling.png"
-        source_rect     0 0 960 32
-        frame_size      960 32
+        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_rect     0 0 512 32
+        frame_size      512 32
 
         animation
         {
