@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// File: sage22_splash.ss
-// Description: script for the SAGE 22 Splash Screen
+// File: allegro_splash.ss
+// Description: script for the Allegro Splash Screen
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
