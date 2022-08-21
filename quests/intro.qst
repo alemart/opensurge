@@ -13,6 +13,6 @@ name            "Introduction"
 
 // level list (in order of appearance)
 level           "levels/scenes/contribute.lev" // opens a "Donate to Open Surge" web page when exiting - please remove this line if you're making your own game
-level           "levels/scenes/allegro.lev"
+level           "levels/scenes/allegro_splash.lev"
 level           "levels/scenes/sage22_splash.lev"
 level           "levels/scenes/title_screen.lev"

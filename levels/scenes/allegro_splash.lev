@@ -1,0 +1,11 @@
+name "Allegro Splash Screen"
+author "Alexandre Martins"
+license "CC0"
+version "1.0"
+requires "0.6.0"
+act 1
+theme "themes/none.brk"
+bgtheme "themes/scenes/allegro_splash.bg"
+setup "Allegro Splash Screen"
+players "None"
+readonly
