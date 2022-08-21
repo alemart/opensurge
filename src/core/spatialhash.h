@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * spatialhash.h - generic-type spatial hash table (bidimensional)
- * Copyright (C) 2011, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2011, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,10 @@
 #include "logfile.h"
 
 /* utilities */
-#define SPATIALHASH_GRID_WIDTH      105
-#define SPATIALHASH_GRID_HEIGHT     21
+#define SPATIALHASH_GRID_WIDTH      64
+#define SPATIALHASH_GRID_HEIGHT     32
+#define DEFAULT_WORLD_WIDTH         50048 /* max. estimates; multiples of the grid size */
+#define DEFAULT_WORLD_HEIGHT        15008
 
 /* spatialhash_<typename> class: pretty much like C++ templates */
 #define SPATIALHASH_GENERATE_CODE(T) \
@@ -72,7 +74,7 @@ spatialhash_##T* spatialhash_##T##_create_ex(T* (*destroy_element_strategy)(T*),
 /* creates a new spatial hash */ \
 spatialhash_##T* spatialhash_##T##_create(T* (*destroy_element_strategy)(T*), int (*get_element_xpos)(const T*), int (*get_element_ypos)(const T*), int (*get_element_width)(const T*), int (*get_element_height)(const T*)) /* destroy_element_strategy may be NULL */ \
 { \
-    return spatialhash_##T##_create_ex(destroy_element_strategy, get_element_xpos, get_element_ypos, get_element_width, get_element_height, 90300, 9030); \
+    return spatialhash_##T##_create_ex(destroy_element_strategy, get_element_xpos, get_element_ypos, get_element_width, get_element_height, DEFAULT_WORLD_WIDTH, DEFAULT_WORLD_HEIGHT); \
 } \
 /* destroys an existing spatial hash */ \
 spatialhash_##T* spatialhash_##T##_destroy(spatialhash_##T *sh) \
