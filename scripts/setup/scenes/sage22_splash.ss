@@ -11,7 +11,7 @@ using SurgeEngine.Level;
 object "SAGE 22 Splash Screen" is "setup"
 {
     jingle = Music("musics/sage22_splash.ogg");
-    fader = spawn("Fader").setFadeTime(1.0);
+    fader = spawn("Fader").setFadeTime(0.5);
     input = Input("default");
     secondsToWait = 9.0;
 
