@@ -5,6 +5,14 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
+//
+// The art is from an Allegro 4 example game ("shooter"). Allegro 4 is licensed
+// as Giftware. The animation was extracted using Allegro's grabber utility and
+// later converted to a spritesheet.
+//
+// ps: this animation was probably created in the early 2000s ;)
+//
+
 background
 {
     initial_position    0 0
