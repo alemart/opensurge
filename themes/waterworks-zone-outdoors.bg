@@ -17,8 +17,8 @@ background
     sprite
     {
         source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 256 256
-        frame_size      256 256
+        source_rect     0 0 16 256
+        frame_size      16 256
 
         animation
         {
@@ -266,8 +266,8 @@ background
     sprite
     {
         source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 256 1024
-        frame_size      256 1024
+        source_rect     0 0 16 1024
+        frame_size      16 1024
 
         animation
         {
@@ -289,54 +289,8 @@ background
     sprite
     {
         source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 256 1024
-        frame_size      256 1024
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-background
-{
-    initial_position    0 12048
-    scroll_speed        -1 -1
-    behavior            DEFAULT
-    repeat_x            TRUE
-    repeat_y            FALSE
-
-    sprite
-    {
-        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 256 1024
-        frame_size      256 1024
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-background
-{
-    initial_position    0 13072
-    scroll_speed        -1 -1
-    behavior            DEFAULT
-    repeat_x            TRUE
-    repeat_y            FALSE
-
-    sprite
-    {
-        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 256 1024
-        frame_size      256 1024
+        source_rect     0 0 16 1024
+        frame_size      16 1024
 
         animation
         {
