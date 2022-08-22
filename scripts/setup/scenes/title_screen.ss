@@ -64,7 +64,7 @@ object "Title Screen - Logo" is "private", "detached", "entity"
 
 object "Title Screen - Music"
 {
-    jingle = Music("musics/allegro.ogg"); // TODO
+    jingle = Music("musics/title.ogg");
 
     fun constructor()
     {
