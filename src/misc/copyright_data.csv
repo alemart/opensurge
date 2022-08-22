@@ -12,10 +12,10 @@ music;musics/boss.ogg;CC-BY-SA 3.0;Johan Brodd (jobromedia);;
 music;musics/allegro.ogg;CC0;Johan Brodd (jobromedia);;
 music;musics/creativecommons.ogg;CC0;Johan Brodd (jobromedia);;
 music;musics/silence.ogg;CC0;Johan Brodd (jobromedia);;
-music;musics/gameover.ogg;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;
-music;musics/drowning.ogg;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;
-music;musics/speed.ogg;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;
-music;musics/title.ogg;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;
+music;musics/gameover.ogg;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
+music;musics/drowning.ogg;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
+music;musics/speed.ogg;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
+music;musics/title.ogg;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
 music;musics/sunshine.ogg;CC-BY 3.0;Victor Seven (TheSeventhEmerald);;
 music;musics/gimacian.ogg;CC-BY 3.0;Colin Beard (SilverstepP);;
 music;musics/citychill.ogg;CC-BY 3.0;Mateus Reis (KZR);;
@@ -195,7 +195,7 @@ sound;samples/windshield.wav;CC-BY 3.0;Colin Beard (SilverstepP);;Compressed by 
 sound;samples/bubbleget.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
 sound;samples/bumper.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
 sound;samples/cash.wav;CC-BY 3.0;Colin Beard (SilverstepP);;
-sound;samples/1up.ogg;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;
+sound;samples/1up.ogg;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
 sound;samples/spikes_appearing.wav;CC-BY 3.0;Alexandre Martins;;
 sound;samples/spikes_disappearing.wav;CC-BY 3.0;Alexandre Martins;;
 sound;samples/destroy.wav;CC-BY 3.0;Alexandre Martins;;
@@ -238,7 +238,7 @@ translation;languages/russian.lng;MIT;Halatnikov;github.com/Halatnikov;
 translation;languages/spanish.lng;MIT;Álvaro Bazán (reaperplayer91);;
 translation;languages/italian.lng;MIT;Nicolò Patanè (Nick);;
 translation;languages/esperanto.lng;MIT;Jorge Maldonado Ventura;;
-artwork-source;src/misc/artwork/musics/1up.mmpz;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;LMMS project file
-artwork-source;src/misc/artwork/musics/drowning.mmpz;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;LMMS project file
-artwork-source;src/misc/artwork/musics/gameover.mmpz;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;LMMS project file
-artwork-source;src/misc/artwork/musics/speed.mmpz;CC-BY 3.0;Alexandre Almeida (M-374 LX);m374lx.users.sourceforge.net;LMMS project file
+artwork-source;src/misc/artwork/musics/1up.mmpz;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;LMMS project file
+artwork-source;src/misc/artwork/musics/drowning.mmpz;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;LMMS project file
+artwork-source;src/misc/artwork/musics/gameover.mmpz;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;LMMS project file
+artwork-source;src/misc/artwork/musics/speed.mmpz;CC-BY 3.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;LMMS project file
