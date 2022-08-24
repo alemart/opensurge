@@ -3623,6 +3623,112 @@ brick 926
 }
 
 
+brick 931
+{
+    type                SOLID
+    behavior            CIRCULAR 64 0 0.125 0
+    mask                "images/bricks/waterworks-zone/mask931.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick931.png"
+        source_rect     0 0 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 932
+{
+    type                SOLID
+    behavior            CIRCULAR 32 0 0.125 0
+    mask                "images/bricks/waterworks-zone/mask932.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick932.png"
+        source_rect     0 0 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 933
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask933.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick933.png"
+        source_rect     0 0 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 934
+{
+    type                SOLID
+    behavior            CIRCULAR 32 0 0.125 0 180
+    mask                "images/bricks/waterworks-zone/mask934.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick934.png"
+        source_rect     0 0 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 935
+{
+    type                SOLID
+    behavior            CIRCULAR 64 0 0.125 0 180
+    mask                "images/bricks/waterworks-zone/mask935.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick935.png"
+        source_rect     0 0 32 32
+        frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+
 brick 998
 {
     type                CLOUD
