@@ -23,13 +23,15 @@ object "Default HUD" is "entity", "detached", "awake", "private"
 
     state "main"
     {
-        if(Level.cleared)
+        if(Level.cleared) {
+            timer.block();
             state = "cleared";
+        }
     }
 
     state "cleared"
     {
-        transform.translateBy(-Screen.width * Time.delta, 0);
+        //transform.translateBy(-Screen.width * Time.delta, 0);
     }
 
     fun constructor()
@@ -84,12 +86,22 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
         label.text = "<color=ffee11>$HUD_TIME</color>";
     }
 
+    state "blocked"
+    {
+        // don't change the labels
+    }
+
     fun pad(x)
     {
         if(x < 10)
             return "0" + x;
         else
             return x;
+    }
+
+    fun block()
+    {
+        state = "blocked";
     }
 
     fun constructor()
