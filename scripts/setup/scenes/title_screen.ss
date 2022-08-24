@@ -24,7 +24,7 @@ using SurgeEngine.Behaviors.DirectionalMovement;
 object "Title Screen" is "setup"
 {
     fader = spawn("Fader");
-    //logo = spawn("Title Screen - Logo");
+    logo = spawn("Title Screen - Logo");
     version = spawn("Title Screen - Version");
     website = spawn("Title Screen - Website");
     music = spawn("Title Screen - Music");
@@ -208,7 +208,7 @@ object "Title Screen - Menu" is "private", "detached", "entity"
 
     fun constructor()
     {
-        transform.position = Vector2(Screen.width / 2, Screen.height - 32);
+        transform.position = Vector2(Screen.width / 2, Screen.height - 20);
     }
 }
 
