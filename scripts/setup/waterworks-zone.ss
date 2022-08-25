@@ -66,9 +66,11 @@ object "Waterworks Zone" is "setup"
         //
         "2": {
             "Bridge": {
+                "anim": 1
+            },
+            "f17c6865adef838f": { // a Bridge
                 "length": 4,
                 "layer": "yellow",
-                "anim": 1
             },
         },
 
