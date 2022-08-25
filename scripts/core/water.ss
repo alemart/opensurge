@@ -180,7 +180,11 @@ object "WaterController.SplashListener"
 
     fun splash(player)
     {
-        Level.spawnEntity("Water Splash", Vector2(player.transform.position.x, Level.waterlevel));
+        if(player.frozen)
+            return;
+
+        position = Vector2(player.transform.position.x, Level.waterlevel);
+        Level.spawnEntity("Water Splash", position);
     }
 }
 
