@@ -15,7 +15,7 @@
 LANG_ID                     "bs_BA"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Bosanski"                // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
-LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2022-08-26"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
