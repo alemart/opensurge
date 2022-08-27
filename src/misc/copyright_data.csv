@@ -218,6 +218,8 @@ sound;samples/electric_bulb.wav;CC-BY 3.0;Eddy Bergman;youtube.com/ededitz, free
 sound;samples/discharge.wav;CC0;Selector;freesound.org;
 sound;samples/teleport_appear.wav;CC0;little_dog4000;freesound.org;Edited by Alexandre Martins
 sound;samples/teleport_disappear.wav;CC0;little_dog4000;freesound.org;Edited by Alexandre Martins
+sound;samples/power_pluggy_enter.wav;CC-BY 3.0;Alexandre Martins;;
+sound;samples/power_pluggy_exit.wav;CC-BY 3.0;Mateus Reis (KZR);;
 level;levels/sunshine-1.lev;CC-BY 3.0;Alexandre Martins;;
 level;levels/sunshine-2.lev;CC-BY 3.0;Alexandre Martins;;
 level;levels/sunshine-3.lev;CC-BY 3.0;Alexandre Martins;;
