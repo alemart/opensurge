@@ -106,6 +106,11 @@ object "Power Pluggy Rotative" is "private", "entity", "awake"
         // do nothing
     }
 
+    state "done"
+    {
+        // do nothing
+    }
+
     state "rotating"
     {
         // look at the player
@@ -133,7 +138,7 @@ object "Power Pluggy Rotative" is "private", "entity", "awake"
                 parent.onPlayerExit(player);
                 transform.angle = -90;
                 player = null;
-                state = "main";
+                state = "done";
                 //Console.print("EXIT");
             }
         }
@@ -149,7 +154,7 @@ object "Power Pluggy Rotative" is "private", "entity", "awake"
     fun onPlayerCollision(p)
     {
         //Console.print(p.name);
-        if(state == "rotating")
+        if(state !== "main")
             return;
 
         player = p;
