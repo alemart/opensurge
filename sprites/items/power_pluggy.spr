@@ -5,12 +5,13 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-sprite "Power Pluggy Clockwise"
+sprite "Power Pluggy"
 {
     source_file     "images/items/power_pluggy.png"
     source_rect     256 32 160 160
     frame_size      160 32
     hot_spot        16 16
+    action_spot     152 16
 
     animation 0
     {
@@ -20,18 +21,33 @@ sprite "Power Pluggy Clockwise"
     }
 }
 
-sprite "Power Pluggy Counterclockwise"
+sprite "Power Pluggy Clockwise"
 {
     source_file     "images/items/power_pluggy.png"
-    source_rect     256 32 160 160
-    frame_size      160 32
-    hot_spot        16 16
+    source_rect     418 32 32 160
+    frame_size      32 160
+    hot_spot        16 144
 
     animation 0
     {
         repeat      TRUE
-        fps         12
-        data        0 0 0 0 0 0 0 0 0 0 0 0 1 2 3 2 1
+        fps         8
+        data        0
+    }
+}
+
+sprite "Power Pluggy Counterclockwise"
+{
+    source_file     "images/items/power_pluggy.png"
+    source_rect     418 32 32 160
+    frame_size      32 160
+    hot_spot        16 144
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
     }
 }
 

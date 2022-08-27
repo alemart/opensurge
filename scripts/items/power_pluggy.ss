@@ -15,7 +15,7 @@ using SurgeEngine.Collisions.CollisionBall;
 object "Power Pluggy Clockwise" is "entity", "gimmick"
 {
     brick = Brick("Power Pluggy Clockwise Mask");
-    rotative = spawn("Power Pluggy Rotative");
+    base = spawn("Power Pluggy Base");
     piOverTwo = Math.pi / 2;
     minGsp = 300;
 
@@ -40,7 +40,7 @@ object "Power Pluggy Clockwise" is "entity", "gimmick"
 
     fun onReset()
     {
-        rotative.reset();
+        base.reset();
     }
 
     fun constructor()
@@ -54,7 +54,7 @@ object "Power Pluggy Clockwise" is "entity", "gimmick"
 object "Power Pluggy Counterclockwise" is "entity", "gimmick"
 {
     brick = Brick("Power Pluggy Counterclockwise Mask");
-    rotative = spawn("Power Pluggy Rotative");
+    base = spawn("Power Pluggy Base");
     piOverTwo = Math.pi / 2;
     minGsp = 300;
 
@@ -79,7 +79,7 @@ object "Power Pluggy Counterclockwise" is "entity", "gimmick"
 
     fun onReset()
     {
-        rotative.reset();
+        base.reset();
     }
 
     fun constructor()
@@ -90,12 +90,12 @@ object "Power Pluggy Counterclockwise" is "entity", "gimmick"
     }
 }
 
-object "Power Pluggy Rotative" is "private", "entity", "awake"
+object "Power Pluggy Base" is "private", "entity", "awake"
 {
-    actor = Actor("Power Pluggy Clockwise");
-    collider = spawn("Power Pluggy Collider");
+    actor = Actor("Power Pluggy");
     sfxEnter = Sound("samples/power_pluggy_enter.wav");
     sfxExit = Sound("samples/power_pluggy_exit.wav");
+    collider = spawn("Power Pluggy Collider").setOffset(actor.animation.actionOffset);
     transform = Transform();
     player = null;
     oldDot = 1.0;
@@ -122,6 +122,7 @@ object "Power Pluggy Rotative" is "private", "entity", "awake"
         // compute a dot product
         oldDot = dot;
         dot = ds.normalized().dot(Vector2.up);
+        //dot = -ds.y / ds.length;
         //Console.print(dot);
 
         // we're just starting to rotate
@@ -162,9 +163,9 @@ object "Power Pluggy Rotative" is "private", "entity", "awake"
         state = "rotating";
 
         sfxEnter.play();
+        parent.onPlayerEnter(player);
         player.roll();
         player.input.enabled = false;
-        parent.onPlayerEnter(player);
 
         //Console.print("ENTER");
     }
@@ -181,10 +182,10 @@ object "Power Pluggy Collider" is "private", "entity", "awake"
     collider = CollisionBall(12);
     transform = Transform();
 
-    fun constructor()
+    fun setOffset(offset)
     {
-        transform.localPosition = Vector2(136, 0);
-        //collider.visible = true;
+        transform.localPosition = offset;
+        return this;
     }
 
     fun onCollision(otherCollider)
