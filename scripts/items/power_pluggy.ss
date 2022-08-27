@@ -126,14 +126,16 @@ object "Power Pluggy Rotative" is "private", "entity", "awake"
         }
 
         // let the player go
-        else if(dot > oldDot && timeout(0.25)) {
-            sfxExit.play();
-            player.input.enabled = true;
-            parent.onPlayerExit(player);
-            transform.angle = -90;
-            player = null;
-            state = "main";
-            //Console.print("EXIT");
+        else if(dot > oldDot) {
+            if(timeout(0.25) || player.slope == 180) {
+                sfxExit.play();
+                player.input.enabled = true;
+                parent.onPlayerExit(player);
+                transform.angle = -90;
+                player = null;
+                state = "main";
+                //Console.print("EXIT");
+            }
         }
     }
 
