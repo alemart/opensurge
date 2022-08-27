@@ -85,7 +85,7 @@ object "Power Pluggy Counterclockwise" is "entity", "gimmick"
     fun constructor()
     {
         brick.type = "solid";
-        brick.offset = Vector2(-144+16, 0);
+        brick.offset = Vector2(-128, 0);
         brick.enabled = false;
     }
 }
