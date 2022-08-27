@@ -2307,6 +2307,7 @@ brick 272
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask272.png"
+    zindex              0.51
 
     sprite
     {
@@ -2329,6 +2330,7 @@ brick 273
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask273.png"
+    zindex              0.51
 
     sprite
     {
@@ -2351,6 +2353,7 @@ brick 274
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask274.png"
+    zindex              0.51
 
     sprite
     {
@@ -2373,6 +2376,7 @@ brick 275
     type                PASSABLE
     behavior            DEFAULT
     mask                "images/bricks/waterworks-zone/mask275.png"
+    zindex              0.51
 
     sprite
     {
@@ -2509,6 +2513,28 @@ brick 282
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick282.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 290
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask290.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick290.png"
         source_rect     0 0 128 128
         frame_size      128 128
 
@@ -3626,7 +3652,7 @@ brick 926
 brick 931
 {
     type                SOLID
-    behavior            CIRCULAR 64 0 0.125 0
+    behavior            CIRCULAR 64 0 0.2 0
     mask                "images/bricks/waterworks-zone/mask931.png"
 
     sprite
@@ -3647,7 +3673,7 @@ brick 931
 brick 932
 {
     type                SOLID
-    behavior            CIRCULAR 32 0 0.125 0
+    behavior            CIRCULAR 32 0 0.2 0
     mask                "images/bricks/waterworks-zone/mask932.png"
 
     sprite
@@ -3689,7 +3715,7 @@ brick 933
 brick 934
 {
     type                SOLID
-    behavior            CIRCULAR 32 0 0.125 0 180
+    behavior            CIRCULAR 32 0 0.2 0 180
     mask                "images/bricks/waterworks-zone/mask934.png"
 
     sprite
@@ -3710,7 +3736,7 @@ brick 934
 brick 935
 {
     type                SOLID
-    behavior            CIRCULAR 64 0 0.125 0 180
+    behavior            CIRCULAR 64 0 0.2 0 180
     mask                "images/bricks/waterworks-zone/mask935.png"
 
     sprite
@@ -3718,6 +3744,48 @@ brick 935
         source_file     "images/bricks/waterworks-zone/brick935.png"
         source_rect     0 0 32 32
         frame_size      32 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 951
+{
+    type                SOLID
+    behavior            FALL 16 4 1
+    mask                "images/bricks/waterworks-zone/mask951.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick951.png"
+        source_rect     0 0 128 32
+        frame_size      128 32
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 961
+{
+    type                SOLID
+    behavior            SMASHABLE 2 1
+    mask                "images/bricks/waterworks-zone/mask961.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick961.png"
+        source_rect     0 0 32 16
+        frame_size      32 16
 
         animation
         {
