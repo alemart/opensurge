@@ -689,10 +689,12 @@ int level_save(const char *filepath)
         fprintf(fp, "grouptheme \"%s\"\n", grouptheme);
 
     /* setup objects? */
-    fprintf(fp, "setup");
-    for(its=setupobject_list; its; its=its->next)
-        fprintf(fp, " \"%s\"", str_addslashes(its->object_name));
-    fprintf(fp, "\n");
+    if(setupobject_list != NULL) {
+        fprintf(fp, "setup");
+        for(its=setupobject_list; its; its=its->next)
+            fprintf(fp, " \"%s\"", str_addslashes(its->object_name));
+        fprintf(fp, "\n");
+    }
 
     /* players */
     fprintf(fp, "players");
