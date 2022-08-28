@@ -1407,6 +1407,48 @@ brick 165
     }
 }
 
+brick 166
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask166.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick166.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+brick 167
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone/mask167.png"
+
+    sprite
+    {
+        source_file     "images/bricks/waterworks-zone/brick167.png"
+        source_rect     0 0 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
 
 brick 180
 {
