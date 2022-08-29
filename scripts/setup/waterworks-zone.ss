@@ -68,9 +68,8 @@ object "Waterworks Zone" is "setup"
             "Bridge": {
                 "anim": 1
             },
-            "f17c6865adef838f": { // a Bridge
-                "length": 4,
-                "layer": "yellow",
+            "Background Exchanger": {
+                "background": "themes/waterworks-zone-outdoors.bg"
             },
         },
 

@@ -13,7 +13,7 @@ requires "0.6.0"
 act 2
 theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-indoors.bg"
-spawn_point 224 8960
+spawn_point 28736 9392
 setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Cleared Animation" "Waterworks Zone"
 players "Surge"
 waterlevel 10000
@@ -1409,6 +1409,10 @@ brick 11 29984 9456
 brick 1 29728 9584
 brick 1 29856 9584
 brick 1 29984 9584
+brick 11 30112 9456
+brick 11 30240 9456
+brick 1 30112 9584
+brick 1 30240 9584
 brick 11 28960 9456
 brick 11 29088 9456
 brick 11 29216 9456
@@ -2046,16 +2050,29 @@ brick 507 624 9488
 brick 101 29952 9328
 brick 101 29824 9328
 brick 101 29984 9328
+brick 101 30112 9328
+brick 101 30240 9328
 brick 101 29440 9328
 brick 101 29312 9328
-brick 101 29184 9328
-brick 101 29056 9328
 brick 101 29568 9328
 brick 101 29696 9328
-brick 101 28928 9328
+brick 501 28992 9344
+brick 501 29120 9344
+brick 511 29248 9344
+brick 111 29280 9216
+brick 111 29280 9088
+brick 111 29280 8960
+brick 11 29120 9216
+brick 11 28992 9216
+brick 1 29152 9216
+brick 1 28960 9088
+brick 1 29088 9088
+brick 1 29152 9088
+brick 1 28960 8960
+brick 1 29088 8960
+brick 1 29152 8960
 brick 555 28416 9344
 brick 551 28544 9344
-brick 103 28800 9328
 brick 556 28480 9344
 brick 556 28480 9216
 brick 556 28480 9088
@@ -2066,6 +2083,15 @@ brick 220 28592 9280
 brick 220 28608 9280
 brick 999 28640 9312
 brick 999 28640 9280
+brick 508 28736 9344
+brick 501 28864 9344
+brick 110 28800 9216
+brick 110 28800 9088
+brick 110 28800 8960
+brick 11 28864 9216
+brick 1 28832 9216
+brick 1 28832 9088
+brick 1 28832 8960
 brick 114 24416 8928
 brick 113 24288 8928
 brick 116 24288 9152
@@ -4181,7 +4207,6 @@ entity "Tube In" 28528 9920 "7a81d39a2aed3244"
 entity "Tube Out" 28592 9408 "a7a77493f1fcf920"
 entity "Tube In" 28560 9408 "88d50cb3a7a148d2"
 entity "Spring Booster Right" 28320 9936 "d47ffdfbfc207ec3"
-entity "Goal" 29456 9424 "9121da4b4395f289"
 entity "Layer Green" 25072 8624 "3da2239a85a925cb"
 entity "Layer Green" 25072 8592 "dab12d6d34d26540"
 entity "Layer Green" 25072 8560 "9b239ff5b59e918a"
@@ -4375,5 +4400,23 @@ entity "Layer Yellow" 752 8864 "b1377545ccdcf6da"
 entity "Layer Yellow" 720 8864 "b9af2e009dcdb9b7"
 entity "Layer Yellow" 688 9136 "96bc3aee0254a35a"
 entity "Spring Stronger Right" 0 8992 "ff6ea231889c5117"
+entity "Background Exchanger" 320 8992 "4c290c2b72f0c59a"
+entity "Background Restorer" 352 8992 "18143b9f85b50291"
+entity "Background Exchanger" 20976 8912 "bf340a2ac899ad70"
+entity "Goal" 30016 9424 "8394117c04f363d2"
+entity "Tube Out" 29280 9408 "cc3bbe71cf723195"
+entity "Tube In" 29248 9408 "63a30034973e10b6"
+entity "Tube Out" 28832 9408 "b04f3ef3f1ac8117"
+entity "Tube In" 28864 9408 "93b1b8dd16e77dd5"
+entity "Background Exchanger" 29056 9408 "3988bb6b3673666e"
+entity "Spring Booster Right" 29296 9424 "7155693da48972d7"
+entity "Event Trigger 7" 29584 9408 "47fa5e10954be626"
+entity "Event Trigger 7" 29584 9376 "f90305f6c3b99bf9"
+entity "Event Trigger 7" 29584 9344 "d4fb40749e3b368e"
+entity "Event Trigger 7" 29584 9312 "cda50622d9dd2363"
+entity "Event Trigger 7" 29584 9280 "52fd01370c8021e5"
+entity "Event Trigger 7" 29584 9248 "5df2da3db761f8e6"
+entity "Event Trigger 7" 29584 9216 "0aa850d3ae43c297"
+entity "Event Trigger 7" 29584 9184 "8210822be01900d2"
 
 // EOF
