@@ -33,9 +33,14 @@ object "Power Pluggy Clockwise" is "entity", "gimmick"
         brick.enabled = false;
     }
 
+    fun canPlayerEnter(player)
+    {
+        return (player.gsp > 0);
+    }
+
     fun isStartingToRotate(angle)
     {
-        return angle < -piOverTwo;
+        return (angle < -piOverTwo);
     }
 
     fun onReset()
@@ -72,9 +77,14 @@ object "Power Pluggy Counterclockwise" is "entity", "gimmick"
         brick.enabled = false;
     }
 
+    fun canPlayerEnter(player)
+    {
+        return (player.gsp < 0);
+    }
+
     fun isStartingToRotate(angle)
     {
-        return angle > -piOverTwo && angle < 0;
+        return (angle > -piOverTwo && angle < 0);
     }
 
     fun onReset()
@@ -158,6 +168,12 @@ object "Power Pluggy Base" is "private", "entity", "awake"
         if(state !== "main")
             return;
 
+        if(p.midair || p.frozen || p.dying || p.drowning)
+            return;
+
+        if(!parent.canPlayerEnter(p))
+            return;
+
         player = p;
         dot = oldDot = 1.0;
         state = "rotating";
@@ -192,9 +208,7 @@ object "Power Pluggy Collider" is "private", "entity", "awake"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            if(!player.midair && !player.frozen && !player.dying && !player.drowning) {
-                parent.onPlayerCollision(player);
-            }
+            parent.onPlayerCollision(player);
         }
     }
 }
