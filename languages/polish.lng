@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // File: languages/polish.lng
 // Description: Polish translation (encoding: UTF-8)
-// Author: Artur "suve" Iwicki (veg@svgames.pl)
+// Author: suve, a.k.a. Artur Frenszek-Iwicki (veg@svgames.pl)
 // License: MIT
 // -----------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@
 LANG_ID                     "pl_PL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
-LANG_LASTUPDATE             "2021-01-24"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2022-08-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.5.2"                   // required engine version
 
 
@@ -103,17 +103,17 @@ CREDITS_BACK                "Wciśnij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</colo
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME, wersja $GAME_VERSION</color>\nnapędzana przez $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ludzie</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Podziękowania dla</color>"
-FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
+CREDITS_ALEXANDRE           "Założyciel projektu\nProgramista\nArtysta"
 CREDITS_JOAO                "Artysta"
 CREDITS_MATEUS              "Efekty dźwiękowe"
-FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
+CREDITS_CODY                "Artysta konceptualny\nDesigner przeciwników"
 CREDITS_JOHAN               "Muzyk (spoczywaj w pokoju, przyjacielu)"
 CREDITS_DI                  "Muzyk"
 CREDITS_VICTOR              "Muzyk"
 CREDITS_M374LX              "Muzyk"
 CREDITS_COLIN               "Sprite'y, scenariusz"
 CREDITS_BRIAN               "Rysownik sprite'ów"
-FIXME (untranslated) CREDITS_LEMON               "Illustrator"
+CREDITS_LEMON               "Rysownik"
 CREDITS_TRANSLATOR          "Tłumacz"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tłumaczenia</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Autorzy poszczególnych plików</color>"
@@ -128,16 +128,16 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skrypty</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autorzy wymienieni zostali wewnątrz skryptów."
 
 // Title Screen
-FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
-FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
-FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
-FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_PLAY            "NOWA GRA"
+TITLESCREEN_OPTIONS         "USTAWIENIA"
+TITLESCREEN_QUIT            "WYJDŹ"
+TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
-FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
-FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
+ENDOFDEMO_CONTINUE          "KONTYNUUJ"
+ENDOFDEMO_VERSION           "DEMO 1\n20220902"
+ENDOFDEMO_TEXT              "Dzięki za grę! Surge the Rabbit jest ciągle rozwijane.\n\nOdwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby być na bieżąco!\n\nA teraz zobacz, jak Ty też możesz tworzyć własne gry!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -223,10 +223,10 @@ LOADING_TEXT                "wczytywanie..."
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Twórz własne, niesamowite gry!</color>\nTa gra została stworzona przy użyciu <color=$COLOR_HIGHLIGHT>Open Surge</color>, otwartoźródłowego silnika 2D, który teraz jest w twoich rękach!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Czy wiesz, że...?</color>\nWszystko w Open Surge jest edytowalne! Możesz tworzyć poziomy, przedmioty, postacie, wrogów - i więcej!\nTo pełny <color=$COLOR_HIGHLIGHT>system tworzenia gier</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uwolnij swoją kreatywność!</color>\nJedną z kluczowych zalet Open Surge jest <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To język skryptowy dla gier - za jego pomocą możesz zbudować co tylko zdołasz sobie wyobrazić!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nCzujesz ekscytację? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nEkscytujące? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Spróbuj!</color>\nTeraz twoja kolej! <color=$COLOR_HIGHLIGHT>Naciśnij F12, by otworzyć edytor.</color> Następnie otwórz paletę przedmiotów i zacznij budować swój poziom! (Naciśnij F1, jeżeli potrzebujesz pomocy.)"
 
 
@@ -243,7 +243,7 @@ EDITOR_UI_GROUP             "grupa"
 EDITOR_UI_ENTITY            "jednostka"
 EDITOR_UI_LEGACYITEM        "przedmiot (kompat. wstecz.)"
 EDITOR_UI_LEGACYOBJECT      "obiekt (kompat. wstecz.)"
-EDITOR_UI_MISSING           "<zaginiony>"
+EDITOR_UI_MISSING           "<brak>"
 
 // Bricks - scenery elements
 // Translators: please keep the names below succint. See the comments for their meaning.
