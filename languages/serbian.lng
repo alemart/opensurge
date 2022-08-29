@@ -15,7 +15,7 @@
 LANG_ID                     "sr_RS"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Српски"                  // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
-LANG_LASTUPDATE             "2020-09-14"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2022-08-26"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
@@ -103,41 +103,41 @@ CREDITS_BACK                "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIR
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME верзија $GAME_VERSION</color>\nпокренуто помоћу $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Људи</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Захваљујући</color>"
-FIXME (untranslated) CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
+CREDITS_ALEXANDRE           "Водитељ и оснивач пројекта\nПројект програмер\nУметник"
 CREDITS_JOAO                "Уметник"
 CREDITS_MATEUS              "Звучни ефекти"
-FIXME (untranslated) CREDITS_CODY                "Concept artist\nEnemy designer"
+CREDITS_CODY                "Уметник концепта\nНепријатељски дизајнер"
 CREDITS_JOHAN               "Музичар (почивај у миру, друже)"
 CREDITS_DI                  "Музичар"
 CREDITS_VICTOR              "Музичар"
 CREDITS_M374LX              "Музичар"
 CREDITS_COLIN               "Спрајти, прва прича"
 CREDITS_BRIAN               "Уметник спрајта"
-FIXME (untranslated) CREDITS_LEMON               "Illustrator"
+CREDITS_LEMON               "Илустратор"
 CREDITS_TRANSLATOR          "Преводилац"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Преводиоци</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Кредити по појединачним ресурсима</color>"
-FIXME (untranslated) CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
+CREDITS_RES_TEXT            "Све наведене датотеке испод су под либре лиценцама. Њихови аутори су представљени:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Слике</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музика</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звучни ефекти</color>"
-FIXME (untranslated) CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fonts</color>"
-FIXME (untranslated) CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Levels</color>"
-FIXME (untranslated) CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Translations</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Фонтови</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Нивои</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Преводи</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипте</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у самим скриптама."
 
 // Title Screen
-FIXME (untranslated) TITLESCREEN_PLAY            "START GAME"
-FIXME (untranslated) TITLESCREEN_OPTIONS         "OPTIONS"
-FIXME (untranslated) TITLESCREEN_QUIT            "QUIT"
-FIXME (untranslated) TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-FIXME (untranslated) TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_PLAY            "ЗАПОЧНИ ИГРУ"
+TITLESCREEN_OPTIONS         "ОПЦИЈЕ"
+TITLESCREEN_QUIT            "НАПУСТИТИ"
+TITLESCREEN_VERSION         "ДЕМО 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
-FIXME (untranslated) ENDOFDEMO_CONTINUE          "CONTINUE"
-FIXME (untranslated) ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-FIXME (untranslated) ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
+ENDOFDEMO_CONTINUE          "НАСТАВИТЕ"
+ENDOFDEMO_VERSION           "ДЕМО 1\n20220902"
+ENDOFDEMO_TEXT              "Хвала што сте играли! Surge the Rabbit је тренутно у развоју.\n\nПосетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> за ажурирања!\n\nСада да видимо како и ви можете да креирате властите игре!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENI"
@@ -193,14 +193,14 @@ INPUT_JOY_LEFT              "ЛЕВО ДУГМЕ"
 INPUT_JOY_RIGHT             "ДЕСНО ДУГМЕ"
 INPUT_JOY_UP                "ГОРЊЕ ДУГМЕ"
 INPUT_JOY_DOWN              "ДОЊЕ ДУГМЕ"
-FIXME (untranslated) // INPUT_JOY_FIRE1             "JUMP"
-FIXME (untranslated) // INPUT_JOY_FIRE2             "SWITCH"
-FIXME (untranslated) // INPUT_JOY_FIRE3             "PAUSE"
-FIXME (untranslated) // INPUT_JOY_FIRE4             "BACK"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<available>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<available>"
+INPUT_JOY_FIRE1             "ШКОЧИ"
+INPUT_JOY_FIRE2             "ПРЕБАЦИ"
+INPUT_JOY_FIRE3             "ПАУЗИРАЈ"
+INPUT_JOY_FIRE4             "НАЗАД"
+INPUT_JOY_FIRE5             "<dostupno>"
+INPUT_JOY_FIRE6             "<dostupno>"
+INPUT_JOY_FIRE7             "<dostupno>"
+INPUT_JOY_FIRE8             "<dostupno>"
 
 
 
@@ -322,7 +322,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Пребачено на <color=$1>жути</color> 
 //
 
 // Demo Level
-FIXME (untranslated) LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Креирајте своје невероватне игре!</color>\nОва игра је направљена са <color=$COLOR_HIGHLIGHT>Open Surge-ом</color>, веома флексибилном кодом отвореног извора за 2D игре која је сада у вашим рукама!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Јесте ли знали...?</color>\nСве у Open Surge-у је измењиво. Можете правити нивое, предмете, boss-ове, ликове и више! Потпун је <color=$COLOR_HIGHLIGHT>систем за креирање игре</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Ослободите своју креативност!</color>\nЈедна од кључних карактеристика у Open Surge-у је <color=$COLOR_HIGHLIGHT>SurgeScript</color>. То је скриптовање за игре! Користите то да направите било што шта можете замислити!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Кул!</color>\nЈесте ли већ узбуђени? Небо је граница! Идите на <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> да направите своје невероватне игре данас!"
