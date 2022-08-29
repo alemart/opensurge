@@ -197,10 +197,10 @@ INPUT_JOY_FIRE1             "SKOČI"
 INPUT_JOY_FIRE2             "ŠALTAJ"
 INPUT_JOY_FIRE3             "PAUZIRAJ"
 INPUT_JOY_FIRE4             "NATRAG"
-FIXME (untranslated) // INPUT_JOY_FIRE5             "<dostupan>"
-FIXME (untranslated) // INPUT_JOY_FIRE6             "<dostupan>"
-FIXME (untranslated) // INPUT_JOY_FIRE7             "<dostupan>"
-FIXME (untranslated) // INPUT_JOY_FIRE8             "<dostupan>"
+INPUT_JOY_FIRE5             "<dostupan>"
+INPUT_JOY_FIRE6             "<dostupan>"
+INPUT_JOY_FIRE7             "<dostupan>"
+INPUT_JOY_FIRE8             "<dostupan>"
 
 
 
