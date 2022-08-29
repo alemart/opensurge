@@ -395,13 +395,34 @@ font "Title Screen - Menu Item"
     }
 }
 
-
 font "Title Screen - Menu Item" for "ru_RU"
 {
     truetype
     {
-        source_file             "fonts/Roboto-Bold.ttf"
-        size                    15
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    12
+        shadow
+        antialias
+    }
+}
+
+font "Title Screen - Menu Item" for "bs_BA"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    12
+        shadow
+        antialias
+    }
+}
+
+font "Title Screen - Menu Item" for "sr_RS"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    12
         shadow
         antialias
     }
