@@ -671,6 +671,8 @@ brick 221 3840 10720
 brick 221 3776 10704
 brick 221 3776 10576
 brick 261 3728 10720
+brick 270 3232 10720
+brick 271 3200 10720
 brick 102 3104 10656
 brick 130 2976 10688
 brick 111 2592 10624
@@ -917,17 +919,11 @@ brick 102 20096 10272
 brick 101 19712 10240
 brick 282 19584 10016
 brick 202 19584 9872
-brick 202 19712 9872
 brick 202 19840 9872
-brick 202 19968 9872
 brick 202 20096 9872
-brick 202 20224 9872
 brick 203 19584 9872
-brick 203 19712 9872
 brick 203 19840 9872
-brick 203 19968 9872
 brick 203 20096 9872
-brick 203 20224 9872
 brick 280 20320 10288
 brick 280 20320 10208
 brick 280 20320 10128
@@ -1208,8 +1204,8 @@ brick 1 14336 10096
 brick 1 14336 10224
 brick 1 14208 9968
 brick 1 14080 9968
-brick 282 14752 10192
 brick 111 14720 10112
+brick 282 14752 10160
 brick 551 13440 9856
 brick 180 13312 9936
 brick 180 13376 9936
@@ -1791,24 +1787,15 @@ brick 802 19936 9568
 brick 802 19888 9568
 brick 802 19840 9568
 brick 801 19808 9568
-brick 202 20224 9744
 brick 202 20096 9744
-brick 202 19968 9744
 brick 202 19840 9744
-brick 202 19712 9744
 brick 202 19584 9744
 brick 202 19584 9616
 brick 202 19584 9488
-brick 202 19712 9616
-brick 202 19712 9488
 brick 202 19840 9616
 brick 202 19840 9488
-brick 202 19968 9616
-brick 202 19968 9488
 brick 202 20096 9616
 brick 202 20096 9488
-brick 202 20224 9616
-brick 202 20224 9488
 brick 103 18912 9728
 brick 105 19104 9728
 brick 101 19040 9728
@@ -2630,11 +2617,8 @@ brick 236 20864 9088
 brick 236 20864 9024
 brick 236 20864 8960
 brick 203 20352 9056
-brick 203 20480 9056
-brick 203 20736 9056
 brick 202 20352 8976
 brick 202 20352 9104
-brick 202 20480 8976
 brick 202 20480 9104
 brick 202 20608 8976
 brick 202 20608 9104
@@ -2646,6 +2630,9 @@ brick 268 20384 9152
 brick 269 20528 9152
 brick 268 20704 9152
 brick 271 20672 9152
+brick 203 20480 9056
+brick 203 20736 9056
+brick 202 20480 8976
 brick 804 19808 9264
 brick 805 19840 9264
 brick 805 19888 9264
@@ -2660,26 +2647,14 @@ brick 202 19584 9360
 brick 202 19584 9232
 brick 202 19584 9104
 brick 202 19584 8976
-brick 202 19712 9360
-brick 202 19712 9232
-brick 202 19712 9104
-brick 202 19712 8976
 brick 202 19840 9360
 brick 202 19840 9232
 brick 202 19840 9104
 brick 202 19840 8976
-brick 202 19968 9360
-brick 202 19968 9232
-brick 202 19968 9104
-brick 202 19968 8976
 brick 202 20096 9360
 brick 202 20096 9232
 brick 202 20096 9104
 brick 202 20096 8976
-brick 202 20224 9360
-brick 202 20224 9232
-brick 202 20224 9104
-brick 202 20224 8976
 brick 277 19472 9328
 brick 277 19472 9264
 brick 277 19472 9200
@@ -3506,34 +3481,25 @@ brick 1 20544 8480
 brick 1 20544 8544
 brick 202 20352 8720
 brick 202 20352 8848
-brick 202 20480 8720
-brick 202 20480 8848
 brick 202 20608 8720
 brick 202 20608 8848
-brick 202 20736 8720
 brick 202 20736 8848
 brick 202 20352 8592
 brick 202 20480 8592
 brick 202 20608 8592
 brick 202 20736 8592
+brick 202 20736 8720
+brick 202 20480 8848
+brick 202 20480 8720
 brick 202 19584 8848
-brick 202 19712 8848
 brick 202 19840 8848
-brick 202 19968 8848
 brick 202 20096 8848
-brick 202 20224 8848
-brick 202 20224 8720
 brick 202 20096 8720
-brick 202 19968 8720
 brick 202 19840 8720
-brick 202 19712 8720
 brick 202 19584 8720
 brick 202 19584 8592
-brick 202 19712 8592
 brick 202 19840 8592
-brick 202 19968 8592
 brick 202 20096 8592
-brick 202 20224 8592
 brick 277 19472 8880
 brick 277 19472 8816
 brick 277 19472 8752
@@ -3931,6 +3897,9 @@ brick 270 7872 8768
 brick 268 8032 8528
 brick 268 8272 8528
 brick 261 7952 8528
+brick 271 8128 8528
+brick 270 8240 8528
+brick 271 8000 8528
 brick 180 7680 8800
 brick 180 7744 8800
 brick 180 7808 8800
@@ -4309,7 +4278,6 @@ brick 202 8704 8320
 brick 269 9088 8384
 brick 271 9040 8384
 brick 923 8480 8416
-brick 201 8160 8432
 brick 277 7792 8384
 brick 277 7792 8320
 brick 277 7680 8384
@@ -4421,8 +4389,6 @@ entity "Layer Yellow" 1264 9648 "9b6c0b716897a7ab"
 entity "Layer Yellow" 1232 9648 "5e68949b5f120224"
 entity "Layer Green" 1296 9648 "321ccd39bd5db77e"
 entity "Layer Green" 1328 9648 "b022d22d08851390"
-entity "Spikes" 3216 10752 "67c97b226c7ad50c"
-entity "Water Bubbles" 3136 10752 "342835cb14ceb921"
 entity "Spring Standard" 2592 10176 "c372a9d11bf5e0a9"
 entity "Conveyor Belt A" 1504 9328 "a011eae4faff0128"
 entity "Conveyor Belt A" 1472 9328 "42d7368f06bbb52a"
@@ -5159,7 +5125,6 @@ entity "Event Trigger 7" 29584 9216 "0aa850d3ae43c297"
 entity "Event Trigger 7" 29584 9184 "8210822be01900d2"
 entity "Tube Out" 496 8976 "b611882de7c72cc9"
 entity "Tube In" 528 8976 "bf634c09c9fab0d0"
-entity "Powerup Shield Water" 14768 10192 "8170ba68e80715f9"
 entity "Bridge" 17200 9040 "9259ed92a69419c0"
 entity "Collectible" 1552 9664 "190f5ab3c7e22948"
 entity "Collectible" 1504 9600 "d3abab9663fabf1a"
@@ -5450,7 +5415,6 @@ entity "Collectible" 4832 10160 "ee831462c5fde81f"
 entity "Collectible" 4800 10160 "299ed65b2a11f40f"
 entity "RedMarmot" 1904 9296 "c24d550d4ef73427"
 entity "SwoopHarrier" 7248 8704 "c19a02742ab4c0bc"
-entity "SwoopHarrier" 8080 8480 "52660070776f5171"
 entity "SwoopHarrier" 9728 8336 "2e4d9277415df393"
 entity "RedMarmot" 9008 8416 "646bf10bdfb9ccb4"
 entity "Spikes" 9184 8416 "25ac202f3bb9122d"
@@ -5459,7 +5423,6 @@ entity "RulerSalamander" 15392 10880 "2e48c5ef2ac94858"
 entity "RedMarmot" 19024 9824 "10587e0789f15551"
 entity "SwoopHarrier" 24832 8544 "144de27e15a28e2e"
 entity "SwoopHarrier" 21536 8320 "e0458554d18b80b2"
-entity "SwoopHarrier" 22320 8528 "d2f814e69cb8fb33"
 entity "Powerup Collectibles" 19392 9456 "4d04cc77dedd2649"
 entity "Powerup Collectibles" 17888 9824 "419bc27eebe9a76b"
 entity "Powerup Shield Thunder" 10880 8528 "52c37dc1b22f2086"
@@ -5523,24 +5486,6 @@ entity "Audio Source" 17200 9472 "a8ac1e0383062f1b"
 entity "Audio Source" 17200 9728 "4645b66e8b628585"
 entity "Audio Source" 17200 8704 "1ef0cb07ddf981ce"
 entity "Audio Source" 17200 8448 "262c28ee1e81c14d"
-entity "Audio Source" 19712 9984 "b3a73d2239fb318f"
-entity "Audio Source" 19712 9728 "ad79b603ed2d442c"
-entity "Audio Source" 19712 9472 "eaecaa76226b95a4"
-entity "Audio Source" 19712 9216 "2a93661a7160ab8f"
-entity "Audio Source" 19712 8960 "561099d4dae96918"
-entity "Audio Source" 19712 8704 "e8b99ec71fb1fdca"
-entity "Audio Source" 19968 9984 "a5413b5a1b2aacb1"
-entity "Audio Source" 19968 9728 "dab04c8cdb71f5a8"
-entity "Audio Source" 19968 9472 "fa1dd453d8897c43"
-entity "Audio Source" 19968 9216 "402e65c24e191e7b"
-entity "Audio Source" 19968 8960 "8d3dde42ca03d287"
-entity "Audio Source" 19968 8704 "ee81066b9cf794e2"
-entity "Audio Source" 20224 9984 "15ede4708221034b"
-entity "Audio Source" 20224 9728 "cf88a5c52c16f38d"
-entity "Audio Source" 20224 9472 "1a089b4047d79d2a"
-entity "Audio Source" 20224 9216 "ac49d0a9b03a3890"
-entity "Audio Source" 20224 8960 "29b70aef7b0468e1"
-entity "Audio Source" 20224 8704 "a9f2e3ac19147870"
 entity "Audio Source" 20480 8704 "28f3782312364c80"
 entity "Audio Source" 20480 8960 "afdad47310230019"
 entity "Audio Source" 20480 9216 "ca89229b5e726059"
@@ -5561,14 +5506,10 @@ entity "Collectible" 7760 8784 "5c84081aefc60f3c"
 entity "Collectible" 7824 8784 "6aaf8fb27239cc22"
 entity "RedMarmot" 6736 8864 "7e8230234f5ef73a"
 entity "RedMarmot" 18192 9824 "9201544e8832c454"
-entity "Collectible" 19552 9936 "917d167028a134dc"
-entity "Collectible" 19520 9936 "d951f90f454cc1b5"
-entity "Collectible" 19488 9936 "04b7d004ba2c9576"
 entity "Collectible" 20144 9808 "a0e763f9c48615ce"
 entity "Collectible" 19728 9520 "9bbec3b880f9aa65"
 entity "SwoopHarrier" 7168 8480 "54d7638b88b8b032"
 entity "Powerup Trap" 17008 10816 "049ae70ad81eb67e"
-entity "SwoopHarrier" 19920 9744 "ce2972e8b5e8d492"
 entity "Collectible" 10032 8256 "7fe874651d924d0c"
 entity "Collectible" 10064 8256 "4d77eb4fafb7aa96"
 entity "Collectible" 10000 8256 "f476722568d6a043"
@@ -5576,5 +5517,39 @@ entity "Collectible" 10016 8224 "4f453dcf38217dc3"
 entity "Collectible" 10048 8224 "afd02012de462ff8"
 entity "Collectible" 11552 8640 "14de803114c05da7"
 entity "SwoopHarrier" 7504 8464 "f1cf136eba52a50a"
+entity "Powerup Shield Water" 14768 10160 "8170ba68e80715f9"
+entity "Checkpoint" 8192 8560 "34811161f1e15534"
+entity "SwoopHarrier" 19936 9776 "ce2972e8b5e8d492"
+entity "SwoopHarrier" 19920 9472 "f1a7ac42ef28afaa"
+entity "SwoopHarrier" 19920 9152 "58aec4141dc25475"
+entity "Collectible" 19552 9936 "bf6a00e7d4d86d9d"
+entity "Collectible" 19520 9936 "d198563a14d51a06"
+entity "Collectible" 19488 9936 "8ffa477c159ef1b2"
+entity "Audio Source" 19648 9984 "2455814a4f71ceb5"
+entity "Audio Source" 19648 9728 "f73e4da17e9a2068"
+entity "Audio Source" 19648 9472 "7fe4eee10a19e034"
+entity "Audio Source" 19648 9216 "9f865adbcf9b5ef4"
+entity "Audio Source" 19648 8960 "66a973745f9f5549"
+entity "Audio Source" 19648 8704 "a6bb03ce891a19a3"
+entity "Audio Source" 19904 9984 "69df743c5b1a2550"
+entity "Audio Source" 19904 9728 "1b150dbf2bbb451a"
+entity "Audio Source" 19904 9472 "e1e40a25b9be3510"
+entity "Audio Source" 19904 9216 "98b14bac41160d7a"
+entity "Audio Source" 19904 8960 "24b47179e2783fe0"
+entity "Audio Source" 19904 8704 "5c976b32e771379f"
+entity "Audio Source" 20160 9984 "1bf425b0dc61d230"
+entity "Audio Source" 20160 9728 "eafd8597a4c39d94"
+entity "Audio Source" 20160 9472 "85207e523781ffaf"
+entity "Audio Source" 20160 9216 "5259741aa344f790"
+entity "Audio Source" 20160 8960 "544627a9ed339a7f"
+entity "Audio Source" 20160 8704 "53662333ee33ed4e"
+entity "Water Bubbles" 3536 10720 "f08a192faa86771a"
+entity "Spikes" 3152 10752 "d58786fc6045fd74"
+entity "Collectible" 15040 10480 "12243a39aae973d5"
+entity "Collectible" 15072 10480 "06bd524fa57ef472"
+entity "Collectible" 14960 10288 "1db58d50b40068b4"
+entity "Collectible" 14928 10288 "e489942e92aec565"
+entity "Collectible" 14992 10288 "6a4f27db7fc861af"
+entity "Spring Booster Right" 28752 9424 "3c158df8babfd559"
 
 // EOF
