@@ -3694,7 +3694,7 @@ brick 926
 brick 931
 {
     type                SOLID
-    behavior            CIRCULAR 64 0 0.2 0
+    behavior            CIRCULAR 64 0 0.15 0
     mask                "images/bricks/waterworks-zone/mask931.png"
 
     sprite
@@ -3715,7 +3715,7 @@ brick 931
 brick 932
 {
     type                SOLID
-    behavior            CIRCULAR 32 0 0.2 0
+    behavior            CIRCULAR 32 0 0.15 0
     mask                "images/bricks/waterworks-zone/mask932.png"
 
     sprite
@@ -3757,7 +3757,7 @@ brick 933
 brick 934
 {
     type                SOLID
-    behavior            CIRCULAR 32 0 0.2 0 180
+    behavior            CIRCULAR 32 0 0.15 0 180
     mask                "images/bricks/waterworks-zone/mask934.png"
 
     sprite
@@ -3778,7 +3778,7 @@ brick 934
 brick 935
 {
     type                SOLID
-    behavior            CIRCULAR 64 0 0.2 0 180
+    behavior            CIRCULAR 64 0 0.15 0 180
     mask                "images/bricks/waterworks-zone/mask935.png"
 
     sprite
