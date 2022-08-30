@@ -502,8 +502,8 @@ brick 51
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick051.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 16
+        frame_size      128 16
 
         animation
         {
@@ -525,8 +525,8 @@ brick 52
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick052.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -548,8 +548,8 @@ brick 53
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick053.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -571,8 +571,8 @@ brick 54
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick054.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -594,8 +594,8 @@ brick 55
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick055.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -617,8 +617,8 @@ brick 56
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick056.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 32
+        frame_size      128 32
 
         animation
         {
@@ -640,8 +640,8 @@ brick 57
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick057.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 32
+        frame_size      128 32
 
         animation
         {
@@ -887,8 +887,8 @@ brick 110
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick110.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -909,8 +909,8 @@ brick 111
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick111.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -931,8 +931,8 @@ brick 112
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick112.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -953,8 +953,8 @@ brick 113
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick113.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 32
+        frame_size      128 32
 
         animation
         {
@@ -975,8 +975,8 @@ brick 114
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick114.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -997,8 +997,8 @@ brick 115
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick115.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -1019,8 +1019,8 @@ brick 116
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick116.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 32
+        frame_size      128 32
 
         animation
         {
@@ -1041,8 +1041,8 @@ brick 117
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick117.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -1459,8 +1459,8 @@ brick 180
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick180.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 48
+        frame_size      64 48
 
         animation
         {
@@ -1569,8 +1569,8 @@ brick 185
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick185.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 96 96
+        frame_size      96 96
 
         animation
         {
@@ -1591,8 +1591,8 @@ brick 186
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick186.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 48 96
+        frame_size      48 96
 
         animation
         {
@@ -1613,8 +1613,8 @@ brick 187
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick187.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 96 80
+        frame_size      96 80
 
         animation
         {
@@ -1635,8 +1635,8 @@ brick 188
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick188.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 96 80
+        frame_size      96 80
 
         animation
         {
@@ -1657,8 +1657,8 @@ brick 189
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick189.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 48 96
+        frame_size      48 96
 
         animation
         {
@@ -1679,8 +1679,8 @@ brick 190
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick190.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 96 96
+        frame_size      96 96
 
         animation
         {
@@ -1701,8 +1701,8 @@ brick 191
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick191.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 48
+        frame_size      16 48
 
         animation
         {
@@ -1723,8 +1723,8 @@ brick 192
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick192.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 32
+        frame_size      16 32
 
         animation
         {
@@ -1745,8 +1745,8 @@ brick 193
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick193.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 32
+        frame_size      16 32
 
         animation
         {
@@ -1836,8 +1836,8 @@ brick 220
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick220.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 64
+        frame_size      64 64
 
         animation
         {
@@ -1859,8 +1859,8 @@ brick 221
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick221.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 64
+        frame_size      16 64
 
         animation
         {
@@ -1882,8 +1882,8 @@ brick 222
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick222.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 16
+        frame_size      64 16
 
         animation
         {
@@ -1905,8 +1905,8 @@ brick 223
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick223.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 16
+        frame_size      64 16
 
         animation
         {
@@ -1951,8 +1951,8 @@ brick 231
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick231.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -1974,8 +1974,8 @@ brick 232
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick232.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 128
+        frame_size      32 128
 
         animation
         {
@@ -2020,8 +2020,8 @@ brick 234
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick234.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 32
+        frame_size      128 32
 
         animation
         {
@@ -2043,8 +2043,8 @@ brick 235
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick235.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 128 32
+        frame_size      128 32
 
         animation
         {
@@ -2066,8 +2066,8 @@ brick 236
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick236.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 64
+        frame_size      64 64
 
         animation
         {
@@ -2089,8 +2089,8 @@ brick 237
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick237.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -2114,8 +2114,8 @@ brick 250
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick250.png"
-        source_rect     0 0 128 128
-        frame_size      32 128
+        source_rect     0 0 128 96
+        frame_size      32 96
 
         animation
         {
@@ -2136,8 +2136,8 @@ brick 251
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick251.png"
-        source_rect     0 0 128 128
-        frame_size      32 128
+        source_rect     0 0 128 96
+        frame_size      32 96
 
         animation
         {
@@ -2242,8 +2242,8 @@ brick 264
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick264.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 32
+        frame_size      16 32
 
         animation
         {
@@ -2264,8 +2264,8 @@ brick 268
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick268.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 80 32
+        frame_size      80 32
 
         animation
         {
@@ -2286,8 +2286,8 @@ brick 269
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick269.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 32
+        frame_size      64 32
 
         animation
         {
@@ -2309,8 +2309,8 @@ brick 270
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick270.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 32
+        frame_size      16 32
 
         animation
         {
@@ -2331,8 +2331,8 @@ brick 271
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick271.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 32
+        frame_size      16 32
 
         animation
         {
@@ -2354,8 +2354,8 @@ brick 272
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick272.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 64 32
+        frame_size      64 32
 
         animation
         {
@@ -2377,8 +2377,8 @@ brick 273
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick273.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -2400,8 +2400,8 @@ brick 274
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick274.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 64
+        frame_size      32 64
 
         animation
         {
@@ -2423,8 +2423,8 @@ brick 275
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick275.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -2445,8 +2445,8 @@ brick 276
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick276.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 64
+        frame_size      16 64
 
         animation
         {
@@ -2467,8 +2467,8 @@ brick 277
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick277.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 64
+        frame_size      16 64
 
         animation
         {
@@ -2489,8 +2489,8 @@ brick 278
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick278.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 16 64
+        frame_size      16 64
 
         animation
         {
@@ -2511,8 +2511,8 @@ brick 280
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick280.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 16
+        frame_size      32 16
 
         animation
         {
@@ -2533,8 +2533,8 @@ brick 281
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick281.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 16
+        frame_size      32 16
 
         animation
         {
@@ -2555,8 +2555,8 @@ brick 282
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick282.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 16
+        frame_size      32 16
 
         animation
         {
@@ -2577,8 +2577,8 @@ brick 290
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick290.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 32
+        frame_size      32 32
 
         animation
         {
@@ -3678,8 +3678,8 @@ brick 926
     sprite
     {
         source_file     "images/bricks/waterworks-zone/brick926.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_rect     0 0 32 64
+        frame_size      32 64
 
         animation
         {
@@ -3881,4 +3881,3 @@ brick 999
         }
     }
 }
-

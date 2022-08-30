@@ -1,4 +1,4 @@
-Waterworks Zone Background :: Surge the Rabbit
+Waterworks Zone Background - Surge the Rabbit
 Author: Alexandre Martins (opensurge2d.org)
 
 License: Creative Commons Attribution 4.0 International
