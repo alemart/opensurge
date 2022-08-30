@@ -395,6 +395,17 @@ font "Title Screen - Menu Item"
     }
 }
 
+font "Title Screen - Menu Item" for "pl_PL"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    15
+        shadow
+        antialias
+    }
+}
+
 font "Title Screen - Menu Item" for "ru_RU"
 {
     truetype
