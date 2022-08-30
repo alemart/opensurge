@@ -65,11 +65,11 @@ object "Waterworks Zone" is "setup"
         // zone 2 only
         //
         "2": {
-            "Bridge": {
-                "anim": 1
-            },
             "Background Exchanger": {
                 "background": "themes/waterworks-zone-outdoors.bg"
+            },
+            "Bridge": {
+                "anim": 1,
             },
         },
 
