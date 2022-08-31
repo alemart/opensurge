@@ -19,3 +19,18 @@ sprite "Title Screen - Logo"
         data        0
     }
 }
+
+sprite "Title Screen - Pointer"
+{
+    source_file     "images/scenes/title_screen_pointer.png"
+    source_rect     0 0 32 32
+    frame_size      32 32
+    hot_spot        24 9
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

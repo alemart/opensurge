@@ -214,7 +214,7 @@ object "Title Screen - Menu" is "private", "detached", "entity"
 
     fun constructor()
     {
-        transform.position = Vector2(Screen.width / 2, Screen.height - 20);
+        transform.position = Vector2(Screen.width / 2, Screen.height - 25);
     }
 }
 
@@ -363,6 +363,7 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
 {
     transform = Transform();
     label = Text("Title Screen - Menu Item");
+    pointer = spawn("Title Screen - Pointer");
     text = "";
     highlighted = false;
 
@@ -387,6 +388,8 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
     {
         highlighted = h;
         label.text = highlighted ? "<color=$COLOR_HIGHLIGHT>" + text + "</color>" : text;
+        pointer.visible = highlighted;
+        pointer.offset = Vector2(-label.size.x / 2, 0);
         return this;
     }
 
@@ -399,5 +402,43 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
     fun constructor()
     {
         label.align = "center";
+        pointer.visible = false;
+    }
+}
+
+
+object "Title Screen - Pointer" is "private", "detached", "entity"
+{
+    actor = Actor("Title Screen - Pointer");
+    transform = Transform();
+
+    state "main"
+    {
+        if(!actor.visible)
+            return;
+
+        // swing back and forth
+        x = 2.0 * Math.cos(12.6 * Time.time);
+        actor.offset = Vector2(x, 0);
+    }
+
+    fun set_visible(visible)
+    {
+        actor.visible = visible;
+    }
+
+    fun get_visible()
+    {
+        return actor.visible;
+    }
+
+    fun set_offset(offset)
+    {
+        transform.localPosition = offset;
+    }
+
+    fun get_offset()
+    {
+        return transform.localPosition;
     }
 }

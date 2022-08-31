@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
+// GoodNeighbors font by Clint Bellanger
 font "GoodNeighbors"
 {
     bitmap
