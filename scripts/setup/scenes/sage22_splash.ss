@@ -46,6 +46,7 @@ object "SAGE 22 Splash Screen" is "setup"
     {
         jingle.volume -= Time.delta / fader.fadeTime;
         if(timeout(fader.fadeTime)) {
+            jingle.stop();
             state = "finished";
         }
     }
