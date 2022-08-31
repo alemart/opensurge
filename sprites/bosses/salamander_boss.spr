@@ -8,7 +8,7 @@
 // art by Cody Licorish
 sprite "Salamander Boss"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     0 0 560 640
     frame_size      112 128
     hot_spot        56 128
@@ -87,7 +87,7 @@ sprite "Salamander Boss"
 
 sprite "Salamander Boss Wing Anchor"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     560 320 16 16
     frame_size      16 16
     hot_spot        8 8
@@ -102,7 +102,7 @@ sprite "Salamander Boss Wing Anchor"
 
 sprite "Salamander Boss Tail"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     640 320 480 80
     frame_size      80 80
     hot_spot        40 54
@@ -146,7 +146,7 @@ sprite "Salamander Boss Tail"
 
 sprite "Salamander Boss Wing"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     640 0 400 320
     frame_size      80 80
     hot_spot        40 22
@@ -226,7 +226,7 @@ sprite "Salamander Boss Wing"
 // TODO replace with built-in invisible wall
 sprite "Salamander Invisible Wall"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     592 288 32 32
     frame_size      32 32
     hot_spot        0 0
@@ -239,7 +239,7 @@ sprite "Salamander Invisible Wall"
 }
 sprite "Salamander Lightning Boom"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     576 416 576 384
     frame_size      192 192
     hot_spot        96 96
@@ -258,7 +258,7 @@ sprite "Salamander Lightning Boom"
 }
 sprite "Salamander Invisible Wall Mask"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     560 288 32 32
     frame_size      32 32
     hot_spot        0 0
@@ -272,7 +272,7 @@ sprite "Salamander Invisible Wall Mask"
 
 sprite "Salamander Dash Sparks"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     1040 0 80 220
     frame_size      80 20
     hot_spot        40 20
@@ -299,7 +299,7 @@ sprite "Salamander Dash Sparks"
 
 sprite "Salamander Boss Defeated"
 {
-    source_file     "images/salamander-boss.png"
+    source_file     "images/salamander_boss.png"
     source_rect     0 650 576 150
     frame_size      64 50
     hot_spot        32 50

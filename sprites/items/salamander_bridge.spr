@@ -8,7 +8,7 @@
 // art by Cody Licorish
 sprite "Salamander Bridge"
 {
-    source_file     "images/salamander-bridge.png"
+    source_file     "images/salamander_bridge.png"
     source_rect     0 0 128 48
     frame_size      64 48
     hot_spot        0 16
@@ -23,7 +23,7 @@ sprite "Salamander Bridge"
 
 sprite "Salamander Bridge Element"
 {
-    source_file     "images/salamander-bridge.png"
+    source_file     "images/salamander_bridge.png"
     source_rect     0 0 128 48
     frame_size      64 48
     hot_spot        32 16
@@ -44,7 +44,7 @@ sprite "Salamander Bridge Element"
 
 sprite "Salamander Bridge Collision Mask"
 {
-    source_file     "images/salamander-bridge.png"
+    source_file     "images/salamander_bridge.png"
     source_rect     0 64 64 48
     frame_size      64 48
     hot_spot        32 16
