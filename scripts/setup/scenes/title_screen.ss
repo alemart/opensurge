@@ -71,6 +71,12 @@ object "Title Screen - Music"
         // play once
         jingle.play();
     }
+
+    fun destructor()
+    {
+        if(jingle.playing)
+            jingle.stop();
+    }
 }
 
 
