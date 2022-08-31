@@ -2,7 +2,7 @@
 <!-- Copyright 2020-2021 Alexandre Martins -->
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
-  <name>Open Surge</name>
+  <name>Surge the Rabbit</name>
   <developer_name>Alexandre Martins &amp; others</developer_name>
   <update_contact>alemartf_at_gmail.com</update_contact>
   <metadata_license>MIT</metadata_license>
@@ -60,28 +60,28 @@
   <url type="translate">https://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
     <screenshot type="default">
-      <image>https://opensurge2d.org/appdata/screenshot1.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot1.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot2.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot2.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot3.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot3.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot4.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot4.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot5.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot5.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot6.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot6.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot7.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot7.png</image>
     </screenshot>
     <screenshot>
-      <video>https://opensurge2d.org/appdata/trailer.webm</video>
+      <video>https://opensurge2d.org/appdata/0_6_0/trailer.webm</video>
     </screenshot>
   </screenshots>
   <categories>

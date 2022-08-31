@@ -52,7 +52,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/alemart/surgescript.git
-        tag: v0.5.5
+        tag: v0.5.6
         #commit: ""
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
@@ -65,7 +65,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/alemart/opensurge.git
-        tag: v0.5.2.1
+        tag: v0.6.0
         #commit: ""
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
