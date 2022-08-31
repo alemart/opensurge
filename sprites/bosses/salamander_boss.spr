@@ -1,0 +1,342 @@
+// -----------------------------------------------------------------------------
+// File: salamander.spr
+// Description: Salamander boss sprite script
+// Author: Cody Licorish <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Cody Licorish
+sprite "Salamander Boss"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     0 0 560 640
+    frame_size      112 128
+    hot_spot        56 128
+
+    animation 0 //zero capacity (initial)
+    {
+        repeat      TRUE
+        fps         1
+        data        0
+        action_spot 51 63
+    }
+    animation 1 //recovering
+    {
+        repeat      TRUE
+        fps         2
+        data        1 1
+        action_spot 59 76
+    }
+    animation 2 //hit! (in use)
+    {
+        repeat      FALSE
+        fps         12
+        data        2 2 1 1 1 1 1 1
+        action_spot 59 76
+    }
+    animation 3 //charging (in use)
+    {
+        repeat      FALSE
+        fps         8
+        data        8 10 11 8 10 11
+        action_spot 56 67
+    }
+    animation 4 //roll (in use)
+    {
+        repeat      TRUE
+        fps         30
+        data        22 24 24 23 16 16 20 17 17 21 4 4
+        action_spot 56 88 //theoretical, but invalid
+    }
+    animation 5 //crouch
+    {
+        repeat      FALSE
+        fps         8
+        data        7 6 5 3 6 5
+        action_spot 59 76
+    }
+    animation 6 //jump
+    {
+        repeat      TRUE
+        fps         4
+        data        15
+        action_spot 51 63
+    }
+    animation 7 //ascend
+    {
+        repeat      TRUE
+        fps         12
+        data        9 12 13
+        action_spot 51 58
+    }
+    animation 8 //fall
+    {
+        repeat      TRUE
+        fps         12
+        data        19 18 14 18 14 19 18 19 18 14
+        action_spot 51 58
+    }
+    animation 9 //spin charge
+    {
+        repeat      TRUE
+        fps         30
+        data        24 16 17 4
+        action_spot 56 88 //theoretical, but invalid
+    }
+}
+
+sprite "Salamander Boss Wing Anchor"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     560 320 16 16
+    frame_size      16 16
+    hot_spot        8 8
+
+    animation 0 //
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+    }
+}
+
+sprite "Salamander Boss Tail"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     640 320 480 80
+    frame_size      80 80
+    hot_spot        40 54
+
+    animation 0 // flat
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+        action_spot 72 54
+    }
+    animation 1 // ascending
+    {
+        repeat      FALSE
+        fps         1
+        data        3
+        action_spot 72 7
+    }
+    animation 2 // descending
+    {
+        repeat      FALSE
+        fps         1
+        data        2
+        action_spot 72 54
+    }
+    animation 3 // hanging
+    {
+        repeat      FALSE
+        fps         1
+        data        1
+        action_spot 72 40
+    }
+    animation 4 // flat but charging
+    {
+        repeat      TRUE
+        fps         8
+        data        4 5 0
+        action_spot 72 54
+    }
+}
+
+sprite "Salamander Boss Wing"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     640 0 400 320
+    frame_size      80 80
+    hot_spot        40 22
+
+    animation 0 // extended (far)
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+        action_spot 1 22
+    }
+    animation 1 // extended (near)
+    {
+        repeat      FALSE
+        fps         1
+        data        4
+        action_spot 1 22
+    }
+    animation 2 // hovering (far)
+    {
+        repeat      TRUE
+        fps         4
+        data        0 1 2 3
+        action_spot 1 22
+    }
+    animation 3 // hovering (near)
+    {
+        repeat      TRUE
+        fps         4
+        data        4 1 2 0
+        action_spot 1 22
+    }
+    animation 4 // flap (far)
+    {
+        repeat      FALSE
+        fps         8
+        data        8 5 13
+        action_spot 1 22
+    }
+    animation 5 // flap (near)
+    {
+        repeat      FALSE
+        fps         8
+        data        7 6 14
+        action_spot 1 22
+    }
+    animation 6 // updraft (far)
+    {
+        repeat      TRUE
+        fps         12
+        data        5 9
+        action_spot 1 22
+    }
+    animation 7 // updraft (near)
+    {
+        repeat      TRUE
+        fps         12
+        data        6 10
+        action_spot 1 22
+    }
+    animation 8 // falling (far)
+    {
+        repeat      TRUE
+        fps         12
+        data        15 16
+        action_spot 1 22
+    }
+    animation 9 // falling (near)
+    {
+        repeat      TRUE
+        fps         12
+        data        17 18
+        action_spot 1 22
+    }
+}
+
+// TODO replace with built-in invisible wall
+sprite "Salamander Invisible Wall"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     592 288 32 32
+    frame_size      32 32
+    hot_spot        0 0
+    animation 0
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+    }
+}
+sprite "Salamander Lightning Boom"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     576 416 576 384
+    frame_size      192 192
+    hot_spot        96 96
+    animation 0 //active
+    {
+        repeat      TRUE
+        fps         8
+        data        0 1 2 1 0 2
+    }
+    animation 1 //deactivating
+    {
+        repeat      FALSE
+        fps         8
+        data        3 4 5
+    }
+}
+sprite "Salamander Invisible Wall Mask"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     560 288 32 32
+    frame_size      32 32
+    hot_spot        0 0
+    animation 0
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+    }
+}
+
+sprite "Salamander Dash Sparks"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     1040 0 80 220
+    frame_size      80 20
+    hot_spot        40 20
+    action_spot     80 20
+    animation 0 // charging
+    {
+        repeat      TRUE
+        fps         30
+        data        0 1 2 3 4
+    }
+    animation 1 // release
+    {
+        repeat      FALSE
+        fps         30
+        data        5 6 7 8 9
+    }
+    animation 2 // hiding
+    {
+        repeat      FALSE
+        fps         30
+        data        10
+    }
+}
+
+sprite "Salamander Boss Defeated"
+{
+    source_file     "images/salamander_boss.png"
+    source_rect     0 650 576 150
+    frame_size      64 50
+    hot_spot        32 50
+    animation 0 //end of boss
+    {
+        repeat      FALSE
+        fps         2
+        data        14 15 14 15 14 15 14 16 13 17 4
+    }
+    animation 1 //cry walk
+    {
+        repeat      TRUE
+        fps         8
+        data        5 6 7 8 9 10 11 12
+    }
+    animation 2 //stop and wail
+    {
+        repeat      TRUE
+        fps         8
+        data        0 0 1 1 0 0 1 1 0 0 1 1 2
+    }
+    transition 1 to 2
+    {
+        repeat      FALSE
+        fps         8
+        data        4 4 4 4 4 3 3 3
+    }
+    animation 3 // gasp
+    {
+        repeat      FALSE
+        fps         8
+        data        4 3 22 19 19 19 19 20 20 21 21 21 21 4
+    }
+    transition 3 to 1 // hand to head
+    {
+        repeat      FALSE
+        fps         12
+        data        18
+    }
+}

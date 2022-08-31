@@ -1,0 +1,59 @@
+// -----------------------------------------------------------------------------
+// File: salamander_bridge.spr
+// Description: Bridge sprite script for Salamander boss
+// Author: Cody Licorish
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Cody Licorish
+sprite "Salamander Bridge"
+{
+    source_file     "images/salamander_bridge.png"
+    source_rect     0 0 128 48
+    frame_size      64 48
+    hot_spot        0 16
+
+    animation 0 //broken
+    {
+        repeat      FALSE
+        fps         1
+        data        1
+    }
+}
+
+sprite "Salamander Bridge Element"
+{
+    source_file     "images/salamander_bridge.png"
+    source_rect     0 0 128 48
+    frame_size      64 48
+    hot_spot        32 16
+
+    animation 0 //broken
+    {
+        repeat      FALSE
+        fps         1
+        data        1
+    }
+    animation 1 //fixed
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+    }
+}
+
+sprite "Salamander Bridge Collision Mask"
+{
+    source_file     "images/salamander_bridge.png"
+    source_rect     0 64 64 48
+    frame_size      64 48
+    hot_spot        32 16
+
+    animation 0 //mask
+    {
+        repeat      FALSE
+        fps         1
+        data        1
+    }
+}
+

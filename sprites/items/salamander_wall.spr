@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------------
+// File: salamander_wall.spr
+// Description: Exploding wall sprite script for Salamander boss
+// Author: Cody Licorish
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Cody Licorish
+sprite "Salamander Exploding Wall"
+{
+    source_file     "images/salamander_wall.png"
+    source_rect     0 0 128 128
+    frame_size      128 128
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      FALSE
+        fps         1
+        data        0
+    }
+}
