@@ -599,5 +599,12 @@ image_t* image_drawing_target()
  */
 void image_hold_drawing(bool hold)
 {
+    /*
+
+    This function works with bitmaps and truetype fonts
+    See: https://liballeg.org/a5docs/trunk/graphics.html#al_hold_bitmap_drawing
+
+    */
+
     al_hold_bitmap_drawing(hold);
 }

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * font.c - font module
- * Copyright (C) 2008-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -454,6 +454,7 @@ void font_render(font_t* f, v2d_t camera_position)
     }
 
     /* for each line p of text (split using '\n') */
+    image_hold_drawing(true);
     for(p = q = text; q != NULL; ) {
         if((q = strchr(p, '\n')) != NULL) { *q = 0; }
         for(s = w = p; w != NULL; ) {
@@ -464,6 +465,7 @@ void font_render(font_t* f, v2d_t camera_position)
         }
         if(q != NULL) { *q = '\n'; p = q+1; }
     }
+    image_hold_drawing(false);
 
     /* undo substring */
     if(offset >= 0)
