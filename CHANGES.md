@@ -16,7 +16,7 @@
 * Improved several core scripts
 * Added support for compound ${EXPRESSIONS} when evaluating text
 * Changed the physics
-* Fixed D-pad support on Xbox controllers
+* Added D-pad support on Xbox controllers
 * Removed legacy Allegro 4 code
 * Bugfixes and general improvements
 

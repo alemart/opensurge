@@ -74,6 +74,30 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+  <releases>
+    <release version="0.6.0" date="2022-09-02">
+      <description>
+        <ul>
+          <li>Renamed the game to Surge the Rabbit</li>
+          <li>Improved the pixel art style of the game</li>
+          <li>Created a new Waterworks Zone</li>
+          <li>New gimmicks: Conveyor Belts, Walk on Water, Power Pluggy</li>
+          <li>New title screen and new title card animation</li>
+          <li>New translations: Italian, Esperanto</li>
+          <li>Introduced language extensions (languages/extends/ folder)</li>
+          <li>Improved macOS compatibility</li>
+          <li>Introduced support for transitions between animations</li>
+          <li>Introduced the concepts of action spot and sprite anchor</li>
+          <li>Improvements to the SurgeScript API</li>
+          <li>Improved several core scripts</li>
+          <li>Added support for compound ${EXPRESSIONS} when evaluating text</li>
+          <li>Changed the physics</li>
+          <li>Added D-pad support on Xbox controllers</li>
+          <li>Removed legacy Allegro 4 code</li>
+          <li>Bugfixes and general improvements</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.5.2.1" date="2021-04-15">
       <ul>
         <li>Fix sprites/overrides/ detection bug on Windows</li>
