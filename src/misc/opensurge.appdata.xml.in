@@ -92,7 +92,7 @@
           <li>Improved several core scripts</li>
           <li>Added support for compound ${EXPRESSIONS} when evaluating text</li>
           <li>Changed the physics</li>
-          <li>Added D-pad support on Xbox controllers</li>
+          <li>Added support for D-pad input on Xbox controllers</li>
           <li>Removed legacy Allegro 4 code</li>
           <li>Bugfixes and general improvements</li>
         </ul>
