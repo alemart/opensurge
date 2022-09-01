@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2020-2021 Alexandre Martins -->
+<!-- Copyright 2020-2022 Alexandre Martins -->
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
   <name>Surge the Rabbit</name>
@@ -10,48 +10,21 @@
   <summary>A fun 2D retro platformer inspired by Sonic games and a game creation system</summary>
   <description>
     <p>
-      Open Surge is a fun 2D retro platformer inspired by Sonic games
-      and a game creation system that lets you unleash your creativity!
+      A fun 2D retro platformer inspired by Sonic games and a
+      game creation system that lets you unleash your creativity!
     </p>
     <p>
-      How do I play?
+      Make your dreams come true! Create your own amazing games using
+      our level editor and SurgeScript, a scripting language for games
+      that is fun to learn! Create new levels, items, bosses, playable
+      characters, gameplay mechanics, cutscenes and much more!
     </p>
     <p>
-      You can play using a keyboard or a joystick.
+      Surge the Rabbit is fun for all ages! You will stop the global
+      takeover planned by evil wizard Gimacian the Dark in a fantastic
+      adventure! ...and you will also get to create your own universes
+      with our open source game engine!
     </p>
-    <ul>
-      <li>Arrows: Move</li>
-      <li>Space: Jump</li>
-      <li>Enter: Pause</li>
-      <li>Esc: Quit</li>
-      <li>Left Ctrl: Switch character</li>
-      <li>Equals: Take snapshot</li>
-      <li>F12: Open the editor</li>
-    </ul>
-    <p>
-      How do I create a game?
-    </p>
-    <p>
-      Use Open Surge to create your own amazing games!
-      Create new levels, items, bosses, gameplay mechanics,
-      playable characters, special abilities and more!
-    </p>
-    <ul>
-      <li>
-        First, learn how to create a level using the
-        built-in editor (press F12 during gameplay)
-      </li>
-      <li>
-        Next, learn how to do basic hacking (modify the
-        images/sounds, create new scenery, new characters, etc.)
-      </li>
-      <li>
-        Finally, have fun with scripting! SurgeScript, the
-        scripting language featured in Open Surge, gives you
-        ultimate power to create anything you desire and make
-        your dreams come alive!
-      </li>
-    </ul>
   </description>
   <url type="homepage">https://opensurge2d.org</url>
   <url type="donation">https://opensurge2d.org/contribute</url>
