@@ -1,5 +1,25 @@
 # Release Notes
 
+## 0.6.0 - September 2nd, 2022
+
+* Renamed the game to Surge the Rabbit
+* Improved the pixel art style of the game
+* Created a new Waterworks Zone
+* New gimmicks: Conveyor Belts, Walk on Water, Power Pluggy
+* New title screen and new title card animation
+* New translations: Italian, Esperanto
+* Introduced language extensions (languages/extends/ folder)
+* Improved macOS compatibility
+* Introduced support for transitions between animations
+* Introduced the concepts of action spot and sprite anchor
+* Improvements to the SurgeScript API
+* Improved several core scripts
+* Added support for compound ${EXPRESSIONS} when evaluating text
+* Changed the physics
+* Fixed D-pad support on Xbox controllers
+* Removed legacy Allegro 4 code
+* Bugfixes and general improvements
+
 ## 0.5.2.1 - April 15th, 2021
 
 * Fix sprites/overrides/ detection bug on Windows
