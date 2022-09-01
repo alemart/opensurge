@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * image.h - image interface
- * Copyright (C) 2008-2010, 2012, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2012, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _IMAGE_H
 #define _IMAGE_H
 
+#include <stdbool.h>
 #include "color.h"
 #include "v2d.h"
 
@@ -58,6 +59,7 @@ void image_putpixel(int x, int y, color_t color);
 /* drawing target */
 void image_set_drawing_target(image_t* new_target);
 image_t* image_drawing_target();
+void image_hold_drawing(bool hold);
 
 /* drawing primitives */
 void image_clear(color_t color);

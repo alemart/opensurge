@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * image.c - image implementation
- * Copyright (C) 2008-2010, 2012, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2012, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -591,4 +591,13 @@ void image_set_drawing_target(image_t* new_target)
 image_t* image_drawing_target()
 {
     return target != NULL ? target : video_get_backbuffer();
+}
+
+/*
+ * image_hold_drawing()
+ * Enable/disable deferred rendering for performance
+ */
+void image_hold_drawing(bool hold)
+{
+    al_hold_bitmap_drawing(hold);
 }
