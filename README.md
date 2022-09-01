@@ -61,7 +61,7 @@ opensurge --help
 To compile Open Surge from the source code, you'll need a C compiler, [CMake](http://cmake.org), and the following development libraries:
 
 * [Allegro 5](http://liballeg.org) (version 5.2.7 or higher)
-* [SurgeScript](http://github.com/alemart/surgescript) (version 0.5.5 or higher)
+* [SurgeScript](http://github.com/alemart/surgescript) (version 0.5.6 or higher)
 
 After downloading and extracting the source code, create a build directory and compile from there:
 
