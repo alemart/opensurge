@@ -97,7 +97,7 @@ static void bgstrategy_linear_update(bgstrategy_t *strategy); /* private class m
 /* === internal methods === */
 static void sort_backgrounds(bgtheme_t *bgtheme);
 static int sort_cmp(const void *a, const void *b);
-static void render(const bgtheme_t *theme, v2d_t camera_position, int foreground);
+static void render(const bgtheme_t *theme, v2d_t camera_position, bool foreground);
 static int traverse(const parsetree_statement_t *stmt, void *bgtheme);
 static int traverse_background_attributes(const parsetree_statement_t *stmt, void *background);
 static void validate_background(const background_t *bg);
@@ -169,7 +169,9 @@ void background_update(bgtheme_t *bgtheme)
  */
 void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    render(bgtheme, camera_position, FALSE);
+    image_hold_drawing(true);
+    render(bgtheme, camera_position, false);
+    image_hold_drawing(false);
 }
 
 /*
@@ -178,7 +180,9 @@ void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
  */
 void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    render(bgtheme, camera_position, TRUE);
+    image_hold_drawing(true);
+    render(bgtheme, camera_position, true);
+    image_hold_drawing(false);
 }
 
 /*
@@ -304,7 +308,7 @@ void bgstrategy_linear_update(bgstrategy_t *strategy)
 }
 
 
-void render(const bgtheme_t *bgtheme, v2d_t camera_position, int foreground)
+void render(const bgtheme_t *bgtheme, v2d_t camera_position, bool foreground)
 {
     int i;
     v2d_t halfscreen = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
