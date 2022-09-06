@@ -102,8 +102,8 @@ inputmap "default"
         left            BUTTON_12
         fire1           BUTTON_1 | BUTTON_2 | BUTTON_3 | BUTTON_4  // jump
         fire2           BUTTON_5 | BUTTON_6   // switch character
-        fire3           BUTTON_8 | BUTTON_10  // pause, confirm
-        fire4           BUTTON_7 | BUTTON_9   // quit, cancel
+        fire3           BUTTON_8 | BUTTON_10  // start, pause, confirm
+        fire4           BUTTON_7 | BUTTON_9   // back, quit, cancel
         fire5           BUTTON_NONE    // available
         fire6           BUTTON_NONE    // available
         fire7           BUTTON_NONE    // available
@@ -170,8 +170,8 @@ inputmap "default.backup"
         left            BUTTON_12
         fire1           BUTTON_1 | BUTTON_2 | BUTTON_3 | BUTTON_4  // jump
         fire2           BUTTON_5 | BUTTON_6   // switch character
-        fire3           BUTTON_8 | BUTTON_10  // pause, confirm
-        fire4           BUTTON_7 | BUTTON_9   // quit, cancel
+        fire3           BUTTON_8 | BUTTON_10  // start, pause, confirm
+        fire4           BUTTON_7 | BUTTON_9   // back, quit, cancel
         fire5           BUTTON_NONE    // available
         fire6           BUTTON_NONE    // available
         fire7           BUTTON_NONE    // available
