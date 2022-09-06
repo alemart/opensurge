@@ -124,7 +124,7 @@ static float zindex_background(renderable_t r) { return 0.0f; }
 static float zindex_foreground(renderable_t r) { return 1.0f; }
 static float zindex_water(renderable_t r) { return 1.0f; }
 
-static void render_particles(renderable_t r, v2d_t camera_position) { particle_render_all(camera_position); }
+static void render_particles(renderable_t r, v2d_t camera_position) { particle_render(camera_position); }
 static void render_player(renderable_t r, v2d_t camera_position) { player_render(r.player, camera_position); }
 static void render_item(renderable_t r, v2d_t camera_position) { item_render(r.item, camera_position); }
 static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(r.object, camera_position); }

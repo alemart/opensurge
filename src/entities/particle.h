@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * particle.h - particle effect
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef _PARTICLE_H
 #define _PARTICLE_H
 
+#include <stdbool.h>
 #include "../core/v2d.h"
 
 struct brick_list_t;
@@ -32,8 +33,8 @@ void particle_init();
 /* releases the particle system */
 void particle_release();
 
-/* adds a new particle to the system. Warning: image will be free'd internally. */
-void particle_add(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick);
+/* adds a new particle to the system */
+void particle_add(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed);
 
 /* updates all the particles */
 void particle_update_all(const struct brick_list_t* brick_list);

@@ -1430,7 +1430,7 @@ void level_update()
     update_ssobjects();
 
     /* update particles */
-    particle_update_all(major_bricks);
+    particle_update(major_bricks);
 
     /* update dialog box */
     update_dialogregions();
@@ -1561,17 +1561,16 @@ void level_release()
 
 /*
  * level_create_particle()
- * Creates a new particle.
- * Warning: image will be free'd internally.
+ * Creates a new particle
  */
-void level_create_particle(image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick)
+void level_create_particle(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed)
 {
     if(editor_is_enabled()) {
         /* no, you can't create a new particle! */
-        image_destroy(image);
+        return;
     }
-    else
-        particle_add(image, position, speed, destroy_on_brick);
+
+    particle_add(source_image, source_x, source_y, width, height, position, speed);
 }
 
 /*

@@ -283,13 +283,16 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                                     dx >= 0 ? (90 + 60*(1+bi)/bw) : -(90 + 60*(bw-bi)/bw),
                                     -(120 + 60*(bh-bj)/bh)
                                 );
-                                image_t *brk_img = image_clone_region(brk->image,
+
+                                level_create_particle(
+                                    brk->image,
                                     (bi * brk_width) / bw,
                                     (bj * brk_height) / bh,
                                     brk_width / bw,
-                                    brk_height / bh
+                                    brk_height / bh,
+                                    brk_pos,
+                                    brk_speed
                                 );
-                                level_create_particle(brk_img, brk_pos, brk_speed, FALSE);
                             }
                         }
 
@@ -327,13 +330,16 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                     for(int bj=0; bj<bh; bj++) {
                         v2d_t piece_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
                         v2d_t piece_speed = v2d_new(0, (1+bj)*15 + (right_oriented?bi:bw-bi)*15);
-                        image_t *piece = image_clone_region(brk->image,
+
+                        level_create_particle(
+                            brk->image,
                             (bi * brk_width) / bw,
                             (bj * brk_height) / bh,
                             brk_width / bw,
-                            brk_height / bh
+                            brk_height / bh,
+                            piece_pos,
+                            piece_speed
                         );
-                        level_create_particle(piece, piece_pos, piece_speed, FALSE);
                     }
                 }
 
@@ -469,13 +475,16 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
                                 60.0f * ((bi + 0.5f) / bw - 0.5f),
                                 -(120 + 60*(bh-bj)/bh)
                             );
-                            image_t *brk_img = image_clone_region(brk->image,
+
+                            level_create_particle(
+                                brk->image,
                                 (bi * brk_width) / bw,
                                 (bj * brk_height) / bh,
                                 brk_width / bw,
-                                brk_height / bh
+                                brk_height / bh,
+                                brk_pos,
+                                brk_speed
                             );
-                            level_create_particle(brk_img, brk_pos, brk_speed, FALSE);
                         }
                     }
 
@@ -557,10 +566,18 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             /* should the brick fall? */
             if(brk->state == BRS_ACTIVE && brk->value[0] >= seconds_til_fall) {
                 /* create particle */
-                image_t *brk_img = image_clone(brk->image);
                 v2d_t brk_pos = v2d_new(brk->x, brk->y);
                 v2d_t brk_speed = v2d_new(0, 120);
-                level_create_particle(brk_img, brk_pos, brk_speed, FALSE);
+
+                level_create_particle(
+                    brk->image,
+                    0,
+                    0,
+                    image_width(brk->image),
+                    image_height(brk->image),
+                    brk_pos,
+                    brk_speed
+                );
 
                 /* destroy brick */
                 brk->state = BRS_DEAD;

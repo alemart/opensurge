@@ -2574,17 +2574,20 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
         int i, j;
         int x = (int)(act->position.x-act->hot_spot.x);
         int y = (int)(act->position.y-act->hot_spot.y);
-        image_t *img = actor_image(act), *particle;
+        image_t *img = actor_image(act);
         int w = image_width(img), h = image_height(img);
 
         /* particle party! :) */
         for(i=0; i<h; i++) {
             for(j=0; j<w; j++) {
-                particle = image_clone_region(img, j, i, 1, 1);
-                level_create_particle(particle, v2d_new(x+j, y+i), v2d_new(
-                    (j - w/2) * 2.0f + (random(w) - w/2),
-                    (i - h/2) * 2.0f + (random(h) - h/2)
-                ), FALSE);
+                level_create_particle(
+                    img, j, i, 1, 1,
+                    v2d_new(x+j, y+i),
+                    v2d_new(
+                        (j - w/2) * 2.0f + (random(w) - w/2),
+                        (i - h/2) * 2.0f + (random(h) - h/2)
+                    )
+                );
             }
         }
 

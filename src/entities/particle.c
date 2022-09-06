@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * particle.c - particle system
- * Copyright (C) 2008-2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2010, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,126 +27,142 @@
 #include "../core/timer.h"
 
 /* private stuff ;) */
-typedef struct {
-    image_t *image;
+typedef struct particle_t particle_t;
+typedef struct particle_list_t particle_list_t;
+
+/* particle */
+struct particle_t {
+
+    /* source image & source rect */
+    const image_t* source_image;
+    int source_x;
+    int source_y;
+    int width;
+    int height;
+
+    /* particle position */
     v2d_t position;
+
+    /* particle speed */
     v2d_t speed;
-    int destroy_on_brick;
-} particle_t;
 
-typedef struct particle_list_t {
-    particle_t *data;
-    struct particle_list_t *next;
-} particle_list_t;
+};
 
-static particle_list_t *particle_list = NULL;
+/* list of particles */
+struct particle_list_t {
+
+    particle_t* data;
+    particle_list_t* next;
+
+};
+
+static particle_list_t* particle_list = NULL;
 
 
 
-/* initializes the particle system */
+/*
+ * particle_init()
+ * initializes the particle system
+ */
 void particle_init()
 {
     particle_list = NULL;
 }
 
-/* releases the particle system */
+/*
+ * particle_release()
+ * releases the particle system
+ */
 void particle_release()
 {
     particle_list_t *it, *next;
-    particle_t *p;
+    particle_t* particle;
 
-    for(it=particle_list; it; it=next) {
-        p = it->data;
+    for(it = particle_list; it; it = next) {
+        particle = it->data;
         next = it->next;
 
-        image_destroy(p->image);
-        free(p);
+        free(particle);
         free(it);
     }
 
     particle_list = NULL;
 }
 
-/* adds a new particle to the system. Warning: image will be free'd internally. */
-void particle_add(struct image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick)
+/*
+ * particle_add()
+ * adds a new particle to the particle system
+ */
+void particle_add(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed)
 {
-    particle_t *p;
-    particle_list_t *node;
+    particle_t* particle = mallocx(sizeof *particle);
+    particle->source_image = source_image;
+    particle->source_x = source_x;
+    particle->source_y = source_y;
+    particle->width = width;
+    particle->height = height;
+    particle->position = position;
+    particle->speed = speed;
 
-    p = mallocx(sizeof *p);
-    p->image = image;
-    p->position = position;
-    p->speed = speed;
-    p->destroy_on_brick = destroy_on_brick;
-
-    node = mallocx(sizeof *node);
-    node->data = p;
+    particle_list_t* node = mallocx(sizeof *node);
+    node->data = particle;
     node->next = particle_list;
     particle_list = node;
 }
 
-/* updates all the particles */
-void particle_update_all(const struct brick_list_t* brick_list)
+/*
+ * particle_update()
+ * Updates all the particles
+ */
+void particle_update(const struct brick_list_t* brick_list)
 {
-    float dt = timer_get_delta(), g = level_gravity();
-    int got_brick, inside_area;
-    particle_list_t *it, *prev = NULL, *next;
-    particle_t *p;
+    particle_list_t *it, *prev, *next;
+    particle_t* particle;
+    float dt = timer_get_delta();
+    float grv = level_gravity();
 
-    for(it=particle_list; it; it=next) {
-        p = it->data;
+    for(it = particle_list, prev = NULL; it; it = next) {
+        particle = it->data;
         next = it->next;
-        inside_area = level_inside_screen(p->position.x, p->position.y, p->position.x+image_width(p->image), p->position.y+image_height(p->image));
 
-        /* collided with bricks? */
-        got_brick = FALSE;
-        if(p->destroy_on_brick && inside_area && p->speed.y > 0) {
-            float a[4] = { p->position.x, p->position.y, p->position.x+image_width(p->image), p->position.y+image_height(p->image) };
-            const brick_list_t *itb;
-            for(itb=brick_list; itb && !got_brick; itb=itb->next) {
-                const brick_t *brk = itb->data;
-                if(brick_type(brk) == BRK_SOLID) {
-                    v2d_t topleft = brick_position(brk);
-                    v2d_t bottomright = v2d_add(topleft, brick_size(brk));
-                    float b[4] = { topleft.x, topleft.y, bottomright.x, bottomright.y };
-                    if(bounding_box(a,b))
-                        got_brick = TRUE;
-                }
-            }
+        if(level_inside_screen(particle->position.x, particle->position.y, particle->width, particle->height)) {
+
+            /* update this particle */
+            particle->speed.y += grv * dt;
+            particle->position.x += particle->speed.x * dt;
+            particle->position.y += particle->speed.y * dt;
+            prev = it;
+
         }
+        else {
 
-        /* update particle */
-        if(!inside_area || got_brick) {
             /* remove this particle */
             if(prev)
                 prev->next = next;
             else
                 particle_list = next;
 
-            image_destroy(p->image);
-            free(p);
+            free(particle);
             free(it);
-        }
-        else {
-            /* update this particle */
-            p->speed.y += g*dt;
-            p->position.x += p->speed.x*dt;
-            p->position.y += p->speed.y*dt;
-            prev = it;
+
         }
     }
 }
 
-/* renders the particles */
-void particle_render_all(v2d_t camera_position)
+/*
+ * particle_render()
+ * Renders the particles
+ */
+void particle_render(v2d_t camera_position)
 {
-    particle_list_t *it;
-    particle_t *p;
-    v2d_t topleft = v2d_new(camera_position.x-VIDEO_SCREEN_W/2, camera_position.y-VIDEO_SCREEN_H/2);
+    v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
 
-    for(it=particle_list; it; it=it->next) {
-        p = it->data;
-        image_draw(p->image, (int)(p->position.x-topleft.x), (int)(p->position.y-topleft.y), IF_NONE);
+    image_hold_drawing(true);
+    for(particle_list_t* it = particle_list; it; it = it->next) {
+        particle_t* particle = it->data;
+        v2d_t screen_pos = v2d_subtract(particle->position, topleft);
+
+        image_blit(particle->source_image, particle->source_x, particle->source_y, (int)screen_pos.x, (int)screen_pos.y, particle->width, particle->height);
     }
+    image_hold_drawing(false);
 }
-
