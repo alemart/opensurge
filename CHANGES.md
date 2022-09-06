@@ -1,5 +1,12 @@
 # Release Notes
 
+## 0.6.0.1 - September 6th, 2022
+
+* Updated the default mapping for gamepads
+* Adjusted the "Walk on Water" gimmick
+* Optimized the creation and the rendering of brick particles
+* Made tweaks to the level design
+
 ## 0.6.0 - September 2nd, 2022
 
 * Renamed the game to Surge the Rabbit
