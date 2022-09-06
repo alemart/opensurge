@@ -1,7 +1,7 @@
 /*
  * nanoparser 1.1.2
  * A tiny stand-alone easy-to-use parser written in C
- * Copyright (c) 2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this 

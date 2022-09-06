@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * scripting.h - scripting system
- * Copyright (C) 2018-2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

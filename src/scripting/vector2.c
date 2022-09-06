@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * vector2.c - scripting system: immutable 2D Vector
- * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sensorstate.h - physics system: sensor state
- * Copyright (C) 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_vm.h - virtual machine of the objects
- * Copyright (C) 2010, 2012  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

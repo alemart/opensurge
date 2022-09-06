@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sprite.c - code for the sprites/animations
- * Copyright (C) 2008-2010, 2012, 2018-2019, 2021-2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
