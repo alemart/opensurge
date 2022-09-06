@@ -115,7 +115,7 @@ object "Walk on Water Watcher" is "companion", "private", "entity"
 
     state "main"
     {
-        // keep the minimum speed if rolling or running on water
+        // keep the minimum speed if rolling or running
         if(player.rolling || player.running) {
             if(player.slope == 0) {
                 if(Math.abs(player.gsp) < minSpeed)
