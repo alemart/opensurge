@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * item.c - legacy items (replaced by SurgeScript)
- * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2570,6 +2570,7 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
         act->position.y -= 40.0f * dt;
     }
     else if(me->elapsed_time >= 2.5f) {
+        #if 0
         /* death */
         int i, j;
         int x = (int)(act->position.x-act->hot_spot.x);
@@ -2590,6 +2591,7 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
                 );
             }
         }
+        #endif
 
         /* done */
         item->state = IS_DEAD;
