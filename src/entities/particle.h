@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * particle.h - particle effect
- * Copyright (C) 2008-2010, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,9 +37,9 @@ void particle_release();
 void particle_add(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed);
 
 /* updates all the particles */
-void particle_update_all(const struct brick_list_t* brick_list);
+void particle_update(const struct brick_list_t* brick_list);
 
 /* renders the particles */
-void particle_render_all(v2d_t camera_position);
+void particle_render(v2d_t camera_position);
 
 #endif
