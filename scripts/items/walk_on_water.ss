@@ -115,11 +115,21 @@ object "Walk on Water Watcher" is "companion", "private", "entity"
 
     state "main"
     {
+        // keep the minimum speed if rolling or running on water
+        if(player.rolling || player.running) {
+            if(player.slope == 0) {
+                if(Math.abs(player.gsp) < minSpeed)
+                    player.gsp = Math.sign(player.gsp) * minSpeed;
+            }
+        }
+
+        // stop walking on water
         if(!canRemainWalkingOnWater(player)) {
             destroy();
             return;
         }
 
+        // splash
         if(timeout(1.0 / splashesPerSecond))
             state = "splash";
     }
