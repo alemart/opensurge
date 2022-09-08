@@ -920,12 +920,14 @@ void scan_default_folders(const char* gameid, const char* basedir)
             scan_folder(root, path, ASSET_DATA, ASSET_PRIMARY);
     }
 #elif defined(__APPLE__) && defined(__MACH__)
-    /* FIXME: untested */
     char* userdatadir = build_userdata_fullpath(gameid, "");
     char* configdir = build_config_fullpath(gameid, "");
     char* cachedir = build_cache_fullpath(gameid, "");
     bool must_scan_basedir = true;
     assetfs_log("Scanning assets...");
+    assetfs_log("userdatadir: %s", userdatadir);
+    assetfs_log("configdir: %s", configdir);
+    assetfs_log("cachedir: %s", cachedir);
 
     /* scan user-specific config & cache files (must come 1st) */
     if(configdir != NULL) {
@@ -965,6 +967,9 @@ void scan_default_folders(const char* gameid, const char* basedir)
     char* cachedir = build_cache_fullpath(gameid, "");
     bool must_scan_basedir = true;
     assetfs_log("Scanning assets...");
+    assetfs_log("userdatadir: %s", userdatadir);
+    assetfs_log("configdir: %s", configdir);
+    assetfs_log("cachedir: %s", cachedir);
 
     /* scan user-specific config & cache files (must come 1st) */
     if(configdir != NULL) {
@@ -1008,46 +1013,37 @@ void scan_default_folders(const char* gameid, const char* basedir)
 /* scan the <exedir>; returns true if it's an asset folder */
 bool scan_exedir(assetdir_t* dir, assetpriority_t priority)
 {
+    int len, dirlen = 0;
+    bool success = false;
+
+    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
+        char* exedir = mallocx((1 + len) * sizeof(*exedir));
+        char* datadir = NULL;
+
+        wai_getExecutablePath(exedir, len, &dirlen);
+        exedir[dirlen] = '\0';
+
 #if defined(__APPLE__) && defined(__MACH__)
-    int len, dirlen = 0;
-    bool success = false;
-
-    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-        char* data_path = NULL;
-        char* exedir = mallocx((1 + len) * sizeof(*exedir));
-        wai_getExecutablePath(exedir, len, &dirlen);
-        exedir[dirlen] = '\0';
-        data_path = join_path(exedir, "../Resources"); /* use realpath() */
-        if(is_asset_folder(data_path)) {
-            success = true;
-            scan_folder(dir, data_path, ASSET_DATA, priority);
-        }
-        free(exedir);
-        free(data_path);
-    }
-    else
-        assetfs_log("Can't find the application folder: game assets may not be loaded");
-
-    return success;
+        datadir = join_path(exedir, "../Resources"); /* use realpath() */
 #else
-    int len, dirlen = 0;
-    bool success = false;
+        datadir = clone_str(exedir);
+#endif
 
-    if((len = wai_getExecutablePath(NULL, 0, NULL)) >= 0) {
-        char* exedir = mallocx((1 + len) * sizeof(*exedir));
-        wai_getExecutablePath(exedir, len, &dirlen);
-        exedir[dirlen] = '\0';
-        if(is_asset_folder(exedir)) {
+        assetfs_log("exedir: %s", exedir);
+        assetfs_log("datadir: %s", datadir);
+
+        if(is_asset_folder(datadir)) {
             success = true;
-            scan_folder(dir, exedir, ASSET_DATA, priority);
+            scan_folder(dir, datadir, ASSET_DATA, priority);
         }
+
         free(exedir);
+        free(datadir);
     }
     else
         assetfs_log("Can't find the application folder: game assets may not be loaded");
 
     return success;
-#endif
 }
 
 /* scan a specific asset folder */
