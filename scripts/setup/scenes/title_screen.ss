@@ -282,6 +282,7 @@ object "Title Screen - Menu Item - Start Game" is "private", "detached", "entity
 
     fun onEnter()
     {
+        Player.active.lives = Player.initialLives;
         Level.load("quests/default.qst");
     }
 
@@ -310,6 +311,7 @@ object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
 
     fun onEnter()
     {
+        Player.active.lives = Player.initialLives;
         Level.load("quests/options.qst");
     }
 
