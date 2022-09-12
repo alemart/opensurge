@@ -58,8 +58,10 @@ object "Spikes" is "entity", "basic"
 
     fun onOverlap(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player"))
-            hit(otherCollider.entity);
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            hit(player);
+        }
     }
 
     fun hit(player)
@@ -68,6 +70,10 @@ object "Spikes" is "entity", "basic"
             !player.blinking && !player.dying &&
             !player.invincible && !player.hit
         ) {
+            // do not hit if the player is midair
+            if(player.midair || player.ysp < 0)
+                return;
+
             // adjust player position
             if(player.collider.bottom > collider.top) {
                 dy = player.collider.bottom - player.transform.position.y;
@@ -128,8 +134,10 @@ object "Spikes Down" is "entity", "basic"
 
     fun onOverlap(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player"))
-            hit(otherCollider.entity);
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            hit(player);
+        }
     }
 
     fun hit(player)
