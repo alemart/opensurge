@@ -57,11 +57,12 @@ typedef struct {
     char* filepath; /* relative path */
     char name[256]; /* stage name */
     int act; /* zone number */
+    bool is_quest; /* is this entry a quest file (.qst)? */
 } stagedata_t;
 
-static stagedata_t* stagedata_load(const char *filename);
+static stagedata_t* stagedata_load(const char *filename, bool is_quest);
 static void stagedata_unload(stagedata_t *s);
-static bool interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data);
+static bool interpret_level_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data);
 
 
 
@@ -85,7 +86,7 @@ static font_t **stage_label; /* vector */
 static bool enable_debug; /* debug mode? must start out as false. */
 static bool can_play_music; /* can play music? */
 static music_t* music = NULL; /* background music */
-static char* level_to_be_loaded;
+static const stagedata_t* selected_stage; /* the level or quest we're going to load (NULL if none) */
 
 
 
@@ -94,6 +95,7 @@ static void load_stage_list();
 static void unload_stage_list();
 static int dirfill(const char *vpath, void *param);
 static int sort_cmp(const void *a, const void *b);
+static int debug_sort_cmp(const void *a, const void *b);
 static int load_selection();
 static void save_selection(int option);
 
@@ -117,7 +119,7 @@ void stageselect_init(void *should_enable_debug)
     option = load_selection();
     state = STAGESTATE_NORMAL;
     input = input_create_user(NULL);
-    level_to_be_loaded = NULL;
+    selected_stage = NULL;
     music = music_load(OPTIONS_MUSICFILE);
     can_play_music = (!enable_debug || timer_get_ticks() >= 10000);
 
@@ -149,11 +151,7 @@ void stageselect_init(void *should_enable_debug)
  */
 void stageselect_release()
 {
-    if(level_to_be_loaded != NULL) {
-        free(level_to_be_loaded);
-        level_to_be_loaded = NULL;
-    }
-
+    selected_stage = NULL;
     bgtheme = background_unload(bgtheme);
     unload_stage_list();
 
@@ -228,14 +226,13 @@ void stageselect_update()
 
                 /* select */
                 if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                    logfile_message("Loading level \"%s\"...", stage_data[option]->filepath);
-
-                    if(level_to_be_loaded != NULL)
-                        free(level_to_be_loaded);
-                    level_to_be_loaded = str_dup(stage_data[option]->filepath);
-
+                    selected_stage = stage_data[option];
+                    logfile_message(
+                        "Loading %s \"%s\"...",
+                        selected_stage->is_quest ? "quest" : "level",
+                        selected_stage->filepath
+                    );
                     save_selection(option);
-
                     sound_play(SFX_CONFIRM);
                     state = STAGESTATE_PLAY;
                 }
@@ -264,8 +261,13 @@ void stageselect_update()
                 player_set_lives(PLAYER_INITIAL_LIVES);
                 player_set_score(0);
 
-                /* push the level scene */
-                scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)level_to_be_loaded);
+                /* push the next scene */
+                if(selected_stage->is_quest)
+                    scenestack_push(storyboard_get_scene(SCENE_QUEST), selected_stage->filepath);
+                else
+                    scenestack_push(storyboard_get_scene(SCENE_LEVEL), selected_stage->filepath);
+
+                /* done! */
                 state = STAGESTATE_FADEIN;
                 return;
             }
@@ -290,7 +292,6 @@ void stageselect_update()
  */
 void stageselect_render()
 {
-    int i;
     v2d_t cam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
     background_render_bg(bgtheme, cam);
@@ -300,7 +301,7 @@ void stageselect_render()
     font_render(msg, cam);
     font_render(page, cam);
 
-    for(i=0; i<stage_count; i++) {
+    for(int i = 0; i < stage_count; i++) {
         if(i/STAGE_MAXPERPAGE == option/STAGE_MAXPERPAGE) {
             if(stage_data[i]->act > 0 && !enable_debug)
                 font_set_text(stage_label[i], (option==i) ? "<color=$COLOR_HIGHLIGHT>%s - %s %d</color>" : "%s - %s %d", stage_data[i]->name, lang_get("STAGESELECT_ACT"), stage_data[i]->act);
@@ -326,8 +327,13 @@ void load_stage_list()
 
     /* loading data */
     stage_count = 0;
-    assetfs_foreach_file("levels", ".lev", dirfill, NULL, enable_debug);
-    qsort(stage_data, stage_count, sizeof(stagedata_t*), sort_cmp);
+    assetfs_foreach_file("levels", ".lev", dirfill, "L", enable_debug);
+    if(enable_debug) {
+        assetfs_foreach_file("quests", ".qst", dirfill, "Q", true);
+        qsort(stage_data, stage_count, sizeof(stagedata_t*), debug_sort_cmp);
+    }
+    else
+        qsort(stage_data, stage_count, sizeof(stagedata_t*), sort_cmp);
 
     /* fatal error */
     if(stage_count == 0)
@@ -348,11 +354,9 @@ void load_stage_list()
 /* unloads the stage list */
 void unload_stage_list()
 {
-    int i;
-
     logfile_message("unload_stage_list()");
 
-    for(i=0; i<stage_count; i++) {
+    for(int i = 0; i < stage_count; i++) {
         font_destroy(stage_label[i]);
         stagedata_unload(stage_data[i]);
     }
@@ -370,7 +374,8 @@ int dirfill(const char *vpath, void *param)
         return 0;
 
     /* read level data */
-    stagedata_t* s = stagedata_load(vpath);
+    bool is_quest = (*((const char*)param) == 'Q');
+    stagedata_t* s = stagedata_load(vpath, is_quest);
     if(s != NULL)
         stage_data[ stage_count++ ] = s;
 
@@ -382,14 +387,26 @@ int dirfill(const char *vpath, void *param)
 int sort_cmp(const void *a, const void *b)
 {
     stagedata_t *s[2] = { *((stagedata_t**)a), *((stagedata_t**)b) };
+    int r = str_icmp(s[0]->name, s[1]->name);
+    return (r == 0) ? (s[0]->act - s[1]->act) : r;
+}
+
+/* debug mode comparator */
+int debug_sort_cmp(const void *a, const void *b)
+{
+    stagedata_t *s[2] = { *((stagedata_t**)a), *((stagedata_t**)b) };
+
+    if(s[0]->is_quest != s[1]->is_quest)
+        return (int)(!!s[0]->is_quest) - (int)(!!s[1]->is_quest);
+
     const char *p = strchr(s[0]->name, '/'), *q = strchr(s[1]->name, '/');
     int r = ((!p && !q) || (p && q)) ? str_icmp(s[0]->name, s[1]->name) : (!p && q ? -1 : 1);
     return (r == 0) ? (s[0]->act - s[1]->act) : r;
 }
 
 
-/* stagedata_t constructor. Returns NULL if filename is not a level. */
-stagedata_t* stagedata_load(const char *filename)
+/* stagedata_t constructor. Returns NULL if filename is not a valid entry. */
+stagedata_t* stagedata_load(const char *filename, bool is_quest)
 {
     stagedata_t* s = mallocx(sizeof *s);
 
@@ -397,6 +414,7 @@ stagedata_t* stagedata_load(const char *filename)
     str_cpy(s->name, "Untitled", sizeof(s->name));
     s->act = 0;
     s->filepath = str_normalize_slashes(str_dup(filename));
+    s->is_quest = is_quest;
 
     /* fill in the fields */
     if(enable_debug) {
@@ -405,9 +423,13 @@ stagedata_t* stagedata_load(const char *filename)
         bool skip_prefix = (0 == str_incmp(s->filepath, "levels/", PREFIX_LENGTH));
         snprintf(s->name, sizeof(s->name), "%s", s->filepath + (skip_prefix ? PREFIX_LENGTH : 0));
     }
-    else {
+    else if(!is_quest) {
         /* read the .lev file */
-        levparser_parse(s->filepath, s, interpret_line);
+        if(!levparser_parse(s->filepath, s, interpret_level_line)) {
+            logfile_message("Level select: can't parse level file \"%s\"", s->filepath);
+            stagedata_unload(s);
+            return NULL;
+        }
     }
 
     /* done! */
@@ -422,9 +444,9 @@ void stagedata_unload(stagedata_t *s)
 }
 
 /* read a line of the .lev file */
-bool interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data)
+bool interpret_level_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data)
 {
-    stagedata_t *s = (stagedata_t*)data;
+    stagedata_t* s = (stagedata_t*)data;
 
     if(param_count == 0)
         return true;
@@ -444,7 +466,6 @@ int load_selection()
 {
     prefs_t* prefs = modmanager_prefs();
     const char* last_selection;
-    int i;
 
     /* first run? */
     if(!prefs_has_item(prefs, STAGE_PREFSENTRY))
@@ -452,7 +473,7 @@ int load_selection()
 
     /* find i such that stage_data[i]->filepath == last_selection */
     last_selection = prefs_get_string(prefs, STAGE_PREFSENTRY);
-    for(i = 0; i < stage_count; i++) {
+    for(int i = 0; i < stage_count; i++) {
         if(strcmp(last_selection, stage_data[i]->filepath) == 0)
             return i;
     }
