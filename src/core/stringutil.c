@@ -179,6 +179,22 @@ const char* str_addslashes(const char *str)
     return buf;
 }
 
+/*
+ * str_normalize_slashes()
+ * Replaces '\\' by '/' in-place
+ */
+char* str_normalize_slashes(char* str)
+{
+    if(str != NULL) {
+        for(char* p = str; *p; p++) {
+            if(*p == '\\')
+                *p = '/';
+        }
+    }
+
+    return str;
+}
+
 
 /*
  * str_rstr()

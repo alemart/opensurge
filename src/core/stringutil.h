@@ -32,6 +32,7 @@ char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of
 char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */
 char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */
 const char* str_addslashes(const char* str); /* replaces " by \\", returning a static char* */
+char* str_normalize_slashes(char* str); /* replaces '\\' by '/' in-place */
 char* str_rstr(char* haystack, const char* needle); /* reverse strstr() */
 const char* str_from_int(int integer, char* buffer, size_t buffer_size); /* converts integer to string; if no buffer is specified, returns a static char* */
 const char* str_basename(const char* path); /* the filename of the path */
