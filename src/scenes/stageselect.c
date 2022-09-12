@@ -228,7 +228,7 @@ void stageselect_update()
 
                 /* select */
                 if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                    logfile_message("Loading level \"%s\" (\"%s\")...", stage_data[option]->name, stage_data[option]->filepath);
+                    logfile_message("Loading level \"%s\"...", stage_data[option]->filepath);
 
                     if(level_to_be_loaded != NULL)
                         free(level_to_be_loaded);
@@ -321,8 +321,6 @@ void stageselect_render()
 /* loads the stage list from the level/ folder */
 void load_stage_list()
 {
-    int i;
-
     video_display_loading_screen();
     logfile_message("load_stage_list()");
 
@@ -339,7 +337,7 @@ void load_stage_list()
 
     /* other stuff */
     stage_label = mallocx(stage_count * sizeof(font_t**));
-    for(i=0; i<stage_count; i++) {
+    for(int i = 0; i < stage_count; i++) {
         stage_label[i] = font_create("MenuText");
         font_set_position(stage_label[i], v2d_new(25, 50 + 20 * (i % STAGE_MAXPERPAGE)));
     }
@@ -373,15 +371,8 @@ int dirfill(const char *vpath, void *param)
 
     /* read level data */
     stagedata_t* s = stagedata_load(vpath);
-    if(s != NULL) {
+    if(s != NULL)
         stage_data[ stage_count++ ] = s;
-        if(enable_debug) {
-            /* debug mode: changing the names... */
-            const int PREFIX_LENGTH = 7; /* == strlen("levels/") */
-            bool skip_prefix = (0 == str_incmp(s->filepath, "levels/", PREFIX_LENGTH));
-            snprintf(s->name, sizeof(s->name), "%s", s->filepath + (skip_prefix ? PREFIX_LENGTH : 0));
-        }
-    }
 
     /* done! */
     return 0;
@@ -408,7 +399,16 @@ stagedata_t* stagedata_load(const char *filename)
     s->filepath = str_normalize_slashes(str_dup(filename));
 
     /* fill in the fields */
-    levparser_parse(s->filepath, s, interpret_line);
+    if(enable_debug) {
+        /* create a name based on the filepath */
+        const int PREFIX_LENGTH = 7; /* == strlen("levels/") */
+        bool skip_prefix = (0 == str_incmp(s->filepath, "levels/", PREFIX_LENGTH));
+        snprintf(s->name, sizeof(s->name), "%s", s->filepath + (skip_prefix ? PREFIX_LENGTH : 0));
+    }
+    else {
+        /* read the .lev file */
+        levparser_parse(s->filepath, s, interpret_line);
+    }
 
     /* done! */
     return s;
