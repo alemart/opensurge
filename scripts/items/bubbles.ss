@@ -16,11 +16,14 @@ object "Water Bubbles" is "entity", "basic"
 {
     transform = Transform();
     bubbles = Actor("Water Bubbles");
-    hy = 16; cnt = 10;
+    bubbleTime = 0.5; // in seconds
+    maxCounter = 16;
+    counter = 0;
+    hy = 16;
 
     state "main"
     {
-        if(timeout(0.5))
+        if(timeout(bubbleTime))
             state = "create bubble";
         else if(transform.position.y - hy <= Level.waterlevel)
             state = "hidden";
@@ -39,7 +42,7 @@ object "Water Bubbles" is "entity", "basic"
     {
         position = transform.position;
 
-        if(++cnt < 16) {
+        if(++counter < maxCounter) {
             size = (Math.random() <= 0.5) ? "sm" : "xs";
             Level.spawnEntity(
                 "Water Bubble",
@@ -51,7 +54,7 @@ object "Water Bubbles" is "entity", "basic"
                 "Water Bubble",
                 position.translatedBy(0, -4)
             ).setSize("lg").addComponent("BreathableBubble");
-            cnt = 0;
+            counter = 0;
         }
 
         state = "main";
@@ -63,6 +66,23 @@ object "Water Bubbles" is "entity", "basic"
         bubbles.zindex = 0.99;
         bubbles.anim = 0;
         hy = bubbles.animation.hotSpot.y / 2;
+        restartCounter();
+    }
+
+    fun onReset()
+    {
+        restartCounter();
+    }
+
+    fun restartCounter()
+    {
+        // bubbles should be spawned quickly
+        // when this object becomes visible.
+        anticipatedSeconds = 2.0;
+
+        // players can trick this logic to
+        // get an air bubble faster!
+        counter = maxCounter - anticipatedSeconds / bubbleTime;
     }
 }
 
