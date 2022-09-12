@@ -21,8 +21,7 @@
 #ifndef _QUEST_H
 #define _QUEST_H
 
-struct image_t;
-#define QUEST_MAXLEVELS 1024
+#include <stdbool.h>
 
 /*
    quest_t* contains all the data relevant to
@@ -34,6 +33,8 @@ struct image_t;
    (see ../scenes/quest.h)
 */
 
+#define QUEST_MAXLEVELS 1024
+
 /* quest structure */
 typedef struct quest_t quest_t;
 struct quest_t {
@@ -43,8 +44,7 @@ struct quest_t {
     char *author; /* author */
     char *version; /* version string */
     char *description; /* description */
-    struct image_t *image; /* thumbnail */
-    int is_hidden; /* this quest should not be shown in the custom quests menu */
+    bool is_hidden; /* this quest should not be shown in the custom quests menu */
 
     /* quest data */
     int level_count; /* how many levels? */

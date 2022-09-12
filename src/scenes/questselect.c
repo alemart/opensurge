@@ -269,14 +269,10 @@ void questselect_update()
 void questselect_render()
 {
     int i, first, last;
-    image_t *thumbnail;
     v2d_t cam = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
 
     background_render_bg(bgtheme, cam);
     background_render_fg(bgtheme, cam);
-
-    thumbnail = quest_data[option]->image;
-    image_blit(thumbnail, 0, 0, VIDEO_SCREEN_W - image_width(thumbnail) - 10, 60, image_width(thumbnail), image_height(thumbnail)); 
 
     font_render(title, cam);
     font_render(msg, cam);

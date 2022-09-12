@@ -23,7 +23,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "global.h"
-#include "image.h"
 #include "util.h"
 #include "stringutil.h"
 #include "logfile.h"
@@ -34,11 +33,7 @@
 
 
 /* private stuff */
-static image_t *load_quest_image(const char *image_file);
 static int traverse_quest(const parsetree_statement_t* stmt, void *quest);
-static const char* DEFAULT_QUEST_IMAGE = "images/null.png";
-static const int QUEST_IMAGE_WIDTH = 100;
-static const int QUEST_IMAGE_HEIGHT = 75;
 
 
 
@@ -61,9 +56,8 @@ quest_t *quest_load(const char *filepath)
     q->author = str_dup("-");
     q->version = str_dup("-");
     q->description = str_dup("-");
-    q->image = load_quest_image(NULL);
     q->level_count = 0;
-    q->is_hidden = FALSE;
+    q->is_hidden = false;
 
     /* reading the quest */
     prog = nanoparser_construct_tree(fullpath);
@@ -84,18 +78,15 @@ quest_t *quest_load(const char *filepath)
  */
 quest_t *quest_unload(quest_t *qst)
 {
-    int i;
-
     free(qst->file);
     free(qst->name);
     free(qst->author);
     free(qst->version);
     free(qst->description);
 
-    for(i=0; i<qst->level_count; i++)
+    for(int i = 0; i < qst->level_count; i++)
         free(qst->level_path[i]);
 
-    image_destroy(qst->image);
     free(qst);
     return NULL;
 }
@@ -104,21 +95,6 @@ quest_t *quest_unload(quest_t *qst)
 
 
 /* private functions */
-
-/* returns the quest image */
-image_t *load_quest_image(const char *image_file)
-{
-    const char *src = image_file ? image_file : DEFAULT_QUEST_IMAGE;
-    image_t *ret, *img;
-
-    img = image_load(src);
-    if(img == NULL)
-        img = image_load(DEFAULT_QUEST_IMAGE);
-
-    ret = image_clone_region(img, 0, 0, QUEST_IMAGE_WIDTH, QUEST_IMAGE_HEIGHT);
-    image_unload(img);
-    return ret;
-}
 
 /* interprets a statement from a .qst file */
 int traverse_quest(const parsetree_statement_t* stmt, void *quest)
@@ -149,12 +125,11 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         q->description = str_dup(nanoparser_get_string(p));
     }
     else if(str_icmp(id, "image") == 0) {
+        /* deprecated */
         nanoparser_expect_string(p, "Quest loader: quest image is expected");
-        image_destroy(q->image);
-        q->image = load_quest_image(nanoparser_get_string(p));
     }
     else if(str_icmp(id, "hidden") == 0) {
-        q->is_hidden = TRUE;
+        q->is_hidden = true;
     }
     else if(str_icmp(id, "level") == 0) {
         nanoparser_expect_string(p, "Quest loader: expected level path");
