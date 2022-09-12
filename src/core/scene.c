@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include "scene.h"
+#include "../core/video.h"
 #include "../core/util.h"
 #include "../core/logfile.h"
 
@@ -69,14 +70,18 @@ void scenestack_release()
 void scenestack_push(scene_t *scn, void *data)
 {
     logfile_message("scenestack_push()");
+
+    if(is_duplicate_scene(scn)) {
+        logfile_message("scenestack_push(): duplicate scenes are not supported");
+        video_showmessage("Duplicate scenes are not supported");
+        return;
+    }
+
     if(scenestack_size >= SCENESTACK_CAPACITY) {
         fatal_error("scenestack_push(): stack overflow");
         return;
     }
-    if(is_duplicate_scene(scn)) {
-        fatal_error("scenestack_push(): duplicate scenes are not supported");
-        return;
-    }
+
     scenestack[scenestack_size++] = scn;
     scn->init(data);
     logfile_message("scenestack_push(): success");
@@ -95,9 +100,9 @@ void scenestack_pop()
 {
     logfile_message("scenestack_pop()");
     if(!scenestack_empty()) {
-        scenestack[scenestack_size - 1]->release();
-        scenestack[scenestack_size - 1] = NULL;
-        scenestack_size--;
+        int last = --scenestack_size;
+        scenestack[last]->release();
+        scenestack[last] = NULL;
         logfile_message("scenestack_pop(): success");
     }
     else
