@@ -23,6 +23,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include "stageselect.h"
+#include "util/levparser.h"
 #include "options.h"
 #include "level.h"
 #include "../core/util.h"
@@ -39,7 +40,6 @@
 #include "../core/lang.h"
 #include "../core/input.h"
 #include "../core/timer.h"
-#include "../core/nanoparser/nanoparser.h"
 #include "../core/font.h"
 #include "../core/modmanager.h"
 #include "../core/prefs.h"
@@ -55,14 +55,13 @@
 /* stage data */
 typedef struct {
     char* filepath; /* relative path */
-    char name[128]; /* stage name */
-    int act; /* act number */
-    int requires[3]; /* required version */
+    char name[256]; /* stage name */
+    int act; /* zone number */
 } stagedata_t;
 
 static stagedata_t* stagedata_load(const char *filename);
 static void stagedata_unload(stagedata_t *s);
-static int traverse(const parsetree_statement_t *stmt, void *stagedata);
+static bool interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data);
 
 
 
@@ -368,40 +367,23 @@ void unload_stage_list()
 /* callback that fills stage_data[] */
 int dirfill(const char *vpath, void *param)
 {
-    int supver, subver, wipver;
-    stagedata_t *s;
-
     /* can't have more than STAGE_MAX levels installed */
     if(stage_count >= STAGE_MAX)
         return 0;
 
-    s = stagedata_load(vpath);
+    /* read level data */
+    stagedata_t* s = stagedata_load(vpath);
     if(s != NULL) {
-        supver = s->requires[0];
-        subver = s->requires[1];
-        wipver = s->requires[2];
-
-        if(game_version_compare(supver, subver, wipver) >= 0) {
-            stage_data[ stage_count++ ] = s;
-            if(enable_debug) { /* debug mode: changing the names... */
-                char *p = str_rstr(s->filepath, "levels/");
-                if(!p) {
-                    p = str_rstr(s->filepath, "levels\\");
-                    if(!p)
-                        snprintf(s->name, sizeof(s->name), "%s", s->filepath);
-                    else
-                        snprintf(s->name, sizeof(s->name), "%s", p + strlen("levels\\"));
-                }
-                else
-                    snprintf(s->name, sizeof(s->name), "%s", p + strlen("levels/"));
-            }
-        }
-        else {
-            logfile_message("Warning: level \"%s\" isn't compatible with this version of the game (requires: %d.%d.%d).", vpath, supver, subver, wipver);
-            stagedata_unload(s);
+        stage_data[ stage_count++ ] = s;
+        if(enable_debug) {
+            /* debug mode: changing the names... */
+            const int PREFIX_LENGTH = 7; /* == strlen("levels/") */
+            bool skip_prefix = (0 == str_incmp(s->filepath, "levels/", PREFIX_LENGTH));
+            snprintf(s->name, sizeof(s->name), "%s", s->filepath + (skip_prefix ? PREFIX_LENGTH : 0));
         }
     }
 
+    /* done! */
     return 0;
 }
 
@@ -418,25 +400,17 @@ int sort_cmp(const void *a, const void *b)
 /* stagedata_t constructor. Returns NULL if filename is not a level. */
 stagedata_t* stagedata_load(const char *filename)
 {
-    parsetree_program_t *prog;
     stagedata_t* s = mallocx(sizeof *s);
-    const char* fullpath = assetfs_fullpath(filename);
-    char* p;
 
-    s->filepath = str_dup(filename);
-    while((p = strchr(s->filepath, '\\')))
-        *p = '/'; /* replace '\\' by '/' */
-
+    /* initialize the fields */
     str_cpy(s->name, "Untitled", sizeof(s->name));
-    s->act = 1;
-    s->requires[0] = 0;
-    s->requires[1] = 0;
-    s->requires[2] = 0;
+    s->act = 0;
+    s->filepath = str_normalize_slashes(str_dup(filename));
 
-    prog = nanoparser_construct_tree(fullpath);
-    nanoparser_traverse_program_ex(prog, (void*)s, traverse);
-    prog = nanoparser_deconstruct_tree(prog);
+    /* fill in the fields */
+    levparser_parse(s->filepath, s, interpret_line);
 
+    /* done! */
     return s;
 }
 
@@ -447,24 +421,22 @@ void stagedata_unload(stagedata_t *s)
     free(s);
 }
 
-/* traverses a line of the level */
-int traverse(const parsetree_statement_t *stmt, void *stagedata)
+/* read a line of the .lev file */
+bool interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data)
 {
-    stagedata_t *s = (stagedata_t*)stagedata;
-    const char *id = nanoparser_get_identifier(stmt);
-    const parsetree_parameter_t *param_list = nanoparser_get_parameter_list(stmt);
-    const char *val = nanoparser_get_string(nanoparser_get_nth_parameter(param_list, 1));
+    stagedata_t *s = (stagedata_t*)data;
 
-    if(str_icmp(id, "name") == 0)
-        str_cpy(s->name, val, sizeof(s->name));
-    else if(str_icmp(id, "act") == 0)
-        s->act = atoi(val);
-    else if(str_icmp(id, "requires") == 0)
-        sscanf(val, "%d.%d.%d", &(s->requires[0]), &(s->requires[1]), &(s->requires[2]));
-    else if(str_icmp(id, "brick") == 0) /* optimization */
-        return 1; /* stop the enumeration */
+    if(param_count == 0)
+        return true;
 
-    return 0;
+    if(strcmp(identifier, "name") == 0)
+        str_cpy(s->name, param[0], sizeof(s->name));
+    else if(strcmp(identifier, "act") == 0)
+        s->act = atoi(param[0]);
+    else if(strcmp(identifier, "brick") == 0 || strcmp(identifier, "entity") == 0) /* optimization */
+        return false; /* stop the enumeration */
+
+    return true;
 }
 
 /* load a level that was previously selected by the user */

@@ -30,6 +30,7 @@
 #include "gameover.h"
 #include "pause.h"
 #include "quest.h"
+#include "util/levparser.h"
 #include "util/editorgrp.h"
 #include "util/editorcmd.h"
 #include "../core/engine.h"
@@ -197,8 +198,7 @@ static font_t *dlgbox_title, *dlgbox_message;
 static void level_load(const char *filepath);
 static void level_unload();
 static int level_save(const char *filepath);
-static void level_interpret_line(const char *filename, int fileline, const char *line);
-static void level_interpret_parsed_line(const char *filename, int fileline, const char *identifier, int param_count, const char **param);
+static bool level_interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
 
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
@@ -464,15 +464,10 @@ static editor_action_list_t* editor_action_delete_list(editor_action_list_t *lis
  */
 void level_load(const char *filepath)
 {
-    char line[LINE_MAXLEN];
-    const char* fullpath;
-    FILE* fp;
-
     logfile_message("Loading level \"%s\"...", filepath);
-    fullpath = assetfs_fullpath(filepath);
 
-    /* default values */
-    str_cpy(file, filepath, sizeof(file)); /* it's the relative filepath we want */
+    /* initialize fields with default values */
+    str_cpy(file, filepath, sizeof(file)); /* we want the relative filepath */
     str_cpy(name, "Untitled", sizeof(name));
     strcpy(musicfile, "");
     strcpy(theme, "");
@@ -483,7 +478,7 @@ void level_load(const char *filepath)
     strcpy(grouptheme, "");
     spawn_point = v2d_new(0,0);
     dialogregion_size = 0;
-    act = 1;
+    act = 0;
     requires[0] = GAME_VERSION_SUP;
     requires[1] = GAME_VERSION_SUB;
     requires[2] = GAME_VERSION_WIP;
@@ -502,21 +497,8 @@ void level_load(const char *filepath)
     /* setup objects (1) */
     init_setup_object_list();
 
-    /* traversing the level file */
-    fp = fopen_utf8(fullpath, "r");
-    if(fp != NULL) {
-        int ln = 0;
-        while(fgets(line, sizeof(line) / sizeof(char), fp)) {
-            if(*line) {
-                char *q = line + strlen(line) - 1;
-                if(*q == '\n') *q = '\0'; /* no newlines, please! */
-                level_interpret_line(fullpath, ++ln, line);
-            }
-        }
-        fclose(fp);
-    }
-    else
-        fatal_error("Can\'t open level file \"%s\".", fullpath);
+    /* reading the level file */
+    levparser_parse(filepath, NULL, level_interpret_line);
 
     /* load the music */
     music = *musicfile ? music_load(musicfile) : NULL;
@@ -778,57 +760,12 @@ int level_save(const char *filepath)
 
 /*
  * level_interpret_line()
- * Interprets a line from the .lev file
+ * Interprets a line of the .lev file
  */
-void level_interpret_line(const char *filename, int fileline, const char *line)
-{
-    int param_count, i;
-    char *param[16], *identifier;
-    char tmp[LINE_MAXLEN], *p, *q;
-    const int sz = (sizeof(tmp)/sizeof(*tmp))-1;
-
-    /* skip spaces */
-    for(p=(char*)line; isspace((int)*p); p++);
-    if(0 == *p) return;
-
-    /* reading the identifier */
-    for(q=tmp; *p && !isspace(*p) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
-    if(strncmp(tmp, "//", 2) == 0 || *tmp == '#') return; /* comment */
-    identifier = str_dup(tmp);
-
-    /* skip spaces */
-    for(; isspace((int)*p); p++);
-
-    /* read the arguments */
-    param_count = 0;
-    if(0 != *p) {
-        int quotes;
-        while(*p && param_count<sizeof(param)/sizeof(*param)) {
-            quotes = (*p == '"') && !!(p++); /* short-circuit AND */
-            for(q=tmp; *p && ((!quotes && !isspace(*p)) || (quotes && !(*p == '"' && *(p-1) != '\\'))) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
-            quotes = (*p == '"') && !!(p++);
-            param[param_count++] = str_dup(tmp);
-            for(; isspace((int)*p); p++); /* skip spaces */
-        }
-    }
-
-    /* interpret the line */
-    level_interpret_parsed_line(filename, fileline, identifier, param_count, (const char**)param);
-
-    /* free the stuff */
-    for(i=0; i<param_count; i++)
-        free(param[i]);
-    free(identifier);
-}
-
-/*
- * level_interpret_parsed_line()
- * Interprets a line parsed by level_interpret_line()
- */
-void level_interpret_parsed_line(const char *filename, int fileline, const char *identifier, int param_count, const char **param)
+bool level_interpret_line(const char* filepath, int fileline, const char* identifier, int param_count, const char** param, void* data)
 {
     /* interpreting the command */
-    if(str_icmp(identifier, "theme") == 0) {
+    if(strcmp(identifier, "theme") == 0) {
         if(!brickset_loaded()) {
             if(param_count == 1) {
                 str_cpy(theme, param[0], sizeof(theme));
@@ -840,49 +777,49 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - duplicate command 'theme' on line %d. Ignoring...", fileline);
     }
-    else if(str_icmp(identifier, "bgtheme") == 0) {
+    else if(strcmp(identifier, "bgtheme") == 0) {
         if(param_count == 1)
             str_cpy(bgtheme, param[0], sizeof(bgtheme));
         else
             logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
     }
-    else if(str_icmp(identifier, "grouptheme") == 0) {
+    else if(strcmp(identifier, "grouptheme") == 0) {
         if(param_count == 1)
             str_cpy(grouptheme, param[0], sizeof(grouptheme));
         else
             logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
     }
-    else if(str_icmp(identifier, "music") == 0) {
+    else if(strcmp(identifier, "music") == 0) {
         if(param_count == 1)
             str_cpy(musicfile, param[0], sizeof(musicfile));
         else
             logfile_message("Level loader - command 'music' expects one parameter: music filepath. Did you forget to double quote the music filepath?");
     }
-    else if(str_icmp(identifier, "name") == 0) {
+    else if(strcmp(identifier, "name") == 0) {
         if(param_count == 1)
             str_cpy(name, param[0], sizeof(name));
         else
             logfile_message("Level loader - command 'name' expects one parameter: level name. Did you forget to double quote the level name?");
     }
-    else if(str_icmp(identifier, "author") == 0) {
+    else if(strcmp(identifier, "author") == 0) {
         if(param_count == 1)
             str_cpy(author, param[0], sizeof(name));
         else
             logfile_message("Level loader - command 'author' expects one parameter: author name. Did you forget to double quote the author name?");
     }
-    else if(str_icmp(identifier, "version") == 0) {
+    else if(strcmp(identifier, "version") == 0) {
         if(param_count == 1)
             str_cpy(version, param[0], sizeof(name));
         else
             logfile_message("Level loader - command 'version' expects one parameter: level version");
     }
-    else if(str_icmp(identifier, "license") == 0) {
+    else if(strcmp(identifier, "license") == 0) {
         if(param_count == 1)
             str_cpy(license, param[0], sizeof(license));
         else
             logfile_message("Level loader - command 'license' expects one parameter: license name. Did you forget to double quote the license parameter?");
     }
-    else if(str_icmp(identifier, "requires") == 0) {
+    else if(strcmp(identifier, "requires") == 0) {
         if(param_count == 1) {
             int i;
             requires[0] = requires[1] = requires[2] = 0;
@@ -898,19 +835,19 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'requires' expects one parameter: minimum required engine version");
     }
-    else if(str_icmp(identifier, "act") == 0) {
+    else if(strcmp(identifier, "act") == 0) {
         if(param_count == 1)
-            act = clip(atoi(param[0]), 0, 99);
+            act = clip(atoi(param[0]), 0, 65535);
         else
             logfile_message("Level loader - command 'act' expects one parameter: act number");
     }
-    else if(str_icmp(identifier, "waterlevel") == 0) {
+    else if(strcmp(identifier, "waterlevel") == 0) {
         if(param_count == 1)
             waterlevel = atoi(param[0]);
         else
             logfile_message("Level loader - command 'waterlevel' expects one parameter: y coordinate");
     }
-    else if(str_icmp(identifier, "watercolor") == 0) {
+    else if(strcmp(identifier, "watercolor") == 0) {
         if(param_count == 3) {
             watercolor = color_rgba(
                 clip(atoi(param[0]), 0, 255),
@@ -930,7 +867,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'watercolor' expects parameters: red, green, blue [, alpha]");
     }
-    else if(str_icmp(identifier, "spawn_point") == 0) {
+    else if(strcmp(identifier, "spawn_point") == 0) {
         if(param_count == 2) {
             int x = atoi(param[0]);
             int y = atoi(param[1]);
@@ -939,7 +876,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'spawn_point' expects two parameters: xpos, ypos");
     }
-    else if(str_icmp(identifier, "dialogbox") == 0) {
+    else if(strcmp(identifier, "dialogbox") == 0) {
         if(param_count == 6) {
             if(dialogregion_size < DIALOGREGION_MAX) {
                 dialogregion_t *d = &(dialogregion[dialogregion_size++]);
@@ -957,7 +894,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
     }
-    else if(str_icmp(identifier, "readonly") == 0) {
+    else if(strcmp(identifier, "readonly") == 0) {
         if(!readonly) {
             if(param_count == 0)
                 readonly = TRUE;
@@ -967,7 +904,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
     }
-    else if(str_icmp(identifier, "brick") == 0) {
+    else if(strcmp(identifier, "brick") == 0) {
         if(param_count == 3 || param_count == 4 || param_count == 5) {
             if(*theme != 0) {
                 bricklayer_t layer = BRL_DEFAULT;
@@ -994,7 +931,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - command 'brick' expects three, four or five parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
     }
-    else if(str_icmp(identifier, "entity") == 0) {
+    else if(strcmp(identifier, "entity") == 0) {
         if(param_count == 3 || param_count == 4) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -1015,8 +952,8 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
     }
     else if(
-        str_icmp(identifier, "setup") == 0 ||
-        str_icmp(identifier, "startup") == 0 /* retro-compatibility */
+        strcmp(identifier, "setup") == 0 ||
+        strcmp(identifier, "startup") == 0 /* retro-compatibility */
     ) {
         if(is_setup_object_list_empty()) {
             if(param_count > 0) {
@@ -1029,21 +966,21 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring... (note: the command accepts one or more parameters)", identifier, fileline);
     }
-    else if(str_icmp(identifier, "players") == 0) {
+    else if(strcmp(identifier, "players") == 0) {
         if(team_size == 0) {
             if(param_count > 0) {
                 for(int i = 0; i < param_count; i++) {
                     if(team_size < TEAM_MAX) {
                         for(int j = 0; j < team_size; j++) {
                             if(strcmp(team[j]->name, param[i]) == 0)
-                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filename, fileline);
+                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filepath, fileline);
                         }
 
                         logfile_message("Loading player '%s'...", param[i]);
                         team[team_size++] = player_create(param[i]);
                     }
                     else
-                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filename, fileline);
+                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
                 }
             }
             else
@@ -1052,7 +989,7 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
         else
             logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring... (note: 'players' accepts one or more parameters)", fileline);
     }
-    else if(str_icmp(identifier, "item") == 0) {
+    else if(strcmp(identifier, "item") == 0) {
         if(param_count == 3) {
             int type = atoi(param[0]);
             int x = atoi(param[1]);
@@ -1071,8 +1008,8 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
     }
     else if(
-        str_icmp(identifier, "object") == 0 ||
-        str_icmp(identifier, "enemy") == 0 /* retro-compatibility */
+        strcmp(identifier, "object") == 0 ||
+        strcmp(identifier, "enemy") == 0 /* retro-compatibility */
     ) {
         if(param_count == 3) {
             const char* name = param[0];
@@ -1096,7 +1033,10 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
             logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
     }
     else
-        logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filename, fileline);
+        logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filepath, fileline);
+
+    /* continue reading */
+    return true;
 }
 
 

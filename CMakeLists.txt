@@ -279,6 +279,7 @@ SET(GAME_SRCS
   src/scenes/util/editorcmd.c
   src/scenes/util/editorgrp.c
   src/scenes/util/grouptree.c
+  src/scenes/util/levparser.c
   src/scenes/confirmbox.c
   src/scenes/credits.c
   src/scenes/editorhelp.c
@@ -395,6 +396,7 @@ SET(GAME_HEADERS
   src/scenes/util/editorcmd.h
   src/scenes/util/editorgrp.h
   src/scenes/util/grouptree.h
+  src/scenes/util/levparser.h
   src/scenes/confirmbox.h
   src/scenes/editorhelp.h
   src/scenes/editorpal.h
