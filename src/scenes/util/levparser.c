@@ -33,8 +33,9 @@ static bool parse_line(const char* filepath, int fileline, char* line, void* dat
  * levelparser_parse()
  * Reads each line of a .lev file, invoking a callback for each of them
  * If the callback returns false, the reading will stop
+ * Returns true on success
  */
-void levparser_parse(const char* path_to_lev_file, void* data, levparser_callback_t callback)
+bool levparser_parse(const char* path_to_lev_file, void* data, levparser_callback_t callback)
 {
     const char* fullpath = assetfs_fullpath(path_to_lev_file);
     char line[LINE_MAXLEN];
@@ -43,7 +44,7 @@ void levparser_parse(const char* path_to_lev_file, void* data, levparser_callbac
     /* open the level file */
     FILE* fp = fopen_utf8(fullpath, "r");
     if(!fp)
-        fatal_error("levparser: can\'t open file \"%s\".", fullpath);
+        return false; /* error */
 
     /* read and parse */
     while(fgets(line, LINE_MAXLEN, fp)) {
@@ -56,6 +57,9 @@ void levparser_parse(const char* path_to_lev_file, void* data, levparser_callbac
 
     /* close the level file */
     fclose(fp);
+
+    /* success! */
+    return true;
 }
 
 /*

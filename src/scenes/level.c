@@ -498,7 +498,8 @@ void level_load(const char *filepath)
     init_setup_object_list();
 
     /* reading the level file */
-    levparser_parse(filepath, NULL, level_interpret_line);
+    if(!levparser_parse(filepath, NULL, level_interpret_line))
+        fatal_error("Can\'t open level file \"%s\".", assetfs_fullpath(filepath));
 
     /* load the music */
     music = *musicfile ? music_load(musicfile) : NULL;

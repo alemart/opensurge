@@ -25,6 +25,6 @@
 
 typedef bool (*levparser_callback_t)(const char *filepath, int fileline, const char *identifier, int param_count, const char **param, void* data);
 
-void levparser_parse(const char* path_to_lev_file, void* data, levparser_callback_t callback);
+bool levparser_parse(const char* path_to_lev_file, void* data, levparser_callback_t callback);
 
 #endif
