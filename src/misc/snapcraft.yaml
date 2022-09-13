@@ -1,6 +1,6 @@
 name: opensurge
 base: core18
-version: '0.6.0'
+version: '0.6.0.2'
 summary: A fun 2D retro platformer inspired by Sonic games and a game creation system
 description: |
   A fun 2D retro platformer inspired by Sonic games and a game creation system that lets you unleash your creativity!
@@ -33,7 +33,7 @@ parts:
   opensurge:
     after: [desktop-glib-only, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.6.0
+    source-tag: v0.6.0.2
     plugin: cmake
     override-build: |
       set -eu
