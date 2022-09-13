@@ -17,7 +17,8 @@ object "Water Bubbles" is "entity", "basic"
     transform = Transform();
     bubbles = Actor("Water Bubbles");
     bubbleTime = 0.5; // in seconds
-    maxCounter = 16;
+    bigBubbleTime = 8.0; // in seconds
+    maxCounter = Math.floor(bigBubbleTime / bubbleTime);
     counter = 0;
     hy = 16;
 
@@ -66,6 +67,7 @@ object "Water Bubbles" is "entity", "basic"
         bubbles.zindex = 0.99;
         bubbles.anim = 0;
         hy = bubbles.animation.hotSpot.y / 2;
+
         restartCounter();
     }
 
@@ -83,6 +85,7 @@ object "Water Bubbles" is "entity", "basic"
         // players can trick this logic to
         // get an air bubble faster!
         counter = maxCounter - anticipatedSeconds / bubbleTime;
+        counter = Math.max(0, Math.floor(counter));
     }
 }
 
