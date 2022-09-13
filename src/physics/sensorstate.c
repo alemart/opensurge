@@ -148,7 +148,8 @@ void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2,
     y2 -= (int)(camera_position.y - VIDEO_SCREEN_H/2);
 
     image_rectfill(min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2), color);
-    image_rectfill(x2, y2, x2, y2, color_rgb(255, 192, 0)); /* render the tail (x2,y2) differently */
+    if(x1 != x2 || y1 != y2)
+        image_rectfill(x2, y2, x2, y2, color_rgb(255, 192, 0)); /* render the tail (x2,y2) differently */
 }
 
 swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2)
