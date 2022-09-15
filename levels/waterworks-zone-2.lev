@@ -1250,6 +1250,8 @@ brick 1 14080 9968
 brick 111 14720 10112
 brick 281 14752 10240
 brick 282 14784 10240
+brick 280 14848 9952
+brick 271 14784 10208
 brick 551 13440 9856
 brick 180 13312 9936
 brick 180 13376 9936
@@ -2068,6 +2070,7 @@ brick 951 14752 9552
 brick 220 14816 9488
 brick 261 14192 9392
 brick 260 14160 9392
+brick 270 14096 9392
 brick 552 13568 9728
 brick 554 13568 9600
 brick 552 13568 9472
@@ -2099,7 +2102,7 @@ brick 110 13952 9840
 brick 270 13728 9392
 brick 271 13776 9392
 brick 270 13856 9392
-brick 269 13984 9392
+brick 271 14048 9392
 brick 202 11520 9744
 brick 202 11648 9744
 brick 202 11520 9616
@@ -4827,7 +4830,6 @@ entity "Layer Green" 13504 9520 "7c435b6d3c264d44"
 entity "Layer Green" 13536 9520 "5520eddb87d9d0de"
 entity "Layer Green" 13680 9408 "1c3f5369d54794ff"
 entity "Layer Green" 13648 9408 "6d9b863d2dbbc416"
-entity "Checkpoint" 14096 9424 "624ca653a893b20c"
 entity "Spikes Down" 15472 9104 "4aa5643871bf9668"
 entity "Spikes Down" 15504 9104 "ba5916337afc7344"
 entity "Spikes Down" 15536 9104 "16921d659839daa2"
@@ -5579,12 +5581,8 @@ entity "Audio Source" 20672 9216 "f081c735cc9b6ce3"
 entity "Collectible" 15056 10288 "8131ef3c8253b949"
 entity "Collectible" 15056 10320 "1abfe2a8c0666c7b"
 entity "Collectible" 15056 10352 "b985a4b4f934de63"
-entity "Spikes" 13936 9424 "db654c85f5485da4"
-entity "Collectible" 13936 9328 "418157caef3f241f"
 entity "Powerup Shield Water" 14768 10752 "8170ba68e80715f9"
 entity "GreenMarmot" 14816 10752 "4b083f12d626039f"
-entity "Collectible" 14768 10224 "36550e201f79509f"
-entity "Collectible" 14800 10224 "c91779d460fc65fe"
 entity "SwoopHarrier" 19920 9440 "d77cb605dd02aa08"
 entity "Collectible" 20272 9808 "3077cb2edba0f341"
 entity "Collectible" 20272 9744 "a074d4fcf58d42e7"
@@ -5592,5 +5590,12 @@ entity "Collectible" 20272 9680 "032d120dc42e01a2"
 entity "Collectible" 20272 9616 "47945bf9fe507521"
 entity "Collectible" 20272 9552 "a8859cd0ec03bd8b"
 entity "Crococopter" 20336 9520 "3b18c2c6478726cd"
+entity "Collectible" 14864 9936 "998b0ae0fe01c129"
+entity "Collectible" 14864 9904 "8f33b45bd67ea8eb"
+entity "Collectible" 14864 9872 "8659e9c335910f7a"
+entity "Checkpoint" 13904 9424 "2e7554eedd059546"
+entity "Layer Green" 13904 9408 "09954cbac8035b1b"
+entity "Spikes" 14000 9424 "3cdd5571afeb20f3"
+entity "Collectible" 14000 9328 "9bc422888686aa72"
 
 // EOF
