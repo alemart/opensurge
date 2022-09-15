@@ -291,6 +291,10 @@ object "Title Screen - Menu Item - Start Game" is "private", "detached", "entity
         parent.onSelect(this);
     }
 
+    fun onHighlight()
+    {
+    }
+
     fun setHighlighted(highlighted)
     {
         delegate.setHighlighted(highlighted);
@@ -320,6 +324,10 @@ object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
         parent.onSelect(this);
     }
 
+    fun onHighlight()
+    {
+    }
+
     fun setHighlighted(highlighted)
     {
         delegate.setHighlighted(highlighted);
@@ -346,6 +354,10 @@ object "Title Screen - Menu Item - Quit" is "private", "detached", "entity"
     fun onSelect()
     {
         parent.onSelect(this);
+    }
+
+    fun onHighlight()
+    {
     }
 
     fun setHighlighted(highlighted)
@@ -389,9 +401,14 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
     fun setHighlighted(h)
     {
         highlighted = h;
+
         label.text = highlighted ? "<color=$COLOR_HIGHLIGHT>" + text + "</color>" : text;
         pointer.visible = highlighted;
         pointer.offset = Vector2(-label.size.x / 2, 0);
+
+        if(highlighted)
+            parent.onHighlight();
+
         return this;
     }
 
