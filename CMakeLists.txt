@@ -203,9 +203,9 @@ ENDIF()
 # Find the header files of Allegro
 FIND_PATH(ALLEGRO_INCDIR NAMES "allegro5/allegro.h" PATHS ${ALLEGRO_INCLUDE_PATH})
 IF(NOT ALLEGRO_INCDIR)
-  MESSAGE(FATAL_ERROR "Can't find the header files of Allegro. ${HELP}")
+  MESSAGE(FATAL_ERROR "Can't find allegro.h. ${HELP}")
 ELSE()
-  MESSAGE(STATUS "Found the header files of Allegro at ${ALLEGRO_INCDIR}")
+  MESSAGE(STATUS "Found allegro.h at ${ALLEGRO_INCDIR}/allegro5")
 ENDIF()
 
 # Write to LALLEGRO5
