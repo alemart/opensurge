@@ -90,12 +90,6 @@ STAGESELECT_MSG             "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> o
 STAGESELECT_PAGE            "pagina $1/$2"
 STAGESELECT_ACT             "Zone"
 
-// Quest Select
-QUESTSELECT_TITLE           "<color=$COLOR_TITLE>ZOEKTOCHT SELECT</color>"
-QUESTSELECT_MSG             "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
-QUESTSELECT_PAGE            "pagina $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Versie:</color> $1\n<color=$COLOR_HIGHLIGHT>Auteur:</color> $2\n<color=$COLOR_HIGHLIGHT>Beschrijving:</color> $3"
-
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
 CREDITS_BACK                "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"

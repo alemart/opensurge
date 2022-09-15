@@ -91,12 +91,6 @@ STAGESELECT_MSG             "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIR
 STAGESELECT_PAGE            "страница $1/$2"
 STAGESELECT_ACT             "Зона"
 
-// Quest Select
-QUESTSELECT_TITLE           "<color=$COLOR_TITLE>ИЗАБЕРИ ПОТРАГУ</color>"
-QUESTSELECT_MSG             "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да идеш назад"
-QUESTSELECT_PAGE            "страница $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Верзија:</color> $1\n<color=$COLOR_HIGHLIGHT>Аутор:</color> $2\n<color=$COLOR_HIGHLIGHT>Запис:</color> $3"
-
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>Кредити</color>"
 CREDITS_BACK                "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да идеш назад"

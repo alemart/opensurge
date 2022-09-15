@@ -91,12 +91,6 @@ STAGESELECT_MSG             "Premi <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> 
 STAGESELECT_PAGE            "pagina $1/$2"
 STAGESELECT_ACT             "Zona"
 
-// Quest Select
-QUESTSELECT_TITLE           "<color=$COLOR_TITLE>SELEZIONE QUEST</color>"
-QUESTSELECT_MSG             "Premi <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> per tornare indietro"
-QUESTSELECT_PAGE            "pagina $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Versione:</color> $1\n<color=$COLOR_HIGHLIGHT>Autore:</color> $2\n<color=$COLOR_HIGHLIGHT>Descrizione:</color> $3"
-
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
 CREDITS_BACK                "Premi <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> per tornare indietro"

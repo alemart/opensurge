@@ -162,8 +162,6 @@ void push_appropriate_scene(const char *str)
             scenestack_push(storyboard_get_scene(SCENE_OPTIONS), NULL);
         else if(str_icmp(str, "<language_select>") == 0)
             scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
-        /*else if(str_icmp(str, "<quest_select>") == 0)
-            scenestack_push(storyboard_get_scene(SCENE_QUESTSELECT), NULL);*/
         else if(str_icmp(str, "<credits>") == 0)
             scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
         else

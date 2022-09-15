@@ -31,7 +31,6 @@
 #include "../scenes/credits.h"
 #include "../scenes/options.h"
 #include "../scenes/stageselect.h"
-#include "../scenes/questselect.h"
 #include "../scenes/editorhelp.h"
 #include "../scenes/editorpal.h"
 
@@ -64,7 +63,6 @@ void storyboard_init()
     storyboard[SCENE_CREDITS] = scene_create(credits_init, credits_update, credits_render, credits_release);
     storyboard[SCENE_OPTIONS] = scene_create(options_init, options_update, options_render, options_release);
     storyboard[SCENE_STAGESELECT] = scene_create(stageselect_init, stageselect_update, stageselect_render, stageselect_release);
-    storyboard[SCENE_QUESTSELECT] = scene_create(questselect_init, questselect_update, questselect_render, questselect_release);
     storyboard[SCENE_EDITORHELP] = scene_create(editorhelp_init, editorhelp_update, editorhelp_render, editorhelp_release);
     storyboard[SCENE_EDITORPAL] = scene_create(editorpal_init, editorpal_update, editorpal_render, editorpal_release);
 }

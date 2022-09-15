@@ -306,7 +306,6 @@ SET(GAME_SRCS
   src/scenes/options.c
   src/scenes/pause.c
   src/scenes/quest.c
-  src/scenes/questselect.c
   src/scenes/stageselect.c
 
   src/scripting/scripting.c
@@ -423,7 +422,6 @@ SET(GAME_HEADERS
   src/scenes/options.h
   src/scenes/pause.h
   src/scenes/quest.h
-  src/scenes/questselect.h
   src/scenes/stageselect.h
 
   src/scripting/scripting.h

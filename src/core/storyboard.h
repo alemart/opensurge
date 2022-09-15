@@ -33,7 +33,6 @@ typedef enum scenetype_t {
     SCENE_CREDITS,
     SCENE_OPTIONS,
     SCENE_STAGESELECT,
-    SCENE_QUESTSELECT,
     SCENE_EDITORHELP,
     SCENE_EDITORPAL
 } scenetype_t;
