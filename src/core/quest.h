@@ -44,7 +44,6 @@ struct quest_t {
     char *author; /* author */
     char *version; /* version string */
     char *description; /* description */
-    bool is_hidden; /* this quest should not be shown in the custom quests menu */
 
     /* quest data */
     int level_count; /* how many levels? */

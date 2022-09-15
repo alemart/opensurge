@@ -52,12 +52,11 @@ quest_t *quest_load(const char *filepath)
 
     /* default values */
     q->file = str_dup(filepath);
-    q->name = str_dup("-");
-    q->author = str_dup("-");
-    q->version = str_dup("-");
-    q->description = str_dup("-");
+    q->name = str_dup("");
+    q->author = str_dup("");
+    q->version = str_dup("");
+    q->description = str_dup("");
     q->level_count = 0;
-    q->is_hidden = false;
 
     /* reading the quest */
     prog = nanoparser_construct_tree(fullpath);
@@ -104,7 +103,20 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
     const parsetree_parameter_t* param_list = nanoparser_get_parameter_list(stmt);
     const parsetree_parameter_t* p = nanoparser_get_nth_parameter(param_list, 1);
 
-    if(str_icmp(id, "name") == 0) {
+    if(str_icmp(id, "level") == 0) {
+        nanoparser_expect_string(p, "Quest loader: expected level path");
+        if(q->level_count < QUEST_MAXLEVELS)
+            q->level_path[q->level_count++] = str_dup(nanoparser_get_string(p));
+        else
+            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
+    }
+    else if(id[0] == '<' && id[strlen(id)-1] == '>') { /* special */
+        if(q->level_count < QUEST_MAXLEVELS)
+            q->level_path[q->level_count++] = str_dup(id);
+        else
+            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
+    }
+    else if(str_icmp(id, "name") == 0) {
         nanoparser_expect_string(p, "Quest loader: quest name is expected");
         free(q->name);
         q->name = str_dup(nanoparser_get_string(p));
@@ -120,29 +132,21 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         q->version = str_dup(nanoparser_get_string(p));
     }
     else if(str_icmp(id, "description") == 0) {
+        /* make obsolete? will this field still have any use? */
         nanoparser_expect_string(p, "Quest loader: quest description is expected");
         free(q->description);
         q->description = str_dup(nanoparser_get_string(p));
     }
     else if(str_icmp(id, "image") == 0) {
-        /* deprecated */
+        /* this field is obsolete and was removed
+           this code is kept for retro-compatibility */
         nanoparser_expect_string(p, "Quest loader: quest image is expected");
+        logfile_message("Quest loader: field image is obsolete");
     }
     else if(str_icmp(id, "hidden") == 0) {
-        q->is_hidden = true;
-    }
-    else if(str_icmp(id, "level") == 0) {
-        nanoparser_expect_string(p, "Quest loader: expected level path");
-        if(q->level_count < QUEST_MAXLEVELS)
-            q->level_path[q->level_count++] = str_dup(nanoparser_get_string(p));
-        else
-            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
-    }
-    else if(id[0] == '<' && id[strlen(id)-1] == '>') { /* special */
-        if(q->level_count < QUEST_MAXLEVELS)
-            q->level_path[q->level_count++] = str_dup(id);
-        else
-            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
+        /* this field is obsolete and was removed
+           this code is kept for retro-compatibility */
+        logfile_message("Quest loader: field hidden is obsolete");
     }
 
     return 0;
