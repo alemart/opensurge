@@ -1,5 +1,13 @@
 # Release Notes
 
+## 0.6.0.2 - September 15th, 2022
+
+* Adjusted gimmicks: Water Bubbles, Spikes
+* Made tweaks to the level design, to the title screen and to the build script
+* Changed the parser used on the stage select
+* Added support for loading quests via developer mode
+* Removed the quest selection screen
+
 ## 0.6.0.1 - September 6th, 2022
 
 * Updated the default mapping for gamepads
