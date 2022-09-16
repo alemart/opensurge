@@ -74,7 +74,27 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
-  <releases>
+    <release version="0.6.0.2" date="2022-09-15">
+      <description>
+        <ul>
+          <li>Adjusted gimmicks: Water Bubbles, Spikes</li>
+          <li>Made tweaks to the level design, to the title screen and to the build script</li>
+          <li>Changed the parser used on the stage select</li>
+          <li>Added support for loading quests via developer mode</li>
+          <li>Removed the quest selection screen</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.6.0.1" date="2022-09-06">
+      <description>
+        <ul>
+          <li>Updated the default mapping for gamepads</li>
+          <li>Adjusted the "Walk on Water" gimmick</li>
+          <li>Optimized the creation and the rendering of brick particles</li>
+          <li>Made tweaks to the level design</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.0" date="2022-09-02">
       <description>
         <ul>
