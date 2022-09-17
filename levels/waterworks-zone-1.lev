@@ -5866,5 +5866,9 @@ entity "Collectible" 21744 10176 "02fef6c77b9ffa60"
 entity "Collectible" 21744 10144 "76918e3356f25d94"
 entity "Collectible" 21744 10112 "d190c5d07f245c2f"
 entity "Water Bubbles" 16336 10928 "8729c7e6bfbb3756"
+entity "Collectible" 22160 8944 "1bfd94acc49b6721"
+entity "Collectible" 22192 8912 "10757278a471b9af"
+entity "Collectible" 28304 8464 "9b30eefedc5ad11c"
+entity "Collectible" 28352 8416 "51dc31f42a09a3be"
 
 // EOF
