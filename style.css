@@ -13,7 +13,12 @@ body {
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.85);
     letter-spacing: 1px;
 }
-a, a:visited, a:hover, a:active, a:focus { color: #ffee11; }
+a, a:visited, a:hover, a:active, a:focus {
+    color: #ffee11;
+}
+a:not(.btn) {
+    text-decoration: underline;
+}
 .cartoon {
     color: #fff;
     font-weight: bold;
