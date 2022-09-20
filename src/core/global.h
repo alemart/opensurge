@@ -34,26 +34,22 @@
 /* Scripting */
 #define SURGESCRIPT_MIN_VERSION "0.5.6"
 
-/* if the following is defined, then this is a development build */
+/* Utilities */
+#define STRINGIFY(x)            _STRINGIFY(x)
+#define _STRINGIFY(x)           #x
+
+/* If the following constant is defined, then this is a development build */
 /*
 #define GAME_BUILD_VERSION      "1337-dev"
 */
 
-/* Data folder (game assets) */
-#if !defined(GAME_DATADIR)
-#define GAME_DATADIR            "/usr/share/games/opensurge"
-#endif
-
-/* Utilities */
-#define VERSION_CODE(X,Y,Z)     ((X) * 10000 + (Y) * 100 + (Z))
-#define VERSION_STRING(X,Y,Z)   STRINGIFY(X) "." STRINGIFY(Y) "." STRINGIFY(Z)
-#define STRINGIFY(x)            _STRINGIFY(x)
-#define _STRINGIFY(x)           #x
-
 /* Version code */
+#define VERSION_CODE(X,Y,Z)     ((X) * 10000 + (Y) * 100 + (Z))
 #define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
 
 /* Version string */
+#define VERSION_STRING(X,Y,Z)   STRINGIFY(X) "." STRINGIFY(Y) "." STRINGIFY(Z)
+
 #if !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX == 0 /* stable version */
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP)
 #elif !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX != 0 /* stable version with patch */
@@ -64,15 +60,14 @@
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" GAME_BUILD_VERSION
 #endif
 
+/* GAME_DATADIR is the directory in which the game assets located by default (*nix only) */
+#ifndef GAME_DATADIR
+#define GAME_DATADIR            "/usr/share/games/opensurge"
+#endif
+
 /* Legacy constants */
-#ifdef TRUE
 #undef TRUE
-#endif
-
-#ifdef FALSE
 #undef FALSE
-#endif
-
 #define TRUE                    1
 #define FALSE                   0
 
