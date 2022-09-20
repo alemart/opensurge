@@ -34,8 +34,10 @@
 /* Scripting */
 #define SURGESCRIPT_MIN_VERSION "0.5.6"
 
-/* if the following is defined, this is a development build */
-/*#define GAME_BUILD_VERSION      1337-dev*/
+/* if the following is defined, then this is a development build */
+/*
+#define GAME_BUILD_VERSION      "1337-dev"
+*/
 
 /* Data folder (game assets) */
 #if !defined(GAME_DATADIR)
@@ -57,9 +59,9 @@
 #elif !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX != 0 /* stable version with patch */
 #define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX)
 #elif defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX == 0 /* development version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "-" STRINGIFY(GAME_BUILD_VERSION)
+#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "-" GAME_BUILD_VERSION
 #else /* development version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" STRINGIFY(GAME_BUILD_VERSION)
+#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" GAME_BUILD_VERSION
 #endif
 
 /* Legacy constants */
