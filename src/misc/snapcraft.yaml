@@ -33,29 +33,21 @@ parts:
     source-tag: v0.6.0.3
     plugin: cmake
     parse-info: [usr/share/metainfo/opensurge.appdata.xml]
-    override-build: |
-      set -eu
-      cd $SNAPCRAFT_PART_BUILD
-      cmake $SNAPCRAFT_PART_SRC \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr \
-        -DSURGESCRIPT_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include \
-        -DSURGESCRIPT_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET \
-        -DALLEGRO_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include \
-        -DALLEGRO_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/ \
-        -DGAME_DATADIR=/usr/share/games/opensurge \
-        -DGAME_BINDIR=$SNAPCRAFT_PART_INSTALL/usr/games \
-        -DBLEEDING_EDGE=OFF \
-        -DALLEGRO_MONOLITH=OFF \
-        -DDESKTOP_INSTALL=ON \
-        -DDESKTOP_ENTRY_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/applications \
-        -DDESKTOP_ICON_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/pixmaps \
-        -DDESKTOP_METAINFO_PATH=$SNAPCRAFT_PART_INSTALL/usr/share/metainfo
-      make -j2 && make install
-      sed -i "s|^Icon=.*|Icon=/usr/share/pixmaps/opensurge.png|" "$SNAPCRAFT_PART_INSTALL/usr/share/applications/opensurge.desktop"
-      sed -i "s|^\s*<icon \([^>]*\)>\([^<]*\)</icon>\s*$|<icon \\1>/usr/share/pixmaps/opensurge.png</icon>|" "$SNAPCRAFT_PART_INSTALL/usr/share/metainfo/opensurge.appdata.xml"
-    organize:
-      '/usr/share/games/opensurge': usr/share/games/opensurge
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBLEEDING_EDGE=OFF
+      - -DALLEGRO_MONOLITH=OFF
+      - -DDESKTOP_INSTALL=ON
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DGAME_DATADIR=/usr/share/games/opensurge
+      - -DGAME_BINDIR=/usr/games
+      - -DDESKTOP_ENTRY_PATH=/usr/share/applications
+      - -DDESKTOP_ICON_PATH=/usr/share/pixmaps
+      - -DDESKTOP_METAINFO_PATH=/usr/share/metainfo
+      - -DSURGESCRIPT_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
+      - -DSURGESCRIPT_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
+      - -DALLEGRO_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
+      - -DALLEGRO_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/
     build-packages:
       - build-essential
     stage-packages:
