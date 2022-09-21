@@ -224,7 +224,8 @@ void input_update()
              of the digital buttons is described by a single bitmask, which is
              mapped to logical buttons defined in the Allegro driver. The state
              of the analog sticks is mapped to different logical sticks and axes
-             that are also defined by Allegro in joyxi_convert_state().
+             that are also defined by Allegro in src/win/wjoyxi.c. Take a look
+             at joyxi_convert_state() in that file.
 
              https://learn.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad
 
