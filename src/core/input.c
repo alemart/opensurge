@@ -63,6 +63,8 @@ struct input_list_t {
     input_list_t *next;
 };
 
+
+
 /* keyboard input */
 static bool a5_key[ALLEGRO_KEY_MAX] = { false };
 
@@ -76,27 +78,37 @@ static struct {
     int b; /* bit vector of active buttons */
 } a5_mouse = { 0 };
 
-/* joysticks */
-#define MAX_JOYS 8 /* maximum number of joysticks */
-#define MAX_AXES 2 /* maximum number of axes */
-typedef char __joy_max[-(!(MAX_JOYS && !(MAX_JOYS & (MAX_JOYS-1))))]; /* MAX_JOYS must be a power of 2 */
-typedef char __joy_axis[-(MAX_AXES < 2)]; /* MAX_AXES must be at least 2 */
+/* joystick input */
+#define MAX_JOYS      8 /* maximum number of joysticks */
+#define AXIS_X        0 /* x-axis of a stick */
+#define AXIS_Y        1 /* y-axis of a stick */
+#define REQUIRED_AXES 2 /* required number of axes of a stick */
 
-static bool ignore_joystick = false;
 static struct {
-    float axis[MAX_AXES]; /* -1.0 <= axis <= 1.0 */
+    float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
     uint32_t button; /* bit vector */
 } joy[MAX_JOYS];
 
+static bool ignore_joystick = false;
+
+/* dead-zone thresholds for the (x,y) axes */
+static const float joy_analog_threshold[REQUIRED_AXES] = {
+
+    /* Pressing up + jump won't make the player jump */
+    [AXIS_X] = 0.4f,
+    [AXIS_Y] = 0.8f
+
+};
+
 /* private data */
 static const char* DEFAULT_INPUTMAP_NAME = "default";
-static const float joy_analog_threshold[MAX_AXES] = { 0.4f, 0.8f }; /* (x,y) axes. Pressing up + jump won't make the player jump */
 static input_list_t *inlist = NULL;
 
 /* private methods */
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
 static inline void input_clear(input_t *in);
+static void log_joysticks();
 
 
 
@@ -109,7 +121,7 @@ void input_init()
     extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
     logfile_message("Initializing the input system...");
 
-    /* initializing Allegro */
+    /* initialize the Allegro input system */
     if(!al_install_keyboard())
         fatal_error("Can't initialize the keyboard");
     al_register_event_source(a5_event_queue, al_get_keyboard_event_source());
@@ -122,17 +134,7 @@ void input_init()
         fatal_error("Can't initialize the joystick subsystem");
     al_register_event_source(a5_event_queue, al_get_joystick_event_source());
 
-    /* joystick config */
-    if(input_is_joystick_available()) {
-        logfile_message("Found %d joystick(s)", input_number_of_joysticks());
-        ignore_joystick = false;
-    }
-    else {
-        logfile_message("No joysticks have been found");
-        ignore_joystick = true;
-    }
-
-    /* initializing the input list */
+    /* initialize the input list */
     inlist = NULL;
 
     /* initialize mouse input */
@@ -143,6 +145,10 @@ void input_init()
     /* initialize keyboard input */
     for(int i = 0; i < ALLEGRO_KEY_MAX; i++)
         a5_key[i] = false;
+
+    /* initialize joystick input */
+    ignore_joystick = !input_is_joystick_available();
+    log_joysticks();
 
     /* loading custom input mappings */
     inputmap_init();
@@ -173,32 +179,62 @@ void input_update()
         int num_sticks = al_get_joystick_num_sticks(joystick);
         int num_buttons = min(al_get_joystick_num_buttons(joystick), MAX_JOYSTICK_BUTTONS);
 
-        /* read current state */
+        /* read the current state */
         ALLEGRO_JOYSTICK_STATE state;
         al_get_joystick_state(joystick, &state);
-
-        /* read sticks */
-        for(int a = 0; a < MAX_AXES; a++)
-            joy[j].axis[a] = 0.0f;
-
-        for(int stick_id = 0; stick_id < num_sticks; stick_id++) {
-            int num_axes = min(MAX_AXES, al_get_joystick_num_axes(joystick, stick_id));
-            for(int a = 0; a < num_axes; a++) {
-                if(fabs(state.stick[stick_id].axis[a]) >= joy_analog_threshold[a])
-                    joy[j].axis[a] += state.stick[stick_id].axis[a];
-            }
-        }
-
-        for(int a = 0; a < MAX_AXES; a++)
-            joy[j].axis[a] = clip(joy[j].axis[a], -1.0f, 1.0f);
 
         /* read buttons */
         joy[j].button = 0;
         for(int b = 0; b < num_buttons; b++)
             joy[j].button |= (state.button[b] != 0) << b;
+
+        /*
+
+        In order to read directional input from the analog sticks, we use the
+        following heuristic: read the first reported stick that has two axes.
+        Such stick likely corresponds to the left analog stick of the connected
+        gamepad.
+
+        If we take a look at SDL_GameControllerDB, a community sourced database
+        of game controller mappings, we'll see that, in most controllers, entry
+        "leftx" is mapped to "a0" (axis 0) and that entry "lefty" is mapped to
+        "a1" (axis 1). Entries "rightx" and "righty" aren't mapped as uniformly.
+        I infer that axis 0 and 1 likely correspond to the two axes of stick 0
+        reported by the Allegro API.
+
+        We only read one analog stick at this time. Other sticks may correspond
+        to pressure buttons. I don't know if the second stick that has two axes
+        (which may be stick 1, 2...), as reported by Allegro, can be reliably
+        associated with the right analog stick. Further testing is desirable.
+        How does Allegro divide the analog input in sticks? jstest only reports
+        axes and buttons.
+
+        https://github.com/gabomdq/SDL_GameControllerDB
+
+        */
+
+        /* read sticks */
+        joy[j].axis[AXIS_X] = 0.0f;
+        joy[j].axis[AXIS_Y] = 0.0f;
+
+        for(int stick_id = 0; stick_id < num_sticks; stick_id++) {
+            if(REQUIRED_AXES <= al_get_joystick_num_axes(joystick, stick_id)) { /* safety check */
+
+                if(fabs(state.stick[stick_id].axis[0]) >= joy_analog_threshold[AXIS_X])
+                    joy[j].axis[AXIS_X] += state.stick[stick_id].axis[0];
+                if(fabs(state.stick[stick_id].axis[1]) >= joy_analog_threshold[AXIS_Y])
+                    joy[j].axis[AXIS_Y] += state.stick[stick_id].axis[1];
+
+                break;
+
+            }
+        }
+
+        joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
+        joy[j].axis[AXIS_Y] = clip(joy[j].axis[AXIS_Y], -1.0f, 1.0f);
     }
 
-    /* updating the input objects */
+    /* update the input objects */
     for(input_list_t* it = inlist; it; it = it->next) {
         for(int i = 0; i < IB_MAX; i++)
             it->data->oldstate[i] = it->data->state[i];
@@ -598,10 +634,10 @@ void inputuserdefined_update(input_t* in)
     if(im->joystick.enabled && input_is_joystick_enabled()) {
         int num_joysticks = min(input_number_of_joysticks(), MAX_JOYS);
         if(im->joystick.id < num_joysticks) {
-            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[1] <= -joy_analog_threshold[1]);
-            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[1] >= joy_analog_threshold[1]);
-            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[0] <= -joy_analog_threshold[0]);
-            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[0] >= joy_analog_threshold[0]);
+            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[AXIS_Y] <= -joy_analog_threshold[AXIS_Y]);
+            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[AXIS_Y] >= joy_analog_threshold[AXIS_Y]);
+            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[AXIS_X] <= -joy_analog_threshold[AXIS_X]);
+            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[AXIS_X] >= joy_analog_threshold[AXIS_X]);
             for(button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
                 in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
@@ -646,7 +682,6 @@ void a5_handle_mouse_event(const ALLEGRO_EVENT* event)
 void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
 {
     switch(event->type) {
-#if 0
         /*
          * Joystick input based on ALLEGRO_JOYSTICK_STATE
          * seems to work better according to several users
@@ -654,6 +689,7 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
          * tested with Allegro 5.2.5 on Windows using
          * DirectInput devices
          */
+#if 0
         case ALLEGRO_EVENT_JOYSTICK_AXIS:
             break;
 
@@ -685,15 +721,44 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
                 input_ignore_joystick(true);
             }
 
-            /* log it */
-            logfile_message("Found %d joystick%s", num_joysticks, num_joysticks == 1 ? "" : "s");
-            for(int j = 0; j < num_joysticks; j++) {
-                ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
-                logfile_message("Joystick %d: \"%s\"", j, al_get_joystick_name(joystick));
-            }
+            /* log joysticks */
+            log_joysticks();
 
             /* done! */
             break;
         }
+    }
+}
+
+/* log joysticks */
+void log_joysticks()
+{
+    int num_joysticks = al_get_num_joysticks();
+
+    if(num_joysticks == 0) {
+        logfile_message("No joysticks have been found");
+        return;
+    }
+
+    logfile_message("Found %d joystick%s", num_joysticks, num_joysticks == 1 ? "" : "s");
+    for(int j = 0; j < num_joysticks; j++) {
+        ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
+
+        logfile_message("- Joystick %d (\"%s\"):", j, al_get_joystick_name(joystick));
+        logfile_message("-- %d sticks, %d buttons", al_get_joystick_num_sticks(joystick), al_get_joystick_num_buttons(joystick));
+
+        for(int s = 0; s < al_get_joystick_num_sticks(joystick); s++) {
+            static const char* joy_flag[4] = { "", "digital", "analog", "" };
+
+            logfile_message("-- stick %d (\"%s\")", s+1, al_get_joystick_stick_name(joystick, s));
+            logfile_message("--- flags: 0x%X %s", al_get_joystick_stick_flags(joystick, s), joy_flag[al_get_joystick_stick_flags(joystick, s) & 0x3]);
+            logfile_message("--- number of axes: %d", al_get_joystick_num_axes(joystick, s));
+
+            for(int a = 0; a < al_get_joystick_num_axes(joystick, s); a++)
+                logfile_message("---- axis %d (\"%s\")", a, al_get_joystick_axis_name(joystick, s, a));
+        }
+
+        for(int b = 0; b < al_get_joystick_num_buttons(joystick); b++)
+            logfile_message("-- button %d (\"%s\")", b+1, al_get_joystick_button_name(joystick, b));
     }
 }
