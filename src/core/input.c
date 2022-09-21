@@ -252,14 +252,18 @@ void input_update()
                 if(fabs(y) >= DEADZONE_THRESHOLD)
                     joy[j].axis[AXIS_Y] += (y - DEADZONE_THRESHOLD * sign(y)) / NORMALIZER;
 
+                /* read nothing else */
                 break;
 
             }
 
         }
 
+        #if 0
+        /* not needed if we read a single stick */
         joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
         joy[j].axis[AXIS_Y] = clip(joy[j].axis[AXIS_Y], -1.0f, 1.0f);
+        #endif
     }
 
     /* update the input objects */
