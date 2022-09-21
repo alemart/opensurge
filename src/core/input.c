@@ -193,7 +193,7 @@ void input_update()
         In order to read directional input from the analog sticks, we use the
         following heuristic: read the first reported stick that has two axes.
         Such stick likely corresponds to the left analog stick of the connected
-        gamepad.
+        gamepad - if it exists.
 
         If we take a look at SDL_GameControllerDB, a community sourced database
         of game controller mappings, we'll see that, in most controllers, entry
