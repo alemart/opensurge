@@ -750,7 +750,7 @@ void log_joysticks()
         for(int s = 0; s < al_get_joystick_num_sticks(joystick); s++) {
             static const char* joy_flag[4] = { "", "digital", "analog", "" };
 
-            logfile_message("-- stick %d (\"%s\")", s+1, al_get_joystick_stick_name(joystick, s));
+            logfile_message("-- stick %d (\"%s\")", s, al_get_joystick_stick_name(joystick, s));
             logfile_message("--- flags: 0x%X %s", al_get_joystick_stick_flags(joystick, s), joy_flag[al_get_joystick_stick_flags(joystick, s) & 0x3]);
             logfile_message("--- number of axes: %d", al_get_joystick_num_axes(joystick, s));
 
@@ -759,6 +759,6 @@ void log_joysticks()
         }
 
         for(int b = 0; b < al_get_joystick_num_buttons(joystick); b++)
-            logfile_message("-- button %d (\"%s\")", b+1, al_get_joystick_button_name(joystick, b));
+            logfile_message("-- button %d (\"%s\")", b, al_get_joystick_button_name(joystick, b));
     }
 }
