@@ -94,7 +94,7 @@ inputmap "default"
         fire8           KEY_NONE       // available
     }
 
-    // default mapping for XInput controllers
+    // default mapping for XInput controllers in Allegro
     joystick 0
     {
         up              BUTTON_14      // d-pad
@@ -163,7 +163,7 @@ inputmap "default.backup"
         fire8           KEY_NONE       // available
     }
 
-    // default mapping for XInput controllers
+    // default mapping for XInput controllers in Allegro
     joystick 0
     {
         up              BUTTON_14      // d-pad

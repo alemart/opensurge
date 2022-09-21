@@ -210,13 +210,23 @@ void input_update()
         know if the second stick that has two axes (which may be stick 1, 2...),
         as reported by Allegro, can be reliably associated with the right analog
         stick*. Further testing is desirable. How does Allegro divide the analog
-        input in sticks? jstest only reports axes and buttons.
+        input in sticks**? jstest only reports axes and buttons.
 
         https://github.com/gabomdq/SDL_GameControllerDB
 
-        (*) apparently it can if we're using a XInput device on Windows. Stick 0
+        (*) Yes, it can if we use Allegro's XInput driver on Windows. Stick 0
             is the "Left Thumbstick" and stick 1 is the "Right Thumbstick". See
             src/win/wjoyxi.c in Allegro's source code.
+
+        (**) the division is merely logical in Allegro's Windows XInput driver.
+             A XINPUT_STATE structure holds a XINPUT_GAMEPAD structure. The
+             latter describes the current state of the controller. The state
+             of the digital buttons is described by a single bitmask, which is
+             mapped to logical buttons defined in the Allegro driver. The state
+             of the analog sticks is mapped to different logical sticks and axes
+             that are also defined by Allegro in joyxi_convert_state().
+
+             https://learn.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad
 
         */
 
@@ -235,7 +245,7 @@ void input_update()
                 float x = state.stick[stick_id].axis[0];
                 float y = state.stick[stick_id].axis[1];
 
-                /* ignore the dead-zone and normalize the data back to [0,1] */
+                /* ignore the dead-zone and normalize the data back to [-1,1] */
                 const float NORMALIZER = 1.0f - DEADZONE_THRESHOLD;
                 if(fabs(x) >= DEADZONE_THRESHOLD)
                     joy[j].axis[AXIS_X] += (x - DEADZONE_THRESHOLD * sign(x)) / NORMALIZER;
