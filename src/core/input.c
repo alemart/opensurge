@@ -98,6 +98,9 @@ static const float joy_analog_threshold[REQUIRED_AXES] = {
     [AXIS_X] = 0.4f,
     [AXIS_Y] = 0.8f
 
+    /* we use large thresholds because the virtual input_t devices
+       currently deal with directionals as if they were digital input */
+
 };
 
 /* private data */
@@ -222,7 +225,12 @@ void input_update()
         joy[j].axis[AXIS_Y] = 0.0f;
 
         for(int stick_id = 0; stick_id < num_sticks; stick_id++) {
-            if(REQUIRED_AXES <= al_get_joystick_num_axes(joystick, stick_id)) { /* safety check */
+
+            /* safety check */
+            /* I use <= because I think al_get_joystick_num_axes() cannot be
+               fully trusted with controllers in DInput mode.
+               https://www.allegro.cc/forums/thread/614996/1 */
+            if(REQUIRED_AXES <= al_get_joystick_num_axes(joystick, stick_id)) {
 
                 if(fabs(state.stick[stick_id].axis[0]) >= joy_analog_threshold[AXIS_X])
                     joy[j].axis[AXIS_X] += state.stick[stick_id].axis[0];
@@ -232,6 +240,7 @@ void input_update()
                 break;
 
             }
+
         }
 
         joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
