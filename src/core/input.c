@@ -91,15 +91,15 @@ static struct {
 
 static bool ignore_joystick = false;
 
-/* dead-zone thresholds for the (x,y) axes */
-static const float joy_analog_threshold[REQUIRED_AXES] = {
+/* dead-zone for analog input */
+static const float DEADZONE_THRESHOLD = 0.2f;
+
+/* analog to digital conversion thresholds for the (x,y) axes */
+static const float analog2digital_threshold[REQUIRED_AXES] = {
 
     /* Pressing up + jump won't make the player jump */
-    [AXIS_X] = 0.4f,
-    [AXIS_Y] = 0.8f
-
-    /* we use large thresholds because the virtual input_t devices
-       currently deal with directionals as if they were digital input */
+    [AXIS_X] = 0.25f,
+    [AXIS_Y] = 0.75f
 
 };
 
@@ -232,10 +232,15 @@ void input_update()
                https://www.allegro.cc/forums/thread/614996/1 */
             if(REQUIRED_AXES <= al_get_joystick_num_axes(joystick, stick_id)) {
 
-                if(fabs(state.stick[stick_id].axis[0]) >= joy_analog_threshold[AXIS_X])
-                    joy[j].axis[AXIS_X] += state.stick[stick_id].axis[0];
-                if(fabs(state.stick[stick_id].axis[1]) >= joy_analog_threshold[AXIS_Y])
-                    joy[j].axis[AXIS_Y] += state.stick[stick_id].axis[1];
+                float x = state.stick[stick_id].axis[0];
+                float y = state.stick[stick_id].axis[1];
+
+                /* ignore the dead-zone and normalize the data back to [0,1] */
+                const float NORMALIZER = 1.0f - DEADZONE_THRESHOLD;
+                if(fabs(x) >= DEADZONE_THRESHOLD)
+                    joy[j].axis[AXIS_X] += (x - DEADZONE_THRESHOLD * sign(x)) / NORMALIZER;
+                if(fabs(y) >= DEADZONE_THRESHOLD)
+                    joy[j].axis[AXIS_Y] += (y - DEADZONE_THRESHOLD * sign(y)) / NORMALIZER;
 
                 break;
 
@@ -647,10 +652,10 @@ void inputuserdefined_update(input_t* in)
     if(im->joystick.enabled && input_is_joystick_enabled()) {
         int num_joysticks = min(input_number_of_joysticks(), MAX_JOYS);
         if(im->joystick.id < num_joysticks) {
-            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[AXIS_Y] <= -joy_analog_threshold[AXIS_Y]);
-            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[AXIS_Y] >= joy_analog_threshold[AXIS_Y]);
-            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[AXIS_X] <= -joy_analog_threshold[AXIS_X]);
-            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[AXIS_X] >= joy_analog_threshold[AXIS_X]);
+            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[AXIS_Y] <= -analog2digital_threshold[AXIS_Y]);
+            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[AXIS_Y] >= analog2digital_threshold[AXIS_Y]);
+            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[AXIS_X] <= -analog2digital_threshold[AXIS_X]);
+            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[AXIS_X] >= analog2digital_threshold[AXIS_X]);
             for(button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
                 in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
