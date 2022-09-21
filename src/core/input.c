@@ -206,10 +206,14 @@ void input_update()
         to shoulder buttons acting as analog sticks with a single axis. I don't
         know if the second stick that has two axes (which may be stick 1, 2...),
         as reported by Allegro, can be reliably associated with the right analog
-        stick. Further testing is desirable. How does Allegro divide the analog
+        stick*. Further testing is desirable. How does Allegro divide the analog
         input in sticks? jstest only reports axes and buttons.
 
         https://github.com/gabomdq/SDL_GameControllerDB
+
+        (*) apparently it can if we're using a XInput device on Windows. Stick 0
+            is the "Left Thumbstick" and stick 1 is the "Right Thumbstick". See
+            src/win/wjoyxi.c in Allegro's source code.
 
         */
 
