@@ -203,11 +203,11 @@ void input_update()
         reported by the Allegro API.
 
         We only read one analog stick at this time. Other sticks may correspond
-        to pressure buttons. I don't know if the second stick that has two axes
-        (which may be stick 1, 2...), as reported by Allegro, can be reliably
-        associated with the right analog stick. Further testing is desirable.
-        How does Allegro divide the analog input in sticks? jstest only reports
-        axes and buttons.
+        to shoulder buttons acting as analog sticks with a single axis. I don't
+        know if the second stick that has two axes (which may be stick 1, 2...),
+        as reported by Allegro, can be reliably associated with the right analog
+        stick. Further testing is desirable. How does Allegro divide the analog
+        input in sticks? jstest only reports axes and buttons.
 
         https://github.com/gabomdq/SDL_GameControllerDB
 
