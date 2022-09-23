@@ -79,7 +79,7 @@ Use preferably the same engine version as the MOD if a native executable isn't p
 
 Linux users should extract the MOD into their home folder, preferably into `~/Downloads`.
 
-Visit the [wiki](https://wiki.opensurge2d.org/User-made_games) for more information on user-made MODs.
+[Visit the wiki](https://wiki.opensurge2d.org/User-made_games) for more information on user-made MODs.
 
 ### Paths
 
