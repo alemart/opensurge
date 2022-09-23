@@ -338,12 +338,6 @@ object "DefaultClearedAnimation.Counter.Score"
     score = -1;
     powerBonus = -1;
     timeBonus = -1;
-    seconds = 0;
-
-    state "main"
-    {
-        seconds += Time.delta;
-    }
 
     fun count(step)
     {
@@ -365,7 +359,7 @@ object "DefaultClearedAnimation.Counter.Score"
     {
         score = Player.active.score;
         powerBonus = Player.active.collectibles * 100;
-        timeBonus = Math.ceil(10 * Math.max(0, 600 - seconds));
+        timeBonus = Math.ceil(10 * Math.max(0, 600 - Level.time));
         return score;
     }
 
@@ -402,13 +396,7 @@ object "DefaultClearedAnimation.Counter.Power"
 object "DefaultClearedAnimation.Counter.Time"
 {
     timeBonus = -1;
-    seconds = 0;
 
-    state "main"
-    {
-        seconds += Time.delta;
-    }
-    
     fun count(step)
     {
         timeBonus -= Math.min(timeBonus, step);
@@ -417,7 +405,7 @@ object "DefaultClearedAnimation.Counter.Time"
 
     fun activate()
     {
-        timeBonus = Math.ceil(10 * Math.max(0, 600 - seconds));
+        timeBonus = Math.ceil(10 * Math.max(0, 600 - Level.time));
         return timeBonus;
     }
 
