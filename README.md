@@ -104,7 +104,7 @@ The default paths of these locations vary according to the platform:
     * `config`: `~/.config/opensurge2d/`
     * `cache`: `~/.cache/opensurge2d/`
 
-    The engine reads the environment variables `$XDG_DATA_HOME`, `$XDG_CONFIG_HOME` and `$XDG_CACHE_HOME` to determine the locations.
+    The engine reads the environment variables `$XDG_DATA_HOME`, `$XDG_CONFIG_HOME` and `$XDG_CACHE_HOME` to determine the paths.
 
 - Linux ([Flatpak](https://flathub.org/apps/details/org.opensurge2d.OpenSurge)):
     * `bin`: `flatpak run org.opensurge2d.OpenSurge`
