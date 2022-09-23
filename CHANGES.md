@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.6.0.3 - September 23rd, 2022
+
+* Tweaks to the level design, to the default controls and to the build system
+* Changed the way the engine handles analog sticks
+
 ## 0.6.0.2 - September 15th, 2022
 
 * Adjusted gimmicks: Water Bubbles, Spikes

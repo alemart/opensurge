@@ -74,6 +74,14 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.6.0.3" date="2022-09-23">
+      <description>
+        <ul>
+          <li>Tweaks to the level design, to the default controls and to the build system</li>
+          <li>Changed the way the engine handles analog sticks</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.0.2" date="2022-09-15">
       <description>
         <ul>
