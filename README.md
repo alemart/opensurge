@@ -35,19 +35,17 @@ Make your dreams come true with the **Open Surge Engine**! Create your own amazi
 
 ## Controls
 
-You can play using a keyboard or a joystick.
+You can play using a keyboard or a joystick. Default controls:
 
-Default keyboard controls:
-
-| Key           | Action                 |
-| --------------|------------------------|
-| Arrow keys    | Move                   |
-| Space         | Jump                   |
-| Enter         | Pause                  |
-| Esc           | Quit                   |
-| Left Ctrl     | Switch character       |
-| Equal (=)     | Take snapshot          |
-| F12           | Open the level editor* |
+| Keyboard      | Joystick                  | Action                 |
+| --------------|---------------------------|------------------------|
+| Arrow keys    | Left analog stick / D-Pad | Move                   |
+| Space         | A / B / X / Y             | Jump                   |
+| Enter         | Start                     | Pause                  |
+| Esc           | Back                      | Quit                   |
+| Left Ctrl     | L / R                     | Switch character       |
+| Equal (=)     | -                         | Take snapshot          |
+| F12           | -                         | Open the level editor* |
 
 `*`: open the editor during gameplay, in a level.
 
