@@ -41,7 +41,6 @@
 #include "../core/input.h"
 #include "../core/timer.h"
 #include "../core/font.h"
-#include "../core/modmanager.h"
 #include "../core/prefs.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
@@ -464,7 +463,7 @@ bool interpret_level_line(const char *filepath, int fileline, const char *identi
 /* load a level that was previously selected by the user */
 int load_selection()
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
     const char* last_selection;
 
     /* first run? */
@@ -485,7 +484,7 @@ int load_selection()
 /* save a level selected by the user */
 void save_selection(int option)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
 
     if(option >= 0 && option < stage_count)
         prefs_set_string(prefs, STAGE_PREFSENTRY, stage_data[option]->filepath);

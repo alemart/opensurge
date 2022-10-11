@@ -25,7 +25,6 @@
 #include <surgescript.h>
 #include "commandline.h"
 #include "global.h"
-#include "logfile.h"
 #include "stringutil.h"
 #include "video.h"
 
@@ -69,7 +68,6 @@ commandline_t commandline_parse(int argc, char **argv)
 {
     const char* program = str_basename(argv[0]);
     commandline_t cmd;
-    int i;
 
     /* initializing values */
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
@@ -84,18 +82,14 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.install_game_path[0] = '\0';
     cmd.basedir[0] = '\0';
     cmd.gamedir[0] = '\0';
-    cmd.gameid[0] = '\0';
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
     cmd.user_argv = NULL;
     cmd.user_argc = 0;
-
-    /* logfile */
-    logfile_message("game arguments:");
-    for(i=0; i<argc; i++)
-        logfile_message("argv[%d]: '%s'", i, argv[i]);
+    cmd.argv = (const char**)argv;
+    cmd.argc = argc;
 
     /* reading data... */
-    for(i=1; i<argc; i++) {
+    for(int i = 1; i < argc; i++) {
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             console_print(

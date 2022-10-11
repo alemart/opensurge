@@ -36,7 +36,6 @@
 #include "../core/logfile.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
 #include "../core/web.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
@@ -240,7 +239,8 @@ void options_render()
 /* saves the user preferences */
 void save_preferences()
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
+
     prefs_set_int(prefs, ".resolution", video_get_resolution());
     prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
     prefs_set_bool(prefs, ".smoothgfx", video_is_smooth());

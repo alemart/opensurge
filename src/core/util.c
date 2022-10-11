@@ -115,7 +115,12 @@ void fatal_error(const char *fmt, ...)
     va_end(args);
 
     /* display an error */
-    logfile_message("----- crash -----\n%s", buf);
+    logfile_message("----- crash -----");
+    logfile_message("%s", buf);
+    fprintf(stderr, "%s", buf);
+
+    /* al_show_native_message_box may be called without Allegro being initialized.
+       https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     al_show_native_message_box(al_get_current_display(),
         "Surgexception Error",
         "Ooops... Surgexception!",

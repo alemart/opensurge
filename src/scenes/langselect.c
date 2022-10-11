@@ -37,7 +37,6 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/sfx.h"
@@ -92,7 +91,7 @@ static int option_of(const char *language_name);
  */
 void langselect_init(void *param)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
 
     quit = false;
     option = 0;
@@ -281,7 +280,7 @@ int option_of(const char *language_name)
 /* saves the user preferences */
 void save_preferences(const char *filepath)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
     prefs_set_string(prefs, ".langpath", filepath);
 }
 

@@ -20,7 +20,6 @@
 
 #include <surgescript.h>
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -62,7 +61,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
     surgescript_object_set_userdata(object, prefs);
     return NULL;
 }

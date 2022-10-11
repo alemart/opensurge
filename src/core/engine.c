@@ -42,7 +42,6 @@
 #include "sprite.h"
 #include "lang.h"
 #include "screenshot.h"
-#include "modmanager.h"
 #include "prefs.h"
 #include "commandline.h"
 #include "font.h"
@@ -68,13 +67,12 @@ static void clean_garbage();
 static void init_basic_stuff(const commandline_t* cmd);
 static void init_managers(const commandline_t* cmd);
 static void init_accessories(const commandline_t* cmd);
-static void init_game_data();
 static void push_initial_scene(const commandline_t* cmd);
 static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
-static void init_nanoparser();
-static void release_nanoparser();
+static void init_nanocalc();
+static void release_nanocalc();
 static void parser_error(const char *msg);
 static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
@@ -91,24 +89,45 @@ extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
 
+/* Global Prefs */
+prefs_t* prefs = NULL; /* public */
+
 
 
 /* public functions */
 
 /*
  * engine_init()
- * Initializes all the subsystems of
- * the game engine
+ * Initializes the subsystems of the engine
  */
 void engine_init(int argc, char **argv)
 {
     commandline_t cmd = commandline_parse(argc, argv);
+
+    /* initialize subsystems */
     init_basic_stuff(&cmd);
     init_managers(&cmd);
     init_accessories(&cmd);
-    init_game_data();
+
+    /* initialize game data */
+    player_set_lives(PLAYER_INITIAL_LIVES);
+    player_set_score(0);
     push_initial_scene(&cmd);
 }
+
+
+
+/*
+ * engine_release()
+ * Releases the engine and its subsystems
+ */
+void engine_release()
+{
+    release_accessories();
+    release_managers();
+    release_basic_stuff();
+}
+
 
 
 /*
@@ -117,13 +136,14 @@ void engine_init(int argc, char **argv)
  */
 void engine_mainloop()
 {
-    ALLEGRO_TIMER* timer = al_create_timer(1.0 / TARGET_FPS);
     scene_t *current_scene = NULL;
     bool redraw = false;
 
     /* configure the timer */
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / TARGET_FPS);
     if(!timer)
         fatal_error("Can't create Allegro timer");
+
     al_register_event_source(a5_event_queue, al_get_timer_event_source(timer));
     al_start_timer(timer);
 
@@ -191,20 +211,6 @@ void engine_mainloop()
     al_destroy_timer(timer);
 }
 
-
-/*
- * engine_release()
- * Releases the game engine and its
- * subsystems
- */
-void engine_release()
-{
-    release_accessories();
-    release_managers();
-    release_basic_stuff();
-}
-
-
 /*
  * engine_quit()
  * Quit the application
@@ -244,23 +250,17 @@ void clean_garbage()
  */
 void init_basic_stuff(const commandline_t* cmd)
 {
-    const char* gameid = commandline_getstring(cmd->gameid, NULL);
     const char* basedir = commandline_getstring(cmd->basedir, NULL);
     const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
 
+    /* basic initialization */
+    srand(time(NULL)); /* randomize */
+    setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
+    setlocale(LC_NUMERIC, "C"); /* use '.' as the decimal separator on atof() */
     force_quit = false;
-    srand(time(NULL));
-    assetfs_init(gameid, basedir, gamedir);
-    logfile_init();
-    init_nanoparser();
-
-    /* show SurgeScript version */
-    logfile_message("Using SurgeScript version %s", surgescript_util_version());
 
     /* initialize Allegro */
-    if(al_init())
-        logfile_message("Using Allegro version %s", a5_version_string());
-    else
+    if(!al_init())
         fatal_error("Can't initialize Allegro");
 
     if(NULL == (a5_event_queue = al_create_event_queue()))
@@ -268,6 +268,20 @@ void init_basic_stuff(const commandline_t* cmd)
 
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");
+
+    /* initialize the filesystem and the logfile */
+    assetfs_init(NULL, basedir, gamedir);
+    logfile_init();
+
+    /* initialize prefs and nanoparser */
+    prefs = prefs_create(NULL);
+    nanoparser_set_error_function(parser_error);
+    nanoparser_set_warning_function(parser_warning);
+    init_nanocalc();
+
+    /* show Allegro & SurgeScript versions */
+    logfile_message("Using Allegro version %s", a5_version_string());
+    logfile_message("Using SurgeScript version %s", surgescript_util_version());
 }
 
 
@@ -277,11 +291,6 @@ void init_basic_stuff(const commandline_t* cmd)
  */
 void init_managers(const commandline_t* cmd)
 {
-    prefs_t* prefs;
-
-    modmanager_init();
-    prefs = modmanager_prefs();
-
     timer_init();
     video_init(
         commandline_getint(
@@ -309,13 +318,9 @@ void init_managers(const commandline_t* cmd)
  */
 void init_accessories(const commandline_t* cmd)
 {
-    prefs_t* prefs = modmanager_prefs();
     const char* custom_lang = commandline_getstring(cmd->language_filepath,
         prefs_has_item(prefs, ".langpath") ? prefs_get_string(prefs, ".langpath") : NULL
     );
-
-    setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
-    setlocale(LC_NUMERIC, "C"); /* use '.' as the decimal separator on atof() */
 
     lang_init();
     if(custom_lang && *custom_lang)
@@ -334,15 +339,6 @@ void init_accessories(const commandline_t* cmd)
     scenestack_init();
 }
 
-/*
- * init_game_data()
- * Initializes the game data
- */
-void init_game_data()
-{
-    player_set_lives(PLAYER_INITIAL_LIVES);
-    player_set_score(0);
-}
 
 
 /*
@@ -367,7 +363,7 @@ void push_initial_scene(const commandline_t* cmd)
     }
     else {
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)(INTRO_QUEST));
-        if(!prefs_has_item(modmanager_prefs(), ".langpath"))
+        if(!prefs_has_item(prefs, ".langpath"))
             scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
     }
@@ -398,7 +394,6 @@ void release_accessories()
  */
 void release_managers()
 {
-    modmanager_release();
     input_release();
     video_release();
     resourcemanager_release();
@@ -414,7 +409,8 @@ void release_managers()
  */
 void release_basic_stuff()
 {
-    release_nanoparser();
+    release_nanocalc();
+    prefs = prefs_destroy(prefs);
     logfile_release();
     assetfs_release();
 
@@ -424,16 +420,11 @@ void release_basic_stuff()
 }
 
 /*
- * init_nanoparser()
- * Initializes nanoparser
+ * init_nanocalc()
+ * Initializes nanocalc
  */
-void init_nanoparser()
+void init_nanocalc()
 {
-    /* nanoparser */
-    nanoparser_set_error_function(parser_error);
-    nanoparser_set_warning_function(parser_warning);
-
-    /* nanocalc */
     nanocalc_init(); /* initializes a basic nanocalc */
     nanocalc_set_error_function(calc_error); /* error callback */
     nanocalc_addons_init(); /* adds some mathematical functions to nanocalc */
@@ -441,15 +432,11 @@ void init_nanoparser()
 }
 
 /*
- * release_nanoparser()
- * Releases nanoparser
+ * release_nanocalc()
+ * Releases nanocalc
  */
-void release_nanoparser()
+void release_nanocalc()
 {
-    /* nanoparser */
-    ; /* empty */
-
-    /* nanocalc */
     nanocalc_addons_release();
     nanocalc_release();
 }

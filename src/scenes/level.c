@@ -50,7 +50,6 @@
 #include "../core/nanoparser/nanoparser.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
 #include "../entities/player.h"
@@ -1481,13 +1480,15 @@ void level_render()
  */
 void level_release()
 {
+    extern prefs_t* prefs;
+
     logfile_message("level_release()");
 
     particle_release();
     level_unload();
     camera_release();
     editor_release();
-    prefs_save(modmanager_prefs());
+    prefs_save(prefs);
     clear_level_state(&saved_state);
 
     font_destroy(dlgbox_title);

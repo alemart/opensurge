@@ -21,12 +21,12 @@
 #ifndef _COMMANDLINE_H
 #define _COMMANDLINE_H
 
-/* command line */
 #define COMMANDLINE_PATHMAX 4096
-typedef struct commandline_t commandline_t;
 
 /* command line structure */
-struct commandline_t {
+typedef struct commandline_t commandline_t;
+struct commandline_t
+{
     /* video stuff */
     int video_resolution;
     int smooth_graphics;
@@ -34,27 +34,36 @@ struct commandline_t {
     int color_depth;
     int show_fps;
     int hide_fps;
+    int allow_font_smoothing;
 
     /* filepaths */
+    char basedir[COMMANDLINE_PATHMAX];
+    char gamedir[COMMANDLINE_PATHMAX];
     char custom_level_path[COMMANDLINE_PATHMAX];
     char custom_quest_path[COMMANDLINE_PATHMAX];
     char language_filepath[COMMANDLINE_PATHMAX];
     char install_game_path[COMMANDLINE_PATHMAX];
-    char basedir[COMMANDLINE_PATHMAX];
-    char gamedir[COMMANDLINE_PATHMAX];
-
-    /* other options */
-    char gameid[128];
-    int allow_font_smoothing;
 
     /* user arguments: what comes after "--" */
     const char** user_argv;
     int user_argc;
+
+    /* argv and argc as passed to main() */
+    const char** argv;
+    int argc;
 };
 
-/* command line interface */
+
+
+/* parse the command line arguments */
 commandline_t commandline_parse(int argc, char **argv);
+
+/* get an int from the command line arguments */
 int commandline_getint(int value, int default_value);
+
+/* get a string from the command line arguments */
 const char* commandline_getstring(const char* value, const char* default_string);
+
+
 
 #endif
