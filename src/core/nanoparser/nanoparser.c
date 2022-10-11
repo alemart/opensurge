@@ -773,7 +773,7 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
                     peek != quote && peek != EOF;
                     peek = lexer_getc(&state)
                 ) {
-                    if(symbol_length + 4 >= sizeof(symbol_buffer) - 1) { /* 4: max size in bytes of a utf-8 code point */
+                    if(symbol_length + 4 >= sizeof(symbol_buffer)) { /* 4: max size in bytes of a utf-8 code point */
                         symbol_buffer[symbol_length++] = '\0';
                         crash("String is too long at %s:%d", lexer->filepath, state.line);
                         return false;
