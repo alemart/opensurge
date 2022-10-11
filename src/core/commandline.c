@@ -28,21 +28,21 @@
 #include "logfile.h"
 #include "stringutil.h"
 #include "video.h"
-#include "install.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 /* private stuff ;) */
-#define BUFFER_CAPACITY 8192
 #define crash(...) do { console_print(__VA_ARGS__); exit(1); } while(0)
 static void console_print(char *fmt, ...);
-static int concat_gameid(const char* gameid, void* data);
 static int COMMANDLINE_UNDEFINED = -1;
-static const char COPYRIGHT[] = GAME_TITLE " version " GAME_VERSION_STRING "\n"
-                                "Copyright (C) " GAME_YEAR " Alexandre Martins\n"
-                                "http://" GAME_WEBSITE;
+
+static const char COPYRIGHT[] = ""
+GAME_TITLE " version " GAME_VERSION_STRING "\n"
+"Copyright (C) " GAME_YEAR " Alexandre Martins\n"
+"http://" GAME_WEBSITE;
+
 static const char LICENSE[] = ""
 "This program is free software; you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -117,12 +117,6 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/default.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/english.lng)\n"
-                "    --reset                          restore Open Surge to its factory state (cleanup)\n"
-                "    --games                          list the installed Open Surge games\n"
-                "    --game \"gameid\"                  run the specified Open Surge game (e.g., opensurge)\n"
-                "    --install \"/path/to/zipfile.zip\" install an Open Surge game package (use its absolute path)\n"
-                "    --uninstall \"gameid\"             uninstall an Open Surge game package\n"
-                "    --build [\"gameid\"]               build an Open Surge game package for redistribution\n"
                 "    --game-folder \"/path/to/data\"    use game assets only from the specified folder\n"
 #ifndef _WIN32
                 "    --base \"/path/to/data\"           set a custom base folder for the assets (*nix only)\n"
@@ -234,54 +228,6 @@ commandline_t commandline_parse(int argc, char **argv)
                 crash("%s: missing --game-folder parameter", program);
         }
 
-        else if(strcmp(argv[i], "--games") == 0) {
-            char games[BUFFER_CAPACITY] = "";
-            foreach_installed_game(concat_gameid, games);
-            console_print("%s", games);
-            exit(0);
-        }
-
-        else if(strcmp(argv[i], "--game") == 0) {
-            if(++i < argc && *(argv[i]) != '-') {
-                str_cpy(cmd.gameid, argv[i], sizeof(cmd.gameid));
-                if(!is_game_installed(cmd.gameid))
-                    crash("%s: game \"%s\" is not installed\nRun %s --games to see the installed games", program, cmd.gameid, program);
-            }
-            else
-                crash("%s: missing --game parameter", program);
-        }
-
-        else if(strcmp(argv[i], "--install") == 0) {
-            if(++i < argc && *(argv[i]) != '-') {
-                str_cpy(cmd.install_game_path, argv[i], sizeof(cmd.install_game_path));
-                if(!install_game(cmd.install_game_path, cmd.gameid, sizeof(cmd.gameid), true))
-                    exit(0);
-            }
-            else
-                crash("%s: missing --install parameter", program);
-        }
-
-        else if(strcmp(argv[i], "--uninstall") == 0) {
-            if(++i < argc && *(argv[i]) != '-') {
-                uninstall_game(argv[i], true);
-                exit(0);
-            }
-            else
-                crash("%s: missing --uninstall parameter", program);
-        }
-
-        else if(strcmp(argv[i], "--reset") == 0) {
-            uninstall_game(NULL, true);
-            exit(0);
-        }
-
-        else if(strcmp(argv[i], "--build") == 0) {
-            if(++i < argc && *(argv[i]) != '-')
-                str_cpy(cmd.gameid, argv[i], sizeof(cmd.gameid));
-            build_game((cmd.gameid[0] != '\0') ? cmd.gameid : NULL);
-            exit(0);
-        }
-
         else if(strcmp(argv[i], "--") == 0) {
             if(++i < argc) {
                 cmd.user_argv = (const char**)(argv + i);
@@ -327,33 +273,19 @@ const char* commandline_getstring(const char* value, const char* default_string)
 /* Displays a message to the user (printf format) */
 void console_print(char *fmt, ...)
 {
-    char buf[BUFFER_CAPACITY];
+    char buffer[8192];
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
     va_end(args);
 
-    puts(buf);
+    puts(buffer);
 
 #ifdef _WIN32
     /* Display a message box on Windows. Because this is
        a GUI application, the text will not show up in the
        console, but stdout may be redirected to a file */
-    MessageBoxA(NULL, buf, GAME_TITLE, MB_OK);
+    MessageBoxA(NULL, buffer, GAME_TITLE, MB_OK);
 #endif
-}
-
-
-
-/* concatenates gameid into a string buffer */
-int concat_gameid(const char* gameid, void* data)
-{
-    char* str = (char*)data;
-
-    if(*str)
-        strncat(str, "\n", BUFFER_CAPACITY - strlen(str) - 1);
-    strncat(str, gameid, BUFFER_CAPACITY - strlen(str) - 1);
-
-    return 0;
 }

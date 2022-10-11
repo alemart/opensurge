@@ -250,7 +250,6 @@ SET(GAME_SRCS
   src/core/nanoparser/nanoparser.c
   src/core/whereami/whereami.c
   src/core/utf8/utf8.c
-  src/core/zip/zip.c
   src/core/assetfs.c
   src/core/audio.c
   src/core/color.c
@@ -261,7 +260,6 @@ SET(GAME_SRCS
   src/core/image.c
   src/core/input.c
   src/core/inputmap.c
-  src/core/install.c
   src/core/lang.c
   src/core/logfile.c
   src/core/modmanager.c
@@ -362,7 +360,6 @@ SET(GAME_HEADERS
   src/core/nanoparser/nanoparser.h
   src/core/whereami/whereami.h
   src/core/utf8/utf8.h
-  src/core/zip/zip.c
   src/core/assetfs.h
   src/core/audio.h
   src/core/color.h
@@ -376,7 +373,6 @@ SET(GAME_HEADERS
   src/core/image.h
   src/core/input.h
   src/core/inputmap.h
-  src/core/install.h
   src/core/lang.h
   src/core/logfile.h
   src/core/modmanager.h
