@@ -472,7 +472,7 @@ void parser_error(const char *msg)
  */
 void parser_warning(const char *msg)
 {
-    logfile_message("WARNING: %s", msg);
+    logfile_message("%s", msg);
 }
 
 /*
