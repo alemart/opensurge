@@ -672,12 +672,11 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
 
                 /* consume the characters */
                 while(EOF != (peek = lexer_getc(&state))) {
-                    if(peek == '\n')
+                    if(peek == '\n') {
+                        lexer_ungetc(&state);
                         break;
+                    }
                 }
-
-                /* put the \n back */
-                lexer_ungetc(&state);
 
                 /* skip spaces */
                 continue;
@@ -705,9 +704,6 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
                     return false;
                 }
 
-                /* put the last \n back */
-                lexer_ungetc(&state);
-
                 /* skip spaces */
                 continue;
 
@@ -730,12 +726,11 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
 
                 /* treat it as a single-line comment */
                 while(EOF != (peek = lexer_getc(&state))) {
-                    if(peek == '\n')
+                    if(peek == '\n') {
+                        lexer_ungetc(&state);
                         break;
+                    }
                 }
-
-                /* put the \n back */
-                lexer_ungetc(&state);
 
                 /* skip spaces */
                 continue;
