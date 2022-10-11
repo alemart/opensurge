@@ -214,13 +214,10 @@ void font_init(bool allow_font_smoothing)
     allow_antialias = allow_font_smoothing;
     fontdrv_list_init();
 
-    /* reading the parse tree */
-    parsetree_program_t* fonts = NULL;
+    /* reading the font scripts */
     logfile_message("Loading fonts...");
-    assetfs_foreach_file("fonts", ".fnt", dirfill, &fonts, true);
-    nanoparser_traverse_program(fonts, traverse);
+    assetfs_foreach_file("fonts", ".fnt", dirfill, NULL, true);
     logfile_message("All fonts have been loaded.");
-    fonts = nanoparser_deconstruct_tree(fonts);
 
     /* initializing the font callback table */
     callbacktable_init();
@@ -1341,9 +1338,12 @@ int traverse_ttf(const parsetree_statement_t* stmt, void* data)
 
 int dirfill(const char* vpath, void* param)
 {
+    (void)param;
+
     const char* fullpath = assetfs_fullpath(vpath);
-    parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
+    parsetree_program_t* p = nanoparser_construct_tree(fullpath);
+    nanoparser_traverse_program(p, traverse);
+    nanoparser_deconstruct_tree(p);
     return 0;
 }
 
