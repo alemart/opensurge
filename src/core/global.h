@@ -31,39 +31,38 @@
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_YEAR               "2008-2022"
 
-/* Scripting */
-#define SURGESCRIPT_MIN_VERSION "0.5.6"
+/* If the following constant is defined, then this is a development build */
+/*#define GAME_BUILD_VERSION    "1337-dev"*/
+
+/* Minimum version of SurgeScript */
+#define SURGESCRIPT_MIN_SUP     0
+#define SURGESCRIPT_MIN_SUB     5
+#define SURGESCRIPT_MIN_WIP     6
+#define SURGESCRIPT_MIN_VERSION STRINGIFY(SURGESCRIPT_MIN_SUP) "." STRINGIFY(SURGESCRIPT_MIN_SUB) "." STRINGIFY(SURGESCRIPT_MIN_WIP)
+
+/* Minimum version of Allegro */
+#define ALLEGRO_MIN_SUP         5
+#define ALLEGRO_MIN_SUB         2
+#define ALLEGRO_MIN_WIP         7
+#define ALLEGRO_MIN_VERSION_INT ((ALLEGRO_MIN_SUP << 24) | (ALLEGRO_MIN_SUB << 16) | (ALLEGRO_MIN_WIP << 8))
+
+/* The default directory of the game assets (*nix only) */
+#ifndef GAME_DATADIR
+#define GAME_DATADIR            "/usr/share/games/opensurge"
+#endif
+
+/* Version code & string */
+#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
+#ifndef GAME_BUILD_VERSION
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) /* stable version */
+#else
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" GAME_BUILD_VERSION /* development build */
+#endif
 
 /* Utilities */
 #define STRINGIFY(x)            _STRINGIFY(x)
 #define _STRINGIFY(x)           #x
-
-/* If the following constant is defined, then this is a development build */
-/*
-#define GAME_BUILD_VERSION      "1337-dev"
-*/
-
-/* Version code */
-#define VERSION_CODE(X,Y,Z)     ((X) * 10000 + (Y) * 100 + (Z))
-#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
-
-/* Version string */
-#define VERSION_STRING(X,Y,Z)   STRINGIFY(X) "." STRINGIFY(Y) "." STRINGIFY(Z)
-
-#if !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX == 0 /* stable version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP)
-#elif !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX != 0 /* stable version with patch */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX)
-#elif defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX == 0 /* development version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "-" GAME_BUILD_VERSION
-#else /* development version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" GAME_BUILD_VERSION
-#endif
-
-/* GAME_DATADIR is the directory in which the game assets located by default (*nix only) */
-#ifndef GAME_DATADIR
-#define GAME_DATADIR            "/usr/share/games/opensurge"
-#endif
+#define VERSION_CODE(x,y,z)     ((x) * 10000 + (y) * 100 + (z))
 
 /* Legacy constants */
 #undef TRUE

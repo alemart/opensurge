@@ -59,10 +59,7 @@
 #include "../scenes/level.h"
 
 /* minimum Allegro version */
-#define AL_MIN_MAJOR       5
-#define AL_MIN_MINOR       2
-#define AL_MIN_REVISION    7
-#if ALLEGRO_VERSION_INT < ((AL_MIN_MAJOR << 24) | (AL_MIN_MINOR << 16) | (AL_MIN_REVISION << 8))
+#if ALLEGRO_VERSION_INT < ALLEGRO_MIN_VERSION_INT
 #error "This build requires a newer version of Allegro"
 #endif
 
