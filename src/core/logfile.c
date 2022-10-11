@@ -18,17 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <allegro5/allegro.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "logfile.h"
 #include "global.h"
 #include "assetfs.h"
-#include "util.h"
 
 
 /* private stuff ;) */
 static const char* LOGFILE_PATH = "logfile.txt"; /* default log file */
-static FILE* logfile = NULL;
+static ALLEGRO_FILE* logfile = NULL;
 
 
 /*
@@ -38,13 +38,13 @@ static FILE* logfile = NULL;
 void logfile_init()
 {
     const char* fullpath = assetfs_create_cache_file(LOGFILE_PATH);
-    if(NULL != (logfile = fopen_utf8(fullpath, "w"))) {
-        logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
+
+    if(NULL == (logfile = al_fopen(fullpath, "w"))) {
+        fprintf(stderr, "Can't open logfile at %s\n", fullpath);
+        return;
     }
-    else {
-        logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
-        logfile_message("logfile_init(): couldn't open \"%s\" for writing.", LOGFILE_PATH);
-    }
+
+    logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
 }
 
 
@@ -54,19 +54,17 @@ void logfile_init()
  */
 void logfile_message(const char* fmt, ...)
 {
-    /*FILE* fp = logfile ? logfile : stdout;*/
-    FILE* fp = logfile;
+    va_list args;
 
-    if(fp != NULL) {
-        va_list args;
+    if(logfile == NULL)
+        return;
 
-        va_start(args, fmt);
-        vfprintf(fp, fmt, args);
-        va_end(args);
+    va_start(args, fmt);
+    al_vfprintf(logfile, fmt, args);
+    va_end(args);
 
-        fputc('\n', fp);
-        fflush(fp);
-    }
+    al_fputs(logfile, "\n");
+    al_fflush(logfile);
 }
 
 
@@ -80,8 +78,7 @@ void logfile_release()
     logfile_message("tchau!");
     
     if(logfile != NULL)
-        fclose(logfile);
+        al_fclose(logfile);
 
     logfile = NULL;
 }
-

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <allegro5/allegro.h>
 #include <string.h>
 #include <ctype.h>
 #include "levparser.h"
@@ -42,12 +43,12 @@ bool levparser_parse(const char* path_to_lev_file, void* data, levparser_callbac
     int ln = 0;
 
     /* open the level file */
-    FILE* fp = fopen_utf8(fullpath, "r");
+    ALLEGRO_FILE* fp = al_fopen(fullpath, "r");
     if(!fp)
         return false; /* error */
 
     /* read and parse */
-    while(fgets(line, LINE_MAXLEN, fp)) {
+    while(al_fgets(fp, line, sizeof(line))) {
 
         /* line has a '\n' at the end, which we keep */
         if(!parse_line(fullpath, ++ln, line, data, callback))
@@ -56,7 +57,7 @@ bool levparser_parse(const char* path_to_lev_file, void* data, levparser_callbac
     }
 
     /* close the level file */
-    fclose(fp);
+    al_fclose(fp);
 
     /* success! */
     return true;

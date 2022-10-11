@@ -83,7 +83,7 @@ bool launch_url(const char *url)
         else 
             success = false;
 #elif defined(__unix__) || defined(__unix)
-        char* argv[5] = { 0 };
+        char* argv[5] = { NULL };
 
         if(file_exists("/usr/bin/xdg-open")) {
             argv[0] = "/usr/bin/xdg-open";
@@ -143,7 +143,7 @@ bool file_exists(const char *filepath)
     struct stat st;
     return (stat(filepath, &st) == 0);
 #else
-    FILE* fp = fopen_utf8(filepath, "rb");
+    FILE* fp = fopen(filepath, "rb");
     bool valid = (fp != NULL);
     if(fp != NULL)
         fclose(fp);
