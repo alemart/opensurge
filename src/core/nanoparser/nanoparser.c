@@ -1,1420 +1,1275 @@
 /*
- * nanoparser 1.1.2
- * A tiny stand-alone easy-to-use parser written in C
+ * Open Surge Engine
+ * nanoparser.c - nanoparser v2
  * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
- * software and associated documentation files (the "Software"), to deal in the Software 
- * without restriction, including without limitation the rights to use, copy, modify, merge, 
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons 
- * to whom the Software is furnished to do so, subject to the following conditions:
- *   
- * The above copyright notice and this permission notice shall be included in all copies or 
- * substantial portions of the Software.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <allegro5/allegro.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include "nanoparser.h"
+#include "../darray.h"
+#include "../util.h"
+#include "../stringutil.h"
+
+/*
+ * nanoparser v2
+ *
+ * Grammar:
+ * <root>      ::= <program> eof
+ * <program>   ::= <br*> <statement>
+ * <statement> ::= identifier <parameter> \n <br*> <statement> | empty
+ * <parameter> ::= string <parameter> | identifier <parameter> | <br*> <block> | empty
+ * <block>     ::= { \n <program> }
+ * <br*>       ::= \n <br*> | empty
+ *
+ * where:
+ * string is a double-quoted, single-quoted or unquoted text (e.g., "Hello, world!", 'Let\'s go!', hello-world)
+ * identifier is a unquoted text that matches /^[A-Za-z_][A-Za-z0-9_]*$/
+ * empty is a symbol of length zero
+ * eof is the end of the file
+ *
+ * Write bytes using "\xhh" (hexadecimal) and
+ * unicode code points using "\uhhhh" (will be encoded as UTF-8)
+ *
+ * // Single-line or / * multi-line
+ *                       comments   * / are ignored
+ */
+
+
+
+/*
+ * ERROR FUNCTIONS
+ */
+
+static void crash(const char* fmt, ...);
+static void crash_fun_default(const char* message);
+static void (*crash_fun)(const char*) = crash_fun_default;
+
+static void warning(const char* fmt, ...);
+static void warning_fun_default(const char* message);
+static void (*warning_fun)(const char*) = warning_fun_default;
+
+#define nanoassert(expr) do { \
+    if(!(expr)) { \
+        crash("Assertion failed: " #expr " at %s:%d", __FILE__, __LINE__); \
+    } \
+} while(0)
+
+#define ERROR_MAXLENGTH 1023
+#define ERROR_PREFIX "[nanoparser] "
+static const char _ERROR_PREFIX[] = ERROR_PREFIX;
+static const int ERROR_PREFIX_LENGTH = sizeof(_ERROR_PREFIX) - 1;
+
+
+
+
+/*
+ * BASIC TYPES
+ */
+
+/* A program contains a list of statements */
+struct parsetree_program_t
+{
+    parsetree_statement_t* statement; /* first statement (head of a linked list; may be NULL) */
+    const parsetree_program_t* parent; /* NULL if root */
+};
+
+/* The root of a parse tree, which corresponds to a file. It's a program.
+   This is for backwards compatibility with the nanoparser v1 API */
+typedef struct parsetree_root_t parsetree_root_t;
+struct parsetree_root_t
+{
+    parsetree_program_t program; /* base class */
+    char* filepath; /* path to the source file */
+};
+
+/* A statement is an identifier followed by a (possibly empty) list of parameters */
+struct parsetree_statement_t
+{
+    char* identifier; /* an identifier */
+    parsetree_parameter_t* parameter; /* a list of parameters */
+    int line; /* line number in the source file associated with the program */
+    const parsetree_program_t* program; /* the program to which this statement belongs */
+
+    parsetree_statement_t* next; /* next node (linked list) */
+};
+
+/* A parameter is either: a) a string followed by another parameter or b) another program */
+struct parsetree_parameter_t
+{
+    enum { PARAMETER_STRING, PARAMETER_BLOCK } type;
+    union {
+        char* string;
+        parsetree_program_t* program;
+    };
+    const parsetree_statement_t* statement; /* the statement to which this parameter belongs */
+
+    parsetree_parameter_t* next; /* next node (linked list) */
+};
+
+static int traverse_adapter(const parsetree_statement_t* statement, void* user_data);
+static parsetree_program_t* release_program(parsetree_program_t* program);
+static parsetree_statement_t* release_statement(parsetree_statement_t* statement);
+static parsetree_parameter_t* release_parameter(parsetree_parameter_t* parameter);
+
+
+
+/*
+ * TOKENS
+ */
+
+#define WRITE_TOKEN_TYPE(x, y) x
+#define WRITE_TOKEN_NAME(x, y) y
+#define FOREACH_TOKEN(F) \
+    F(TOKEN_EOF, "end of file"), \
+    F(TOKEN_IDENTIFIER, "identifier"), \
+    F(TOKEN_STRING, "string"), \
+    F(TOKEN_BLOCKSTART, "{"), \
+    F(TOKEN_BLOCKEND, "}"), \
+    F(TOKEN_LINEBREAK, "line break")
+
+typedef enum nanotokentype_t nanotokentype_t;
+enum nanotokentype_t
+{
+    FOREACH_TOKEN(WRITE_TOKEN_TYPE)
+};
+
+static const char* TOKEN_NAME[] =
+{
+    FOREACH_TOKEN(WRITE_TOKEN_NAME)
+};
+
+typedef struct nanotoken_t nanotoken_t;
+struct nanotoken_t
+{
+    nanotokentype_t type;
+    int line;
+    char* value;
+    size_t value_size;
+};
+
+#define token_create(type, value, value_size, line) (nanotoken_t){ (type), (line), memcpy(malloc(value_size), (value), (value_size)), (value_size) }
+#define token_destroy(token) do { free((token).value); (token).value = NULL; } while(0)
+
+
+
+/*
+ * LEXICAL ANALYSIS
+ */
+
+#define LEXER_SYMBOL_MAXLENGTH 4095 /* long strings; use 2^n - 1 */
+#define LEXER_BUFFER_SIZE 4096 /* use 2^n */
+
+typedef struct nanofilestate_t nanofilestate_t;
+struct nanofilestate_t
+{
+    ALLEGRO_FILE* fp;
+    int cursor;
+    char buffer[2 * LEXER_BUFFER_SIZE];
+    int line;
+    int last;
+    bool locked;
+};
+
+typedef struct nanolexer_t nanolexer_t;
+struct nanolexer_t
+{
+    char* filepath;
+    DARRAY(nanotoken_t, token);
+};
+
+static nanolexer_t* lexer_create(const char* filepath);
+static nanolexer_t* lexer_destroy(nanolexer_t* lexer);
+
+static bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp);
+static int lexer_getc(nanofilestate_t* state);
+static int lexer_ungetc(nanofilestate_t* state);
+
+
+
+/*
+ * SYNTAX ANALYSIS
+ */
+
+typedef struct nanoparser_t nanoparser_t;
+struct nanoparser_t
+{
+    const nanolexer_t* lexer;
+    int cursor;
+};
+
+static nanoparser_t* parser_create(const nanolexer_t* lexer);
+static nanoparser_t* parser_destroy(nanoparser_t* parser);
+
+static const nanotoken_t* parser_lookahead(const nanoparser_t* parser);
+static bool parser_check(const nanoparser_t* parser, nanotokentype_t token_type);
+static void parser_expect(const nanoparser_t* parser, nanotokentype_t token_type);
+static void parser_match(nanoparser_t* parser, nanotokentype_t token_type);
+static void parser_unmatch(nanoparser_t* parser, nanotokentype_t token_type);
+
+static parsetree_root_t* parser_parse_root(nanoparser_t* parser);
+static parsetree_program_t* parser_parse_program(nanoparser_t* parser, const parsetree_program_t* parent);
+static parsetree_statement_t* parser_parse_statement(nanoparser_t* parser, const parsetree_program_t* program);
+static parsetree_parameter_t* parser_parse_parameter(nanoparser_t* parser, const parsetree_statement_t* statement);
+
+
+
+
+/*
+ * LOADING & UNLOADING
+ */
+
+
+/*
+ * nanoparser_construct_tree()
+ * Parse a file and construct a parse tree
+ */
+parsetree_program_t* nanoparser_construct_tree(const char* filepath)
+{
+    warning("Reading file %s...", filepath);
+
+    nanolexer_t* lexer = lexer_create(filepath);
+    nanoparser_t* parser = parser_create(lexer);
+
+    parsetree_root_t* root = parser_parse_root(parser);
+
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+
+    return (parsetree_program_t*)root;
+}
+
+/*
+ * nanoparser_deconstruct_tree()
+ * Release a parse tree
+ */
+parsetree_program_t* nanoparser_deconstruct_tree(parsetree_program_t* root)
+{
+    free(((parsetree_root_t*)root)->filepath);
+    return release_program(root);
+}
+
+/*
+ * release_program()
+ * Release a program
+ */
+parsetree_program_t* release_program(parsetree_program_t* program)
+{
+    release_statement(program->statement);
+    free(program);
+
+    return NULL;
+}
+
+/*
+ * release_statement()
+ * Release a list of statements
+ */
+parsetree_statement_t* release_statement(parsetree_statement_t* statement)
+{
+    while(statement != NULL) {
+        parsetree_statement_t* next = statement->next;
+
+        release_parameter(statement->parameter);
+        free(statement->identifier);
+        free(statement);
+
+        statement = next;
+    }
+
+    return NULL;
+}
+
+/*
+ * release_parameter()
+ * Release a list of parameters
+ */
+parsetree_parameter_t* release_parameter(parsetree_parameter_t* parameter)
+{
+    while(parameter != NULL) {
+        parsetree_parameter_t* next = parameter->next;
+
+        switch(parameter->type) {
+            case PARAMETER_STRING:
+                free(parameter->string);
+                break;
+
+            case PARAMETER_BLOCK:
+                release_program(parameter->program);
+                break;
+        }
+
+        free(parameter);
+        parameter = next;
+    }
+
+    return NULL;
+}
+
+
+
+/*
+ * TREE TRAVERSAL
  */
 
 /*
-                                    INSTRUCTIONS
-
-I)   Installation
-
-        Just drop nanoparser.c and nanoparser.h into your project and you're done.
-
-II)  Usage
-
-        parsetree_program_t *tree;
-
-        tree = nanoparser_construct_tree("my text file.txt");
-        interpret(tree); // you write this
-        tree = nanoparser_deconstruct_tree(tree);
-
-III) "my text file.txt" example:
-
-        // hello, this is a comment!
-
-        resource "skybox"
-        {
-            type                TEXTURE
-            properties {
-                file            "images/space skybox.jpg"
-                color           32 48 64        // rgb color, r=32, g=48, b=64
-                speed           0.5 0.3         // x-speed, y-speed
-                dimensions {
-                    width       128
-                    height      128
-                }
-            }
-        }
-*/
-
+ * traverse_adapter()
+ * A helper for tree traversal
+ */
+int traverse_adapter(const parsetree_statement_t* statement, void* user_data)
+{
+    int (*callback)(const parsetree_statement_t*) = (int(*)(const parsetree_statement_t*))user_data;
+    return callback(statement);
+}
 
 /*
-
-Context-free grammar:
-
-<program> ::= <statement> <program> | EMPTY
-<statement> ::= STRING <parameter> <nl>
-<parameter> ::= STRING <parameter> | <block> | EMPTY
-<block> ::= <nq> '{' <nl> <program> '}'
-<nl> ::= '\n' <nl> | '\n'
-<nq> := '\n' | EMPTY
-
-where:
-
-    STRING is:
-            a single-line double-quoted text (e.g., "Hello, world! Texts can be \"quoted\".")
-            or
-            a sequence of printable characters not in { ' ', '{', '}' } (e.g., hello_world)
-            http://en.wikipedia.org/wiki/ASCII
-
-    EMPTY is a zero-length symbol
-
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <ctype.h>
-#include "nanoparser.h"
-
-#if defined(_WIN32)
-#include <windows.h>
-#include <wchar.h>
-#endif
-
-#ifdef TRUE
-#undef TRUE
-#endif
-
-#ifdef FALSE
-#undef FALSE
-#endif
-
-#define TRUE  1
-#define FALSE 0
-
-/*#define NANOPARSER_DEBUG_MODE*/
-/*#define NANOPARSER_DISABLE_DOUBLE_QUOTES*/
-
-#define GENERATE_INTERFACE_OF_EXPANDABLE_ARRAY(T)                                               \
-                                                                                                \
-    typedef struct expandable_array_##T {                                                       \
-        T *_data; int _size; int _capacity;                                                     \
-    } expandable_array_##T ;                                                                    \
-                                                                                                \
-    expandable_array_##T *expandable_array_##T##_new();                                         \
-    expandable_array_##T *expandable_array_##T##_delete(expandable_array_##T *array);           \
-    void expandable_array_##T##_push_back(expandable_array_##T *array, T element);              \
-    void expandable_array_##T##_pop_back(expandable_array_##T *array);                          \
-    T *expandable_array_##T##_at(expandable_array_##T *array, int index);                       \
-    int expandable_array_##T##_size(expandable_array_##T *array)                           
-
-#define GENERATE_IMPLEMENTATION_OF_EXPANDABLE_ARRAY(T)                                          \
-                                                                                                \
-    expandable_array_##T *expandable_array_##T##_new()                                          \
-    {                                                                                           \
-        expandable_array_##T *a = malloc(sizeof *a);                                            \
-        a->_size = 0; a->_capacity = 8; a->_data = malloc_x(a->_capacity * sizeof(T));          \
-        return a;                                                                               \
-    }                                                                                           \
-                                                                                                \
-    expandable_array_##T *expandable_array_##T##_delete(expandable_array_##T *array)            \
-    {                                                                                           \
-        if(array) { free(array->_data); free(array); }                                          \
-        return NULL;                                                                            \
-    }                                                                                           \
-                                                                                                \
-    void expandable_array_##T##_push_back(expandable_array_##T *array, T element)               \
-    {                                                                                           \
-        if(array->_size >= array->_capacity) {                                                  \
-            array->_capacity *= 2;                                                              \
-            array->_data = realloc_x(array->_data, array->_capacity * sizeof(T));               \
-        }                                                                                       \
-        array->_data[ array->_size++ ] = element;                                               \
-    }                                                                                           \
-                                                                                                \
-    void expandable_array_##T##_pop_back(expandable_array_##T *array)                           \
-    {                                                                                           \
-        if(array->_size > 0) array->_size--;                                                    \
-    }                                                                                           \
-                                                                                                \
-    T *expandable_array_##T##_at(expandable_array_##T *array, int index)                        \
-    {                                                                                           \
-        int i = index;                                                                          \
-        if(i < 0) { i = 0; } else if(i >= array->_size) { i = array->_size - 1; }               \
-        return &(array->_data[i]);                                                              \
-    }                                                                                           \
-                                                                                                \
-    int expandable_array_##T##_size(expandable_array_##T *array)                                \
-    {                                                                                           \
-        return array->_size;                                                                    \
-    }                                                                                           \
-                                                                                                \
-    
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* forward declarations */
-typedef struct sourcelocation_t sourcelocation_t;
-
-
-
-/* private structures */
-
-
-/* a program is a list of statements */
-struct parsetree_program_t {
-    parsetree_statement_t *statement;
-    parsetree_program_t *next;
-};
-
-/* a statement is a line containing an identifier (i.e., a string) followed by a parameter */
-struct parsetree_statement_t {
-    char *string;
-    parsetree_parameter_t *parameter;
-    sourcelocation_t *source_location; /* where is this statement located in the source code? */
-};
-
-/* a parameter is either:
-   i)   another program;
-   ii)  a string followed by another parameter */
-struct parsetree_parameter_t {
-    enum { VALUE, PROGRAM } type;
-    union {
-        struct {
-            char *string;
-            parsetree_parameter_t *next;
-        } value;
-        parsetree_program_t *program;
-    } data;
-    const parsetree_statement_t *stmt; /* I belong to stmt */
-};
-
-
-
-/* utilities */
-static void (*error_fun)(const char*) = NULL;
-static void (*warning_fun)(const char*) = NULL;
-static void error(const char *fmt, ...); /* fatal error */
-static void warning(const char *fmt, ...); /* warning */
-static char* dirpath(const char *filepath); /* dirpath("f/folder/file.txt") = "f/folder/" */
-static void* malloc_x(size_t bytes); /* our version of malloc */
-static void* realloc_x(void *ptr, size_t bytes); /* our version of realloc */
-static FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen with UTF-8 filename support */
-static char* str_dup(const char *s); /* our version of strdup: duplicates s */
-static char* r_trim(char *s); /* r_trim */
-
-
-
-/* parse tree */
-static parsetree_parameter_t* parsetree_parameter_new_value(const char *str, parsetree_parameter_t *nextparam);
-static parsetree_parameter_t* parsetree_parameter_new_program(parsetree_program_t *prog);
-static parsetree_parameter_t* parsetree_parameter_delete(parsetree_parameter_t* param);
-static void parsetree_parameter_show(parsetree_parameter_t* param);
-
-static parsetree_statement_t* parsetree_statement_new(const char *str, parsetree_parameter_t *parameter);
-static parsetree_statement_t* parsetree_statement_delete(parsetree_statement_t* stmt);
-static void parsetree_statement_show(parsetree_statement_t* stmt);
-
-static parsetree_program_t* parsetree_program_new(parsetree_statement_t* stmt, parsetree_program_t* nextprog);
-static parsetree_program_t* parsetree_program_delete(parsetree_program_t* prog);
-static void parsetree_program_show(parsetree_program_t* prog);
-
-
-
-/* virtual file (in-memory) */
-GENERATE_INTERFACE_OF_EXPANDABLE_ARRAY(int);
-GENERATE_IMPLEMENTATION_OF_EXPANDABLE_ARRAY(int);
-static char* vfile_name; /* filename */
-static expandable_array_int* vfile_contents; /* file contents */
-static int vfile_ptr; /* current file pointer */
-
-static void vfile_create(const char *name); /* creates the virtual file */
-static void vfile_destroy(); /* destroys the virtual file */
-static int vfile_getc(); /* getchar */
-static int vfile_ungetc(int c); /* ungetchar */
-static int vfile_putc(int c); /* putchar */
-static void vfile_rewind(); /* rewind */
-
-
-
-/* preprocessor */
-typedef char* pchar;
-GENERATE_INTERFACE_OF_EXPANDABLE_ARRAY(pchar);
-GENERATE_IMPLEMENTATION_OF_EXPANDABLE_ARRAY(pchar);
-static expandable_array_pchar* preprocessor_include_table; /* avoids infinite recursive inclusions */
-static int preprocessor_line; /* current line number */
-
-static void preprocessor_init();
-static void preprocessor_release();
-static void preprocessor_run(FILE *in, int depth); /* runs the preprocessor */
-static void preprocessor_show(); /* shows the pre-processed file */
-static void preprocessor_add_to_include_table(const char *filepath);
-static int preprocessor_has_file_been_included(const char *filepath);
-
-
-
-/* error detection: this is used to detect WHERE errors are located (after preprocessing) */
-typedef struct {
-    /* filename */
-    char *filename;
-
-    /* file [filename] starts at line [vline_start_line] of the virtual preprocessed file */
-    int vfile_start_line;
-
-    /* vfile_line_offset: used if there's another file included within filename (otherwise it's 0) */
-    int vfile_line_offset;
-} errorcontext;
-GENERATE_INTERFACE_OF_EXPANDABLE_ARRAY(errorcontext);
-GENERATE_IMPLEMENTATION_OF_EXPANDABLE_ARRAY(errorcontext);
-static expandable_array_errorcontext* errorcontext_table;
-
-static void errorcontext_init(); /* initializes the error context module */
-static void errorcontext_release(); /* releases the erro context module */
-static void errorcontext_add_to_table(const char *filename, int vfile_start_line, int vfile_line_offset); /* adds a new error context to its internal table */
-static int errorcontext_detect_file_line(int vfile_line); /* provide a line number of the virtual file, and it will return you the line number of the real file at that place */
-static const char* errorcontext_detect_file_name(int vfile_line); /* provide a line number of the virtual file, and it will return you the name of the real file at that place */
-static errorcontext* errorcontext_find(int idx, int vfile_line); /* internal use only */
-
-
-
-
-
-/* source location (used for improved error detection) */
-/* this is an easy-to-use facade for errorcontext */
-struct sourcelocation_t {
-    char *file;
-    int line;
-};
-static sourcelocation_t* sourcelocation_new(int vfile_line); /* must be called before errorcontext_release() */
-static sourcelocation_t* sourcelocation_delete(sourcelocation_t* s);
-static const char* sourcelocation_get_file(sourcelocation_t* s);
-static int sourcelocation_get_line(sourcelocation_t* s);
-
-
-/* lexical analyzer */
-#define SYMBOL_MAXLENGTH        2048
-
-typedef enum {
-    SYM_EOF,
-    SYM_NEWLINE,
-    SYM_STRING,
-    SYM_BEGINBLOCK,
-    SYM_ENDBLOCK
-} symbol_t;
-
-static int line; /* current line number (after preprocessing phase) */
-static symbol_t sym, oldsym; /* current/old token */
-static char symdata[SYMBOL_MAXLENGTH+1], oldsymdata[SYMBOL_MAXLENGTH+1]; /* current/old token textual data */
-
-static void getsym(); /* read the next token */
-static void ungetsym(); /* put the last read token back into the stream */
-static int read_hex_char(); /* reads a token of the form \xAB */
-
-
-
-/* syntatic analyzer */
-static parsetree_program_t* parse(); /* main parsing routine */
-static int acceptsym(symbol_t s); /* reads the next token and returns true iff s is found */
-static int expectsym(symbol_t s); /* throws an error if s doesn't get accepted */
-
-
-
-/* grammar rules */
-static parsetree_program_t* program();
-static parsetree_statement_t* statement();
-static parsetree_parameter_t* parameter();
-static parsetree_program_t* block();
-static void nl();
-static void nq();
-
-
-/* tree traversal */
-static int traversal_adapter(const parsetree_statement_t *stmt, void *eval_fun);
-
-
-
-
-
-/* ---------------------------------------------
- * public methods of the parser
- * ---------------------------------------------- */
-
-parsetree_program_t* nanoparser_construct_tree(const char *filepath)
+ * nanoparser_traverse_program_ex()
+ * Traverse a program with a data field. The callback must return zero to let the enumeration proceed, or any non-zero value to stop it
+ */
+void nanoparser_traverse_program_ex(const parsetree_program_t* program, void *user_data, int (*callback)(const parsetree_statement_t*,void*))
 {
-    FILE *fp;
-    parsetree_program_t *prog;
-
-    fp = fopen_utf8(filepath, "r");
-    if(fp != NULL) {
-        /* creates the temporary virtual file */
-        vfile_create(filepath);
-
-        /* initializes the error context module (used for improved error detection) */
-        errorcontext_init();
-        errorcontext_add_to_table(filepath, 1, 0);
-
-        /* calls the preprocessor */
-        preprocessor_init();
-        preprocessor_add_to_include_table(filepath); /* you can't #include yourself */
-        preprocessor_run(fp, 0);
-        preprocessor_release();
-
-        /* calls the parser */
-        prog = parse();
-
-        /* releases the error context module */
-        errorcontext_release();
-
-        /* destroys the temporary virtual file */
-        vfile_destroy();
-
-        /* done! */
-        fclose(fp);
-    }
-    else {
-        prog = NULL;
-        error("Couldn't open file \"%s\" for reading.", filepath);
-    }
-
-    return prog;
-}
-
-parsetree_program_t* nanoparser_deconstruct_tree(parsetree_program_t *tree)
-{
-    tree = parsetree_program_delete(tree);
-    return tree;
-}
-
-void nanoparser_set_error_function(void (*fun)(const char*))
-{
-    error_fun = fun;
-}
-
-void nanoparser_set_warning_function(void (*fun)(const char*))
-{
-    warning_fun = fun;
-}
-
-
-/* ---------------------------------------------
- * lexical analysis
- * ---------------------------------------------- */
-
-/* this is the lexer */
-void getsym()
-{
-    int i = 0;
-    unsigned int c;
-    char *p = symdata;
-
-    /* create a backup */
-    oldsym = sym;
-    strcpy(oldsymdata, symdata);
-
-    /* skip white spaces */
-    do {
-        c = vfile_getc();
-    } while(c != '\n' && isspace(c));
-
-    /* deciding which symbol comes next */
-    if(c == EOF) {
-        sym = SYM_EOF;
-        *(p++) = (char)c;
-    }
-    else if(c == '\n') {
-        sym = SYM_NEWLINE;
-        *(p++) = (char)c;
-        ++line;
-    }
-    else if(c == '{') {
-        sym = SYM_BEGINBLOCK;
-        *(p++) = (char)c;
-    }
-    else if(c == '}') {
-        sym = SYM_ENDBLOCK;
-        *(p++) = (char)c;
-    }
-    else if(c >= 0x20) {
-        sym = SYM_STRING;
-#ifndef NANOPARSER_DISABLE_DOUBLE_QUOTES
-        if(c != '"') {
-#endif
-            /* non-quoted string */
-            while(c >= 0x20 && c != EOF && !isspace(c) && c != '{' && c != '}' && ++i <= SYMBOL_MAXLENGTH) { /* printable character */
-                *(p++) = (char)c;
-                c = vfile_getc();
-            }
-            vfile_ungetc(c);
-#ifndef NANOPARSER_DISABLE_DOUBLE_QUOTES
-        }
-        else {
-            /* double-quoted string */
-            c = vfile_getc(); /* discard '"' */
-            while(c >= 0x20 && c != '"' && c != EOF && ++i <= SYMBOL_MAXLENGTH) {
-                if(c == '\n') {
-                    error(
-                        "Unexpected end of string in \"%s\" on line %d.",
-                        errorcontext_detect_file_name(line),
-                        errorcontext_detect_file_line(line)
-                    );
-                }
-                else if(c == '\\') {
-                    int h = vfile_getc();
-                    switch(h) {
-                        case '"':  c = '"';  break;
-                        case 'n':  c = '\n'; break;
-                        case 't':  c = '\t'; break;
-                        case '\\': c = '\\'; break;
-                        case 'x': c = read_hex_char(); break;
-                        default:
-                            error(
-                                "Invalid character '\\%c' in \"%s\" on line %d. Did you mean '\\\\'?",
-                                h,
-                                errorcontext_detect_file_name(line),
-                                errorcontext_detect_file_line(line)
-                            );
-                            break;
-                    }
-                }
-
-                *(p++) = (char)c;
-                c = vfile_getc();
-            }
-
-            if(c != '"') /* discard '"' */
-                vfile_ungetc(c);
-        }
-#endif
-    }
-    else {
-        error(
-            "Lexical error in \"%s\" on line %d: unknown symbol \"%c\" (%d).",
-            errorcontext_detect_file_name(line),
-            errorcontext_detect_file_line(line),
-            c,
-            c
-        );
-    }
-
-    *p = 0;
-}
-
-void ungetsym()
-{
-    char *str = symdata;
-    int i;
-
-    /* putting the symbol back into the stream */
-    vfile_ungetc(' ');
-    for(i=strlen(str)-1; i>=0; i--) {
-        vfile_ungetc((int)str[i]);
-        if(str[i] == '\n')
-            --line;
-    }
-
-    /* restoring the backup */
-    strcpy(symdata, oldsymdata);
-    sym = oldsym;
-}
-
-int acceptsym(symbol_t s)
-{
-    if(sym == s) {
-        getsym();
-        return TRUE;
-    }
-    else
-        return FALSE;
-}
-
-int expectsym(symbol_t s)
-{
-    if(!acceptsym(s)) {
-        error(
-            "Syntax error in \"%s\" on line %d: unexpected symbol \"%s\".",
-            errorcontext_detect_file_name(line),
-            errorcontext_detect_file_line(line),
-            symdata
-        );
-        return FALSE;
-    }
-    else
-        return TRUE;
-}
-
-int read_hex_char()
-{
-    int a, b;
-
-    a = tolower(vfile_getc());
-    if(isdigit(a) || (a >= 'a' && a <= 'f')) {
-        b = tolower(vfile_getc());
-        if(isdigit(b) || (b >= 'a' && b <= 'f'))
-            return ((isdigit(a) ? a-'0' : 10+(a-'a')) << 4) | (isdigit(b) ? b-'0' : 10+(b-'a'));
-    }
-
-    error(
-        "Invalid token in \"%s\" on line %d.",
-        errorcontext_detect_file_name(line),
-        errorcontext_detect_file_line(line)
-    );
-
-    return '?';
-}
-
-
-/* ---------------------------------------------
- * syntatic analysis: parser
- * ---------------------------------------------- */
-
-parsetree_program_t* parse()
-{
-    parsetree_program_t *prog;
-
-    line = 1;
-    getsym(); /* reads the first symbol */
-    while(acceptsym(SYM_NEWLINE)); /* skips newlines */
-    prog = program(); /* generates the syntatic tree */
-    expectsym(SYM_EOF); /* expects an EOF character */
-
-    return prog;
-}
-
-
-
-
-
-/* ---------------------------------------------
- * syntax analysis: grammar rules
- * ---------------------------------------------- */
-
-parsetree_program_t* program()
-{
-    parsetree_program_t *prog = NULL;
-
-    if(sym != SYM_EOF && sym != SYM_ENDBLOCK) {
-        parsetree_statement_t *stmt = statement();
-        prog = parsetree_program_new(
-            stmt,
-            program()
-        );
-    }
-    else
-        ; /* empty */
-
-    return prog;
-}
-
-parsetree_statement_t* statement()
-{
-    parsetree_statement_t *stmt = NULL;
-    char *str = str_dup(symdata);
-
-    expectsym(SYM_STRING);
-    stmt = parsetree_statement_new(
-        str,
-        parameter()
-    );
-    if(sym != SYM_EOF)
-        nl();
-
-    free(str);
-    return stmt;
-}
-
-parsetree_parameter_t* parameter()
-{
-    parsetree_parameter_t *param = NULL;
-
-    if(sym == SYM_STRING) {
-        char *str = str_dup(symdata);
-        acceptsym(SYM_STRING);
-        param = parsetree_parameter_new_value(
-            str,
-            parameter()
-        );
-        free(str);
-    }
-    else if(sym == SYM_BEGINBLOCK) {
-        param = parsetree_parameter_new_program(
-            block()
-        );
-    }
-    else if(sym == SYM_NEWLINE) {
-        /* lookahead: do we have a block? */
-        int blk;
-
-        getsym();
-        blk = (sym == SYM_BEGINBLOCK);
-        ungetsym();
-
-        if(blk) {
-            param = parsetree_parameter_new_program(
-                block()
-            );
-        }
-    }
-    else
-        ; /* empty */
-
-    return param;
-}
-
-parsetree_program_t* block()
-{
-    parsetree_program_t *prog = NULL;
-
-    nq();
-    expectsym(SYM_BEGINBLOCK);
-    nl();
-    prog = program();
-    expectsym(SYM_ENDBLOCK);
-
-    return prog;
-}
-
-void nq()
-{
-    acceptsym(SYM_NEWLINE);
-}
-
-void nl()
-{
-    expectsym(SYM_NEWLINE);
-    while(acceptsym(SYM_NEWLINE));
-}
-
-
-
-
-/* ---------------------------------------------
- * syntax analysis: parse tree manipulation
- * ---------------------------------------------- */
-
-parsetree_parameter_t* parsetree_parameter_new_value(const char *str, parsetree_parameter_t *nextparam)
-{
-    parsetree_parameter_t *p = malloc_x(sizeof *p);
-    p->type = VALUE;
-    p->data.value.string = str_dup(str);
-    p->data.value.next = nextparam;
-    p->stmt = NULL;
-    return p;
-}
-
-parsetree_parameter_t* parsetree_parameter_new_program(parsetree_program_t *prog)
-{
-    parsetree_parameter_t *p = malloc_x(sizeof *p);
-    p->type = PROGRAM;
-    p->data.program = prog;
-    p->stmt = NULL;
-    return p;
-}
-
-parsetree_parameter_t* parsetree_parameter_delete(parsetree_parameter_t* param)
-{
-    if(param != NULL) {
-        if(param->type == VALUE) {
-            free(param->data.value.string);
-            param->data.value.string = NULL;
-            param->data.value.next = parsetree_parameter_delete(param->data.value.next);
-        }
-        else
-            param->data.program = parsetree_program_delete(param->data.program);
-
-        free(param);
-    }
-
-    return NULL;
-}
-
-void parsetree_parameter_show(parsetree_parameter_t* param)
-{
-    printf("[ ");
-    if(param != NULL) {
-        if(param->type == PROGRAM) {
-            printf("\n");
-            parsetree_program_show(param->data.program);
-            printf("\n");
-        }
-        else {
-            printf("%s ", param->data.value.string);
-            parsetree_parameter_show(param->data.value.next);
-        }
-    }
-    printf(" ] ");
-}
-
-parsetree_statement_t* parsetree_statement_new(const char *str, parsetree_parameter_t *parameter)
-{
-    parsetree_statement_t *p = malloc_x(sizeof *p);
-    parsetree_parameter_t *element;
-    int j, n;
-
-    p->string = str_dup(str);
-    p->parameter = parameter;
-    p->source_location = sourcelocation_new(line-1);
-
-    n = nanoparser_get_number_of_parameters(parameter);
-    for(j=1; j<=n; j++) {
-        element = (parsetree_parameter_t*)nanoparser_get_nth_parameter(parameter, j);
-        element->stmt = p;
-    }
-
-    return p;
-}
-
-parsetree_statement_t* parsetree_statement_delete(parsetree_statement_t* stmt)
-{
-    if(stmt != NULL) {
-        stmt->source_location = sourcelocation_delete(stmt->source_location);
-        free(stmt->string);
-        stmt->string = NULL;
-        stmt->parameter = parsetree_parameter_delete(stmt->parameter);
-        free(stmt);
-    }
-
-    return NULL;
-}
-
-void parsetree_statement_show(parsetree_statement_t* stmt)
-{
-    if(stmt != NULL) {
-        printf("%s := ", stmt->string);
-        parsetree_parameter_show(stmt->parameter);
-        printf("\n");
-    }
-}
-
-parsetree_program_t* parsetree_program_new(parsetree_statement_t *stmt, parsetree_program_t *nextprog)
-{
-    parsetree_program_t *p = malloc_x(sizeof *p);
-    p->statement = stmt;
-    p->next = nextprog;
-    return p;
-}
-
-parsetree_program_t* parsetree_program_delete(parsetree_program_t *prog)
-{
-    parsetree_program_t *next = NULL;
-
-    for(; prog; prog = next) { /* we should avoid using recursion here... 'prog' can be HUGE! */
-        next = prog->next;
-        parsetree_statement_delete(prog->statement);
-        free(prog);
-    }
-
-    return NULL;
-}
-
-void parsetree_program_show(parsetree_program_t* prog)
-{
-    if(prog != NULL) {
-        parsetree_statement_show(prog->statement);
-        parsetree_program_show(prog->next);
-    }
-}
-
-
-
-/* ---------------------------------------------
- * virtual files
- * ---------------------------------------------- */
-
-void vfile_create(const char *name)
-{
-    vfile_ptr = 0;
-    vfile_name = str_dup(name);
-    vfile_contents = expandable_array_int_new();
-}
-
-void vfile_destroy()
-{
-    vfile_contents = expandable_array_int_delete(vfile_contents);
-    free(vfile_name);
-    vfile_name = NULL;
-    vfile_ptr = 0;
-}
-
-int vfile_getc()
-{
-    if(vfile_ptr < expandable_array_int_size(vfile_contents)) {
-        int *ptr = expandable_array_int_at(vfile_contents, vfile_ptr++);
-        return *ptr;
-    }
-    else
-        return EOF;
-}
-
-int vfile_ungetc(int c)
-{
-    if(vfile_ptr > 0 && c != EOF) {
-        int *ptr = expandable_array_int_at(vfile_contents, --vfile_ptr);
-        *ptr = c;
-        return *ptr;
-    }
-    else
-        return EOF;
-}
-
-int vfile_putc(int c)
-{
-    int size = expandable_array_int_size(vfile_contents);
-
-    if(vfile_ptr < size) {
-        int *ptr = expandable_array_int_at(vfile_contents, vfile_ptr++);
-        *ptr = c;
-    }
-    else {
-        expandable_array_int_push_back(vfile_contents, c);
-        vfile_ptr = size+1;
-    }
-
-    return c;
-}
-
-void vfile_rewind()
-{
-    vfile_ptr = 0;
-}
-
-
-
-
-/* ---------------------------------------------
- * preprocessor
- * ---------------------------------------------- */
-
-void preprocessor_init()
-{
-    preprocessor_line = 1;
-    preprocessor_include_table = expandable_array_pchar_new();
-}
-
-void preprocessor_release()
-{
-    int i, len = expandable_array_pchar_size(preprocessor_include_table);
-
-    for(i=0; i<len; i++) {
-        char **p = expandable_array_pchar_at(preprocessor_include_table, i);
-        free(*p);
-        *p = NULL;
-    }
-
-    preprocessor_include_table = expandable_array_pchar_delete(preprocessor_include_table);
-    preprocessor_line = 1;
-    vfile_rewind();
-}
-
-void preprocessor_show()
-{
-#ifdef NANOPARSER_DEBUG_MODE
-    int c;
-
-    vfile_rewind();
-    while(EOF != (c=vfile_getc()))
-        putchar(c);
-    vfile_rewind();
-#endif
-}
-
-void preprocessor_run(FILE *in, int depth)
-{
-    int c;
-    int line_start = TRUE;
-
-    while(EOF != (c = fgetc(in))) {
-        /* do nothing with double-quoted strings */
-        if(c == '"') {
-            int old = c;
-            vfile_putc(c);
-            c = fgetc(in);
-            while(((c != '"') || (old == '\\' && c == '"')) && c != EOF && c != '\n') {
-                vfile_putc(c);
-                old = c;
-                c = fgetc(in);
-            }
-        }
-
-        /* ignore comments */
-        if(c == '/') {
-            int h = fgetc(in);
-            if(h == '/') {
-                do {
-                    c = fgetc(in);
-                } while(c != '\n' && c != EOF);
-            }
-            else
-                ungetc(h, in);
-        }
-
-        /* preprocessor directives */
-        if(c == '#' && line_start) {
-            char key[1+512]="", value[1+512]="";
-            int key_len = 0, value_len = 0;
-            int quot = FALSE;
-            char *p;
-
-            /* read key */
-            p = key;
-            do {
-                *(p++) = c;
-                c = fgetc(in);
-            } while(!isspace(c) && c != '\n' && c != EOF && ++key_len < 512);
-            *p = 0;
-
-            /* read value */
-            p = value;
-            while(c != '\n' && isspace(c)) /* skip spaces */
-                c = fgetc(in);
-            while(c != '\n' && c != EOF && value_len++ < 512) {
-                if(c == '/' && !quot) {
-                    int h = fgetc(in);
-                    if(h == '/')
-                        break;
-                    else
-                        ungetc(h, in);
-                }
-                if(c != '"')
-                    *(p++) = c;
-                else
-                    quot = !quot;
-                c = fgetc(in);
-            }
-            *p = 0;
-            r_trim(value);
-
-            /* #include has been deprecated */
-            if(strcmp(key, "#include") == 0) {
-                warning(
-                    "The #include directive has been deprecated and removed. It must no longer be used (see %s:%d)",
-                    errorcontext_detect_file_name(preprocessor_line),
-                    errorcontext_detect_file_line(preprocessor_line)
-                );
-                (void)preprocessor_has_file_been_included;
-                (void)dirpath;
-            }
-            else if(strcmp(key, "#") == 0) {
-                /* ignore comments */
-                ;
-            }
-            else {
-                /* we'll consider unknown pre-processor commands as being comments */
-                warning(
-                    "Preprocessor error in \"%s\" on line %d: unknown command \"%s %s\".",
-                    errorcontext_detect_file_name(preprocessor_line),
-                    errorcontext_detect_file_line(preprocessor_line),
-                    key,
-                    value
-                );
-            }
-
-        }
-
-        /* new line... */
-        if(c == '\n') {
-            line_start = TRUE;
-            preprocessor_line++;
-        }
-        else if(!isspace(c))
-            line_start = FALSE;
-
-        /* accept this character */
-        if(c != EOF)
-            vfile_putc(c);
-        else if(feof(in))
-            vfile_putc(c);
-        else if(ferror(in))
-            error("Error reading from stream '%s'", vfile_name);
-    }
-
-    if(depth == 0) {
-        /* rewinds the virtual file */
-        vfile_rewind();
-
-        /* debug information */
-        preprocessor_show();
-    }
-}
-
-int preprocessor_has_file_been_included(const char *filename)
-{
-    int i, len = expandable_array_pchar_size(preprocessor_include_table);
-    char *file;
-
-    for(i=0; i<len; i++) {
-        file = *(expandable_array_pchar_at(preprocessor_include_table, i));
-        if(strcmp(file, filename) == 0)
-            return TRUE;
-    }
-
-    return FALSE;
-}
-
-void preprocessor_add_to_include_table(const char *filepath)
-{
-    expandable_array_pchar_push_back(preprocessor_include_table, (pchar)str_dup(filepath));
-}
-
-
-
-/* ---------------------------------------------
- * improved error detection
- * ---------------------------------------------- */
-
-void errorcontext_init()
-{
-    errorcontext_table = expandable_array_errorcontext_new();
-}
-
-void errorcontext_release()
-{
-    int i, size = expandable_array_errorcontext_size(errorcontext_table);
-
-    for(i=0; i<size; i++)
-        free( expandable_array_errorcontext_at(errorcontext_table, i)->filename );
-
-    errorcontext_table = expandable_array_errorcontext_delete(errorcontext_table);
-}
-
-void errorcontext_add_to_table(const char *filename, int vfile_start_line, int vfile_line_offset)
-{
-    errorcontext ctx;
-    ctx.filename = str_dup(filename);
-    ctx.vfile_start_line = vfile_start_line;
-    ctx.vfile_line_offset = vfile_line_offset;
-    expandable_array_errorcontext_push_back(errorcontext_table, ctx);
-}
-
-errorcontext* errorcontext_find(int idx, int vfile_line)
-{
-    int size = expandable_array_errorcontext_size(errorcontext_table);
-
-    if(idx < 0)
-        return expandable_array_errorcontext_at(errorcontext_table, 0);
-    else if(idx >= size)
-        return expandable_array_errorcontext_at(errorcontext_table, size-1);
-    else if(vfile_line < expandable_array_errorcontext_at(errorcontext_table, idx)->vfile_start_line)
-        return expandable_array_errorcontext_at(errorcontext_table, idx>0 ? idx-1 : 0);
-    else
-        return errorcontext_find(idx+1, vfile_line);
-}
-
-int errorcontext_detect_file_line(int vfile_line)
-{
-    errorcontext *c = errorcontext_find(0, vfile_line);
-    return 1 + vfile_line - c->vfile_start_line + c->vfile_line_offset;
-}
-
-const char* errorcontext_detect_file_name(int vfile_line)
-{
-    errorcontext *c = errorcontext_find(0, vfile_line);
-    return c->filename;
-}
-
-
-
-/* ---------------------------------------------
- * tree traversal
- * ---------------------------------------------- */
-void nanoparser_traverse_program(const parsetree_program_t *program, int (*eval)(const parsetree_statement_t*))
-{
-    nanoparser_traverse_program_ex(program, (void*)eval, traversal_adapter);
-}
-
-void nanoparser_traverse_program_ex(const parsetree_program_t *program, void *some_user_data, int (*eval)(const parsetree_statement_t*,void*))
-{
-    const parsetree_program_t *p;
-
-    for(p = program; p != NULL; p = p->next) {
-        if(eval(p->statement, some_user_data) != 0)
+    /* for each statement, traverse in order */
+    for(const parsetree_statement_t* statement = program->statement; statement != NULL; statement = statement->next) {
+        if(0 != callback(statement, user_data))
             break;
     }
 }
 
-int traversal_adapter(const parsetree_statement_t *stmt, void *eval_fun)
+/*
+ * nanoparser_traverse_program()
+ * Traverse a program. The callback must return zero to let the enumeration proceed, or any non-zero value to stop it
+ */
+void nanoparser_traverse_program(const parsetree_program_t* program, int (*callback)(const parsetree_statement_t*))
 {
-    int (*eval)(const parsetree_statement_t*) = (int (*)(const parsetree_statement_t*))eval_fun;
-    return eval(stmt);
+    nanoparser_traverse_program_ex(program, callback, traverse_adapter);
 }
 
 
-/* ---------------------------------------------
- * source location
- * ---------------------------------------------- */
-sourcelocation_t* sourcelocation_new(int vfile_line)
+
+/*
+ * DATA RETRIEVAL
+ */
+
+/*
+ * nanoparser_get_identifier()
+ * Read the identifier of a statement
+ */
+const char* nanoparser_get_identifier(const parsetree_statement_t* statement)
 {
-    sourcelocation_t *s = malloc_x(sizeof *s);
-    s->file = str_dup(errorcontext_detect_file_name(vfile_line));
-    s->line = errorcontext_detect_file_line(vfile_line);
-    return s;
+    return statement->identifier;
 }
 
-sourcelocation_t* sourcelocation_delete(sourcelocation_t* s)
+/*
+ * nanoparser_get_parameter_list()
+ * Read the list of parameters of a statement
+ */
+const parsetree_parameter_t* nanoparser_get_parameter_list(const parsetree_statement_t* statement)
 {
-    free(s->file);
-    free(s);
-    return NULL;
+    return statement->parameter;
 }
 
-const char* sourcelocation_get_file(sourcelocation_t* s)
+/*
+ * nanoparser_get_file()
+ * Get the file associated with a statement
+ */
+const char* nanoparser_get_file(const parsetree_statement_t* statement)
 {
-    return s->file;
+    const parsetree_program_t* program = statement->program;
+
+    while(program->parent != NULL)
+        program = program->parent;
+
+    return ((parsetree_root_t*)program)->filepath;
 }
 
-int sourcelocation_get_line(sourcelocation_t* s)
+/*
+ * nanoparser_get_line_number()
+ * Get the line number associated with a statement
+ */
+int nanoparser_get_line_number(const parsetree_statement_t* statement)
 {
-    return s->line;
+    return statement->line;
 }
 
-
-/* ---------------------------------------------
- * statement handling
- * ---------------------------------------------- */
-
-const char* nanoparser_get_identifier(const parsetree_statement_t *stmt)
+/*
+ * nanoparser_get_number_of_parameters()
+ * Get the number of parameters of a list of statements
+ */
+int nanoparser_get_number_of_parameters(const parsetree_parameter_t* param_list)
 {
-    return stmt->string;
+    int counter = 0;
+
+    for(; param_list != NULL; param_list = param_list->next)
+        ++counter;
+
+    return counter;
 }
 
-const parsetree_parameter_t* nanoparser_get_parameter_list(const parsetree_statement_t *stmt)
+/*
+ * nanoparser_get_nth_parameter()
+ * Get a specific parameter of a list of parameters (n=1: first parameter; n=2: second parameter; and so on)
+ */
+const parsetree_parameter_t* nanoparser_get_nth_parameter(const parsetree_parameter_t* param_list, int n)
 {
-    return stmt->parameter;
-}
+    nanoassert(n >= 1);
 
-const char* nanoparser_get_file(const parsetree_statement_t *stmt)
-{
-    return (stmt != NULL) ? sourcelocation_get_file(stmt->source_location) : "null";
-}
-
-int nanoparser_get_line_number(const parsetree_statement_t *stmt)
-{
-    return (stmt != NULL) ? sourcelocation_get_line(stmt->source_location) : -1;
-}
-
-
-/* ---------------------------------------------
- * data retrieval
- * ---------------------------------------------- */
-
-int nanoparser_get_number_of_parameters(const parsetree_parameter_t *param_list)
-{
-    if(param_list != NULL) {
-        if(param_list->type == VALUE)
-            return 1 + nanoparser_get_number_of_parameters(param_list->data.value.next);
-        else
-            return 1;
-    }
-    else
-        return 0;
-}
-
-const parsetree_parameter_t* nanoparser_get_nth_parameter(const parsetree_parameter_t *param_list, int n)
-{
-    if(param_list != NULL && n >= 1) {
-        if(n == 1)
+    for(int counter = 1; param_list != NULL; counter++, param_list = param_list->next) {
+        if(n == counter)
             return param_list;
-        else if(param_list->type == VALUE)
-            return nanoparser_get_nth_parameter(param_list->data.value.next, n-1);
     }
 
     return NULL;
 }
 
-void nanoparser_expect_string(const parsetree_parameter_t *param, const char *error_message)
+/*
+ * nanoparser_expect_string()
+ * Crash if the given parameter is not a string
+ */
+void nanoparser_expect_string(const parsetree_parameter_t* param, const char* error_message)
 {
-    if(param == NULL)
-        error("%s", error_message);
-    else if(param != NULL && param->type != VALUE)
-        error("%s\nin \"%s\" near line %d", error_message, nanoparser_get_file(param->stmt), nanoparser_get_line_number(param->stmt));
+    if(param != NULL && param->type != PARAMETER_STRING)
+        crash("%s at %s:%d", error_message, nanoparser_get_file(param->statement), param->statement->line);
+    else if(param == NULL)
+        crash("%s at ???", error_message);
 }
 
-void nanoparser_expect_program(const parsetree_parameter_t *param, const char *error_message)
+/*
+ * nanoparser_expect_program()
+ * Crash if the given parameter is not a program (block)
+ */
+void nanoparser_expect_program(const parsetree_parameter_t* param, const char* error_message)
 {
-    if(param == NULL)
-        error("%s", error_message);
-    else if(param != NULL && param->type != PROGRAM)
-        error("%s\nin \"%s\" near line %d", error_message, nanoparser_get_file(param->stmt), nanoparser_get_line_number(param->stmt));
+    if(param != NULL && param->type != PARAMETER_BLOCK)
+        crash("%s at %s:%d", error_message, nanoparser_get_file(param->statement), param->statement->line);
+    else if(param == NULL)
+        crash("%s at ???", error_message);
 }
 
-const char* nanoparser_get_string(const parsetree_parameter_t *param)
+/*
+ * nanoparser_get_string()
+ * Get the string associated with the given parameter, if any
+ */
+const char* nanoparser_get_string(const parsetree_parameter_t* param)
 {
-    if(param != NULL && param->type == VALUE)
-        return param->data.value.string;
+    if(param != NULL && param->type == PARAMETER_STRING)
+        return param->string;
     else
         return "null";
 }
 
-const parsetree_program_t* nanoparser_get_program(const parsetree_parameter_t *param)
+/*
+ * nanoparser_get_program()
+ * Get the program associated with the given parameter, if any
+ * Returns NULL if there is no such program
+ */
+const parsetree_program_t* nanoparser_get_program(const parsetree_parameter_t* param)
 {
-    if(param != NULL && param->type == PROGRAM)
-        return param->data.program;
+    if(param != NULL && param->type == PARAMETER_BLOCK)
+        return param->program;
     else
         return NULL;
 }
 
 
-/* ---------------------------------------------
- * operations
- * --------------------------------------------- */
-parsetree_program_t* nanoparser_append_program(parsetree_program_t *dest, parsetree_program_t *src)
+
+
+
+/*
+ * LEXICAL ANALYSIS
+ */
+
+
+
+/*
+ * lexer_create()
+ * Creates a lexer.
+ * Returns NULL on error.
+ */
+nanolexer_t* lexer_create(const char* filepath)
 {
-    if(dest != NULL) {
-        parsetree_program_t *node = dest;
-        while(node->next != NULL)
-            node = node->next;
-        node->next = src;
-        return dest;
+    /* open file */
+    ALLEGRO_FILE* fp = al_fopen(filepath, "r");
+    if(!fp) {
+        crash("Can't open file %s", filepath);
+        return NULL;
     }
-    else
-        return src;
+
+    /* initialize the lexer */
+    nanolexer_t* lexer = mallocx(sizeof *lexer);
+    lexer->filepath = str_dup(filepath);
+    darray_init(lexer->token);
+
+    /* read the tokens */
+    if(!lexer_read(lexer, fp)) {
+        lexer = lexer_destroy(lexer);
+        al_fclose(fp);
+        crash("Can't read the tokens of %s", filepath);
+        return NULL;
+    }
+
+    #if 0
+    /* list tokens */
+    for(int i = 0; i < darray_length(lexer->token); i++)
+        printf("% 3d. (%d,<%s>)\n", lexer->token[i].line, lexer->token[i].type, lexer->token[i].value);
+    #endif
+
+    /* done! */
+    al_fclose(fp);
+    return lexer;
+}
+
+/*
+ * lexer_destroy()
+ * Destroy a lexer
+ */
+nanolexer_t* lexer_destroy(nanolexer_t* lexer)
+{
+    for(int i = darray_length(lexer->token) - 1; i >= 0; i--)
+        token_destroy(lexer->token[i]);
+
+    darray_release(lexer->token);
+    free(lexer->filepath);
+    free(lexer);
+
+    return NULL;
+}
+
+/*
+ * lexer_getc()
+ * Get a character from the file
+ */
+int lexer_getc(nanofilestate_t* state)
+{
+    int* j = &(state->cursor);
+    size_t read_bytes;
+    char c;
+
+    if(state->locked) {
+        state->locked = false;
+        return state->last;
+    }
+
+    if(state->last == '\n')
+        ++state->line;
+
+    while(true) {
+
+        if(0 == (c = state->buffer[(*j)++])) { /* end of buffer or file */
+
+            if(*j == LEXER_BUFFER_SIZE) {
+                /* the first buffer has been processed; now read to the second buffer */
+                /*memset(state->buffer + LEXER_BUFFER_SIZE, 0, LEXER_BUFFER_SIZE);*/
+                read_bytes = al_fread(state->fp, state->buffer + LEXER_BUFFER_SIZE, LEXER_BUFFER_SIZE - 1);
+                state->buffer[LEXER_BUFFER_SIZE + read_bytes] = 0;
+            }
+            else if(*j == 2 * LEXER_BUFFER_SIZE) {
+                /* the second buffer has been processed; now read to the first buffer */
+                /*memset(state->buffer, 0, LEXER_BUFFER_SIZE);*/
+                read_bytes = al_fread(state->fp, state->buffer, LEXER_BUFFER_SIZE - 1);
+                state->buffer[read_bytes] = 0;
+                *j = 0;
+            }
+            else {
+                /* end of file */
+                return (state->last = EOF);
+            }
+
+            /* end of buffer: read next char */
+            /* loop */ ;
+
+        }
+        else {
+
+            /* we're not done reading yet */
+            /*putchar(c);*/
+            return (state->last = (int)c); /* not 0 */
+
+        }
+
+    }
+
+    return EOF;
+}
+
+/*
+ * lexer_ungetc()
+ * Puts the last retrieved character back on the stream
+ */
+int lexer_ungetc(nanofilestate_t* state)
+{
+    nanoassert(!state->locked);
+    state->locked = true;
+    return state->last;
+}
+
+/*
+ * lexer_read()
+ * Reads all tokens from the file
+ */
+bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
+{
+    char symbol_buffer[LEXER_SYMBOL_MAXLENGTH + 1];
+    int symbol_length;
+    int peek, next;
+    nanotoken_t token;
+    nanofilestate_t state = {
+        .fp = fp,
+        .cursor = 0,
+        .buffer = { 0 },
+        .line = 1,
+        .last = EOF,
+        .locked = false
+    };
+
+    /* initialize */
+    /*memset(state.buffer, 0, LEXER_BUFFER_SIZE);*/
+    size_t read_bytes = al_fread(fp, state.buffer, LEXER_BUFFER_SIZE - 1);
+    state.buffer[read_bytes] = state.buffer[LEXER_BUFFER_SIZE - 1] = state.buffer[2 * LEXER_BUFFER_SIZE - 1] = 0;
+
+    #if 0
+    /* debug */
+    while(EOF != (peek = lexer_getc(&state)))
+        putchar(peek);
+    return true;
+    #endif
+
+    for(peek = 0; peek != EOF; ) {
+
+        /* skip spaces */
+        while(EOF != (peek = lexer_getc(&state)) && isspace(peek)) {
+            if(peek == '\n') {
+                token = token_create(TOKEN_LINEBREAK, "\n", 2, state.line);
+                darray_push(lexer->token, token);
+            }
+        }
+
+        /* skip comments */
+        if(peek == '/') {
+            next = lexer_getc(&state);
+
+            /* single-line comment */
+            if(next == '/') {
+
+                /* consume the characters */
+                while(EOF != (peek = lexer_getc(&state))) {
+                    if(peek == '\n')
+                        break;
+                }
+
+                /* put the \n back */
+                lexer_ungetc(&state);
+
+                /* skip spaces */
+                continue;
+
+            }
+
+            /* multi-line comment */
+            else if(next == '*') {
+
+                int start_line = state.line;
+
+                /* consume the characters */
+                while(EOF != (peek = lexer_getc(&state))) {
+                    if(peek == '*') {
+                        peek = lexer_getc(&state);
+                        if('/' == peek || EOF == peek)
+                            break;
+                    }
+
+                }
+
+                /* need to close the comment? */
+                if(peek == EOF) {
+                    crash("Please close the open /* comment */ at %s:%d", lexer->filepath, start_line);
+                    return false;
+                }
+
+                /* put the last \n back */
+                lexer_ungetc(&state);
+
+                /* skip spaces */
+                continue;
+
+            }
+
+            /* not a comment */
+            else {
+                lexer_ungetc(&state);
+            }
+        }
+
+        /* preprocessor (backwards compatibility) */
+        else if(peek == '#') {
+
+            /* line start? */
+            if(darray_length(lexer->token) <= 0 || lexer->token[darray_length(lexer->token)-1].type == TOKEN_LINEBREAK) {
+
+                /* warning */
+                warning("Obsolete: ignored preprocessor directive at %s:%d", lexer->filepath, state.line);
+
+                /* treat it as a single-line comment */
+                while(EOF != (peek = lexer_getc(&state))) {
+                    if(peek == '\n')
+                        break;
+                }
+
+                /* put the \n back */
+                lexer_ungetc(&state);
+
+                /* skip spaces */
+                continue;
+            }
+
+        }
+
+        /* read token */
+        switch(peek) {
+            case EOF:
+                /* end of file */
+                break;
+
+            case '{':
+                /* open block */
+                token = token_create(TOKEN_BLOCKSTART, "{", 2, state.line);
+                darray_push(lexer->token, token);
+                break;
+
+            case '}':
+                /* close block */
+                token = token_create(TOKEN_BLOCKEND, "}", 2, state.line);
+                darray_push(lexer->token, token);
+                break;
+
+            case '"':
+            case '\'': {
+                /* quoted string */
+                char quote = peek;
+
+                /* accumulate characters */
+                symbol_length = 0;
+                for(
+                    peek = lexer_getc(&state); /* skip opening quote */
+                    peek != quote && peek != EOF;
+                    peek = lexer_getc(&state)
+                ) {
+                    if(symbol_length + 4 >= sizeof(symbol_buffer) - 1) { /* 4: max size in bytes of a utf-8 code point */
+                        symbol_buffer[symbol_length++] = '\0';
+                        crash("String is too long at %s:%d", lexer->filepath, state.line);
+                        return false;
+                    }
+                    else if(peek == '\n') {
+                        symbol_buffer[symbol_length++] = '\0';
+                        crash("Unexpected line break at %s:%d", lexer->filepath, state.line);
+                        return false;
+                    }
+                    else if(peek != '\\') {
+                        /* any character, except the closing quote and a backslash */
+                        symbol_buffer[symbol_length++] = peek;
+                    }
+                    else {
+                        /* read escape sequences */
+                        switch((peek = lexer_getc(&state))) {
+                            case 'n':
+                                /* line break */
+                                symbol_buffer[symbol_length++] = '\n';
+                                break;
+
+                            case 't':
+                                /* tab */
+                                symbol_buffer[symbol_length++] = '\t';
+                                break;
+
+                            case '\\':
+                                /* backslash */
+                                symbol_buffer[symbol_length++] = '\\';
+                                break;
+
+                            case 'u':
+                            case 'x': {
+                                /* hex byte or unicode code-point: \xhh or \uhhhh */
+                                uint32_t hex = 0;
+                                bool unicode = (peek != 'x');
+                                int digits, expected_digits = unicode ? 4 : 2;
+
+                                for(digits = expected_digits; digits > 0; digits--) {
+                                    peek = lexer_getc(&state);
+                                    if(!isxdigit(peek)) {
+                                        lexer_ungetc(&state);
+                                        break;
+                                    }
+                                    else if(isdigit(peek))
+                                        hex = (hex << 4) | (peek - '0');
+                                    else
+                                        hex = (hex << 4) | ((tolower(peek) - 'a') + 10);
+                                }
+
+                                if(digits != 0) {
+                                    crash("Use %s at %s:%d", unicode ? "\\uhhhh" : "\\xhh", lexer->filepath, state.line);
+                                    return false;
+                                }
+
+                                #if 1
+                                if(hex == 0) /* ignore the null character */
+                                    break;
+                                #endif
+
+                                if(!unicode) { /* write byte */
+                                    ((unsigned char*)symbol_buffer)[symbol_length++] = hex & 0xFF;
+                                    break;
+                                }
+
+                                /* encode in UTF-8 a unicode code point */
+                                size_t written_bytes = al_utf8_encode(symbol_buffer + symbol_length, hex);
+                                nanoassert(written_bytes <= 4);
+                                symbol_length += written_bytes;
+                                break;
+                            }
+
+                            default: {
+                                /* quote */
+                                if(peek == quote) {
+                                    symbol_buffer[symbol_length++] = quote;
+                                    break;
+                                }
+
+                                /* invalid escape sequence */
+                                crash("Invalid escape sequence '\\%c' at %s:%d", (char)peek, lexer->filepath, state.line);
+                                return false;
+                            }
+                        }
+                    }
+                }
+                symbol_buffer[symbol_length++] = '\0';
+
+                /* validate closing quote */
+                if(peek != quote) {
+                    crash("Invalid string at %s:%d\n\n\"%s\"", lexer->filepath, state.line, symbol_buffer);
+                    return false;
+                }
+
+                /* add token */
+                token = token_create(TOKEN_STRING, symbol_buffer, symbol_length, state.line);
+                darray_push(lexer->token, token);
+                break;
+            }
+
+            default: {
+                /* unquoted string */
+
+                /* printable characters (ASCII), no whitespaces, no quotes, no curly braces */
+                #define isvalidchar(c) ((c) > 0x20 && (c) < 0x7f && (c) != '"' && (c) != '\'' && (c) != '{' && (c) != '}')
+
+                /* only valid chars (as defined above) are accepted. UTF-8 strings must be quoted */
+                if(!isvalidchar(peek)) {
+                    crash("Invalid character 0x%x '%c' at %s:%d", peek, (char)peek, lexer->filepath, state.line);
+                    return false;
+                }
+
+                /* maybe this token will be an identifier? */
+                bool is_identifier = (isalpha(peek) || peek == '_');
+
+                /* accumulate characters */
+                symbol_length = 0;
+                do {
+
+                    if(symbol_length + 1 >= sizeof(symbol_buffer)) {
+                        symbol_buffer[symbol_length++] = '\0';
+                        crash("Token is too long at %s:%d\n\n\"%s\"", lexer->filepath, state.line, symbol_buffer);
+                        return false;
+                    }
+
+                    symbol_buffer[symbol_length++] = (char)peek;
+                    is_identifier = is_identifier && (isalnum(peek) || peek == '_');
+                    peek = lexer_getc(&state);
+
+                } while(isvalidchar(peek) && peek != EOF);
+                symbol_buffer[symbol_length++] = '\0';
+
+                /* ungetc */
+                lexer_ungetc(&state);
+
+                /* add token */
+                nanotokentype_t token_type = is_identifier ? TOKEN_IDENTIFIER : TOKEN_STRING;
+                token = token_create(token_type, symbol_buffer, symbol_length, state.line);
+                darray_push(lexer->token, token);
+                break;
+            }
+        }
+
+    }
+
+    /* add a line break at the end to simplify the syntax analysis */
+    token = token_create(TOKEN_LINEBREAK, "\n", 2, state.line);
+    darray_push(lexer->token, token);
+
+    /* EOF */
+    token = token_create(TOKEN_EOF, "EOF", 4, state.line);
+    darray_push(lexer->token, token);
+
+    /* success */
+    return true;
 }
 
 
-/* ---------------------------------------------
- * utilities
- * ---------------------------------------------- */
+/*
+ * SYNTAX ANALYSIS
+ */
 
-char* dirpath(const char *filepath)
+/*
+ * parser_create()
+ * Create a parser
+ */
+nanoparser_t* parser_create(const nanolexer_t* lexer)
 {
-    char *p, *str = str_dup(filepath);
+    nanoparser_t* parser = mallocx(sizeof *parser);
 
-    if(NULL == (p=strrchr(str, '/'))) {
-        if(NULL == (p=strrchr(str, '\\'))) {
-            *str = 0;
-            return str;
+    parser->lexer = lexer;
+    parser->cursor = 0;
+
+    return parser;
+}
+
+/*
+ * parser_destroy()
+ * Destroy a parser
+ */
+nanoparser_t* parser_destroy(nanoparser_t* parser)
+{
+    free(parser);
+    return NULL;
+}
+
+/*
+ * parser_lookahead()
+ * Get the lookahead symbol
+ */
+const nanotoken_t* parser_lookahead(const nanoparser_t* parser)
+{
+    int cursor = parser->cursor;
+
+    /* check boundaries */
+    nanoassert(cursor >= 0);
+    if(cursor >= darray_length(parser->lexer->token)) /* eof */
+        cursor = darray_length(parser->lexer->token) - 1;
+
+    /* return token */
+    return parser->lexer->token + cursor;
+}
+
+/*
+ * parser_check()
+ * Check if the lookahead has the given type
+ */
+bool parser_check(const nanoparser_t* parser, nanotokentype_t token_type)
+{
+    const nanotoken_t* lookahead = parser_lookahead(parser);
+    return lookahead->type == token_type;
+}
+
+/*
+ * parser_expect()
+ * Require that the lookahead has the given type
+ */
+void parser_expect(const nanoparser_t* parser, nanotokentype_t token_type)
+{
+    const nanotoken_t* lookahead = parser_lookahead(parser);
+
+    if(lookahead->type != token_type)
+        crash("Syntax error: expected %s at %s:%d", TOKEN_NAME[token_type], parser->lexer->filepath, lookahead->line);
+}
+
+/*
+ * parser_match()
+ * Require that the lookahead has the given type and advance the cursor
+ */
+void parser_match(nanoparser_t* parser, nanotokentype_t token_type)
+{
+    parser_expect(parser, token_type);
+    /*printf("match %s <%s>\n",TOKEN_NAME[token_type], parser_lookahead(parser)->value);*/
+    ++parser->cursor;
+}
+
+/*
+ * parser_unmatch()
+ * Put the last symbol back into the stream, provided that its type matches the given type
+ */
+void parser_unmatch(nanoparser_t* parser, nanotokentype_t token_type)
+{
+    --parser->cursor;
+    nanoassert(parser->cursor >= 0);
+    parser_expect(parser, token_type);
+}
+
+/*
+ * parser_parse_root()
+ * Create the root of the parse tree
+ */
+parsetree_root_t* parser_parse_root(nanoparser_t* parser)
+{
+    /* create root program */
+    parsetree_root_t* root = mallocx(sizeof *root);
+    root->filepath = str_dup(parser->lexer->filepath);
+
+
+
+    /* read program */
+    parsetree_program_t* program = (parsetree_program_t*)root;
+    program->parent = NULL;
+
+    /* skip empty lines */
+    while(parser_check(parser, TOKEN_LINEBREAK))
+        parser_match(parser, TOKEN_LINEBREAK);
+
+    /* read statements */
+    program->statement = parser_parse_statement(parser, program);
+
+
+
+    /* validate */
+    parser_match(parser, TOKEN_EOF);
+
+    /* reset cursor? */
+    /*parser->cursor = 0;*/ /* we won't read the same file twice */
+
+    /* done! */
+    return root;
+}
+
+/*
+ * parser_parse_program()
+ * Parse a program
+ */
+parsetree_program_t* parser_parse_program(nanoparser_t* parser, const parsetree_program_t* parent)
+{
+    /* create program */
+    parsetree_program_t* program = mallocx(sizeof *program);
+    program->parent = parent;
+
+    /* skip empty lines */
+    while(parser_check(parser, TOKEN_LINEBREAK))
+        parser_match(parser, TOKEN_LINEBREAK);
+
+    /* read statements */
+    program->statement = parser_parse_statement(parser, program);
+
+    /* done! */
+    return program;
+}
+
+/*
+ * parser_parse_statement()
+ * Parse a statement
+ */
+parsetree_statement_t* parser_parse_statement(nanoparser_t* parser, const parsetree_program_t* program)
+{
+    /* no more statements? */
+    if(parser_check(parser, TOKEN_EOF) || parser_check(parser, TOKEN_BLOCKEND))
+        return NULL;
+
+    /* expect an identifier */
+    parser_expect(parser, TOKEN_IDENTIFIER);
+
+    /* read statement(s) */
+    parsetree_statement_t* head = mallocx(sizeof *head);
+    parsetree_statement_t* statement = head;
+    do {
+        const nanotoken_t* lookahead = parser_lookahead(parser);
+
+        /* read the identifier */
+        statement->program = program;
+        statement->identifier = memcpy(mallocx(lookahead->value_size), lookahead->value, lookahead->value_size);
+        statement->line = lookahead->line;
+        statement->next = NULL;
+        parser_match(parser, TOKEN_IDENTIFIER);
+
+        /* read the parameters */
+        statement->parameter = parser_parse_parameter(parser, statement);
+
+        /* skip empty lines */
+        do {
+            parser_match(parser, TOKEN_LINEBREAK);
+        } while(parser_check(parser, TOKEN_LINEBREAK));
+
+        /* prepare to read the next statement */
+        if(parser_check(parser, TOKEN_IDENTIFIER))
+            statement->next = mallocx(sizeof *(statement->next));
+
+        /* next node */
+        statement = statement->next;
+
+    } while(statement != NULL);
+
+    /* expect no more statements */
+    if(!parser_check(parser, TOKEN_BLOCKEND) && !parser_check(parser, TOKEN_EOF)) {
+        const nanotoken_t* lookahead = parser_lookahead(parser);
+        crash("Syntax error: unexpected %s at %s:%d", TOKEN_NAME[lookahead->type], parser->lexer->filepath, lookahead->line);
+    }
+
+    /* done! */
+    return head;
+}
+
+/*
+ * parser_parse_parameter()
+ * Parse the parameters of a statement
+ */
+parsetree_parameter_t* parser_parse_parameter(nanoparser_t* parser, const parsetree_statement_t* statement)
+{
+    const nanotoken_t* lookahead = parser_lookahead(parser);
+
+    if(parser_check(parser, TOKEN_STRING)) {
+        /* read string */
+        parsetree_parameter_t* parameter = mallocx(sizeof *parameter);
+
+        parameter->type = PARAMETER_STRING;
+        parameter->statement = statement;
+        parameter->string = memcpy(mallocx(lookahead->value_size), lookahead->value, lookahead->value_size);
+        parser_match(parser, TOKEN_STRING);
+        parameter->next = parser_parse_parameter(parser, statement);
+
+        return parameter;
+    }
+    else if(parser_check(parser, TOKEN_IDENTIFIER)) {
+        /* read identifier */
+        parsetree_parameter_t* parameter = mallocx(sizeof *parameter);
+
+        parameter->type = PARAMETER_STRING;
+        parameter->statement = statement;
+        parameter->string = memcpy(mallocx(lookahead->value_size), lookahead->value, lookahead->value_size);
+        parser_match(parser, TOKEN_IDENTIFIER);
+        parameter->next = parser_parse_parameter(parser, statement);
+
+        return parameter;
+    }
+    else {
+        bool newline = parser_check(parser, TOKEN_LINEBREAK);
+
+        /* skip newlines */
+        while(parser_check(parser, TOKEN_LINEBREAK))
+            parser_match(parser, TOKEN_LINEBREAK);
+
+        /* read block */
+        if(parser_check(parser, TOKEN_BLOCKSTART)) {
+            parsetree_parameter_t* parameter = mallocx(sizeof *parameter);
+
+            parameter->type = PARAMETER_BLOCK;
+            parameter->statement = statement;
+            parser_match(parser, TOKEN_BLOCKSTART);
+            parser_match(parser, TOKEN_LINEBREAK);
+            parameter->program = parser_parse_program(parser, statement->program);
+            parser_match(parser, TOKEN_BLOCKEND);
+            parameter->next = NULL;
+
+            return parameter;
+        }
+
+        /* end of statement */
+        else {
+
+            /* put a \n back */
+            if(newline)
+                parser_unmatch(parser, TOKEN_LINEBREAK);
+
+            /* empty list */
+            return NULL;
+
         }
     }
-
-    *(++p) = 0;
-    return str;
 }
 
-void error(const char *fmt, ...)
+
+
+/*
+ * ERROR FUNCTIONS
+ */
+
+/*
+ * nanoparser_set_error_function()
+ * Set an error function
+ */
+void nanoparser_set_error_function(void (*fun)(const char*))
 {
-    char buf[1024] = "nanoparser error! ";
-    int len = strlen(buf);
+    crash_fun = fun != NULL ? fun : crash_fun_default;
+}
+
+/*
+ * nanoparser_set_warning_function()
+ * Set a warning function
+ */
+void nanoparser_set_warning_function(void (*fun)(const char*))
+{
+    warning_fun = fun != NULL ? fun : warning_fun_default;
+}
+
+/*
+ * crash()
+ * Crash the program with a formatted error message
+ */
+void crash(const char* fmt, ...)
+{
+    char buffer[ERROR_MAXLENGTH + 1] = ERROR_PREFIX;
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(buf+len, sizeof(buf)-len, fmt, args);
+    vsnprintf(buffer + ERROR_PREFIX_LENGTH, sizeof(buffer) - ERROR_PREFIX_LENGTH, fmt, args);
     va_end(args);
 
-    if(error_fun)
-        error_fun(buf);
-    else
-        fprintf(stderr, "%s\n", buf);
-
+    crash_fun(buffer);
     exit(1);
 }
 
-void warning(const char *fmt, ...)
+/*
+ * crash_fun_default()
+ * Crash the program with an error message
+ */
+void crash_fun_default(const char* message)
 {
-    char buf[1024] = "nanoparser warning! ";
-    int len = strlen(buf);
+    fprintf(stderr, "%s\n", message);
+    exit(1);
+}
+
+/*
+ * warning()
+ * Report a formatted message
+ */
+void warning(const char* fmt, ...)
+{
+    char buffer[ERROR_MAXLENGTH + 1] = ERROR_PREFIX;
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(buf+len, sizeof(buf)-len, fmt, args);
+    vsnprintf(buffer + ERROR_PREFIX_LENGTH, sizeof(buffer) - ERROR_PREFIX_LENGTH, fmt, args);
     va_end(args);
 
-    if(warning_fun)
-        warning_fun(buf);
-    else
-        fprintf(stderr, "%s\n", buf);
+    warning_fun(buffer);
 }
 
-char* str_dup(const char *s)
+/*
+ * warning_fun_default()
+ * Report a message
+ */
+void warning_fun_default(const char* message)
 {
-    char *p = malloc_x( (1 + strlen(s)) * sizeof(char) );
-    return strcpy(p, s);
+    fprintf(stderr, "%s\n", message);
 }
-
-char* r_trim(char *s)
-{
-    char *p;
-
-    if(NULL != (p=strrchr(s, ' ')))
-        *p = 0;
-
-    if(NULL != (p=strrchr(s, '\t')))
-        *p = 0;
-
-    if(NULL != (p=strrchr(s, '\r')))
-        *p = 0;
-
-    if(NULL != (p=strrchr(s, '\n')))
-        *p = 0;
-
-    return s;
-}
-
-void* malloc_x(size_t bytes)
-{
-    void *m = malloc(bytes);
-
-    if(m == NULL) {
-        fprintf(stderr, __FILE__ ": Out of memory");
-        error(__FILE__ ": Out of memory");
-        exit(1);
-    }
-
-    return m;
-}
-
-void* realloc_x(void *ptr, size_t bytes)
-{
-    void *m = realloc(ptr, bytes);
-
-    if(m == NULL) {
-        fprintf(stderr, __FILE__ ": Out of memory (realloc_x)");
-        error(__FILE__ ": Out of memory (realloc_x)");
-        exit(1);
-    }
-
-    return m;
-}
-
-FILE* fopen_utf8(const char* filepath, const char* mode)
-{
-#if defined(_WIN32)
-    FILE* fp;
-    int wpath_size = MultiByteToWideChar(CP_UTF8, 0, filepath, -1, NULL, 0);
-    int wmode_size = MultiByteToWideChar(CP_UTF8, 0, mode, -1, NULL, 0);
-
-    if(wpath_size > 0 && wmode_size > 0) {
-        wchar_t* wpath = malloc_x(wpath_size * sizeof(*wpath));
-        wchar_t* wmode = malloc_x(wmode_size * sizeof(*wmode));
-
-        MultiByteToWideChar(CP_UTF8, 0, filepath, -1, wpath, wpath_size);
-        MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, wmode_size);
-        fp = _wfopen(wpath, wmode);
-
-        free(wmode);
-        free(wpath);
-    }
-    else {
-        warning("%s(\"%s\", \"%s\") ERROR %d", __func__, filepath, mode, GetLastError());
-        fp = fopen(filepath, mode);
-    }
-
-    return fp;
-#else
-    return fopen(filepath, mode);
-#endif
-}
-
-#ifdef __cplusplus
-}
-#endif
-
