@@ -508,9 +508,9 @@ const parsetree_program_t* nanoparser_get_program(const parsetree_parameter_t* p
 nanolexer_t* lexer_create(const char* filepath)
 {
     /* open file */
-    ALLEGRO_FILE* fp = al_fopen(filepath, "r");
+    ALLEGRO_FILE* fp = al_fopen(filepath, "rb"); /* we're requesting binary mode because physfs reads files in binary mode only */
     if(!fp) {
-        crash("Can't open file %s", filepath);
+        crash("Can't open file %s for reading", filepath);
         return NULL;
     }
 
@@ -599,6 +599,10 @@ int lexer_getc(nanofilestate_t* state)
 
         }
         else {
+
+            /* ignore CR; physfs reads files in binary mode only */
+            if(c == '\r')
+                continue;
 
             /* we're not done reading yet */
             /*putchar(c);*/

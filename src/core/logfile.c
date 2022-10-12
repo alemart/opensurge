@@ -39,7 +39,7 @@ void logfile_init()
 {
     const char* fullpath = assetfs_create_cache_file(LOGFILE_PATH);
 
-    if(NULL == (logfile = al_fopen(fullpath, "w"))) {
+    if(NULL == (logfile = al_fopen(fullpath, "wb"))) {
         fprintf(stderr, "Can't open logfile at %s\n", fullpath);
         return;
     }
@@ -63,7 +63,15 @@ void logfile_message(const char* fmt, ...)
     al_vfprintf(logfile, fmt, args);
     va_end(args);
 
+#ifdef _WIN32
+    /* "PhysFS does not support the text-mode reading and writing,
+       which means that Windows-style newlines will not be preserved."
+       https://liballeg.org/a5docs/trunk/physfs.html */
+    al_fputs(logfile, "\r\n");
+#else
     al_fputs(logfile, "\n");
+#endif
+
     al_fflush(logfile);
 }
 
