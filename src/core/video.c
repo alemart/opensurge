@@ -39,6 +39,11 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_memfile.h>
 
+#ifdef ALLEGRO_UNIX
+#define ALLEGRO_UNSTABLE
+#include <allegro5/allegro_x.h>
+#endif
+
 #define PRINT(x, y, flags, fmt, ...) do { \
     al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
     al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
@@ -146,6 +151,9 @@ void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen
     /* Create a display */
     if(display == NULL) {
         v2d_t window_size = video_get_window_size();
+
+        /* set initial icon on X11 */
+        set_display_icon(NULL);
 
         /* setup display flags */
         al_set_new_display_flags(ALLEGRO_OPENGL);
@@ -493,9 +501,17 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 {
     extern const unsigned char ICON_PNG[];
     extern const size_t ICON_SIZE;
-    ALLEGRO_FILE* f = al_open_memfile((void*)ICON_PNG, ICON_SIZE, "r");
+    ALLEGRO_FILE* f = al_open_memfile((void*)ICON_PNG, ICON_SIZE, "rb");
     ALLEGRO_BITMAP* icon = al_load_bitmap_f(f, ".png");
-    al_set_display_icon(display, icon);
+
+    if(display != NULL)
+        al_set_display_icon(display, icon);
+
+#if defined(ALLEGRO_UNIX) && !defined(ALLEGRO_RASPBERRYPI)
+    if(display == NULL)
+        al_x_set_initial_icon(icon);
+#endif
+
     al_destroy_bitmap(icon);
     al_fclose(f);
 }
