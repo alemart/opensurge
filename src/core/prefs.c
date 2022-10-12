@@ -31,7 +31,6 @@
 #include "logfile.h"
 #include "global.h"
 #include "assetfs.h"
-#include "whereami/whereami.h"
 
 /* OS-specific includes */
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
