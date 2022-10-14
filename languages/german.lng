@@ -110,7 +110,7 @@ CREDITS_LEMON               "Zeichner"
 CREDITS_TRANSLATOR          "Übersetzer"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Übersetzer</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Mitwirkende der einzelnen Mediendaten</color>"
-CREDITS_RES_TEXT            "Die unten aufgelisteten Dateien sind unter freien Lizenzen gestellt. Ihre jeweiligen Autoren sind hier aufgeführt:
+CREDITS_RES_TEXT            "Die unten aufgelisteten Dateien sind unter freien Lizenzen gestellt. Ihre jeweiligen Autoren sind hier aufgeführt:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Bilder</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Musik</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Toneffekte</color>"
