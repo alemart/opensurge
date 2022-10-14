@@ -30,7 +30,7 @@
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/v2d.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
@@ -326,9 +326,9 @@ void load_stage_list()
 
     /* loading data */
     stage_count = 0;
-    assetfs_foreach_file("levels", ".lev", dirfill, "L", enable_debug);
+    asset_foreach_file("levels", ".lev", dirfill, "L", enable_debug);
     if(enable_debug) {
-        assetfs_foreach_file("quests", ".qst", dirfill, "Q", true);
+        asset_foreach_file("quests", ".qst", dirfill, "Q", true);
         qsort(stage_data, stage_count, sizeof(stagedata_t*), debug_sort_cmp);
     }
     else

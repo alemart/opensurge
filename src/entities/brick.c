@@ -31,7 +31,7 @@
 #include "../core/image.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/util.h"
 #include "../core/timer.h"
 #include "../core/audio.h"
@@ -142,7 +142,7 @@ void brickset_load(const char* filename)
     }
 
     logfile_message("Loading brickset \"%s\"...", filename);
-    fullpath = assetfs_fullpath(filename);
+    fullpath = asset_path(filename);
 
     brickdata_count = 0;
     for(i=0; i<BRKDATA_MAX; i++) 

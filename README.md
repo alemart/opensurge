@@ -83,46 +83,42 @@ Linux users should extract the MOD into their home folder, preferably into `~/Do
 
 ### Paths
 
-Content is distributed in the following locations:
+Content is distributed in the following locations: (since version 0.6.1)
 
 - `bin`: executable file
-- `share`: game data (images, audio, levels, scripts, etc.)
-- `config`: user-specific configuration files
-- `cache`: user-specific logs and screenshots
+- `share`: game assets (images, audio, levels, scripts, etc.)
+- `user`: user-modifiable data (preferences, logs, screenshots, additional assets such as user-made levels)
 
 The default paths of these locations vary according to the platform:
 
 - Windows (.zip package):
     * `bin`: `./opensurge.exe`
     * `share`: `.`
-    * `config`: `.`
-    * `cache`: `.`
+    * `user`: `.` or `%OPENSURGE_USER_PATH%`
 
 - Linux:
     * `bin`: `/usr/games/opensurge`
-    * `share`: `/usr/share/games/opensurge/` and `~/.local/share/opensurge2d/`
-    * `config`: `~/.config/opensurge2d/`
-    * `cache`: `~/.cache/opensurge2d/`
-
-    The engine reads the environment variables `$XDG_DATA_HOME`, `$XDG_CONFIG_HOME` and `$XDG_CACHE_HOME` to determine the paths.
+    * `share`: `/usr/share/games/opensurge/`
+    * `user`: `~/.local/share/opensurge/` or `$XDG_DATA_HOME/opensurge/` or `$OPENSURGE_USER_PATH`
 
 - Linux ([Flatpak](https://flathub.org/apps/details/org.opensurge2d.OpenSurge)):
     * `bin`: `flatpak run org.opensurge2d.OpenSurge`
-    * `share`: `/var/lib/flatpak/app/org.opensurge2d.OpenSurge/current/active/files/share/opensurge/` and `~/.local/share/flatpak/app/org.opensurge2d.OpenSurge/current/active/files/share/opensurge/` and `~/.var/app/org.opensurge2d.OpenSurge/data/opensurge2d/`
-    * `config`: `~/.var/app/org.opensurge2d.OpenSurge/config/opensurge2d/`
-    * `cache`: `~/.var/app/org.opensurge2d.OpenSurge/cache/opensurge2d/`
+    * `share`: `/var/lib/flatpak/app/org.opensurge2d.OpenSurge/current/active/files/share/opensurge/`
+    * `user`: `~/.var/app/org.opensurge2d.OpenSurge/data/opensurge/` or `$OPENSURGE_USER_PATH`
+
+    If you use `$OPENSURGE_USER_PATH`, make sure it points to a subdirectory of `~/Downloads` (`$XDG_DOWNLOAD_DIR`).
 
 - Linux ([Snap](https://snapcraft.io/opensurge)):
     * `bin`: `snap run opensurge`
-    * `share`: `/snap/opensurge/current/share/games/opensurge/` and `~/snap/opensurge/current/.local/share/opensurge2d/`
-    * `config`: `~/snap/opensurge/current/.config/opensurge2d/`
-    * `cache`: `~/snap/opensurge/common/.cache/opensurge2d/`
+    * `share`: `/snap/opensurge/current/share/games/opensurge/`
+    * `user`: `~/snap/opensurge/current/.local/share/opensurge/` or `$OPENSURGE_USER_PATH`
+
+    If you use `$OPENSURGE_USER_PATH`, make sure it points to a subdirectory of your home folder.
 
 - macOS:
     * `bin`: `Contents/MacOS`
     * `share`: `Contents/Resources`
-    * `config`: `~/Library/Application Support/opensurge2d/`
-    * `cache`: `~/Library/Caches/opensurge2d/`
+    * `user`: `~/Library/Application Support/opensurge/` or `$OPENSURGE_USER_PATH`
 
 If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases), extract them to your filesystem and use the `--game-folder` command-line option as explained in [Running MODs](#running-mods).
 
@@ -130,8 +126,9 @@ If you intend to hack the game, it's easier to have all files in the same place 
 
 Dependencies:
 
-* [Allegro](http://liballeg.org) version 5.2.7 or higher
-* [SurgeScript](http://github.com/alemart/surgescript) version 0.5.6 or higher
+* [Allegro](http://liballeg.org) version 5.2.7 or later
+* [SurgeScript](http://github.com/alemart/surgescript) version 0.5.7 or later
+* [PhysicsFS](https://icculus.org/physfs) version 3.0.2 or later
 
 Compile as usual:
 

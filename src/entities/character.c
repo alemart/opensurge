@@ -21,7 +21,7 @@
 #include "character.h"
 #include "../core/hashtable.h"
 #include "../core/nanoparser/nanoparser.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/audio.h"
@@ -55,7 +55,7 @@ void charactersystem_init()
     characters = hashtable_character_t_create();
 
     /* read the character scripts */
-    assetfs_foreach_file("characters", ".chr", dirfill, &character_count, true);
+    asset_foreach_file("characters", ".chr", dirfill, &character_count, true);
     if(character_count == 0)
         fatal_error("FATAL ERROR: no characters have been found. Please reinstall the game.");
 
@@ -145,7 +145,7 @@ void character_delete(character_t* c)
 
 int dirfill(const char *vpath, void *param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
+    const char* fullpath = asset_path(vpath);
     parsetree_program_t* p = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(p, param, traverse);
     nanoparser_deconstruct_tree(p);

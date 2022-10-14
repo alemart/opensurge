@@ -22,7 +22,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "levparser.h"
-#include "../../core/assetfs.h"
+#include "../../core/asset.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
 
@@ -38,7 +38,7 @@ static bool parse_line(const char* filepath, int fileline, char* line, void* dat
  */
 bool levparser_parse(const char* path_to_lev_file, void* data, levparser_callback_t callback)
 {
-    const char* fullpath = assetfs_fullpath(path_to_lev_file);
+    const char* fullpath = asset_path(path_to_lev_file);
     char line[LINE_MAXLEN];
     int ln = 0;
 

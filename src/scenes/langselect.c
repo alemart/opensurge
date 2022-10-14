@@ -25,7 +25,7 @@
 #include "options.h"
 #include "../core/util.h"
 #include "../core/scene.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
@@ -292,7 +292,7 @@ void load_lang_list()
 
     /* loading language data */
     lngcount = 0;
-    assetfs_foreach_file("languages", ".lng", dircount, (void*)&lngcount, false);
+    asset_foreach_file("languages", ".lng", dircount, (void*)&lngcount, false);
 
     /* fatal error */
     if(lngcount == 0)
@@ -302,7 +302,7 @@ void load_lang_list()
 
     /* grabbing language data */
     lngdata = mallocx(lngcount * sizeof(lngdata_t));
-    assetfs_foreach_file("languages", ".lng", dirfill, (void*)&c, false);
+    asset_foreach_file("languages", ".lng", dirfill, (void*)&c, false);
     qsort(lngdata, lngcount, sizeof(lngdata_t), sort_cmp);
 
     /* other stuff */

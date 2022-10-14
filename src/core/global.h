@@ -37,7 +37,7 @@
 /* Minimum version of SurgeScript */
 #define SURGESCRIPT_MIN_SUP     0
 #define SURGESCRIPT_MIN_SUB     5
-#define SURGESCRIPT_MIN_WIP     6
+#define SURGESCRIPT_MIN_WIP     7
 #define SURGESCRIPT_MIN_VERSION STRINGIFY(SURGESCRIPT_MIN_SUP) "." STRINGIFY(SURGESCRIPT_MIN_SUB) "." STRINGIFY(SURGESCRIPT_MIN_WIP)
 
 /* Minimum version of Allegro */
@@ -45,11 +45,7 @@
 #define ALLEGRO_MIN_SUB         2
 #define ALLEGRO_MIN_WIP         7
 #define ALLEGRO_MIN_VERSION_INT ((ALLEGRO_MIN_SUP << 24) | (ALLEGRO_MIN_SUB << 16) | (ALLEGRO_MIN_WIP << 8))
-
-/* The default directory of the game assets (*nix only) */
-#ifndef GAME_DATADIR
-#define GAME_DATADIR            "/usr/share/games/opensurge"
-#endif
+#define ALLEGRO_MIN_VERSION_STR STRINGIFY(ALLEGRO_MIN_SUP) "." STRINGIFY(ALLEGRO_MIN_SUB) "." STRINGIFY(ALLEGRO_MIN_WIP)
 
 /* Version code & string */
 #define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */

@@ -27,7 +27,7 @@
 #include "stringutil.h"
 #include "logfile.h"
 #include "quest.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "nanoparser/nanoparser.h"
 
 
@@ -48,7 +48,7 @@ quest_t *quest_load(const char *filepath)
     const char* fullpath;
 
     logfile_message("Loading quest \"%s\"...", filepath);
-    fullpath = assetfs_fullpath(filepath);
+    fullpath = asset_path(filepath);
 
     /* default values */
     q->file = str_dup(filepath);

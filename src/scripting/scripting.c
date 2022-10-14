@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include "scripting.h"
 #include "../core/logfile.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/stringutil.h"
 #include "../core/util.h"
 
@@ -43,6 +43,7 @@ static void compile_scripts(surgescript_vm_t* vm);
 static int compile_script(const char* filepath, void* param);
 static bool found_test_script(const surgescript_vm_t* vm);
 static void check_if_compatible();
+static char* read_file(const char* filepath);
 
 /* SurgeEngine */
 static void setup_surgeengine(surgescript_vm_t* vm);
@@ -191,14 +192,11 @@ void scripting_pause_vm()
  */
 void scripting_resume_vm()
 {
-#ifdef SURGESCRIPT_VERSION_IS_AT_LEAST
-#if SURGESCRIPT_VERSION_IS_AT_LEAST(0,5,5,0)
     if(--pause_counter == 0) {
         logfile_message("Resuming the SurgeScript VM");
         surgescript_vm_resume(vm);
     }
-#endif
-#endif
+
     pause_counter = max(pause_counter, 0); /* safeguard */
 }
 
@@ -428,7 +426,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
 void compile_scripts(surgescript_vm_t* vm)
 {
     /* compile scripts */
-    assetfs_foreach_file("scripts", ".ss", compile_script, surgescript_vm_parser(vm), true);
+    asset_foreach_file("scripts", ".ss", compile_script, NULL, true);
 
     /* if no test script is present... */
     if(found_test_script(vm)) {
@@ -441,25 +439,21 @@ void compile_scripts(surgescript_vm_t* vm)
     }
 }
 
-/* compiles a script */
+/* reads and compiles a script */
 int compile_script(const char* filepath, void* param)
 {
-    surgescript_parser_t* parser = (surgescript_parser_t*)param;
-    surgescript_parser_flags_t flags = SSPARSER_DEFAULTS;
-    const char* fullpath = assetfs_fullpath(filepath);
-    bool success;
+    const char* fullpath = asset_path(filepath);
 
-    /* select flags for maximum compatibility */
-    if(!assetfs_is_primary_file(filepath))
-        flags |= SSPARSER_SKIP_DUPLICATES;
+    /* read script */
+    char* script = read_file(fullpath);
+    if(script == NULL)
+        return -1;
 
-    /* Compile script file */
-    /*logfile_message("Compiling '%s'...", filepath);*/
-    surgescript_parser_set_flags(parser, flags);
-    success = surgescript_vm_compile(vm, fullpath);
-    surgescript_parser_set_flags(parser, SSPARSER_DEFAULTS);
+    /* compile script */
+    bool success = surgescript_vm_compile_virtual_file(vm, script, fullpath);
 
-    /* done */
+    /* done! */
+    free(script);
     return success ? 0 : -1;
 }
 
@@ -468,4 +462,32 @@ bool found_test_script(const surgescript_vm_t* vm)
 {
     surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
     return surgescript_programpool_exists(pool, "Application", "state:main");
+}
+
+/* reads a file using Allegro's File I/O interface */
+char* read_file(const char* filepath)
+{
+    const size_t BUFSIZE = 4096;
+    size_t read_chars = 0, data_size = 0;
+    char* data = NULL;
+
+    /* open the file in binary mode, so that offsets don't get messed up */
+    ALLEGRO_FILE* fp = al_fopen(filepath, "rb");
+    if(!fp) {
+        fatal_error("Can't read file \"%s\". errno = %d", filepath, al_get_errno());
+        return NULL;
+    }
+
+    /* read file to data[] */
+    logfile_message("Reading script %s...", filepath);
+    do {
+        data_size += BUFSIZE;
+        data = reallocx(data, data_size + 1);
+        read_chars += al_fread(fp, data + read_chars, BUFSIZE);
+        data[read_chars] = '\0';
+    } while(read_chars == data_size);
+    al_fclose(fp);
+
+    /* success! */
+    return data;
 }

@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include "audio.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "stringutil.h"
 #include "resourcemanager.h"
 #include "logfile.h"
@@ -66,7 +66,7 @@ music_t *music_load(const char *path)
         return NULL;
 
     if(NULL == (m = resourcemanager_find_music(path))) {
-        const char* fullpath = assetfs_fullpath(path);
+        const char* fullpath = asset_path(path);
         logfile_message("Loading music \"%s\"...", fullpath);
 
         /* build the music object */
@@ -282,7 +282,7 @@ sound_t *sound_load(const char *path)
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
         ALLEGRO_SAMPLE_INSTANCE* spl;
-        const char* fullpath = assetfs_fullpath(path);
+        const char* fullpath = asset_path(path);
         logfile_message("Loading sound \"%s\"...", fullpath);
 
         /* build the sound object */

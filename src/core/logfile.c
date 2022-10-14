@@ -19,14 +19,16 @@
  */
 
 #include <allegro5/allegro.h>
+#include <surgescript.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "logfile.h"
 #include "global.h"
-#include "assetfs.h"
+#include "asset.h"
 
 
 /* private stuff ;) */
+static const char* a5_version_string();
 static const char* LOGFILE_PATH = "logfile.txt"; /* default log file */
 static ALLEGRO_FILE* logfile = NULL;
 
@@ -37,14 +39,20 @@ static ALLEGRO_FILE* logfile = NULL;
  */
 void logfile_init()
 {
-    const char* fullpath = assetfs_create_cache_file(LOGFILE_PATH);
+    const char* fullpath = asset_path(LOGFILE_PATH);
+    char tmp_path[4096];
 
-    if(NULL == (logfile = al_fopen(fullpath, "wb"))) {
+    if(NULL == (logfile = al_fopen(fullpath, "wb"))) { /* physfs uses binary mode */
         fprintf(stderr, "Can't open logfile at %s\n", fullpath);
         return;
     }
 
+    /* initial messages */
     logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
+    logfile_message("Using Allegro version %s", a5_version_string());
+    logfile_message("Using SurgeScript version %s", surgescript_util_version());
+    logfile_message("Asset directory: %s", asset_shared_datadir(tmp_path, sizeof(tmp_path)));
+    logfile_message("User directory: %s", asset_user_datadir(tmp_path, sizeof(tmp_path)));
 }
 
 
@@ -89,4 +97,32 @@ void logfile_release()
         al_fclose(logfile);
 
     logfile = NULL;
+}
+
+
+
+
+
+
+/* private */
+
+
+
+/*
+ * a5_version_string()
+ * Returns the compiled Allegro version as a static char[]
+ */
+const char* a5_version_string()
+{
+    static char str[17];
+    uint32_t version = al_get_allegro_version();
+
+    snprintf(str, sizeof(str), "%u.%u.%u-%u",
+        (version & 0xFF000000) >> 24,
+        (version & 0xFF0000) >> 16,
+        (version & 0xFF00) >> 8,
+        (version & 0xFF)
+    );
+
+    return str;
 }

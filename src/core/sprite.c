@@ -24,7 +24,7 @@
 #include "stringutil.h"
 #include "image.h"
 #include "logfile.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "hashtable.h"
 #include "resourcemanager.h"
 #include "nanoparser/nanoparser.h"
@@ -85,7 +85,7 @@ void sprite_init()
     sprites = hashtable_spriteinfo_t_create();
 
     /* scan the sprites/ folder */
-    assetfs_foreach_file("sprites", ".spr", scanfile, NULL, true);
+    asset_foreach_file("sprites", ".spr", scanfile, NULL, true);
 
     logfile_message("All sprites have been loaded!");
 }
@@ -267,7 +267,7 @@ void spriteinfo_destroy(spriteinfo_t *info)
  */
 int scanfile(const char *vpath, void *param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
+    const char* fullpath = asset_path(vpath);
 
     /* read the .spr file */
     parsetree_program_t* p = nanoparser_construct_tree(fullpath);

@@ -25,7 +25,7 @@
 #include "util.h"
 #include "logfile.h"
 #include "resourcemanager.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "hashtable.h"
 #include "nanoparser/nanoparser.h"
 
@@ -237,10 +237,10 @@ void inputmap_init()
     mappings = hashtable_inputmapnode_t_create();
 
     /* read the inputmap scripts */
-    assetfs_foreach_file("inputs/", ".in", read_script, NULL, true);
+    asset_foreach_file("inputs/", ".in", read_script, NULL, true);
 
     /* read the legacy script AFTER you read all the regular scripts */
-    if(assetfs_exists("config/input.def"))
+    if(asset_exists("config/input.def"))
         read_script("config/input.def", NULL);
 }
 
@@ -282,7 +282,7 @@ const inputmap_t* inputmap_get(const char* name)
 int read_script(const char* vpath, void* param)
 {
     /* load the script */
-    const char* fullpath = assetfs_fullpath(vpath);
+    const char* fullpath = asset_path(vpath);
     parsetree_program_t* prog = nanoparser_construct_tree(fullpath);
 
     /* traverse the script */

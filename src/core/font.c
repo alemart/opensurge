@@ -33,7 +33,7 @@
 #include "image.h"
 #include "color.h"
 #include "stringutil.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "lang.h"
 #include "logfile.h"
 #include "hashtable.h"
@@ -216,7 +216,7 @@ void font_init(bool allow_font_smoothing)
 
     /* reading the font scripts */
     logfile_message("Loading fonts...");
-    assetfs_foreach_file("fonts", ".fnt", dirfill, NULL, true);
+    asset_foreach_file("fonts", ".fnt", dirfill, NULL, true);
     logfile_message("All fonts have been loaded.");
 
     /* initializing the font callback table */
@@ -1340,7 +1340,7 @@ int dirfill(const char* vpath, void* param)
 {
     (void)param;
 
-    const char* fullpath = assetfs_fullpath(vpath);
+    const char* fullpath = asset_path(vpath);
     parsetree_program_t* p = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program(p, traverse);
     nanoparser_deconstruct_tree(p);
@@ -1629,7 +1629,7 @@ bool has_loaded_ttf(const fontdrv_ttf_t* f)
 
 void load_ttf(fontdrv_ttf_t* f)
 {
-    const char* fullpath = assetfs_fullpath(f->source_file);
+    const char* fullpath = asset_path(f->source_file);
 
     logfile_message("Loading TrueType font \"%s\"...", fullpath);
 

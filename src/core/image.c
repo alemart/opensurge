@@ -24,7 +24,7 @@
 #include "video.h"
 #include "stringutil.h"
 #include "logfile.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "util.h"
 #include "resourcemanager.h"
 
@@ -56,7 +56,7 @@ image_t* image_load(const char* path)
     image_t* img;
 
     if(NULL == (img = resourcemanager_find_image(path))) {
-        const char* fullpath = assetfs_fullpath(path);
+        const char* fullpath = asset_path(path);
         logfile_message("Loading image \"%s\"...", fullpath);
 
         /* build the image object */
@@ -102,7 +102,7 @@ image_t* image_load(const char* path)
  */
 void image_save(const image_t* img, const char *path)
 {
-    const char* fullpath = assetfs_create_cache_file(path);
+    const char* fullpath = asset_path(path);
 
     if(al_save_bitmap(fullpath, img->data))
         logfile_message("Saved image to \"%s\"", fullpath);

@@ -30,7 +30,7 @@
 #include "util.h"
 #include "logfile.h"
 #include "global.h"
-#include "assetfs.h"
+#include "asset.h"
 
 /* OS-specific includes */
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
@@ -1001,11 +1001,11 @@ int write_header(ALLEGRO_FILE* fp, const prefs_t* prefs)
 /* load prefs from the disk */
 int load(prefs_t* prefs)
 {
-    const char* filename = assetfs_create_config_file(PREFS_FILE);
-    ALLEGRO_FILE* fp = al_fopen(filename, "rb");
+    const char* fullpath = asset_path(PREFS_FILE);
+    ALLEGRO_FILE* fp = al_fopen(fullpath, "rb");
     int success = 0;
 
-    prefs_log("Loading prefs from file \"%s\"...", filename);
+    prefs_log("Loading prefs from \"%s\"...", fullpath);
 
     /* load file */
     if(fp != NULL) {
@@ -1039,11 +1039,11 @@ int load(prefs_t* prefs)
 /* save prefs to the disk */
 int save(const prefs_t* prefs)
 {
-    const char* filename = assetfs_create_config_file(PREFS_FILE);
-    ALLEGRO_FILE* fp = al_fopen(filename, "wb");
+    const char* fullpath = asset_path(PREFS_FILE);
+    ALLEGRO_FILE* fp = al_fopen(fullpath, "wb");
     int success = 0;
 
-    prefs_log("Saving prefs to file \"%s\"...", filename);
+    prefs_log("Saving prefs to file \"%s\"...", fullpath);
 
     /* save file */
     if(fp != NULL) {

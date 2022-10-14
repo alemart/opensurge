@@ -25,7 +25,7 @@
 #include "../../entities/legacy/item.h"
 #include "../../entities/legacy/enemy.h"
 #include "../../core/logfile.h"
-#include "../../core/assetfs.h"
+#include "../../core/asset.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
 #include "../../core/nanoparser/nanoparser.h"
@@ -112,7 +112,7 @@ editorgrp_entity_list_t* editorgrp_get_group(int id)
 void read_from_file(const char *filename)
 {
     parsetree_program_t *prog;
-    const char* fullpath = assetfs_fullpath(filename);
+    const char* fullpath = asset_path(filename);
 
     logfile_message("Loading group file \"%s\"...", filename);
 

@@ -43,7 +43,7 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/sprite.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/lang.h"
@@ -498,7 +498,7 @@ void level_load(const char *filepath)
 
     /* reading the level file */
     if(!levparser_parse(filepath, NULL, level_interpret_line))
-        fatal_error("Can\'t open level file \"%s\".", assetfs_fullpath(filepath));
+        fatal_error("Can\'t open level file \"%s\".", filepath);
 
     /* load the music */
     music = *musicfile ? music_load(musicfile) : NULL;
@@ -607,8 +607,8 @@ void level_unload()
  */
 int level_save(const char *filepath)
 {
+    const char* fullpath = asset_path(filepath);
     ALLEGRO_FILE *fp;
-    const char* fullpath = assetfs_create_data_file(filepath, false);
 
     /* open file for writing */
     logfile_message("level_save(\"%s\")", fullpath);

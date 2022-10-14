@@ -24,7 +24,7 @@
 #include "actor.h"
 #include "../core/sprite.h"
 #include "../core/video.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
@@ -116,7 +116,7 @@ bgtheme_t* background_load(const char *filepath)
     const char *fullpath;
 
     logfile_message("Loading background \"%s\"...", filepath);
-    fullpath = assetfs_fullpath(filepath);
+    fullpath = asset_path(filepath);
 
     bgtheme = mallocx(sizeof *bgtheme);
     bgtheme->filepath = str_dup(filepath);

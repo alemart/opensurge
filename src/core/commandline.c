@@ -22,11 +22,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <surgescript.h>
 #include "commandline.h"
 #include "global.h"
 #include "stringutil.h"
 #include "video.h"
+#include "asset.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -35,6 +37,8 @@
 /* private stuff ;) */
 #define crash(...) do { console_print(__VA_ARGS__); exit(1); } while(0)
 static void console_print(char *fmt, ...);
+static bool console_ask(const char* fmt, ...);
+
 static int COMMANDLINE_UNDEFINED = -1;
 
 static const char COPYRIGHT[] = ""
@@ -80,7 +84,6 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.custom_quest_path[0] = '\0';
     cmd.language_filepath[0] = '\0';
     cmd.install_game_path[0] = '\0';
-    cmd.basedir[0] = '\0';
     cmd.gamedir[0] = '\0';
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
     cmd.user_argv = NULL;
@@ -111,10 +114,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/default.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/english.lng)\n"
-                "    --game-folder \"/path/to/data\"    use game assets only from the specified folder\n"
-#ifndef _WIN32
-                "    --base \"/path/to/data\"           set a custom base folder for the assets (*nix only)\n"
-#endif
+                "    --game-folder \"/path/to/game\"    use game assets only from the specified folder\n"
+                "    --reset                          factory reset: clear all user-space files & changes\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
                 COPYRIGHT, program
@@ -208,18 +209,23 @@ commandline_t commandline_parse(int argc, char **argv)
                 crash("%s: missing --language parameter", program);
         }
 
-        else if(strcmp(argv[i], "--base") == 0) {
-            if(++i < argc && *(argv[i]) != '-')
-                str_cpy(cmd.basedir, argv[i], sizeof(cmd.basedir));
-            else
-                crash("%s: missing --base parameter", program);
-        }
-
         else if(strcmp(argv[i], "--game-folder") == 0) {
             if(++i < argc && *(argv[i]) != '-')
                 str_cpy(cmd.gamedir, argv[i], sizeof(cmd.gamedir));
             else
                 crash("%s: missing --game-folder parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--reset") == 0) {
+            static char user_datadir[1024];
+            asset_user_datadir(user_datadir, sizeof(user_datadir));
+            if(console_ask("This operation will remove %s. Are you sure?", user_datadir)) {
+                if(asset_purge_user_data())
+                    console_print("Success.");
+                else
+                    crash("An error has occurred.");
+            }
+            exit(0);
         }
 
         else if(strcmp(argv[i], "--") == 0) {
@@ -282,4 +288,28 @@ void console_print(char *fmt, ...)
        console, but stdout may be redirected to a file */
     MessageBoxA(NULL, buffer, GAME_TITLE, MB_OK);
 #endif
+}
+
+/* Asks a y/n question on the console */
+bool console_ask(const char* fmt, ...)
+{
+    char c, buf[80] = { 0 };
+    va_list args;
+
+    for(;;) {
+        va_start(args, fmt);
+        vfprintf(stdout, fmt, args);
+        va_end(args);
+
+        fprintf(stdout, " (y/n) ");
+        fflush(stdout);
+
+        if(fgets(buf, sizeof(buf), stdin) != NULL) {
+            c = tolower(buf[0]);
+            if((c == 'y' || c == 'n') && buf[1] == '\0')
+                return (c == 'y');
+        }
+        else
+            return false;
+    }
 }

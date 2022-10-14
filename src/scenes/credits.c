@@ -33,7 +33,7 @@
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/font.h"
-#include "../core/assetfs.h"
+#include "../core/asset.h"
 #include "../core/logfile.h"
 #include "../core/stringutil.h"
 #include "../core/csv.h"

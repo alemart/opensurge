@@ -20,7 +20,6 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
-
 #include <stdint.h>
 #include <string.h>
 #include <locale.h>
@@ -30,7 +29,7 @@
 #include "scene.h"
 #include "storyboard.h"
 #include "util.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "resourcemanager.h"
 #include "stringutil.h"
 #include "logfile.h"
@@ -62,6 +61,11 @@
 #error "This build requires a newer version of Allegro"
 #endif
 
+/* minimum SurgeScript version */
+#if !SURGESCRIPT_VERSION_IS_AT_LEAST(SURGESCRIPT_MIN_SUP, SURGESCRIPT_MIN_SUB, SURGESCRIPT_MIN_WIP, 0)
+#error "This build requires a newer version of SurgeScript"
+#endif
+
 /* private stuff ;) */
 static void clean_garbage();
 static void init_basic_stuff(const commandline_t* cmd);
@@ -76,7 +80,6 @@ static void release_nanocalc();
 static void parser_error(const char *msg);
 static void parser_warning(const char *msg);
 static void calc_error(const char *msg);
-static const char* a5_version_string();
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
@@ -250,7 +253,6 @@ void clean_garbage()
  */
 void init_basic_stuff(const commandline_t* cmd)
 {
-    const char* basedir = commandline_getstring(cmd->basedir, NULL);
     const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
 
     /* basic initialization */
@@ -270,7 +272,7 @@ void init_basic_stuff(const commandline_t* cmd)
         fatal_error("Can't initialize Allegro's native dialog addon");
 
     /* initialize the filesystem and the logfile */
-    assetfs_init(NULL, basedir, gamedir);
+    asset_init(cmd->argv[0], gamedir);
     logfile_init();
 
     /* initialize prefs and nanoparser */
@@ -278,10 +280,6 @@ void init_basic_stuff(const commandline_t* cmd)
     nanoparser_set_error_function(parser_error);
     nanoparser_set_warning_function(parser_warning);
     init_nanocalc();
-
-    /* show Allegro & SurgeScript versions */
-    logfile_message("Using Allegro version %s", a5_version_string());
-    logfile_message("Using SurgeScript version %s", surgescript_util_version());
 }
 
 
@@ -412,7 +410,7 @@ void release_basic_stuff()
     release_nanocalc();
     prefs = prefs_destroy(prefs);
     logfile_release();
-    assetfs_release();
+    asset_release();
 
     /* Release Allegro */
     al_destroy_event_queue(a5_event_queue);
@@ -466,23 +464,4 @@ void parser_warning(const char *msg)
 void calc_error(const char *msg)
 {
     fatal_error("%s", msg);
-}
-
-/*
- * a5_version_string()
- * Returns the Allegro version as a static char[]
- */
-const char* a5_version_string()
-{
-    static char str[17];
-    uint32_t version = al_get_allegro_version();
-
-    snprintf(str, sizeof(str), "%u.%u.%u-%u",
-        (version & 0xFF000000) >> 24,
-        (version & 0xFF0000) >> 16,
-        (version & 0xFF00) >> 8,
-        (version & 0xFF)
-    );
-
-    return str;
 }

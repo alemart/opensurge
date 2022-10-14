@@ -37,7 +37,6 @@ struct commandline_t
     int allow_font_smoothing;
 
     /* filepaths */
-    char basedir[COMMANDLINE_PATHMAX];
     char gamedir[COMMANDLINE_PATHMAX];
     char custom_level_path[COMMANDLINE_PATHMAX];
     char custom_quest_path[COMMANDLINE_PATHMAX];

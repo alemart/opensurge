@@ -63,6 +63,14 @@ IF(UNIX)
   OPTION(DESKTOP_INSTALL "Add Open Surge to the Desktop menu when installing" ON)
 ENDIF()
 
+# Compile the development version?
+OPTION(BLEEDING_EDGE "Enable if using the development version" OFF)
+SET(BLEEDING_EDGE_VERSION "custom" CACHE STRING "Build version (bleeding edge)")
+IF(BLEEDING_EDGE)
+  LIST(APPEND DEFS "GAME_BUILD_VERSION=\"${BLEEDING_EDGE_VERSION}-dev\"")
+  MESSAGE(STATUS "Detected development version: ${BLEEDING_EDGE_VERSION}-dev")
+ENDIF()
+
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
 SET(ALLEGRO_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of Allegro")
@@ -74,20 +82,22 @@ ENDIF()
 IF(UNIX)
   SET(GAME_BINDIR "games" CACHE PATH "Directory in which the game executable will be stored when installing")
   SET(GAME_DATADIR "share/games/${GAME_UNIXNAME}" CACHE PATH "Directory in which the game data will be stored when installing")
+  SET(GAME_USERDIRNAME "${GAME_UNIXNAME}" CACHE PATH "Name of the user-modifiable asset directory")
   SET(DESKTOP_ICON_PATH "/usr/share/pixmaps" CACHE PATH "Where to store the icon file when installing")
   SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to store the .desktop file when installing")
   SET(DESKTOP_METAINFO_PATH "/usr/share/metainfo" CACHE PATH "Where to store the metainfo file. You shouldn't change this (check the AppStream spec).")
 ENDIF()
 
-# Compiling the development version?
-OPTION(BLEEDING_EDGE "Enable if using the development version" OFF)
-SET(BLEEDING_EDGE_VERSION "custom" CACHE STRING "Build version (bleeding edge)")
-IF(BLEEDING_EDGE)
-  LIST(APPEND DEFS "GAME_BUILD_VERSION=\"${BLEEDING_EDGE_VERSION}-dev\"")
+# Run in place? (i.e., read assets from the directory of the executable)
+OPTION(GAME_RUNINPLACE "Read assets only from the directory of the executable. For testing & development." OFF)
+IF(GAME_RUNINPLACE)
+  LIST(APPEND DEFS "GAME_RUNINPLACE=1")
+  MESSAGE(STATUS "Detected the RUN IN PLACE flag")
 ENDIF()
 
-# data folder (game assets)
+# data folders (game assets)
 IF(UNIX)
+  LIST(APPEND DEFS "GAME_USERDIRNAME=\"${GAME_USERDIRNAME}\"")
   IF(IS_ABSOLUTE "${GAME_DATADIR}")
     LIST(APPEND DEFS "GAME_DATADIR=\"${GAME_DATADIR}\"")
   ELSEIF(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}/${GAME_DATADIR}")
@@ -124,79 +134,77 @@ ENDIF()
 
 # Find Allegro 5 & addons
 SET(REQUIRED_A5_LIBS
-allegro
-allegro_image
-allegro_primitives
-allegro_font
-allegro_ttf
-allegro_acodec
-allegro_audio
-allegro_dialog
-allegro_memfile
+  allegro
+  allegro_main
+  allegro_image
+  allegro_primitives
+  allegro_font
+  allegro_ttf
+  allegro_acodec
+  allegro_audio
+  allegro_dialog
+  allegro_memfile
+  allegro_physfs
+  physfs
 )
-
-# OSX requires allegro_main
-IF(APPLE)
-    LIST(APPEND REQUIRED_A5_LIBS allegro_main)
-ENDIF()
 
 # Use the monolith version
 IF(ALLEGRO_MONOLITH)
-    SET(REQUIRED_A5_LIBS allegro_monolith)
+  SET(REQUIRED_A5_LIBS allegro_monolith)
 ENDIF()
 
 # Use static libs
 IF(ALLEGRO_STATIC)
 
-    # add -static suffix
-    SET(A5_LIBS "")
-    FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
-        LIST(APPEND A5_LIBS "${A5_LIB}-static")
-    ENDFOREACH()
-    SET(REQUIRED_A5_LIBS ${A5_LIBS})
+  # add -static suffix
+  SET(A5_LIBS "")
+  FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
+    LIST(APPEND A5_LIBS "${A5_LIB}-static")
+  ENDFOREACH()
+  SET(REQUIRED_A5_LIBS ${A5_LIBS})
 
-    # define ALLEGRO_STATICLINK
-    LIST(APPEND DEFS "ALLEGRO_STATICLINK")
+  # define ALLEGRO_STATICLINK
+  LIST(APPEND DEFS "ALLEGRO_STATICLINK")
 
-    # require Win32 libs
-    IF(WIN32)
-        LIST(APPEND REQUIRED_A5_LIBS
-        mingw32
-        #dumb
-        #FLAC
-        vorbisfile
-        vorbis
-        freetype
-        ogg
-        #physfs
-        png16
-        z
-        #zlibstatic
-        gdiplus
-        uuid
-        kernel32
-        winmm
-        psapi
-        opengl32
-        glu32
-        user32
-        comdlg32
-        gdi32
-        shell32
-        ole32
-        advapi32
-        ws2_32
-        shlwapi
-        dsound
-        #d3dx9 # needed?
-        jpeg
-        #opusfile
-        #opus
-        #webp
-        )
-    ELSE()
-        MESSAGE(FATAL_ERROR "Static linking is currently unavailable for this platform.")
-    ENDIF()
+  # require Win32 libs
+  IF(WIN32)
+    LIST(APPEND REQUIRED_A5_LIBS
+      mingw32
+      #dumb
+      #FLAC
+      vorbisfile
+      vorbis
+      freetype
+      ogg
+      physfs
+      png16
+      z
+      #zlibstatic
+      gdiplus
+      uuid
+      kernel32
+      winmm
+      psapi
+      opengl32
+      glu32
+      user32
+      comdlg32
+      gdi32
+      shell32
+      ole32
+      advapi32
+      ws2_32
+      shlwapi
+      dsound
+      #d3dx9 # needed?
+      jpeg
+      #opusfile
+      #opus
+      #webp
+    )
+  ELSE()
+    MESSAGE(FATAL_ERROR "Static linking is currently unavailable for this platform.")
+  ENDIF()
 
 ENDIF()
 
@@ -211,14 +219,14 @@ ENDIF()
 # Write to LALLEGRO5
 SET(LALLEGRO5 "")
 FOREACH(A5_LIB ${REQUIRED_A5_LIBS})
-STRING(TOUPPER "L${A5_LIB}" _A5_LIB)
-FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATHS ${ALLEGRO_LIBRARY_PATH})
-IF(NOT ${_A5_LIB})
-    MESSAGE(FATAL_ERROR "Can't find Allegro 5 lib (lib${A5_LIB}). ${HELP}")
-ELSE()
+  STRING(TOUPPER "L${A5_LIB}" _A5_LIB)
+  FIND_LIBRARY(${_A5_LIB} NAMES "${A5_LIB}" PATHS ${ALLEGRO_LIBRARY_PATH})
+  IF(NOT ${_A5_LIB})
+    MESSAGE(FATAL_ERROR "Can't find lib${A5_LIB}. ${HELP}")
+  ELSE()
     MESSAGE(STATUS "Found lib${A5_LIB} at ${${_A5_LIB}}...")
     SET(LALLEGRO5 "${LALLEGRO5}" "${${_A5_LIB}}")
-ENDIF()
+  ENDIF()
 ENDFOREACH()
 
 # SurgeScript: libsurgescript
@@ -248,9 +256,9 @@ ENDIF()
 # adding sources
 SET(GAME_SRCS
   src/core/nanoparser/nanoparser.c
-  src/core/whereami/whereami.c
   src/core/utf8/utf8.c
-  src/core/assetfs.c
+  src/core/physfs/ignorecase.c
+  src/core/asset.c
   src/core/audio.c
   src/core/color.c
   src/core/commandline.c
@@ -357,9 +365,9 @@ SET(GAME_SRCS
 # adding headers
 SET(GAME_HEADERS
   src/core/nanoparser/nanoparser.h
-  src/core/whereami/whereami.h
   src/core/utf8/utf8.h
-  src/core/assetfs.h
+  src/core/physfs/ignorecase.h
+  src/core/asset.h
   src/core/audio.h
   src/core/color.h
   src/core/commandline.h
@@ -445,42 +453,42 @@ SET(GAME_HEADERS
 
 IF(WIN32)
 
-    # Windows executable
-    IF(MINGW)
-      IF(NOT CMAKE_RC_COMPILER)
-        SET(CMAKE_RC_COMPILER windres)
-      ENDIF(NOT CMAKE_RC_COMPILER)
-      ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
-      TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
-      EXECUTE_PROCESS(COMMAND ${CMAKE_RC_COMPILER} -O coff -o "${CMAKE_CURRENT_BINARY_DIR}/iconwin.res" -i "${CMAKE_SOURCE_DIR}/src/misc/iconwin.rc" -I "${CMAKE_SOURCE_DIR}")
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++ \"${CMAKE_CURRENT_BINARY_DIR}/iconwin.res\"")
-    ELSEIF(MSVC)
-      ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS} ${GAME_HEADERS})
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LSURGESCRIPT} ${LALLEGRO5})
-      TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "/D_CRT_SECURE_NO_DEPRECATE /D_CRT_SECURE_NO_WARNINGS ${CMAKE_C_FLAGS}")
-    ELSE()
-      MESSAGE("*** Unrecognized compiler ***") # e.g., clang?
-      ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-      TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
-      TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")     
-    ENDIF()
-
-    # Bugfix
-    IF(ALLEGRO_STATIC)
-      SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINKER_LANGUAGE CXX)
-    ENDIF()
-
-ELSEIF(UNIX)
-
-    # *nix executable
-    ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
+  # Windows executable
+  IF(MINGW)
+    IF(NOT CMAKE_RC_COMPILER)
+      SET(CMAKE_RC_COMPILER windres)
+    ENDIF(NOT CMAKE_RC_COMPILER)
+    ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
     TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
     TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
+    EXECUTE_PROCESS(COMMAND ${CMAKE_RC_COMPILER} -O coff -o "${CMAKE_CURRENT_BINARY_DIR}/iconwin.res" -i "${CMAKE_SOURCE_DIR}/src/misc/iconwin.rc" -I "${CMAKE_SOURCE_DIR}")
+    SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++ \"${CMAKE_CURRENT_BINARY_DIR}/iconwin.res\"")
+  ELSEIF(MSVC)
+    ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS} ${GAME_HEADERS})
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LSURGESCRIPT} ${LALLEGRO5})
+    TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
+    SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "/D_CRT_SECURE_NO_DEPRECATE /D_CRT_SECURE_NO_WARNINGS ${CMAKE_C_FLAGS}")
+  ELSE()
+    MESSAGE("*** Unrecognized compiler ***") # e.g., clang?
+    ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
+    TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
+    SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")     
+  ENDIF()
+
+  # Bugfix
+  IF(ALLEGRO_STATIC)
+    SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINKER_LANGUAGE CXX)
+  ENDIF()
+
+ELSEIF(UNIX)
+
+  # *nix executable
+  ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
+  TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LALLEGRO5})
+  TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${ALLEGRO_INCDIR})
+  SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
 
 ENDIF()
 

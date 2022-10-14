@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include "screenshot.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "logfile.h"
 #include "image.h"
 #include "video.h"
@@ -42,7 +42,7 @@ void screenshot_init()
     in = input_create_user("screenshots");
 
     /* What's the next screenshot? */
-    while(assetfs_exists(screenshot_filename(next_screenshot_id)) &&
+    while(asset_exists(screenshot_filename(next_screenshot_id)) &&
     ++next_screenshot_id < MAX_SCREENSHOTS);
 }
 

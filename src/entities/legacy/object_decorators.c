@@ -31,7 +31,7 @@
 #include "../sfx.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
-#include "../../core/assetfs.h"
+#include "../../core/asset.h"
 #include "../../core/audio.h"
 #include "../../core/timer.h"
 #include "../../core/web.h"
@@ -673,10 +673,10 @@ audiostrategy_t* playsamplestrategy_new(const char *sample_name, expression_t *v
 
     /* backwards compatibility */
     sound_t *sfx = NULL;
-    if(!assetfs_exists(sample_name)) {
+    if(!asset_exists(sample_name)) {
         char *compat_path = mallocx((12 + strlen(sample_name) + 1) * sizeof(char));
         sprintf(compat_path, "samples/%s.wav", sample_name);
-        if(assetfs_exists(compat_path))
+        if(asset_exists(compat_path))
             sfx = sound_load(compat_path);
         free(compat_path);
     }
@@ -807,10 +807,10 @@ audiostrategy_t* stopsamplestrategy_new(const char *sample_name)
 
     /* backwards compatibility */
     sound_t *sfx = NULL;
-    if(!assetfs_exists(sample_name)) {
+    if(!asset_exists(sample_name)) {
         char *compat_path = mallocx((12 + strlen(sample_name) + 1) * sizeof(char));
         sprintf(compat_path, "samples/%s.wav", sample_name);
-        if(assetfs_exists(compat_path))
+        if(asset_exists(compat_path))
             sfx = sound_load(compat_path);
         free(compat_path);
     }

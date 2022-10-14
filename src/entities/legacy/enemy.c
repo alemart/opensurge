@@ -36,7 +36,7 @@
 #include "../../core/input.h"
 #include "../../core/logfile.h"
 #include "../../core/stringutil.h"
-#include "../../core/assetfs.h"
+#include "../../core/asset.h"
 #include "../../core/video.h"
 #include "../../core/hashtable.h"
 #include "../../physics/collisionmask.h"
@@ -99,8 +99,8 @@ void objects_init()
 
     /* read the legacy scripts */
     allow_duplicate_scripts = TRUE; /* for retro-compatibility */
-    assetfs_foreach_file("objects", ".obj", dirfill, NULL, true);
-    assetfs_foreach_file("scripts/legacy", ".obj", dirfill, NULL, true);
+    asset_foreach_file("objects", ".obj", dirfill, NULL, true);
+    asset_foreach_file("scripts/legacy", ".obj", dirfill, NULL, true);
 
     /* create the name table */
     name_table.length = 0;
@@ -556,7 +556,7 @@ int dirfill(const char *vpath, void *param)
 {
     (void)param;
 
-    const char* fullpath = assetfs_fullpath(vpath);
+    const char* fullpath = asset_path(vpath);
     parsetree_program_t* tree = nanoparser_construct_tree(fullpath);
 
     darray_push(objects, tree);
