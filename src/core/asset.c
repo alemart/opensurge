@@ -244,6 +244,10 @@ bool asset_purge_user_data()
     if(PHYSFS_isInit())
         return false;
 
+    /* uninitialized Allegro? */
+    if(!al_is_system_installed())
+        al_init();
+
     /* get the user data dir */
     ALLEGRO_PATH* path = find_user_datadir();
     const char* user_datadir = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
@@ -278,6 +282,10 @@ char* asset_user_datadir(char* dest, size_t dest_size)
     if(gamedir != NULL)
         return str_cpy(dest, gamedir, dest_size);
 
+    /* uninitialized Allegro? */
+    if(!al_is_system_installed())
+        al_init();
+
     /* find the default path */
     ALLEGRO_PATH* path = find_user_datadir();
     const char* dirpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
@@ -298,6 +306,10 @@ char* asset_shared_datadir(char* dest, size_t dest_size)
     /* custom gamedir? */
     if(gamedir != NULL)
         return str_cpy(dest, gamedir, dest_size);
+
+    /* uninitialized Allegro? */
+    if(!al_is_system_installed())
+        al_init();
 
     /* find the default path */
     ALLEGRO_PATH* path = find_shared_datadir();

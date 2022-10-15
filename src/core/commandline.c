@@ -306,7 +306,7 @@ bool console_ask(const char* fmt, ...)
 
         if(fgets(buf, sizeof(buf), stdin) != NULL) {
             c = tolower(buf[0]);
-            if((c == 'y' || c == 'n') && buf[1] == '\0')
+            if((c == 'y' || c == 'n') && buf[1] == '\n')
                 return (c == 'y');
         }
         else
