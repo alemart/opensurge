@@ -1043,7 +1043,7 @@ int save(const prefs_t* prefs)
     ALLEGRO_FILE* fp = al_fopen(fullpath, "wb");
     int success = 0;
 
-    prefs_log("Saving prefs to file \"%s\"...", fullpath);
+    prefs_log("Saving prefs to \"%s\"...", fullpath);
 
     /* save file */
     if(fp != NULL) {
