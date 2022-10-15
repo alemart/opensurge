@@ -29,7 +29,7 @@
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/timer.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../core/nanoparser.h"
 
 /* forward declarations */
 typedef struct background_t background_t;

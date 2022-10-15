@@ -44,7 +44,7 @@
 #include "prefs.h"
 #include "commandline.h"
 #include "font.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
 #include "../entities/legacy/enemy.h"
 #include "../entities/legacy/nanocalc/nanocalc.h"
 #include "../entities/legacy/nanocalc/nanocalc_addons.h"

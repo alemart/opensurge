@@ -36,7 +36,7 @@
 #include "../core/timer.h"
 #include "../core/audio.h"
 #include "../core/sprite.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../core/nanoparser.h"
 #include "../scenes/level.h"
 #include "../physics/collisionmask.h"
 #include "../physics/obstacle.h"

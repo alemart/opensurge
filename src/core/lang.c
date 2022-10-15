@@ -26,7 +26,7 @@
 #include "stringutil.h"
 #include "logfile.h"
 #include "hashtable.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
 
 /* fake string type */
 typedef struct { char* data; } stringadapter_t;

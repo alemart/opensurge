@@ -28,7 +28,7 @@
 #include "../../core/asset.h"
 #include "../../core/util.h"
 #include "../../core/stringutil.h"
-#include "../../core/nanoparser/nanoparser.h"
+#include "../../core/nanoparser.h"
 
 /* internal data */
 #define EDITORGRP_MAX_GROUPS        512

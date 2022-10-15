@@ -26,7 +26,7 @@
 #include "v2d.h"
 #include "image.h"
 #include "darray.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
 
 typedef struct animation_t animation_t;
 typedef struct spriteinfo_t spriteinfo_t;

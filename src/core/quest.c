@@ -28,7 +28,7 @@
 #include "logfile.h"
 #include "quest.h"
 #include "asset.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
 
 
 

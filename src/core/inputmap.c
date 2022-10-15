@@ -27,7 +27,7 @@
 #include "resourcemanager.h"
 #include "asset.h"
 #include "hashtable.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
 
 /* storage */
 typedef struct inputmapnode_t inputmapnode_t;

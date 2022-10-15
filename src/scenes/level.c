@@ -47,7 +47,7 @@
 #include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/lang.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../core/nanoparser.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
 #include "../entities/actor.h"

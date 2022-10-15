@@ -27,9 +27,9 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "nanoparser.h"
-#include "../darray.h"
-#include "../util.h"
-#include "../stringutil.h"
+#include "darray.h"
+#include "util.h"
+#include "stringutil.h"
 
 /*
  * nanoparser v2

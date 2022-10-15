@@ -28,7 +28,7 @@
 #include "../actor.h"
 #include "../player.h"
 #include "../brick.h"
-#include "../../core/nanoparser/nanoparser.h"
+#include "../../core/nanoparser.h"
 #include "../../core/global.h"
 #include "../../core/util.h"
 #include "../../core/audio.h"

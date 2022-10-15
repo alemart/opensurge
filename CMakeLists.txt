@@ -255,7 +255,7 @@ ENDIF()
 
 # adding sources
 SET(GAME_SRCS
-  src/core/nanoparser/nanoparser.c
+  src/core/nanoparser.c
   src/core/utf8/utf8.c
   src/core/physfs/ignorecase.c
   src/core/asset.c
@@ -364,7 +364,7 @@ SET(GAME_SRCS
 
 # adding headers
 SET(GAME_HEADERS
-  src/core/nanoparser/nanoparser.h
+  src/core/nanoparser.h
   src/core/utf8/utf8.h
   src/core/physfs/ignorecase.h
   src/core/asset.h

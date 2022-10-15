@@ -20,7 +20,7 @@
 
 #include "character.h"
 #include "../core/hashtable.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../core/nanoparser.h"
 #include "../core/asset.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"

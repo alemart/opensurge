@@ -37,7 +37,7 @@
 #include "lang.h"
 #include "logfile.h"
 #include "hashtable.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
 #include "utf8/utf8.h"
 #include "input.h"
 #include "../entities/player.h"
