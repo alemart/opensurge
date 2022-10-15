@@ -44,7 +44,7 @@
  *
  * where:
  * string is a double-quoted, single-quoted or unquoted text (e.g., "Hello, world!", 'Let\'s go!', hello-world)
- * identifier is a unquoted text that matches /^[A-Za-z_][A-Za-z0-9_]*$/
+ * identifier is a unquoted text that matches /^[A-Za-z_<>][A-Za-z0-9_<>]*$/
  * empty is a symbol of length zero
  * eof is the end of the file
  *
@@ -886,7 +886,7 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
                 }
 
                 /* maybe this token will be an identifier? */
-                bool is_identifier = (isalpha(peek) || peek == '_');
+                bool is_identifier = (isalpha(peek) || peek == '_' || peek == '<' || peek == '>');
 
                 /* accumulate characters */
                 symbol_length = 0;
@@ -899,7 +899,7 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
                     }
 
                     symbol_buffer[symbol_length++] = (char)peek;
-                    is_identifier = is_identifier && (isalnum(peek) || peek == '_');
+                    is_identifier = is_identifier && (isalnum(peek) || peek == '_' || peek == '<' || peek == '>');
                     peek = lexer_getc(&state);
 
                 } while(isvalidchar(peek) && peek != EOF);
