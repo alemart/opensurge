@@ -1,0 +1,14 @@
+// -----------------------------------------------------------------------------
+// File: stage_select.qst
+// Description: this quest loads the built-in stage select of the engine
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// modders: you don't need to modify this file.
+
+// quest properties
+name            "Stage Select"
+
+// level list
+<stage_select>

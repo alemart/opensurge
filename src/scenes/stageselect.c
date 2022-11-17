@@ -111,7 +111,7 @@ static void save_selection(int option);
  */
 void stageselect_init(void *should_enable_debug)
 {
-    enable_debug = (*((int*)should_enable_debug) != 0);
+    enable_debug = (should_enable_debug != NULL) && (*((bool*)should_enable_debug));
     load_stage_list();
 
     scene_time = 0;

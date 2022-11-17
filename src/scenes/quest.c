@@ -164,6 +164,8 @@ void push_appropriate_scene(const char *str)
             scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
         else if(str_icmp(str, "<credits>") == 0)
             scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
+        else if(str_icmp(str, "<stage_select>") == 0)
+            scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), NULL);
         else
             fatal_error("Quest error: unrecognized symbol '%s'", str);
     }
