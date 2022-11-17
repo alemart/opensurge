@@ -43,7 +43,7 @@
 #define PRIMARY_COLOR       "424c6e"
 #define SECONDARY_COLOR     "657392"
 static float elapsed_time;
-static int debug_mode;
+static bool debug_mode;
 static font_t* fnt;
 static input_t* in;
 static image_t* box;
@@ -62,7 +62,7 @@ void intro_init(void *foo)
 
     /* initialize variables */
     elapsed_time = 0.0f;
-    debug_mode = FALSE;
+    debug_mode = false;
     in = input_create_user(NULL);
 
     /* create box */
@@ -130,7 +130,7 @@ void intro_update()
         if(!debug_mode && ++cnt == 3) {
             sound_play(SFX_SECRET);
             elapsed_time += INTRO_TIMEOUT;
-            debug_mode = TRUE;
+            debug_mode = true;
             cnt = 0;
         }
     }

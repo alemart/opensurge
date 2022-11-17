@@ -924,7 +924,7 @@ int brick_exists(int id)
  */
 int brick_image_flags(brickflip_t flip)
 {
-    brick_t b = { flip: flip }; /* hackish */
+    brick_t b = { .flip = flip }; /* hackish */
     return get_image_flags(&b);
 }
 

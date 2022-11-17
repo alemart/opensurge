@@ -46,10 +46,8 @@ static scene_t *storyboard[STORYBOARD_CAPACITY];
  */
 void storyboard_init()
 {
-    int i;
-
     /* initializing... */
-    for(i=0; i<STORYBOARD_CAPACITY; i++)
+    for(int i = 0; i < STORYBOARD_CAPACITY; i++)
         storyboard[i] = NULL;
 
     /* registering the scenes */
@@ -76,9 +74,7 @@ void storyboard_init()
  */
 void storyboard_release()
 {
-    int i;
-
-    for(i=0; i<STORYBOARD_CAPACITY; i++) {
+    for(int i = 0; i < STORYBOARD_CAPACITY; i++) {
         if(storyboard[i])
             scene_destroy(storyboard[i]);
     }
