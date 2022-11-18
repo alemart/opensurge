@@ -189,8 +189,8 @@ static const char* read_variable(const char* key, void* data);
 static int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*callback)(const char*,void*), void* data);
 static inline bool has_vars_to_expand(const char* str);
 static void convert_to_ascii(char* str);
-static void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_height, color_t color_stack[], int* stack_top);
-static void print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, int line_height, color_t color_stack[], int* stack_top);
+static void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_height, v2d_t sp, color_t color_stack[], int* stack_top);
+static void print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, int line_height, v2d_t sp, color_t color_stack[], int* stack_top);
 static char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width);
 static int find_blanks(const char* text, int blank[], size_t size);
 static char* tagged_text_offset(char* txt, int charnum);
@@ -462,7 +462,7 @@ void font_render(font_t* f, v2d_t camera_position)
         for(s = w = p; w != NULL; ) {
             /* for each line s of text (split using wordwrap rules) */
             if((w = find_wordwrap(f->drv, s, f->width)) != NULL) { r = *w; *w = 0; }
-            print_aligned_line(f->drv, s, f->align, pos.x, pos.y, line_height, stack, &stack_top);
+            print_aligned_line(f->drv, s, f->align, pos.x, pos.y, line_height, sp, stack, &stack_top);
             pos.y += line_height;
             if(w != NULL) { *w = r; s = w; }
         }
@@ -813,14 +813,14 @@ void convert_to_ascii(char* str)
 }
 
 /* will print a single line of text with the specified font */
-void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_height, color_t color_stack[], int* stack_top)
+void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_height, v2d_t sp, color_t color_stack[], int* stack_top)
 {
     static char linebuf[FONT_TEXTMAXSIZE];
     char *p, *q;
     size_t j = 0;
     uint32_t chr, tag = 0;
-    v2d_t sp = drv->charspacing(drv);
-    const image_t* target = image_drawing_target();
+
+    /* a macro defined for convenience */
     #define _print_linebuf() \
         do { \
             if(*linebuf) { \
@@ -829,10 +829,6 @@ void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_h
             } \
             *(p = linebuf) = 0; \
         } while(0)
-
-    /* clip */
-    if(y < -line_height || y > image_height(target) + line_height || x > image_width(target) + sp.x)
-        return;
 
     /* print */
     *(p = linebuf) = 0;
@@ -884,25 +880,31 @@ void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_h
     _print_linebuf();
 }
 
-/* print a line with a certain alignment */
-void print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, int line_height, color_t color_stack[], int* stack_top)
+/* print a line with the given alignment */
+void print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, int line_height, v2d_t sp, color_t color_stack[], int* stack_top)
 {
-    int dx = 0;
+    const image_t* target = image_drawing_target();
 
+    /* clip */
+    if(y < -line_height || y > image_height(target) + line_height || x > image_width(target) + sp.x)
+        return;
+
+    /* compute offset */
     switch(align) {
         case FONTALIGN_LEFT:
             break;
 
         case FONTALIGN_CENTER:
-            dx = drv->textsize(drv, text).x * 0.5f;
+            x -= drv->textsize(drv, text).x * 0.5f;
             break;
 
         case FONTALIGN_RIGHT:
-            dx = drv->textsize(drv, text).x;
+            x -= drv->textsize(drv, text).x;
             break;
     }
 
-    print_line(drv, text, x - dx, y, line_height, color_stack, stack_top);
+    /* print line */
+    print_line(drv, text, x, y, line_height, sp, color_stack, stack_top);
 }
 
 /* find the next point where a wordwrap should be placed */
