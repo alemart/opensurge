@@ -54,6 +54,7 @@ static input_t *input;
 static bgtheme_t *bgtheme;
 static music_t *music;
 static scene_t *next_scene;
+static int text_height;
 
 #define ASSETS_CATEGORIES 6
 #define ASSETS_TEXT_MAXLEN 65536
@@ -113,6 +114,7 @@ void credits_init(void *foo)
     font_set_text(text, "%s", CREDITS_TEXT);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
+    text_height = font_get_textsize(text).y;
 
     /* fade-in */
     fadefx_in(color_rgb(0,0,0), 1.0);
@@ -157,7 +159,7 @@ void credits_update()
     /* text movement */
     textpos = font_get_position(text);
     textpos.y -= (scroll_speed_multiplier * SCROLL_SPEED) * dt;
-    if(textpos.y < -font_get_textsize(text).y || textpos.y > VIDEO_SCREEN_H)
+    if(textpos.y < -text_height || textpos.y > VIDEO_SCREEN_H)
         textpos.y = VIDEO_SCREEN_H;
     font_set_position(text, textpos);
 
