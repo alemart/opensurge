@@ -47,6 +47,7 @@
 #define FONT_STACKCAPACITY          8        /* color stack capacity */
 #define FONT_TEXTMAXSIZE            65536    /* maximum size for texts */
 #define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
+#define FONT_BLANKSMAXSIZE          8192     /* max buffer size for find_blanks() */
 static bool allow_antialias = true;          /* allow antialiasing for all TTF fonts? */
 
 /* macros */
@@ -188,10 +189,10 @@ static const char* read_variable(const char* key, void* data);
 static int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*callback)(const char*,void*), void* data);
 static inline bool has_vars_to_expand(const char* str);
 static void convert_to_ascii(char* str);
-static int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t color_stack[], int* stack_top);
-static int print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, color_t color_stack[], int* stack_top);
+static void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_height, color_t color_stack[], int* stack_top);
+static void print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, int line_height, color_t color_stack[], int* stack_top);
 static char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width);
-static int find_blanks(int blank[], size_t size, const char* text);
+static int find_blanks(const char* text, int blank[], size_t size);
 static char* tagged_text_offset(char* txt, int charnum);
 static char* join_names(const char* name, const char* lang_id);
 static bool must_refresh_driver(const font_t* fnt);
@@ -450,6 +451,10 @@ void font_render(font_t* f, v2d_t camera_position)
         }
     }
 
+    /* compute the height of a line of text */
+    v2d_t sp = f->drv->charspacing(f->drv);
+    int line_height = f->drv->textsize(f->drv, " ").y + sp.y;
+
     /* for each line p of text (split using '\n') */
     image_hold_drawing(true);
     for(p = q = text; q != NULL; ) {
@@ -457,7 +462,8 @@ void font_render(font_t* f, v2d_t camera_position)
         for(s = w = p; w != NULL; ) {
             /* for each line s of text (split using wordwrap rules) */
             if((w = find_wordwrap(f->drv, s, f->width)) != NULL) { r = *w; *w = 0; }
-            pos.y += print_aligned_line(f->drv, s, f->align, pos.x, pos.y, stack, &stack_top);
+            print_aligned_line(f->drv, s, f->align, pos.x, pos.y, line_height, stack, &stack_top);
+            pos.y += line_height;
             if(w != NULL) { *w = r; s = w; }
         }
         if(q != NULL) { *q = '\n'; p = q+1; }
@@ -806,16 +812,14 @@ void convert_to_ascii(char* str)
     *q = 0;
 }
 
-/* will print a single line of text with the specified font,
-   returning its height */
-int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t color_stack[], int* stack_top)
+/* will print a single line of text with the specified font */
+void print_line(const fontdrv_t* drv, const char* text, int x, int y, int line_height, color_t color_stack[], int* stack_top)
 {
     static char linebuf[FONT_TEXTMAXSIZE];
     char *p, *q;
     size_t j = 0;
     uint32_t chr, tag = 0;
     v2d_t sp = drv->charspacing(drv);
-    int line_height = drv->textsize(drv, " ").y + sp.y;
     const image_t* target = image_drawing_target();
     #define _print_linebuf() \
         do { \
@@ -828,7 +832,7 @@ int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t col
 
     /* clip */
     if(y < -line_height || y > image_height(target) + line_height || x > image_width(target) + sp.x)
-        return line_height;
+        return;
 
     /* print */
     *(p = linebuf) = 0;
@@ -878,13 +882,10 @@ int print_line(const fontdrv_t* drv, const char* text, int x, int y, color_t col
         }
     }
     _print_linebuf();
-
-    /* done */
-    return line_height;
 }
 
-/* print a line with a certain alignment, returning its height */
-int print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, color_t color_stack[], int* stack_top)
+/* print a line with a certain alignment */
+void print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align, int x, int y, int line_height, color_t color_stack[], int* stack_top)
 {
     int dx = 0;
 
@@ -901,15 +902,15 @@ int print_aligned_line(const fontdrv_t* drv, const char* text, fontalign_t align
             break;
     }
 
-    return print_line(drv, text, x - dx, y, color_stack, stack_top);
+    print_line(drv, text, x - dx, y, line_height, color_stack, stack_top);
 }
 
 /* find the next point where a wordwrap should be placed */
 char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
 {
     if(max_width > 0) {
-        static int blank[1024];
-        int blanks = find_blanks(blank, sizeof(blank), text);
+        static int blank[FONT_BLANKSMAXSIZE]; /* WARNING: using a fixed-length array. We just process single-line of text, though. */
+        int blanks = find_blanks(text, blank, sizeof(blank) / sizeof(int));
         int m, l = 0, r = blanks - 1;
         int best_m = 0, width;
         char *wordwrap, chr;
@@ -958,7 +959,7 @@ char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width)
 }
 
 /* find all indexes of the text containing blank spaces */
-int find_blanks(int blank[], size_t size, const char* text)
+int find_blanks(const char* text, int blank[], size_t size)
 {
     const char* p;
     int n = 0;
