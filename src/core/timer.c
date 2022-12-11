@@ -30,9 +30,13 @@ static double current_time = 0.0;
 static float delta_time = 0.0f;
 static int64_t frames = 0;
 
+static bool is_paused = false;
+static double pause_duration = 0.0;
+static double pause_start_time = 0.0;
+
 /*
  * timer_init()
- * Initializes the Time Handler
+ * Initializes the time manager
  */
 void timer_init()
 {
@@ -46,14 +50,16 @@ void timer_init()
     current_time = 0.0f;
     delta_time = 0.0;
     frames = 0;
+
+    is_paused = false;
+    pause_duration = 0.0;
+    pause_start_time = 0.0;
 }
 
 
 /*
  * timer_update()
- * Updates the Time Handler. This routine
- * must be called at every cycle of the
- * main loop
+ * This routine must be called at every cycle of the main loop
  */
 void timer_update()
 {
@@ -61,8 +67,14 @@ void timer_update()
     static const float maximum_delta = 0.017f; /* if 0.0166667f, you don't get physics with the fixed timestep; if too large (0.20f), there may be issues with collisions */
     static double old_time = 0.0;
 
+    /* paused timer? */
+    if(is_paused) {
+        delta_time = 0.0;
+        return;
+    }
+
     /* read the time at the beginning of this framestep */
-    current_time = al_get_time() - start_time;
+    current_time = timer_get_now();
 
     /* compute the delta time */
     delta_time = current_time - old_time;
@@ -82,7 +94,7 @@ void timer_update()
 
 /*
  * timer_release()
- * Releases the Time Handler
+ * Releases the time manager
  */
 void timer_release()
 {
@@ -92,8 +104,7 @@ void timer_release()
 
 /*
  * timer_get_delta()
- * Returns the time interval, in seconds, between the
- * last two cycles of the main loop
+ * Returns the time interval, in seconds, between the last two cycles of the main loop
  */
 float timer_get_delta()
 {
@@ -117,9 +128,9 @@ uint32_t timer_get_ticks()
  * Elapsed seconds since the application has started,
  * measured at the beginning of the current framestep
  */
-float timer_get_elapsed()
+double timer_get_elapsed()
 {
-    return (float)current_time;
+    return current_time;
 }
 
 
@@ -138,7 +149,40 @@ int64_t timer_get_frames()
  * Elapsed of seconds since the application has started
  * and at the moment of the function call
  */
-float timer_get_now()
+double timer_get_now()
 {
-    return (float)(al_get_time() - start_time);
+    return al_get_time() - pause_duration - start_time;
 }
+
+
+/*
+ * timer_pause()
+ * Pauses the time manager
+ */
+void timer_pause()
+{
+    if(is_paused)
+        return;
+
+    is_paused = true;
+    pause_start_time = al_get_time();
+
+    logfile_message("The time manager has been paused");
+}
+
+
+/*
+ * timer_resume()
+ * Resumes the time manager
+ */
+void timer_resume()
+{
+    if(!is_paused)
+        return;
+
+    pause_duration += al_get_time() - pause_start_time;
+    is_paused = false;
+
+    logfile_message("The time manager has been resumed");
+}
+

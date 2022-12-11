@@ -60,7 +60,7 @@ bool launch_url(const char *url)
     char *safe_url = url_encode(url); /* encode the URL */
 
     if(video_is_fullscreen())
-        video_changemode(video_get_resolution(), video_is_smooth(), false);
+        video_set_fullscreen(false);
 
     if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
 #if defined(_WIN32)

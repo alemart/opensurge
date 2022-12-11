@@ -289,8 +289,6 @@ enum editor_entity_type {
 
 /* internal stuff */
 static bool editor_enabled; /* is the level editor enabled? */
-static videoresolution_t editor_previous_video_resolution;
-static bool editor_previous_video_smooth;
 static editorcmd_t* editor_cmd;
 static v2d_t editor_camera, editor_cursor;
 static enum editor_entity_type editor_cursor_entity_type;
@@ -2876,8 +2874,6 @@ void editor_init()
     while(editor_item_list[++editor_item_list_size] >= 0);
     editor_cursor_entity_type = EDT_BRICK;
     editor_cursor_entity_id = 0;
-    /*editor_previous_video_resolution = video_get_resolution();
-    editor_previous_video_smooth = video_is_smooth();*/
     editor_enemy_name = objects_get_list_of_names(&editor_enemy_name_length);
     editor_enemy_selected_category_id = 0;
     editor_enemy_category = objects_get_list_of_categories(&editor_enemy_category_length);
@@ -3422,10 +3418,8 @@ void editor_enable()
     /* pause the SurgeScript VM */
     scripting_pause_vm();
 
-    /* changing the video resolution */
-    editor_previous_video_resolution = video_get_resolution();
-    editor_previous_video_smooth = video_is_smooth();
-    video_changemode(VIDEORESOLUTION_EDT, false, video_is_fullscreen());
+    /* changing the video mode */
+    video_set_game_mode(false);
 
     /* activating the editor */
     editor_action_init();
@@ -3451,8 +3445,8 @@ void editor_disable()
     editor_action_release();
     editor_enabled = false;
 
-    /* restoring the video resolution */
-    video_changemode(editor_previous_video_resolution, editor_previous_video_smooth, video_is_fullscreen());
+    /* changing the video mode */
+    video_set_game_mode(true);
 
     /* updating the level size */
     update_level_size();

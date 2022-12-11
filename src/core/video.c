@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include "video.h"
 #include "image.h"
+#include "engine.h"
 #include "timer.h"
 #include "logfile.h"
 #include "util.h"
@@ -44,268 +45,348 @@
 #include <allegro5/allegro_x.h>
 #endif
 
-#define PRINT(x, y, flags, fmt, ...) do { \
-    al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
-    al_draw_textf(font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
-    al_draw_textf(font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
-} while(0)
 
-static ALLEGRO_DISPLAY* display = NULL;
-static image_t* backbuffer = NULL;
-static ALLEGRO_FONT* font = NULL;
-static int suggested_bpp = 32;
-static void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer);
+/* Display (window) */
+#define DEFAULT_WINDOW_TITLE (GAME_TITLE " " GAME_VERSION_STRING)
+static char window_title[256] = DEFAULT_WINDOW_TITLE;
+static ALLEGRO_DISPLAY* display = NULL; /* game window */
+static bool create_display();
+static void destroy_display();
+static void reconfigure_display();
+static void compute_display_transform(ALLEGRO_TRANSFORM* transform);
 static void set_display_icon(ALLEGRO_DISPLAY* display);
 
-/* private stuff */
-#define DEFAULT_SCREEN_SIZE     (v2d_t){ 426, 240 }    /* this is set on stone! Picked a 16:9 resolution */
-static const char WINDOW_TITLE[] = GAME_TITLE " " GAME_VERSION_STRING;
 
-/* video manager */
-static v2d_t screen_size = DEFAULT_SCREEN_SIZE; /* represents the size of the screen. This may change (eg, is the user on the level editor?) */
-static videoresolution_t video_resolution = VIDEORESOLUTION_1X;
-static bool video_fullscreen = false;
-static bool video_showfps = false;
-static bool video_smooth = false;
-static int fps_rate = 0;
-
-/* Video Message */
-static const uint32_t VIDEOMSG_TIMEOUT = 5000; /* milliseconds */
-static const int VIDEOMSG_MAXLINES = 30;
-
-typedef struct videomsg_t {
-    char* message;
-    uint32_t endtime;
-    struct videomsg_t* next;
-} videomsg_t;
-
-static videomsg_t* videomsg_new(const char* message, videomsg_t* next);
-static videomsg_t* videomsg_delete(videomsg_t* videomsg);
-static videomsg_t* videomsg_render(videomsg_t* videomsg, int line);
-static videomsg_t* videomsg = NULL;
+/* Backbuffer */
+#define DEFAULT_SCREEN_WIDTH  426 /* this is set on stone! Picked a 16:9 resolution */
+#define DEFAULT_SCREEN_HEIGHT 240
+static int game_screen_width = DEFAULT_SCREEN_WIDTH; /* the width of the backbuffer during regular gameplay (i.e., not in the level editor) */
+static int game_screen_height = DEFAULT_SCREEN_HEIGHT; /* the height of the backbuffer during regular gameplay */
+static image_t* backbuffer = NULL;
+static bool create_backbuffer();
+static void destroy_backbuffer();
+static void reconfigure_backbuffer();
 
 
+/* FPS counter */
+static int fps = 0;
+static int fps_counter = 0;
+static double fps_time = 0.0;
 
-/* video manager */
+
+/* Video settings */
+static struct {
+
+    /* current resolution */
+    videoresolution_t resolution;
+
+    /* fullscreen mode? */
+    bool is_fullscreen;
+
+    /* should we display the FPS counter? */
+    bool is_fps_visible;
+
+    /* should the size of the backbuffer match the size of the screen or of the window? */
+    bool is_in_game_mode;
+
+} settings = {
+    .resolution = VIDEORESOLUTION_1X,
+    .is_fullscreen = false,
+    .is_fps_visible = false,
+    .is_in_game_mode = true,
+};
+
+
+/* Console */
+#define CONSOLE_MAX_ENTRIES       30
+#define CONSOLE_MESSAGE_TIMEOUT   5.0 /* in seconds */
+#define CONSOLE_MESSAGE_MAXSIZE   256
+static struct {
+
+    /* entries */
+    struct {
+        char message[CONSOLE_MESSAGE_MAXSIZE];
+        double expire_time;
+    } entry[CONSOLE_MAX_ENTRIES];
+
+    /* index of the first empty entry */
+    int head;
+
+    /* font */
+    ALLEGRO_FONT* font;
+
+} console = {
+    .head = 0,
+    .font = NULL
+};
+static void init_console();
+static void release_console();
+static void print_to_console(const char* message);
+static void render_console();
+
+
+/* Misc */
+static const char LOADING_FONT[] = "Loading";
+static const char LOADING_TEXT[] = "LOADING_TEXT";
+static const char LOADING_IMAGE[] = "images/loading.png";
+
+static const char* RESOLUTION_NAME[] = {
+    [VIDEORESOLUTION_1X] = "1x",
+    [VIDEORESOLUTION_2X] = "2x",
+    [VIDEORESOLUTION_3X] = "3x",
+    [VIDEORESOLUTION_4X] = "4x"
+};
+
+#define DRAW_TEXT(x, y, flags, fmt, ...) do { \
+    al_draw_textf(console.font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+    al_draw_textf(console.font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+    al_draw_textf(console.font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+} while(0)
+
+
+
+
+
+/* -------------------- public stuff -------------------- */
+
+
+
+
 
 /*
  * video_init()
  * Initializes the video manager
  */
-void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int bpp)
+void video_init()
 {
-    logfile_message("Initializing the video...");
+    logfile_message("Initializing the video manager...");
 
-    /* initializing Allegro */
+    /* initialize Allegro */
     if(!al_init_image_addon())
         fatal_error("Can't initialize Allegro's image addon");
 
     if(!al_init_primitives_addon())
         fatal_error("Can't initialize Allegro's primitives addon");
 
-    if(!al_init_font_addon()) /* we need this here; see 'font' below */
+    if(!al_init_font_addon()) /* initialize the font addon before creating the console font */
         fatal_error("Can't initialize Allegro's font addon");
 
-    /* setup color depth */
-    if(!(bpp == 16 || bpp == 24 || bpp == 32))
-        fatal_error("Invalid color depth: %d. Valid modes are: 16, 24, 32.", bpp);
-    suggested_bpp = bpp;
+    al_inhibit_screensaver(true);
 
-    /* video init */
-    display = NULL;
-    backbuffer = NULL;
-    video_changemode(resolution, smooth, fullscreen);
+    /* load the default video settings */
+    game_screen_width = DEFAULT_SCREEN_WIDTH;
+    game_screen_height = DEFAULT_SCREEN_HEIGHT;
+    str_cpy(window_title, DEFAULT_WINDOW_TITLE, sizeof(window_title));
 
-    /* console font */
-    font = al_create_builtin_font();
+    /* reset the FPS counter */
+    fps = 0;
+    fps_counter = 0;
+    fps_time = 0.0;
 
-    /* video message */
-    videomsg = NULL;
+    /* create the display */
+    if(!create_display())
+        fatal_error("Failed to create the display");
 
-    /* set window icon */
-    set_display_icon(display);
+    /* create the backbuffer */
+    if(!create_backbuffer())
+        fatal_error("Failed to create the backbuffer");
+
+    /* initialize the console */
+    init_console();
 }
 
 /*
- * video_changemode()
- * Sets up the game window
+ * video_release()
+ * Releases the video manager
  */
-void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen)
+void video_release()
 {
-    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
-    bool prev_fullscreen = video_fullscreen;
-    
-    /* Change the video mode */
-    video_resolution = resolution;
-    video_fullscreen = fullscreen;
-    video_smooth = false; /* not supported yet */
+    logfile_message("Releasing the video manager...");
 
-    /* Log the event */
-    logfile_message(
-        "Changing the video mode to 0x%x (%s, %s)",
-        (int)video_resolution,
-        video_fullscreen ? "fullscreen" : "windowed",
-        video_smooth ? "smooth" : "plain"
-    );
+    /* release the console */
+    release_console();
 
-    /* Create a display */
-    if(display == NULL) {
-        v2d_t window_size = video_get_window_size();
+    /* destroy the backbuffer */
+    destroy_backbuffer();
 
-        /* set initial icon on X11 */
-        set_display_icon(NULL);
-
-        /* setup display flags */
-        al_set_new_display_flags(ALLEGRO_OPENGL);
-        al_set_new_display_flags(ALLEGRO_PROGRAMMABLE_PIPELINE);
-        al_set_new_display_flags(video_fullscreen ? ALLEGRO_FULLSCREEN_WINDOW : ALLEGRO_WINDOWED);
-        al_set_new_display_option(ALLEGRO_COLOR_SIZE, suggested_bpp, ALLEGRO_SUGGEST);
-
-        /* setup orientation */
-        if(window_size.x >= window_size.y)
-            al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_SUGGEST);
-        else
-            al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT, ALLEGRO_SUGGEST);
-
-        /* create display */
-        if(NULL == (display = al_create_display(window_size.x, window_size.y)))
-            fatal_error("Failed to create a %dx%d display", (int)window_size.x, (int)window_size.y);
-        al_register_event_source(a5_event_queue, al_get_display_event_source(display));
-        al_set_window_title(display, WINDOW_TITLE);
-        al_hide_mouse_cursor(display);
-    }
-
-    /* Compute the dimensions of the screen (gameplay area) */
-    screen_size = DEFAULT_SCREEN_SIZE;
-    if(resolution == VIDEORESOLUTION_EDT) {
-        /* in the level editor, we set screen_size to the dimensions of the display */
-        screen_size = v2d_new(al_get_display_width(display), al_get_display_height(display));
-    }
-
-    /* toggle fullscreen */
-    if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, video_fullscreen)) {
-        logfile_message("Failed to toggle to %s mode", video_fullscreen ? "fullscreen" : "windowed");
-        video_fullscreen = prev_fullscreen;
-    }
-
-    /* resize the display */
-    if(!video_fullscreen) {
-        v2d_t window_size = video_get_window_size();
-        if(!al_resize_display(display, window_size.x, window_size.y))
-            logfile_message("Failed to resize the display to %dx%d", (int)window_size.x, (int)window_size.y);
-    }
-
-    /* Create the backbuffer */
-    if(backbuffer != NULL)
-        image_destroy(backbuffer);
-    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP);
-    if(NULL == (backbuffer = image_create(screen_size.x, screen_size.y)))
-        fatal_error("Failed to create a %dx%d backbuffer", (int)screen_size.x, (int)screen_size.y);
-    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
+    /* destroy the display */
+    destroy_display();
 }
 
+/*
+ * video_render()
+ * Updates the video manager and the screen
+ */
+void video_render()
+{
+    ALLEGRO_STATE state;
+    ALLEGRO_TRANSFORM display_transform;
+    double now = timer_get_now();
+
+    /* compute the framerate */
+    ++fps_counter;
+    if(now >= fps_time + 1.0) {
+        fps_time = now;
+        fps = fps_counter;
+        fps_counter = 0;
+    }
+
+    /* display the framerate */
+    if(settings.is_fps_visible) {
+        DRAW_TEXT(image_width(backbuffer), 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
+    }
+
+    /* copy the backbuffer with an appropriate transform and render the console */
+    al_store_state(&state, ALLEGRO_STATE_TRANSFORM | ALLEGRO_STATE_TARGET_BITMAP);
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+
+    compute_display_transform(&display_transform);
+    al_use_transform(&display_transform);
+    al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
+    render_console();
+
+    al_restore_state(&state);
+    al_flip_display();
+}
+
+/*
+ * video_set_resolution()
+ * Set the resolution, which controls the size of the window
+ */
+void video_set_resolution(videoresolution_t resolution)
+{
+    logfile_message("Changing the video resolution to %s", RESOLUTION_NAME[(int)resolution]);
+    settings.resolution = resolution;
+    reconfigure_display();
+}
 
 /*
  * video_get_resolution()
- * Returns the current resolution
+ * Get the current resolution
  */
 videoresolution_t video_get_resolution()
 {
-    return video_resolution;
+    return settings.resolution;
 }
 
 /*
- * video_initial_resolution()
- * The initial video resolution (adopted when
- * no resolution has been selected yet)
+ * video_best_fit_resolution()
+ * Compute the best fit resolution for the user
  */
-videoresolution_t video_initial_resolution()
+videoresolution_t video_best_fit_resolution()
 {
     ALLEGRO_MONITOR_INFO info;
 
     if(al_get_monitor_info(0, &info)) {
-        v2d_t desktop = v2d_new(info.x2 - info.x1, info.y2 - info.y1);
-        v2d_t screen3 = v2d_multiply(DEFAULT_SCREEN_SIZE, 3);
+        int desktop_width = info.x2 - info.x1;
+        int desktop_height = info.y2 - info.y1;
 
-        if(desktop.x > screen3.x && desktop.y > screen3.y)
+        if(desktop_width > 4 * game_screen_width && desktop_height > 4 * game_screen_height)
+            return VIDEORESOLUTION_4X;
+        else if(desktop_width > 3 * game_screen_width && desktop_height > 3 * game_screen_height)
             return VIDEORESOLUTION_3X;
-        else
+        else if(desktop_width > 2 * game_screen_width && desktop_height > 2 * game_screen_height)
             return VIDEORESOLUTION_2X;
+        else
+            return VIDEORESOLUTION_1X;
     }
-    else
-        return VIDEORESOLUTION_2X;
-}
 
+    /* if the monitor info is not available, we return a safe guess */
+    return VIDEORESOLUTION_2X;
+}
 
 /*
- * video_is_smooth()
- * Smooth graphics?
+ * video_set_fullscreen()
+ * Enable/disable fullscreen
  */
-bool video_is_smooth()
+void video_set_fullscreen(bool fullscreen)
 {
-    return video_smooth;
+    logfile_message("%s fullscreen", fullscreen ? "Enabling" : "Disabling");
+    settings.is_fullscreen = fullscreen;
+    reconfigure_display();
 }
-
 
 /*
  * video_is_fullscreen()
- * Fullscreen mode?
+ * Are we in fullscreen mode?
  */
 bool video_is_fullscreen()
 {
-    return video_fullscreen;
+    return settings.is_fullscreen;
 }
 
+/*
+ * video_set_game_mode()
+ * Enable/disable the game mode
+ */
+void video_set_game_mode(bool in_game_mode)
+{
+    logfile_message("%s the game mode", in_game_mode ? "Enabling" : "Disabling");
+    settings.is_in_game_mode = in_game_mode;
+    reconfigure_backbuffer();
+}
+
+/*
+ * video_is_in_game_mode()
+ * Is the game mode enabled?
+ */
+bool video_is_in_game_mode()
+{
+    return settings.is_in_game_mode;
+}
+
+/*
+ * video_set_fps_visible()
+ * Shows/hides the FPS counter
+ */
+void video_set_fps_visible(bool visible)
+{
+    logfile_message("%s the FPS counter", visible ? "Enabling" : "Disabling");
+    settings.is_fps_visible = visible;
+}
+
+/*
+ * video_is_fps_visible()
+ * Is the FPS counter visible?
+ */
+bool video_is_fps_visible()
+{
+    return settings.is_fps_visible;
+}
+
+/*
+ * video_fps()
+ * Get the FPS rate
+ */
+int video_fps()
+{
+    return fps;
+}
 
 /*
  * video_get_screen_size()
- * Returns the size of the screen.
+ * Returns the size of the backbuffer
  */
 v2d_t video_get_screen_size()
 {
-    return screen_size;
+    if(!settings.is_in_game_mode && backbuffer != NULL)
+        return v2d_new(image_width(backbuffer), image_height(backbuffer));
+    else
+        return v2d_new(game_screen_width, game_screen_height);
 }
-
 
 /*
  * video_get_window_size()
- * Returns the window size, based on
- * the current resolution
+ * Returns the window size, based on the current resolution
  */
 v2d_t video_get_window_size()
 {
-    int width = DEFAULT_SCREEN_SIZE.x;
-    int height = DEFAULT_SCREEN_SIZE.y;
-
-    switch(video_resolution) {
-        case VIDEORESOLUTION_1X:
-            break;
-
-        case VIDEORESOLUTION_2X:
-            width *= 2;
-            height *= 2;
-            break;
-
-        case VIDEORESOLUTION_3X:
-            width *= 3;
-            height *= 3;
-            break;
-
-        case VIDEORESOLUTION_4X:
-            width *= 4;
-            height *= 4;
-            break;
-
-        case VIDEORESOLUTION_EDT:
-            width = VIDEO_SCREEN_W;
-            height = VIDEO_SCREEN_H;
-            break;
-    }
-
-    return v2d_new(width, height);
+    if(display != NULL)
+        return v2d_new(al_get_display_width(display), al_get_display_height(display));
+    else
+        return v2d_new(game_screen_width, game_screen_height);
 }
-
 
 /*
  * video_get_backbuffer()
@@ -317,135 +398,20 @@ image_t* video_get_backbuffer()
 }
 
 /*
- * video_render()
- * Updates the video manager and the screen
- */
-void video_render()
-{
-    ALLEGRO_STATE state;
-    uint32_t current_time;
-    static uint32_t fps_timer = 0, frame_count = 0;
-
-    /* video message */
-    videomsg = videomsg_render(videomsg, 0);
-
-    /* compute fps rate */
-    ++frame_count;
-    if((current_time = timer_get_ticks()) >= fps_timer + 1000) {
-        fps_timer = current_time;
-        fps_rate = frame_count;
-        frame_count = 0;
-    }
-
-    /* show fps */
-    if(video_is_fps_visible())
-        PRINT(image_width(backbuffer), 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps_rate);
-
-    /* render */
-    al_store_state(&state, ALLEGRO_STATE_TRANSFORM | ALLEGRO_STATE_TARGET_BITMAP);
-    al_set_target_bitmap(al_get_backbuffer(display));
-    apply_display_transform(display, backbuffer);
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
-    al_flip_display();
-    al_restore_state(&state);
-    /*al_set_target_bitmap(IMAGE2BITMAP(backbuffer));*/
-}
-
-
-/*
- * video_release()
- * Releases the video manager
- */
-void video_release()
-{
-    logfile_message("Releasing the video...");
-
-    if(videomsg != NULL)
-        videomsg = videomsg_delete(videomsg);
-
-    if(font != NULL) {
-        al_destroy_font(font);
-        font = NULL;
-    }
-
-    if(backbuffer != NULL) {
-        image_destroy(backbuffer);
-        backbuffer = NULL;
-    }
-
-    if(display != NULL) {
-        al_destroy_display(display);
-        display = NULL;
-    }
-}
-
-
-/*
  * video_showmessage()
  * Shows a text message to the user
  */
 void video_showmessage(const char *fmt, ...)
 {
-    char message[512] = "";
+    char message[CONSOLE_MESSAGE_MAXSIZE];
     va_list args;
 
     va_start(args, fmt);
     vsnprintf(message, sizeof(message), fmt, args);
     va_end(args);
 
-    videomsg = videomsg_new(message, videomsg);
+    print_to_console(message);
 }
-
-
-/*
- * video_get_color_depth()
- * Returns the current color depth
- */
-int video_get_color_depth()
-{
-    return display ? al_get_display_option(display, ALLEGRO_COLOR_SIZE) : 0;
-}
-
-
-/*
- * video_get_preferred_color_depth()
- * Returns the preferred color depth for the game
- */
-int video_get_preferred_color_depth()
-{
-    return 32;
-}
-
-
-/*
- * video_show_fps()
- * Shows/hides the FPS counter
- */
-void video_show_fps(bool show)
-{
-    video_showfps = show;
-}
-
-
-/*
- * video_is_fps_visible()
- * Is the FPS counter visible?
- */
-bool video_is_fps_visible()
-{
-    return video_showfps;
-}
-
-/*
- * video_fps()
- * Get FPS rate
- */
-int video_fps()
-{
-    return fps_rate;
-}
-
 
 /*
  * video_display_loading_screen()
@@ -453,8 +419,6 @@ int video_fps()
  */
 void video_display_loading_screen()
 {
-    static const char* LOADING_IMAGE = "images/loading.png";
-    static const char* LOADING_FONT = "Loading";
     image_t *img = image_load(LOADING_IMAGE);
     font_t* fnt = font_create(LOADING_FONT);
     v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
@@ -462,7 +426,7 @@ void video_display_loading_screen()
     image_clear(color_rgb(0, 0, 0));
     image_blit(img, 0, 0, (VIDEO_SCREEN_W - image_width(img)) / 2, (VIDEO_SCREEN_H - image_height(img)) / 2, image_width(img), image_height(img));
     font_set_align(fnt, FONTALIGN_CENTER);
-    font_set_text(fnt, "%s", lang_get("LOADING_TEXT"));
+    font_set_text(fnt, "%s", lang_get(LOADING_TEXT));
     font_set_position(fnt, v2d_subtract(cam, v2d_new(0, font_get_textsize(fnt).y / 2)));
     font_render(fnt, cam);
     video_render();
@@ -471,14 +435,143 @@ void video_display_loading_screen()
 }
 
 
-
-/* private stuff */
-
-/* apply a transform when rendering, so that we have a resized
-   screen that maintains the original aspect ratio of the game */
-void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer)
+/*
+ * a5_handle_video_event()
+ * Handle a video event from Allegro
+ */
+void a5_handle_video_event(const ALLEGRO_EVENT* event)
 {
-    ALLEGRO_TRANSFORM t;
+    switch(event->type) {
+
+        case ALLEGRO_EVENT_DISPLAY_CLOSE:
+            if(event->display.source == display)
+                engine_quit();
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESIZE:
+            al_acknowledge_resize(event->display.source);
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+            al_acknowledge_drawing_halt(event->display.source);
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+            al_acknowledge_drawing_resume(event->display.source);
+            reconfigure_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
+            break;
+
+    }
+}
+
+
+
+/* -------------------- private stuff -------------------- */
+
+
+
+
+
+/*
+ *
+ * DISPLAY
+ *
+ */
+
+/* Create the display (window) */
+bool create_display()
+{
+    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
+    ALLEGRO_STATE state;
+
+    if(display != NULL)
+        fatal_error("Duplicate display");
+
+    al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
+    al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE);
+    al_set_new_display_option(
+        ALLEGRO_SUPPORTED_ORIENTATIONS,
+        game_screen_width >= game_screen_height ?
+            ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE :
+            ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT,
+        ALLEGRO_REQUIRE
+    );
+
+#if defined(ALLEGRO_UNIX) && !defined(ALLEGRO_RASPBERRYPI)
+    set_display_icon(NULL);
+#endif
+
+#if defined(__ANDROID__)
+    display = al_create_display(0, 0); /* occupy the entire screen on mobile */
+#else
+    display = al_create_display(game_screen_width, game_screen_height);
+#endif
+
+    if(display == NULL)
+        return false;
+
+    al_register_event_source(a5_event_queue, al_get_display_event_source(display));
+    al_set_window_title(display, window_title);
+    al_hide_mouse_cursor(display);
+    set_display_icon(display);
+
+    al_restore_state(&state);
+    return true;
+}
+
+/* Destroy the display */
+void destroy_display()
+{
+    if(display == NULL)
+        fatal_error("Display released twice");
+
+    al_set_target_bitmap(NULL);
+    al_destroy_display(display);
+    display = NULL;
+}
+
+/* Reconfigure the display according to the current settings */
+void reconfigure_display()
+{
+#if !defined(__ANDROID__)
+    int multiplier = (int)(settings.resolution - VIDEORESOLUTION_1X) + 1;
+    int new_display_width = game_screen_width * multiplier;
+    int new_display_height = game_screen_height * multiplier;
+    int delta_width = new_display_width - al_get_display_width(display);
+    int delta_height = new_display_height - al_get_display_height(display);
+
+    /* toggle fullscreen */
+    if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, settings.is_fullscreen))
+        logfile_message("VIDEO: can't toggle fullscreen mode");
+
+    /* resize the window */
+    if(!(al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW)) {
+        if(al_resize_display(display, new_display_width, new_display_height)) {
+
+            /* reposition the window */
+            int x, y;
+            al_get_window_position(display, &x, &y);
+
+            x = max(0, x - delta_width / 2);
+            y = max(0, y - delta_height / 2);
+            al_set_window_position(display, x, y);
+
+        }
+        else
+            logfile_message("VIDEO: can't resize the display to %dx%d", new_display_width, new_display_height);
+    }
+#endif
+}
+
+/* compute a transform, so that we have a resized screen that maintains the original aspect ratio of the game */
+void compute_display_transform(ALLEGRO_TRANSFORM* transform)
+{
     v2d_t scale, offset;
 
     /* compute the scale */
@@ -492,8 +585,7 @@ void apply_display_transform(ALLEGRO_DISPLAY* display, image_t* backbuffer)
         offset = v2d_new((al_get_display_width(display) - scale.y * image_width(backbuffer)) * 0.5f, 0.0f);
 
     /* compute the transform */
-    al_build_transform(&t, offset.x, offset.y, min(scale.x, scale.y), min(scale.x, scale.y), 0.0f);
-    al_use_transform(&t);
+    al_build_transform(transform, offset.x, offset.y, min(scale.x, scale.y), min(scale.x, scale.y), 0.0f);
 }
 
 /* sets the icon of the display to a built-in icon */
@@ -516,41 +608,143 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
     al_fclose(f);
 }
 
-/* creates a new videomsg_t node */
-videomsg_t* videomsg_new(const char* message, videomsg_t* next)
+
+
+/*
+ *
+ * BACKBUFFER
+ *
+ */
+
+/* Create the backbuffer (the image texture to which the game will be rendered to) */
+bool create_backbuffer()
 {
-    videomsg_t* node = mallocx(sizeof *node);
-    node->message = str_dup(message);
-    node->endtime = timer_get_ticks() + VIDEOMSG_TIMEOUT;
-    node->next = next;
-    return node;
+    ALLEGRO_STATE state;
+
+    if(backbuffer != NULL)
+        fatal_error("Duplicate backbuffer");
+
+    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
+
+    if(NULL == (backbuffer = image_create(game_screen_width, game_screen_height)))
+        return false;
+
+    al_restore_state(&state);
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+    return true;
 }
 
-/* deletes an existing videomsg_t node */
-videomsg_t* videomsg_delete(videomsg_t* videomsg)
+/* Destroy the backbuffer */
+void destroy_backbuffer()
 {
-    if(videomsg->next)
-        videomsg->next = videomsg_delete(videomsg->next);
-    free(videomsg->message);
-    free(videomsg);
-    return NULL;
+    /* a display is tied to an OpenGL rendering context. A video bitmap is tied
+       to a display. If the display is invalidated, so is the backbuffer */
+    if(backbuffer == NULL)
+        fatal_error("Backbuffer released twice");
+
+    al_set_target_bitmap(al_get_backbuffer(display));
+    image_destroy(backbuffer);
+    backbuffer = NULL;
 }
 
-/* updates and renders a videomsg_t linked list; returns the updated list */
-videomsg_t* videomsg_render(videomsg_t* videomsg, int line)
+/* Reconfigure the backbuffer according to the current settings */
+void reconfigure_backbuffer()
 {
-    if(videomsg != NULL) {
-        /* got timeout? */
-        if(timer_get_ticks() >= videomsg->endtime || line + 1 > VIDEOMSG_MAXLINES)
-            return videomsg_delete(videomsg);
+    ALLEGRO_STATE state;
+    int backbuffer_width = settings.is_in_game_mode ? game_screen_width : al_get_display_width(display);
+    int backbuffer_height = settings.is_in_game_mode ? game_screen_height : al_get_display_height(display);
 
-        /* render current message */
-        PRINT(0.0f, image_height(backbuffer) - al_get_font_line_height(font) * (line + 1), ALLEGRO_ALIGN_LEFT, "%s", videomsg->message);
+    if(backbuffer == NULL)
+        fatal_error("No backbuffer");
+    else
+        image_destroy(backbuffer);
 
-        /* render next message */
-        videomsg->next = videomsg_render(videomsg->next, line + 1);
+    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
+
+    if(NULL == (backbuffer = image_create(backbuffer_width, backbuffer_height)))
+        fatal_error("Can't reconfigure the backbuffer");
+
+    al_restore_state(&state);
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+
+    /* it seems that we need this for some reason on Android. Why? */
+    al_destroy_font(console.font);
+    console.font = al_create_builtin_font();
+}
+
+
+
+
+/*
+ *
+ * BUILT-IN CONSOLE
+ *
+ */
+
+/* Initialize the console */
+void init_console()
+{
+    /* initialize the entries */
+    for(int i = 0; i < CONSOLE_MAX_ENTRIES; i++) {
+        console.entry[i].message[0] = '\0';
+        console.entry[i].expire_time = 0.0;
     }
 
-    /* done! */
-    return videomsg;
+    /* initialize the head */
+    console.head = 0;
+
+    /* create a font for the console */
+    console.font = al_create_builtin_font();
+}
+
+/* Release the console */
+void release_console()
+{
+    /* release the font of the console */
+    al_destroy_font(console.font);
+}
+
+/* Print a message to the console */
+void print_to_console(const char* message)
+{
+    /* create the entry */
+    str_cpy(console.entry[console.head].message, message, sizeof(console.entry[console.head].message));
+    console.entry[console.head].expire_time = timer_get_elapsed() + CONSOLE_MESSAGE_TIMEOUT;
+
+    /* advance the head */
+    console.head = (console.head + 1) % CONSOLE_MAX_ENTRIES;
+}
+
+/* Render the messages of the console */
+void render_console()
+{
+    int font_scale = (settings.resolution == VIDEORESOLUTION_1X) ? 1 : 2;
+    int font_height = al_get_font_line_height(console.font);
+    int first = console.head;
+    int last = (console.head + (CONSOLE_MAX_ENTRIES - 1)) % CONSOLE_MAX_ENTRIES;
+    int ypos = al_get_display_height(display) / font_scale;
+    double elapsed = timer_get_elapsed();
+
+    ALLEGRO_TRANSFORM transform;
+    al_identity_transform(&transform);
+    al_scale_transform(&transform, font_scale, font_scale);
+    al_use_transform(&transform);
+
+    #define PRINT_ENTRIES(from, to) \
+        for(int i = (to); i >= (from); i--) { \
+            if(elapsed < console.entry[i].expire_time) { \
+                ypos -= font_height; \
+                DRAW_TEXT(0, ypos, ALLEGRO_ALIGN_LEFT, "%s", console.entry[i].message); \
+            } \
+        }
+
+    if(first < last) {
+        PRINT_ENTRIES(first, last);
+    }
+    else {
+        PRINT_ENTRIES(0, last);
+        PRINT_ENTRIES(first, CONSOLE_MAX_ENTRIES - 1);
+    }
 }

@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_native_dialog.h>
 #include <stdint.h>
 #include <string.h>
 #include <locale.h>
@@ -56,6 +54,12 @@
 #include "../scenes/quest.h"
 #include "../scenes/level.h"
 
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#if !defined(__ANDROID__)
+#include <allegro5/allegro_native_dialog.h>
+#endif
+
 /* minimum Allegro version */
 #if ALLEGRO_VERSION_INT < ALLEGRO_MIN_VERSION_INT
 #error "This build requires a newer version of Allegro"
@@ -91,6 +95,7 @@ ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL; /* public */
 extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
+extern void a5_handle_video_event(const ALLEGRO_EVENT* event);
 
 /* Global Prefs */
 prefs_t* prefs = NULL; /* public */
@@ -140,12 +145,13 @@ void engine_release()
 void engine_mainloop()
 {
     scene_t *current_scene = NULL;
-    bool redraw = false;
+    bool must_redraw = false;
+    bool is_active = true;
 
     /* configure the timer */
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / TARGET_FPS);
     if(!timer)
-        fatal_error("Can't create Allegro timer");
+        fatal_error("Can't create an Allegro timer");
 
     al_register_event_source(a5_event_queue, al_get_timer_event_source(timer));
     al_start_timer(timer);
@@ -170,7 +176,7 @@ void engine_mainloop()
                 /* updating the current scene */
                 current_scene = scenestack_top();
                 current_scene->update();
-                redraw = (current_scene == scenestack_top()); /* same scene? */
+                must_redraw = (current_scene == scenestack_top()); /* same scene? */
 
                 /* prevent locking */
                 while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event.timer.source)
@@ -196,17 +202,38 @@ void engine_mainloop()
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                engine_quit();
+            case ALLEGRO_EVENT_DISPLAY_RESIZE:
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+                a5_handle_video_event(&event);
                 break;
+
+#if defined(__ANDROID__)
+            case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+                logfile_message("Received an ALLEGRO_EVENT_DISPLAY_HALT_DRAWING");
+                is_active = false;
+                al_stop_timer(timer);
+                timer_pause();
+                a5_handle_video_event(&event);
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+                logfile_message("Received an ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING");
+                a5_handle_video_event(&event);
+                timer_resume();
+                al_start_timer(timer);
+                is_active = true;
+                break;
+#endif
         }
 
         /* render */
-        if(redraw && al_is_event_queue_empty(a5_event_queue)) {
+        if(is_active && must_redraw && al_is_event_queue_empty(a5_event_queue)) {
             current_scene->render();
             screenshot_update();
             fadefx_update();
             video_render();
-            redraw = false;
+            must_redraw = false;
         }
     }
 
@@ -268,8 +295,10 @@ void init_basic_stuff(const commandline_t* cmd)
     if(NULL == (a5_event_queue = al_create_event_queue()))
         fatal_error("Can't create Allegro's event queue");
 
+#if !defined(__ANDROID__)
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");
+#endif
 
     /* initialize the filesystem and the logfile */
     asset_init(cmd->argv[0], gamedir);
@@ -290,20 +319,23 @@ void init_basic_stuff(const commandline_t* cmd)
 void init_managers(const commandline_t* cmd)
 {
     timer_init();
-    video_init(
-        commandline_getint(
-            cmd->video_resolution,
+
+    video_init();
+    video_set_resolution(
+        commandline_getint(cmd->video_resolution,
             prefs_has_item(prefs, ".resolution") ?
-                prefs_get_int(prefs, ".resolution") : video_initial_resolution()
-        ),
-        commandline_getint(cmd->smooth_graphics, prefs_get_bool(prefs, ".smoothgfx")),
-        commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen")),
-        commandline_getint(cmd->color_depth, video_get_preferred_color_depth())
+            prefs_get_int(prefs, ".resolution") :
+            video_best_fit_resolution()
+        )
     );
-    video_show_fps(
+    video_set_fullscreen(
+        commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen"))
+    );
+    video_set_fps_visible(
         commandline_getint(cmd->show_fps, prefs_get_bool(prefs, ".showfps")) &&
         !commandline_getint(cmd->hide_fps, FALSE)
     );
+
     audio_init();
     input_init();
     resourcemanager_init();
@@ -323,6 +355,7 @@ void init_accessories(const commandline_t* cmd)
     lang_init();
     if(custom_lang && *custom_lang)
         lang_loadfile(custom_lang);
+
     font_init(commandline_getint(cmd->allow_font_smoothing, TRUE));
     video_display_loading_screen();
 

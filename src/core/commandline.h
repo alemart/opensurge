@@ -31,7 +31,6 @@ struct commandline_t
     int video_resolution;
     int smooth_graphics;
     int fullscreen;
-    int color_depth;
     int show_fps;
     int hide_fps;
     int allow_font_smoothing;

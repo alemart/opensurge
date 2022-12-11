@@ -118,28 +118,34 @@ void image_save(const image_t* img, const char *path)
  */
 image_t* image_create(int width, int height)
 {
+    ALLEGRO_BITMAP* bmp;
+    ALLEGRO_STATE state;
     image_t* img;
 
+    if(width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE)
+        logfile_message("WARNING: image_create(%d,%d) - larger than %dx%d", width, height, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
+
     if(width <= 0 || height <= 0) {
-        fatal_error("Can't create image of size %d x %d", width, height);
+        fatal_error("Can't create image of size %dx%d", width, height);
         return NULL;
     }
 
+    if(NULL == (bmp = al_create_bitmap(width, height))) {
+        logfile_message("ERROR: image_create(%d,%d) failed", width, height);
+        return NULL;
+    }
+
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+    al_set_target_bitmap(bmp);
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_restore_state(&state);
+
     img = mallocx(sizeof *img);
-    img->path = NULL;
+    img->data = bmp;
     img->w = width;
     img->h = height;
+    img->path = NULL;
     
-    if(NULL != (img->data = al_create_bitmap(img->w, img->h))) {
-        ALLEGRO_STATE state;
-        al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-        al_set_target_bitmap(img->data);
-        al_clear_to_color(al_map_rgb(0, 0, 0));
-        al_restore_state(&state);
-    }
-    else
-        logfile_message("ERROR - image_create(%d,%d) failed", img->w, img->h);
-
     return img;
 }
 

@@ -310,13 +310,12 @@ void bgstrategy_linear_update(bgstrategy_t *strategy)
 
 void render(const bgtheme_t *bgtheme, v2d_t camera_position, bool foreground)
 {
-    int i;
     v2d_t halfscreen = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
     v2d_t topleft = v2d_subtract(camera_position, halfscreen);
-    background_t *bg;
 
-    for(i=0; i<bgtheme->length; i++) {
-        bg = bgtheme->data[i];
+    for(int i = 0; i < bgtheme->length; i++) {
+        background_t* bg = bgtheme->data[i];
+
         if((!foreground && bg->zindex <= 0.5f) || (foreground && bg->zindex > 0.5f)) {
             v2d_t prev = bg->actor->position;
 

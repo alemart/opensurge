@@ -27,40 +27,44 @@
 
 struct image_t;
 
-/* video modes */
-typedef enum videoresolution_t {
-    VIDEORESOLUTION_EDT, /* level editor */
-    VIDEORESOLUTION_1X,  /* original size */
-    VIDEORESOLUTION_2X,  /* double size */
-    VIDEORESOLUTION_3X,  /* triple size */
-    VIDEORESOLUTION_4X,  /* quadruple size */
-} videoresolution_t;
-
 /* video manager */
-void video_init(videoresolution_t resolution, bool smooth, bool fullscreen, int bpp);
+void video_init();
 void video_release();
 void video_render();
-int video_get_preferred_color_depth();
-int video_get_color_depth();
-void video_changemode(videoresolution_t resolution, bool smooth, bool fullscreen);
-videoresolution_t video_get_resolution();
-videoresolution_t video_initial_resolution();
-bool video_is_smooth();
-bool video_is_fullscreen();
-v2d_t video_get_screen_size(); /* usually, 426x240 */
-v2d_t video_get_window_size(); /* the real size of the window, in pixels */
 
 /* backbuffer */
-#define VIDEO_SCREEN_W            ((int)(video_get_screen_size().x))
-#define VIDEO_SCREEN_H            ((int)(video_get_screen_size().y))
+#define VIDEO_SCREEN_W ((int)(video_get_screen_size().x))
+#define VIDEO_SCREEN_H ((int)(video_get_screen_size().y))
 struct image_t *video_get_backbuffer();
+v2d_t video_get_screen_size(); /* usually 426x240 pixels */
 
-/* FPS counter (frames per second) */
-void video_show_fps(bool show);
+/* resolution: controls the size of the window */
+typedef enum videoresolution_t {
+    VIDEORESOLUTION_1X = 1, /* original size */
+    VIDEORESOLUTION_2X,     /* double size */
+    VIDEORESOLUTION_3X,     /* triple size */
+    VIDEORESOLUTION_4X      /* quadruple size */
+} videoresolution_t;
+
+void video_set_resolution(videoresolution_t resolution);
+videoresolution_t video_get_resolution();
+videoresolution_t video_best_fit_resolution();
+v2d_t video_get_window_size();
+
+/* game mode (regular gameplay vs level editor) */
+void video_set_game_mode(bool in_game_mode);
+bool video_is_in_game_mode();
+
+/* fullscreen mode */
+void video_set_fullscreen(bool fullscreen);
+bool video_is_fullscreen();
+
+/* frames per second */
+void video_set_fps_visible(bool visible);
 bool video_is_fps_visible();
-int video_fps(); /* get FPS rate */
+int video_fps(); /* the FPS rate */
 
-/* video message */
+/* built-in console */
 void video_showmessage(const char *fmt, ...);
 
 /* loading screen */

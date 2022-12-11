@@ -243,7 +243,6 @@ void save_preferences()
 
     prefs_set_int(prefs, ".resolution", video_get_resolution());
     prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
-    prefs_set_bool(prefs, ".smoothgfx", video_is_smooth());
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 }
 
@@ -429,18 +428,18 @@ static void group_fullscreen_update(group_t *g)
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                 sound_play(SFX_CONFIRM);
-                video_changemode(video_get_resolution(), video_is_smooth(), !video_is_fullscreen());
+                video_set_fullscreen(!video_is_fullscreen());
             }
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_fullscreen()) {
                     sound_play(SFX_CONFIRM);
-                    video_changemode(video_get_resolution(), video_is_smooth(), false);
+                    video_set_fullscreen(false);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_fullscreen()) {
                     sound_play(SFX_CONFIRM);
-                    video_changemode(video_get_resolution(), video_is_smooth(), true);
+                    video_set_fullscreen(true);
                 }
             }
         }
@@ -477,86 +476,6 @@ static group_t *group_fullscreen_create()
 }
 
 
-/* "Smooth Graphics" label */
-static void group_smooth_init(group_t *g)
-{
-    group_highlightable_init(g, "OPTIONS_SMOOTHGFX", option_count++);
-}
-
-static void group_smooth_release(group_t *g)
-{
-    group_highlightable_release(g);
-}
-
-static int group_smooth_is_highlighted(group_t *g)
-{
-    return group_highlightable_is_highlighted(g);
-}
-
-static void group_smooth_update(group_t *g)
-{
-    int resolution = (video_get_resolution() == VIDEORESOLUTION_1X) ? VIDEORESOLUTION_2X : video_get_resolution();
-
-    /* base class */
-    group_highlightable_update(g);
-
-    /* derived class */
-    if(group_smooth_is_highlighted(g) && video_get_color_depth() == 32) {
-        if(!fadefx_is_fading()) {
-            if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
-                sound_play(SFX_CONFIRM);
-                video_changemode(resolution, !video_is_smooth(), video_is_fullscreen());
-            }
-            if(input_button_pressed(input, IB_RIGHT)) {
-                if(video_is_smooth()) {
-                    sound_play(SFX_CONFIRM);
-                    video_changemode(resolution, false, video_is_fullscreen());
-                }
-            }
-            if(input_button_pressed(input, IB_LEFT)) {
-                if(!video_is_smooth()) {
-                    sound_play(SFX_CONFIRM);
-                    video_changemode(resolution, true, video_is_fullscreen());
-                }
-            }
-        }
-    }
-}
-
-static void group_smooth_render(group_t *g, v2d_t camera_position)
-{
-    font_t *f;
-    char v[2][80];
-
-    /* base class */
-    group_highlightable_render(g, camera_position);
-
-    /* derived class */
-    f = font_create("MenuText");
-    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
-
-    str_cpy(v[0], lang_get("OPTIONS_YES"), sizeof(v[0]));
-    str_cpy(v[1], lang_get("OPTIONS_NO"), sizeof(v[1]));
-
-    if(video_get_color_depth() == 32) {
-        if(video_is_smooth())
-            font_set_text(f, "<color=$COLOR_HIGHLIGHT>%s</color>  %s", v[0], v[1]);
-        else
-            font_set_text(f, "%s  <color=$COLOR_HIGHLIGHT>%s</color>", v[0], v[1]);
-    }
-    else
-        font_set_text(f, "<color=ff8888>%s</color>", lang_get("OPTIONS_SMOOTHGFX_ERROR"));
-
-    font_render(f, camera_position);
-    font_destroy(f);
-}
-
-static group_t *group_smooth_create()
-{
-    return group_create(group_smooth_init, group_smooth_release, group_smooth_update, group_smooth_render);
-}
-
-
 /* "Show FPS" label */
 static void group_fps_init(group_t *g)
 {
@@ -583,18 +502,18 @@ static void group_fps_update(group_t *g)
         if(!fadefx_is_fading()) {
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                 sound_play(SFX_CONFIRM);
-                video_show_fps(!video_is_fps_visible());
+                video_set_fps_visible(!video_is_fps_visible());
             }
             if(input_button_pressed(input, IB_RIGHT)) {
                 if(video_is_fps_visible()) {
                     sound_play(SFX_CONFIRM);
-                    video_show_fps(false);
+                    video_set_fps_visible(false);
                 }
             }
             if(input_button_pressed(input, IB_LEFT)) {
                 if(!video_is_fps_visible()) {
                     sound_play(SFX_CONFIRM);
-                    video_show_fps(true);
+                    video_set_fps_visible(true);
                 }
             }
         }
@@ -658,57 +577,69 @@ static void group_resolution_update(group_t *g)
             if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
                 switch(video_get_resolution()) {
                     case VIDEORESOLUTION_1X:
-                        video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_2X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_2X:
-                        video_changemode(VIDEORESOLUTION_3X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_3X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_3X:
-                        video_changemode(VIDEORESOLUTION_4X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_4X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_4X:
-                        video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_1X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     default:
                         break;
                 }
             }
+
             if(input_button_pressed(input, IB_RIGHT)) {
                 switch(video_get_resolution()) {
                     case VIDEORESOLUTION_1X:
-                        video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_2X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_2X:
-                        video_changemode(VIDEORESOLUTION_3X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_3X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_3X:
-                        video_changemode(VIDEORESOLUTION_4X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_4X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     default:
                         break;
                 }
             }
+
             if(input_button_pressed(input, IB_LEFT)) {
                 switch(video_get_resolution()) {
                     case VIDEORESOLUTION_4X:
-                        video_changemode(VIDEORESOLUTION_3X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_3X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_3X:
-                        video_changemode(VIDEORESOLUTION_2X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_2X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     case VIDEORESOLUTION_2X:
-                        video_changemode(VIDEORESOLUTION_1X, video_is_smooth(), video_is_fullscreen());
+                        video_set_resolution(VIDEORESOLUTION_1X);
                         sound_play(SFX_CONFIRM);
                         break;
+
                     default:
                         break;
                 }
@@ -1105,8 +1036,6 @@ group_t *create_grouptree()
     graphics = group_graphics_create();
     group_addchild(graphics, group_resolution_create());
     group_addchild(graphics, group_fullscreen_create());
-    /*group_addchild(graphics, group_smooth_create());*/
-    (void)group_smooth_create;
     group_addchild(graphics, group_fps_create());
 
     /* section: game */
