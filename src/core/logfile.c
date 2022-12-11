@@ -20,15 +20,29 @@
 
 #include <allegro5/allegro.h>
 #include <surgescript.h>
+#include <physfs.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "logfile.h"
 #include "global.h"
 #include "asset.h"
 
+#if defined(__ANDROID__)
+#include <allegro5/allegro_android.h>
+#include <android/log.h>
+#endif
+
+#if !defined(_WIN32)
+#include <unistd.h>
+#elif !defined(STDERR_FILENO)
+#define STDERR_FILENO 2 /* _fileno(stderr) */
+#endif
+
 
 /* private stuff ;) */
-static const char* a5_version_string();
+static const char* allegro_version_string();
+static const char* surgescript_version_string();
+static const char* physfs_version_string();
 static const char* LOGFILE_PATH = "logfile.txt"; /* default log file */
 static ALLEGRO_FILE* logfile = NULL;
 
@@ -39,20 +53,35 @@ static ALLEGRO_FILE* logfile = NULL;
  */
 void logfile_init()
 {
-    const char* fullpath = asset_path(LOGFILE_PATH);
     char tmp_path[4096];
+
+#if !defined(__ANDROID__)
+    const char* fullpath = asset_path(LOGFILE_PATH);
 
     if(NULL == (logfile = al_fopen(fullpath, "wb"))) { /* physfs uses binary mode */
         fprintf(stderr, "Can't open logfile at %s\n", fullpath);
-        return;
+
+        if(NULL == (logfile = al_fopen_fd(STDERR_FILENO, "w"))) {
+            fprintf(stderr, "Can't open logfile at stderr\n");
+            return;
+        }
     }
+#else
+    (void)LOGFILE_PATH;
+    logfile = NULL;
+#endif
 
     /* initial messages */
     logfile_message("%s version %s", GAME_TITLE, GAME_VERSION_STRING);
-    logfile_message("Using Allegro version %s", a5_version_string());
-    logfile_message("Using SurgeScript version %s", surgescript_util_version());
+    logfile_message("Using Allegro version %s", allegro_version_string());
+    logfile_message("Using SurgeScript version %s", surgescript_version_string());
+    logfile_message("Using PhysicsFS version %s", physfs_version_string());
     logfile_message("Asset directory: %s", asset_shared_datadir(tmp_path, sizeof(tmp_path)));
     logfile_message("User directory: %s", asset_user_datadir(tmp_path, sizeof(tmp_path)));
+
+#if defined(__ANDROID__)
+    logfile_message("Android platform: %s", al_android_get_os_version());
+#endif
 }
 
 
@@ -62,6 +91,8 @@ void logfile_init()
  */
 void logfile_message(const char* fmt, ...)
 {
+#if !defined(__ANDROID__)
+
     va_list args;
 
     if(logfile == NULL)
@@ -81,6 +112,16 @@ void logfile_message(const char* fmt, ...)
 #endif
 
     al_fflush(logfile);
+
+#else
+
+    va_list args;
+
+    va_start(args, fmt);
+    __android_log_vprint(ANDROID_LOG_INFO, GAME_UNIXNAME, fmt, args);
+    va_end(args);
+
+#endif
 }
 
 
@@ -109,12 +150,12 @@ void logfile_release()
 
 
 /*
- * a5_version_string()
- * Returns the compiled Allegro version as a static char[]
+ * allegro_version_string()
+ * Returns the compiled Allegro version as a string
  */
-const char* a5_version_string()
+const char* allegro_version_string()
 {
-    static char str[17];
+    static char str[16];
     uint32_t version = al_get_allegro_version();
 
     snprintf(str, sizeof(str), "%u.%u.%u-%u",
@@ -123,6 +164,31 @@ const char* a5_version_string()
         (version & 0xFF00) >> 8,
         (version & 0xFF)
     );
+
+    return str;
+}
+
+/*
+ * surgescript_version_string()
+ * The compiled version of SurgeScript as a string
+ */
+const char* surgescript_version_string()
+{
+    return surgescript_util_version();
+}
+
+
+/*
+ * physfs_version_string()
+ * The compiled version of PhysicsFS as a string
+ */
+const char* physfs_version_string()
+{
+    static char str[16];
+    PHYSFS_Version version;
+
+    PHYSFS_getLinkedVersion(&version);
+    snprintf(str, sizeof(str), "%u.%u.%u", version.major, version.minor, version.patch);
 
     return str;
 }

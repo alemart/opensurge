@@ -31,8 +31,12 @@ void timer_release();
 /* main utilities */
 float timer_get_delta();
 uint32_t timer_get_ticks();
-float timer_get_elapsed();
-float timer_get_now();
+double timer_get_elapsed();
+double timer_get_now();
 int64_t timer_get_frames();
+
+/* pause & resume */
+void timer_pause();
+void timer_resume();
 
 #endif

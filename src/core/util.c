@@ -32,7 +32,12 @@
 #include "resourcemanager.h"
 
 #include <allegro5/allegro.h>
+
+#if defined(__ANDROID__)
+#include <android/log.h>
+#else
 #include <allegro5/allegro_native_dialog.h>
+#endif
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -119,6 +124,10 @@ void fatal_error(const char *fmt, ...)
     logfile_message("%s", buf);
     fprintf(stderr, "%s", buf);
 
+#if defined(__ANDROID__)
+    __android_log_print(ANDROID_LOG_FATAL, GAME_UNIXNAME, "Surgexception! %s", buf);
+    /* TODO TODO TODO dialog box */
+#else
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     al_show_native_message_box(al_get_current_display(),
@@ -126,13 +135,21 @@ void fatal_error(const char *fmt, ...)
         "Ooops... Surgexception!",
         buf,
     NULL, ALLEGRO_MESSAGEBOX_ERROR);
+#endif
 
     /* clear up resources */
     if(resourcemanager_is_initialized())
         resourcemanager_release();
 
+    /* release Allegro */
+    al_uninstall_system();
+
     /* exit */
+#if defined(__ANDROID__)
+    abort(); /* won't call atexit functions */
+#else
     exit(1);
+#endif
 }
 
 
@@ -167,9 +184,10 @@ float lerp_angle(float alpha, float beta, float t)
 uint64_t random64()
 {
     static uint64_t state = 0;
+    static bool seeded = false;
 
     /* generate seed: wang hash */
-    if(!state) {
+    if(!seeded) {
         state = time(NULL);
         state = (~state) + (state << 21);
         state ^= state >> 24;
@@ -178,6 +196,7 @@ uint64_t random64()
         state = (state + (state << 2)) + (state << 4);
         state ^= state >> 28;
         state += state << 31;
+        seeded = true;
     }
 
     /* xorshift */ 

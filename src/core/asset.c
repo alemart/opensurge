@@ -65,7 +65,7 @@ static ALLEGRO_PATH* find_homedir();
 static ALLEGRO_PATH* find_shared_datadir();
 static ALLEGRO_PATH* find_user_datadir();
 static void create_dir(const ALLEGRO_PATH* path);
-static bool is_valid_gamedir(const char* gamedir);
+static uint32_t get_fs_mode(const char* path);
 static const char* find_extension(const char* path);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
@@ -85,8 +85,13 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         return;
 
     /* initialize physfs */
+#if !defined(__ANDROID__)
     if(!PHYSFS_init(argv0))
         CRASH("Can't initialize physfs. %s", PHYSFSx_getLastErrorMessage());
+#else
+    if(!PHYSFS_init(NULL))
+        CRASH("Can't initialize physfs. %s", PHYSFSx_getLastErrorMessage());
+#endif
 
     /* copy the gamedir, if specified */
     gamedir = (optional_gamedir != NULL) ? str_dup(optional_gamedir) : NULL;
@@ -94,17 +99,27 @@ void asset_init(const char* argv0, const char* optional_gamedir)
     /* set the search path to the specified gamedir */
     if(gamedir != NULL) {
 
+        uint32_t mode = get_fs_mode(gamedir);
+        char* custom_writedir = NULL;
+
         /* validate the gamedir */
-        if(!is_valid_gamedir(gamedir))
-            CRASH("Can't use the game directory at %s. Make sure that it exists and that you have read-write privileges to it.", gamedir);
+        if(!(mode & ALLEGRO_FILEMODE_READ))
+            CRASH("Can't use game directory %s. Make sure that it exists and that it is readable.", gamedir);
+        else if(!(mode & ALLEGRO_FILEMODE_WRITE))
+            custom_writedir = NULL; /* FIXME create a writable folder */
 
         /* set the write dir */
-        if(!PHYSFS_setWriteDir(gamedir))
-            CRASH("Can't set the write directory to %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
+        const char* writedir = custom_writedir != NULL ? custom_writedir : gamedir;
+        if(!PHYSFS_setWriteDir(writedir))
+            CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
 
         /* mount gamedir to the root */
         if(!PHYSFS_mount(gamedir, "/", 1))
             CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
+
+        /* done */
+        if(custom_writedir != NULL)
+            free(custom_writedir);
 
     }
 
@@ -131,6 +146,12 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);
         if(!PHYSFS_mount(dirpath, "/", 1))
             CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
+
+#if defined(__ANDROID__)
+        /* on Android, read from the assets/ folder inside the .apk */
+        /*dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);*/
+        PHYSFS_setRoot(dirpath, "/assets");
+#endif
 
         /* done! */
         al_destroy_path(user_datadir);
@@ -368,6 +389,11 @@ ALLEGRO_PATH* find_shared_datadir()
 
     return find_exedir();
 
+#elif defined(__ANDROID__)
+
+    /* on Android, treat the .apk itself as the shared datadir (it's a .zip file) */
+    return al_get_standard_path(ALLEGRO_EXENAME_PATH);
+
 #elif defined(_WIN32)
 
     return find_exedir();
@@ -391,7 +417,6 @@ ALLEGRO_PATH* find_shared_datadir()
 #elif defined(__unix__) || defined(__unix)
 
     (void)find_exedir;
-
     return al_create_path_for_directory(GAME_DATADIR);
 
 #else
@@ -408,7 +433,6 @@ ALLEGRO_PATH* find_user_datadir()
 #if (GAME_RUNINPLACE)
 
     (void)find_homedir;
-
     return find_exedir();
 
 #else
@@ -418,10 +442,14 @@ ALLEGRO_PATH* find_user_datadir()
     if(env != NULL)
         return al_create_path_for_directory(env);
 
-#if defined(_WIN32)
+#if defined(__ANDROID__)
 
     (void)find_homedir;
+    return al_get_standard_path(ALLEGRO_RESOURCES_PATH);
 
+#elif defined(_WIN32)
+
+    (void)find_homedir;
     return find_exedir();
 
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -522,29 +550,16 @@ bool clear_dir(ALLEGRO_FS_ENTRY* entry)
 }
 
 /*
- * is_valid_gamedir()
- * Checks if the given gamedir exists and has read-write permissions
- * gamedir is assumed not to be NULL
+ * get_fs_mode()
+ * Returns the mode flags (ALLEGRO_FILE_MODE) of a filesystem entry
  */
-bool is_valid_gamedir(const char* gamedir)
+uint32_t get_fs_mode(const char* path)
 {
     ALLEGRO_FS_ENTRY* entry = al_create_fs_entry(gamedir);
-    bool exists = al_fs_entry_exists(entry);
-    uint32_t mode = exists ? al_get_fs_entry_mode(entry) : 0;
+    uint32_t mode = al_fs_entry_exists(entry) ? al_get_fs_entry_mode(entry) : 0;
     al_destroy_fs_entry(entry);
 
-    if(!exists)
-        return false;
-
-    #if 0
-    if(!(mode & ALLEGRO_FILEMODE_ISDIR)) {
-        const char* extension = find_extension(gamedir);
-        if(!((mode & ALLEGRO_FILEMODE_ISFILE) && (0 == str_icmp(extension, ".zip")))) /* only zips? */
-            return false;
-    }
-    #endif
-
-    return (mode & ALLEGRO_FILEMODE_READ) && (mode & ALLEGRO_FILEMODE_WRITE);
+    return mode;
 }
 
 /*

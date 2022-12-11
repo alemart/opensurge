@@ -128,7 +128,7 @@ Dependencies:
 
 * [Allegro](http://liballeg.org) version 5.2.7 or later
 * [SurgeScript](http://github.com/alemart/surgescript) version 0.5.7 or later
-* [PhysicsFS](https://icculus.org/physfs) version 3.0.2 or later
+* [PhysicsFS](https://icculus.org/physfs) version 3.2.0 or later
 
 Compile as usual:
 

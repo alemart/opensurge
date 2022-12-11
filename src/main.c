@@ -19,7 +19,9 @@
  */
 
 #include <allegro5/allegro.h> /* included for cross-platform compatibility; see https://liballeg.org/a5docs/5.2.7/getting_started.html#the-main-function */
+#include "core/global.h"
 #include "core/engine.h"
+
 
 /*
  * main()
@@ -27,6 +29,12 @@
  */
 int main(int argc, char **argv)
 {
+#if defined(__ANDROID__)
+    char* args[] = { GAME_UNIXNAME };
+    argc = sizeof(args) / sizeof(args[0]);
+    argv = args;
+#endif
+
     engine_init(argc, argv);
     engine_mainloop();
     engine_release();

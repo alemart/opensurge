@@ -77,7 +77,6 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
     cmd.smooth_graphics = COMMANDLINE_UNDEFINED;
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
-    cmd.color_depth = COMMANDLINE_UNDEFINED;
     cmd.show_fps = COMMANDLINE_UNDEFINED;
     cmd.hide_fps = COMMANDLINE_UNDEFINED;
     cmd.custom_level_path[0] = '\0';
@@ -168,16 +167,6 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--windowed") == 0)
             cmd.fullscreen = FALSE;
-
-        else if(strcmp(argv[i], "--color-depth") == 0) {
-            if(++i < argc && *(argv[i]) != '-') {
-                cmd.color_depth = atoi(argv[i]);
-                if(cmd.color_depth != 16 && cmd.color_depth != 24 && cmd.color_depth != 32) {
-                    crash("Invalid color depth: %d", cmd.color_depth);
-                    cmd.color_depth = COMMANDLINE_UNDEFINED;
-                }
-            }
-        }
 
         else if(strcmp(argv[i], "--show-fps") == 0)
             cmd.show_fps = TRUE;
