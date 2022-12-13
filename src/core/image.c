@@ -33,7 +33,7 @@
 #include <allegro5/allegro_primitives.h>
 
 /* convert imageflags_t to ALLEGRO_FLIP flags */
-#define FLIPPY(flags) ((((flags) & IF_HFLIP) ? ALLEGRO_FLIP_HORIZONTAL : 0) | (((flags) & IF_VFLIP) ? ALLEGRO_FLIP_VERTICAL : 0))
+#define FLIPPY(flags) ((((flags) & IF_HFLIP) != 0) * ALLEGRO_FLIP_HORIZONTAL + (((flags) & IF_VFLIP) != 0) * ALLEGRO_FLIP_VERTICAL)
 
 /* image type */
 struct image_t {
@@ -515,6 +515,22 @@ void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags
     );
 }
 
+/*
+ * image_draw_scaled_trans()
+ * Draw scaled with alpha
+ */
+void image_draw_scaled_trans(const image_t* src, int x, int y, v2d_t scale, float alpha, imageflags_t flags)
+{
+    float a = clip01(alpha);
+    ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
+
+    al_draw_tinted_scaled_bitmap(
+        src->data, tint,
+        0.0f, 0.0f, src->w, src->h,
+        x, y, scale.x * src->w, scale.y * src->h,
+        FLIPPY(flags)
+    );
+}
 
 /*
  * image_draw_rotated()
@@ -527,16 +543,38 @@ void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float 
     al_draw_rotated_bitmap(src->data, cx, cy, x, y, -radians, FLIPPY(flags));
 }
 
+/*
+ * image_draw_rotated_trans()
+ * Draws a rotated image with alpha
+ */
+void image_draw_rotated_trans(const image_t* src, int x, int y, int cx, int cy, float radians, float alpha, imageflags_t flags)
+{
+    float a = clip01(alpha);
+    ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
+
+    al_draw_tinted_rotated_bitmap(src->data, tint, cx, cy, x, y, -radians, FLIPPY(flags));
+}
 
 /*
  * image_draw_scaled_rotated()
- * Draw scaled and rotated ;)
+ * Draws a scaled and rotated image
  */
 void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags)
 {
     al_draw_scaled_rotated_bitmap(src->data, cx, cy, x, y, scale.x, scale.y, -radians, FLIPPY(flags));
 }
 
+/*
+ * image_draw_scaled_rotated_trans()
+ * Draws a scaled and rotated image with alpha
+ */
+void image_draw_scaled_rotated_trans(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, float alpha, imageflags_t flags)
+{
+    float a = clip01(alpha);
+    ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
+
+    al_draw_tinted_scaled_rotated_bitmap(src->data, tint, cx, cy, x, y, scale.x, scale.y, -radians, FLIPPY(flags));
+}
  
 /*
  * image_draw_trans()
@@ -546,7 +584,9 @@ void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy,
 void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags)
 {
     float a = clip01(alpha);
-    al_draw_tinted_bitmap(src->data, al_map_rgba_f(a, a, a, a), x, y, FLIPPY(flags));
+    ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
+
+    al_draw_tinted_bitmap(src->data, tint, x, y, FLIPPY(flags));
 }
 
 /*

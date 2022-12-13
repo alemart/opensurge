@@ -92,13 +92,25 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
         /* render */
         if(!nearly_zero(act->angle)) {
-            if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f))
-                image_draw_scaled_rotated(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
-            else
-                image_draw_rotated(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
+            if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f)) {
+                if(!nearly_equal(act->alpha, 1.0f))
+                    image_draw_scaled_rotated_trans(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->alpha, act->mirror);
+                else
+                    image_draw_scaled_rotated(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
+            }
+            else {
+                if(!nearly_equal(act->alpha, 1.0f))
+                    image_draw_rotated_trans(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->alpha, act->mirror);
+                else
+                    image_draw_rotated(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
+            }
         }
-        else if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f))
-            image_draw_scaled(img, (int)(act->position.x - act->hot_spot.x*act->scale.x - topleft.x), (int)(act->position.y - act->hot_spot.y*act->scale.y - topleft.y), act->scale, act->mirror);
+        else if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f)) {
+            if(!nearly_equal(act->alpha, 1.0f))
+                image_draw_scaled_trans(img, (int)(act->position.x - act->hot_spot.x*act->scale.x - topleft.x), (int)(act->position.y - act->hot_spot.y*act->scale.y - topleft.y), act->scale, act->alpha, act->mirror);
+            else
+                image_draw_scaled(img, (int)(act->position.x - act->hot_spot.x*act->scale.x - topleft.x), (int)(act->position.y - act->hot_spot.y*act->scale.y - topleft.y), act->scale, act->mirror);
+        }
         else if(!nearly_equal(act->alpha, 1.0f))
             image_draw_trans(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->alpha, act->mirror);
         else
