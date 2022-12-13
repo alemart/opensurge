@@ -595,18 +595,81 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
  */
 void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
-    /* TODO: shader for specific contours */
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_BLENDER);
-    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
-    al_set_separate_blender(
-        ALLEGRO_ADD, ALLEGRO_CONST_COLOR, ALLEGRO_INVERSE_CONST_COLOR,
-        ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO
+
+    al_set_blend_color(color._color);
+    al_set_blender(
+
+        /*
+
+        this works with a source image with pre-multiplied alpha:
+
+            x = dx * (1 - sa) + (sx * sa) * cc
+
+        replace x by r, g, b, a
+
+        x is the result of the blending
+        dx is destination color
+        sx is the source color
+        sa is the source alpha
+        (sx * sa) is the source color with pre-multiplied alpha
+        cc is a constant color
+
+        if sa = 1 (fully opaque), then we'll have x = sx * cc
+        if sa = 0 (fully transparent), then we'll have x = dx
+
+        */
+
+        ALLEGRO_ADD, ALLEGRO_CONST_COLOR, ALLEGRO_INVERSE_ALPHA
     );
-    al_set_blend_color(al_map_rgba_f(0.65f, 0.65f, 0.65f, 1.0f));
-    al_draw_filled_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, color._color);
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+
+    al_set_blender(
+
+        /*
+
+        this second equation works as follows:
+
+            y = dy + (sy * sa) * cc
+
+        where dy = x is the result of the previous call to al_draw_bitmap()
+        and sy = sx is the source pixel of the bitmap that is being drawn.
+        Replace y by r, g, b, a.
+
+        let's analyze two cases:
+
+        1) suppose that sa = 1.0 (fully opaque pixel). This means that,
+           in the previous call to al_draw_bitmap(), we had x = sx * cc
+           as the result. Therefore, we'll have y = sx * cc + sx * cc =
+           2 * sx * cc now, which will give us a nice colored effect with
+           both additive and multiplicative blending.
+
+        2) suppose that sa = 0.0 (fully transparent pixel). This means that,
+           in the previous call to al_draw_bitmap(), we had x = dx as the
+           result. Therefore, we'll have y = dx now, which means that we'll
+           be preserving the background as-is.
+
+        we could modify the cc variable of this second equation for a more
+        refined control of the color. If we had two separate colors for each
+        equation, cc1 and cc2, then the result would be y = sx * (cc1 + cc2).
+        If cc2 = t * cc1 for some 0 < t < 1, then y' = (1 + t) * sx * cc1 <
+        2 * sx * cc1. Seems like overkill, though.
+
+        perhaps a better result would be achieved with y' = sx * cc + cc,
+        because multiplicative blending doesn't always look great depending
+        on the colors. How can we draw y'' = cc * sa? So far I don't see in
+        Allegro an op with a constant offset, neither a way to compute 1/sx.
+        Creating a temporary, single-colored bitmap could work. Is there an
+        easier way?
+
+        */
+
+        ALLEGRO_ADD, ALLEGRO_CONST_COLOR, ALLEGRO_ONE
+    );
+    al_draw_bitmap(src->data, x, y, FLIPPY(flags));
+
     al_restore_state(&state);
-    /*al_draw_rectangle(x, y, x + src->w + 1.0f, y + src->h + 1.0f, color._color, 2.0f);*/
 }
 
 /*
