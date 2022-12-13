@@ -38,5 +38,6 @@ v2d_t v2d_normalize(v2d_t v); /* returns a normalized copy of v */
 float v2d_magnitude(v2d_t v); /* returns the length of v */
 float v2d_dotproduct(v2d_t u, v2d_t v); /* returns <u,v> */
 v2d_t v2d_lerp(v2d_t u, v2d_t v, float t); /* linear interpolation; 0.0 <= t <= 1.0 */
+v2d_t v2d_compmult(v2d_t u, v2d_t v); /* component-wise multiplication */
 
 #endif

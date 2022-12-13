@@ -119,3 +119,11 @@ v2d_t v2d_lerp(v2d_t u, v2d_t v, float t)
     return v2d_new(u.x + (v.x - u.x) * t, u.y + (v.y - u.y) * t);
 }
 
+/*
+ * v2d_compmult()
+ * Performs component-wise multiplication
+ */
+v2d_t v2d_compmult(v2d_t u, v2d_t v)
+{
+    return v2d_new(u.x * v.x, u.y * v.y);
+}
