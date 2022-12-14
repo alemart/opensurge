@@ -289,6 +289,7 @@ SET(GAME_SRCS
   src/core/inputmap.c
   src/core/lang.c
   src/core/logfile.c
+  src/core/mobile_gamepad.c
   src/core/web.c
   src/core/prefs.c
   src/core/quest.c
@@ -401,6 +402,7 @@ SET(GAME_HEADERS
   src/core/inputmap.h
   src/core/lang.h
   src/core/logfile.h
+  src/core/mobile_gamepad.h
   src/core/web.h
   src/core/prefs.h
   src/core/quest.h

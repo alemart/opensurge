@@ -31,10 +31,11 @@
 #include "resourcemanager.h"
 #include "stringutil.h"
 #include "logfile.h"
+#include "timer.h"
 #include "video.h"
 #include "audio.h"
 #include "input.h"
-#include "timer.h"
+#include "mobile_gamepad.h"
 #include "fadefx.h"
 #include "sprite.h"
 #include "lang.h"
@@ -72,6 +73,7 @@
 
 /* private stuff ;) */
 static void clean_garbage();
+static void render_overlay();
 static void init_basic_stuff(const commandline_t* cmd);
 static void init_managers(const commandline_t* cmd);
 static void init_accessories(const commandline_t* cmd);
@@ -169,8 +171,9 @@ void engine_mainloop()
 
                 /* updating the managers */
                 timer_update();
-                input_update();
                 audio_update();
+                mobilegamepad_update();
+                input_update();
                 clean_garbage();
 
                 /* updating the current scene */
@@ -230,9 +233,9 @@ void engine_mainloop()
         /* render */
         if(is_active && must_redraw && al_is_event_queue_empty(a5_event_queue)) {
             current_scene->render();
-            screenshot_update();
             fadefx_update();
-            video_render();
+            video_render(render_overlay);
+            screenshot_update();
             must_redraw = false;
         }
     }
@@ -272,6 +275,14 @@ void clean_garbage()
         last = now; /* time overflow... really?! */
 }
 
+/*
+ * render_overlay()
+ * Renders an overlay in window space (not screen space)
+ */
+void render_overlay()
+{
+    mobilegamepad_render();
+}
 
 /*
  * init_basic_stuff()
@@ -360,6 +371,7 @@ void init_accessories(const commandline_t* cmd)
     video_display_loading_screen();
 
     sprite_init();
+    mobilegamepad_init();
     charactersystem_init();
     objects_init();
     storyboard_init();
@@ -416,6 +428,7 @@ void release_accessories()
     objects_release();
     charactersystem_release();
     font_release();
+    mobilegamepad_release();
     sprite_release();
 }
 

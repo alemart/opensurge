@@ -33,6 +33,7 @@
 #include "stringutil.h"
 #include "font.h"
 #include "lang.h"
+#include "mobile_gamepad.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
@@ -216,11 +217,13 @@ void video_release()
 /*
  * video_render()
  * Updates the video manager and the screen
+ * An optional callback may be used to render an overlay in window space (not screen space)
  */
-void video_render()
+void video_render(void (*render_overlay)())
 {
     ALLEGRO_STATE state;
     ALLEGRO_TRANSFORM display_transform;
+    ALLEGRO_TRANSFORM identity_transform;
     double now = timer_get_now();
 
     /* compute the framerate */
@@ -241,10 +244,16 @@ void video_render()
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
+    al_identity_transform(&identity_transform);
     compute_display_transform(&display_transform);
+
     al_use_transform(&display_transform);
     al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
+    al_use_transform(&identity_transform);
     render_console();
+
+    if(render_overlay != NULL)
+        render_overlay();
 
     al_restore_state(&state);
     al_flip_display();
@@ -429,7 +438,7 @@ void video_display_loading_screen()
     font_set_text(fnt, "%s", lang_get(LOADING_TEXT));
     font_set_position(fnt, v2d_subtract(cam, v2d_new(0, font_get_textsize(fnt).y / 2)));
     font_render(fnt, cam);
-    video_render();
+    video_render(NULL);
     
     font_destroy(fnt);
 }
@@ -727,6 +736,9 @@ void render_console()
     int ypos = al_get_display_height(display) / font_scale;
     double elapsed = timer_get_elapsed();
 
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_TRANSFORM);
+
     ALLEGRO_TRANSFORM transform;
     al_identity_transform(&transform);
     al_scale_transform(&transform, font_scale, font_scale);
@@ -747,4 +759,6 @@ void render_console()
         PRINT_ENTRIES(0, last);
         PRINT_ENTRIES(first, CONSOLE_MAX_ENTRIES - 1);
     }
+
+    al_restore_state(&state);
 }

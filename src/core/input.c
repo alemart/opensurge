@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ALLEGRO_UNSTABLE /* mouse emulation via touch input */
 #include <allegro5/allegro.h>
 
 #include "input.h"
@@ -27,6 +28,7 @@
 #include "timer.h"
 #include "inputmap.h"
 #include "stringutil.h"
+#include "mobile_gamepad.h"
 
 /* <base class>: generic input */
 struct input_t {
@@ -79,10 +81,11 @@ static struct {
 } a5_mouse = { 0 };
 
 /* joystick input */
-#define MAX_JOYS      8 /* maximum number of joysticks */
-#define AXIS_X        0 /* x-axis of a stick */
-#define AXIS_Y        1 /* y-axis of a stick */
-#define REQUIRED_AXES 2 /* required number of axes of a stick */
+#define MAX_JOYS         8 /* maximum number of joysticks */
+#define AXIS_X           0 /* x-axis of a stick */
+#define AXIS_Y           1 /* y-axis of a stick */
+#define REQUIRED_AXES    2 /* required number of axes of a stick */
+#define REQUIRED_BUTTONS 4 /* minimum number of buttons for a joystick to be considered a gamepad */
 
 static struct {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
@@ -137,6 +140,13 @@ void input_init()
         fatal_error("Can't initialize the joystick subsystem");
     al_register_event_source(a5_event_queue, al_get_joystick_event_source());
 
+    if(!al_install_touch_input())
+        logfile_message("Can't initialize the multi-touch subsystem");
+    else
+        al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_TRANSPARENT);
+
+
+
     /* initialize the input list */
     inlist = NULL;
 
@@ -181,6 +191,10 @@ void input_update()
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
         int num_sticks = al_get_joystick_num_sticks(joystick);
         int num_buttons = min(al_get_joystick_num_buttons(joystick), MAX_JOYSTICK_BUTTONS);
+
+        /* ignore devices such as accelerometers */
+        if(num_buttons < REQUIRED_BUTTONS)
+            continue;
 
         /* read the current state */
         ALLEGRO_JOYSTICK_STATE state;
@@ -261,7 +275,7 @@ void input_update()
         }
 
         #if 0
-        /* not needed if we read a single stick */
+        /* clamp values to [0,1]; not needed if we read a single stick */
         joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
         joy[j].axis[AXIS_Y] = clip(joy[j].axis[AXIS_Y], -1.0f, 1.0f);
         #endif
@@ -654,28 +668,42 @@ void inputuserdefined_update(input_t* in)
 {
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
-    inputbutton_t button;
 
-    for(button = 0; button < IB_MAX; button++)
+    for(inputbutton_t button = 0; button < IB_MAX; button++)
         in->state[button] = false;
 
     if(im->keyboard.enabled) {
-        for(button = 0; button < IB_MAX; button++)
+        for(inputbutton_t button = 0; button < IB_MAX; button++)
             in->state[button] = (im->keyboard.scancode[button] > 0) && a5_key[im->keyboard.scancode[button]];
     }
 
     if(im->joystick.enabled && input_is_joystick_enabled()) {
         int num_joysticks = min(input_number_of_joysticks(), MAX_JOYS);
+
         if(im->joystick.id < num_joysticks) {
             in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[AXIS_Y] <= -analog2digital_threshold[AXIS_Y]);
             in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[AXIS_Y] >= analog2digital_threshold[AXIS_Y]);
             in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[AXIS_X] <= -analog2digital_threshold[AXIS_X]);
             in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[AXIS_X] >= analog2digital_threshold[AXIS_X]);
-            for(button = 0; button < IB_MAX; button++) {
+
+            for(inputbutton_t button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
                 in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
             }
         }
+    }
+
+    if(im->joystick.enabled) {
+        mobilegamepad_state_t mobile;
+        mobilegamepad_get_state(&mobile);
+
+        in->state[IB_UP] = in->state[IB_UP] || ((mobile.dpad & MOBILEGAMEPAD_DPAD_UP) != 0);
+        in->state[IB_DOWN] = in->state[IB_DOWN] || ((mobile.dpad & MOBILEGAMEPAD_DPAD_DOWN) != 0);
+        in->state[IB_LEFT] = in->state[IB_LEFT] || ((mobile.dpad & MOBILEGAMEPAD_DPAD_LEFT) != 0);
+        in->state[IB_RIGHT] = in->state[IB_RIGHT] || ((mobile.dpad & MOBILEGAMEPAD_DPAD_RIGHT) != 0);
+
+        in->state[IB_FIRE1] = in->state[IB_FIRE1] || ((mobile.buttons & MOBILEGAMEPAD_BUTTON_ACTION) != 0);
+        in->state[IB_FIRE4] = in->state[IB_FIRE4] || ((mobile.buttons & MOBILEGAMEPAD_BUTTON_BACK) != 0);
     }
 }
 

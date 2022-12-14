@@ -33,6 +33,7 @@
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/sfx.h"
 
 /* private data */
@@ -86,6 +87,7 @@ void intro_init(void *foo)
     /* misc */
     fadefx_in(color_rgb(0,0,0), INTRO_FADETIME);
     music_stop();
+    mobilegamepad_fadeout();
 }
 
 /*
@@ -94,6 +96,7 @@ void intro_init(void *foo)
  */
 void intro_release()
 {
+    mobilegamepad_fadein();
     font_destroy(fnt);
     image_destroy(box);
     input_destroy(in);

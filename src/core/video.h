@@ -30,7 +30,7 @@ struct image_t;
 /* video manager */
 void video_init();
 void video_release();
-void video_render();
+void video_render(void (*render_overlay)());
 
 /* backbuffer */
 #define VIDEO_SCREEN_W ((int)(video_get_screen_size().x))
