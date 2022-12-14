@@ -35,6 +35,9 @@
 /* convert imageflags_t to ALLEGRO_FLIP flags */
 #define FLIPPY(flags) ((((flags) & IF_HFLIP) != 0) * ALLEGRO_FLIP_HORIZONTAL + (((flags) & IF_VFLIP) != 0) * ALLEGRO_FLIP_VERTICAL)
 
+/* check if an expression is a power of two */
+#define IS_POWER_OF_TWO(n) (((n) & ((n) - 1)) == 0)
+
 /* image type */
 struct image_t {
     ALLEGRO_BITMAP* data; /* this must be the first field */
@@ -326,9 +329,32 @@ void image_enable_linear_filtering(image_t* img)
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 
+    ALLEGRO_BITMAP* root = img->data;
+    while(al_get_parent_bitmap(root) != NULL)
+        root = al_get_parent_bitmap(root);
+
+    int width = al_get_bitmap_width(root), height = al_get_bitmap_height(root);
+    bool is_pot = IS_POWER_OF_TWO(width) && IS_POWER_OF_TWO(height);
+    int mipmap = is_pot ? ALLEGRO_MIPMAP : 0;
+
     int flags = al_get_bitmap_flags(img->data);
-    al_set_new_bitmap_flags(flags | (ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR));
+    al_set_new_bitmap_flags(flags | (mipmap | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR));
     al_convert_bitmap(img->data);
+
+    /*
+
+    According to the Allegro docs, "if this bitmap is a sub-bitmap, then it,
+    its parent and all the sibling sub-bitmaps are also converted". Does
+    this mean that the parent (root) bitmap must be a POT texture? The size
+    of the sub-bitmaps shouldn't matter.
+
+    ALLEGRO_MIPMAP
+    "This can only be used for bitmaps whose width and height is a power of two"
+
+    https://liballeg.org/a5docs/trunk/graphics.html#al_convert_bitmap
+    https://liballeg.org/a5docs/trunk/graphics.html#al_set_new_bitmap_flags
+
+    */
 
     al_restore_state(&state);
 }
@@ -343,7 +369,7 @@ void image_disable_linear_filtering(image_t* img)
     al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 
     int flags = al_get_bitmap_flags(img->data);
-    al_set_new_bitmap_flags(flags & ~(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR));
+    al_set_new_bitmap_flags(flags & ~(ALLEGRO_MIPMAP | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR));
     al_convert_bitmap(img->data);
 
     al_restore_state(&state);
