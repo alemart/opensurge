@@ -318,6 +318,38 @@ image_t* image_snapshot()
 }
 
 /*
+ * image_enable_linear_filtering()
+ * Enable linear filtering
+ */
+void image_enable_linear_filtering(image_t* img)
+{
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+
+    int flags = al_get_bitmap_flags(img->data);
+    al_set_new_bitmap_flags(flags | (ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR));
+    al_convert_bitmap(img->data);
+
+    al_restore_state(&state);
+}
+
+/*
+ * image_disable_linear_filtering()
+ * Disable linear filtering
+ */
+void image_disable_linear_filtering(image_t* img)
+{
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+
+    int flags = al_get_bitmap_flags(img->data);
+    al_set_new_bitmap_flags(flags & ~(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR));
+    al_convert_bitmap(img->data);
+
+    al_restore_state(&state);
+}
+
+/*
  * image_lock()
  * Locks the image, enabling fast in-memory pixel access
  */
@@ -661,7 +693,7 @@ void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_
         on the colors. How can we draw y'' = cc * sa? So far I don't see in
         Allegro an op with a constant offset, neither a way to compute 1/sx.
         Creating a temporary, single-colored bitmap could work. Is there an
-        easier way?
+        easier way? We can draw a black silhouette with blending alone.
 
         */
 
