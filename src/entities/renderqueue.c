@@ -67,6 +67,7 @@ static v2d_t camera;
 /* utilities */
 #define ZINDEX_OFFSET(n) (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum offset */
 #define ZINDEX_LARGE     (99999.0f) /* will be displayed in front of others */
+enum { TYPE_PARTICLE, TYPE_PLAYER, TYPE_ITEM, TYPE_OBJECT, TYPE_BRICK, TYPE_SSOBJECT, TYPE_BACKGROUND, TYPE_FOREGROUND, TYPE_WATER };
 
 static int cmp_fun(const void *i, const void *j)
 {
@@ -78,7 +79,7 @@ static int cmp_fun(const void *i, const void *j)
         if(a->type(a->entity) == b->type(b->entity))
             return a->ypos(a->entity) - b->ypos(b->entity);
         else
-            return 0;
+            return (a->type(a->entity) == TYPE_PLAYER) - (b->type(b->entity) == TYPE_PLAYER);
     }
     else
         return (za > zb) - (za < zb);
@@ -167,15 +168,15 @@ static int ypos_background(renderable_t r) { return 0; } /* preserve relative in
 static int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
 static int ypos_water(renderable_t r) { return 0; } /* not needed */
 
-static int type_particles(renderable_t r) { return 0; }
-static int type_player(renderable_t r) { return 1; }
-static int type_item(renderable_t r) { return 2; }
-static int type_object(renderable_t r) { return 3; }
-static int type_brick(renderable_t r) { return 4; }
-static int type_ssobject(renderable_t r) { return 5; }
-static int type_background(renderable_t r) { return 5; }
-static int type_foreground(renderable_t r) { return 6; }
-static int type_water(renderable_t r) { return 7; }
+static int type_particles(renderable_t r) { return TYPE_PARTICLE; }
+static int type_player(renderable_t r) { return TYPE_PLAYER; }
+static int type_item(renderable_t r) { return TYPE_ITEM; }
+static int type_object(renderable_t r) { return TYPE_OBJECT; }
+static int type_brick(renderable_t r) { return TYPE_BRICK; }
+static int type_ssobject(renderable_t r) { return TYPE_SSOBJECT; }
+static int type_background(renderable_t r) { return TYPE_BACKGROUND; }
+static int type_foreground(renderable_t r) { return TYPE_FOREGROUND; }
+static int type_water(renderable_t r) { return TYPE_WATER; }
 
 
 
