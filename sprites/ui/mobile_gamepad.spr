@@ -8,9 +8,9 @@
 sprite "Mobile Gamepad - Directional Stick"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     0 64 896 672
-    frame_size      224 224
-    hot_spot        112 112 // at the center
+    source_rect     0 64 2016 576
+    frame_size      288 288
+    hot_spot        144 144 // at the center
 
     // center
     animation 0

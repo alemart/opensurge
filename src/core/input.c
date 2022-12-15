@@ -140,10 +140,14 @@ void input_init()
         fatal_error("Can't initialize the joystick subsystem");
     al_register_event_source(a5_event_queue, al_get_joystick_event_source());
 
-    if(!al_install_touch_input())
+    if(!al_install_touch_input()) {
         logfile_message("Can't initialize the multi-touch subsystem");
-    else
+    }
+    else {
+        al_register_event_source(a5_event_queue, al_get_touch_input_event_source());
         al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_TRANSPARENT);
+        al_register_event_source(a5_event_queue, al_get_touch_input_mouse_emulation_event_source());
+    }
 
 
 
@@ -707,7 +711,7 @@ void inputuserdefined_update(input_t* in)
     }
 }
 
-/* handle an ALLEGRO_KEYBOARD_EVENT */
+/* handle a keyboard event */
 void a5_handle_keyboard_event(const ALLEGRO_EVENT* event)
 {
     switch(event->type) {
@@ -723,7 +727,7 @@ void a5_handle_keyboard_event(const ALLEGRO_EVENT* event)
     }
 }
 
-/* handle an ALLEGRO_MOUSE_EVENT */
+/* handle a mouse event */
 void a5_handle_mouse_event(const ALLEGRO_EVENT* event)
 {
     switch(event->type) {
@@ -739,10 +743,11 @@ void a5_handle_mouse_event(const ALLEGRO_EVENT* event)
     }
 }
 
-/* handle an ALLEGRO_JOYSTICK_EVENT */
+/* handle a joystick event */
 void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
 {
     switch(event->type) {
+#if 0
         /*
          * Joystick input based on ALLEGRO_JOYSTICK_STATE
          * seems to work better according to several users
@@ -750,7 +755,6 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
          * tested with Allegro 5.2.5 on Windows using
          * DirectInput devices
          */
-#if 0
         case ALLEGRO_EVENT_JOYSTICK_AXIS:
             break;
 
@@ -789,6 +793,12 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
             break;
         }
     }
+}
+
+/* handle a touch event */
+void a5_handle_touch_event(const ALLEGRO_EVENT* event)
+{
+    /* touch input is currently read using ALLEGRO_TOUCH_INPUT_STATE */
 }
 
 /* log joysticks */

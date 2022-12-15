@@ -97,6 +97,7 @@ ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL; /* public */
 extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
+extern void a5_handle_touch_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_video_event(const ALLEGRO_EVENT* event);
 
 /* Global Prefs */
@@ -202,6 +203,13 @@ void engine_mainloop()
             case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
             case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
                 a5_handle_joystick_event(&event);
+                break;
+
+            case ALLEGRO_EVENT_TOUCH_BEGIN:
+            case ALLEGRO_EVENT_TOUCH_END:
+            case ALLEGRO_EVENT_TOUCH_MOVE:
+            case ALLEGRO_EVENT_TOUCH_CANCEL:
+                a5_handle_touch_event(&event);
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_CLOSE:

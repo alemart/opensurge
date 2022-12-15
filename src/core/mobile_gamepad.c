@@ -30,7 +30,7 @@
 
 
 /* settings */
-#define WANT_MOUSE_INPUT         0 /*1*/ /* Will the mobile gamepad will be activated by mouse input? For testing only */
+#define WANT_MOUSE_INPUT         0 /* Will the mobile gamepad will be activated by mouse input? For testing only */
 #define ENABLE_MOUSE_INPUT       ((WANT_MOUSE_INPUT) && !defined(__ANDROID__))
 #define ENABLE_MOBILE_GAMEPAD    (defined(__ANDROID__) || (ENABLE_MOUSE_INPUT))
 
@@ -92,18 +92,18 @@ static const v2d_t REFERENCE_RESOLUTION = {
 static const v2d_t RELATIVE_POSITION[] = {
 
     [DPAD] = {
-        .x = 0.12f,
-        .y = 0.8f
+        .x = 0.135f,
+        .y = 0.75f
     },
 
     [DPAD_STICK] = { /* same as DPAD */
-        .x = 0.12f,
-        .y = 0.8f
+        .x = 0.135f,
+        .y = 0.75f
     },
 
     [ACTION_BUTTON] = {
-        .x = 0.88f,
-        .y = 0.8f
+        .x = 0.865f,
+        .y = 0.75f
     }
 
 };
@@ -308,7 +308,7 @@ void mobilegamepad_update()
 
     al_get_touch_input_state(&state);
     for(int i = 0, j = 0; i < MAX_TOUCHES; i++) {
-        if(state.touches[i].id > 0) {
+        if(state.touches[i].id >= 0) {
             touch[j].down = true;
             touch[j].position = v2d_new(state.touches[i].x, state.touches[i].y);
             j++;
