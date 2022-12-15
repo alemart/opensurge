@@ -22,7 +22,7 @@
 #define _V2D_H
 
 /* 2D vector structure */
-typedef struct {
+typedef struct v2d_t {
     float x, y;
 } v2d_t;
 
@@ -33,10 +33,10 @@ typedef struct {
 v2d_t v2d_add(v2d_t u, v2d_t v); /* returns u+v */
 v2d_t v2d_subtract(v2d_t u, v2d_t v); /* returns u-v */
 v2d_t v2d_multiply(v2d_t u, float h); /* returns h*u */
-v2d_t v2d_rotate(v2d_t v, float ang); /* returns v rotated by ang radians */
+v2d_t v2d_rotate(v2d_t v, float radians); /* returns v rotated by an angle */
 v2d_t v2d_normalize(v2d_t v); /* returns a normalized copy of v */
 float v2d_magnitude(v2d_t v); /* returns the length of v */
-float v2d_dotproduct(v2d_t u, v2d_t v); /* returns <u,v> */
+float v2d_dot(v2d_t u, v2d_t v); /* returns the dot product u.v */
 v2d_t v2d_lerp(v2d_t u, v2d_t v, float t); /* linear interpolation; 0.0 <= t <= 1.0 */
 v2d_t v2d_compmult(v2d_t u, v2d_t v); /* component-wise multiplication */
 

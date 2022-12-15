@@ -23,14 +23,14 @@
 #include "util.h"
 #include "global.h"
 
+
 /*
  * v2d_add()
  * Adds two vectors
  */
 v2d_t v2d_add(v2d_t u, v2d_t v)
 {
-    v2d_t w = { u.x + v.x , u.y + v.y };
-    return w;
+    return v2d_new(u.x + v.x , u.y + v.y);
 }
 
 
@@ -40,8 +40,7 @@ v2d_t v2d_add(v2d_t u, v2d_t v)
  */
 v2d_t v2d_subtract(v2d_t u, v2d_t v)
 {
-    v2d_t w = { u.x - v.x , u.y - v.y };
-    return w;
+    return v2d_new(u.x - v.x , u.y - v.y);
 }
 
 
@@ -51,26 +50,25 @@ v2d_t v2d_subtract(v2d_t u, v2d_t v)
  */
 v2d_t v2d_multiply(v2d_t u, float h)
 {
-    v2d_t v = { h * u.x , h * u.y };
-    return v;
+    return v2d_new(h * u.x , h * u.y);
 }
 
 
 /*
  * v2d_magnitude()
- * Returns the magnitude of a given vector
+ * Returns the length of a vector
  */
 float v2d_magnitude(v2d_t v)
 {
-    return sqrt((v.x * v.x) + (v.y * v.y));
+    return sqrtf(v.x * v.x + v.y * v.y);
 }
 
 
 /*
- * v2d_dotproduct()
- * Dot product: u.v
+ * v2d_dot()
+ * Returns the dot product between u and v
  */
-float v2d_dotproduct(v2d_t u, v2d_t v)
+float v2d_dot(v2d_t u, v2d_t v)
 {
     return (u.x * v.x + u.y * v.y);
 }
@@ -78,22 +76,20 @@ float v2d_dotproduct(v2d_t u, v2d_t v)
 
 /*
  * v2d_rotate()
- * Rotates a vector. Angle in radians.
+ * Rotates a vector by an angle given in radians
  */
-v2d_t v2d_rotate(v2d_t v, float ang)
+v2d_t v2d_rotate(v2d_t v, float radians)
 {
-    v2d_t w = {
-        v.x * cos(ang) - v.y * sin(ang),
-        v.y * cos(ang) + v.x * sin(ang)
-    };
-    return w;
+    return v2d_new(
+        v.x * cos(radians) - v.y * sin(radians),
+        v.y * cos(radians) + v.x * sin(radians)
+    );
 }
 
 
 /*
  * v2d_normalize()
- * The same thing as v = v / |v|,
- * where |v| is the magnitude of v.
+ * Returns a normalized copy of the given vector
  */
 v2d_t v2d_normalize(v2d_t v)
 {
@@ -106,18 +102,17 @@ v2d_t v2d_normalize(v2d_t v)
 }
 
 
-
 /*
  * v2d_lerp()
- * Performs a linear interpolation
- * between u and v (0.0 <= t <= 1.0)
- * The same as: (1-t) * u + t * v
+ * Linear interpolation between u and v
+ * The same as: (1-t) * u + t * v, where 0 <= t <= 1
  */
 v2d_t v2d_lerp(v2d_t u, v2d_t v, float t)
 {
     t = clip01(t);
     return v2d_new(u.x + (v.x - u.x) * t, u.y + (v.y - u.y) * t);
 }
+
 
 /*
  * v2d_compmult()
