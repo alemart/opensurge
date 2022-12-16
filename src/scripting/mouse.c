@@ -123,7 +123,7 @@ surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescri
     v2d_t m = v2d_new(screen_size.x / window_size.x, screen_size.y / window_size.y);
     v2d_t pos = input_get_xy((inputmouse_t*)surgescript_object_userdata(object));
 
-    scripting_vector2_update(v2, floor(pos.x * m.x), floor(pos.y * m.y));
+    scripting_vector2_update(v2, pos.x * m.x, pos.y * m.y);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
