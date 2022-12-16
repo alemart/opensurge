@@ -43,7 +43,6 @@ enum { DPAD, DPAD_STICK, ACTION_BUTTON };
 enum { UNPRESSED, PRESSED };
 
 /* multi-touch */
-#define MAX_TOUCHES (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches) / sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches[0]))
 typedef struct touch_t touch_t;
 struct touch_t {
 
@@ -59,6 +58,8 @@ struct touch_t {
 
 };
 
+static const int MAX_TOUCHES = (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches) / sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches[0]));
+
 
 
 
@@ -73,10 +74,9 @@ struct touch_t {
     .position = (v2d_t){ .x = 0.0f, .y = 0.0f } \
 }
 
+#define DEG2RAD            0.01745329251994329576f
 #define IS_POWER_OF_TWO(n) (((n) & ((n) - 1)) == 0)
 #define VALIDATE_MASK(x)   typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
-
-static const float DEG2RAD = 0.01745329251994329576f;
 
 
 
@@ -126,23 +126,26 @@ static const int DPAD_ANIMATION_NUMBER[16] = {
     [MOBILEGAMEPAD_DPAD_DOWN | MOBILEGAMEPAD_DPAD_RIGHT] = 8
 };
 
-static const int DPAD_STICK_ANIMATION_NUMBER = 9;
+static const int DPAD_STICK_ANIMATION_NUMBER[] = {
+    [UNPRESSED] = 9,
+    [PRESSED]   = 10
+};
 
 static const int BUTTON_ANIMATION_NUMBER[] = {
     [UNPRESSED] = 0,
     [PRESSED]   = 1
 };
 
-static const int DPAD_STICK_ANGLE[16] = { /* clockwise (y-axis grows downwards) */
-    [MOBILEGAMEPAD_DPAD_CENTER]                          = 0,
-    [MOBILEGAMEPAD_DPAD_RIGHT]                           = 0,
-    [MOBILEGAMEPAD_DPAD_UP | MOBILEGAMEPAD_DPAD_RIGHT]   = -45,
-    [MOBILEGAMEPAD_DPAD_UP]                              = -90,
-    [MOBILEGAMEPAD_DPAD_UP | MOBILEGAMEPAD_DPAD_LEFT]    = -135,
-    [MOBILEGAMEPAD_DPAD_LEFT]                            = -180,
-    [MOBILEGAMEPAD_DPAD_DOWN | MOBILEGAMEPAD_DPAD_LEFT]  = -225,
-    [MOBILEGAMEPAD_DPAD_DOWN]                            = -270,
-    [MOBILEGAMEPAD_DPAD_DOWN | MOBILEGAMEPAD_DPAD_RIGHT] = -315
+static const float DPAD_STICK_ANGLE[16] = { /* clockwise (y-axis grows downwards) */
+    [MOBILEGAMEPAD_DPAD_CENTER]                          =  0.0f,
+    [MOBILEGAMEPAD_DPAD_RIGHT]                           =  0.0f,
+    [MOBILEGAMEPAD_DPAD_UP | MOBILEGAMEPAD_DPAD_RIGHT]   = -45.0f  * DEG2RAD,
+    [MOBILEGAMEPAD_DPAD_UP]                              = -90.0f  * DEG2RAD,
+    [MOBILEGAMEPAD_DPAD_UP | MOBILEGAMEPAD_DPAD_LEFT]    = -135.0f * DEG2RAD,
+    [MOBILEGAMEPAD_DPAD_LEFT]                            = -180.0f * DEG2RAD,
+    [MOBILEGAMEPAD_DPAD_DOWN | MOBILEGAMEPAD_DPAD_LEFT]  = -225.0f * DEG2RAD,
+    [MOBILEGAMEPAD_DPAD_DOWN]                            = -270.0f * DEG2RAD,
+    [MOBILEGAMEPAD_DPAD_DOWN | MOBILEGAMEPAD_DPAD_RIGHT] = -315.0f * DEG2RAD
 };
 
 static const float DPAD_STICK_MOVEMENT_LENGTH = 0.2f; /* a value relative to the radius of the dpad */
@@ -165,7 +168,7 @@ static const v2d_t DPAD_AXIS_THRESHOLD = {
     .y = 0.707f   /* sin(45 degrees) ~ 90 degrees vertically */
 };
 
-static const float DPAD_DEADZONE_THRESHOLD = 0.15f; /* a percentage of the radius of the dpad */
+static const float DPAD_DEADZONE_THRESHOLD = 0.125f; /* a percentage of the interactive radius of the dpad */
 
 
 
@@ -183,11 +186,11 @@ static bool is_visible = true;
 /* alpha value used for fading in and fading out the mobile gamepad */
 static float alpha = 1.0f;
 
-/* radii of the controls, in pixels */
-static int radius[] = {
-    [DPAD] = 0,
-    [DPAD_STICK] = 0, /* unused */
-    [ACTION_BUTTON] = 0
+/* the distance from the center of the sprites, in pixels, to which controls respond to input */
+static float interactive_radius[] = {
+    [DPAD] = 0.0f,
+    [DPAD_STICK] = 0.0f, /* unused */
+    [ACTION_BUTTON] = 0.0f
 };
 
 /* actors */
@@ -207,6 +210,7 @@ static void update_actors();
 static void render_actors();
 static void handle_fade_effect();
 static void enable_linear_filtering();
+static void reposition_dpad_stick(float scale);
 
 
 
@@ -249,9 +253,9 @@ void mobilegamepad_init()
 
 #endif
 
-    /* initialize the radii */
+    /* initialize the interactive radii */
     for(int i = 0; i < NUM_CONTROLS; i++)
-        radius[i] = 0;
+        interactive_radius[i] = 0.0f;
 
     /* create the actors */
     for(int i = 0; i < NUM_CONTROLS; i++)
@@ -336,9 +340,9 @@ void mobilegamepad_update()
         if(touch[i].down) {
             for(int j = 0; j < NUM_CONTROLS; j++) {
                 v2d_t offset = v2d_subtract(touch[i].position, actor[j]->position);
-                int distance = (int)(v2d_magnitude(offset) + 0.5f);
+                float distance = v2d_magnitude(offset);
 
-                if(distance <= radius[j])
+                if(distance <= interactive_radius[j])
                     trigger(j, offset);
             }
         }
@@ -414,7 +418,7 @@ void trigger(int control, v2d_t offset)
 
         case DPAD:
             /* ignore the deadzone: unstable angle */
-            if(v2d_magnitude(offset) > radius[DPAD] * DPAD_DEADZONE_THRESHOLD) {
+            if(v2d_magnitude(offset) > interactive_radius[DPAD] * DPAD_DEADZONE_THRESHOLD) {
 
                 /* find the direction */
                 v2d_t normalized_offset = v2d_normalize(offset); /* cos(angle), sin(angle) */
@@ -443,7 +447,7 @@ void animate_actors()
     /* compute the animation numbers */
     int anim[] = {
         [DPAD] = DPAD_ANIMATION_NUMBER[current_state.dpad & DPAD_ANIMATION_NUMBER_MASK],
-        [DPAD_STICK] = DPAD_STICK_ANIMATION_NUMBER,
+        [DPAD_STICK] = DPAD_STICK_ANIMATION_NUMBER[(current_state.dpad != MOBILEGAMEPAD_DPAD_CENTER) ? PRESSED : UNPRESSED],
         [ACTION_BUTTON] = BUTTON_ANIMATION_NUMBER[(current_state.buttons & MOBILEGAMEPAD_BUTTON_ACTION) ? PRESSED : UNPRESSED]
     };
 
@@ -456,7 +460,8 @@ void update_actors()
 {
     /* compute the scale of the actors based on the size of the window */
     v2d_t window_size = video_get_window_size();
-    v2d_t scale = v2d_new(window_size.x / REFERENCE_RESOLUTION.x, window_size.y / REFERENCE_RESOLUTION.y);
+    v2d_t window_scale = v2d_new(window_size.x / REFERENCE_RESOLUTION.x, window_size.y / REFERENCE_RESOLUTION.y);
+    float scale = max(window_scale.x, window_scale.y);
 
     /* animate the actors */
     animate_actors();
@@ -464,31 +469,20 @@ void update_actors()
     /* update the attributes of the actors */
     for(int i = 0; i < NUM_CONTROLS; i++) {
         actor[i]->position = v2d_compmult(RELATIVE_POSITION[i], window_size);
-        actor[i]->scale = scale;
+        actor[i]->scale = v2d_new(scale, scale);
         actor[i]->alpha = alpha;
     }
 
-    /* update the radii of the controls */
-    for(int i = 0; i < NUM_CONTROLS; i++)
-        radius[i] = 0.5f * image_width(actor_image(actor[i])) * max(scale.x, scale.y);
+    /* update the interactive radii of the controls based on the scale of the actors */
+    for(int i = 0; i < NUM_CONTROLS; i++) {
+        v2d_t delta = v2d_subtract(actor_action_spot(actor[i]), actor[i]->hot_spot);
+        float unscaled_radius = v2d_magnitude(delta);
 
-    /* adjust the position of the dpad stick using polar coordinates */
-    static float transition = 0.0f, angle = 0.0f;
-    float ds = timer_get_delta() / DPAD_STICK_MOVEMENT_TIME;
-
-    if(current_state.dpad != MOBILEGAMEPAD_DPAD_CENTER) {
-        transition = min(1.0f, transition + ds);
-        angle = DPAD_STICK_ANGLE[current_state.dpad & DPAD_STICK_ANGLE_MASK] * DEG2RAD;
+        interactive_radius[i] = unscaled_radius * scale;
     }
-    else
-        transition = max(0.0f, transition - ds);
 
-    float max_length = radius[DPAD] * DPAD_STICK_MOVEMENT_LENGTH;
-    float length = max_length * transition;
-    v2d_t unit_vector = v2d_new(cosf(angle), sinf(angle));
-    v2d_t offset = v2d_multiply(unit_vector, length);
-
-    actor[DPAD_STICK]->position = v2d_add(actor[DPAD_STICK]->position, offset);
+    /* reposition the dpad stick */
+    reposition_dpad_stick(scale);
 }
 
 void render_actors()
@@ -517,4 +511,32 @@ void enable_linear_filtering()
         image_t* image = actor_image(actor[i]);
         image_enable_linear_filtering(image);
     }
+}
+
+void reposition_dpad_stick(float scale)
+{
+    /* compute a smooth transition and determine the angle of the dpad stick */
+    static float transition = 0.0f, angle = 0.0f;
+    float ds = timer_get_delta() / DPAD_STICK_MOVEMENT_TIME;
+
+    if(current_state.dpad != MOBILEGAMEPAD_DPAD_CENTER) {
+        transition = min(1.0f, transition + ds);
+        angle = DPAD_STICK_ANGLE[current_state.dpad & DPAD_STICK_ANGLE_MASK];
+    }
+    else
+        transition = max(0.0f, transition - ds);
+
+    /* adjust the position of the dpad stick using polar coordinates */
+    const image_t* dpad = actor_image(actor[DPAD]);
+    int dpad_width = image_width(dpad), dpad_height = image_height(dpad);
+
+    float unscaled_visual_radius = 0.5f * min(dpad_width, dpad_height);
+    float visual_radius = unscaled_visual_radius * scale;
+    float max_length = visual_radius * DPAD_STICK_MOVEMENT_LENGTH;
+    float current_length = max_length * transition;
+
+    v2d_t unit_vector = v2d_new(cosf(angle), sinf(angle));
+    v2d_t offset = v2d_multiply(unit_vector, floorf(current_length));
+
+    actor[DPAD_STICK]->position = v2d_add(actor[DPAD_STICK]->position, offset);
 }
