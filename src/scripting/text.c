@@ -32,8 +32,9 @@
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfont(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_settext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -101,6 +102,7 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Text", "get_size", fun_getsize, 0);
     surgescript_vm_bind(vm, "Text", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Text", "get_filepathOfRenderable", fun_getfilepathofrenderable, 0);
 }
 
 /*
@@ -214,6 +216,19 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
         font_render(font, camera);
     }
     return NULL;
+}
+
+/* the filepath of this renderable */
+surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    font_t* font = get_font(object);
+    if(font != NULL) {
+        const char* filepath = font_get_filepath(font);
+        return surgescript_var_set_string(surgescript_var_create(), filepath);
+    }
+
+    /* this should happen only before calling __init() */
+    return surgescript_var_set_string(surgescript_var_create(), "");
 }
 
 /* set zindex */

@@ -34,6 +34,7 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -101,6 +102,7 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Actor", "get_filepathOfRenderable", fun_getfilepathofrenderable, 0);
 
     /* animation methods */
     surgescript_vm_bind(vm, "Actor", "get_animation", fun_getanimation, 0);
@@ -193,6 +195,16 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 
     actor_render(actor, camera);
     return NULL;
+}
+
+/* the filepath of this renderable */
+surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = scripting_actor_ptr(object);
+    const image_t* image = actor_image(actor);
+    const char* filepath = image_filepath(image);
+
+    return surgescript_var_set_string(surgescript_var_create(), filepath);
 }
 
 /* __init: set sprite name */
