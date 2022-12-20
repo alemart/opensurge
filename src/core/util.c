@@ -253,7 +253,7 @@ FILE* fopen_utf8(const char* filepath, const char* mode)
  *              a negative value, zero or a positive value
  *              int comparator(const void *elem1, const void *elem2)
  */
-void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const void*,const void*))
+void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,const void*))
 {
     merge_sort_recursive(base, size, comparator, 0, num-1);
 }
@@ -264,7 +264,8 @@ void merge_sort(void *base, size_t num, size_t size, int (*comparator)(const voi
 void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q)
 {
     if(q > p) {
-        int m = (p+q)/2;
+        int m = (p+q) / 2;
+
         merge_sort_recursive(base, size, comparator, p, m);
         merge_sort_recursive(base, size, comparator, m+1, q);
         merge_sort_mix(base, size, comparator, p, q, m);
@@ -275,7 +276,8 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
 {
     /* due to the static array declared as an optimization below,
        merge_sort() isn't thread-safe */
-    static uint8_t tmp[16384]; size_t bytes = (q-p+1) * size;
+    static uint8_t tmp[16384];
+    size_t bytes = (q-p+1) * size;
     uint8_t *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
     uint8_t *i = arr;
     uint8_t *j = arr + (m+1-p) * size;
@@ -304,7 +306,7 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
         j += size;
     }
 
-    if(bytes > sizeof(tmp))
+    if(arr != tmp)
         free(arr);
 }
 
