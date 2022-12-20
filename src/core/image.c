@@ -735,11 +735,11 @@ void image_hold_drawing(bool hold)
 }
 
 /*
- * image_path()
- * The path to the file of this image, if it exists.
- * An empty string ("") is returned if there is no such path
+ * image_filepath()
+ * The relative path to the file of this image, if it exists.
+ * An empty string ("") is returned if there is no such path.
  */
-const char* image_path(const image_t* img)
+const char* image_filepath(const image_t* img)
 {
     return img->path != NULL ? img->path : "";
 }
