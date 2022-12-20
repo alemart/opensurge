@@ -34,58 +34,482 @@
 #include "../scenes/level.h"
 #include "../scripting/scripting.h"
 
-/* private stuff ;) */
-typedef union renderable_t renderable_t;
-union renderable_t {
-    player_t *player;
-    brick_t *brick;
-    item_t *item;
-    object_t *object; /* legacy object */
-    surgescript_object_t *ssobject;
-    bgtheme_t *theme;
+
+
+/* the types of renderables */
+enum {
+    TYPE_PLAYER,
+
+    TYPE_BRICK,
+    TYPE_BRICK_MASK,
+    TYPE_PARTICLE,
+
+    TYPE_SSOBJECT,
+    TYPE_SSOBJECT_DEBUG,
+    TYPE_SSOBJECT_GIZMO,
+
+    TYPE_BACKGROUND,
+    TYPE_FOREGROUND,
+    TYPE_WATER,
+
+    TYPE_ITEM, /* legacy item */
+    TYPE_OBJECT /* legacy object */
 };
 
-typedef struct renderqueue_cell_t renderqueue_cell_t;
-struct renderqueue_cell_t {
-    renderable_t entity;
+/* a renderable entity */
+typedef union renderable_t renderable_t;
+union renderable_t {
+    player_t* player;
+    brick_t* brick;
+    item_t* item;
+    object_t* object; /* legacy object */
+    surgescript_object_t* ssobject;
+    bgtheme_t* theme;
+    void* dummy;
+};
+
+/* a vtable used for rendering different types of entities */
+typedef struct renderable_vtable_t renderable_vtable_t;
+struct renderable_vtable_t {
     float (*zindex)(renderable_t);
     void (*render)(renderable_t,v2d_t);
     int (*ypos)(renderable_t);
     int (*type)(renderable_t);
 };
 
-typedef struct renderqueue_t renderqueue_t;
-struct renderqueue_t {
-    renderqueue_cell_t cell;
-    renderqueue_t *next; /* linked list */
+/* an entry of the render queue */
+typedef struct renderqueue_entry_t renderqueue_entry_t;
+struct renderqueue_entry_t {
+    renderable_t entity;
+    const renderable_vtable_t* vtable;
 };
 
-static renderqueue_t* queue = NULL;
-static int size = 0;
-static v2d_t camera;
+/* vtables */
+static float zindex_particles(renderable_t r);
+static float zindex_player(renderable_t r);
+static float zindex_item(renderable_t r);
+static float zindex_object(renderable_t r);
+static float zindex_brick(renderable_t r);
+static float zindex_brick_mask(renderable_t r);
+static float zindex_ssobject(renderable_t r);
+static float zindex_ssobject_debug(renderable_t r);
+static float zindex_ssobject_gizmo(renderable_t r);
+static float zindex_background(renderable_t r);
+static float zindex_foreground(renderable_t r);
+static float zindex_water(renderable_t r);
+
+static void render_particles(renderable_t r, v2d_t camera_position);
+static void render_player(renderable_t r, v2d_t camera_position);
+static void render_item(renderable_t r, v2d_t camera_position);
+static void render_object(renderable_t r, v2d_t camera_position);
+static void render_brick(renderable_t r, v2d_t camera_position);
+static void render_brick_mask(renderable_t r, v2d_t camera_position);
+static void render_ssobject(renderable_t r, v2d_t camera_position);
+static void render_ssobject_gizmo(renderable_t r, v2d_t camera_position);
+static void render_ssobject_debug(renderable_t r, v2d_t camera_position);
+static void render_background(renderable_t r, v2d_t camera_position);
+static void render_foreground(renderable_t r, v2d_t camera_position);
+static void render_water(renderable_t r, v2d_t camera_position);
+
+static int ypos_particles(renderable_t r);
+static int ypos_player(renderable_t r);
+static int ypos_item(renderable_t r);
+static int ypos_object(renderable_t r);
+static int ypos_brick(renderable_t r);
+static int ypos_brick_mask(renderable_t r);
+static int ypos_ssobject(renderable_t r);
+static int ypos_ssobject_debug(renderable_t r);
+static int ypos_ssobject_gizmo(renderable_t r);
+static int ypos_background(renderable_t r);
+static int ypos_foreground(renderable_t r);
+static int ypos_water(renderable_t r);
+
+static int type_particles(renderable_t r);
+static int type_player(renderable_t r);
+static int type_item(renderable_t r);
+static int type_object(renderable_t r);
+static int type_brick(renderable_t r);
+static int type_brick_mask(renderable_t r);
+static int type_ssobject(renderable_t r);
+static int type_ssobject_debug(renderable_t r);
+static int type_ssobject_gizmo(renderable_t r);
+static int type_background(renderable_t r);
+static int type_foreground(renderable_t r);
+static int type_water(renderable_t r);
+
+static const renderable_vtable_t VTABLE[] = {
+    [TYPE_BRICK] = {
+        .zindex = zindex_brick,
+        .render = render_brick,
+        .ypos = ypos_brick,
+        .type = type_brick
+    },
+
+    [TYPE_BRICK_MASK] = {
+        .zindex = zindex_brick_mask,
+        .render = render_brick_mask,
+        .ypos = ypos_brick_mask,
+        .type = type_brick_mask
+    },
+
+    [TYPE_ITEM] = {
+        .zindex = zindex_item,
+        .render = render_item,
+        .ypos = ypos_item,
+        .type = type_item
+    },
+
+    [TYPE_OBJECT] = {
+        .zindex = zindex_object,
+        .render = render_object,
+        .ypos = ypos_object,
+        .type = type_object
+    },
+
+    [TYPE_PLAYER] = {
+        .zindex = zindex_player,
+        .render = render_player,
+        .ypos = ypos_player,
+        .type = type_player
+    },
+
+    [TYPE_PARTICLE] = {
+        .zindex = zindex_particles,
+        .render = render_particles,
+        .ypos = ypos_particles,
+        .type = type_particles
+    },
+
+    [TYPE_SSOBJECT] = {
+        .zindex = zindex_ssobject,
+        .render = render_ssobject,
+        .ypos = ypos_ssobject,
+        .type = type_ssobject
+    },
+
+    [TYPE_SSOBJECT_DEBUG] = {
+        .zindex = zindex_ssobject_debug,
+        .render = render_ssobject_debug,
+        .ypos = ypos_ssobject_debug,
+        .type = type_ssobject_debug
+    },
+
+    [TYPE_SSOBJECT_GIZMO] = {
+        .zindex = zindex_ssobject_gizmo,
+        .render = render_ssobject_gizmo,
+        .ypos = ypos_ssobject_gizmo,
+        .type = type_ssobject_gizmo
+    },
+
+    [TYPE_BACKGROUND] = {
+        .zindex = zindex_background,
+        .render = render_background,
+        .ypos = ypos_background,
+        .type = type_background
+    },
+
+    [TYPE_FOREGROUND] = {
+        .zindex = zindex_foreground,
+        .render = render_foreground,
+        .ypos = ypos_foreground,
+        .type = type_foreground
+    },
+
+    [TYPE_WATER] = {
+        .zindex = zindex_water,
+        .render = render_water,
+        .ypos = ypos_water,
+        .type = type_water
+    }
+};
 
 /* utilities */
-#define ZINDEX_OFFSET(n) (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum offset */
-#define ZINDEX_LARGE     (99999.0f) /* will be displayed in front of others */
-enum { TYPE_PARTICLE, TYPE_PLAYER, TYPE_ITEM, TYPE_OBJECT, TYPE_BRICK, TYPE_SSOBJECT, TYPE_BACKGROUND, TYPE_FOREGROUND, TYPE_WATER };
+#define ZINDEX_OFFSET(n)          (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum zindex offset */
+#define ZINDEX_LARGE              99999.0f /* will be displayed in front of others */
+#define INITIAL_BUFFER_CAPACITY   256
+static int cmp_fun(const void *i, const void *j);
+static inline float brick_zindex_offset(const brick_t *brick);
+static void enqueue(const renderqueue_entry_t* entry);
 
-static int cmp_fun(const void *i, const void *j)
+/* internal data */
+static renderqueue_entry_t* buffer = NULL;
+static int buffer_size = 0;
+static int buffer_capacity = 0;
+static v2d_t camera;
+
+
+
+
+
+/* ----- public interface -----*/
+
+
+
+/*
+ * renderqueue_init()
+ * Initializes the render queue
+ */
+void renderqueue_init()
 {
-    const renderqueue_cell_t *a = (const renderqueue_cell_t*)i;
-    const renderqueue_cell_t *b = (const renderqueue_cell_t*)j;
-    float za = a->zindex(a->entity), zb = b->zindex(b->entity);
+    buffer_size = 0;
+    buffer_capacity = INITIAL_BUFFER_CAPACITY;
+    buffer = malloc(buffer_capacity * sizeof(*buffer));
 
-    if(fabs(za - zb) * 10.0f < ZINDEX_OFFSET(1)) {
-        if(a->type(a->entity) == b->type(b->entity))
-            return a->ypos(a->entity) - b->ypos(b->entity);
-        else
-            return (a->type(a->entity) == TYPE_PLAYER) - (b->type(b->entity) == TYPE_PLAYER);
-    }
-    else
-        return (za > zb) - (za < zb);
+    camera = v2d_new(0, 0);
 }
 
-static inline float brick_zindex_offset(const brick_t *brick)
+/*
+ * renderqueue_release()
+ * Deinitializes the render queue
+ */
+void renderqueue_release()
+{
+    free(buffer);
+    buffer_capacity = 0;
+    buffer_size = 0;
+}
+
+
+
+
+/*
+ * renderqueue_begin()
+ * Starts a new rendering process
+ */
+void renderqueue_begin(v2d_t camera_position)
+{
+    camera = camera_position;
+    buffer_size = 0;
+}
+
+/*
+ * renderqueue_end()
+ * Finishes an existing rendering process
+ * (will render everything in the queue)
+ */
+void renderqueue_end()
+{
+    /* sort the entries with a stable sorting algorithm */
+    merge_sort(buffer, buffer_size, sizeof(*buffer), cmp_fun);
+
+    /* render the entries */
+    for(int i = 0; i < buffer_size; i++)
+        buffer[i].vtable->render(buffer[i].entity, camera);
+
+    /* clean up */
+    buffer_size = 0;
+}
+
+
+
+
+/*
+ * renderqueue_enqueue_brick()
+ * Enqueues a brick
+ */
+void renderqueue_enqueue_brick(brick_t *brick)
+{
+    renderqueue_entry_t entry = {
+        .entity.brick = brick,
+        .vtable = &VTABLE[TYPE_BRICK]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_brick_mask()
+ * Enqueues a brick mask
+ */
+void renderqueue_enqueue_brick_mask(brick_t *brick)
+{
+    renderqueue_entry_t entry = {
+        .entity.brick = brick,
+        .vtable = &VTABLE[TYPE_BRICK_MASK]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_item()
+ * Enqueues a legacy item
+ */
+void renderqueue_enqueue_item(item_t *item)
+{
+    renderqueue_entry_t entry = {
+        .entity.item = item,
+        .vtable = &VTABLE[TYPE_ITEM]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_object()
+ * Enqueues a legacy object
+ */
+void renderqueue_enqueue_object(object_t *object)
+{
+    renderqueue_entry_t entry = {
+        .entity.object = object,
+        .vtable = &VTABLE[TYPE_OBJECT]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_player()
+ * Enqueues a player
+ */
+void renderqueue_enqueue_player(player_t *player)
+{
+    renderqueue_entry_t entry = {
+        .entity.player = player,
+        .vtable = &VTABLE[TYPE_PLAYER]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_particles()
+ * Enqueues the level particles
+ */
+void renderqueue_enqueue_particles()
+{
+    renderqueue_entry_t entry = {
+        .entity.dummy = NULL,
+        .vtable = &VTABLE[TYPE_PARTICLE]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_ssobject()
+ * Enqueues a SurgeScript object
+ */
+void renderqueue_enqueue_ssobject(surgescript_object_t* object)
+{
+    renderqueue_entry_t entry = {
+        .entity.ssobject = object,
+        .vtable = &VTABLE[TYPE_SSOBJECT]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_ssobject_debug()
+ * Enqueues a SurgeScript object (editor)
+ */
+void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
+{
+    renderqueue_entry_t entry = {
+        .entity.ssobject = object,
+        .vtable = &VTABLE[TYPE_SSOBJECT_DEBUG]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_ssobject_gizmo()
+ * Enqueues a SurgeScript object gizmo (editor)
+ */
+void renderqueue_enqueue_ssobject_gizmo(surgescript_object_t* object)
+{
+    renderqueue_entry_t entry = {
+        .entity.ssobject = object,
+        .vtable = &VTABLE[TYPE_SSOBJECT_GIZMO]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_background()
+ * Enqueues the background
+ */
+void renderqueue_enqueue_background(bgtheme_t* background)
+{
+    renderqueue_entry_t entry = {
+        .entity.theme = background,
+        .vtable = &VTABLE[TYPE_BACKGROUND]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_foreground()
+ * Enqueues the foreground
+ */
+void renderqueue_enqueue_foreground(bgtheme_t* foreground)
+{
+    renderqueue_entry_t entry = {
+        .entity.theme = foreground,
+        .vtable = &VTABLE[TYPE_FOREGROUND]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_water()
+ * Enqueues the water
+ */
+void renderqueue_enqueue_water()
+{
+    renderqueue_entry_t entry = {
+        .entity.dummy = NULL,
+        .vtable = &VTABLE[TYPE_WATER]
+    };
+
+    enqueue(&entry);
+}
+
+
+
+
+
+/* ----- private utilities ----- */
+
+/* enqueues an entry */
+void enqueue(const renderqueue_entry_t* entry)
+{
+    /* grow the buffer if necessary */
+    if(buffer_size == buffer_capacity) {
+        buffer_capacity *= 2;
+        buffer = realloc(buffer, buffer_capacity * sizeof(*buffer));
+    }
+
+    /* add the entry to the buffer */
+    buffer[buffer_size++] = *entry;
+}
+
+/* compares two entries of the render queue */
+int cmp_fun(const void *i, const void *j)
+{
+    const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
+    const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
+    float za = a->vtable->zindex(a->entity);
+    float zb = b->vtable->zindex(b->entity);
+
+    if(fabs(za - zb) * 10.0f < ZINDEX_OFFSET(1)) {
+        if(a->vtable->type(a->entity) == b->vtable->type(b->entity))
+            return a->vtable->ypos(a->entity) - b->vtable->ypos(b->entity);
+        else
+            return (a->vtable->type(a->entity) == TYPE_PLAYER) - (b->vtable->type(b->entity) == TYPE_PLAYER);
+    }
+
+    return (za > zb) - (za < zb);
+}
+
+/* compute a tiny zindex offset for a brick depending on its type, layer and behavior */
+float brick_zindex_offset(const brick_t *brick)
 {
     float s = 0.0f;
 
@@ -111,29 +535,96 @@ static inline float brick_zindex_offset(const brick_t *brick)
     return s;
 }
 
-/* private strategies */
-static float zindex_particles(renderable_t r) { return 1.0f; }
-static float zindex_player(renderable_t r) { return player_is_dying(r.player) ? (1.0f - ZINDEX_OFFSET(1)) : 0.5f; }
-static float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f); }
-static float zindex_object(renderable_t r) { return r.object->zindex; }
-static float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
-static float zindex_brick_mask(renderable_t r) { return ZINDEX_LARGE + brick_zindex_offset(r.brick); }
-static float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
-static float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
-static float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE; }
-static float zindex_background(renderable_t r) { return 0.0f; }
-static float zindex_foreground(renderable_t r) { return 1.0f; }
-static float zindex_water(renderable_t r) { return 1.0f; }
 
-static void render_particles(renderable_t r, v2d_t camera_position) { particle_render(camera_position); }
-static void render_player(renderable_t r, v2d_t camera_position) { player_render(r.player, camera_position); }
-static void render_item(renderable_t r, v2d_t camera_position) { item_render(r.item, camera_position); }
-static void render_object(renderable_t r, v2d_t camera_position) { enemy_render(r.object, camera_position); }
-static void render_brick(renderable_t r, v2d_t camera_position) { brick_render(r.brick, camera_position); }
-static void render_brick_mask(renderable_t r, v2d_t camera_position) { brick_render_mask(r.brick, camera_position); }
-static void render_ssobject(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "onRender", NULL, 0, NULL); }
-static void render_ssobject_gizmo(renderable_t r, v2d_t camera_position) { surgescript_object_call_function(r.ssobject, "onRenderGizmos", NULL, 0, NULL); }
-static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
+
+
+
+
+/* ----- private strategies ----- */
+
+int type_particles(renderable_t r) { return TYPE_PARTICLE; }
+int type_player(renderable_t r) { return TYPE_PLAYER; }
+int type_item(renderable_t r) { return TYPE_ITEM; }
+int type_object(renderable_t r) { return TYPE_OBJECT; }
+int type_brick(renderable_t r) { return TYPE_BRICK; }
+int type_brick_mask(renderable_t r) { return TYPE_BRICK_MASK; }
+int type_ssobject(renderable_t r) { return TYPE_SSOBJECT; }
+int type_ssobject_debug(renderable_t r) { return TYPE_SSOBJECT_DEBUG; }
+int type_ssobject_gizmo(renderable_t r) { return TYPE_SSOBJECT_GIZMO; }
+int type_background(renderable_t r) { return TYPE_BACKGROUND; }
+int type_foreground(renderable_t r) { return TYPE_FOREGROUND; }
+int type_water(renderable_t r) { return TYPE_WATER; }
+
+float zindex_particles(renderable_t r) { return 1.0f; }
+float zindex_player(renderable_t r) { return player_is_dying(r.player) ? (1.0f - ZINDEX_OFFSET(1)) : 0.5f; }
+float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f); }
+float zindex_object(renderable_t r) { return r.object->zindex; }
+float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
+float zindex_brick_mask(renderable_t r) { return ZINDEX_LARGE + brick_zindex_offset(r.brick); }
+float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
+float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
+float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE; }
+float zindex_background(renderable_t r) { return 0.0f; }
+float zindex_foreground(renderable_t r) { return 1.0f; }
+float zindex_water(renderable_t r) { return 1.0f; }
+
+int ypos_particles(renderable_t r) { return 0; }
+int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
+int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
+int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
+int ypos_brick(renderable_t r) { return brick_position(r.brick).y; }
+int ypos_brick_mask(renderable_t r) { return ypos_brick(r); }
+int ypos_ssobject(renderable_t r) { return 0; } /* TODO (not needed?) */
+int ypos_ssobject_debug(renderable_t r) { return ypos_ssobject(r); }
+int ypos_ssobject_gizmo(renderable_t r) { return ypos_ssobject(r); }
+int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes */
+int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
+int ypos_water(renderable_t r) { return 0; } /* not needed */
+
+
+/* --- private rendering routines --- */
+
+void render_particles(renderable_t r, v2d_t camera_position)
+{
+    particle_render(camera_position);
+}
+
+void render_player(renderable_t r, v2d_t camera_position)
+{
+    player_render(r.player, camera_position);
+}
+
+void render_item(renderable_t r, v2d_t camera_position)
+{
+    item_render(r.item, camera_position);
+}
+
+void render_object(renderable_t r, v2d_t camera_position)
+{
+    enemy_render(r.object, camera_position);
+}
+
+void render_brick(renderable_t r, v2d_t camera_position)
+{
+    brick_render(r.brick, camera_position);
+}
+
+void render_brick_mask(renderable_t r, v2d_t camera_position)
+{
+    brick_render_mask(r.brick, camera_position);
+}
+
+void render_ssobject(renderable_t r, v2d_t camera_position)
+{
+    surgescript_object_call_function(r.ssobject, "onRender", NULL, 0, NULL);
+}
+
+void render_ssobject_gizmo(renderable_t r, v2d_t camera_position)
+{
+    surgescript_object_call_function(r.ssobject, "onRenderGizmos", NULL, 0, NULL);
+}
+
+void render_ssobject_debug(renderable_t r, v2d_t camera_position)
 {
     /* in render_ssobject_debug(), we don't call the "onRender"
        method of the SurgeScript object, so we don't provoke
@@ -143,237 +634,28 @@ static void render_ssobject_debug(renderable_t r, v2d_t camera_position)
     const image_t* img = sprite_get_image(anim, 0);
     v2d_t hot_spot = anim->hot_spot;
     v2d_t position = scripting_util_world_position(r.ssobject);
+
     if(level_inside_screen(position.x - hot_spot.x, position.y - hot_spot.y, image_width(img), image_height(img))) {
         v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
         v2d_t topleft = v2d_subtract(camera_position, half_screen);
         image_draw(img, position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
     }
 }
-static void render_background(renderable_t r, v2d_t camera_position) { background_render_bg(r.theme, camera_position); }
-static void render_foreground(renderable_t r, v2d_t camera_position) { background_render_fg(r.theme, camera_position); }
-static void render_water(renderable_t r, v2d_t camera_position)
+
+void render_background(renderable_t r, v2d_t camera_position)
 {
-    int y = level_waterlevel() - ((int)camera_position.y - VIDEO_SCREEN_H/2);
+    background_render_bg(r.theme, camera_position);
+}
+
+void render_foreground(renderable_t r, v2d_t camera_position)
+{
+    background_render_fg(r.theme, camera_position);
+}
+
+void render_water(renderable_t r, v2d_t camera_position)
+{
+    int y = level_waterlevel() - ((int)camera_position.y - VIDEO_SCREEN_H / 2);
+
     if(y < VIDEO_SCREEN_H)
         image_waterfx(y, level_watercolor());
-}
-
-static int ypos_particles(renderable_t r) { return 0; }
-static int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
-static int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
-static int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
-static int ypos_brick(renderable_t r) { return brick_position(r.brick).y; }
-static int ypos_ssobject(renderable_t r) { return 0; } /* TODO (not needed?) */
-static int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes */
-static int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
-static int ypos_water(renderable_t r) { return 0; } /* not needed */
-
-static int type_particles(renderable_t r) { return TYPE_PARTICLE; }
-static int type_player(renderable_t r) { return TYPE_PLAYER; }
-static int type_item(renderable_t r) { return TYPE_ITEM; }
-static int type_object(renderable_t r) { return TYPE_OBJECT; }
-static int type_brick(renderable_t r) { return TYPE_BRICK; }
-static int type_ssobject(renderable_t r) { return TYPE_SSOBJECT; }
-static int type_background(renderable_t r) { return TYPE_BACKGROUND; }
-static int type_foreground(renderable_t r) { return TYPE_FOREGROUND; }
-static int type_water(renderable_t r) { return TYPE_WATER; }
-
-
-
-
-/* public interface */
-
-/* starts a new rendering process */
-void renderqueue_begin(v2d_t camera_position)
-{
-    /* initialize stuff */
-    queue = NULL;
-    size = 0;
-    camera = camera_position;
-}
-
-/* finishes an existing rendering process, rendering everything */
-void renderqueue_end()
-{
-    renderqueue_t *it, *next;
-    renderqueue_cell_t *arr;
-    int i = size;
-
-    /* create a temporary array */
-    arr = mallocx(size * sizeof *arr);
-    for(it=queue; it; it=it->next)
-        arr[--i] = it->cell;
-
-    /* sort stuff. we need an stable sorting algorithm here. */
-    merge_sort(arr, size, sizeof *arr, cmp_fun);
-
-    /* render everything */
-    for(i=0; i<size; i++)
-        arr[i].render(arr[i].entity, camera);
-
-    /* release the temporary array */
-    free(arr);
-
-    /* release stuff */
-    for(it=queue; it; it=next) {
-        next = it->next;
-        free(it);
-    }
-    size = 0;
-    queue = NULL;
-}
-
-/* enqueues entities */
-void renderqueue_enqueue_brick(brick_t *brick)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.brick = brick;
-    node->cell.zindex = zindex_brick;
-    node->cell.render = render_brick;
-    node->cell.ypos = ypos_brick;
-    node->cell.type = type_brick;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_brick_mask(brick_t *brick)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.brick = brick;
-    node->cell.zindex = zindex_brick_mask;
-    node->cell.render = render_brick_mask;
-    node->cell.ypos = ypos_brick;
-    node->cell.type = type_brick;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_item(item_t *item)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.item = item;
-    node->cell.zindex = zindex_item;
-    node->cell.render = render_item;
-    node->cell.ypos = ypos_item;
-    node->cell.type = type_item;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_object(object_t *object)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.object = object;
-    node->cell.zindex = zindex_object;
-    node->cell.render = render_object;
-    node->cell.ypos = ypos_object;
-    node->cell.type = type_object;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_player(player_t *player)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.player = player;
-    node->cell.zindex = zindex_player;
-    node->cell.render = render_player;
-    node->cell.ypos = ypos_player;
-    node->cell.type = type_player;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_particles()
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.zindex = zindex_particles;
-    node->cell.render = render_particles;
-    node->cell.ypos = ypos_particles;
-    node->cell.type = type_particles;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_ssobject(surgescript_object_t* object)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.ssobject = object;
-    node->cell.zindex = zindex_ssobject;
-    node->cell.render = render_ssobject;
-    node->cell.ypos = ypos_ssobject;
-    node->cell.type = type_ssobject;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.ssobject = object;
-    node->cell.zindex = zindex_ssobject_debug;
-    node->cell.render = render_ssobject_debug;
-    node->cell.ypos = ypos_ssobject;
-    node->cell.type = type_ssobject;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_ssobject_gizmo(surgescript_object_t* object)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.ssobject = object;
-    node->cell.zindex = zindex_ssobject_gizmo;
-    node->cell.render = render_ssobject_gizmo;
-    node->cell.ypos = ypos_ssobject;
-    node->cell.type = type_ssobject;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_background(bgtheme_t* background)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.theme = background;
-    node->cell.zindex = zindex_background;
-    node->cell.render = render_background;
-    node->cell.ypos = ypos_background;
-    node->cell.type = type_background;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_foreground(bgtheme_t* foreground)
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.entity.theme = foreground;
-    node->cell.zindex = zindex_foreground;
-    node->cell.render = render_foreground;
-    node->cell.ypos = ypos_foreground;
-    node->cell.type = type_foreground;
-    node->next = queue;
-    queue = node;
-    size++;
-}
-
-void renderqueue_enqueue_water()
-{
-    renderqueue_t *node = mallocx(sizeof *node);
-    node->cell.zindex = zindex_water;
-    node->cell.render = render_water;
-    node->cell.ypos = ypos_water;
-    node->cell.type = type_water;
-    node->next = queue;
-    queue = node;
-    size++;
 }

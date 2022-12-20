@@ -39,10 +39,12 @@ struct player_t;
 struct bgtheme_t;
 struct surgescript_object_t;
 
-/* starts a new rendering process */
-void renderqueue_begin(v2d_t camera_position);
+/* initialization & deinitialization */
+void renderqueue_init();
+void renderqueue_release();
 
-/* finishes an existing rendering process, rendering everything */
+/* rendering */
+void renderqueue_begin(v2d_t camera_position);
 void renderqueue_end();
 
 /* enqueues entities */

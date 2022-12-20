@@ -1073,8 +1073,9 @@ void level_init(void *path_to_lev_file)
     /* helpers */
     clear_level_state(&saved_state);
     clear_bricklike_ssobjects();
+    renderqueue_init();
     particle_init();
-    music_stop();
+    /*music_stop();*/
 
     /* level init */
     level_load(filepath);
@@ -1477,6 +1478,7 @@ void level_release()
     logfile_message("level_release()");
 
     particle_release();
+    renderqueue_release();
     level_unload();
     camera_release();
     editor_release();
