@@ -129,7 +129,7 @@ void pause_render()
     image_t *p = sprite_get_image(sprite_get_animation("Pause", 0), 0);
     v2d_t size = v2d_new(image_width(p), image_height(p));
 
-    const float frequency = 1.5707963267948966f; /* PI / 2 */
+    const float frequency = PI_OVER_TWO;
     float scale = 1.0f + 0.5f * fabs(cosf(frequency * pause_timer));
 
     v2d_t pos = v2d_new(

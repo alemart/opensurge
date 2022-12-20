@@ -114,7 +114,6 @@ static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
 /* utilities */
 #define DEG2RAD(x) ((x) / 57.2957795131f)
 #define ROUND(x)   (int)(((x)>=0.0f)?((x)+0.5f):((x)-0.5f))
-static const float TWO_PI = 6.28318530718f;
 static const float BRICK_FALL_TTL = 1.0f; /* time in seconds before a BRB_FALL gets destroyed */
 static const float BRICK_FLOAT_AMPLITUDE = 8.0f; /* if a player touches a floating brick, how deep in pixels should it go? */
 static const float BRICK_FLOAT_TIME = 0.25f; /* time in seconds before a floating brick reaches full amplitude */

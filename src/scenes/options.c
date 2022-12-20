@@ -333,7 +333,7 @@ static void group_highlightable_update(group_t *g)
     font_set_text(g->font, "%s", lang_get(data->lang_key));
     if(group_highlightable_is_highlighted(g)) {
         font_set_text(g->font, "<color=$COLOR_HIGHLIGHT>%s</color>", lang_get(data->lang_key));
-        icon->position = v2d_add(font_get_position(g->font), v2d_new(-20+3*cos(2*PI*scene_time),0));
+        icon->position = v2d_add(font_get_position(g->font), v2d_new(-20 + 3 * cosf(TWO_PI * scene_time), 0));
     }
 }
 

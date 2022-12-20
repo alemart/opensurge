@@ -36,15 +36,13 @@
 #undef max
 #endif
 
-#ifdef round
-#undef round
-#endif
-
 #ifdef PI
 #undef PI
 #endif
 
 #define PI                      3.14159265358979323846
+#define TWO_PI                  6.283185307179586
+#define PI_OVER_TWO             1.5707963267948966
 #define LARGE_INT               (1 << 30)
 
 /* Useful macros */

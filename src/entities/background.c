@@ -257,8 +257,8 @@ bgstrategy_t *bgstrategy_circular_new(background_t *background, float amplitude_
     me->timer = 0.0f;
     me->amplitude_x = amplitude_x;
     me->amplitude_y = amplitude_y;
-    me->angularspeed_x = (2.0f * PI) * angularspeed_x;
-    me->angularspeed_y = (2.0f * PI) * angularspeed_y;
+    me->angularspeed_x = TWO_PI * angularspeed_x;
+    me->angularspeed_y = TWO_PI * angularspeed_y;
     me->initialphase_x = (initialphase_x * PI) / 180.0f;
     me->initialphase_y = (initialphase_y * PI) / 180.0f;
 

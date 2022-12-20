@@ -1881,8 +1881,8 @@ void ellipticaltrajectory_update(objectmachine_t *obj, player_t **team, int team
 
     float amplitude_x = expression_evaluate(me->amplitude_x);
     float amplitude_y = expression_evaluate(me->amplitude_y);
-    float angularspeed_x = expression_evaluate(me->angularspeed_x) * (2.0f * PI);
-    float angularspeed_y = expression_evaluate(me->angularspeed_y) * (2.0f * PI);
+    float angularspeed_x = expression_evaluate(me->angularspeed_x) * TWO_PI;
+    float angularspeed_y = expression_evaluate(me->angularspeed_y) * TWO_PI;
     float initialphase_x = (expression_evaluate(me->initialphase_x) * PI) / 180.0f;
     float initialphase_y = (expression_evaluate(me->initialphase_y) * PI) / 180.0f;
 

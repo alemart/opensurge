@@ -179,7 +179,7 @@ void stageselect_update()
 
     /* menu option */
     icon->position = font_get_position(stage_label[option]);
-    icon->position.x += -20 + 3*cos(2*PI * scene_time);
+    icon->position.x += -20 + 3 * cosf(TWO_PI * scene_time);
 
     /* page number */
     pagenum = option/STAGE_MAXPERPAGE + 1;

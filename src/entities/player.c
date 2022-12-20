@@ -1696,7 +1696,7 @@ void hotspot_magic(player_t* player)
 void animate_invincibility_stars(player_t* player)
 {
     const float magic = PLAYER_MAX_STARS * PLAYER_MAX_STARS * 1.5f;
-    const float angpi = (2.0f * PI) / PLAYER_MAX_STARS;
+    const float angpi = TWO_PI / PLAYER_MAX_STARS;
     float x, angle, distance, max_distance;
     int i, width, height;
     v2d_t center;
@@ -1723,9 +1723,8 @@ void animate_invincibility_stars(player_t* player)
 /* given two angles in [0, 2pi], return their difference */
 float delta_angle(float alpha, float beta)
 {
-    static const float twopi = PI * 2;
-    float diff = fmod(fabs(alpha - beta), twopi);
-    return min(twopi - diff, diff);
+    float diff = fmod(fabs(alpha - beta), TWO_PI);
+    return min(TWO_PI - diff, diff);
 }
 
 /* truncates the angle within a given threshold, assuming 0 <= degrees < 360 */
