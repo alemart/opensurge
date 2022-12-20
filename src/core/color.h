@@ -34,6 +34,7 @@ typedef struct color_t {
 /* public API */
 color_t color_rgb(uint8_t r, uint8_t g, uint8_t b);
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+color_t color_premul_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 color_t color_hex(const char* hex_string);
 const char* color_to_hex(color_t color, char* dest, size_t dest_size);
 void color_unmap(color_t color, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
