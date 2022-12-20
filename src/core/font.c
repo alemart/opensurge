@@ -115,6 +115,7 @@ struct fontdrv_t { /* abstract font: base class */
     void (*textout)(const fontdrv_t*,const char*,int,int,color_t); /* prints a string */
     v2d_t (*textsize)(const fontdrv_t*,const char*); /* text size, in pixels */
     v2d_t (*charspacing)(const fontdrv_t*); /* a pair (hspace, vspace) */
+    const char* (*filepath)(const fontdrv_t*); /* relative path of the font */
     void (*release)(fontdrv_t*); /* release the fontdrv_t */
 };
 static fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int spacing[2]);
@@ -126,10 +127,12 @@ struct fontdrv_bmp_t { /* bitmap font */
     image_t* bmp[256]; /* bitmap character indexed by its unicode number */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
+    char* filepath; /* relative path */
 };
 static void fontdrv_bmp_textout(const fontdrv_t* fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_bmp_textsize(const fontdrv_t* fnt, const char* string);
 static v2d_t fontdrv_bmp_charspacing(const fontdrv_t* fnt);
+static const char* fontdrv_bmp_filepath(const fontdrv_t* fnt);
 static void fontdrv_bmp_release(fontdrv_t* fnt);
 
 typedef struct fontdrv_ttf_t fontdrv_ttf_t;
@@ -139,11 +142,12 @@ struct fontdrv_ttf_t { /* truetype font */
     int size; /* font size */
     bool antialias; /* enable antialiasing? */
     bool shadow; /* enable shadow? */
-    char* source_file; /* relative path */
+    char* filepath; /* relative path */
 };
 static void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, color_t color);
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t* fnt);
+static const char* fontdrv_ttf_filepath(const fontdrv_t* fnt);
 static void fontdrv_ttf_release(fontdrv_t* fnt);
 
 /* ------------------------------- */
@@ -623,6 +627,16 @@ void font_set_maxlength(font_t* f, int maxlength)
 {
     f->length = clip(maxlength, 0, FONT_TEXTMAXSIZE - 1);
 }
+
+/*
+ * font_get_filepath()
+ * Get the relative path of the file (image, truetype font...) that originates this font
+ */
+const char* font_get_filepath(const font_t* f)
+{
+    return f->drv->filepath(f->drv);
+}
+
 
 
 /* ------------------------------------------------- */
@@ -1421,6 +1435,7 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
     ((fontdrv_t*)f)->textout = fontdrv_bmp_textout;
     ((fontdrv_t*)f)->textsize = fontdrv_bmp_textsize;
     ((fontdrv_t*)f)->charspacing = fontdrv_bmp_charspacing;
+    ((fontdrv_t*)f)->filepath = fontdrv_bmp_filepath;
     ((fontdrv_t*)f)->release = fontdrv_bmp_release;
 
     /* configure the spritesheet */
@@ -1437,6 +1452,9 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
     /* validation */
     if(f->line_height == 0)
         fatal_error("Font script error: font \"%s\" has got no valid characters.", source_file);
+
+    /* copy the source file */
+    f->filepath = str_dup(source_file);
 
     /* done! ;) */
     return (fontdrv_t*)f;
@@ -1474,6 +1492,7 @@ void fontdrv_bmp_release(fontdrv_t* fnt)
             image_destroy(f->bmp[i]);
     }
 
+    free(f->filepath);
     free(f);
 }
 
@@ -1513,6 +1532,13 @@ v2d_t fontdrv_bmp_textsize(const fontdrv_t* fnt, const char* string)
     return v2d_new(width, height);
 }
 
+const char* fontdrv_bmp_filepath(const fontdrv_t* fnt)
+{
+    const fontdrv_bmp_t* f = (const fontdrv_bmp_t*)fnt;
+
+    return f->filepath;
+}
+
 /* ------------------------------------------------- */
 /* ttf fonts */
 /* ------------------------------------------------- */
@@ -1524,10 +1550,11 @@ fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bo
     ((fontdrv_t*)f)->textout = fontdrv_ttf_textout;
     ((fontdrv_t*)f)->textsize = fontdrv_ttf_textsize;
     ((fontdrv_t*)f)->charspacing = fontdrv_ttf_charspacing;
+    ((fontdrv_t*)f)->filepath = fontdrv_ttf_filepath;
     ((fontdrv_t*)f)->release = fontdrv_ttf_release;
 
     /* store font attributes */
-    f->source_file = str_dup(source_file);
+    f->filepath = str_dup(source_file);
     f->size = max(size, 0); /* height of glyphs in pixels */
     f->antialias = allow_antialias && antialias;
     f->shadow = shadow;
@@ -1566,7 +1593,7 @@ void fontdrv_ttf_release(fontdrv_t* fnt)
     if(has_loaded_ttf(f))
         unload_ttf(f);
 
-    free(f->source_file);
+    free(f->filepath);
     free(f);
 }
 
@@ -1625,6 +1652,13 @@ v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string)
     return v2d_new(width, height);
 }
 
+const char* fontdrv_ttf_filepath(const fontdrv_t* fnt)
+{
+    const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
+
+    return f->filepath;
+}
+
 bool has_loaded_ttf(const fontdrv_ttf_t* f)
 {
     return f->font != NULL;
@@ -1632,7 +1666,7 @@ bool has_loaded_ttf(const fontdrv_ttf_t* f)
 
 void load_ttf(fontdrv_ttf_t* f)
 {
-    const char* fullpath = asset_path(f->source_file);
+    const char* fullpath = asset_path(f->filepath);
 
     logfile_message("Loading TrueType font \"%s\"...", fullpath);
 

@@ -49,6 +49,7 @@ fontalign_t font_get_align(const font_t* f); /* get the current align */
 void font_set_align(font_t* f, fontalign_t align); /* set the align */
 int font_get_maxlength(const font_t* f); /* get the maximum number of characters that can be displayed, ignoring color tags and blanks */
 void font_set_maxlength(font_t* f, int maxlength); /* set the maximum number of characters, ignoring color tags and blanks */
+const char* font_get_filepath(const font_t* f); /* get the relative path of the file (image, truetype font...) that originates this font */
 
 /* misc */
 void font_init(bool allow_font_smoothing); /* initializes the font module */
