@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Actor;
 using SurgeEngine.Level;
+using SurgeEngine.Transform;
 using SurgeEngine.Behaviors.Platformer;
 using SurgeEngine.Behaviors.DirectionalMovement;
 
@@ -17,10 +18,10 @@ object "Animal" is "entity", "private", "disposable"
     public zindex = 0.5;
 
     actor = Actor("Animal");
+    transform = Transform();
     movement = null;
     activationState = null;
     maxAnimals = 1;
-    t = 0;
 
     state "main"
     {
@@ -34,15 +35,25 @@ object "Animal" is "entity", "private", "disposable"
 
     state "wait"
     {
-        if((t += Time.delta) >= secondsBeforeMoving) {
+        if(timeout(secondsBeforeMoving)) {
             movement.enabled = true;
             state = activationState;
         }
     }
 
+    state "start jumping"
+    {
+        platformer = movement;
+        updatePlaformerSettings(platformer);
+
+        platformer.forceJump(platformer.jumpSpeed * 1.1);
+        state = "initial jump";
+    }
+
     state "initial jump"
     {
         platformer = movement;
+        updatePlaformerSettings(platformer);
 
         // when touching the ground, run!
         if(!platformer.midair) {
@@ -59,13 +70,12 @@ object "Animal" is "entity", "private", "disposable"
     state "running"
     {
         platformer = movement;
+        updatePlaformerSettings(platformer);
 
-        if(platformer.wall) {
-            if(platformer.direction > 0)
-                platformer.walkLeft();
-            else
-                platformer.walkRight();
-        }
+        if(platformer.rightWall)
+            platformer.walkLeft();
+        else if(platformer.leftWall)
+            platformer.walkRight();
         else if(!platformer.midair)
             platformer.jump();
     }
@@ -108,16 +118,34 @@ object "Animal" is "entity", "private", "disposable"
         else {
             // setup the platformer
             platformer = Platformer();
-            platformer.speed = 64;
-            platformer.jumpSpeed = 200;
-            platformer.forceJump(220);
+            updatePlaformerSettings(platformer);
 
             movement = platformer;
-            activationState = "initial jump";
+            activationState = "start jumping";
         }
 
         // won't move initially
         movement.enabled = false;
+    }
+
+    fun updatePlaformerSettings(platformer)
+    {
+        platformer.speed = 64;
+        platformer.jumpSpeed = 200;
+        platformer.gravityMultiplier = 1.0;
+        actor.animation.speedFactor = 1.0;
+
+        if(isUnderwater()) {
+            platformer.speed /= 2.0;
+            platformer.jumpSpeed /= 1.85;
+            platformer.gravityMultiplier = 0.2857;
+            actor.animation.speedFactor = 0.7;
+        }
+    }
+
+    fun isUnderwater()
+    {
+        return (transform.position.y >= Level.waterlevel);
     }
 }
 
