@@ -772,6 +772,20 @@ void image_hold_drawing(bool hold)
     See: https://liballeg.org/a5docs/trunk/graphics.html#al_hold_bitmap_drawing
 
     */
+    static int counter = 0;
 
-    al_hold_bitmap_drawing(hold);
+    if(hold) {
+
+        if(0 == counter++)
+            al_hold_bitmap_drawing(true);
+
+    }
+    else {
+
+        if(0 == --counter)
+            al_hold_bitmap_drawing(false);
+
+        counter = max(0, counter);
+
+    }
 }
