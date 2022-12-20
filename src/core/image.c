@@ -77,9 +77,9 @@ image_t* image_load(const char* path)
         img->h = al_get_bitmap_height(img->data);
         if(img->w > MAX_IMAGE_SIZE || img->h > MAX_IMAGE_SIZE) {
             /* ensure broad compatibility with video cards */
-            fatal_error("Failed to load \"%s\": images can't be larger than %dx%d", path, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
             al_destroy_bitmap(img->data);
             free(img);
+            fatal_error("Failed to load \"%s\": images can't be larger than %dx%d", path, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
             return NULL;
         }
 
@@ -163,10 +163,8 @@ void image_destroy(image_t* img)
     if(img->data != NULL)
         al_destroy_bitmap(img->data);
 
-    if(img->path != NULL) {
-        resourcemanager_unref_image(img->path);
+    if(img->path != NULL)
         free(img->path);
-    }
 
     if(target == img)
         target = NULL;
@@ -205,12 +203,11 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
     if(NULL == (img->data = al_create_sub_bitmap(parent->data, x, y, width, height)))
         fatal_error("Failed to create shared image of \"%s\": %d, %d, %d, %d", parent->path ? parent->path : "", x, y, width, height);
 
+    img->path = NULL;
     if(parent->path != NULL) {
         img->path = str_dup(parent->path);
         resourcemanager_ref_image(img->path); /* reference it, otherwise the parent may be destroyed */
     }
-    else
-        img->path = NULL;
 
     return img;
 }
@@ -251,46 +248,6 @@ image_t* image_clone(const image_t* src)
     if(NULL == (img->data = al_clone_bitmap(src->data)))
         fatal_error("Failed to clone image \"%s\" sized %dx%d", src->path ? src->path : "", src->w, src->h);
 
-    return img;
-}
-
-/*
- * image_clone_region()
- * Clones a region of an image; make sure you
- * call image_destroy() after usage
- */
-image_t* image_clone_region(const image_t* src, int x, int y, int width, int height)
-{
-    image_t* img;
-    int sw, sh;
-
-    if(width <= 0 || height <= 0) {
-        fatal_error("Can't create cloned image of size %d x %d", width, height);
-        return NULL;
-    }
-
-    sw = src->w;
-    sh = src->h;
-    x = clip(x, 0, sw-1);
-    y = clip(y, 0, sh-1);
-    width = clip(width, 0, sw-x);
-    height = clip(height, 0, sh-y);
-
-    img = mallocx(sizeof *img);
-    img->w = width;
-    img->h = height;
-    img->path = NULL;
-    if(NULL != (img->data = al_create_bitmap(img->w, img->h))) {
-        ALLEGRO_STATE state;
-        al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-        al_set_target_bitmap(img->data);
-        al_clear_to_color(al_map_rgba(0, 0, 0, 0));
-        al_draw_bitmap_region(src->data, x, y, width, height, 0.0f, 0.0f, 0);
-        al_restore_state(&state);
-    }
-    else
-        fatal_error("Failed to clone region of image \"%s\": %d, %d, %d, %d", src->path ? src->path : "", x, y, width, height);
-    
     return img;
 }
 
@@ -788,4 +745,14 @@ void image_hold_drawing(bool hold)
         counter = max(0, counter);
 
     }
+}
+
+/*
+ * image_path()
+ * The path to the file of this image, if it exists.
+ * An empty string ("") is returned if there is no such path
+ */
+const char* image_path(const image_t* img)
+{
+    return img->path != NULL ? img->path : "";
 }
