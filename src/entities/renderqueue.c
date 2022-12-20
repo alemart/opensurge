@@ -638,6 +638,7 @@ void render_ssobject_debug(renderable_t r, v2d_t camera_position)
     if(level_inside_screen(position.x - hot_spot.x, position.y - hot_spot.y, image_width(img), image_height(img))) {
         v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
         v2d_t topleft = v2d_subtract(camera_position, half_screen);
+
         image_draw(img, position.x - hot_spot.x - topleft.x, position.y - hot_spot.y - topleft.y, IF_NONE);
     }
 }
@@ -654,8 +655,35 @@ void render_foreground(renderable_t r, v2d_t camera_position)
 
 void render_water(renderable_t r, v2d_t camera_position)
 {
+    /* convert the waterlevel from world space to screen space */
     int y = level_waterlevel() - ((int)camera_position.y - VIDEO_SCREEN_H / 2);
 
-    if(y < VIDEO_SCREEN_H)
-        image_waterfx(y, level_watercolor());
+    /* clip out */
+    if(y >= VIDEO_SCREEN_H)
+        return;
+
+    /* adjust y */
+    y = max(0, y);
+
+    /*
+
+    Let's adjust the color of the water by pre-multiplying the alpha value
+
+    "By default Allegro uses pre-multiplied alpha for transparent blending of
+    bitmaps and primitives (see al_load_bitmap_flags for a discussion of that
+    feature). This means that if you want to tint a bitmap or primitive to be
+    transparent you need to multiply the color components by the alpha
+    components when you pass them to this function."
+
+    Source: Allegro manual at
+    https://liballeg.org/a5docs/trunk/graphics.html#al_premul_rgba
+
+    */
+    uint8_t red, green, blue, alpha;
+    color_t color = level_watercolor();
+    color_unmap(color, &red, &green, &blue, &alpha);
+    color = color_premul_rgba(red, green, blue, alpha);
+
+    /* render the water */
+    image_rectfill(0, y, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color);
 }

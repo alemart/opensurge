@@ -442,42 +442,6 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 
 
 /*
- * image_waterfx()
- * Pixels below y will have a water effect
- */
-void image_waterfx(int y, color_t color)
-{
-    image_t* target = image_drawing_target();
-
-    /* obtain the components of the color */
-    uint8_t r, g, b, a;
-    color_unmap(color, &r, &g, &b, &a);
-
-    /*
-
-    Let's pre-multiply the alpha
-
-    "By default Allegro uses pre-multiplied alpha for transparent blending of
-    bitmaps and primitives (see al_load_bitmap_flags for a discussion of that
-    feature). This means that if you want to tint a bitmap or primitive to be
-    transparent you need to multiply the color components by the alpha
-    components when you pass them to this function."
-
-    Source: Allegro manual at
-    https://liballeg.org/a5docs/trunk/graphics.html#al_premul_rgba
-
-    */
-    ALLEGRO_COLOR col = al_premul_rgba(r, g, b, a);
-
-    /* adjust y */
-    y = clip(y, 0, target->h);
-
-    /* draw water effect */
-    al_draw_filled_rectangle(0, y, target->w + 1.0f, target->h + 1.0f, col);
-}
-
-
-/*
  * image_clear()
  * Clears an given image with some color
  */
