@@ -574,9 +574,27 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
  */
 void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags)
 {
+    /*
+
+    "While deferred bitmap drawing is enabled, the only functions that can be
+    used are the bitmap drawing functions and font drawing functions. Changing
+    the state such as the blending modes will result in undefined behaviour."
+
+    source: Allegro manual at
+    https://liballeg.org/a5docs/trunk/graphics.html#al_hold_bitmap_drawing
+
+    */
+
+    /* temporarily disable deferred drawing if it's activated */
+    bool is_held = al_is_bitmap_drawing_held();
+    if(is_held)
+        al_hold_bitmap_drawing(false);
+
+    /* store the blend state */
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_BLENDER);
 
+    /* blending magic */
     al_set_blend_color(color._color);
     al_set_blender(
 
@@ -648,7 +666,12 @@ void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_
     );
     al_draw_bitmap(src->data, x, y, FLIPPY(flags));
 
+    /* restore the blending state */
     al_restore_state(&state);
+
+    /* re-enable deferred drawing if it was activated */
+    if(is_held)
+        al_hold_bitmap_drawing(true);
 }
 
 /*
