@@ -29,6 +29,7 @@
 #include "legacy/item.h"
 #include "legacy/enemy.h"
 #include "../core/util.h"
+#include "../core/stringutil.h"
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../scenes/level.h"
@@ -56,7 +57,7 @@ enum {
     TYPE_OBJECT /* legacy object */
 };
 
-/* a renderable entity */
+/* a renderable */
 typedef union renderable_t renderable_t;
 union renderable_t {
     player_t* player;
@@ -74,14 +75,16 @@ struct renderable_vtable_t {
     float (*zindex)(renderable_t);
     void (*render)(renderable_t,v2d_t);
     int (*ypos)(renderable_t);
+    const char* (*path)(renderable_t, char*, size_t);
     int (*type)(renderable_t);
 };
 
 /* an entry of the render queue */
 typedef struct renderqueue_entry_t renderqueue_entry_t;
 struct renderqueue_entry_t {
-    renderable_t entity;
+    renderable_t renderable;
     const renderable_vtable_t* vtable;
+    int group_index; /* a helper for deferred rendering; see my commentary about it below */
 };
 
 /* vtables */
@@ -124,6 +127,19 @@ static int ypos_background(renderable_t r);
 static int ypos_foreground(renderable_t r);
 static int ypos_water(renderable_t r);
 
+static const char* path_particles(renderable_t r, char* dest, size_t dest_size);
+static const char* path_player(renderable_t r, char* dest, size_t dest_size);
+static const char* path_item(renderable_t r, char* dest, size_t dest_size);
+static const char* path_object(renderable_t r, char* dest, size_t dest_size);
+static const char* path_brick(renderable_t r, char* dest, size_t dest_size);
+static const char* path_brick_mask(renderable_t r, char* dest, size_t dest_size);
+static const char* path_ssobject(renderable_t r, char* dest, size_t dest_size);
+static const char* path_ssobject_debug(renderable_t r, char* dest, size_t dest_size);
+static const char* path_ssobject_gizmo(renderable_t r, char* dest, size_t dest_size);
+static const char* path_background(renderable_t r, char* dest, size_t dest_size);
+static const char* path_foreground(renderable_t r, char* dest, size_t dest_size);
+static const char* path_water(renderable_t r, char* dest, size_t dest_size);
+
 static int type_particles(renderable_t r);
 static int type_player(renderable_t r);
 static int type_item(renderable_t r);
@@ -142,6 +158,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_brick,
         .render = render_brick,
         .ypos = ypos_brick,
+        .path = path_brick,
         .type = type_brick
     },
 
@@ -149,6 +166,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_brick_mask,
         .render = render_brick_mask,
         .ypos = ypos_brick_mask,
+        .path = path_brick_mask,
         .type = type_brick_mask
     },
 
@@ -156,6 +174,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_item,
         .render = render_item,
         .ypos = ypos_item,
+        .path = path_item,
         .type = type_item
     },
 
@@ -163,6 +182,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_object,
         .render = render_object,
         .ypos = ypos_object,
+        .path = path_object,
         .type = type_object
     },
 
@@ -170,6 +190,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_player,
         .render = render_player,
         .ypos = ypos_player,
+        .path = path_player,
         .type = type_player
     },
 
@@ -177,6 +198,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_particles,
         .render = render_particles,
         .ypos = ypos_particles,
+        .path = path_particles,
         .type = type_particles
     },
 
@@ -184,6 +206,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_ssobject,
         .render = render_ssobject,
         .ypos = ypos_ssobject,
+        .path = path_ssobject,
         .type = type_ssobject
     },
 
@@ -191,6 +214,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_ssobject_debug,
         .render = render_ssobject_debug,
         .ypos = ypos_ssobject_debug,
+        .path = path_ssobject_debug,
         .type = type_ssobject_debug
     },
 
@@ -198,6 +222,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_ssobject_gizmo,
         .render = render_ssobject_gizmo,
         .ypos = ypos_ssobject_gizmo,
+        .path = path_ssobject_gizmo,
         .type = type_ssobject_gizmo
     },
 
@@ -205,6 +230,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_background,
         .render = render_background,
         .ypos = ypos_background,
+        .path = path_background,
         .type = type_background
     },
 
@@ -212,6 +238,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_foreground,
         .render = render_foreground,
         .ypos = ypos_foreground,
+        .path = path_foreground,
         .type = type_foreground
     },
 
@@ -219,6 +246,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_water,
         .render = render_water,
         .ypos = ypos_water,
+        .path = path_water,
         .type = type_water
     }
 };
@@ -230,6 +258,7 @@ static const renderable_vtable_t VTABLE[] = {
 static int cmp_fun(const void *i, const void *j);
 static inline float brick_zindex_offset(const brick_t *brick);
 static void enqueue(const renderqueue_entry_t* entry);
+static const char* random_path(char prefix);
 
 /* internal data */
 static renderqueue_entry_t* buffer = NULL;
@@ -239,6 +268,58 @@ static v2d_t camera;
 
 
 
+/*
+
+OPTIMIZATION: DEFERRED DRAWING
+------------------------------
+
+According to the Allegro 5 manual (see the link below), deferred bitmap drawing
+"allows for efficient drawing of many bitmaps that share a parent bitmap, such
+as sub-bitmaps from a tilesheet or simply identical bitmaps".
+
+In order to optimize the rendering process, we'll group the entries of the
+render queue that share the same or a parent bitmap and enable deferred bitmap
+drawing whenever we see fit.
+
+Each of the n entries of the render queue is associated with a group_index
+defined as follows:
+
+group_index[n-1] = 1
+
+group_index[i] = 1 + group_index[i+1], if path[i] == path[i+1]
+                 1 otherwise                               for all 0 <= i < n-1
+
+where path[i] is the path of the image file (if any) of the i-th entry of the
+*sorted* render queue. If the paths are the same, then the bitmaps of the two
+entries are either the same or one is a descendant of the other, thanks to our
+resource manager (see src/core/image.h and src/core/resourcemanager.h). Simply
+put, if the paths are the same, we will group the entries.
+
+Let's also define the special off-bounds value group_index[-1] = 1. This is
+implemented as a circular array, i.e., group_index[-1] = group_index[n-1] = 1.
+
+It turns out that group_index[] is a piecewise monotonic decreasing sequence:
+each piece corresponds to a group.
+
+The optimization is implemented as follows:
+
+for each j = 0 .. n-1,
+
+    1. enable deferred drawing if group_index[j] > group_index[j-1]
+
+    2. draw the j-th entry of the render queue
+
+    3. disable deferred drawing if it's enabled and if group_index[j] == 1
+
+since group_index[n-1] = 1, then deferred drawing will be disabled at the end
+of the loop. We must disable deferred drawing because "no drawing is guaranteed
+to take place until you disable the hold".
+
+Read the documentation for al_hold_bitmap_drawing() at:
+https://liballeg.org/a5docs/trunk/graphics.html#deferred-drawing
+
+*/
+#define USE_DEFERRED_DRAWING 1
 
 
 /* ----- public interface -----*/
@@ -284,17 +365,61 @@ void renderqueue_begin(v2d_t camera_position)
 
 /*
  * renderqueue_end()
- * Finishes an existing rendering process
- * (will render everything in the queue)
+ * Finishes an existing rendering process (will render everything in the queue)
  */
 void renderqueue_end()
 {
+    /* skip if the buffer is empty */
+    if(buffer_size == 0)
+        return;
+
     /* sort the entries with a stable sorting algorithm */
     merge_sort(buffer, buffer_size, sizeof(*buffer), cmp_fun);
 
+#if USE_DEFERRED_DRAWING
+
+    /* fill the group_index[] array */
+    buffer[buffer_size - 1].group_index = 1;
+    for(int i = buffer_size - 2; i >= 0; i--) {
+        static char path[2][1024];
+
+        buffer[i].vtable->path(buffer[i].renderable, path[0], sizeof(path[0]));
+        buffer[i+1].vtable->path(buffer[i+1].renderable, path[1], sizeof(path[1]));
+
+        if(0 == strcmp(path[0], path[1]))
+            buffer[i].group_index = 1 + buffer[i+1].group_index;
+        else
+            buffer[i].group_index = 1;
+    }
+
     /* render the entries */
-    for(int i = 0; i < buffer_size; i++)
-        buffer[i].vtable->render(buffer[i].entity, camera);
+    bool held = false;
+    for(int j = 0; j < buffer_size; j++) {
+
+        /* enable deferred drawing */
+        if(buffer[j].group_index > buffer[(j + (buffer_size - 1)) % buffer_size].group_index) {
+            held = true;
+            image_hold_drawing(true);
+        }
+
+        /* render the j-th entry */
+        buffer[j].vtable->render(buffer[j].renderable, camera);
+
+        /* disable deferred drawing */
+        if(held && buffer[j].group_index == 1) {
+            image_hold_drawing(false);
+            held = false;
+        }
+
+    }
+
+#else
+
+    /* render the entries without deferred drawing */
+    for(int j = 0; j < buffer_size; j++)
+        buffer[j].vtable->render(buffer[j].renderable, camera);
+
+#endif
 
     /* clean up */
     buffer_size = 0;
@@ -310,7 +435,7 @@ void renderqueue_end()
 void renderqueue_enqueue_brick(brick_t *brick)
 {
     renderqueue_entry_t entry = {
-        .entity.brick = brick,
+        .renderable.brick = brick,
         .vtable = &VTABLE[TYPE_BRICK]
     };
 
@@ -324,7 +449,7 @@ void renderqueue_enqueue_brick(brick_t *brick)
 void renderqueue_enqueue_brick_mask(brick_t *brick)
 {
     renderqueue_entry_t entry = {
-        .entity.brick = brick,
+        .renderable.brick = brick,
         .vtable = &VTABLE[TYPE_BRICK_MASK]
     };
 
@@ -338,7 +463,7 @@ void renderqueue_enqueue_brick_mask(brick_t *brick)
 void renderqueue_enqueue_item(item_t *item)
 {
     renderqueue_entry_t entry = {
-        .entity.item = item,
+        .renderable.item = item,
         .vtable = &VTABLE[TYPE_ITEM]
     };
 
@@ -352,7 +477,7 @@ void renderqueue_enqueue_item(item_t *item)
 void renderqueue_enqueue_object(object_t *object)
 {
     renderqueue_entry_t entry = {
-        .entity.object = object,
+        .renderable.object = object,
         .vtable = &VTABLE[TYPE_OBJECT]
     };
 
@@ -366,7 +491,7 @@ void renderqueue_enqueue_object(object_t *object)
 void renderqueue_enqueue_player(player_t *player)
 {
     renderqueue_entry_t entry = {
-        .entity.player = player,
+        .renderable.player = player,
         .vtable = &VTABLE[TYPE_PLAYER]
     };
 
@@ -380,7 +505,7 @@ void renderqueue_enqueue_player(player_t *player)
 void renderqueue_enqueue_particles()
 {
     renderqueue_entry_t entry = {
-        .entity.dummy = NULL,
+        .renderable.dummy = NULL,
         .vtable = &VTABLE[TYPE_PARTICLE]
     };
 
@@ -394,10 +519,26 @@ void renderqueue_enqueue_particles()
 void renderqueue_enqueue_ssobject(surgescript_object_t* object)
 {
     renderqueue_entry_t entry = {
-        .entity.ssobject = object,
+        .renderable.ssobject = object,
         .vtable = &VTABLE[TYPE_SSOBJECT]
     };
 
+    /* skip if the object is not a renderable */
+    if(!surgescript_object_has_tag(object, "renderable"))
+        return;
+
+    /* don't enqueue invisible renderables */
+    if(surgescript_object_has_function(object, "get_visible")) {
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_object_call_function(object, "get_visible", NULL, 0, ret);
+        bool is_visible = surgescript_var_get_bool(ret);
+        surgescript_var_destroy(ret);
+
+        if(!is_visible)
+            return;
+    }
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -408,7 +549,7 @@ void renderqueue_enqueue_ssobject(surgescript_object_t* object)
 void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
 {
     renderqueue_entry_t entry = {
-        .entity.ssobject = object,
+        .renderable.ssobject = object,
         .vtable = &VTABLE[TYPE_SSOBJECT_DEBUG]
     };
 
@@ -422,10 +563,15 @@ void renderqueue_enqueue_ssobject_debug(surgescript_object_t* object)
 void renderqueue_enqueue_ssobject_gizmo(surgescript_object_t* object)
 {
     renderqueue_entry_t entry = {
-        .entity.ssobject = object,
+        .renderable.ssobject = object,
         .vtable = &VTABLE[TYPE_SSOBJECT_GIZMO]
     };
 
+    /* skip if the object is not a gizmo */
+    if(!surgescript_object_has_tag(object, "gizmo"))
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -436,7 +582,7 @@ void renderqueue_enqueue_ssobject_gizmo(surgescript_object_t* object)
 void renderqueue_enqueue_background(bgtheme_t* background)
 {
     renderqueue_entry_t entry = {
-        .entity.theme = background,
+        .renderable.theme = background,
         .vtable = &VTABLE[TYPE_BACKGROUND]
     };
 
@@ -450,7 +596,7 @@ void renderqueue_enqueue_background(bgtheme_t* background)
 void renderqueue_enqueue_foreground(bgtheme_t* foreground)
 {
     renderqueue_entry_t entry = {
-        .entity.theme = foreground,
+        .renderable.theme = foreground,
         .vtable = &VTABLE[TYPE_FOREGROUND]
     };
 
@@ -464,7 +610,7 @@ void renderqueue_enqueue_foreground(bgtheme_t* foreground)
 void renderqueue_enqueue_water()
 {
     renderqueue_entry_t entry = {
-        .entity.dummy = NULL,
+        .renderable.dummy = NULL,
         .vtable = &VTABLE[TYPE_WATER]
     };
 
@@ -495,14 +641,17 @@ int cmp_fun(const void *i, const void *j)
 {
     const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
     const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
-    float za = a->vtable->zindex(a->entity);
-    float zb = b->vtable->zindex(b->entity);
+    float za = a->vtable->zindex(a->renderable);
+    float zb = b->vtable->zindex(b->renderable);
 
     if(fabs(za - zb) * 10.0f < ZINDEX_OFFSET(1)) {
-        if(a->vtable->type(a->entity) == b->vtable->type(b->entity))
-            return a->vtable->ypos(a->entity) - b->vtable->ypos(b->entity);
+        int ta = a->vtable->type(a->renderable);
+        int tb = b->vtable->type(b->renderable);
+
+        if(ta == tb)
+            return a->vtable->ypos(a->renderable) - b->vtable->ypos(b->renderable);
         else
-            return (a->vtable->type(a->entity) == TYPE_PLAYER) - (b->vtable->type(b->entity) == TYPE_PLAYER);
+            return (ta == TYPE_PLAYER) - (tb == TYPE_PLAYER); /* render the players in front of the other entries if all else is equal */
     }
 
     return (za > zb) - (za < zb);
@@ -535,7 +684,29 @@ float brick_zindex_offset(const brick_t *brick)
     return s;
 }
 
+/* generates a random string */
+const char* random_path(char prefix)
+{
+    static char buffer[8], table[] = {
+        [0x0] = '0', [0x1] = '1', [0x2] = '2', [0x3] = '3',
+        [0x4] = '4', [0x5] = '5', [0x6] = '6', [0x7] = '7',
+        [0x8] = '8', [0x9] = '9', [0xa] = 'a', [0xb] = 'b',
+        [0xc] = 'c', [0xd] = 'd', [0xe] = 'e', [0xf] = 'f'
+    };
 
+    int x = random(65536);
+
+    buffer[0] = '<';
+    buffer[1] = prefix;
+    buffer[2] = table[(x >> 12) & 0xf];
+    buffer[3] = table[(x >> 8) & 0xf];
+    buffer[4] = table[(x >> 4) & 0xf];
+    buffer[5] = table[x & 0xf];
+    buffer[6] = '>';
+    buffer[7] = '\0';
+
+    return buffer;
+}
 
 
 
@@ -580,6 +751,49 @@ int ypos_ssobject_gizmo(renderable_t r) { return ypos_ssobject(r); }
 int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_water(renderable_t r) { return 0; } /* not needed */
+
+const char* path_particles(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<particles>", dest_size); }
+const char* path_player(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, image_filepath(actor_image(r.player->actor)), dest_size); }
+const char* path_item(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<legacy-item>", dest_size); }
+const char* path_object(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<legacy-object>", dest_size); }
+const char* path_brick(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, image_filepath(brick_image(r.brick)), dest_size); }
+const char* path_brick_mask(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, random_path('M'), dest_size); }
+const char* path_background(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<background>", dest_size); }
+const char* path_foreground(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<foreground>", dest_size); }
+const char* path_water(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<water>", dest_size); }
+
+const char* path_ssobject(renderable_t r, char* dest, size_t dest_size)
+{
+    if(surgescript_object_has_function(r.ssobject, "get_filepathOfRenderable")) {
+        surgescript_var_t* ret = surgescript_var_create();
+
+        surgescript_object_call_function(r.ssobject, "get_filepathOfRenderable", NULL, 0, ret);
+        str_cpy(dest, surgescript_var_fast_get_string(ret), dest_size);
+
+        surgescript_var_destroy(ret);
+        return dest;
+    }
+
+    /*str_cpy(dest, surgescript_object_name(r.ssobject), dest_size);*/
+    return str_cpy(dest, random_path('S'), dest_size);
+}
+
+const char* path_ssobject_debug(renderable_t r, char* dest, size_t dest_size)
+{
+    /* this routine is based on render_ssobject_debug() */
+    const char* name = surgescript_object_name(r.ssobject);
+    const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
+    const image_t* img = sprite_get_image(anim, 0);
+
+    return str_cpy(dest, image_filepath(img), dest_size);
+}
+
+const char* path_ssobject_gizmo(renderable_t r, char* dest, size_t dest_size)
+{
+    return str_cpy(dest, random_path('G'), dest_size);
+}
+
+
 
 
 /* --- private rendering routines --- */
