@@ -38,7 +38,8 @@ image;images/items/power_pluggy.png;CC-BY 4.0;Alexandre Martins;;
 image;images/ui/mobile_gamepad.png;CC-BY 4.0;Alexandre Martins;;
 image;images/ui/title_card.png;CC-BY 4.0;Alexandre Martins;;
 image;images/ui/title_card_zone_numbers.png;CC-BY 4.0;Alexandre Martins;;
-image;images/bricks/waterworks-zone/*.png;CC-BY 4.0;Alexandre Martins;;
+image;images/bricks/waterworks-zone.png;CC-BY 4.0;Alexandre Martins;;
+image;images/bricks/waterworks-zone-mask.png;CC-BY 4.0;Alexandre Martins;;
 image;images/backgrounds/waterworks-zone/*.png;CC-BY 4.0;Alexandre Martins;;
 image;images/scenes/title_screen_logo.png;CC-BY 4.0;Alexandre Martins;;Special thanks to João Victor (Race the Hedgehog)
 image;images/scenes/title_screen_pointer.png;CC-BY 4.0;Alexandre Martins;;
