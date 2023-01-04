@@ -341,15 +341,15 @@ void bgbehavior_circular_update(bgbehavior_t *behavior)
 {
     bgbehavior_circular_t *me = (bgbehavior_circular_t*)behavior;
     float dt = timer_get_delta();
-    float t, sx, cy;
+    float t, s, c;
 
     t = (me->elapsed_time += dt);
-    sx = -sinf(me->angular_speed.x * t + me->initial_phase.x);
-    cy = cosf(me->angular_speed.y * t + me->initial_phase.y);
+    s = sinf(me->angular_speed.y * t + me->initial_phase.y);
+    c = cosf(me->angular_speed.x * t + me->initial_phase.x);
 
     /* elliptical trajectory */
-    behavior->offset.x += (me->angular_speed.x * me->amplitude.x * sx) * dt;
-    behavior->offset.y += (me->angular_speed.y * me->amplitude.y * cy) * dt;
+    behavior->offset.x += (me->angular_speed.x * me->amplitude.x * c) * dt;
+    behavior->offset.y += (me->angular_speed.y * me->amplitude.y * s) * dt;
 }
 
 
