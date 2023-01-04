@@ -18,7 +18,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 128 512 192
         frame_size      512 192
 
@@ -51,7 +51,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 112 512 16
         frame_size      512 16
 
@@ -74,7 +74,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 96 512 16
         frame_size      512 16
 
@@ -97,7 +97,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 80 512 16
         frame_size      512 16
 
@@ -124,7 +124,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 56 512 24
         frame_size      512 24
 
@@ -147,7 +147,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 32 512 24
         frame_size      512 24
 
@@ -175,7 +175,7 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/boss-zone.png"
+        source_file     "images/backgrounds/waterworks-zone-boss.png"
         source_rect     0 0 512 32
         frame_size      512 32
 

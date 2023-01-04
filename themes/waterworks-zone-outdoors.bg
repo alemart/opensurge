@@ -16,9 +16,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 16 256
-        frame_size      16 256
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     128 128 128 128
+        frame_size      128 128
 
         animation
         {
@@ -40,8 +40,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/sky.png"
-        source_rect     0 0 128 128
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     128 0 128 128
         frame_size      128 128
 
         animation
@@ -64,8 +64,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/clouds.png"
-        source_rect     0 128 512 32
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 352 512 32
         frame_size      512 32
 
         animation
@@ -87,9 +87,9 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/clouds.png"
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
         //source_rect     0 64 512 32
-        source_rect     0 32 512 32
+        source_rect     0 256 512 32
         frame_size      512 32
 
         animation
@@ -112,8 +112,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/mountains.png"
-        source_rect     0 0 128 128
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 0 128 128
         frame_size      128 128
 
         animation
@@ -141,8 +141,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 64 256 4
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 576 256 4
         frame_size      256 4
 
         animation
@@ -164,8 +164,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-thinmask.png"
-        source_rect     0 0 256 4
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 480 256 4
         frame_size      256 4
 
         animation
@@ -188,8 +188,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 72 256 4
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 584 256 4
         frame_size      256 4
 
         animation
@@ -211,8 +211,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-thinmask.png"
-        source_rect     0 8 256 4
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 488 256 4
         frame_size      256 4
 
         animation
@@ -241,8 +241,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/waterfalls.png"
-        source_rect     0 0 128 128
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     384 0 128 128
         frame_size      128 32
 
         animation
@@ -265,8 +265,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 16 1024
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     512 0 16 1024
         frame_size      16 1024
 
         animation
@@ -288,8 +288,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-fill.png"
-        source_rect     0 0 16 1024
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     512 0 16 1024
         frame_size      16 1024
 
         animation
@@ -364,8 +364,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 528 256 16
         frame_size      256 16
 
         animation
@@ -387,8 +387,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 528 256 16
         frame_size      256 16
 
         animation
@@ -411,8 +411,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 544 256 16
         frame_size      256 16
 
         animation
@@ -434,8 +434,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 544 256 16
         frame_size      256 16
 
         animation
@@ -458,8 +458,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 560 256 16
         frame_size      256 16
 
         animation
@@ -481,8 +481,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 560 256 16
         frame_size      256 16
 
         animation
@@ -505,8 +505,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 576 256 16
         frame_size      256 16
 
         animation
@@ -528,8 +528,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 576 256 16
         frame_size      256 16
 
         animation
@@ -552,8 +552,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 592 256 16
         frame_size      256 16
 
         animation
@@ -575,8 +575,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 592 256 16
         frame_size      256 16
 
         animation
@@ -599,8 +599,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 608 256 16
         frame_size      256 16
 
         animation
@@ -622,8 +622,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 608 256 16
         frame_size      256 16
 
         animation
@@ -646,8 +646,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 624 256 16
         frame_size      256 16
 
         animation
@@ -669,8 +669,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 624 256 16
         frame_size      256 16
 
         animation
@@ -693,8 +693,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 640 256 16
         frame_size      256 16
 
         animation
@@ -716,8 +716,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 640 256 16
         frame_size      256 16
 
         animation
@@ -740,8 +740,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 656 256 16
         frame_size      256 16
 
         animation
@@ -763,8 +763,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 656 256 16
         frame_size      256 16
 
         animation
@@ -787,8 +787,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 672 256 16
         frame_size      256 16
 
         animation
@@ -810,8 +810,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 672 256 16
         frame_size      256 16
 
         animation
@@ -834,8 +834,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 688 256 16
         frame_size      256 16
 
         animation
@@ -857,8 +857,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 688 256 16
         frame_size      256 16
 
         animation
@@ -881,8 +881,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 704 256 16
         frame_size      256 16
 
         animation
@@ -904,8 +904,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 704 256 16
         frame_size      256 16
 
         animation
@@ -928,8 +928,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 720 256 16
         frame_size      256 16
 
         animation
@@ -951,8 +951,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 720 256 16
         frame_size      256 16
 
         animation
@@ -975,8 +975,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 736 256 16
         frame_size      256 16
 
         animation
@@ -998,8 +998,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 736 256 16
         frame_size      256 16
 
         animation
@@ -1022,8 +1022,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 752 256 16
         frame_size      256 16
 
         animation
@@ -1045,8 +1045,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 752 256 16
         frame_size      256 16
 
         animation
@@ -1069,8 +1069,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 768 256 16
         frame_size      256 16
 
         animation
@@ -1092,8 +1092,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 768 256 16
         frame_size      256 16
 
         animation
@@ -1116,8 +1116,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 784 256 16
         frame_size      256 16
 
         animation
@@ -1139,8 +1139,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 784 256 16
         frame_size      256 16
 
         animation
@@ -1163,8 +1163,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 800 256 16
         frame_size      256 16
 
         animation
@@ -1186,8 +1186,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 800 256 16
         frame_size      256 16
 
         animation
@@ -1210,8 +1210,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 816 256 16
         frame_size      256 16
 
         animation
@@ -1233,8 +1233,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 816 256 16
         frame_size      256 16
 
         animation
@@ -1257,8 +1257,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 512 256 16
         frame_size      256 16
 
         animation
@@ -1280,8 +1280,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 512 256 16
         frame_size      256 16
 
         animation
@@ -1304,8 +1304,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 528 256 16
         frame_size      256 16
 
         animation
@@ -1327,8 +1327,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 528 256 16
         frame_size      256 16
 
         animation
@@ -1351,8 +1351,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 544 256 16
         frame_size      256 16
 
         animation
@@ -1374,8 +1374,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 544 256 16
         frame_size      256 16
 
         animation
@@ -1398,8 +1398,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 560 256 16
         frame_size      256 16
 
         animation
@@ -1421,8 +1421,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 560 256 16
         frame_size      256 16
 
         animation
@@ -1445,8 +1445,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 576 256 16
         frame_size      256 16
 
         animation
@@ -1468,8 +1468,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 576 256 16
         frame_size      256 16
 
         animation
@@ -1492,8 +1492,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 592 256 16
         frame_size      256 16
 
         animation
@@ -1515,8 +1515,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 592 256 16
         frame_size      256 16
 
         animation
@@ -1539,8 +1539,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 608 256 16
         frame_size      256 16
 
         animation
@@ -1562,8 +1562,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 608 256 16
         frame_size      256 16
 
         animation
@@ -1586,8 +1586,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 624 256 16
         frame_size      256 16
 
         animation
@@ -1609,8 +1609,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 624 256 16
         frame_size      256 16
 
         animation
@@ -1633,8 +1633,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 640 256 16
         frame_size      256 16
 
         animation
@@ -1656,8 +1656,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 640 256 16
         frame_size      256 16
 
         animation
@@ -1680,8 +1680,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 656 256 16
         frame_size      256 16
 
         animation
@@ -1703,8 +1703,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 656 256 16
         frame_size      256 16
 
         animation
@@ -1727,8 +1727,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 672 256 16
         frame_size      256 16
 
         animation
@@ -1750,8 +1750,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 672 256 16
         frame_size      256 16
 
         animation
@@ -1774,8 +1774,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 688 256 16
         frame_size      256 16
 
         animation
@@ -1797,8 +1797,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 688 256 16
         frame_size      256 16
 
         animation
@@ -1821,8 +1821,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 704 256 16
         frame_size      256 16
 
         animation
@@ -1844,8 +1844,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 704 256 16
         frame_size      256 16
 
         animation
@@ -1868,8 +1868,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 720 256 16
         frame_size      256 16
 
         animation
@@ -1891,8 +1891,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 720 256 16
         frame_size      256 16
 
         animation
@@ -1915,8 +1915,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 736 256 16
         frame_size      256 16
 
         animation
@@ -1938,8 +1938,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 736 256 16
         frame_size      256 16
 
         animation
@@ -1962,8 +1962,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 752 256 16
         frame_size      256 16
 
         animation
@@ -1985,8 +1985,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 752 256 16
         frame_size      256 16
 
         animation
@@ -2009,8 +2009,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 768 256 16
         frame_size      256 16
 
         animation
@@ -2032,8 +2032,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 768 256 16
         frame_size      256 16
 
         animation
@@ -2056,8 +2056,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 784 256 16
         frame_size      256 16
 
         animation
@@ -2079,8 +2079,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 784 256 16
         frame_size      256 16
 
         animation
@@ -2103,8 +2103,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 800 256 16
         frame_size      256 16
 
         animation
@@ -2126,8 +2126,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 800 256 16
         frame_size      256 16
 
         animation
@@ -2150,8 +2150,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 816 256 16
         frame_size      256 16
 
         animation
@@ -2173,8 +2173,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 816 256 16
         frame_size      256 16
 
         animation
@@ -2197,8 +2197,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 512 256 16
         frame_size      256 16
 
         animation
@@ -2220,8 +2220,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 512 256 16
         frame_size      256 16
 
         animation
@@ -2244,8 +2244,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 528 256 16
         frame_size      256 16
 
         animation
@@ -2267,8 +2267,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 528 256 16
         frame_size      256 16
 
         animation
@@ -2291,8 +2291,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 544 256 16
         frame_size      256 16
 
         animation
@@ -2314,8 +2314,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 544 256 16
         frame_size      256 16
 
         animation
@@ -2338,8 +2338,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 560 256 16
         frame_size      256 16
 
         animation
@@ -2361,8 +2361,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 560 256 16
         frame_size      256 16
 
         animation
@@ -2385,8 +2385,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 576 256 16
         frame_size      256 16
 
         animation
@@ -2408,8 +2408,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 576 256 16
         frame_size      256 16
 
         animation
@@ -2432,8 +2432,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 592 256 16
         frame_size      256 16
 
         animation
@@ -2455,8 +2455,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 592 256 16
         frame_size      256 16
 
         animation
@@ -2479,8 +2479,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 608 256 16
         frame_size      256 16
 
         animation
@@ -2502,8 +2502,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 608 256 16
         frame_size      256 16
 
         animation
@@ -2526,8 +2526,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 624 256 16
         frame_size      256 16
 
         animation
@@ -2549,8 +2549,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 624 256 16
         frame_size      256 16
 
         animation
@@ -2573,8 +2573,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 640 256 16
         frame_size      256 16
 
         animation
@@ -2596,8 +2596,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 640 256 16
         frame_size      256 16
 
         animation
@@ -2620,8 +2620,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 656 256 16
         frame_size      256 16
 
         animation
@@ -2643,8 +2643,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 656 256 16
         frame_size      256 16
 
         animation
@@ -2667,8 +2667,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 672 256 16
         frame_size      256 16
 
         animation
@@ -2690,8 +2690,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 672 256 16
         frame_size      256 16
 
         animation
@@ -2714,8 +2714,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 688 256 16
         frame_size      256 16
 
         animation
@@ -2737,8 +2737,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 688 256 16
         frame_size      256 16
 
         animation
@@ -2761,8 +2761,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 704 256 16
         frame_size      256 16
 
         animation
@@ -2784,8 +2784,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 704 256 16
         frame_size      256 16
 
         animation
@@ -2808,8 +2808,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 720 256 16
         frame_size      256 16
 
         animation
@@ -2831,8 +2831,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 720 256 16
         frame_size      256 16
 
         animation
@@ -2855,8 +2855,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 736 256 16
         frame_size      256 16
 
         animation
@@ -2878,8 +2878,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 736 256 16
         frame_size      256 16
 
         animation
@@ -2902,8 +2902,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 752 256 16
         frame_size      256 16
 
         animation
@@ -2925,8 +2925,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 752 256 16
         frame_size      256 16
 
         animation
@@ -2949,8 +2949,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 768 256 16
         frame_size      256 16
 
         animation
@@ -2972,8 +2972,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 768 256 16
         frame_size      256 16
 
         animation
@@ -2996,8 +2996,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 784 256 16
         frame_size      256 16
 
         animation
@@ -3019,8 +3019,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 784 256 16
         frame_size      256 16
 
         animation
@@ -3043,8 +3043,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 800 256 16
         frame_size      256 16
 
         animation
@@ -3066,8 +3066,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 800 256 16
         frame_size      256 16
 
         animation
@@ -3090,8 +3090,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 816 256 16
         frame_size      256 16
 
         animation
@@ -3113,8 +3113,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 816 256 16
         frame_size      256 16
 
         animation
@@ -3137,8 +3137,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 512 256 16
         frame_size      256 16
 
         animation
@@ -3160,8 +3160,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 512 256 16
         frame_size      256 16
 
         animation
@@ -3184,8 +3184,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 528 256 16
         frame_size      256 16
 
         animation
@@ -3207,8 +3207,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 16 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 528 256 16
         frame_size      256 16
 
         animation
@@ -3231,8 +3231,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 544 256 16
         frame_size      256 16
 
         animation
@@ -3254,8 +3254,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 32 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 544 256 16
         frame_size      256 16
 
         animation
@@ -3278,8 +3278,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 560 256 16
         frame_size      256 16
 
         animation
@@ -3301,8 +3301,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 48 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 560 256 16
         frame_size      256 16
 
         animation
@@ -3325,8 +3325,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 576 256 16
         frame_size      256 16
 
         animation
@@ -3348,8 +3348,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 64 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 576 256 16
         frame_size      256 16
 
         animation
@@ -3372,8 +3372,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 592 256 16
         frame_size      256 16
 
         animation
@@ -3395,8 +3395,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 80 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 592 256 16
         frame_size      256 16
 
         animation
@@ -3419,8 +3419,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 608 256 16
         frame_size      256 16
 
         animation
@@ -3442,8 +3442,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 96 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 608 256 16
         frame_size      256 16
 
         animation
@@ -3466,8 +3466,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 624 256 16
         frame_size      256 16
 
         animation
@@ -3489,8 +3489,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 112 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 624 256 16
         frame_size      256 16
 
         animation
@@ -3513,8 +3513,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 640 256 16
         frame_size      256 16
 
         animation
@@ -3536,8 +3536,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 128 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 640 256 16
         frame_size      256 16
 
         animation
@@ -3560,8 +3560,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 656 256 16
         frame_size      256 16
 
         animation
@@ -3583,8 +3583,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 144 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 656 256 16
         frame_size      256 16
 
         animation
@@ -3607,8 +3607,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 672 256 16
         frame_size      256 16
 
         animation
@@ -3630,8 +3630,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 160 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 672 256 16
         frame_size      256 16
 
         animation
@@ -3654,8 +3654,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 688 256 16
         frame_size      256 16
 
         animation
@@ -3677,8 +3677,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 176 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 688 256 16
         frame_size      256 16
 
         animation
@@ -3701,8 +3701,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 704 256 16
         frame_size      256 16
 
         animation
@@ -3724,8 +3724,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 192 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 704 256 16
         frame_size      256 16
 
         animation
@@ -3748,8 +3748,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 720 256 16
         frame_size      256 16
 
         animation
@@ -3771,8 +3771,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 208 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 720 256 16
         frame_size      256 16
 
         animation
@@ -3795,8 +3795,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 736 256 16
         frame_size      256 16
 
         animation
@@ -3818,8 +3818,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 224 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 736 256 16
         frame_size      256 16
 
         animation
@@ -3842,8 +3842,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 752 256 16
         frame_size      256 16
 
         animation
@@ -3865,8 +3865,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 240 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 752 256 16
         frame_size      256 16
 
         animation
@@ -3889,8 +3889,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 768 256 16
         frame_size      256 16
 
         animation
@@ -3912,8 +3912,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 256 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 768 256 16
         frame_size      256 16
 
         animation
@@ -3936,8 +3936,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 784 256 16
         frame_size      256 16
 
         animation
@@ -3959,8 +3959,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 272 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 784 256 16
         frame_size      256 16
 
         animation
@@ -3983,8 +3983,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 800 256 16
         frame_size      256 16
 
         animation
@@ -4006,8 +4006,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 288 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 800 256 16
         frame_size      256 16
 
         animation
@@ -4030,8 +4030,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 816 256 16
         frame_size      256 16
 
         animation
@@ -4053,8 +4053,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 304 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 816 256 16
         frame_size      256 16
 
         animation
@@ -4077,8 +4077,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-lights.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     0 512 256 16
         frame_size      256 16
 
         animation
@@ -4100,8 +4100,8 @@ background
 
     sprite
     {
-        source_file     "images/backgrounds/waterworks-zone/water-mask.png"
-        source_rect     0 0 256 16
+        source_file     "images/backgrounds/waterworks-zone-outdoors.png"
+        source_rect     256 512 256 16
         frame_size      256 16
 
         animation
