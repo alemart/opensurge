@@ -406,7 +406,7 @@ void render_layers(const bgtheme_t *bgtheme, v2d_t camera_position, bool foregro
         const bglayer_t* layer = bgtheme->layer[start + i];
         const bglayer_t* prev_layer = bgtheme->layer[start + ((i + (count-1)) % count)];
 
-        /* compute the position the layer */
+        /* compute the position the layer in screen space */
         v2d_t scroll = v2d_compmult(layer->scroll_speed, topleft);
         v2d_t offset = v2d_add(layer->behavior->offset, scroll);
         layer->actor->position = v2d_add(layer->initial_position, offset);
