@@ -45,6 +45,7 @@ typedef struct bgbehavior_linear_t bgbehavior_linear_t;
 struct bgtheme_t {
     bglayer_t **layer; /* array of bglayer_t* */
     int layer_count; /* length of layer[] */
+    int background_count; /* number of background layers */
     int foreground_count; /* number of foreground layers */
     char* filepath; /* filepath of the background */
 };
@@ -64,6 +65,7 @@ struct bglayer_t {
     float zindex; /* 0.0 (far) <= zindex <= 1.0 (near) */
 
     bgbehavior_t *behavior; /* behavior */
+    int group_index; /* for deferred drawing */
 };
 static bglayer_t *bglayer_new(); /* constructor */
 static bglayer_t *bglayer_delete(bglayer_t *layer); /* destructor */
@@ -87,9 +89,9 @@ static bgbehavior_t *bgbehavior_delete(bgbehavior_t *behavior); /* class destruc
 struct bgbehavior_default_t {
     bgbehavior_t base; /* inherits from bgbehavior_t */
 };
-static bgbehavior_t *bgbehavior_default_new(); /* class constructor */
-static bgbehavior_t* bgbehavior_default_delete(bgbehavior_t *behavior); /* class destructor */
-static void bgbehavior_default_update(bgbehavior_t *behavior); /* private class method*/
+static bgbehavior_t *bgbehavior_default_new(); /* constructor */
+static bgbehavior_t* bgbehavior_default_delete(bgbehavior_t *behavior); /* destructor */
+static void bgbehavior_default_update(bgbehavior_t *behavior); /* private method */
 
 /* circular strategy (elliptical trajectory) */
 struct bgbehavior_circular_t {
@@ -99,18 +101,18 @@ struct bgbehavior_circular_t {
     v2d_t angular_speed; /* in radians per second */
     v2d_t initial_phase; /* in radians */
 };
-static bgbehavior_t *bgbehavior_circular_new(float amplitude_x, float amplitude_y, float angularspeed_x, float angularspeed_y, float initialphase_x, float initialphase_y); /* class constructor */
-static bgbehavior_t* bgbehavior_circular_delete(bgbehavior_t *behavior); /* class destructor */
-static void bgbehavior_circular_update(bgbehavior_t *behavior); /* private class method */
+static bgbehavior_t *bgbehavior_circular_new(float amplitude_x, float amplitude_y, float angularspeed_x, float angularspeed_y, float initialphase_x, float initialphase_y); /* constructor */
+static bgbehavior_t* bgbehavior_circular_delete(bgbehavior_t *behavior); /* destructor */
+static void bgbehavior_circular_update(bgbehavior_t *behavior); /* private method */
 
 /* linear strategy */
 struct bgbehavior_linear_t {
     bgbehavior_t base; /* base class */
     v2d_t speed; /* in pixels per second */
 };
-static bgbehavior_t *bgbehavior_linear_new(float speed_x, float speed_y); /* class constructor */
-static bgbehavior_t* bgbehavior_linear_delete(bgbehavior_t *behavior); /* class destructor */
-static void bgbehavior_linear_update(bgbehavior_t *behavior); /* private class method */
+static bgbehavior_t *bgbehavior_linear_new(float speed_x, float speed_y); /* constructor */
+static bgbehavior_t* bgbehavior_linear_delete(bgbehavior_t *behavior); /* destructor */
+static void bgbehavior_linear_update(bgbehavior_t *behavior); /* private method */
 
 
 
@@ -121,6 +123,7 @@ static void bgbehavior_linear_update(bgbehavior_t *behavior); /* private class m
 static void sort_layers(bgtheme_t *bgtheme);
 static int sort_cmp(const void *a, const void *b);
 static void split_layers(bgtheme_t *bgtheme);
+static void group_layers(bgtheme_t *bgtheme);
 static void render_layers(const bgtheme_t *theme, v2d_t camera_position, bool foreground);
 static int traverse(const parsetree_statement_t *stmt, void *bgtheme);
 static int traverse_layer_attributes(const parsetree_statement_t *stmt, void *bglayer);
@@ -144,18 +147,25 @@ bgtheme_t* background_load(const char *filepath)
     logfile_message("Loading background \"%s\"...", filepath);
     fullpath = asset_path(filepath);
 
+    /* create the struct */
     bgtheme = mallocx(sizeof *bgtheme);
     bgtheme->filepath = str_dup(filepath);
     bgtheme->layer = NULL;
     bgtheme->layer_count = 0;
+    bgtheme->background_count = 0;
     bgtheme->foreground_count = 0;
 
+    /* read the .bg file */
     tree = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(tree, (void*)bgtheme, traverse);
     tree = nanoparser_deconstruct_tree(tree);
 
+    /* prepare for rendering */
     sort_layers(bgtheme);
     split_layers(bgtheme);
+    group_layers(bgtheme);
+
+    /* done! */
     return bgtheme;
 }
 
@@ -197,9 +207,7 @@ void background_update(bgtheme_t *bgtheme)
  */
 void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    image_hold_drawing(true);
     render_layers(bgtheme, camera_position, false);
-    image_hold_drawing(false);
 }
 
 /*
@@ -208,9 +216,7 @@ void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
  */
 void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    image_hold_drawing(true);
     render_layers(bgtheme, camera_position, true);
-    image_hold_drawing(false);
 }
 
 /*
@@ -243,6 +249,7 @@ bglayer_t *bglayer_new()
     layer->repeat_y = false;
     layer->zindex = 0.0f;
     layer->behavior = bgbehavior_default_new(layer);
+    layer->group_index = 0;
 
     return layer;
 }
@@ -390,22 +397,32 @@ void render_layers(const bgtheme_t *bgtheme, v2d_t camera_position, bool foregro
 {
     v2d_t halfscreen = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, halfscreen);
-    int background_count = bgtheme->layer_count - bgtheme->foreground_count;
-    int foreground_count = bgtheme->foreground_count;
-    int count = !foreground ? background_count : foreground_count;
-    int start = !foreground ? 0 : background_count;
-    int end = start + count;
+    int count = !foreground ? bgtheme->background_count : bgtheme->foreground_count;
+    int start = !foreground ? 0 : bgtheme->background_count;
+    /*int end = start + count;*/
+    bool held = false;
 
-    for(int i = start; i < end; i++) {
-        const bglayer_t* layer = bgtheme->layer[i];
+    for(int i = 0; i < count; i++) {
+        const bglayer_t* layer = bgtheme->layer[start + i];
+        const bglayer_t* prev_layer = bgtheme->layer[start + ((i + (count-1)) % count)];
+
+        /* compute the position the layer */
         v2d_t scroll = v2d_compmult(layer->scroll_speed, topleft);
         v2d_t offset = v2d_add(layer->behavior->offset, scroll);
-
         layer->actor->position = v2d_add(layer->initial_position, offset);
         layer->actor->position.x = floorf(0.5 + layer->actor->position.x); /* round to nearest integer */
         layer->actor->position.y = floorf(0.5 + layer->actor->position.y);
 
+        /* enable deferred drawing */
+        if(layer->group_index > prev_layer->group_index)
+            image_hold_drawing(held = true);
+
+        /* render */
         actor_render_repeat_xy(layer->actor, halfscreen, layer->repeat_x, layer->repeat_y);
+
+        /* disable deferred drawing */
+        if(held && layer->group_index == 1)
+            image_hold_drawing(held = false);
     }
 }
 
@@ -431,14 +448,57 @@ int sort_cmp(const void *a, const void *b)
 /* split background & foreground layers */
 void split_layers(bgtheme_t *bgtheme)
 {
+    /*
+     * bgtheme->layer[] is partitioned into background and foreground layers:
+     *
+     * layer[0 .. background_count-1] are the background layers
+     * layer[background_count-1 .. layer_count-1] are the foreground layers
+     */
+
     bgtheme->foreground_count = 0;
 
-    for(int i = 0; i < bgtheme->layer_count; i++) {
+    for(int i = bgtheme->layer_count - 1; i >= 0; i--) {
         if(IS_FOREGROUND_LAYER(bgtheme->layer[i]))
             bgtheme->foreground_count++;
+        else
+            break; /* the array is assumed to be sorted */
     }
+
+    bgtheme->background_count = bgtheme->layer_count - bgtheme->foreground_count;
 }
 
+/* group layers for deferred drawing */
+void group_layers(bgtheme_t *bgtheme)
+{
+    #define layer_image(layer) actor_image((layer)->actor)
+    bglayer_t** layer = bgtheme->layer;
+
+    /*
+     * we use the same technique explained at renderqueue.c for deferred drawing
+     */
+
+    /* initialize indices */
+    for(int i = 0; i < bgtheme->layer_count; i++)
+        layer[i]->group_index = 1;
+
+    /* group foreground layers */
+    for(int i = bgtheme->layer_count - 2; i >= bgtheme->background_count; i--) {
+        const image_t* a = layer_image(layer[i]);
+        const image_t* b = layer_image(layer[i+1]);
+
+        if(image_same_root(a, b))
+            layer[i]->group_index = 1 + layer[i+1]->group_index;
+    }
+
+    /* group background layers */
+    for(int i = bgtheme->background_count - 2; i >= 0; i--) {
+        const image_t* a = layer_image(layer[i]);
+        const image_t* b = layer_image(layer[i+1]);
+
+        if(image_same_root(a, b))
+            layer[i]->group_index = 1 + layer[i+1]->group_index;
+    }
+}
 
 
 
