@@ -51,6 +51,7 @@ image_t* image_snapshot(); /* take a snapshot */
 void image_enable_linear_filtering(image_t* img); /* enable linear filtering */
 void image_disable_linear_filtering(image_t* img); /* disable linear filtering */
 const char* image_filepath(const image_t* img); /* relative path of the originating file, if defined */
+bool image_same_root(const image_t* a, const image_t* b); /* checks if two images have the same root (ascendant) */
 
 /* pixel manipulation */
 void image_lock(image_t* img);
