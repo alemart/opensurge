@@ -474,7 +474,10 @@ void group_layers(bgtheme_t *bgtheme)
     bglayer_t** layer = bgtheme->layer;
 
     /*
-     * we use the same technique explained at renderqueue.c for deferred drawing
+     * We use the technique explained at renderqueue.c for deferred drawing:
+     * group_index is a piecewise monotonic decrease sequence: each piece
+     * identifies a group of layers. Layers are grouped if they share a parent
+     * bitmap. Grouped layers can be rendered efficiently via deferred drawing.
      */
 
     /* initialize indices */
