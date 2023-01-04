@@ -58,7 +58,7 @@ background
 {
     initial_position    0 36
     scroll_speed        -0.01 0
-    behavior            LINEAR -1 0
+    behavior            LINEAR -20 0
     repeat_x            TRUE
     repeat_y            FALSE
 
@@ -81,7 +81,7 @@ background
 {
     initial_position    0 8
     scroll_speed        -0.02 0
-    behavior            LINEAR -4 0
+    behavior            LINEAR -30 0
     repeat_x            TRUE
     repeat_y            FALSE
 
