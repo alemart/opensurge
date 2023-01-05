@@ -71,16 +71,6 @@ static const int MAX_TOUCHES = (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches)
 
 
 /* utilities */
-#define IDLE_STATE (mobilegamepad_state_t){ \
-    .dpad = MOBILEGAMEPAD_DPAD_CENTER, \
-    .buttons = MOBILEGAMEPAD_BUTTON_NONE \
-}
-
-#define NO_TOUCH (touch_t){ \
-    .down = false, \
-    .position = (v2d_t){ .x = 0.0f, .y = 0.0f } \
-}
-
 #define IS_POWER_OF_TWO(n) (((n) & ((n) - 1)) == 0)
 #define VALIDATE_MASK(x)   typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
 
@@ -180,8 +170,20 @@ static const float DPAD_DEADZONE_THRESHOLD = 0.125f; /* a percentage of the inte
 
 /* private stuff */
 
+/* idle state */
+static const mobilegamepad_state_t IDLE_STATE = {
+    .dpad = MOBILEGAMEPAD_DPAD_CENTER,
+    .buttons = MOBILEGAMEPAD_BUTTON_NONE
+};
+
+/* no touch */
+static const touch_t NO_TOUCH = {
+    .down = false,
+    .position = (v2d_t){ .x = 0.0f, .y = 0.0f }
+};
+
 /* current state of the mobile gamepad */
-static mobilegamepad_state_t current_state = IDLE_STATE;
+static mobilegamepad_state_t current_state;
 
 /* is the mobile gamepad enabled? */
 static bool is_enabled = false;
@@ -213,7 +215,7 @@ static void update_actors();
 static void render_actors();
 static void handle_fade_effect();
 static void enable_linear_filtering();
-static void reposition_dpad_stick(float scale);
+static v2d_t dpad_stick_offset(float scale);
 
 
 
@@ -233,6 +235,7 @@ void mobilegamepad_init()
     /* reset the state */
     current_state = IDLE_STATE;
     is_enabled = false;
+    is_visible = false;
 
 #if !ENABLE_MOBILE_GAMEPAD
 
@@ -251,8 +254,10 @@ void mobilegamepad_init()
 #else
 
     /* require mouse input */
-    if(!al_is_mouse_installed())
+    if(!al_is_mouse_installed()) {
         fatal_error("No mouse input for the mobile gamepad!");
+        return;
+    }
 
 #endif
 
@@ -345,7 +350,7 @@ void mobilegamepad_update()
                 v2d_t offset = v2d_subtract(touch[i].position, actor[j]->position);
                 float distance = v2d_magnitude(offset);
 
-                if(distance <= interactive_radius[j])
+                if(distance < interactive_radius[j])
                     trigger(j, offset);
             }
         }
@@ -492,13 +497,16 @@ void update_actors()
     }
 
     /* reposition the dpad stick */
-    reposition_dpad_stick(scale);
+    v2d_t stick_offset = dpad_stick_offset(scale);
+    actor[DPAD_STICK]->position.x += stick_offset.x;
+    actor[DPAD_STICK]->position.y += stick_offset.y;
 }
 
 void render_actors()
 {
     v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
 
+    /* render the mobile controls in screen space */
     for(int i = 0; i < NUM_CONTROLS; i++)
         actor_render(actor[i], camera);
 }
@@ -523,7 +531,9 @@ void enable_linear_filtering()
     }
 }
 
-void reposition_dpad_stick(float scale)
+/* compute the current offset of the dpad stick
+   (relative to the center of the dpad) */
+v2d_t dpad_stick_offset(float scale)
 {
     /* compute a smooth transition and determine the angle of the dpad stick */
     static float transition = 0.0f, angle = 0.0f;
@@ -536,7 +546,7 @@ void reposition_dpad_stick(float scale)
     else
         transition = max(0.0f, transition - ds);
 
-    /* adjust the position of the dpad stick using polar coordinates */
+    /* compute the offset of the dpad stick using polar coordinates */
     const image_t* dpad = actor_image(actor[DPAD]);
     int dpad_width = image_width(dpad), dpad_height = image_height(dpad);
 
@@ -548,5 +558,6 @@ void reposition_dpad_stick(float scale)
     v2d_t unit_vector = v2d_new(cosf(angle), sinf(angle));
     v2d_t offset = v2d_multiply(unit_vector, floorf(current_length));
 
-    actor[DPAD_STICK]->position = v2d_add(actor[DPAD_STICK]->position, offset);
+    /* done! */
+    return offset;
 }
