@@ -112,7 +112,6 @@ static int brickdata_count = 0; /* size of brickdata[] */
 static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
 
 /* utilities */
-#define DEG2RAD(x) ((x) / 57.2957795131f)
 #define ROUND(x)   (int)(((x)>=0.0f)?((x)+0.5f):((x)-0.5f))
 static const float BRICK_FALL_TTL = 1.0f; /* time in seconds before a BRB_FALL gets destroyed */
 static const float BRICK_FLOAT_AMPLITUDE = 8.0f; /* if a player touches a floating brick, how deep in pixels should it go? */
@@ -360,7 +359,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             float ry = max(brk->brick_ref->behavior_arg[1], 0.0f); /* y-dist */
             float sx = TWO_PI * brk->brick_ref->behavior_arg[2]; /* x-speed */
             float sy = TWO_PI * brk->brick_ref->behavior_arg[3]; /* y-speed */
-            float ph = DEG2RAD(brk->brick_ref->behavior_arg[4]); /* initial phase */
+            float ph = DEG2RAD * brk->brick_ref->behavior_arg[4]; /* initial phase */
 
             /* compute the position */
             old_x = brk->x; old_y = brk->y;
@@ -401,9 +400,9 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
             float t = (brk->value[0] = level_time()); /* elapsed time */
             float r = max(brk->brick_ref->behavior_arg[0], 0.0f); /* radius */
             float f = TWO_PI * brk->brick_ref->behavior_arg[1]; /* cycles per second */
-            float ph = DEG2RAD(brk->brick_ref->behavior_arg[2]); /* initial phase */
-            float off = DEG2RAD(90.0f + brk->brick_ref->behavior_arg[3]); /* angular offset */
-            float a = DEG2RAD(fmodf(180.0f + brk->brick_ref->behavior_arg[4], 360.0f)); /* angular amplitude */
+            float ph = DEG2RAD * brk->brick_ref->behavior_arg[2]; /* initial phase */
+            float off = DEG2RAD * (90.0f + brk->brick_ref->behavior_arg[3]); /* angular offset */
+            float a = DEG2RAD * (fmodf(180.0f + brk->brick_ref->behavior_arg[4], 360.0f)); /* angular amplitude */
 
             /* compute the angle */
             float ang = (a / 2.0f) * cosf(f * t + ph) + off;

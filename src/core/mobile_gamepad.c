@@ -74,7 +74,6 @@ static const int MAX_TOUCHES = (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches)
     .position = (v2d_t){ .x = 0.0f, .y = 0.0f } \
 }
 
-#define DEG2RAD            0.01745329251994329576f
 #define IS_POWER_OF_TWO(n) (((n) & ((n) - 1)) == 0)
 #define VALIDATE_MASK(x)   typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
 

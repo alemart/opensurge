@@ -169,7 +169,6 @@ static void update_animation(surgescript_object_t* object, const animation_t* an
 static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
 static void release_children(surgescript_objecthandle_t handle, void* mgr);
-static const double RAD2DEG = 57.2957795131;
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 #define STAY_MIDAIR(player) (player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
 
@@ -529,7 +528,7 @@ surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const sur
         /* assuming local position == world position */
         read_transform(object, &position, &angle, &scale);
         player->actor->position = position;
-        player->actor->angle = angle / (float)RAD2DEG;
+        player->actor->angle = angle * DEG2RAD;
         player->actor->scale = scale;
     }
     return NULL;

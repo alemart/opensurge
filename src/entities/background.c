@@ -118,7 +118,6 @@ static void bgbehavior_linear_update(bgbehavior_t *behavior); /* private method 
 
 
 /* internal utilities */
-#define DEG2RAD                       0.01745329251994329576f
 #define IS_FOREGROUND_LAYER(layer)    ((layer)->zindex > 0.5f)
 static void sort_layers(bgtheme_t *bgtheme);
 static int sort_cmp(const void *a, const void *b);

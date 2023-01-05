@@ -64,7 +64,6 @@ static inline surgescript_vector2_t* get_vector(const surgescript_object_t* obje
 static inline const surgescript_vector2_t* safe_get_vector(const surgescript_object_t* object);
 static inline surgescript_objecthandle_t spawn_vector(surgescript_objectmanager_t* manager, double x, double y);
 static const surgescript_vector2_t ZERO = { 0.0, 0.0 };
-static const double RAD2DEG = 57.2957795131;
 static const double EPS = DBL_EPSILON;
 static double y_axis = -1.0;
 
@@ -300,7 +299,7 @@ surgescript_var_t* fun_rotatedby(surgescript_object_t* object, const surgescript
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_vector2_t* me = get_vector(object);
-    double angle = surgescript_var_get_number(param[0]) / RAD2DEG;
+    double angle = surgescript_var_get_number(param[0]) * DEG2RAD;
     double s = sin(angle) * y_axis, c = cos(angle);
     surgescript_objecthandle_t result = spawn_vector(manager,
         me->x * c - me->y * s,

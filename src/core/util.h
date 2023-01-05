@@ -43,6 +43,8 @@
 #define PI                      3.14159265358979323846
 #define TWO_PI                  6.283185307179586
 #define PI_OVER_TWO             1.5707963267948966
+#define RAD2DEG                 57.29577951308232
+#define DEG2RAD                 0.01745329251994329576
 #define LARGE_INT               (1 << 30)
 
 /* Useful macros */

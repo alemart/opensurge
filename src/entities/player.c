@@ -65,9 +65,6 @@
 #define ANIM_SPEED_FACTOR(k, spd) \
     1.5f * min(1, (max((spd), 100)) / (k)) /* 24 / 16 */
 
-#define DEG2RAD(x) \
-    ((x) / 57.2957795131f)
-
 /* public constants */
 const int PLAYER_INITIAL_LIVES = 5;    /* initial lives */
 
@@ -535,8 +532,8 @@ void player_hit(player_t *player, float direction)
             /* create collectibles */
             for(int i = 0; i < r; i++) {
                 v2d_t velocity = v2d_new(
-                    -sinf(DEG2RAD(a)) * spd * (1 - 2 * (i % 2)),
-                    cosf(DEG2RAD(a)) * spd
+                    -sinf(DEG2RAD * a) * spd * (1 - 2 * (i % 2)),
+                    cosf(DEG2RAD * a) * spd
                 );
                 surgescript_object_t* collectible = level_create_object("Bouncing Collectible", player->actor->position);
 
@@ -1549,7 +1546,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         player_is_jumping(player) || player_is_pushing(player) ||
         player_is_rolling(player) || player_is_at_ledge(player)
     )) && !player_is_dying(player)) {
-        float new_angle = DEG2RAD(fix_angle(physicsactor_get_angle(pa), 15));
+        float new_angle = DEG2RAD * fix_angle(physicsactor_get_angle(pa), 15);
         if(delta_angle(new_angle, act->angle) < 1.6f) {
             float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
             act->angle = lerp_angle(act->angle, new_angle, t);
@@ -1624,7 +1621,7 @@ void hotspot_magic(player_t* player)
     int angle = physicsactor_get_angle(pa);
 
     if(!player_is_rolling(player) && !player_is_charging(player)) {
-        const float angthr = sinf(DEG2RAD(11.25f));
+        const float angthr = sinf(DEG2RAD * 11.25f);
         if(angle % 90 == 0 || player_is_at_ledge(player) || fabs(sinf(act->angle)) < angthr) {
             switch(physicsactor_get_movmode(pa)) {
                 case MM_FLOOR: act->hot_spot.y += 1; break;

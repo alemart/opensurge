@@ -67,7 +67,6 @@ static const surgescript_heapptr_t DETACHED_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static const surgescript_heapptr_t OFFSET_ADDR = 4;
 static const double DEFAULT_ZINDEX = 0.5;
-static const double DEG2RAD = 0.01745329251994329576;
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 
 /*
