@@ -37,7 +37,14 @@
 
 
 /* mobile controls */
-enum { DPAD, DPAD_STICK, ACTION_BUTTON };
+enum {
+    DPAD,
+    DPAD_STICK,
+    ACTION_BUTTON,
+
+    /* number of controls that are displayed on the screen */
+    NUM_CONTROLS
+};
 
 /* states of a button */
 enum { UNPRESSED, PRESSED };
@@ -101,7 +108,7 @@ static const v2d_t RELATIVE_POSITION[] = {
     },
 
     [ACTION_BUTTON] = {
-        .x = 0.865f,
+        .x = 0.89f,
         .y = 0.75f
     }
 
@@ -198,9 +205,6 @@ static actor_t* actor[] = {
     [DPAD_STICK] = NULL,
     [ACTION_BUTTON] = NULL
 };
-
-/* number of controls */
-static const int NUM_CONTROLS = sizeof(actor) / sizeof(actor[0]);
 
 /* misc */
 static void trigger(int control, v2d_t offset);
@@ -299,6 +303,9 @@ void mobilegamepad_update()
     if(!is_enabled)
         return;
 
+    /* reset state */
+    current_state = IDLE_STATE;
+
     /* reset touch */
     touch_t touch[MAX_TOUCHES];
     for(int j = 0; j < MAX_TOUCHES; j++)
@@ -307,13 +314,13 @@ void mobilegamepad_update()
 #if !ENABLE_MOUSE_INPUT
 
     /* read touch input */
-    ALLEGRO_TOUCH_INPUT_STATE state;
+    ALLEGRO_TOUCH_INPUT_STATE touch_state;
+    al_get_touch_input_state(&touch_state);
 
-    al_get_touch_input_state(&state);
     for(int i = 0, j = 0; i < MAX_TOUCHES; i++) {
-        if(state.touches[i].id >= 0) {
+        if(touch_state.touches[i].id >= 0) {
             touch[j].down = true;
-            touch[j].position = v2d_new(state.touches[i].x, state.touches[i].y);
+            touch[j].position = v2d_new(touch_state.touches[i].x, touch_state.touches[i].y);
             j++;
         }
     }
@@ -322,17 +329,14 @@ void mobilegamepad_update()
 
     /* read mouse input */
     ALLEGRO_MOUSE_STATE mouse;
-
     al_get_mouse_state(&mouse);
+
     if(mouse.buttons & 1) {
         touch[0].down = true;
         touch[0].position = v2d_new(mouse.x, mouse.y);
     }
 
 #endif
-
-    /* reset state */
-    current_state = IDLE_STATE;
 
     /* detect if something is pressed */
     for(int i = 0; i < MAX_TOUCHES; i++) {
@@ -346,6 +350,13 @@ void mobilegamepad_update()
             }
         }
     }
+
+    /* check if the back button is pressed */
+    ALLEGRO_KEYBOARD_STATE keyboard_state;
+    al_get_keyboard_state(&keyboard_state);
+
+    if(al_key_down(&keyboard_state, ALLEGRO_KEY_BACK))
+        current_state.buttons |= MOBILEGAMEPAD_BUTTON_BACK;
 
     /* update actors */
     update_actors();
