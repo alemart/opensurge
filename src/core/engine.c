@@ -319,9 +319,12 @@ void init_basic_stuff(const commandline_t* cmd)
         fatal_error("Can't initialize Allegro's native dialog addon");
 #endif
 
-    /* initialize the filesystem and the logfile */
+    /* initialize the the asset manager and the logfile module */
+    if(commandline_getint(cmd->verbose, FALSE))
+        logfile_init(LOGFILE_CONSOLE);
+
     asset_init(cmd->argv[0], gamedir);
-    logfile_init();
+    logfile_init(LOGFILE_TXT);
 
     /* initialize prefs and nanoparser */
     prefs = prefs_create(NULL);
@@ -461,10 +464,14 @@ void release_managers()
  */
 void release_basic_stuff()
 {
+    /* Release nanocalc and prefs */
     release_nanocalc();
     prefs = prefs_destroy(prefs);
-    logfile_release();
+
+    /* Release the logfile module and the asset manager */
+    logfile_release(LOGFILE_TXT);
     asset_release();
+    logfile_release(LOGFILE_CONSOLE);
 
     /* Release Allegro */
     al_destroy_event_queue(a5_event_queue);

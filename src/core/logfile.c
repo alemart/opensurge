@@ -27,48 +27,82 @@
 #include "global.h"
 #include "asset.h"
 
+
+
 #if defined(__ANDROID__)
+
 #include <allegro5/allegro_android.h>
 #include <android/log.h>
-#endif
 
-#if !defined(_WIN32)
+#elif defined(_WIN32)
+
+#include <io.h>
+#define LINE_BREAK "\r\n"
+
+#else
+
 #include <unistd.h>
-#elif !defined(STDERR_FILENO)
-#define STDERR_FILENO 2 /* _fileno(stderr) */
+#define LINE_BREAK "\n"
+
 #endif
 
+
+
+/* name of the logfile */
+#define LOGFILE_NAME            "logfile.txt"
+
+/* error macro */
+#define ERROR(...)              fprintf(stderr, __VA_ARGS__)
+
+/* this macro calls a function of unknown arity given as its first parameter,
+   removing the preceding comma of __VA_ARGS__ when it expands to nothing */
+#define CALL(...) KALL(__VA_ARGS__, CALLX, CALLX, CALL0)(__VA_ARGS__)
+#define CALL0(fn) do { \
+    if(logfile != NULL) { (fn)(logfile); } \
+    if(console != NULL) { (fn)(console); } \
+} while(0)
+#define CALLX(fn, ...) do { \
+    if(logfile != NULL) { (fn)(logfile, __VA_ARGS__); } \
+    if(console != NULL) { (fn)(console, __VA_ARGS__); } \
+} while(0)
+#define KALL(_0, _1, _2, fn, ...) fn
 
 /* private stuff ;) */
 static const char* allegro_version_string();
 static const char* surgescript_version_string();
 static const char* physfs_version_string();
-static const char* LOGFILE_PATH = "logfile.txt"; /* default log file */
+
 static ALLEGRO_FILE* logfile = NULL;
+static bool open_logfile();
+static void close_logfile();
+
+static ALLEGRO_FILE* console = NULL;
+static bool open_console();
+static void close_console();
+
+
+
+
+
+/* public */
 
 
 /*
  * logfile_init()
  * Initializes the logfile module.
  */
-void logfile_init()
+void logfile_init(int flags)
 {
-    char tmp_path[4096];
-
 #if !defined(__ANDROID__)
-    const char* fullpath = asset_path(LOGFILE_PATH);
+    /* open the output streams */
+    if(flags & LOGFILE_TXT)
+        open_logfile();
 
-    if(NULL == (logfile = al_fopen(fullpath, "wb"))) { /* physfs uses binary mode */
-        fprintf(stderr, "Can't open logfile at %s\n", fullpath);
-
-        if(NULL == (logfile = al_fopen_fd(STDERR_FILENO, "w"))) {
-            fprintf(stderr, "Can't open logfile at stderr\n");
-            return;
-        }
-    }
+    if(flags & LOGFILE_CONSOLE)
+        open_console();
 #else
-    (void)LOGFILE_PATH;
-    logfile = NULL;
+    (void)open_logfile;
+    (void)open_console;
 #endif
 
     /* initial messages */
@@ -76,13 +110,19 @@ void logfile_init()
     logfile_message("Using Allegro version %s", allegro_version_string());
     logfile_message("Using SurgeScript version %s", surgescript_version_string());
     logfile_message("Using PhysicsFS version %s", physfs_version_string());
-    logfile_message("Asset directory: %s", asset_shared_datadir(tmp_path, sizeof(tmp_path)));
-    logfile_message("User directory: %s", asset_user_datadir(tmp_path, sizeof(tmp_path)));
-
 #if defined(__ANDROID__)
     logfile_message("Android platform: %s", al_android_get_os_version());
 #endif
+
+    /* asset directories */
+    if(asset_is_init()) {
+        char tmp_path[4096];
+
+        logfile_message("Asset directory: %s", asset_shared_datadir(tmp_path, sizeof(tmp_path)));
+        logfile_message("User directory: %s", asset_user_datadir(tmp_path, sizeof(tmp_path)));
+    }
 }
+
 
 
 /*
@@ -95,23 +135,18 @@ void logfile_message(const char* fmt, ...)
 
     va_list args;
 
-    if(logfile == NULL)
-        return;
-
+    /* print the message */
     va_start(args, fmt);
-    al_vfprintf(logfile, fmt, args);
+    CALL(al_vfprintf, fmt, args);
     va_end(args);
 
-#ifdef _WIN32
-    /* "PhysFS does not support the text-mode reading and writing,
-       which means that Windows-style newlines will not be preserved."
-       https://liballeg.org/a5docs/trunk/physfs.html */
-    al_fputs(logfile, "\r\n");
-#else
-    al_fputs(logfile, "\n");
-#endif
+    /* break line */
+    CALL(al_fputs, LINE_BREAK);
+    CALL(al_fflush);
 
-    al_fflush(logfile);
+    /* "PhysFS does not support the text-mode reading and writing,
+        which means that Windows-style newlines will not be preserved."
+        https://liballeg.org/a5docs/trunk/physfs.html */
 
 #else
 
@@ -130,14 +165,15 @@ void logfile_message(const char* fmt, ...)
  * logfile_release()
  * Releases the logfile module
  */
-void logfile_release()
+void logfile_release(int flags)
 {
     logfile_message("tchau!");
-    
-    if(logfile != NULL)
-        al_fclose(logfile);
 
-    logfile = NULL;
+    if(flags & LOGFILE_TXT)
+        close_logfile();
+
+    if(flags & LOGFILE_CONSOLE)
+        close_console();
 }
 
 
@@ -177,7 +213,6 @@ const char* surgescript_version_string()
     return surgescript_util_version();
 }
 
-
 /*
  * physfs_version_string()
  * The compiled version of PhysicsFS as a string
@@ -191,4 +226,86 @@ const char* physfs_version_string()
     snprintf(str, sizeof(str), "%u.%u.%u", version.major, version.minor, version.patch);
 
     return str;
+}
+
+/*
+ * open_logfile()
+ * Opens the file to which we'll write the logs
+ * The asset manager must be initialized
+ * Returns true on success
+ */
+bool open_logfile()
+{
+    /* nothing to do */
+    if(logfile != NULL)
+        return false;
+
+    /* check if the asset manager is initialized */
+    if(!asset_is_init()) {
+        ERROR("Can't open logfile: no virtual filesystem");
+        return false;
+    }
+
+    /* open file */
+    const char* fullpath = asset_path(LOGFILE_NAME);
+    if(NULL == (logfile = al_fopen(fullpath, "wb"))) { /* physfs uses binary mode */
+        ERROR("Can't open logfile at %s. errno = %d\n", fullpath, al_get_errno());
+        return false;
+    }
+
+    /* success! */
+    return true;
+}
+
+/*
+ * close_logfile()
+ * Closes the file to which we wrote the logs
+ */
+void close_logfile()
+{
+    if(logfile != NULL) {
+        al_fclose(logfile);
+        logfile = NULL;
+    }
+}
+
+/*
+ * open_console()
+ * Initializes the console output
+ * Returns true on success
+ */
+bool open_console()
+{
+    /* nothing to do */
+    if(console != NULL)
+        return false;
+
+    /* a negative file descriptor may be returned in a Windows application without a console window;
+       see https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fileno?view=msvc-170 */
+    int fd = fileno(stdout);
+    if(fd < 0)
+        return false;
+
+    /* duplicate the file descriptor and open a stream */
+    fd = dup(fd); /* al_fclose() will close this file descriptor */
+    if(NULL == (console = al_fopen_fd(fd, "wb"))) { /* physfs uses binary mode */
+        ERROR("Can't use the console as the logfile. errno = %d\n", al_get_errno());
+        close(fd);
+        return false;
+    }
+
+    /* success! */
+    return true;
+}
+
+/*
+ * close_console()
+ * Releases the console output
+ */
+void close_console()
+{
+    if(console != NULL) {
+        al_fclose(console);
+        console = NULL;
+    }
 }
