@@ -61,8 +61,9 @@
 #define GENERATED_USER_DATADIRNAME_PREFIX_LENGTH    (sizeof(_GENERATED_USER_DATADIRNAME_PREFIX) - 1)
 #define GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH    ((sizeof(user_datadirname) - 1) - GENERATED_USER_DATADIRNAME_PREFIX_LENGTH)
 static const char _GENERATED_USER_DATADIRNAME_PREFIX[] = GENERATED_USER_DATADIRNAME_PREFIX;
+static const char _GENERATED_USER_DATADIRNAME[] = GENERATED_USER_DATADIRNAME_PREFIX GENERATED_USER_DATADIRNAME_SUFFIX;
 static const char _DEFAULT_USER_DATADIRNAME[] = DEFAULT_USER_DATADIRNAME;
-static char user_datadirname[] = GENERATED_USER_DATADIRNAME_PREFIX GENERATED_USER_DATADIRNAME_SUFFIX;
+static char user_datadirname[sizeof(_GENERATED_USER_DATADIRNAME)] = DEFAULT_USER_DATADIRNAME;
 typedef char _32bit_hash_assert[ !!(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH == 8) * 2 - 1 ];
 typedef char _default_user_datadirname_assert[ !!(sizeof(user_datadirname) > DEFAULT_USER_DATADIRNAME_LENGTH) * 2 - 1 ];
 typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == 1 + GENERATED_USER_DATADIRNAME_PREFIX_LENGTH + GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH) * 2 - 1 ];
@@ -154,12 +155,14 @@ void asset_init(const char* argv0, const char* optional_gamedir)
             /* log */
             LOG("The specified game directory isn't writable. Trying %s", generated_user_datadir);
 
+#if 0
             /* check the permissions of the generated write folder */
             uint32_t gmode = get_fs_mode(generated_user_datadir);
-            if(!(gmode & ALLEGRO_FILEMODE_WRITE))
+            if(!(gmode & ALLEGRO_FILEMODE_WRITE)) /* for whatever reason this fails with a chmod 777 folder. Why? */
                 CRASH("Can't use game directory %s because it's not writable. Write directory %s is also not writable. Check the permissions of your filesystem.", gamedir, generated_user_datadir);
             else if(!(gmode & ALLEGRO_FILEMODE_READ)) /* not needed. good to have */
                 WARN("Can't use game directory %s because it's not writable. Write directory %s is writable but not readable. Check the permissions of your filesystem.", gamedir, generated_user_datadir);
+#endif
 
         }
 
@@ -519,10 +522,20 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
 
 #if (GAME_RUNINPLACE) || defined(_WIN32)
 
-    (void)find_homedir;
-    (void)dirname;
+    ALLEGRO_PATH* path = find_exedir();
 
-    return find_exedir();
+    /* If a custom gamedir is specified and that directory is
+       not writable, then a new write directory will be created.
+       If the game runs in place, then that write directory will
+       be a subdirectory of the folder of the executable.
+       This situation should happen rarely. */
+    if(0 != strcmp(dirname, DEFAULT_USER_DATADIRNAME)) {
+        al_append_path_component(path, "__mods__");
+        al_append_path_component(path, dirname);
+    }
+
+    (void)find_homedir;
+    return path;
 
 #elif defined(__ANDROID__)
 
