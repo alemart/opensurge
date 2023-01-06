@@ -85,6 +85,7 @@ static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
 static uint32_t hash32(const char* str);
+static bool is_valid_root_folder();
 
 
 
@@ -219,6 +220,14 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         /* done! */
         al_destroy_path(user_datadir);
         al_destroy_path(shared_datadir);
+    }
+
+    /* validate */
+    if(!is_valid_root_folder()) {
+        if(gamedir == NULL)
+            CRASH("Not a valid Open Surge installation. Please reinstall the game.");
+        else
+            CRASH("Not a valid Open Surge game directory: %s", gamedir);
     }
 
     /* enable the physfs file interface. This should be the last task
@@ -735,6 +744,15 @@ const char* find_extension(const char* path)
 {
     const char* ext = strrchr(path, '.');
     return ext != NULL ? ext : "";
+}
+
+/*
+ * is_valid_root_folder()
+ * Check if the root directory of the physfs filesystem is a valid Open Surge folder
+ */
+bool is_valid_root_folder()
+{
+    return PHYSFS_exists("surge.rocks") || PHYSFS_exists("languages/english.lng");
 }
 
 /*
