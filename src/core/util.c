@@ -122,7 +122,7 @@ void fatal_error(const char *fmt, ...)
     /* display an error */
     logfile_message("----- crash -----");
     logfile_message("%s", buf);
-    fprintf(stderr, "%s", buf);
+    fprintf(stderr, "%s\n", buf);
 
 #if defined(__ANDROID__)
     __android_log_print(ANDROID_LOG_FATAL, GAME_UNIXNAME, "Surgexception! %s", buf);
