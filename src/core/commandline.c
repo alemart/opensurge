@@ -75,16 +75,18 @@ commandline_t commandline_parse(int argc, char **argv)
 
     /* initializing values */
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
-    cmd.smooth_graphics = COMMANDLINE_UNDEFINED;
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
     cmd.show_fps = COMMANDLINE_UNDEFINED;
     cmd.hide_fps = COMMANDLINE_UNDEFINED;
+    cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
+
+    cmd.verbose = COMMANDLINE_UNDEFINED;
+
     cmd.custom_level_path[0] = '\0';
     cmd.custom_quest_path[0] = '\0';
     cmd.language_filepath[0] = '\0';
-    cmd.install_game_path[0] = '\0';
     cmd.gamedir[0] = '\0';
-    cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
+
     cmd.user_argv = NULL;
     cmd.user_argc = 0;
     cmd.argv = (const char**)argv;
@@ -116,6 +118,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --game-folder \"/path/to/game\"    use game assets only from the specified folder\n"
                 "    --reset                          factory reset: clear all user-space files & changes\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
+                "    --verbose                        print logs to stdout\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
                 COPYRIGHT, program
             );
@@ -152,13 +155,6 @@ commandline_t commandline_parse(int argc, char **argv)
             }
         }
 
-        else if(strcmp(argv[i], "--smooth") == 0) {
-            cmd.smooth_graphics = TRUE;
-            if(cmd.video_resolution == VIDEORESOLUTION_1X)
-                cmd.video_resolution = VIDEORESOLUTION_2X;
-            crash("Smooth graphics: not yet implemented in the Allegro 5 backend");
-        }
-
         else if(strcmp(argv[i], "--tiny") == 0) /* obsolete */
             cmd.video_resolution = VIDEORESOLUTION_1X;
 
@@ -176,6 +172,9 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;
+
+        else if(strcmp(argv[i], "--verbose") == 0)
+            cmd.verbose = TRUE;
 
         else if(strcmp(argv[i], "--level") == 0) {
             if(++i < argc && *(argv[i]) != '-')

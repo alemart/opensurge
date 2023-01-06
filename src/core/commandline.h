@@ -27,20 +27,21 @@
 typedef struct commandline_t commandline_t;
 struct commandline_t
 {
-    /* video stuff */
+    /* video options */
     int video_resolution;
-    int smooth_graphics;
     int fullscreen;
     int show_fps;
     int hide_fps;
     int allow_font_smoothing;
+
+    /* other options */
+    int verbose;
 
     /* filepaths */
     char gamedir[COMMANDLINE_PATHMAX];
     char custom_level_path[COMMANDLINE_PATHMAX];
     char custom_quest_path[COMMANDLINE_PATHMAX];
     char language_filepath[COMMANDLINE_PATHMAX];
-    char install_game_path[COMMANDLINE_PATHMAX];
 
     /* user arguments: what comes after "--" */
     const char** user_argv;
