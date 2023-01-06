@@ -56,17 +56,16 @@
 /* Name of the user-modifiable asset directory */
 #define DEFAULT_USER_DATADIRNAME                    GAME_UNIXNAME
 #define DEFAULT_USER_DATADIRNAME_LENGTH             (sizeof(_DEFAULT_USER_DATADIRNAME) - 1)
-#define GENERATED_USER_DATADIRNAME_PREFIX           DEFAULT_USER_DATADIRNAME "_"  /* a constant, known string */
-#define GENERATED_USER_DATADIRNAME_SUFFIX           "________"                /* template for a 32-bit hash */
-#define GENERATED_USER_DATADIRNAME_PREFIX_LENGTH    (sizeof(_GENERATED_USER_DATADIRNAME_PREFIX) - 1)
-#define GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH    ((sizeof(user_datadirname) - 1) - GENERATED_USER_DATADIRNAME_PREFIX_LENGTH)
-static const char _GENERATED_USER_DATADIRNAME_PREFIX[] = GENERATED_USER_DATADIRNAME_PREFIX;
+#define GENERATED_USER_DATADIRNAME_PREFIX           DEFAULT_USER_DATADIRNAME "_" /* a constant, known string */
+#define GENERATED_USER_DATADIRNAME_SUFFIX           "12345678" /* template for a 32-bit hash */
+#define GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH    (sizeof(_GENERATED_USER_DATADIRNAME_SUFFIX) - 1)
+static const char _GENERATED_USER_DATADIRNAME_SUFFIX[] = GENERATED_USER_DATADIRNAME_SUFFIX;
 static const char _GENERATED_USER_DATADIRNAME[] = GENERATED_USER_DATADIRNAME_PREFIX GENERATED_USER_DATADIRNAME_SUFFIX;
 static const char _DEFAULT_USER_DATADIRNAME[] = DEFAULT_USER_DATADIRNAME;
 static char user_datadirname[sizeof(_GENERATED_USER_DATADIRNAME)] = DEFAULT_USER_DATADIRNAME;
 typedef char _32bit_hash_assert[ !!(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH == 8) * 2 - 1 ];
 typedef char _default_user_datadirname_assert[ !!(sizeof(user_datadirname) > DEFAULT_USER_DATADIRNAME_LENGTH) * 2 - 1 ];
-typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == 1 + GENERATED_USER_DATADIRNAME_PREFIX_LENGTH + GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH) * 2 - 1 ];
+typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == sizeof(_GENERATED_USER_DATADIRNAME)) * 2 - 1 ];
 
 
 
