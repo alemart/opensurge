@@ -32,44 +32,59 @@
 
 /* The default directory of the game assets provided by upstream (*nix only) */
 #ifndef GAME_DATADIR
-#define GAME_DATADIR                   "/usr/share/games/" GAME_UNIXNAME
-#endif
-
-/* The default name of the user-modifiable asset directory (*nix only) */
-#ifndef GAME_USERDIRNAME
-#define GAME_USERDIRNAME               GAME_UNIXNAME
+#define GAME_DATADIR                    "/usr/share/games/" GAME_UNIXNAME
 #endif
 
 /* If RUNINPLACE is non-zero, then the assets will be read only from the directory of the executable */
 #ifndef GAME_RUNINPLACE
-#define GAME_RUNINPLACE                0
+#define GAME_RUNINPLACE                 0
 #endif
 
 /* Utility macros */
-#define ASSET_PATH_MAX                 4096
-#define PHYSFSx_getLastErrorMessage()  PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
-#define LOG(...)                       logfile_message("[asset] " __VA_ARGS__)
-#define WARN(...)                      do { fprintf(stderr, "[asset] " __VA_ARGS__); fprintf(stderr, "\n"); LOG(__VA_ARGS__); } while(0)
-#define CRASH(...)                     fatal_error("[asset] " __VA_ARGS__)
+#define ENVORINMENT_VARIABLE_NAME       "OPENSURGE_USER_PATH"
+#define ASSET_PATH_MAX                  4096
+#define PHYSFSx_getLastErrorMessage()   PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+#define LOG(...)                        logfile_message("[asset] " __VA_ARGS__)
+#define WARN(...)                       do { fprintf(stderr, "[asset] " __VA_ARGS__); fprintf(stderr, "\n"); LOG(__VA_ARGS__); } while(0)
+#define CRASH(...)                      fatal_error("[asset] " __VA_ARGS__)
 #define ASSERT(expr) do { \
     if(!(expr)) { \
         CRASH("Assertion failed: " #expr " in %s at %s:%d", __func__, __FILE__, __LINE__); \
     } \
 } while(0)
 
+/* Name of the user-modifiable asset directory */
+#define DEFAULT_USER_DATADIRNAME                    GAME_UNIXNAME
+#define DEFAULT_USER_DATADIRNAME_LENGTH             (sizeof(_DEFAULT_USER_DATADIRNAME) - 1)
+#define GENERATED_USER_DATADIRNAME_PREFIX           DEFAULT_USER_DATADIRNAME "_"  /* a constant, known string */
+#define GENERATED_USER_DATADIRNAME_SUFFIX           "________"                /* template for a 32-bit hash */
+#define GENERATED_USER_DATADIRNAME_PREFIX_LENGTH    (sizeof(_GENERATED_USER_DATADIRNAME_PREFIX) - 1)
+#define GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH    ((sizeof(user_datadirname) - 1) - GENERATED_USER_DATADIRNAME_PREFIX_LENGTH)
+static const char _GENERATED_USER_DATADIRNAME_PREFIX[] = GENERATED_USER_DATADIRNAME_PREFIX;
+static const char _DEFAULT_USER_DATADIRNAME[] = DEFAULT_USER_DATADIRNAME;
+static char user_datadirname[] = GENERATED_USER_DATADIRNAME_PREFIX GENERATED_USER_DATADIRNAME_SUFFIX;
+typedef char _32bit_hash_assert[ !!(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH == 8) * 2 - 1 ];
+typedef char _default_user_datadirname_assert[ !!(sizeof(user_datadirname) > DEFAULT_USER_DATADIRNAME_LENGTH) * 2 - 1 ];
+typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == 1 + GENERATED_USER_DATADIRNAME_PREFIX_LENGTH + GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH) * 2 - 1 ];
+
+
+
 /* Utilities */
 static char* gamedir = NULL; /* custom asset folder specified by the user */
+
 static ALLEGRO_STATE state;
 static ALLEGRO_PATH* find_exedir();
 static ALLEGRO_PATH* find_homedir();
 static ALLEGRO_PATH* find_shared_datadir();
-static ALLEGRO_PATH* find_user_datadir();
+static ALLEGRO_PATH* find_user_datadir(const char* dirname);
+
 static void create_dir(const ALLEGRO_PATH* path);
 static uint32_t get_fs_mode(const char* path);
 static const char* find_extension(const char* path);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
+static uint32_t hash32(const char* str);
 
 
 
@@ -81,8 +96,11 @@ static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
 void asset_init(const char* argv0, const char* optional_gamedir)
 {
     /* already initialized? */
-    if(PHYSFS_isInit())
+    if(asset_is_init())
         return;
+
+    /* log */
+    LOG("Initializing the asset manager...");
 
     /* initialize physfs */
 #if !defined(__ANDROID__)
@@ -93,6 +111,9 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         CRASH("Can't initialize physfs. %s", PHYSFSx_getLastErrorMessage());
 #endif
 
+    /* set the default name of the user-modifiable asset directory */
+    str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
+
     /* copy the gamedir, if specified */
     gamedir = (optional_gamedir != NULL) ? str_dup(optional_gamedir) : NULL;
 
@@ -100,33 +121,70 @@ void asset_init(const char* argv0, const char* optional_gamedir)
     if(gamedir != NULL) {
 
         uint32_t mode = get_fs_mode(gamedir);
-        char* custom_writedir = NULL;
+        char* generated_user_datadir = NULL;
+
+        /* log */
+        LOG("Using a custom game directory: %s", gamedir);
 
         /* validate the gamedir */
-        if(!(mode & ALLEGRO_FILEMODE_READ))
-            CRASH("Can't use game directory %s. Make sure that it exists and that it is readable.", gamedir);
-        else if(!(mode & ALLEGRO_FILEMODE_WRITE))
-            custom_writedir = NULL; /* FIXME create a writable folder */
+        if(!(mode & ALLEGRO_FILEMODE_READ)) {
 
-        /* set the write dir */
-        const char* writedir = custom_writedir != NULL ? custom_writedir : gamedir;
+            /* gamedir isn't readable */
+            CRASH("Can't use game directory %s. Make sure that it exists and that it is readable.", gamedir);
+
+        }
+        else if(!(mode & ALLEGRO_FILEMODE_WRITE)) {
+
+            /* gamedir isn't writable... could this be flatpak?
+               let's generate a write folder based on gamedir */
+            snprintf(
+                user_datadirname, sizeof(user_datadirname),
+                "%s%0*x",
+                GENERATED_USER_DATADIRNAME_PREFIX,
+                (int)(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH),
+                hash32(gamedir)
+            );
+
+            /* find the path to the writable folder and create it if necessary */
+            ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
+            generated_user_datadir = str_dup(al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP));
+            create_dir(user_datadir);
+            al_destroy_path(user_datadir);
+
+            /* log */
+            LOG("The specified game directory isn't writable. Trying %s", generated_user_datadir);
+
+            /* check the permissions of the generated write folder */
+            uint32_t gmode = get_fs_mode(generated_user_datadir);
+            if(!(gmode & ALLEGRO_FILEMODE_WRITE))
+                CRASH("Can't use game directory %s because it's not writable. Write directory %s is also not writable. Check the permissions of your filesystem.", gamedir, generated_user_datadir);
+            else if(!(gmode & ALLEGRO_FILEMODE_READ)) /* not needed. good to have */
+                WARN("Can't use game directory %s because it's not writable. Write directory %s is writable but not readable. Check the permissions of your filesystem.", gamedir, generated_user_datadir);
+
+        }
+
+        /* set the write dir to gamedir if possible;
+           otherwise set it to a generated directory */
+        const char* writedir = generated_user_datadir != NULL ? generated_user_datadir : gamedir;
         if(!PHYSFS_setWriteDir(writedir))
             CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
+        LOG("Setting the write directory to %s", writedir);
 
         /* mount gamedir to the root */
         if(!PHYSFS_mount(gamedir, "/", 1))
             CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
+        LOG("Mounting gamedir: %s", gamedir);
 
         /* done */
-        if(custom_writedir != NULL)
-            free(custom_writedir);
+        if(generated_user_datadir != NULL)
+            free(generated_user_datadir);
 
     }
 
     /* set the default search paths */
     else {
         ALLEGRO_PATH* shared_datadir = find_shared_datadir();
-        ALLEGRO_PATH* user_datadir = find_user_datadir();
+        ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
         const char* dirpath;
 
         /* create the user dir if it doesn't exist */
@@ -136,16 +194,19 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         dirpath = al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP);
         if(!PHYSFS_setWriteDir(dirpath))
             CRASH("Can't set the write directory to %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
+        LOG("Setting the write directory to %s", dirpath);
 
         /* mount the user path to the root (higher precedence) */
         /*dirpath = al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP);*/
         if(!PHYSFS_mount(dirpath, "/", 1))
             CRASH("Can't mount the user data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
+        LOG("Mounting user data directory: %s", dirpath);
 
         /* mount the shared path to the root */
         dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);
         if(!PHYSFS_mount(dirpath, "/", 1))
             CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
+        LOG("Mounting shared data directory: %s", dirpath);
 
 #if defined(__ANDROID__)
         /* on Android, read from the assets/ folder inside the .apk */
@@ -162,6 +223,9 @@ void asset_init(const char* argv0, const char* optional_gamedir)
        performed in this function (e.g., see create_dir()) */
     al_store_state(&state, ALLEGRO_STATE_NEW_FILE_INTERFACE);
     al_set_physfs_file_interface();
+
+    /* done! */
+    LOG("The asset manager has been initialized!");
 }
 
 /*
@@ -171,12 +235,20 @@ void asset_init(const char* argv0, const char* optional_gamedir)
 void asset_release()
 {
     /* not initialized? */
-    if(!PHYSFS_isInit())
+    if(!asset_is_init())
         return;
 
+    /* log */
+    LOG("Releasing the asset manager...");
+
     /* release the gamedir string, if any */
-    if(gamedir != NULL)
+    if(gamedir != NULL) {
         free(gamedir);
+        gamedir = NULL;
+    }
+
+    /* reset the user_datadirname string, just in case */
+    str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
 
     /* restore the previous I/O backend */
     al_restore_state(&state);
@@ -184,6 +256,18 @@ void asset_release()
     /* deinit physfs */
     if(!PHYSFS_deinit())
         LOG("Can't deinitialize physfs. %s", PHYSFSx_getLastErrorMessage());
+
+    /* done! */
+    LOG("The asset manager has been released!");
+}
+
+/*
+ * asset_is_init()
+ * Checks if the asset subsystem is initialized
+ */
+bool asset_is_init()
+{
+    return PHYSFS_isInit();
 }
 
 /*
@@ -270,12 +354,12 @@ bool asset_purge_user_data()
         al_init();
 
     /* get the user data dir */
-    ALLEGRO_PATH* path = find_user_datadir();
+    ALLEGRO_PATH* path = find_user_datadir(user_datadirname);
     const char* user_datadir = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
     /* validity check */
     ALLEGRO_FS_ENTRY* entry = al_create_fs_entry(user_datadir);
-    bool valid = (entry != NULL) && al_fs_entry_exists(entry);
+    bool valid = al_fs_entry_exists(entry);
     if(!valid)
         WARN("Invalid directory: %s. errno = %d", user_datadir, al_get_errno());
 
@@ -300,7 +384,7 @@ bool asset_purge_user_data()
 char* asset_user_datadir(char* dest, size_t dest_size)
 {
     /* custom gamedir? */
-    if(gamedir != NULL)
+    if(gamedir != NULL && 0 != strcmp(user_datadirname, DEFAULT_USER_DATADIRNAME))
         return str_cpy(dest, gamedir, dest_size);
 
     /* uninitialized Allegro? */
@@ -308,7 +392,7 @@ char* asset_user_datadir(char* dest, size_t dest_size)
         al_init();
 
     /* find the default path */
-    ALLEGRO_PATH* path = find_user_datadir();
+    ALLEGRO_PATH* path = find_user_datadir(user_datadirname);
     const char* dirpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
     str_cpy(dest, dirpath, dest_size);
@@ -382,10 +466,11 @@ ALLEGRO_PATH* find_homedir()
 /*
  * find_shared_datadir()
  * Finds the path of the directory storing the game assets provided by upstream
+ * This function behaves as if no custom gamedir is specified
  */
 ALLEGRO_PATH* find_shared_datadir()
 {
-#if (GAME_RUNINPLACE)
+#if (GAME_RUNINPLACE) || defined(_WIN32)
 
     return find_exedir();
 
@@ -393,10 +478,6 @@ ALLEGRO_PATH* find_shared_datadir()
 
     /* on Android, treat the .apk itself as the shared datadir (it's a .zip file) */
     return al_get_standard_path(ALLEGRO_EXENAME_PATH);
-
-#elif defined(_WIN32)
-
-    return find_exedir();
 
 #elif defined(__APPLE__) && defined(__MACH__)
 
@@ -427,30 +508,31 @@ ALLEGRO_PATH* find_shared_datadir()
 /*
  * find_user_datadir()
  * Finds the path of the user-modifiable directory storing game assets
+ * This function behaves as if no custom gamedir is specified
  */
-ALLEGRO_PATH* find_user_datadir()
+ALLEGRO_PATH* find_user_datadir(const char* dirname)
 {
-#if (GAME_RUNINPLACE)
-
-    (void)find_homedir;
-    return find_exedir();
-
-#else
-
     /* Use custom user path? */
-    const char* env = getenv("OPENSURGE_USER_PATH");
+    const char* env = getenv(ENVORINMENT_VARIABLE_NAME);
     if(env != NULL)
         return al_create_path_for_directory(env);
 
-#if defined(__ANDROID__)
+#if (GAME_RUNINPLACE) || defined(_WIN32)
 
     (void)find_homedir;
-    return al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    (void)dirname;
 
-#elif defined(_WIN32)
-
-    (void)find_homedir;
     return find_exedir();
+
+#elif defined(__ANDROID__)
+
+    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+
+    al_append_path_component(path, dirname);
+
+    (void)find_homedir;
+    return path;
+
 
 #elif defined(__APPLE__) && defined(__MACH__)
 
@@ -462,7 +544,7 @@ ALLEGRO_PATH* find_user_datadir()
 
     al_append_path_component(path, "Library");
     al_append_path_component(path, "Application Support");
-    al_append_path_component(path, GAME_USERDIRNAME);
+    al_append_path_component(path, dirname);
 
     return path;
 
@@ -484,12 +566,11 @@ ALLEGRO_PATH* find_user_datadir()
     else
         path = al_create_path_for_directory(xdg_data_home);
 
-    al_append_path_component(path, GAME_USERDIRNAME);
+    al_append_path_component(path, dirname);
     return path;
 
 #else
 #error "Unsupported operating system."
-#endif
 #endif
 }
 
@@ -642,4 +723,29 @@ const char* find_extension(const char* path)
 {
     const char* ext = strrchr(path, '.');
     return ext != NULL ? ext : "";
+}
+
+/*
+ * hash32()
+ * Jenkins' hash function
+ */
+uint32_t hash32(const char* str)
+{
+    const unsigned char* p = (const unsigned char*)str;
+    uint32_t hash = 0;
+
+    if(str == NULL)
+        return 0;
+
+    while(*p) {
+        hash += *(p++);
+        hash += hash << 10;
+        hash ^= hash >> 6;
+    }
+
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+
+    return hash;
 }

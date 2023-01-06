@@ -26,6 +26,7 @@
 
 void asset_init(const char* argv0, const char* optional_gamedir);
 void asset_release();
+bool asset_is_init();
 
 bool asset_exists(const char* virtual_path);
 const char* asset_path(const char* virtual_path);
