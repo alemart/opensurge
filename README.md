@@ -122,6 +122,8 @@ The default paths of these locations vary according to the platform:
 
 If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases), extract them to your filesystem and use the `--game-folder` command-line option as explained in [Running MODs](#running-mods).
 
+Tip: since version 0.6.1, you can use the command-line option `--verbose` to see where the files are. The directories will appear at the beginning of the output.
+
 ### Compiling the engine
 
 Dependencies:
