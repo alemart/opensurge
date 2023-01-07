@@ -89,17 +89,17 @@ static const v2d_t RELATIVE_POSITION[] = {
 
     [DPAD] = {
         .x = 0.135f,
-        .y = 0.75f
+        .y = 0.8f
     },
 
     [DPAD_STICK] = { /* same as DPAD */
         .x = 0.135f,
-        .y = 0.75f
+        .y = 0.8f
     },
 
     [ACTION_BUTTON] = {
         .x = 0.89f,
-        .y = 0.75f
+        .y = 0.8f
     }
 
 };
@@ -185,8 +185,8 @@ static const touch_t NO_TOUCH = {
 /* current state of the mobile gamepad */
 static mobilegamepad_state_t current_state;
 
-/* is the mobile gamepad enabled? */
-static bool is_enabled = false;
+/* is the mobile gamepad available in this system? */
+static bool is_available = false;
 
 /* is the mobile gamepad visible? */
 static bool is_visible = true;
@@ -215,6 +215,7 @@ static void update_actors();
 static void render_actors();
 static void handle_fade_effect();
 static void enable_linear_filtering();
+static bool is_back_button_down();
 static v2d_t dpad_stick_offset(float scale);
 
 
@@ -234,7 +235,7 @@ void mobilegamepad_init()
 
     /* reset the state */
     current_state = IDLE_STATE;
-    is_enabled = false;
+    is_available = false;
     is_visible = false;
 
 #if !ENABLE_MOBILE_GAMEPAD
@@ -255,7 +256,7 @@ void mobilegamepad_init()
 
     /* require mouse input */
     if(!al_is_mouse_installed()) {
-        fatal_error("No mouse input for the mobile gamepad!");
+        fatal_error("No mouse input. The mobile gamepad won't be available!");
         return;
     }
 
@@ -276,7 +277,7 @@ void mobilegamepad_init()
     alpha = 0.0f; /* make it fade in nicely when initializing */
 
     /* success! */
-    is_enabled = true;
+    is_available = true;
 }
 
 /*
@@ -295,7 +296,7 @@ void mobilegamepad_release()
 
     /* reset the state */
     current_state = IDLE_STATE;
-    is_enabled = false;
+    is_available = false;
 }
 
 /*
@@ -304,12 +305,16 @@ void mobilegamepad_release()
  */
 void mobilegamepad_update()
 {
-    /* do nothing if disabled */
-    if(!is_enabled)
+    /* do nothing if uanvailable */
+    if(!is_available)
         return;
 
-    /* reset state */
+    /* reset the state */
     current_state = IDLE_STATE;
+
+    /* the back button works regardless of the visibility of the mobile gamepad */
+    if(is_back_button_down())
+        current_state.buttons |= MOBILEGAMEPAD_BUTTON_BACK;
 
     /* reset touch */
     touch_t touch[MAX_TOUCHES];
@@ -343,25 +348,21 @@ void mobilegamepad_update()
 
 #endif
 
-    /* detect if something is pressed */
-    for(int i = 0; i < MAX_TOUCHES; i++) {
-        if(touch[i].down) {
-            for(int j = 0; j < NUM_CONTROLS; j++) {
-                v2d_t offset = v2d_subtract(touch[i].position, actor[j]->position);
-                float distance = v2d_magnitude(offset);
+    /* detect if something is pressed on the screen,
+       but only if the mobile gamepad is visible */
+    if(is_visible) {
+        for(int i = 0; i < MAX_TOUCHES; i++) {
+            if(touch[i].down) {
+                for(int j = 0; j < NUM_CONTROLS; j++) {
+                    v2d_t offset = v2d_subtract(touch[i].position, actor[j]->position);
+                    float distance = v2d_magnitude(offset);
 
-                if(distance < interactive_radius[j])
-                    trigger(j, offset);
+                    if(distance < interactive_radius[j])
+                        trigger(j, offset);
+                }
             }
         }
     }
-
-    /* check if the back button is pressed */
-    ALLEGRO_KEYBOARD_STATE keyboard_state;
-    al_get_keyboard_state(&keyboard_state);
-
-    if(al_key_down(&keyboard_state, ALLEGRO_KEY_BACK))
-        current_state.buttons |= MOBILEGAMEPAD_BUTTON_BACK;
 
     /* update actors */
     update_actors();
@@ -373,8 +374,8 @@ void mobilegamepad_update()
  */
 void mobilegamepad_render()
 {
-    /* do nothing if disabled */
-    if(!is_enabled)
+    /* do nothing if unavailable */
+    if(!is_available)
         return;
 
     /* fading in and fading out */
@@ -395,12 +396,21 @@ void mobilegamepad_render()
 }
 
 /*
+ * mobilegamepad_is_available()
+ * Checks if the mobile gamepad is available in this system
+ */
+bool mobilegamepad_is_available()
+{
+    return is_available;
+}
+
+/*
  * mobilegamepad_get_state()
  * Reads the current state of the mobile gamepad
  */
 void mobilegamepad_get_state(mobilegamepad_state_t* state)
 {
-    *state = is_enabled && is_visible ? current_state : IDLE_STATE;
+    *state = is_available ? current_state : IDLE_STATE;
 }
 
 /*
@@ -529,6 +539,15 @@ void enable_linear_filtering()
         image_t* image = actor_image(actor[i]);
         image_enable_linear_filtering(image);
     }
+}
+
+/* check if the back button [of the smartphone] is being pressed */
+bool is_back_button_down()
+{
+    ALLEGRO_KEYBOARD_STATE keyboard_state;
+    al_get_keyboard_state(&keyboard_state);
+
+    return al_key_down(&keyboard_state, ALLEGRO_KEY_BACK);
 }
 
 /* compute the current offset of the dpad stick

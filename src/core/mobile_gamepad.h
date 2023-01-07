@@ -55,6 +55,7 @@ void mobilegamepad_release();
 void mobilegamepad_update();
 void mobilegamepad_render();
 
+bool mobilegamepad_is_available();
 void mobilegamepad_get_state(mobilegamepad_state_t* state);
 
 void mobilegamepad_fadein();
