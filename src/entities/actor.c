@@ -275,9 +275,18 @@ v2d_t actor_action_spot(const actor_t* act)
     );
 
     /* flip the action spot relative to the hot spot */
-    return v2d_add(hot_spot, v2d_new(offset.x * sign.x, offset.y * sign.y));
+    return v2d_add(hot_spot, v2d_compmult(offset, sign));
 }
 
+/*
+ * actor_action_offset()
+ * An offset that, when added to the position of the actor in space, results
+ * in the position of the (appropriately flipped) action spot in space.
+ */
+v2d_t actor_action_offset(const actor_t* act)
+{
+    return v2d_subtract(actor_action_spot(act), act->hot_spot);
+}
 
 
 /* private stuff */

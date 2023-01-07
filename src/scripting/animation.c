@@ -358,13 +358,9 @@ surgescript_var_t* fun_getactionoffset(surgescript_object_t* object, const surge
     surgescript_objecthandle_t handle;
     surgescript_object_t* v2;
 
-    /* get the action spot */
+    /* get the action offset */
     const actor_t* actor = get_animation_actor(object);
-    v2d_t spot = actor != NULL ? actor_action_spot(actor) : v2d_new(0, 0);
-
-    /* compute the action offset: action_spot - hot_spot */
-    const animation_t* animation = scripting_animation_ptr(object);
-    v2d_t offset = v2d_subtract(spot, animation->hot_spot);
+    v2d_t offset = actor != NULL ? actor_action_offset(actor) : v2d_new(0, 0);
 
     /* lazy evaluation */
     if(surgescript_var_is_null(action_offset)) {

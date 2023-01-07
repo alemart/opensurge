@@ -71,6 +71,7 @@ bool actor_animation_finished(const actor_t *act); /* true if the current animat
 void actor_synchronize_animation(actor_t *act, bool sync); /* should I use a shared animation frame? */
 int actor_animation_frame(const actor_t* act);
 v2d_t actor_action_spot(const actor_t* act); /* action spot appropriately flipped */
+v2d_t actor_action_offset(const actor_t* act); /* action_spot - hot_spot */
 
 /* legacy */
 int actor_collision(const actor_t *a, const actor_t *b); /* tests bounding-box collision between a and b */
