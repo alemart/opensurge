@@ -55,6 +55,7 @@ const char* font_get_filepath(const font_t* f); /* get the relative path of the 
 void font_init(bool allow_font_smoothing); /* initializes the font module */
 void font_release(); /* releases the font module */
 void font_register_variable(const char* variable_name, const char* (*callback)()); /* variable/text interpolation */
+bool font_exists(const char* font_name); /* checks if a font script (.fnt) of the given name exists */
 
 
 #endif

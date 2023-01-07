@@ -264,6 +264,16 @@ void font_register_variable(const char* variable_name, const char* (*callback)()
 
 
 /*
+ * font_exists()
+ * Checks if a font script (.fnt) of the given name exists
+ */
+bool font_exists(const char* font_name)
+{
+    return fontdrv_list_find(font_name) != NULL;
+}
+
+
+/*
  * font_create()
  * Creates a new font object
  */
