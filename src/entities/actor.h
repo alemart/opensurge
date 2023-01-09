@@ -68,6 +68,7 @@ void actor_change_animation(actor_t *act, const animation_t *anim);
 void actor_change_animation_frame(actor_t *act, int frame);
 void actor_change_animation_speed_factor(actor_t *act, float factor); /* default factor: 1.0 */
 bool actor_animation_finished(const actor_t *act); /* true if the current animation has finished */
+bool actor_is_transition_animation_playing(const actor_t *act); /* true if a transition animation is playing */
 void actor_synchronize_animation(actor_t *act, bool sync); /* should I use a shared animation frame? */
 int actor_animation_frame(const actor_t* act);
 v2d_t actor_action_spot(const actor_t* act); /* action spot appropriately flipped */

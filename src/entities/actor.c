@@ -226,6 +226,20 @@ bool actor_animation_finished(const actor_t *act)
 
 
 /*
+ * actor_is_transition_animation_playing()
+ * Returns true if a transition animation is playing
+ */
+bool actor_is_transition_animation_playing(const actor_t *act)
+{
+    if(!act->animation)
+        return false;
+
+    return is_transition_animation(act->animation);
+}
+
+
+
+/*
  * actor_synchronize_animation()
  * should I use a shared animation frame?
  */
