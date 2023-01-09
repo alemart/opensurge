@@ -81,8 +81,8 @@ float v2d_dot(v2d_t u, v2d_t v)
 v2d_t v2d_rotate(v2d_t v, float radians)
 {
     return v2d_new(
-        v.x * cos(radians) - v.y * sin(radians),
-        v.y * cos(radians) + v.x * sin(radians)
+        v.x * cosf(radians) - v.y * sinf(radians),
+        v.y * cosf(radians) + v.x * sinf(radians)
     );
 }
 
@@ -98,7 +98,7 @@ v2d_t v2d_normalize(v2d_t v)
     if(!nearly_zero(length))
         return v2d_new(v.x / length, v.y / length);
     else
-        return v2d_new(0, 0);
+        return v2d_new(0.0f, 0.0f);
 }
 
 
