@@ -369,3 +369,9 @@ GAMEOVER_PART2              "IGRE"
 // Time Over
 TIMEOVER_PART1              "VREME"
 TIMEOVER_PART2              "JE ISTEKLO"
+
+// Pause Menu
+FIXME PAUSE_TITLE                 "PAUSE"
+FIXME PAUSE_CONTINUE              "CONTINUE"
+FIXME PAUSE_RESTART               "RESTART"
+FIXME PAUSE_EXIT                  "EXIT"

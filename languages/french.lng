@@ -362,3 +362,9 @@ GAMEOVER_PART2           "PERDU"
 // Time Over
 TIMEOVER_PART1           "TEMPS"
 TIMEOVER_PART2           "DEPASSE"
+
+// Pause Menu
+FIXME PAUSE_TITLE                 "PAUSE"
+FIXME PAUSE_CONTINUE              "CONTINUE"
+FIXME PAUSE_RESTART               "RESTART"
+FIXME PAUSE_EXIT                  "EXIT"

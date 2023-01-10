@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * pause.h - "pause" scene
+ * pause.h - pause menu
  * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *

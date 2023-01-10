@@ -1211,7 +1211,6 @@ void level_update()
 
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
-        sound_play(SFX_PAUSE);
         scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
         return;
     }

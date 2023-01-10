@@ -364,3 +364,9 @@ GAMEOVER_PART2              "OVER"
 // Time Over
 TIMEOVER_PART1              "KONIEC"
 TIMEOVER_PART2              "CZASU"
+
+// Pause Menu
+FIXME PAUSE_TITLE                 "PAUSE"
+FIXME PAUSE_CONTINUE              "CONTINUE"
+FIXME PAUSE_RESTART               "RESTART"
+FIXME PAUSE_EXIT                  "EXIT"

@@ -364,6 +364,12 @@ GAMEOVER_PART2              "OVER"
 TIMEOVER_PART1              "TIME"
 TIMEOVER_PART2              "OVER"
 
+// Pause Menu
+PAUSE_TITLE                 "PAUSE"
+PAUSE_CONTINUE              "CONTINUE"
+PAUSE_RESTART               "RESTART"
+PAUSE_EXIT                  "EXIT"
+
 
 
 //
@@ -384,6 +390,8 @@ COLOR_HIGHLIGHT             "ffee11"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 COLOR_EDITOR_HIGHLIGHT      "ffa060"
+PAUSE_HIGHLIGHT             "ffee11"
+PAUSE_UNHIGHLIGHT           "ffffff"
 
 // Input
 INPUT_DIRECTIONAL           "${INPUT_${INPUT_TYPE}_DIRECTIONAL}"

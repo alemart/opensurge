@@ -16,8 +16,12 @@ object "Default Pause and Quit"
         if(!Level.cleared) {
             if(input.buttonPressed("fire3"))
                 Level.pause();
+            /*
+            // the following is obsolete since Open Surge 0.6.1
+            // (not helpful in terms of user experience)
             else if(input.buttonPressed("fire4"))
                 Level.quit();
+            */
         }
     }
 }

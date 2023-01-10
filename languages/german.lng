@@ -368,3 +368,9 @@ GAMEOVER_PART2              "VORBEI"
 // Time Over
 TIMEOVER_PART1              "DIE ZEIT"
 TIMEOVER_PART2              "IST UM"
+
+// Pause Menu
+FIXME PAUSE_TITLE                 "PAUSE"
+FIXME PAUSE_CONTINUE              "CONTINUE"
+FIXME PAUSE_RESTART               "RESTART"
+FIXME PAUSE_EXIT                  "EXIT"

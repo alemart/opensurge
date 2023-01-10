@@ -1,0 +1,603 @@
+// -----------------------------------------------------------------------------
+// File: pause_menu.fnt
+// Description: fonts used in the Pause Menu
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// GoodNeighbors font by Clint Bellanger
+font "Pause Menu - Option"
+{
+    bitmap
+    {
+        source_file             "fonts/good_neighbors.png"
+        spacing                 -1 1
+
+        char " " {
+            source_rect         1 1 8 16
+        }
+        char "!" {
+            source_rect         10 1 6 16
+        }
+        char "\"" {
+            source_rect         17 1 7 16
+        }
+        char "#" {
+            source_rect         25 1 10 16
+        }
+        char "$" {
+            source_rect         36 1 10 16
+        }
+        char "%" {
+            source_rect         47 1 11 16
+        }
+        char "&" {
+            source_rect         59 1 11 16
+        }
+        char "'" {
+            source_rect         71 1 4 16
+        }
+        char "(" {
+            source_rect         76 1 6 16
+        }
+        char ")" {
+            source_rect         83 1 6 16
+        }
+        char "*" {
+            source_rect         90 1 10 16
+        }
+        char "+" {
+            source_rect         101 1 8 16
+        }
+        char "," {
+            source_rect         110 1 4 16
+        }
+        char "-" {
+            source_rect         115 1 9 16
+        }
+        char "." {
+            source_rect         125 1 4 16
+        }
+        char "/" {
+            source_rect         130 1 8 16
+        }
+        char "0" {
+            source_rect         139 1 8 16
+        }
+        char "1" {
+            source_rect         148 1 6 16
+        }
+        char "2" {
+            source_rect         155 1 8 16
+        }
+        char "3" {
+            source_rect         164 1 8 16
+        }
+        char "4" {
+            source_rect         173 1 9 16
+        }
+        char "5" {
+            source_rect         183 1 8 16
+        }
+        char "6" {
+            source_rect         192 1 8 16
+        }
+        char "7" {
+            source_rect         201 1 8 16
+        }
+        char "8" {
+            source_rect         210 1 8 16
+        }
+        char "9" {
+            source_rect         219 1 8 16
+        }
+        char ":" {
+            source_rect         228 1 4 16
+        }
+        char ";" {
+            source_rect         233 1 4 16
+        }
+        char "<" {
+            source_rect         238 1 9 16
+        }
+        char "=" {
+            source_rect         248 1 7 16
+        }
+        char ">" {
+            source_rect         256 1 9 16
+        }
+        char "?" {
+            source_rect         266 1 8 16
+        }
+        char "@" {
+            source_rect         275 1 10 16
+        }
+        char "A" {
+            source_rect         286 1 8 16
+        }
+        char "B" {
+            source_rect         295 1 8 16
+        }
+        char "C" {
+            source_rect         304 1 8 16
+        }
+        char "D" {
+            source_rect         313 1 9 16
+        }
+        char "E" {
+            source_rect         323 1 8 16
+        }
+        char "F" {
+            source_rect         332 1 8 16
+        }
+        char "G" {
+            source_rect         341 1 8 16
+        }
+        char "H" {
+            source_rect         350 1 8 16
+        }
+        char "I" {
+            source_rect         359 1 6 16
+        }
+        char "J" {
+            source_rect         366 1 9 16
+        }
+        char "K" {
+            source_rect         376 1 8 16
+        }
+        char "L" {
+            source_rect         385 1 8 16
+        }
+        char "M" {
+            source_rect         394 1 10 16
+        }
+        char "N" {
+            source_rect         405 1 9 16
+        }
+        char "O" {
+            source_rect         415 1 8 16
+        }
+        char "P" {
+            source_rect         424 1 8 16
+        }
+        char "Q" {
+            source_rect         433 1 9 16
+        }
+        char "R" {
+            source_rect         443 1 9 16
+        }
+        char "S" {
+            source_rect         453 1 8 16
+        }
+        char "T" {
+            source_rect         462 1 8 16
+        }
+        char "U" {
+            source_rect         471 1 8 16
+        }
+        char "V" {
+            source_rect         480 1 8 16
+        }
+        char "W" {
+            source_rect         489 1 10 16
+        }
+        char "X" {
+            source_rect         500 1 9 16
+        }
+        char "Y" {
+            source_rect         510 1 8 16
+        }
+        char "Z" {
+            source_rect         519 1 8 16
+        }
+        char "[" {
+            source_rect         528 1 6 16
+        }
+        char "\\" {
+            source_rect         535 1 8 16
+        }
+        char "]" {
+            source_rect         544 1 6 16
+        }
+        char "^" {
+            source_rect         551 1 11 16
+        }
+        char "_" {
+            source_rect         563 1 8 16
+        }
+        char "`" {
+            source_rect         572 1 8 16
+        }
+        char "a" {
+            source_rect         579 1 8 16
+        }
+        char "b" {
+            source_rect         588 1 8 16
+        }
+        char "c" {
+            source_rect         597 1 8 16
+        }
+        char "d" {
+            source_rect         606 1 8 16
+        }
+        char "e" {
+            source_rect         615 1 8 16
+        }
+        char "f" {
+            source_rect         624 1 7 16
+        }
+        char "g" {
+            source_rect         632 1 8 16
+        }
+        char "h" {
+            source_rect         641 1 8 16
+        }
+        char "i" {
+            source_rect         650 1 6 16
+        }
+        char "j" {
+            source_rect         657 1 6 16
+        }
+        char "k" {
+            source_rect         664 1 8 16
+        }
+        char "l" {
+            source_rect         673 1 5 16
+        }
+        char "m" {
+            source_rect         679 1 10 16
+        }
+        char "n" {
+            source_rect         690 1 8 16
+        }
+        char "o" {
+            source_rect         699 1 8 16
+        }
+        char "p" {
+            source_rect         708 1 8 16
+        }
+        char "q" {
+            source_rect         717 1 9 16
+        }
+        char "r" {
+            source_rect         727 1 8 16
+        }
+        char "s" {
+            source_rect         736 1 8 16
+        }
+        char "t" {
+            source_rect         745 1 8 16
+        }
+        char "u" {
+            source_rect         754 1 8 16
+        }
+        char "v" {
+            source_rect         763 1 8 16
+        }
+        char "w" {
+            source_rect         772 1 10 16
+        }
+        char "x" {
+            source_rect         783 1 8 16
+        }
+        char "y" {
+            source_rect         792 1 8 16
+        }
+        char "z" {
+            source_rect         801 1 8 16
+        }
+        char "{" {
+            source_rect         810 1 7 16
+        }
+        char "|" {
+            source_rect         818 1 4 16
+        }
+        char "}" {
+            source_rect         823 1 7 16
+        }
+        char "~" {
+            source_rect         831 1 9 16
+        }
+        char "\x7f" {
+            source_rect         841 1 10 16
+        }
+    }
+}
+
+font "Pause Menu - Title"
+{
+    bitmap
+    {
+        source_file             "fonts/good_neighbors.png"
+        spacing                 -2 2
+
+        char " " {
+            source_rect         2 20 16 32
+        }
+        char "!" {
+            source_rect         20 20 12 32
+        }
+        char "\"" {
+            source_rect         34 20 14 32
+        }
+        char "#" {
+            source_rect         50 20 20 32
+        }
+        char "$" {
+            source_rect         72 20 20 32
+        }
+        char "%" {
+            source_rect         94 20 22 32
+        }
+        char "&" {
+            source_rect         118 20 22 32
+        }
+        char "'" {
+            source_rect         142 20 8 32
+        }
+        char "(" {
+            source_rect         152 20 12 32
+        }
+        char ")" {
+            source_rect         166 20 12 32
+        }
+        char "*" {
+            source_rect         180 20 20 32
+        }
+        char "+" {
+            source_rect         202 20 16 32
+        }
+        char "," {
+            source_rect         220 20 8 32
+        }
+        char "-" {
+            source_rect         230 20 18 32
+        }
+        char "." {
+            source_rect         250 20 8 32
+        }
+        char "/" {
+            source_rect         260 20 16 32
+        }
+        char "0" {
+            source_rect         278 20 16 32
+        }
+        char "1" {
+            source_rect         296 20 12 32
+        }
+        char "2" {
+            source_rect         310 20 16 32
+        }
+        char "3" {
+            source_rect         328 20 16 32
+        }
+        char "4" {
+            source_rect         346 20 18 32
+        }
+        char "5" {
+            source_rect         366 20 16 32
+        }
+        char "6" {
+            source_rect         384 20 16 32
+        }
+        char "7" {
+            source_rect         402 20 16 32
+        }
+        char "8" {
+            source_rect         420 20 16 32
+        }
+        char "9" {
+            source_rect         438 20 16 32
+        }
+        char ":" {
+            source_rect         456 20 8 32
+        }
+        char ";" {
+            source_rect         466 20 8 32
+        }
+        char "<" {
+            source_rect         476 20 18 32
+        }
+        char "=" {
+            source_rect         496 20 14 32
+        }
+        char ">" {
+            source_rect         512 20 18 32
+        }
+        char "?" {
+            source_rect         532 20 16 32
+        }
+        char "@" {
+            source_rect         550 20 20 32
+        }
+        char "A" {
+            source_rect         572 20 16 32
+        }
+        char "B" {
+            source_rect         590 20 16 32
+        }
+        char "C" {
+            source_rect         608 20 16 32
+        }
+        char "D" {
+            source_rect         626 20 18 32
+        }
+        char "E" {
+            source_rect         646 20 16 32
+        }
+        char "F" {
+            source_rect         664 20 16 32
+        }
+        char "G" {
+            source_rect         682 20 16 32
+        }
+        char "H" {
+            source_rect         700 20 16 32
+        }
+        char "I" {
+            source_rect         718 20 12 32
+        }
+        char "J" {
+            source_rect         732 20 18 32
+        }
+        char "K" {
+            source_rect         752 20 16 32
+        }
+        char "L" {
+            source_rect         770 20 16 32
+        }
+        char "M" {
+            source_rect         788 20 20 32
+        }
+        char "N" {
+            source_rect         810 20 18 32
+        }
+        char "O" {
+            source_rect         830 20 16 32
+        }
+        char "P" {
+            source_rect         848 20 16 32
+        }
+        char "Q" {
+            source_rect         866 20 18 32
+        }
+        char "R" {
+            source_rect         886 20 18 32
+        }
+        char "S" {
+            source_rect         906 20 16 32
+        }
+        char "T" {
+            source_rect         924 20 16 32
+        }
+        char "U" {
+            source_rect         942 20 16 32
+        }
+        char "V" {
+            source_rect         960 20 16 32
+        }
+        char "W" {
+            source_rect         978 20 20 32
+        }
+        char "X" {
+            source_rect         1000 20 18 32
+        }
+        char "Y" {
+            source_rect         1020 20 16 32
+        }
+        char "Z" {
+            source_rect         1038 20 16 32
+        }
+        char "[" {
+            source_rect         1056 20 12 32
+        }
+        char "\\" {
+            source_rect         1070 20 16 32
+        }
+        char "]" {
+            source_rect         1088 20 12 32
+        }
+        char "^" {
+            source_rect         1102 20 22 32
+        }
+        char "_" {
+            source_rect         1126 20 16 32
+        }
+        char "`" {
+            source_rect         1144 20 16 32
+        }
+        char "a" {
+            source_rect         1158 20 16 32
+        }
+        char "b" {
+            source_rect         1176 20 16 32
+        }
+        char "c" {
+            source_rect         1194 20 16 32
+        }
+        char "d" {
+            source_rect         1212 20 16 32
+        }
+        char "e" {
+            source_rect         1230 20 16 32
+        }
+        char "f" {
+            source_rect         1248 20 14 32
+        }
+        char "g" {
+            source_rect         1264 20 16 32
+        }
+        char "h" {
+            source_rect         1282 20 16 32
+        }
+        char "i" {
+            source_rect         1300 20 12 32
+        }
+        char "j" {
+            source_rect         1314 20 12 32
+        }
+        char "k" {
+            source_rect         1328 20 16 32
+        }
+        char "l" {
+            source_rect         1346 20 10 32
+        }
+        char "m" {
+            source_rect         1358 20 20 32
+        }
+        char "n" {
+            source_rect         1380 20 16 32
+        }
+        char "o" {
+            source_rect         1398 20 16 32
+        }
+        char "p" {
+            source_rect         1416 20 16 32
+        }
+        char "q" {
+            source_rect         1434 20 18 32
+        }
+        char "r" {
+            source_rect         1454 20 16 32
+        }
+        char "s" {
+            source_rect         1472 20 16 32
+        }
+        char "t" {
+            source_rect         1490 20 16 32
+        }
+        char "u" {
+            source_rect         1508 20 16 32
+        }
+        char "v" {
+            source_rect         1526 20 16 32
+        }
+        char "w" {
+            source_rect         1544 20 20 32
+        }
+        char "x" {
+            source_rect         1566 20 16 32
+        }
+        char "y" {
+            source_rect         1584 20 16 32
+        }
+        char "z" {
+            source_rect         1602 20 16 32
+        }
+        char "{" {
+            source_rect         1620 20 14 32
+        }
+        char "|" {
+            source_rect         1636 20 8 32
+        }
+        char "}" {
+            source_rect         1646 20 14 32
+        }
+        char "~" {
+            source_rect         1662 20 18 32
+        }
+        char "\x7f" {
+            source_rect         1682 20 20 32
+        }
+    }
+}
