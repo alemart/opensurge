@@ -106,7 +106,7 @@ static const v2d_t RELATIVE_POSITION[] = {
 
 static const char* SPRITE_NAME[] = {
     [DPAD]          = "Mobile Gamepad - Directional Stick",
-    [DPAD_STICK]    = "Mobile Gamepad - Directional Stick",
+    [DPAD_STICK]    = "Mobile Gamepad - Directional Stick - Ball",
     [ACTION_BUTTON] = "Mobile Gamepad - Action Button"
 };
 
@@ -123,8 +123,8 @@ static const int DPAD_ANIMATION_NUMBER[16] = {
 };
 
 static const int DPAD_STICK_ANIMATION_NUMBER[] = {
-    [UNPRESSED] = 9,
-    [PRESSED]   = 10
+    [UNPRESSED] = 0,
+    [PRESSED]   = 1
 };
 
 static const int BUTTON_ANIMATION_NUMBER[] = {
@@ -405,6 +405,15 @@ bool mobilegamepad_is_available()
 }
 
 /*
+ * mobilegamepad_is_visible()
+ * Checks if the mobile gamepad is visible
+ */
+bool mobilegamepad_is_visible()
+{
+    return is_visible;
+}
+
+/*
  * mobilegamepad_get_state()
  * Reads the current state of the mobile gamepad
  */
@@ -419,7 +428,8 @@ void mobilegamepad_get_state(mobilegamepad_state_t* state)
  */
 void mobilegamepad_fadein()
 {
-    is_visible = true;
+    if(is_available)
+        is_visible = true;
 }
 
 /*
@@ -428,7 +438,8 @@ void mobilegamepad_fadein()
  */
 void mobilegamepad_fadeout()
 {
-    is_visible = false;
+    if(is_available)
+        is_visible = false;
 }
 
 
@@ -460,6 +471,10 @@ void trigger(int control, v2d_t offset)
 
             }
 
+            break;
+
+        case DPAD_STICK:
+            /* do nothing */
             break;
 
         default:
@@ -500,8 +515,8 @@ void update_actors()
 
     /* update the interactive radii of the controls based on the scale of the actors */
     for(int i = 0; i < NUM_CONTROLS; i++) {
-        v2d_t delta = v2d_subtract(actor_action_spot(actor[i]), actor[i]->hot_spot);
-        float unscaled_radius = v2d_magnitude(delta);
+        v2d_t action_offset = actor_action_offset(actor[i]);
+        float unscaled_radius = v2d_magnitude(action_offset);
 
         interactive_radius[i] = unscaled_radius * scale;
     }

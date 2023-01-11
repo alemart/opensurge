@@ -30,6 +30,31 @@
 // Generally, you should leave these settings as they are.
 //
 
+sprite "Mobile Gamepad - Action Button"
+{
+    source_file     "images/ui/mobile_gamepad.png"
+    source_rect     0 832 384 192
+    frame_size      192 192
+    hot_spot        96 96 // at the center
+    action_spot     192 96 // a point of the interactive circle
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
 sprite "Mobile Gamepad - Directional Stick"
 {
     source_file     "images/ui/mobile_gamepad.png"
@@ -109,33 +134,17 @@ sprite "Mobile Gamepad - Directional Stick"
         fps         8
         data        8
     }
-
-    // stick at the center (unpressed)
-    animation 9
-    {
-        repeat      TRUE
-        fps         8
-        data        9
-    }
-
-    // stick not at the center (pressed)
-    animation 10
-    {
-        repeat      TRUE
-        fps         8
-        data        10
-    }
 }
 
-sprite "Mobile Gamepad - Action Button"
+sprite "Mobile Gamepad - Directional Stick - Ball"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     0 832 384 192
-    frame_size      192 192
-    hot_spot        96 96 // at the center
-    action_spot     192 96 // a point of the interactive circle
+    source_rect     576 352 576 288
+    frame_size      288 288
+    hot_spot        144 144 // at the center
+    action_spot     336 144 // the same as "Mobile Gamepad - Directional Stick"
 
-    // unpressed
+    // unpressed & at the center
     animation 0
     {
         repeat      TRUE
@@ -143,7 +152,7 @@ sprite "Mobile Gamepad - Action Button"
         data        0
     }
 
-    // pressed
+    // pressed & not at the center
     animation 1
     {
         repeat      TRUE
