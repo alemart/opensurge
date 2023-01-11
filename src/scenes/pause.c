@@ -34,6 +34,7 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/asset.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../scenes/level.h"
 #include "../scripting/scripting.h"
@@ -52,10 +53,10 @@ enum pause_state_t
 #define INITIAL_STATE STATE_APPEARING
 static pause_state_t state = INITIAL_STATE;
 
-static bool update_appearing();
-static bool update_sustaining();
-static bool update_disappearing();
-static bool (*update[])() = {
+static void update_appearing();
+static void update_sustaining();
+static void update_disappearing();
+static void (*update[])() = {
     [STATE_APPEARING] = update_appearing,
     [STATE_SUSTAINING] = update_sustaining,
     [STATE_DISAPPEARING] = update_disappearing
@@ -94,10 +95,10 @@ enum { UNHIGHLIGHTED, HIGHLIGHTED };
 #define INITIAL_OPTION OPTION_CONTINUE
 static pause_option_t option = INITIAL_OPTION;
 
-static bool confirm_continue();
-static bool confirm_restart();
-static bool confirm_exit();
-static bool (*confirm[])() = {
+static void confirm_continue();
+static void confirm_restart();
+static void confirm_exit();
+static void (*confirm[])() = {
     [OPTION_CONTINUE] = confirm_continue,
     [OPTION_RESTART] = confirm_restart,
     [OPTION_EXIT] = confirm_exit
@@ -231,7 +232,7 @@ enum pause_sound_t {
     SOUND_APPEAR,           /* played when the pause menu is appearing */
     SOUND_HIGHLIGHT,        /* an option has just been highlighted */
     SOUND_CONFIRM,          /* the player has chosen an option */
-    SOUND_CANCEL,           /* the player has pushed the back button */
+    SOUND_CANCEL,           /* the player has pressed the back button */
 
     SOUND_COUNT             /* number of sound effects */
 };
@@ -247,8 +248,49 @@ static sound_t* sound[SOUND_COUNT] = { NULL };
 
 
 
-/* private data */
+/* overlay with a drag handle for mobile */
+#define DRAG_HANDLE_SPEED ((float)(VIDEO_SCREEN_H) / 0.25f) /* in px/s */
+#define DRAG_HANDLE_RADIUS 16 /*(min(image_width(actor_image(drag_handle)), image_height(actor_image(drag_handle))))*/
+static const char* DRAG_HANDLE_SPRITE_NAME = "Pause Menu - Drag Handle";
+static const int DRAG_HANDLE_ANIMATION_NUMBER = 0;
+static const float DRAG_HANDLE_FADE_TIME = 0.125f; /* in seconds */
+
+#define OVERLAY_COLOR color_rgba(0, 0, 0, 192)
+static enum {
+    OVERLAY_CLOSING,    /* move down; not dragging */
+    OVERLAY_DRAGGING,   /* dragging the handle */
+    OVERLAY_OPENING,    /* move up after dragging */
+    OVERLAY_FULLYOPEN,  /* change the scene */
+    OVERLAY_FINISHED    /* move down and exit the pause menu */
+} overlay_state = OVERLAY_CLOSING;
+
+static v2d_t read_mouse_position();
+static bool want_overlay();
+static bool is_holding_drag_handle();
+
+static void render_overlay();
+static void close_overlay();
+static void drag_overlay();
+static void open_overlay();
+static void fullyopen_overlay();
+static void finish_overlay();
+static void (*update_overlay[])() = {
+    [OVERLAY_CLOSING] = close_overlay,
+    [OVERLAY_DRAGGING] = drag_overlay,
+    [OVERLAY_OPENING] = open_overlay,
+    [OVERLAY_FULLYOPEN] = fullyopen_overlay,
+    [OVERLAY_FINISHED] = finish_overlay
+};
+
+static actor_t* drag_handle = NULL;
+static input_t* mouse_input = NULL;
+
+
+
+/* private stuff */
+#define changed_scene() (scenestack_top() != storyboard_get_scene(SCENE_PAUSE))
 static const float FADEOUT_TIME = 0.5f; /* in seconds */
+static bool was_mobilegamepad_visible = false;
 static image_t* snapshot = NULL;
 static input_t* input = NULL;
 
@@ -286,6 +328,10 @@ void pause_init(void *_)
     music_pause();
     scripting_pause_vm();
 
+    /* enable the mobile gamepad (just in case) */
+    was_mobilegamepad_visible = mobilegamepad_is_visible();
+    mobilegamepad_fadein();
+
     /* should we use the legacy mode? */
     legacy_mode = want_legacy_mode();
     if(legacy_mode) {
@@ -318,6 +364,15 @@ void pause_init(void *_)
     for(int i = 0; i < SOUND_COUNT; i++)
         sound[i] = sound_load(SOUND_PATH[i]);
 
+    /* initialize the mobile overlay */
+    overlay_state = OVERLAY_CLOSING;
+    mouse_input = input_create_mouse();
+    drag_handle = actor_create();
+    drag_handle->alpha = 0.0f;
+    drag_handle->visible = want_overlay();
+    drag_handle->position = v2d_new(0, VIDEO_SCREEN_H);
+    actor_change_animation(drag_handle, sprite_get_animation(DRAG_HANDLE_SPRITE_NAME, DRAG_HANDLE_ANIMATION_NUMBER));
+
     /* initialize the state */
     state = INITIAL_STATE;
     option = INITIAL_OPTION;
@@ -343,25 +398,27 @@ void pause_release()
     if(!legacy_mode) {
 
         /* release the actors */
-        for(int i = 0; i < SPRITE_COUNT; i++) {
-            if(actor[i] != NULL) {
-                actor_destroy(actor[i]);
-                actor[i] = NULL;
-            }
-        }
+        for(int i = 0; i < SPRITE_COUNT; i++)
+            actor_destroy(actor[i]);
 
         /* release the fonts */
-        for(int i = 0; i < TEXT_COUNT; i++) {
-            if(font[i] != NULL) {
-                font_destroy(font[i]);
-                font[i] = NULL;
-            }
-        }
+        for(int i = 0; i < TEXT_COUNT; i++)
+            font_destroy(font[i]);
 
         /* release the sound effects */
         /* done automatically by the resource manager */
 
+        /* release the drag handle for mobile */
+        input_destroy(mouse_input);
+        actor_destroy(drag_handle);
+
     }
+
+    /* restore the previous visibility of the mobile gamepad */
+    if(!was_mobilegamepad_visible)
+        mobilegamepad_fadeout(); /* seriously?! */
+    else
+        mobilegamepad_fadein(); /* just in case... */
 
     /* resume music & scripting */
     scripting_resume_vm();
@@ -386,7 +443,8 @@ void pause_update()
     }
 
     /* state update */
-    if(!update[state]())
+    update[state]();
+    if(changed_scene())
         return;
 
     /* animate the sprites */
@@ -446,31 +504,28 @@ void pause_render()
     for(int i = 0; i < TEXT_COUNT; i++)
         font_render(font[i], camera);
 
-    /* render the overlay */
-    /* TODO */
+    /* render the mobile overlay */
+    if(want_overlay())
+        render_overlay();
 }
-
 
 
 
 /* private */
 
 /* update logic: appearing state */
-bool update_appearing()
+void update_appearing()
 {
     /* wait for the appearing animation to finish */
     if(!actor_animation_finished(actor[SPRITE_BACKGROUND]))
-        return true;
+        return;
 
     /* change the state */
     state = STATE_SUSTAINING;
-
-    /* success! */
-    return true;
 }
 
 /* update logic: sustaining state */
-bool update_sustaining()
+void update_sustaining()
 {
     inputbutton_t next_button = NEXT_BUTTON[orientation];
     inputbutton_t previous_button = PREVIOUS_BUTTON[orientation];
@@ -504,55 +559,56 @@ bool update_sustaining()
         sound_play(sound[SOUND_CANCEL]);
     }
 
-    /* success! */
-    return true;
+    /* update the mobile overlay */
+    if(want_overlay()) {
+        update_overlay[overlay_state]();
+        /*if(changed_scene()) return;*/
+    }
 }
 
 /* update logic: disappearing state */
-bool update_disappearing()
+void update_disappearing()
 {
     /* wait for the disappearing animation to finish */
     if(!actor_animation_finished(actor[SPRITE_BACKGROUND]))
-        return true;
+        return;
 
     /* perform the necessary action */
-    return confirm[option]();
+    confirm[option]();
+    /*if(changed_scene()) return;*/
 }
 
 /* the player has chosen to continue playing */
-bool confirm_continue()
+void confirm_continue()
 {
     scenestack_pop();
-    return false;
 }
 
 /* the player has chosen to restart the level */
-bool confirm_restart()
+void confirm_restart()
 {
     if(fadefx_is_over()) {
         level_restart();
         scenestack_pop();
-        return false;
+        return;
     }
 
     color_t black = color_rgb(0, 0, 0);
     fadefx_out(black, FADEOUT_TIME);
-    return true;
 }
 
 /* the player has chosen to exit the game */
-bool confirm_exit()
+void confirm_exit()
 {
     if(fadefx_is_over()) {
         scenestack_pop();
         scenestack_pop();
         quest_abort();
-        return false;
+        return;
     }
 
     color_t black = color_rgb(0, 0, 0);
     fadefx_out(black, FADEOUT_TIME);
-    return true;
 }
 
 /* guess the best alignment for a font given its target position */
@@ -586,6 +642,156 @@ pause_orientation_t guess_orientation(v2d_t direction)
 }
 
 
+
+
+/* overlay with a drag handle for mobile */
+
+
+/* should we enable the mobile overlay */
+bool want_overlay()
+{
+    return mobilegamepad_is_available();
+}
+
+/* read the position of the cursor of the mouse in screen space */
+v2d_t read_mouse_position()
+{
+    v2d_t window_size = video_get_window_size();
+    v2d_t screen_size = video_get_screen_size();
+    v2d_t window_mouse = input_get_xy((inputmouse_t*)mouse_input);
+    v2d_t normalized_mouse = v2d_new(window_mouse.x / window_size.x, window_mouse.y / window_size.y);
+    v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
+
+    return mouse;
+}
+
+/* is the handle being dragged? */
+bool is_holding_drag_handle()
+{
+    /* skip calculations: definitely not dragging */
+    bool mouse_down = input_button_down(mouse_input, IB_FIRE1);
+    if(!mouse_down)
+        return false;
+
+    /* user is already dragging */
+    if(overlay_state == OVERLAY_DRAGGING)
+        return true;
+
+    /* user may start dragging now */
+    v2d_t mouse = read_mouse_position();
+    v2d_t handle_location = v2d_add(drag_handle->position, actor_action_offset(drag_handle));
+    v2d_t ds = v2d_subtract(mouse, handle_location);
+
+    return max(fabs(ds.x), fabs(ds.y)) <= DRAG_HANDLE_RADIUS;
+}
+
+/* render the drag handle */
+void render_overlay()
+{
+    v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
+    float dt = timer_get_delta();
+
+    /* fade-in & fade-out */
+    if(state == STATE_SUSTAINING)
+        drag_handle->alpha = min(1.0f, drag_handle->alpha + dt / DRAG_HANDLE_FADE_TIME);
+    else
+        drag_handle->alpha = max(0.0f, drag_handle->alpha - dt / DRAG_HANDLE_FADE_TIME);
+
+    /* render */
+    actor_render(drag_handle, camera);
+    image_rectfill(0, drag_handle->position.y, VIDEO_SCREEN_W, VIDEO_SCREEN_H, OVERLAY_COLOR);
+}
+
+/* overlay logic: closing */
+void close_overlay()
+{
+    if(!is_holding_drag_handle()) {
+
+        /* close the handle */
+        float dt = timer_get_delta();
+        drag_handle->position.y = min(VIDEO_SCREEN_H, drag_handle->position.y + DRAG_HANDLE_SPEED * dt);
+
+    }
+    else {
+
+        /* drag the handle */
+        overlay_state = OVERLAY_DRAGGING;
+
+    }
+}
+
+/* overlay logic: dragging */
+void drag_overlay()
+{
+    if(is_holding_drag_handle()) {
+
+        /* hide the mobile gamepad */
+        mobilegamepad_fadeout();
+
+        /* drag the handle */
+        drag_handle->position.y = read_mouse_position().y;
+
+        /* open the overlay */
+        if(drag_handle->position.y < VIDEO_SCREEN_H / 3)
+            overlay_state = OVERLAY_OPENING;
+
+    }
+    else {
+
+        /* show the mobile gamepad */
+        mobilegamepad_fadein();
+
+        /* close the overlay if stopped dragging */
+        overlay_state = OVERLAY_CLOSING;
+
+    }
+}
+
+/* overlay logic: opening */
+void open_overlay()
+{
+    /* open the overlay */
+    float dt = timer_get_delta();
+    drag_handle->position.y -= DRAG_HANDLE_SPEED * dt;
+
+    /* change the state */
+    if(drag_handle->position.y <= 0.0f) {
+        overlay_state = OVERLAY_FULLYOPEN;
+        drag_handle->position.y = 0.0f;
+    }
+}
+
+/* overlay logic: fully open */
+void fullyopen_overlay()
+{
+    /* move to the finished state */
+    overlay_state = OVERLAY_FINISHED;
+
+    /* change the scene */
+    scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
+}
+
+/* overlay logic: finish */
+void finish_overlay()
+{
+    /* move down */
+    float dt = timer_get_delta();
+    drag_handle->position.y += DRAG_HANDLE_SPEED * dt;
+
+    /* finish */
+    if(drag_handle->position.y >= VIDEO_SCREEN_H) {
+        drag_handle->position.y = VIDEO_SCREEN_H;
+
+        /* reset the state */
+        overlay_state = OVERLAY_CLOSING;
+        mobilegamepad_fadein();
+
+        /* resume game */
+        option = OPTION_CONTINUE;
+        state = STATE_DISAPPEARING;
+        sound_play(sound[SOUND_CANCEL]);
+    }
+}
 
 
 

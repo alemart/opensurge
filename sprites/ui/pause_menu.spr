@@ -208,3 +208,19 @@ sprite "Pause Menu - Option - Exit"
         data        31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
     }
 }
+
+sprite "Pause Menu - Drag Handle"
+{
+    source_file     "images/ui/pause_menu_drag_handle.png"
+    source_rect     0 0 426 16
+    frame_size      426 16
+    hot_spot        0 16
+    action_spot     213 0 // the spot that can be dragged
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
