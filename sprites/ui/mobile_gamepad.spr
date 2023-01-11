@@ -142,7 +142,7 @@ sprite "Mobile Gamepad - Directional Stick - Ball"
     source_rect     576 352 576 288
     frame_size      288 288
     hot_spot        144 144 // at the center
-    action_spot     336 144 // the same as "Mobile Gamepad - Directional Stick"
+    action_spot     172 144 // determines the length of the offset when pressed
 
     // unpressed & at the center
     animation 0

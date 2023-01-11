@@ -30,7 +30,7 @@
 
 
 /* settings */
-#define WANT_MOUSE_INPUT         0 /* Will the mobile gamepad will be activated by mouse input? For testing only */
+#define WANT_MOUSE_INPUT         1 /* Will the mobile gamepad will be activated by mouse input? For testing only */
 #define ENABLE_MOUSE_INPUT       ((WANT_MOUSE_INPUT) && !defined(__ANDROID__))
 #define ENABLE_MOBILE_GAMEPAD    (defined(__ANDROID__) || (ENABLE_MOUSE_INPUT))
 
@@ -144,15 +144,13 @@ static const float DPAD_STICK_ANGLE[16] = { /* clockwise (y-axis grows downwards
     [MOBILEGAMEPAD_DPAD_DOWN | MOBILEGAMEPAD_DPAD_RIGHT] = -315.0f * DEG2RAD
 };
 
-static const float DPAD_STICK_MOVEMENT_LENGTH = 0.2f; /* a value relative to the radius of the dpad */
-static const float DPAD_STICK_MOVEMENT_TIME = 0.05f; /* in seconds */
-
 #define DPAD_ANIMATION_NUMBER_MASK (sizeof(DPAD_ANIMATION_NUMBER) / sizeof(DPAD_ANIMATION_NUMBER[0]) - 1)
 VALIDATE_MASK(DPAD_ANIMATION_NUMBER_MASK);
 
 #define DPAD_STICK_ANGLE_MASK (sizeof(DPAD_STICK_ANGLE) / sizeof(DPAD_STICK_ANGLE[0]) - 1)
 VALIDATE_MASK(DPAD_STICK_ANGLE_MASK);
 
+static const float DPAD_STICK_MOVEMENT_TIME = 0.05f; /* in seconds */
 static const float FADE_TIME = 0.5f; /* used when showing/hiding the controls; given in seconds */
 
 
@@ -581,12 +579,9 @@ v2d_t dpad_stick_offset(float scale)
         transition = max(0.0f, transition - ds);
 
     /* compute the offset of the dpad stick using polar coordinates */
-    const image_t* dpad = actor_image(actor[DPAD]);
-    int dpad_width = image_width(dpad), dpad_height = image_height(dpad);
-
-    float unscaled_visual_radius = 0.5f * min(dpad_width, dpad_height);
-    float visual_radius = unscaled_visual_radius * scale;
-    float max_length = visual_radius * DPAD_STICK_MOVEMENT_LENGTH;
+    v2d_t action_offset = actor_action_offset(actor[DPAD_STICK]);
+    float unscaled_max_length = v2d_magnitude(action_offset);
+    float max_length = unscaled_max_length * scale;
     float current_length = max_length * transition;
 
     v2d_t unit_vector = v2d_new(cosf(angle), sinf(angle));
