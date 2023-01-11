@@ -870,5 +870,8 @@ bool want_legacy_mode()
             return true;
     }
 
+    if(!sprite_animation_exists(DRAG_HANDLE_SPRITE_NAME, DRAG_HANDLE_ANIMATION_NUMBER))
+        return true;
+
     return false;
 }
