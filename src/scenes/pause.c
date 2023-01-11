@@ -34,6 +34,7 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/asset.h"
+#include "../core/logfile.h"
 #include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../scenes/level.h"
@@ -288,6 +289,7 @@ static input_t* mouse_input = NULL;
 
 
 /* private stuff */
+#define LOG(...)        logfile_message("Pause Menu - " __VA_ARGS__)
 #define changed_scene() (scenestack_top() != storyboard_get_scene(SCENE_PAUSE))
 static const float FADEOUT_TIME = 0.5f; /* in seconds */
 static bool was_mobilegamepad_visible = false;
@@ -315,6 +317,9 @@ static bool want_legacy_mode();
 void pause_init(void *_)
 {
     (void)_;
+
+    /* log */
+    LOG("Paused the game");
 
     /* take a snapshot of the game */
     snapshot = image_clone(video_get_backbuffer());
@@ -395,6 +400,9 @@ void pause_init(void *_)
  */
 void pause_release()
 {
+    /* log */
+    LOG("Unpaused the game");
+
     if(!legacy_mode) {
 
         /* release the actors */
@@ -581,18 +589,30 @@ void update_disappearing()
 /* the player has chosen to continue playing */
 void confirm_continue()
 {
+    /* log */
+    LOG("Will continue the game");
+
+    /* back to game */
     scenestack_pop();
+    /*return;*/
 }
 
 /* the player has chosen to restart the level */
 void confirm_restart()
 {
     if(fadefx_is_over()) {
+
+        /* log */
+        LOG("Will restart the level");
+
+        /* restart the level */
         level_restart();
         scenestack_pop();
         return;
+
     }
 
+    /* fade out */
     color_t black = color_rgb(0, 0, 0);
     fadefx_out(black, FADEOUT_TIME);
 }
@@ -601,12 +621,19 @@ void confirm_restart()
 void confirm_exit()
 {
     if(fadefx_is_over()) {
+
+        /* log */
+        LOG("Will exit the game");
+
+        /* exit the game */
         scenestack_pop();
         scenestack_pop();
         quest_abort();
         return;
+
     }
 
+    /* fade out */
     color_t black = color_rgb(0, 0, 0);
     fadefx_out(black, FADEOUT_TIME);
 }
@@ -764,11 +791,15 @@ void open_overlay()
 /* overlay logic: fully open */
 void fullyopen_overlay()
 {
+    /* log */
+    LOG("Will load the mobile menu");
+
     /* move to the finished state */
     overlay_state = OVERLAY_FINISHED;
 
     /* change the scene */
     scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
+    /*return;*/
 }
 
 /* overlay logic: finish */
