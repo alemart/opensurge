@@ -212,10 +212,12 @@ sprite "Pause Menu - Option - Exit"
 sprite "Pause Menu - Drag Handle"
 {
     source_file     "images/ui/pause_menu_drag_handle.png"
-    source_rect     0 0 426 16
-    frame_size      426 16
-    hot_spot        0 16
-    action_spot     213 0 // the spot that can be dragged
+    source_rect     0 0 426 240
+    frame_size      426 240
+    hot_spot        213 240
+
+    // the spot that can be dragged
+    action_spot     213 224
 
     animation 0
     {

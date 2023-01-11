@@ -370,7 +370,7 @@ void pause_init(void *_)
     drag_handle = actor_create();
     drag_handle->alpha = 0.0f;
     drag_handle->visible = want_overlay();
-    drag_handle->position = v2d_new(0, VIDEO_SCREEN_H);
+    drag_handle->position = v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H);
     actor_change_animation(drag_handle, sprite_get_animation(DRAG_HANDLE_SPRITE_NAME, DRAG_HANDLE_ANIMATION_NUMBER));
 
     /* initialize the state */
@@ -698,8 +698,8 @@ void render_overlay()
         drag_handle->alpha = max(0.0f, drag_handle->alpha - dt / DRAG_HANDLE_FADE_TIME);
 
     /* render */
-    actor_render(drag_handle, camera);
     image_rectfill(0, drag_handle->position.y, VIDEO_SCREEN_W, VIDEO_SCREEN_H, OVERLAY_COLOR);
+    actor_render(drag_handle, camera);
 }
 
 /* overlay logic: closing */
