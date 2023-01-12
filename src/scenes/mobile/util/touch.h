@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * mobilemenu.h - menu for mobile devices
+ * touch.h - touch input utilities
  * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MOBILEMENU_H
-#define _MOBILEMENU_H
+#ifndef _MOBILEUTILTOUCH_H
+#define _MOBILEUTILTOUCH_H
 
-/* public functions */
-void mobilemenu_init(void*);
-void mobilemenu_update();
-void mobilemenu_render();
-void mobilemenu_release();
+#include "../../../core/v2d.h"
+
+struct input_t;
+
+void handle_touch_input(struct input_t* mouse_input, void (*on_touch_start)(v2d_t), void (*on_touch_end)(v2d_t,v2d_t), void (*on_touch_move)(v2d_t,v2d_t));
 
 #endif

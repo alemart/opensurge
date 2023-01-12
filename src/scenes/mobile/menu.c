@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * mobilemenu.h - menu for mobile devices
+ * menu.h - menu for mobile devices
  * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -19,15 +19,16 @@
  */
 
 #include <stdbool.h>
-#include "mobilemenu.h"
-#include "../core/scene.h"
-#include "../core/timer.h"
-#include "../core/util.h"
-#include "../core/video.h"
-#include "../core/image.h"
-#include "../core/input.h"
-#include "../core/logfile.h"
-#include "../entities/actor.h"
+#include "menu.h"
+#include "util/touch.h"
+#include "../../core/scene.h"
+#include "../../core/timer.h"
+#include "../../core/util.h"
+#include "../../core/video.h"
+#include "../../core/image.h"
+#include "../../core/input.h"
+#include "../../core/logfile.h"
+#include "../../entities/actor.h"
 
 /* buttons */
 typedef enum mobilemenu_button_t mobilemenu_button_t;
@@ -119,8 +120,6 @@ static void (*update[])() = {
 #define LOG(...)        logfile_message("Mobile Menu - " __VA_ARGS__)
 static input_t* input = NULL;
 static input_t* mouse_input = NULL;
-static v2d_t read_mouse_position();
-static void handle_touch_input();
 static void on_touch_start(v2d_t touch_start);
 static void on_touch_end(v2d_t touch_start, v2d_t touch_end);
 static void on_touch_move(v2d_t touch_start, v2d_t touch_current);
@@ -293,7 +292,8 @@ void update_disappearing()
 /* waiting: detect if any button is pressed */
 void update_waiting()
 {
-    handle_touch_input();
+    /* handle touch input */
+    handle_touch_input(mouse_input, on_touch_start, on_touch_end, on_touch_move);
 
     /* animate buttons */
     for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
@@ -335,43 +335,6 @@ void update_triggered_info()
 
 
 /* input handling */
-
-/* read the position of the cursor of the mouse in screen space */
-v2d_t read_mouse_position()
-{
-    v2d_t window_size = video_get_window_size();
-    v2d_t screen_size = video_get_screen_size();
-    v2d_t window_mouse = input_get_xy((inputmouse_t*)mouse_input);
-    v2d_t normalized_mouse = v2d_new(window_mouse.x / window_size.x, window_mouse.y / window_size.y);
-    v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
-
-    return mouse;
-}
-
-/* detect touch input */
-void handle_touch_input()
-{
-    static v2d_t touch_start, touch_end;
-
-    if(input_button_up(mouse_input, IB_FIRE1)) {
-        touch_end = read_mouse_position();
-        on_touch_end(touch_start, touch_end);
-        return;
-    }
-
-    if(input_button_pressed(mouse_input, IB_FIRE1)) {
-        touch_start = read_mouse_position();
-        on_touch_start(touch_start);
-        return;
-    }
-
-    if(input_button_down(mouse_input, IB_FIRE1)) {
-        v2d_t touch_current = read_mouse_position();
-        on_touch_move(touch_start, touch_current);
-        return;
-    }
-}
-
 void on_touch_start(v2d_t touch_start)
 {
     mobilemenu_button_t b = button_at(touch_start);

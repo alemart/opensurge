@@ -33,7 +33,7 @@
 #include "../scenes/stageselect.h"
 #include "../scenes/editorhelp.h"
 #include "../scenes/editorpal.h"
-#include "../scenes/mobilemenu.h"
+#include "../scenes/mobile/menu.h"
 
 /* private stuff */
 #define STORYBOARD_CAPACITY         32     /* up to this amount of scenes in the storyboard */

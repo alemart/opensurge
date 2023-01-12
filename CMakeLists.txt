@@ -305,6 +305,8 @@ SET(GAME_SRCS
   src/core/v2d.c
   src/core/video.c
 
+  src/scenes/mobile/util/touch.c
+  src/scenes/mobile/menu.c
   src/scenes/util/editorcmd.c
   src/scenes/util/editorgrp.c
   src/scenes/util/grouptree.c
@@ -317,7 +319,6 @@ SET(GAME_SRCS
   src/scenes/intro.c
   src/scenes/langselect.c
   src/scenes/level.c
-  src/scenes/mobilemenu.c
   src/scenes/options.c
   src/scenes/pause.c
   src/scenes/quest.c
@@ -420,6 +421,8 @@ SET(GAME_HEADERS
   src/core/video.h
   src/core/v2d.h
 
+  src/scenes/mobile/util/touch.h
+  src/scenes/mobile/menu.h
   src/scenes/util/editorcmd.h
   src/scenes/util/editorgrp.h
   src/scenes/util/grouptree.h
@@ -432,7 +435,6 @@ SET(GAME_HEADERS
   src/scenes/intro.h
   src/scenes/langselect.h
   src/scenes/level.h
-  src/scenes/mobilemenu.h
   src/scenes/options.h
   src/scenes/pause.h
   src/scenes/quest.h
