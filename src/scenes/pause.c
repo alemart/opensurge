@@ -47,7 +47,7 @@ typedef enum pause_state_t pause_state_t;
 enum pause_state_t
 {
     STATE_APPEARING,    /* the player has just paused the game */
-    STATE_SUSTAINING,   /* waiting for player input */
+    STATE_WAITING,   /* waiting for player input */
     STATE_DISAPPEARING  /* closing the pause menu */
 };
 
@@ -55,11 +55,11 @@ enum pause_state_t
 static pause_state_t state = INITIAL_STATE;
 
 static void update_appearing();
-static void update_sustaining();
+static void update_waiting();
 static void update_disappearing();
 static void (*update[])() = {
     [STATE_APPEARING] = update_appearing,
-    [STATE_SUSTAINING] = update_sustaining,
+    [STATE_WAITING] = update_waiting,
     [STATE_DISAPPEARING] = update_disappearing
 };
 
@@ -173,7 +173,7 @@ static const char* SPRITE_NAME[] = {
 };
 
 static const int ANIMATION_NUMBER[][3] = {
-    [SPRITE_BACKGROUND] =   { [STATE_APPEARING] = 1, [STATE_SUSTAINING] = 2, [STATE_DISAPPEARING] = 3 },
+    [SPRITE_BACKGROUND] =   { [STATE_APPEARING] = 1, [STATE_WAITING] = 2, [STATE_DISAPPEARING] = 3 },
     [SPRITE_CONTINUE] =     { [HIGHLIGHTED] = 1, [UNHIGHLIGHTED] = 0 },
     [SPRITE_RESTART] =      { [HIGHLIGHTED] = 1, [UNHIGHLIGHTED] = 0 },
     [SPRITE_EXIT] =         { [HIGHLIGHTED] = 1, [UNHIGHLIGHTED] = 0 }
@@ -250,8 +250,10 @@ static sound_t* sound[SOUND_COUNT] = { NULL };
 
 
 /* overlay with a drag handle for mobile */
-#define DRAG_HANDLE_SPEED ((float)(VIDEO_SCREEN_H) / 0.25f) /* in px/s */
-#define DRAG_HANDLE_RADIUS 16 /*(min(image_width(actor_image(drag_handle)), image_height(actor_image(drag_handle))))*/
+#define DRAG_HANDLE_SPEED               ((float)(VIDEO_SCREEN_H) / 0.25f) /* in px/s */
+#define DRAG_HANDLE_RADIUS              16 /*(min(image_width(actor_image(drag_handle)), image_height(actor_image(drag_handle))))*/
+#define DRAG_HANDLE_MINDIST             ((VIDEO_SCREEN_H * 2) / 3) /* minimum distance required to open the overlay */
+#define DRAG_HANDLE_INITIAL_POSITION    (v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H))
 static const char* DRAG_HANDLE_SPRITE_NAME = "Pause Menu - Drag Handle";
 static const int DRAG_HANDLE_ANIMATION_NUMBER = 0;
 static const float DRAG_HANDLE_FADE_TIME = 0.125f; /* in seconds */
@@ -375,7 +377,7 @@ void pause_init(void *_)
     drag_handle = actor_create();
     drag_handle->alpha = 0.0f;
     drag_handle->visible = want_overlay();
-    drag_handle->position = v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H);
+    drag_handle->position = DRAG_HANDLE_INITIAL_POSITION;
     actor_change_animation(drag_handle, sprite_get_animation(DRAG_HANDLE_SPRITE_NAME, DRAG_HANDLE_ANIMATION_NUMBER));
 
     /* initialize the state */
@@ -459,7 +461,7 @@ void pause_update()
     #define ANIMATE_SPRITE(s, a) actor_change_animation(actor[s], ANIMATION(s, a))
     #define ANIMATE_OPTION(s, o) do { \
         if(!actor_is_transition_animation_playing(actor[s])) \
-            ANIMATE_SPRITE((s), option == (o) && state == STATE_SUSTAINING ? HIGHLIGHTED : UNHIGHLIGHTED); \
+            ANIMATE_SPRITE((s), option == (o) && state == STATE_WAITING ? HIGHLIGHTED : UNHIGHLIGHTED); \
     } while(0)
 
     ANIMATE_SPRITE(SPRITE_BACKGROUND, state);
@@ -474,7 +476,7 @@ void pause_update()
         font_set_position(font[i], v2d_add(actor[parent]->position, action_offset));
 
         font_set_align(font[i], guess_font_align(font[i], font_get_position(font[i])));
-        font_set_visible(font[i], state == STATE_SUSTAINING);
+        font_set_visible(font[i], state == STATE_WAITING);
     }
 
     /* colorize the options */
@@ -529,11 +531,11 @@ void update_appearing()
         return;
 
     /* change the state */
-    state = STATE_SUSTAINING;
+    state = STATE_WAITING;
 }
 
-/* update logic: sustaining state */
-void update_sustaining()
+/* update logic: waiting state */
+void update_waiting()
 {
     inputbutton_t next_button = NEXT_BUTTON[orientation];
     inputbutton_t previous_button = PREVIOUS_BUTTON[orientation];
@@ -719,7 +721,7 @@ void render_overlay()
     float dt = timer_get_delta();
 
     /* fade-in & fade-out */
-    if(state == STATE_SUSTAINING)
+    if(state == STATE_WAITING)
         drag_handle->alpha = min(1.0f, drag_handle->alpha + dt / DRAG_HANDLE_FADE_TIME);
     else
         drag_handle->alpha = max(0.0f, drag_handle->alpha - dt / DRAG_HANDLE_FADE_TIME);
@@ -759,7 +761,9 @@ void drag_overlay()
         drag_handle->position.y = read_mouse_position().y;
 
         /* open the overlay */
-        if(drag_handle->position.y < VIDEO_SCREEN_H / 3)
+        float initial_position = DRAG_HANDLE_INITIAL_POSITION.y;
+        float drag_distance = fabs(drag_handle->position.y - initial_position);
+        if(drag_distance >= DRAG_HANDLE_MINDIST)
             overlay_state = OVERLAY_OPENING;
 
     }

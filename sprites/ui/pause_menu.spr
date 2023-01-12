@@ -9,11 +9,11 @@
 // The Pause Menu animation is divided into 3 phases:
 //
 // phase 1: appearing
-// phase 2: sustaining
+// phase 2: waiting
 // phase 3: disappearing
 //
 // These phases are played sequentially. The user will select an option during
-// the sustaining phase. When an option is chosen, the pause menu disappears.
+// the waiting phase. When an option is chosen, the pause menu disappears.
 //
 // The options are: Continue, Restart and Exit (in this order). They can be
 // either highlighed or unhighlighted. Only one option will be highlighted at
@@ -45,7 +45,7 @@ sprite "Pause Menu"
         data        0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
     }
 
-    // sustaining
+    // waiting
     animation 2
     {
         repeat      TRUE
