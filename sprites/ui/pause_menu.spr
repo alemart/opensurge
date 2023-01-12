@@ -214,6 +214,8 @@ sprite "Pause Menu - Drag Handle"
     source_file     "images/ui/pause_menu_drag_handle.png"
     source_rect     0 0 426 240
     frame_size      426 240
+
+    // this must be at the (center, bottom) of the screen
     hot_spot        213 240
 
     // the spot that can be dragged
