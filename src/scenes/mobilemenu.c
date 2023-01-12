@@ -46,9 +46,8 @@ enum mobilemenu_button_t
 typedef enum mobilemenu_buttonstate_t mobilemenu_buttonstate_t;
 enum mobilemenu_buttonstate_t
 {
-    UNPRESSED,  /* idle */
-    PRESSED,    /* held down */
-    TRIGGERED   /* will trigger an action */
+    UNPRESSED,
+    PRESSED
 };
 
 static const char* SPRITE_NAME[] = {
@@ -60,8 +59,7 @@ static const char* SPRITE_NAME[] = {
 
 static const int ANIMATION_NUMBER[] = {
     [UNPRESSED] = 0,
-    [PRESSED] = 1,
-    [TRIGGERED] = 0,
+    [PRESSED] = 1
 };
 
 static struct {
@@ -72,7 +70,7 @@ static struct {
 static const v2d_t INITIAL_BUTTON_POSITION = (v2d_t){ .x = 0, .y = 0 };
 static v2d_t next_button_position(v2d_t button_position, const image_t* button_image);
 static mobilemenu_button_t button_at(v2d_t position);
-static void update_button(mobilemenu_button_t b);
+static void animate_button(mobilemenu_button_t b);
 
 /* menu state */
 typedef enum mobilemenustate_t mobilemenustate_t;
@@ -150,20 +148,17 @@ void mobilemenu_init(void *game_screenshot)
     input = input_create_user(NULL);
 
     v2d_t button_position = INITIAL_BUTTON_POSITION;
-    for(int i = 0; i < BUTTON_COUNT; i++) {
-        button[i].state = UNPRESSED;
-        button[i].actor = actor_create();
-        button[i].actor->alpha = 0.0f;
-        button[i].actor->position = button_position;
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++) {
+        button[b].state = UNPRESSED;
 
-        actor_change_animation(
-            button[i].actor,
-            sprite_get_animation(SPRITE_NAME[i], ANIMATION_NUMBER[button[i].state])
-        );
+        button[b].actor = actor_create();
+        button[b].actor->alpha = 0.0f;
+        button[b].actor->position = button_position;
+        animate_button(b);
 
         button_position = next_button_position(
             button_position,
-            actor_image(button[i].actor)
+            actor_image(button[b].actor)
         );
     }
 }
@@ -191,8 +186,8 @@ void mobilemenu_render()
 
     image_blit(background, 0, 0, 0, 0, image_width(background), image_height(background));
 
-    for(int i = 0; i < BUTTON_COUNT; i++)
-        actor_render(button[i].actor, camera);
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
+        actor_render(button[b].actor, camera);
 }
 
 
@@ -205,8 +200,8 @@ void mobilemenu_release()
 {
     LOG("Left the mobile menu");
 
-    for(int i = 0; i < BUTTON_COUNT; i++)
-        actor_destroy(button[i].actor);
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
+        actor_destroy(button[b].actor);
 
     input_destroy(input);
     input_destroy(mouse_input);
@@ -239,27 +234,22 @@ v2d_t next_button_position(v2d_t button_position, const image_t* button_image)
 /* the button that is displayed at a particular point in the screen */
 mobilemenu_button_t button_at(v2d_t position)
 {
-    for(int i = 0; i < BUTTON_COUNT; i++) {
-        v2d_t d = v2d_subtract(position, button[i].actor->position);
-        int w = image_width(actor_image(button[i].actor));
-        int h = image_height(actor_image(button[i].actor));
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++) {
+        v2d_t d = v2d_subtract(position, button[b].actor->position);
+        int w = image_width(actor_image(button[b].actor));
+        int h = image_height(actor_image(button[b].actor));
 
         if(0.0f <= d.x && d.x < w) {
             if(0.0f <= d.y && d.y < h)
-                return (mobilemenu_button_t)i;
+                return b;
         }
     }
 
     return BUTTON_NONE;
 }
 
-void update_button(mobilemenu_button_t b)
+void animate_button(mobilemenu_button_t b)
 {
-    if(button[b].state == TRIGGERED) {
-        button[b].state = UNPRESSED;
-        state = TRIGGERED_STATE[b];
-    }
-
     actor_change_animation(
         button[b].actor,
         sprite_get_animation(SPRITE_NAME[b], ANIMATION_NUMBER[button[b].state])
@@ -277,10 +267,10 @@ void update_appearing()
     float alpha = button[BUTTON_BACK].actor->alpha;
 
     alpha = min(1.0f, alpha + dt / FADE_TIME);
-    for(int i = 0; i < BUTTON_COUNT; i++)
-        button[i].actor->alpha = alpha;
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
+        button[b].actor->alpha = alpha;
 
-    if(alpha == 1.0f)
+    if(alpha >= 1.0f)
         state = WAITING;
 }
 
@@ -291,10 +281,10 @@ void update_disappearing()
     float alpha = button[BUTTON_BACK].actor->alpha;
 
     alpha = max(0.0f, alpha - dt / FADE_TIME);
-    for(int i = 0; i < BUTTON_COUNT; i++)
-        button[i].actor->alpha = alpha;
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
+        button[b].actor->alpha = alpha;
 
-    if(alpha == 0.0f) {
+    if(alpha <= 0.0f) {
         scenestack_pop();
         /*return;*/
     }
@@ -305,9 +295,9 @@ void update_waiting()
 {
     handle_touch_input();
 
-    /* check if a screen on the screen button has been pressed */
-    for(int i = 0; i < BUTTON_COUNT; i++)
-        update_button(i);
+    /* animate buttons */
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
+        animate_button(b);
 
     /* check if the back button of the smartphone has been pressed */
     if(input_button_pressed(input, BACK_BUTTON))
@@ -343,7 +333,20 @@ void update_triggered_info()
 }
 
 
-/* touch events */
+
+/* input handling */
+
+/* read the position of the cursor of the mouse in screen space */
+v2d_t read_mouse_position()
+{
+    v2d_t window_size = video_get_window_size();
+    v2d_t screen_size = video_get_screen_size();
+    v2d_t window_mouse = input_get_xy((inputmouse_t*)mouse_input);
+    v2d_t normalized_mouse = v2d_new(window_mouse.x / window_size.x, window_mouse.y / window_size.y);
+    v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
+
+    return mouse;
+}
 
 /* detect touch input */
 void handle_touch_input()
@@ -381,40 +384,28 @@ void on_touch_start(v2d_t touch_start)
 
 void on_touch_end(v2d_t touch_start, v2d_t touch_end)
 {
-    mobilemenu_button_t b = button_at(touch_start);
-    mobilemenu_button_t p = button_at(touch_end);
+    mobilemenu_button_t p = button_at(touch_start);
+    mobilemenu_button_t q = button_at(touch_end);
 
-    if(b == BUTTON_NONE || b != p)
+    if(p == BUTTON_NONE || p != q)
         return;
 
-    for(int i = 0; i < BUTTON_COUNT; i++) {
-        if(button[i].state == PRESSED)
-            button[i].state = TRIGGERED;
-        else
-            button[i].state = UNPRESSED;
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++) {
+        if(button[b].state == PRESSED)
+            state = TRIGGERED_STATE[b];
+
+        button[b].state = UNPRESSED;
     }
 }
 
 void on_touch_move(v2d_t touch_start, v2d_t touch_current)
 {
-    mobilemenu_button_t b = button_at(touch_start);
-    mobilemenu_button_t p = button_at(touch_current);
+    mobilemenu_button_t p = button_at(touch_start);
+    mobilemenu_button_t q = button_at(touch_current);
 
-    if(b == BUTTON_NONE || b == p)
+    if(p == BUTTON_NONE || p == q)
         return;
 
-    for(int i = 0; i < BUTTON_COUNT; i++)
-        button[i].state = UNPRESSED;
-}
-
-/* read the position of the cursor of the mouse in screen space */
-v2d_t read_mouse_position()
-{
-    v2d_t window_size = video_get_window_size();
-    v2d_t screen_size = video_get_screen_size();
-    v2d_t window_mouse = input_get_xy((inputmouse_t*)mouse_input);
-    v2d_t normalized_mouse = v2d_new(window_mouse.x / window_size.x, window_mouse.y / window_size.y);
-    v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
-
-    return mouse;
+    for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
+        button[b].state = UNPRESSED;
 }
