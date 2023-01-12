@@ -317,6 +317,7 @@ SET(GAME_SRCS
   src/scenes/intro.c
   src/scenes/langselect.c
   src/scenes/level.c
+  src/scenes/mobilemenu.c
   src/scenes/options.c
   src/scenes/pause.c
   src/scenes/quest.c
@@ -431,6 +432,7 @@ SET(GAME_HEADERS
   src/scenes/intro.h
   src/scenes/langselect.h
   src/scenes/level.h
+  src/scenes/mobilemenu.h
   src/scenes/options.h
   src/scenes/pause.h
   src/scenes/quest.h

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * storyboard.h - storyboard (stores the scenes of the game)
+ * mobilemenu.h - menu for mobile devices
  * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,29 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _STORYBOARD_H
-#define _STORYBOARD_H
+#ifndef _MOBILEMENU_H
+#define _MOBILEMENU_H
 
-/* available scenes */
-typedef enum scenetype_t {
-    SCENE_INTRO,
-    SCENE_LEVEL,
-    SCENE_PAUSE,
-    SCENE_GAMEOVER,
-    SCENE_QUEST,
-    SCENE_CONFIRMBOX,
-    SCENE_LANGSELECT,
-    SCENE_CREDITS,
-    SCENE_OPTIONS,
-    SCENE_STAGESELECT,
-    SCENE_EDITORHELP,
-    SCENE_EDITORPAL,
-    SCENE_MOBILEMENU
-} scenetype_t;
-
-/* Storyboard */
-void storyboard_init();
-void storyboard_release();
-struct scene_t* storyboard_get_scene(scenetype_t type);
+/* public functions */
+void mobilemenu_init(void*);
+void mobilemenu_update();
+void mobilemenu_render();
+void mobilemenu_release();
 
 #endif

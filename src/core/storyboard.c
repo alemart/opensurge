@@ -33,6 +33,7 @@
 #include "../scenes/stageselect.h"
 #include "../scenes/editorhelp.h"
 #include "../scenes/editorpal.h"
+#include "../scenes/mobilemenu.h"
 
 /* private stuff */
 #define STORYBOARD_CAPACITY         32     /* up to this amount of scenes in the storyboard */
@@ -63,6 +64,7 @@ void storyboard_init()
     storyboard[SCENE_STAGESELECT] = scene_create(stageselect_init, stageselect_update, stageselect_render, stageselect_release);
     storyboard[SCENE_EDITORHELP] = scene_create(editorhelp_init, editorhelp_update, editorhelp_render, editorhelp_release);
     storyboard[SCENE_EDITORPAL] = scene_create(editorpal_init, editorpal_update, editorpal_render, editorpal_release);
+    storyboard[SCENE_MOBILEMENU] = scene_create(mobilemenu_init, mobilemenu_update, mobilemenu_render, mobilemenu_release);
 }
 
 

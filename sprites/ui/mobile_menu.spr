@@ -1,0 +1,102 @@
+// -----------------------------------------------------------------------------
+// File: mobile_menu.spr
+// Description: sprites displayed in the menu for mobile devices
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+sprite "Mobile Menu - Back"
+{
+    source_file     "images/ui/mobile_menu.png"
+    source_rect     0 0 240 120
+    frame_size      120 120
+    hot_spot        0 0
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Mobile Menu - Screenshot"
+{
+    source_file     "images/ui/mobile_menu.png"
+    source_rect     0 120 240 120
+    frame_size      120 120
+    hot_spot        0 0
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Mobile Menu - Debug"
+{
+    source_file     "images/ui/mobile_menu.png"
+    source_rect     0 240 240 120
+    frame_size      120 120
+    hot_spot        0 0
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Mobile Menu - Info"
+{
+    source_file     "images/ui/mobile_menu.png"
+    source_rect     0 360 240 120
+    frame_size      120 120
+    hot_spot        0 0
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}

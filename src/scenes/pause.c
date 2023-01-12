@@ -252,7 +252,7 @@ static sound_t* sound[SOUND_COUNT] = { NULL };
 /* overlay with a drag handle for mobile */
 #define DRAG_HANDLE_SPEED               ((float)(VIDEO_SCREEN_H) / 0.25f) /* in px/s */
 #define DRAG_HANDLE_RADIUS              16 /*(min(image_width(actor_image(drag_handle)), image_height(actor_image(drag_handle))))*/
-#define DRAG_HANDLE_MINDIST             ((VIDEO_SCREEN_H * 2) / 3) /* minimum distance required to open the overlay */
+#define DRAG_HANDLE_MINDIST             (VIDEO_SCREEN_H / 2) /* minimum distance required to open the overlay */
 #define DRAG_HANDLE_INITIAL_POSITION    (v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H))
 static const char* DRAG_HANDLE_SPRITE_NAME = "Pause Menu - Drag Handle";
 static const int DRAG_HANDLE_ANIMATION_NUMBER = 0;
@@ -802,7 +802,7 @@ void fullyopen_overlay()
     overlay_state = OVERLAY_FINISHED;
 
     /* change the scene */
-    scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
+    scenestack_push(storyboard_get_scene(SCENE_MOBILEMENU), snapshot);
     /*return;*/
 }
 
