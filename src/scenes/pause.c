@@ -39,6 +39,7 @@
 #include "../entities/actor.h"
 #include "../scenes/level.h"
 #include "../scripting/scripting.h"
+#include "mobile/util/touch.h"
 
 
 
@@ -267,11 +268,9 @@ static enum {
     OVERLAY_FINISHED    /* move down and exit the pause menu */
 } overlay_state = OVERLAY_CLOSING;
 
-static v2d_t read_mouse_position();
 static bool want_overlay();
-static bool is_holding_drag_handle();
-
 static void render_overlay();
+
 static void close_overlay();
 static void drag_overlay();
 static void open_overlay();
@@ -284,6 +283,10 @@ static void (*update_overlay[])() = {
     [OVERLAY_FULLYOPEN] = fullyopen_overlay,
     [OVERLAY_FINISHED] = finish_overlay
 };
+
+static void on_touch_start(v2d_t touch_start);
+static void on_touch_end(v2d_t touch_start, v2d_t touch_end);
+static void on_touch_move(v2d_t touch_start, v2d_t touch_current);
 
 static actor_t* drag_handle = NULL;
 static input_t* mouse_input = NULL;
@@ -682,38 +685,6 @@ bool want_overlay()
     return mobilegamepad_is_available();
 }
 
-/* read the position of the cursor of the mouse in screen space */
-v2d_t read_mouse_position()
-{
-    v2d_t window_size = video_get_window_size();
-    v2d_t screen_size = video_get_screen_size();
-    v2d_t window_mouse = input_get_xy((inputmouse_t*)mouse_input);
-    v2d_t normalized_mouse = v2d_new(window_mouse.x / window_size.x, window_mouse.y / window_size.y);
-    v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
-
-    return mouse;
-}
-
-/* is the handle being dragged? */
-bool is_holding_drag_handle()
-{
-    /* skip calculations: definitely not dragging */
-    bool mouse_down = input_button_down(mouse_input, IB_FIRE1);
-    if(!mouse_down)
-        return false;
-
-    /* user is already dragging */
-    if(overlay_state == OVERLAY_DRAGGING)
-        return true;
-
-    /* user may start dragging now */
-    v2d_t mouse = read_mouse_position();
-    v2d_t handle_location = v2d_add(drag_handle->position, actor_action_offset(drag_handle));
-    v2d_t ds = v2d_subtract(mouse, handle_location);
-
-    return max(fabs(ds.x), fabs(ds.y)) <= DRAG_HANDLE_RADIUS;
-}
-
 /* render the drag handle */
 void render_overlay()
 {
@@ -734,61 +705,68 @@ void render_overlay()
 /* overlay logic: closing */
 void close_overlay()
 {
-    if(!is_holding_drag_handle()) {
+    float dt = timer_get_delta();
+    float v = DRAG_HANDLE_SPEED;
 
-        /* close the handle */
-        float dt = timer_get_delta();
-        drag_handle->position.y = min(VIDEO_SCREEN_H, drag_handle->position.y + DRAG_HANDLE_SPEED * dt);
+    drag_handle->position.y += v * dt;
+    if(drag_handle->position.y >= VIDEO_SCREEN_H)
+        drag_handle->position.y = VIDEO_SCREEN_H;
 
-    }
-    else {
+    handle_touch_input(mouse_input, on_touch_start, NULL, NULL);
+}
 
-        /* drag the handle */
+void on_touch_start(v2d_t touch_start)
+{
+    v2d_t handle_location = v2d_add(drag_handle->position, actor_action_offset(drag_handle));
+    v2d_t ds = v2d_subtract(touch_start, handle_location);
+    float r = DRAG_HANDLE_RADIUS;
+
+    bool is_dragging = (max(fabs(ds.x), fabs(ds.y)) <= r);
+    if(is_dragging) {
         overlay_state = OVERLAY_DRAGGING;
-
+        mobilegamepad_fadeout();
     }
 }
 
 /* overlay logic: dragging */
 void drag_overlay()
 {
-    if(is_holding_drag_handle()) {
+    handle_touch_input(mouse_input, NULL, on_touch_end, on_touch_move);
+}
 
-        /* hide the mobile gamepad */
-        mobilegamepad_fadeout();
+void on_touch_move(v2d_t touch_start, v2d_t touch_current)
+{
+    v2d_t ds = v2d_subtract(touch_current, touch_start);
 
-        /* drag the handle */
-        drag_handle->position.y = read_mouse_position().y;
+    /* drag the handle */
+    float dy = min(ds.y, 0.0f);
+    drag_handle->position.y = DRAG_HANDLE_INITIAL_POSITION.y + dy;
+}
 
-        /* open the overlay */
-        float initial_position = DRAG_HANDLE_INITIAL_POSITION.y;
-        float drag_distance = fabs(drag_handle->position.y - initial_position);
-        if(drag_distance >= DRAG_HANDLE_MINDIST)
-            overlay_state = OVERLAY_OPENING;
+void on_touch_end(v2d_t touch_start, v2d_t touch_end)
+{
+    v2d_t ds = v2d_subtract(touch_end, touch_start);
+    float drag_distance = -ds.y;
 
-    }
-    else {
-
-        /* show the mobile gamepad */
-        mobilegamepad_fadein();
-
-        /* close the overlay if stopped dragging */
+    /* open or close the overlay */
+    if(drag_distance < DRAG_HANDLE_MINDIST) {
         overlay_state = OVERLAY_CLOSING;
-
+        mobilegamepad_fadein();
     }
+    else
+        overlay_state = OVERLAY_OPENING;
 }
 
 /* overlay logic: opening */
 void open_overlay()
 {
-    /* open the overlay */
     float dt = timer_get_delta();
-    drag_handle->position.y -= DRAG_HANDLE_SPEED * dt;
+    float v = DRAG_HANDLE_SPEED;
 
-    /* change the state */
+    drag_handle->position.y -= v * dt;
     if(drag_handle->position.y <= 0.0f) {
-        overlay_state = OVERLAY_FULLYOPEN;
         drag_handle->position.y = 0.0f;
+        overlay_state = OVERLAY_FULLYOPEN;
     }
 }
 
@@ -809,11 +787,10 @@ void fullyopen_overlay()
 /* overlay logic: finish */
 void finish_overlay()
 {
-    /* move down */
     float dt = timer_get_delta();
-    drag_handle->position.y += DRAG_HANDLE_SPEED * dt;
+    float v = DRAG_HANDLE_SPEED;
 
-    /* finish */
+    drag_handle->position.y += v * dt;
     if(drag_handle->position.y >= VIDEO_SCREEN_H) {
         drag_handle->position.y = VIDEO_SCREEN_H;
 
