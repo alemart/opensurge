@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * storyboard.h - storyboard (stores the scenes of the game)
+ * subscene.h - subscene definition
  * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,30 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _STORYBOARD_H
-#define _STORYBOARD_H
+#ifndef _MOBILESUBSCENE_H
+#define _MOBILESUBSCENE_H
 
-/* available scenes */
-typedef enum scenetype_t {
-    SCENE_INTRO,
-    SCENE_LEVEL,
-    SCENE_PAUSE,
-    SCENE_GAMEOVER,
-    SCENE_QUEST,
-    SCENE_CONFIRMBOX,
-    SCENE_LANGSELECT,
-    SCENE_CREDITS,
-    SCENE_OPTIONS,
-    SCENE_STAGESELECT,
-    SCENE_EDITORHELP,
-    SCENE_EDITORPAL,
-    SCENE_MOBILEMENU,
-    SCENE_MOBILEPOPUP
-} scenetype_t;
+#include "../../../core/v2d.h"
 
-/* Storyboard */
-void storyboard_init();
-void storyboard_release();
-struct scene_t* storyboard_get_scene(scenetype_t type);
+typedef struct mobile_subscene_t mobile_subscene_t;
+struct mobile_subscene_t {
+    void (*init)(mobile_subscene_t*);
+    void (*release)(mobile_subscene_t*);
+    void (*update)(mobile_subscene_t*,v2d_t);
+    void (*render)(mobile_subscene_t*,v2d_t);
+};
 
 #endif

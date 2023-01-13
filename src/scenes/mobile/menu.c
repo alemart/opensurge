@@ -21,7 +21,10 @@
 #include <stdbool.h>
 #include "menu.h"
 #include "util/touch.h"
+#include "subscenes/info.h"
+#include "subscenes/screenshot.h"
 #include "../../core/scene.h"
+#include "../../core/storyboard.h"
 #include "../../core/timer.h"
 #include "../../core/util.h"
 #include "../../core/video.h"
@@ -118,6 +121,7 @@ static void (*update[])() = {
 
 /* touch/mouse input */
 #define LOG(...)        logfile_message("Mobile Menu - " __VA_ARGS__)
+static const inputbutton_t BACK_BUTTON = IB_FIRE4;
 static input_t* input = NULL;
 static input_t* mouse_input = NULL;
 static void on_touch_start(v2d_t touch_start);
@@ -127,7 +131,6 @@ static void on_touch_move(v2d_t touch_start, v2d_t touch_current);
 
 /* private stuff */
 static const float FADE_TIME = 0.25f; /* in seconds */
-static const inputbutton_t BACK_BUTTON = IB_FIRE4;
 static const image_t* screenshot = NULL;
 static image_t* background = NULL;
 
@@ -171,6 +174,7 @@ void mobilemenu_init(void *game_screenshot)
 void mobilemenu_update()
 {
     update[state]();
+    /*if(changed_scene()) return;*/
 }
 
 
@@ -308,6 +312,7 @@ void update_waiting()
 void update_triggered_back()
 {
     LOG("Chose option: BACK");
+
     state = DISAPPEARING;
 }
 
@@ -315,21 +320,32 @@ void update_triggered_back()
 void update_triggered_screenshot()
 {
     LOG("Chose option: SCREENSHOT");
+
     state = WAITING;
+
+    mobile_subscene_t* subscene = mobile_subscene_screenshot(screenshot);
+    scenestack_push(storyboard_get_scene(SCENE_MOBILEPOPUP), subscene);
 }
 
 /* triggered the debug button */
 void update_triggered_debug()
 {
     LOG("Chose option: DEBUG");
+
     state = DISAPPEARING;
+
+    video_showmessage("TODO");
 }
 
 /* triggered the info button */
 void update_triggered_info()
 {
     LOG("Chose option: INFO");
+
     state = WAITING;
+
+    mobile_subscene_t* subscene = mobile_subscene_info();
+    scenestack_push(storyboard_get_scene(SCENE_MOBILEPOPUP), subscene);
 }
 
 
