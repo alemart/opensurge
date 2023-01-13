@@ -71,6 +71,10 @@ IF(BLEEDING_EDGE)
   MESSAGE(STATUS "Detected development version: ${BLEEDING_EDGE_VERSION}-dev")
 ENDIF()
 
+# Set the build date
+STRING(TIMESTAMP GAME_BUILD_DATE UTC)
+LIST(APPEND DEFS "GAME_BUILD_DATE=\"${GAME_BUILD_DATE}\"")
+
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
 SET(ALLEGRO_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of Allegro")
@@ -305,8 +309,11 @@ SET(GAME_SRCS
   src/core/v2d.c
   src/core/video.c
 
+  src/scenes/mobile/subscenes/info.c
+  src/scenes/mobile/subscenes/screenshot.c
   src/scenes/mobile/util/touch.c
   src/scenes/mobile/menu.c
+  src/scenes/mobile/popup.c
   src/scenes/util/editorcmd.c
   src/scenes/util/editorgrp.c
   src/scenes/util/grouptree.c
@@ -421,8 +428,12 @@ SET(GAME_HEADERS
   src/core/video.h
   src/core/v2d.h
 
+  src/scenes/mobile/subscenes/info.h
+  src/scenes/mobile/subscenes/screenshot.h
+  src/scenes/mobile/subscenes/subscene.h
   src/scenes/mobile/util/touch.h
   src/scenes/mobile/menu.h
+  src/scenes/mobile/touch.h
   src/scenes/util/editorcmd.h
   src/scenes/util/editorgrp.h
   src/scenes/util/grouptree.h
