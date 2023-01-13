@@ -146,6 +146,11 @@ static const char* RESOLUTION_NAME[] = {
     al_draw_textf(console.font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
 } while(0)
 
+#define FONT_SCALE() (( \
+    al_get_display_width(display) >= 2 * game_screen_width && \
+    al_get_display_height(display) >= 2 * game_screen_height \
+) ? 2 : 1)
+
 #define LOG(...)    logfile_message("Video - " __VA_ARGS__)
 #define FATAL(...)  fatal_error("Video - " __VA_ARGS__)
 
@@ -730,7 +735,7 @@ void print_to_console(const char* message)
 /* Render the messages of the console */
 void render_console()
 {
-    int font_scale = (settings.resolution == VIDEORESOLUTION_1X) ? 1 : 2;
+    int font_scale = FONT_SCALE();
     int font_height = al_get_font_line_height(console.font);
     int first = console.head;
     int last = (console.head + (CONSOLE_MAX_ENTRIES - 1)) % CONSOLE_MAX_ENTRIES;
@@ -787,7 +792,7 @@ void update_fps()
 /* render the FPS counter */
 void render_fps()
 {
-    int font_scale = (settings.resolution == VIDEORESOLUTION_1X) ? 1 : 2;
+    int font_scale = FONT_SCALE();
     int display_width = al_get_display_width(display);
 
     ALLEGRO_STATE state;
