@@ -115,6 +115,7 @@ static void input_register(input_t *in);
 static void input_unregister(input_t *in);
 static inline void input_clear(input_t *in);
 static void log_joysticks();
+static void handle_hotkey(int keycode);
 
 
 
@@ -718,6 +719,7 @@ void a5_handle_keyboard_event(const ALLEGRO_EVENT* event)
 
         case ALLEGRO_EVENT_KEY_DOWN:
             a5_key[event->keyboard.keycode] = true;
+            handle_hotkey(event->keyboard.keycode);
             break;
 
         case ALLEGRO_EVENT_KEY_UP:
@@ -799,6 +801,14 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
 void a5_handle_touch_event(const ALLEGRO_EVENT* event)
 {
     /* touch input is currently read using ALLEGRO_TOUCH_INPUT_STATE */
+}
+
+/* handle hotkeys */
+void handle_hotkey(int keycode)
+{
+    /* toggle fullscreen */
+    if(keycode == ALLEGRO_KEY_F11)
+        video_set_fullscreen(!video_is_fullscreen());
 }
 
 /* log joysticks */
