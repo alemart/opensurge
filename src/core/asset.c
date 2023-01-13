@@ -547,7 +547,7 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
 
 #elif defined(__ANDROID__)
 
-    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_USER_DATA_PATH);
 
     al_append_path_component(path, dirname);
 
