@@ -41,11 +41,6 @@ static bool console_ask(const char* fmt, ...);
 
 static int COMMANDLINE_UNDEFINED = -1;
 
-static const char COPYRIGHT[] = ""
-GAME_TITLE " version " GAME_VERSION_STRING "\n"
-"Copyright (C) " GAME_YEAR " Alexandre Martins\n"
-"http://" GAME_WEBSITE;
-
 static const char LICENSE[] = ""
 "This program is free software; you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -120,7 +115,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    --verbose                        print logs to stdout\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
-                COPYRIGHT, program
+                GAME_COPYRIGHT, program
             );
             exit(0);
         }
@@ -136,7 +131,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--license") == 0) {
-            console_print("%s\n\n%s", COPYRIGHT, LICENSE);
+            console_print("%s\n\n%s", GAME_COPYRIGHT, LICENSE);
             exit(0);
         }
 

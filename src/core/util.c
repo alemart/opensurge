@@ -25,6 +25,8 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <surgescript.h>
+#include <physfs.h>
 #include "v2d.h"
 #include "util.h"
 #include "timer.h"
@@ -237,6 +239,49 @@ FILE* fopen_utf8(const char* filepath, const char* mode)
 #else
     return fopen(filepath, mode);
 #endif
+}
+
+/*
+ * allegro_version_string()
+ * Returns the compiled Allegro version as a string
+ */
+const char* allegro_version_string()
+{
+    static char str[16];
+    uint32_t version = al_get_allegro_version();
+
+    snprintf(str, sizeof(str), "%u.%u.%u-%u",
+        (version & 0xFF000000) >> 24,
+        (version & 0xFF0000) >> 16,
+        (version & 0xFF00) >> 8,
+        (version & 0xFF)
+    );
+
+    return str;
+}
+
+/*
+ * surgescript_version_string()
+ * The compiled version of SurgeScript as a string
+ */
+const char* surgescript_version_string()
+{
+    return surgescript_util_version();
+}
+
+/*
+ * physfs_version_string()
+ * The compiled version of PhysicsFS as a string
+ */
+const char* physfs_version_string()
+{
+    static char str[16];
+    PHYSFS_Version version;
+
+    PHYSFS_getLinkedVersion(&version);
+    snprintf(str, sizeof(str), "%u.%u.%u", version.major, version.minor, version.patch);
+
+    return str;
 }
 
 /*

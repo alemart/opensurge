@@ -73,5 +73,8 @@ float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
 uint64_t random64(); /* pseudo-random 64-bit number */
 FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 filename support */
+const char* allegro_version_string(); /* version of the Allegro library */
+const char* surgescript_version_string(); /* version of the SurgeScript runtime */
+const char* physfs_version_string(); /* version of the PhysFS library */
 
 #endif

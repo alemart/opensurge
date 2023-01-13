@@ -19,12 +19,11 @@
  */
 
 #include <allegro5/allegro.h>
-#include <surgescript.h>
-#include <physfs.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "logfile.h"
 #include "global.h"
+#include "util.h"
 #include "asset.h"
 
 
@@ -68,10 +67,6 @@
 #define KALL(_0, _1, _2, fn, ...) fn
 
 /* private stuff ;) */
-static const char* allegro_version_string();
-static const char* surgescript_version_string();
-static const char* physfs_version_string();
-
 static ALLEGRO_FILE* logfile = NULL;
 static bool open_logfile();
 static void close_logfile();
@@ -183,50 +178,6 @@ void logfile_release(int flags)
 
 /* private */
 
-
-
-/*
- * allegro_version_string()
- * Returns the compiled Allegro version as a string
- */
-const char* allegro_version_string()
-{
-    static char str[16];
-    uint32_t version = al_get_allegro_version();
-
-    snprintf(str, sizeof(str), "%u.%u.%u-%u",
-        (version & 0xFF000000) >> 24,
-        (version & 0xFF0000) >> 16,
-        (version & 0xFF00) >> 8,
-        (version & 0xFF)
-    );
-
-    return str;
-}
-
-/*
- * surgescript_version_string()
- * The compiled version of SurgeScript as a string
- */
-const char* surgescript_version_string()
-{
-    return surgescript_util_version();
-}
-
-/*
- * physfs_version_string()
- * The compiled version of PhysicsFS as a string
- */
-const char* physfs_version_string()
-{
-    static char str[16];
-    PHYSFS_Version version;
-
-    PHYSFS_getLinkedVersion(&version);
-    snprintf(str, sizeof(str), "%u.%u.%u", version.major, version.minor, version.patch);
-
-    return str;
-}
 
 /*
  * open_logfile()

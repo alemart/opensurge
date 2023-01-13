@@ -29,10 +29,31 @@
 #define GAME_VERSION_WIP        1
 #define GAME_VERSION_FIX        0
 #define GAME_WEBSITE            "opensurge2d.org"
-#define GAME_YEAR               "2008-2022"
+#define GAME_YEAR               "2008-2023"
 
-/* If the following constant is defined, then this is a development build */
-/*#define GAME_BUILD_VERSION    "1337-dev"*/
+/* Build date */
+#ifndef GAME_BUILD_DATE
+#define GAME_BUILD_DATE         ""
+#endif
+
+/* Build version */
+#ifdef GAME_BUILD_VERSION
+/* if defined, then this is a development build */
+#define _GAME_BUILD_VERSION     "-" GAME_BUILD_VERSION
+#else
+#define GAME_BUILD_VERSION      ""
+#define _GAME_BUILD_VERSION     ""
+#endif
+
+/* Version code & string */
+#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) _GAME_BUILD_VERSION
+
+/* Copyright text */
+#define GAME_COPYRIGHT "" \
+    GAME_TITLE " version " GAME_VERSION_STRING "\n" \
+    "Copyright (C) " GAME_YEAR " Alexandre Martins\n" \
+    "http://" GAME_WEBSITE "\n"
 
 /* Minimum version of SurgeScript */
 #define SURGESCRIPT_MIN_SUP     0
@@ -46,14 +67,6 @@
 #define ALLEGRO_MIN_WIP         7
 #define ALLEGRO_MIN_VERSION_INT ((ALLEGRO_MIN_SUP << 24) | (ALLEGRO_MIN_SUB << 16) | (ALLEGRO_MIN_WIP << 8))
 #define ALLEGRO_MIN_VERSION_STR STRINGIFY(ALLEGRO_MIN_SUP) "." STRINGIFY(ALLEGRO_MIN_SUB) "." STRINGIFY(ALLEGRO_MIN_WIP)
-
-/* Version code & string */
-#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
-#ifndef GAME_BUILD_VERSION
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) /* stable version */
-#else
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" GAME_BUILD_VERSION /* development build */
-#endif
 
 /* Utilities */
 #define STRINGIFY(x)            _STRINGIFY(x)
