@@ -69,6 +69,8 @@ static int option_count;
 static group_t *root;
 static group_t *create_grouptree();
 
+/* deprecated? */
+#define ENABLE_RESOLUTION 0
 
 
 
@@ -241,7 +243,9 @@ void save_preferences()
 {
     extern prefs_t* prefs;
 
+#if ENABLE_RESOLUTION
     prefs_set_int(prefs, ".resolution", video_get_resolution());
+#endif
     prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 }
@@ -1034,7 +1038,11 @@ group_t *create_grouptree()
 
     /* section: graphics */
     graphics = group_graphics_create();
+#if ENABLE_RESOLUTION
     group_addchild(graphics, group_resolution_create());
+#else
+    (void)group_resolution_create;
+#endif
     group_addchild(graphics, group_fullscreen_create());
     group_addchild(graphics, group_fps_create());
 

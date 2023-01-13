@@ -130,7 +130,7 @@ static void render_console();
 
 /* Misc */
 static const char LOADING_FONT[] = "Loading";
-static const char LOADING_TEXT[] = "LOADING_TEXT";
+static const char LOADING_TEXT[] = "$LOADING_TEXT";
 static const char LOADING_IMAGE[] = "images/loading.png";
 
 static const char* RESOLUTION_NAME[] = {
@@ -146,6 +146,8 @@ static const char* RESOLUTION_NAME[] = {
     al_draw_textf(console.font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
 } while(0)
 
+#define LOG(...)    logfile_message("Video - " __VA_ARGS__)
+#define FATAL(...)  fatal_error("Video - " __VA_ARGS__)
 
 
 
@@ -162,17 +164,17 @@ static const char* RESOLUTION_NAME[] = {
  */
 void video_init()
 {
-    logfile_message("Initializing the video manager...");
+    LOG("Initializing the video manager...");
 
     /* initialize Allegro */
     if(!al_init_image_addon())
-        fatal_error("Can't initialize Allegro's image addon");
+        FATAL("Can't initialize Allegro's image addon");
 
     if(!al_init_primitives_addon())
-        fatal_error("Can't initialize Allegro's primitives addon");
+        FATAL("Can't initialize Allegro's primitives addon");
 
     if(!al_init_font_addon()) /* initialize the font addon before creating the console font */
-        fatal_error("Can't initialize Allegro's font addon");
+        FATAL("Can't initialize Allegro's font addon");
 
     al_inhibit_screensaver(true);
 
@@ -188,11 +190,11 @@ void video_init()
 
     /* create the display */
     if(!create_display())
-        fatal_error("Failed to create the display");
+        FATAL("Failed to create the display");
 
     /* create the backbuffer */
     if(!create_backbuffer())
-        fatal_error("Failed to create the backbuffer");
+        FATAL("Failed to create the backbuffer");
 
     /* initialize the console */
     init_console();
@@ -204,7 +206,7 @@ void video_init()
  */
 void video_release()
 {
-    logfile_message("Releasing the video manager...");
+    LOG("Releasing the video manager...");
 
     /* release the console */
     release_console();
@@ -262,7 +264,7 @@ void video_render(void (*render_overlay)())
  */
 void video_set_resolution(videoresolution_t resolution)
 {
-    logfile_message("Changing the video resolution to %s", RESOLUTION_NAME[(int)resolution]);
+    LOG("Changing the video resolution to %s", RESOLUTION_NAME[(int)resolution]);
     settings.resolution = resolution;
     reconfigure_display();
 }
@@ -308,7 +310,7 @@ videoresolution_t video_best_fit_resolution()
  */
 void video_set_fullscreen(bool fullscreen)
 {
-    logfile_message("%s fullscreen", fullscreen ? "Enabling" : "Disabling");
+    LOG("%s fullscreen", fullscreen ? "Enabling" : "Disabling");
     settings.is_fullscreen = fullscreen;
     reconfigure_display();
 }
@@ -328,7 +330,7 @@ bool video_is_fullscreen()
  */
 void video_set_game_mode(bool in_game_mode)
 {
-    logfile_message("%s the game mode", in_game_mode ? "Enabling" : "Disabling");
+    LOG("%s the game mode", in_game_mode ? "Enabling" : "Disabling");
     settings.is_in_game_mode = in_game_mode;
     reconfigure_backbuffer();
 }
@@ -348,7 +350,7 @@ bool video_is_in_game_mode()
  */
 void video_set_fps_visible(bool visible)
 {
-    logfile_message("%s the FPS counter", visible ? "Enabling" : "Disabling");
+    LOG("%s the FPS counter", visible ? "Enabling" : "Disabling");
     settings.is_fps_visible = visible;
 }
 
@@ -432,7 +434,7 @@ void video_display_loading_screen()
     image_clear(color_rgb(0, 0, 0));
     image_blit(img, 0, 0, (VIDEO_SCREEN_W - image_width(img)) / 2, (VIDEO_SCREEN_H - image_height(img)) / 2, image_width(img), image_height(img));
     font_set_align(fnt, FONTALIGN_CENTER);
-    font_set_text(fnt, "%s", lang_get(LOADING_TEXT));
+    font_set_text(fnt, "%s", LOADING_TEXT);
     font_set_position(fnt, v2d_subtract(cam, v2d_new(0, font_get_textsize(fnt).y / 2)));
     font_render(fnt, cam);
     video_render(NULL);
@@ -456,6 +458,8 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event)
 
         case ALLEGRO_EVENT_DISPLAY_RESIZE:
             al_acknowledge_resize(event->display.source);
+            if(!settings.is_in_game_mode)
+                reconfigure_backbuffer();
             break;
 
         case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
@@ -497,10 +501,10 @@ bool create_display()
     ALLEGRO_STATE state;
 
     if(display != NULL)
-        fatal_error("Duplicate display");
+        FATAL("Duplicate display");
 
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
-    al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE);
+    al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE);
     al_set_new_display_option(
         ALLEGRO_SUPPORTED_ORIENTATIONS,
         game_screen_width >= game_screen_height ?
@@ -535,7 +539,7 @@ bool create_display()
 void destroy_display()
 {
     if(display == NULL)
-        fatal_error("Display released twice");
+        FATAL("Display released twice");
 
     al_set_target_bitmap(NULL);
     al_destroy_display(display);
@@ -554,7 +558,7 @@ void reconfigure_display()
 
     /* toggle fullscreen */
     if(!al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, settings.is_fullscreen))
-        logfile_message("VIDEO: can't toggle fullscreen mode");
+        LOG("Can't toggle fullscreen mode");
 
     /* resize the window */
     if(!(al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW)) {
@@ -570,7 +574,7 @@ void reconfigure_display()
 
         }
         else
-            logfile_message("VIDEO: can't resize the display to %dx%d", new_display_width, new_display_height);
+            LOG("Can't resize the display to %dx%d", new_display_width, new_display_height);
     }
 #endif
 }
@@ -628,7 +632,7 @@ bool create_backbuffer()
     ALLEGRO_STATE state;
 
     if(backbuffer != NULL)
-        fatal_error("Duplicate backbuffer");
+        FATAL("Duplicate backbuffer");
 
     al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
@@ -647,7 +651,7 @@ void destroy_backbuffer()
     /* a display is tied to an OpenGL rendering context. A video bitmap is tied
        to a display. If the display is invalidated, so is the backbuffer */
     if(backbuffer == NULL)
-        fatal_error("Backbuffer released twice");
+        FATAL("Backbuffer released twice");
 
     al_set_target_bitmap(al_get_backbuffer(display));
     image_destroy(backbuffer);
@@ -662,7 +666,7 @@ void reconfigure_backbuffer()
     int backbuffer_height = settings.is_in_game_mode ? game_screen_height : al_get_display_height(display);
 
     if(backbuffer == NULL)
-        fatal_error("No backbuffer");
+        FATAL("No backbuffer");
     else
         image_destroy(backbuffer);
 
@@ -670,7 +674,7 @@ void reconfigure_backbuffer()
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
 
     if(NULL == (backbuffer = image_create(backbuffer_width, backbuffer_height)))
-        fatal_error("Can't reconfigure the backbuffer");
+        FATAL("Can't reconfigure the backbuffer");
 
     al_restore_state(&state);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer));

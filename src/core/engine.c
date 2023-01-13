@@ -344,11 +344,7 @@ void init_managers(const commandline_t* cmd)
 
     video_init();
     video_set_resolution(
-        commandline_getint(cmd->video_resolution,
-            prefs_has_item(prefs, ".resolution") ?
-            prefs_get_int(prefs, ".resolution") :
-            video_best_fit_resolution()
-        )
+        commandline_getint(cmd->video_resolution, video_best_fit_resolution())
     );
     video_set_fullscreen(
         commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen"))
