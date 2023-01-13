@@ -23,18 +23,33 @@
 
 #include <stdint.h>
 
+/* directionals */
 enum {
-    MOBILEGAMEPAD_DPAD_CENTER = 0,
-    MOBILEGAMEPAD_DPAD_RIGHT  = 1,
-    MOBILEGAMEPAD_DPAD_UP     = 1 << 1,
-    MOBILEGAMEPAD_DPAD_LEFT   = 1 << 2,
-    MOBILEGAMEPAD_DPAD_DOWN   = 1 << 3
+    MOBILEGAMEPAD_DPAD_CENTER       = 0,
+    MOBILEGAMEPAD_DPAD_RIGHT        = 1,
+    MOBILEGAMEPAD_DPAD_UP           = 1 << 1,
+    MOBILEGAMEPAD_DPAD_LEFT         = 1 << 2,
+    MOBILEGAMEPAD_DPAD_DOWN         = 1 << 3
 };
 
+/* buttons */
 enum {
-    MOBILEGAMEPAD_BUTTON_NONE   = 0,
-    MOBILEGAMEPAD_BUTTON_ACTION = 1,
-    MOBILEGAMEPAD_BUTTON_BACK   = 1 << 1
+    MOBILEGAMEPAD_BUTTON_NONE       = 0,
+    MOBILEGAMEPAD_BUTTON_ACTION     = 1,
+    MOBILEGAMEPAD_BUTTON_BACK       = 1 << 1
+};
+
+/* initialization flags */
+enum {
+    MOBILEGAMEPAD_DISABLED          = 0,
+    MOBILEGAMEPAD_WANT_TOUCH_INPUT  = 1,
+    MOBILEGAMEPAD_WANT_MOUSE_INPUT  = 1 << 1,
+
+#if defined(__ANDROID__)
+    MOBILEGAMEPAD_DEFAULT_FLAGS     = MOBILEGAMEPAD_WANT_TOUCH_INPUT
+#else
+    MOBILEGAMEPAD_DEFAULT_FLAGS     = MOBILEGAMEPAD_WANT_TOUCH_INPUT | MOBILEGAMEPAD_WANT_MOUSE_INPUT
+#endif
 };
 
 /* state of the mobile gamepad */
@@ -50,7 +65,7 @@ struct mobilegamepad_state_t {
 };
 
 /* public API */
-void mobilegamepad_init();
+void mobilegamepad_init(int flags);
 void mobilegamepad_release();
 void mobilegamepad_update();
 void mobilegamepad_render();

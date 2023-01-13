@@ -29,13 +29,6 @@
 
 
 
-/* settings */
-#define WANT_MOUSE_INPUT         1 /* Will the mobile gamepad will be activated by mouse input? For testing only */
-#define ENABLE_MOUSE_INPUT       ((WANT_MOUSE_INPUT) && !defined(__ANDROID__))
-#define ENABLE_MOBILE_GAMEPAD    (defined(__ANDROID__) || (ENABLE_MOUSE_INPUT))
-
-
-
 /* mobile controls */
 enum {
     DPAD,
@@ -71,8 +64,9 @@ static const int MAX_TOUCHES = (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches)
 
 
 /* utilities */
-#define IS_POWER_OF_TWO(n) (((n) & ((n) - 1)) == 0)
-#define VALIDATE_MASK(x)   typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
+#define LOG(...)            logfile_message("Mobile Gamepad - " __VA_ARGS__)
+#define IS_POWER_OF_TWO(n)  (((n) & ((n) - 1)) == 0)
+#define VALIDATE_MASK(x)    typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
 
 
 
@@ -180,6 +174,9 @@ static const touch_t NO_TOUCH = {
     .position = (v2d_t){ .x = 0.0f, .y = 0.0f }
 };
 
+/* initialization flags */
+static int flags = 0;
+
 /* current state of the mobile gamepad */
 static mobilegamepad_state_t current_state;
 
@@ -227,38 +224,41 @@ static v2d_t dpad_stick_offset(float scale);
  * mobilegamepad_init()
  * Initializes the mobile gamepad
  */
-void mobilegamepad_init()
+void mobilegamepad_init(int _flags)
 {
-    logfile_message("Initializing the mobile gamepad...");
+    LOG("Initializing the mobile gamepad...");
 
     /* reset the state */
     current_state = IDLE_STATE;
     is_available = false;
     is_visible = false;
+    flags = _flags;
 
-#if !ENABLE_MOBILE_GAMEPAD
-
-    /* disable multi-touch */
-    logfile_message("The mobile gamepad isn't available in this system");
-    return;
-
-#elif !ENABLE_MOUSE_INPUT
-
-    /* require touch input */
-    if(!al_is_touch_input_installed()) {
-        logfile_message("No touch input. The mobile gamepad won't be available!");
-        return;
+    /* request touch input */
+    if(flags & MOBILEGAMEPAD_WANT_TOUCH_INPUT) {
+        if(!al_is_touch_input_installed()) {
+            LOG("Touch input isn't available");
+            flags &= ~MOBILEGAMEPAD_WANT_TOUCH_INPUT;
+        }
+        else
+            LOG("Will accept touch input");
     }
 
-#else
-
-    /* require mouse input */
-    if(!al_is_mouse_installed()) {
-        fatal_error("No mouse input. The mobile gamepad won't be available!");
-        return;
+    /* request mouse input */
+    if(flags & MOBILEGAMEPAD_WANT_MOUSE_INPUT) {
+        if(!al_is_mouse_installed()) {
+            LOG("Mouse input isn't available");
+            flags &= ~MOBILEGAMEPAD_WANT_MOUSE_INPUT;
+        }
+        else
+            LOG("Will accept mouse input");
     }
 
-#endif
+    /* disable the mobile gamepad */
+    if(0 == (flags & (MOBILEGAMEPAD_WANT_TOUCH_INPUT | MOBILEGAMEPAD_WANT_MOUSE_INPUT))) {
+        LOG("The mobile gamepad isn't available in this system");
+        return;
+    }
 
     /* initialize the interactive radii */
     for(int i = 0; i < NUM_CONTROLS; i++)
@@ -314,44 +314,49 @@ void mobilegamepad_update()
     if(is_back_button_down())
         current_state.buttons |= MOBILEGAMEPAD_BUTTON_BACK;
 
-    /* reset touch */
-    touch_t touch[MAX_TOUCHES];
-    for(int j = 0; j < MAX_TOUCHES; j++)
-        touch[j] = NO_TOUCH;
-
-#if !ENABLE_MOUSE_INPUT
-
-    /* read touch input */
-    ALLEGRO_TOUCH_INPUT_STATE touch_state;
-    al_get_touch_input_state(&touch_state);
-
-    for(int i = 0, j = 0; i < MAX_TOUCHES; i++) {
-        if(touch_state.touches[i].id >= 0) {
-            touch[j].down = true;
-            touch[j].position = v2d_new(touch_state.touches[i].x, touch_state.touches[i].y);
-            j++;
-        }
-    }
-
-#else
-
-    /* read mouse input */
-    ALLEGRO_MOUSE_STATE mouse;
-    al_get_mouse_state(&mouse);
-
-    if(mouse.buttons & 1) {
-        touch[0].down = true;
-        touch[0].position = v2d_new(mouse.x, mouse.y);
-    }
-
-#endif
-
     /* detect if something is pressed on the screen,
        but only if the mobile gamepad is visible */
-    if(is_visible) {
+    if(is_visible && video_is_in_game_mode()) {
+
+        /* reset touch */
+        touch_t touch[MAX_TOUCHES];
+        for(int j = 0; j < MAX_TOUCHES; j++)
+            touch[j] = NO_TOUCH;
+
+        /* read touch input */
+        if(flags & MOBILEGAMEPAD_WANT_TOUCH_INPUT) {
+
+            ALLEGRO_TOUCH_INPUT_STATE touch_state;
+            al_get_touch_input_state(&touch_state);
+
+            for(int i = 0, j = 0; i < MAX_TOUCHES; i++) {
+                if(touch_state.touches[i].id >= 0) {
+                    touch[j].down = true;
+                    touch[j].position = v2d_new(touch_state.touches[i].x, touch_state.touches[i].y);
+                    j++;
+                }
+            }
+
+        }
+
+        /* read mouse input */
+        if(flags & MOBILEGAMEPAD_WANT_MOUSE_INPUT) {
+
+            ALLEGRO_MOUSE_STATE mouse;
+            al_get_mouse_state(&mouse);
+
+            if(mouse.buttons & 1) {
+                touch[0].down = true;
+                touch[0].position = v2d_new(mouse.x, mouse.y);
+            }
+
+        }
+
+        /* check if any button is pressed */
         for(int i = 0; i < MAX_TOUCHES; i++) {
             if(touch[i].down) {
                 for(int j = 0; j < NUM_CONTROLS; j++) {
+                    /* coordinates are given in window space */
                     v2d_t offset = v2d_subtract(touch[i].position, actor[j]->position);
                     float distance = v2d_magnitude(offset);
 
@@ -360,6 +365,7 @@ void mobilegamepad_update()
                 }
             }
         }
+
     }
 
     /* update actors */
@@ -376,21 +382,26 @@ void mobilegamepad_render()
     if(!is_available)
         return;
 
+    /* skip if not in game mode */
+    if(!video_is_in_game_mode())
+        return;
+
     /* fading in and fading out */
     handle_fade_effect();
 
     /* render mobile gamepad */
     render_actors();
 
-
-#if ENABLE_MOUSE_INPUT
     /* render the mouse cursor */
-    ALLEGRO_MOUSE_STATE mouse;
-    al_get_mouse_state(&mouse);
+    if(flags & MOBILEGAMEPAD_WANT_MOUSE_INPUT) {
 
-    float r = video_get_window_size().x * 0.01f;
-    image_ellipsefill(mouse.x, mouse.y, r, r, color_rgba(255, 255, 0, 64));
-#endif
+        ALLEGRO_MOUSE_STATE mouse;
+        al_get_mouse_state(&mouse);
+
+        float r = video_get_window_size().x * 0.01f;
+        image_ellipsefill(mouse.x, mouse.y, r, r, color_rgba(255, 255, 0, 64));
+
+    }
 }
 
 /*
