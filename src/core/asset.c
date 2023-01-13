@@ -35,6 +35,11 @@
 #define GAME_DATADIR                    "/usr/share/games/" GAME_UNIXNAME
 #endif
 
+/* The default name of the user-modifiable asset directory */
+#ifndef GAME_USERDIRNAME
+#define GAME_USERDIRNAME                GAME_UNIXNAME
+#endif
+
 /* If RUNINPLACE is non-zero, then the assets will be read only from the directory of the executable */
 #ifndef GAME_RUNINPLACE
 #define GAME_RUNINPLACE                 0
@@ -54,7 +59,7 @@
 } while(0)
 
 /* Name of the user-modifiable asset directory */
-#define DEFAULT_USER_DATADIRNAME                    GAME_UNIXNAME
+#define DEFAULT_USER_DATADIRNAME                    GAME_USERDIRNAME
 #define DEFAULT_USER_DATADIRNAME_LENGTH             (sizeof(_DEFAULT_USER_DATADIRNAME) - 1)
 #define GENERATED_USER_DATADIRNAME_PREFIX           DEFAULT_USER_DATADIRNAME "_" /* a constant, known string */
 #define GENERATED_USER_DATADIRNAME_SUFFIX           "12345678" /* template for a 32-bit hash */
@@ -549,7 +554,9 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
 
     ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_USER_DATA_PATH);
 
-    al_append_path_component(path, dirname);
+    /* ALLEGRO_USER_DATA_PATH relies on getFilesDir() of the Activity */
+    /*al_append_path_component(path, dirname);*/
+    (void)dirname;
 
     (void)find_homedir;
     return path;
