@@ -75,6 +75,7 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.hide_fps = COMMANDLINE_UNDEFINED;
     cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
 
+    cmd.mobile = COMMANDLINE_UNDEFINED;
     cmd.verbose = COMMANDLINE_UNDEFINED;
 
     cmd.custom_level_path[0] = '\0';
@@ -112,6 +113,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --language \"filepath\"            use the specified language (e.g., languages/english.lng)\n"
                 "    --game-folder \"/path/to/game\"    use game assets only from the specified folder\n"
                 "    --reset                          factory reset: clear all user-space files & changes\n"
+                "    --mobile                         enable mobile device simulation\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    --verbose                        print logs to stdout\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
@@ -167,6 +169,9 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--no-font-smoothing") == 0)
             cmd.allow_font_smoothing = FALSE;
+
+        else if(strcmp(argv[i], "--mobile") == 0)
+            cmd.mobile = TRUE;
 
         else if(strcmp(argv[i], "--verbose") == 0)
             cmd.verbose = TRUE;

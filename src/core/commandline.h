@@ -35,6 +35,7 @@ struct commandline_t
     int allow_font_smoothing;
 
     /* other options */
+    int mobile;
     int verbose;
 
     /* filepaths */

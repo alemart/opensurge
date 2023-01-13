@@ -30,7 +30,7 @@
 int main(int argc, char **argv)
 {
 #if defined(__ANDROID__)
-    char* args[] = { GAME_UNIXNAME };
+    char* args[] = { GAME_UNIXNAME, "--mobile" };
     argc = sizeof(args) / sizeof(args[0]);
     argv = args;
 #endif

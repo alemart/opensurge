@@ -378,7 +378,7 @@ void init_accessories(const commandline_t* cmd)
     video_display_loading_screen();
 
     sprite_init();
-    mobilegamepad_init();
+    mobilegamepad_init(commandline_getint(cmd->mobile, FALSE) ? MOBILEGAMEPAD_DEFAULT_FLAGS : MOBILEGAMEPAD_DISABLED);
     charactersystem_init();
     objects_init();
     storyboard_init();
