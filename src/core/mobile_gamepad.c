@@ -83,17 +83,17 @@ static const v2d_t RELATIVE_POSITION[] = {
 
     [DPAD] = {
         .x = 0.135f,
-        .y = 0.8f
+        .y = 0.77f
     },
 
     [DPAD_STICK] = { /* same as DPAD */
         .x = 0.135f,
-        .y = 0.8f
+        .y = 0.77f
     },
 
     [ACTION_BUTTON] = {
-        .x = 0.89f,
-        .y = 0.8f
+        .x = 0.87f,
+        .y = 0.77f
     }
 
 };
@@ -524,8 +524,12 @@ void update_actors()
 
     /* update the interactive radii of the controls based on the scale of the actors */
     for(int i = 0; i < NUM_CONTROLS; i++) {
-        v2d_t action_offset = actor_action_offset(actor[i]);
-        float unscaled_radius = v2d_magnitude(action_offset);
+        const image_t* image = actor_image(actor[i]);
+        int width = image_width(image);
+        int height = image_height(image);
+
+        int unscaled_diameter = max(width, height);
+        float unscaled_radius = unscaled_diameter * 0.5f;
 
         interactive_radius[i] = unscaled_radius * scale;
     }

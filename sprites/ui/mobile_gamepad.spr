@@ -5,38 +5,12 @@
 // License: MIT
 // ----------------------------------------------------------------------------
 
-//
-// The mobile gamepad is typically displayed on a touch screen. I define two
-// circles for each of its elements (buttons or direction controllers):
-//
-// 1. visual circle: defined by the size of the sprite (frame_size).
-//
-// 2. interactive circle: defined by the position of the action spot relative
-//    to the hot spot. The latter is always at the center of the sprite.
-//
-// The visual circle is related to how the element is rendered. The interactive
-// circle controls how the element responds to user input. Whenever the player
-// touches on the interactive circle, the element is activated. Therefore,
-//
-// a) If the two circles match, then the element will be activated if the user
-//    touches on the sprite.
-//
-// b) If the interactive circle is larger than the visual circle, then the area
-//    that responds to user input will be larger than the area of the sprite.
-//    This setting can enhance the usability of the gamepad.
-//
-// c) The visual circle should not be larger than the interactive circle.
-//
-// Generally, you should leave these settings as they are.
-//
-
 sprite "Mobile Gamepad - Action Button"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     0 832 384 192
-    frame_size      192 192
-    hot_spot        96 96 // at the center
-    action_spot     192 96 // a point of the interactive circle
+    source_rect     0 736 416 208
+    frame_size      208 208
+    hot_spot        104 104 // at the center
 
     // unpressed
     animation 0
@@ -58,10 +32,9 @@ sprite "Mobile Gamepad - Action Button"
 sprite "Mobile Gamepad - Directional Stick"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     0 64 2016 576
-    frame_size      288 288
-    hot_spot        144 144 // at the center
-    action_spot     336 144 // a point of the interactive circle
+    source_rect     0 64 2016 672
+    frame_size      336 336
+    hot_spot        168 168 // at the center
 
     // center
     animation 0
@@ -139,10 +112,10 @@ sprite "Mobile Gamepad - Directional Stick"
 sprite "Mobile Gamepad - Directional Stick - Ball"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     576 352 576 288
-    frame_size      288 288
-    hot_spot        144 144 // at the center
-    action_spot     172 144 // determines the length of the offset when pressed
+    source_rect     1008 400 672 336
+    frame_size      336 336
+    hot_spot        168 168 // at the center
+    action_spot     196 168 // determines the length of the offset when pressed
 
     // unpressed & at the center
     animation 0
