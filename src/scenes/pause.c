@@ -253,7 +253,7 @@ static sound_t* sound[SOUND_COUNT] = { NULL };
 /* overlay with a drag handle for mobile */
 #define DRAG_HANDLE_SPEED               ((float)(VIDEO_SCREEN_H) / 0.25f) /* in px/s */
 #define DRAG_HANDLE_RADIUS              (v2d_magnitude(actor_action_offset(drag_handle)))
-#define DRAG_HANDLE_MINDIST             (VIDEO_SCREEN_H / 2) /* minimum distance required to open the overlay */
+#define DRAG_HANDLE_MINDIST             (VIDEO_SCREEN_H / 4) /* minimum distance required to open the overlay */
 #define DRAG_HANDLE_INITIAL_POSITION    (v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H))
 static const char* DRAG_HANDLE_SPRITE_NAME = "Pause Menu - Drag Handle";
 static const int DRAG_HANDLE_ANIMATION_NUMBER = 0;
