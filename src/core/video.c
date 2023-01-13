@@ -73,6 +73,8 @@ static void reconfigure_backbuffer();
 static int fps = 0;
 static int fps_counter = 0;
 static double fps_time = 0.0;
+static void update_fps();
+static void render_fps();
 
 
 /* Video settings */
@@ -224,37 +226,32 @@ void video_render(void (*render_overlay)())
     ALLEGRO_STATE state;
     ALLEGRO_TRANSFORM display_transform;
     ALLEGRO_TRANSFORM identity_transform;
-    double now = timer_get_now();
 
-    /* compute the framerate */
-    ++fps_counter;
-    if(now >= fps_time + 1.0) {
-        fps_time = now;
-        fps = fps_counter;
-        fps_counter = 0;
-    }
-
-    /* display the framerate */
-    if(settings.is_fps_visible) {
-        DRAW_TEXT(image_width(backbuffer), 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
-    }
-
-    /* copy the backbuffer with an appropriate transform and render the console */
+    /* save the state & compute an appropriate transform */
     al_store_state(&state, ALLEGRO_STATE_TRANSFORM | ALLEGRO_STATE_TARGET_BITMAP);
-    al_set_target_bitmap(al_get_backbuffer(display));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-
     al_identity_transform(&identity_transform);
     compute_display_transform(&display_transform);
 
-    al_use_transform(&display_transform);
-    al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
-    al_use_transform(&identity_transform);
-    render_console();
+    /* clear the screen */
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
 
+    /* copy the backbuffer */
+    al_use_transform(&display_transform);
+        al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
+    al_use_transform(&identity_transform);
+
+    /* compute the framerate */
+    update_fps();
+
+    /* render stuff in window space */
     if(render_overlay != NULL)
         render_overlay();
+    if(settings.is_fps_visible)
+        render_fps();
+    render_console();
 
+    /* restore the state and flip */
     al_restore_state(&state);
     al_flip_display();
 }
@@ -760,5 +757,44 @@ void render_console()
         PRINT_ENTRIES(first, CONSOLE_MAX_ENTRIES - 1);
     }
 
+    al_restore_state(&state);
+}
+
+
+/*
+ *
+ * FRAMERATE
+ *
+ */
+
+/* compute the framerate */
+void update_fps()
+{
+    double now = timer_get_now();
+
+    ++fps_counter;
+    if(now >= fps_time + 1.0) {
+        fps_time = now;
+        fps = fps_counter;
+        fps_counter = 0;
+    }
+}
+
+/* render the FPS counter */
+void render_fps()
+{
+    int font_scale = (settings.resolution == VIDEORESOLUTION_1X) ? 1 : 2;
+    int display_width = al_get_display_width(display);
+
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_TRANSFORM);
+
+    ALLEGRO_TRANSFORM transform;
+    al_identity_transform(&transform);
+    al_scale_transform(&transform, font_scale, font_scale);
+    al_translate_transform(&transform, display_width, 0.0f);
+
+    al_use_transform(&transform);
+        DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
     al_restore_state(&state);
 }
