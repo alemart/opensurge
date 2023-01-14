@@ -1,0 +1,31 @@
+// -----------------------------------------------------------------------------
+// File: mobile_pause_button.spr
+// Description: pause button displayed on mobile devices (HUD)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+sprite "Mobile Pause Button"
+{
+    source_file     "images/ui/mobile_pause_button.png"
+    source_rect     0 0 48 24
+    frame_size      24 24
+    hot_spot        12 12 // at the center
+    action_spot     4 4
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
