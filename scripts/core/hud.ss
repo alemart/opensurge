@@ -366,21 +366,24 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
 
     fun isTappingButton()
     {
-        // not touching the screen
-        if(!Mouse.buttonDown("left"))
-            return false;
+        return Mouse.buttonDown("left") && isOverlappingButton(Mouse.position);
+    }
 
-        // is this button being touched?
+    fun isOverlappingButton(target)
+    {
         top = transform.position.y - actor.hotSpot.y;
-        dy = Mouse.position.y - top;
+        dy = target.y - top;
+
+        // test collision on the y-axis
         if(0 <= dy && dy < actor.height) {
             left = transform.position.x - actor.hotSpot.x;
-            dx = Mouse.position.x - left;
+            dx = target.x - left;
+
+            // test collision on the x-axis
             if(0 <= dx && dx < actor.width)
                 return true;
         }
 
-        // touching the screen, but not this button
         return false;
     }
 }
