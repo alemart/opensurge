@@ -1,7 +1,7 @@
 /*
  * nanocalc addons
  * Mathematical built-in functions for nanocalc
- * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
