@@ -345,6 +345,7 @@ SET(GAME_SRCS
   src/scripting/lang.c
   src/scripting/level.c
   src/scripting/levelmanager.c
+  src/scripting/mobilegamepad.c
   src/scripting/mouse.c
   src/scripting/music.c
   src/scripting/obstaclemap.c

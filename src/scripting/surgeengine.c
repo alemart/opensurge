@@ -40,8 +40,8 @@ object 'SurgeEngine' \n\
     public readonly Input = spawn('InputFactory'); \n\
     public readonly Camera = spawn('Camera'); \n\
     public readonly Collisions = spawn('Collision'); \n\
-    public readonly UI = spawn('UI'); \n\
     public readonly Events = spawn('Events'); \n\
+    public readonly UI = spawn('UI'); \n\
     public readonly version = '" GAME_VERSION_STRING "'; \n\
 \n\
     fun get_Level() \n\
@@ -138,6 +138,7 @@ object 'SensorFactory' \n\
 object 'InputFactory' \n\
 { \n\
     public readonly Mouse = spawn('Mouse'); \n\
+    public readonly MobileGamepad = spawn('MobileGamepad'); \n\
 \n\
     fun call(inputMap) \n\
     { \n\
