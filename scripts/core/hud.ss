@@ -316,6 +316,7 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
         actor.anim = unpressed;
         actor.zindex = parent.zindex;
 
+        // display this pause button in mobile mode only
         if(!parent.useMobileVersion()) {
             actor.visible = false;
             state = "sleep";
@@ -328,14 +329,21 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
 
     state "unpressed"
     {
+        // check if tapped
         if(isTappingButton()) {
             actor.anim = pressed;
             state = "pressed";
         }
+
+        // check if blocked
+        if(!canPause())
+            state = "blocked";
     }
 
     state "pressed"
     {
+        // check if the game should be paused or
+        // if the button should just be released
         if(!Mouse.buttonDown("left")) {
             actor.anim = unpressed;
             actor.visible = false;
@@ -345,11 +353,17 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
             actor.anim = unpressed;
             state = "unpressed";
         }
+
+        // check if blocked
+        if(!canPause())
+            state = "blocked";
     }
 
     state "triggered"
     {
-        Level.pause();
+        if(canPause())
+            Level.pause();
+
         state = "paused";
     }
 
@@ -359,9 +373,25 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
         state = "unpressed";
     }
 
+    state "blocked"
+    {
+        if(canPause()) {
+            actor.visible = true;
+            state = "unpressed";
+        }
+        else {
+            actor.visible = false;
+        }
+    }
+
     state "sleep"
     {
         // do nothing
+    }
+
+    fun canPause()
+    {
+        return !Level.cleared;
     }
 
     fun isTappingButton()
