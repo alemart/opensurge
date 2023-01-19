@@ -12,6 +12,7 @@ using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Input.Mouse;
+using SurgeEngine.Input.MobileGamepad;
 
 object "Default HUD" is "entity", "detached", "awake", "private"
 {
@@ -45,8 +46,7 @@ object "Default HUD" is "entity", "detached", "awake", "private"
     // whether or not to adapt the HUD for mobile devices
     fun useMobileVersion()
     {
-        // TODO
-        return true;
+        return MobileGamepad.available;
     }
 
     // base zindex for the components of the HUD
