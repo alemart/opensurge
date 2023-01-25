@@ -331,7 +331,7 @@ void pause_init(void *_)
 
     /* create an input object */
     input = input_create_user(NULL);
-    input_simulate_button_down(input, START_BUTTON); /* this assumes the start button triggered the opening of this scene */
+    input_simulate_button_down(input, START_BUTTON); /* this assumes that the start button triggered the opening of this scene */
     input_simulate_button_down(input, BACK_BUTTON);
 
     /* pause music & scripting */
