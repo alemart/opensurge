@@ -117,37 +117,32 @@ surgescript_var_t* fun_set(surgescript_object_t* object, const surgescript_var_t
     prefs_t* prefs = (prefs_t*)surgescript_object_userdata(object);
     char* key = surgescript_var_get_string(param[0], manager);
 
-    switch(surgescript_var_typecode(param[1])) {
-        case 'b':
-            prefs_set_bool(prefs, key, surgescript_var_get_bool(param[1]));
-            break;
-        case 'n':
-            prefs_set_double(prefs, key, surgescript_var_get_number(param[1]));
-            break;
-        case 's':
-            prefs_set_string(prefs, key, surgescript_var_fast_get_string(param[1]));
-            break;
-        case 'o': {
-            /* convert object to string: using toString() */
-            surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[1]);
-            surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
-            if(obj != NULL) {
-                surgescript_var_t* tmp = surgescript_var_create();
-                char* str = NULL;
-                surgescript_object_call_function(obj, "toString", NULL, 0, tmp);
-                str = surgescript_var_get_string(tmp, manager);
-                prefs_set_string(prefs, key, str);
-                ssfree(str);
-                surgescript_var_destroy(tmp);
-            }
-            else
-                prefs_set_null(prefs, key);
-            break;
+    if(surgescript_var_is_objecthandle(param[1])) {
+
+        /* convert object to string: using toString() */
+        surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[1]);
+        surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
+        if(obj != NULL) {
+            surgescript_var_t* tmp = surgescript_var_create();
+            char* str = NULL;
+            surgescript_object_call_function(obj, "toString", NULL, 0, tmp);
+            str = surgescript_var_get_string(tmp, manager);
+            prefs_set_string(prefs, key, str);
+            ssfree(str);
+            surgescript_var_destroy(tmp);
         }
-        default:
+        else
             prefs_set_null(prefs, key);
-            break;
+
     }
+    else if(surgescript_var_is_string(param[1]))
+        prefs_set_string(prefs, key, surgescript_var_fast_get_string(param[1]));
+    else if(surgescript_var_is_number(param[1]))
+        prefs_set_double(prefs, key, surgescript_var_get_number(param[1]));
+    else if(surgescript_var_is_bool(param[1]))
+        prefs_set_bool(prefs, key, surgescript_var_get_bool(param[1]));
+    else
+        prefs_set_null(prefs, key);
 
     ssfree(key);
     return NULL;
