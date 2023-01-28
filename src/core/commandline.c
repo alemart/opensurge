@@ -29,6 +29,7 @@
 #include "stringutil.h"
 #include "video.h"
 #include "asset.h"
+#include "import.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -113,6 +114,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --language \"filepath\"            use the specified language (e.g., languages/english.lng)\n"
                 "    --game-folder \"/path/to/game\"    use game assets only from the specified folder\n"
                 "    --reset                          factory reset: clear all user-space files & changes\n"
+                "    --import \"/path/to/game\"         import an Open Surge game from the specified folder\n"
+                "    --import-wizard                  import an Open Surge game using a wizard\n"
                 "    --mobile                         enable mobile device simulation\n"
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    --verbose                        print logs to stdout\n"
@@ -216,6 +219,23 @@ commandline_t commandline_parse(int argc, char **argv)
             exit(0);
         }
 
+        else if(strcmp(argv[i], "--import") == 0) {
+            if(++i < argc && *(argv[i]) != '-') {
+                if(console_ask("This operation will copy files from %s to the engine folder. Are you sure?", argv[i])) {
+                    const char* gamedir = argv[i];
+                    import_game(gamedir);
+                }
+                exit(0);
+            }
+            else
+                crash("%s: missing --import parameter", program);
+        }
+
+        else if(strcmp(argv[i], "--import-wizard") == 0) {
+            import_wizard();
+            exit(0);
+        }
+
         else if(strcmp(argv[i], "--") == 0) {
             if(++i < argc) {
                 cmd.user_argv = (const char**)(argv + i);
@@ -281,8 +301,11 @@ void console_print(char *fmt, ...)
 /* Asks a y/n question on the console */
 bool console_ask(const char* fmt, ...)
 {
-    char c, buf[80] = { 0 };
     va_list args;
+
+#ifndef _WIN32
+
+    char c, buf[80] = { 0 };
 
     for(;;) {
         va_start(args, fmt);
@@ -300,4 +323,16 @@ bool console_ask(const char* fmt, ...)
         else
             return false;
     }
+
+#else
+
+    char text[8192];
+
+    va_start(args, fmt);
+    vsnprintf(text, sizeof(text), fmt, args);
+    va_end(args);
+
+    return IDYES == MessageBoxA(NULL, text, GAME_TITLE, MB_YESNO);
+
+#endif
 }

@@ -289,6 +289,7 @@ SET(GAME_SRCS
   src/core/engine.c
   src/core/font.c
   src/core/image.c
+  src/core/import.c
   src/core/input.c
   src/core/inputmap.c
   src/core/lang.c
@@ -408,6 +409,7 @@ SET(GAME_HEADERS
   src/core/global.h
   src/core/hashtable.h
   src/core/image.h
+  src/core/import.h
   src/core/input.h
   src/core/inputmap.h
   src/core/lang.h
