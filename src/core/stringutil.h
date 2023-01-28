@@ -23,21 +23,26 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 const char* str_to_upper(const char* str); /* returns a pointer to a static variable */
 const char* str_to_lower(const char* str); /* returns a pointer to a static variable */
+
 int str_icmp(const char* s1, const char* s2); /* case-insensitive compare function */
 int str_incmp(const char* s1, const char* s2, size_t n); /* case-insensitive compare up to n characters */
+bool str_startswith(const char* str, const char* prefix); /* checks if str starts with the given prefix */
+bool str_endswith(const char* str, const char* suffix); /* checks if str ends with the given suffix */
+
 char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of strcpy() */
 char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */
 char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */
+char* str_rstr(char* haystack, const char* needle); /* reverse strstr() */
+
 const char* str_addslashes(const char* str); /* replaces " by \\", returning a static char* */
 char* str_normalize_slashes(char* str); /* replaces '\\' by '/' in-place */
-char* str_rstr(char* haystack, const char* needle); /* reverse strstr() */
 const char* str_from_int(int integer, char* buffer, size_t buffer_size); /* converts integer to string; if no buffer is specified, returns a static char* */
 const char* str_basename(const char* path); /* the filename of the path */
 char* x64_to_str(uint64_t value, char* buf, size_t size); /* converts a 64-bit value to a padded hex-string */
 uint64_t str_to_x64(const char* buf); /* converts a hex-string to a 64-bit value */
 
 #endif
-

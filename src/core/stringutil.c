@@ -109,6 +109,29 @@ int str_incmp(const char* s1, const char* s2, size_t n)
 
 
 /*
+ * str_startswith()
+ * Checks if str starts with the given prefix
+ */
+bool str_startswith(const char* str, const char* prefix)
+{
+    return (0 == strncmp(str, prefix, strlen(prefix)));
+}
+
+
+/*
+ * str_endswith()
+ * Checks if str ends with the given suffix
+ */
+bool str_endswith(const char* str, const char* suffix)
+{
+    size_t str_length = strlen(str);
+    size_t suffix_length = strlen(suffix);
+
+    return (str_length >= suffix_length) && (0 == strcmp(str + str_length - suffix_length, suffix));
+}
+
+
+/*
  * str_cpy()
  * Safe version of strcpy(). Returns dest.
  * If we have something like char str[32], then
