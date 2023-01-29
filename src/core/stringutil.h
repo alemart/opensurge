@@ -32,6 +32,8 @@ int str_icmp(const char* s1, const char* s2); /* case-insensitive compare functi
 int str_incmp(const char* s1, const char* s2, size_t n); /* case-insensitive compare up to n characters */
 bool str_startswith(const char* str, const char* prefix); /* checks if str starts with the given prefix */
 bool str_endswith(const char* str, const char* suffix); /* checks if str ends with the given suffix */
+bool str_istartswith(const char* str, const char* prefix); /* checks if str starts with the given prefix with a case-insensitive match */
+bool str_iendswith(const char* str, const char* suffix); /* checks if str ends with the given suffix with a case-insensitive match */
 
 char* str_cpy(char* dest, const char* src, size_t dest_size); /* safe version of strcpy() */
 char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */

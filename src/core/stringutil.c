@@ -132,6 +132,29 @@ bool str_endswith(const char* str, const char* suffix)
 
 
 /*
+ * str_istartswith()
+ * Checks if str starts with the given prefix, with a case-insensitive match
+ */
+bool str_istartswith(const char* str, const char* prefix)
+{
+    return (0 == str_incmp(str, prefix, strlen(prefix)));
+}
+
+
+/*
+ * str_iendswith()
+ * Checks if str ends with the given suffix, with a case-insensitive match
+ */
+bool str_iendswith(const char* str, const char* suffix)
+{
+    size_t str_length = strlen(str);
+    size_t suffix_length = strlen(suffix);
+
+    return (str_length >= suffix_length) && (0 == str_icmp(str + str_length - suffix_length, suffix));
+}
+
+
+/*
  * str_cpy()
  * Safe version of strcpy(). Returns dest.
  * If we have something like char str[32], then
