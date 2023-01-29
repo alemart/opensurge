@@ -221,7 +221,7 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--import") == 0) {
             if(++i < argc && *(argv[i]) != '-') {
-                if(console_ask("This operation will copy files from %s to the engine folder. Are you sure?", argv[i])) {
+                if(console_ask("This operation will copy files from %s to the data folder.\n\nAre you sure?", argv[i])) {
                     const char* gamedir = argv[i];
                     import_game(gamedir);
                 }
