@@ -46,7 +46,7 @@
 #endif
 
 /* Utility macros */
-#define ENVORINMENT_VARIABLE_NAME       "OPENSURGE_USER_PATH"
+#define ENVIRONMENT_VARIABLE_NAME       "OPENSURGE_USER_PATH"
 #define ASSET_PATH_MAX                  4096
 #define PHYSFSx_getLastErrorMessage()   PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
 #define LOG(...)                        logfile_message("[asset] " __VA_ARGS__)
@@ -529,7 +529,7 @@ ALLEGRO_PATH* find_shared_datadir()
 ALLEGRO_PATH* find_user_datadir(const char* dirname)
 {
     /* Use custom user path? */
-    const char* env = getenv(ENVORINMENT_VARIABLE_NAME);
+    const char* env = getenv(ENVIRONMENT_VARIABLE_NAME);
     if(env != NULL)
         return al_create_path_for_directory(env);
 
