@@ -207,6 +207,7 @@ static int import_file(ALLEGRO_FS_ENTRY* e, void* extra);
 static bool is_match(const char* relative_path, const char** pattern_list);
 static bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src);
 static int my_for_each_fs_entry(ALLEGRO_FS_ENTRY *dir, int (*callback)(ALLEGRO_FS_ENTRY *dir, void *extra), void *extra);
+static bool make_directory_for_file(ALLEGRO_FS_ENTRY* e);
 static int pathcmp(const char* a, const char* b);
 
 
@@ -541,9 +542,7 @@ bool import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog)
     PRINT("Done!");
 
     /* show error count */
-    if(error_count == 0)
-        PRINT("No errors have occurred.");
-    else
+    if(error_count > 0)
         PRINT("%d error%s have occurred.", error_count, error_count != 1 ? "s" : "");
 
 exit:
@@ -758,7 +757,11 @@ bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src)
 {
 #if !(DRY_RUN)
 
-    /* open files */
+    /* create the directory that will store dest, if needed */
+    if(!make_directory_for_file(dest))
+        return false;
+
+    /* open the files */
     ALLEGRO_FILE* file_read = al_open_fs_entry(src, "rb");
     if(NULL == file_read)
         return false;
@@ -785,7 +788,7 @@ bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src)
             success = false;
     }
 
-    /* close files */
+    /* close the files */
     al_fclose(file_write);
     al_fclose(file_read);
 
@@ -796,10 +799,24 @@ bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src)
 
     (void)dest;
     (void)src;
+    (void)make_directory_for_file;
 
     return true;
 
 #endif
+}
+
+/* create a directory (and parent directories, if needed) to store a file */
+bool make_directory_for_file(ALLEGRO_FS_ENTRY* e)
+{
+    ALLEGRO_PATH* path = al_create_path(al_get_fs_entry_name(e));
+    al_set_path_filename(path, NULL);
+
+    /* al_make_directory() returns true (success) if the directory already exists */
+    bool result = al_make_directory(al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP));
+
+    al_destroy_path(path);
+    return result;
 }
 
 /* compare paths to directories a/ and b/ */
