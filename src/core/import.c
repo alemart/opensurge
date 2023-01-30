@@ -152,7 +152,7 @@ static const char* BLACKLIST[] = {
     "\n" \
     "As a rule of thumb, KEEP YOUR ASSETS SEPARATE FROM THOSE OF THE BASE GAME.\n" \
     "\n" \
-    "If you've been following the above rule of thumb, keeping your game in sync with the latest versions of the engine will be straightforward. If not, this is a good time to fix things.\n" \
+    "If you've been following the above rule of thumb, upgrading your game to latest versions of the engine will be straightforward. If not, this is a good time to fix things.\n" \
 ""
 
 #define SUCCESSFUL_IMPORT_2 "" \
@@ -172,9 +172,9 @@ static const char* BLACKLIST[] = {
     "\n" \
     "- If you have modified the input controls, manually merge your changes. Look especially at inputs/default.in.\n" \
     "\n" \
-    "- If you have modified the source code of the engine (C language), your changes no longer apply, but you may redo them.\n" \
+    "- If you have modified the source code of the engine (C language), your changes no longer apply. You may redo them.\n" \
     "\n" \
-    "- You can modify the audio files directly. These were all imported.\n" \
+    "- You can modify the audio files directly. These files were all imported.\n" \
     "\n" \
     "The logfile.txt can give you insights in case of need. For more information, read the article on how to upgrade the engine at the Open Surge Wiki: " GAME_WEBSITE \
 ""
