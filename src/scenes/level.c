@@ -1075,7 +1075,9 @@ void level_init(void *path_to_lev_file)
     clear_bricklike_ssobjects();
     renderqueue_init();
     particle_init();
-    /*music_stop();*/
+
+    /* stop any music that's playing */
+    music_stop();
 
     /* level init */
     level_load(filepath);
