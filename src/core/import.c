@@ -192,6 +192,7 @@ static const char* BLACKLIST[] = {
 /* strings */
 static const char TITLE_WIZARD[] = "Open Surge Import Wizard";
 static const char UNAVAILABLE_ERROR[] = "Define environment variable " ENVIRONMENT_VARIABLE_NAME " before invoking this import utility.";
+static const char INVALID_DIRECTORY_ERROR[] = "Not a valid Open Surge game directory!";
 static const char BACKUP_MESSAGE[] = "\"I declare that I made a backup of my game. My backup is stored safely and I can access it now and in the future.\"";
 static const char SUCCESSFUL_IMPORT[] = FOREACH_SUCCESSFUL_IMPORT_MESSAGE(GLUE);
 static const char UNSUCCESSFUL_IMPORT[] = "Something went wrong.\n\nPlease review the logs, double check the permissions of your filesystem and try again.";
@@ -322,7 +323,7 @@ void import_wizard()
 
         dialog = al_create_native_file_dialog(
             NULL,
-            "Locate the game",
+            "Where is the folder of the game?",
             "",
             ALLEGRO_FILECHOOSER_FOLDER /* | ALLEGRO_FILECHOOSER_FILE_MUST_EXIST */
         );
@@ -350,7 +351,7 @@ void import_wizard()
         if(valid_gamedir)
             break;
 
-        WARN("Not a valid Open Surge game:\n\n%s", gamedir);
+        WARN("%s\n\n%s", INVALID_DIRECTORY_ERROR, gamedir);
 
         const int MAX_ATTEMPTS = 3;
         if(i >= MAX_ATTEMPTS) {
@@ -504,7 +505,7 @@ bool import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog)
 
     /* validate the source directory (i.e., gamedir) */
     if(!is_valid_gamedir(src)) {
-        PRINT("Not a valid Open Surge game directory: %s", gamedir);
+        PRINT("%s %s", INVALID_DIRECTORY_ERROR, gamedir);
         goto exit;
     }
 
@@ -520,7 +521,7 @@ bool import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog)
 
     /* validate the destination directory (it may not be the folder of this executable) */
     if(!is_valid_gamedir(dest)) {
-        PRINT("Not a valid Open Surge game directory: %s", destdir);
+        PRINT("%s %s", INVALID_DIRECTORY_ERROR, destdir);
         goto exit;
     }
 
@@ -600,6 +601,7 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
     int root_cnt = al_get_path_num_components(src_path);
     while(root_cnt-- > 0)
         al_remove_path_component(relative_path, 0);
+    al_set_path_drive(relative_path, NULL);
 
     /* find d_path, the absolute path in the destination folder corresponding to e_path */
     ALLEGRO_PATH* d_path = al_clone_path(dest_path);
