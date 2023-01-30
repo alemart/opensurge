@@ -818,7 +818,7 @@ bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src)
     }
 
     /* copy src to dest */
-    char buffer[4096];
+    unsigned char buffer[4096];
     int num_bytes;
     bool success = true;
 
@@ -846,7 +846,6 @@ bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src)
     (void)src;
     (void)make_directory_for_file;
 
-return 0 != (rand() % 10);
     return true;
 
 #endif
