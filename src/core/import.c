@@ -84,6 +84,8 @@ static const char* WHITELIST[] = {
     EXACT("themes/scenes/levelselect.bg"),
     EXACT("themes/scenes/options.bg"),
 
+    EXACT("images/loading.png"),
+
     PREFIX("musics/"),
     PREFIX("samples/"),
 
@@ -164,7 +166,7 @@ static const char* BLACKLIST[] = {
     "\n" \
     "- Do not modify the SurgeScript objects of the base game. If you want changed functionality, clone the objects and change their name.\n" \
     "\n" \
-    "- Do not modify the characters and the bricksets of the base game. Create your own.\n" \
+    "- Do not modify the characters nor bricksets of the base game. Create your own.\n" \
 ""
 
 #define SUCCESSFUL_IMPORT_3 "" \
