@@ -126,9 +126,13 @@ static const char* BLACKLIST[] = {
 #define CONFIRM(...)    message_box(ALLEGRO_MESSAGEBOX_QUESTION | ALLEGRO_MESSAGEBOX_YES_NO, __VA_ARGS__)
 #define YES             1
 
-#define PRINT(...)      do { \
+#define CONSOLE_PRINT(...) do { \
     fprintf(stdout, __VA_ARGS__); \
     fprintf(stdout, "\n"); \
+} while(0)
+
+#define PRINT(...)      do { \
+    CONSOLE_PRINT(__VA_ARGS__); \
     if(textlog != NULL) { \
         al_append_native_text_log(textlog, __VA_ARGS__); \
         al_append_native_text_log(textlog, "\n"); \
@@ -141,7 +145,7 @@ static const char* BLACKLIST[] = {
 
 
 /* instructions & tips */
-#define INSTRUCTIONS_1 "" \
+#define SUCCESSFUL_IMPORT_1 "" \
     "Your game is now in sync with version " GAME_VERSION_STRING " of the engine.\n" \
     "\n" \
     "It's possible that you'll see some of your changes missing. If this happens, you'll have to adjust a few things.\n" \
@@ -151,7 +155,7 @@ static const char* BLACKLIST[] = {
     "If you've been following the above rule of thumb, keeping your game in sync with the latest versions of the engine will be straightforward. If not, this is a good time to fix things.\n" \
 ""
 
-#define INSTRUCTIONS_2 "" \
+#define SUCCESSFUL_IMPORT_2 "" \
     "Tips:\n" \
     "\n" \
     "- Do not modify the images of the base game. If you want to change them, create new images and replace the sprites using the sprites/overrides/ folder.\n" \
@@ -163,7 +167,7 @@ static const char* BLACKLIST[] = {
     "- Do not modify the characters and the bricksets of the base game. Create your own.\n" \
 ""
 
-#define INSTRUCTIONS_3 "" \
+#define SUCCESSFUL_IMPORT_3 "" \
     "More tips:\n" \
     "\n" \
     "- If you have modified the input controls, manually merge your changes. Look especially at inputs/default.in.\n" \
@@ -175,12 +179,20 @@ static const char* BLACKLIST[] = {
     "The logfile.txt can give you insights in case of need. For more information, read the article on how to upgrade the engine at the Open Surge Wiki: " GAME_WEBSITE \
 ""
 
+#define FOREACH_SUCCESSFUL_IMPORT_MESSAGE(F) \
+    F(SUCCESSFUL_IMPORT_1) \
+    F(SUCCESSFUL_IMPORT_2) \
+    F(SUCCESSFUL_IMPORT_3)
+
+#define GLUE(x) x "\n"
+#define TELL(x) WARN("%s", x);
 
 /* strings */
 static const char TITLE_WIZARD[] = "Open Surge Import Wizard";
 static const char UNAVAILABLE_ERROR[] = "Define environment variable " ENVIRONMENT_VARIABLE_NAME " before invoking this import utility.";
 static const char BACKUP_MESSAGE[] = "\"I declare that I made a backup of my game. My backup is stored safely and I can access it now and in the future.\"";
-static const char COMPLETED_MESSAGE[] = INSTRUCTIONS_1 "\n" INSTRUCTIONS_2 "\n" INSTRUCTIONS_3;
+static const char SUCCESSFUL_IMPORT[] = FOREACH_SUCCESSFUL_IMPORT_MESSAGE(GLUE);
+static const char UNSUCCESSFUL_IMPORT[] = "Something went wrong.\n\nPlease review the logs, double check the permissions of your filesystem and try again.";
 
 /* private functions */
 static inline bool is_import_utility_available();
@@ -189,8 +201,8 @@ static inline bool init_dialog();
 static int message_box(int flags, const char* format, ...);
 static bool is_valid_gamedir(ALLEGRO_FS_ENTRY* dir);
 static char* fullpath_of(ALLEGRO_FS_ENTRY* dir, const char* filename, char* dest, size_t dest_size);
-static void import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog);
-static void import_files(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src, ALLEGRO_TEXTLOG* textlog);
+static bool import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog);
+static int import_files(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src, ALLEGRO_TEXTLOG* textlog);
 static int import_file(ALLEGRO_FS_ENTRY* e, void* extra);
 static bool is_match(const char* relative_path, const char** pattern_list);
 static bool copy_file(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src);
@@ -216,7 +228,10 @@ void import_game(const char* gamedir)
     }
 
     /* call the underlying import function */
-    import_game_ex(gamedir, NULL);
+    if(import_game_ex(gamedir, NULL))
+        CONSOLE_PRINT("%s", SUCCESSFUL_IMPORT);
+    else
+        ERROR("%s", UNSUCCESSFUL_IMPORT);
 }
 
 
@@ -260,9 +275,9 @@ void import_wizard()
 
     /* ask for a clean build */
     if(YES != CONFIRM(
-        "The %s should only be invoked from a clean build of the engine, which you can get at %s. Do not invoke this utility from your MOD.\n"
+        "The %s should only be invoked from a clean build of the engine, which you can get at %s.\n"
         "\n"
-        "I will alter the files of the current directory, but I don't want you to lose any of your hard work. Backup your stuff.\n"
+        "Do not invoke me from your MOD. I will alter some files of this build. Also, backup your stuff, because I don't want you to lose any of your hard work.\n"
         "\n"
         "Are you sure you want to continue?",
         TITLE_WIZARD, GAME_WEBSITE
@@ -335,8 +350,10 @@ void import_wizard()
         WARN("Not a valid Open Surge game:\n\n%s", gamedir);
 
         const int MAX_ATTEMPTS = 3;
-        if(i >= MAX_ATTEMPTS)
+        if(i >= MAX_ATTEMPTS) {
+            ALERT("Enough of that.");
             goto done;
+        }
 
     }
 
@@ -349,10 +366,12 @@ void import_wizard()
 
     /* create a text log and import the game */
     ALLEGRO_TEXTLOG* textlog = al_open_native_text_log(TITLE_WIZARD, ALLEGRO_TEXTLOG_MONOSPACE);
-    import_game_ex(gamedir, textlog);
-    WARN("%s", INSTRUCTIONS_1);
-    WARN("%s", INSTRUCTIONS_2);
-    WARN("%s", INSTRUCTIONS_3);
+    if(import_game_ex(gamedir, textlog)) {
+        { FOREACH_SUCCESSFUL_IMPORT_MESSAGE(TELL); }
+    }
+    else {
+        ERROR("%s", UNSUCCESSFUL_IMPORT);
+    }
     al_close_native_text_log(textlog);
 
 done:
@@ -456,10 +475,11 @@ char* fullpath_of(ALLEGRO_FS_ENTRY* dir, const char* filename, char* dest, size_
 }
 
 /* Import an Open Surge game located at the given absolute path */
-void import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog)
+bool import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog)
 {
     ALLEGRO_FS_ENTRY* src = NULL;
     ALLEGRO_FS_ENTRY* dest = NULL;
+    int error_count = -1;
 
     /* check if the import utility is available in this platform */
     if(!is_import_utility_available()) {
@@ -514,15 +534,17 @@ void import_game_ex(const char* gamedir, ALLEGRO_TEXTLOG* textlog)
     PRINT("Destination: %s", al_get_fs_entry_name(dest));
 
     /* import files */
-    import_files(dest, src, textlog);
+    error_count = import_files(dest, src, textlog);
 
     /* done! */
     PRINT(" ");
     PRINT("Done!");
-    if(textlog == NULL) {
-        PRINT(" ");
-        PRINT("%s", COMPLETED_MESSAGE);
-    }
+
+    /* show error count */
+    if(error_count == 0)
+        PRINT("No errors have occurred.");
+    else
+        PRINT("%d error%s have occurred.", error_count, error_count != 1 ? "s" : "");
 
 exit:
     /* clean up */
@@ -531,25 +553,32 @@ exit:
 
     if(dest != NULL)
         al_destroy_fs_entry(dest);
+
+    /* return success if no errors have occurred */
+    return error_count == 0;
 }
 
-/* import files from src/ into dest/ */
-void import_files(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src, ALLEGRO_TEXTLOG* textlog)
+/* import files from src/ into dest/, returning the number of errors */
+int import_files(ALLEGRO_FS_ENTRY* dest, ALLEGRO_FS_ENTRY* src, ALLEGRO_TEXTLOG* textlog)
 {
     const char* dest_dir = al_get_fs_entry_name(dest);
     const char* src_dir = al_get_fs_entry_name(src);
+    int error_count = 0;
 
     /* prepare iteration */
     ALLEGRO_PATH* src_path = al_create_path_for_directory(src_dir);
     ALLEGRO_PATH* dest_path = al_create_path_for_directory(dest_dir);
 
     /* call import_file() for each entry of the src folder */
-    void* extra[] = { textlog, src_path, dest_path };
+    void* extra[] = { textlog, src_path, dest_path, &error_count };
     my_for_each_fs_entry(src, import_file, extra);
 
     /* clean up */
     al_destroy_path(dest_path);
     al_destroy_path(src_path);
+
+    /* done! */
+    return error_count;
 }
 
 /* import a file, if applicable */
@@ -558,6 +587,7 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
     ALLEGRO_TEXTLOG* textlog = (ALLEGRO_TEXTLOG*)(((void**)extra)[0]);
     const ALLEGRO_PATH* src_path = (ALLEGRO_PATH*)(((void**)extra)[1]);
     const ALLEGRO_PATH* dest_path = (ALLEGRO_PATH*)(((void**)extra)[2]);
+    int* error_count = (int*)(((void**)extra)[3]);
     int result = ALLEGRO_FOR_EACH_FS_ENTRY_OK; /* continue iteration */
 
     /* find e_path, the absolute path of the current entry e */
@@ -604,8 +634,10 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
             PRINT("    Importing %s", vpath);
 
             ALLEGRO_FS_ENTRY* d = al_create_fs_entry(al_path_cstr(d_path, ALLEGRO_NATIVE_PATH_SEP));
-            if(!copy_file(d, e))
-                PRINT("    ERROR: can't copy %s", vpath);
+            if(!copy_file(d, e)) {
+                PRINT("!   ERROR: can't copy %s", vpath);
+                ++(*error_count);
+            }
             al_destroy_fs_entry(d);
 
         }
