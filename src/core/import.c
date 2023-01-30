@@ -164,9 +164,9 @@ static const char* BLACKLIST[] = {
     "\n" \
     "- Do not modify the texts of the base game. If you want different texts, store your changes in the languages/extends/ folder.\n" \
     "\n" \
-    "- Do not modify the SurgeScript objects of the base game. If you want changed functionality, clone the objects and change their name.\n" \
+    "- Do not modify the SurgeScript objects of the base game. If you want changed functionality, clone the objects, change their name and save them as separate files.\n" \
     "\n" \
-    "- Do not modify the characters nor bricksets of the base game. Create your own.\n" \
+    "- Do not modify the characters/levels/bricksets of the base game. Clone them before you remix, or create your own.\n" \
 ""
 
 #define SUCCESSFUL_IMPORT_3 "" \
@@ -174,9 +174,15 @@ static const char* BLACKLIST[] = {
     "\n" \
     "- If you have modified the input controls, manually merge your changes. Look especially at inputs/default.in.\n" \
     "\n" \
+    "- If you'd like to know which files you have changed, you may run a diff between the folder of your MOD and the folder of a clean build of the version of the engine you were previously using.\n" \
+    "\n" \
     "- If you have modified the source code of the engine (C language), your changes no longer apply. You may redo them.\n" \
     "\n" \
     "- You can modify the audio files directly. These files were all imported.\n" \
+""
+
+#define SUCCESSFUL_IMPORT_4 "" \
+    "Again: keep your assets separate from those of the base game.\n" \
     "\n" \
     "The logfile.txt can give you insights in case of need. For more information, read the article on how to upgrade the engine at the Open Surge Wiki: " GAME_WEBSITE \
 ""
@@ -184,7 +190,8 @@ static const char* BLACKLIST[] = {
 #define FOREACH_SUCCESSFUL_IMPORT_MESSAGE(F) \
     F(SUCCESSFUL_IMPORT_1) \
     F(SUCCESSFUL_IMPORT_2) \
-    F(SUCCESSFUL_IMPORT_3)
+    F(SUCCESSFUL_IMPORT_3) \
+    F(SUCCESSFUL_IMPORT_4)
 
 #define GLUE(x) x "\n"
 #define TELL(x) WARN("%s", x);
@@ -292,7 +299,8 @@ void import_wizard()
         ask for a backup, even though we technically don't require it*
 
         * assuming that this utility was invoked from a clean build of the engine,
-          which should be the case, but may not be
+          which should be the case. If the user accidentally invokes this from his
+          or her MOD, then a backup is required!
 
         (users should have a backup anyway!)
     */
@@ -302,13 +310,18 @@ void import_wizard()
 #if WANT_SILLY_JOKE
     int repetitions = 3;
     do {
+
         ALERT("Good.");
         ALERT("Now I want you to confirm it to me %d more times, just for fun :)", repetitions);
+
         for(int i = 1; i <= repetitions; i++) {
             if(YES != CONFIRM("%s\n\n%d / %d", BACKUP_MESSAGE, i, repetitions))
                 goto done;
         }
+
         repetitions *= 2;
+
+        /* are you paying attention?!?! */
     } while(YES == CONFIRM("Alright, gotcha. I love to have fun.\n\nWanna confirm some more?"));
     ALERT("Fine.");
 #endif
@@ -370,13 +383,18 @@ void import_wizard()
 
     /* create a text log and import the game */
     ALLEGRO_TEXTLOG* textlog = al_open_native_text_log(TITLE_WIZARD, ALLEGRO_TEXTLOG_MONOSPACE);
+
     if(import_game_ex(gamedir, textlog)) {
         { FOREACH_SUCCESSFUL_IMPORT_MESSAGE(TELL); }
+        PRINT("%s", SUCCESSFUL_IMPORT);
     }
     else {
         ERROR("%s", UNSUCCESSFUL_IMPORT);
+        PRINT("%s", UNSUCCESSFUL_IMPORT);
     }
+
     al_close_native_text_log(textlog);
+    textlog = NULL;
 
 done:
     ALERT("See you later!");
