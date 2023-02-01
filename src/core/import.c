@@ -154,7 +154,7 @@ static const char* BLACKLIST[] = {
     "\n" \
     "As a rule of thumb, KEEP YOUR ASSETS SEPARATE FROM THOSE OF THE BASE GAME.\n" \
     "\n" \
-    "If you've been following the above rule of thumb, upgrading your game to latest versions of the engine will be straightforward. If not, this is a good time to fix things.\n" \
+    "If you've been following the above rule of thumb, upgrading your game to the latest versions of the engine will be straightforward. If not, this is a good time to fix things.\n" \
 ""
 
 #define SUCCESSFUL_IMPORT_2 "" \
@@ -294,7 +294,7 @@ void import_wizard()
         "\n"
         "I will help you import your Open Surge game into this version of the engine (%s).\n"
         "\n"
-        "As soon as you import your game, it will be in sync with this version of the engine.",
+        "As soon as you import your game, it will be in sync with this version.",
         TITLE_WIZARD, GAME_VERSION_STRING
     );
 
@@ -650,13 +650,14 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
 
         /* use a consistent path separator across platforms */
         const char* vpath = al_path_cstr(relative_path, '/');
+        vpath = *vpath ? vpath : "/";
 
         /* match and import the file */
         if(is_dir) {
 
             /* ignore directories */
             PRINT(" ");
-            PRINT("Scanning %s", *vpath ? vpath : "/");
+            PRINT("Scanning %s", vpath);
             PRINT(" ");
 
         }
