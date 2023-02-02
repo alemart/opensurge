@@ -2,12 +2,13 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Donate to our project - Surge the Rabbit</title>
+        <title>Support Surge the Rabbit</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" href="/favicon.ico">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
@@ -18,110 +19,186 @@
         gtag('config', 'UA-120511928-1');
         </script>
         <style>
-            body {
-                font-family: 'Roboto', sans-serif;
-                background-color: royalblue;
-                height: 100vh;
-            }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: royalblue;
+            height: 100vh;
+        }
 
-            a:any-link {
-                color: royalblue;
-                text-decoration: none;
-            }
+        a:any-link {
+            color: royalblue;
+            text-decoration: none;
+        }
 
-            h1 {
-                font-size: 1.6em;
-            }
+        h1 {
+            font-size: 1.6em;
+        }
 
-            .speech-bubble {
-                position: relative;
-                font-size: 1.25rem;
+        .container {
+            width: 100%;
+        }
 
-                color: #060a36;
-                background: whitesmoke;
+        .speech-bubble:not(.hidden) {
+            position: relative;
+            font-size: 1.25rem;
 
-                padding: 32px;
-                border-radius: 16px;
-                margin: 16px;
+            color: #060a36;
+            background: whitesmoke;
+
+            padding: 32px;
+            border-radius: 16px;
+            margin: 16px;
+
+            animation-duration: 0.5s;
+            animation-name: speech-bubble;
+            animation-timing-function: cubic-bezier(.55,.08,.47,1.52);
+            animation-delay: 0s;
+            animation-fill-mode: backwards;
+        }
+
+        @keyframes speech-bubble {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .image-wrapper {
+            display: flex;
+            justify-content: end;
+            height: 100%;
+        }
+
+        img#surge {
+            display: none;
+            align-self: center;
+        }
+
+        /* Desktop */
+        @media screen and (min-width: 35.5em) {
+            img#surge {
+                display: inline;
 
                 animation-duration: 0.5s;
-                animation-name: speech-bubble;
-                animation-timing-function: cubic-bezier(.55,.08,.47,1.52);
-                animation-delay: 0.5s;
-                animation-fill-mode: backwards;
-            }
-                
-            @keyframes speech-bubble {
-                0% {
-                    opacity: 0;
-                    transform: scale(0.5);
-                }
-                        
-                100% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
+                animation-name: surge;
+                animation-timing-function: ease-out;
+                animation-delay: 0.0s;
+                animation-fill-mode: forwards;
             }
 
-            .image-wrapper {
-                display: flex;
-                justify-content: end;
-                height: 100%;
+            @keyframes surge {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(0%); }
             }
 
-            img#surge {
-                display: none;
-                align-self: center;
+            /* detail of the speech bubble */
+            .speech-bubble:after {
+                content: '';
+                display: block;
+                width: 0;
+                z-index: 1;
+
+                position: absolute;
+                top: 33%;
+                right: -20px;
+                margin-top: -20px;
+
+                border-color: transparent whitesmoke;
+                border-style: solid;
+                border-width: 20px 0 20px 20px;
             }
+        }
 
-            /* Desktop */
-            @media screen and (min-width: 35.5em) {
-                img#surge {
-                    display: inline;
-
-                    animation-duration: 0.5s;
-                    animation-name: surge;
-                    animation-timing-function: ease-out;
-                    animation-delay: 0.0s;
-                    animation-fill-mode: forwards;
-                }
-
-                @keyframes surge {
-                    0% {
-                        transform: translateX(100%);
-                    }
-
-                    100% {
-                        transform: translateX(0%);
-                    }
-                }
-
-                /* detail of the speech bubble */
-                .speech-bubble:after {
-                    content: '';
-                    display: block;
-                    width: 0;
-                    z-index: 1;
-
-                    position: absolute;
-                    top: 33%;
-                    right: -20px;
-                    margin-top: -20px;
-
-                    border-color: transparent whitesmoke;
-                    border-style: solid;
-                    border-width: 20px 0 20px 20px;
-                }
+        /* vertical align */
+        @media screen and (min-height: 750px) {
+            .container {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
             }
+        }
 
-            /* vertical align */
-            @media screen and (min-height: 600px) {
-                .container {
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                }
-            }
+        /* from ko-fi */
+        img.kofiimg {
+            display: initial!important;
+            vertical-align:middle;
+            height:13px!important;
+            width:20px!important;
+            padding-top:0!important;
+            padding-bottom:0!important;
+            border:none;
+            margin-top:0;
+            margin-right:5px!important;
+            margin-left:0!important;
+            margin-bottom:3px!important;
+            content:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAVCAMAAAAQExzYAAABLFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////XlsAAADh4eHl5eX//Pz/XGT/XV/o6Ojr6+vm5ub/XGny8vL/W2rY2NjOzs7/y83Ly8v/wMj/nZz/WHP/Wm//Wm7/Wmz/W2f/XWL/Xl3/9PX/8PHt7e3q6ur/6end3d3T09P/w8W9vb3/tL3/urmsrKybm5v/WHdubm5qampMTEz29vb/3N3c3Nz/ztD/yMjBwcH/uL24uLj/sLf/qKf/pqWioqKUlJT/hZL/h4r/cYqGhob/hoR/f3//YXljY2NXV1dUVFQfHx9UYKmWAAAAIHRSTlMA8vRI++2e5t/FeWsd6NW7p1IvKRAHBv6xlIpfXDstF3+fWh4AAAEvSURBVCjPddHXdoJAFIXhIwHsvaQnh1HUoLFF0+wlajS99/r+7xAn4wBZgf+Cm/0tWMNA2OmwzO/2bALN1U9a1rl8EzwUOFJoV+FTtgX5bIs+p147QAiZFhELUgyEX1CvDCoNVM9vrtoMLCRWhS7ixxoD9efxuPpeetzd286dMgDgPUYcygxUqtVaja776fQTB1GiYtnNwICvB5mMwsEGQR30+HqoKK/mT/SX2CkaObbSSnOwLpURXzwM4MVsZd2yU7gC39eImujj/+Fovu+oSOsUi3nEk8kKgJRCLvjOy06CCQNg78+u5gujxeU4ADg5wJJyp+9fhDjlCLvuJPLaxvtJOAbzAl38nybGgRe6twCjEOhFhWGq2dyitbKzNE07e/D7wCgSFIk5UZRk0/4D8SBRKyIOaB4AAAAASUVORK5CYII=');
+        }
+
+        .kofiimg:after {
+            vertical-align:middle;
+            height:25px;
+            padding-top:0;
+            padding-bottom:0;
+            border:none;
+            margin-top:0;
+            margin-right:6px;
+            margin-left:0;
+            margin-bottom:4px!important;
+            content:'';
+        }
+
+        .kofitext {
+            color:#fff !important;
+            letter-spacing: -0.15px!important;
+            vertical-align:middle;
+            line-height:33px !important;
+            padding:0;
+            text-align:center;
+            text-decoration:none!important;
+            text-shadow: 0 1px 1px rgba(34, 34, 34, 0.05);
+        }
+
+        .kofi-button {
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
+            line-height:36px!important;
+            min-width:150px;
+            display:inline-block!important;
+            background-color:royalblue;
+            padding:2px 12px !important;
+            text-align:center !important;
+            border-radius:7px;
+            color:#fff;
+            cursor:pointer;
+            overflow-wrap:break-word;
+            vertical-align:middle;
+            border:0 none #fff !important;
+            font-family:'Quicksand',Helvetica,Century Gothic,sans-serif !important;
+            text-decoration:none;
+            text-shadow:none;
+            font-weight:700!important;
+            font-size:14px !important
+        }
+
+        .kofi-button:hover {
+            opacity:.85;
+        }
+
+        .kofitext img.kofiimg {
+            height:15px!important;
+            width:22px!important;
+            display: initial;
+            animation: kofi-wiggle 3s infinite;
+        }
+
+        @keyframes kofi-wiggle {
+            0% { transform:rotate(0) scale(1); }
+            60% { transform:rotate(0) scale(1); }
+            75% { transform:rotate(0) scale(1.12); }
+            80% { transform:rotate(0) scale(1.1); }
+            84% { transform:rotate(-10deg) scale(1.1); }
+            88% { transform:rotate(10deg) scale(1.1); }
+            92% { transform:rotate(-10deg) scale(1.1); }
+            96% { transform:rotate(10deg) scale(1.1); }
+            100% { transform:rotate(0) scale(1); }
+        }
         </style>
     </head>
     <body>
@@ -130,13 +207,22 @@
                 <div class="pure-u-1 pure-u-lg-1-5"></div>
                 <div class="pure-u-1 pure-u-sm-2-3 pure-u-md-3-4 pure-u-lg-3-5">
 
-                    <div class="speech-bubble">
+                    <div id="donate-message" class="speech-bubble">
                         <h1>Thank you for playing Surge the Rabbit!</h1>
                         <p>This open source game is shared as a gift for everyone to enjoy.</p>
                         <p>Donate now and help this project be one of the best open source games! Your contribution will help create an amazing gaming experience that you'll surely enjoy!</p>
                         <p>Every donation matters, so what are you waiting for? Let's make this game great together!</p>
-                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'J3J41O00K');kofiwidget2.draw();</script> 
+                        <button id="donate-button" class="kofi-button">
+                            <span class="kofitext">
+                                <img alt="Ko-fi donations" class="kofiimg">
+                                Support Us on Ko-fi
+                            </span>
+                        </button>
                         <p>P.S. <a href="https://discord.gg/w8JqM7m" target="_blank">Join us on Discord</a> if you're interested in <a href="https://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank">creating games with the engine</a>!</p>
+                    </div>
+
+                    <div id="donate-widget" class="speech-bubble hidden">
+                        <iframe id="kofiframe" src="https://ko-fi.com/alemart/?hidefeed=true&widget=true&embed=true&preview=true" style="border:none;width:100%;padding:0px;background:whitesmoke;" height="640" title="alemart"></iframe>
                     </div>
 
                 </div>
@@ -149,5 +235,16 @@
                 </div>
             </div>
         </div>
+        <script>
+        document.getElementById('donate-button').addEventListener('click', function() {
+            document.getElementById('donate-message').classList.add('hidden');
+            document.getElementById('donate-widget').classList.remove('hidden');
+            history.pushState({ donate: true }, '', '#donate');
+        });
+        window.addEventListener('popstate', function(e) {
+            document.getElementById('donate-message').classList.toggle('hidden');
+            document.getElementById('donate-widget').classList.toggle('hidden');
+        });
+        </script>
     </body>
 </html>
