@@ -71,6 +71,7 @@ struct item_t* level_create_legacy_item(int id, v2d_t position);
 struct enemy_t* level_create_legacy_object(const char *name, v2d_t position);
 surgescript_object_t* level_create_object(const char* object_name, v2d_t position);
 surgescript_object_t* level_get_entity_by_id(const char* entity_id);
+surgescript_object_t* level_child_object(const char* object_name);
 
 /* camera */
 void level_set_camera_focus(struct actor_t *act);

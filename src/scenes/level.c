@@ -1744,6 +1744,25 @@ surgescript_object_t* level_get_entity_by_id(const char* entity_id)
 
 
 /*
+ * level_child_object()
+ * Get a direct child of the SurgeScript Level object with the given name
+ * Returns NULL if no such object exists
+ */
+surgescript_object_t* level_child_object(const char* object_name)
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    surgescript_object_t* level = level_ssobject();
+    surgescript_objecthandle_t child = surgescript_object_child(level, object_name);
+
+    if(surgescript_objectmanager_exists(manager, child))
+        return surgescript_objectmanager_get(manager, child);
+
+    return NULL;
+}
+
+
+/*
  * level_add_to_score()
  * Adds a value to the player's score.
  * (It also creates a flying text that
