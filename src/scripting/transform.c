@@ -32,6 +32,8 @@ static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_translateby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_translate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_rotate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_scale(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_scaleby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setposition(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -75,6 +77,8 @@ void scripting_register_transform(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Transform", "translateBy", fun_translateby, 2);
     surgescript_vm_bind(vm, "Transform", "move", fun_translateby, 2); /* deprecated */
     surgescript_vm_bind(vm, "Transform", "rotate", fun_rotate, 1);
+    surgescript_vm_bind(vm, "Transform", "scale", fun_scale, 1);
+    surgescript_vm_bind(vm, "Transform", "scaleBy", fun_scaleby, 2);
     surgescript_vm_bind(vm, "Transform", "lookAt", fun_lookat, 1);
     surgescript_vm_bind(vm, "Transform", "get_position", fun_getposition, 0);
     surgescript_vm_bind(vm, "Transform", "set_position", fun_setposition, 1);
@@ -182,6 +186,34 @@ surgescript_var_t* fun_rotate(surgescript_object_t* object, const surgescript_va
     return NULL;
 }
 
+/* scaleBy: scale by (x,y) */
+surgescript_var_t* fun_scaleby(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_transform_t* transform = surgescript_object_transform(target(object));
+    double x = surgescript_var_get_number(param[0]);
+    double y = surgescript_var_get_number(param[1]);
+
+    surgescript_transform_scale2d(transform, x, y);
+
+    notify_change(object);
+    return NULL;
+}
+
+/* scale by a Vector2 */
+surgescript_var_t* fun_scale(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_transform_t* transform = surgescript_object_transform(target(object));
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
+    double x = 0.0, y = 0.0;
+
+    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
+    surgescript_transform_scale2d(transform, x, y);
+
+    notify_change(object);
+    return NULL;
+}
+
 /* will look at a given position */
 surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -193,6 +225,7 @@ surgescript_var_t* fun_lookat(surgescript_object_t* object, const surgescript_va
     scripting_vector2_read(position, &position_x, &position_y);
     surgescript_transform_util_lookat2d(target(object), position_x, position_y);
 
+    notify_change(object);
     return NULL;
 }
 
@@ -233,7 +266,9 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_setangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     double world_angle = surgescript_var_get_number(param[0]);
+
     surgescript_transform_util_setworldangle2d(target(object), world_angle);
+
     notify_change(object);
     return NULL;
 }
@@ -276,7 +311,9 @@ surgescript_var_t* fun_getlocalangle(surgescript_object_t* object, const surgesc
 surgescript_var_t* fun_setlocalangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_transform_t* transform = surgescript_object_transform(target(object));
+
     surgescript_transform_setrotation2d(transform, surgescript_var_get_number(param[0]));
+
     notify_change(object);
     return NULL;
 }
