@@ -230,6 +230,7 @@ object 'VectorFactory' \n\
     public readonly down = spawn('Vector2').__init(0, 1); \n\
     public readonly left = spawn('Vector2').__init(-1, 0); \n\
     public readonly zero = spawn('Vector2').__init(0, 0); \n\
+    public readonly one = spawn('Vector2').__init(1, 1); \n\
     temp = System.child('__Temp'); \n\
 \n\
     fun call(x, y) \n\
