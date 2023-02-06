@@ -36,6 +36,7 @@ The import procedure works as follows:
 
 Copy to dest/ all files from src/ that do not match the blacklist.
 Do not overwrite any files, except the ones that match the whitelist.
+Ask the user about overwriting files that match the greylist.
 
 src/ and dest/ are both Open Surge game folders.
 
@@ -116,7 +117,6 @@ static const char* WHITELIST[] = {
     PREFIX("samples/"),
 
     PREFIX("fonts/"), /* FIXME: should we have a fonts/overrides/ instead? */
-    /*PREFIX("inputs/"),*/ /* users sometimes stick with outdated mappings; require a manual merge? */
 
     /* NULL-terminated list */
     NULL
@@ -140,6 +140,18 @@ static const char* BLACKLIST[] = {
     EXACT("LICENSE"),
     EXACT("surge.png"),
     EXACT("logo.png"),
+
+    /* NULL-terminated list */
+    NULL
+
+};
+
+/* the greylist should have few matching files, because we'll ask the user about each one of them */
+static const char* GREYLIST[] = {
+
+    /* users sometimes stick with outdated mappings;
+       a manual merge could be appropriate */
+    EXACT("inputs/default.in"),
 
     /* NULL-terminated list */
     NULL
@@ -466,6 +478,8 @@ int message_box(int flags, const char* format, ...)
     vsnprintf(buffer, sizeof(buffer), format, args);
     va_end(args);
 
+    /* According to the Allegro manual, al_show_native_message_box() may be called
+       without Allegro being initialized. */
     return al_show_native_message_box(NULL, TITLE_WIZARD, TITLE_WIZARD, buffer, NULL, flags);
 }
 
@@ -652,7 +666,10 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
         const char* vpath = al_path_cstr(relative_path, '/');
         vpath = *vpath ? vpath : "/";
 
-        /* match and import the file */
+        /* will we import the file? */
+        bool import = false;
+
+        /* match the file */
         if(is_dir) {
 
             /* ignore directories */
@@ -667,6 +684,18 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
             PRINT("    Ignoring %s", vpath);
 
         }
+        else if(al_filename_exists(al_path_cstr(d_path, ALLEGRO_NATIVE_PATH_SEP)) && is_match(vpath, GREYLIST)) {
+
+            /* ask the user about overwriting files in the greylist */
+            if(YES != CONFIRM("Use updated file \"%s\" of the base game?\n\nDefault answer: yes", vpath)) {
+                PRINT("    Importing %s", vpath);
+                import = true;
+            }
+            else {
+                PRINT("    Skipping %s", vpath);
+            }
+
+        }
         else if(al_filename_exists(al_path_cstr(d_path, ALLEGRO_NATIVE_PATH_SEP)) && !is_match(vpath, WHITELIST)) {
 
             /* skip existing files, except those that are in the whitelist */
@@ -677,14 +706,20 @@ int import_file(ALLEGRO_FS_ENTRY* e, void* extra)
 
             /* import all other files */
             PRINT("    Importing %s", vpath);
+            import = true;
 
+        }
+
+        /* import the file */
+        if(import) {
             ALLEGRO_FS_ENTRY* d = al_create_fs_entry(al_path_cstr(d_path, ALLEGRO_NATIVE_PATH_SEP));
+
             if(!copy_file(d, e)) {
                 PRINT("!   ERROR: can't copy %s", vpath);
                 ++(*error_count);
             }
-            al_destroy_fs_entry(d);
 
+            al_destroy_fs_entry(d);
         }
 
     }
