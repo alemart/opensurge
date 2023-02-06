@@ -38,10 +38,13 @@ Study the plugins of the Debug Mode for practical examples.
 
 */
 using SurgeEngine.Level;
+using SurgeEngine.Vector2;
+using SurgeEngine.Transform;
 
 // The Debug Mode object manages its plugins
 object "Debug Mode" is "detached", "private", "entity"
 {
+    transform = Transform();
     plugins = [];
     indicesOfPluginsScheduledForRemoval = [];
 
@@ -148,6 +151,9 @@ object "Debug Mode" is "detached", "private", "entity"
         // this object must be unique and a child of Level
         assert(parent === Level);
         assert(parent.children(this.__name).length == 1);
+
+        // just to make sure...
+        transform.position = Vector2.zero;
     }
 
     fun destructor()
