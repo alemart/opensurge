@@ -116,5 +116,6 @@ void level_hide_dialogbox();
 /* editor & development */
 int level_editmode(); /* active editor? */
 int level_is_displaying_gizmos(); /* are we displaying gizmos for visual debugging? */
+void level_enter_debug_mode();
 
 #endif

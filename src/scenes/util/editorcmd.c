@@ -46,6 +46,7 @@ static const command_t command[] = {
     { "DOWN", "Shift+S" },
     { "LEFT", "Shift+Left" },
     { "LEFT", "Shift+A" },
+    { "enter-debug-mode", "Shift+F12" },
     { "enter", "F12" },
     { "quit", "F12" },
     { "quit-alt", "ESC" },

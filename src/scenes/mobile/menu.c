@@ -32,6 +32,7 @@
 #include "../../core/input.h"
 #include "../../core/logfile.h"
 #include "../../entities/actor.h"
+#include "../../scenes/level.h"
 
 /* buttons */
 typedef enum mobilemenu_button_t mobilemenu_button_t;
@@ -334,7 +335,7 @@ void update_triggered_debug()
 
     state = DISAPPEARING;
 
-    video_showmessage("TODO");
+    level_enter_debug_mode();
 }
 
 /* triggered the info button */
