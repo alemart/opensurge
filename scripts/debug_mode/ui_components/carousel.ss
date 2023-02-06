@@ -8,14 +8,12 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Input.Mouse;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
-using SurgeEngine.Actor;
-using SurgeEngine.Level;
 
-object "Debug Mode - Carousel" is "debug-mode-ui-component", "detached", "private", "entity"
+object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detached", "private", "entity"
 {
-    debugMode = Level.child("Debug Mode");
+    debugMode = findDebugModeObject();
     transform = Transform();
-    items = [];
+    itemContainers = [];
     itemWidth = 32;
     itemHeight = 32;
     uiScroller = spawn("Debug Mode - UI Scroller");
@@ -30,7 +28,7 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "detached", "privat
             transform.translateBy(uiScroller.dx, 0);
 
             // keep the scroll within the boundaries of the carousel
-            width = itemWidth * items.length - Screen.width;
+            width = itemWidth * itemContainers.length - Screen.width;
             if(transform.localPosition.x > 0)
                 transform.translateBy(-transform.localPosition.x, 0);
             else if(width > 0 && transform.localPosition.x < -width)
@@ -40,58 +38,96 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "detached", "privat
         // pick an item
         if(Mouse.buttonPressed("left") && uiScroller.isInActiveArea(Mouse.position)) {
             itemIndex = Math.floor((Mouse.position.x - transform.localPosition.x) / itemWidth);
-            if(itemIndex >= 0 && itemIndex < items.length)
-                parent.onCarouselItemPick(items[itemIndex].name);
+            if(itemIndex >= 0 && itemIndex < itemContainers.length)
+                parent.onCarouselItemPick(itemContainers[itemIndex].item);
         }
     }
 
-    fun addItem(entityName)
+    fun add(itemBuilder)
     {
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
-        zindex = uiSettings.zindex;
 
-        item = spawn("Debug Mode - Carousel Item").init(entityName, items.length, itemWidth, itemHeight, zindex);
-        items.push(item);
+        itemContainer = spawn("Debug Mode - Carousel Item Container");
+        item = itemBuilder.build(itemContainer);
+        itemContainer.init(item, itemContainers.length, itemWidth, itemHeight, uiSettings.zindex);
+        itemContainers.push(itemContainer);
 
         return this;
     }
 
-    fun setItemSize(width, height)
+    fun iterator()
     {
-        itemWidth = Math.max(8, width);
-        itemHeight = Math.max(8, height);
+        return spawn("Debug Mode - Carousel Iterator").setItemContainers(itemContainers);
+    }
+
+    fun findDebugModeObject()
+    {
+        for(obj = parent; obj != obj.parent; obj = obj.parent) {
+            if(obj.__name == "Debug Mode")
+                return obj;
+        }
+
+        assert(0);
+        return null;
+    }
+}
+
+object "Debug Mode - Carousel Item Container" is "detached", "private", "entity"
+{
+    transform = Transform();
+    item = null; // another carousel item
+
+    fun get_item()
+    {
+        return item;
+    }
+
+    fun init(itemReference, itemIndex, itemWidth, itemHeight, itemZindex)
+    {
+        item = itemReference;
+        item.zindex = itemZindex;
+
+        sx = itemWidth / item.naturalWidth;
+        sy = itemHeight / item.naturalHeight;
+        scale = Math.min(sx, sy);
+
+        transform.localScale = Vector2(scale, scale);
+        transform.localPosition = Vector2(itemWidth * itemIndex, 0);
+
         return this;
     }
 }
 
-// TODO: make this more generic
-object "Debug Mode - Carousel Item" is "detached", "private", "entity"
+object "Debug Mode - Carousel Item Builder"
 {
-    transform = Transform();
-    actor = null;
-    name = "";
-
-    fun init(entityName, index, itemWidth, itemHeight, zindex)
+    fun build(itemContainer)
     {
-        name = entityName;
-        actor = Actor(entityName);
-        assert(actor.animation.exists);
+        return null;
+        //return itemContainer.spawn("...");
+    }
+}
 
-        actor.offset = actor.hotSpot;
-        actor.zindex = zindex;
+object "Debug Mode - Carousel Iterator" is "iterator"
+{
+    itemContainers = null;
+    index = 0;
 
-        sx = itemWidth / actor.width;
-        sy = itemHeight / actor.height;
-        scale = Math.min(sx, sy);
-
-        transform.localScale = Vector2(scale, scale);
-        transform.localPosition = Vector2(itemWidth * index, 0);
-
+    fun setItemContainers(array)
+    {
+        itemContainers = array;
         return this;
     }
 
-    fun get_name()
+    fun hasNext()
     {
-        return name;
+        return index < itemContainers.length;
+    }
+
+    fun next()
+    {
+        if(!hasNext())
+            return null;
+
+        return itemContainers[index++].item;
     }
 }

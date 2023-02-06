@@ -6,45 +6,48 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
+using SurgeEngine.Actor;
 
 object "Debug Mode - Entity Picker" is "debug-mode-plugin", "detached", "private", "entity"
 {
     debugMode = parent;
-    carousel = spawn("Debug Mode - Carousel").setItemSize(40, 32);
     transform = Transform();
+    carousel = spawn("Debug Mode - Carousel");
 
     state "main"
     {
-        // initialize
-        transform.position = Vector2.zero;
+        // initialize the carousel
         carousel
-            .addItem("Collectible")
-            .addItem("Checkpoint")
-            .addItem("Goal")
-            .addItem("Goal Capsule")
-            .addItem("Bumper")
-            .addItem("Layer Green")
-            .addItem("Layer Yellow")
-            .addItem("Powerup 1up")
-            .addItem("Powerup Collectibles")
-            .addItem("Powerup Lucky Bonus")
-            .addItem("Powerup Invincibility")
-            .addItem("Powerup Speed")
-            .addItem("Powerup Shield")
-            .addItem("Powerup Shield Acid")
-            .addItem("Powerup Shield Fire")
-            .addItem("Powerup Shield Thunder")
-            .addItem("Powerup Shield Water")
-            .addItem("Powerup Shield Wind")
-            .addItem("Powerup Trap")
-            .addItem("Spikes")
-            .addItem("Spikes Down")
-            .addItem("Spring Booster Left")
-            .addItem("Spring Booster Right")
-            .addItem("Water Bubbles")
-            .addItem("Tube In")
-            .addItem("Tube Out")
+            .add(entity("Collectible"))
+            .add(entity("Checkpoint"))
+            .add(entity("Goal"))
+            .add(entity("Goal Capsule"))
+            .add(entity("Bumper"))
+            .add(entity("Layer Green"))
+            .add(entity("Layer Yellow"))
+            .add(entity("Powerup 1up"))
+            .add(entity("Powerup Collectibles"))
+            .add(entity("Powerup Lucky Bonus"))
+            .add(entity("Powerup Invincibility"))
+            .add(entity("Powerup Speed"))
+            .add(entity("Powerup Shield"))
+            .add(entity("Powerup Shield Acid"))
+            .add(entity("Powerup Shield Fire"))
+            .add(entity("Powerup Shield Thunder"))
+            .add(entity("Powerup Shield Water"))
+            .add(entity("Powerup Shield Wind"))
+            .add(entity("Powerup Trap"))
+            .add(entity("Spikes"))
+            .add(entity("Spikes Down"))
+            .add(entity("Spring Booster Left"))
+            .add(entity("Spring Booster Right"))
+            .add(entity("Water Bubbles"))
+            .add(entity("Tube In"))
+            .add(entity("Tube Out"))
         ;
+
+        // set the position
+        transform.position = Vector2.zero;
 
         // done!
         state = "enabled";
@@ -55,8 +58,92 @@ object "Debug Mode - Entity Picker" is "debug-mode-plugin", "detached", "private
         // do nothing
     }
 
-    fun onCarouselItemPick(itemName)
+    fun entity(entityName)
     {
-        Console.print(itemName);
+        return spawn("Debug Mode - Entity Picker - Carousel Item Builder").setEntityName(entityName);
+    }
+
+    fun onCarouselItemPick(pickedItem)
+    {
+        foreach(item in carousel) {
+            item.highlighted = false;
+        }
+
+        pickedItem.highlighted = true;
+    }
+}
+
+object "Debug Mode - Entity Picker - Carousel Item Builder"
+{
+    entityName = "";
+
+    fun build(itemContainer)
+    {
+        return itemContainer.spawn("Debug Mode - Entity Picker - Carousel Item").setEntityName(entityName);
+    }
+
+    fun setEntityName(name)
+    {
+        entityName = name;
+        return this;
+    }
+}
+
+object "Debug Mode - Entity Picker - Carousel Item" is "detached", "private", "entity"
+{
+    name = "";
+    actor = null;
+
+
+
+    fun get_name()
+    {
+        return name;
+    }
+
+    fun get_highlighted()
+    {
+        return actor.alpha == 1.0;
+    }
+
+    fun set_highlighted(highlighted)
+    {
+        actor.alpha = highlighted ? 1.0 : 0.5;
+    }
+
+    fun setEntityName(entityName)
+    {
+        name = entityName;
+        actor = Actor(name);
+
+        assert(actor.animation.exists);
+        actor.offset = actor.hotSpot;
+
+        this.highlighted = false;
+        return this;
+    }
+
+
+
+    // the following methods are required for all Carousel items
+    // the Carousel component will use these to adjust the UI
+    fun get_naturalWidth()
+    {
+        return actor.width;
+    }
+
+    fun get_naturalHeight()
+    {
+        return actor.height;
+    }
+
+    fun get_zindex()
+    {
+        return actor.zindex;
+    }
+
+    fun set_zindex(zindex)
+    {
+        actor.zindex = zindex;
     }
 }

@@ -16,7 +16,7 @@ object "Debug Mode - UI Scroller" is "debug-mode-ui-component"
 
     state "main"
     {
-        alpha = delegate.isTouched() ? 1 : smoothingFactor;
+        alpha = delegate.isScrolling() ? 1 : smoothingFactor;
 
         // apply exponential smoothing
         dx += alpha * (delegate.dx - dx);
@@ -34,9 +34,9 @@ object "Debug Mode - UI Scroller" is "debug-mode-ui-component"
         return delegate.isInActiveArea(position);
     }
 
-    fun isTouched()
+    fun isScrolling()
     {
-        return delegate.isTouched();
+        return delegate.isScrolling();
     }
 }
 
@@ -51,32 +51,40 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
     my = 0;
     public readonly dx = 0; // offset
     public readonly dy = 0;
+    mouseWheelSpeed = 12;
 
     state "main"
     {
-        state = "inactive";
+        state = "waiting";
     }
 
-    state "inactive"
+    state "waiting"
     {
         if(Mouse.buttonDown("left")) {
             if(isInActiveArea(Mouse.position)) {
                 mx = Mouse.position.x;
                 my = Mouse.position.y;
                 dx = dy = 0;
-                state = "active";
+                state = "scrolling";
                 return;
             }
 
             state = "locked";
         }
+        else if(Mouse.scrollUp || Mouse.scrollDown) {
+            if(isInActiveArea(Mouse.position)) {
+                sign = Mouse.scrollUp ? -1 : 1;
+                dx = dy = mouseWheelSpeed * sign;
+                state = "mouse scrolling";
+            }
+        }
     }
 
-    state "active"
+    state "scrolling"
     {
         if(!Mouse.buttonDown("left")) {
-            state = "inactive";
             dx = dy = 0;
+            state = "waiting";
             return;
         }
 
@@ -87,10 +95,19 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
         my = Mouse.position.y;
     }
 
+    state "mouse scrolling"
+    {
+        if(Mouse.scrollUp || Mouse.scrollDown)
+            return;
+
+        dx = dy = 0;
+        state = "waiting";
+    }
+
     state "locked"
     {
         if(!Mouse.buttonDown("left"))
-            state = "inactive";
+            state = "waiting";
     }
 
     fun setActiveArea(x, y, width, height)
@@ -113,9 +130,8 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
         return false;
     }
 
-    // is this widget being touched?
-    fun isTouched()
+    fun isScrolling()
     {
-        return state == "active";
+        return state == "scrolling" || state == "mouse scrolling";
     }
 }

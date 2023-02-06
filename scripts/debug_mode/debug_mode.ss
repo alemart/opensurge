@@ -153,6 +153,8 @@ object "Debug Mode" is "detached", "private", "entity"
     fun destructor()
     {
         if(state != "exit")
-            Application.crash("Use exit() to leave the debug mode!");
+            Console.print("Use exit() to leave the debug mode!");
+
+        // note: the engine may be closed while the debug mode is activated
     }
 }
