@@ -4,15 +4,46 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
-using SurgeEngine.Transform;
-using SurgeEngine.Vector2;
+
+/*
+
+In order to interact with this Entity Picker, register your plugin as one of
+its listeners and implement method onPickEntity(entityName) as in this example:
+
+object "Debug Mode - My Entity Picker Test" is "debug-mode-plugin"
+{
+    debugMode = parent;
+
+    state "main"
+    {
+        // initialization:
+        // get the Entity Picker and register this plugin as a listener
+        entityPicker = debugMode.plugin("Debug Mode - Entity Picker");
+        entityPicker.subscribe(this);
+
+        // done
+        state = "waiting";
+    }
+
+    state "waiting"
+    {
+    }
+
+    // this function will be called whenever the user picks an entity
+    fun onPickEntity(entityName)
+    {
+        Console.print("Picked entity " + entityName);
+    }
+}
+
+*/
 using SurgeEngine.Actor;
 
 object "Debug Mode - Entity Picker" is "debug-mode-plugin", "detached", "private", "entity"
 {
     debugMode = parent;
-    transform = Transform();
     carousel = spawn("Debug Mode - Carousel");
+    listeners = [];
 
     state "main"
     {
@@ -46,9 +77,6 @@ object "Debug Mode - Entity Picker" is "debug-mode-plugin", "detached", "private
             .add(entity("Tube Out"))
         ;
 
-        // set the position
-        transform.position = Vector2.zero;
-
         // done!
         state = "enabled";
     }
@@ -70,6 +98,19 @@ object "Debug Mode - Entity Picker" is "debug-mode-plugin", "detached", "private
         }
 
         pickedItem.highlighted = true;
+        _notify(pickedItem.name);
+    }
+
+    fun subscribe(listener)
+    {
+        if(listeners.indexOf(listener) < 0)
+            listeners.push(listener);
+    }
+
+    fun _notify(entityName)
+    {
+        foreach(listener in listeners)
+            listener.onPickEntity(entityName);
     }
 }
 
@@ -96,6 +137,18 @@ object "Debug Mode - Entity Picker - Carousel Item" is "detached", "private", "e
 
 
 
+    fun setEntityName(entityName)
+    {
+        name = entityName;
+        actor = Actor(name);
+
+        assert(actor.animation.exists);
+        actor.offset = actor.hotSpot;
+
+        this.highlighted = false;
+        return this;
+    }
+
     fun get_name()
     {
         return name;
@@ -109,18 +162,6 @@ object "Debug Mode - Entity Picker - Carousel Item" is "detached", "private", "e
     fun set_highlighted(highlighted)
     {
         actor.alpha = highlighted ? 1.0 : 0.5;
-    }
-
-    fun setEntityName(entityName)
-    {
-        name = entityName;
-        actor = Actor(name);
-
-        assert(actor.animation.exists);
-        actor.offset = actor.hotSpot;
-
-        this.highlighted = false;
-        return this;
     }
 
 
