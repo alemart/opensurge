@@ -4,6 +4,14 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+
+/*
+
+This plugin disables the physics and the interactions of the Player objects
+while the Debug Mode is activated.
+
+*/
+
 using SurgeEngine.Player;
 
 object "Debug Mode - Player Locker" is "debug-mode-plugin"
@@ -23,7 +31,7 @@ object "Debug Mode - Player Locker" is "debug-mode-plugin"
         }
     }
 
-    fun constructor()
+    fun init()
     {
         for(i = Player.count - 1; i >= 0; i--) {
             player = Player[i];
@@ -33,7 +41,7 @@ object "Debug Mode - Player Locker" is "debug-mode-plugin"
         }
     }
 
-    fun destructor()
+    fun release()
     {
         for(i = Player.count - 1; i >= 0; i--) {
             player = Player[i];

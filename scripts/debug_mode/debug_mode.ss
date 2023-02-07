@@ -36,6 +36,9 @@ Visible elements should be rendered in screen space. This means that you should
 add the tags "detached", "private", "entity" to the objects you wish to see.
 Study the plugins of the Debug Mode for practical examples.
 
+Plugins may optionally implement functions init() and release() for
+initialization and deinitialization of resources, respectively.
+
 */
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
@@ -47,6 +50,7 @@ object "Debug Mode" is "detached", "private", "entity"
     transform = Transform();
     plugins = [];
     indicesOfPluginsScheduledForRemoval = [];
+    cleared = false;
 
     state "main"
     {
@@ -55,6 +59,12 @@ object "Debug Mode" is "detached", "private", "entity"
         for(i = 0; i < pluginNames.length; i++) {
             plugin = spawn(pluginNames[i]);
             plugins.push(plugin);
+        }
+
+        // initialize all plugins
+        foreach(plugin in plugins) {
+            if(plugin.hasFunction("init"))
+                plugin.init();
         }
 
         // done!
@@ -67,24 +77,49 @@ object "Debug Mode" is "detached", "private", "entity"
         if(indicesOfPluginsScheduledForRemoval.length == 0)
             return;
 
-        // remove plugins
+        // release plugins
         for(i = 0; i < indicesOfPluginsScheduledForRemoval.length; i++) {
             index = indicesOfPluginsScheduledForRemoval[i];
+            plugin = plugins[index];
+
+            if(plugin.hasFunction("release"))
+                plugin.release();
+        }
+
+        // unload plugins
+        for(i = 0; i < indicesOfPluginsScheduledForRemoval.length; i++) {
+            index = indicesOfPluginsScheduledForRemoval[i];
+
+            // unload plugin
             plugins[index].destroy();
 
+            // remove from the plugins array
             if(plugins.length > 1)
                 plugins[index] = plugins.pop(); // length -= 1
             else
                 plugins.clear();
         }
 
+        // no more plugins scheduled for removal
         indicesOfPluginsScheduledForRemoval.clear();
     }
 
     state "exit"
     {
+        // release all plugins
+        foreach(plugin in plugins) {
+            if(plugin.hasFunction("release"))
+                plugin.release();
+        }
+
+        // unload all plugins
+        foreach(plugin in plugins)
+            plugin.destroy();
+        plugins.clear();
+
         // exit debug mode
-        destroy(); // this will automatically unload all plugins
+        cleared = true;
+        destroy();
     }
 
 
@@ -92,17 +127,6 @@ object "Debug Mode" is "detached", "private", "entity"
     // exit the debug mode
     fun exit()
     {
-        // skip duplicate calls
-        if(state == "exit")
-            return;
-
-        // for each plugin, call plugin.onExitDebugMode()
-        for(i = plugins.length - 1; i >= 0; i--) {
-            if(plugins[i].hasFunction("onExitDebugMode"))
-                plugins[i].onExitDebugMode();
-        }
-
-        // exit
         state = "exit";
     }
 
@@ -158,8 +182,11 @@ object "Debug Mode" is "detached", "private", "entity"
 
     fun destructor()
     {
-        if(state != "exit")
+        // did the user destroy() the Debug Mode object?
+        if(!cleared) {
+            // plugin.release() is not being called...
             Console.print("Use exit() to leave the debug mode!");
+        }
 
         // note: the engine may be closed while the debug mode is activated
     }

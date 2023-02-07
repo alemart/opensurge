@@ -4,6 +4,13 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+
+/*
+
+This plugin lets the user exit the Debug Mode.
+
+*/
+
 using SurgeEngine.Input;
 
 object "Debug Mode - Exit" is "debug-mode-plugin"

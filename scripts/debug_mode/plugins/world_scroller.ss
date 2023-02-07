@@ -4,42 +4,62 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+
+/*
+
+This plugin helps the user scroll through the level.
+
+If you need to know the spot that is being looked at, subscribe to this plugin
+and implement method onWorldScroll(position) as in the example below:
+
+object "Debug Mode - My Plugin" is "debug-mode-plugin"
+{
+    debugMode = parent;
+
+    fun init()
+    {
+        worldScroller = debugMode.plugin("Debug Mode - World Scroller");
+        worldScroller.subscribe(this);
+    }
+
+    fun release()
+    {
+        worldScroller = debugMode.plugin("Debug Mode - World Scroller");
+        worldScroller.unsubscribe(this);
+    }
+
+    fun onWorldScroll(position)
+    {
+        Console.print(position);
+    }
+}
+
+*/
 using SurgeEngine.Input;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Camera;
 
-object "Debug Mode - World Scroller" is "debug-mode-plugin"
+object "Debug Mode - World Scroller" is "debug-mode-plugin", "debug-mode-observable"
 {
     public scrollSpeed = 400;
     public gridSize = 16;
-    debugMode = parent;
     input = Input("default");
+    observable = spawn("Debug Mode - Observable");
+    debugMode = parent;
 
     state "main"
     {
         player = Player.active;
-        transform = player.transform;
         ds = scrollVector();
 
-        transform.translate(ds);
+        player.transform.translate(ds);
         if(ds.length == 0)
-            transform.position = snapToGrid(transform.position);
+            player.transform.position = snapToGrid(player.transform.position);
 
-        Camera.position = transform.position;
+        Camera.position = player.transform.position;
+        observable.notify(player.transform.position);
     }
-
-    fun get_position()
-    {
-        return Player.active.transform.position;
-    }
-
-    fun set_position(position)
-    {
-        Player.active.transform.position = position;
-    }
-
-
 
     fun scrollVector()
     {
@@ -77,5 +97,20 @@ object "Debug Mode - World Scroller" is "debug-mode-plugin"
             position.x - mx + dx,
             position.y - my + dy
         );
+    }
+
+    fun subscribe(observer)
+    {
+        observable.subscribe(observer);
+    }
+
+    fun unsubscribe(observer)
+    {
+        observable.unsubscribe(observer);
+    }
+
+    fun onNotifyObserver(observer, position)
+    {
+        observer.onWorldScroll(position);
     }
 }

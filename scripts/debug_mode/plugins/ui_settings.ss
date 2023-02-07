@@ -5,6 +5,12 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
+/*
+
+This plugin has UI settings that are useful to other plugins.
+
+*/
+
 object "Debug Mode - UI Settings" is "debug-mode-plugin"
 {
     public readonly zindex = 10000;

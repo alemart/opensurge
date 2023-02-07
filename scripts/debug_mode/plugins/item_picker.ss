@@ -7,29 +7,27 @@
 
 /*
 
+This plugin lets users pick items in a carousel.
+
 In order to interact with this Item Picker, register your plugin as one of
-its listeners and implement method onPickItem(item) as in this example:
+its observers and implement method onPickItem(item) as in this example:
 
 object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
 {
     debugMode = parent;
 
-    state "main"
+    fun init()
     {
-        // initialization:
-        // get the Item Picker and register this plugin as a listener
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.subscribe(this);
-
-        // done
-        state = "waiting";
     }
 
-    state "waiting"
+    fun release()
     {
+        itemPicker = debugMode.plugin("Debug Mode - Item Picker");
+        itemPicker.unsubscribe(this);
     }
 
-    // this function will be called whenever the user picks an item
     fun onPickItem(item)
     {
         Console.print("Picked item " + item.name);
@@ -38,15 +36,16 @@ object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
 }
 
 */
+
 using SurgeEngine.Actor;
 
-object "Debug Mode - Item Picker" is "debug-mode-plugin", "detached", "private", "entity"
+object "Debug Mode - Item Picker" is "debug-mode-plugin", "debug-mode-observable", "detached", "private", "entity"
 {
     debugMode = parent;
     carousel = spawn("Debug Mode - Carousel");
-    listeners = [];
+    observable = spawn("Debug Mode - Observable");
 
-    state "main"
+    fun init()
     {
         // initialize the carousel
         carousel
@@ -118,14 +117,6 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "detached", "private",
             .add(entity("SwoopHarrier"))
             .add(entity("Skaterbug"))
         ;
-
-        // done!
-        state = "enabled";
-    }
-
-    state "enabled"
-    {
-        // do nothing
     }
 
     fun entity(entityName)
@@ -141,9 +132,9 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "detached", "private",
         }
         pickedCarouselItem.highlighted = true;
 
-        // notify listeners
+        // notify observers
         item = Item(pickedCarouselItem.type, pickedCarouselItem.name);
-        _notify(item);
+        observable.notify(item);
     }
 
     fun Item(type, name)
@@ -151,16 +142,19 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "detached", "private",
         return spawn("Debug Mode - Item Picker - Item").init(type, name);
     }
 
-    fun subscribe(listener)
+    fun subscribe(observer)
     {
-        if(listeners.indexOf(listener) < 0)
-            listeners.push(listener);
+        observable.subscribe(observer);
     }
 
-    fun _notify(item)
+    fun unsubscribe(observer)
     {
-        foreach(listener in listeners)
-            listener.onPickItem(item);
+        observable.unsubscribe(observer);
+    }
+
+    fun onNotifyObserver(observer, item)
+    {
+        observer.onPickItem(item);
     }
 }
 
