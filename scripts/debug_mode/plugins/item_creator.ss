@@ -52,12 +52,15 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
         Level.spawnEntity(entityName, transform.position);
     }
 
-    fun onPickItem(name)
+    fun onPickItem(item)
     {
-        itemType = "entity";
-        itemName = name;
+        itemType = item.type;
+        itemName = item.name;
 
-        itemPreview.setEntity(itemName);
+        if(itemType == "entity")
+            itemPreview.setEntity(itemName);
+        else
+            itemPreview.setNull();
     }
 
     fun onPositionUpdate(position)
@@ -80,6 +83,12 @@ object "Debug Mode - Item Creator - Preview" is "private", "awake", "entity"
         actor.visible = true;
         actor.alpha = 0.67;
         actor.zindex = zindex;
+    }
+
+    fun setNull()
+    {
+        if(actor !== null)
+            actor.destroy();
     }
 }
 

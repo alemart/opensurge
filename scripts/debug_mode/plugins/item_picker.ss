@@ -8,7 +8,7 @@
 /*
 
 In order to interact with this Item Picker, register your plugin as one of
-its listeners and implement method onPickItem(itemName) as in this example:
+its listeners and implement method onPickItem(item) as in this example:
 
 object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
 {
@@ -29,10 +29,11 @@ object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
     {
     }
 
-    // this function will be called whenever the user picks an entity
-    fun onPickItem(itemName)
+    // this function will be called whenever the user picks an item
+    fun onPickItem(item)
     {
-        Console.print("Picked item " + itemName);
+        Console.print("Picked item " + item.name);
+        Console.print(item.type);
     }
 }
 
@@ -132,14 +133,22 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "detached", "private",
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Entity").setEntityName(entityName);
     }
 
-    fun onPickCarouselItem(pickedItem)
+    fun onPickCarouselItem(pickedCarouselItem)
     {
+        // highlight picked item
         foreach(item in carousel) {
             item.highlighted = false;
         }
+        pickedCarouselItem.highlighted = true;
 
-        pickedItem.highlighted = true;
-        _notify(pickedItem.name);
+        // notify listeners
+        item = Item(pickedCarouselItem.type, pickedCarouselItem.name);
+        _notify(item);
+    }
+
+    fun Item(type, name)
+    {
+        return spawn("Debug Mode - Item Picker - Item").init(type, name);
     }
 
     fun subscribe(listener)
@@ -148,12 +157,41 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "detached", "private",
             listeners.push(listener);
     }
 
-    fun _notify(itemName)
+    fun _notify(item)
     {
         foreach(listener in listeners)
-            listener.onPickItem(itemName);
+            listener.onPickItem(item);
     }
 }
+
+object "Debug Mode - Item Picker - Item"
+{
+    type = "";
+    name = "";
+
+    fun get_type()
+    {
+        return type;
+    }
+
+    fun get_name()
+    {
+        return name;
+    }
+
+    fun init(itemType, itemName)
+    {
+        type = itemType;
+        name = itemName;
+        return this;
+    }
+}
+
+
+
+//
+// Item type: entity
+//
 
 object "Debug Mode - Item Picker - Carousel Item Builder - Entity"
 {
@@ -173,6 +211,7 @@ object "Debug Mode - Item Picker - Carousel Item Builder - Entity"
 
 object "Debug Mode - Item Picker - Carousel Item - Entity" is "detached", "private", "entity"
 {
+    public readonly type = "entity";
     name = "";
     actor = null;
 
