@@ -73,7 +73,7 @@ object "Debug Mode" is "detached", "private", "entity"
             plugins[index].destroy();
 
             if(plugins.length > 1)
-                plugins[index] = plugins.pop();
+                plugins[index] = plugins.pop(); // length -= 1
             else
                 plugins.clear();
         }

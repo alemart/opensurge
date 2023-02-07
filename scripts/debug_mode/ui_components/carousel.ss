@@ -14,8 +14,8 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
     debugMode = findDebugModeObject();
     transform = Transform();
     itemContainers = [];
-    itemWidth = 32;
-    itemHeight = 32;
+    itemWidth = 48;
+    itemHeight = 48;
     uiScroller = spawn("Debug Mode - UI Scroller");
 
     state "main"
@@ -39,7 +39,7 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
         if(Mouse.buttonPressed("left") && uiScroller.isInActiveArea(Mouse.position)) {
             itemIndex = Math.floor((Mouse.position.x - transform.localPosition.x) / itemWidth);
             if(itemIndex >= 0 && itemIndex < itemContainers.length)
-                parent.onCarouselItemPick(itemContainers[itemIndex].item);
+                parent.onPickCarouselItem(itemContainers[itemIndex].item);
         }
     }
 
