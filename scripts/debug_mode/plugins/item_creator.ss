@@ -20,7 +20,6 @@ using SurgeEngine.Transform;
 
 object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "entity"
 {
-    debugMode = parent;
     transform = Transform();
     input = Input("default");
     actionButton = "fire1";
@@ -48,7 +47,7 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
         Level.spawnEntity(entityName, transform.position);
     }
 
-    fun init()
+    fun onLoad(debugMode)
     {
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
         itemPreview.zindex = uiSettings.zindex;
@@ -60,7 +59,7 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
         worldScroller.subscribe(this);
     }
 
-    fun release()
+    fun onUnload(debugMode)
     {
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.unsubscribe(this);

@@ -4,19 +4,25 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+
+/*
+
+This UI component lets you pick items in a Carousel.
+
+*/
+
 using SurgeEngine.Video.Screen;
-using SurgeEngine.Input.Mouse;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 
 object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detached", "private", "entity"
 {
-    debugMode = findDebugModeObject();
     transform = Transform();
     itemContainers = [];
     itemWidth = 48;
     itemHeight = 48;
     uiScroller = spawn("Debug Mode - UI Scroller");
+    zindex = 0;
 
     state "main"
     {
@@ -34,22 +40,13 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
             else if(width > 0 && transform.localPosition.x < -width)
                 transform.translateBy(-transform.localPosition.x - width, 0);
         }
-
-        // pick an item
-        if(Mouse.buttonPressed("left") && uiScroller.isInActiveArea(Mouse.position)) {
-            itemIndex = Math.floor((Mouse.position.x - transform.localPosition.x) / itemWidth);
-            if(itemIndex >= 0 && itemIndex < itemContainers.length)
-                parent.onPickCarouselItem(itemContainers[itemIndex].item);
-        }
     }
 
     fun add(itemBuilder)
     {
-        uiSettings = debugMode.plugin("Debug Mode - UI Settings");
-
         itemContainer = spawn("Debug Mode - Carousel Item Container");
         item = itemBuilder.build(itemContainer);
-        itemContainer.init(item, itemContainers.length, itemWidth, itemHeight, uiSettings.zindex);
+        itemContainer.init(item, itemContainers.length, itemWidth, itemHeight, zindex);
         itemContainers.push(itemContainer);
 
         return this;
@@ -60,15 +57,45 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
         return spawn("Debug Mode - Carousel Iterator").setItemContainers(itemContainers);
     }
 
-    fun findDebugModeObject()
+    fun onLoad(debugMode)
     {
-        for(obj = parent; obj != obj.parent; obj = obj.parent) {
-            if(obj.__name == "Debug Mode")
-                return obj;
-        }
+        tapDetector = debugMode.plugin("Debug Mode - Tap Detector");
+        tapDetector.subscribe(this);
 
-        assert(0);
+        uiSettings = debugMode.plugin("Debug Mode - UI Settings");
+        zindex = uiSettings.zindex + 1000;
+    }
+
+    fun onUnload(debugMode)
+    {
+        tapDetector = debugMode.plugin("Debug Mode - Tap Detector");
+        tapDetector.unsubscribe(this);
+    }
+
+    fun onTapScreen(position)
+    {
+        // pick an item
+        if(uiScroller.isInActiveArea(position)) {
+            itemIndex = Math.floor((position.x - transform.localPosition.x) / itemWidth);
+            if(itemIndex >= 0 && itemIndex < itemContainers.length)
+                parent.onPickCarouselItem(itemContainers[itemIndex].item);
+        }
+    }
+}
+
+object "Debug Mode - Carousel Item" is "debug-mode-carousel-item", "detached", "private", "entity"
+{
+    public zindex = 0;
+    public readonly naturalWidth = 1;
+    public readonly naturalHeight = 1;
+}
+
+object "Debug Mode - Carousel Item Builder" is "debug-mode-carousel-item-builder"
+{
+    fun build(itemContainer)
+    {
         return null;
+        //return itemContainer.spawn("...");
     }
 }
 
@@ -95,15 +122,6 @@ object "Debug Mode - Carousel Item Container" is "detached", "private", "entity"
         transform.localPosition = Vector2(itemWidth * itemIndex, 0);
 
         return this;
-    }
-}
-
-object "Debug Mode - Carousel Item Builder"
-{
-    fun build(itemContainer)
-    {
-        return null;
-        //return itemContainer.spawn("...");
     }
 }
 

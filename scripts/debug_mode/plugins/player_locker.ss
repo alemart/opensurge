@@ -16,7 +16,6 @@ using SurgeEngine.Player;
 
 object "Debug Mode - Player Locker" is "debug-mode-plugin"
 {
-    debugMode = parent;
     frozenPhysics = {};
     enabledInput = {};
     enabledCollider = {};
@@ -31,7 +30,7 @@ object "Debug Mode - Player Locker" is "debug-mode-plugin"
         }
     }
 
-    fun init()
+    fun onLoad(debugMode)
     {
         for(i = Player.count - 1; i >= 0; i--) {
             player = Player[i];
@@ -41,7 +40,7 @@ object "Debug Mode - Player Locker" is "debug-mode-plugin"
         }
     }
 
-    fun release()
+    fun onUnload(debugMode)
     {
         for(i = Player.count - 1; i >= 0; i--) {
             player = Player[i];

@@ -21,8 +21,6 @@ debug_mode/plugins/ folder. Example:
 // File: debug_mode/plugins/my_plugin.ss
 object "Debug Mode - My Plugin" is "debug-mode-plugin"
 {
-    debugMode = parent; // this is the "Debug Mode" object
-
     state "main"
     {
         Console.print("Hello from My Plugin!");
@@ -36,10 +34,32 @@ Visible elements should be rendered in screen space. This means that you should
 add the tags "detached", "private", "entity" to the objects you wish to see.
 Study the plugins of the Debug Mode for practical examples.
 
-Plugins may optionally implement functions init() and release() for
-initialization and deinitialization of resources, respectively.
+Plugins may optionally implement functions onLoad() and onUnload() for
+initialization and deinitialization of resources, respectively. Example:
+
+// File: debug_mode/plugins/my_other_plugin.ss
+object "Debug Mode - My Other Plugin" is "debug-mode-plugin"
+{
+    fun onLoad(debugMode) // debugMode is the "Debug Mode" object below
+    {
+        Console.print("Loading this plugin");
+    }
+
+    fun onUnload(debugMode)
+    {
+        Console.print("Unloading this plugin");
+    }
+}
+
+Plugins can also interact with each other. I'll let you figure this out.
+
+Study how the existing plugins are made. Some are simple and short. The
+possibilities are limitless!
+
+Happy hacking! ;)
 
 */
+
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
@@ -54,18 +74,17 @@ object "Debug Mode" is "detached", "private", "entity"
 
     state "main"
     {
-        // load all plugins
+        // spawn all plugins
         pluginNames = System.tags.select("debug-mode-plugin");
         for(i = 0; i < pluginNames.length; i++) {
             plugin = spawn(pluginNames[i]);
             plugins.push(plugin);
         }
 
-        // initialize all plugins
-        foreach(plugin in plugins) {
-            if(plugin.hasFunction("init"))
-                plugin.init();
-        }
+        // load all plugins
+        // (ideally we would have a dependency graph)
+        foreach(plugin in plugins)
+            _loadPlugin(plugin);
 
         // done!
         state = "active";
@@ -77,27 +96,22 @@ object "Debug Mode" is "detached", "private", "entity"
         if(indicesOfPluginsScheduledForRemoval.length == 0)
             return;
 
-        // release plugins
-        for(i = 0; i < indicesOfPluginsScheduledForRemoval.length; i++) {
-            index = indicesOfPluginsScheduledForRemoval[i];
-            plugin = plugins[index];
-
-            if(plugin.hasFunction("release"))
-                plugin.release();
-        }
-
         // unload plugins
         for(i = 0; i < indicesOfPluginsScheduledForRemoval.length; i++) {
             index = indicesOfPluginsScheduledForRemoval[i];
+            _unloadPlugin(plugins[index]);
+        }
 
-            // unload plugin
+        // destroy plugins
+        for(i = 0; i < indicesOfPluginsScheduledForRemoval.length; i++) {
+            index = indicesOfPluginsScheduledForRemoval[i];
             plugins[index].destroy();
 
             // remove from the plugins array
-            if(plugins.length > 1)
+            if(index < plugins.length - 1)
                 plugins[index] = plugins.pop(); // length -= 1
             else
-                plugins.clear();
+                plugins.pop();
         }
 
         // no more plugins scheduled for removal
@@ -106,13 +120,11 @@ object "Debug Mode" is "detached", "private", "entity"
 
     state "exit"
     {
-        // release all plugins
-        foreach(plugin in plugins) {
-            if(plugin.hasFunction("release"))
-                plugin.release();
-        }
-
         // unload all plugins
+        foreach(plugin in plugins)
+            _unloadPlugin(plugin);
+
+        // destroy all plugins
         foreach(plugin in plugins)
             plugin.destroy();
         plugins.clear();
@@ -133,10 +145,9 @@ object "Debug Mode" is "detached", "private", "entity"
     // get a plugin
     fun plugin(pluginName)
     {
-        for(i = plugins.length - 1; i >= 0; i--) {
-            if(plugins[i].__name == pluginName)
-                return plugins[i];
-        }
+        plugin = this.child(pluginName);
+        if(plugin !== null && plugins.indexOf(plugin) >= 0)
+            return plugin;
 
         Application.crash("Can't find Debug Mode Plugin: " + pluginName);
         return null;
@@ -145,12 +156,8 @@ object "Debug Mode" is "detached", "private", "entity"
     // check if a plugin is in use
     fun hasPlugin(pluginName)
     {
-        for(i = plugins.length - 1; i >= 0; i--) {
-            if(plugins[i].__name == pluginName)
-                return true;
-        }
-
-        return false;
+        plugin = this.child(pluginName);
+        return (plugin !== null && plugins.indexOf(plugin) >= 0);
     }
 
     // remove a plugin
@@ -184,10 +191,37 @@ object "Debug Mode" is "detached", "private", "entity"
     {
         // did the user destroy() the Debug Mode object?
         if(!cleared) {
-            // plugin.release() is not being called...
+            // plugin.onUnload() is not being called...
             Console.print("Use exit() to leave the debug mode!");
         }
 
         // note: the engine may be closed while the debug mode is activated
+    }
+
+    fun _loadPlugin(plugin)
+    {
+        if(plugin.findObjectWithTag("debug-mode-plugin") !== null)
+            Application.crash("Debug Mode: nested plugins are not acceptable.");
+
+        uiComponents = plugin.findObjectsWithTag("debug-mode-ui-component");
+        foreach(uiComponent in uiComponents) {
+            if(uiComponent.hasFunction("onLoad"))
+                uiComponent.onLoad(this);
+        }
+
+        if(plugin.hasFunction("onLoad"))
+            plugin.onLoad(this);
+    }
+
+    fun _unloadPlugin(plugin)
+    {
+        if(plugin.hasFunction("onUnload"))
+            plugin.onUnload(this);
+
+        uiComponents = plugin.findObjectsWithTag("debug-mode-ui-component");
+        foreach(uiComponent in uiComponents) {
+            if(uiComponent.hasFunction("onUnload"))
+                uiComponent.onUnload(this);
+        }
     }
 }

@@ -20,7 +20,6 @@ object "Debug Mode - Player Position" is "debug-mode-plugin", "awake", "private"
 {
     text = Text("GoodNeighbors");
     transform = Transform();
-    debugMode = parent;
 
 
 
@@ -36,7 +35,7 @@ object "Debug Mode - Player Position" is "debug-mode-plugin", "awake", "private"
 
 
 
-    fun init()
+    fun onLoad(debugMode)
     {
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
 
@@ -48,7 +47,7 @@ object "Debug Mode - Player Position" is "debug-mode-plugin", "awake", "private"
         worldScroller.subscribe(this);
     }
 
-    fun release()
+    fun onUnload(debugMode)
     {
         worldScroller = debugMode.plugin("Debug Mode - World Scroller");
         worldScroller.unsubscribe(this);

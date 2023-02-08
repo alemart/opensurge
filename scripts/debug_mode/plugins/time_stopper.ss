@@ -16,19 +16,18 @@ using SurgeEngine.Level;
 object "Debug Mode - Time Stopper" is "debug-mode-plugin"
 {
     frozenTime = 0;
-    debugMode = parent;
 
     state "main"
     {
         Level.time = 0;
     }
 
-    fun init()
+    fun onLoad(debugMode)
     {
         frozenTime = Level.time;
     }
 
-    fun release()
+    fun onUnload(debugMode)
     {
         Level.time = frozenTime;
     }

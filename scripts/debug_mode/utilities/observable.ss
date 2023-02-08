@@ -20,10 +20,10 @@ object "Debug Mode - Observable" is "debug-mode-utility"
         if((j = observers.indexOf(observer)) < 0)
             return;
 
-        if(observers.length > 1)
+        if(j < observers.length - 1)
             observers[j] = observers.pop(); // length -= 1
         else
-            observers.clear();
+            observers.pop();
     }
 
     fun notify(data)

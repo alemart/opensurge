@@ -20,7 +20,6 @@ object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private"
 {
     actor = Actor("Mouse Cursor");
     transform = Transform();
-    debugMode = parent;
 
     state "main"
     {
@@ -28,11 +27,15 @@ object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private"
         transform.position = Mouse.position;
     }
 
-    fun init()
+    fun onLoad(debugMode)
     {
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
 
         actor.zindex = uiSettings.zindex;
         actor.visible = !MobileGamepad.available; // display only if not on mobile
+    }
+
+    fun onUnload(debugMode)
+    {
     }
 }

@@ -14,15 +14,13 @@ its observers and implement method onPickItem(item) as in this example:
 
 object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
 {
-    debugMode = parent;
-
-    fun init()
+    fun onLoad(debugMode)
     {
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.subscribe(this);
     }
 
-    fun release()
+    fun onUnload(debugMode)
     {
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.unsubscribe(this);
@@ -41,11 +39,10 @@ using SurgeEngine.Actor;
 
 object "Debug Mode - Item Picker" is "debug-mode-plugin", "debug-mode-observable", "detached", "private", "entity"
 {
-    debugMode = parent;
     carousel = spawn("Debug Mode - Carousel");
     observable = spawn("Debug Mode - Observable");
 
-    fun init()
+    fun onLoad(debugMode)
     {
         // initialize the carousel
         carousel
@@ -119,6 +116,10 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "debug-mode-observable
         ;
     }
 
+    fun onUnload(debugMode)
+    {
+    }
+
     fun entity(entityName)
     {
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Entity").setEntityName(entityName);
@@ -187,7 +188,7 @@ object "Debug Mode - Item Picker - Item"
 // Item type: entity
 //
 
-object "Debug Mode - Item Picker - Carousel Item Builder - Entity"
+object "Debug Mode - Item Picker - Carousel Item Builder - Entity" is "debug-mode-carousel-item-builder"
 {
     entityName = "";
 
@@ -203,7 +204,7 @@ object "Debug Mode - Item Picker - Carousel Item Builder - Entity"
     }
 }
 
-object "Debug Mode - Item Picker - Carousel Item - Entity" is "detached", "private", "entity"
+object "Debug Mode - Item Picker - Carousel Item - Entity" is "debug-mode-carousel-item", "detached", "private", "entity"
 {
     public readonly type = "entity";
     name = "";

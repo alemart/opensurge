@@ -14,15 +14,13 @@ and implement method onWorldScroll(position) as in the example below:
 
 object "Debug Mode - My Plugin" is "debug-mode-plugin"
 {
-    debugMode = parent;
-
-    fun init()
+    fun onLoad(debugMode)
     {
         worldScroller = debugMode.plugin("Debug Mode - World Scroller");
         worldScroller.subscribe(this);
     }
 
-    fun release()
+    fun onUnload(debugMode)
     {
         worldScroller = debugMode.plugin("Debug Mode - World Scroller");
         worldScroller.unsubscribe(this);
@@ -46,7 +44,6 @@ object "Debug Mode - World Scroller" is "debug-mode-plugin", "debug-mode-observa
     public gridSize = 16;
     input = Input("default");
     observable = spawn("Debug Mode - Observable");
-    debugMode = parent;
 
     state "main"
     {
