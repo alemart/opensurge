@@ -4,6 +4,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine;
 using SurgeEngine.Transform;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
@@ -12,7 +13,6 @@ using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Input.Mouse;
-using SurgeEngine.Input.MobileGamepad;
 
 object "Default HUD" is "entity", "detached", "awake", "private"
 {
@@ -41,12 +41,6 @@ object "Default HUD" is "entity", "detached", "awake", "private"
     state "cleared"
     {
         //transform.translateBy(-Screen.width * Time.delta, 0);
-    }
-
-    // whether or not to adapt the HUD for mobile devices
-    fun useMobileVersion()
-    {
-        return MobileGamepad.available;
     }
 
     // base zindex for the components of the HUD
@@ -177,7 +171,7 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
         value.zindex = parent.zindex;
 
         transform.localPosition = Vector2(0, Screen.height - 29);
-        /*if(parent.useMobileVersion())
+        /*if(SurgeEngine.mobileMode)
             transform.position = Vector2(Screen.width * 0.87, parent.transform.position.y);*/
 
         state = "active";
@@ -225,7 +219,7 @@ object "DefaultHUD.Powerups" is "entity", "detached", "awake", "private"
     {
         transform.position = Vector2(Screen.width - parent.transform.position.x, parent.transform.position.y);
 
-        if(parent.useMobileVersion()) {
+        if(SurgeEngine.mobileMode) {
             offset = Vector2.left.scaledBy(Screen.width / 4);
             transform.position = transform.position.plus(offset);
         }
@@ -317,7 +311,7 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
         actor.zindex = parent.zindex;
 
         // display this pause button in mobile mode only
-        if(!parent.useMobileVersion()) {
+        if(!SurgeEngine.mobileMode) {
             actor.visible = false;
             state = "sleep";
         }

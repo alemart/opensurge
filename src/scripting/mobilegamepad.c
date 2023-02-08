@@ -23,7 +23,6 @@
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getavailable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_fadein(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_fadeout(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -35,7 +34,6 @@ static surgescript_var_t* fun_fadeout(surgescript_object_t* object, const surges
 void scripting_register_mobilegamepad(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "MobileGamepad", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "MobileGamepad", "get_available", fun_getavailable, 0);
     surgescript_vm_bind(vm, "MobileGamepad", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "MobileGamepad", "fadeIn", fun_fadein, 0);
     surgescript_vm_bind(vm, "MobileGamepad", "fadeOut", fun_fadeout, 0);
@@ -48,12 +46,6 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 {
     surgescript_object_set_active(object, false);
     return NULL;
-}
-
-/* whether or not the mobile gamepad is available in this platform */
-surgescript_var_t* fun_getavailable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    return surgescript_var_set_bool(surgescript_var_create(), mobilegamepad_is_available());
 }
 
 /* whether or not the mobile gamepad is visible */

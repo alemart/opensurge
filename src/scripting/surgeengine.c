@@ -20,6 +20,36 @@
 
 #include <surgescript.h>
 #include "../core/global.h"
+#include "../core/mobile_gamepad.h"
+
+/* private */
+static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getmobilemode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static const char code_in_surgescript[];
+
+/*
+ * scripting_register_surgeengine()
+ * Register SurgeEngine
+ */
+void scripting_register_surgeengine(surgescript_vm_t* vm)
+{
+    surgescript_vm_bind(vm, "SurgeEngine", "get_version", fun_getversion, 0);
+    surgescript_vm_bind(vm, "SurgeEngine", "get_mobileMode", fun_getmobilemode, 0);
+
+    surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
+}
+
+/* the version of the game engine, as a string */
+surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), GAME_VERSION_STRING);
+}
+
+/* checks whether or not the engine has been launched in mobile mode */
+surgescript_var_t* fun_getmobilemode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_bool(surgescript_var_create(), mobilegamepad_is_available());
+}
 
 /* SurgeScript code */
 static const char code_in_surgescript[] = "\
@@ -42,7 +72,6 @@ object 'SurgeEngine' \n\
     public readonly Collisions = spawn('Collision'); \n\
     public readonly Events = spawn('Events'); \n\
     public readonly UI = spawn('UI'); \n\
-    public readonly version = '" GAME_VERSION_STRING "'; \n\
 \n\
     fun get_Level() \n\
     { \n\
@@ -358,11 +387,4 @@ object 'EventChainFactory' \n\
 } \n\
 ";
 
-/*
- * scripting_register_surgeengine()
- * Register SurgeEngine
- */
-void scripting_register_surgeengine(surgescript_vm_t* vm)
-{
-    surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
-}
+/* EOF */

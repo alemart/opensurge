@@ -11,10 +11,10 @@ This plugin displays a mouse cursor on Desktop computers.
 
 */
 
-using SurgeEngine.Input.MobileGamepad;
-using SurgeEngine.Input.Mouse;
-using SurgeEngine.Transform;
+using SurgeEngine;
 using SurgeEngine.Actor;
+using SurgeEngine.Transform;
+using SurgeEngine.Input.Mouse;
 
 object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private", "entity"
 {
@@ -32,10 +32,6 @@ object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private"
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
 
         actor.zindex = uiSettings.zindex;
-        actor.visible = !MobileGamepad.available; // display only if not on mobile
-    }
-
-    fun onUnload(debugMode)
-    {
+        actor.visible = !SurgeEngine.mobileMode;
     }
 }
