@@ -245,91 +245,126 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     if(player != level_player())
         input_reset(act->input);
 
-    /* physics */
+    /* if the player movement is enabled... */
     if(!player->disable_movement) {
+
+        /* run physics simulation */
         player->pa_old_state = physicsactor_get_state(pa);
         physics_adapter(player, team, team_size, brick_list, item_list, enemy_list, get_bricklike_object);
-    }
 
-    /* the player is blinking */
-    if(player->blinking) {
-        player->blink_timer += timer_get_delta();
+        /* underwater logic: enter / leave water */
+        /* FIXME: scripting */
+        if(!player->underwater && act->position.y >= level_waterlevel())
+            player_enter_water(player);
+        else if(player->underwater && act->position.y < level_waterlevel())
+            player_leave_water(player);
 
-        if(player->blink_timer - player->blink_visibility_timer >= 0.067f) {
-            player->blink_visibility_timer = player->blink_timer;
-            act->visible = !act->visible;
-        }
-
-        if(player->blink_timer >= PLAYER_MAX_BLINK)
-            player_set_blinking(player, FALSE);
-    }
-
-    if(physicsactor_get_state(pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT)
-        player_set_blinking(player, TRUE);
-
-    /* shield */
-    if(player->shield_type != SH_NONE)
-        update_shield(player);
-
-    /* underwater logic */
-    if(!player->underwater && act->position.y >= level_waterlevel())
-        player_enter_water(player);
-    else if(player->underwater && act->position.y < level_waterlevel())
-        player_leave_water(player);
-    if(player->underwater) {
-        /* disable turbo */
-        player_set_turbo(player, FALSE);
-
-        /* disable some shields */
-        if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD) {
-            if(!player_is_invincible(player))
-                player_hit(player, 0.0f);
-            else
-                player->shield_type = SH_NONE;
-        }
-
-        /* timer countdown */
-        if(player->shield_type != SH_WATERSHIELD && !player_is_winning(player) && (
-            act->position.y < level_waterlevel() || /* forced underwater via scripting OR... */
-            is_head_underwater(player)              /* the head of the player is underwater */
-        ))
-            player->underwater_timer += dt;
-        else
-            player->underwater_timer = 0.0f;
-
-        /* drowning */
-        if(player_seconds_remaining_to_drown(player) <= 0.0f)
-            player_drown(player);
-    }
-
-    /* invincibility stars */
-    if(player->invincible) {
-        /* animate */
-        animate_invincibility_stars(player);
-
-        /* update timer & finish */
-        player->invincibility_timer += dt;
-        if(player->invincibility_timer >= PLAYER_INVINCIBILITY_TIME)
-            player_set_invincible(player, FALSE);
-    }
-
-    /* turbo speed */
-    if(player->turbo) {
-        /* update timer & finish */
-        player->turbo_timer += dt;
-        if(player->turbo_timer >= PLAYER_TURBO_TIME)
+        /* underwater logic */
+        if(player->underwater) {
+            /* disable turbo */
             player_set_turbo(player, FALSE);
+
+            /* disable some shields */
+            if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD) {
+                if(!player_is_invincible(player))
+                    player_hit(player, 0.0f);
+                else
+                    player->shield_type = SH_NONE;
+            }
+
+            /* timer countdown */
+            if(player->shield_type != SH_WATERSHIELD && !player_is_winning(player) && (
+                act->position.y < level_waterlevel() || /* forced underwater via scripting OR... */
+                is_head_underwater(player)              /* the head of the player is underwater */
+            ))
+                player->underwater_timer += dt;
+            else
+                player->underwater_timer = 0.0f;
+
+            /* drowning */
+            if(player_seconds_remaining_to_drown(player) <= 0.0f)
+                player_drown(player);
+        }
+
+        /* the player is blinking */
+        if(player->blinking) {
+            player->blink_timer += timer_get_delta();
+
+            if(player->blink_timer - player->blink_visibility_timer >= 0.067f) {
+                player->blink_visibility_timer = player->blink_timer;
+                act->visible = !act->visible;
+            }
+
+            if(player->blink_timer >= PLAYER_MAX_BLINK)
+                player_set_blinking(player, FALSE);
+        }
+
+        if(physicsactor_get_state(pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT)
+            player_set_blinking(player, TRUE);
+
+        /* invincibility stars */
+        if(player->invincible) {
+            /* update timer & finish */
+            player->invincibility_timer += dt;
+            if(player->invincibility_timer >= PLAYER_INVINCIBILITY_TIME)
+                player_set_invincible(player, FALSE);
+        }
+
+        /* turbo speed */
+        if(player->turbo) {
+            /* update timer & finish */
+            player->turbo_timer += dt;
+            if(player->turbo_timer >= PLAYER_TURBO_TIME)
+                player_set_turbo(player, FALSE);
+        }
+
+        /* pitfalls */
+        if(act->position.y >= level_height_at(act->position.x))
+            player_kill(player);
+
+        /* smashed / crushed */
+        if(!physicsactor_is_midair(player->pa) && physicsactor_is_touching_ceiling(player->pa) && physicsactor_is_inside_wall(player->pa))
+            player_kill(player);
+
+        /* active player can't get off camera */
+        if(player == level_player()) {
+            v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
+            v2d_t cam_bottomright = camera_clip(level_size());
+
+            /* lock horizontally */
+            if(act->position.x > cam_bottomright.x - padding + eps) {
+                act->position.x = cam_bottomright.x - padding;
+                act->speed.x *= 0.5f;
+            }
+            else if(act->position.x < cam_topleft.x + padding - eps) {
+                act->position.x = cam_topleft.x + padding;
+                act->speed.x *= 0.5f;
+            }
+
+            /* lock on top; won't prevent pits */
+            if(!player_is_dying(player)) {
+                if(act->position.y < cam_topleft.y + padding - eps) {
+                    act->position.y = cam_topleft.y + padding;
+                    act->speed.y *= 0.5f;
+                }
+            }
+        }
+
+        /* winning pose */
+        if(level_has_been_cleared())
+            physicsactor_enable_winning_pose(pa);
+
+        /* rolling misc */
+        if(!player_is_midair(player))
+            player->thrown_while_rolling = FALSE;
+        else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
+            player->thrown_while_rolling = TRUE;
+
+        /* misc */
+        player->on_movable_platform = FALSE;
+
     }
-
-    /* winning pose */
-    if(level_has_been_cleared())
-        physicsactor_enable_winning_pose(pa);
-
-    /* animation */
-    update_animation(player);
-
-    /* play sounds */
-    play_sounds(player);
+    /* else if player is frozen, blinking and invisible ...? */
 
     /* can't leave the world */
     if(act->position.x < padding - eps) {
@@ -346,48 +381,19 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         act->speed.y *= 0.5f;
     }
 
-    /* pitfalls */
-    if(act->position.y >= level_height_at(act->position.x) && !player->disable_movement)
-        player_kill(player);
+    /* invincibility stars */
+    if(player->invincible)
+        animate_invincibility_stars(player);
 
-    /* smashed / crushed */
-    if(!player->disable_movement) {
-        if(!physicsactor_is_midair(player->pa) && physicsactor_is_touching_ceiling(player->pa) && physicsactor_is_inside_wall(player->pa))
-            player_kill(player);
-    }
+    /* shield */
+    if(player->shield_type != SH_NONE)
+        update_shield(player);
 
-    /* active player can't get off camera */
-    if(player == level_player() && !player->disable_movement) {
-        v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
-        v2d_t cam_bottomright = camera_clip(level_size());
+    /* animation */
+    update_animation(player);
 
-        /* lock horizontally */
-        if(act->position.x > cam_bottomright.x - padding + eps) {
-            act->position.x = cam_bottomright.x - padding;
-            act->speed.x *= 0.5f;
-        }
-        else if(act->position.x < cam_topleft.x + padding - eps) {
-            act->position.x = cam_topleft.x + padding;
-            act->speed.x *= 0.5f;
-        }
-
-        /* lock on top; won't prevent pits */
-        if(!player_is_dying(player)) {
-            if(act->position.y < cam_topleft.y + padding - eps) {
-                act->position.y = cam_topleft.y + padding;
-                act->speed.y *= 0.5f;
-            }
-        }
-    }
-
-    /* rolling misc */
-    if(!player_is_midair(player))
-        player->thrown_while_rolling = FALSE;
-    else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
-        player->thrown_while_rolling = TRUE;
-
-    /* misc */
-    player->on_movable_platform = FALSE;
+    /* play sounds */
+    play_sounds(player);
 }
 
 
