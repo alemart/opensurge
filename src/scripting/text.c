@@ -126,9 +126,6 @@ font_t* scripting_text_fontptr(const surgescript_object_t* object)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    font_t* font = get_font(object);
-    if(font != NULL)
-        font_set_position(font, scripting_util_world_position(object));
     return NULL;
 }
 
@@ -213,6 +210,7 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
         surgescript_heap_t* heap = surgescript_object_heap(object);
         bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
         v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
+        font_set_position(font, scripting_util_world_position(object));
         font_render(font, camera);
     }
     return NULL;
