@@ -62,7 +62,7 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
 
     // misc
     mouseWheelSpeed = 12;
-    touchId = -1;
+    trackedTouchId = -1;
 
     state "main"
     {
@@ -94,15 +94,15 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
 
     fun onTouchBegin(touch)
     {
-        if(touchId < 0 && isInActiveArea(touch.position)) {
-            touchId = touch.id;
+        if(trackedTouchId < 0 && isInActiveArea(touch.position)) {
+            trackedTouchId = touch.id;
             dx = dy = 0;
         }
     }
 
     fun onTouchMove(touch)
     {
-        if(touchId == touch.id) {
+        if(trackedTouchId == touch.id) {
             dx = touch.deltaPosition.x;
             dy = touch.deltaPosition.y;
         }
@@ -110,8 +110,8 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
 
     fun onTouchEnd(touch)
     {
-        if(touchId == touch.id) {
-            touchId = -1;
+        if(trackedTouchId == touch.id) {
+            trackedTouchId = -1;
             dx = dy = 0;
         }
     }
@@ -138,6 +138,6 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
 
     fun isBeingScrolled()
     {
-        return (touchId >= 0) || (dx * dx + dy * dy > 0);
+        return (trackedTouchId >= 0) || (dx * dx + dy * dy > 0);
     }
 }
