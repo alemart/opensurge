@@ -16,45 +16,48 @@ using SurgeEngine.UI.Text;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 
-object "Debug Mode - Player Position" is "debug-mode-plugin", "awake", "private", "entity"
+object "Debug Mode - Player Position" is "debug-mode-plugin"
 {
-    text = Text("GoodNeighbors");
-    transform = Transform();
-
-
-
-    state "main"
-    {
-        player = Player.active;
-
-        xpos = Math.floor(player.transform.position.x);
-        ypos = Math.floor(player.transform.position.y);
-
-        text.text = xpos + " , " + ypos;
-    }
-
-
+    text = null;
 
     fun onLoad(debugMode)
     {
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
+        zindex = uiSettings.zindex + 1000;
 
-        text.zindex = uiSettings.zindex + 1000;
-        text.align = "center";
-        text.offset = Vector2(0, 16);
-
-        worldScroller = debugMode.plugin("Debug Mode - World Scroller");
-        worldScroller.subscribe(this);
+        player = Player.active;
+        text = player.spawn("Debug Mode - Player Position - Text").setZIndex(zindex);
     }
 
     fun onUnload(debugMode)
     {
-        worldScroller = debugMode.plugin("Debug Mode - World Scroller");
-        worldScroller.unsubscribe(this);
+        text.destroy();
+        text = null;
+    }
+}
+
+object "Debug Mode - Player Position - Text" is "awake", "private", "entity"
+{
+    text = Text("GoodNeighbors");
+    transform = Transform();
+
+    state "main"
+    {
+        xpos = Math.floor(transform.position.x);
+        ypos = Math.floor(transform.position.y);
+
+        text.text = xpos + " , " + ypos;
     }
 
-    fun onWorldScroll(position)
+    fun setZIndex(zindex)
     {
-        transform.position = position;
+        text.zindex = zindex;
+        return this;
+    }
+
+    fun constructor()
+    {
+        text.align = "center";
+        text.offset = Vector2(0, 16);
     }
 }
