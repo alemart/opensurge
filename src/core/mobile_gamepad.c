@@ -26,6 +26,7 @@
 #include "timer.h"
 #include "v2d.h"
 #include "../entities/actor.h"
+#include "../scenes/level.h"
 
 
 
@@ -316,7 +317,7 @@ void mobilegamepad_update()
 
     /* detect if something is pressed on the screen,
        but only if the mobile gamepad is visible */
-    if(is_visible && video_is_in_game_mode()) {
+    if(is_visible && !level_editmode()) {
 
         /* reset touch */
         touch_t touch[MAX_TOUCHES];
@@ -382,8 +383,8 @@ void mobilegamepad_render()
     if(!is_available)
         return;
 
-    /* skip if not in game mode */
-    if(!video_is_in_game_mode())
+    /* skip if in the editor */
+    if(level_editmode())
         return;
 
     /* fading in and fading out */

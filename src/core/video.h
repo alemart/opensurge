@@ -51,9 +51,15 @@ videoresolution_t video_get_resolution();
 videoresolution_t video_best_fit_resolution();
 v2d_t video_get_window_size();
 
-/* game mode (regular gameplay vs level editor) */
-void video_set_game_mode(bool in_game_mode);
-bool video_is_in_game_mode();
+/* video mode: controls the size of the screen / backbuffer */
+typedef enum videomode_t {
+    VIDEOMODE_DEFAULT,      /* the screen size is set to its default (usually 426x240) */
+    VIDEOMODE_FILL,         /* the size of the screen is set to the size of the window */
+    VIDEOMODE_BESTFIT       /* similar to FILL, but maintains the aspect ratio of the default screen size */
+} videomode_t;
+
+void video_set_mode(videomode_t mode);
+videomode_t video_get_mode();
 
 /* fullscreen mode */
 void video_set_fullscreen(bool fullscreen);

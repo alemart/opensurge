@@ -300,6 +300,7 @@ static int editor_cursor_entity_id, editor_cursor_itemid;
 static font_t *editor_cursor_font;
 static font_t *editor_properties_font; /* top bar */
 static font_t *editor_help_font; /* top bar */
+static videomode_t editor_previous_videomode = VIDEOMODE_DEFAULT;
 static const char* editor_entity_class(enum editor_entity_type objtype);
 static const char* editor_entity_info(enum editor_entity_type objtype, int objid);
 static void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t position);
@@ -3465,7 +3466,8 @@ void editor_enable()
     scripting_pause_vm();
 
     /* changing the video mode */
-    video_set_game_mode(false);
+    editor_previous_videomode = video_get_mode();
+    video_set_mode(VIDEOMODE_FILL);
 
     /* activating the editor */
     editor_action_init();
@@ -3492,7 +3494,7 @@ void editor_disable()
     editor_enabled = false;
 
     /* changing the video mode */
-    video_set_game_mode(true);
+    video_set_mode(editor_previous_videomode);
 
     /* updating the level size */
     update_level_size();

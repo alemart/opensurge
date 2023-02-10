@@ -67,6 +67,7 @@ static image_t* backbuffer = NULL;
 static bool create_backbuffer();
 static void destroy_backbuffer();
 static void reconfigure_backbuffer();
+static void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height);
 
 
 /* FPS counter */
@@ -83,20 +84,20 @@ static struct {
     /* current resolution */
     videoresolution_t resolution;
 
+    /* current mode */
+    videomode_t mode;
+
     /* fullscreen mode? */
     bool is_fullscreen;
 
     /* should we display the FPS counter? */
     bool is_fps_visible;
 
-    /* should the size of the backbuffer match the size of the screen or of the window? */
-    bool is_in_game_mode;
-
 } settings = {
     .resolution = VIDEORESOLUTION_1X,
+    .mode = VIDEOMODE_DEFAULT,
     .is_fullscreen = false,
     .is_fps_visible = false,
-    .is_in_game_mode = true,
 };
 
 
@@ -138,6 +139,12 @@ static const char* RESOLUTION_NAME[] = {
     [VIDEORESOLUTION_2X] = "2x",
     [VIDEORESOLUTION_3X] = "3x",
     [VIDEORESOLUTION_4X] = "4x"
+};
+
+static const char* VIDEOMODE_NAME[] = {
+    [VIDEOMODE_DEFAULT] = "default",
+    [VIDEOMODE_FILL] = "fill",
+    [VIDEOMODE_BESTFIT] = "best-fit"
 };
 
 #define DRAW_TEXT(x, y, flags, fmt, ...) do { \
@@ -184,6 +191,7 @@ void video_init()
     al_inhibit_screensaver(true);
 
     /* load the default video settings */
+    settings.mode = VIDEOMODE_DEFAULT;
     game_screen_width = DEFAULT_SCREEN_WIDTH;
     game_screen_height = DEFAULT_SCREEN_HEIGHT;
     str_cpy(window_title, DEFAULT_WINDOW_TITLE, sizeof(window_title));
@@ -330,23 +338,28 @@ bool video_is_fullscreen()
 }
 
 /*
- * video_set_game_mode()
- * Enable/disable the game mode
+ * video_set_mode()
+ * Set the video mode
  */
-void video_set_game_mode(bool in_game_mode)
+void video_set_mode(videomode_t mode)
 {
-    LOG("%s the game mode", in_game_mode ? "Enabling" : "Disabling");
-    settings.is_in_game_mode = in_game_mode;
+    /* no need to change anything */
+    if(mode == settings.mode)
+        return;
+
+    /* change the video mode */
+    LOG("Setting the video mode to %s", VIDEOMODE_NAME[mode]);
+    settings.mode = mode;
     reconfigure_backbuffer();
 }
 
 /*
- * video_is_in_game_mode()
- * Is the game mode enabled?
+ * video_get_mode()
+ * Get the current video mode
  */
-bool video_is_in_game_mode()
+videomode_t video_get_mode()
 {
-    return settings.is_in_game_mode;
+    return settings.mode;
 }
 
 /*
@@ -383,15 +396,17 @@ int video_fps()
  */
 v2d_t video_get_screen_size()
 {
-    if(!settings.is_in_game_mode && backbuffer != NULL)
-        return v2d_new(image_width(backbuffer), image_height(backbuffer));
-    else
-        return v2d_new(game_screen_width, game_screen_height);
+    int screen_width = game_screen_width;
+    int screen_height = game_screen_height;
+
+    compute_screen_size(settings.mode, &screen_width, &screen_height);
+
+    return v2d_new(screen_width, screen_height);
 }
 
 /*
  * video_get_window_size()
- * Returns the window size, based on the current resolution
+ * Returns the window size
  */
 v2d_t video_get_window_size()
 {
@@ -463,7 +478,7 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event)
 
         case ALLEGRO_EVENT_DISPLAY_RESIZE:
             al_acknowledge_resize(event->display.source);
-            if(!settings.is_in_game_mode)
+            if(settings.mode != VIDEOMODE_DEFAULT)
                 reconfigure_backbuffer();
             break;
 
@@ -635,6 +650,8 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 bool create_backbuffer()
 {
     ALLEGRO_STATE state;
+    int screen_width = game_screen_width;
+    int screen_height = game_screen_height;
 
     if(backbuffer != NULL)
         FATAL("Duplicate backbuffer");
@@ -642,7 +659,8 @@ bool create_backbuffer()
     al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
 
-    if(NULL == (backbuffer = image_create(game_screen_width, game_screen_height)))
+    compute_screen_size(settings.mode, &screen_width, &screen_height);
+    if(NULL == (backbuffer = image_create(screen_width, screen_height)))
         return false;
 
     al_restore_state(&state);
@@ -667,8 +685,8 @@ void destroy_backbuffer()
 void reconfigure_backbuffer()
 {
     ALLEGRO_STATE state;
-    int backbuffer_width = settings.is_in_game_mode ? game_screen_width : al_get_display_width(display);
-    int backbuffer_height = settings.is_in_game_mode ? game_screen_height : al_get_display_height(display);
+    int screen_width = game_screen_width;
+    int screen_height = game_screen_height;
 
     if(backbuffer == NULL)
         FATAL("No backbuffer");
@@ -678,7 +696,8 @@ void reconfigure_backbuffer()
     al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
 
-    if(NULL == (backbuffer = image_create(backbuffer_width, backbuffer_height)))
+    compute_screen_size(settings.mode, &screen_width, &screen_height);
+    if(NULL == (backbuffer = image_create(screen_width, screen_height)))
         FATAL("Can't reconfigure the backbuffer");
 
     al_restore_state(&state);
@@ -689,7 +708,39 @@ void reconfigure_backbuffer()
     console.font = al_create_builtin_font();
 }
 
+/* Compute the size of the screen / backbuffer according to the video mode */
+void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height)
+{
+    int window_width = al_get_display_width(display);
+    int window_height = al_get_display_height(display);
 
+    switch(mode) {
+        case VIDEOMODE_DEFAULT:
+            *screen_width = game_screen_width;
+            *screen_height = game_screen_height;
+            break;
+
+        case VIDEOMODE_FILL:
+            *screen_width = window_width;
+            *screen_height = window_height;
+            break;
+
+        case VIDEOMODE_BESTFIT:
+            if(game_screen_width > 0 && game_screen_height > 0) { /* do we need to do this checking? */
+                float aspect_ratio = (float)game_screen_width / (float)game_screen_height;
+
+                if(aspect_ratio >= 1.0f) {
+                    *screen_width = window_width;
+                    *screen_height = (int)roundf((float)window_width / aspect_ratio);
+                }
+                else {
+                    *screen_width = (int)roundf((float)window_height * aspect_ratio);
+                    *screen_height = window_height;
+                }
+            }
+            break;
+    }
+}
 
 
 /*

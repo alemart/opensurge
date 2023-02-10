@@ -110,25 +110,36 @@ surgescript_var_t* fun_getscreen(surgescript_object_t* object, const surgescript
 /* get the current Video mode */
 surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    const char* mode = video_is_in_game_mode() ? "default" : "fill";
+    const char* mode = "";
+
+    switch(video_get_mode()) {
+        case VIDEOMODE_DEFAULT:
+            mode = "default";
+            break;
+
+        case VIDEOMODE_FILL:
+            mode = "fill";
+            break;
+
+        case VIDEOMODE_BESTFIT:
+            mode = "best-fit";
+            break;
+    }
+
     return surgescript_var_set_string(surgescript_var_create(), mode);
 }
 
 /* set the current Video mode */
 surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    return NULL;
-
     const char* mode = surgescript_var_fast_get_string(param[0]);
 
-    if(strcmp(mode, "default") == 0) {
-        if(!video_is_in_game_mode())
-            video_set_game_mode(true);
-    }
-    else if(strcmp(mode, "fill") == 0) {
-        if(video_is_in_game_mode())
-            video_set_game_mode(false);
-    }
+    if(strcmp(mode, "default") == 0)
+        video_set_mode(VIDEOMODE_DEFAULT);
+    else if(strcmp(mode, "fill") == 0)
+        video_set_mode(VIDEOMODE_FILL);
+    else if(strcmp(mode, "best-fit") == 0)
+        video_set_mode(VIDEOMODE_BESTFIT);
 
     return NULL;
 }
