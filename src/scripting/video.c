@@ -117,12 +117,18 @@ surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_v
 /* set the current Video mode */
 surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    return NULL;
+
     const char* mode = surgescript_var_fast_get_string(param[0]);
 
-    if(strcmp(mode, "default") == 0)
-        video_set_game_mode(true);
-    else if(strcmp(mode, "fill") == 0)
-        video_set_game_mode(false);
+    if(strcmp(mode, "default") == 0) {
+        if(!video_is_in_game_mode())
+            video_set_game_mode(true);
+    }
+    else if(strcmp(mode, "fill") == 0) {
+        if(video_is_in_game_mode())
+            video_set_game_mode(false);
+    }
 
     return NULL;
 }
