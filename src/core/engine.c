@@ -303,8 +303,6 @@ void init_basic_stuff(const commandline_t* cmd)
 
     /* basic initialization */
     srand(time(NULL)); /* randomize */
-    setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
-    setlocale(LC_NUMERIC, "C"); /* use '.' as the decimal separator on atof() */
     force_quit = false;
 
     /* initialize Allegro */
@@ -318,6 +316,10 @@ void init_basic_stuff(const commandline_t* cmd)
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");
 #endif
+
+    /* set the locale */
+    setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
+    setlocale(LC_NUMERIC, "C"); /* use '.' as the decimal separator on atof() */
 
     /* initialize the the asset manager and the logfile module */
     if(commandline_getint(cmd->verbose, FALSE))
