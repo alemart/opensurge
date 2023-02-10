@@ -21,7 +21,6 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
-#include "../core/util.h"
 #include "../core/video.h"
 
 /* private */
@@ -31,6 +30,8 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t SCREEN_ADDR = 0;
 
 /*
@@ -45,6 +46,8 @@ void scripting_register_video(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Video", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Video", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Video", "get_Screen", fun_getscreen, 0);
+    surgescript_vm_bind(vm, "Video", "get_mode", fun_getmode, 0);
+    surgescript_vm_bind(vm, "Video", "set_mode", fun_setmode, 1);
 }
 
 
@@ -102,4 +105,24 @@ surgescript_var_t* fun_getscreen(surgescript_object_t* object, const surgescript
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     return surgescript_var_clone(surgescript_heap_at(heap, SCREEN_ADDR));
+}
+
+/* get the current Video mode */
+surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* mode = video_is_in_game_mode() ? "default" : "fill";
+    return surgescript_var_set_string(surgescript_var_create(), mode);
+}
+
+/* set the current Video mode */
+surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* mode = surgescript_var_fast_get_string(param[0]);
+
+    if(strcmp(mode, "default") == 0)
+        video_set_game_mode(true);
+    else if(strcmp(mode, "fill") == 0)
+        video_set_game_mode(false);
+
+    return NULL;
 }
