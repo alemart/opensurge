@@ -307,13 +307,6 @@ object 'SoundFactory' \n\
     fun destroy() { } \n\
 } \n\
 \n\
-object 'Video' \n\
-{ \n\
-    public readonly Screen = spawn('Screen'); \n\
-\n\
-    fun destroy() { } \n\
-} \n\
-\n\
 object 'Events' \n\
 { \n\
     public readonly Event = spawn('EventFactory'); \n\

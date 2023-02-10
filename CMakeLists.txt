@@ -359,6 +359,7 @@ SET(GAME_SRCS
   src/scripting/time.c
   src/scripting/transform.c
   src/scripting/vector2.c
+  src/scripting/video.c
   src/scripting/web.c
   src/physics/obstacle.c
   src/physics/obstaclemap.c
