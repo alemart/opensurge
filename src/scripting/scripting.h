@@ -77,6 +77,6 @@ extern bool scripting_brick_enabled(const surgescript_object_t* object);
 extern v2d_t scripting_brick_hotspot(const surgescript_object_t* object);
 extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* object);
 
-extern struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
+extern const struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 
 #endif

@@ -258,7 +258,7 @@ const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object)
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR));
     surgescript_object_t* target = surgescript_objectmanager_get(manager, handle);
-    obstaclemap_t* obstaclemap = scripting_obstaclemap_ptr(target);
+    const obstaclemap_t* obstaclemap = scripting_obstaclemap_ptr(target);
     ssassert(obstaclemap != NULL);
     return obstaclemap;
 }

@@ -62,6 +62,7 @@
 #include "../entities/legacy/item.h"
 #include "../entities/legacy/enemy.h"
 #include "../physics/obstacle.h"
+#include "../physics/obstaclemap.h"
 #include "../scripting/scripting.h"
 #include "../scenes/editorpal.h"
 
@@ -163,15 +164,21 @@ static void save_level_state(levelstate_t* state);
 static void restore_level_state(const levelstate_t* state);
 static void clear_level_state(levelstate_t* state);
 
-/* internal data */
+/* level size */
 static int level_width;/* width of this level (in pixels) */
 static int level_height; /* height of this level (in pixels) */
 static int *height_at, height_at_count; /* level height at different sample points */
+static void init_level_size();
+static void release_level_size();
+static void update_level_size();
+static void update_level_height_samples(int level_width, int level_height);
+
+/* internal data */
 static float level_timer;
 static music_t *music;
+static bgtheme_t *backgroundtheme;
 static int quit_level;
 static image_t *quit_level_img;
-static bgtheme_t *backgroundtheme;
 static int must_load_another_level;
 static int must_restart_this_level;
 static int must_push_a_quest;
@@ -201,8 +208,6 @@ static bool level_interpret_line(const char *filepath, int fileline, const char 
 
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
-static void update_level_size();
-static void update_level_height_samples(int level_width, int level_height);
 static void restart(int preserve_level_state);
 static void render_players();
 static void update_music();
@@ -212,6 +217,19 @@ static void render_hud(); /* gui / hud related */
 static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
+
+/* obstacle map */
+static obstaclemap_t* obstaclemap = NULL; /* obstacle map near the camera */
+STATIC_DARRAY(obstacle_t*, mock_obstacles); /* dynamically generated obstacles */
+static void create_obstaclemap();
+static void destroy_obstaclemap();
+static void clear_obstaclemap();
+static void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, surgescript_object_t* (*get_bricklike_ssobject)(int));
+static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
+static obstacle_t* item2obstacle(const item_t* item);
+static obstacle_t* object2obstacle(const object_t* object);
+static collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object);
+static void destroy_collisionmask_of_bricklike_object(void* mask);
 
 /* Scripting */
 #define TRANSFORM_MAX_DEPTH 128
@@ -488,50 +506,40 @@ void level_load(const char *filepath)
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR();
 
+    /* clear pointers */
+    backgroundtheme = NULL;
+    music = NULL;
+
+    /* clear players */
+    team_size = 0;
+    for(int i = 0; i < TEAM_MAX; i++)
+        team[i] = NULL;
+
     /* scripting: preparing a new Level... */
-    cached_level_ssobject = NULL;
-    ssobj_extradata = fasthash_create(free_ssobj_extradata, 15);
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
-
-    /* entity manager */
-    entitymanager_init();
-
-    /* setup objects (1) */
-    init_setup_object_list();
 
     /* reading the level file */
     if(!levparser_parse(filepath, NULL, level_interpret_line))
         fatal_error("Can\'t open level file \"%s\".", filepath);
 
     /* load the music */
+    music_stop(); /* stop any music that's playing */
     music = *musicfile ? music_load(musicfile) : NULL;
+
+    /* compute the level size */
+    update_level_size();
 
     /* background */
     backgroundtheme = background_load(bgtheme);
 
-    /* level size */
-    level_width = 0;
-    level_height = 0;
-    height_at_count = 0;
-    height_at = NULL;
-    update_level_size();
-
     /* players */
-    if(team_size == 0) {
-        /* default players */
-        logfile_message("Loading the default players...");
-        team[team_size++] = player_create("Surge");
-        team[team_size++] = player_create("Neon");
-        team[team_size++] = player_create("Charge");
-    }
-    level_change_player(team[0]);
     spawn_players();
-    camera_init();
-    camera_set_position(player->actor->position);
     player_set_collectibles(0);
+    level_change_player(team[0]);
+    camera_set_position(player->actor->position);
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
 
-    /* setup objects (2) */
+    /* spawn setup objects */
     spawn_setup_objects();
 
     /* success! */
@@ -545,8 +553,6 @@ void level_load(const char *filepath)
  */
 void level_unload()
 {
-    int i;
-
     logfile_message("Unloading the level...");
 
     /* scripting */
@@ -556,44 +562,29 @@ void level_unload()
         logfile_message("The level scripts have been cleared.");
     }
 
-    /* music */
-    if(music != NULL) {
-        music_stop();
-        music_unref(music);
-    }
-
-    /* destroy extradata */
-    ssobj_extradata = fasthash_destroy(ssobj_extradata);
-    cached_level_ssobject = NULL;
-
-    /* entity manager */
-    entitymanager_release();
-
-    /* releases the setup object list */
-    release_setup_object_list();
-
-    /* unloading the brickset */
-    logfile_message("Unloading the brickset...");
-    brickset_unload();
+    /* destroying the players */
+    logfile_message("Unloading the players...");
+    for(int i = 0; i < team_size; i++)
+        player_destroy(team[i]);
+    team_size = 0;
+    player = NULL;
 
     /* unloading the background */
     logfile_message("Unloading the background...");
     backgroundtheme = background_unload(backgroundtheme);
 
-    /* destroying the players */
-    logfile_message("Unloading the players...");
-    for(i=0; i<team_size; i++)
-        player_destroy(team[i]);
-    team_size = 0;
-    player = NULL;
+    /* unloading the brickset */
+    logfile_message("Unloading the brickset...");
+    brickset_unload();
 
-    /* level size */
-    level_width = 0;
-    level_height = 0;
-    if(height_at != NULL)
-        free(height_at);
-    height_at = NULL;
-    height_at_count = 0;
+    /* note: the bricks are released when the entity manager is released */
+
+    /* music */
+    logfile_message("Stopping the music...");
+    if(music != NULL) {
+        music_stop();
+        music_unref(music);
+    }
 
     /* misc */
     camera_unlock();
@@ -1054,46 +1045,28 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
 void level_init(void *path_to_lev_file)
 {
     const char *filepath = (const char*)path_to_lev_file;
-    int i;
 
     logfile_message("level_init()");
     video_display_loading_screen();
 
-    /* main init */
-    level_width = level_height = 0;
-    level_timer = 0.0f;
-    dialogregion_size = 0;
-    quit_level = FALSE;
-    quit_level_img = NULL;
+    /* initialize variables */
+    player = NULL;
+    music = NULL;
     backgroundtheme = NULL;
+
+    level_timer = 0.0f;
+    quit_level = FALSE;
     must_load_another_level = FALSE;
     must_restart_this_level = FALSE;
     must_push_a_quest = FALSE;
     must_render_brick_masks = FALSE;
     must_display_gizmos = FALSE;
     dead_player_timeout = 0.0f;
-    team_size = 0;
-    for(i=0; i<TEAM_MAX; i++)
-        team[i] = NULL;
-    player = NULL;
-    music = NULL;
 
-    /* scripting controlled variables */
     level_cleared = FALSE;
     jump_to_next_stage = FALSE;
-
-    /* helpers */
-    clear_level_state(&saved_state);
-    clear_bricklike_ssobjects();
-    renderqueue_init();
-    particle_init();
-
-    /* stop any music that's playing */
-    music_stop();
-
-    /* level init */
-    level_load(filepath);
-    spawn_players();
+    wants_to_leave = FALSE;
+    wants_to_pause = FALSE;
 
     /* dialog box */
     dlgbox_active = FALSE;
@@ -1104,12 +1077,86 @@ void level_init(void *path_to_lev_file)
     dlgbox_title = font_create("dialogbox");
     dlgbox_message = font_create("dialogbox");
 
+    /* quit level img */
+    quit_level_img = NULL;
+
+    /* helpers */
+    clear_level_state(&saved_state);
+
+    renderqueue_init();
+    particle_init();
+    camera_init();
+    init_setup_object_list();
+    init_level_size();
+
+    entitymanager_init();
+    create_obstaclemap();
+    clear_bricklike_ssobjects();
+
+    cached_level_ssobject = NULL;
+    ssobj_extradata = fasthash_create(free_ssobj_extradata, 15);
+
+    /* load level file */
+    level_load(filepath);
+
     /* editor */
     editor_init();
 
     /* done! */
     logfile_message("level_init() ok");
 }
+
+
+
+/*
+ * level_release()
+ * Releases the scene
+ */
+void level_release()
+{
+    logfile_message("level_release()");
+
+    /* save prefs */
+    extern prefs_t* prefs;
+    prefs_save(prefs);
+
+    /* release the editor */
+    editor_release();
+
+    /* unload the level and its scripts */
+    level_unload();
+
+    /* dialog box */
+    font_destroy(dlgbox_title);
+    font_destroy(dlgbox_message);
+    actor_destroy(dlgbox);
+
+    /* quit level img */
+    if(quit_level_img != NULL)
+        image_destroy(quit_level_img);
+
+    /* release the helpers */
+    ssobj_extradata = fasthash_destroy(ssobj_extradata);
+    cached_level_ssobject = NULL;
+
+    clear_bricklike_ssobjects();
+    destroy_obstaclemap();
+    entitymanager_release();
+
+    release_level_size();
+    release_setup_object_list();
+    camera_release();
+    particle_release();
+    renderqueue_release();
+
+    clear_level_state(&saved_state);
+
+    /* done! */
+    logfile_message("level_release() ok");
+}
+
+
+
 
 
 /*
@@ -1249,7 +1296,11 @@ void level_update()
     /* updating the entities */
     /* -------------------------------------- */
 
+    /* update background */
+    background_update(backgroundtheme);
+
     /* getting the major entities */
+    /* note: bricks should use a larger margin when compared to SurgeScript entities */
     entitymanager_set_active_region(
         (int)cam.x - VIDEO_SCREEN_W/2 - (DEFAULT_MARGIN*3)/2,
         (int)cam.y - VIDEO_SCREEN_H/2 - (DEFAULT_MARGIN*3)/2,
@@ -1259,18 +1310,7 @@ void level_update()
 
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
-
-    entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-    );
-
     major_bricks = entitymanager_retrieve_active_bricks();
-
-    /* update background */
-    background_update(backgroundtheme);
 
     /* update legacy items */
     for(inode = major_items; inode != NULL; inode = inode->next) {
@@ -1364,9 +1404,12 @@ void level_update()
 
     /* update bricks */
     for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
-        /* update this brick */
-        brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
+        brick_t* brick = bnode->data;
+        brick_update(brick, team, team_size, major_bricks, major_items, major_enemies);
     }
+
+    /* update obstacle map */
+    update_obstaclemap(major_bricks, major_items, major_enemies, get_bricklike_ssobject);
 
     /* basic camera */
     if(level_cleared)
@@ -1480,35 +1523,6 @@ void level_render()
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);
     entitymanager_release_retrieved_object_list(major_enemies);
-}
-
-
-
-/*
- * level_release()
- * Releases the scene
- */
-void level_release()
-{
-    extern prefs_t* prefs;
-
-    logfile_message("level_release()");
-
-    particle_release();
-    renderqueue_release();
-    level_unload();
-    camera_release();
-    editor_release();
-    prefs_save(prefs);
-    clear_level_state(&saved_state);
-
-    font_destroy(dlgbox_title);
-    font_destroy(dlgbox_message);
-    actor_destroy(dlgbox);
-    if(quit_level_img != NULL)
-        image_destroy(quit_level_img);
-
-    logfile_message("level_release() ok");
 }
 
 
@@ -1775,6 +1789,17 @@ surgescript_object_t* level_child_object(const char* object_name)
         return surgescript_objectmanager_get(manager, child);
 
     return NULL;
+}
+
+/*
+ * level_obstaclemap()
+ * The obstaclemap featuring the bricks and brick-like objects that are
+ * placed near the camera of the level.
+ * WARNING: will be NULL if the level is not loaded !!!
+ */
+const obstaclemap_t* level_obstaclemap()
+{
+    return obstaclemap;
 }
 
 
@@ -2225,8 +2250,30 @@ int inside_screen(int x, int y, int w, int h, int margin)
     return bounding_box(a,b);
 }
 
-/* calculates the size of the
- * current level */
+/* initializes the level size structure */
+void init_level_size()
+{
+    level_width = 0;
+    level_height = 0;
+
+    height_at_count = 0;
+    height_at = NULL;
+}
+
+/* releases the level size structure */
+void release_level_size()
+{
+    level_width = 0;
+    level_height = 0;
+
+    height_at_count = 0;
+    if(height_at != NULL)
+        free(height_at);
+    height_at = NULL;
+}
+
+/* updates the level size structure, i.e.,
+   calculates the size of the current level */
 void update_level_size()
 {
     int max_x, max_y;
@@ -2371,10 +2418,18 @@ void update_music()
 /* puts the players at the spawn point */
 void spawn_players()
 {
-    int i, j;
+    /* default players */
+    /* TODO: crash with an error message? */
+    if(team_size == 0) {
+        logfile_message("Loading the default players...");
+        team[team_size++] = player_create("Surge");
+        team[team_size++] = player_create("Neon");
+        team[team_size++] = player_create("Charge");
+    }
 
-    for(i = 0; i < team_size; i++) {
-        j = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
+    for(int i = 0; i < team_size; i++) {
+        int j = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
+
         team[i]->actor->mirror = ((int)spawn_point.x <= level_width/2) ? IF_NONE : IF_HFLIP;
         team[i]->actor->spawn_point.x = team[i]->actor->position.x = spawn_point.x + 15 * j;
         team[i]->actor->spawn_point.y = team[i]->actor->position.y = spawn_point.y;
@@ -2579,6 +2634,146 @@ void clear_level_state(levelstate_t* state)
 {
     state->is_valid = false;
 }
+
+
+
+/* obstacle map */
+
+/* create the obstacle map */
+void create_obstaclemap()
+{
+    obstaclemap = obstaclemap_create();
+    darray_init(mock_obstacles);
+}
+
+/* destroy the obstacle map */
+void destroy_obstaclemap()
+{
+    for(int i = 0; i < darray_length(mock_obstacles); i++)
+        obstacle_destroy(mock_obstacles[i]);
+    darray_release(mock_obstacles);
+
+    obstaclemap_destroy(obstaclemap);
+    obstaclemap = NULL;
+}
+
+/* clear the obstacle map */
+void clear_obstaclemap()
+{
+    obstaclemap_clear(obstaclemap);
+
+    for(int i = 0; i < darray_length(mock_obstacles); i++)
+        obstacle_destroy(mock_obstacles[i]);
+    darray_clear(mock_obstacles);
+}
+
+/* update the obstacle map */
+void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, surgescript_object_t* (*get_bricklike_ssobject)(int))
+{
+    /* note: the layers of the bricks and of the brick-like objects are being ignored */
+    /* TODO: should refactor and move the layer into the obstacle_t */
+
+    /* clear */
+    clear_obstaclemap();
+
+    /* add bricks */
+    for(; brick_list != NULL; brick_list = brick_list->next) {
+        const brick_t* brick = brick_list->data;
+        const obstacle_t* obstacle = brick_obstacle(brick);
+        /*bricklayer_t layer = brick_layer(brick);*/
+
+        if(obstacle != NULL)
+            obstaclemap_add_obstacle(obstaclemap, obstacle);
+    }
+
+    /* add legacy items */
+    for(; item_list; item_list = item_list->next) {
+        const item_t* item = item_list->data;
+
+        if(item->obstacle && item->mask) {
+            obstacle_t* mock_obstacle = item2obstacle(item);
+
+            darray_push(mock_obstacles, mock_obstacle);
+            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
+        }
+    }
+
+    /* add legacy objects */
+    for(; object_list; object_list = object_list->next) {
+        const object_t* object = object_list->data;
+
+        if(object->obstacle && object->mask) {
+            obstacle_t* mock_obstacle = object2obstacle(object);
+
+            darray_push(mock_obstacles, mock_obstacle);
+            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
+        }
+    }
+
+    /* add brick-like objects */
+    const surgescript_object_t* bricklike_object;
+    for(int i = 0; NULL != (bricklike_object = get_bricklike_ssobject(i)); i++) {
+
+        if(surgescript_object_is_killed(bricklike_object))
+            continue;
+
+        if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object)) {
+            /*bricklayer_t layer = scripting_brick_layer(bricklike_object);*/
+            obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
+
+            darray_push(mock_obstacles, mock_obstacle);
+            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
+        }
+
+    }
+}
+
+/* converts a brick-like SurgeScript object to an obstacle */
+obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
+{
+    v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
+    int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
+
+    collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
+    return obstacle_create_ex(
+        clone,
+        position.x, position.y, flags,
+        destroy_collisionmask_of_bricklike_object, clone
+    );
+}
+
+/* converts a legacy item to an obstacle */
+obstacle_t* item2obstacle(const item_t* item)
+{
+    const collisionmask_t* mask = item->mask;
+    v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
+    return obstacle_create(mask, position.x, position.y, OF_SOLID);
+}
+
+/* converts a legacy object to an obstacle */
+obstacle_t* object2obstacle(const object_t* object)
+{
+    const collisionmask_t* mask = object->mask;
+    v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
+    return obstacle_create(mask, position.x, position.y, OF_SOLID);
+}
+
+/* creates a collision mask for a brick-like SurgeScript object */
+collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object)
+{
+    /* the following pointer is guaranteed to be valid during the lifetime of the obstacle_t,
+       regardless of what happens with the brick-like object (i.e., it may get destroyed) */
+    const collisionmask_t* mask = scripting_brick_mask(object); /* assumed to be valid */
+    return collisionmask_clone(mask); /* not very efficient, though */
+}
+
+/* destroys a collision mask created for a brick-like SurgeScript object */
+void destroy_collisionmask_of_bricklike_object(void* mask)
+{
+    collisionmask_t* clone = (collisionmask_t*)mask;
+    collisionmask_destroy(clone);
+}
+
 
 
 /* scripting */

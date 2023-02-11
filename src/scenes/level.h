@@ -48,6 +48,7 @@ struct enemy_list_t;
 struct sound_t;
 struct music_t;
 struct bgtheme_t;
+struct obstaclemap_t;
 
 /* level data */
 const char* level_file();
@@ -72,6 +73,7 @@ struct enemy_t* level_create_legacy_object(const char *name, v2d_t position);
 surgescript_object_t* level_create_object(const char* object_name, v2d_t position);
 surgescript_object_t* level_get_entity_by_id(const char* entity_id);
 surgescript_object_t* level_child_object(const char* object_name);
+const struct obstaclemap_t* level_obstaclemap();
 
 /* camera */
 void level_set_camera_focus(struct actor_t *act);
