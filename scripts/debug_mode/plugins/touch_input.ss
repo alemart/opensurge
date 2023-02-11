@@ -42,6 +42,12 @@ object "Debug Mode - My Touch Input Test" is "debug-mode-plugin"
         print(touch);
     }
 
+    fun onTouchStationary(touch)
+    {
+        Console.print("TOUCH STATIONARY");
+        print(touch);
+    }
+
     fun print(touch)
     {
         Console.print("");
@@ -206,6 +212,10 @@ object "Debug Mode - Touch Input" is "debug-mode-plugin", "debug-mode-observable
         else if(touch.phase == "ended") {
             if(observer.hasFunction("onTouchEnd"))
                 observer.onTouchEnd(touch);
+        }
+        else if(touch.phase == "stationary") {
+            if(observer.hasFunction("onTouchStationary"))
+                observer.onTouchStationary(touch);
         }
     }
 
