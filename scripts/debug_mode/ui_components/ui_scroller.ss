@@ -9,6 +9,11 @@
 
 This UI component helps to develop other components that rely on scrolling.
 
+Properties:
+- dx: number, read-only. Horizontal scroll.
+- dy: number, read-only. Vertical scroll.
+- smooth: boolean. Whether or not to use smooth scrolling. Defaults to true.
+
 */
 
 using SurgeEngine.Input.Mouse;
@@ -17,14 +22,16 @@ using SurgeEngine.Video.Screen;
 // The UI Scroller is the Basic UI Scroller with a smoothing filter
 object "Debug Mode - UI Scroller" is "debug-mode-ui-component"
 {
-    delegate = spawn("Debug Mode - Basic UI Scroller");
-    smoothingFactor = 1.0 * (1.0 / 60.0); // between 0 and 1
     public readonly dx = 0;
     public readonly dy = 0;
+    public smooth = true;
+    delegate = spawn("Debug Mode - Basic UI Scroller");
+    smoothingFactor = 1.0 * (1.0 / 60.0); // between 0 and 1
 
     state "main"
     {
-        alpha = delegate.isBeingScrolled() ? 1 : smoothingFactor;
+        wantSmoothing = smooth && !delegate.isBeingScrolled();
+        alpha = wantSmoothing ? smoothingFactor : 1;
 
         // apply exponential smoothing
         dx += alpha * (delegate.dx - dx);
@@ -72,6 +79,7 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
                 state = "mouse scrolling";
             }
         }
+        Console.print([dx,dy]);
     }
 
     state "mouse scrolling"
@@ -106,6 +114,12 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
             dx = touch.deltaPosition.x;
             dy = touch.deltaPosition.y;
         }
+    }
+
+    fun onTouchStationary(touch)
+    {
+        if(trackedTouchId == touch.id)
+            dx = dy = 0;
     }
 
     fun onTouchEnd(touch)
