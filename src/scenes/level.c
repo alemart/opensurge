@@ -225,9 +225,9 @@ static void create_obstaclemap();
 static void destroy_obstaclemap();
 static void clear_obstaclemap();
 static void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, surgescript_object_t* (*get_bricklike_ssobject)(int));
-static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
 static obstacle_t* item2obstacle(const item_t* item);
 static obstacle_t* object2obstacle(const object_t* object);
+static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
 static collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object);
 static void destroy_collisionmask_of_bricklike_object(void* mask);
 
@@ -2728,20 +2728,6 @@ void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_
     }
 }
 
-/* converts a brick-like SurgeScript object to an obstacle */
-obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
-{
-    v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
-    int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
-
-    collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
-    return obstacle_create_ex(
-        clone,
-        position.x, position.y, flags,
-        destroy_collisionmask_of_bricklike_object, clone
-    );
-}
-
 /* converts a legacy item to an obstacle */
 obstacle_t* item2obstacle(const item_t* item)
 {
@@ -2756,6 +2742,20 @@ obstacle_t* object2obstacle(const object_t* object)
     const collisionmask_t* mask = object->mask;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
     return obstacle_create(mask, position.x, position.y, OF_SOLID);
+}
+
+/* converts a brick-like SurgeScript object to an obstacle */
+obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
+{
+    v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
+    int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
+
+    collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
+    return obstacle_create_ex(
+        clone,
+        position.x, position.y, flags,
+        destroy_collisionmask_of_bricklike_object, clone
+    );
 }
 
 /* creates a collision mask for a brick-like SurgeScript object */
