@@ -26,11 +26,15 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
     itemType = "";
     itemName = "";
     itemPreview = spawn("Debug Mode - Item Creator - Preview");
+    camera = null; // camera of the debug mode (plugin)
 
 
 
     state "main"
     {
+        // follow the camera
+        transform.position = camera.position;
+
         // create the item if the action button is pressed
         if(input.buttonPressed(actionButton)) {
 
@@ -55,17 +59,13 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.subscribe(this);
 
-        worldScroller = debugMode.plugin("Debug Mode - World Scroller");
-        worldScroller.subscribe(this);
+        camera = debugMode.plugin("Debug Mode - Camera");
     }
 
     fun onUnload(debugMode)
     {
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.unsubscribe(this);
-
-        worldScroller = debugMode.plugin("Debug Mode - World Scroller");
-        worldScroller.unsubscribe(this);
     }
 
     fun onPickItem(item)
@@ -77,11 +77,6 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
             itemPreview.setEntity(itemName);
         else
             itemPreview.setNull();
-    }
-
-    fun onWorldScroll(position)
-    {
-        transform.position = position;
     }
 }
 
