@@ -57,8 +57,8 @@
 
 /* Minimum version of SurgeScript */
 #define SURGESCRIPT_MIN_SUP     0
-#define SURGESCRIPT_MIN_SUB     5
-#define SURGESCRIPT_MIN_WIP     7
+#define SURGESCRIPT_MIN_SUB     6
+#define SURGESCRIPT_MIN_WIP     0
 #define SURGESCRIPT_MIN_VERSION STRINGIFY(SURGESCRIPT_MIN_SUP) "." STRINGIFY(SURGESCRIPT_MIN_SUB) "." STRINGIFY(SURGESCRIPT_MIN_WIP)
 
 /* Minimum version of Allegro */

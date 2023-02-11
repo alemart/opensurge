@@ -129,7 +129,7 @@ Tip: since version 0.6.1 you can use the command-line option `--verbose` to see 
 Dependencies:
 
 * [Allegro](http://liballeg.org) version 5.2.7 or later
-* [SurgeScript](http://github.com/alemart/surgescript) version 0.5.7 or later
+* [SurgeScript](http://github.com/alemart/surgescript) version 0.6.0 or later
 * [PhysicsFS](https://icculus.org/physfs) version 3.2.0 or later
 
 Compile as usual:
@@ -146,4 +146,4 @@ Use `cmake-gui` or `ccmake` for tweaking, like installing the engine to or findi
 
 ## License
 
-Open Surge Engine Copyright 2008-2022 Alexandre Martins. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. For more information, see [LICENSE](https://github.com/alemart/opensurge/blob/master/LICENSE).
+Open Surge Engine Copyright 2008-present Alexandre Martins. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. For more information, see [LICENSE](https://github.com/alemart/opensurge/blob/master/LICENSE).
