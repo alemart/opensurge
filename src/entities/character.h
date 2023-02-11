@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * character.h - Character system: meta data about a playable character
- * Copyright (C) 2011, 2018, 2019 Alexandre Martins <alemartf@gmail.com>
+ * Copyright (C) 2008-2023 Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
