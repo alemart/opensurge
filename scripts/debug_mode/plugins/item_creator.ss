@@ -17,6 +17,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
+using SurgeEngine.UI.Text;
 
 object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "entity"
 {
@@ -54,7 +55,7 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
     fun onLoad(debugMode)
     {
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
-        itemPreview.zindex = uiSettings.zindex;
+        itemPreview.zindex = uiSettings.zindex + 1000;
 
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.subscribe(this);
@@ -83,7 +84,18 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
 object "Debug Mode - Item Creator - Preview" is "private", "awake", "entity"
 {
     public zindex = 0.0;
+    transform = Transform();
+    text = Text("GoodNeighbors");
     actor = null;
+
+    state "main"
+    {
+        xpos = Math.floor(transform.position.x);
+        ypos = Math.floor(transform.position.y);
+
+        text.text = xpos + " , " + ypos;
+        text.zindex = zindex;
+    }
 
     fun setEntity(entityName)
     {
@@ -100,5 +112,11 @@ object "Debug Mode - Item Creator - Preview" is "private", "awake", "entity"
     {
         if(actor !== null)
             actor.destroy();
+    }
+
+    fun constructor()
+    {
+        text.align = "center";
+        text.offset = Vector2(0, 16);
     }
 }

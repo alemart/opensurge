@@ -79,7 +79,6 @@ object "Debug Mode - Basic UI Scroller" is "debug-mode-ui-component"
                 state = "mouse scrolling";
             }
         }
-        Console.print([dx,dy]);
     }
 
     state "mouse scrolling"
