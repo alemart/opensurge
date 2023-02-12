@@ -285,6 +285,7 @@ object "Debug Mode - Camera - Scroll Mode" is "debug-mode-camera-strategy"
     fun constructor()
     {
         scroller.smooth = false;
+        scroller.setActiveArea(0, 32, Screen.width, Screen.height - 32);
     }
 }
 

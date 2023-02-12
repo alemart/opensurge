@@ -40,6 +40,7 @@ object "Debug Mode - UI Scroller" is "debug-mode-ui-component"
 
     fun setActiveArea(x, y, width, height)
     {
+        // the (x,y) coordinates are given in screen space
         delegate.setActiveArea(x, y, width, height);
         return this;
     }
