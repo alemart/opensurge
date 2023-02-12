@@ -24,7 +24,7 @@
 
 /* private */
 static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getmobilemode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getmobile(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const char code_in_surgescript[];
 
 /*
@@ -34,7 +34,7 @@ static const char code_in_surgescript[];
 void scripting_register_surgeengine(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "SurgeEngine", "get_version", fun_getversion, 0);
-    surgescript_vm_bind(vm, "SurgeEngine", "get_mobileMode", fun_getmobilemode, 0);
+    surgescript_vm_bind(vm, "SurgeEngine", "get_mobile", fun_getmobile, 0);
 
     surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
 }
@@ -46,7 +46,7 @@ surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescrip
 }
 
 /* checks whether or not the engine has been launched in mobile mode */
-surgescript_var_t* fun_getmobilemode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getmobile(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_bool(surgescript_var_create(), mobilegamepad_is_available());
 }

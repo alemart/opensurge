@@ -171,7 +171,7 @@ object "DefaultHUD.Lives" is "entity", "detached", "awake", "private"
         value.zindex = parent.zindex;
 
         transform.localPosition = Vector2(0, Screen.height - 29);
-        /*if(SurgeEngine.mobileMode)
+        /*if(SurgeEngine.mobile)
             transform.position = Vector2(Screen.width * 0.87, parent.transform.position.y);*/
 
         state = "active";
@@ -219,7 +219,7 @@ object "DefaultHUD.Powerups" is "entity", "detached", "awake", "private"
     {
         transform.position = Vector2(Screen.width - parent.transform.position.x, parent.transform.position.y);
 
-        if(SurgeEngine.mobileMode) {
+        if(SurgeEngine.mobile) {
             offset = Vector2.left.scaledBy(Screen.width / 4);
             transform.position = transform.position.plus(offset);
         }
@@ -311,7 +311,7 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
         actor.zindex = parent.zindex;
 
         // display this pause button in mobile mode only
-        if(!SurgeEngine.mobileMode) {
+        if(!SurgeEngine.mobile) {
             actor.visible = false;
             state = "sleep";
         }

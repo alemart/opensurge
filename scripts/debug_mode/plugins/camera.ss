@@ -122,7 +122,7 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
 
     fun constructor()
     {
-        if(SurgeEngine.mobileMode)
+        if(SurgeEngine.mobile)
             this.mode = "player";
         else
             this.mode = "free-look";

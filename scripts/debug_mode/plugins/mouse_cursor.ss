@@ -55,7 +55,7 @@ object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private"
 
     fun constructor()
     {
-        actor.visible = !SurgeEngine.mobileMode; // hide if mobile mode
+        actor.visible = !SurgeEngine.mobile; // hide in mobile mode
 
         text.visible = actor.visible;
         text.align = "left";
