@@ -161,7 +161,7 @@ object "Debug Mode - Camera - Player Mode" is "debug-mode-camera-strategy"
 
     fun scrollVector()
     {
-        multiplier = input.buttonDown(turboButton) ? 2 : 1;
+        multiplier = input.buttonDown(turboButton) ? 4 : 1;
         speed = scrollSpeed * multiplier;
 
         return scrollDirection().scaledBy(speed * Time.delta);
@@ -221,7 +221,7 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
 
     fun scrollVector()
     {
-        multiplier = input.buttonDown(turboButton) ? 2 : 1;
+        multiplier = input.buttonDown(turboButton) ? 4 : 1;
         speed = scrollSpeed * multiplier;
 
         return scrollDirection().scaledBy(speed * Time.delta);
