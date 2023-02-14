@@ -35,7 +35,7 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
 
             // keep the scroll within the boundaries of the carousel
             width = itemWidth * itemContainers.length - Screen.width;
-            if(transform.localPosition.x > 0)
+            if(transform.localPosition.x > 0 || width <= 0)
                 transform.translateBy(-transform.localPosition.x, 0);
             else if(width > 0 && transform.localPosition.x < -width)
                 transform.translateBy(-transform.localPosition.x - width, 0);
