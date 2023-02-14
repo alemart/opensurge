@@ -22,6 +22,7 @@
 #define _LEVEL_H
 
 #include <surgescript.h>
+#include <stdbool.h>
 #include "../core/v2d.h"
 #include "../core/color.h"
 #include "../entities/brick.h"
@@ -119,5 +120,6 @@ void level_hide_dialogbox();
 int level_editmode(); /* active editor? */
 int level_is_displaying_gizmos(); /* are we displaying gizmos for visual debugging? */
 void level_enter_debug_mode();
+bool level_is_in_debug_mode();
 
 #endif

@@ -2168,7 +2168,7 @@ int level_is_displaying_gizmos()
 
 /*
  * level_enter_debug_mode()
- * Enter the debug mode
+ * Enter the Debug Mode
  */
 void level_enter_debug_mode()
 {
@@ -2177,13 +2177,20 @@ void level_enter_debug_mode()
 }
 
 
+/*
+ * level_is_in_debug_mode()
+ * Are we in Debug Mode?
+ */
+bool level_is_in_debug_mode()
+{
+    return level_child_object(DEBUG_MODE_OBJECT_NAME) != NULL;
+}
 
 
 /* private functions */
 
 
-/* renders the entities of the level: bricks,
- * enemies, items, players, etc. */
+/* renders the entities of the level: bricks, enemies, items, players, etc. */
 void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies)
 {
     brick_list_t *bnode;
@@ -2872,47 +2879,60 @@ void render_ssobjects()
     surgescript_vm_t* vm = surgescript_vm();
     if(surgescript_vm_is_active(vm)) {
         surgescript_object_t* root = surgescript_vm_root_object(vm);
-        surgescript_object_traverse_tree_ex(root, surgescript_vm_programpool(vm), render_ssobject);
+        surgescript_object_t* debug_mode = level_child_object(DEBUG_MODE_OBJECT_NAME);
+        surgescript_object_traverse_tree_ex(root, debug_mode, render_ssobject);
     }
 }
 
 bool render_ssobject(surgescript_object_t* object, void* param)
 {
-    if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
-        if(editor_is_enabled()) {
-            /* level editor */
-            if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
-                renderqueue_enqueue_ssobject_debug(object);
+    /* skip inactive & deleted objects and its children */
+    if(!surgescript_object_is_active(object) || surgescript_object_is_killed(object))
+        return false;
 
-            /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
-               provoke any data or state changes within SurgeScript */
-            /*if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-                renderqueue_enqueue_ssobject_gizmo(object);*/
+    if(editor_is_enabled()) {
+        /* level editor */
+        if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
+            renderqueue_enqueue_ssobject_debug(object);
 
-            return true;
+        /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
+            provoke any data or state changes within SurgeScript */
+        /*if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
+            renderqueue_enqueue_ssobject_gizmo(object);*/
+
+        return true;
+    }
+    else {
+        /* gameplay */
+        ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
+        if(obj_data != NULL && obj_data->sleeping) {
+            /* no need to render sleeping objects */
+            return false; /* won't render their children */
         }
         else {
-            /* gameplay */
-            ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-            if(obj_data && obj_data->sleeping) {
-                /* no need to render sleeping objects */
-                return false; /* won't render their children */
-            }
-            else {
-                /* will render objects tagged "renderable" */
-                if(surgescript_object_has_tag(object, "renderable"))
-                    renderqueue_enqueue_ssobject(object);
+            const surgescript_object_t* debug_mode_object = (const surgescript_object_t*)param;
+            bool debug_mode = (debug_mode_object != NULL);
 
-                /* will render objects tagged "gizmo" */
-                if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-                    renderqueue_enqueue_ssobject_gizmo(object);
+            /* skip detached entities in debug mode */
+            if(debug_mode) {
+                if(surgescript_object_has_tag(object, "entity") && surgescript_object_has_tag(object, "detached")) {
+                    if(!surgescript_object_is_ascendant(object, debug_mode_object) && object != debug_mode_object)
+                        return false;
+                }
             }
 
+            /* will render objects tagged "renderable" */
+            if(surgescript_object_has_tag(object, "renderable"))
+                renderqueue_enqueue_ssobject(object);
+
+            /* will render objects tagged "gizmo" */
+            if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
+                renderqueue_enqueue_ssobject_gizmo(object);
+
+            /* visit the children */
             return true;
         }
     }
-    else
-        return false;
 }
 
 /* brick-like objects */
