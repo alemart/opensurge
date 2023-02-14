@@ -74,8 +74,8 @@ object "Debug Mode" is "detached", "private", "entity"
 
     state "main"
     {
-        // spawn all plugins
-        pluginNames = System.tags.select("debug-mode-plugin");
+        // spawn all plugins in ascending order
+        pluginNames = System.tags.select("debug-mode-plugin").sort(null);
         for(i = 0; i < pluginNames.length; i++) {
             plugin = spawn(pluginNames[i]);
             plugins.push(plugin);
