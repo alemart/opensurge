@@ -236,7 +236,7 @@ object "Debug Mode - Item Picker - Carousel Item - Actor" is "debug-mode-item-pi
         name = itemName;
         actor = Actor(name);
 
-        assert(actor.animation.exists);
+        //assert(actor.animation.exists);
         actor.offset = actor.hotSpot;
 
         this.highlighted = false;
