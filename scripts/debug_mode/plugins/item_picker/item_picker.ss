@@ -36,103 +36,44 @@ object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
 */
 
 using SurgeEngine.Actor;
+using SurgeEngine.Vector2;
+using SurgeEngine.Transform;
 
+// Item Picker
 object "Debug Mode - Item Picker" is "debug-mode-plugin", "debug-mode-observable", "detached", "private", "entity"
 {
-    carousel = spawn("Debug Mode - Carousel");
+    transform = Transform();
+    stack = spawn("Debug Mode - Item Picker - Stack");
     observable = spawn("Debug Mode - Observable");
 
-    fun onLoad(debugMode)
+    fun add(itemBuilder)
     {
-        // initialize the carousel
-        carousel
-            .add(entity("Collectible"))
-            .add(entity("Checkpoint"))
-            .add(entity("Goal"))
-            .add(entity("Goal Capsule"))
-            .add(entity("Bumper"))
-            .add(entity("Spikes"))
-            .add(entity("Spikes Down"))
-            .add(entity("Bridge"))
-            .add(entity("Water Bubbles"))
-            .add(entity("Powerup 1up"))
-            .add(entity("Powerup Collectibles"))
-            .add(entity("Powerup Lucky Bonus"))
-            .add(entity("Powerup Invincibility"))
-            .add(entity("Powerup Speed"))
-            .add(entity("Powerup Shield"))
-            .add(entity("Powerup Shield Acid"))
-            .add(entity("Powerup Shield Fire"))
-            .add(entity("Powerup Shield Thunder"))
-            .add(entity("Powerup Shield Water"))
-            .add(entity("Powerup Shield Wind"))
-            .add(entity("Powerup Trap"))
-            .add(entity("Spring Booster Left"))
-            .add(entity("Spring Booster Right"))
-            .add(entity("Spring Booster Up"))
-            .add(entity("Spring Standard"))
-            .add(entity("Spring Standard Down"))
-            .add(entity("Spring Standard Down Left"))
-            .add(entity("Spring Standard Down Right"))
-            .add(entity("Spring Standard Hidden"))
-            .add(entity("Spring Standard Left"))
-            .add(entity("Spring Standard Right"))
-            .add(entity("Spring Standard Up Left"))
-            .add(entity("Spring Standard Up Right"))
-            .add(entity("Spring Stronger"))
-            .add(entity("Spring Stronger Down"))
-            .add(entity("Spring Stronger Down Left"))
-            .add(entity("Spring Stronger Down Right"))
-            .add(entity("Spring Stronger Hidden"))
-            .add(entity("Spring Stronger Left"))
-            .add(entity("Spring Stronger Right"))
-            .add(entity("Spring Stronger Up Left"))
-            .add(entity("Spring Stronger Up Right"))
-            .add(entity("Spring Strongest"))
-            .add(entity("Spring Strongest Down"))
-            .add(entity("Spring Strongest Down Left"))
-            .add(entity("Spring Strongest Down Right"))
-            .add(entity("Spring Strongest Hidden"))
-            .add(entity("Spring Strongest Left"))
-            .add(entity("Spring Strongest Right"))
-            .add(entity("Spring Strongest Up Left"))
-            .add(entity("Spring Strongest Up Right"))
-            .add(entity("Zipline Grabber"))
-            .add(entity("Zipline Left"))
-            .add(entity("Zipline Right"))
-            .add(entity("Power Pluggy Clockwise"))
-            .add(entity("Power Pluggy Counterclockwise"))
-            .add(entity("Lady Bugsy"))
-            .add(entity("Springfling"))
-            .add(entity("Wolfey"))
-            .add(entity("Mosquito"))
-            .add(entity("Jumping Fish"))
-            .add(entity("Crococopter"))
-            .add(entity("GreenMarmot"))
-            .add(entity("RedMarmot"))
-            .add(entity("RulerSalamander"))
-            .add(entity("SwoopHarrier"))
-            .add(entity("Skaterbug"))
-        ;
+        stack.top.add(itemBuilder);
+        return this;
     }
 
-    fun onUnload(debugMode)
+    /*
+    fun clear()
     {
+        stack.top.clear();
+        return this;
+    }
+    */
+
+    fun push()
+    {
+        stack.push();
+        return this;
     }
 
-    fun entity(entityName)
+    fun pop()
     {
-        return spawn("Debug Mode - Item Picker - Carousel Item Builder - Entity").setEntityName(entityName);
+        stack.pop();
+        return this;
     }
 
     fun onPickCarouselItem(pickedCarouselItem)
     {
-        // highlight picked item
-        foreach(item in carousel) {
-            item.highlighted = false;
-        }
-        pickedCarouselItem.highlighted = true;
-
         // notify observers
         item = Item(pickedCarouselItem.type, pickedCarouselItem.name);
         observable.notify(item);
@@ -157,10 +98,17 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "debug-mode-observable
     {
         observer.onPickItem(item);
     }
+
+    fun constructor()
+    {
+        transform.position = Vector2.zero;
+    }
 }
 
+// an item that is picked
 object "Debug Mode - Item Picker - Item"
 {
+    public readonly picker = parent;
     type = "";
     name = "";
 
@@ -182,39 +130,110 @@ object "Debug Mode - Item Picker - Item"
     }
 }
 
-
-
-//
-// Item type: entity
-//
-
-object "Debug Mode - Item Picker - Carousel Item Builder - Entity" is "debug-mode-carousel-item-builder"
+// a stack of groups of items
+object "Debug Mode - Item Picker - Stack" is "detached", "private", "entity"
 {
-    entityName = "";
+    stack = []; // we require stack.length >= 1 (root) - see the constructor below
+    pool = [];
+    poolSize = 16;
+    poolPointer = 0;
+
+    state "main" {}
+    state "frozen" { state = "main"; }
+
+    fun get_top()
+    {
+        // top of the stack
+        return stack[stack.length - 1];
+    }
+
+    fun push()
+    {
+        if(poolPointer >= poolSize) {
+            Console.print("Exhausted pool in " + this.__name);
+            return;
+        }
+
+        carousel = pool[poolPointer++];
+        carousel.clear();
+
+        this.top.transform.localPosition = Vector2(0, -carousel.height);
+        carousel.transform.localPosition = Vector2.zero;
+
+        stack.push(carousel);
+        state = "frozen";
+    }
+
+    fun pop()
+    {
+        if(stack.length <= 1) {
+            Console.print("Can't empty stack in " + this.__name);
+            return;
+        }
+
+        carousel = stack.pop();
+        --poolPointer;
+
+        carousel.transform.localPosition = Vector2(0, -carousel.height);
+        this.top.transform.localPosition = Vector2.zero;
+
+        state = "frozen";
+    }
+
+    fun onPickCarouselItem(pickedCarouselItem)
+    {
+        if(state == "frozen")
+            return;
+
+        parent.onPickCarouselItem(pickedCarouselItem);
+    }
+
+    fun constructor()
+    {
+        for(i = 0; i < poolSize; i++)
+            pool.push(spawn("Debug Mode - Carousel"));
+
+        stack.push(pool[poolPointer++]);
+    }
+}
+
+// This object builds items that display an Actor in a Carousel
+object "Debug Mode - Item Picker - Carousel Item Builder - Actor" is "debug-mode-carousel-item-builder"
+{
+    name = "";
+    type = "";
 
     fun build(itemContainer)
     {
-        return itemContainer.spawn("Debug Mode - Item Picker - Carousel Item - Entity").setEntityName(entityName);
+        return itemContainer.spawn("Debug Mode - Item Picker - Carousel Item - Actor").setName(name).setType(type);
     }
 
-    fun setEntityName(name)
+    fun setName(itemName)
     {
-        entityName = name;
+        name = itemName;
+        return this;
+    }
+
+    fun setType(itemType)
+    {
+        type = itemType;
         return this;
     }
 }
 
-object "Debug Mode - Item Picker - Carousel Item - Entity" is "debug-mode-carousel-item", "detached", "private", "entity"
+// This object displays an Actor in a Carousel
+object "Debug Mode - Item Picker - Carousel Item - Actor" is "debug-mode-item-picker-item", "debug-mode-carousel-item", "detached", "private", "entity"
 {
-    public readonly type = "entity";
+    carousel = null;
     name = "";
+    type = "";
     actor = null;
 
 
 
-    fun setEntityName(entityName)
+    fun setName(itemName)
     {
-        name = entityName;
+        name = itemName;
         actor = Actor(name);
 
         assert(actor.animation.exists);
@@ -224,19 +243,24 @@ object "Debug Mode - Item Picker - Carousel Item - Entity" is "debug-mode-carous
         return this;
     }
 
+    fun setType(itemType)
+    {
+        type = itemType;
+        return this;
+    }
+
+
+
+
+    // the following methods are required for all items of an Item Picker
+    fun get_type()
+    {
+        return type;
+    }
+
     fun get_name()
     {
         return name;
-    }
-
-    fun get_highlighted()
-    {
-        return actor.alpha == 1.0;
-    }
-
-    fun set_highlighted(highlighted)
-    {
-        actor.alpha = highlighted ? 1.0 : 0.5;
     }
 
 
@@ -261,5 +285,25 @@ object "Debug Mode - Item Picker - Carousel Item - Entity" is "debug-mode-carous
     fun set_zindex(zindex)
     {
         actor.zindex = zindex;
+    }
+
+    fun get_highlighted()
+    {
+        return actor.alpha == 1.0;
+    }
+
+    fun set_highlighted(highlighted)
+    {
+        actor.alpha = highlighted ? 1.0 : 0.5;
+    }
+
+    fun get_carousel()
+    {
+        return carousel;
+    }
+
+    fun set_carousel(carouselObject)
+    {
+        carousel = carouselObject;
     }
 }

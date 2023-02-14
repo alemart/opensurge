@@ -112,6 +112,8 @@ object "Debug Mode - Item Creator - Preview" is "private", "awake", "entity"
     {
         if(actor !== null)
             actor.destroy();
+
+        actor = null;
     }
 
     fun constructor()
