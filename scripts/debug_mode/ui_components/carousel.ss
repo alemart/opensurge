@@ -14,13 +14,14 @@ This UI component lets you pick items in a Carousel.
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
+using SurgeEngine;
 
 object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detached", "private", "entity"
 {
     public readonly transform = Transform();
     itemContainers = [];
-    itemWidth = 48;
-    itemHeight = 48;
+    itemHeight = SurgeEngine.mobile ? 32 : 64;
+    itemWidth = itemHeight + 8;
     uiScroller = spawn("Debug Mode - UI Scroller");
     zindex = 0;
 
