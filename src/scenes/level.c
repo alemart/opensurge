@@ -2915,11 +2915,22 @@ bool render_ssobject(surgescript_object_t* object, void* param)
             const surgescript_object_t* debug_mode_object = (const surgescript_object_t*)param;
             bool debug_mode = (debug_mode_object != NULL);
 
-            /* skip detached entities in debug mode */
+            /* debug mode */
             if(debug_mode) {
-                if(surgescript_object_has_tag(object, "entity") && surgescript_object_has_tag(object, "detached")) {
-                    if(!surgescript_object_is_ascendant(object, debug_mode_object) && object != debug_mode_object)
-                        return false;
+                if(surgescript_object_has_tag(object, "entity")) {
+
+                    /* skip detached entities */
+                    if(surgescript_object_has_tag(object, "detached")) {
+                        if(!surgescript_object_is_ascendant(object, debug_mode_object) && object != debug_mode_object)
+                            return false;
+                    }
+
+                    /* render special entities that are normally invisible */
+                    if(surgescript_object_has_tag(object, "special")) {
+                        if(!surgescript_object_has_tag(object, "private"))
+                            renderqueue_enqueue_ssobject_debug(object);
+                    }
+
                 }
             }
 

@@ -35,7 +35,7 @@ sprite "Debug Mode - Item Picker - Camera"
     }
 }
 
-sprite "Debug Mode - Item Picker - Special"
+sprite "Debug Mode - Item Picker - Specials"
 {
     source_file     "images/debug_mode/item_picker.png"
     source_rect     64 0 32 32
