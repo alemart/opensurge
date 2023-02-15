@@ -29,7 +29,7 @@ object "Debug Mode - Item Picker - Basics Menu" is "debug-mode-plugin"
     fun menu()
     {
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Actor")
-            .setName("Bumper") // sprite name
+            .setName("Debug Mode - Item Picker - Basics") // sprite name
             .setType("open-basics-menu") // item type
         ;
     }
@@ -37,7 +37,7 @@ object "Debug Mode - Item Picker - Basics Menu" is "debug-mode-plugin"
     fun back()
     {
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Actor")
-            .setName("Skaterbug") // sprite name
+            .setName("Debug Mode - Item Picker - Back") // sprite name
             .setType("close-basics-menu") // item type
         ;
     }

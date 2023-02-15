@@ -27,7 +27,7 @@ object "Debug Mode - Item Picker - Gimmicks Menu" is "debug-mode-plugin"
     fun menu()
     {
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Actor")
-            .setName("Zipline Grabber") // sprite name
+            .setName("Debug Mode - Item Picker - Gimmicks") // sprite name
             .setType("open-gimmicks-menu") // item type
         ;
     }
@@ -35,7 +35,7 @@ object "Debug Mode - Item Picker - Gimmicks Menu" is "debug-mode-plugin"
     fun back()
     {
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Actor")
-            .setName("Skaterbug") // sprite name
+            .setName("Debug Mode - Item Picker - Back") // sprite name
             .setType("close-gimmicks-menu") // item type
         ;
     }

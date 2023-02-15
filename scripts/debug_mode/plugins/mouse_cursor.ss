@@ -21,7 +21,7 @@ using SurgeEngine.UI.Text;
 
 object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private", "entity"
 {
-    actor = Actor("Mouse Cursor");
+    actor = Actor("Debug Mode - Mouse Cursor");
     text = Text("GoodNeighbors");
     transform = Transform();
 
