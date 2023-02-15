@@ -46,9 +46,14 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
 {
     transform = Transform();
     mode = "";
-    strategy = null;
     observable = spawn("Debug Mode - Observable");
     defaultCameraDisabler = spawn("Debug Mode - Camera - Default Camera Disabler");
+    strategies = {
+        "player":    spawn("Debug Mode - Camera - Player Mode"),
+        "free-look": spawn("Debug Mode - Camera - Free Look Mode"),
+        "scroll":    spawn("Debug Mode - Camera - Scroll Mode")
+    };
+    strategy = null;
 
     state "main"
     {
@@ -75,17 +80,17 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
         // change the mode
         if(newMode == "player") {
             mode = newMode;
-            strategy = spawn("Debug Mode - Camera - Player Mode").init(transform);
+            strategy = strategies["player"].init(transform);
             observable.notify(mode);
         }
         else if(newMode == "free-look") {
             mode = newMode;
-            strategy = spawn("Debug Mode - Camera - Free Look Mode");
+            strategy = strategies["free-look"];
             observable.notify(mode);
         }
         else if(newMode == "scroll") {
             mode = newMode;
-            strategy = spawn("Debug Mode - Camera - Scroll Mode");
+            strategy = strategies["scroll"];
             observable.notify(mode);
         }
         else
@@ -126,6 +131,7 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
             this.mode = "player";
         else
             this.mode = "free-look";
+        this.mode="scroll";
     }
 }
 
@@ -264,10 +270,13 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
 object "Debug Mode - Camera - Scroll Mode" is "debug-mode-camera-strategy"
 {
     scroller = spawn("Debug Mode - UI Scroller");
-    gridSize = 8;
 
     fun move(transform)
     {
+        // update the active area
+        scroller.setActiveArea(0, 32, Screen.width, Screen.height - 32);
+
+        // scroll
         dx = scroller.dx;
         dy = scroller.dy;
 
@@ -285,7 +294,6 @@ object "Debug Mode - Camera - Scroll Mode" is "debug-mode-camera-strategy"
     fun constructor()
     {
         scroller.smooth = false;
-        scroller.setActiveArea(0, 32, Screen.width, Screen.height - 32);
     }
 }
 
