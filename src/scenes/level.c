@@ -1411,12 +1411,14 @@ void level_update()
     /* update obstacle map */
     update_obstaclemap(major_bricks, major_items, major_enemies, get_bricklike_ssobject);
 
-    /* basic camera */
-    if(level_cleared)
-        camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
-    else if(!got_dying_player)
-        camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
+    /* update camera */
     camera_update();
+    if(!level_is_in_debug_mode()) { /* legacy camera code */
+        if(level_cleared)
+            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
+        else if(!got_dying_player)
+            camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
+    }
 
     /* update scripts */
     clear_bricklike_ssobjects();

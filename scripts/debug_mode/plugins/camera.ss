@@ -131,7 +131,6 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
             this.mode = "player";
         else
             this.mode = "free-look";
-        this.mode="scroll";
     }
 }
 
@@ -282,13 +281,6 @@ object "Debug Mode - Camera - Scroll Mode" is "debug-mode-camera-strategy"
 
         // move
         transform.translateBy(-dx, -dy);
-
-        // boundaries
-        if(transform.position.x < Screen.width / 2)
-            transform.translateBy(-transform.position.x + Screen.width / 2, 0);
-        if(transform.position.y < Screen.height / 2)
-            transform.translateBy(0, -transform.position.y + Screen.height / 2);
-
     }
 
     fun constructor()
