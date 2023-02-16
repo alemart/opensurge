@@ -242,23 +242,15 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
 
     /* sanity check */
     if(surgescript_tagsystem_has_tag(tag_system, entity_name, "entity")) {
-        surgescript_objecthandle_t pos = surgescript_var_get_objecthandle(param[1]);
-        surgescript_object_t* v2 = surgescript_objectmanager_get(manager, pos);
+        surgescript_objecthandle_t position = surgescript_var_get_objecthandle(param[1]);
+        surgescript_object_t* v2 = surgescript_objectmanager_get(manager, position);
 
         /* spawn entity */
-        surgescript_var_t* ret = fun_spawn(object, param, 1);
-        if(ret != NULL) {
-            surgescript_objecthandle_t child = surgescript_var_get_objecthandle(ret);
-            surgescript_var_destroy(ret);
-
-            /* position entity */
-            scripting_util_set_world_position(
-                surgescript_objectmanager_get(manager, child),
-                scripting_vector2_to_v2d(v2)
-            );
-
-            /* done */
-            return surgescript_var_set_objecthandle(surgescript_var_create(), child);
+        v2d_t spawn_point = scripting_vector2_to_v2d(v2);
+        surgescript_object_t* entity = level_create_object(entity_name, spawn_point);
+        if(entity != NULL) {
+            surgescript_objecthandle_t handle = surgescript_object_handle(entity);
+            return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
         }
     }
 
