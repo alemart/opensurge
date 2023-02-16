@@ -57,8 +57,18 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
 
     state "main"
     {
+        prevX = transform.position.x;
+        prevY = transform.position.y;
+
         strategy.move(transform);
         Camera.position = transform.position;
+
+        currX = transform.position.x;
+        currY = transform.position.y;
+
+        deltaPosition = Vector2(currX - prevX, currY - prevY);
+        if(deltaPosition.length > 0)
+            observable.notify(deltaPosition);
     }
 
     fun get_position()
@@ -81,17 +91,14 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
         if(newMode == "player") {
             mode = newMode;
             strategy = strategies["player"].init(transform);
-            observable.notify(mode);
         }
         else if(newMode == "free-look") {
             mode = newMode;
             strategy = strategies["free-look"];
-            observable.notify(mode);
         }
         else if(newMode == "scroll") {
             mode = newMode;
             strategy = strategies["scroll"];
-            observable.notify(mode);
         }
         else
             Console.print("Invalid camera mode: " + newMode);
@@ -107,9 +114,9 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
         observable.unsubscribe(observer);
     }
 
-    fun onNotifyObserver(observer, mode)
+    fun onNotifyObserver(observer, deltaPosition)
     {
-        observer.onChangeCameraMode(mode);
+        observer.onCameraMove(deltaPosition);
     }
 
     fun onLoad(debugMode)

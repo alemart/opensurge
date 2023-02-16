@@ -12,11 +12,10 @@ object "Debug Mode - Item Picker - Camera Menu" is "debug-mode-plugin"
 
     fun onLoad(debugMode)
     {
+        camera = debugMode.plugin("Debug Mode - Camera");
+
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.subscribe(this);
-
-        camera = debugMode.plugin("Debug Mode - Camera");
-        camera.subscribe(this);
 
         // add to the main menu
         itemPicker
@@ -87,10 +86,5 @@ object "Debug Mode - Item Picker - Camera Menu" is "debug-mode-plugin"
                 camera.mode = "scroll";
 
         }
-    }
-
-    fun onChangeCameraMode(mode)
-    {
-        Console.print("Changed camera mode to " + mode);
     }
 }
