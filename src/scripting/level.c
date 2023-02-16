@@ -63,6 +63,7 @@ static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -122,6 +123,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
     surgescript_vm_bind(vm, "Level", "loadNext", fun_loadnext, 0);
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
+    surgescript_vm_bind(vm, "Level", "entityId", fun_entityid, 1);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
     surgescript_vm_bind(vm, "Level", "__callUnloadFunctor", fun_callunloadfunctor, 0);
     surgescript_vm_bind(vm, "Level", "__releaseChildren", fun_releasechildren, 0);
@@ -518,6 +520,20 @@ surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_va
     }
     else
         return NULL;
+}
+
+/* get the .lev file ID of the given entity. If no such ID exists, an empty string is returned */
+surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    const surgescript_object_t* entity = surgescript_objectmanager_get(manager, handle);
+    char entity_id[17] = "";
+
+    if(surgescript_object_has_tag(entity, "entity"))
+        str_cpy(entity_id, level_get_entity_id(entity), sizeof(entity_id));
+
+    return surgescript_var_set_string(surgescript_var_create(), entity_id);
 }
 
 /* Level.setup(config): configure level entities using a config Dictionary */

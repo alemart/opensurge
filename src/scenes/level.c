@@ -1776,6 +1776,23 @@ surgescript_object_t* level_get_entity_by_id(const char* entity_id)
 
 
 /*
+ * level_get_entity_id()
+ * Gets the ID, a 64-bit hex-string, of the given entity
+ * If no ID exists, an empty string is returned
+ */
+const char* level_get_entity_id(const surgescript_object_t* entity)
+{
+    surgescript_objecthandle_t handle = surgescript_object_handle(entity);
+    ssobj_extradata_t* data = fasthash_get(ssobj_extradata, handle);
+
+    if(data != NULL)
+        return x64_to_str(data->entity_id, NULL, 0);
+
+    return "";
+}
+
+
+/*
  * level_child_object()
  * Get a direct child of the SurgeScript Level object with the given name
  * Returns NULL if no such object exists
