@@ -152,7 +152,8 @@ image;images/salamander_boss.png;CC-BY 4.0;Cody Licorish (svgmovement);;Special 
 image;images/salamander_bridge.png;CC-BY 4.0;Cody Licorish (svgmovement);;
 image;images/salamander_wall.png;CC-BY 4.0;Cody Licorish (svgmovement);;
 image;images/debug_mode/item_picker.png;CC-BY 4.0;Alexandre Martins;;
-image;images/debug_mode/item_selector.png;CC0;Alexandre Martins;;
+image;images/debug_mode/trash.png;CC-BY 4.0;Alexandre Martins;;
+image;images/debug_mode/selection.png;CC0;Alexandre Martins;;
 image;images/debug_mode/mouse_cursor.png;CC0;qubodup;opengameart.org;
 font;fonts/default.png;CC0;Clint Bellanger;opengameart.org;
 font;fonts/good_neighbors.png;CC0;Clint Bellanger;opengameart.org;Expanded by Alexandre Martins
@@ -242,6 +243,7 @@ sound;samples/discharge.wav;CC0;Selector;freesound.org;
 sound;samples/teleport_appear.wav;CC0;little_dog4000;freesound.org;Edited by Alexandre Martins
 sound;samples/teleport_disappear.wav;CC0;little_dog4000;freesound.org;Edited by Alexandre Martins
 sound;samples/vibrate.wav;CC0;kyles;freesound.org;Edited by Alexandre Martins
+sound;samples/trash_empty.wav;CC0;daboy291;freesound.org;Edited by Alexandre Martins
 sound;samples/power_pluggy_enter.wav;CC-BY 3.0;Alexandre Martins;;
 sound;samples/power_pluggy_exit.wav;CC-BY 3.0;Mateus Reis (KZR);;
 sound;samples/salamander_ascent.ogg;CC-BY 4.0;Cody Licorish (svgmovement);;

@@ -7,7 +7,33 @@
 
 /*
 
-This plugin lets the user select, move and remove items of the level.
+This plugin lets the user select, move and remove items of the level. Follow
+the example below to listen to events:
+
+object "Debug Mode - Item Selector Watcher" is "debug-mode-plugin"
+{
+    fun onLoad(debugMode)
+    {
+        itemSelector = debugMode.plugin("Debug Mode - Item Selector");
+        itemSelector.subscribe(this);
+    }
+
+    fun onUnload(debugMode)
+    {
+        itemSelector = debugMode.plugin("Debug Mode - Item Selector");
+        itemSelector.unsubscribe(this);
+    }
+
+    fun onSelectItems(items)
+    {
+        foreach(item in items) {
+            Console.print(item.name);
+            Console.print(item.type);
+        }
+
+        Console.print(items.length + " item(s) selected.");
+    }
+}
 
 */
 
@@ -20,18 +46,18 @@ using SurgeEngine.Camera;
 using SurgeEngine.Input;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.UI.Text;
+using SurgeEngine.Video.Screen;
 
-object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", "entity"
+object "Debug Mode - Item Selector" is "debug-mode-plugin", "debug-mode-observable", "private", "awake", "entity"
 {
-    transform = Transform();
-    input = Input("default");
+    observable = spawn("Debug Mode - Observable");
+    trackedTouchId = -1;
     selectionOrigin = Vector2.zero;
     selectionPoint = Vector2.zero;
-    selectionActor = Actor("Debug Mode - Item Selector - Selection");
+    selection = spawn("Debug Mode - Item Selector - Selection");
     selectedEntities = spawn("Debug Mode - Item Selector - Selected Entities");
-    vibrateSfx = Sound("samples/vibrate.wav");
-    trackedTouchId = -1;
-    zindex = 0.0;
+    input = Input("default");
+    vibrateSound = Sound("samples/vibrate.wav");
     warmUpTime = 0.5; // seconds
 
     state "main"
@@ -45,7 +71,7 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
 
     state "ready"
     {
-        selectionActor.visible = false;
+        selection.hide();
     }
 
     state "warming up"
@@ -73,16 +99,13 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
 
     state "selecting"
     {
-        width = selectionPoint.x - selectionOrigin.x; // may be negative
-        height = selectionPoint.y - selectionOrigin.y; // may be negative
-
-        transform.localScale = Vector2(width / selectionActor.width, height / selectionActor.height);
-        selectionActor.visible = true;
+        selection.update(selectionOrigin, selectionPoint);
+        selection.show();
     }
 
     state "selected"
     {
-        selectionActor.visible = false;
+        selection.hide();
 
         // find bounding box (xs,ys,ws,hs) of the selection
         xs = Math.min(selectionOrigin.x, selectionPoint.x);
@@ -117,6 +140,10 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
             }
         }
 
+        // notify observers
+        if(selectedEntities.count > 0)
+            observable.notify(selectedEntities.items());
+
         // we're ready for a new selection
         deselect();
         state = "ready";
@@ -128,11 +155,8 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
         touchInput.subscribe(this);
 
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
-        zindex = uiSettings.zindex;
-
-        selectionActor.zindex = uiSettings.zindex;
-        selectionActor.offset = selectionActor.hotSpot;
-        selectionActor.visible = false;
+        selection.zindex = uiSettings.zindex;
+        selection.hide();
 
         selectedEntities.onLoad(debugMode);
     }
@@ -146,6 +170,21 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
         touchInput.unsubscribe(this);
     }
 
+    fun subscribe(observer)
+    {
+        observable.subscribe(observer);
+    }
+
+    fun unsubscribe(observer)
+    {
+        observable.unsubscribe(observer);
+    }
+
+    fun onNotifyObserver(observer, items)
+    {
+        observer.onSelectItems(items);
+    }
+
     fun onTouchBegin(touch)
     {
         if(touch.position.y < 32)
@@ -153,13 +192,12 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
 
         if(state == "ready") {
             trackedTouchId = touch.id;
-            selectionActor.visible = true;
 
             selectionOrigin = Camera.screenToWorld(touch.position);
             selectionPoint = Camera.screenToWorld(touch.position);
 
-            transform.position = selectionOrigin;
-            transform.localScale = Vector2.zero;
+            selection.update(selectionOrigin, selectionPoint);
+            selection.show();
 
             state = "warming up";
         }
@@ -186,8 +224,13 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
             return;
 
         if(state == "warming up") {
-            deselect();
-            state = "ready";
+
+            // we tolerate a little bit of shaking
+            if(touch.deltaPosition.length >= 1) {
+                deselect();
+                state = "ready";
+            }
+
         }
         else if(state == "selecting") {
             selectedEntities.blocked = true;
@@ -206,30 +249,154 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
     {
         // well... this workaround signals that something has happened
         //if(SurgeEngine.mobile)
-        vibrateSfx.play();
+        vibrateSound.play();
     }
 
     fun deselect()
     {
         trackedTouchId = -1;
-        selectionActor.visible = false;
+        selection.hide();
     }
 }
 
-object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "entity"
+object "Debug Mode - Item Selector - Item"
+{
+    type = "";
+    name = "";
+
+    fun get_type()
+    {
+        return type;
+    }
+
+    fun get_name()
+    {
+        return name;
+    }
+
+    fun init(itemType, itemName)
+    {
+        type = itemType;
+        name = itemName;
+        return this;
+    }
+}
+
+object "Debug Mode - Item Selector - Selection" is "awake", "private", "entity"
+{
+    actor = Actor("Debug Mode - Item Selector - Selection");
+    transform = Transform();
+
+    fun update(selectionOrigin, selectionPoint)
+    {
+        width = selectionPoint.x - selectionOrigin.x; // may be negative
+        height = selectionPoint.y - selectionOrigin.y; // may be negative
+
+        transform.localPosition = selectionOrigin;
+        transform.localScale = Vector2(width / actor.width, height / actor.height);
+    }
+
+    fun show()
+    {
+        actor.visible = true;
+    }
+
+    fun hide()
+    {
+        actor.visible = false;
+    }
+
+    fun get_zindex()
+    {
+        return actor.zindex;
+    }
+
+    fun set_zindex(zindex)
+    {
+        actor.zindex = zindex;
+    }
+
+    fun constructor()
+    {
+        actor.offset = actor.hotSpot; // top-left at (0,0)
+        hide();
+    }
+}
+
+object "Debug Mode - Item Selector - Selected Entities"// is "private", "awake", "entity"
 {
     public blocked = false;
     selectedEntities = [];
     trackedTouchId = -1;
     zindex = 0.0;
     grid = null;
+    trash = spawn("Debug Mode - Item Selector - Trash");
+
+    fun get_count()
+    {
+        return selectedEntities.length;
+    }
+
+    fun items()
+    {
+        result = [];
+
+        for(i = 0; i < selectedEntities.length; i++) {
+            entity = selectedEntities[i];
+            item = spawn("Debug Mode - Item Selector - Item").init("entity", entity.name);
+            result.push(item);
+        }
+
+        return result;
+    }
+
+    fun add(entity, xe, ye, we, he)
+    {
+        // add selected entity
+        //selectedEntity = Level.spawnEntity("Debug Mode - Item Selector - Selected Entity", Vector2(xe, ye));
+        selectedEntity = spawn("Debug Mode - Item Selector - Selected Entity");
+        selectedEntities.push(selectedEntity.init(
+            entity,
+            xe, ye, we, he,
+            zindex
+        ));
+
+        // show the trash
+        trash.show();
+    }
+
+    fun clear()
+    {
+        // destroy the selected entities
+        foreach(selectedEntity in selectedEntities)
+            selectedEntity.destroy();
+
+        selectedEntities.clear();
+
+        // hide the trash
+        trash.hide();
+    }
+
+    fun respawnAll()
+    {
+        // we do this to change the spawn point of all selected entities
+        foreach(selectedEntity in selectedEntities)
+            selectedEntity.respawn();
+    }
+
+    fun moveAll(deltaPosition)
+    {
+        foreach(selectedEntity in selectedEntities)
+            selectedEntity.move(deltaPosition);
+    }
 
     fun onLoad(debugMode)
     {
         grid = debugMode.plugin("Debug Mode - Grid System");
 
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
-        zindex = uiSettings.zindex + 200;
+        zindex = uiSettings.zindex + 10;
+        trash.zindex = uiSettings.zindex + 100;
 
         touchInput = debugMode.plugin("Debug Mode - Touch Input");
         touchInput.subscribe(this);
@@ -254,38 +421,6 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
 
         touchInput = debugMode.plugin("Debug Mode - Touch Input");
         touchInput.unsubscribe(this);
-    }
-
-    fun add(entity, xe, ye, we, he)
-    {
-        // add selected entity
-        selectedEntity = Level.spawnEntity("Debug Mode - Item Selector - Selected Entity", Vector2(xe, ye));
-        selectedEntities.push(selectedEntity.init(
-            entity,
-            xe, ye, we, he,
-            zindex
-        ));
-    }
-
-    fun clear()
-    {
-        foreach(selectedEntity in selectedEntities)
-            selectedEntity.destroy();
-
-        selectedEntities.clear();
-    }
-
-    fun respawnAll()
-    {
-        // we do this to change the spawn point of all selected entities
-        foreach(selectedEntity in selectedEntities)
-            selectedEntity.respawn();
-    }
-
-    fun moveAll(deltaPosition)
-    {
-        foreach(selectedEntity in selectedEntities)
-            selectedEntity.move(deltaPosition);
     }
 
     fun onTapScreen(position)
@@ -313,6 +448,15 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
 
         trackedTouchId = -1;
 
+        // remove entities
+        if(trash.isWithinBounds(touch.position)) {
+            trash.playSound();
+            trash.hide();
+            clear();
+            return;
+        }
+
+        // reposition entities
         foreach(selectedEntity in selectedEntities)
             selectedEntity.snapToGrid(grid);
     }
@@ -326,6 +470,11 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
             return;
 
         moveAll(touch.deltaPosition);
+
+        if(trash.isWithinBounds(touch.position))
+            trash.highlight();
+        else
+            trash.dehighlight();
     }
 
     fun onCameraMove(deltaPosition)
@@ -364,6 +513,8 @@ object "Debug Mode - Item Selector - Selected Entity" is "private", "awake", "en
 
     fun init(entity, x, y, w, h, zindex)
     {
+        transform.position = Vector2(x, y);
+
         entityTransform = entity.child("Transform") || entity.spawn("Transform");
         entityPosition = entityTransform.position;
 
@@ -374,13 +525,17 @@ object "Debug Mode - Item Selector - Selected Entity" is "private", "awake", "en
 
         text.text = entityName;
         text.offset = Vector2.up.scaledBy(text.size.y);
-        text.zindex = zindex + 0.1;
+        text.zindex = zindex + 2;
 
-        transform.position = Vector2(x, y);
-        selection.init(w, h, zindex + 0.001);
+        selection.init(w, h, zindex + 1);
         entity.destroy(); // temporarily destroy the entity
 
         return this;
+    }
+
+    fun get_name()
+    {
+        return entityName;
     }
 }
 
@@ -399,5 +554,134 @@ object "Debug Mode - Item Selector - Selected Entity - Selection" is "private", 
         transform.scaleBy(xscale, yscale);
 
         return this;
+    }
+}
+
+object "Debug Mode - Item Selector - Trash" is "private", "detached", "awake", "entity"
+{
+    actor = Actor("Debug Mode - Item Selector - Trash");
+    transform = Transform();
+    sound = Sound("samples/trash_empty.wav");
+    appearTime = 0.33;
+    highlightTime = 0.25;
+    x0 = Screen.width + actor.width;
+    x1 = Screen.width - actor.width;
+    y = Screen.height / 2;
+    idle = 0; highlighted = 1;
+    t = 0; s = 0;
+
+    state "main"
+    {
+    }
+
+    state "hidden"
+    {
+        _resize();
+    }
+
+    state "visible"
+    {
+        _resize();
+    }
+
+    state "appearing"
+    {
+        _resize();
+
+        x = Math.smoothstep(x0, x1, t);
+        transform.position = Vector2(x, y);
+        t += Time.delta / appearTime;
+
+        if(timeout(appearTime))
+            state = "visible";
+    }
+
+    state "disappearing"
+    {
+        _resize();
+
+        x = Math.smoothstep(x1, x0, t);
+        transform.position = Vector2(x, y);
+        t += Time.delta / appearTime;
+
+        if(timeout(appearTime))
+            state = "hidden";
+    }
+
+    fun show()
+    {
+        if(state == "appearing" || state == "visible")
+            return;
+
+        s = t = 0;
+        actor.anim = idle;
+        state = "appearing";
+    }
+
+    fun hide()
+    {
+        if(state == "disappearing" || state == "hidden")
+            return;
+
+        s = t = 0;
+        actor.anim = idle;
+        state = "disappearing";
+    }
+
+    fun highlight()
+    {
+        s = t = 0;
+        actor.anim = highlighted;
+    }
+
+    fun dehighlight()
+    {
+        s = t = 0;
+        actor.anim = idle;
+    }
+
+    fun playSound()
+    {
+        sound.play();
+    }
+
+    fun get_zindex()
+    {
+        return actor.zindex;
+    }
+
+    fun set_zindex(zindex)
+    {
+        actor.zindex = zindex;
+    }
+
+    fun isWithinBounds(positionInScreenSpace)
+    {
+        rx = transform.position.x - actor.hotSpot.x;
+        ry = transform.position.y - actor.hotSpot.y;
+        rw = actor.width;
+        rh = actor.height;
+
+        dx = positionInScreenSpace.x - rx;
+        dy = positionInScreenSpace.y - ry;
+
+        return (dx >= 0 && dx < rw) && (dy >= 0 && dy < rh);
+    }
+
+    fun _resize()
+    {
+        if(s >= 1)
+            return;
+
+        targetScale = actor.anim == highlighted ? 1.25 : 1.0;
+        scale = Math.lerp(transform.localScale.x, targetScale, s);
+        transform.localScale = Vector2(scale, scale);
+        s += Time.delta / highlightTime;
+    }
+
+    fun constructor()
+    {
+        transform.position = Vector2(x0, y);
+        state = "hidden";
     }
 }
