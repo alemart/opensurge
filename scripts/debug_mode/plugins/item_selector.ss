@@ -19,6 +19,7 @@ using SurgeEngine.Transform;
 using SurgeEngine.Camera;
 using SurgeEngine.Input;
 using SurgeEngine.Audio.Sound;
+using SurgeEngine.UI.Text;
 
 object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", "entity"
 {
@@ -114,11 +115,6 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "awake", "private", 
 
                 entityActor.destroy();
             }
-        }
-
-        // go to the selected state only if something was selected
-        if(selectedEntities.count > 0) {
-            Console.print("Selected " + selectedEntities.count + " entities");
         }
 
         // we're ready for a new selection
@@ -226,9 +222,12 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
     selectedEntities = [];
     trackedTouchId = -1;
     zindex = 0.0;
+    grid = null;
 
     fun onLoad(debugMode)
     {
+        grid = debugMode.plugin("Debug Mode - Grid System");
+
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
         zindex = uiSettings.zindex + 200;
 
@@ -255,11 +254,6 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
 
         touchInput = debugMode.plugin("Debug Mode - Touch Input");
         touchInput.unsubscribe(this);
-    }
-
-    fun get_count()
-    {
-        return selectedEntities.length;
     }
 
     fun add(entity, xe, ye, we, he)
@@ -296,6 +290,10 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
 
     fun onTapScreen(position)
     {
+        if(position.y < 32)
+            return;
+
+        // we're done with the selection
         respawnAll();
         clear();
     }
@@ -314,6 +312,9 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
             return;
 
         trackedTouchId = -1;
+
+        foreach(selectedEntity in selectedEntities)
+            selectedEntity.snapToGrid(grid);
     }
 
     fun onTouchMove(touch)
@@ -336,6 +337,7 @@ object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "
 object "Debug Mode - Item Selector - Selected Entity" is "private", "awake", "entity"
 {
     transform = Transform();
+    text = Text(SurgeEngine.mobile ? "BoxyBold" : "GoodNeighbors");
     selection = spawn("Debug Mode - Item Selector - Selected Entity - Selection");
     entityName = "";
     entityActor = null;
@@ -345,6 +347,11 @@ object "Debug Mode - Item Selector - Selected Entity" is "private", "awake", "en
         transform.translate(deltaPosition);
     }
 
+    fun snapToGrid(grid)
+    {
+        transform.position = grid.snapToGrid(transform.position);
+    }
+
     fun respawn()
     {
         // we respawn the object in order to change the spawn point
@@ -352,6 +359,7 @@ object "Debug Mode - Item Selector - Selected Entity" is "private", "awake", "en
         entity = Level.spawnEntity(entityName, entityPosition);
 
         // FIXME public properties are not preserved...
+        // FIXME the ID of the entity is lost...
     }
 
     fun init(entity, x, y, w, h, zindex)
@@ -363,6 +371,10 @@ object "Debug Mode - Item Selector - Selected Entity" is "private", "awake", "en
         entityActor = Actor(entityName);
         entityActor.offset = entityPosition.minus(transform.position);
         entityActor.zindex = zindex;
+
+        text.text = entityName;
+        text.offset = Vector2.up.scaledBy(text.size.y);
+        text.zindex = zindex + 0.1;
 
         transform.position = Vector2(x, y);
         selection.init(w, h, zindex + 0.001);

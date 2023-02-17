@@ -48,7 +48,7 @@ object "Debug Mode - Item Picker - Camera Menu" is "debug-mode-plugin"
     fun button(spriteName)
     {
         return spawn("Debug Mode - Item Picker - Carousel Item Builder - Actor")
-            .setName(spriteName) // entityName is also the name of a sprite
+            .setName(spriteName)
             .setType("change-camera-mode") // item type
         ;
     }
@@ -84,6 +84,9 @@ object "Debug Mode - Item Picker - Camera Menu" is "debug-mode-plugin"
                 camera.mode = "free-look";
             else if(item.name == "Debug Mode - Item Picker - Camera - Scroll Mode")
                 camera.mode = "scroll";
+
+
+            Console.print("Set camera mode to " + camera.mode);
 
         }
     }

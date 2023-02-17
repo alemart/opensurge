@@ -54,13 +54,14 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
         "scroll":    spawn("Debug Mode - Camera - Scroll Mode")
     };
     strategy = null;
+    grid = null;
 
     state "main"
     {
         prevX = transform.position.x;
         prevY = transform.position.y;
 
-        strategy.move(transform);
+        strategy.move(transform, grid);
         Camera.position = transform.position;
 
         currX = transform.position.x;
@@ -121,6 +122,8 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
 
     fun onLoad(debugMode)
     {
+        grid = debugMode.plugin("Debug Mode - Grid System");
+
         player = Player.active;
         transform.position = player.transform.position;
 
@@ -148,7 +151,7 @@ object "Debug Mode - Camera - Player Mode" is "debug-mode-camera-strategy"
     input = Input("default");
     turboButton = "fire2";
 
-    fun move(transform)
+    fun move(transform, grid)
     {
         // move the camera
         ds = scrollVector();
@@ -156,7 +159,7 @@ object "Debug Mode - Camera - Player Mode" is "debug-mode-camera-strategy"
 
         // snap to grid
         if(ds.length == 0)
-            transform.position = snapToGrid(transform.position);
+            transform.position = grid.snapToGrid(transform.position);
 
         // reposition the player
         player = Player.active;
@@ -195,22 +198,6 @@ object "Debug Mode - Camera - Player Mode" is "debug-mode-camera-strategy"
 
         return Vector2(dx, dy).normalized();
     }
-
-    fun snapToGrid(position)
-    {
-        halfGridSize = gridSize / 2;
-
-        mx = position.x % gridSize;
-        my = position.y % gridSize;
-
-        dx = mx < halfGridSize ? 0 : gridSize;
-        dy = my < halfGridSize ? 0 : gridSize;
-
-        return Vector2(
-            position.x - mx + dx,
-            position.y - my + dy
-        );
-    }
 }
 
 object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
@@ -220,7 +207,7 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
     input = Input("default");
     turboButton = "fire2";
 
-    fun move(transform)
+    fun move(transform, grid)
     {
         // move the camera
         ds = scrollVector();
@@ -228,7 +215,7 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
 
         // snap to grid
         if(ds.length == 0)
-            transform.position = snapToGrid(transform.position);
+            transform.position = grid.snapToGrid(transform.position);
     }
 
     fun scrollVector()
@@ -255,29 +242,13 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
 
         return Vector2(dx, dy).normalized();
     }
-
-    fun snapToGrid(position)
-    {
-        halfGridSize = gridSize / 2;
-
-        mx = position.x % gridSize;
-        my = position.y % gridSize;
-
-        dx = mx < halfGridSize ? 0 : gridSize;
-        dy = my < halfGridSize ? 0 : gridSize;
-
-        return Vector2(
-            position.x - mx + dx,
-            position.y - my + dy
-        );
-    }
 }
 
 object "Debug Mode - Camera - Scroll Mode" is "debug-mode-camera-strategy"
 {
     scroller = spawn("Debug Mode - UI Scroller");
 
-    fun move(transform)
+    fun move(transform, grid)
     {
         // update the active area
         scroller.setActiveArea(0, 32, Screen.width, Screen.height - 32);
