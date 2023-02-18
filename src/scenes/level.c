@@ -2402,16 +2402,12 @@ void restart(int preserve_level_state)
  * players after switching characters */
 void reconfigure_players_input_devices()
 {
-    int i;
-
-    for(i=0; i<team_size; i++) {
+    for(int i = 0; i < team_size; i++) {
         if(NULL == team[i]->actor->input)
             team[i]->actor->input = input_create_user(NULL);
 
-        if(team[i] == player) {
+        if(team[i] == player)
             input_restore(team[i]->actor->input);
-            input_simulate_button_down(team[i]->actor->input, IB_FIRE2); /* bugfix (character switching) */
-        }
         else
             input_ignore(team[i]->actor->input);
     }
@@ -2421,7 +2417,7 @@ void reconfigure_players_input_devices()
 /* renders the players */
 void render_players()
 {
-    for(int i=team_size-1; i>=0; i--) {
+    for(int i = team_size - 1; i >= 0; i--) {
         if(team[i] != player)
             renderqueue_enqueue_player(team[i]);
     }

@@ -12,29 +12,63 @@ object "Switch Controller"
 {
     public enabled = true; // enable character switching?
     deny = Sound("samples/deny.wav");
+    leftShoulder = "fire7";
+    rightShoulder = "fire8";
+    secondaryActionButton = "fire2";
 
     state "main"
     {
-        if(!Level.cleared) {
-            if(Player.active.input.buttonPressed("fire2"))
-                switchCharacter();
-        }
+        player = Player.active;
+        input = player.input;
+
+        if(input.buttonPressed(rightShoulder))
+            switchCharacter(-1);
+        else if(input.buttonPressed(leftShoulder))
+            switchCharacter(+1);
+
+        // We'll keep the following logic temporarily, for backwards
+        // compatibility. Button "fire2" is the secondary action button,
+        // and character switching now happens via shoulder buttons.
+        // The secondary action button is currently unused elsewhere in
+        // the game. We used it to do the character switching. This will
+        // no longer be the case.
+
+        // TODO: remove this fire2 trigger.
+        else if(input.buttonPressed(secondaryActionButton))
+            switchCharacter(+1);
     }
 
-    fun switchCharacter()
+    fun switchCharacter(direction)
     {
-        n = Player.count;
-        if(n == 1 || !enabled)
+        // is the character switching disabled?
+        if(!enabled || Level.cleared || Player.count == 1)
             return;
+
+        // switch character
+        n = Player.count;
         for(i = 0; i < n; i++) {
-            p = Player[i];
-            if(p.hasFocus()) {
-                if(p.midair || p.underwater || p.frozen)
-                    deny.play();
+            player = Player[i];
+            if(player.hasFocus()) {
+
+                if(!(player.midair || player.underwater || player.frozen)) {
+                    next = (i + (n + direction)) % n;
+                    Player[next].focus();
+                    adjustShoulderButtons(Player[next].input);
+                }
                 else
-                    Player[(i + 1) % n].focus();
+                    deny.play();
+
                 break;
             }
         }
+    }
+
+    fun adjustShoulderButtons(input)
+    {
+        input.simulateButton(leftShoulder, true);
+        input.simulateButton(rightShoulder, true);
+
+        // TODO: remove this fire2 trigger.
+        input.simulateButton(secondaryActionButton, true);
     }
 }
