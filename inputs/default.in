@@ -100,10 +100,12 @@ inputmap "default"
         right           KEY_RIGHT
         down            KEY_DOWN
         left            KEY_LEFT
+
         fire1           KEY_SPACE
         fire2           KEY_LCONTROL
         fire3           KEY_ENTER
         fire4           KEY_ESC
+
         fire5           KEY_NONE
         fire6           KEY_NONE
         fire7           KEY_LSHIFT
@@ -117,10 +119,12 @@ inputmap "default"
         right           BUTTON_11
         down            BUTTON_13
         left            BUTTON_12
+
         fire1           BUTTON_1 | BUTTON_2 | BUTTON_3 | BUTTON_4
         fire2           BUTTON_NONE
         fire3           BUTTON_10
         fire4           BUTTON_9
+
         fire5           BUTTON_NONE
         fire6           BUTTON_NONE
         fire7           BUTTON_6
