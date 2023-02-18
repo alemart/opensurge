@@ -43,11 +43,13 @@ enum {
 
     TYPE_BRICK,
     TYPE_BRICK_MASK,
+    TYPE_BRICK_DEBUG,
+    TYPE_BRICK_PATH,
     TYPE_PARTICLE,
 
     TYPE_SSOBJECT,
-    TYPE_SSOBJECT_DEBUG,
     TYPE_SSOBJECT_GIZMO,
+    TYPE_SSOBJECT_DEBUG,
 
     TYPE_BACKGROUND,
     TYPE_FOREGROUND,
@@ -94,9 +96,11 @@ static float zindex_item(renderable_t r);
 static float zindex_object(renderable_t r);
 static float zindex_brick(renderable_t r);
 static float zindex_brick_mask(renderable_t r);
+static float zindex_brick_debug(renderable_t r);
+static float zindex_brick_path(renderable_t r);
 static float zindex_ssobject(renderable_t r);
-static float zindex_ssobject_debug(renderable_t r);
 static float zindex_ssobject_gizmo(renderable_t r);
+static float zindex_ssobject_debug(renderable_t r);
 static float zindex_background(renderable_t r);
 static float zindex_foreground(renderable_t r);
 static float zindex_water(renderable_t r);
@@ -107,6 +111,8 @@ static void render_item(renderable_t r, v2d_t camera_position);
 static void render_object(renderable_t r, v2d_t camera_position);
 static void render_brick(renderable_t r, v2d_t camera_position);
 static void render_brick_mask(renderable_t r, v2d_t camera_position);
+static void render_brick_debug(renderable_t r, v2d_t camera_position);
+static void render_brick_path(renderable_t r, v2d_t camera_position);
 static void render_ssobject(renderable_t r, v2d_t camera_position);
 static void render_ssobject_gizmo(renderable_t r, v2d_t camera_position);
 static void render_ssobject_debug(renderable_t r, v2d_t camera_position);
@@ -120,9 +126,11 @@ static int ypos_item(renderable_t r);
 static int ypos_object(renderable_t r);
 static int ypos_brick(renderable_t r);
 static int ypos_brick_mask(renderable_t r);
+static int ypos_brick_debug(renderable_t r);
+static int ypos_brick_path(renderable_t r);
 static int ypos_ssobject(renderable_t r);
-static int ypos_ssobject_debug(renderable_t r);
 static int ypos_ssobject_gizmo(renderable_t r);
+static int ypos_ssobject_debug(renderable_t r);
 static int ypos_background(renderable_t r);
 static int ypos_foreground(renderable_t r);
 static int ypos_water(renderable_t r);
@@ -133,9 +141,11 @@ static const char* path_item(renderable_t r, char* dest, size_t dest_size);
 static const char* path_object(renderable_t r, char* dest, size_t dest_size);
 static const char* path_brick(renderable_t r, char* dest, size_t dest_size);
 static const char* path_brick_mask(renderable_t r, char* dest, size_t dest_size);
+static const char* path_brick_debug(renderable_t r, char* dest, size_t dest_size);
+static const char* path_brick_path(renderable_t r, char* dest, size_t dest_size);
 static const char* path_ssobject(renderable_t r, char* dest, size_t dest_size);
-static const char* path_ssobject_debug(renderable_t r, char* dest, size_t dest_size);
 static const char* path_ssobject_gizmo(renderable_t r, char* dest, size_t dest_size);
+static const char* path_ssobject_debug(renderable_t r, char* dest, size_t dest_size);
 static const char* path_background(renderable_t r, char* dest, size_t dest_size);
 static const char* path_foreground(renderable_t r, char* dest, size_t dest_size);
 static const char* path_water(renderable_t r, char* dest, size_t dest_size);
@@ -146,9 +156,11 @@ static int type_item(renderable_t r);
 static int type_object(renderable_t r);
 static int type_brick(renderable_t r);
 static int type_brick_mask(renderable_t r);
+static int type_brick_debug(renderable_t r);
+static int type_brick_path(renderable_t r);
 static int type_ssobject(renderable_t r);
-static int type_ssobject_debug(renderable_t r);
 static int type_ssobject_gizmo(renderable_t r);
+static int type_ssobject_debug(renderable_t r);
 static int type_background(renderable_t r);
 static int type_foreground(renderable_t r);
 static int type_water(renderable_t r);
@@ -168,6 +180,22 @@ static const renderable_vtable_t VTABLE[] = {
         .ypos = ypos_brick_mask,
         .path = path_brick_mask,
         .type = type_brick_mask
+    },
+
+    [TYPE_BRICK_DEBUG] = {
+        .zindex = zindex_brick_debug,
+        .render = render_brick_debug,
+        .ypos = ypos_brick_debug,
+        .path = path_brick_debug,
+        .type = type_brick_debug
+    },
+
+    [TYPE_BRICK_PATH] = {
+        .zindex = zindex_brick_path,
+        .render = render_brick_path,
+        .ypos = ypos_brick_path,
+        .path = path_brick_path,
+        .type = type_brick_path
     },
 
     [TYPE_ITEM] = {
@@ -457,6 +485,36 @@ void renderqueue_enqueue_brick_mask(brick_t *brick)
 }
 
 /*
+ * renderqueue_enqueue_brick_debug()
+ * Enqueues a brick (editor)
+ */
+void renderqueue_enqueue_brick_debug(brick_t *brick)
+{
+    renderqueue_entry_t entry = {
+        .renderable.brick = brick,
+        .vtable = &VTABLE[TYPE_BRICK_DEBUG]
+    };
+
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_brick_path()
+ * Enqueues the path of a moving brick (editor)
+ */
+void renderqueue_enqueue_brick_path(brick_t *brick)
+{
+    renderqueue_entry_t entry = {
+        .renderable.brick = brick,
+        .vtable = &VTABLE[TYPE_BRICK_PATH]
+    };
+
+    enqueue(&entry);
+}
+
+
+
+/*
  * renderqueue_enqueue_item()
  * Enqueues a legacy item
  */
@@ -719,6 +777,8 @@ int type_item(renderable_t r) { return TYPE_ITEM; }
 int type_object(renderable_t r) { return TYPE_OBJECT; }
 int type_brick(renderable_t r) { return TYPE_BRICK; }
 int type_brick_mask(renderable_t r) { return TYPE_BRICK_MASK; }
+int type_brick_debug(renderable_t r) { return TYPE_BRICK_DEBUG; }
+int type_brick_path(renderable_t r) { return TYPE_BRICK_PATH; }
 int type_ssobject(renderable_t r) { return TYPE_SSOBJECT; }
 int type_ssobject_debug(renderable_t r) { return TYPE_SSOBJECT_DEBUG; }
 int type_ssobject_gizmo(renderable_t r) { return TYPE_SSOBJECT_GIZMO; }
@@ -732,6 +792,8 @@ float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDE
 float zindex_object(renderable_t r) { return r.object->zindex; }
 float zindex_brick(renderable_t r) { return brick_zindex(r.brick) + brick_zindex_offset(r.brick); }
 float zindex_brick_mask(renderable_t r) { return ZINDEX_LARGE + brick_zindex_offset(r.brick); }
+float zindex_brick_debug(renderable_t r) { return zindex_brick(r); }
+float zindex_brick_path(renderable_t r) { return zindex_brick_mask(r) + 1.0f; }
 float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
 float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
 float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE; }
@@ -745,6 +807,8 @@ int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
 int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
 int ypos_brick(renderable_t r) { return brick_position(r.brick).y; }
 int ypos_brick_mask(renderable_t r) { return ypos_brick(r); }
+int ypos_brick_debug(renderable_t r) { return ypos_brick(r); }
+int ypos_brick_path(renderable_t r) { return ypos_brick(r); }
 int ypos_ssobject(renderable_t r) { return 0; } /* TODO (not needed?) */
 int ypos_ssobject_debug(renderable_t r) { return ypos_ssobject(r); }
 int ypos_ssobject_gizmo(renderable_t r) { return ypos_ssobject(r); }
@@ -758,6 +822,8 @@ const char* path_item(renderable_t r, char* dest, size_t dest_size) { return str
 const char* path_object(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<legacy-object>", dest_size); }
 const char* path_brick(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, image_filepath(brick_image(r.brick)), dest_size); }
 const char* path_brick_mask(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, random_path('M'), dest_size); }
+const char* path_brick_debug(renderable_t r, char* dest, size_t dest_size) { return path_brick(r, dest, dest_size); }
+const char* path_brick_path(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, random_path('P'), dest_size); }
 const char* path_background(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<background>", dest_size); }
 const char* path_foreground(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<foreground>", dest_size); }
 const char* path_water(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<water>", dest_size); }
@@ -826,6 +892,16 @@ void render_brick(renderable_t r, v2d_t camera_position)
 void render_brick_mask(renderable_t r, v2d_t camera_position)
 {
     brick_render_mask(r.brick, camera_position);
+}
+
+void render_brick_debug(renderable_t r, v2d_t camera_position)
+{
+    brick_render_debug(r.brick, camera_position);
+}
+
+void render_brick_path(renderable_t r, v2d_t camera_position)
+{
+    brick_render_path(r.brick, camera_position);
 }
 
 void render_ssobject(renderable_t r, v2d_t camera_position)

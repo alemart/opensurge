@@ -93,8 +93,10 @@ int brickset_loaded(); /* is a brickset loaded? */
 brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t flip_flags); /* creates a new brick */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
 void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
-void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
-void brick_render_mask(brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */
+void brick_render(const brick_t *brk, v2d_t camera_position); /* renders a brick */
+void brick_render_debug(const brick_t *brk, v2d_t camera_position); /* renders a brick (editor) */
+void brick_render_mask(const brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */
+void brick_render_path(const brick_t *brk, v2d_t camera_position); /* renders the path of a moving brick (editor) */
 
 /* brick properties & operations */
 int brick_id(const brick_t* brk); /* brick id (its number in the brickset) */
@@ -120,7 +122,6 @@ const char* brick_util_typename(bricktype_t type); /* type name */
 const char* brick_util_behaviorname(brickbehavior_t behavior); /* behavior name */
 const char* brick_util_layername(bricklayer_t layer); /* layer name */
 const char* brick_util_flipstr(brickflip_t flip); /* flip string */
-void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
 const struct image_t* brick_image_preview(int id); /* image of the brick having the given id (may be NULL) */
 bricktype_t brick_type_preview(int id); /* the type of the brick having the given id */

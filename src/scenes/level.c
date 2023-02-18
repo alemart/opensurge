@@ -2224,8 +2224,16 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
             renderqueue_enqueue_background(backgroundtheme);
 
         /* render bricks */
-        for(bnode=major_bricks; bnode; bnode=bnode->next)
-            renderqueue_enqueue_brick(bnode->data);
+        if(!editor_is_enabled() && !level_is_in_debug_mode()) {
+            for(bnode=major_bricks; bnode; bnode=bnode->next)
+                renderqueue_enqueue_brick(bnode->data);
+        }
+        else {
+            for(bnode=major_bricks; bnode; bnode=bnode->next) {
+                renderqueue_enqueue_brick_debug(bnode->data);
+                renderqueue_enqueue_brick_path(bnode->data);
+            }
+        }
 
         /* render the masks of the bricks */
         if(must_render_brick_masks) {

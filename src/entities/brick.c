@@ -93,8 +93,8 @@ struct maskdetails_t {
 };
 
 /* private stuff */
+static void animate_brick(brick_t *brk);
 static brickdata_t *brickdata_get(int id);
-static void brick_animate(brick_t *brk);
 static brickdata_t* brickdata_new();
 static brickdata_t* brickdata_delete(brickdata_t *obj);
 static void validate_brickdata(const brickdata_t *obj);
@@ -251,12 +251,16 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
 {
     int i, brk_width, brk_height;
 
+    /* do we still need this? */
     if((brk == NULL) || (brk->brick_ref == NULL))
         return;
 
+    /* animate the brick */
+    animate_brick(brk);
+
+    /* move the brick */
     brk_width = image_width(brk->brick_ref->image);
     brk_height = image_height(brk->brick_ref->image);
-
     switch(brk->brick_ref->behavior) {
         /* breakable bricks */
         case BRB_BREAKABLE: {
@@ -596,31 +600,50 @@ void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *br
  * brick_render()
  * Renders a brick
  */
-void brick_render(brick_t *brk, v2d_t camera_position)
+void brick_render(const brick_t *brk, v2d_t camera_position)
 {
-    brick_animate(brk);
-    if(level_editmode()) {
-        brick_render_path(brk, camera_position);
-        if(brk->layer != BRL_DEFAULT)
-            image_draw_lit(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), brick_util_layercolor(brk->layer), get_image_flags(brk));
-        else
-            image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+    if(brk->brick_ref->behavior != BRB_MARKER) {
+        v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
+        image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
     }
-    else {
-        if(brk->brick_ref->behavior != BRB_MARKER)
-            image_draw(brk->image, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
+}
+
+/*
+ * brick_render_debug()
+ * Renders a brick (editor)
+ */
+void brick_render_debug(const brick_t *brk, v2d_t camera_position)
+{
+    v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
+
+    if(brk->layer != BRL_DEFAULT)
+        image_draw_lit(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, brick_util_layercolor(brk->layer), get_image_flags(brk));
+    else
+        image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
+}
+
+/*
+ * brick_render_mask()
+ * Renders the mask of a brick (if any)
+ */
+void brick_render_mask(const brick_t *brk, v2d_t camera_position)
+{
+    if(brk->brick_ref->maskimg != NULL) {
+        v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
+        image_draw(brk->brick_ref->maskimg, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
     }
 }
 
 /*
  * brick_render_path()
- * Renders the path of a brick (if it's a movable platform)
+ * Renders the path of a moving brick (editor)
  */
 void brick_render_path(const brick_t *brk, v2d_t camera_position)
 {
-    int w = brick_size(brk).x, h = brick_size(brk).y;
-    v2d_t topleft = v2d_subtract(camera_position, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+    v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
     color_t color = color_rgb(255, 0, 0);
+    int w = brick_size(brk).x;
+    int h = brick_size(brk).y;
 
     switch(brk->brick_ref->behavior) {
         case BRB_CIRCULAR: {
@@ -644,16 +667,6 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
         default:
             break;
     }
-}
-
-/*
- * brick_render_mask()
- * Renders the mask of a brick (if any)
- */
-void brick_render_mask(brick_t *brk, v2d_t camera_position)
-{
-    if(brk->brick_ref->maskimg != NULL)
-        image_draw(brk->brick_ref->maskimg, brk->x-((int)camera_position.x-VIDEO_SCREEN_W/2), brk->y-((int)camera_position.y-VIDEO_SCREEN_H/2), get_image_flags(brk));
 }
 
 /*
@@ -985,12 +998,12 @@ float brick_zindex_preview(int id)
 /* === private stuff === */
 
 /* Animates a brick */
-void brick_animate(brick_t *brk)
+void animate_brick(brick_t *brk)
 {
     spriteinfo_t *sprite = brk->brick_ref->data;
 
     if(sprite != NULL) { /* if brk is not a fake brick */
-        int loop = sprite->animation_data[0]->repeat;
+        bool loop = sprite->animation_data[0]->repeat;
         int f, c = sprite->animation_data[0]->frame_count;
 
         if(!loop)
