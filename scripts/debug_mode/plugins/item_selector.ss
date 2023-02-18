@@ -564,28 +564,36 @@ object "Debug Mode - Item Selector - Trash" is "private", "detached", "awake", "
     sound = Sound("samples/trash_empty.wav");
     appearTime = 0.33;
     highlightTime = 0.25;
-    x0 = Screen.width + actor.width;
-    x1 = Screen.width - actor.width;
-    y = Screen.height / 2;
+    x0 = 0; x1 = 0; y = 0;
     idle = 0; highlighted = 1;
     t = 0; s = 0;
 
     state "main"
     {
+        x0 = Screen.width + actor.width;
+        x1 = x0 - 2 * actor.width;
+        y = Screen.height / 2;
+
+        transform.position = Vector2(x0, y);
+
+        state = "hidden";
     }
 
     state "hidden"
     {
-        _resize();
+        actor.visible = false;
+        //_resize();
     }
 
     state "visible"
     {
+        actor.visible = true;
         _resize();
     }
 
     state "appearing"
     {
+        actor.visible = true;
         _resize();
 
         x = Math.smoothstep(x0, x1, t);
@@ -598,6 +606,7 @@ object "Debug Mode - Item Selector - Trash" is "private", "detached", "awake", "
 
     state "disappearing"
     {
+        actor.visible = true;
         _resize();
 
         x = Math.smoothstep(x1, x0, t);
@@ -677,11 +686,5 @@ object "Debug Mode - Item Selector - Trash" is "private", "detached", "awake", "
         scale = Math.lerp(transform.localScale.x, targetScale, s);
         transform.localScale = Vector2(scale, scale);
         s += Time.delta / highlightTime;
-    }
-
-    fun constructor()
-    {
-        transform.position = Vector2(x0, y);
-        state = "hidden";
     }
 }
