@@ -241,10 +241,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     float padding = 16.0f, eps = 1e-5;
     float dt = timer_get_delta();
 
-    /* is it a CPU controlled player? */
-    if(player != level_player())
-        input_reset(act->input);
-
     /* if the player movement is enabled... */
     if(!player->disable_movement) {
 
@@ -318,6 +314,12 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
                 player_set_turbo(player, FALSE);
         }
 
+        /* am I hurt? Gotta have the focus */
+        if(player_is_getting_hit(player) || player_is_dying(player)) {
+            if(level_player() != player)
+                level_change_player(player);
+        }
+
         /* pitfalls */
         if(act->position.y >= level_height_at(act->position.x))
             player_kill(player);
@@ -326,7 +328,20 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
         if(!physicsactor_is_midair(player->pa) && physicsactor_is_touching_ceiling(player->pa) && physicsactor_is_inside_wall(player->pa))
             player_kill(player);
 
-        /* active player can't get off camera */
+        /* winning pose */
+        if(level_has_been_cleared())
+            physicsactor_enable_winning_pose(pa);
+
+        /* rolling misc */
+        if(!player_is_midair(player))
+            player->thrown_while_rolling = FALSE;
+        else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
+            player->thrown_while_rolling = TRUE;
+
+        /* misc */
+        player->on_movable_platform = FALSE;
+
+        /* the active player can't get off camera */
         if(player == level_player()) {
             v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
             v2d_t cam_bottomright = camera_clip(level_size());
@@ -349,19 +364,6 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
                 }
             }
         }
-
-        /* winning pose */
-        if(level_has_been_cleared())
-            physicsactor_enable_winning_pose(pa);
-
-        /* rolling misc */
-        if(!player_is_midair(player))
-            player->thrown_while_rolling = FALSE;
-        else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
-            player->thrown_while_rolling = TRUE;
-
-        /* misc */
-        player->on_movable_platform = FALSE;
 
     }
     /* else if player is frozen, blinking and invisible ...? */
@@ -389,11 +391,18 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
     if(player->shield_type != SH_NONE)
         update_shield(player);
 
-    /* animation */
-    update_animation(player);
-
     /* play sounds */
     play_sounds(player);
+}
+
+/*
+ * player_early_update()
+ * Pre-scripting update routine
+ */
+void player_early_update(player_t *player)
+{
+    /* animation */
+    update_animation(player);
 }
 
 
@@ -1397,44 +1406,48 @@ void update_shield(player_t *player)
 /* updates the animation of the player */
 void update_animation(player_t *player)
 {
-    /* animations */
-    if(!player->disable_animation_control) {
-        physicsactorstate_t state = physicsactor_get_state(player->pa);
-        float xsp = fabs(physicsactor_get_xsp(player->pa));
-        float gsp = fabs(physicsactor_get_gsp(player->pa));
-
-        switch(state) {
-            case PAS_STOPPED:    CHANGE_ANIM(player, stopped);    break;
-            case PAS_WALKING:    CHANGE_ANIM(player, walking);    break;
-            case PAS_RUNNING:    CHANGE_ANIM(player, running);    break;
-            case PAS_JUMPING:    CHANGE_ANIM(player, jumping);    break;
-            case PAS_SPRINGING:  CHANGE_ANIM(player, springing);  break;
-            case PAS_ROLLING:    CHANGE_ANIM(player, rolling);    break;
-            case PAS_CHARGING:   CHANGE_ANIM(player, charging);   break;
-            case PAS_PUSHING:    CHANGE_ANIM(player, pushing);    break;
-            case PAS_GETTINGHIT: CHANGE_ANIM(player, gettinghit); break;
-            case PAS_DEAD:       CHANGE_ANIM(player, dead);       break;
-            case PAS_BRAKING:    CHANGE_ANIM(player, braking);    break;
-            case PAS_LEDGE:      CHANGE_ANIM(player, ledge);      break;
-            case PAS_DROWNED:    CHANGE_ANIM(player, drowned);    break;
-            case PAS_BREATHING:  CHANGE_ANIM(player, breathing);  break;
-            case PAS_WAITING:    CHANGE_ANIM(player, waiting);    break;
-            case PAS_DUCKING:    CHANGE_ANIM(player, ducking);    break;
-            case PAS_LOOKINGUP:  CHANGE_ANIM(player, lookingup);  break;
-            case PAS_WINNING:    CHANGE_ANIM(player, winning);    break;
-        }
-
-        if(state == PAS_WALKING || state == PAS_RUNNING)
-            actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, gsp));
-        else if(state == PAS_ROLLING && !physicsactor_is_midair(player->pa))
-            actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
-        else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_midair(player->pa))))
-            actor_change_animation_speed_factor(player->actor, 1.0f);
-        else if(state == PAS_JUMPING && player->actor->animation_speed_factor < 1.0f)
-            actor_change_animation_speed_factor(player->actor, 1.0f);
-    }
-    else
+    if(player->disable_animation_control) {
         player->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
+        return;
+    }
+
+    if(player->disable_movement)
+        return;
+
+    /* animations */
+    physicsactorstate_t state = physicsactor_get_state(player->pa);
+    float xsp = fabs(physicsactor_get_xsp(player->pa));
+    float gsp = fabs(physicsactor_get_gsp(player->pa));
+
+    switch(state) {
+        case PAS_STOPPED:    CHANGE_ANIM(player, stopped);    break;
+        case PAS_WALKING:    CHANGE_ANIM(player, walking);    break;
+        case PAS_RUNNING:    CHANGE_ANIM(player, running);    break;
+        case PAS_JUMPING:    CHANGE_ANIM(player, jumping);    break;
+        case PAS_SPRINGING:  CHANGE_ANIM(player, springing);  break;
+        case PAS_ROLLING:    CHANGE_ANIM(player, rolling);    break;
+        case PAS_CHARGING:   CHANGE_ANIM(player, charging);   break;
+        case PAS_PUSHING:    CHANGE_ANIM(player, pushing);    break;
+        case PAS_GETTINGHIT: CHANGE_ANIM(player, gettinghit); break;
+        case PAS_DEAD:       CHANGE_ANIM(player, dead);       break;
+        case PAS_BRAKING:    CHANGE_ANIM(player, braking);    break;
+        case PAS_LEDGE:      CHANGE_ANIM(player, ledge);      break;
+        case PAS_DROWNED:    CHANGE_ANIM(player, drowned);    break;
+        case PAS_BREATHING:  CHANGE_ANIM(player, breathing);  break;
+        case PAS_WAITING:    CHANGE_ANIM(player, waiting);    break;
+        case PAS_DUCKING:    CHANGE_ANIM(player, ducking);    break;
+        case PAS_LOOKINGUP:  CHANGE_ANIM(player, lookingup);  break;
+        case PAS_WINNING:    CHANGE_ANIM(player, winning);    break;
+    }
+
+    if(state == PAS_WALKING || state == PAS_RUNNING)
+        actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, gsp));
+    else if(state == PAS_ROLLING && !physicsactor_is_midair(player->pa))
+        actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
+    else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_midair(player->pa))))
+        actor_change_animation_speed_factor(player->actor, 1.0f);
+    else if(state == PAS_JUMPING && player->actor->animation_speed_factor < 1.0f)
+        actor_change_animation_speed_factor(player->actor, 1.0f);
 }
 
 /* play sounds as needed */
@@ -1494,9 +1507,7 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         physicsactor_duck(pa);
     if(input_button_down(act->input, IB_UP))
         physicsactor_look_up(pa);
-    if(input_button_pressed(act->input, IB_FIRE1))
-        physicsactor_1stjump(pa);
-    else if(input_button_down(act->input, IB_FIRE1))
+    if(input_button_down(act->input, IB_FIRE1))
         physicsactor_jump(pa);
 
     /* clearing the obstacle map &

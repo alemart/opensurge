@@ -524,13 +524,6 @@ void physicsactor_look_up(physicsactor_t *pa)
 void physicsactor_jump(physicsactor_t *pa)
 {
     input_simulate_button_down(pa->input, IB_FIRE1);
-    input_simulate_button_down(pa->input, IB_FIRE1);
-}
-
-void physicsactor_1stjump(physicsactor_t *pa)
-{
-    input_simulate_button_up(pa->input, IB_FIRE1);
-    input_simulate_button_down(pa->input, IB_FIRE1);
 }
 
 void physicsactor_kill(physicsactor_t *pa)

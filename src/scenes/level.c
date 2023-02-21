@@ -237,7 +237,7 @@ static void destroy_collisionmask_of_bricklike_object(void* mask);
 static surgescript_object_t* cached_level_ssobject = NULL;
 static void update_ssobjects();
 static void update_ssobject(surgescript_object_t* object, void* param);
-static void late_update_ssobject(surgescript_object_t* object, void* param);
+static void after_update_ssobject(surgescript_object_t* object, void* param);
 static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
 static bool ssobject_exists(const char* object_name);
@@ -269,6 +269,11 @@ static surgescript_objecthandle_t bricklike_ssobject[BRICKLIKE_MAX_COUNT];
 static int bricklike_ssobject_count = 0;
 bool notify_ssobject(surgescript_object_t* object, void* param);
 void notify_ssobjects(const char* fun_name);
+STATIC_DARRAY(surgescript_objecthandle_t, late_update_queue);
+static void init_late_update_queue();
+static void release_late_update_queue();
+static void clear_late_update_queue();
+static void late_update_ssobjects();
 
 /* debug mode */
 #define debug_mode_want_to_activate() editorcmd_is_triggered(editor_cmd, "enter-debug-mode")
@@ -1092,6 +1097,7 @@ void level_init(void *path_to_lev_file)
     entitymanager_init();
     create_obstaclemap();
     clear_bricklike_ssobjects();
+    init_late_update_queue();
 
     cached_level_ssobject = NULL;
     ssobj_extradata = fasthash_create(free_ssobj_extradata, 15);
@@ -1139,6 +1145,7 @@ void level_release()
     ssobj_extradata = fasthash_destroy(ssobj_extradata);
     cached_level_ssobject = NULL;
 
+    release_late_update_queue();
     clear_bricklike_ssobjects();
     destroy_obstaclemap();
     entitymanager_release();
@@ -1214,12 +1221,6 @@ void level_update()
 
     /* level editor */
     if(editor_is_enabled()) {
-        entitymanager_set_active_region(
-            (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-            (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-            VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-            VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-        );
         editor_update();
         return;
     }
@@ -1299,6 +1300,16 @@ void level_update()
     /* update background */
     background_update(backgroundtheme);
 
+#if 1
+    /* legacy camera code (runs before scripts) */
+    if(!level_is_in_debug_mode()) {
+        if(level_cleared)
+            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
+        else if(!got_dying_player)
+            camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
+    }
+#endif
+
     /* getting the major entities */
     /* note: bricks should use a larger margin when compared to SurgeScript entities */
     entitymanager_set_active_region(
@@ -1356,6 +1367,28 @@ void level_update()
         }
     }
 
+    /* update bricks */
+    for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
+        brick_t* brick = bnode->data;
+        brick_update(brick, team, team_size, major_bricks, major_items, major_enemies);
+    }
+
+    /* update obstacle map */
+    update_obstaclemap(major_bricks, major_items, major_enemies, get_bricklike_ssobject);
+
+    /* update particles */
+    particle_update(major_bricks);
+
+    /* early update: players */
+    if(entitymanager_get_number_of_bricks() > 0) {
+        for(i = 0; i < team_size; i++)
+            player_early_update(team[i]);
+    }
+
+    /* update scripts */
+    clear_bricklike_ssobjects();
+    update_ssobjects();
+
     /* got dying player? */
     for(i = 0; i < team_size; i++) {
         if(player_is_dying(team[i]))
@@ -1363,20 +1396,14 @@ void level_update()
     }
 
     /* update players */
-    for(i=0; i<team_size; i++) {
-        float x = team[i]->actor->position.x;
-        float y = team[i]->actor->position.y;
-        float w = image_width(actor_image(team[i]->actor));
-        float h = image_height(actor_image(team[i]->actor));
+    if(entitymanager_get_number_of_bricks() > 0) {
+        for(i = 0; i < team_size; i++) {
+            float x = team[i]->actor->position.x;
+            float y = team[i]->actor->position.y;
+            float w = image_width(actor_image(team[i]->actor));
+            float h = image_height(actor_image(team[i]->actor));
 
-        /* somebody is hurt! show it to the user */
-        if(team[i] != player) {
-            if(player_is_getting_hit(team[i]) || player_is_dying(team[i]))
-                level_change_player(team[i]);
-        }
-
-        /* updating... */
-        if(entitymanager_get_number_of_bricks() > 0) {
+            /* updating... */
             if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
                     player_update(team[i], team, team_size, major_bricks, major_items, major_enemies, get_bricklike_ssobject);
@@ -1402,30 +1429,11 @@ void level_update()
         }
     }
 
-    /* update bricks */
-    for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
-        brick_t* brick = bnode->data;
-        brick_update(brick, team, team_size, major_bricks, major_items, major_enemies);
-    }
-
-    /* update obstacle map */
-    update_obstaclemap(major_bricks, major_items, major_enemies, get_bricklike_ssobject);
-
     /* update camera */
     camera_update();
-    if(!level_is_in_debug_mode()) { /* legacy camera code */
-        if(level_cleared)
-            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
-        else if(!got_dying_player)
-            camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
-    }
 
-    /* update scripts */
-    clear_bricklike_ssobjects();
-    update_ssobjects();
-
-    /* update particles */
-    particle_update(major_bricks);
+    /* scripting: late update */
+    late_update_ssobjects();
 
     /* update dialog box */
     update_dialogregions();
@@ -2812,11 +2820,10 @@ void destroy_collisionmask_of_bricklike_object(void* mask)
 void update_ssobjects()
 {
     surgescript_vm_t* vm = surgescript_vm();
+    v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
 
-    if(surgescript_vm_is_active(vm)) {
-        v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
-        surgescript_vm_update_ex(vm, origin, update_ssobject, late_update_ssobject);
-    }
+    if(surgescript_vm_is_active(vm))
+        surgescript_vm_update_ex(vm, origin, update_ssobject, after_update_ssobject);
 }
 
 void update_ssobject(surgescript_object_t* object, void* param)
@@ -2851,6 +2858,10 @@ void update_ssobject(surgescript_object_t* object, void* param)
                 /* is it a brick-like object? */
                 if(strcmp(surgescript_object_name(object), "Brick") == 0)
                     add_bricklike_ssobject(object);
+
+                /* does this entity implement lateUpdate() ? */
+                if(surgescript_object_has_function(object, "lateUpdate"))
+                    darray_push(late_update_queue, surgescript_object_handle(object));
             }
             else if(!surgescript_object_has_tag(object, "disposable")) {
                 /* the entity should no longer be active and
@@ -2889,11 +2900,35 @@ void update_ssobject(surgescript_object_t* object, void* param)
         scripting_error(object, "TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
 }
 
-void late_update_ssobject(surgescript_object_t* object, void* param)
+void after_update_ssobject(surgescript_object_t* object, void* param)
 {
     if(!surgescript_object_is_active(object) && surgescript_object_has_tag(object, "entity"))
         surgescript_object_set_active(object, true); /* the object may reawaken in the future */
 }
+
+/* call lateUpdate() for each SurgeScript entity that implements it */
+void late_update_ssobjects()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+
+    for(int i = 0; i < darray_length(late_update_queue); i++) {
+        surgescript_objecthandle_t handle = late_update_queue[i];
+
+        if(surgescript_objectmanager_exists(manager, handle)) {
+            surgescript_object_t* object = surgescript_objectmanager_get(manager, handle);
+
+            if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
+                if(surgescript_object_has_function(object, "lateUpdate")) /* just to make sure? no crashing */
+                    surgescript_object_call_function(object, "lateUpdate", NULL, 0, NULL);
+            }
+        }
+    }
+
+    clear_late_update_queue();
+}
+
+
 
 /* render objects */
 
@@ -3009,6 +3044,23 @@ surgescript_object_t* get_bricklike_ssobject(int index)
 inline void clear_bricklike_ssobjects()
 {
     bricklike_ssobject_count = 0;
+}
+
+
+/* queue for storing SurgeScript entities that implement lateUpdate() */
+void init_late_update_queue()
+{
+    darray_init(late_update_queue);
+}
+
+void release_late_update_queue()
+{
+    darray_release(late_update_queue);
+}
+
+void clear_late_update_queue()
+{
+    darray_clear(late_update_queue);
 }
 
 
@@ -3346,6 +3398,14 @@ void editor_update()
     }
 
     /* ----------------------------------------- */
+
+    v2d_t cam = editor_camera;
+    entitymanager_set_active_region(
+        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
+        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
+        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
+        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+    );
 
     /* getting major entities */
     major_enemies = entitymanager_retrieve_active_objects();

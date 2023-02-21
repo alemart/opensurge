@@ -40,6 +40,7 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -285,6 +286,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Player", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "Player", "lateUpdate", fun_lateupdate, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
     surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 0);
@@ -504,6 +506,13 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    update_player(object);
+    return NULL;
+}
+
+/* lateUpdate() */
+surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     update_player(object);
     return NULL;

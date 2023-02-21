@@ -102,7 +102,6 @@ void physicsactor_walk_left(physicsactor_t *pa);
 void physicsactor_duck(physicsactor_t *pa);
 void physicsactor_look_up(physicsactor_t *pa);
 void physicsactor_jump(physicsactor_t *pa);
-void physicsactor_1stjump(physicsactor_t *pa);
 
 void physicsactor_kill(physicsactor_t *pa);
 void physicsactor_hit(physicsactor_t *pa);

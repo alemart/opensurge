@@ -471,7 +471,7 @@ bool input_is_ignored(input_t *in)
  */
 void input_simulate_button_down(input_t *in, inputbutton_t button)
 {
-    in->oldstate[(int)button] = in->state[(int)button];
+    /*in->oldstate[(int)button] = in->state[(int)button];*/ /* this logic creates issues between frames */
     in->state[(int)button] = true;
 }
 
@@ -483,7 +483,6 @@ void input_simulate_button_down(input_t *in, inputbutton_t button)
  */
 void input_simulate_button_up(input_t *in, inputbutton_t button)
 {
-    in->oldstate[(int)button] = in->state[(int)button];
     in->state[(int)button] = false;
 }
 

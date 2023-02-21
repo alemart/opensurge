@@ -210,6 +210,10 @@ surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surges
     bool down = surgescript_var_get_bool(param[1]);
     void (*simulate_button)(input_t*,inputbutton_t) = down ? input_simulate_button_down : input_simulate_button_up;
 
+    /* non-active players should respond to this input */
+    /* TODO: reimplement as input_block() or similar; not to get confused with this.enabled */
+    input_restore(input);
+
     switch(hash(button)) {
         case BUTTON_UP:     simulate_button(input, IB_UP); break;
         case BUTTON_DOWN:   simulate_button(input, IB_DOWN); break;
