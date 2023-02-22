@@ -1956,7 +1956,7 @@ void level_clear(actor_t *end_sign)
 
     /* ignore input and focus the camera on the end sign */
     for(i=0; i<team_size; i++)
-        input_ignore(team[i]->actor->input);
+        input_disable(team[i]->actor->input);
 
     /* set the focus */
     if(end_sign != NULL)
@@ -2423,9 +2423,9 @@ void reconfigure_players_input_devices()
             team[i]->actor->input = input_create_user(NULL);
 
         if(team[i] == player)
-            input_restore(team[i]->actor->input);
+            input_enable(team[i]->actor->input);
         else
-            input_ignore(team[i]->actor->input);
+            input_disable(team[i]->actor->input);
     }
 }
 

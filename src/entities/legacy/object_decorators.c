@@ -4087,9 +4087,9 @@ static int onrightwallcollision_should_trigger_event(eventstrategy_t *event, obj
 struct onbutton_t {
     eventstrategy_t base; /* implements eventstrategy_t */
     inputbutton_t button;
-    bool (*check)(input_t*,inputbutton_t);
+    bool (*check)(const input_t*,inputbutton_t);
 };
-static eventstrategy_t* onbutton_new(const char *button_name, bool (*check)(input_t*,inputbutton_t));
+static eventstrategy_t* onbutton_new(const char *button_name, bool (*check)(const input_t*,inputbutton_t));
 static void onbutton_init(eventstrategy_t *event);
 static void onbutton_release(eventstrategy_t *event);
 static int onbutton_should_trigger_event(eventstrategy_t *event, object_t *object, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list);
@@ -4382,7 +4382,7 @@ objectmachine_t* objectdecorator_onbuttonpressed_new(objectmachine_t *decorated_
 
 objectmachine_t* objectdecorator_onbuttonup_new(objectmachine_t *decorated_machine, const char *button_name, const char *new_state_name)
 {
-    return onevent_make_decorator(decorated_machine, new_state_name, onbutton_new(button_name, input_button_up));
+    return onevent_make_decorator(decorated_machine, new_state_name, onbutton_new(button_name, input_button_released));
 }
 
 objectmachine_t* objectdecorator_onmusicplay_new(objectmachine_t *decorated_machine, const char *new_state_name)
@@ -5091,7 +5091,7 @@ int onrightwallcollision_should_trigger_event(eventstrategy_t *event, object_t *
 }
 
 /* onbutton_t strategy */
-eventstrategy_t* onbutton_new(const char *button_name, bool (*check)(input_t*,inputbutton_t))
+eventstrategy_t* onbutton_new(const char *button_name, bool (*check)(const input_t*,inputbutton_t))
 {
     onbutton_t *x = mallocx(sizeof *x);
     eventstrategy_t *e = (eventstrategy_t*)x;
@@ -7511,7 +7511,7 @@ void simulatebutton_update(objectmachine_t *obj, player_t **team, int team_size,
     object_t *object = obj->get_object_instance(obj);
     player_t *player = enemy_get_observed_player(object);
 
-    input_restore(player->actor->input); /* so that non-active players will respond to this command */
+    input_enable(player->actor->input); /* so that non-active players will respond to this command */
     me->callback(player->actor->input, me->button);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);

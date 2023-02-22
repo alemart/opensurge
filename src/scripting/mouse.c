@@ -166,9 +166,9 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
     switch(hash(button)) {
-        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE1));
-        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE2));
-        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE3));
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE1));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE2));
+        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE3));
         default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }

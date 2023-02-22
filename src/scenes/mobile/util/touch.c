@@ -38,7 +38,7 @@ void handle_touch_input(input_t* mouse_input, void (*on_touch_start)(v2d_t), voi
     /* only a single touch point is supported at the moment */
     static v2d_t touch_start, touch_end;
 
-    if(input_button_up(mouse_input, ACTION_BUTTON)) {
+    if(input_button_released(mouse_input, ACTION_BUTTON)) {
         touch_end = read_mouse_position(mouse_input);
         if(on_touch_end != NULL)
             on_touch_end(touch_start, touch_end);

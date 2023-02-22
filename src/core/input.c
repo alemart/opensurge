@@ -319,7 +319,7 @@ void input_release()
  * input_button_down()
  * Checks if a given button is down
  */
-bool input_button_down(input_t *in, inputbutton_t button)
+bool input_button_down(const input_t *in, inputbutton_t button)
 {
     return in->enabled && in->state[(int)button];
 }
@@ -329,17 +329,17 @@ bool input_button_down(input_t *in, inputbutton_t button)
  * input_button_pressed()
  * Checks if a given button has just been pressed (not held down)
  */
-bool input_button_pressed(input_t *in, inputbutton_t button)
+bool input_button_pressed(const input_t *in, inputbutton_t button)
 {
     return in->enabled && (in->state[(int)button] && !in->oldstate[(int)button]);
 }
 
 
 /*
- * input_button_up()
+ * input_button_released()
  * Checks if a given button has just been released
  */
-bool input_button_up(input_t *in, inputbutton_t button)
+bool input_button_released(const input_t *in, inputbutton_t button)
 {
     return in->enabled && (!in->state[(int)button] && in->oldstate[(int)button]);
 }
@@ -432,20 +432,20 @@ void input_destroy(input_t *in)
 
 
 /*
- * input_ignore()
- * Ignore Control
+ * input_disable()
+ * Disable this input object
  */
-void input_ignore(input_t *in)
+void input_disable(input_t *in)
 {
     in->enabled = false;
 }
 
 
 /*
- * input_restore()
- * Restore Control
+ * input_enable()
+ * Enable this input object
  */
-void input_restore(input_t *in)
+void input_enable(input_t *in)
 {
     in->enabled = true;
 }
@@ -453,12 +453,12 @@ void input_restore(input_t *in)
 
 
 /*
- * input_is_ignored()
- * Checks if the input device is ignored
+ * input_is_enabled()
+ * Checks if the input device is enabled
  */
-bool input_is_ignored(input_t *in)
+bool input_is_enabled(const input_t *in)
 {
-    return !in->enabled;
+    return in->enabled;
 }
 
 
@@ -558,7 +558,7 @@ int input_number_of_joysticks()
  * input_get_xy()
  * Gets the xy coordinates (this will only work for a mouse device)
  */
-v2d_t input_get_xy(inputmouse_t *in)
+v2d_t input_get_xy(const inputmouse_t *in)
 {
     return v2d_new(in->x, in->y);
 }

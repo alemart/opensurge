@@ -357,7 +357,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 
     /* getting hit & winning pose */
     if(pa->state == PAS_GETTINGHIT) {
-        input_ignore(pa->input);
+        input_disable(pa->input);
         if(!nearly_zero(pa->xsp))
             pa->facing_right = (pa->xsp < 0.0f);
     }
@@ -375,10 +375,10 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         else if(pa->gsp < -thr)
             input_simulate_button_down(pa->input, IB_RIGHT);
         else
-            input_ignore(pa->input);
+            input_disable(pa->input);
     }
     else
-        input_restore(pa->input);
+        input_enable(pa->input);
 
     /* horizontal control lock timer */
     if(pa->horizontal_control_lock_timer > 0.0f) {

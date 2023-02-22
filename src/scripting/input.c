@@ -184,18 +184,18 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
     switch(hash(button)) {
-        case BUTTON_UP:     return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_UP));
-        case BUTTON_DOWN:   return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_DOWN));
-        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_LEFT));
-        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_RIGHT));
-        case BUTTON_FIRE1:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE1));
-        case BUTTON_FIRE2:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE2));
-        case BUTTON_FIRE3:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE3));
-        case BUTTON_FIRE4:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE4));
-        case BUTTON_FIRE5:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE5));
-        case BUTTON_FIRE6:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE6));
-        case BUTTON_FIRE7:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE7));
-        case BUTTON_FIRE8:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE8));
+        case BUTTON_UP:     return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_UP));
+        case BUTTON_DOWN:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_DOWN));
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_LEFT));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_RIGHT));
+        case BUTTON_FIRE1:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE1));
+        case BUTTON_FIRE2:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE2));
+        case BUTTON_FIRE3:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE3));
+        case BUTTON_FIRE4:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE4));
+        case BUTTON_FIRE5:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE5));
+        case BUTTON_FIRE6:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE6));
+        case BUTTON_FIRE7:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE7));
+        case BUTTON_FIRE8:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE8));
         default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }
@@ -212,7 +212,7 @@ surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surges
 
     /* non-active players should respond to this input */
     /* TODO: reimplement as input_block() or similar; not to get confused with this.enabled */
-    input_restore(input);
+    input_enable(input);
 
     switch(hash(button)) {
         case BUTTON_UP:     simulate_button(input, IB_UP); break;
@@ -236,7 +236,7 @@ surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surges
 surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
-    return surgescript_var_set_bool(surgescript_var_create(), !input_is_ignored(input));
+    return surgescript_var_set_bool(surgescript_var_create(), input_is_enabled(input));
 }
 
 /* enable or disable the input object */
@@ -246,12 +246,12 @@ surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescrip
     bool enabled = surgescript_var_get_bool(param[0]);
 
     if(enabled) {
-        if(input_is_ignored(input))
-            input_restore(input);
+        if(!input_is_enabled(input))
+            input_enable(input);
     }
     else {
-        if(!input_is_ignored(input))
-            input_ignore(input);
+        if(input_is_enabled(input))
+            input_disable(input);
     }
 
     return NULL;

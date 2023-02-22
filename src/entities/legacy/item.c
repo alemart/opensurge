@@ -4021,7 +4021,7 @@ void teleporter_activate(item_t *teleporter, player_t *who)
         me->is_active = TRUE;
         me->who = who;
 
-        input_ignore(who->actor->input);
+        input_disable(who->actor->input);
         level_set_camera_focus(act);
         sound_play(SFX_TELEPORTER);
     }
@@ -4067,7 +4067,7 @@ void teleporter_update(item_t* item, player_t** team, int team_size, brick_list_
             /* okay, teleport them all! */
             player_t *who = me->who; /* who has activated the teleporter? */
 
-            input_restore(who->actor->input);
+            input_enable(who->actor->input);
             level_set_camera_focus(who->actor);
 
             for(i=0; i<team_size; i++) {

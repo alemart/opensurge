@@ -36,19 +36,23 @@ typedef struct inputuserdefined_t inputuserdefined_t;
 
 /* available buttons */
 enum inputbutton_t {
+    /* enum */  /* suggested action */
+    /* -----*/  /* ----------------- */
     IB_UP,      /* up */
-    IB_DOWN,    /* down */
     IB_RIGHT,   /* right */
+    IB_DOWN,    /* down */
     IB_LEFT,    /* left */
-    IB_FIRE1,   /* jump */
-    IB_FIRE2,   /* switch character */
-    IB_FIRE3,   /* pause */
-    IB_FIRE4,   /* quit */
-    IB_FIRE5,
-    IB_FIRE6,
-    IB_FIRE7,
-    IB_FIRE8,
-    /* --- */
+
+    IB_FIRE1,   /* action button */
+    IB_FIRE2,   /* secondary action button */
+    IB_FIRE3,   /* start, confirm, pause */
+    IB_FIRE4,   /* back, cancel, quit */
+
+    IB_FIRE5,   /* tertiary action button */
+    IB_FIRE6,   /* quaternary action button */
+    IB_FIRE7,   /* left shoulder button */
+    IB_FIRE8,   /* right shoulder button */
+
     IB_MAX      /* number of buttons */
 };
 
@@ -68,18 +72,20 @@ input_t *input_create_computer(); /* computer-controlled "input": will return an
 input_t *input_create_mouse(); /* mouse */
 void input_destroy(input_t *in);
 
-bool input_button_down(input_t *in, inputbutton_t button);
-bool input_button_pressed(input_t *in, inputbutton_t button);
-bool input_button_up(input_t *in, inputbutton_t button);
+bool input_button_down(const input_t *in, inputbutton_t button);
+bool input_button_pressed(const input_t *in, inputbutton_t button);
+bool input_button_released(const input_t *in, inputbutton_t button);
+
+void input_reset(input_t *in);
 void input_simulate_button_down(input_t *in, inputbutton_t button);
 void input_simulate_button_up(input_t *in, inputbutton_t button);
-void input_reset(input_t *in);
-void input_ignore(input_t *in);
-void input_restore(input_t *in);
-bool input_is_ignored(input_t *in);
+
+bool input_is_enabled(const input_t *in);
+void input_enable(input_t *in);
+void input_disable(input_t *in);
 
 /* these will only work for a mouse input device */
-v2d_t input_get_xy(inputmouse_t *in);
+v2d_t input_get_xy(const inputmouse_t *in);
 
 /* the following will only work for a user customized input device */
 void input_change_mapping(inputuserdefined_t *in, const char* inputmap_name); /* set inputmap_name to NULL to use a default mapping */
