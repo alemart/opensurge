@@ -32,8 +32,9 @@
 
 /* <base class>: generic input */
 struct input_t {
-    bool enabled; /* enable input? */
-    bool state[IB_MAX], oldstate[IB_MAX]; /* states */
+    bool enabled; /* is this input object enabled? */
+    bool blocked; /* is this input object blocked for user input? */
+    bool state[IB_MAX], oldstate[IB_MAX]; /* state of the buttons */
     void (*update)(input_t*); /* update method */
 };
 
@@ -107,13 +108,13 @@ static const float analog2digital_threshold[REQUIRED_AXES] = {
 };
 
 /* private data */
-static const char* DEFAULT_INPUTMAP_NAME = "default";
-static input_list_t *inlist = NULL;
+static const char DEFAULT_INPUTMAP_NAME[] = "default";
+static input_list_t* input_list = NULL;
 
 /* private methods */
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
-static inline void input_clear(input_t *in);
+static void input_clear(input_t *in);
 static void log_joysticks();
 static void handle_hotkey(int keycode);
 
@@ -153,7 +154,7 @@ void input_init()
 
 
     /* initialize the input list */
-    inlist = NULL;
+    input_list = NULL;
 
     /* initialize mouse input */
     a5_mouse.b = 0;
@@ -287,10 +288,19 @@ void input_update()
     }
 
     /* update the input objects */
-    for(input_list_t* it = inlist; it; it = it->next) {
-        for(int i = 0; i < IB_MAX; i++)
-            it->data->oldstate[i] = it->data->state[i];
-        it->data->update(it->data);
+    for(input_list_t* it = input_list; it; it = it->next) {
+        input_t* in = it->data;
+
+        /* save the previous state of the buttons */
+        memcpy(in->oldstate, in->state, sizeof(in->oldstate));
+
+        /* clear the current state of the buttons */
+        for(inputbutton_t button = 0; button < IB_MAX; button++)
+            in->state[button] = false;
+
+        /* accept user input */
+        if(!in->blocked)
+            in->update(in);
     }
 }
 
@@ -301,13 +311,11 @@ void input_update()
  */
 void input_release()
 {
-    input_list_t *it, *next;
-
     logfile_message("input_release()");
     inputmap_release();
 
     logfile_message("Releasing registered input objects...");
-    for(it = inlist; it; it=next) {
+    for(input_list_t *next, *it = input_list; it; it = next) {
         next = it->next;
         free(it->data);
         free(it);
@@ -321,7 +329,7 @@ void input_release()
  */
 bool input_button_down(const input_t *in, inputbutton_t button)
 {
-    return in->enabled && in->state[(int)button];
+    return in->enabled && in->state[button];
 }
 
 
@@ -331,7 +339,7 @@ bool input_button_down(const input_t *in, inputbutton_t button)
  */
 bool input_button_pressed(const input_t *in, inputbutton_t button)
 {
-    return in->enabled && (in->state[(int)button] && !in->oldstate[(int)button]);
+    return in->enabled && (in->state[button] && !in->oldstate[button]);
 }
 
 
@@ -341,7 +349,7 @@ bool input_button_pressed(const input_t *in, inputbutton_t button)
  */
 bool input_button_released(const input_t *in, inputbutton_t button)
 {
-    return in->enabled && (!in->state[(int)button] && in->oldstate[(int)button]);
+    return in->enabled && (!in->state[button] && in->oldstate[button]);
 }
 
 
@@ -358,6 +366,7 @@ input_t *input_create_mouse()
 
     in->update = inputmouse_update;
     in->enabled = true;
+    in->blocked = false;
     me->dx = 0;
     me->dy = 0;
     me->x = 0;
@@ -383,6 +392,7 @@ input_t *input_create_computer()
 
     in->update = inputcomputer_update;
     in->enabled = true;
+    in->blocked = false;
     input_clear(in);
 
     input_register(in);
@@ -400,6 +410,7 @@ input_t *input_create_user(const char* inputmap_name)
 
     in->update = inputuserdefined_update;
     in->enabled = true;
+    in->blocked = false;
     input_clear(in);
 
     /* if there isn't such a inputmap_name, the game will exit beautifully */
@@ -433,7 +444,7 @@ void input_destroy(input_t *in)
 
 /*
  * input_disable()
- * Disable this input object
+ * Disables an input object
  */
 void input_disable(input_t *in)
 {
@@ -443,7 +454,7 @@ void input_disable(input_t *in)
 
 /*
  * input_enable()
- * Enable this input object
+ * Enables an input object
  */
 void input_enable(input_t *in)
 {
@@ -454,7 +465,7 @@ void input_enable(input_t *in)
 
 /*
  * input_is_enabled()
- * Checks if the input device is enabled
+ * Checks if an input object is enabled
  */
 bool input_is_enabled(const input_t *in)
 {
@@ -462,6 +473,34 @@ bool input_is_enabled(const input_t *in)
 }
 
 
+/*
+ * input_is_blocked()
+ * Checks if an input object is blocked for user input
+ */
+bool input_is_blocked(const input_t *in)
+{
+    return in->blocked;
+}
+
+
+/*
+ * input_block()
+ * Blocks an input object for user input, but not necessarily for simulated input
+ */
+void input_block(input_t *in)
+{
+    in->blocked = true;
+}
+
+
+/*
+ * input_unblock()
+ * Unblocks an input object for user input
+ */
+void input_unblock(input_t *in)
+{
+    in->blocked = false;
+}
 
 
 
@@ -471,8 +510,8 @@ bool input_is_enabled(const input_t *in)
  */
 void input_simulate_button_down(input_t *in, inputbutton_t button)
 {
-    /*in->oldstate[(int)button] = in->state[(int)button];*/ /* this logic creates issues between frames */
-    in->state[(int)button] = true;
+    /*in->oldstate[button] = in->state[button];*/ /* this logic creates issues between frames */
+    in->state[button] = true;
 }
 
 
@@ -483,7 +522,7 @@ void input_simulate_button_down(input_t *in, inputbutton_t button)
  */
 void input_simulate_button_up(input_t *in, inputbutton_t button)
 {
-    in->state[(int)button] = false;
+    in->state[button] = false;
 }
 
 
@@ -494,8 +533,8 @@ void input_simulate_button_up(input_t *in, inputbutton_t button)
  */
 void input_reset(input_t *in)
 {
-    for(int i = 0; i < IB_MAX; i++)
-        input_simulate_button_up(in, (inputbutton_t)i);
+    for(inputbutton_t button = 0; button < IB_MAX; button++)
+        input_simulate_button_up(in, button);
 }
 
 
@@ -602,8 +641,8 @@ void input_register(input_t *in)
     input_list_t *node = mallocx(sizeof *node);
 
     node->data = in;
-    node->next = inlist;
-    inlist = node;
+    node->next = input_list;
+    input_list = node;
 }
 
 /* unregisters the given input device */
@@ -611,16 +650,16 @@ void input_unregister(input_t *in)
 {
     input_list_t *node, *next;
 
-    if(!inlist)
+    if(!input_list)
         return;
 
-    if(inlist->data == in) {
-        next = inlist->next;
-        free(inlist);
-        inlist = next;
+    if(input_list->data == in) {
+        next = input_list->next;
+        free(input_list);
+        input_list = next;
     }
     else {
-        node = inlist;
+        node = input_list;
         while(node->next && node->next->data != in)
             node = node->next;
         if(node->next) {
@@ -634,8 +673,8 @@ void input_unregister(input_t *in)
 /* clears all the input buttons */
 void input_clear(input_t *in)
 {
-    for(int i = 0; i < IB_MAX; i++)
-        in->state[i] = in->oldstate[i] = false;
+    for(inputbutton_t button = 0; button < IB_MAX; button++)
+        in->state[button] = in->oldstate[button] = false;
 }
 
 /* update specific input devices */
@@ -672,9 +711,6 @@ void inputuserdefined_update(input_t* in)
 {
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
-
-    for(inputbutton_t button = 0; button < IB_MAX; button++)
-        in->state[button] = false;
 
     if(im->keyboard.enabled) {
         for(inputbutton_t button = 0; button < IB_MAX; button++)

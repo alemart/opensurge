@@ -2423,9 +2423,9 @@ void reconfigure_players_input_devices()
             team[i]->actor->input = input_create_user(NULL);
 
         if(team[i] == player)
-            input_enable(team[i]->actor->input);
+            input_unblock(team[i]->actor->input);
         else
-            input_disable(team[i]->actor->input);
+            input_block(team[i]->actor->input);
     }
 }
 

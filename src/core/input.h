@@ -84,6 +84,10 @@ bool input_is_enabled(const input_t *in);
 void input_enable(input_t *in);
 void input_disable(input_t *in);
 
+bool input_is_blocked(const input_t *in);
+void input_block(input_t *in);
+void input_unblock(input_t *in);
+
 /* these will only work for a mouse input device */
 v2d_t input_get_xy(const inputmouse_t *in);
 
