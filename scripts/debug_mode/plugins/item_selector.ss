@@ -152,11 +152,11 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "debug-mode-observab
 
     fun onLoad(debugMode)
     {
-        itemPicker = debugMode.plugin("Debug Mode - Item Picker");
-        itemPickerHeight = itemPicker.height;
-
         touchInput = debugMode.plugin("Debug Mode - Touch Input");
         touchInput.subscribe(this);
+
+        itemPicker = debugMode.plugin("Debug Mode - Item Picker");
+        itemPickerHeight = itemPicker.height;
 
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
         selection.zindex = uiSettings.zindex;
@@ -335,6 +335,7 @@ object "Debug Mode - Item Selector - Selected Entities"// is "private", "awake",
     zindex = 0.0;
     grid = null;
     trash = spawn("Debug Mode - Item Selector - Trash");
+    itemPickerHeight = 0;
 
     fun get_count()
     {
@@ -398,6 +399,9 @@ object "Debug Mode - Item Selector - Selected Entities"// is "private", "awake",
     {
         grid = debugMode.plugin("Debug Mode - Grid System");
 
+        itemPicker = debugMode.plugin("Debug Mode - Item Picker");
+        itemPickerHeight = itemPicker.height;
+
         uiSettings = debugMode.plugin("Debug Mode - UI Settings");
         zindex = uiSettings.zindex + 10;
         trash.zindex = uiSettings.zindex + 100;
@@ -429,7 +433,7 @@ object "Debug Mode - Item Selector - Selected Entities"// is "private", "awake",
 
     fun onTapScreen(position)
     {
-        if(position.y < 32)
+        if(position.y < itemPickerHeight)
             return;
 
         // we're done with the selection
