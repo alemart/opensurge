@@ -20,8 +20,8 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
 {
     public readonly transform = Transform();
     itemContainers = [];
-    itemHeight = SurgeEngine.mobile ? 32 : 64;
-    itemWidth = itemHeight + 8;
+    itemHeight = 32;
+    itemWidth = 32;
     uiScroller = spawn("Debug Mode - UI Scroller");
     zindex = 0;
 
@@ -75,6 +75,13 @@ object "Debug Mode - Carousel" is "debug-mode-ui-component", "iterable", "detach
     fun iterator()
     {
         return spawn("Debug Mode - Carousel Iterator").setItemContainers(itemContainers);
+    }
+
+    fun setItemSize(width, height)
+    {
+        itemWidth = width;
+        itemHeight = height;
+        return this;
     }
 
     fun onLoad(debugMode)
