@@ -35,6 +35,7 @@ object "Debug Mode - My Item Picker Test" is "debug-mode-plugin"
 
 */
 
+using SurgeEngine;
 using SurgeEngine.Actor;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
@@ -70,6 +71,16 @@ object "Debug Mode - Item Picker" is "debug-mode-plugin", "debug-mode-observable
     {
         stack.pop();
         return this;
+    }
+
+    fun get_width()
+    {
+        return stack.top.width;
+    }
+
+    fun get_height()
+    {
+        return stack.top.height;
     }
 
     fun onPickCarouselItem(pickedCarouselItem)
@@ -190,8 +201,13 @@ object "Debug Mode - Item Picker - Stack" is "detached", "private", "entity"
 
     fun constructor()
     {
-        for(i = 0; i < poolSize; i++)
-            pool.push(spawn("Debug Mode - Carousel"));
+        itemHeight = SurgeEngine.mobile ? 32 : 64;
+        itemWidth = itemHeight + 8;
+
+        for(i = 0; i < poolSize; i++) {
+            carousel = spawn("Debug Mode - Carousel").setItemSize(itemWidth, itemHeight);
+            pool.push(carousel);
+        }
 
         stack.push(pool[poolPointer++]);
     }

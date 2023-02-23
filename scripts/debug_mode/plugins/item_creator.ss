@@ -9,8 +9,12 @@
 
 This plugin lets the user put items on the level.
 
+Properties:
+- mode: string. One of the following: "mobile", "mouse".
+
 */
 
+using SurgeEngine;
 using SurgeEngine.Actor;
 using SurgeEngine.Input;
 using SurgeEngine.Level;
@@ -18,6 +22,8 @@ using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.UI.Text;
+using SurgeEngine.Input.Mouse;
+using SurgeEngine.Camera;
 
 object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "entity"
 {
@@ -28,10 +34,16 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
     itemName = "";
     itemPreview = spawn("Debug Mode - Item Creator - Preview");
     camera = null; // camera of the debug mode (plugin)
+    gridSystem = null;
+    itemPickerHeight = 0;
 
 
 
     state "main"
+    {
+    }
+
+    state "mobile"
     {
         // follow the camera
         transform.position = camera.position;
@@ -39,17 +51,34 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
         // create the item if the action button is pressed
         if(input.buttonPressed(actionButton)) {
 
-            if(itemType == "entity")
-                createEntity(itemName);
+            createItem(transform.position);
 
         }
     }
 
-
-
-    fun createEntity(entityName)
+    state "mouse"
     {
-        Level.spawnEntity(entityName, transform.position);
+        // follow the mouse
+        transform.position = gridSystem.snapToGrid(Camera.screenToWorld(Mouse.position));
+
+        // create the item when the user taps the screen
+        // onTapScreen() ...
+    }
+
+    fun onTapScreen(position)
+    {
+        if(state == "mouse") {
+            if(position.y >= itemPickerHeight)
+                createItem(transform.position);
+        }
+    }
+
+    fun createItem(position)
+    {
+        if(itemType == "entity") {
+            entityName = itemName;
+            Level.spawnEntity(entityName, position);
+        }
     }
 
     fun onLoad(debugMode)
@@ -59,12 +88,20 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
 
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.subscribe(this);
+        itemPickerHeight = itemPicker.height;
+
+        tapDetector = debugMode.plugin("Debug Mode - Tap Detector");
+        tapDetector.subscribe(this);
 
         camera = debugMode.plugin("Debug Mode - Camera");
+        gridSystem = debugMode.plugin("Debug Mode - Grid System");
     }
 
     fun onUnload(debugMode)
     {
+        tapDetector = debugMode.plugin("Debug Mode - Tap Detector");
+        tapDetector.unsubscribe(this);
+
         itemPicker = debugMode.plugin("Debug Mode - Item Picker");
         itemPicker.unsubscribe(this);
     }
@@ -78,6 +115,14 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
             itemPreview.setEntity(itemName);
         else
             itemPreview.setNull();
+    }
+
+    fun constructor()
+    {
+        if(SurgeEngine.mobile)
+            state = "mobile";
+        else
+            state = "mouse";
     }
 }
 

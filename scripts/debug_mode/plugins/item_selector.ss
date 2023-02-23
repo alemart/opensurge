@@ -59,6 +59,7 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "debug-mode-observab
     input = Input("default");
     vibrateSound = Sound("samples/vibrate.wav");
     warmUpTime = 0.5; // seconds
+    itemPickerHeight = 0;
 
     state "main"
     {
@@ -151,6 +152,9 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "debug-mode-observab
 
     fun onLoad(debugMode)
     {
+        itemPicker = debugMode.plugin("Debug Mode - Item Picker");
+        itemPickerHeight = itemPicker.height;
+
         touchInput = debugMode.plugin("Debug Mode - Touch Input");
         touchInput.subscribe(this);
 
@@ -187,7 +191,7 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "debug-mode-observab
 
     fun onTouchBegin(touch)
     {
-        if(touch.position.y < 32)
+        if(touch.position.y < itemPickerHeight)
             return;
 
         if(state == "ready") {

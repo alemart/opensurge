@@ -57,7 +57,8 @@ object "Debug Mode - Mouse Cursor" is "debug-mode-plugin", "detached", "private"
     {
         actor.visible = !SurgeEngine.mobile; // hide in mobile mode
 
-        text.visible = actor.visible;
+        //text.visible = actor.visible;
+        text.visible = false;
         text.align = "left";
         text.offset = Vector2(0, -16);
     }
