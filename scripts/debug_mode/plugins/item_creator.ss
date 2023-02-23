@@ -16,7 +16,6 @@ Properties:
 
 using SurgeEngine;
 using SurgeEngine.Actor;
-using SurgeEngine.Input;
 using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
@@ -28,8 +27,7 @@ using SurgeEngine.Camera;
 object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "entity"
 {
     transform = Transform();
-    input = Input("default");
-    actionButton = "fire1";
+    input = spawn("Debug Mode - Input");
     itemType = "";
     itemName = "";
     itemPreview = spawn("Debug Mode - Item Creator - Preview");
@@ -49,7 +47,7 @@ object "Debug Mode - Item Creator" is "debug-mode-plugin", "private", "awake", "
         transform.position = camera.position;
 
         // create the item if the action button is pressed
-        if(input.buttonPressed(actionButton)) {
+        if(input.buttonPressed("action")) {
 
             createItem(transform.position);
 

@@ -35,7 +35,6 @@ object "Debug Mode - My Plugin" is "debug-mode-plugin"
 */
 using SurgeEngine;
 using SurgeEngine.Level;
-using SurgeEngine.Input;
 using SurgeEngine.Player;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
@@ -148,8 +147,8 @@ object "Debug Mode - Camera - Player Mode" is "debug-mode-camera-strategy"
 {
     scrollSpeed = 400;
     gridSize = 16;
-    input = Input("default");
-    turboButton = "fire2";
+    input = spawn("Debug Mode - Input");
+    turboButton = "secondary-action";
 
     fun move(transform, grid)
     {
@@ -204,8 +203,8 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
 {
     scrollSpeed = 400;
     gridSize = 8; //16;
-    input = Input("default");
-    turboButton = "fire2";
+    input = spawn("Debug Mode - Input");
+    turboButton = "secondary-action";
 
     fun move(transform, grid)
     {

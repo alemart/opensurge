@@ -11,18 +11,15 @@ This plugin lets the user exit the Debug Mode.
 
 */
 
-using SurgeEngine.Input;
-
 object "Debug Mode - Exit" is "debug-mode-plugin"
 {
-    input = Input("default");
-    backButton = "fire4";
+    input = spawn("Debug Mode - Input");
     debugMode = null;
 
     state "main"
     {
         // return to the game if the back button is pressed
-        if(input.buttonPressed(backButton))
+        if(input.buttonPressed("back"))
             debugMode.exit();
     }
 
