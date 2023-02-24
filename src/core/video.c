@@ -34,6 +34,8 @@
 #include "font.h"
 #include "lang.h"
 #include "mobile_gamepad.h"
+#include "asset.h"
+#include "nanoparser.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
@@ -129,6 +131,15 @@ static void print_to_console(const char* message);
 static void render_console();
 
 
+/* Configuration file */
+static const char CONFIG_FILE[] = "surge.cfg";
+static void read_config_file(const char* vpath);
+static int traverse(const parsetree_statement_t* stmt);
+static int traverse_game(const parsetree_statement_t* stmt);
+static int traverse_video(const parsetree_statement_t* stmt);
+
+
+
 /* Misc */
 static const char LOADING_FONT[] = "Loading";
 static const char LOADING_TEXT[] = "$LOADING_TEXT";
@@ -195,6 +206,9 @@ void video_init()
     game_screen_width = DEFAULT_SCREEN_WIDTH;
     game_screen_height = DEFAULT_SCREEN_HEIGHT;
     str_cpy(window_title, DEFAULT_WINDOW_TITLE, sizeof(window_title));
+
+    /* read the config file */
+    read_config_file(CONFIG_FILE);
 
     /* reset the FPS counter */
     fps = 0;
@@ -857,4 +871,98 @@ void render_fps()
     al_use_transform(&transform);
         DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
     al_restore_state(&state);
+}
+
+
+
+/*
+ *
+ * CONFIGURATION FILE
+ *
+ */
+
+/* read the configuration file */
+void read_config_file(const char* vpath)
+{
+    if(asset_exists(vpath)) {
+        const char* fullpath = asset_path(vpath);
+        parsetree_program_t* p = nanoparser_construct_tree(fullpath);
+
+        nanoparser_traverse_program(p, traverse);
+
+        nanoparser_deconstruct_tree(p);
+    }
+
+    /*
+
+    use the default settings if the configuration file is not found
+    (i.e., legacy games?)
+
+    */
+}
+
+/* traverse the configuration file */
+int traverse(const parsetree_statement_t* stmt)
+{
+    const char* identifier = nanoparser_get_identifier(stmt);
+    const parsetree_parameter_t* param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "game") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_program(p1, "Expected game settings");
+
+        nanoparser_traverse_program(nanoparser_get_program(p1), traverse_game);
+    }
+    else if(str_icmp(identifier, "video") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_program(p1, "Expected video settings");
+
+        nanoparser_traverse_program(nanoparser_get_program(p1), traverse_video);
+    }
+    else
+        fatal_error("Unexpected identifier \"%s\" in %s:%d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    return 0;
+}
+
+/* read the game section of the configuration file */
+int traverse_game(const parsetree_statement_t* stmt)
+{
+    const char* identifier = nanoparser_get_identifier(stmt);
+    const parsetree_parameter_t* param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "title") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "Expected game title");
+
+        str_cpy(window_title, nanoparser_get_string(p1), sizeof(window_title));
+    }
+    else
+        fatal_error("Unexpected identifier \"%s\" in %s:%d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    return 0;
+}
+
+/* read the video section of the configuration file */
+int traverse_video(const parsetree_statement_t* stmt)
+{
+    const char* identifier = nanoparser_get_identifier(stmt);
+    const parsetree_parameter_t* param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "screen_size") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        const parsetree_parameter_t* p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "Expected screen_size: width, height");
+        nanoparser_expect_string(p2, "Expected screen_size: width, height");
+
+        game_screen_width = atoi(nanoparser_get_string(p1));
+        game_screen_height = atoi(nanoparser_get_string(p2));
+
+        if(game_screen_width <= 0 || game_screen_height <= 0)
+            fatal_error("Invalid screen_size (%d x %d) in %s:%d", game_screen_width, game_screen_height, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+    }
+    else
+        fatal_error("Unexpected identifier \"%s\" in %s:%d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    return 0;
 }

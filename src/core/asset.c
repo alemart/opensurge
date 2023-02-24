@@ -759,7 +759,7 @@ const char* find_extension(const char* path)
  */
 bool is_valid_root_folder()
 {
-    return PHYSFS_exists("surge.rocks") || PHYSFS_exists("surge.prefs") || PHYSFS_exists("languages/english.lng");
+    return PHYSFS_exists("surge.rocks") || PHYSFS_exists("surge.prefs") || PHYSFS_exists("surge.cfg") || PHYSFS_exists("languages/english.lng");
 }
 
 /*

@@ -102,6 +102,7 @@ static const char* WHITELIST[] = {
 
     EXACT("surge.prefs"),
     EXACT("surge.rocks"),
+    EXACT("surge.cfg"),
 
     EXACT("quests/default.qst"),
     EXACT("quests/intro.qst"),
@@ -498,7 +499,7 @@ bool is_valid_gamedir(ALLEGRO_FS_ENTRY* dir)
         return false;
 
     /* look for one of the following files in dir */
-    const char* files[] = { "surge.rocks", "surge.prefs" };
+    const char* files[] = { "surge.prefs", "surge.rocks", "surge.cfg" };
     for(int i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
         char path[PATH_MAXSIZE];
         fullpath_of(dir, files[i], path, sizeof(path));
