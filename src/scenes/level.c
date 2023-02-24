@@ -2488,6 +2488,10 @@ void render_hud()
 /* renders the dialog box */
 void render_dlgbox(v2d_t camera_position)
 {
+    /* this legacy component (dlgbox) will be removed */
+    if(video_get_mode() != VIDEOMODE_DEFAULT)
+        return;
+
     if(dlgbox->position.y < VIDEO_SCREEN_H) {
         actor_render(dlgbox, camera_position);
         font_render(dlgbox_title, camera_position);
