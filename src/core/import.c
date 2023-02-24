@@ -142,6 +142,9 @@ static const char* BLACKLIST[] = {
     EXACT("surge.png"),
     EXACT("logo.png"),
 
+    /* deleted files from previous builds */
+    EXACT("preferences.dat"),
+
     /* NULL-terminated list */
     NULL
 
