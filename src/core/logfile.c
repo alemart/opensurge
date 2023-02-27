@@ -32,6 +32,7 @@
 
 #include <allegro5/allegro_android.h>
 #include <android/log.h>
+#include <unistd.h>
 
 #elif defined(_WIN32)
 

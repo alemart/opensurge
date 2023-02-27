@@ -437,7 +437,7 @@ SET(GAME_HEADERS
   src/scenes/mobile/subscenes/subscene.h
   src/scenes/mobile/util/touch.h
   src/scenes/mobile/menu.h
-  src/scenes/mobile/touch.h
+  src/scenes/mobile/popup.h
   src/scenes/util/editorcmd.h
   src/scenes/util/editorgrp.h
   src/scenes/util/grouptree.h
