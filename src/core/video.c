@@ -476,6 +476,15 @@ void video_display_loading_screen()
     font_destroy(fnt);
 }
 
+/*
+ * video_get_window_title()
+ * The title of the window as a statically allocated buffer
+ */
+const char* video_get_window_title()
+{
+    return window_title;
+}
+
 
 /*
  * a5_handle_video_event()
