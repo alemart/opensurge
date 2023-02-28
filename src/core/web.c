@@ -22,11 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "web.h"
-#include "util.h"
-#include "video.h"
-#include "logfile.h"
-#include "stringutil.h"
 
 #if !defined(_WIN32)
 #include <unistd.h>
@@ -36,13 +31,25 @@
 #include <windows.h>
 #endif
 
+#if defined(__ANDROID__)
+#define ALLEGRO_UNSTABLE /* required for al_android_get_jni_env(), al_android_get_activity() */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_android.h>
+#endif
+
+#include "web.h"
+#include "util.h"
+#include "video.h"
+#include "logfile.h"
+#include "stringutil.h"
+
+
 
 
 /* private stuff */
 static bool file_exists(const char *filepath);
 static inline char ch2hex(unsigned char code);
 static char *url_encode(const char *url);
-
 
 
 
@@ -59,11 +66,25 @@ bool launch_url(const char *url)
     bool success = true;
     char *safe_url = url_encode(url); /* encode the URL */
 
+    logfile_message("Launching URL: \"%s\"...", safe_url);
     if(video_is_fullscreen())
         video_set_fullscreen(false);
 
     if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
-#if defined(_WIN32)
+#if defined(__ANDROID__)
+        /* See https://liballeg.org/a5docs/trunk/platform.html#al_android_get_jni_env */
+        JNIEnv* env = al_android_get_jni_env();
+        jobject activity = al_android_get_activity();
+
+        jclass class_id = (*env)->GetObjectClass(env, activity);
+        jmethodID method_id = (*env)->GetMethodID(env, class_id, "openWebPage", "(Ljava/lang/String;)V");
+
+        jstring jdata = (*env)->NewStringUTF(env, safe_url);
+        (*env)->CallVoidMethod(env, activity, method_id, jdata);
+        (*env)->DeleteLocalRef(env, jdata);
+
+        (void)file_exists;
+#elif defined(_WIN32)
         ShellExecuteA(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
         (void)file_exists;
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -88,16 +109,19 @@ bool launch_url(const char *url)
         if(file_exists("/usr/bin/xdg-open")) {
             argv[0] = "/usr/bin/xdg-open";
             argv[1] = safe_url;
+            argv[2] = NULL;
         }
         else if(file_exists("/usr/bin/firefox")) {
             argv[0] = "/usr/bin/firefox";
             argv[1] = safe_url;
+            argv[2] = NULL;
         }
         else if(file_exists("/usr/bin/python")) {
             argv[0] = "/usr/bin/python";
             argv[1] = "-m";
             argv[2] = "webbrowser";
             argv[3] = safe_url;
+            argv[4] = NULL;
         }
         else
             success = false;
@@ -125,8 +149,6 @@ bool launch_url(const char *url)
 
     if(!success)
         logfile_message("Can't launch URL: \"%s\"", safe_url);
-    else
-        logfile_message("Launching URL: \"%s\"...", safe_url);
 
     free(safe_url);
     return success;
