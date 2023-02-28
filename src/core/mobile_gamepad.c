@@ -157,7 +157,7 @@ static const v2d_t DPAD_AXIS_THRESHOLD = {
     .y = 0.707f   /* sin(45 degrees) ~ 90 degrees vertically */
 };
 
-static const float DPAD_DEADZONE_THRESHOLD = 0.125f; /* a percentage of the interactive radius of the dpad */
+static const float DPAD_DEADZONE_THRESHOLD = 0.0625f; /* a percentage of the interactive radius of the dpad */
 
 
 

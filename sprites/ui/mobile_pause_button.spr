@@ -8,10 +8,10 @@
 sprite "Mobile Pause Button"
 {
     source_file     "images/ui/mobile_pause_button.png"
-    source_rect     0 0 48 24
-    frame_size      24 24
-    hot_spot        12 12 // at the center
-    action_spot     4 4
+    source_rect     0 0 64 32
+    frame_size      32 32
+    hot_spot        16 16 // at the center
+    action_spot     8 8
 
     // unpressed
     animation 0

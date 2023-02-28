@@ -8,9 +8,9 @@
 sprite "Mobile Gamepad - Action Button"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     0 736 416 208
-    frame_size      208 208
-    hot_spot        104 104 // at the center
+    source_rect     0 1456 464 232
+    frame_size      232 232
+    hot_spot        116 116 // at the center
 
     // unpressed
     animation 0
@@ -32,9 +32,9 @@ sprite "Mobile Gamepad - Action Button"
 sprite "Mobile Gamepad - Directional Stick"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     0 64 2016 672
-    frame_size      336 336
-    hot_spot        168 168 // at the center
+    source_rect     0 64 1856 1392
+    frame_size      464 464
+    hot_spot        232 232 // at the center
 
     // center
     animation 0
@@ -112,10 +112,10 @@ sprite "Mobile Gamepad - Directional Stick"
 sprite "Mobile Gamepad - Directional Stick - Ball"
 {
     source_file     "images/ui/mobile_gamepad.png"
-    source_rect     1008 400 672 336
-    frame_size      336 336
-    hot_spot        168 168 // at the center
-    action_spot     196 168 // determines the length of the offset when pressed
+    source_rect     464 992 928 464
+    frame_size      464 464
+    hot_spot        232 232 // at the center
+    action_spot     260 232 // determines the length of the offset when pressed
 
     // unpressed & at the center
     animation 0
