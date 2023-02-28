@@ -96,7 +96,10 @@ object "Title Screen - Scroller" is "private", "entity", "awake"
         // wrap around
         if(transform.position.x >= wrapThreshold)
             transform.position = Level.spawnpoint;
+    }
 
+    fun lateUpdate()
+    {
         // update the position of the camera
         Camera.position = transform.position;
     }

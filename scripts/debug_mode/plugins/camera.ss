@@ -61,7 +61,6 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
         prevY = transform.position.y;
 
         strategy.move(transform, grid);
-        Camera.position = transform.position;
 
         currX = transform.position.x;
         currY = transform.position.y;
@@ -69,6 +68,11 @@ object "Debug Mode - Camera" is "debug-mode-plugin", "debug-mode-observable", "a
         deltaPosition = Vector2(currX - prevX, currY - prevY);
         if(deltaPosition.length > 0)
             observable.notify(deltaPosition);
+    }
+
+    fun lateUpdate()
+    {
+        Camera.position = transform.position;
     }
 
     fun get_position()
