@@ -171,6 +171,7 @@ static const char* BLACKLIST[] = {
 
     /* deleted files from previous builds */
     EXACT("preferences.dat"),
+    EXACT("scripts/core/motd.ss"),
 
     /* NULL-terminated list */
     NULL
