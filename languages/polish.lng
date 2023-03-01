@@ -222,6 +222,7 @@ LEV_DEMO_2                  "<color=$COLOR_TITLE>Czy wiesz, że...?</color>\nWsz
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uwolnij swoją kreatywność!</color>\nJedną z kluczowych zalet Open Surge jest <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To język skryptowy dla gier - za jego pomocą możesz zbudować co tylko zdołasz sobie wyobrazić!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nEkscytujące? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Spróbuj!</color>\nTeraz twoja kolej! <color=$COLOR_HIGHLIGHT>Naciśnij F12, by otworzyć edytor.</color> Następnie otwórz paletę przedmiotów i zacznij budować swój poziom! (Naciśnij F1, jeżeli potrzebujesz pomocy.)"
+FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 
 
 

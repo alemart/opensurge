@@ -221,7 +221,8 @@ LEV_DEMO_1                  "<color=$COLOR_TITLE>Crie seus jogos incríveis!</co
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Saca só que irado!</color>\nTudo no Open Surge é customizável. Você pode criar fases, itens, chefes, personagens e muito mais! Ele é um <color=$COLOR_HIGHLIGHT>sistema para criar jogos</color>!"
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Liberte sua criatividade!</color>\nUm dos recursos-chave do Open Surge é o <color=$COLOR_HIGHLIGHT>SurgeScript</color>: programação para games! Use-o para construir tudo o que você imaginar!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Que massa!</color>\nE aí, curtiu? Sua imaginação é o limite! Visite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
-LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é sua vez!</color>\nVamos conhecer o editor de fases. <color=$COLOR_HIGHLIGHT>Aperte F12 para abri-lo</color>. Depois, abra a palheta de itens e comece a criar sua fase! (use F1 p/ ajuda)"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é a sua vez!</color>\n<color=$COLOR_HIGHLIGHT>Aperte F12 para abrir o editor de fases</color>. Em seguida, abra a palheta de itens e comece a criar sua fase! (aperte F1 para obter ajuda)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Agora é a sua vez!</color>\nPause o jogo, arraste a alça na parte inferior da tela e entre no <color=$COLOR_HIGHLIGHT>MODO DEBUG</color> para <color=$COLOR_HIGHLIGHT>editar a fase</color>!"
 
 
 

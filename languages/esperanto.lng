@@ -228,6 +228,7 @@ LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio 
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Provu ĝin vi!</color>\nNun estas via vico! <color=$COLOR_HIGHLIGHT>Premu F12-n por malfermi la redaktilon.</color> Poste malfermu la paletron de eroj kaj komencu konstrui vian nivelon! (uzu F1-n por helpo)"
+FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 
 
 
