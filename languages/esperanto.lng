@@ -125,12 +125,12 @@ CREDITS_RES_SCRIPTS_TEXT    "La aŭtoroj estas identigitaj en la propraj skripto
 TITLESCREEN_PLAY            "KOMENCI LUDON"
 TITLESCREEN_OPTIONS         "OPCIOJ"
 TITLESCREEN_QUIT            "ELIRI"
-TITLESCREEN_VERSION         "1a DEMO\n$GAME_VERSION" // bitmap font: no special characters are allowed
+FIXME TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "DAŬRIGI"
-ENDOFDEMO_VERSION           "1a DEMO\n20220902"
+FIXME ENDOFDEMO_VERSION           "DEMO 1.1\n"
 ENDOFDEMO_TEXT              "Danko pro ludi! Surge the Rabbit disvolviĝas.\n\nVizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por ĝisdatigoj!\n\nNun ni vidu kiel vi povas krei viajn proprajn ludojn!"
 
 // (legacy) Main Menu

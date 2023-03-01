@@ -125,12 +125,12 @@ CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у сами�
 TITLESCREEN_PLAY            "ЗАПОЧНИ ИГРУ"
 TITLESCREEN_OPTIONS         "ОПЦИЈЕ"
 TITLESCREEN_QUIT            "НАПУСТИТИ"
-TITLESCREEN_VERSION         "DЕМО 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "DЕМО 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "НАСТАВИТЕ"
-ENDOFDEMO_VERSION           "ДЕМО 1\n20220902"
+ENDOFDEMO_VERSION           "ДЕМО 1.1\n"
 ENDOFDEMO_TEXT              "Хвала што сте играли! Surge the Rabbit је тренутно у развоју.\n\nПосетите <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> за ажурирања!\n\nСада да видимо како и ви можете да креирате властите игре!"
 
 // (legacy) Main Menu

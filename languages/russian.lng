@@ -128,13 +128,13 @@ CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих
 TITLESCREEN_PLAY            "НАЧАТЬ ИГРУ"
 TITLESCREEN_OPTIONS         "НАСТРОЙКИ"
 TITLESCREEN_QUIT            "ВЫХОД"
-TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 // v5
 ENDOFDEMO_CONTINUE          "ПРОДОЛЖИТЬ"
-ENDOFDEMO_VERSION           "ДЕМО 1\n20220902"
+ENDOFDEMO_VERSION           "ДЕМО 1.1\n"
 ENDOFDEMO_TEXT              "Спасибо за игру! Surge the Rabbit находится в разработке.\n\nСледите за обновлениями на <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> !\n\nТеперь посмотрим как вы тоже можете создать свою игру!"
 
 // (legacy) Main Menu
