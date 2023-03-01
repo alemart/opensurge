@@ -49,8 +49,8 @@ static const mobile_subscene_t super = { .init = init, .release = release, .upda
 static const v2d_t FONT_POSITION = { .x = 4, .y = 4 };
 static const char FONT_NAME[] = "BoxyBold";
 
-static const char* game_name();
-static const char* game_author();
+static const char* opensurge_game_name();
+static const char* opensurge_game_author();
 
 
 
@@ -122,14 +122,15 @@ void init(mobile_subscene_t* subscene_ptr)
 #endif
         "Data" NOWRAP_SPACE "directories: %s %s",
 
-        game_name(),
-        game_author(),
+        opensurge_game_name(),
+        opensurge_game_author(),
 
         GAME_TITLE,
         GAME_COPYRIGHT,
 
         GAME_VERSION_STRING,
         GAME_BUILD_DATE,
+
         surgescript_version_string(),
         allegro_version_string(),
 #if defined(__ANDROID__)
@@ -192,8 +193,8 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
 
 /* --- private --- */
 
-/* the sanitized name of the game / MOD */
-const char* game_name()
+/* the sanitized name of the game / MOD that is being run in the engine */
+const char* opensurge_game_name()
 {
     /* don't use a large buffer because wordwrap is enabled */
     static char buffer[64];
@@ -211,8 +212,8 @@ const char* game_name()
     return buffer;
 }
 
-/* the author(s) of the game / MOD */
-const char* game_author()
+/* the author(s) of the game / MOD that is being run in the engine */
+const char* opensurge_game_author()
 {
     /* don't use a large buffer because wordwrap is enabled */
     static char buffer[64];
@@ -220,7 +221,7 @@ const char* game_author()
     /* FIXME: this is a stub */
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wformat-truncation"
-    snprintf(buffer, sizeof(buffer), "%s authors", game_name());
+    snprintf(buffer, sizeof(buffer), "%s authors", opensurge_game_name());
     #pragma GCC diagnostic pop
 
     /* get rid of newlines */
