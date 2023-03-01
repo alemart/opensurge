@@ -94,7 +94,8 @@ commandline_t commandline_parse(int argc, char **argv)
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             console_print(
-                "%s\n\n"
+                "%s\n"
+                "\n"
                 "usage:\n"
                 "    %s [options ...]\n"
                 "\n"
@@ -120,7 +121,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --no-font-smoothing              disable antialiased fonts\n"
                 "    --verbose                        print logs to stdout\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
-                GAME_COPYRIGHT, program
+                GAME_HEADER, program
             );
             exit(0);
         }
@@ -136,7 +137,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--license") == 0) {
-            console_print("%s\n\n%s", GAME_COPYRIGHT, LICENSE);
+            console_print("%s\n\n%s", GAME_HEADER, LICENSE);
             exit(0);
         }
 

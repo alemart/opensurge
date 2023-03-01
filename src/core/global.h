@@ -51,9 +51,13 @@
 
 /* Copyright text */
 #define GAME_COPYRIGHT "" \
-    GAME_TITLE " version " GAME_VERSION_STRING "\n" \
     "Copyright (C) " GAME_YEAR " Alexandre Martins\n" \
-    "http://" GAME_WEBSITE "\n"
+    "http://" GAME_WEBSITE
+
+/* Header text */
+#define GAME_HEADER "" \
+    GAME_TITLE " version " GAME_VERSION_STRING "\n" \
+    GAME_COPYRIGHT
 
 /* Minimum version of SurgeScript */
 #define SURGESCRIPT_MIN_SUP     0
