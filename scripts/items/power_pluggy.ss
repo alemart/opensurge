@@ -123,7 +123,19 @@ object "Power Pluggy Base" is "private", "entity", "awake"
 
     state "rotating"
     {
+        // since the rotation angle of the Power Pluggy depends on the position of the
+        // player - which is likely to change on the physics update - we'll calculate
+        // the angle in lateUpdate()
+    }
+
+    fun lateUpdate()
+    {
+        // this will run AFTER the physics update and only on the "rotating" state
+        if(state != "rotating")
+            return;
+
         // look at the player
+        // compute the angle between the player and the rotation axis of the Power Pluggy
         ds = player.transform.position.minus(transform.position);
         theta = Math.atan2(ds.y, ds.x);
         transform.angle = -Math.rad2deg(theta);
@@ -143,7 +155,8 @@ object "Power Pluggy Base" is "private", "entity", "awake"
 
         // let the player go
         else if(dot > oldDot) {
-            if(timeout(0.25) || player.slope == 180) {
+            if(Math.abs(player.slope - 180) <= 30) { // is the player upside down?
+                //Console.print(player.slope); // player.slope is supposed to be 180 degrees, but we compare using a safety margin
                 sfxExit.play();
                 player.input.enabled = true;
                 parent.onPlayerExit(player);
