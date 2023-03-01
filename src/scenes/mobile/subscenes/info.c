@@ -18,12 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include "info.h"
 #include "../../../core/video.h"
 #include "../../../core/image.h"
 #include "../../../core/color.h"
 #include "../../../core/font.h"
 #include "../../../core/util.h"
+#include "../../../core/stringutil.h"
 #include "../../../core/asset.h"
 #include "../../../core/global.h"
 
@@ -43,12 +45,12 @@ static void update(mobile_subscene_t*,v2d_t);
 static void render(mobile_subscene_t*,v2d_t);
 static const mobile_subscene_t super = { .init = init, .release = release, .update = update, .render = render };
 
-
-#define BACKGROUND_COLOR color_rgb(32, 32, 32)
+#define BACKGROUND_COLOR "303030" /* RGB hex code */
 static const v2d_t FONT_POSITION = { .x = 4, .y = 4 };
-static const char FONT_NAME[] = "GoodNeighbors";
+static const char FONT_NAME[] = "BoxyBold";
 
-
+static const char* game_name();
+static const char* game_author();
 
 
 
@@ -86,20 +88,44 @@ void init(mobile_subscene_t* subscene_ptr)
     font_set_align(font, FONTALIGN_LEFT);
     font_set_width(font, VIDEO_SCREEN_W - 2 * FONT_POSITION.x);
     font_set_text(font,
-        "%s"
-        "\n"
-        "Version: %s\n"
-        "Build date: %s\n"
-        "SurgeScript version: %s\n"
-        "Allegro version: %s\n"
-#if defined(__ANDROID__)
-        "Android version: %s\n"
-#endif
-        "\n"
-        "Asset directory: %s\n"
-        "User directory: %s\n"
-        "\n",
 
+        #define SEPARATOR    "     "
+        #define NOWRAP_SPACE "<color=" BACKGROUND_COLOR ">_</color>"
+
+        "%s\n"
+        "Created by %s\n"
+        "\n"
+        "Powered by %s\n"
+        "%s\n"
+        "\n"
+        "This program is free software; you can redistribute it and/or modify "
+        "it under the terms of the GNU General Public License as published by "
+        "the Free Software Foundation; either version 3 of the License, or "
+        "(at your option) any later version.\n"
+        "\n"
+        "This program is distributed in the hope that it will be useful, "
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
+        "GNU General Public License for more details.\n"
+        "\n"
+        "You should have received a copy of the GNU General Public License "
+        "along with this program.  If not, see < http://www.gnu.org/licenses/ >.\n"
+        "\n"
+        "Engine"        NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
+        "Build"         NOWRAP_SPACE "date:"    NOWRAP_SPACE "%s" SEPARATOR
+        "SurgeScript"   NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
+        "Allegro"       NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
+#if defined(__ANDROID__)
+        "Platform:"     NOWRAP_SPACE "Android"  NOWRAP_SPACE "%s" SEPARATOR
+#else
+        "Platform:"     NOWRAP_SPACE "%s" SEPARATOR
+#endif
+        "Data" NOWRAP_SPACE "directories: %s %s",
+
+        game_name(),
+        game_author(),
+
+        GAME_TITLE,
         GAME_COPYRIGHT,
 
         GAME_VERSION_STRING,
@@ -108,6 +134,10 @@ void init(mobile_subscene_t* subscene_ptr)
         allegro_version_string(),
 #if defined(__ANDROID__)
         al_android_get_os_version(),
+#elif defined(ALLEGRO_PLATFORM_STR)
+        ALLEGRO_PLATFORM_STR,
+#else
+        "Undefined",
 #endif
 
         asset_shared_datadir(path[0], sizeof(path[0])),
@@ -150,10 +180,55 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
     /* render background */
     int x = subscene_offset.x;
     int y = subscene_offset.y;
-    image_rectfill(x, y, VIDEO_SCREEN_W, VIDEO_SCREEN_H, BACKGROUND_COLOR);
+    image_rectfill(x, y, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_hex(BACKGROUND_COLOR));
 
     /* render font */
     v2d_t center = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t camera = v2d_subtract(center, subscene_offset);
     font_render(subscene->font, camera);
+}
+
+
+
+/* --- private --- */
+
+/* the sanitized name of the game / MOD */
+const char* game_name()
+{
+    /* don't use a large buffer because wordwrap is enabled */
+    static char buffer[64];
+
+    /* FIXME: is the title of the window always equal to the name of the game? */
+    str_cpy(buffer, video_get_window_title(), sizeof(buffer));
+
+    /* get rid of newlines */
+    for(char* p = buffer; *p; p++) {
+        if(*p == '\n' || *p == '\r')
+            *p = ' ';
+    }
+
+    /* done! */
+    return buffer;
+}
+
+/* the author(s) of the game / MOD */
+const char* game_author()
+{
+    /* don't use a large buffer because wordwrap is enabled */
+    static char buffer[64];
+
+    /* FIXME: this is a stub */
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-truncation"
+    snprintf(buffer, sizeof(buffer), "%s authors", game_name());
+    #pragma GCC diagnostic pop
+
+    /* get rid of newlines */
+    for(char* p = buffer; *p; p++) {
+        if(*p == '\n' || *p == '\r')
+            *p = ' ';
+    }
+
+    /* done! */
+    return buffer;
 }
