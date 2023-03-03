@@ -19,6 +19,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include <stdbool.h>
 #include "options.h"
 #include "util/grouptree.h"
@@ -68,6 +69,13 @@ static int option; /* current option: 0 <= option <= option_count - 1 */
 static int option_count;
 static group_t *root;
 static group_t *create_grouptree();
+
+/* check if this build targets the Google Play Store */
+#if defined(__ANDROID__)
+#define IS_GOOGLEPLAY_BUILD() (strstr(GAME_VERSION_STRING, "googleplay") != NULL)
+#else
+#define IS_GOOGLEPLAY_BUILD() 0
+#endif
 
 /* deprecated? */
 #define ENABLE_RESOLUTION 0
@@ -1052,7 +1060,11 @@ group_t *create_grouptree()
     group_addchild(game, group_stageselect_create());
     group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_credits_create());
-    group_addchild(game, group_donate_create());
+    if(!IS_GOOGLEPLAY_BUILD()) {
+        /* adding an external donation page to an Android app published
+           in the Google Play Store is a violation of their policy */
+        group_addchild(game, group_donate_create());
+    }
 
     /* section: root */
     root = group_root_create();

@@ -23,7 +23,9 @@ object "Congratulations"
     text = spawn("CongratulationsText");
     title = spawn("CongratulationsTitle");
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
-        ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_DONATE", "$CONGRATULATIONS_BACK" ]
+        !isGooglePlayBuild() ?
+            ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_DONATE", "$CONGRATULATIONS_BACK" ] :
+            ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_BACK" ]
     ).withSpacing(211).withAxisAngle(0).build();
     nextState = "";
 
@@ -64,8 +66,10 @@ object "Congratulations"
             fadeTo("back");
         }
         else if(buttonIndex == 1) {
-            // donate
-            Web.launchURL(donateURL());
+            // donate or go back
+            if(!isGooglePlayBuild())
+                Web.launchURL(donateURL());
+
             fadeTo("back");
         }
         else if(buttonIndex == 2) {
@@ -88,6 +92,13 @@ object "Congratulations"
     fun donateURL()
     {
         return "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
+    }
+
+    fun isGooglePlayBuild()
+    {
+        /* adding an external donation page to an Android app published
+           in the Google Play Store is a violation of their policy */
+        return SurgeEngine.version.indexOf("googleplay") >= 0;
     }
 }
 

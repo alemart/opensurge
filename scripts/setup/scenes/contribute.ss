@@ -33,6 +33,9 @@ object "Open Contribute web page"
 
     fun call()
     {
+        if(isGooglePlayBuild())
+            return;
+
         asked = Prefs[key] || false;
         if(!asked) {
             Prefs[key] = true;
@@ -43,5 +46,12 @@ object "Open Contribute web page"
     fun donateURL()
     {
         return "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
+    }
+
+    fun isGooglePlayBuild()
+    {
+        /* adding an external donation page to an Android app published
+           in the Google Play Store is a violation of their policy */
+        return SurgeEngine.version.indexOf("googleplay") >= 0;
     }
 }
