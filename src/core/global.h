@@ -38,16 +38,22 @@
 
 /* Build version */
 #ifdef GAME_BUILD_VERSION
-/* if defined, then this is a development build */
 #define _GAME_BUILD_VERSION     "-" GAME_BUILD_VERSION
 #else
 #define GAME_BUILD_VERSION      ""
 #define _GAME_BUILD_VERSION     ""
 #endif
 
+/* "Fix" version */
+#if GAME_VERSION_FIX != 0
+#define _GAME_VERSION_FIX       "." STRINGIFY(GAME_VERSION_FIX)
+#else
+#define _GAME_VERSION_FIX       ""
+#endif
+
 /* Version code & string */
 #define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
-#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) _GAME_BUILD_VERSION
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) _GAME_VERSION_FIX _GAME_BUILD_VERSION /* must include GAME_BUILD_VERSION */
 
 /* Copyright text */
 #define GAME_COPYRIGHT "" \

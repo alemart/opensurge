@@ -120,7 +120,7 @@ void init(mobile_subscene_t* subscene_ptr)
 #else
         "Platform:"     NOWRAP_SPACE "%s" SEPARATOR
 #endif
-        "Data" NOWRAP_SPACE "directories: %s %s",
+        "Data" NOWRAP_SPACE "folders: %s %s",
 
         opensurge_game_name(),
         opensurge_game_author(),
