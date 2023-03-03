@@ -83,6 +83,7 @@ bool launch_url(const char *url)
         (*env)->CallVoidMethod(env, activity, method_id, jdata);
         (*env)->DeleteLocalRef(env, jdata);
 
+        (*env)->DeleteLocalRef(env, class_id);
         (void)file_exists;
 #elif defined(_WIN32)
         ShellExecuteA(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
