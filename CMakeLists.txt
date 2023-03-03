@@ -63,12 +63,10 @@ IF(UNIX)
   OPTION(DESKTOP_INSTALL "Add Open Surge to the Desktop menu when installing" ON)
 ENDIF()
 
-# Compile the development version?
-OPTION(BLEEDING_EDGE "Enable if using the development version" OFF)
-SET(BLEEDING_EDGE_VERSION "custom" CACHE STRING "Build version (bleeding edge)")
-IF(BLEEDING_EDGE)
-  LIST(APPEND DEFS "GAME_BUILD_VERSION=\"${BLEEDING_EDGE_VERSION}-dev\"")
-  MESSAGE(STATUS "Detected development version: ${BLEEDING_EDGE_VERSION}-dev")
+# Set the build type & version (optional; this helps identify the platform and the development builds)
+SET(GAME_BUILD_VERSION "" CACHE STRING "Build type & version (optional)")
+IF(NOT GAME_BUILD_VERSION STREQUAL "")
+  LIST(APPEND DEFS "GAME_BUILD_VERSION=\"${GAME_BUILD_VERSION}\"")
 ENDIF()
 
 # Set the build date
