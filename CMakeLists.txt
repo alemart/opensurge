@@ -70,8 +70,10 @@ IF(NOT GAME_BUILD_VERSION STREQUAL "")
 ENDIF()
 
 # Set the build date
-STRING(TIMESTAMP GAME_BUILD_DATE UTC)
-LIST(APPEND DEFS "GAME_BUILD_DATE=\"${GAME_BUILD_DATE}\"")
+OPTION(WANT_BUILD_DATE "Include the build date in the binary (disable for reproducible builds)" ON)
+IF(WANT_BUILD_DATE)
+  LIST(APPEND DEFS "GAME_BUILD_DATE=__DATE__")
+ENDIF()
 
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
@@ -530,7 +532,7 @@ ELSEIF(UNIX)
 
 ENDIF()
 
-# Use relative paths in __FILE__
+# Use relative paths in __FILE__ (reproducible builds)
 IF(NOT MSVC)
   TARGET_COMPILE_OPTIONS(${GAME_UNIXNAME} PUBLIC "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=.")
 ENDIF()

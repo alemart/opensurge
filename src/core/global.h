@@ -33,7 +33,7 @@
 
 /* Build date */
 #ifndef GAME_BUILD_DATE
-#define GAME_BUILD_DATE         ""
+#define GAME_BUILD_DATE         "undefined"
 #endif
 
 /* Build version */
