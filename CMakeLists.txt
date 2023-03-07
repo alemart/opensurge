@@ -350,6 +350,7 @@ SET(GAME_SRCS
   src/scripting/mouse.c
   src/scripting/music.c
   src/scripting/obstaclemap.c
+  src/scripting/platform.c
   src/scripting/player.c
   src/scripting/prefs.c
   src/scripting/screen.c
