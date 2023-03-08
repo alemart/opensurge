@@ -29,7 +29,12 @@
 #include "stringutil.h"
 #include "asset.h"
 
-#define WANT_IMPORT_WIZARD (!defined(__ANDROID__))
+#if defined(__ANDROID__)
+#define WANT_IMPORT_WIZARD 0
+#else
+#define WANT_IMPORT_WIZARD 1
+#endif
+
 #if WANT_IMPORT_WIZARD
 #include <allegro5/allegro_native_dialog.h>
 #else
