@@ -1046,13 +1046,21 @@ group_t *create_grouptree()
 
     /* section: graphics */
     graphics = group_graphics_create();
+
 #if ENABLE_RESOLUTION
     group_addchild(graphics, group_resolution_create());
 #else
     (void)group_resolution_create;
 #endif
+
+#if !defined(__ANDROID__)
     group_addchild(graphics, group_fullscreen_create());
+#else
+    (void)group_fullscreen_create;
+#endif
+
     group_addchild(graphics, group_fps_create());
+
 
     /* section: game */
     game = group_game_create();
