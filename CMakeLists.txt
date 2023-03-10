@@ -26,7 +26,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT(opensurge)
 SET(GAME_UNIXNAME "${CMAKE_PROJECT_NAME}")
-SET(GAME_NAME "Open Surge")
+SET(GAME_NAME "Open Surge Engine")
 FUNCTION(READ_VERSION VERSION_STRING)
   SET(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/core/global.h")
   SET(VERSION_MAIN_REGEX "#define[ \t]+GAME_VERSION_SUP[ \t]+(.+)")
@@ -45,7 +45,7 @@ FUNCTION(READ_VERSION VERSION_STRING)
 ENDFUNCTION()
 READ_VERSION(GAME_VERSION)
 MESSAGE("${GAME_NAME} version ${GAME_VERSION}")
-SET(HELP "Tweak CMake options or get help at opensurge2d.org")
+SET(HELP "Tweak the CMake options or get help at opensurge2d.org")
 
 # Default config
 SET(CMAKE_C_STANDARD 99)
