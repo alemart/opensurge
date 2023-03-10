@@ -39,7 +39,7 @@ object "Base Collectible" is "private", "entity"
             player.collectibles += value;
             sfx.play();
             actor.anim = 1;
-            actor.zindex = 0.51;
+            actor.zindex = 0.5001;
             state = "disappearing";
         }
     }
@@ -265,7 +265,7 @@ object "Lucky Collectible" is "private", "entity", "awake"
 
     fun constructor()
     {
-        base.zindex = 1.0;
+        base.zindex = 1.001; // group these in the render queue
     }
 
 
