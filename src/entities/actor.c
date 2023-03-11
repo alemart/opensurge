@@ -34,6 +34,7 @@
 /* private stuff */
 #define is_transition_animation(anim) ((anim)->next != NULL) /* is anim a transition animation? */
 static void update_animation(actor_t *act);
+static bool can_be_clipped_out(const actor_t* act, v2d_t topleft);
 
 
 /*
@@ -84,7 +85,7 @@ void actor_destroy(actor_t *act)
 void actor_render(actor_t *act, v2d_t camera_position)
 {
     if(act->visible && act->animation != NULL) {
-        image_t* img = actor_image(act);
+        const image_t* img = actor_image(act);
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
 
         /* update animation */
@@ -111,10 +112,12 @@ void actor_render(actor_t *act, v2d_t camera_position)
             else
                 image_draw_scaled(img, (int)(act->position.x - act->hot_spot.x*act->scale.x - topleft.x), (int)(act->position.y - act->hot_spot.y*act->scale.y - topleft.y), act->scale, act->mirror);
         }
-        else if(!nearly_equal(act->alpha, 1.0f))
-            image_draw_trans(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->alpha, act->mirror);
-        else
-            image_draw(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->mirror);
+        else if(!can_be_clipped_out(act, topleft)) {
+            if(!nearly_equal(act->alpha, 1.0f))
+                image_draw_trans(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->alpha, act->mirror);
+            else
+                image_draw(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->mirror);
+        }
     }
 }
 
@@ -335,6 +338,22 @@ void update_animation(actor_t *act)
     }
 }
 
+/* Checks if the actor can be clipped out (rendering) */
+bool can_be_clipped_out(const actor_t* act, v2d_t topleft)
+{
+    int x = (int)(act->position.x - act->hot_spot.x - topleft.x);
+    int y = (int)(act->position.y - act->hot_spot.y - topleft.y);
+
+    const image_t* img = actor_image(act);
+    int w = image_width(img);
+    int h = image_height(img);
+
+    const image_t* backbuffer = video_get_backbuffer();
+    int sw = image_width(backbuffer);
+    int sh = image_height(backbuffer);
+
+    return (x + w <= 0 || x >= sw || y + h <= 0 || y >= sh);
+}
 
 
 

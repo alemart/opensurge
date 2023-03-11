@@ -108,6 +108,7 @@ static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
 static bool is_player_standing_on_platform(const player_t *player, const brick_t *brk);
+static bool can_be_clipped_out(const brick_t* brick, v2d_t topleft);
 static int brickdata_count = 0; /* size of brickdata[] */
 static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
 
@@ -604,7 +605,9 @@ void brick_render(const brick_t *brk, v2d_t camera_position)
 {
     if(brk->brick_ref->behavior != BRB_MARKER) {
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
-        image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
+
+        if(!can_be_clipped_out(brk, topleft))
+            image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
     }
 }
 
@@ -616,10 +619,12 @@ void brick_render_debug(const brick_t *brk, v2d_t camera_position)
 {
     v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
 
-    if(brk->layer != BRL_DEFAULT)
-        image_draw_lit(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, brick_util_layercolor(brk->layer), get_image_flags(brk));
-    else
-        image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
+    if(!can_be_clipped_out(brk, topleft)) {
+        if(brk->layer != BRL_DEFAULT)
+            image_draw_lit(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, brick_util_layercolor(brk->layer), get_image_flags(brk));
+        else
+            image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
+    }
 }
 
 /*
@@ -630,7 +635,9 @@ void brick_render_mask(const brick_t *brk, v2d_t camera_position)
 {
     if(brk->brick_ref->maskimg != NULL) {
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
-        image_draw(brk->brick_ref->maskimg, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
+
+        if(!can_be_clipped_out(brk, topleft))
+            image_draw(brk->brick_ref->maskimg, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
     }
 }
 
@@ -1025,6 +1032,22 @@ bool is_player_standing_on_platform(const player_t *player, const brick_t *brk)
     return physicsactor_is_standing_on_platform(player->pa, brk->obstacle);
 }
 
+/* Checks if the brick can be clipped out (rendering) */
+bool can_be_clipped_out(const brick_t* brick, v2d_t topleft)
+{
+    int x = brick->x - (int)topleft.x;
+    int y = brick->y - (int)topleft.y;
+
+    const image_t* img = brick->image;
+    int w = image_width(img);
+    int h = image_height(img);
+
+    const image_t* backbuffer = video_get_backbuffer();
+    int sw = image_width(backbuffer);
+    int sh = image_height(backbuffer);
+
+    return (x + w <= 0 || x >= sw || y + h <= 0 || y >= sh);
+}
 
 
 
