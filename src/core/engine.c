@@ -99,6 +99,7 @@ extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_touch_event(const ALLEGRO_EVENT* event);
 extern void a5_handle_video_event(const ALLEGRO_EVENT* event);
+extern void a5_handle_back_event(const ALLEGRO_EVENT* event);
 
 /* Global Prefs */
 prefs_t* prefs = NULL; /* public */
@@ -191,6 +192,8 @@ void engine_mainloop()
             case ALLEGRO_EVENT_KEY_DOWN:
             case ALLEGRO_EVENT_KEY_UP:
                 a5_handle_keyboard_event(&event);
+                if(event.keyboard.keycode == ALLEGRO_KEY_BACK)
+                    a5_handle_back_event(&event);
                 break;
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:

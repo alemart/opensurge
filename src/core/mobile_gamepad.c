@@ -204,6 +204,9 @@ static actor_t* actor[] = {
     [ACTION_BUTTON] = NULL
 };
 
+/* indicates the pressing of the back button or the performing of a back gesture on a smartphone */
+static bool back_pressed = false;
+
 /* misc */
 static void trigger(int control, v2d_t offset);
 static void animate_actors();
@@ -211,7 +214,6 @@ static void update_actors();
 static void render_actors();
 static void handle_fade_effect();
 static void enable_linear_filtering();
-static bool is_back_button_down();
 static v2d_t dpad_stick_offset(float scale);
 
 
@@ -230,10 +232,11 @@ void mobilegamepad_init(int _flags)
     LOG("Initializing the mobile gamepad...");
 
     /* reset the state */
+    flags = _flags;
     current_state = IDLE_STATE;
     is_available = false;
     is_visible = false;
-    flags = _flags;
+    back_pressed = false;
 
     /* request touch input */
     if(flags & MOBILEGAMEPAD_WANT_TOUCH_INPUT) {
@@ -312,8 +315,10 @@ void mobilegamepad_update()
     current_state = IDLE_STATE;
 
     /* the back button works regardless of the visibility of the mobile gamepad */
-    if(is_back_button_down())
+    if(back_pressed) {
         current_state.buttons |= MOBILEGAMEPAD_BUTTON_BACK;
+        back_pressed = false;
+    }
 
     /* detect if something is pressed on the screen,
        but only if the mobile gamepad is visible */
@@ -570,13 +575,18 @@ void enable_linear_filtering()
     }
 }
 
-/* check if the back button [of the smartphone] is being pressed */
-bool is_back_button_down()
+/* handle a keyboard ALLEGRO_KEY_BACK event */
+void a5_handle_back_event(const ALLEGRO_EVENT* event)
 {
-    ALLEGRO_KEYBOARD_STATE keyboard_state;
-    al_get_keyboard_state(&keyboard_state);
+    /* When triggering the back button or performing a back gesture on Android,
+       we receive a keyDown event followed by a keyUp event - possibly in the
+       same frame. Therefore, let's just focus on the keyUp event. */
+    if(event->type == ALLEGRO_EVENT_KEY_UP && event->keyboard.keycode == ALLEGRO_KEY_BACK) {
 
-    return al_key_down(&keyboard_state, ALLEGRO_KEY_BACK);
+        /* we clear up this flag in the main loop */
+        back_pressed = true;
+
+    }
 }
 
 /* compute the current offset of the dpad stick
