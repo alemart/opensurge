@@ -171,14 +171,14 @@ void engine_mainloop()
                 /* update game logic */
                 ALLEGRO_EVENT next_event;
 
-                /* updating the managers */
+                /* update the managers */
                 timer_update();
                 audio_update();
                 mobilegamepad_update();
                 input_update();
                 clean_garbage();
 
-                /* updating the current scene */
+                /* update the current scene */
                 current_scene = scenestack_top();
                 current_scene->update();
                 must_redraw = (current_scene == scenestack_top()); /* same scene? */
