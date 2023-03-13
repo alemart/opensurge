@@ -228,12 +228,14 @@ void engine_mainloop()
                 is_active = false;
                 al_stop_timer(timer);
                 timer_pause();
+                al_set_default_voice(NULL);
                 a5_handle_video_event(&event);
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
                 logfile_message("Received an ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING");
                 a5_handle_video_event(&event);
+                al_restore_default_mixer();
                 timer_resume();
                 al_start_timer(timer);
                 is_active = true;
