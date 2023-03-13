@@ -124,6 +124,8 @@ CREDITS_RES_SCRIPTS_TEXT    "Autori su prepoznati u samim skriptama."
 // Title Screen
 TITLESCREEN_PLAY            "ZAPOČNI IGRU"
 TITLESCREEN_OPTIONS         "POSTAVKE"
+TITLESCREEN_SHARE           "PODIJELITE"
+TITLESCREEN_DONATE          "DONIRAJTE"
 TITLESCREEN_QUIT            "IZAĐI"
 TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed

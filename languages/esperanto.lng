@@ -124,6 +124,8 @@ CREDITS_RES_SCRIPTS_TEXT    "La aŭtoroj estas identigitaj en la propraj skripto
 // Title Screen
 TITLESCREEN_PLAY            "KOMENCI LUDON"
 TITLESCREEN_OPTIONS         "OPCIOJ"
+TITLESCREEN_SHARE           "DISKONIGI"
+TITLESCREEN_DONATE          "DONACI"
 TITLESCREEN_QUIT            "ELIRI"
 FIXME TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed

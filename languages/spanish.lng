@@ -123,6 +123,8 @@ CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los prop
 // Title Screen
 TITLESCREEN_PLAY            "EMPEZAR PARTIDA"
 TITLESCREEN_OPTIONS         "OPCIONES"
+TITLESCREEN_SHARE           "COMPARTIR"
+TITLESCREEN_DONATE          "DONAR"
 TITLESCREEN_QUIT            "SALIR"
 TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed

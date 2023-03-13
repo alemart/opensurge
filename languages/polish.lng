@@ -124,6 +124,8 @@ CREDITS_RES_SCRIPTS_TEXT    "Autorzy wymienieni zostali wewnątrz skryptów."
 // Title Screen
 TITLESCREEN_PLAY            "NOWA GRA"
 TITLESCREEN_OPTIONS         "USTAWIENIA"
+TITLESCREEN_SHARE           "PODAJ DALEJ"
+TITLESCREEN_DONATE          "ZRÓB DONATE"
 TITLESCREEN_QUIT            "WYJDŹ"
 TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed

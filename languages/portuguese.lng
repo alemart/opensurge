@@ -122,8 +122,10 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts."
 
 // Title Screen
-TITLESCREEN_PLAY            "INICIAR JOGO"
+TITLESCREEN_PLAY            "JOGAR"
 TITLESCREEN_OPTIONS         "CONFIGURAR"
+TITLESCREEN_SHARE           "COMPARTILHAR"
+TITLESCREEN_DONATE          "DOAR"
 TITLESCREEN_QUIT            "SAIR"
 TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed

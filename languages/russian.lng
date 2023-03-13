@@ -127,6 +127,8 @@ CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих
 // v5
 TITLESCREEN_PLAY            "НАЧАТЬ ИГРУ"
 TITLESCREEN_OPTIONS         "НАСТРОЙКИ"
+TITLESCREEN_SHARE           "ПОДЕЛИТЬСЯ"
+TITLESCREEN_DONATE          "ПОДДЕРЖАТЬ"
 TITLESCREEN_QUIT            "ВЫХОД"
 TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed

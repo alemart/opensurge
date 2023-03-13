@@ -123,6 +123,8 @@ CREDITS_RES_SCRIPTS_TEXT    "The authors are identified within the scripts thems
 // Title Screen
 TITLESCREEN_PLAY            "START GAME"
 TITLESCREEN_OPTIONS         "OPTIONS"
+TITLESCREEN_SHARE           "SHARE"
+TITLESCREEN_DONATE          "DONATE"
 TITLESCREEN_QUIT            "QUIT"
 TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
