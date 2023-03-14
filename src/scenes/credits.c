@@ -59,7 +59,7 @@ static int text_height;
 #define ASSETS_CATEGORIES 6
 #define ASSETS_TEXT_MAXLEN 65536
 extern const char CREDITS_ASSETS_CSV[];
-static char assets_text_buffer[ASSETS_CATEGORIES * ASSETS_TEXT_MAXLEN];
+static char assets_text_buffer[ASSETS_CATEGORIES * ASSETS_TEXT_MAXLEN] = "";
 static const char* assets_filter[ASSETS_CATEGORIES] = { "music", "level", "image", "translation", "sound", "font" };
 static void aggregate_assets(int field_count, const char** fields, int line_number, void* user_data);
 typedef struct {
@@ -79,16 +79,12 @@ typedef struct {
  */
 void credits_init(void *foo)
 {
-    const char* assets_arguments[ASSETS_CATEGORIES];
+    /* generate the credits text */
+    const char* base_text;
+    const char** assets_argv;
+    int assets_argc;
 
-    /* parse the text from the assets CSV file */
-    for(int i = 0; i < ASSETS_CATEGORIES; i++) {
-        char* text_buffer = assets_text_buffer + i * ASSETS_TEXT_MAXLEN;
-        assets_aggregator_t helper = { assets_filter[i], "", "", 0 };
-        csv_parse(CREDITS_ASSETS_CSV, ";", aggregate_assets, &helper);
-        str_cpy(text_buffer, helper.text_buffer, ASSETS_TEXT_MAXLEN);
-        assets_arguments[i] = text_buffer;
-    }
+    credits_text(&base_text, &assets_argc, &assets_argv);
 
     /* load components */
     quit = false;
@@ -110,8 +106,8 @@ void credits_init(void *foo)
 
     /* load the font that will display the credits */
     text = font_create("MenuText");
-    font_set_textargumentsv(text, ASSETS_CATEGORIES, assets_arguments);
-    font_set_text(text, "%s", CREDITS_TEXT);
+    font_set_textargumentsv(text, assets_argc, assets_argv);
+    font_set_text(text, "%s", base_text);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
     text_height = font_get_textsize(text).y;
@@ -204,6 +200,33 @@ void credits_render()
     font_render(back, cam);
 }
 
+/*
+ * credits_text()
+ * Generates the credits text and stores it in statically allocated buffers
+ */
+void credits_text(const char** base_text, int* assets_argc, const char*** assets_argv)
+{
+    const char* assets_arguments[ASSETS_CATEGORIES];
+    bool uninitialized = (*assets_text_buffer == '\0');
+
+    /* parse the text from the assets CSV file */
+    for(int i = 0; i < ASSETS_CATEGORIES; i++) {
+        char* text_buffer = assets_text_buffer + i * ASSETS_TEXT_MAXLEN;
+
+        if(uninitialized) {
+            assets_aggregator_t helper = { assets_filter[i], "", "", 0 };
+            csv_parse(CREDITS_ASSETS_CSV, ";", aggregate_assets, &helper);
+            str_cpy(text_buffer, helper.text_buffer, ASSETS_TEXT_MAXLEN);
+        }
+
+        assets_arguments[i] = text_buffer;
+    }
+
+    /* return the credits text */
+    *base_text = CREDITS_TEXT;
+    *assets_argc = ASSETS_CATEGORIES;
+    *assets_argv = assets_arguments;
+}
 
 /* private stuff */
 

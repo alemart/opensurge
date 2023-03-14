@@ -27,4 +27,7 @@ void credits_release();
 void credits_update();
 void credits_render();
 
+/* generates the credits text and stores it in statically allocated buffers */
+void credits_text(const char** base_text, int* assets_argc, const char*** assets_argv);
+
 #endif
