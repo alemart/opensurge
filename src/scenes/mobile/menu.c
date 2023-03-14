@@ -33,7 +33,10 @@
 #include "../../core/input.h"
 #include "../../core/logfile.h"
 #include "../../entities/actor.h"
+#include "../../entities/sfx.h"
+#include "../../core/mobile_gamepad.h"
 #include "../../scenes/level.h"
+#include "../../scenes/quest.h"
 
 /* buttons */
 typedef enum mobilemenu_button_t mobilemenu_button_t;
@@ -92,7 +95,7 @@ enum mobilemenustate_t
     TRIGGERED_SCREENSHOT,
     TRIGGERED_DEBUG,
     TRIGGERED_INFO,
-    TRIGGERED_CREDITS,
+    TRIGGERED_CREDITS
 };
 
 static const mobilemenustate_t TRIGGERED_STATE[] = {
@@ -142,6 +145,12 @@ static const float FADE_TIME = 0.25f; /* in seconds */
 static const image_t* screenshot = NULL;
 static image_t* background = NULL;
 
+/* developer mode trick */
+static const float WARP_TRICK_TIME = 3.0f; /* in seconds */
+static float warp_trick_elapsed = 0.0f;
+static bool prepared_to_warp = false;
+static void warp_to_developer_mode();
+
 
 /*
  * mobilemenu_init()
@@ -156,6 +165,8 @@ void mobilemenu_init(void *game_screenshot)
     background = image_clone(video_get_backbuffer());
     mouse_input = input_create_mouse();
     input = input_create_user(NULL);
+    warp_trick_elapsed = 0.0f;
+    prepared_to_warp = false;
 
     v2d_t button_position = INITIAL_BUTTON_POSITION;
     for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++) {
@@ -311,6 +322,18 @@ void update_waiting()
     for(mobilemenu_button_t b = 0; b < BUTTON_COUNT; b++)
         animate_button(b);
 
+    /* handle the developer mode warp trick */
+    if(button[BUTTON_CREDITS].state == PRESSED && !prepared_to_warp) {
+        warp_trick_elapsed += timer_get_delta();
+        if(warp_trick_elapsed >= WARP_TRICK_TIME) {
+            button[BUTTON_CREDITS].state = UNPRESSED;
+            prepared_to_warp = true;
+            sound_play(SFX_SECRET);
+        }
+    }
+    else
+        warp_trick_elapsed = 0.0f;
+
     /* check if the back button of the smartphone has been pressed */
     if(input_button_pressed(input, BACK_BUTTON))
         state = TRIGGERED_STATE[BUTTON_BACK]; /* behaves the same as pressing BACK on the screen */
@@ -363,9 +386,40 @@ void update_triggered_credits()
 
     state = WAITING;
 
+    if(prepared_to_warp) {
+        warp_to_developer_mode();
+        return;
+    }
+
     mobile_subscene_t* subscene = mobile_subscene_credits();
     scenestack_push(storyboard_get_scene(SCENE_MOBILEPOPUP), subscene);
 }
+
+
+
+
+/* warp to developer mode */
+void warp_to_developer_mode()
+{
+    LOG("WARPING TO DEVELOPER MODE");
+    prepared_to_warp = false;
+    warp_trick_elapsed = 0.0f;
+
+    /* restart the game */
+    while(!scenestack_empty())
+        scenestack_pop();
+
+    scenestack_push(storyboard_get_scene(SCENE_QUEST), "quests/intro.qst"); /* hard coded path :\ */
+    scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
+
+    /* warp to the developer mode */
+    bool developer_mode = true;
+    scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &developer_mode);
+
+    /* call these after releasing and initializing the other scenes */
+    mobilegamepad_fadein();
+}
+
 
 
 
