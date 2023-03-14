@@ -86,8 +86,6 @@ void intro_init(void *foo)
 
     /* misc */
     fadefx_in(color_rgb(0,0,0), INTRO_FADETIME);
-    music_stop();
-    mobilegamepad_fadeout();
 }
 
 /*
@@ -110,6 +108,10 @@ void intro_update()
 {
     static int cnt = 0;
 
+    /* reset state */
+    mobilegamepad_fadeout();
+    music_stop();
+
     /* elapsed time */
     elapsed_time += timer_get_delta();
 
@@ -123,6 +125,8 @@ void intro_update()
             scenestack_pop();
             if(developer_mode)
                 scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &developer_mode);
+
+            mobilegamepad_fadein();
             return;
         }
         fadefx_out(color_rgb(0,0,0), INTRO_FADETIME);
