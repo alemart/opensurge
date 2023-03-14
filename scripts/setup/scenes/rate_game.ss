@@ -107,7 +107,7 @@ object "Rate the Game" is "setup"
 // This object memorizes when the user has rated the game
 object "Rate the Game - Rating Time"
 {
-    key = "rate-game-time";
+    key = generateKey("rate-game-time");
 
     fun memorize()
     {
@@ -134,7 +134,17 @@ object "Rate the Game - Rating Time"
         daysInAYear = 365;
         oneYear = secondsInADay * daysInAYear;
 
-        return oneYear; // ask once in a year
+        return oneYear; // ask once in a year (per key)
+    }
+
+    fun generateKey(prefix)
+    {
+        isDevelopmentBuild = (SurgeEngine.version.indexOf("-dev") >= 0);
+
+        if(isDevelopmentBuild)
+            return prefix + "-" + SurgeEngine.version;
+        else
+            return prefix;
     }
 }
 
