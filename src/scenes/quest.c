@@ -59,7 +59,7 @@ void quest_init(void *path_to_qst_file)
     stack[top].next_level = 0;
     stack[top].abort_quest = false;
 
-    logfile_message("Pushed quest \"%s\" (\"%s\") onto the quest stack...", stack[top].current_quest->file, stack[top].current_quest->name);
+    logfile_message("Pushed quest \"%s\" onto the quest stack...", stack[top].current_quest->file);
 }
 
 /*
@@ -68,13 +68,17 @@ void quest_init(void *path_to_qst_file)
  */
 void quest_release()
 {
-    quest_unload(stack[top--].current_quest);
+    if(top >= 0) {
+        logfile_message("Popping quest \"%s\" from the stack...", stack[top].current_quest->file);
+        quest_unload(stack[top--].current_quest);
+    }
+
     logfile_message("The quest has been released.");
 }
 
 /*
  * quest_render()
- * Actually, this function does nothing
+ * This function does nothing
  */
 void quest_render()
 {
@@ -100,9 +104,9 @@ void quest_update()
     else {
         /* the user has cleared (or exited) the quest! */
         logfile_message(
-            "Quest '%s' has been %s Popping...",
+            "Quest \"%s\" has been %s.",
             stack[top].current_quest->file,
-            (stack[top].abort_quest ? "aborted." : "cleared!")
+            (stack[top].abort_quest ? "aborted" : "cleared")
         );
         scenestack_pop();
     }
@@ -110,7 +114,7 @@ void quest_update()
 
 /*
  * quest_abort()
- * Aborts the current quest, popping it from the stack
+ * Aborts the current quest. It will be popped from the stack
  */
 void quest_abort()
 {

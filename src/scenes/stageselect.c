@@ -261,10 +261,24 @@ void stageselect_update()
                 player_set_score(0);
 
                 /* push the next scene */
-                if(selected_stage->is_quest)
+                if(selected_stage->is_quest) {
+
+                    /* selected_stage->filepath is a .qst file */
                     scenestack_push(storyboard_get_scene(SCENE_QUEST), selected_stage->filepath);
-                else
-                    scenestack_push(storyboard_get_scene(SCENE_LEVEL), selected_stage->filepath);
+
+                }
+                else {
+
+                    /* selected_stage->filepath is a .lev file */
+
+                    /* Let's open it as a quest anyway. During gameplay, the top-most quest
+                       may be aborted for any reason. If this happens, we don't want this
+                       fact to affect any previously loaded quests. */
+
+                    /* open the .lev file as a quest containing a single level */
+                    scenestack_push(storyboard_get_scene(SCENE_QUEST), selected_stage->filepath);
+
+                }
 
                 /* done! */
                 state = STAGESTATE_FADEIN;

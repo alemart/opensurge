@@ -34,6 +34,8 @@
 
 /* private stuff */
 static int traverse_quest(const parsetree_statement_t* stmt, void *quest);
+static bool has_extension(const char* filepath, const char* extension);
+static quest_t* create_single_level_quest(quest_t* q, const char* path_to_lev_file);
 
 
 
@@ -43,8 +45,7 @@ static int traverse_quest(const parsetree_statement_t* stmt, void *quest);
  */
 quest_t *quest_load(const char *filepath)
 {
-    quest_t *q = mallocx(sizeof *q);
-    parsetree_program_t *prog;
+    quest_t* q = mallocx(sizeof *q);
     const char* fullpath;
 
     logfile_message("Loading quest \"%s\"...", filepath);
@@ -59,9 +60,26 @@ quest_t *quest_load(const char *filepath)
     q->level_count = 0;
 
     /* reading the quest */
-    prog = nanoparser_construct_tree(fullpath);
-    nanoparser_traverse_program_ex(prog, (void*)q, traverse_quest);
-    prog = nanoparser_deconstruct_tree(prog);
+    if(has_extension(filepath, ".qst")) {
+
+        /* read quest file */
+        parsetree_program_t* prog = nanoparser_construct_tree(fullpath);
+        nanoparser_traverse_program_ex(prog, (void*)q, traverse_quest);
+        nanoparser_deconstruct_tree(prog);
+
+    }
+    else if(has_extension(filepath, ".lev")) {
+
+        /* implicitly create a quest with a single level */
+        create_single_level_quest(q, filepath);
+
+    }
+    else {
+
+        /* not a quest file */
+        fatal_error("Can't load quest file \"%s\"", filepath);
+
+    }
 
     /* success! */
     logfile_message("Quest \"%s\" has been loaded successfully!", q->name);
@@ -150,4 +168,27 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
     }
 
     return 0;
+}
+
+/* create a quest structure with a single level (give a relative path to a .lev file) */
+quest_t* create_single_level_quest(quest_t* q, const char* path_to_lev_file)
+{
+    free(q->file);
+    free(q->name);
+
+    q->file = str_dup(path_to_lev_file);
+    q->name = str_dup(path_to_lev_file);
+
+    q->level_path[0] = str_dup(path_to_lev_file);
+    q->level_count = 1;
+
+    return q;
+}
+
+/* checks if the provided filepath has the given extension (include the '.' at the extension) */
+bool has_extension(const char* filepath, const char* extension)
+{
+    const char* ext = strrchr(filepath, '.');
+
+    return (ext != NULL) && (0 == str_icmp(ext, extension));
 }
