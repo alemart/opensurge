@@ -133,7 +133,6 @@ the directory of the executable (which is the default behavior). Simply put,
 static const char* WHITELIST[] = {
 
     EXACT("surge.prefs"),
-    EXACT("surge.rocks"),
     EXACT("surge.cfg"),
 
     EXACT("quests/default.qst"),
@@ -162,6 +161,7 @@ static const char* BLACKLIST[] = {
     EXACT("opensurge"),
     EXACT("logfile.txt"),
     EXACT(IMPORT_LOGFILE_NAME),
+    EXACT("surge.rocks"),
 
     EXACT("CMakeLists.txt"),
     PREFIX("src/"),
