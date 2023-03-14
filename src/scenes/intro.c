@@ -44,7 +44,7 @@
 #define PRIMARY_COLOR       "424c6e"
 #define SECONDARY_COLOR     "657392"
 static float elapsed_time;
-static bool debug_mode;
+static bool developer_mode;
 static font_t* fnt;
 static input_t* in;
 static image_t* box;
@@ -63,7 +63,7 @@ void intro_init(void *foo)
 
     /* initialize variables */
     elapsed_time = 0.0f;
-    debug_mode = false;
+    developer_mode = false;
     in = input_create_user(NULL);
 
     /* create box */
@@ -121,8 +121,8 @@ void intro_update()
     if(elapsed_time >= INTRO_TIMEOUT) {
         if(fadefx_is_over()) {
             scenestack_pop();
-            if(debug_mode)
-                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &debug_mode);
+            if(developer_mode)
+                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &developer_mode);
             return;
         }
         fadefx_out(color_rgb(0,0,0), INTRO_FADETIME);
@@ -130,10 +130,10 @@ void intro_update()
 
     /* secret */
     if(input_button_pressed(in, IB_RIGHT)) {
-        if(!debug_mode && ++cnt == 3) {
+        if(!developer_mode && ++cnt == 3) {
             sound_play(SFX_SECRET);
             elapsed_time += INTRO_TIMEOUT;
-            debug_mode = true;
+            developer_mode = true;
             cnt = 0;
         }
     }
