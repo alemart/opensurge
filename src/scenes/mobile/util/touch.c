@@ -25,6 +25,10 @@
 
 static const inputbutton_t ACTION_BUTTON = IB_FIRE1;
 static v2d_t read_mouse_position(input_t* mouse_input);
+static void on_touch_start_adapter(v2d_t touch_start, void* data);
+static void on_touch_end_adapter(v2d_t touch_start, v2d_t touch_end, void* data);
+static void on_touch_move_adapter(v2d_t touch_start, v2d_t touch_current, void* data);
+
 
 
 
@@ -35,23 +39,35 @@ static v2d_t read_mouse_position(input_t* mouse_input);
  */
 void handle_touch_input(input_t* mouse_input, void (*on_touch_start)(v2d_t), void (*on_touch_end)(v2d_t,v2d_t), void (*on_touch_move)(v2d_t,v2d_t))
 {
+    void* callback[] = { on_touch_start, on_touch_end, on_touch_move };
+    handle_touch_input_ex(mouse_input, callback, on_touch_start_adapter, on_touch_end_adapter, on_touch_move_adapter);
+}
+
+
+
+/*
+ * handle_touch_input_ex()
+ * Works like handle_touch_input() with an extra user-provided data parameter
+ */
+void handle_touch_input_ex(input_t* mouse_input, void* data, void (*on_touch_start)(v2d_t,void*), void (*on_touch_end)(v2d_t,v2d_t,void*), void (*on_touch_move)(v2d_t,v2d_t,void*))
+{
     /* only a single touch point is supported at the moment */
     static v2d_t touch_start, touch_end;
 
     if(input_button_released(mouse_input, ACTION_BUTTON)) {
         touch_end = read_mouse_position(mouse_input);
         if(on_touch_end != NULL)
-            on_touch_end(touch_start, touch_end);
+            on_touch_end(touch_start, touch_end, data);
     }
     else if(input_button_pressed(mouse_input, ACTION_BUTTON)) {
         touch_start = read_mouse_position(mouse_input);
         if(on_touch_start != NULL)
-            on_touch_start(touch_start);
+            on_touch_start(touch_start, data);
     }
     else if(input_button_down(mouse_input, ACTION_BUTTON)) {
         v2d_t touch_current = read_mouse_position(mouse_input);
         if(on_touch_move != NULL)
-            on_touch_move(touch_start, touch_current);
+            on_touch_move(touch_start, touch_current, data);
     }
 }
 
@@ -70,4 +86,34 @@ v2d_t read_mouse_position(input_t* mouse_input)
     v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
 
     return mouse;
+}
+
+/* touch start adapter */
+void on_touch_start_adapter(v2d_t touch_start, void* data)
+{
+    void** callback = (void**)data;
+    void (*on_touch_start)(v2d_t) = (void(*)(v2d_t))(callback[0]);
+
+    if(on_touch_start != NULL)
+        on_touch_start(touch_start);
+}
+
+/* touch end adapter */
+void on_touch_end_adapter(v2d_t touch_start, v2d_t touch_end, void* data)
+{
+    void** callback = (void**)data;
+    void (*on_touch_end)(v2d_t,v2d_t) = (void(*)(v2d_t,v2d_t))(callback[1]);
+
+    if(on_touch_end != NULL)
+        on_touch_end(touch_start, touch_end);
+}
+
+/* touch move adapter */
+void on_touch_move_adapter(v2d_t touch_start, v2d_t touch_current, void* data)
+{
+    void** callback = (void**)data;
+    void (*on_touch_move)(v2d_t,v2d_t) = (void(*)(v2d_t,v2d_t))(callback[2]);
+
+    if(on_touch_move != NULL)
+        on_touch_move(touch_start, touch_current);
 }

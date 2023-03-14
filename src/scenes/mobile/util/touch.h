@@ -26,5 +26,6 @@
 struct input_t;
 
 void handle_touch_input(struct input_t* mouse_input, void (*on_touch_start)(v2d_t), void (*on_touch_end)(v2d_t,v2d_t), void (*on_touch_move)(v2d_t,v2d_t));
+void handle_touch_input_ex(struct input_t* mouse_input, void* data, void (*on_touch_start)(v2d_t,void*), void (*on_touch_end)(v2d_t,v2d_t,void*), void (*on_touch_move)(v2d_t,v2d_t,void*));
 
 #endif
