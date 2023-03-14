@@ -1,0 +1,86 @@
+// -----------------------------------------------------------------------------
+// File: rate_game.spr
+// Description: sprite script - "Rate the Game" scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Rate the Game - Dialog"
+{
+    source_file     "images/scenes/rate_game.png"
+    source_rect     0 0 426 240
+    frame_size      426 240
+    hot_spot        0 0
+
+    animation
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Rate the Game - Desktop Menu - Cursor"
+{
+    source_file     "images/scenes/rate_game.png"
+    source_rect     320 368 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Rate the Game - Mobile Menu - Primary Button"
+{
+    source_file     "images/scenes/rate_game.png"
+    source_rect     0 368 160 64
+    frame_size      160 32
+    hot_spot        80 16
+    action_spot     80 8
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Rate the Game - Mobile Menu - Secondary Button"
+{
+    source_file     "images/scenes/rate_game.png"
+    source_rect     160 368 160 64
+    frame_size      160 32
+    hot_spot        80 16
+    action_spot     80 8
+
+    // default
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}

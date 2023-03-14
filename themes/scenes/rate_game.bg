@@ -1,0 +1,29 @@
+// -----------------------------------------------------------------------------
+// File: rate_game.bg
+// Description: background script for the "Rate the Game" scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            LINEAR -32 32
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/scenes/rate_game.png"
+        source_rect     0 240 128 128
+        frame_size      128 128
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}

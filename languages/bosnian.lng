@@ -135,6 +135,13 @@ ENDOFDEMO_CONTINUE          "NASTAVI"
 ENDOFDEMO_VERSION           "DEMO 1.1\n"
 ENDOFDEMO_TEXT              "Hvala vam što ste igrali! Surge the Rabbit je u razvoju.\n\nPosjetite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> za ažuriranja!\n\nSada da vidimo kako i vi možete praviti vlastite igre!"
 
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+FIXME RATEGAME_TITLE              "Enjoying Surge the Rabbit?"
+FIXME RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
+FIXME RATEGAME_YES                "Sure!!!"
+FIXME RATEGAME_NO                 "Not now"
+
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENI"
 MAINMENU_PLAY               "IGRAJ"
