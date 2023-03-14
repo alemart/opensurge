@@ -150,6 +150,8 @@ static const char* WHITELIST[] = {
 
     PREFIX("fonts/"), /* FIXME: should we have a fonts/overrides/ instead? */
 
+    EXACT("credits.txt"),
+
     /* NULL-terminated list */
     NULL
 

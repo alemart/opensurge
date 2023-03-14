@@ -22,6 +22,7 @@
 #include "menu.h"
 #include "util/touch.h"
 #include "subscenes/info.h"
+#include "subscenes/credits.h"
 #include "subscenes/screenshot.h"
 #include "../../core/scene.h"
 #include "../../core/storyboard.h"
@@ -44,6 +45,7 @@ enum mobilemenu_button_t
     BUTTON_SCREENSHOT,
     BUTTON_DEBUG,
     BUTTON_INFO,
+    BUTTON_CREDITS,
 
     BUTTON_COUNT
 };
@@ -59,7 +61,8 @@ static const char* SPRITE_NAME[] = {
     [BUTTON_BACK] = "Mobile Menu - Back",
     [BUTTON_SCREENSHOT] = "Mobile Menu - Screenshot",
     [BUTTON_DEBUG] = "Mobile Menu - Debug",
-    [BUTTON_INFO] = "Mobile Menu - Info"
+    [BUTTON_INFO] = "Mobile Menu - Info",
+    [BUTTON_CREDITS] = "Mobile Menu - Credits"
 };
 
 static const int ANIMATION_NUMBER[] = {
@@ -88,14 +91,16 @@ enum mobilemenustate_t
     TRIGGERED_BACK,
     TRIGGERED_SCREENSHOT,
     TRIGGERED_DEBUG,
-    TRIGGERED_INFO
+    TRIGGERED_INFO,
+    TRIGGERED_CREDITS,
 };
 
 static const mobilemenustate_t TRIGGERED_STATE[] = {
     [BUTTON_BACK] = TRIGGERED_BACK,
     [BUTTON_SCREENSHOT] = TRIGGERED_SCREENSHOT,
     [BUTTON_DEBUG] = TRIGGERED_DEBUG,
-    [BUTTON_INFO] = TRIGGERED_INFO
+    [BUTTON_INFO] = TRIGGERED_INFO,
+    [BUTTON_CREDITS] = TRIGGERED_CREDITS
 };
 
 static mobilemenustate_t state = APPEARING;
@@ -107,6 +112,7 @@ static void update_triggered_back();
 static void update_triggered_screenshot();
 static void update_triggered_debug();
 static void update_triggered_info();
+static void update_triggered_credits();
 static void (*update[])() = {
     [APPEARING] = update_appearing,
     [WAITING] = update_waiting,
@@ -115,7 +121,8 @@ static void (*update[])() = {
     [TRIGGERED_BACK] = update_triggered_back,
     [TRIGGERED_SCREENSHOT] = update_triggered_screenshot,
     [TRIGGERED_DEBUG] = update_triggered_debug,
-    [TRIGGERED_INFO] = update_triggered_info
+    [TRIGGERED_INFO] = update_triggered_info,
+    [TRIGGERED_CREDITS] = update_triggered_credits
 };
 
 
@@ -346,6 +353,17 @@ void update_triggered_info()
     state = WAITING;
 
     mobile_subscene_t* subscene = mobile_subscene_info();
+    scenestack_push(storyboard_get_scene(SCENE_MOBILEPOPUP), subscene);
+}
+
+/* triggered the credits button */
+void update_triggered_credits()
+{
+    LOG("Chose option: CREDITS");
+
+    state = WAITING;
+
+    mobile_subscene_t* subscene = mobile_subscene_credits();
     scenestack_push(storyboard_get_scene(SCENE_MOBILEPOPUP), subscene);
 }
 

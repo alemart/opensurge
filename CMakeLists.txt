@@ -311,6 +311,7 @@ SET(GAME_SRCS
   src/core/video.c
 
   src/scenes/mobile/subscenes/info.c
+  src/scenes/mobile/subscenes/credits.c
   src/scenes/mobile/subscenes/screenshot.c
   src/scenes/mobile/util/touch.c
   src/scenes/mobile/menu.c
@@ -434,6 +435,7 @@ SET(GAME_HEADERS
   src/core/v2d.h
 
   src/scenes/mobile/subscenes/info.h
+  src/scenes/mobile/subscenes/credits.h
   src/scenes/mobile/subscenes/screenshot.h
   src/scenes/mobile/subscenes/subscene.h
   src/scenes/mobile/util/touch.h

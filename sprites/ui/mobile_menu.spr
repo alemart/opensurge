@@ -100,3 +100,27 @@ sprite "Mobile Menu - Info"
         data        1
     }
 }
+
+sprite "Mobile Menu - Credits"
+{
+    source_file     "images/ui/mobile_menu.png"
+    source_rect     0 480 240 120
+    frame_size      120 120
+    hot_spot        0 0
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
