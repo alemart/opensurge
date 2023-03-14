@@ -427,11 +427,22 @@ void pause_release()
 
     }
 
+    #if 0
+
     /* restore the previous visibility of the mobile gamepad */
+    /* do we really want this? what if a script incorrectly disabled the controls? */
     if(!was_mobilegamepad_visible)
         mobilegamepad_fadeout(); /* seriously?! */
     else
         mobilegamepad_fadein(); /* just in case... */
+
+    #else
+
+    /* make the mobile gamepad visible no matter what */
+    mobilegamepad_fadein();
+    (void)was_mobilegamepad_visible;
+
+    #endif
 
     /* resume music & scripting */
     scripting_resume_vm();
