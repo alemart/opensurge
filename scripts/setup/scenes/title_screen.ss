@@ -18,6 +18,7 @@ using SurgeEngine.Camera;
 using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Lang;
 using SurgeEngine.Web;
+using SurgeEngine.Input.MobileGamepad;
 
 // ----------------------------------------------------------------------------
 // TITLE SCREEN: SETUP OBJECT
@@ -37,6 +38,8 @@ object "Title Screen" is "setup"
     {
         fader.fadeTime = 0.5;
         fader.fadeIn();
+
+        MobileGamepad.fadeIn();
     }
 }
 

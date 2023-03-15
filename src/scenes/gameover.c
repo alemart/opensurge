@@ -30,6 +30,7 @@
 #include "../core/image.h"
 #include "../core/timer.h"
 #include "../core/lang.h"
+#include "../core/mobile_gamepad.h"
 
 
 /* private data */
@@ -94,11 +95,15 @@ void gameover_update()
     /* timer */
     gameover_timer += dt;
 
+    /* mobile gamepad */
+    mobilegamepad_fadeout();
+
     /* fade out */
     if(gameover_timer >= GAMEOVER_APPEARTIME && !music_is_playing(music)) {
         if(fadefx_is_over()) {
             quest_abort();
             scenestack_pop();
+            mobilegamepad_fadein();
             return;
         }
         fadefx_out(color_rgb(0,0,0), GAMEOVER_FADETIME);

@@ -37,6 +37,7 @@
 #include "../core/logfile.h"
 #include "../core/stringutil.h"
 #include "../core/csv.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/sfx.h"
@@ -145,6 +146,9 @@ void credits_update()
 
     /* background movement */
     background_update(bgtheme);
+
+    /* display the mobile gamepad */
+    mobilegamepad_fadein();
 
     /* scroll the text faster */
     if(input_button_down(input, IB_DOWN))

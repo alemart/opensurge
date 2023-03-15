@@ -38,6 +38,7 @@
 #include "../core/font.h"
 #include "../core/prefs.h"
 #include "../core/web.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/sfx.h"
@@ -156,6 +157,9 @@ void options_update()
 
     /* background movement */
     background_update(bgtheme);
+
+    /* display the mobile gamepad */
+    mobilegamepad_fadein();
 
     /* menu option */
     if(!quit && jump_to == NULL && !fadefx_is_fading()) {

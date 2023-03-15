@@ -28,6 +28,7 @@ using SurgeEngine.Actor;
 using SurgeEngine.Player;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
+using SurgeEngine.Input.MobileGamepad;
 
 object "Default Title Card" is "entity", "awake", "detached", "private"
 {
@@ -40,6 +41,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
 
     state "main"
     {
+        MobileGamepad.fadeOut();
         actor.anim = 0;
         state = "warming up";
     }
@@ -72,6 +74,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
 
     state "disappearing"
     {
+        MobileGamepad.fadeIn();
         if(actor.animation.finished) {
             actor.anim = 4;
             state = "finishing up";

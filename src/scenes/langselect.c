@@ -37,6 +37,7 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/sfx.h"
@@ -160,6 +161,9 @@ void langselect_update()
 
     /* background movement */
     background_update(bgtheme);
+
+    /* display the mobile gamepad */
+    mobilegamepad_fadein();
 
     /* menu option */
     arrow->position = font_get_position(lngfnt[0][option]);

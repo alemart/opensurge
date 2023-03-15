@@ -42,6 +42,7 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/player.h"
@@ -176,6 +177,9 @@ void stageselect_update()
 
     /* background movement */
     background_update(bgtheme);
+
+    /* display the mobile gamepad */
+    mobilegamepad_fadein();
 
     /* menu option */
     icon->position = font_get_position(stage_label[option]);

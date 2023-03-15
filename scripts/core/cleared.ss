@@ -13,6 +13,7 @@ using SurgeEngine.UI.Text;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
+using SurgeEngine.Input.MobileGamepad;
 
 object "Default Cleared Animation" is "entity", "awake", "detached", "private"
 {
@@ -104,6 +105,7 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
 
     state "fadeout"
     {
+        MobileGamepad.fadeOut();
         if(timeout(3.0)) {
             fader.fadeOut();
             state = "done";
@@ -112,8 +114,10 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
 
     state "done"
     {
-        if(timeout(1.0))
+        if(timeout(1.0)) {
+            MobileGamepad.fadeIn();
             Level.loadNext();
+        }
     }
 
     fun finish()

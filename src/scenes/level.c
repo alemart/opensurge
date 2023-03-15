@@ -50,6 +50,7 @@
 #include "../core/nanoparser.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
+#include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
 #include "../entities/player.h"
@@ -1444,13 +1445,19 @@ void level_update()
         /* fade out the music */
         music_set_volume(music_get_volume() - 0.5*dt);
 
+        /* hide the mobile gamepad */
+        mobilegamepad_fadeout();
+
         /* restart the level */
         if(((dead_player_timeout += dt) >= 2.5f)) {
+
+            /* decide what to do next */
             if(player_get_lives() > 1) {
                 /* restart the level! */
                 if(fadefx_is_over()) {
                     player_set_lives(player_get_lives()-1);
                     restart(TRUE);
+                    mobilegamepad_fadein();
                     return;
                 }
                 fadefx_out(color_rgb(0,0,0), 1.0);
@@ -1459,8 +1466,10 @@ void level_update()
                 /* game over */
                 scenestack_pop();
                 scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
+                mobilegamepad_fadein();
                 return;
             }
+
         }
     }
 

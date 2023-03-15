@@ -11,6 +11,7 @@ using SurgeEngine.Player;
 using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
+using SurgeEngine.Input.MobileGamepad;
 
 // -----------------------------------------------------------------------------
 // ATTENTION
@@ -42,6 +43,8 @@ object "Default Opening Animation" is "entity", "awake", "detached", "private"
     {
         leftArrow.appear();
         rightArrow.appear();
+        MobileGamepad.fadeOut();
+
         state = "appearing arrows";
     }
 
@@ -85,6 +88,7 @@ object "Default Opening Animation" is "entity", "awake", "detached", "private"
 
     state "done"
     {
+        MobileGamepad.fadeIn();
         if(timeout(1.0))
             destroy();
     }
