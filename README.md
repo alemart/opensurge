@@ -6,7 +6,7 @@
 [![Discord server](https://img.shields.io/discord/493384707937927178?color=5662f6&logo=discord&logoColor=white)](https://discord.gg/w8JqM7m)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?label=Sponsor%20me&logo=github%20sponsors&style=social)](https://github.com/sponsors/alemart)
 
-**Open Surge** is a fun 2D retro platformer inspired by Sonic games and a game creation system that lets you unleash your creativity!
+**Surge the Rabbit** is a fun 2D retro platformer inspired by 16 bit classics and **Open Surge Engine** is its game engine, designed for you to unleash your creativity!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
 

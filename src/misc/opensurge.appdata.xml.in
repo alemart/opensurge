@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2020-2022 Alexandre Martins -->
+<!-- Copyright 2020-2023 Alexandre Martins -->
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
   <name>Surge the Rabbit</name>
@@ -7,11 +7,11 @@
   <update_contact>alemartf_at_gmail.com</update_contact>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <summary>A fun 2D retro platformer inspired by Sonic games and a game creation system</summary>
+  <summary>Fun 2D retro platformer inspired by 16 bit classics. Open source game & engine.</summary>
   <description>
     <p>
-      A fun 2D retro platformer inspired by Sonic games and a
-      game creation system that lets you unleash your creativity!
+      A fun 2D retro platformer inspired by 16 bit classics and a
+      game engine for you to unleash your creativity!
     </p>
     <p>
       Make your dreams come true! Create your own amazing games and
