@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "global.h"
 #include "util.h"
 #include "stringutil.h"
@@ -45,24 +46,19 @@ static quest_t* create_single_level_quest(quest_t* q, const char* path_to_lev_fi
  */
 quest_t *quest_load(const char *filepath)
 {
-    quest_t* q = mallocx(sizeof *q);
-    const char* fullpath;
-
     logfile_message("Loading quest \"%s\"...", filepath);
-    fullpath = asset_path(filepath);
 
     /* default values */
+    quest_t* q = mallocx(sizeof *q);
     q->file = str_dup(filepath);
     q->name = str_dup("");
-    q->author = str_dup("");
-    q->version = str_dup("");
-    q->description = str_dup("");
     q->level_count = 0;
 
     /* reading the quest */
     if(has_extension(filepath, ".qst")) {
 
         /* read quest file */
+        const char* fullpath = asset_path(filepath);
         parsetree_program_t* prog = nanoparser_construct_tree(fullpath);
         nanoparser_traverse_program_ex(prog, (void*)q, traverse_quest);
         nanoparser_deconstruct_tree(prog);
@@ -97,9 +93,6 @@ quest_t *quest_unload(quest_t *qst)
 {
     free(qst->file);
     free(qst->name);
-    free(qst->author);
-    free(qst->version);
-    free(qst->description);
 
     for(int i = 0; i < qst->level_count; i++)
         free(qst->level_path[i]);
@@ -139,27 +132,16 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         free(q->name);
         q->name = str_dup(nanoparser_get_string(p));
     }
-    else if(str_icmp(id, "author") == 0) {
-        nanoparser_expect_string(p, "Quest loader: quest author is expected");
-        free(q->author);
-        q->author = str_dup(nanoparser_get_string(p));
-    }
-    else if(str_icmp(id, "version") == 0) {
-        nanoparser_expect_string(p, "Quest loader: quest version is expected");
-        free(q->version);
-        q->version = str_dup(nanoparser_get_string(p));
-    }
-    else if(str_icmp(id, "description") == 0) {
-        /* make obsolete? will this field still have any use? */
-        nanoparser_expect_string(p, "Quest loader: quest description is expected");
-        free(q->description);
-        q->description = str_dup(nanoparser_get_string(p));
-    }
-    else if(str_icmp(id, "image") == 0) {
-        /* this field is obsolete and was removed
+    else if(
+        str_icmp(id, "image") == 0 ||
+        str_icmp(id, "description") == 0 ||
+        str_icmp(id, "version") == 0 ||
+        str_icmp(id, "author") == 0
+    ) {
+        /* these fields are obsolete and were removed
            this code is kept for retro-compatibility */
-        nanoparser_expect_string(p, "Quest loader: quest image is expected");
-        logfile_message("Quest loader: field image is obsolete");
+        nanoparser_expect_string(p, "Quest loader: quest parameter is expected");
+        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id));
     }
     else if(str_icmp(id, "hidden") == 0) {
         /* this field is obsolete and was removed

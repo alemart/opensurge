@@ -21,16 +21,14 @@
 #ifndef _QUEST_H
 #define _QUEST_H
 
-#include <stdbool.h>
-
 /*
-   quest_t* contains all the data relevant to
-   a quest (including name, author and list of
-   levels), but it does nothing for itself.
 
-   The quest scene is used to dispatch the
-   player to the correct levels.
-   (see ../scenes/quest.h)
+   A quest is basically a list of level files read
+   from a .qst file located in the quests/ folder.
+
+   The quest scene is used to dispatch the player
+   to the correct levels (see ../scenes/quest.h)
+
 */
 
 #define QUEST_MAXLEVELS 1024
@@ -38,14 +36,9 @@
 /* quest structure */
 typedef struct quest_t quest_t;
 struct quest_t {
-    /* meta data */
-    char *file; /* quest file */
+    char *file; /* relative path of the quest file */
     char *name; /* quest name */
-    char *author; /* author */
-    char *version; /* version string */
-    char *description; /* description */
 
-    /* quest data */
     int level_count; /* how many levels? */
     char *level_path[QUEST_MAXLEVELS]; /* relative paths of the levels */
 };
