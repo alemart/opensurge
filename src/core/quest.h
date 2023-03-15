@@ -21,29 +21,38 @@
 #ifndef _QUEST_H
 #define _QUEST_H
 
+#include <stdbool.h>
+
 /*
 
-   A quest is basically a list of level files read
-   from a .qst file located in the quests/ folder.
+A quest is an immutable list specified in a .qst
+file stored in the quests/ folder. An entry of such
+a list may be:
 
-   The quest scene is used to dispatch the player
-   to the correct levels (see ../scenes/quest.h)
+a) a level, i.e., a .lev file stored in levels/
+b) another quest, i.e., a .qst file
+c) a built-in scene of the engine
+
+The quest scene is used to dispatch the player
+to the appropriate scenes (see ../scenes/quest.h).
 
 */
 
-#define QUEST_MAXLEVELS 1024
-
-/* quest structure */
 typedef struct quest_t quest_t;
-struct quest_t {
-    char *file; /* relative path of the quest file */
-    char *name; /* quest name */
 
-    int level_count; /* how many levels? */
-    char *level_path[QUEST_MAXLEVELS]; /* relative paths of the levels */
-};
+/* instantiation */
+quest_t* quest_load(const char* filepath); /* relative filepath */
+quest_t* quest_unload(quest_t* quest);
 
-quest_t *quest_load(const char *filepath); /* relative filepath */
-quest_t *quest_unload(quest_t *qst);
+/* quest properties */
+const char* quest_name(const quest_t* quest);
+const char* quest_file(const quest_t* quest);
+
+/* entries of the quest */
+int quest_entry_count(const quest_t* quest);
+const char* quest_entry_path(const quest_t* quest, int index); /* index = 0, 1, 2... */
+bool quest_entry_is_level(const quest_t* quest, int index);
+bool quest_entry_is_quest(const quest_t* quest, int index);
+bool quest_entry_is_builtin_scene(const quest_t* quest, int index);
 
 #endif

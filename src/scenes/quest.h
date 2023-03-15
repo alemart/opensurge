@@ -25,9 +25,11 @@
    Multiple quest scenes may be pushed onto the
    scene stack. It will work.
 
-   This is actually a "mock" scene that just
-   dispatches the player to the correct levels.
+   This scene just dispatches the player to the
+   appropriate scenes.
 */
+
+struct quest_t;
 
 /* quest scene: functions */
 void quest_init(void *path_to_qst_file); /* pass an string */
