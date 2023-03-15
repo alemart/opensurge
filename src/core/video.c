@@ -672,21 +672,16 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 /* Create the backbuffer (the image texture to which the game will be rendered to) */
 bool create_backbuffer()
 {
-    ALLEGRO_STATE state;
     int screen_width = game_screen_width;
     int screen_height = game_screen_height;
 
     if(backbuffer != NULL)
         FATAL("Duplicate backbuffer");
 
-    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
-
     compute_screen_size(settings.mode, &screen_width, &screen_height);
-    if(NULL == (backbuffer = image_create(screen_width, screen_height)))
+    if(NULL == (backbuffer = image_create_backbuffer(screen_width, screen_height)))
         return false;
 
-    al_restore_state(&state);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
     return true;
 }
@@ -707,7 +702,6 @@ void destroy_backbuffer()
 /* Reconfigure the backbuffer according to the current settings */
 void reconfigure_backbuffer()
 {
-    ALLEGRO_STATE state;
     int screen_width = game_screen_width;
     int screen_height = game_screen_height;
 
@@ -716,14 +710,10 @@ void reconfigure_backbuffer()
     else
         image_destroy(backbuffer);
 
-    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
-
     compute_screen_size(settings.mode, &screen_width, &screen_height);
-    if(NULL == (backbuffer = image_create(screen_width, screen_height)))
+    if(NULL == (backbuffer = image_create_backbuffer(screen_width, screen_height)))
         FATAL("Can't reconfigure the backbuffer");
 
-    al_restore_state(&state);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
 
     /* it seems that we need this for some reason on Android. Why? */

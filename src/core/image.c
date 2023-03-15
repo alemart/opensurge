@@ -212,6 +212,25 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
     return img;
 }
 
+/*
+ * image_create_backbuffer()
+ * Creates an image that is optimized to be a drawing target.
+ * Its contents need not be preserved: the resulting image is
+ * meant to be copied to the screen.
+ */
+image_t* image_create_backbuffer(int width, int height)
+{
+    ALLEGRO_STATE state;
+    image_t* backbuffer;
+
+    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
+
+    backbuffer = image_create(width, height);
+
+    al_restore_state(&state);
+    return backbuffer;
+}
 
 /*
  * image_unload()

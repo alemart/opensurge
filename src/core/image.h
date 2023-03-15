@@ -37,8 +37,9 @@ typedef enum imageflags_t {
 
 /* image management */
 image_t* image_load(const char* path); /* will be unloaded automatically */
-image_t* image_create(int width, int height); /* create a memory surface */
+image_t* image_create(int width, int height); /* create an image */
 image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* creates a shared sub-image */
+image_t* image_create_backbuffer(int width, int height); /* create an optimized drawing target */
 void image_destroy(image_t* img); /* call this after image_create() */
 int image_unload(image_t* img); /* use if you want to save memory... */
 
