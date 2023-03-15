@@ -30,7 +30,7 @@
 #include "../core/storyboard.h"
 
 /* private data */
-#define STACK_MAX 32 /* maximum number of simultaneous quests */
+#define STACK_MAX 64 /* maximum number of simultaneous quests */
 static int top = -1;
 static struct {
     quest_t* current_quest;
@@ -162,7 +162,7 @@ const quest_t* quest_current()
 void push_appropriate_scene(const char *str)
 {
     if(str[0] == '<' && str[strlen(str)-1] == '>') {
-        /* not a level? TODO: at the moment, the engine can't handle those scenes repeatedly on the stack */
+        /* special scene; not a level */
         if(str_icmp(str, "<options>") == 0)
             scenestack_push(storyboard_get_scene(SCENE_OPTIONS), NULL);
         else if(str_icmp(str, "<language_select>") == 0)
