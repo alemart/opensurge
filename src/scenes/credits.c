@@ -210,7 +210,7 @@ void credits_render()
  */
 void credits_text(const char** base_text, int* assets_argc, const char*** assets_argv)
 {
-    const char* assets_arguments[ASSETS_CATEGORIES];
+    static const char* assets_arguments[ASSETS_CATEGORIES]; /* must allocate statically */
     bool uninitialized = (*assets_text_buffer == '\0');
 
     /* parse the text from the assets CSV file */
