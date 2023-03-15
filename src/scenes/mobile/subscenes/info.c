@@ -46,11 +46,9 @@ static void render(mobile_subscene_t*,v2d_t);
 static const mobile_subscene_t super = { .init = init, .release = release, .update = update, .render = render };
 
 #define BACKGROUND_COLOR "303030" /* RGB hex code */
-static const v2d_t FONT_POSITION = { .x = 4, .y = 4 };
 static const char FONT_NAME[] = "BoxyBold";
 
 static const char* opensurge_game_name();
-static const char* opensurge_game_author();
 
 
 
@@ -84,18 +82,18 @@ void init(mobile_subscene_t* subscene_ptr)
 
     /* create font */
     font_t* font = font_create(FONT_NAME);
-    font_set_position(font, FONT_POSITION);
-    font_set_align(font, FONTALIGN_LEFT);
-    font_set_width(font, VIDEO_SCREEN_W - 2 * FONT_POSITION.x);
+    font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, 4));
+    font_set_width(font, VIDEO_SCREEN_W - 8);
+    font_set_align(font, FONTALIGN_CENTER);
     font_set_text(font,
 
         #define SEPARATOR    "     "
         #define NOWRAP_SPACE "<color=" BACKGROUND_COLOR ">_</color>"
 
         "%s\n"
-        "Created by %s\n"
+        "(see credits) is created with\n"
         "\n"
-        "Powered by %s\n"
+        "%s\n"
         "%s\n"
         "\n"
         "This program is free software; you can redistribute it and/or modify "
@@ -120,10 +118,9 @@ void init(mobile_subscene_t* subscene_ptr)
 #else
         "Platform:"     NOWRAP_SPACE "%s" SEPARATOR
 #endif
-        "Data" NOWRAP_SPACE "folders: %s %s",
+        "Data"          NOWRAP_SPACE "directories: %s %s",
 
         opensurge_game_name(),
-        opensurge_game_author(),
 
         GAME_TITLE,
         GAME_COPYRIGHT,
@@ -197,32 +194,10 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
 const char* opensurge_game_name()
 {
     /* don't use a large buffer because wordwrap is enabled */
-    static char buffer[64];
+    static char buffer[48];
 
     /* FIXME: is the title of the window always equal to the name of the game? */
     str_cpy(buffer, video_get_window_title(), sizeof(buffer));
-
-    /* get rid of newlines */
-    for(char* p = buffer; *p; p++) {
-        if(*p == '\n' || *p == '\r')
-            *p = ' ';
-    }
-
-    /* done! */
-    return buffer;
-}
-
-/* the author(s) of the game / MOD that is being run in the engine */
-const char* opensurge_game_author()
-{
-    /* don't use a large buffer because wordwrap is enabled */
-    static char buffer[64];
-
-    /* FIXME: this is a stub */
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-truncation"
-    snprintf(buffer, sizeof(buffer), "%s authors", opensurge_game_name());
-    #pragma GCC diagnostic pop
 
     /* get rid of newlines */
     for(char* p = buffer; *p; p++) {
