@@ -1,0 +1,21 @@
+// -----------------------------------------------------------------------------
+// File: classic.qst
+// Description: the classic quest that was played in Open Surge 0.5.x
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// quest name
+name            "Classic quest"
+
+// level list (in order of appearance)
+level           "levels/sunshine-1.lev"
+level           "levels/sunshine-2.lev"
+level           "levels/sunshine-3.lev"
+
+level           "levels/waterworks-1.lev"
+level           "levels/waterworks-2.lev"
+level           "levels/waterworks-3.lev"
+
+level           "levels/scenes/rate_game.lev"
+level           "levels/scenes/congratulations.lev"
