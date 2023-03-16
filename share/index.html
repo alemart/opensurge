@@ -155,7 +155,7 @@
         <!-- Sharing Code -->
         <script>
         $(document).ready(function() {
-            var redirect = function() { window.location = '/contribute?v=' + window.ver + '&lang=' + window.lang; }
+            var redirect = function() { window.location = '/?v=' + window.ver + '&lang=' + window.lang; }
             var progress = $('#progressbar').progress(10.0, redirect);
             window.share = function(link, on) {
                 var win = window.open(link.href, 'Social ' + on, 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes'); //width=657,height=487
