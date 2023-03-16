@@ -62,6 +62,7 @@ static surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_loadandreturn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -122,6 +123,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "pause", fun_pause, 0);
     surgescript_vm_bind(vm, "Level", "load", fun_load, 1);
     surgescript_vm_bind(vm, "Level", "loadNext", fun_loadnext, 0);
+    surgescript_vm_bind(vm, "Level", "loadAndReturn", fun_loadandreturn, 1);
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
     surgescript_vm_bind(vm, "Level", "entityId", fun_entityid, 1);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
@@ -474,8 +476,8 @@ surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var
 }
 
 /* loads the specified level.
-   You may also pass the path to a quest; then the specified quest will be loaded, and
-   when it's completed, the system will make you go back to the level you were before. */
+   You may also pass the path to a quest; then that quest will be loaded, and when it's
+   completed or aborted, the system will make you go back to the level you were before. */
 surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
@@ -496,6 +498,21 @@ surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_loadnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     level_jump_to_next_stage();
+    return NULL;
+}
+
+/* loads the specified level and returns to the level you were before after you quit
+   or exit the loaded level. You may pass the path to a level or to a quest file. If
+   you pass a quest file, this function behaves exactly like fun_load() */
+surgescript_var_t* fun_loadandreturn(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    char* filepath = surgescript_var_get_string(param[0], manager);
+
+    /* a single .lev file implicitly defines a single-level quest */
+    level_push_quest(filepath);
+
+    ssfree(filepath);
     return NULL;
 }
 
