@@ -486,6 +486,21 @@ const char* video_get_window_title()
     return window_title;
 }
 
+/*
+ * video_convert_window_to_screen()
+ * Convert a pair of window to screen coordinates
+ */
+v2d_t video_convert_window_to_screen(v2d_t window_coordinates)
+{
+    ALLEGRO_TRANSFORM transform;
+    v2d_t screen_coordinates = window_coordinates;
+
+    compute_display_transform(&transform);
+    al_invert_transform(&transform); /* the inverse is guaranteed to exist, since transform is a 2D scale followed by a translation */
+    al_transform_coordinates(&transform, &screen_coordinates.x, &screen_coordinates.y);
+
+    return screen_coordinates;
+}
 
 
 /* -------------------- private stuff -------------------- */
@@ -600,16 +615,20 @@ void reconfigure_display()
 void compute_display_transform(ALLEGRO_TRANSFORM* transform)
 {
     v2d_t scale, offset;
+    float display_width = (float)al_get_display_width(display);
+    float display_height = (float)al_get_display_height(display);
+    float backbuffer_width = (float)image_width(backbuffer);
+    float backbuffer_height = (float)image_height(backbuffer);
 
     /* compute the scale */
-    scale.x = (float)al_get_display_width(display) / (float)image_width(backbuffer);
-    scale.y = (float)al_get_display_height(display) / (float)image_height(backbuffer);
+    scale.x = display_width / backbuffer_width;
+    scale.y = display_height / backbuffer_height;
 
     /* compute the offset */
     if(scale.x < scale.y)
-        offset = v2d_new(0.0f, (al_get_display_height(display) - scale.x * image_height(backbuffer)) * 0.5f);
+        offset = v2d_new(0.0f, (display_height - scale.x * backbuffer_height) * 0.5f);
     else
-        offset = v2d_new((al_get_display_width(display) - scale.y * image_width(backbuffer)) * 0.5f, 0.0f);
+        offset = v2d_new((display_width - scale.y * backbuffer_width) * 0.5f, 0.0f);
 
     /* compute the transform */
     al_build_transform(transform, offset.x, offset.y, min(scale.x, scale.y), min(scale.x, scale.y), 0.0f);
