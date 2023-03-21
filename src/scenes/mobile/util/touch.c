@@ -79,13 +79,10 @@ void handle_touch_input_ex(input_t* mouse_input, void* data, void (*on_touch_sta
 /* read the position of the cursor of the mouse in screen space */
 v2d_t read_mouse_position(input_t* mouse_input)
 {
-    v2d_t window_size = video_get_window_size();
-    v2d_t screen_size = video_get_screen_size();
     v2d_t window_mouse = input_get_xy((inputmouse_t*)mouse_input);
-    v2d_t normalized_mouse = v2d_new(window_mouse.x / window_size.x, window_mouse.y / window_size.y);
-    v2d_t mouse = v2d_compmult(normalized_mouse, screen_size);
+    v2d_t screen_mouse = video_convert_window_to_screen(window_mouse);
 
-    return mouse;
+    return screen_mouse;
 }
 
 /* touch start adapter */
