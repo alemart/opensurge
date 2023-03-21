@@ -71,6 +71,36 @@
 #error "This build requires a newer version of SurgeScript"
 #endif
 
+
+
+/* Allegro 5 events & event listeners */
+typedef struct event_listener_t event_listener_t;
+struct event_listener_t {
+    ALLEGRO_EVENT_TYPE event_type;
+    void* data;
+    void (*callback)(const ALLEGRO_EVENT*,void*);
+};
+
+typedef struct event_listener_list_t event_listener_list_t;
+struct event_listener_list_t {
+    event_listener_t event_listener;
+    event_listener_list_t* next;
+};
+
+#define EVENT_LISTENER_TABLE_SIZE 64
+static event_listener_list_t* event_listener_table[EVENT_LISTENER_TABLE_SIZE];
+
+static void init_event_listener_table();
+static void release_event_listener_table();
+static void add_to_event_listener_table(event_listener_t event_listener);
+static void call_event_listeners(const ALLEGRO_EVENT* event);
+
+static ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
+static void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data);
+static void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data);
+
+
+
 /* private stuff ;) */
 static void clean_garbage();
 static void render_overlay();
@@ -90,16 +120,8 @@ static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
 static const uint32_t GC_INTERVAL = 10000; /* in ms (garbage collector) */
+static ALLEGRO_TIMER* a5_timer = NULL;
 static bool force_quit = false;
-
-/* Allegro 5 events */
-ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL; /* public */
-extern void a5_handle_keyboard_event(const ALLEGRO_EVENT* event);
-extern void a5_handle_mouse_event(const ALLEGRO_EVENT* event);
-extern void a5_handle_joystick_event(const ALLEGRO_EVENT* event);
-extern void a5_handle_touch_event(const ALLEGRO_EVENT* event);
-extern void a5_handle_video_event(const ALLEGRO_EVENT* event);
-extern void a5_handle_back_event(const ALLEGRO_EVENT* event);
 
 /* Global Prefs */
 prefs_t* prefs = NULL; /* public */
@@ -148,113 +170,44 @@ void engine_release()
  */
 void engine_mainloop()
 {
-    scene_t *current_scene = NULL;
-    bool must_redraw = false;
     bool is_active = true;
+    bool should_redraw = false;
+
+    /* setup event listeners */
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, &is_active, a5_handle_haltresume_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, &is_active, a5_handle_haltresume_event);
 
     /* configure the timer */
-    ALLEGRO_TIMER* timer = al_create_timer(1.0 / TARGET_FPS);
-    if(!timer)
+    if(NULL == (a5_timer = al_create_timer(1.0 / TARGET_FPS)))
         fatal_error("Can't create an Allegro timer");
 
-    al_register_event_source(a5_event_queue, al_get_timer_event_source(timer));
-    al_start_timer(timer);
+    engine_add_event_source(al_get_timer_event_source(a5_timer));
+    engine_add_event_listener(ALLEGRO_EVENT_TIMER, &should_redraw, a5_handle_timer_event);
+    al_start_timer(a5_timer);
 
-    /* main loop */
+    /* game loop */
     while(!force_quit && !scenestack_empty()) {
+
+        /* handle events & update game logic */
         ALLEGRO_EVENT event;
         al_wait_for_event(a5_event_queue, &event);
-
-        /* handle events */
-        switch(event.type) {
-            case ALLEGRO_EVENT_TIMER: {
-                /* update game logic */
-                ALLEGRO_EVENT next_event;
-
-                /* update the managers */
-                timer_update();
-                audio_update();
-                mobilegamepad_update();
-                input_update();
-                clean_garbage();
-
-                /* update the current scene */
-                current_scene = scenestack_top();
-                current_scene->update();
-                must_redraw = (current_scene == scenestack_top()); /* same scene? */
-
-                /* prevent locking */
-                while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event.timer.source)
-                    al_drop_next_event(a5_event_queue);
-                break;
-            }
-
-            case ALLEGRO_EVENT_KEY_DOWN:
-            case ALLEGRO_EVENT_KEY_UP:
-                a5_handle_keyboard_event(&event);
-                if(event.keyboard.keycode == ALLEGRO_KEY_BACK)
-                    a5_handle_back_event(&event);
-                break;
-
-            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-                a5_handle_mouse_event(&event);
-                break;
-
-            case ALLEGRO_EVENT_JOYSTICK_AXIS:
-            case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
-            case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
-            case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
-                a5_handle_joystick_event(&event);
-                break;
-
-            case ALLEGRO_EVENT_TOUCH_BEGIN:
-            case ALLEGRO_EVENT_TOUCH_END:
-            case ALLEGRO_EVENT_TOUCH_MOVE:
-            case ALLEGRO_EVENT_TOUCH_CANCEL:
-                a5_handle_touch_event(&event);
-                break;
-
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-            case ALLEGRO_EVENT_DISPLAY_RESIZE:
-            case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-            case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
-                a5_handle_video_event(&event);
-                break;
-
-#if defined(__ANDROID__)
-            case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
-                logfile_message("Received an ALLEGRO_EVENT_DISPLAY_HALT_DRAWING");
-                is_active = false;
-                al_stop_timer(timer);
-                timer_pause();
-                al_set_default_voice(NULL);
-                a5_handle_video_event(&event);
-                break;
-
-            case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
-                logfile_message("Received an ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING");
-                a5_handle_video_event(&event);
-                al_restore_default_mixer();
-                timer_resume();
-                al_start_timer(timer);
-                is_active = true;
-                break;
-#endif
-        }
+        call_event_listeners(&event);
 
         /* render */
-        if(is_active && must_redraw && al_is_event_queue_empty(a5_event_queue)) {
+        if(is_active && should_redraw && al_is_event_queue_empty(a5_event_queue)) {
+            scene_t* current_scene = scenestack_top();
             current_scene->render();
             fadefx_update();
             video_render(render_overlay);
             screenshot_update();
-            must_redraw = false;
+            should_redraw = false;
         }
+
     }
 
     /* done */
-    al_destroy_timer(timer);
+    al_stop_timer(a5_timer);
+    al_destroy_timer(a5_timer);
 }
 
 /*
@@ -264,6 +217,28 @@ void engine_mainloop()
 void engine_quit()
 {
     force_quit = true;
+}
+
+/*
+ * engine_add_event_listener()
+ * Add an event listener, i.e., a function that handles an Allegro event
+ */
+void engine_add_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (*callback)(const ALLEGRO_EVENT*,void*))
+{
+    add_to_event_listener_table((event_listener_t) {
+        .event_type = event_type,
+        .data = data,
+        .callback = callback
+    });
+}
+
+/*
+ * engine_add_event_source()
+ * Add an event source to the Allegro event queue
+ */
+void engine_add_event_source(ALLEGRO_EVENT_SOURCE* event_source)
+{
+    al_register_event_source(a5_event_queue, event_source);
 }
 
 
@@ -321,6 +296,9 @@ void init_basic_stuff(const commandline_t* cmd)
     if(!al_init_native_dialog_addon())
         fatal_error("Can't initialize Allegro's native dialog addon");
 #endif
+
+    /* initialize the table of event listeners */
+    init_event_listener_table();
 
     /* set the locale */
     setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
@@ -476,6 +454,9 @@ void release_basic_stuff()
     asset_release();
     logfile_release(LOGFILE_CONSOLE);
 
+    /* Release the table of event listeners */
+    release_event_listener_table();
+
     /* Release Allegro */
     al_destroy_event_queue(a5_event_queue);
     a5_event_queue = NULL;
@@ -528,4 +509,116 @@ void parser_warning(const char *msg)
 void calc_error(const char *msg)
 {
     fatal_error("%s", msg);
+}
+
+/*
+ * init_event_listener_table()
+ * Initializes the table of event listeners
+ */
+void init_event_listener_table()
+{
+    for(int i = 0; i < EVENT_LISTENER_TABLE_SIZE; i++) {
+
+        /* initialize linked lists */
+        event_listener_table[i] = NULL;
+
+    }
+}
+
+/*
+ * release_event_listener_table()
+ * Releases the table of event listeners
+ */
+void release_event_listener_table()
+{
+    for(int i = 0; i < EVENT_LISTENER_TABLE_SIZE; i++) {
+
+        /* release linked lists */
+        for(event_listener_list_t *next, *it = event_listener_table[i]; it != NULL; it = next) {
+            next = it->next;
+            free(it);
+        }
+
+        event_listener_table[i] = NULL;
+    }
+}
+
+/*
+ * add_to_event_listener_table()
+ * Add an entry to the table of event listeners
+ */
+void add_to_event_listener_table(event_listener_t event_listener)
+{
+    int index = event_listener.event_type % EVENT_LISTENER_TABLE_SIZE;
+    event_listener_list_t* node = mallocx(sizeof *node);
+    node->event_listener = event_listener;
+    node->next = event_listener_table[index];
+    event_listener_table[index] = node;
+}
+
+/*
+ * call_event_listeners()
+ * Calls the registered event listeners for a particular event
+ */
+void call_event_listeners(const ALLEGRO_EVENT* event)
+{
+    int index = event->type % EVENT_LISTENER_TABLE_SIZE;
+
+    for(event_listener_list_t *it = event_listener_table[index]; it != NULL; it = it->next) {
+        if(it->event_listener.event_type == event->type)
+            it->event_listener.callback(event, it->event_listener.data);
+    }
+}
+
+/*
+ * a5_handle_haltresume_event()
+ * Handles a HALT_DRAWING / RESUME_DRAWING event
+ */
+void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data)
+{
+    bool* is_active = (bool*)data;
+
+    switch(event->type) {
+        case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+            logfile_message("Received an ALLEGRO_EVENT_DISPLAY_HALT_DRAWING");
+            *is_active = false;
+            al_stop_timer(a5_timer);
+            timer_pause();
+            al_set_default_voice(NULL);
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+            logfile_message("Received an ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING");
+            al_restore_default_mixer();
+            timer_resume();
+            al_start_timer(a5_timer);
+            *is_active = true;
+            break;
+    }
+}
+
+/*
+ * a5_handle_timer_event()
+ * Update game logic
+ */
+void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data)
+{
+    bool* should_redraw = (bool*)data;
+
+    /* update the managers */
+    timer_update();
+    audio_update();
+    mobilegamepad_update();
+    input_update();
+    clean_garbage();
+
+    /* update the current scene */
+    scene_t* current_scene = scenestack_top();
+    current_scene->update();
+    *should_redraw = (current_scene == scenestack_top()); /* same scene? */
+
+    /* prevent locking */
+    ALLEGRO_EVENT next_event;
+    while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event->timer.source)
+        al_drop_next_event(a5_event_queue);
 }

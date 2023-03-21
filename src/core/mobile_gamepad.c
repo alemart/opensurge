@@ -21,6 +21,7 @@
 #include <allegro5/allegro.h>
 #include <stdbool.h>
 #include "mobile_gamepad.h"
+#include "engine.h"
 #include "logfile.h"
 #include "video.h"
 #include "timer.h"
@@ -215,6 +216,7 @@ static void render_actors();
 static void handle_fade_effect();
 static void enable_linear_filtering();
 static v2d_t dpad_stick_offset(float scale);
+static void a5_handle_back_event(const ALLEGRO_EVENT* event, void* data);
 
 
 
@@ -263,6 +265,9 @@ void mobilegamepad_init(int _flags)
         LOG("The mobile gamepad isn't available in this system");
         return;
     }
+
+    /* listen to the back button */
+    engine_add_event_listener(ALLEGRO_EVENT_KEY_UP, NULL, a5_handle_back_event);
 
     /* initialize the interactive radii */
     for(int i = 0; i < NUM_CONTROLS; i++)
@@ -576,7 +581,7 @@ void enable_linear_filtering()
 }
 
 /* handle a keyboard ALLEGRO_KEY_BACK event */
-void a5_handle_back_event(const ALLEGRO_EVENT* event)
+void a5_handle_back_event(const ALLEGRO_EVENT* event, void* data)
 {
     /* When triggering the back button or performing a back gesture on Android,
        we receive a keyDown event followed by a keyUp event - possibly in the
@@ -587,6 +592,8 @@ void a5_handle_back_event(const ALLEGRO_EVENT* event)
         back_pressed = true;
 
     }
+
+    (void)data;
 }
 
 /* compute the current offset of the dpad stick

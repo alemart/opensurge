@@ -22,6 +22,7 @@
 #include <allegro5/allegro.h>
 
 #include "input.h"
+#include "engine.h"
 #include "util.h"
 #include "video.h"
 #include "logfile.h"
@@ -118,6 +119,11 @@ static void input_clear(input_t *in);
 static void log_joysticks();
 static void handle_hotkey(int keycode);
 
+/* Allegro 5 events */
+static void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data);
+static void a5_handle_mouse_event(const ALLEGRO_EVENT* event, void* data);
+static void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data);
+static void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data);
 
 
 /*
@@ -126,29 +132,41 @@ static void handle_hotkey(int keycode);
  */
 void input_init()
 {
-    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
     logfile_message("Initializing the input system...");
 
     /* initialize the Allegro input system */
     if(!al_install_keyboard())
         fatal_error("Can't initialize the keyboard");
-    al_register_event_source(a5_event_queue, al_get_keyboard_event_source());
+    engine_add_event_source(al_get_keyboard_event_source());
+    engine_add_event_listener(ALLEGRO_EVENT_KEY_DOWN, NULL, a5_handle_keyboard_event);
+    engine_add_event_listener(ALLEGRO_EVENT_KEY_UP, NULL, a5_handle_keyboard_event);
 
     if(!al_install_mouse())
         fatal_error("Can't initialize the mouse");
-    al_register_event_source(a5_event_queue, al_get_mouse_event_source());
+    engine_add_event_source(al_get_mouse_event_source());
+    engine_add_event_listener(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, NULL, a5_handle_mouse_event);
+    engine_add_event_listener(ALLEGRO_EVENT_MOUSE_BUTTON_UP, NULL, a5_handle_mouse_event);
 
     if(!al_install_joystick())
         fatal_error("Can't initialize the joystick subsystem");
-    al_register_event_source(a5_event_queue, al_get_joystick_event_source());
+    engine_add_event_source(al_get_joystick_event_source());
+    engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_CONFIGURATION, NULL, a5_handle_joystick_event);
+    /*engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_AXIS, NULL, a5_handle_joystick_event);
+    engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN, NULL, a5_handle_joystick_event);
+    engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_BUTTON_UP, NULL, a5_handle_joystick_event);*/
 
     if(!al_install_touch_input()) {
         logfile_message("Can't initialize the multi-touch subsystem");
     }
     else {
-        al_register_event_source(a5_event_queue, al_get_touch_input_event_source());
+        engine_add_event_source(al_get_touch_input_event_source());
+        engine_add_event_listener(ALLEGRO_EVENT_TOUCH_BEGIN, NULL, a5_handle_touch_event);
+        engine_add_event_listener(ALLEGRO_EVENT_TOUCH_END, NULL, a5_handle_touch_event);
+        engine_add_event_listener(ALLEGRO_EVENT_TOUCH_MOVE, NULL, a5_handle_touch_event);
+        engine_add_event_listener(ALLEGRO_EVENT_TOUCH_CANCEL, NULL, a5_handle_touch_event);
+
         al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_TRANSPARENT);
-        al_register_event_source(a5_event_queue, al_get_touch_input_mouse_emulation_event_source());
+        engine_add_event_source(al_get_touch_input_mouse_emulation_event_source());
     }
 
 
@@ -748,7 +766,7 @@ void inputuserdefined_update(input_t* in)
 }
 
 /* handle a keyboard event */
-void a5_handle_keyboard_event(const ALLEGRO_EVENT* event)
+void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data)
 {
     switch(event->type) {
 
@@ -762,10 +780,12 @@ void a5_handle_keyboard_event(const ALLEGRO_EVENT* event)
             break;
 
     }
+
+    (void)data;
 }
 
 /* handle a mouse event */
-void a5_handle_mouse_event(const ALLEGRO_EVENT* event)
+void a5_handle_mouse_event(const ALLEGRO_EVENT* event, void* data)
 {
     switch(event->type) {
 
@@ -778,10 +798,12 @@ void a5_handle_mouse_event(const ALLEGRO_EVENT* event)
             break;
 
     }
+
+    (void)data;
 }
 
 /* handle a joystick event */
-void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
+void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
 {
     switch(event->type) {
 #if 0
@@ -830,12 +852,15 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event)
             break;
         }
     }
+
+    (void)data;
 }
 
 /* handle a touch event */
-void a5_handle_touch_event(const ALLEGRO_EVENT* event)
+void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
 {
     /* touch input is currently read using ALLEGRO_TOUCH_INPUT_STATE */
+    (void)data;
 }
 
 /* handle hotkeys */

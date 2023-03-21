@@ -58,6 +58,7 @@ static void destroy_display();
 static void reconfigure_display();
 static void compute_display_transform(ALLEGRO_TRANSFORM* transform);
 static void set_display_icon(ALLEGRO_DISPLAY* display);
+static void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data);
 
 
 /* Backbuffer */
@@ -486,44 +487,6 @@ const char* video_get_window_title()
 }
 
 
-/*
- * a5_handle_video_event()
- * Handle a video event from Allegro
- */
-void a5_handle_video_event(const ALLEGRO_EVENT* event)
-{
-    switch(event->type) {
-
-        case ALLEGRO_EVENT_DISPLAY_CLOSE:
-            if(event->display.source == display)
-                engine_quit();
-            break;
-
-        case ALLEGRO_EVENT_DISPLAY_RESIZE:
-            al_acknowledge_resize(event->display.source);
-            if(settings.mode != VIDEOMODE_DEFAULT)
-                reconfigure_backbuffer();
-            break;
-
-        case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-            break;
-
-        case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
-            break;
-
-        case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
-            al_acknowledge_drawing_halt(event->display.source);
-            break;
-
-        case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
-            al_acknowledge_drawing_resume(event->display.source);
-            reconfigure_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
-            break;
-
-    }
-}
-
-
 
 /* -------------------- private stuff -------------------- */
 
@@ -540,12 +503,13 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event)
 /* Create the display (window) */
 bool create_display()
 {
-    extern ALLEGRO_EVENT_QUEUE* a5_event_queue;
     ALLEGRO_STATE state;
 
+    /* check for duplicates */
     if(display != NULL)
         FATAL("Duplicate display");
 
+    /* create a new display */
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
     al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE);
     al_set_new_display_option(
@@ -566,15 +530,25 @@ bool create_display()
     display = al_create_display(game_screen_width, game_screen_height);
 #endif
 
+    al_restore_state(&state);
     if(display == NULL)
         return false;
 
-    al_register_event_source(a5_event_queue, al_get_display_event_source(display));
+    /* configure the display */
     al_set_window_title(display, window_title);
     al_hide_mouse_cursor(display);
     set_display_icon(display);
 
-    al_restore_state(&state);
+    /* listen to Allegro 5 events */
+    engine_add_event_source(al_get_display_event_source(display));
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_CLOSE, NULL, a5_handle_video_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESIZE, NULL, a5_handle_video_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_SWITCH_IN, NULL, a5_handle_video_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_SWITCH_OUT, NULL, a5_handle_video_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, a5_handle_video_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, a5_handle_video_event);
+
+    /* done! */
     return true;
 }
 
@@ -659,6 +633,41 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 
     al_destroy_bitmap(icon);
     al_fclose(f);
+}
+
+/* handle a video event from Allegro */
+void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
+{
+    switch(event->type) {
+
+        case ALLEGRO_EVENT_DISPLAY_CLOSE:
+            if(event->display.source == display)
+                engine_quit();
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESIZE:
+            al_acknowledge_resize(event->display.source);
+            if(settings.mode != VIDEOMODE_DEFAULT)
+                reconfigure_backbuffer();
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+            al_acknowledge_drawing_halt(event->display.source);
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+            al_acknowledge_drawing_resume(event->display.source);
+            reconfigure_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
+            break;
+    }
+
+    (void)data;
 }
 
 

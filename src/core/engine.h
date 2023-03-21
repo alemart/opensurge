@@ -21,11 +21,16 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
+#include <allegro5/allegro.h>
+
 void engine_init(int argc, char **argv);
 void engine_mainloop();
 void engine_release();
 
 void engine_quit();
+
+void engine_add_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (*callback)(const ALLEGRO_EVENT*,void*));
+void engine_add_event_source(ALLEGRO_EVENT_SOURCE* event_source);
 
 #endif
 
