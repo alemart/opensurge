@@ -238,9 +238,21 @@ void engine_add_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (
  */
 void engine_add_event_source(ALLEGRO_EVENT_SOURCE* event_source)
 {
+    /* if event_source is already registered in the event queue,
+       this call does nothing according to the Allegro docs */
     al_register_event_source(a5_event_queue, event_source);
 }
 
+/*
+ * engine_remove_event_source()
+ * Remove an event source to the Allegro event queue
+ */
+void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
+{
+    /* if event_source is unregistered in the event queue,
+       this call does nothing according to the Allegro docs */
+    al_unregister_event_source(a5_event_queue, event_source);
+}
 
 
 /* private functions */
