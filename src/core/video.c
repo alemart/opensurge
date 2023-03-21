@@ -496,7 +496,7 @@ v2d_t video_convert_window_to_screen(v2d_t window_coordinates)
     v2d_t screen_coordinates = window_coordinates;
 
     compute_display_transform(&transform);
-    al_invert_transform(&transform); /* the inverse is guaranteed to exist, since transform is a 2D scale followed by a translation */
+    al_invert_transform(&transform); /* the inverse is guaranteed to exist, since transform is a non-zero 2D scale followed by a translation */
     al_transform_coordinates(&transform, &screen_coordinates.x, &screen_coordinates.y);
 
     return screen_coordinates;
@@ -619,6 +619,10 @@ void compute_display_transform(ALLEGRO_TRANSFORM* transform)
     float display_height = (float)al_get_display_height(display);
     float backbuffer_width = (float)image_width(backbuffer);
     float backbuffer_height = (float)image_height(backbuffer);
+
+    /* ensure non-zero scale for an invertible transform. is this necessary? */
+    display_width = max(1, display_width);
+    display_height = max(1, display_height);
 
     /* compute the scale */
     scale.x = display_width / backbuffer_width;
