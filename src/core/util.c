@@ -33,11 +33,13 @@
 #include "logfile.h"
 #include "resourcemanager.h"
 
-#include <allegro5/allegro.h>
-
 #if defined(__ANDROID__)
+#define ALLEGRO_UNSTABLE /* required for al_android_get_jni_env(), al_android_get_activity() */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_android.h>
 #include <android/log.h>
 #else
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
 #endif
 
@@ -49,6 +51,10 @@
 /* private stuff */
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
+
+#if defined(__ANDROID__)
+static void android_show_alert_dialog(const char* title, const char* message);
+#endif
 
 
 
@@ -127,8 +133,8 @@ void fatal_error(const char *fmt, ...)
     fprintf(stderr, "%s\n", buf);
 
 #if defined(__ANDROID__)
-    __android_log_print(ANDROID_LOG_FATAL, GAME_UNIXNAME, "Surgexception! %s", buf);
-    /* TODO TODO TODO dialog box */
+    __android_log_print(ANDROID_LOG_FATAL, GAME_UNIXNAME, "Surgexception Error: %s", buf);
+    android_show_alert_dialog("Ooops... Surgexception!", buf);
 #else
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
@@ -355,3 +361,25 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
         free(arr);
 }
 
+#if defined(__ANDROID__)
+
+/* Show a native alert dialog on Android */
+void android_show_alert_dialog(const char* title, const char* message)
+{
+    /* See https://liballeg.org/a5docs/trunk/platform.html#al_android_get_jni_env */
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "showAlertDialog", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+    jstring jtitle = (*env)->NewStringUTF(env, title);
+    jstring jmessage = (*env)->NewStringUTF(env, message);
+    (*env)->CallVoidMethod(env, activity, method_id, jtitle, jmessage);
+    (*env)->DeleteLocalRef(env, jmessage);
+    (*env)->DeleteLocalRef(env, jtitle);
+
+    (*env)->DeleteLocalRef(env, class_id);
+}
+
+#endif
