@@ -70,7 +70,8 @@ void quest_release()
 {
     if(top >= 0) {
         logfile_message("Popping quest \"%s\" from the quest stack...", quest_file(stack[top].quest));
-        quest_unload(stack[top--].quest);
+        quest_unload(stack[top].quest);
+        top--;
     }
 
     logfile_message("The quest has been released.");
@@ -91,11 +92,36 @@ void quest_render()
  */
 void quest_update()
 {
-    const quest_t* quest = stack[top].quest;
+    if(top < 0) {
 
-    if(stack[top].next_level < quest_entry_count(quest) && !stack[top].abort_quest) {
+        /* empty stack: this shouldn't happen */
+        logfile_message("ERROR: empty quest stack");
+        scenestack_pop();
+        return;
+
+    }
+    else if(stack[top].abort_quest) {
+
+        /* aborted quest */
+        const quest_t* quest = stack[top].quest;
+        logfile_message("Quest \"%s\" has been aborted.", quest_file(quest));
+        scenestack_pop();
+        return;
+
+    }
+    else if(stack[top].next_level >= quest_entry_count(stack[top].quest)) {
+
+        /* cleared quest */
+        const quest_t* quest = stack[top].quest;
+        logfile_message("Quest \"%s\" has been cleared!", quest_file(quest));
+        scenestack_pop();
+        return;
+
+    }
+    else {
 
         /* go to the next level */
+        const quest_t* quest = stack[top].quest;
         int index = stack[top].next_level++;
         const char* path = quest_entry_path(quest, index);
 
@@ -149,17 +175,6 @@ void quest_update()
 
         }
     }
-    else {
-
-        /* the user has cleared (or exited) the quest */
-        logfile_message(
-            "Quest \"%s\" has been %s.", quest_file(quest),
-            (stack[top].abort_quest ? "aborted" : "cleared")
-        );
-        scenestack_pop();
-        return;
-
-    }
 }
 
 /*
@@ -181,7 +196,9 @@ void quest_set_next_level(int id)
 {
     if(top >= 0) {
         const quest_t* quest = stack[top].quest;
-        stack[top].next_level = clip(id, 0, quest_entry_count(quest));
+        int n = quest_entry_count(quest);
+
+        stack[top].next_level = clip(id, 0, n);
     }
 }
 
