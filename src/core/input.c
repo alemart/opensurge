@@ -18,9 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define ALLEGRO_UNSTABLE /* mouse emulation via touch input */
 #include <allegro5/allegro.h>
-
 #include "input.h"
 #include "engine.h"
 #include "util.h"
@@ -124,6 +122,11 @@ static void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data);
 static void a5_handle_mouse_event(const ALLEGRO_EVENT* event, void* data);
 static void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data);
 static void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data);
+static struct {
+    ALLEGRO_EVENT_SOURCE event_source;
+    bool initialized;
+    int tracked_touch_id;
+} emulated_mouse = { .initialized = false, .tracked_touch_id = -1 };
 
 
 /*
@@ -146,6 +149,7 @@ void input_init()
     engine_add_event_source(al_get_mouse_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, NULL, a5_handle_mouse_event);
     engine_add_event_listener(ALLEGRO_EVENT_MOUSE_BUTTON_UP, NULL, a5_handle_mouse_event);
+    engine_add_event_listener(ALLEGRO_EVENT_MOUSE_AXES, NULL, a5_handle_mouse_event);
 
     if(!al_install_joystick())
         fatal_error("Can't initialize the joystick subsystem");
@@ -157,19 +161,22 @@ void input_init()
 
     if(!al_install_touch_input()) {
         logfile_message("Can't initialize the multi-touch subsystem");
+        emulated_mouse.initialized = false;
     }
     else {
+        logfile_message("Touch input is available");
+
+        logfile_message("Enabling mouse emulation via touch input");
+        al_init_user_event_source(&emulated_mouse.event_source);
+        emulated_mouse.initialized = true;
+
+        engine_add_event_source(&emulated_mouse.event_source);
         engine_add_event_source(al_get_touch_input_event_source());
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_BEGIN, NULL, a5_handle_touch_event);
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_END, NULL, a5_handle_touch_event);
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_MOVE, NULL, a5_handle_touch_event);
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_CANCEL, NULL, a5_handle_touch_event);
-
-        al_set_mouse_emulation_mode(ALLEGRO_MOUSE_EMULATION_TRANSPARENT);
-        engine_add_event_source(al_get_touch_input_mouse_emulation_event_source());
     }
-
-
 
     /* initialize the input list */
     input_list = NULL;
@@ -197,18 +204,7 @@ void input_init()
  */
 void input_update()
 {
-    ALLEGRO_MOUSE_STATE state;
     int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
-
-    /* read mouse input */
-    al_get_mouse_state(&state);
-    a5_mouse.dx = state.x - a5_mouse.x;
-    a5_mouse.dy = state.y - a5_mouse.y;
-    a5_mouse.dz = state.z - a5_mouse.z;
-    a5_mouse.x = state.x;
-    a5_mouse.y = state.y;
-    a5_mouse.z = state.z;
-    /*a5_mouse.b is received from the event queue */
 
     /* read joystick input */
     for(int j = 0; j < num_joys; j++) {
@@ -330,13 +326,21 @@ void input_update()
 void input_release()
 {
     logfile_message("input_release()");
-    inputmap_release();
 
     logfile_message("Releasing registered input objects...");
     for(input_list_t *next, *it = input_list; it; it = next) {
         next = it->next;
         free(it->data);
         free(it);
+    }
+
+    inputmap_release();
+
+    if(emulated_mouse.initialized) {
+        logfile_message("Disabling mouse emulation via touch input");
+        engine_remove_event_source(&emulated_mouse.event_source);
+        al_destroy_user_event_source(&emulated_mouse.event_source);
+        emulated_mouse.initialized = false;
     }
 }
 
@@ -787,18 +791,37 @@ void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data)
 /* handle a mouse event */
 void a5_handle_mouse_event(const ALLEGRO_EVENT* event, void* data)
 {
+    #define update_mouse_position() do { \
+        a5_mouse.dx = event->mouse.x - a5_mouse.x; \
+        a5_mouse.dy = event->mouse.y - a5_mouse.y; \
+        a5_mouse.dz = event->mouse.z - a5_mouse.z; \
+        a5_mouse.x = event->mouse.x; \
+        a5_mouse.y = event->mouse.y; \
+        a5_mouse.z = event->mouse.z; \
+    } while(0)
+
     switch(event->type) {
 
         case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
             a5_mouse.b |= 1 << (event->mouse.button - 1);
+            update_mouse_position();
             break;
 
         case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
             a5_mouse.b &= ~(1 << (event->mouse.button - 1));
+            update_mouse_position();
+            break;
+
+        case ALLEGRO_EVENT_MOUSE_AXES:
+            /* we track the position of the mouse using events and not
+               ALLEGRO_MOUSE_STATE because we emit mouse events in order
+               to emulate mouse input using touch input */
+            update_mouse_position();
             break;
 
     }
 
+    #undef update_mouse_position
     (void)data;
 }
 
@@ -806,7 +829,6 @@ void a5_handle_mouse_event(const ALLEGRO_EVENT* event, void* data)
 void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
 {
     switch(event->type) {
-#if 0
         /*
          * Joystick input based on ALLEGRO_JOYSTICK_STATE
          * seems to work better according to several users
@@ -814,6 +836,7 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
          * tested with Allegro 5.2.5 on Windows using
          * DirectInput devices
          */
+        /*
         case ALLEGRO_EVENT_JOYSTICK_AXIS:
             break;
 
@@ -822,7 +845,8 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
 
         case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
             break;
-#endif
+        */
+
         /* hot plugging */
         case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION: {
             int num_joysticks;
@@ -856,11 +880,79 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
     (void)data;
 }
 
-/* handle a touch event */
+/* emulate mouse input using touch input */
 void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
 {
-    /* touch input is currently read using ALLEGRO_TOUCH_INPUT_STATE */
-    (void)data;
+    ALLEGRO_EVENT my_event;
+    static int num_touches = 0;
+    const unsigned int left_mouse_button = 1u;
+
+    /* validate */
+    if(!emulated_mouse.initialized)
+        return;
+
+    /* fill mouse event */
+    memset(&my_event, 0, sizeof(my_event));
+    switch(event->type) {
+        case ALLEGRO_EVENT_TOUCH_BEGIN:
+            num_touches++;
+            my_event.type = ALLEGRO_EVENT_MOUSE_BUTTON_DOWN;
+            my_event.mouse.x = event->touch.x;
+            my_event.mouse.y = event->touch.y;
+            my_event.mouse.button = left_mouse_button;
+            my_event.mouse.pressure = 1.0f;
+            break;
+
+        case ALLEGRO_EVENT_TOUCH_MOVE:
+            if(event->touch.id != emulated_mouse.tracked_touch_id)
+                return; /* skip */
+
+            my_event.type = ALLEGRO_EVENT_MOUSE_AXES;
+            my_event.mouse.x = event->touch.x;
+            my_event.mouse.y = event->touch.y;
+            my_event.mouse.dx = event->touch.dx;
+            my_event.mouse.dy = event->touch.dy;
+            break;
+
+        case ALLEGRO_EVENT_TOUCH_END:
+        case ALLEGRO_EVENT_TOUCH_CANCEL:
+            num_touches = max(0, num_touches - 1);
+            if(!(event->touch.id == emulated_mouse.tracked_touch_id || num_touches == 0))
+                return; /* skip */
+
+            my_event.type = ALLEGRO_EVENT_MOUSE_BUTTON_UP;
+            my_event.mouse.x = event->touch.x;
+            my_event.mouse.y = event->touch.y;
+            my_event.mouse.button = left_mouse_button;
+            my_event.mouse.pressure = 1.0f;
+            break;
+
+        default:
+            return; /* skip */
+    }
+
+    /* emit mouse event */
+    bool is_valid_touch = (event->touch.id >= 0);
+    /*bool is_target_touch = (event->touch.primary);*/
+    bool is_target_touch = true; /* do not assume that touch.id is monotonically increasing */
+
+    if(is_valid_touch && is_target_touch) {
+        ALLEGRO_EVENT_SOURCE* my_event_source = &emulated_mouse.event_source;
+        al_emit_user_event(my_event_source, &my_event, NULL);
+
+        /*
+            According to the Allegro docs, al_emit_user_event():
+
+            "Events are copied in and out of event queues, so after this function
+            returns the memory pointed to by event may be freed or reused."
+        */
+
+        /* track the touch ID */
+        if(event->type == ALLEGRO_EVENT_TOUCH_BEGIN)
+            emulated_mouse.tracked_touch_id = event->touch.id;
+        else if(event->type == ALLEGRO_EVENT_TOUCH_END || event->type == ALLEGRO_EVENT_TOUCH_CANCEL)
+            emulated_mouse.tracked_touch_id = -1;
+    }
 }
 
 /* handle hotkeys */
