@@ -25,12 +25,12 @@
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getwindows(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getunix(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getmacos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getandroid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getios(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_gethtml(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getiswindows(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getisunix(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getismacos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getisandroid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getisios(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getishtml(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
  * scripting_register_platform()
@@ -42,15 +42,15 @@ void scripting_register_platform(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Platform", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Platform", "spawn", fun_spawn, 1);
 
-    surgescript_vm_bind(vm, "Platform", "get_windows", fun_getwindows, 0);
-    surgescript_vm_bind(vm, "Platform", "get_unix", fun_getunix, 0);
-    surgescript_vm_bind(vm, "Platform", "get_macos", fun_getmacos, 0);
-    surgescript_vm_bind(vm, "Platform", "get_android", fun_getandroid, 0);
-    /*surgescript_vm_bind(vm, "Platform", "get_ios", fun_getios, 0);
-    surgescript_vm_bind(vm, "Platform", "get_html", fun_gethtml, 0);*/
+    surgescript_vm_bind(vm, "Platform", "get_isWindows", fun_getiswindows, 0);
+    surgescript_vm_bind(vm, "Platform", "get_isUnix", fun_getisunix, 0);
+    surgescript_vm_bind(vm, "Platform", "get_isMacOS", fun_getismacos, 0);
+    surgescript_vm_bind(vm, "Platform", "get_isAndroid", fun_getisandroid, 0);
+    /*surgescript_vm_bind(vm, "Platform", "get_isIOS", fun_getisios, 0);
+    surgescript_vm_bind(vm, "Platform", "get_isHTML", fun_getishtml, 0);*/
 
-    (void)fun_getios;
-    (void)fun_gethtml;
+    (void)fun_getisios;
+    (void)fun_getishtml;
 }
 
 /* Platform routines */
@@ -77,72 +77,72 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 }
 
 /* is the engine currently running on Microsoft Windows? */
-surgescript_var_t* fun_getwindows(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getiswindows(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    bool result = false;
-
 #if defined(_WIN32)
-    result = true;
+    bool result = true;
+#else
+    bool result = false;
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);
 }
 
 /* is the engine currently running on a Unix-style OS? e.g., Linux, macOS, BSD, Android, iOS, etc. */
-surgescript_var_t* fun_getunix(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getisunix(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    bool result = false;
-
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
-    result = true;
+    bool result = true;
+#else
+    bool result = false;
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);
 }
 
 /* is the engine currently running on macOS or iOS? */
-surgescript_var_t* fun_getmacos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getismacos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    bool result = false;
-
 #if defined(__APPLE__) && defined(__MACH__)
-    result = true;
+    bool result = true;
+#else
+    bool result = false;
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);
 }
 
 /* is the engine currently running on Android? */
-surgescript_var_t* fun_getandroid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getisandroid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    bool result = false;
-
 #if defined(__ANDROID__)
-    result = true;
+    bool result = true;
+#else
+    bool result = false;
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);
 }
 
 /* is the engine currently running on iOS? (currently unsupported) */
-surgescript_var_t* fun_getios(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getisios(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    bool result = false;
-
 #if defined(ALLEGRO_IPHONE)
-    result = true;
+    bool result = true;
+#else
+    bool result = false;
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);
 }
 
 /* is the engine currently running on HTML5? (currently unsupported) */
-surgescript_var_t* fun_gethtml(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_getishtml(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    bool result = false;
-
 #if defined(__EMSCRIPTEN__)
-    result = true;
+    bool result = true;
+#else
+    bool result = false;
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);

@@ -91,13 +91,13 @@ object "Rate the Game" is "setup"
 
     fun platformName()
     {
-        if(Platform.android)
+        if(Platform.isAndroid)
             return "Android";
-        else if(Platform.windows)
+        else if(Platform.isWindows)
             return "Windows";
-        else if(Platform.macos)
+        else if(Platform.isMacOS)
             return "macOS";
-        else if(Platform.unix)
+        else if(Platform.isUnix)
             return "Unix";
         else
             return "Unknown";
