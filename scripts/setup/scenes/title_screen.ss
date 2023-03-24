@@ -16,9 +16,8 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Camera;
 using SurgeEngine.Behaviors.DirectionalMovement;
-using SurgeEngine.Lang;
-using SurgeEngine.Web;
 using SurgeEngine.Input.MobileGamepad;
+using SurgeTheRabbit;
 
 // ----------------------------------------------------------------------------
 // TITLE SCREEN: SETUP OBJECT
@@ -289,7 +288,7 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
             spawn("Title Screen - Menu Item - Share").setOffset(Vector2.right.scaledBy(offset += spacing))
         );
 
-        if(!isGooglePlayBuild()) {
+        if(!SurgeTheRabbit.isGooglePlayBuild()) {
             /* adding an external donation page to an Android app published
                in the Google Play Store is a violation of their policy */
             items.push(
@@ -300,11 +299,6 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
         items.push(
             spawn("Title Screen - Menu Item - Quit").setOffset(Vector2.right.scaledBy(offset += spacing))
         );
-    }
-
-    fun isGooglePlayBuild()
-    {
-        return SurgeEngine.version.indexOf("googleplay") >= 0;
     }
 }
 
@@ -387,8 +381,7 @@ object "Title Screen - Menu Item - Share" is "private", "detached", "entity"
 
     fun onEnter()
     {
-        url = "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
-        Web.launchURL(url);
+        SurgeTheRabbit.share();
         Level.load(Level.file);
     }
 
@@ -421,8 +414,7 @@ object "Title Screen - Menu Item - Donate" is "private", "detached", "entity"
 
     fun onEnter()
     {
-        url = "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
-        Web.launchURL(url);
+        SurgeTheRabbit.donate();
         Level.load(Level.file);
     }
 

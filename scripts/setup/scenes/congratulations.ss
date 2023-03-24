@@ -12,8 +12,7 @@ using SurgeEngine.Player;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Camera;
-using SurgeEngine.Lang;
-using SurgeEngine.Web;
+using SurgeTheRabbit;
 
 object "Congratulations"
 {
@@ -23,7 +22,7 @@ object "Congratulations"
     text = spawn("CongratulationsText");
     title = spawn("CongratulationsTitle");
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
-        !isGooglePlayBuild() ?
+        !SurgeTheRabbit.isGooglePlayBuild() ?
             ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_DONATE", "$CONGRATULATIONS_BACK" ] :
             ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_BACK" ]
     ).withSpacing(211).withAxisAngle(0).build();
@@ -62,18 +61,18 @@ object "Congratulations"
     {
         if(buttonIndex == 0) {
             // share
-            Web.launchURL(shareURL());
+            SurgeTheRabbit.share();
             fadeTo("back");
         }
         else if(buttonIndex == 1) {
             // donate or go back
-            if(!isGooglePlayBuild())
-                Web.launchURL(donateURL());
+            if(!SurgeTheRabbit.isGooglePlayBuild())
+                SurgeTheRabbit.donate();
 
             fadeTo("back");
         }
         else if(buttonIndex == 2) {
-            // back
+            // go back
             fadeTo("back");
         }
     }
@@ -82,23 +81,6 @@ object "Congratulations"
     {
         nextState = newState;
         state = "waitToFade";
-    }
-
-    fun shareURL()
-    {
-        return "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
-    }
-
-    fun donateURL()
-    {
-        return "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
-    }
-
-    fun isGooglePlayBuild()
-    {
-        /* adding an external donation page to an Android app published
-           in the Google Play Store is a violation of their policy */
-        return SurgeEngine.version.indexOf("googleplay") >= 0;
     }
 }
 

@@ -7,8 +7,7 @@
 using SurgeEngine;
 using SurgeEngine.Level;
 using SurgeEngine.Prefs;
-using SurgeEngine.Lang;
-using SurgeEngine.Web;
+using SurgeTheRabbit;
 
 // Setup object
 object "Setup contribute web page"
@@ -33,25 +32,13 @@ object "Open Contribute web page"
 
     fun call()
     {
-        if(isGooglePlayBuild())
+        if(SurgeTheRabbit.isGooglePlayBuild())
             return;
 
         asked = Prefs[key] || false;
         if(!asked) {
             Prefs[key] = true;
-            Web.launchURL(donateURL());
+            SurgeTheRabbit.donate();
         }
-    }
-
-    fun donateURL()
-    {
-        return "http://opensurge2d.org/contribute?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
-    }
-
-    fun isGooglePlayBuild()
-    {
-        /* adding an external donation page to an Android app published
-           in the Google Play Store is a violation of their policy */
-        return SurgeEngine.version.indexOf("googleplay") >= 0;
     }
 }

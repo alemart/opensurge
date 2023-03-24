@@ -14,8 +14,7 @@ using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Camera;
-using SurgeEngine.Lang;
-using SurgeEngine.Web;
+using SurgeTheRabbit;
 
 object "MainMenu"
 {
@@ -107,7 +106,7 @@ object "MainMenu"
         }
         else if(buttonIndex == 2) {
             // share
-            Web.launchURL(shareURL());
+            SurgeTheRabbit.share();
             fadeTo("restart");
         }
         else if(buttonIndex == 3) {
@@ -131,11 +130,6 @@ object "MainMenu"
         player = Player.active;
         player.lives = Player.initialLives;
         player.score = 0;
-    }
-
-    fun shareURL()
-    {
-        return "http://opensurge2d.org/share?v=" + SurgeEngine.version + "&lang=" + Lang["LANG_ID"];
     }
 
     fun constructor()
@@ -220,7 +214,7 @@ object "MainMenuGameVersion" is "private", "detached", "entity"
     {
         transform.position = Vector2(Screen.width - 4, 4);
         text[0].zindex = text[1].zindex = 1.0;
-        if(SurgeEngine.version.indexOf("dev") >= 0) {
+        if(SurgeTheRabbit.isDevelopmentBuild()) {
             text[0].align = "right";
             text[0].text = "$MAINMENU_DEVBUILD";
             text[1].align = "right";

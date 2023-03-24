@@ -15,11 +15,10 @@ using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
-using SurgeEngine.Web;
 using SurgeEngine.Behaviors.CircularMovement;
 using SurgeEngine.Platform;
-using SurgeEngine.Lang;
 using SurgeEngine.Prefs;
+using SurgeTheRabbit;
 
 
 
@@ -68,14 +67,9 @@ object "Rate the Game" is "setup"
         state = "fading";
     }
 
-
-
-
     fun onChooseYes()
     {
-        url = "http://opensurge2d.org/rating?v=" + SurgeEngine.version + "&platform=" + platformName() + "&lang=" + Lang["LANG_ID"];
-        Web.launchURL(url);
-
+        SurgeTheRabbit.rate();
         ratingTime.memorize();
 
         goToNextLevel();
@@ -84,23 +78,6 @@ object "Rate the Game" is "setup"
     fun onChooseNo()
     {
         goToNextLevel();
-    }
-
-
-
-
-    fun platformName()
-    {
-        if(Platform.isAndroid)
-            return "Android";
-        else if(Platform.isWindows)
-            return "Windows";
-        else if(Platform.isMacOS)
-            return "macOS";
-        else if(Platform.isUnix)
-            return "Unix";
-        else
-            return "Unknown";
     }
 }
 
@@ -139,9 +116,7 @@ object "Rate the Game - Rating Time"
 
     fun generateKey(prefix)
     {
-        isDevelopmentBuild = (SurgeEngine.version.indexOf("-dev") >= 0);
-
-        if(isDevelopmentBuild)
+        if(SurgeTheRabbit.isDevelopmentBuild())
             return prefix + "-" + SurgeEngine.version;
         else
             return prefix;
