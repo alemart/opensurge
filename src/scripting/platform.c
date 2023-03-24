@@ -22,9 +22,11 @@
 #include <allegro5/allegro.h>
 
 /* private */
+static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
 static surgescript_var_t* fun_getiswindows(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getisunix(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getismacos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -32,15 +34,23 @@ static surgescript_var_t* fun_getisandroid(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getisios(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getishtml(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
+static surgescript_var_t* fun_getandroid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
+/* children's addresses */
+static const surgescript_heapptr_t ANDROID_ADDR = 0;
+
 /*
  * scripting_register_platform()
  * Register the Platform object
  */
 void scripting_register_platform(surgescript_vm_t* vm)
 {
+    surgescript_vm_bind(vm, "Platform", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Platform", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Platform", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Platform", "spawn", fun_spawn, 1);
+
+    surgescript_vm_bind(vm, "Platform", "get_Android", fun_getandroid, 0);
 
     surgescript_vm_bind(vm, "Platform", "get_isWindows", fun_getiswindows, 0);
     surgescript_vm_bind(vm, "Platform", "get_isUnix", fun_getisunix, 0);
@@ -54,6 +64,20 @@ void scripting_register_platform(surgescript_vm_t* vm)
 }
 
 /* Platform routines */
+
+/* constructor */
+surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t me = surgescript_object_handle(object);
+
+    surgescript_objecthandle_t android = surgescript_objectmanager_spawn(manager, me, "AndroidPlatform", NULL);
+    ssassert(ANDROID_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANDROID_ADDR), android);
+
+    return NULL;
+}
 
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
@@ -75,6 +99,9 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     /* disabled */
     return NULL;
 }
+
+
+
 
 /* is the engine currently running on Microsoft Windows? */
 surgescript_var_t* fun_getiswindows(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
@@ -146,4 +173,14 @@ surgescript_var_t* fun_getishtml(surgescript_object_t* object, const surgescript
 #endif
 
     return surgescript_var_set_bool(surgescript_var_create(), result);
+}
+
+
+
+
+/* Android-specific routines */
+surgescript_var_t* fun_getandroid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    return surgescript_var_clone(surgescript_heap_at(heap, ANDROID_ADDR));
 }

@@ -337,6 +337,7 @@ SET(GAME_SRCS
   src/scripting/application.c
   src/scripting/surgeengine.c
   src/scripting/actor.c
+  src/scripting/androidplatform.c
   src/scripting/animation.c
   src/scripting/brick.c
   src/scripting/camera.c
