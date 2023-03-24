@@ -30,6 +30,8 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfullscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setfullscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t SCREEN_ADDR = 0;
@@ -46,6 +48,8 @@ void scripting_register_video(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Video", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Video", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Video", "get_Screen", fun_getscreen, 0);
+    surgescript_vm_bind(vm, "Video", "get_fullscreen", fun_getfullscreen, 0);
+    surgescript_vm_bind(vm, "Video", "set_fullscreen", fun_setfullscreen, 1);
     surgescript_vm_bind(vm, "Video", "get_mode", fun_getmode, 0);
     surgescript_vm_bind(vm, "Video", "set_mode", fun_setmode, 1);
 }
@@ -105,6 +109,21 @@ surgescript_var_t* fun_getscreen(surgescript_object_t* object, const surgescript
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     return surgescript_var_clone(surgescript_heap_at(heap, SCREEN_ADDR));
+}
+
+/* is the engine running on fullscreen mode? */
+surgescript_var_t* fun_getfullscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    bool fullscreen = video_is_fullscreen();
+    return surgescript_var_set_bool(surgescript_var_create(), fullscreen);
+}
+
+/* enable/disable the fullscreen mode */
+surgescript_var_t* fun_setfullscreen(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    bool fullscreen = surgescript_var_get_bool(param[0]);
+    video_set_fullscreen(fullscreen);
+    return NULL;
 }
 
 /* get the current Video mode */
