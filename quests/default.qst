@@ -8,7 +8,7 @@
 // quest name
 name            "Default quest"
 
-// scene list (in order of appearance)
+// level list (in order of appearance)
 level           "levels/waterworks-zone-1.lev"
 level           "levels/waterworks-zone-2.lev"
 level           "levels/waterworks-zone-3.lev"

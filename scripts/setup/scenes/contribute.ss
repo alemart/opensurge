@@ -7,6 +7,7 @@
 using SurgeEngine;
 using SurgeEngine.Level;
 using SurgeEngine.Prefs;
+using SurgeEngine.Platform;
 using SurgeTheRabbit;
 
 // Setup object
@@ -32,7 +33,10 @@ object "Open Contribute web page"
 
     fun call()
     {
-        if(SurgeTheRabbit.isGooglePlayBuild())
+        //if(SurgeTheRabbit.isGooglePlayBuild())
+        //    return;
+
+        if(Platform.isAndroid)
             return;
 
         asked = Prefs[key] || false;

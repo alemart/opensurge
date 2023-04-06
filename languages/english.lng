@@ -136,7 +136,7 @@ ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in developm
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-RATEGAME_TITLE              "Enjoying Surge the Rabbit?"
+RATEGAME_TITLE              "Rate Surge the Rabbit?"
 RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
 RATEGAME_YES                "Sure!!!"
 RATEGAME_NO                 "Not now"
