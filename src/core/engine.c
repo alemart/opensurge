@@ -59,6 +59,8 @@
 #include <allegro5/allegro_audio.h>
 #if !defined(__ANDROID__)
 #include <allegro5/allegro_native_dialog.h>
+#else
+#include <jni.h>
 #endif
 
 /* minimum Allegro version */
@@ -634,3 +636,24 @@ void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data)
     while(al_peek_next_event(a5_event_queue, &next_event) && next_event.type == ALLEGRO_EVENT_TIMER && next_event.timer.source == event->timer.source)
         al_drop_next_event(a5_event_queue);
 }
+
+
+
+
+
+/* ----- native methods for Android ----- */
+
+#if defined(__ANDROID__)
+
+/*
+ * Class:     org_opensurge2d_surgeengine_MainActivity
+ * Method:    nativeGetAllegroVersion
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_opensurge2d_surgeengine_MainActivity_nativeGetAllegroVersion(JNIEnv* env, jobject activity)
+{
+    uint32_t allegro_version = al_get_allegro_version();
+    return (jint)allegro_version; /* note: converts unsigned int to signed int */
+}
+
+#endif
