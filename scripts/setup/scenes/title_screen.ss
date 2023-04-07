@@ -315,7 +315,12 @@ object "Title Screen - Menu Item - Start Game" is "private", "detached", "entity
 
     fun onEnter()
     {
-        Player.active.lives = Player.initialLives;
+        // reset player data
+        player = Player.active;
+        player.lives = Player.initialLives;
+        player.score = 0;
+
+        // load the default quest
         Level.load("quests/default.qst");
     }
 
