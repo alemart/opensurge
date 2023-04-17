@@ -6,7 +6,6 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine;
 using SurgeEngine.Web;
-using SurgeEngine.Lang;
 using SurgeEngine.Platform;
 
 @Package
@@ -22,7 +21,7 @@ object "SurgeTheRabbit"
             return;
         }
 
-        url = website + "/contribute?v=" + SurgeEngine.version + "&platform=" + platformName() + "&lang=" + Lang["LANG_ID"];
+        url = website + "/contribute?v=" + SurgeEngine.version;
         Web.launchURL(url);
     }
 
@@ -33,29 +32,15 @@ object "SurgeTheRabbit"
             Platform.Android.shareText(text);
         }
         else {
-            url = website + "/share?v=" + SurgeEngine.version + "&platform=" + platformName() + "&lang=" + Lang["LANG_ID"];
+            url = website + "/share?v=" + SurgeEngine.version;
             Web.launchURL(url);
         }
     }
 
     fun rate()
     {
-        url = website + "/rating?v=" + SurgeEngine.version + "&platform=" + platformName() + "&lang=" + Lang["LANG_ID"];
+        url = website + "/rating?v=" + SurgeEngine.version;
         Web.launchURL(url);
-    }
-
-    fun platformName()
-    {
-        if(Platform.isAndroid)
-            return "Android";
-        else if(Platform.isWindows)
-            return "Windows";
-        else if(Platform.isMacOS)
-            return "macOS";
-        else if(Platform.isUnix)
-            return "Unix";
-        else
-            return "Unknown";
     }
 
     fun isDevelopmentBuild()
