@@ -1298,10 +1298,15 @@ void level_update()
     /* updating the entities */
     /* -------------------------------------- */
 
+    /* got dying player? */
+    for(i = 0; i < team_size; i++) {
+        if(player_is_dying(team[i]))
+            got_dying_player = TRUE;
+    }
+
     /* update background */
     background_update(backgroundtheme);
 
-#if 1
     /* legacy camera code (runs before scripts) */
     if(!level_is_in_debug_mode()) {
         if(level_cleared)
@@ -1309,7 +1314,6 @@ void level_update()
         else if(!got_dying_player)
             camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
     }
-#endif
 
     /* getting the major entities */
     /* note: bricks should use a larger margin when compared to SurgeScript entities */
@@ -1389,12 +1393,6 @@ void level_update()
     /* update scripts */
     clear_bricklike_ssobjects();
     update_ssobjects();
-
-    /* got dying player? */
-    for(i = 0; i < team_size; i++) {
-        if(player_is_dying(team[i]))
-            got_dying_player = TRUE;
-    }
 
     /* update players */
     if(entitymanager_get_number_of_bricks() > 0) {
