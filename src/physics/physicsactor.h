@@ -73,6 +73,7 @@ enum movmode_t
 /* forward declarations */
 struct obstaclemap_t;
 struct obstacle_t;
+enum obstaclelayer_t;
 
 /* API */
 physicsactor_t* physicsactor_create(v2d_t position);
@@ -91,7 +92,9 @@ v2d_t physicsactor_get_position(const physicsactor_t *pa); /* the position of th
 void physicsactor_set_position(physicsactor_t *pa, v2d_t position);
 void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds); /* set the horizontal control lock timer */
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
-movmode_t physicsactor_get_movmode(physicsactor_t *pa);
+movmode_t physicsactor_get_movmode(const physicsactor_t *pa);
+enum obstaclelayer_t physicsactor_get_layer(const physicsactor_t *pa);
+void physicsactor_set_layer(physicsactor_t *pa, enum obstaclelayer_t layer);
 int physicsactor_roll_delta(const physicsactor_t* pa); /* roll delta (sensors) */
 float physicsactor_charge_intensity(const physicsactor_t* pa); /* in [0,1] */
 void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height, v2d_t *center); /* center may be NULL */

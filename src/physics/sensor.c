@@ -90,10 +90,10 @@ sensor_t* sensor_destroy(sensor_t *sensor)
 }
 
 
-const obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, const obstaclemap_t *obstaclemap)
+const obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, obstaclelayer_t layer_filter, const obstaclemap_t *obstaclemap)
 {
     sensorstate_t *s = get_active_state(sensor, mm);
-    return sensorstate_check(s, actor_position, obstaclemap, sensor->x1, sensor->y1, sensor->x2, sensor->y2);
+    return sensorstate_check(s, actor_position, obstaclemap, sensor->x1, sensor->y1, sensor->x2, sensor->y2, layer_filter);
 }
 
 void sensor_render(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, v2d_t camera_position)

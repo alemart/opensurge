@@ -81,6 +81,7 @@ struct physicsactor_t
     float airdrag_coefficient[2]; /* airdrag approx. coefficient */
     physicsactorstate_t state; /* state */
     movmode_t movmode; /* current movement mode, based on the angle */
+    obstaclelayer_t layer; /* current layer */
     input_t *input; /* input device */
 
     sensor_t *A_normal; /* sensors */
@@ -241,6 +242,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->gsp = 0.0f;
     pa->angle = 0x0;
     pa->movmode = MM_FLOOR;
+    pa->layer = OL_DEFAULT;
     pa->midair = true;
     pa->state = PAS_STOPPED;
     pa->horizontal_control_lock_timer = 0.0f;
@@ -392,7 +394,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     }
 
     /* inside a solid brick? */
-    at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, obstaclemap);
+    at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, pa->layer, obstaclemap);
     pa->inside_wall = (at_U != NULL && obstacle_is_solid(at_U));
 
     /* run the physics simulation */
@@ -485,9 +487,19 @@ void physicsactor_enable_winning_pose(physicsactor_t *pa)
     pa->winning_pose = true;
 }
 
-movmode_t physicsactor_get_movmode(physicsactor_t *pa)
+movmode_t physicsactor_get_movmode(const physicsactor_t *pa)
 {
     return pa->movmode;
+}
+
+obstaclelayer_t physicsactor_get_layer(const physicsactor_t *pa)
+{
+    return pa->layer;
+}
+
+void physicsactor_set_layer(physicsactor_t *pa, obstaclelayer_t layer)
+{
+    pa->layer = layer;
 }
 
 int physicsactor_roll_delta(const physicsactor_t* pa)
@@ -716,11 +728,11 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 /* call UPDATE_SENSORS whenever you update pa->position or pa->angle */
 #define UPDATE_SENSORS() \
     do { \
-        at_A = sensor_check(sensor_A(pa), pa->position, pa->movmode, obstaclemap); \
-        at_B = sensor_check(sensor_B(pa), pa->position, pa->movmode, obstaclemap); \
-        at_C = sensor_check(sensor_C(pa), pa->position, pa->movmode, obstaclemap); \
-        at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, obstaclemap); \
-        at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, obstaclemap); \
+        at_A = sensor_check(sensor_A(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
+        at_B = sensor_check(sensor_B(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
+        at_C = sensor_check(sensor_C(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
+        at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
+        at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
         if(at_A != NULL && !obstacle_is_solid(at_A)) { \
             int x, y; \
             sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
@@ -802,7 +814,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
             if(!found_a) { \
                 xa = x - (hoff) * COS(pa->angle); \
                 ya = y + (hoff) * SIN(pa->angle); \
-                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode); \
+                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer); \
                 found_a = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
                     (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + CLOUD_OFFSET) || \
                     (pa->movmode == MM_CEILING && ya > obstacle_ground_position(gnd, xa, ya, GD_UP) - CLOUD_OFFSET) || \
@@ -813,7 +825,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
             if(!found_b) { \
                 xb = x + (hoff) * COS(pa->angle); \
                 yb = y - (hoff) * SIN(pa->angle); \
-                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode); \
+                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer); \
                 found_b = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
                     (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + CLOUD_OFFSET) || \
                     (pa->movmode == MM_CEILING && yb > obstacle_ground_position(gnd, xb, yb, GD_UP) - CLOUD_OFFSET) || \
@@ -826,8 +838,8 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
         out_dx = out_dy = 0; \
         pa->angle_sensor[0] = pa->angle_sensor[1] = pa->position; \
         if(found_a && found_b) { \
-            const obstacle_t* ga = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode); \
-            const obstacle_t* gb = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode); \
+            const obstacle_t* ga = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer); \
+            const obstacle_t* gb = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer); \
             if(ga && gb) { \
                 switch(pa->movmode) { \
                     case MM_FLOOR: \
@@ -1343,19 +1355,19 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             */
             for(; u < h; u++) {
                 if(pa->movmode == MM_FLOOR) {
-                    if(obstaclemap_obstacle_exists(obstaclemap, x, y + u))
+                    if(obstaclemap_obstacle_exists(obstaclemap, x, y + u, pa->layer))
                         break;
                 }
                 else if(pa->movmode == MM_RIGHTWALL) {
-                    if(obstaclemap_obstacle_exists(obstaclemap, y + u, x))
+                    if(obstaclemap_obstacle_exists(obstaclemap, y + u, x, pa->layer))
                         break;
                 }
                 else if(pa->movmode == MM_CEILING) {
-                    if(obstaclemap_obstacle_exists(obstaclemap, x, y - u))
+                    if(obstaclemap_obstacle_exists(obstaclemap, x, y - u, pa->layer))
                         break;
                 }
                 else if(pa->movmode == MM_LEFTWALL) {
-                    if(obstaclemap_obstacle_exists(obstaclemap, y - u, x))
+                    if(obstaclemap_obstacle_exists(obstaclemap, y - u, x, pa->layer))
                         break;
                 }
             }
@@ -1530,11 +1542,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         const sensor_t* s = at_A ? sensor_A(pa) : sensor_B(pa);
         int x = (int)pa->position.x;
         int y = (int)pa->position.y + sensor_get_y2(s) + 8;
-        if(at_A != NULL && at_B == NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
+        if(at_A != NULL && at_B == NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode, pa->layer) == NULL) {
             pa->state = PAS_LEDGE;
             pa->facing_right = true;
         }
-        else if(at_A == NULL && at_B != NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode) == NULL) {
+        else if(at_A == NULL && at_B != NULL && obstaclemap_get_best_obstacle_at(obstaclemap, x, y, x, y, pa->movmode, pa->layer) == NULL) {
             pa->state = PAS_LEDGE;
             pa->facing_right = false;
         }

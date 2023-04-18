@@ -106,6 +106,7 @@ static void create_collisionmasks();
 static obstacle_t* create_obstacle(const brick_t* brick);
 static obstacle_t* destroy_obstacle(obstacle_t* obstacle);
 static inline int get_obstacle_flags(const brick_t* brick);
+static inline obstaclelayer_t get_obstacle_layer(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
 static bool is_player_standing_on_platform(const player_t *player, const brick_t *brk);
 static bool can_be_clipped_out(const brick_t* brick, v2d_t topleft);
@@ -222,8 +223,8 @@ brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t fl
     b->state = BRS_IDLE;
     b->layer = layer;
     b->flip = flip_flags;
-    b->obstacle = create_obstacle(b);
     b->image = b->brick_ref->image;
+    b->obstacle = create_obstacle(b);
 
     for(i=0; i<BRICK_MAXVALUES; i++)
         b->value[i] = 0.0f;
@@ -1110,7 +1111,8 @@ obstacle_t* create_obstacle(const brick_t* brick)
     if(brick->brick_ref && brick->brick_ref->type != BRK_PASSABLE && brick->brick_ref->mask) {
         const collisionmask_t* mask = brick->brick_ref->mask;
         int flags = get_obstacle_flags(brick);
-        return obstacle_create(mask, brick->x, brick->y, flags);
+        obstaclelayer_t layer = get_obstacle_layer(brick);
+        return obstacle_create(mask, brick->x, brick->y, layer, flags);
     }
     else
         return NULL;
@@ -1129,6 +1131,14 @@ int get_obstacle_flags(const brick_t* brick)
         ((brick->flip & BRF_HFLIP) ? OF_HFLIP : 0) |
         ((brick->flip & BRF_VFLIP) ? OF_VFLIP : 0)
     ;
+}
+
+obstaclelayer_t get_obstacle_layer(const brick_t* brick)
+{
+    return (
+        (brick->layer == BRL_GREEN) ? OL_GREEN :
+        ((brick->layer == BRL_YELLOW) ? OL_YELLOW : OL_DEFAULT)
+    );
 }
 
 int get_image_flags(const brick_t* brick)

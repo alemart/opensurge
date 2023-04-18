@@ -38,6 +38,7 @@ struct obstacle_t
     uint16_t width;
     uint16_t height;
 
+    obstaclelayer_t layer;
     uint8_t flags;
 
     const collisionmask_t* mask;
@@ -51,21 +52,24 @@ static inline void flip(const obstacle_t* obstacle, int *local_x, int *local_y, 
 static inline grounddir_t flip_grounddir(grounddir_t ground_direction);
 
 /* public methods */
-obstacle_t* obstacle_create(const collisionmask_t* mask, int xpos, int ypos, int flags)
+obstacle_t* obstacle_create(const collisionmask_t* mask, int xpos, int ypos, obstaclelayer_t layer, int flags)
 {
-    return obstacle_create_ex(mask, xpos, ypos, flags, NULL, NULL);
+    return obstacle_create_ex(mask, xpos, ypos, layer, flags, NULL, NULL);
 }
 
-obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, int flags, void (*dtor)(void*), void *dtor_userdata)
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
     o->xpos = xpos;
     o->ypos = ypos;
+
+    o->layer = layer;
+    o->flags = flags;
+
+    o->mask = mask;
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
-    o->flags = flags;
-    o->mask = mask;
 
     o->dtor = dtor;
     o->dtor_userdata = dtor_userdata;
@@ -110,6 +114,11 @@ int obstacle_get_width(const obstacle_t *obstacle)
 int obstacle_get_height(const obstacle_t *obstacle)
 {
     return obstacle->height;
+}
+
+obstaclelayer_t obstacle_get_layer(const obstacle_t *obstacle)
+{
+    return obstacle->layer;
 }
 
 /* find the ground position, given (x,y) in world coordinates */

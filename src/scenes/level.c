@@ -1896,7 +1896,7 @@ int level_height_at(int xpos)
     int a, b, i, best, sample_width;
 
     if(height_at != NULL && xpos >= 0 && xpos < level_width) {
-        /* clipping interval indexes */
+        /* clipping interval indices */
         sample_width = max(0, level_width) / max(1, height_at_count - 1);
         a = ((xpos - WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
         b = ((xpos + WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
@@ -2719,9 +2719,6 @@ void clear_obstaclemap()
 /* update the obstacle map */
 void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, surgescript_object_t* (*get_bricklike_ssobject)(int))
 {
-    /* note: the layers of the bricks and of the brick-like objects are being ignored */
-    /* TODO: should refactor and move the layer into the obstacle_t */
-
     /* clear */
     clear_obstaclemap();
 
@@ -2729,7 +2726,6 @@ void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_
     for(; brick_list != NULL; brick_list = brick_list->next) {
         const brick_t* brick = brick_list->data;
         const obstacle_t* obstacle = brick_obstacle(brick);
-        /*bricklayer_t layer = brick_layer(brick);*/
 
         if(obstacle != NULL)
             obstaclemap_add_obstacle(obstaclemap, obstacle);
@@ -2767,7 +2763,6 @@ void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_
             continue;
 
         if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object)) {
-            /*bricklayer_t layer = scripting_brick_layer(bricklike_object);*/
             obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
 
             darray_push(mock_obstacles, mock_obstacle);
@@ -2782,7 +2777,7 @@ obstacle_t* item2obstacle(const item_t* item)
 {
     const collisionmask_t* mask = item->mask;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
-    return obstacle_create(mask, position.x, position.y, OF_SOLID);
+    return obstacle_create(mask, position.x, position.y, OL_DEFAULT, OF_SOLID);
 }
 
 /* converts a legacy object to an obstacle */
@@ -2790,7 +2785,7 @@ obstacle_t* object2obstacle(const object_t* object)
 {
     const collisionmask_t* mask = object->mask;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
-    return obstacle_create(mask, position.x, position.y, OF_SOLID);
+    return obstacle_create(mask, position.x, position.y, OL_DEFAULT, OF_SOLID);
 }
 
 /* converts a brick-like SurgeScript object to an obstacle */
@@ -2798,11 +2793,14 @@ obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
 {
     v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
     int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
+    bricklayer_t brick_layer = scripting_brick_layer(object);
+    obstaclelayer_t layer = ((brick_layer == BRL_GREEN) ? OL_GREEN : ((brick_layer == BRL_YELLOW) ? OL_YELLOW : OL_DEFAULT));
 
     collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
     return obstacle_create_ex(
         clone,
-        position.x, position.y, flags,
+        position.x, position.y,
+        layer, flags,
         destroy_collisionmask_of_bricklike_object, clone
     );
 }

@@ -35,26 +35,26 @@ typedef struct swpos_t
 /* sensorstate */
 struct sensorstate_t
 {
-    const obstacle_t* (*check)(v2d_t,const obstaclemap_t*,int,int,int,int);
+    const obstacle_t* (*check)(v2d_t,const obstaclemap_t*,int,int,int,int,obstaclelayer_t);
     void (*render)(v2d_t,v2d_t,int,int,int,int,color_t);
     swpos_t (*worldpos)(v2d_t,int,int,int,int);
 };
 
 /* private stuff ;-) */
-static const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm);
+static const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm, obstaclelayer_t layer_filter);
 static void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2);
 
-static const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2);
+static const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter);
 static void render_floormode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos_floormode(v2d_t actor_position, int x1, int y1, int x2, int y2);
-static const obstacle_t* check_rightwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2);
+static const obstacle_t* check_rightwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter);
 static void render_rightwallmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos_rightwallmode(v2d_t actor_position, int x1, int y1, int x2, int y2);
-static const obstacle_t* check_ceilingmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2);
+static const obstacle_t* check_ceilingmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter);
 static void render_ceilingmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos_ceilingmode(v2d_t actor_position, int x1, int y1, int x2, int y2);
-static const obstacle_t* check_leftwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2);
+static const obstacle_t* check_leftwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter);
 static void render_leftwallmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos_leftwallmode(v2d_t actor_position, int x1, int y1, int x2, int y2);
 
@@ -103,9 +103,9 @@ sensorstate_t* sensorstate_destroy(sensorstate_t *sensorstate)
     return NULL;
 }
 
-const obstacle_t* sensorstate_check(const sensorstate_t *sensorstate, v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2)
+const obstacle_t* sensorstate_check(const sensorstate_t *sensorstate, v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
-    return sensorstate->check(actor_position, obstaclemap, x1, y1, x2, y2);
+    return sensorstate->check(actor_position, obstaclemap, x1, y1, x2, y2, layer_filter);
 }
 
 void sensorstate_render(const sensorstate_t *sensorstate, v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)
@@ -125,14 +125,14 @@ void sensorstate_worldpos(const sensorstate_t *sensorstate, v2d_t actor_position
 
 
 /* private stuff */
-const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm)
+const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm, obstaclelayer_t layer_filter)
 {
     x1 += (int)actor_position.x;
     y1 += (int)actor_position.y;
     x2 += (int)actor_position.x;
     y2 += (int)actor_position.y;
 
-    return obstaclemap_get_best_obstacle_at(obstaclemap, min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2), mm);
+    return obstaclemap_get_best_obstacle_at(obstaclemap, min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2), mm, layer_filter);
 }
 
 void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)
@@ -162,9 +162,9 @@ swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2)
     };
 }
 
-const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2)
+const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
-    return check(actor_position, obstaclemap, x1, y1, x2, y2, MM_FLOOR);
+    return check(actor_position, obstaclemap, x1, y1, x2, y2, MM_FLOOR, layer_filter);
 }
 
 void render_floormode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)
@@ -177,9 +177,9 @@ swpos_t worldpos_floormode(v2d_t actor_position, int x1, int y1, int x2, int y2)
     return worldpos(actor_position, x1, y1, x2, y2);
 }
 
-const obstacle_t* check_rightwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2)
+const obstacle_t* check_rightwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
-    return check(actor_position, obstaclemap, y1, -x1, y2, -x2, MM_RIGHTWALL);
+    return check(actor_position, obstaclemap, y1, -x1, y2, -x2, MM_RIGHTWALL, layer_filter);
 }
 
 void render_rightwallmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)
@@ -192,9 +192,9 @@ swpos_t worldpos_rightwallmode(v2d_t actor_position, int x1, int y1, int x2, int
     return worldpos(actor_position, y1, -x1, y2, -x2);
 }
 
-const obstacle_t* check_ceilingmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2)
+const obstacle_t* check_ceilingmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
-    return check(actor_position, obstaclemap, -x1, -y1, -x2, -y2, MM_CEILING);
+    return check(actor_position, obstaclemap, -x1, -y1, -x2, -y2, MM_CEILING, layer_filter);
 }
 
 void render_ceilingmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)
@@ -207,9 +207,9 @@ swpos_t worldpos_ceilingmode(v2d_t actor_position, int x1, int y1, int x2, int y
     return worldpos(actor_position, -x1, -y1, -x2, -y2);
 }
 
-const obstacle_t* check_leftwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2)
+const obstacle_t* check_leftwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
-    return check(actor_position, obstaclemap, -y1, x1, -y2, x2, MM_LEFTWALL);
+    return check(actor_position, obstaclemap, -y1, x1, -y2, x2, MM_LEFTWALL, layer_filter);
 }
 
 void render_leftwallmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)

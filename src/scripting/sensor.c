@@ -279,7 +279,7 @@ void update(surgescript_object_t* object)
     if(sensor_is_enabled) {
         sensor_t* sensor = get_sensor(object);
         const obstaclemap_t* obstaclemap = get_obstaclemap(object);
-        const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, obstaclemap);
+        const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, OL_DEFAULT, obstaclemap);
 
         if(obstacle != NULL) {
             if(obstacle_is_solid(obstacle)) {

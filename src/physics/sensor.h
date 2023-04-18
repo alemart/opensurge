@@ -33,6 +33,7 @@ typedef struct sensor_t sensor_t;
 /* forward declarations */
 struct obstacle_t;
 struct obstaclemap_t;
+enum obstaclelayer_t;
 enum movmode_t;
 
 /* create and destroy */
@@ -41,7 +42,7 @@ sensor_t* sensor_create_vertical(int x, int y1, int y2, color_t color); /* facto
 sensor_t* sensor_destroy(sensor_t *sensor);
 
 /* public methods */
-const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */
+const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, enum obstaclelayer_t layer_filter, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */
 void sensor_render(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, v2d_t camera_position);
 void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int *x1, int *y1, int *x2, int *y2);
 int sensor_get_x1(const sensor_t *sensor);

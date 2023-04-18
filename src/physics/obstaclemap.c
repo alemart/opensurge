@@ -33,6 +33,7 @@ struct obstaclemap_t
 
 /* private methods */
 static const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, int x1, int y1, int x2, int y2, movmode_t mm);
+static inline bool ignore_obstacle(const obstacle_t *obstacle, obstaclelayer_t layer_filter);
 
 /* public methods */
 obstaclemap_t* obstaclemap_create()
@@ -54,32 +55,38 @@ void obstaclemap_add_obstacle(obstaclemap_t *obstaclemap, const obstacle_t *obst
     darray_push(obstaclemap->obstacle, obstacle);
 }
 
-const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm)
+const obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm, obstaclelayer_t layer_filter)
 {
     const obstacle_t *best = NULL;
 
     for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
-        if(obstacle_got_collision(obstaclemap->obstacle[i], x1, y1, x2, y2))
-            best = pick_best_obstacle(obstaclemap->obstacle[i], best, x1, y1, x2, y2, mm);
+        const obstacle_t *obstacle = obstaclemap->obstacle[i];
+
+        if(!ignore_obstacle(obstacle, layer_filter) && obstacle_got_collision(obstacle, x1, y1, x2, y2))
+            best = pick_best_obstacle(obstacle, best, x1, y1, x2, y2, mm);
     }
 
     return best;
 }
 
-bool obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y)
+bool obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y, obstaclelayer_t layer_filter)
 {
     for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
-        if(obstacle_got_collision(obstaclemap->obstacle[i], x, y, x, y))
+        const obstacle_t *obstacle = obstaclemap->obstacle[i];
+
+        if(!ignore_obstacle(obstacle, layer_filter) && obstacle_got_collision(obstacle, x, y, x, y))
             return true;
     }
 
     return false;
 }
 
-bool obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y)
+bool obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y, obstaclelayer_t layer_filter)
 {
     for(int i = 0; i < darray_length(obstaclemap->obstacle); i++) {
-        if(obstacle_got_collision(obstaclemap->obstacle[i], x, y, x, y) && obstacle_is_solid(obstaclemap->obstacle[i]))
+        const obstacle_t *obstacle = obstaclemap->obstacle[i];
+
+        if(!ignore_obstacle(obstacle, layer_filter) && obstacle_got_collision(obstacle, x, y, x, y) && obstacle_is_solid(obstacle))
             return true;
     }
 
@@ -172,4 +179,11 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 
     /* this shouldn't happen */
     return a;
+}
+
+/* whether or not the given obstacle should be ignored, given a layer filter */
+bool ignore_obstacle(const obstacle_t *obstacle, obstaclelayer_t layer_filter)
+{
+    obstaclelayer_t obstacle_layer = obstacle_get_layer(obstacle);
+    return layer_filter != OL_DEFAULT && obstacle_layer != OL_DEFAULT && obstacle_layer != layer_filter;
 }

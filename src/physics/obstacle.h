@@ -36,9 +36,17 @@ typedef struct obstacle_t obstacle_t;
 extern const int OF_SOLID, OF_CLOUD;
 extern const int OF_HFLIP, OF_VFLIP;
 
+/* obstacle layer */
+typedef enum obstaclelayer_t obstaclelayer_t;
+enum obstaclelayer_t {
+    OL_DEFAULT,
+    OL_GREEN,
+    OL_YELLOW
+};
+
 /* create and destroy */
-obstacle_t* obstacle_create(const collisionmask_t *mask, int xpos, int ypos, int flags);
-obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, int flags, void (*dtor)(void*), void *dtor_userdata);
+obstacle_t* obstacle_create(const collisionmask_t *mask, int xpos, int ypos, obstaclelayer_t layer, int flags);
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata);
 obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 
 /* public methods */
@@ -49,5 +57,6 @@ int obstacle_get_width(const obstacle_t *obstacle); /* width of the bounding box
 int obstacle_get_height(const obstacle_t *obstacle); /* height of the bounding box */
 int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2); /* check for collision with sensor (x1,y1,x2,y2); x1<=x2, y1<=y2 */
 int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir_t ground_direction); /* get the (absolute) ground position for world coordinates (x,y) */
+obstaclelayer_t obstacle_get_layer(const obstacle_t *obstacle); /* get layer */
 
 #endif
