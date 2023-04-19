@@ -25,7 +25,6 @@
 #define _PLAYER_H
 
 #include "../core/v2d.h"
-#include "../core/darray.h"
 #include "brick.h"
 
 /* constants */
@@ -96,15 +95,13 @@ struct player_t {
     int thrown_while_rolling;
     int visible;
     const struct character_t* character;
-    struct obstaclemap_t* obstaclemap;
-    DARRAY(struct obstacle_t*, mock_obstacles);
 };
 
 /* public functions */
 player_t* player_create(const char *character_name);
 player_t* player_destroy(player_t *player);
 void player_early_update(player_t *player);
-void player_update(player_t *player, struct player_t **team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list, struct surgescript_object_t* (*get_bricklike_object)(int));
+void player_update(player_t *player, const struct obstaclemap_t* obstaclemap);
 void player_render(player_t *player, v2d_t camera_position);
 
 void player_hit(player_t *player, float direction);

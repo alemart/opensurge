@@ -39,6 +39,7 @@
 #include "../core/logfile.h"
 #include "../core/input.h"
 #include "../core/sprite.h"
+#include "../core/darray.h"
 #include "../scenes/level.h"
 #include "../physics/physicsactor.h"
 #include "../physics/obstaclemap.h"
@@ -84,12 +85,7 @@ static int score;                /* shared score */
 static void update_shield(player_t *player);
 static void update_animation(player_t *player);
 static void play_sounds(player_t *player);
-static void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list, surgescript_object_t* (*get_bricklike_object)(int));
-static obstacle_t* item2obstacle(const item_t* item);
-static obstacle_t* object2obstacle(const object_t* object);
-static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
-static collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object);
-static void destroy_collisionmask_of_bricklike_object(void* mask);
+static void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap);
 static inline float delta_angle(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
@@ -156,8 +152,6 @@ player_t *player_create(const char *character_name)
     /* physics */
     p->pa = physicsactor_create(p->actor->position);
     p->pa_old_state = physicsactor_get_state(p->pa);
-    p->obstaclemap = obstaclemap_create();
-    darray_init_ex(p->mock_obstacles, 32);
 
     /* misc */
     p->underwater = FALSE;
@@ -215,12 +209,6 @@ player_t* player_destroy(player_t *player)
     /* physics */
     physicsactor_destroy(player->pa);
 
-    /* obstacle map */
-    obstaclemap_destroy(player->obstaclemap);
-    for(i = 0; i < darray_length(player->mock_obstacles); i++)
-        obstacle_destroy(player->mock_obstacles[i]);
-    darray_release(player->mock_obstacles);
-
     /* done */
     free(player->name);
     free(player);
@@ -233,7 +221,7 @@ player_t* player_destroy(player_t *player)
  * player_update()
  * Updates the player
  */
-void player_update(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, enemy_list_t *enemy_list, surgescript_object_t* (*get_bricklike_object)(int))
+void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 {
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
@@ -245,7 +233,7 @@ void player_update(player_t *player, player_t **team, int team_size, brick_list_
 
         /* run physics simulation */
         player->pa_old_state = physicsactor_get_state(pa);
-        physics_adapter(player, team, team_size, brick_list, item_list, enemy_list, get_bricklike_object);
+        physics_adapter(player, obstaclemap);
 
         /* underwater logic: enter / leave water */
         /* FIXME: scripting */
@@ -1482,13 +1470,10 @@ void play_sounds(player_t* player)
 }
 
 /* the interface between player_t and physicsactor_t */
-void physics_adapter(player_t *player, player_t **team, int team_size, brick_list_t *brick_list, item_list_t *item_list, object_list_t *object_list, surgescript_object_t* (*get_bricklike_object)(int))
+void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
 {
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
-    obstaclemap_t* obstaclemap = player->obstaclemap;
-    surgescript_object_t* bricklike_object = NULL;
-    int i;
 
     /* converting variables */
     physicsactor_set_position(pa, act->position);
@@ -1508,42 +1493,6 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
         physicsactor_look_up(pa);
     if(input_button_down(act->input, IB_FIRE1))
         physicsactor_jump(pa);
-
-    /* clearing the obstacle map &
-       removing previous mock obstacles */
-    obstaclemap_clear(obstaclemap);
-    for(i = 0; i < darray_length(player->mock_obstacles); i++)
-        obstacle_destroy(player->mock_obstacles[i]);
-    darray_clear(player->mock_obstacles);
-
-    /* creating the obstacle map */
-    for(; brick_list; brick_list = brick_list->next) {
-        if(brick_obstacle(brick_list->data) != NULL)
-            obstaclemap_add_obstacle(obstaclemap, brick_obstacle(brick_list->data));
-    }
-    for(; item_list; item_list = item_list->next) {
-        if(item_list->data->obstacle && item_list->data->mask) {
-            obstacle_t* mock_obstacle = item2obstacle(item_list->data);
-            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
-            darray_push(player->mock_obstacles, mock_obstacle);
-        }
-    }
-    for(; object_list; object_list = object_list->next) {
-        if(object_list->data->obstacle && object_list->data->mask) {
-            obstacle_t* mock_obstacle = object2obstacle(object_list->data);
-            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
-            darray_push(player->mock_obstacles, mock_obstacle);
-        }
-    }
-    for(i = 0; (bricklike_object = get_bricklike_object(i)) != NULL; i++) {
-        if(!surgescript_object_is_killed(bricklike_object)) {
-            if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object)) {
-                obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
-                obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
-                darray_push(player->mock_obstacles, mock_obstacle);
-            }
-        }
-    }
 
     /* set the layer of the physics actor */
     if(player->layer == BRL_GREEN)
@@ -1583,55 +1532,6 @@ void physics_adapter(player_t *player, player_t **team, int team_size, brick_lis
 
     /* mirroring */
     act->mirror = !physicsactor_is_facing_right(pa) ? IF_HFLIP : IF_NONE;
-}
-
-/* converts a built-in item to an obstacle */
-obstacle_t* item2obstacle(const item_t* item)
-{
-    const collisionmask_t* mask = item->mask;
-    v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
-    return obstacle_create(mask, position.x, position.y, OL_DEFAULT, OF_SOLID);
-}
-
-/* converts a legacy object to an obstacle */
-obstacle_t* object2obstacle(const object_t* object)
-{
-    const collisionmask_t* mask = object->mask;
-    v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
-    return obstacle_create(mask, position.x, position.y, OL_DEFAULT, OF_SOLID);
-}
-
-/* converts a brick-like SurgeScript object to an obstacle */
-obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
-{
-    v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
-    int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
-    bricklayer_t brick_layer = scripting_brick_layer(object);
-    obstaclelayer_t layer = ((brick_layer == BRL_GREEN) ? OL_GREEN : ((brick_layer == BRL_YELLOW) ? OL_YELLOW : OL_DEFAULT));
-
-    collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
-    return obstacle_create_ex(
-        clone,
-        position.x, position.y,
-        layer, flags,
-        destroy_collisionmask_of_bricklike_object, clone
-    );
-}
-
-/* creates a collision mask for a brick-like SurgeScript object */
-collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object)
-{
-    /* the following pointer is guaranteed to be valid during the lifetime of the obstacle_t,
-       regardless of what happens with the brick-like object (i.e., it may get destroyed) */
-    const collisionmask_t* mask = scripting_brick_mask(object); /* assumed to be valid */
-    return collisionmask_clone(mask); /* not very efficient, though */
-}
-
-/* destroys a collision mask created for a brick-like SurgeScript object */
-void destroy_collisionmask_of_bricklike_object(void* mask)
-{
-    collisionmask_t* clone = (collisionmask_t*)mask;
-    collisionmask_destroy(clone);
 }
 
 /* hotspot "gambiarra" */

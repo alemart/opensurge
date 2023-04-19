@@ -25,6 +25,7 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/stringutil.h"
+#include "../core/darray.h"
 #include "../scenes/level.h"
 #include "../scenes/quest.h"
 #include "../entities/player.h"

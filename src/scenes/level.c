@@ -50,6 +50,7 @@
 #include "../core/nanoparser.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
+#include "../core/darray.h"
 #include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
@@ -1405,7 +1406,7 @@ void level_update()
             /* updating... */
             if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
-                    player_update(team[i], team, team_size, major_bricks, major_items, major_enemies, get_bricklike_ssobject);
+                    player_update(team[i], obstaclemap);
             }
         }
     }
