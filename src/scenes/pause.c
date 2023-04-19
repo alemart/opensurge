@@ -844,6 +844,12 @@ void legacy_update()
         scenestack_pop();
         return;
     }
+
+    /* unpause in mobile mode: accept fire1 */
+    if(mobilegamepad_is_visible() && input_button_pressed(input, IB_FIRE1)) {
+        scenestack_pop();
+        return;
+    }
 }
 
 /* legacy pause screen: render */
