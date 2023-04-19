@@ -271,6 +271,7 @@ object "Surge's Lightning Boom" is "companion"
 
     fun mustAdjustToCeiling()
     {
+        ceilingSensor.layer = player.layer;
         return ceilingSensor.status == "solid";
     }
 
