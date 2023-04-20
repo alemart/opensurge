@@ -120,6 +120,11 @@ void asset_init(const char* argv0, const char* optional_gamedir)
     /* set the default name of the user-modifiable asset directory */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
 
+    /* experimental compatibility option for old MODs: append gamedir to the default shared datadir */
+    bool experimental_compatibility = (optional_gamedir != NULL && *optional_gamedir == '+');
+    if(experimental_compatibility)
+        ++optional_gamedir;
+
     /* copy the gamedir, if specified */
     gamedir = (optional_gamedir != NULL) ? str_dup(optional_gamedir) : NULL;
 
@@ -182,6 +187,23 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         if(!PHYSFS_mount(gamedir, "/", 1))
             CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
         LOG("Mounting gamedir: %s", gamedir);
+
+        /* experimental compatibility option */
+        if(experimental_compatibility) {
+            ALLEGRO_PATH* shared_datadir = find_shared_datadir();
+            const char* dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);
+
+            if(!PHYSFS_mount(dirpath, "/", 1))
+                CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
+            LOG("Mounting shared data directory [compatibility mode]: %s", dirpath);
+
+#if defined(__ANDROID__)
+            /* on Android, read from the assets/ folder inside the .apk */
+            PHYSFS_setRoot(dirpath, "/assets");
+#endif
+
+            al_destroy_path(shared_datadir); /* invalidates dirpath */
+        }
 
         /* done */
         if(generated_user_datadir != NULL)
