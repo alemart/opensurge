@@ -67,6 +67,7 @@ static const int MAX_TOUCHES = (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches)
 
 /* utilities */
 #define LOG(...)            logfile_message("Mobile Gamepad - " __VA_ARGS__)
+#define FATAL(...)          fatal_error("Mobile Gamepad - " __VA_ARGS__)
 #define IS_POWER_OF_TWO(n)  (((n) & ((n) - 1)) == 0)
 #define VALIDATE_MASK(x)    typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
 
@@ -154,7 +155,7 @@ static const float FADE_TIME = 0.5f; /* used when showing/hiding the controls; g
 /* D-Pad sensitivity */
 
 static const v2d_t DPAD_AXIS_THRESHOLD = {
-    .x = 0.5f,    /* cos(60 degrees) ~ 120 degrees horizontally */
+    .x = 0.609f,  /* cos(52.5 degrees) ~ 105 degrees horizontally */
     .y = 0.707f   /* sin(45 degrees) ~ 90 degrees vertically */
 };
 
@@ -272,6 +273,12 @@ void mobilegamepad_init(int _flags)
     /* initialize the interactive radii */
     for(int i = 0; i < NUM_CONTROLS; i++)
         interactive_radius[i] = 0.0f;
+
+    /* validate the animations */
+    for(int i = 0; i < NUM_CONTROLS; i++) {
+        if(!sprite_animation_exists(SPRITE_NAME[i], 0))
+            FATAL("Can't find sprite \"%s\"", SPRITE_NAME[i]);
+    }
 
     /* create the actors */
     for(int i = 0; i < NUM_CONTROLS; i++)
