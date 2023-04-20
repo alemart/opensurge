@@ -44,6 +44,7 @@ static int compile_script(const char* filepath, void* param);
 static bool found_test_script(const surgescript_vm_t* vm);
 static void check_if_compatible();
 static char* read_file(const char* filepath);
+static void parse_surgescript_options(surgescript_vm_t* vm, int argc, char** argv);
 
 /* SurgeEngine */
 static void setup_surgeengine(surgescript_vm_t* vm);
@@ -93,6 +94,9 @@ void scripting_init(int argc, const char** argv)
     vm_argv = mallocx((vm_argc = argc) * sizeof(*vm_argv));
     while(argc-- > 0)
         vm_argv[argc] = str_dup(argv[argc]);
+
+    /* parse special command-line options that affect the SurgeScript runtime */
+    parse_surgescript_options(vm, vm_argc, vm_argv);
 
     /* register SurgeEngine builtins */
     setup_surgeengine(vm);
@@ -160,6 +164,9 @@ void scripting_reload()
         logfile_message("Failed to reload the scripts");
         return;
     }
+
+    /* parse special command-line options that affect the SurgeScript runtime */
+    parse_surgescript_options(vm, vm_argc, vm_argv);
 
     /* register SurgeEngine builtins */
     setup_surgeengine(vm);
@@ -498,4 +505,21 @@ char* read_file(const char* filepath)
 
     /* success! */
     return data;
+}
+
+/* parse special command-line options that affect the SurgeScript runtime */
+void parse_surgescript_options(surgescript_vm_t* vm, int argc, char** argv)
+{
+    for(int i = 0; i < argc; i++) {
+        logfile_message("Found SurgeScript option %s", argv[i]);
+
+        if(strcmp(argv[i], "--ss-allow-duplicates") == 0) {
+            surgescript_parser_t* parser = surgescript_vm_parser(vm);
+            surgescript_parser_set_flags(parser, SSPARSER_ALLOW_DUPLICATES);
+        }
+        else if(strcmp(argv[i], "--ss-skip-duplicates") == 0) {
+            surgescript_parser_t* parser = surgescript_vm_parser(vm);
+            surgescript_parser_set_flags(parser, SSPARSER_SKIP_DUPLICATES);
+        }
+    }
 }
