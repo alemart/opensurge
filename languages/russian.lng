@@ -83,6 +83,7 @@ OPTIONS_GAMEPAD             "Геймпад"
 OPTIONS_LANGUAGE            "Сменить язык"
 OPTIONS_STAGESELECT         "Выбор уровня"
 OPTIONS_CREDITS             "Авторы Open Surge"  //v2
+FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "Поддержать Open Surge"
 OPTIONS_BACK                "НАЗАД"
 

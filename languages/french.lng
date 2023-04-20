@@ -80,6 +80,7 @@ OPTIONS_GAMEPAD          "Utiliser une manette"
 OPTIONS_LANGUAGE         "Changer la langue"
 OPTIONS_STAGESELECT      "Sélection de stage"
 OPTIONS_CREDITS          "Crédits d'Open Surge"
+FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE           "Faire un don pour Open Surge"
 OPTIONS_BACK             "RETOUR"
 

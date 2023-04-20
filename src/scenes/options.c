@@ -64,6 +64,7 @@ static const int OFFSET_X = 60;
 /* private methods */
 static void save_preferences();
 static void open_donate_page();
+static void open_website();
 
 /* group tree */
 static int option; /* current option: 0 <= option <= option_count - 1 */
@@ -265,15 +266,24 @@ void save_preferences()
 /* opens a donate page */
 void open_donate_page()
 {
-    const char* donate_url = "http://opensurge2d.org/contribute";
+    const char* base_url = "http://opensurge2d.org/contribute";
     char url[128];
     
     snprintf(url, sizeof(url),
-        "%s?v=%s&lang=%s",
-        donate_url, GAME_VERSION_STRING, lang_get("LANG_ID")
+        "%s?v=%s",
+        base_url, GAME_VERSION_STRING
     );
+
     launch_url(url);
 }
+
+/* opens the website of the engine */
+void open_website()
+{
+    launch_url("http://opensurge2d.org");
+}
+
+
 
 
 
@@ -864,6 +874,49 @@ static group_t *group_donate_create()
     return group_create(group_donate_init, group_donate_release, group_donate_update, group_donate_render);
 }
 
+/* "Website" label */
+static void group_website_init(group_t *g)
+{
+    group_highlightable_init(g, "OPTIONS_WEBSITE", option_count++);
+}
+
+static void group_website_release(group_t *g)
+{
+    group_highlightable_release(g);
+}
+
+static int group_website_is_highlighted(group_t *g)
+{
+    return group_highlightable_is_highlighted(g);
+}
+
+static void group_website_update(group_t *g)
+{
+    /* base class */
+    group_highlightable_update(g);
+
+    /* derived class */
+    if(group_website_is_highlighted(g)) {
+        if(!fadefx_is_fading()) {
+            if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
+                sound_play(SFX_CONFIRM);
+                open_website();
+                quit = true;
+            }
+        }
+    }
+}
+
+static void group_website_render(group_t *g, v2d_t camera_position)
+{
+    group_highlightable_render(g, camera_position);
+}
+
+static group_t *group_website_create()
+{
+    return group_create(group_website_init, group_website_release, group_website_update, group_website_render);
+}
+
 /* "Stage Select" label */
 static void group_stageselect_init(group_t *g)
 {
@@ -1072,6 +1125,7 @@ group_t *create_grouptree()
     group_addchild(game, group_stageselect_create());
     group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_credits_create());
+    group_addchild(game, group_website_create());
     if(!IS_GOOGLEPLAY_BUILD()) {
         /* adding an external donation page to an Android app published
            in the Google Play Store is a violation of their policy */

@@ -81,6 +81,7 @@ OPTIONS_GAMEPAD             "Користи Џојстик"
 OPTIONS_LANGUAGE            "Промени језик"
 OPTIONS_STAGESELECT         "Изабери ниво"
 OPTIONS_CREDITS             "Open Surge Заслуге"
+FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "Донирај Open Surge-u"
 OPTIONS_BACK                "Назад"
 

@@ -80,6 +80,7 @@ OPTIONS_GAMEPAD             "Gamepad benutzen"
 OPTIONS_LANGUAGE            "Sprache wechseln"
 OPTIONS_STAGESELECT         "Level auswählen"
 OPTIONS_CREDITS             "Mitwirkende von Open Surge"
+FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "An Open Surge spenden"
 OPTIONS_BACK                "ZURÜCK"
 

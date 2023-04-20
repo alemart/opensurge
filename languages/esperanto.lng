@@ -81,6 +81,7 @@ OPTIONS_GAMEPAD             "Uzi ludregilon"
 OPTIONS_LANGUAGE            "Ŝanĝi lingvon"
 OPTIONS_STAGESELECT         "Elekti nivelon"
 OPTIONS_CREDITS             "Atribuoj de Open Surge"
+FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "Donaci al Open Surge"
 OPTIONS_BACK                "REEN"
 
