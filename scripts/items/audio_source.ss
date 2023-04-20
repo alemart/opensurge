@@ -134,6 +134,14 @@ object "Audio Mixer"
         if(0 < (volume[snd] = Math.max(vol, volume[snd] || 0)))
             audible = true;
     }
+
+    fun destructor()
+    {
+        foreach(entry in sound) {
+            sfx = entry.value;
+            sfx.stop();
+        }
+    }
 }
 
 // Computes the horizontal distance between
