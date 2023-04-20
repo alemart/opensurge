@@ -737,7 +737,8 @@ surgescript_var_t* fun_collisionbox_onrendergizmos(surgescript_object_t* object,
 
     if(scripting_util_is_object_inside_screen(object)) {
         color_t color = COLLIDER_COLOR();
-        v2d_t center = ((collider_t*)collider)->worldpos;
+        /*v2d_t center = ((collider_t*)collider)->worldpos;*/ /* this cached value may become outdated if an ancestor object changes its position in lateUpdate() */
+        v2d_t center = scripting_util_world_position(object);
         v2d_t camera = scripting_util_object_camera(object);
         v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
 
@@ -952,7 +953,8 @@ surgescript_var_t* fun_collisionball_onrendergizmos(surgescript_object_t* object
     ballcollider_t* collider = surgescript_object_userdata(object);
 
     if(scripting_util_is_object_inside_screen(object)) {
-        v2d_t center = ((collider_t*)collider)->worldpos;
+        /*v2d_t center = ((collider_t*)collider)->worldpos;*/ /* this cached value may become outdated if an ancestor object changes its position in lateUpdate() */
+        v2d_t center = scripting_util_world_position(object);
         v2d_t camera = scripting_util_object_camera(object);
         v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
         double r = collider->radius;
