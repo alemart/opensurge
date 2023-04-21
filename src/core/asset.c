@@ -193,6 +193,7 @@ void asset_init(const char* argv0, const char* optional_gamedir)
             ALLEGRO_PATH* shared_datadir = find_shared_datadir();
             const char* dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);
 
+            /* mount the default shared data directory with lower precedence */
             if(!PHYSFS_mount(dirpath, "/", 1))
                 CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
             LOG("Mounting shared data directory [compatibility mode]: %s", dirpath);
