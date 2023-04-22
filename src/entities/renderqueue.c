@@ -19,6 +19,7 @@
  */
 
 #include <surgescript.h>
+#include <string.h>
 #include <math.h>
 #include "renderqueue.h"
 #include "particle.h"
@@ -84,10 +85,16 @@ struct renderable_vtable_t {
 /* an entry of the render queue */
 typedef struct renderqueue_entry_t renderqueue_entry_t;
 struct renderqueue_entry_t {
+
     renderable_t renderable;
     const renderable_vtable_t* vtable;
     int group_index; /* a helper for deferred rendering; see my commentary about it below */
+
+#if defined(__GNUC__)
+} __attribute__((aligned));
+#else
 };
+#endif
 
 /* vtables */
 static float zindex_particles(renderable_t r);
@@ -697,8 +704,60 @@ void enqueue(const renderqueue_entry_t* entry)
 /* compares two entries of the render queue */
 int cmp_fun(const void *i, const void *j)
 {
+    /*
+     * Here I document a very interesting phenomenon that take place in this
+     * function, on armeabi-v7a (Android), when compiling with clang 12.0.8
+     * distributed with the Android NDK r23:
+     *
+     * We get a memory alignment crash (SIGBUS / BUS_ADRALN).
+     *
+     * The crash does not take place when compiling with -O0, but it shows up
+     * as soon as I enable optimizations (e.g., with -O1).
+     *
+     * I run some experiments with C11 alignas and I also experimented using
+     * the non-standard __attribute__((aligned)) to align the fields and the
+     * structures, including renderqueue_entry_t, but the crash persisted.
+     *
+     * Interestingly, the crash takes place when calling a function of the
+     * vtable AND when passing a renderable_t as a parameter. Example:
+     *
+     * const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
+     * renderable_t r = a->renderable; // no crash
+     * int p = a->vtable->type((renderable_t){ .dummy = NULL }); // no crash
+     * int q = a->vtable->type(r); // crash! vtable->type() doesn't use r!
+     *
+     * At the time of this writing, renderable_t is a union of pointers (just
+     * aliases). It's the first element of a renderqueue_entry_t struct. Hence,
+     * it's supposed to have the same address as the renderqueue_entry_t, which
+     * "should" be aligned(*). All members of that struct "should" have been
+     * aligned in my experiments (via alignas) and sizeof(renderqueue_entry_t)
+     * was a power of two, and yet it was crashing.
+     *
+     * (*) the rendering queue encapsulates an array of renderqueue_entry_t.
+     * The address of the first element of that array is given by malloc(),
+     * which returns a pointer that is aligned to alignof(max_align_t), i.e.,
+     * a suitably aligned pointer.
+     *
+     * Why did it crash when I enabled optimizations? Data was not aligned,
+     * even though it """should""" have been. Which data?
+     *
+     * I get around the issue entirely. Instead of reading the data directly,
+     * I allocate renderqueue_entry_t structs on the stack and copy the data
+     * via memcpy(), which interprets the data as arrays of bytes. Since I'm
+     * just reading and writing bytes, no memory alignment errors occur.
+     */
+#if 0
+    /* possible memory alignment errors */
     const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
     const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
+#else
+    renderqueue_entry_t _a, _b;
+    memcpy(&_a, i, sizeof(_a));
+    memcpy(&_b, j, sizeof(_b));
+    const renderqueue_entry_t *a = &_a;
+    const renderqueue_entry_t *b = &_b;
+#endif
+
     float za = a->vtable->zindex(a->renderable);
     float zb = b->vtable->zindex(b->renderable);
 
