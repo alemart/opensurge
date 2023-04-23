@@ -705,7 +705,7 @@ void enqueue(const renderqueue_entry_t* entry)
 int cmp_fun(const void *i, const void *j)
 {
     /*
-     * Here I document a very interesting phenomenon that take place in this
+     * Here I document a very interesting phenomenon that takes place in this
      * function, on armeabi-v7a (Android), when compiling with clang 12.0.8
      * distributed with the Android NDK r23:
      *
@@ -739,7 +739,7 @@ int cmp_fun(const void *i, const void *j)
      * a suitably aligned pointer.
      *
      * Why did it crash when I enabled optimizations? Data was not aligned,
-     * even though it """should""" have been. Which data?
+     * even though it """should""" have been. Which data? Which instruction?
      *
      * I get around the issue entirely. Instead of reading the data directly,
      * I allocate renderqueue_entry_t structs on the stack and copy the data
