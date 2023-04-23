@@ -327,7 +327,7 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
 {
     /* due to the static array declared as an optimization below,
        merge_sort() isn't thread-safe */
-    static uint8_t tmp[16384];
+    static uint8_t tmp[65536];
     size_t bytes = (q-p+1) * size;
     uint8_t *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
     uint8_t *i = arr;
