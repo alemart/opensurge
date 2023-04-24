@@ -232,9 +232,9 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
 
             // breathing counter
             t = player.secondsToDrown;
-            if(t > 0 && t <= duration) {
+            if(t > 0 && t < duration) {
                 // show counter
-                counter.text = "<color=ff0055>" + Math.ceil(t * maxCounterValue / duration) + "</color>";
+                counter.text = "<color=ff0055>" + Math.floor(t * (1 + maxCounterValue) / duration) + "</color>";
                 counter.visible = true;
 
                 // music
