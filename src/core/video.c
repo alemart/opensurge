@@ -62,11 +62,13 @@ static void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data);
 
 
 /* Backbuffer */
+#define USE_ROUNDROBIN_BACKBUFFER 1 /* use a small pool of FBOs in a round-robin fashion? */
 #define DEFAULT_SCREEN_WIDTH  426 /* this is set on stone! Picked a 16:9 resolution */
 #define DEFAULT_SCREEN_HEIGHT 240
 static int game_screen_width = DEFAULT_SCREEN_WIDTH; /* the width of the backbuffer during regular gameplay (i.e., not in the level editor) */
 static int game_screen_height = DEFAULT_SCREEN_HEIGHT; /* the height of the backbuffer during regular gameplay */
-static image_t* backbuffer = NULL;
+static image_t* backbuffer[2] = { NULL, NULL };
+static int backbuffer_index = 0; /* round-robin backbuffer: 0 = primary; 1 = secondary */
 static bool create_backbuffer();
 static void destroy_backbuffer();
 static void reconfigure_backbuffer();
@@ -253,22 +255,27 @@ void video_release()
  */
 void video_render(void (*render_overlay)())
 {
-    ALLEGRO_STATE state;
     ALLEGRO_TRANSFORM display_transform;
     ALLEGRO_TRANSFORM identity_transform;
 
-    /* save the state & compute an appropriate transform */
-    al_store_state(&state, ALLEGRO_STATE_TRANSFORM | ALLEGRO_STATE_TARGET_BITMAP);
+    /* compute an appropriate transform */
     al_identity_transform(&identity_transform);
     compute_display_transform(&display_transform);
 
-    /* clear the screen */
+    /* copy our backbuffer to the display backbuffer */
     al_set_target_bitmap(al_get_backbuffer(display));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-
-    /* copy the backbuffer */
     al_use_transform(&display_transform);
-        al_draw_bitmap(IMAGE2BITMAP(backbuffer), 0.0f, 0.0f, 0);
+#if USE_ROUNDROBIN_BACKBUFFER
+#if 1
+        /* render the current frame */
+        al_draw_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]), 0.0f, 0.0f, 0);
+#else
+        /* render the previous frame */
+        al_draw_bitmap(IMAGE2BITMAP(backbuffer[1-backbuffer_index]), 0.0f, 0.0f, 0);
+#endif
+#else
+        al_draw_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]), 0.0f, 0.0f, 0);
+#endif
     al_use_transform(&identity_transform);
 
     /* compute the framerate */
@@ -281,9 +288,25 @@ void video_render(void (*render_overlay)())
         render_fps();
     render_console();
 
-    /* restore the state and flip */
-    al_restore_state(&state);
+    /* flip display */
     al_flip_display();
+
+    /* clearing just after flipping may provide a slight performance increase
+       in some drivers (?). Allegro should call glClear() behind the scenes */
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+
+#if USE_ROUNDROBIN_BACKBUFFER
+    /* use a round-robin scheme for a (possible) performance improvement,
+       in an attempt to avoid pipeline stalling */
+    backbuffer_index = 1 - backbuffer_index;
+#endif
+
+    /* restore our backbuffer */
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
+
+    /* it's useful to call glClear() just after glBindFramebuffer() in
+       some tiled architectures */
+    /*al_clear_to_color(al_map_rgb(0, 0, 0));*/
 }
 
 /*
@@ -437,7 +460,7 @@ v2d_t video_get_window_size()
  */
 image_t* video_get_backbuffer()
 {
-    return backbuffer;
+    return backbuffer[backbuffer_index];
 }
 
 /*
@@ -617,8 +640,8 @@ void compute_display_transform(ALLEGRO_TRANSFORM* transform)
     v2d_t scale, offset;
     float display_width = (float)al_get_display_width(display);
     float display_height = (float)al_get_display_height(display);
-    float backbuffer_width = (float)image_width(backbuffer);
-    float backbuffer_height = (float)image_height(backbuffer);
+    float backbuffer_width = (float)image_width(backbuffer[0]);
+    float backbuffer_height = (float)image_height(backbuffer[0]);
 
     /* ensure non-zero scale for an invertible transform. is this necessary? */
     display_width = max(1, display_width);
@@ -682,11 +705,13 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
 
         case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
             al_acknowledge_drawing_halt(event->display.source);
+            destroy_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
             break;
 
         case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
             al_acknowledge_drawing_resume(event->display.source);
-            reconfigure_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
+            if(!create_backbuffer())
+                FATAL("Can't create backbuffer after al_acknowledge_drawing_resume()");
             break;
     }
 
@@ -707,14 +732,32 @@ bool create_backbuffer()
     int screen_width = game_screen_width;
     int screen_height = game_screen_height;
 
-    if(backbuffer != NULL)
+    /* validate */
+    if(backbuffer[0] != NULL) {
         FATAL("Duplicate backbuffer");
-
-    compute_screen_size(settings.mode, &screen_width, &screen_height);
-    if(NULL == (backbuffer = image_create_backbuffer(screen_width, screen_height)))
         return false;
+    }
 
-    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
+    /* compute the size of the backbuffer */
+    compute_screen_size(settings.mode, &screen_width, &screen_height);
+
+    /* create the images */
+    if(NULL == (backbuffer[0] = image_create_backbuffer(screen_width, screen_height))) {
+        return false;
+    }
+#if USE_ROUNDROBIN_BACKBUFFER
+    else if(NULL == (backbuffer[1] = image_create_backbuffer(screen_width, screen_height))) {
+        image_destroy(backbuffer[0]);
+        backbuffer[0] = NULL;
+        return false;
+    }
+#endif
+
+    /* set the target bitmap */
+    backbuffer_index = 0;
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
+
+    /* done! */
     return true;
 }
 
@@ -723,34 +766,38 @@ void destroy_backbuffer()
 {
     /* a display is tied to an OpenGL rendering context. A video bitmap is tied
        to a display. If the display is invalidated, so is the backbuffer */
-    if(backbuffer == NULL)
+    if(backbuffer[0] == NULL) {
         FATAL("Backbuffer released twice");
+        return;
+    }
 
+    /* restore the default framebuffer */
     al_set_target_bitmap(al_get_backbuffer(display));
-    image_destroy(backbuffer);
-    backbuffer = NULL;
+
+    /* destroy the images */
+    for(int b = sizeof(backbuffer) / sizeof(backbuffer[0]) - 1; b >= 0; b--) {
+        if(backbuffer[b] != NULL)
+            image_destroy(backbuffer[b]);
+        backbuffer[b] = NULL;
+    }
 }
 
 /* Reconfigure the backbuffer according to the current settings */
 void reconfigure_backbuffer()
 {
-    int screen_width = game_screen_width;
-    int screen_height = game_screen_height;
+    /* validate */
+    if(backbuffer[0] == NULL) {
+        FATAL("Can't reconfigure the backbuffer: no backbuffer");
+        return;
+    }
 
-    if(backbuffer == NULL)
-        FATAL("No backbuffer");
-    else
-        image_destroy(backbuffer);
+    /* destroy the old */
+    LOG("Will reconfigure the backbuffer...");
+    destroy_backbuffer();
 
-    compute_screen_size(settings.mode, &screen_width, &screen_height);
-    if(NULL == (backbuffer = image_create_backbuffer(screen_width, screen_height)))
+    /* create the new */
+    if(!create_backbuffer())
         FATAL("Can't reconfigure the backbuffer");
-
-    al_set_target_bitmap(IMAGE2BITMAP(backbuffer));
-
-    /* it seems that we need this for some reason on Android. Why? */
-    al_destroy_font(console.font);
-    console.font = al_create_builtin_font();
 }
 
 /* Compute the size of the screen / backbuffer according to the video mode */
