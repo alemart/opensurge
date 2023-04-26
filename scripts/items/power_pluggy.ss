@@ -100,7 +100,7 @@ object "Power Pluggy Counterclockwise" is "entity", "gimmick"
     }
 }
 
-object "Power Pluggy Base" is "private", "entity", "awake"
+object "Power Pluggy Base" is "private", "entity"
 {
     actor = Actor("Power Pluggy");
     sfxEnter = Sound("samples/power_pluggy_enter.wav");
@@ -206,7 +206,7 @@ object "Power Pluggy Base" is "private", "entity", "awake"
     }
 }
 
-object "Power Pluggy Collider" is "private", "entity", "awake"
+object "Power Pluggy Collider" is "private", "entity"
 {
     collider = CollisionBall(12);
     transform = Transform();
