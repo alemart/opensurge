@@ -25,7 +25,7 @@ using SurgeEngine.Video.Screen;
 // - volume: number. Base volume: a number between 0 and 1. Usually set to 1.
 // - enabled: boolean. Whether the audio source is enabled or not.
 //
-object "Audio Source" is "entity", "special", "awake"
+object "Audio Source" is "entity", "special"
 {
     public sound = null;
     public type = "line";
@@ -63,7 +63,15 @@ object "Audio Source" is "entity", "special", "awake"
     // this audio source is disabled
     state "disabled"
     {
-        mixer.notify(snd, 0.0);
+        if(snd !== null)
+            mixer.notify(snd, 0.0);
+    }
+
+    // stop the sound
+    fun onReset()
+    {
+        if(snd !== null)
+            mixer.notify(snd, 0.0);
     }
 
     // compute the volume of the audio source at a certain position
