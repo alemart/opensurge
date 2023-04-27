@@ -175,6 +175,8 @@ static const char* VIDEOMODE_NAME[] = {
 #define LOG(...)    logfile_message("Video - " __VA_ARGS__)
 #define FATAL(...)  fatal_error("Video - " __VA_ARGS__)
 
+static void render_texts();
+
 
 
 
@@ -262,6 +264,11 @@ void video_render(void (*render_overlay)())
     al_identity_transform(&identity_transform);
     compute_display_transform(&display_transform);
 
+    /* hint the graphics driver that we no longer need the depth buffer
+       just before switching the target bitmap */
+    /*glInvalidateFramebuffer();*/
+    al_clear_depth_buffer(1);
+
     /* copy our backbuffer to the display backbuffer */
     al_set_target_bitmap(al_get_backbuffer(display));
     al_use_transform(&display_transform);
@@ -284,16 +291,15 @@ void video_render(void (*render_overlay)())
     /* render stuff in window space */
     if(render_overlay != NULL)
         render_overlay();
-    if(settings.is_fps_visible)
-        render_fps();
-    render_console();
+    render_texts();
 
     /* flip display */
     al_flip_display();
 
     /* clearing just after flipping may provide a slight performance increase
        in some drivers (?). Allegro should call glClear() behind the scenes */
-    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+    al_clear_depth_buffer(1);
 
 #if USE_ROUNDROBIN_BACKBUFFER
     /* use a round-robin scheme for a (possible) performance improvement,
@@ -304,9 +310,10 @@ void video_render(void (*render_overlay)())
     /* restore our backbuffer */
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
 
-    /* it's useful to call glClear() just after glBindFramebuffer() in
-       some tiled architectures */
-    /*al_clear_to_color(al_map_rgb(0, 0, 0));*/
+    /* it's a good idea to call glClear() just after glBindFramebuffer() in
+       some tiled architectures (mobile) */
+    al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
+    al_clear_depth_buffer(1);
 }
 
 /*
@@ -550,6 +557,10 @@ bool create_display()
     /* create a new display */
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
     al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE);
+#if defined(__ANDROID__)
+    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_ES_PROFILE);
+#endif
+
     al_set_new_display_option(
         ALLEGRO_SUPPORTED_ORIENTATIONS,
         game_screen_width >= game_screen_height ?
@@ -557,6 +568,12 @@ bool create_display()
             ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT,
         ALLEGRO_REQUIRE
     );
+    al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 1, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_CAN_DRAW_INTO_BITMAP, 1, ALLEGRO_REQUIRE);
+    /*al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);*/
+    #if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
+    al_set_new_display_option(ALLEGRO_DEFAULT_SHADER_PLATFORM, ALLEGRO_SHADER_GLSL_MINIMAL, ALLEGRO_REQUIRE); /* faster shader with no alpha testing */
+    #endif
 
 #if defined(ALLEGRO_UNIX) && !defined(ALLEGRO_RASPBERRYPI)
     set_display_icon(NULL);
@@ -742,11 +759,13 @@ bool create_backbuffer()
     compute_screen_size(settings.mode, &screen_width, &screen_height);
 
     /* create the images */
-    if(NULL == (backbuffer[0] = image_create_backbuffer(screen_width, screen_height))) {
+    bool want_depth_buffer = true;
+
+    if(NULL == (backbuffer[0] = image_create_backbuffer(screen_width, screen_height, want_depth_buffer))) {
         return false;
     }
 #if USE_ROUNDROBIN_BACKBUFFER
-    else if(NULL == (backbuffer[1] = image_create_backbuffer(screen_width, screen_height))) {
+    else if(NULL == (backbuffer[1] = image_create_backbuffer(screen_width, screen_height, want_depth_buffer))) {
         image_destroy(backbuffer[0]);
         backbuffer[0] = NULL;
         return false;
@@ -949,6 +968,26 @@ void render_fps()
     al_use_transform(&transform);
         DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
     al_restore_state(&state);
+}
+
+
+
+/*
+ *
+ * MISC
+ *
+ */
+
+/* render texts with Allegro's built-in font */
+void render_texts()
+{
+    al_hold_bitmap_drawing(true);
+
+    if(settings.is_fps_visible)
+        render_fps();
+    render_console();
+
+    al_hold_bitmap_drawing(false);
 }
 
 
