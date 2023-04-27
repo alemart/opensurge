@@ -34,6 +34,7 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_canbeclippedout(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -101,6 +102,7 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Actor", "__canBeClippedOut", fun_canbeclippedout, 0);
     surgescript_vm_bind(vm, "Actor", "get_filepathOfRenderable", fun_getfilepathofrenderable, 0);
 
     /* animation methods */
@@ -185,7 +187,7 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
-    v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
+    v2d_t camera = !is_detached ? camera_get_position() : v2d_multiply(video_get_screen_size(), 0.5f);
     actor_t* actor = scripting_actor_ptr(object);
 
     actor->position = scripting_util_world_position(object);
@@ -194,6 +196,40 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 
     actor_render(actor, camera);
     return NULL;
+}
+
+/* can this renderable be clipped out from the screen, so that no rendering takes place? */
+surgescript_var_t* fun_canbeclippedout(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = scripting_actor_ptr(object);
+    bool can_be_clipped_out = !actor->visible || actor->alpha == 0.0f; /* clip out invisible actors */
+
+    /* we do a simple, fast bounding-box check */
+    /* could we leave this to the scissor test...? */
+    if(!can_be_clipped_out && actor->angle == 0.0f && actor->scale.x == 1.0f && actor->scale.y == 1.0f) {
+        surgescript_heap_t* heap = surgescript_object_heap(object);
+        bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
+
+        v2d_t screen_size = video_get_screen_size();
+        v2d_t center_of_screen = v2d_multiply(screen_size, 0.5f);
+        v2d_t camera = !is_detached ? camera_get_position() : center_of_screen;
+        v2d_t camera_topleft = v2d_subtract(camera, center_of_screen);
+
+        v2d_t position_in_world_space = scripting_util_world_position(object);
+        v2d_t position_in_screen_space = v2d_subtract(position_in_world_space, camera_topleft);
+
+        const image_t* image = actor_image(actor);
+        int width = image_width(image);
+        int height = image_height(image);
+
+        v2d_t topleft = v2d_subtract(position_in_screen_space, actor->hot_spot);
+        v2d_t bottomright = v2d_add(topleft, v2d_new(width, height));
+
+        can_be_clipped_out = (topleft.x >= screen_size.x) || (bottomright.x <= 0.0f) || (topleft.y >= screen_size.y) || (bottomright.y <= 0.0f);
+    }
+
+    /* done! */
+    return surgescript_var_set_bool(surgescript_var_create(), can_be_clipped_out);
 }
 
 /* the filepath of this renderable */
