@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ALLEGRO_UNSTABLE /* al_set_new_bitmap_depth */
+
 #include <string.h>
 #include <stdint.h>
 #include "image.h"
@@ -218,7 +220,7 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
  * Its contents need not be preserved: the resulting image is
  * meant to be copied to the screen.
  */
-image_t* image_create_backbuffer(int width, int height)
+image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer)
 {
     ALLEGRO_STATE state;
     image_t* backbuffer;
@@ -226,7 +228,13 @@ image_t* image_create_backbuffer(int width, int height)
     al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
 
+    if(want_depth_buffer)
+        al_set_new_bitmap_depth(16);
+
     backbuffer = image_create(width, height);
+
+    if(want_depth_buffer)
+        al_set_new_bitmap_depth(0);
 
     al_restore_state(&state);
     return backbuffer;

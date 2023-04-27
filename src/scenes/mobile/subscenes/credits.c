@@ -106,7 +106,7 @@ void init(mobile_subscene_t* subscene_ptr)
     subscene->mouse = mouse;
 
     /* create a backbuffer */
-    image_t* backbuffer = image_create_backbuffer(VIDEO_SCREEN_W, VIDEO_SCREEN_H);
+    image_t* backbuffer = image_create_backbuffer(VIDEO_SCREEN_W, VIDEO_SCREEN_H, false);
     subscene->backbuffer = backbuffer;
 
     /* create a font */
