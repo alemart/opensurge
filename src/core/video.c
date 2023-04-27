@@ -472,7 +472,7 @@ image_t* video_get_backbuffer()
 
 /*
  * video_showmessage()
- * Shows a text message to the user
+ * Displays a text message in the built-in console
  */
 void video_showmessage(const char *fmt, ...)
 {
@@ -484,6 +484,16 @@ void video_showmessage(const char *fmt, ...)
     va_end(args);
 
     print_to_console(message);
+}
+
+/*
+ * video_clearmessages()
+ * Clears the built-in console
+ */
+void video_clearmessages()
+{
+    for(int i = 0; i < CONSOLE_MAX_ENTRIES; i++)
+        print_to_console("");
 }
 
 /*

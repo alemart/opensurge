@@ -70,8 +70,11 @@ void video_set_fps_visible(bool visible);
 bool video_is_fps_visible();
 int video_fps(); /* the FPS rate */
 
+/* built-in console */
+void video_showmessage(const char *fmt, ...);
+void video_clearmessages();
+
 /* misc */
-void video_showmessage(const char *fmt, ...); /* built-in console */
 void video_display_loading_screen();
 const char* video_get_window_title();
 v2d_t video_convert_window_to_screen(v2d_t window_coordinates);
