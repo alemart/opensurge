@@ -42,4 +42,7 @@ void particle_update(const struct brick_list_t* brick_list);
 /* renders the particles */
 void particle_render(v2d_t camera_position);
 
+/* is the particle system empty? */
+bool particle_is_empty();
+
 #endif

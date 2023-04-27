@@ -157,12 +157,29 @@ void particle_render(v2d_t camera_position)
 {
     v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
 
+    /* FIXME: this is assuming that all particles belong to the same bitmap.
+       This is not necessarily true, though it generally is if all particles came
+       from bricks having the same brickset image.
+
+       Holding the bitmap isn't necessarily "incorrect" if there are multiple images.
+       Even though Allegro can handle this, it isn't optimal. */
     image_hold_drawing(true);
+
     for(particle_list_t* it = particle_list; it; it = it->next) {
         particle_t* particle = it->data;
         v2d_t screen_pos = v2d_subtract(particle->position, topleft);
 
         image_blit(particle->source_image, particle->source_x, particle->source_y, (int)screen_pos.x, (int)screen_pos.y, particle->width, particle->height);
     }
+
     image_hold_drawing(false);
+}
+
+/*
+ * particle_is_empty()
+ * Checks if the particle system is empty
+ */
+bool particle_is_empty()
+{
+    return particle_list == NULL;
 }
