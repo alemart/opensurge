@@ -427,15 +427,16 @@ static const char fs_glsl_with_alpha_testing[] = ""
 #define ZINDEX_LARGE              99999.0f /* will be displayed in front of others */
 #define INITIAL_BUFFER_CAPACITY   256
 #define LOG(...)                  logfile_message("Render queue - " __VA_ARGS__)
-static int cmp_fun(const void *i, const void *j);
-static int cmp_zbuf_fun(const void *i, const void *j);
+static int cmp_fun(const void* i, const void* j);
+static int cmp_zbuf_fun(const void* i, const void* j);
 static inline float brick_zindex_offset(const brick_t *brick);
 static void enqueue(const renderqueue_entry_t* entry);
 static const char* random_path(char prefix);
 
 /* internal data */
 static ALLEGRO_SHADER* shader = NULL;
-static renderqueue_entry_t* buffer = NULL;
+static renderqueue_entry_t* buffer = NULL; /* storage */
+static renderqueue_entry_t** sorted_buffer = NULL; /* sorted indirection to buffer[] */
 static int buffer_size = 0;
 static int buffer_capacity = 0;
 static v2d_t camera;
@@ -514,7 +515,8 @@ void renderqueue_init()
     /* allocate buffers */
     buffer_size = 0;
     buffer_capacity = INITIAL_BUFFER_CAPACITY;
-    buffer = malloc(buffer_capacity * sizeof(*buffer));
+    buffer = mallocx(buffer_capacity * sizeof(*buffer));
+    sorted_buffer = mallocx(buffer_capacity * sizeof(*sorted_buffer));
 
     /* setup the shader of the renderqueue */
     const char* fs_glsl = use_depth_buffer ? fs_glsl_with_alpha_testing : fs_glsl_without_alpha_testing;
@@ -554,8 +556,12 @@ void renderqueue_release()
         shader = NULL;
     }
 
+    free(sorted_buffer);
+    sorted_buffer = NULL;
+
     free(buffer);
     buffer = NULL;
+
     buffer_capacity = 0;
     buffer_size = 0;
 
@@ -591,18 +597,7 @@ void renderqueue_end()
     REPORT_BEGIN();
     REPORT("Render queue stats");
     REPORT("------------------");
-
-    /* cache values */
-    for(int i = 0; i < buffer_size; i++) {
-        renderqueue_entry_t* entry = &buffer[i];
-        entry->cached.zindex = entry->vtable->zindex(entry->renderable);
-        entry->cached.type = entry->vtable->type(entry->renderable);
-        entry->cached.ypos = entry->vtable->ypos(entry->renderable);
-        entry->cached.is_translucent = entry->vtable->is_translucent(entry->renderable);
-    }
-
-    /* sort the entries with a stable sorting algorithm */
-    merge_sort(buffer, buffer_size, sizeof(*buffer), cmp_fun);
+    REPORT("Depth test: % 3s", use_depth_buffer ? "yes" : "no");
 
     /* use the shader of the render queue */
     if(shader != NULL)
@@ -630,14 +625,15 @@ void renderqueue_end()
 
         /* set the z-order of each entry */
         for(int i = 0; i < buffer_size; i++)
-            buffer[i].zorder = i;
+            sorted_buffer[i]->zorder = i;
 
-        /* sort by source image for batching */
-        qsort(buffer, buffer_size, sizeof(*buffer), cmp_zbuf_fun);
+        /* sort by source image for batching
+           no need of stable sorting here */
+        qsort(sorted_buffer, buffer_size, sizeof(*sorted_buffer), cmp_zbuf_fun);
 
         /* after sorting, partition the buffer into opaque and translucent objects */
         for(int i = buffer_size - 1; i >= 0; i--) {
-            if(buffer[i].vtable->is_translucent(buffer[i].renderable))
+            if(sorted_buffer[i]->vtable->is_translucent(sorted_buffer[i]->renderable))
                 translucent_start = i;
             else
                 break;
@@ -646,23 +642,23 @@ void renderqueue_end()
     }
 
     /* fill the group_index[] array */
-    buffer[buffer_size - 1].group_index = 1;
+    sorted_buffer[buffer_size - 1]->group_index = 1;
     for(int i = buffer_size - 2; i >= 0; i--) {
-        buffer[i].vtable->path(buffer[i].renderable, path[0], sizeof(path[0]));
-        buffer[i+1].vtable->path(buffer[i+1].renderable, path[1], sizeof(path[1]));
+        sorted_buffer[i]->vtable->path(sorted_buffer[i]->renderable, path[0], sizeof(path[0]));
+        sorted_buffer[i+1]->vtable->path(sorted_buffer[i+1]->renderable, path[1], sizeof(path[1]));
 
         if(0 == strcmp(path[0], path[1]))
-            buffer[i].group_index = 1 + buffer[i+1].group_index;
+            sorted_buffer[i]->group_index = 1 + sorted_buffer[i+1]->group_index;
         else
-            buffer[i].group_index = 1;
+            sorted_buffer[i]->group_index = 1;
     }
 
     /* render the entries */
     bool held = false;
     for(int j = 0; j < buffer_size; j++) {
 
-        int curr = buffer[j].group_index;
-        int prev = buffer[(j + (buffer_size - 1)) % buffer_size].group_index;
+        int curr = sorted_buffer[j]->group_index;
+        int prev = sorted_buffer[(j + (buffer_size - 1)) % buffer_size]->group_index;
 
         /* enable deferred drawing */
         if(curr > prev) {
@@ -675,8 +671,8 @@ void renderqueue_end()
             ++draw_calls;
             if(want_report()) {
                 char c = (curr == prev) ? '+' : ' '; /* curr == prev only if group_index == 1 */
-                buffer[j].vtable->path(buffer[j].renderable, path[0], sizeof(path[0]));
-                REPORT("Batch size:%c%3d %s", c, buffer[j].group_index, path[0]);
+                sorted_buffer[j]->vtable->path(sorted_buffer[j]->renderable, path[0], sizeof(path[0]));
+                REPORT("Batch size:%c%3d %s", c, sorted_buffer[j]->group_index, path[0]);
             }
         }
 
@@ -689,7 +685,7 @@ void renderqueue_end()
                 al_set_render_state(ALLEGRO_WRITE_MASK, ALLEGRO_MASK_RGBA);
 
             /* set z to a value in [0,1] according to the z-order of the entry */
-            float z = 1.0f - (float)buffer[j].zorder / (float)(buffer_size - 1);
+            float z = 1.0f - (float)sorted_buffer[j]->zorder / (float)(buffer_size - 1);
 
             /* map z from [0,1] to [-1,1], the range of the default
                orthographic projection set by Allegro */
@@ -701,10 +697,10 @@ void renderqueue_end()
         }
 
         /* render the j-th entry */
-        buffer[j].vtable->render(buffer[j].renderable, camera);
+        sorted_buffer[j]->vtable->render(sorted_buffer[j]->renderable, camera);
 
         /* disable deferred drawing */
-        if(held && buffer[j].group_index == 1) {
+        if(held && sorted_buffer[j]->group_index == 1) {
             image_hold_drawing(false);
             held = false;
         }
@@ -726,7 +722,7 @@ void renderqueue_end()
 
     /* render the entries without deferred drawing */
     for(int j = 0; j < buffer_size; j++) {
-        buffer[j].vtable->render(buffer[j].renderable, camera);
+        sorted_buffer[j]->vtable->render(sorted_buffer[j]->renderable, camera);
         ++draw_calls; /* will be equal to buffer_size */
     }
 
@@ -736,8 +732,9 @@ void renderqueue_end()
 #endif
 
     /* end of report */
+    float savings = 1.0f - (float)draw_calls / (float)buffer_size;
     REPORT("Total     :=%3d", buffer_size);
-    REPORT("Draw calls: %3d", draw_calls);
+    REPORT("Draw calls: %3d <saved %.2f%%>", draw_calls, 100.0f * savings);
     REPORT_END();
 
     /* go back to the default shader set by Allegro */
@@ -895,6 +892,7 @@ void renderqueue_enqueue_ssobject(surgescript_object_t* object)
             return;
     }
 
+#if 0
     /* clip out the renderables */
     if(surgescript_object_has_function(object, "__canBeClippedOut")) {
         surgescript_var_t* ret = surgescript_var_create();
@@ -905,6 +903,7 @@ void renderqueue_enqueue_ssobject(surgescript_object_t* object)
         if(can_be_clipped_out)
             return;
     }
+#endif
 
     /* enqueue */
     enqueue(&entry);
@@ -1002,75 +1001,58 @@ void enqueue(const renderqueue_entry_t* entry)
     /* grow the buffer if necessary */
     if(buffer_size == buffer_capacity) {
         buffer_capacity *= 2;
-        buffer = realloc(buffer, buffer_capacity * sizeof(*buffer));
+        buffer = reallocx(buffer, buffer_capacity * sizeof(*buffer));
+        sorted_buffer = reallocx(sorted_buffer, buffer_capacity * sizeof(*sorted_buffer));
     }
 
     /* add the entry to the buffer */
-    memcpy(&buffer[buffer_size], entry, sizeof(*entry));
+    renderqueue_entry_t* e = &buffer[buffer_size];
+    memcpy(e, entry, sizeof(*entry));
+    sorted_buffer[buffer_size] = e;
+
+    /* cache the values of the new entry for purposes of comparison to other entries */
+    e->cached.zindex = e->vtable->zindex(e->renderable);
+    e->cached.type = e->vtable->type(e->renderable);
+    e->cached.ypos = e->vtable->ypos(e->renderable);
+    e->cached.is_translucent = e->vtable->is_translucent(e->renderable);
+
+    /*
+       keep the buffer sorted using insertion sort, which is
+       stable, works well with nearly sorted(?) input and is
+       good enough for small arrays
+       
+       at the time of this writing, we can expect arrays of
+       length 100 - 200, approximately, to be sorted on each frame
+
+       is it worthwhile to replace this simple and compact
+       implementation for merge_sort(), which relies on memcpy()?
+       idea for future work: adaptive approach.
+
+       we want stable sorting in order to preserve the z-order of
+       elements that are deemed "equal" by the comparison function
+    */
+    int j = buffer_size - 1;
+    while(j >= 0 && cmp_fun(e, sorted_buffer[j]) < 0) {
+        sorted_buffer[j+1] = sorted_buffer[j];
+        --j;
+    }
+    sorted_buffer[j+1] = e;
+
+    /* done! */
     buffer_size++;
 }
 
 /* compares two entries of the render queue */
-int cmp_fun(const void *i, const void *j)
+int cmp_fun(const void* i, const void* j)
 {
-    /*
-     * Here I document a very interesting phenomenon that takes place in this
-     * function, on armeabi-v7a (Android), when compiling with clang 12.0.8
-     * distributed with the Android NDK r23:
-     *
-     * We get a memory alignment crash (SIGBUS / BUS_ADRALN).
-     *
-     * The crash does not take place when compiling with -O0, but it shows up
-     * as soon as I enable optimizations (e.g., with -O1).
-     *
-     * I run some experiments with C11 alignas and I also experimented using
-     * the non-standard __attribute__((aligned)) to align the fields and the
-     * structures, including renderqueue_entry_t, but the crash persisted.
-     *
-     * Interestingly, the crash takes place when calling a function of the
-     * vtable AND when passing a renderable_t as a parameter. Example:
-     *
-     * const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
-     * renderable_t r = a->renderable; // no crash
-     * int p = a->vtable->type((renderable_t){ .dummy = NULL }); // no crash
-     * int q = a->vtable->type(r); // crash! vtable->type() doesn't use r!
-     *
-     * At the time of this writing, renderable_t is a union of pointers (just
-     * aliases). It's the first element of a renderqueue_entry_t struct. Hence,
-     * it's supposed to have the same address as the renderqueue_entry_t, which
-     * "should" be aligned(*). All members of that struct "should" have been
-     * aligned in my experiments (via alignas) and sizeof(renderqueue_entry_t)
-     * was a power of two, and yet it was crashing.
-     *
-     * (*) the rendering queue encapsulates an array of renderqueue_entry_t.
-     * The address of the first element of that array is given by malloc(),
-     * which returns a pointer that is aligned to alignof(max_align_t), i.e.,
-     * a suitably aligned pointer.
-     *
-     * Why did it crash when I enabled optimizations? Data was not aligned,
-     * even though it """should""" have been. Which data? Which instruction?
-     *
-     * I get around the issue entirely. Instead of reading the data directly,
-     * I allocate renderqueue_entry_t structs on the stack and copy the data
-     * via memcpy(), which interprets the data as arrays of bytes. Since I'm
-     * just reading and writing bytes, no memory alignment errors occur.
-     */
-#if 0
-    /* possible memory alignment errors on some ARM processors */
-    const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
-    const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
-#else
-    renderqueue_entry_t _a, _b;
-    memcpy(&_a, i, sizeof(_a));
-    memcpy(&_b, j, sizeof(_b));
-    const renderqueue_entry_t *a = &_a;
-    const renderqueue_entry_t *b = &_b;
-#endif
+    const renderqueue_entry_t* a = (const renderqueue_entry_t*)i;
+    const renderqueue_entry_t* b = (const renderqueue_entry_t*)j;
 
     /* zindex check */
     float za = a->cached.zindex;
     float zb = b->cached.zindex;
 
+    /* approximately same z-index? */
     if(fabs(za - zb) * 10.0f < ZINDEX_OFFSET(1)) {
         /* sort by type */
         int ta = a->cached.type;
@@ -1091,18 +1073,10 @@ int cmp_fun(const void *i, const void *j)
 }
 
 /* sort the render queue while taking the depth buffer into consideration */
-int cmp_zbuf_fun(const void *i, const void *j)
+int cmp_zbuf_fun(const void* i, const void* j)
 {
-#if 0
-    const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
-    const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
-#else
-    renderqueue_entry_t _a, _b;
-    memcpy(&_a, i, sizeof(_a));
-    memcpy(&_b, j, sizeof(_b));
-    const renderqueue_entry_t *a = &_a;
-    const renderqueue_entry_t *b = &_b;
-#endif
+    const renderqueue_entry_t* a = *((const renderqueue_entry_t**)i);
+    const renderqueue_entry_t* b = *((const renderqueue_entry_t**)j);
 
     /* put opaque objects first */
     int la = (int)a->cached.is_translucent;
@@ -1169,7 +1143,7 @@ float brick_zindex_offset(const brick_t *brick)
 /* generates a random string */
 const char* random_path(char prefix)
 {
-    static char buffer[8], table[] = {
+    static char path[8], table[] = {
         [0x0] = '0', [0x1] = '1', [0x2] = '2', [0x3] = '3',
         [0x4] = '4', [0x5] = '5', [0x6] = '6', [0x7] = '7',
         [0x8] = '8', [0x9] = '9', [0xa] = 'a', [0xb] = 'b',
@@ -1178,16 +1152,16 @@ const char* random_path(char prefix)
 
     int x = random(65536);
 
-    buffer[0] = '<';
-    buffer[1] = prefix;
-    buffer[2] = table[(x >> 12) & 0xf];
-    buffer[3] = table[(x >> 8) & 0xf];
-    buffer[4] = table[(x >> 4) & 0xf];
-    buffer[5] = table[x & 0xf];
-    buffer[6] = '>';
-    buffer[7] = '\0';
+    path[0] = '<';
+    path[1] = prefix;
+    path[2] = table[(x >> 12) & 0xf];
+    path[3] = table[(x >> 8) & 0xf];
+    path[4] = table[(x >> 4) & 0xf];
+    path[5] = table[x & 0xf];
+    path[6] = '>';
+    path[7] = '\0';
 
-    return buffer;
+    return path;
 }
 
 
