@@ -633,7 +633,7 @@ void renderqueue_end()
             buffer[i].zorder = i;
 
         /* sort by source image for batching */
-        merge_sort(buffer, buffer_size, sizeof(*buffer), cmp_zbuf_fun);
+        qsort(buffer, buffer_size, sizeof(*buffer), cmp_zbuf_fun);
 
         /* after sorting, partition the buffer into opaque and translucent objects */
         for(int i = buffer_size - 1; i >= 0; i--) {
@@ -1129,11 +1129,14 @@ int cmp_zbuf_fun(const void *i, const void *j)
        back-to-front. We'll render them separately. */
     float za = a->cached.zindex;
     float zb = b->cached.zindex;
+    int dz = (za > zb) - (za < zb);
 
-    if(!la)
-        return (za < zb) - (za > zb); /* front-to-back */
+    if(dz == 0)
+        return a->zorder - b->zorder; /* keep relative z-order */
+    else if(!la)
+        return -dz; /* front-to-back */
     else
-        return (za > zb) - (za < zb); /* back-to-front */
+        return dz; /* back-to-front */
 }
 
 /* compute a tiny zindex offset for a brick depending on its type, layer and behavior */
