@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <allegro5/allegro.h>
 #include <surgescript.h>
 #include <string.h>
 #include <math.h>
@@ -29,6 +30,7 @@
 #include "background.h"
 #include "legacy/item.h"
 #include "legacy/enemy.h"
+#include "../core/logfile.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/video.h"
@@ -75,11 +77,12 @@ union renderable_t {
 /* a vtable used for rendering different types of entities */
 typedef struct renderable_vtable_t renderable_vtable_t;
 struct renderable_vtable_t {
-    float (*zindex)(renderable_t);
     void (*render)(renderable_t,v2d_t);
+    float (*zindex)(renderable_t);
     int (*ypos)(renderable_t);
     const char* (*path)(renderable_t, char*, size_t);
     int (*type)(renderable_t);
+    bool (*is_translucent)(renderable_t);
 };
 
 /* an entry of the render queue */
@@ -88,7 +91,16 @@ struct renderqueue_entry_t {
 
     renderable_t renderable;
     const renderable_vtable_t* vtable;
+
     int group_index; /* a helper for deferred rendering; see my commentary about it below */
+    int zorder;
+
+    struct {
+        float zindex;
+        int type;
+        int ypos;
+        bool is_translucent;
+    } cached;
 
 #if defined(__GNUC__)
 } __attribute__((aligned));
@@ -172,13 +184,29 @@ static int type_background(renderable_t r);
 static int type_foreground(renderable_t r);
 static int type_water(renderable_t r);
 
+static bool is_translucent_particles(renderable_t r);
+static bool is_translucent_player(renderable_t r);
+static bool is_translucent_item(renderable_t r);
+static bool is_translucent_object(renderable_t r);
+static bool is_translucent_brick(renderable_t r);
+static bool is_translucent_brick_mask(renderable_t r);
+static bool is_translucent_brick_debug(renderable_t r);
+static bool is_translucent_brick_path(renderable_t r);
+static bool is_translucent_ssobject(renderable_t r);
+static bool is_translucent_ssobject_gizmo(renderable_t r);
+static bool is_translucent_ssobject_debug(renderable_t r);
+static bool is_translucent_background(renderable_t r);
+static bool is_translucent_foreground(renderable_t r);
+static bool is_translucent_water(renderable_t r);
+
 static const renderable_vtable_t VTABLE[] = {
     [TYPE_BRICK] = {
         .zindex = zindex_brick,
         .render = render_brick,
         .ypos = ypos_brick,
         .path = path_brick,
-        .type = type_brick
+        .type = type_brick,
+        .is_translucent = is_translucent_brick
     },
 
     [TYPE_BRICK_MASK] = {
@@ -186,7 +214,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_brick_mask,
         .ypos = ypos_brick_mask,
         .path = path_brick_mask,
-        .type = type_brick_mask
+        .type = type_brick_mask,
+        .is_translucent = is_translucent_brick_mask
     },
 
     [TYPE_BRICK_DEBUG] = {
@@ -194,7 +223,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_brick_debug,
         .ypos = ypos_brick_debug,
         .path = path_brick_debug,
-        .type = type_brick_debug
+        .type = type_brick_debug,
+        .is_translucent = is_translucent_brick_debug
     },
 
     [TYPE_BRICK_PATH] = {
@@ -202,7 +232,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_brick_path,
         .ypos = ypos_brick_path,
         .path = path_brick_path,
-        .type = type_brick_path
+        .type = type_brick_path,
+        .is_translucent = is_translucent_brick_path
     },
 
     [TYPE_ITEM] = {
@@ -210,7 +241,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_item,
         .ypos = ypos_item,
         .path = path_item,
-        .type = type_item
+        .type = type_item,
+        .is_translucent = is_translucent_item
     },
 
     [TYPE_OBJECT] = {
@@ -218,7 +250,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_object,
         .ypos = ypos_object,
         .path = path_object,
-        .type = type_object
+        .type = type_object,
+        .is_translucent = is_translucent_object
     },
 
     [TYPE_PLAYER] = {
@@ -226,7 +259,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_player,
         .ypos = ypos_player,
         .path = path_player,
-        .type = type_player
+        .type = type_player,
+        .is_translucent = is_translucent_player
     },
 
     [TYPE_PARTICLE] = {
@@ -234,7 +268,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_particles,
         .ypos = ypos_particles,
         .path = path_particles,
-        .type = type_particles
+        .type = type_particles,
+        .is_translucent = is_translucent_particles
     },
 
     [TYPE_SSOBJECT] = {
@@ -242,7 +277,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_ssobject,
         .ypos = ypos_ssobject,
         .path = path_ssobject,
-        .type = type_ssobject
+        .type = type_ssobject,
+        .is_translucent = is_translucent_ssobject
     },
 
     [TYPE_SSOBJECT_DEBUG] = {
@@ -250,7 +286,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_ssobject_debug,
         .ypos = ypos_ssobject_debug,
         .path = path_ssobject_debug,
-        .type = type_ssobject_debug
+        .type = type_ssobject_debug,
+        .is_translucent = is_translucent_ssobject_debug
     },
 
     [TYPE_SSOBJECT_GIZMO] = {
@@ -258,7 +295,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_ssobject_gizmo,
         .ypos = ypos_ssobject_gizmo,
         .path = path_ssobject_gizmo,
-        .type = type_ssobject_gizmo
+        .type = type_ssobject_gizmo,
+        .is_translucent = is_translucent_ssobject_gizmo
     },
 
     [TYPE_BACKGROUND] = {
@@ -266,7 +304,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_background,
         .ypos = ypos_background,
         .path = path_background,
-        .type = type_background
+        .type = type_background,
+        .is_translucent = is_translucent_background
     },
 
     [TYPE_FOREGROUND] = {
@@ -274,7 +313,8 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_foreground,
         .ypos = ypos_foreground,
         .path = path_foreground,
-        .type = type_foreground
+        .type = type_foreground,
+        .is_translucent = is_translucent_foreground
     },
 
     [TYPE_WATER] = {
@@ -282,20 +322,119 @@ static const renderable_vtable_t VTABLE[] = {
         .render = render_water,
         .ypos = ypos_water,
         .path = path_water,
-        .type = type_water
+        .type = type_water,
+        .is_translucent = is_translucent_water
     }
 };
+
+/* shaders */
+static const char vs_glsl[] = ""
+    "#define a_position " ALLEGRO_SHADER_VAR_POS "\n"
+    "#define a_color " ALLEGRO_SHADER_VAR_COLOR "\n"
+    "#define a_texcoord " ALLEGRO_SHADER_VAR_TEXCOORD "\n"
+    "#define projview " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX "\n"
+    "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n"
+    "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n"
+    "\n"
+    "attribute vec4 a_position;\n"
+    "attribute vec4 a_color;\n"
+    "attribute vec2 a_texcoord;\n"
+    "\n"
+    "varying vec4 v_color;\n"
+    "varying vec2 v_texcoord;\n"
+    "\n"
+    "uniform mat4 projview;\n"
+    "uniform mat4 texmatrix;\n"
+    "uniform bool use_texmatrix;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "   mat4 m = use_texmatrix ? texmatrix : mat4(1.0);\n"
+    "   vec4 uv = m * vec4(a_texcoord, 0.0, 1.0);\n"
+
+    "   v_texcoord = uv.xy;\n"
+    "   v_color = a_color;\n"
+
+    "   gl_Position = projview * a_position;\n"
+    "}\n"
+"";
+
+static const char fs_glsl_without_alpha_testing[] = ""
+    "#ifdef GL_ES\n"
+    "precision lowp float;\n"
+    "#endif\n"
+    "\n"
+    "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
+    "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
+    "\n"
+    "uniform sampler2D tex;\n"
+    "uniform bool use_tex;\n"
+    "varying vec4 v_color;\n" /* tint */
+    "varying vec2 v_texcoord;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
+    "   gl_FragColor = v_color * p;\n"
+    "}\n"
+"";
+
+static const char fs_glsl_with_alpha_testing[] = ""
+    "#ifdef GL_ES\n"
+    "precision lowp float;\n"
+    "#endif\n"
+    "\n"
+    "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
+    "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
+    "\n"
+    "uniform sampler2D tex;\n"
+    "uniform bool use_tex;\n"
+    "varying vec4 v_color;\n" /* tint */
+    "varying vec2 v_texcoord;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
+
+        /* alpha test: discard the fragment (and don't write to the depth buffer) if alpha is zero */
+    "   if(p.a == 0.0)\n"
+    "       discard;\n"
+
+    "   gl_FragColor = v_color * p;\n"
+
+#if 0
+        /* inspect the depth map */
+    "   float depth = gl_FragCoord.z * 0.5 + 0.5;" /* map [-1,1] to [0,1] */
+    "   gl_FragColor = vec4(vec3(1.0 - depth), 1.0);\n"
+#endif
+
+    "}\n"
+"";
+
+/* testing */
+#define use_depth_buffer 0
+/*#define use_depth_buffer true*/
+/*#define use_depth_buffer false*/
+
+/* render queue stats reporting */
+#define want_report()             0
+#define REPORT(...)               do { if(want_report()) video_showmessage(__VA_ARGS__); } while(0)
+#define REPORT_BEGIN()            video_clearmessages()
+#define REPORT_END()              REPORT("")
 
 /* utilities */
 #define ZINDEX_OFFSET(n)          (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum zindex offset */
 #define ZINDEX_LARGE              99999.0f /* will be displayed in front of others */
 #define INITIAL_BUFFER_CAPACITY   256
+#define LOG(...)                  logfile_message("Render queue - " __VA_ARGS__)
 static int cmp_fun(const void *i, const void *j);
+static int cmp_zbuf_fun(const void *i, const void *j);
 static inline float brick_zindex_offset(const brick_t *brick);
 static void enqueue(const renderqueue_entry_t* entry);
 static const char* random_path(char prefix);
 
 /* internal data */
+static ALLEGRO_SHADER* shader = NULL;
 static renderqueue_entry_t* buffer = NULL;
 static int buffer_size = 0;
 static int buffer_capacity = 0;
@@ -367,11 +506,39 @@ https://liballeg.org/a5docs/trunk/graphics.html#deferred-drawing
  */
 void renderqueue_init()
 {
+    LOG("initializing...");
+
+    /* initialize the camera */
+    camera = v2d_new(0, 0);
+
+    /* allocate buffers */
     buffer_size = 0;
     buffer_capacity = INITIAL_BUFFER_CAPACITY;
     buffer = malloc(buffer_capacity * sizeof(*buffer));
 
-    camera = v2d_new(0, 0);
+    /* setup the shader of the renderqueue */
+    const char* fs_glsl = use_depth_buffer ? fs_glsl_with_alpha_testing : fs_glsl_without_alpha_testing;
+    LOG("will %s alpha testing", use_depth_buffer ? "perform" : "not perform");
+
+    shader = al_create_shader(ALLEGRO_SHADER_GLSL);
+    if(!al_attach_shader_source(shader, ALLEGRO_VERTEX_SHADER, vs_glsl)) {
+        LOG("Can't compile the vertex shader. %s", al_get_shader_log(shader));
+        al_destroy_shader(shader);
+        shader = NULL;
+    }
+    else if(!al_attach_shader_source(shader, ALLEGRO_PIXEL_SHADER, fs_glsl)) {
+        LOG("Can't compile the fragment shader. %s", al_get_shader_log(shader));
+        al_destroy_shader(shader);
+        shader = NULL;
+    }
+    else if(!al_build_shader(shader)) {
+        LOG("Can't build the shader. %s", al_get_shader_log(shader));
+        al_destroy_shader(shader);
+        shader = NULL;
+    }
+
+    /* done! */
+    LOG("initialized!");
 }
 
 /*
@@ -380,9 +547,19 @@ void renderqueue_init()
  */
 void renderqueue_release()
 {
+    LOG("releasing...");
+
+    if(shader != NULL) {
+        al_destroy_shader(shader);
+        shader = NULL;
+    }
+
     free(buffer);
+    buffer = NULL;
     buffer_capacity = 0;
     buffer_size = 0;
+
+    LOG("released!");
 }
 
 
@@ -404,20 +581,73 @@ void renderqueue_begin(v2d_t camera_position)
  */
 void renderqueue_end()
 {
+    int draw_calls = 0;
+
     /* skip if the buffer is empty */
     if(buffer_size == 0)
         return;
 
+    /* start reporting */
+    REPORT_BEGIN();
+    REPORT("Render queue stats");
+    REPORT("------------------");
+
+    /* cache values */
+    for(int i = 0; i < buffer_size; i++) {
+        renderqueue_entry_t* entry = &buffer[i];
+        entry->cached.zindex = entry->vtable->zindex(entry->renderable);
+        entry->cached.type = entry->vtable->type(entry->renderable);
+        entry->cached.ypos = entry->vtable->ypos(entry->renderable);
+        entry->cached.is_translucent = entry->vtable->is_translucent(entry->renderable);
+    }
+
     /* sort the entries with a stable sorting algorithm */
     merge_sort(buffer, buffer_size, sizeof(*buffer), cmp_fun);
 
+    /* use the shader of the render queue */
+    if(shader != NULL)
+        al_use_shader(shader);
+
 #if USE_DEFERRED_DRAWING
+
+    ALLEGRO_TRANSFORM ztransform;
+    static char path[2][1024];
+    int translucent_start = buffer_size;
+
+    if(use_depth_buffer) {
+
+        /* enable the depth test */
+        al_set_render_state(ALLEGRO_DEPTH_FUNCTION, ALLEGRO_RENDER_LESS_EQUAL);
+        al_set_render_state(ALLEGRO_WRITE_MASK, ALLEGRO_MASK_DEPTH | ALLEGRO_MASK_RGBA); /* write to the framebuffer and to the depth buffer */
+        al_set_render_state(ALLEGRO_DEPTH_TEST, 1);
+
+        /* clear the depth buffer */
+        /*al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));*/ /* should we clear? */
+        al_clear_depth_buffer(1);
+
+        /* initialize the z-transform */
+        al_identity_transform(&ztransform);
+
+        /* set the z-order of each entry */
+        for(int i = 0; i < buffer_size; i++)
+            buffer[i].zorder = i;
+
+        /* sort by source image for batching */
+        merge_sort(buffer, buffer_size, sizeof(*buffer), cmp_zbuf_fun);
+
+        /* after sorting, partition the buffer into opaque and translucent objects */
+        for(int i = buffer_size - 1; i >= 0; i--) {
+            if(buffer[i].vtable->is_translucent(buffer[i].renderable))
+                translucent_start = i;
+            else
+                break;
+        }
+
+    }
 
     /* fill the group_index[] array */
     buffer[buffer_size - 1].group_index = 1;
     for(int i = buffer_size - 2; i >= 0; i--) {
-        static char path[2][1024];
-
         buffer[i].vtable->path(buffer[i].renderable, path[0], sizeof(path[0]));
         buffer[i+1].vtable->path(buffer[i+1].renderable, path[1], sizeof(path[1]));
 
@@ -431,10 +661,43 @@ void renderqueue_end()
     bool held = false;
     for(int j = 0; j < buffer_size; j++) {
 
+        int curr = buffer[j].group_index;
+        int prev = buffer[(j + (buffer_size - 1)) % buffer_size].group_index;
+
         /* enable deferred drawing */
-        if(buffer[j].group_index > buffer[(j + (buffer_size - 1)) % buffer_size].group_index) {
+        if(curr > prev) {
             held = true;
             image_hold_drawing(true);
+        }
+
+        /* reporting */
+        if(curr >= prev) {
+            ++draw_calls;
+            if(want_report()) {
+                char c = (curr == prev) ? '+' : ' '; /* curr == prev only if group_index == 1 */
+                buffer[j].vtable->path(buffer[j].renderable, path[0], sizeof(path[0]));
+                REPORT("Batch size:%c%3d %s", c, buffer[j].group_index, path[0]);
+            }
+        }
+
+        /* set the z-coordinate */
+        if(use_depth_buffer) {
+            /* we've rendered all opaque objects. Now we're going to render
+               the translucent ones. Let's disable depth writes and render
+               back-to-front. */
+            if(j == translucent_start)
+                al_set_render_state(ALLEGRO_WRITE_MASK, ALLEGRO_MASK_RGBA);
+
+            /* set z to a value in [0,1] according to the z-order of the entry */
+            float z = 1.0f - (float)buffer[j].zorder / (float)(buffer_size - 1);
+
+            /* map z from [0,1] to [-1,1], the range of the default
+               orthographic projection set by Allegro */
+            z = 2.0f * z - 1.0f;
+
+            /* change the transform */
+            ztransform.m[3][2] = z;
+            al_use_transform(&ztransform);
         }
 
         /* render the j-th entry */
@@ -448,13 +711,38 @@ void renderqueue_end()
 
     }
 
+    if(use_depth_buffer) {
+
+        /* reset the z-transform */
+        al_identity_transform(&ztransform);
+        al_use_transform(&ztransform);
+
+        /* disable the depth test */
+        al_set_render_state(ALLEGRO_DEPTH_TEST, 0);
+
+    }
+
 #else
 
     /* render the entries without deferred drawing */
-    for(int j = 0; j < buffer_size; j++)
+    for(int j = 0; j < buffer_size; j++) {
         buffer[j].vtable->render(buffer[j].renderable, camera);
+        ++draw_calls; /* will be equal to buffer_size */
+    }
+
+    REPORT("No batching!");
+    (void)cmp_zbuf_fun;
 
 #endif
+
+    /* end of report */
+    REPORT("Total     :=%3d", buffer_size);
+    REPORT("Draw calls: %3d", draw_calls);
+    REPORT_END();
+
+    /* go back to the default shader set by Allegro */
+    if(shader != NULL)
+        al_use_shader(NULL);
 
     /* clean up */
     buffer_size = 0;
@@ -574,6 +862,10 @@ void renderqueue_enqueue_particles()
         .vtable = &VTABLE[TYPE_PARTICLE]
     };
 
+    /* skip if there are no particles to render */
+    if(particle_is_empty())
+        return;
+
     enqueue(&entry);
 }
 
@@ -600,6 +892,17 @@ void renderqueue_enqueue_ssobject(surgescript_object_t* object)
         surgescript_var_destroy(ret);
 
         if(!is_visible)
+            return;
+    }
+
+    /* clip out the renderables */
+    if(surgescript_object_has_function(object, "__canBeClippedOut")) {
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_object_call_function(object, "__canBeClippedOut", NULL, 0, ret);
+        bool can_be_clipped_out = surgescript_var_get_bool(ret);
+        surgescript_var_destroy(ret);
+
+        if(can_be_clipped_out)
             return;
     }
 
@@ -679,6 +982,11 @@ void renderqueue_enqueue_water()
         .vtable = &VTABLE[TYPE_WATER]
     };
 
+    /* clip out */
+    int y = level_waterlevel() - ((int)camera.y - VIDEO_SCREEN_H / 2);
+    if(y >= VIDEO_SCREEN_H)
+        return;
+
     enqueue(&entry);
 }
 
@@ -698,7 +1006,8 @@ void enqueue(const renderqueue_entry_t* entry)
     }
 
     /* add the entry to the buffer */
-    buffer[buffer_size++] = *entry;
+    memcpy(&buffer[buffer_size], entry, sizeof(*entry));
+    buffer_size++;
 }
 
 /* compares two entries of the render queue */
@@ -747,7 +1056,7 @@ int cmp_fun(const void *i, const void *j)
      * just reading and writing bytes, no memory alignment errors occur.
      */
 #if 0
-    /* possible memory alignment errors */
+    /* possible memory alignment errors on some ARM processors */
     const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
     const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
 #else
@@ -758,20 +1067,73 @@ int cmp_fun(const void *i, const void *j)
     const renderqueue_entry_t *b = &_b;
 #endif
 
-    float za = a->vtable->zindex(a->renderable);
-    float zb = b->vtable->zindex(b->renderable);
+    /* zindex check */
+    float za = a->cached.zindex;
+    float zb = b->cached.zindex;
 
     if(fabs(za - zb) * 10.0f < ZINDEX_OFFSET(1)) {
-        int ta = a->vtable->type(a->renderable);
-        int tb = b->vtable->type(b->renderable);
+        /* sort by type */
+        int ta = a->cached.type;
+        int tb = b->cached.type;
 
-        if(ta == tb)
-            return a->vtable->ypos(a->renderable) - b->vtable->ypos(b->renderable);
-        else
-            return (ta == TYPE_PLAYER) - (tb == TYPE_PLAYER); /* render the players in front of the other entries if all else is equal */
+        if(ta == tb) {
+            /* sort by ypos */
+            return a->cached.ypos - b->cached.ypos;
+        }
+        else {
+            /* render the players in front of the other entries if all else is equal */
+            return (ta == TYPE_PLAYER) - (tb == TYPE_PLAYER);
+        }
     }
 
+    /* sort back-to-front */
     return (za > zb) - (za < zb);
+}
+
+/* sort the render queue while taking the depth buffer into consideration */
+int cmp_zbuf_fun(const void *i, const void *j)
+{
+#if 0
+    const renderqueue_entry_t *a = (const renderqueue_entry_t*)i;
+    const renderqueue_entry_t *b = (const renderqueue_entry_t*)j;
+#else
+    renderqueue_entry_t _a, _b;
+    memcpy(&_a, i, sizeof(_a));
+    memcpy(&_b, j, sizeof(_b));
+    const renderqueue_entry_t *a = &_a;
+    const renderqueue_entry_t *b = &_b;
+#endif
+
+    /* put opaque objects first */
+    int la = (int)a->cached.is_translucent;
+    int lb = (int)b->cached.is_translucent;
+    if(la != lb)
+        return la - lb;
+
+    /* read paths - TODO not optimal... */
+    static char path[2][1024];
+    int texcmp = strcmp(
+        a->vtable->path(a->renderable, path[0], sizeof(path[0])),
+        b->vtable->path(b->renderable, path[1], sizeof(path[1]))
+    );
+
+    /* sort by texture first, for optimal batching */
+    if(texcmp != 0)
+        return texcmp;
+
+    /* if the entries share the same texture, sort
+       front-to-back, so that the depth testing can
+       discard pixels.
+
+       if both entries are translucent, then sort
+       back-to-front. We'll render them separately. */
+    float za = a->cached.zindex;
+    float zb = b->cached.zindex;
+
+    if(!la)
+        return (za < zb) - (za > zb); /* front-to-back */
+    else
+        return (za > zb) - (za < zb); /* back-to-front */
 }
 
 /* compute a tiny zindex offset for a brick depending on its type, layer and behavior */
@@ -874,6 +1236,34 @@ int ypos_ssobject_gizmo(renderable_t r) { return ypos_ssobject(r); }
 int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_water(renderable_t r) { return 0; } /* not needed */
+
+bool is_translucent_particles(renderable_t r) { return false; }
+bool is_translucent_player(renderable_t r) { return false; }
+bool is_translucent_item(renderable_t r) { return false; }
+bool is_translucent_object(renderable_t r) { return false; }
+bool is_translucent_brick(renderable_t r) { return false; }
+bool is_translucent_brick_mask(renderable_t r) { return false; }
+bool is_translucent_brick_debug(renderable_t r) { return false; }
+bool is_translucent_brick_path(renderable_t r) { return false; }
+bool is_translucent_background(renderable_t r) { return false; }
+bool is_translucent_foreground(renderable_t r) { return false; }
+
+bool is_translucent_water(renderable_t r) { return true; }
+bool is_translucent_ssobject_gizmo(renderable_t r) { return false; }
+bool is_translucent_ssobject_debug(renderable_t r) { return is_translucent_ssobject(r); }
+bool is_translucent_ssobject(renderable_t r)
+{
+    if(surgescript_object_has_function(r.ssobject, "get_alpha")) {
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_object_call_function(r.ssobject, "get_alpha", NULL, 0, ret);
+        double alpha = surgescript_var_get_number(ret);
+        surgescript_var_destroy(ret);
+
+        return alpha < 1.0;
+    }
+
+    return false;
+}
 
 const char* path_particles(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<particles>", dest_size); }
 const char* path_player(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, image_filepath(actor_image(r.player->actor)), dest_size); }
