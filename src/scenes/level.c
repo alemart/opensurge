@@ -279,7 +279,7 @@ static void late_update_ssobjects();
 
 /* debug mode */
 #define debug_mode_want_to_activate() editorcmd_is_triggered(editor_cmd, "enter-debug-mode")
-#define DEBUG_MODE_OBJECT_NAME "Debug Mode"
+#define debug_mode_find_object() (level_is_in_debug_mode() ? level_child_object("Debug Mode") : NULL) /* avoid searching if possible */
 
 
 
@@ -2207,8 +2207,16 @@ int level_is_displaying_gizmos()
  */
 void level_enter_debug_mode()
 {
-    if(level_child_object(DEBUG_MODE_OBJECT_NAME) == NULL)
-        level_create_object(DEBUG_MODE_OBJECT_NAME, v2d_new(0, 0));
+    if(!level_is_in_debug_mode()) {
+        surgescript_object_t* level = level_ssobject();
+        surgescript_var_t* tmp = surgescript_var_create();
+        const surgescript_var_t* param[] = { tmp };
+
+        surgescript_var_set_bool(tmp, true);
+        surgescript_object_call_function(level, "set_debugMode", param, 1, NULL);
+
+        surgescript_var_destroy(tmp);
+    }
 }
 
 
@@ -2218,7 +2226,15 @@ void level_enter_debug_mode()
  */
 bool level_is_in_debug_mode()
 {
-    return level_child_object(DEBUG_MODE_OBJECT_NAME) != NULL;
+    surgescript_object_t* level = level_ssobject();
+    surgescript_var_t* ret = surgescript_var_create();
+    bool flag = false;
+
+    surgescript_object_call_function(level, "get_debugMode", NULL, 0, ret);
+    flag = surgescript_var_get_bool(ret);
+
+    surgescript_var_destroy(ret);
+    return flag;
 }
 
 
@@ -2947,7 +2963,7 @@ void render_ssobjects()
     surgescript_vm_t* vm = surgescript_vm();
     if(surgescript_vm_is_active(vm)) {
         surgescript_object_t* level = level_ssobject();
-        surgescript_object_t* debug_mode = level_child_object(DEBUG_MODE_OBJECT_NAME);
+        surgescript_object_t* debug_mode = debug_mode_find_object();
         surgescript_object_traverse_tree_ex(level, debug_mode, render_ssobject);
     }
 }
