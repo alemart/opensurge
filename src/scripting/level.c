@@ -81,7 +81,8 @@ static const surgescript_heapptr_t SETUP_ADDR = 2; /* object "Setup Level" */
 static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3; /* Level.onUnload functor */
 static const surgescript_heapptr_t TIME_ADDR = 4; /* Level.time */
 static const surgescript_heapptr_t ISDEBUGGING_ADDR = 5; /* Debug Mode on/off flag (fast access) */
-static const surgescript_heapptr_t IDX_ADDR = 6; /* must be the last address */
+static const surgescript_heapptr_t STORAGE_ADDR = 6; /* LevelStorage object */
+#define LAST_ADDR STORAGE_ADDR /* must be an alias to the last address */
 static const char DEBUG_MODE_OBJECT_NAME[] = "Debug Mode";
 static const char code_in_surgescript[];
 static void update_music(surgescript_object_t* object);
@@ -147,6 +148,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t spawnpoint = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "Setup Level", NULL);
+    surgescript_objecthandle_t storage = surgescript_objectmanager_spawn(manager, me, "LevelStorage", NULL);
 
     /* Level music */
     ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
@@ -172,13 +174,9 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(ISDEBUGGING_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_bool(surgescript_heap_at(heap, ISDEBUGGING_ADDR), false);
 
-    /*
-     * Memory layout:
-     * [ ... | IDX | obj_1 | obj_2 | ... | obj_N ]
-     * only Level-spawned() objects come after IDX
-     */
-    ssassert(IDX_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), 1 + IDX_ADDR);
+    /* LevelStorage */
+    ssassert(STORAGE_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, STORAGE_ADDR), storage);
 
     /* done */
     return NULL;
@@ -194,31 +192,9 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_heapptr_t idx = surgescript_var_get_rawbits(surgescript_heap_at(heap, IDX_ADDR));
-    size_t heap_size = surgescript_heap_size(heap);
-
-    /* scan the memory continuously for broken references */
-    if(idx > IDX_ADDR && idx < heap_size) {
-        surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-
-        /* an object stored in heap[idx] has been destroyed */
-        if(surgescript_heap_validaddress(heap, idx) && (
-            surgescript_var_is_null(surgescript_heap_at(heap, idx)) ||
-            !surgescript_objectmanager_exists(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, idx)))
-        ))
-            surgescript_heap_free(heap, idx); /* release the memory, so it can be reused */
-    }
-
-    /* update the scan index on the object memory */
-    idx = max(1 + IDX_ADDR, (idx + 1) % heap_size);
-    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
-    
-    /* misc */
     update_music(object);
     update_time(object);
 
-    /* done */
     return NULL;
 }
 
@@ -237,10 +213,18 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     /*if(1 || surgescript_tagsystem_has_tag(tag_system, child_name, "entity"))*/
 
     /* store its reference, so it won't be Garbage Collected */
+
+    /* get the LevelStorage object */
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_heapptr_t ptr = surgescript_heap_malloc(heap);
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ptr), child);
-    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), 1 + IDX_ADDR); /* scan for broken references */
+    surgescript_var_t* storage_var = surgescript_heap_at(heap, STORAGE_ADDR);
+    surgescript_objecthandle_t storage_handle = surgescript_var_get_objecthandle(storage_var);
+    surgescript_object_t* storage = surgescript_objectmanager_get(manager, storage_handle);
+
+    /* call LevelStorage.storeReference() */
+    surgescript_var_t* arg = surgescript_var_set_objecthandle(surgescript_var_create(), child);
+    const surgescript_var_t* args[] = { arg };
+    surgescript_object_call_function(storage, "storeReference", args, 1, NULL);
+    surgescript_var_destroy(arg);
 
     /* done! */
     return surgescript_var_set_objecthandle(surgescript_var_create(), child);
@@ -665,8 +649,8 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 
         /* is the child a built-in child of Level? TODO make this more efficient? */
         bool is_builtin = false;
-        for(surgescript_heapptr_t j = 0; j < IDX_ADDR; j++) {
-            surgescript_var_t* builtin_var = surgescript_heap_at(heap, j);
+        for(surgescript_heapptr_t j = 0; j <= LAST_ADDR; j++) { /* maybe the compiler unrolls this little loop? */
+            const surgescript_var_t* builtin_var = surgescript_heap_at(heap, j);
             surgescript_objecthandle_t builtin_handle = surgescript_var_get_objecthandle(builtin_var);
             is_builtin = is_builtin || (child_handle == builtin_handle /*&& surgescript_var_is_objecthandle(builtin_var)*/);
         }

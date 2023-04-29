@@ -62,6 +62,7 @@ extern void scripting_register_input(surgescript_vm_t* vm);
 extern void scripting_register_lang(surgescript_vm_t* vm);
 extern void scripting_register_level(surgescript_vm_t* vm);
 extern void scripting_register_levelmanager(surgescript_vm_t* vm);
+extern void scripting_register_levelstorage(surgescript_vm_t* vm);
 extern void scripting_register_mobilegamepad(surgescript_vm_t* vm);
 extern void scripting_register_mouse(surgescript_vm_t* vm);
 extern void scripting_register_music(surgescript_vm_t* vm);
@@ -419,6 +420,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_lang(vm);
     scripting_register_level(vm);
     scripting_register_levelmanager(vm);
+    scripting_register_levelstorage(vm);
     scripting_register_mobilegamepad(vm);
     scripting_register_mouse(vm);
     scripting_register_music(vm);
