@@ -385,7 +385,7 @@ object "DefaultHUD.PauseButton" is "entity", "detached", "awake", "private"
 
     fun canPause()
     {
-        return !Level.cleared && Level.child("Debug Mode") === null;
+        return !Level.cleared && !Level.debugMode;
     }
 
     fun isTappingButton()

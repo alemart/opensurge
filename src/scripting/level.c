@@ -69,16 +69,20 @@ static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_get_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_set_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static const surgescript_heapptr_t MUSIC_ADDR = 0;
-static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1;
-static const surgescript_heapptr_t SETUP_ADDR = 2;
-static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3;
-static const surgescript_heapptr_t TIME_ADDR = 4;
-static const surgescript_heapptr_t IDX_ADDR = 5; /* must be the last address */
+static const surgescript_heapptr_t MUSIC_ADDR = 0; /* Level.music */
+static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1; /* Level.spawnpoint */
+static const surgescript_heapptr_t SETUP_ADDR = 2; /* object "Setup Level" */
+static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3; /* Level.onUnload functor */
+static const surgescript_heapptr_t TIME_ADDR = 4; /* Level.time */
+static const surgescript_heapptr_t ISDEBUGGING_ADDR = 5; /* Debug Mode on/off flag (fast access) */
+static const surgescript_heapptr_t IDX_ADDR = 6; /* must be the last address */
+static const char DEBUG_MODE_OBJECT_NAME[] = "Debug Mode";
 static const char code_in_surgescript[];
 static void update_music(surgescript_object_t* object);
 static void update_time(surgescript_object_t* object);
@@ -128,6 +132,8 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "entity", fun_entity, 1);
     surgescript_vm_bind(vm, "Level", "entityId", fun_entityid, 1);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
+    surgescript_vm_bind(vm, "Level", "get_debugMode", fun_get_debugmode, 0);
+    surgescript_vm_bind(vm, "Level", "set_debugMode", fun_set_debugmode, 1);
     surgescript_vm_bind(vm, "Level", "__callUnloadFunctor", fun_callunloadfunctor, 0);
     surgescript_vm_bind(vm, "Level", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
@@ -161,6 +167,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* Level time */
     ssassert(TIME_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, TIME_ADDR), 0.0);
+
+    /* Fast-access Debug Mode on/off flag */
+    ssassert(ISDEBUGGING_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_bool(surgescript_heap_at(heap, ISDEBUGGING_ADDR), false);
 
     /*
      * Memory layout:
@@ -560,6 +570,65 @@ surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var
     return ret;
 }
 
+/* is the Debug Mode activated? */
+surgescript_var_t* fun_get_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* this method must be fast! It's used often. */
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* flag = surgescript_heap_at(heap, ISDEBUGGING_ADDR);
+
+    /* we just read a flag */
+    return surgescript_var_clone(flag);
+}
+
+/* enable/disable the Debug Mode */
+surgescript_var_t* fun_set_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* flag = surgescript_heap_at(heap, ISDEBUGGING_ADDR);
+    bool new_value = surgescript_var_get_bool(param[0]);
+    bool old_value = surgescript_var_get_bool(flag);
+
+#if 1
+    /* skip - nothing to do */
+    if(new_value == old_value)
+        return NULL;
+#endif
+
+    /* update the flag */
+    surgescript_var_set_bool(flag, new_value);
+
+    /* enter or exit the Debug Mode */
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t debug_mode_handle = surgescript_object_child(object, DEBUG_MODE_OBJECT_NAME);
+    surgescript_objecthandle_t null = surgescript_objectmanager_null(manager);
+
+    bool want_debug_mode = new_value;
+    if(want_debug_mode) {
+        if(debug_mode_handle == null) {
+
+            /* enter the Debug Mode: call this.spawn("Debug Mode") */
+            surgescript_var_t* debug_mode_name = surgescript_var_set_string(surgescript_var_create(), DEBUG_MODE_OBJECT_NAME);
+            const surgescript_var_t* spawn_param[] = { debug_mode_name };
+            surgescript_object_call_function(object, "spawn", spawn_param, 1, NULL);
+            surgescript_var_destroy(debug_mode_name);
+
+        }
+    }
+    else {
+        if(debug_mode_handle != null) {
+
+            /* exit the Debug Mode: call debug.exit() */
+            surgescript_object_t* debug_mode = surgescript_objectmanager_get(manager, debug_mode_handle);
+            surgescript_object_call_function(debug_mode, "exit", NULL, 0, NULL);
+
+        }
+    }
+
+    /* done! */
+    return NULL;
+}
+
 /* this function gets called when the level is unloaded */
 surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -620,6 +689,7 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
     darray_release(handles);
     return NULL;
 }
+
 
 
 

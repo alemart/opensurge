@@ -139,7 +139,8 @@ object "Debug Mode" is "detached", "private", "entity"
     // exit the debug mode
     fun exit()
     {
-        state = "exit";
+        // exit() may be called twice or more...
+        state = "exit"; // don't destroy() the object right away
     }
 
     // get a plugin
@@ -183,12 +184,18 @@ object "Debug Mode" is "detached", "private", "entity"
         assert(parent === Level);
         assert(parent.children(this.__name).length == 1);
 
+        // enable the Debug Mode flag
+        Level.debugMode = true;
+
         // just to make sure...
         transform.position = Vector2.zero;
     }
 
     fun destructor()
     {
+        // disable the Debug Mode flag
+        Level.debugMode = false;
+
         // did the user destroy() the Debug Mode object?
         if(!cleared) {
             // plugin.onUnload() is not being called...
