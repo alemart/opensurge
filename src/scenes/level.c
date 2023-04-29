@@ -2946,9 +2946,9 @@ void render_ssobjects()
 {
     surgescript_vm_t* vm = surgescript_vm();
     if(surgescript_vm_is_active(vm)) {
-        surgescript_object_t* root = surgescript_vm_root_object(vm);
+        surgescript_object_t* level = level_ssobject();
         surgescript_object_t* debug_mode = level_child_object(DEBUG_MODE_OBJECT_NAME);
-        surgescript_object_traverse_tree_ex(root, debug_mode, render_ssobject);
+        surgescript_object_traverse_tree_ex(level, debug_mode, render_ssobject);
     }
 }
 
@@ -2958,9 +2958,12 @@ bool render_ssobject(surgescript_object_t* object, void* param)
     if(!surgescript_object_is_active(object) || surgescript_object_is_killed(object))
         return false;
 
+    /* is this object an entity? */
+    bool is_entity = surgescript_object_has_tag(object, "entity");
+
     if(editor_is_enabled()) {
         /* level editor */
-        if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
+        if(is_entity && !surgescript_object_has_tag(object, "private"))
             renderqueue_enqueue_ssobject_debug(object);
 
         /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
@@ -2972,7 +2975,7 @@ bool render_ssobject(surgescript_object_t* object, void* param)
     }
     else {
         /* gameplay */
-        ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
+        ssobj_extradata_t* obj_data = is_entity ? get_ssobj_extradata(object) : NULL; /* avoid calls to get_ssobj_extradata() if possible */
         if(obj_data != NULL && obj_data->sleeping) {
             /* no need to render sleeping objects */
             return false; /* won't render their children */
@@ -2983,7 +2986,7 @@ bool render_ssobject(surgescript_object_t* object, void* param)
 
             /* debug mode */
             if(debug_mode) {
-                if(surgescript_object_has_tag(object, "entity")) {
+                if(is_entity) {
 
                     /* skip detached entities */
                     if(surgescript_object_has_tag(object, "detached")) {
