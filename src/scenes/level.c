@@ -2945,8 +2945,8 @@ void late_update_ssobjects()
             surgescript_object_t* object = surgescript_objectmanager_get(manager, handle);
 
             if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
-                if(surgescript_object_has_function(object, "lateUpdate")) /* just to make sure? no crashing */
-                    surgescript_object_call_function(object, "lateUpdate", NULL, 0, NULL);
+                /* function lateUpdate() is guaranteed to exist */
+                surgescript_object_call_function(object, "lateUpdate", NULL, 0, NULL);
             }
         }
     }
