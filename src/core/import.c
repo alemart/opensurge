@@ -390,9 +390,9 @@ void import_wizard()
 
         repetitions *= 2;
 
-        /* are you paying attention?!?! */
-    } while(YES == CONFIRM("Alright, gotcha.\n\nWanna confirm some more?"));
-    ALERT("Fine.");
+        /* are you paying attention?! :P */
+    } while(repetitions <= 6 && YES == CONFIRM("Alright, gotcha.\n\nWanna confirm some more?"));
+    ALERT("Alright.");
 #endif
 
     /* locate the gamedir */
