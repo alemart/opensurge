@@ -1827,6 +1827,15 @@ surgescript_object_t* level_child_object(const char* object_name)
 }
 
 /*
+ * level_is_setup_object()
+ * Checks if the given object name belongs to the setup list
+ */
+bool level_is_setup_object(const char* object_name)
+{
+    return is_setup_object(object_name);
+}
+
+/*
  * level_obstaclemap()
  * The obstaclemap featuring the bricks and brick-like objects that are
  * placed near the camera of the level.

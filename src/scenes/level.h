@@ -75,6 +75,7 @@ surgescript_object_t* level_create_object(const char* object_name, v2d_t positio
 surgescript_object_t* level_get_entity_by_id(const char* entity_id);
 const char* level_get_entity_id(const surgescript_object_t* entity);
 surgescript_object_t* level_child_object(const char* object_name);
+bool level_is_setup_object(const char* object_name);
 const struct obstaclemap_t* level_obstaclemap();
 
 /* camera */
