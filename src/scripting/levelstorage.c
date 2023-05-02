@@ -140,13 +140,16 @@ surgescript_var_t* fun_storereference(surgescript_object_t* object, const surges
         return NULL;
     }
 
-    /* the object must be a child of Level */
+    /* get my parent, which is Level */
+    surgescript_objecthandle_t my_parent_handle = surgescript_object_parent(object);
+    surgescript_object_t* my_parent = surgescript_objectmanager_get(manager, my_parent_handle);
+
+    /* the object must be a descendant of Level */
     surgescript_objecthandle_t child_handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
     surgescript_objecthandle_t childs_parent = surgescript_object_parent(child);
-    surgescript_objecthandle_t my_parent = surgescript_object_parent(object); /* this is Level */
-    if(childs_parent != my_parent) {
-        scripting_error(object, "%s.storeReference() requires object \"%s\" to be a child of Level", surgescript_object_name(object), surgescript_object_name(child));
+    if(!surgescript_object_is_ascendant(child, my_parent)) {
+        scripting_error(object, "%s.storeReference() requires object \"%s\" to be a descendant of %s", surgescript_object_name(object), surgescript_object_name(child), surgescript_object_name(my_parent));
         return NULL;
     }
 
