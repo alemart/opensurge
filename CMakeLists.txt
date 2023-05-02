@@ -50,7 +50,7 @@ SET(HELP "Tweak the CMake options or get help at opensurge2d.org")
 # Default config
 SET(CMAKE_C_STANDARD 99)
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug | Release | MinSizeRel | RelWithDebInfo" FORCE)
+  SET(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Debug | Release | MinSizeRel | RelWithDebInfo" FORCE)
   SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF()
 SET(DEFS "") # #define'd stuff
