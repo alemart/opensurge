@@ -436,6 +436,7 @@ static const char* random_path(char prefix);
 /* internal data */
 static ALLEGRO_SHADER* shader = NULL;
 static renderqueue_entry_t* buffer = NULL; /* storage */
+static int* sorted_indices = NULL; /* a permutation of 0, 1, ... n-1, where n = buffer_size */
 static renderqueue_entry_t** sorted_buffer = NULL; /* sorted indirection to buffer[] */
 static int buffer_size = 0;
 static int buffer_capacity = 0;
@@ -517,6 +518,7 @@ void renderqueue_init()
     buffer_capacity = INITIAL_BUFFER_CAPACITY;
     buffer = mallocx(buffer_capacity * sizeof(*buffer));
     sorted_buffer = mallocx(buffer_capacity * sizeof(*sorted_buffer));
+    sorted_indices = mallocx(buffer_capacity * sizeof(*sorted_indices));
 
     /* setup the shader of the renderqueue */
     const char* fs_glsl = use_depth_buffer ? fs_glsl_with_alpha_testing : fs_glsl_without_alpha_testing;
@@ -555,6 +557,9 @@ void renderqueue_release()
         al_destroy_shader(shader);
         shader = NULL;
     }
+
+    free(sorted_indices);
+    sorted_indices = NULL;
 
     free(sorted_buffer);
     sorted_buffer = NULL;
@@ -1003,12 +1008,18 @@ void enqueue(const renderqueue_entry_t* entry)
         buffer_capacity *= 2;
         buffer = reallocx(buffer, buffer_capacity * sizeof(*buffer));
         sorted_buffer = reallocx(sorted_buffer, buffer_capacity * sizeof(*sorted_buffer));
+        sorted_indices = reallocx(sorted_indices, buffer_capacity * sizeof(*sorted_indices));
+
+        /* sorted_buffer[] is invalidated because we have realloc'd buffer[] */
+        for(int i = 0; i < buffer_size; i++)
+            sorted_buffer[i] = &buffer[sorted_indices[i]];
     }
 
     /* add the entry to the buffer */
     renderqueue_entry_t* e = &buffer[buffer_size];
     memcpy(e, entry, sizeof(*entry));
     sorted_buffer[buffer_size] = e;
+    sorted_indices[buffer_size] = buffer_size;
 
     /* cache the values of the new entry for purposes of comparison to other entries */
     e->cached.zindex = e->vtable->zindex(e->renderable);
@@ -1034,9 +1045,11 @@ void enqueue(const renderqueue_entry_t* entry)
     int j = buffer_size - 1;
     while(j >= 0 && cmp_fun(e, sorted_buffer[j]) < 0) {
         sorted_buffer[j+1] = sorted_buffer[j];
+        sorted_indices[j+1] = sorted_indices[j];
         --j;
     }
     sorted_buffer[j+1] = e;
+    sorted_indices[j+1] = buffer_size;
 
     /* done! */
     buffer_size++;
