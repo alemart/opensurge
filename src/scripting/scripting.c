@@ -57,6 +57,7 @@ extern void scripting_register_brick(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
+extern void scripting_register_entitymanager(surgescript_vm_t* vm);
 extern void scripting_register_events(surgescript_vm_t* vm);
 extern void scripting_register_input(surgescript_vm_t* vm);
 extern void scripting_register_lang(surgescript_vm_t* vm);
@@ -188,14 +189,10 @@ void scripting_reload()
  */
 void scripting_pause_vm()
 {
-#ifdef SURGESCRIPT_VERSION_IS_AT_LEAST
-#if SURGESCRIPT_VERSION_IS_AT_LEAST(0,5,5,0)
     if(pause_counter++ == 0) {
         logfile_message("Pausing the SurgeScript VM");
         surgescript_vm_pause(vm);
     }
-#endif
-#endif
 }
 
 /*
@@ -415,6 +412,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_camera(vm);
     scripting_register_collisions(vm);
     scripting_register_console(vm);
+    scripting_register_entitymanager(vm);
     scripting_register_events(vm);
     scripting_register_input(vm);
     scripting_register_lang(vm);

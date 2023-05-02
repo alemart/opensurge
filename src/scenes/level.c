@@ -207,6 +207,7 @@ static void level_load(const char *filepath);
 static void level_unload();
 static int level_save(const char *filepath);
 static bool level_interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
+static bool level_save_ssobject(surgescript_object_t* object, void* param);
 
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
@@ -236,41 +237,38 @@ static void destroy_collisionmask_of_bricklike_object(void* mask);
 /* Scripting */
 #define TRANSFORM_MAX_DEPTH 128
 #define BRICKLIKE_MAX_COUNT 1024
+
 static surgescript_object_t* cached_level_ssobject = NULL;
+static surgescript_object_t* cached_entity_manager = NULL;
+
+static inline surgescript_object_t* level_ssobject();
+static inline surgescript_object_t* entitymanager_ssobject();
+static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
+static bool notify_ssobject(surgescript_object_t* object, void* param);
+static void notify_ssobjects(const char* fun_name);
+
 static void update_ssobjects();
 static void update_ssobject(surgescript_object_t* object, void* param);
 static void after_update_ssobject(surgescript_object_t* object, void* param);
 static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
-static bool ssobject_exists(const char* object_name);
-static surgescript_object_t* level_ssobject();
-static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor);
-static bool save_ssobject(surgescript_object_t* object, void* param);
-typedef struct ssobj_extradata_t ssobj_extradata_t;
-struct ssobj_extradata_t {
-    surgescript_objecthandle_t handle;
-    uint64_t entity_id;
-    v2d_t spawn_point;
-    int spawned_in_the_editor;
-    int sleeping;
-};
-static v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object);
-static uint64_t get_ssobj_id(const surgescript_object_t* object);
-static int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
-static int is_ssobj_sleeping(const surgescript_object_t* object);
-static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object);
-static void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata);
-static void clear_ssobj_extradata(const surgescript_object_t* object);
-static void free_ssobj_extradata(void* data);
-static bool match_ssobj_id(const void* value, void* data);
-static fasthash_t* ssobj_extradata;
+
+static bool entity_info_exists(const surgescript_object_t* object);
+static void entity_info_remove(const surgescript_object_t* object);
+static v2d_t entity_info_spawnpoint(const surgescript_object_t* object);
+static uint64_t entity_info_id(const surgescript_object_t* object);
+static void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id);
+static bool entity_info_is_persistent(const surgescript_object_t* object);
+static void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent);
+static bool entity_info_is_sleeping(const surgescript_object_t* object);
+static void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping);
+
 static void add_bricklike_ssobject(surgescript_object_t* object);
 static surgescript_object_t* get_bricklike_ssobject(int index);
 static inline void clear_bricklike_ssobjects();
 static surgescript_objecthandle_t bricklike_ssobject[BRICKLIKE_MAX_COUNT];
 static int bricklike_ssobject_count = 0;
-bool notify_ssobject(surgescript_object_t* object, void* param);
-void notify_ssobjects(const char* fun_name);
+
 STATIC_DARRAY(surgescript_objecthandle_t, late_update_queue);
 static void init_late_update_queue();
 static void release_late_update_queue();
@@ -523,7 +521,8 @@ void level_load(const char *filepath)
         team[i] = NULL;
 
     /* scripting: preparing a new Level... */
-    surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
+    surgescript_object_t* level_manager = scripting_util_surgeengine_component(surgescript_vm(), "LevelManager");
+    surgescript_object_call_function(level_manager, "onLevelLoad", NULL, 0, NULL);
 
     /* reading the level file */
     if(!levparser_parse(filepath, NULL, level_interpret_line))
@@ -728,7 +727,7 @@ int level_save(const char *filepath)
 
     /* SurgeScript entity list */
     al_fprintf(fp, "\n// entities\n");
-    surgescript_object_traverse_tree_ex(level_ssobject(), fp, save_ssobject);
+    surgescript_object_traverse_tree_ex(level_ssobject(), fp, level_save_ssobject);
 
     /* item list */
     if(item_list) {
@@ -943,8 +942,8 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
-                    else if(param_count > 3 && get_ssobj_extradata(obj))
-                        get_ssobj_extradata(obj)->entity_id = str_to_x64(param[3]);
+                    else if(param_count > 3 && entity_info_exists(obj))
+                        entity_info_set_id(obj, str_to_x64(param[3]));
                 }
                 else
                     logfile_message("Level loader - can't spawn \"%s\": entity doesn't exist", name);
@@ -999,9 +998,8 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
             surgescript_object_t* object = NULL;
             const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
             if(object_name != NULL && (object = level_create_object(object_name, v2d_new(x, y))) != NULL) {
-                ssobj_extradata_t* data = get_ssobj_extradata(object);
-                if(data != NULL)
-                    data->spawned_in_the_editor = TRUE; /* force this flag, so the port gets persisted */
+                /* force this flag, so the port gets persisted */
+                entity_info_set_persistent(object, true);
             }
             else
                 level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
@@ -1038,6 +1036,28 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filepath, fileline);
 
     /* continue reading */
+    return true;
+}
+
+/*
+ * level_save_ssobject()
+ * Writes an object declaration to a level file
+ */
+bool level_save_ssobject(surgescript_object_t* object, void* param)
+{
+    ALLEGRO_FILE* fp = (ALLEGRO_FILE*)param;
+
+    if(surgescript_object_is_killed(object))
+        return false;
+
+    if(entity_info_is_persistent(object)) {
+        const char* object_name = surgescript_object_name(object);
+        v2d_t spawn_point = entity_info_spawnpoint(object);
+        uint64_t entity_id = entity_info_id(object);
+
+        al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
+    }
+
     return true;
 }
 
@@ -1102,7 +1122,7 @@ void level_init(void *path_to_lev_file)
     init_late_update_queue();
 
     cached_level_ssobject = NULL;
-    ssobj_extradata = fasthash_create(free_ssobj_extradata, 15);
+    cached_entity_manager = NULL;
 
     /* load level file */
     level_load(filepath);
@@ -1144,8 +1164,8 @@ void level_release()
         image_destroy(quit_level_img);
 
     /* release the helpers */
-    ssobj_extradata = fasthash_destroy(ssobj_extradata);
     cached_level_ssobject = NULL;
+    cached_entity_manager = NULL;
 
     release_late_update_queue();
     clear_bricklike_ssobjects();
@@ -1754,20 +1774,7 @@ enemy_t* level_create_legacy_object(const char *name, v2d_t position)
  */
 surgescript_object_t* level_create_object(const char* object_name, v2d_t position)
 {
-    if(ssobject_exists(object_name)) {
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
-        int spawned_in_the_editor =
-            /* note: objects not created with this function (e.g., via scripting)
-               will not have this flag set to true */
-            surgescript_tagsystem_has_tag(tag_system, object_name, "entity") &&
-            !surgescript_tagsystem_has_tag(tag_system, object_name, "private") &&
-            !is_setup_object(object_name)
-        ;
-        return spawn_ssobject(object_name, position, spawned_in_the_editor);
-    }
-    else
-        return NULL;
+    return spawn_ssobject(object_name, position);
 }
 
 /*
@@ -1777,17 +1784,19 @@ surgescript_object_t* level_create_object(const char* object_name, v2d_t positio
  */
 surgescript_object_t* level_get_entity_by_id(const char* entity_id)
 {
+    extern surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id);
+    surgescript_object_t* level = level_ssobject();
+    surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+
     uint64_t id = str_to_x64(entity_id);
-    ssobj_extradata_t* data = fasthash_find(ssobj_extradata, match_ssobj_id, &id);
+    surgescript_object_t* entity_manager = entitymanager_ssobject();
+    surgescript_objecthandle_t handle = entitymanager_find_entity_by_id(entity_manager, id);
 
-    if(data != NULL) {
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-        if(surgescript_objectmanager_exists(manager, data->handle)) /* the object may have been deleted */
-            return surgescript_objectmanager_get(manager, data->handle);
-    }
+    if(!surgescript_objectmanager_exists(manager, handle)) /* the object may have been deleted */
+        return NULL; /* not found */
 
-    return NULL; /* not found */
+    /* success! */
+    return surgescript_objectmanager_get(manager, handle);
 }
 
 
@@ -1798,11 +1807,10 @@ surgescript_object_t* level_get_entity_by_id(const char* entity_id)
  */
 const char* level_get_entity_id(const surgescript_object_t* entity)
 {
-    surgescript_objecthandle_t handle = surgescript_object_handle(entity);
-    ssobj_extradata_t* data = fasthash_get(ssobj_extradata, handle);
+    static char buf[17];
 
-    if(data != NULL)
-        return x64_to_str(data->entity_id, NULL, 0);
+    if(entity_info_exists(entity))
+        return x64_to_str(entity_info_id(entity), buf, sizeof(buf));
 
     return "";
 }
@@ -2883,9 +2891,7 @@ void update_ssobject(surgescript_object_t* object, void* param)
                 surgescript_object_has_tag(object, "detached")
             ) {
                 /* the entity is not sleeping */
-                ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-                if(obj_data != NULL)
-                    obj_data->sleeping = FALSE;
+                entity_info_set_sleeping(object, false);
 
                 /* the entity should be updated */
                 surgescript_object_set_active(object, true);
@@ -2901,19 +2907,20 @@ void update_ssobject(surgescript_object_t* object, void* param)
             else if(!surgescript_object_has_tag(object, "disposable")) {
                 /* the entity should no longer be active and
                    should be repositioned to its spawn point */
-                ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-                if(obj_data && obj_data->spawned_in_the_editor && !obj_data->sleeping) {
-                    v2d_t spawn_point = obj_data->spawn_point;
-                    if(!level_inside_screen(spawn_point.x, spawn_point.y, 1, 1)) {
-                        /* put it to sleep */
-                        obj_data->sleeping = TRUE;
+                if(entity_info_exists(object)) {
+                    if(entity_info_is_persistent(object) && !entity_info_is_sleeping(object)) {
+                        v2d_t spawn_point = entity_info_spawnpoint(object);
+                        if(!level_inside_screen(spawn_point.x, spawn_point.y, 1, 1)) {
+                            /* put it to sleep */
+                            entity_info_set_sleeping(object, true);
 
-                        /* reposition the entity */
-                        if(v2d_magnitude(v2d_subtract(origin, spawn_point)) >= 1.0f)
-                            scripting_util_set_world_position(object, origin = spawn_point);
+                            /* reposition the entity */
+                            if(v2d_magnitude(v2d_subtract(origin, spawn_point)) >= 1.0f)
+                                scripting_util_set_world_position(object, origin = spawn_point);
 
-                        /* notify it */
-                        notify_ssobject(object, "onReset");
+                            /* notify it */
+                            notify_ssobject(object, "onReset");
+                        }
                     }
                 }
 
@@ -2923,7 +2930,7 @@ void update_ssobject(surgescript_object_t* object, void* param)
             else {
                 /* the entity should be disposed */
                 surgescript_object_kill(object);
-                clear_ssobj_extradata(object);
+                entity_info_remove(object);
             }
         }
 
@@ -3000,8 +3007,7 @@ bool render_ssobject(surgescript_object_t* object, void* param)
     }
     else {
         /* gameplay */
-        ssobj_extradata_t* obj_data = is_entity ? get_ssobj_extradata(object) : NULL; /* avoid calls to get_ssobj_extradata() if possible */
-        if(obj_data != NULL && obj_data->sleeping) {
+        if(is_entity && entity_info_exists(object) && entity_info_is_sleeping(object)) {
             /* no need to render sleeping objects */
             return false; /* won't render their children */
         }
@@ -3041,6 +3047,10 @@ bool render_ssobject(surgescript_object_t* object, void* param)
         }
     }
 }
+
+
+
+
 
 /* brick-like objects */
 void add_bricklike_ssobject(surgescript_object_t* object)
@@ -3104,14 +3114,6 @@ void clear_late_update_queue()
 
 /* SurgeScript object utilities */
 
-/* does the specified object exist? */
-bool ssobject_exists(const char* object_name)
-{
-    surgescript_vm_t* vm = surgescript_vm();
-    surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
-    return surgescript_programpool_is_compiled(pool, object_name);
-}
-
 /* get the Level object (SurgeScript) */
 surgescript_object_t* level_ssobject()
 {
@@ -3120,72 +3122,60 @@ surgescript_object_t* level_ssobject()
     return cached_level_ssobject;
 }
 
-/* spawns a ssobject */
-surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor)
+/* get the EntityManager object (SurgeScript) */
+surgescript_object_t* entitymanager_ssobject()
 {
-    if(ssobject_exists(object_name)) {
-        /* create the object by invoking Level.spawn */
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-        surgescript_transform_t* transform = NULL;
-        surgescript_object_t* object = NULL;
-        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
-        surgescript_var_t* ret = surgescript_var_create();
-        const surgescript_var_t* param[] = { tmp };
-
-        surgescript_object_call_function(level_ssobject(), "spawn", param, 1, ret);
-        object = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(ret));
-        surgescript_var_destroy(ret);
-        surgescript_var_destroy(tmp);
-
-        /* set the spawn point */
-        transform = surgescript_object_transform(object);
-        surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
-
-        /* save the editor-related data (entities only) */
-        if(surgescript_object_has_tag(object, "entity")) {
-            store_ssobj_extradata(object, (ssobj_extradata_t){
-                .handle = surgescript_object_handle(object),
-                .entity_id = random64(),
-                .spawn_point = spawn_point,
-                .spawned_in_the_editor = spawned_in_the_editor,
-                .sleeping = TRUE
-            });
-
-            /* sanity check for entities */
-            if(surgescript_object_has_tag(object, "detached") && !surgescript_object_has_tag(object, "private")) {
-                surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
-                logfile_message("WARNING: object \"%s\" is tagged detached, but not private. Fixing...", object_name);
-                surgescript_tagsystem_add_tag(tag_system, object_name, "private");
-            }
-        }
-
-        /* done! */
-        return object;
-    }
-    else {
-        fatal_error("Can't spawn level object \"%s\": object does not exist.");
-        return NULL;
-    }
+    if(cached_entity_manager == NULL)
+        cached_entity_manager = scripting_level_entitymanager(level_ssobject());
+    return cached_entity_manager;
 }
 
-/* writes an object declaration to a file */
-bool save_ssobject(surgescript_object_t* object, void* param)
+/* spawns a ssobject */
+surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
 {
-    ALLEGRO_FILE* fp = (ALLEGRO_FILE*)param;
+    surgescript_object_t* level = level_ssobject();
+    surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    surgescript_objecthandle_t new_object_handle;
 
-    if(surgescript_object_is_killed(object))
-        return false;
+    /* return NULL if the class of objects doesn't exist */
+    if(!surgescript_objectmanager_is_declared(manager, object_name))
+        return NULL;
 
-    if(is_ssobj_spawned_in_the_editor(object)) {
-        const char* object_name = surgescript_object_name(object);
-        v2d_t spawn_point = get_ssobj_spawnpoint(object);
-        uint64_t entity_id = get_ssobj_id(object);
+    if(!surgescript_tagsystem_has_tag(tag_system, object_name, "entity")) {
+        /* call Level.spawn(object_name) */
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
 
-        al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
+        const surgescript_var_t* param[] = { tmp };
+        surgescript_object_call_function(level, "spawn", param, 1, ret);
+        new_object_handle = surgescript_var_get_objecthandle(ret);
+
+        surgescript_var_destroy(tmp);
+        surgescript_var_destroy(ret);
+    }
+    else {
+        /* call Level.spawnEntity(object_name, spawn_point) */
+        surgescript_objecthandle_t v2_handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+        surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2_handle);
+        scripting_vector2_update(v2, spawn_point.x, spawn_point.y);
+
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
+        surgescript_var_t* tmp2 = surgescript_var_set_objecthandle(surgescript_var_create(), v2_handle);
+
+        const surgescript_var_t* param[] = { tmp, tmp2 };
+        surgescript_object_call_function(level, "spawnEntity", param, 2, ret);
+        new_object_handle = surgescript_var_get_objecthandle(ret);
+
+        surgescript_var_destroy(tmp2);
+        surgescript_var_destroy(tmp);
+        surgescript_var_destroy(ret);
+
+        surgescript_object_kill(v2);
     }
 
-    return true;
+    return surgescript_objectmanager_get(manager, new_object_handle);
 }
 
 /* notify an entity: call a function (if it exists) */
@@ -3206,6 +3196,8 @@ void notify_ssobjects(const char* fun_name)
 {
     surgescript_object_traverse_tree_ex(level_ssobject(), (void*)fun_name, notify_ssobject);
 }
+
+
 
 
 
@@ -3668,13 +3660,13 @@ void editor_update()
                     int index = editor_ssobj_index(surgescript_object_name(ssobject));
                     if(!pick_object) {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, index, scripting_util_world_position(ssobject));
-                        eda.ssobj_id = get_ssobj_id(ssobject);
+                        eda.ssobj_id = entity_info_id(ssobject);
                         editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                     else if(index >= 0) {
                         editor_cursor_entity_id = index;
-                        editor_ssobj_picked_entity.id = get_ssobj_id(ssobject);
+                        editor_ssobj_picked_entity.id = entity_info_id(ssobject);
                         str_cpy(editor_ssobj_picked_entity.name, surgescript_object_name(ssobject), sizeof(editor_ssobj_picked_entity.name));
                     }
                 }
@@ -4682,15 +4674,15 @@ void editor_tooltip_update()
         for(int i = 0; i < n; i++) {
             surgescript_objecthandle_t handle = surgescript_object_nth_child(level, i);
             surgescript_object_t* child = surgescript_objectmanager_get(manager, handle);
-            if(get_ssobj_extradata(child) != NULL)
+            if(entity_info_exists(child))
                 editor_pick_ssobj(child, &target);
         }
 
         /* found a target */
         if(target != NULL && !surgescript_object_is_killed(target)) {
-            ssobj_extradata_t* data = get_ssobj_extradata(target);
-            const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
-            v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
+            bool has_data = entity_info_exists(target);
+            const char* entity_id = has_data ? x64_to_str(entity_info_id(target), NULL, 0) : "";
+            v2d_t sp = has_data ? entity_info_spawnpoint(target) : v2d_new(0, 0);
             font_set_text(editor_tooltip_font, "<color=$COLOR_HIGHLIGHT>%s</color>\n%d,%d\n%s\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
             font_set_position(editor_tooltip_font, scripting_util_world_position(target));
             font_set_visible(editor_tooltip_font, true);
@@ -5107,8 +5099,7 @@ void editor_action_commit(editor_action_t action)
                 surgescript_object_t* ssobj = level_create_object(editor_ssobj_name(action.obj_id), action.obj_position);
 
                 /* recover entity ID */
-                ssobj_extradata_t* data = get_ssobj_extradata(ssobj);
-                if(data != NULL) {
+                if(entity_info_exists(ssobj)) {
                     uint64_t recovered_id;
 
                     /* what is the ID to recover? */
@@ -5122,7 +5113,7 @@ void editor_action_commit(editor_action_t action)
                     /* enforce uniqueness */
                     if(recovered_id != 0) {
                         if(level_get_entity_by_id(x64_to_str(recovered_id, NULL, 0)) == NULL)
-                            data->entity_id = recovered_id;
+                            entity_info_set_id(ssobj, recovered_id);
                     }
                 }
                 editor_ssobj_picked_entity.id = 0;
@@ -5235,14 +5226,14 @@ void editor_action_commit(editor_action_t action)
 bool editor_remove_ssobj(surgescript_object_t* object, void* data)
 {
     if(surgescript_object_is_active(object)) {
-        if(is_ssobj_spawned_in_the_editor(object)) {
+        if(entity_info_is_persistent(object)) {
             const char* object_name = surgescript_object_name(object);
             editor_action_t *action = (editor_action_t*)data;
             if(editor_ssobj_index(object_name) == action->obj_id) {
                 v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
                 if(nearly_zero(v2d_magnitude(delta))) {
                     surgescript_object_kill(object);
-                    clear_ssobj_extradata(object);
+                    entity_info_remove(object);
                 }
             }
         }
@@ -5256,7 +5247,7 @@ bool editor_remove_ssobj(surgescript_object_t* object, void* data)
 bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 {
     if(surgescript_object_is_active(object)) {
-        if(is_ssobj_spawned_in_the_editor(object)) {
+        if(entity_info_is_persistent(object)) {
             v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
             float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
             float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
@@ -5288,68 +5279,59 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
 
 
 
-/* extradata: extra metadata for SurgeScript objects */
-v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object)
+/*
+ * Additional info of SurgeScript entities
+ */
+v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
 {
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->spawn_point : v2d_new(0, 0);
+    extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
-uint64_t get_ssobj_id(const surgescript_object_t* object)
+uint64_t entity_info_id(const surgescript_object_t* object)
 {
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->entity_id : 0;
+    extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
-int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object)
+bool entity_info_is_persistent(const surgescript_object_t* object)
 {
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->spawned_in_the_editor : FALSE;
+    extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
-int is_ssobj_sleeping(const surgescript_object_t* object)
+bool entity_info_is_sleeping(const surgescript_object_t* object)
 {
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->sleeping : FALSE;
+    extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
-/* Get the editor data of a given object
-   It may return NULL (if no such data exists) */
-ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object)
+void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
 {
-    surgescript_objecthandle_t key = surgescript_object_handle(object);
-    return fasthash_get(ssobj_extradata, key); /* may be NULL */
+    extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
+    entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
 }
 
-void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata)
+void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
 {
-    surgescript_objecthandle_t key = surgescript_object_handle(object);
-    ssobj_extradata_t* data = fasthash_get(ssobj_extradata, key);
-
-    if(data == NULL) {
-        data = mallocx(sizeof *data);
-        *data = extradata;
-        fasthash_put(ssobj_extradata, key, data);
-    }
-    else
-        *data = extradata;
-
-    (void)is_ssobj_sleeping;
+    extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
+    entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
 }
 
-void clear_ssobj_extradata(const surgescript_object_t* object)
+void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
 {
-    surgescript_objecthandle_t key = surgescript_object_handle(object);
-    fasthash_delete(ssobj_extradata, key);
+    extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
+    entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
 }
 
-void free_ssobj_extradata(void* data)
+bool entity_info_exists(const surgescript_object_t* object)
 {
-    free(data);
+    extern bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_has_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
-bool match_ssobj_id(const void* value, void* data)
+void entity_info_remove(const surgescript_object_t* object)
 {
-    ssobj_extradata_t* entry = (ssobj_extradata_t*)value;
-    return entry->entity_id == *((uint64_t*)data);
+    extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    entitymanager_remove_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
 }

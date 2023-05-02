@@ -79,4 +79,6 @@ extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* 
 
 extern const struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 
+extern surgescript_object_t* scripting_level_entitymanager(const surgescript_object_t* object);
+
 #endif
