@@ -427,7 +427,6 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         /* spawn the companion objects */
         if(player_companion_name(player, 0) != NULL) {
             const char* companion_name = NULL;
-            surgescript_programpool_t* pool = surgescript_objectmanager_programpool(manager);
             surgescript_objecthandle_t companion, null_handle = surgescript_objectmanager_null(manager);
             for(int i = 0; (companion_name = player_companion_name(player, i)) != NULL; i++) {
                 /* allocate memory */
@@ -436,7 +435,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
                     ssassert(addr == surgescript_heap_malloc(heap));
 
                 /* spawn the object */
-                if(surgescript_programpool_is_compiled(pool, companion_name)) {
+                if(surgescript_objectmanager_is_declared(manager, companion_name)) {
                     /* spawn the companion in SurgeScript */
                     if(surgescript_object_child(object, companion_name) == null_handle) {
                         companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);
