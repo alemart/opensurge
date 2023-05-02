@@ -1041,6 +1041,9 @@ void enqueue(const renderqueue_entry_t* entry)
 
        we want stable sorting in order to preserve the z-order of
        elements that are deemed "equal" by the comparison function
+
+       maybe we can also use heapsort and keep an additional index
+       for stability.
     */
     int j = buffer_size - 1;
     while(j >= 0 && cmp_fun(e, sorted_buffer[j]) < 0) {
