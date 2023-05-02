@@ -419,7 +419,7 @@ static const char fs_glsl_with_alpha_testing[] = ""
 /* render queue stats reporting */
 #define want_report()             0
 #define REPORT(...)               do { if(want_report()) video_showmessage(__VA_ARGS__); } while(0)
-#define REPORT_BEGIN()            video_clearmessages()
+#define REPORT_BEGIN()            do { if(want_report()) video_clearmessages(); } while(0)
 #define REPORT_END()              REPORT("")
 
 /* utilities */
