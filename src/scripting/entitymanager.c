@@ -167,7 +167,7 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t position_handle = surgescript_var_get_objecthandle(param[1]);
 
     /* validate: does the object exist? */
-    if(!surgescript_objectmanager_is_declared(manager, entity_name)) {
+    if(!surgescript_objectmanager_class_exists(manager, entity_name)) {
         scripting_error(object, "Can't spawn entity: object \"%s\" doesn't exist!", entity_name);
         return NULL;
     }

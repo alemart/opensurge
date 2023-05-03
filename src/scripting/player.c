@@ -435,7 +435,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
                     ssassert(addr == surgescript_heap_malloc(heap));
 
                 /* spawn the object */
-                if(surgescript_objectmanager_is_declared(manager, companion_name)) {
+                if(surgescript_objectmanager_class_exists(manager, companion_name)) {
                     /* spawn the companion in SurgeScript */
                     if(surgescript_object_child(object, companion_name) == null_handle) {
                         companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);

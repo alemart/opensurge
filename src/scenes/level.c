@@ -3139,7 +3139,7 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
     surgescript_objecthandle_t new_object_handle;
 
     /* return NULL if the class of objects doesn't exist */
-    if(!surgescript_objectmanager_is_declared(manager, object_name))
+    if(!surgescript_objectmanager_class_exists(manager, object_name))
         return NULL;
 
     if(!surgescript_tagsystem_has_tag(tag_system, object_name, "entity")) {
