@@ -295,21 +295,30 @@ const char* str_basename(const char *path)
 /*
  * x64_to_str()
  * Converts a uint64_t to a padded hex-string
- * If buf is NULL, an internal buffer is used and returned
+ * If buf is NULL, an internal buffer is used
  * If buf is not NULL, size should be at least 17
  */
 char* x64_to_str(uint64_t value, char* buf, size_t size)
 {
     static char c[] = "0123456789abcdef", _buf[17] = "";
     char *p = buf ? (buf + size) : (_buf + (size = sizeof(_buf)));
-    if(!size) return buf;
 
+    /* validate */
+    if(!size)
+        return buf;
+
+    /* write string */
     *(--p) = 0;
     while(--size) {
         *(--p) = c[value & 15];
         value >>= 4;
     }
 
+    /* remove leading zeros */
+    while(*p == '0')
+        p++; /* will not return buf */
+
+    /* done */
     return p;
 }
 
