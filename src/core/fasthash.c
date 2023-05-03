@@ -35,14 +35,14 @@ enum fasthash_entry_state_t {
 struct fasthash_entry_t
 {
     uint64_t key;
-    fasthash_entry_state_t state;
     void* value;
+    fasthash_entry_state_t state;
 };
 
 struct fasthash_t
 {
     int length;
-    int capacity;
+    int capacity; /* a power of 2 */
     uint64_t cap_mask; /* capacity - 1 */
     fasthash_entry_t* data;
     void (*destructor)(void*); /* element destructor */
@@ -50,9 +50,9 @@ struct fasthash_t
 
 /* static data */
 static const int SPARSITY = 4; /* 1 / load_factor */
-static fasthash_entry_t BLANK_ENTRY = { 0, BLANK, NULL };
+static fasthash_entry_t BLANK_ENTRY = { 0, NULL, BLANK };
 static inline uint64_t hash(uint64_t x);
-static inline void grow(fasthash_t* hashtable);
+static void grow(fasthash_t* hashtable);
 static void empty_destructor(void* data);
 
 
@@ -116,8 +116,8 @@ fasthash_t* fasthash_destroy(fasthash_t* hashtable)
  */
 void* fasthash_get(fasthash_t* hashtable, uint64_t key)
 {
-    uint64_t k = hash(key) & hashtable->cap_mask;
-    uint64_t marker = hashtable->capacity;
+    uint32_t k = hash(key) & hashtable->cap_mask;
+    uint32_t marker = hashtable->capacity;
 
     while(hashtable->data[k].state != BLANK) {
         if(hashtable->data[k].state == ACTIVE) {
@@ -156,7 +156,7 @@ void fasthash_put(fasthash_t* hashtable, uint64_t key, void* value)
 
     /* make it sparse */
     if(hashtable->length < hashtable->capacity / SPARSITY) {
-        uint64_t k = hash(key) & hashtable->cap_mask;
+        uint32_t k = hash(key) & hashtable->cap_mask;
 
         while(hashtable->data[k].state != BLANK) {
             if(hashtable->data[k].state == DELETED) {
@@ -199,7 +199,7 @@ void fasthash_put(fasthash_t* hashtable, uint64_t key, void* value)
  */
 bool fasthash_delete(fasthash_t* hashtable, uint64_t key)
 {
-    uint64_t k = hash(key) & hashtable->cap_mask;
+    uint32_t k = hash(key) & hashtable->cap_mask;
 
     while(hashtable->data[k].state != BLANK) {
         if(hashtable->data[k].key == key) {
