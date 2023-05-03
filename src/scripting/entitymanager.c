@@ -300,8 +300,17 @@ uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surge
 void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id)
 {
     entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
-    if(info != NULL)
+
+    if(info != NULL) {
+        entitymanagerdatabase_t* db = get_db(entity_manager);
+
+        /* update the id_to_handle hashtable */
+        fasthash_delete(db->id_to_handle, info->id);
+        fasthash_put(db->id_to_handle, entity_id, handle_ctor(info->handle));
+
+        /* set the new id */
         info->id = entity_id;
+    }
 }
 
 /* get the spawn point of an entity */
