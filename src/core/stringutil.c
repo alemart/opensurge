@@ -295,28 +295,44 @@ const char* str_basename(const char *path)
 /*
  * x64_to_str()
  * Converts a uint64_t to a padded hex-string
- * If buf is NULL, an internal buffer is used
+ * If buf is NULL, an internal buffer is used and returned
  * If buf is not NULL, size should be at least 17
  */
 char* x64_to_str(uint64_t value, char* buf, size_t size)
 {
     static char c[] = "0123456789abcdef", _buf[17] = "";
-    char *p = buf ? (buf + size) : (_buf + (size = sizeof(_buf)));
+    char *p, *q, *r;
 
-    /* validate */
-    if(!size)
+    /* use an internal buffer? */
+    if(buf == NULL) {
+        buf = _buf;
+        size = sizeof(_buf);
+    }
+
+    /* validate the size of the buffer */
+    else if(size < 17) {
+        *buf = '\0';
         return buf;
+    }
 
     /* write string */
-    *(--p) = 0;
+    p = buf + (size = 17);
+    *(--p) = '\0';
     while(--size) {
         *(--p) = c[value & 15];
         value >>= 4;
     }
 
-    /* remove leading zeros */
-    while(*p == '0')
-        p++; /* will not return buf */
+    /* read leading zeros */
+    for(q = p; *q == '0'; q++);
+
+    /* remove leading zeros by moving the
+       string to the beginning of the buffer */
+    if(p != q) {
+        for(r = p; *q != '\0';)
+            *(r++) = *(q++);
+        *r = '\0';
+    }
 
     /* done */
     return p;
@@ -329,15 +345,15 @@ char* x64_to_str(uint64_t value, char* buf, size_t size)
  */
 uint64_t str_to_x64(const char* buf)
 {
-    uint64_t value = 0;
     static const uint8_t t[128] = { /* accepts any 0-127 char */
         ['0'] = 0, ['1'] = 1, ['2'] = 2, ['3'] = 3, ['4'] = 4,
         ['5'] = 5, ['6'] = 6, ['7'] = 7, ['8'] = 8, ['9'] = 9,
         ['a'] = 10, ['b'] = 11, ['c'] = 12, ['d'] = 13, ['e'] = 14, ['f'] = 15,
         ['A'] = 10, ['B'] = 11, ['C'] = 12, ['D'] = 13, ['E'] = 14, ['F'] = 15
     };
+    uint64_t value = 0;
 
-    while(*buf)
+    while(*buf != '\0')
         value = (value << 4) | t[*(buf++) & 127];
 
     return value;
