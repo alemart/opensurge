@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 /* Inline usage:
 
@@ -37,7 +36,7 @@ No need to compile fasthash.c separately */
 #endif
 
 typedef struct fasthash_t fasthash_t;
-FASTHASH_API fasthash_t* fasthash_create(void (*element_destructor)(void*), size_t lg2_cap);
+FASTHASH_API fasthash_t* fasthash_create(void (*element_destructor)(void*), int lg2_cap);
 FASTHASH_API fasthash_t* fasthash_destroy(fasthash_t* hashtable);
 FASTHASH_API void* fasthash_get(fasthash_t* hashtable, uint64_t key);
 FASTHASH_API void fasthash_put(fasthash_t* hashtable, uint64_t key, void* value);
