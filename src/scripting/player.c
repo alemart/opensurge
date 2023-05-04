@@ -1548,23 +1548,25 @@ void update_player(surgescript_object_t* object)
 /* update the player transform */
 void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale)
 {
-    /* the angle is given in degrees */
-    surgescript_transform_t transform;
-    surgescript_transform_reset(&transform);
-    surgescript_transform_setposition2d(&transform, position.x, position.y); /* assuming local position == world position */
-    surgescript_transform_setrotation2d(&transform, angle);
-    surgescript_transform_setscale2d(&transform, scale.x, scale.y);
-    surgescript_object_poke_transform(object, &transform);
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    surgescript_transform_setposition2d(transform, position.x, position.y); /* assuming local position == world position */
+    surgescript_transform_setrotation2d(transform, angle); /* in degrees */
+    surgescript_transform_setscale2d(transform, scale.x, scale.y);
 }
 
 /* read the player transform */
 void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale)
 {
-    surgescript_transform_t transform;
-    surgescript_object_peek_transform(object, &transform);
-    *position = v2d_new(transform.position.x, transform.position.y); /* assuming local position == world position */
-    *angle = transform.rotation.z;
-    *scale = v2d_new(transform.scale.x, transform.scale.y);
+    const surgescript_transform_t* transform = surgescript_object_transform(object);
+    float x, y, deg, sx, sy;
+
+    surgescript_transform_getposition2d(transform, &x, &y); /* assuming local position == world position */
+    deg = surgescript_transform_getrotation2d(transform); /* in degrees */
+    surgescript_transform_getscale2d(transform, &sx, &sy);
+
+    *position = v2d_new(x, y);
+    *angle = deg;
+    *scale = v2d_new(sx, sy);
 }
 
 /* update the collider */

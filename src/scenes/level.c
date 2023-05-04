@@ -2872,7 +2872,9 @@ void update_ssobjects()
 void update_ssobject(surgescript_object_t* object, void* param)
 {
     /* initialization */
+    surgescript_transform_t* transform = surgescript_transform_create();
     int depth = surgescript_object_depth(object);
+
     if(depth < TRANSFORM_MAX_DEPTH) {
         /* get the transform origin */
         v2d_t origin = ((v2d_t*)param)[depth];
@@ -2880,9 +2882,8 @@ void update_ssobject(surgescript_object_t* object, void* param)
         /* are we dealing with a level entity? */
         if(surgescript_object_has_tag(object, "entity")) {
             /* get the position of the object */
-            surgescript_transform_t transform;
-            surgescript_object_peek_transform(object, &transform);
-            surgescript_transform_apply2d(&transform, &origin.x, &origin.y);
+            surgescript_object_peek_transform(object, transform);
+            surgescript_transform_apply2d(transform, &origin.x, &origin.y);
 
             /* check whether the entity should be updated, disposed or what */
             if(
@@ -2940,6 +2941,9 @@ void update_ssobject(surgescript_object_t* object, void* param)
     }
     else
         scripting_error(object, "TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
+
+    /* done */
+    surgescript_transform_destroy(transform);
 }
 
 void after_update_ssobject(surgescript_object_t* object, void* param)
@@ -3112,7 +3116,10 @@ void clear_late_update_queue()
 }
 
 
-/* SurgeScript object utilities */
+
+/*
+ * SurgeScript object utilities
+ */
 
 /* get the Level object (SurgeScript) */
 surgescript_object_t* level_ssobject()
@@ -3199,6 +3206,64 @@ void notify_ssobjects(const char* fun_name)
 
 
 
+
+
+/*
+ * Additional info of SurgeScript entities
+ */
+v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
+{
+    extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+uint64_t entity_info_id(const surgescript_object_t* object)
+{
+    extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+bool entity_info_is_persistent(const surgescript_object_t* object)
+{
+    extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+bool entity_info_is_sleeping(const surgescript_object_t* object)
+{
+    extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
+{
+    extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
+    entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
+}
+
+void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
+{
+    extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
+    entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
+}
+
+void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
+{
+    extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
+    entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
+}
+
+bool entity_info_exists(const surgescript_object_t* object)
+{
+    extern bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_has_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_remove(const surgescript_object_t* object)
+{
+    extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    entitymanager_remove_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
+}
 
 
 
@@ -5275,63 +5340,4 @@ bool editor_pick_ssobj(surgescript_object_t* object, void* data)
     }
     else
         return false;
-}
-
-
-
-/*
- * Additional info of SurgeScript entities
- */
-v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
-{
-    extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-uint64_t entity_info_id(const surgescript_object_t* object)
-{
-    extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-bool entity_info_is_persistent(const surgescript_object_t* object)
-{
-    extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-bool entity_info_is_sleeping(const surgescript_object_t* object)
-{
-    extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
-{
-    extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
-    entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
-}
-
-void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
-{
-    extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
-    entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
-}
-
-void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
-{
-    extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
-    entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
-}
-
-bool entity_info_exists(const surgescript_object_t* object)
-{
-    extern bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_has_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-void entity_info_remove(const surgescript_object_t* object)
-{
-    extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    entitymanager_remove_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
 }

@@ -278,8 +278,10 @@ surgescript_var_t* fun_getlocalposition(surgescript_object_t* object, const surg
 {
     surgescript_transform_t* transform = surgescript_object_transform(target(object));
     surgescript_object_t* v2 = get_v2(object, LOCALPOSITION_ADDR);
+    float x, y;
 
-    scripting_vector2_update(v2, transform->position.x, transform->position.y);
+    surgescript_transform_getposition2d(transform, &x, &y);
+    scripting_vector2_update(v2, x, y);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(v2));
 }
@@ -293,8 +295,7 @@ surgescript_var_t* fun_setlocalposition(surgescript_object_t* object, const surg
     double x = 0.0, y = 0.0;
 
     scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
-    transform->position.x = x;
-    transform->position.y = y;
+    surgescript_transform_setposition2d(transform, x, y);
 
     notify_change(object);
     return NULL;
@@ -304,7 +305,8 @@ surgescript_var_t* fun_setlocalposition(surgescript_object_t* object, const surg
 surgescript_var_t* fun_getlocalangle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_transform_t* transform = surgescript_object_transform(target(object));
-    return surgescript_var_set_number(surgescript_var_create(), transform->rotation.z);
+    float degrees = surgescript_transform_getrotation2d(transform);
+    return surgescript_var_set_number(surgescript_var_create(), degrees);
 }
 
 /* set local angle (in degrees) */
@@ -323,8 +325,10 @@ surgescript_var_t* fun_getlocalscale(surgescript_object_t* object, const surgesc
 {
     surgescript_transform_t* transform = surgescript_object_transform(target(object));
     surgescript_object_t* v2 = get_v2(object, LOCALSCALE_ADDR);
+    float sx, sy;
 
-    scripting_vector2_update(v2, transform->scale.x, transform->scale.y);
+    surgescript_transform_getscale2d(transform, &sx, &sy);
+    scripting_vector2_update(v2, sx, sy);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(v2));
 }
@@ -338,8 +342,7 @@ surgescript_var_t* fun_setlocalscale(surgescript_object_t* object, const surgesc
     double x = 0.0, y = 0.0;
 
     scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
-    transform->scale.x = x;
-    transform->scale.y = y;
+    surgescript_transform_setscale2d(transform, x, y);
 
     notify_change(object);
     return NULL;

@@ -352,14 +352,18 @@ surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescrip
 /* get offset */
 surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_transform_t* transform = surgescript_object_transform(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR));
+
+    /* read transform */
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    float x, y;
+    surgescript_transform_getposition2d(transform, &x, &y);
+
+    /* get offset */
     surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
-
-    scripting_vector2_update(v2, transform->position.x, transform->position.y);
-
+    scripting_vector2_update(v2, x, y);
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
@@ -371,9 +375,9 @@ surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript
     surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
     double x = 0.0, y = 0.0;
 
-    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
-    transform->position.x = x;
-    transform->position.y = y;
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2h);
+    scripting_vector2_read(v2, &x, &y);
+    surgescript_transform_setposition2d(transform, x, y);
 
     return NULL;
 }
