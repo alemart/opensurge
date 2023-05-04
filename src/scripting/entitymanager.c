@@ -26,6 +26,7 @@
 #include "scripting.h"
 #include "../core/v2d.h"
 #include "../core/util.h"
+#include "../core/stringutil.h"
 #include "../core/video.h"
 #include "../scenes/level.h"
 
@@ -38,8 +39,8 @@ struct entityinfo_t {
     bool is_sleeping; /* inactive */
 };
 
-typedef struct entitymanagerdatabase_t entitymanagerdatabase_t;
-struct entitymanagerdatabase_t {
+typedef struct entityinfodb_t entityinfodb_t;
+struct entityinfodb_t {
     fasthash_t* info;
     fasthash_t* id_to_handle;
     entityinfo_t* cached_query;
@@ -72,11 +73,15 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* helpers */
 #define generate_entity_id()            (random64() & UINT64_C(0xFFFFFFFF)) /* in Open Surge 0.6.0.x and 0.5.x, we used all 64 bits */
-#define get_db(entity_manager)          ((entitymanagerdatabase_t*)surgescript_object_userdata(entity_manager))
+#define get_db(entity_manager)          ((entityinfodb_t*)surgescript_object_userdata(entity_manager))
 #define get_info(db, entity_handle)     ((entityinfo_t*)fasthash_get((db)->info, (entity_handle)))
 static inline entityinfo_t* quick_lookup(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 
@@ -94,6 +99,10 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "EntityManager", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "EntityManager", "spawnEntity", fun_spawnentity, 2);
+    surgescript_vm_bind(vm, "EntityManager", "entity", fun_entity, 1);
+    surgescript_vm_bind(vm, "EntityManager", "entityId", fun_entityid, 1);
+    surgescript_vm_bind(vm, "EntityManager", "findEntity", fun_findentity, 1);
+    surgescript_vm_bind(vm, "EntityManager", "findEntities", fun_findentities, 1);
     surgescript_vm_bind(vm, "EntityManager", "__releaseChildren", fun_releasechildren, 0);
 }
 
@@ -122,7 +131,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 
     /* allocate a database */
     int lg2_cap = 15;
-    entitymanagerdatabase_t* db = mallocx(sizeof *db);
+    entityinfodb_t* db = mallocx(sizeof *db);
     db->info = fasthash_create(entityinfo_dtor, lg2_cap);
     db->id_to_handle = fasthash_create(handle_dtor, lg2_cap);
     db->cached_query = &NULL_ENTRY;
@@ -136,7 +145,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* release the database */
-    entitymanagerdatabase_t* db = get_db(object);
+    entityinfodb_t* db = get_db(object);
     fasthash_destroy(db->id_to_handle);
     fasthash_destroy(db->info);
     free(db);
@@ -216,12 +225,94 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     });
 
     /* store entity info */
-    entitymanagerdatabase_t* db = get_db(object);
+    entityinfodb_t* db = get_db(object);
     fasthash_put(db->info, info->handle, info);
     fasthash_put(db->id_to_handle, info->id, handle_ctor(info->handle));
 
     /* return the handle to the spawned entity */
     return surgescript_var_set_objecthandle(surgescript_var_create(), entity_handle);
+}
+
+/* get the entity with the given id */
+surgescript_var_t* fun_entity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const char* entity_id = surgescript_var_fast_get_string(param[0]);
+    surgescript_objecthandle_t entity_handle = entitymanager_find_entity_by_id(object, str_to_x64(entity_id));
+    surgescript_objecthandle_t null_handle = surgescript_objectmanager_null(manager);
+    surgescript_var_t* ret = surgescript_var_create();
+
+    if(entity_handle == null_handle)
+        return surgescript_var_set_null(ret);
+    else
+        return surgescript_var_set_objecthandle(ret, entity_handle);
+}
+
+/* get the id of the given entity */
+surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_var_t* ret = surgescript_var_create();
+
+    if(entitymanager_has_entity_info(object, entity_handle)) {
+        /* return the ID */
+        char buffer[32];
+        uint64_t entity_id = entitymanager_get_entity_id(object, entity_handle);
+        return surgescript_var_set_string(ret, x64_to_str(entity_id, buffer, sizeof(buffer)));
+    }
+    else {
+        /* ID not found */
+        return surgescript_var_set_string(ret, "");
+    }
+}
+
+/* find by name an entity that was spawned with this.spawnEntity() */
+surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* we first check if the object exists and if it's an entity
+       it it passes those tests, then we call this.findObject() */
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    const char* object_name = surgescript_var_fast_get_string(param[0]);
+    surgescript_var_t* ret = surgescript_var_create();
+
+    if(
+        surgescript_objectmanager_class_exists(manager, object_name) &&
+        surgescript_tagsystem_has_tag(tag_system, object_name, "entity")
+    ) {
+        /* find the entity down the object tree */
+        surgescript_object_call_function(object, "findObject", param, 1, ret);
+        return ret; /* will be null if no such entity is found */
+    }
+    else {
+        /* the object doesn't exist or is not an entity */
+        return surgescript_var_set_null(ret);
+    }
+}
+
+/* find all entities with the given name that were spawned with this.spawnEntity() */
+surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* we first check if the objects exist and if they're entities
+       it they pass those tests, then we call this.findObjects() */
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    const char* object_name = surgescript_var_fast_get_string(param[0]);
+    surgescript_var_t* ret = surgescript_var_create();
+
+    if(
+        surgescript_objectmanager_class_exists(manager, object_name) &&
+        surgescript_tagsystem_has_tag(tag_system, object_name, "entity")
+    ) {
+        /* find the entities down the object tree */
+        surgescript_object_call_function(object, "findObjects", param, 1, ret);
+        return ret; /* will be a new empty array if no such entities are found */
+    }
+    else {
+        /* the object doesn't exist or is not an entity */
+        surgescript_objecthandle_t empty_array = surgescript_objectmanager_spawn_array(manager);
+        return surgescript_var_set_objecthandle(ret, empty_array);
+    }
 }
 
 /* release all children */
@@ -258,13 +349,13 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 entityinfo_t* quick_lookup(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle)
 {
     /* this gotta be fast! */
-    entitymanagerdatabase_t* db = get_db(entity_manager);
+    entityinfodb_t* db = get_db(entity_manager);
 
     /* the rationale for caching is that we tend to make multiple
        queries related to the same entity sequentially in time */
     if(db->cached_query->handle != entity_handle) {
         entityinfo_t* info = get_info(db, entity_handle); /* NULL if not found */
-        return info != NULL ? ((db->cached_query = info)) : NULL;
+        return info != NULL ? (db->cached_query = info) : NULL;
     }
 
     /* the entry was cached */
@@ -280,12 +371,14 @@ bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgesc
 /* remove entity info */
 void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle)
 {
-    entitymanagerdatabase_t* db = get_db(entity_manager);
+    entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
 
-    if(entitymanager_has_entity_info(entity_manager, entity_handle)) {
-        uint64_t entity_id = entitymanager_get_entity_id(entity_manager, entity_handle);
-        fasthash_delete(db->info, entity_handle);
+    if(info != NULL) {
+        entityinfodb_t* db = get_db(entity_manager);
+        uint64_t entity_id = info->id;
+
         fasthash_delete(db->id_to_handle, entity_id);
+        fasthash_delete(db->info, entity_handle);
     }
 }
 
@@ -302,7 +395,7 @@ void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescri
     entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
 
     if(info != NULL) {
-        entitymanagerdatabase_t* db = get_db(entity_manager);
+        entityinfodb_t* db = get_db(entity_manager);
 
         /* update the id_to_handle hashtable */
         fasthash_delete(db->id_to_handle, info->id);
@@ -350,21 +443,24 @@ void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, sur
         info->is_sleeping = is_sleeping;
 }
 
-/* find entity by ID. This may return null! */
+/* find entity by ID. This may return a null handle! */
 surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id)
 {
-    entitymanagerdatabase_t* db = get_db(entity_manager);
+    entityinfodb_t* db = get_db(entity_manager);
     surgescript_objecthandle_t* handle_ptr = (surgescript_objecthandle_t*)fasthash_get(db->id_to_handle, entity_id);
     surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
 
-    /* ID not found */
-    if(handle_ptr == NULL)
+    if(handle_ptr == NULL) {
+        /* ID not found */
         return surgescript_objectmanager_null(manager);
-
-    /* the entity no longer exists */
-    if(!surgescript_objectmanager_exists(manager, *handle_ptr))
+    }
+    else if(!surgescript_objectmanager_exists(manager, *handle_ptr)) {
+        /* the entity no longer exists */
+        entitymanager_remove_entity_info(entity_manager, *handle_ptr);
         return surgescript_objectmanager_null(manager);
-
-    /* success! */
-    return *handle_ptr;
+    }
+    else {
+        /* success! */
+        return *handle_ptr;
+    }
 }
