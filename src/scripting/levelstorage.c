@@ -147,7 +147,7 @@ surgescript_var_t* fun_storereference(surgescript_object_t* object, const surges
     /* the object must be a descendant of Level */
     surgescript_objecthandle_t child_handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
-    if(!surgescript_object_is_ascendant(child, my_parent)) {
+    if(!surgescript_object_is_ascendant(child, my_parent_handle)) {
         scripting_error(object, "%s.storeReference() requires object \"%s\" to be a descendant of %s", surgescript_object_name(object), surgescript_object_name(child), surgescript_object_name(my_parent));
         return NULL;
     }

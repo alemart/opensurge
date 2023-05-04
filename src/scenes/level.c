@@ -3017,6 +3017,7 @@ bool render_ssobject(surgescript_object_t* object, void* param)
         }
         else {
             const surgescript_object_t* debug_mode_object = (const surgescript_object_t*)param;
+            surgescript_objecthandle_t debug_mode_handle = surgescript_object_handle(debug_mode_object);
             bool debug_mode = (debug_mode_object != NULL);
 
             /* debug mode */
@@ -3025,7 +3026,7 @@ bool render_ssobject(surgescript_object_t* object, void* param)
 
                     /* skip detached entities */
                     if(surgescript_object_has_tag(object, "detached")) {
-                        if(!surgescript_object_is_ascendant(object, debug_mode_object) && object != debug_mode_object)
+                        if(!surgescript_object_is_ascendant(object, debug_mode_handle) && object != debug_mode_object)
                             return false;
                     }
 
