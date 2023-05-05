@@ -62,12 +62,10 @@ Happy hacking! ;)
 
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
-using SurgeEngine.Transform;
 
 // The Debug Mode object manages its plugins
-object "Debug Mode" is "detached", "private", "entity"
+object "Debug Mode"
 {
-    transform = Transform();
     plugins = [];
     indicesOfPluginsScheduledForRemoval = [];
     cleared = false;
@@ -186,9 +184,6 @@ object "Debug Mode" is "detached", "private", "entity"
 
         // enable the Debug Mode flag
         Level.debugMode = true;
-
-        // just to make sure...
-        transform.position = Vector2.zero;
     }
 
     fun destructor()
