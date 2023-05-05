@@ -28,6 +28,7 @@
 #include "../core/util.h"
 #include "../core/stringutil.h"
 #include "../core/video.h"
+#include "../core/darray.h"
 #include "../scenes/level.h"
 
 typedef struct entityinfo_t entityinfo_t;
@@ -39,11 +40,20 @@ struct entityinfo_t {
     bool is_sleeping; /* inactive */
 };
 
-typedef struct entityinfodb_t entityinfodb_t;
-struct entityinfodb_t {
+typedef struct entitydb_t entitydb_t;
+struct entitydb_t {
+
+    /* entity info */
     fasthash_t* info;
     fasthash_t* id_to_handle;
     entityinfo_t* cached_query;
+
+    /* late update queue */
+    DARRAY(surgescript_objecthandle_t, late_update_queue);
+
+    /* brick-like objects */
+    DARRAY(surgescript_objecthandle_t, bricklike_objects);
+
 };
 
 static entityinfo_t NULL_ENTRY = { .handle = 0, .id = 0 };
@@ -56,7 +66,6 @@ static void handle_dtor(void* handle) { free(handle); }
 /* C API; make sure you call these with an actual EntityManager object (it won't be checked) */
 bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-
 surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id);
 uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
@@ -67,9 +76,11 @@ bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surg
 void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
 
 /* SurgeScript API */
+static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -78,12 +89,18 @@ static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_consumelateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static const surgescript_heapptr_t AWAKEENTITYCONTAINER_ADDR = 0;
+static const surgescript_heapptr_t UNAWAKEENTITYCONTAINER_ADDR = 1;
 
 /* helpers */
 #define generate_entity_id()            (random64() & UINT64_C(0xFFFFFFFF)) /* in Open Surge 0.6.0.x and 0.5.x, we used all 64 bits */
-#define get_db(entity_manager)          ((entityinfodb_t*)surgescript_object_userdata(entity_manager))
+#define get_db(entity_manager)          ((entitydb_t*)surgescript_object_userdata(entity_manager))
 #define get_info(db, entity_handle)     ((entityinfo_t*)fasthash_get((db)->info, (entity_handle)))
 static inline entityinfo_t* quick_lookup(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+static bool update_subtree(surgescript_object_t* object);
 
 
 
@@ -94,6 +111,8 @@ static inline entityinfo_t* quick_lookup(surgescript_object_t* entity_manager, s
 void scripting_register_entitymanager(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "EntityManager", "state:main", fun_main, 0);
+    surgescript_vm_bind(vm, "EntityManager", "update", fun_update, 0);
+    surgescript_vm_bind(vm, "EntityManager", "render", fun_render, 0);
     surgescript_vm_bind(vm, "EntityManager", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "EntityManager", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "EntityManager", "destroy", fun_destroy, 0);
@@ -104,6 +123,9 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "findEntity", fun_findentity, 1);
     surgescript_vm_bind(vm, "EntityManager", "findEntities", fun_findentities, 1);
     surgescript_vm_bind(vm, "EntityManager", "__releaseChildren", fun_releasechildren, 0);
+    surgescript_vm_bind(vm, "EntityManager", "addToLateUpdateQueue", fun_addtolateupdatequeue, 1);
+    surgescript_vm_bind(vm, "EntityManager", "consumeLateUpdateQueue", fun_consumelateupdatequeue, 0);
+    surgescript_vm_bind(vm, "EntityManager", "addBricklikeObject", fun_addbricklikeobject, 1);
 }
 
 
@@ -112,6 +134,12 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* don't visit my children when traversing the object tree.
+       Instead, call update(). I will update the sub-tree in which
+       I am the root in my own special way. */
+    surgescript_object_set_active(object, false);
+
+    /* done */
     return NULL;
 }
 
@@ -119,6 +147,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
 
     /* validate: Level must be the parent object */
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
@@ -130,12 +159,29 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     }
 
     /* allocate a database */
+    entitydb_t* db = mallocx(sizeof *db);
+
     int lg2_cap = 15;
-    entityinfodb_t* db = mallocx(sizeof *db);
     db->info = fasthash_create(entityinfo_dtor, lg2_cap);
     db->id_to_handle = fasthash_create(handle_dtor, lg2_cap);
     db->cached_query = &NULL_ENTRY;
+
+    darray_init(db->late_update_queue);
+    darray_init(db->bricklike_objects);
+
     surgescript_object_set_userdata(object, db);
+
+    /* allocate variables */
+    ssassert(AWAKEENTITYCONTAINER_ADDR == surgescript_heap_malloc(heap));
+    ssassert(UNAWAKEENTITYCONTAINER_ADDR == surgescript_heap_malloc(heap));
+
+    /* spawn the entity containers */
+    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
+    surgescript_objecthandle_t awake_container = surgescript_objectmanager_spawn(manager, this_handle, "AwakeEntityContainer", object);
+    surgescript_objecthandle_t unawake_container = surgescript_objectmanager_spawn(manager, this_handle, "EntityContainer", object);
+
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR), awake_container);
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR), unawake_container);
 
     /* done */
     return NULL;
@@ -145,9 +191,14 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* release the database */
-    entityinfodb_t* db = get_db(object);
+    entitydb_t* db = get_db(object);
+
+    darray_release(db->bricklike_objects);
+    darray_release(db->late_update_queue);
+
     fasthash_destroy(db->id_to_handle);
     fasthash_destroy(db->info);
+
     free(db);
 
     /* done! */
@@ -171,6 +222,7 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 /* spawn an entity at a position in world space */
 surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const char* entity_name = surgescript_var_fast_get_string(param[0]);
     surgescript_objecthandle_t position_handle = surgescript_var_get_objecthandle(param[1]);
@@ -189,15 +241,30 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     }
 
     /* sanity check */
-    if(surgescript_object_has_tag(object, "detached") && !surgescript_object_has_tag(object, "private")) {
+    if(
+        surgescript_tagsystem_has_tag(tag_system, entity_name, "detached") &&
+        !surgescript_tagsystem_has_tag(tag_system, entity_name, "private")
+    ) {
         video_showmessage("Entity \"%s\" is tagged detached, but not private. Fixing...", entity_name);
         surgescript_tagsystem_add_tag(tag_system, entity_name, "private");
     }
+
+    /* decide the parent container: is the new entity awake or not? */
+    bool is_awake = (
+        surgescript_tagsystem_has_tag(tag_system, entity_name, "awake") ||
+        surgescript_tagsystem_has_tag(tag_system, entity_name, "detached")
+    );
+    surgescript_objecthandle_t parent_container = surgescript_var_get_objecthandle(
+        is_awake ?
+        surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR) :
+        surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR)
+    );
 
     /* spawn the entity */
     //surgescript_objecthandle_t me = surgescript_object_handle(object);
     //surgescript_objecthandle_t entity_parent = me;
     surgescript_objecthandle_t entity_parent = surgescript_object_parent(object);
+    //surgescript_objecthandle_t entity_parent = parent_container;
     surgescript_objecthandle_t entity_handle = surgescript_objectmanager_spawn(manager, entity_parent, entity_name, NULL);
 
     /* read the spawn point */
@@ -225,7 +292,7 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     });
 
     /* store entity info */
-    entityinfodb_t* db = get_db(object);
+    entitydb_t* db = get_db(object);
     fasthash_put(db->info, info->handle, info);
     fasthash_put(db->id_to_handle, info->id, handle_ctor(info->handle));
 
@@ -335,7 +402,97 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
     return NULL;
 }
 
+/* add an entity to the late update queue */
+surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    entitydb_t* db = get_db(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
 
+    darray_push(db->late_update_queue, handle);
+
+    return NULL;
+}
+
+/* consume the late update queue */
+surgescript_var_t* fun_consumelateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    entitydb_t* db = get_db(object);
+
+    /* for each entity in the late update queue, call entity.lateUpdate() */
+    for(int i = 0; i < darray_length(db->late_update_queue); i++) {
+        surgescript_objecthandle_t entity_handle = db->late_update_queue[i];
+        if(surgescript_objectmanager_exists(manager, entity_handle)) { /* validity check */
+            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+            if(surgescript_object_is_active(entity) && !surgescript_object_is_killed(entity)) {
+                surgescript_object_call_function(entity, "lateUpdate", NULL, 0, NULL);
+            }
+        }
+    }
+
+    /* clear the queue */
+    darray_clear(db->late_update_queue);
+
+    /* done! */
+    return NULL;
+}
+
+/* add a brick-like object */
+surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    entitydb_t* db = get_db(object);
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+
+    darray_push(db->bricklike_objects, handle);
+
+    return NULL;
+}
+
+/* update the sub-tree in which I am the root */
+surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+
+    /* update unawake container */
+    surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
+    surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
+    surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
+    surgescript_object_traverse_tree(unawake_container, update_subtree);
+
+    /* update awake container */
+    surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
+    surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
+    surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
+    surgescript_object_traverse_tree(awake_container, update_subtree);
+
+    /* late update */
+    fun_consumelateupdatequeue(object, NULL, 0);
+
+    /* done */
+    return NULL;
+}
+
+/* render the entities */
+surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* TODO */
+    return NULL;
+}
+
+
+/*
+ *
+ * Helpers
+ *
+ */
+
+/* update cycle */
+bool update_subtree(surgescript_object_t* object)
+{
+    surgescript_object_call_current_state(object);
+    return surgescript_object_is_active(object);
+}
 
 
 
@@ -349,7 +506,7 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 entityinfo_t* quick_lookup(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle)
 {
     /* this gotta be fast! */
-    entityinfodb_t* db = get_db(entity_manager);
+    entitydb_t* db = get_db(entity_manager);
 
     /* the rationale for caching is that we tend to make multiple
        queries related to the same entity sequentially in time */
@@ -374,7 +531,7 @@ void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surg
     entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
 
     if(info != NULL) {
-        entityinfodb_t* db = get_db(entity_manager);
+        entitydb_t* db = get_db(entity_manager);
         uint64_t entity_id = info->id;
 
         fasthash_delete(db->id_to_handle, entity_id);
@@ -395,7 +552,7 @@ void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescri
     entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
 
     if(info != NULL) {
-        entityinfodb_t* db = get_db(entity_manager);
+        entitydb_t* db = get_db(entity_manager);
 
         /* update the id_to_handle hashtable */
         fasthash_delete(db->id_to_handle, info->id);
@@ -446,7 +603,7 @@ void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, sur
 /* find entity by ID. This may return a null handle! */
 surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id)
 {
-    entityinfodb_t* db = get_db(entity_manager);
+    entitydb_t* db = get_db(entity_manager);
     surgescript_objecthandle_t* handle_ptr = (surgescript_objecthandle_t*)fasthash_get(db->id_to_handle, entity_id);
     surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
 

@@ -233,9 +233,16 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+
+    /* internal updates */
     update_music(object);
     update_time(object);
 
+    /* update entities */
+    surgescript_object_call_function(entity_manager, "update", NULL, 0, NULL);
+
+    /* done! */
     return NULL;
 }
 
@@ -273,6 +280,10 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
         surgescript_object_kill(v2);
         return surgescript_var_set_objecthandle(surgescript_var_create(), child);
     }
+
+    /* the new object isn't an entity.
+       What if a child of that new object is an entity?
+       We do nothing in this case? Show a warning? */
 
     /* spawn the new object */
     surgescript_objecthandle_t me = surgescript_object_handle(object);
