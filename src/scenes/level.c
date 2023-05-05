@@ -3017,12 +3017,12 @@ bool render_ssobject(surgescript_object_t* object, void* param)
         }
         else {
             const surgescript_object_t* debug_mode_object = (const surgescript_object_t*)param;
-            surgescript_objecthandle_t debug_mode_handle = surgescript_object_handle(debug_mode_object);
             bool debug_mode = (debug_mode_object != NULL);
 
             /* debug mode */
             if(debug_mode) {
                 if(is_entity) {
+                    surgescript_objecthandle_t debug_mode_handle = surgescript_object_handle(debug_mode_object);
 
                     /* skip detached entities */
                     if(surgescript_object_has_tag(object, "detached")) {
