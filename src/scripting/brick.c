@@ -56,6 +56,7 @@ static surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static inline bricklike_data_t* get_data(const surgescript_object_t* object);
 static const surgescript_heapptr_t OFFSET_ADDR = 0;
+static const surgescript_heapptr_t ENTITYMANAGER_ADDR = 1;
 static const int BRICKLIKE_ANIMATION_ID = 0; /* which animation number should be used to extract the collision mask? */
 
 /*
@@ -144,11 +145,26 @@ collisionmask_t* scripting_brick_mask(const surgescript_object_t* object)
 
 
 
-/* Console routines */
-
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    /* get the Entity Manager */
+    surgescript_var_t* entity_manager_var = surgescript_heap_at(heap, ENTITYMANAGER_ADDR);
+    surgescript_objecthandle_t entity_manager_handle = surgescript_var_get_objecthandle(entity_manager_var);
+    surgescript_object_t* entity_manager = surgescript_objectmanager_get(manager, entity_manager_handle);
+
+    /* notify the Entity Manager */
+    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
+    surgescript_var_set_objecthandle(arg, this_handle);
+    surgescript_object_call_function(entity_manager, "addBricklikeObject", args, 1, NULL);
+
+    /* done */
+    surgescript_var_destroy(arg);
     return NULL;
 }
 
@@ -179,6 +195,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(OFFSET_ADDR == surgescript_heap_malloc(heap));
     offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR), offset);
+
+    /* cache a reference to the Entity Manager */
+    ssassert(ENTITYMANAGER_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYMANAGER_ADDR), surgescript_object_find_ascendant(object, "EntityManager"));
 
     /* default values of the brick */
     data = mallocx(sizeof *data);

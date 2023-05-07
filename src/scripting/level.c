@@ -69,6 +69,7 @@ static surgescript_var_t* fun_entity(surgescript_object_t* object, const surgesc
 static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setnext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -145,6 +146,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "entityId", fun_entityid, 1);
     surgescript_vm_bind(vm, "Level", "findEntity", fun_findentity, 1);
     surgescript_vm_bind(vm, "Level", "findEntities", fun_findentities, 1);
+    surgescript_vm_bind(vm, "Level", "activeEntities", fun_activeentities, 0);
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
     surgescript_vm_bind(vm, "Level", "get_debugMode", fun_get_debugmode, 0);
     surgescript_vm_bind(vm, "Level", "set_debugMode", fun_set_debugmode, 1);
@@ -281,9 +283,15 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
         return surgescript_var_set_objecthandle(surgescript_var_create(), child);
     }
 
-    /* the new object isn't an entity.
-       What if a child of that new object is an entity?
-       We do nothing in this case? Show a warning? */
+    /* The new object isn't an entity.
+       What if a descendant of that new object is an entity?
+
+       In this case we don't support it. It will behave just like
+       any other SurgeScript object and it will not be handled by
+       the Entity Manager.
+
+       We don't traverse the sub-tree to find possible entities,
+       as that case is unusual and this operation is expensive. */
 
     /* spawn the new object */
     surgescript_objecthandle_t me = surgescript_object_handle(object);
@@ -625,6 +633,19 @@ surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescr
     /* delegate to the entity manager */
     surgescript_var_t* ret = surgescript_var_create();
     surgescript_object_call_function(entity_manager, "findEntities", param, 1, ret);
+
+    /* done! */
+    return ret;
+}
+
+/* get active entities: those that are inside the region of interest, as well as the awake (and detached) ones */
+surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+
+    /* delegate to the entity manager */
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_object_call_function(entity_manager, "activeEntities", NULL, 0, ret);
 
     /* done! */
     return ret;

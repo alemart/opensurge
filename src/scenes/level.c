@@ -252,6 +252,7 @@ static void update_ssobject(surgescript_object_t* object, void* param);
 static void after_update_ssobject(surgescript_object_t* object, void* param);
 static void render_ssobjects();
 static bool render_ssobject(surgescript_object_t* object, void* param);
+static void set_entitymanager_roi(int x, int y, int width, int height);
 
 static bool entity_info_exists(const surgescript_object_t* object);
 static void entity_info_remove(const surgescript_object_t* object);
@@ -1344,6 +1345,12 @@ void level_update()
         VIDEO_SCREEN_W + (DEFAULT_MARGIN*3),
         VIDEO_SCREEN_H + (DEFAULT_MARGIN*3)
     );
+    set_entitymanager_roi(
+        (int)cam.x - VIDEO_SCREEN_W,
+        (int)cam.y - VIDEO_SCREEN_H,
+        2*VIDEO_SCREEN_W,
+        2*VIDEO_SCREEN_H
+    );
 
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
@@ -1541,6 +1548,12 @@ void level_render()
         (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
         VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
         VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+    );
+    set_entitymanager_roi(
+        (int)cam.x - VIDEO_SCREEN_W,
+        (int)cam.y - VIDEO_SCREEN_H,
+        2*VIDEO_SCREEN_W,
+        2*VIDEO_SCREEN_H
     );
 
     /* retrieve lists of active entities */
@@ -2862,11 +2875,18 @@ void destroy_collisionmask_of_bricklike_object(void* mask)
 /* update surgescript */
 void update_ssobjects()
 {
+#if 1
+    surgescript_vm_t* vm = surgescript_vm();
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_vm_update(vm);
+    }
+#else
     surgescript_vm_t* vm = surgescript_vm();
     v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
 
     if(surgescript_vm_is_active(vm))
         surgescript_vm_update_ex(vm, origin, update_ssobject, after_update_ssobject);
+#endif
 }
 
 void update_ssobject(surgescript_object_t* object, void* param)
@@ -2955,6 +2975,14 @@ void after_update_ssobject(surgescript_object_t* object, void* param)
 /* call lateUpdate() for each SurgeScript entity that implements it */
 void late_update_ssobjects()
 {
+#if 1
+    surgescript_vm_t* vm = surgescript_vm();
+
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_object_call_function(entity_manager, "lateUpdate", NULL, 0, NULL);
+    }
+#else
     surgescript_vm_t* vm = surgescript_vm();
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
 
@@ -2972,6 +3000,7 @@ void late_update_ssobjects()
     }
 
     clear_late_update_queue();
+#endif
 }
 
 
@@ -2980,12 +3009,20 @@ void late_update_ssobjects()
 
 void render_ssobjects()
 {
+#if 1
+    surgescript_vm_t* vm = surgescript_vm();
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_object_call_function(entity_manager, "render", NULL, 0, NULL);
+    }
+#else
     surgescript_vm_t* vm = surgescript_vm();
     if(surgescript_vm_is_active(vm)) {
         surgescript_object_t* level = level_ssobject();
         surgescript_object_t* debug_mode = debug_mode_find_object();
         surgescript_object_traverse_tree_ex(level, debug_mode, render_ssobject);
     }
+#endif
 }
 
 bool render_ssobject(surgescript_object_t* object, void* param)
@@ -3053,7 +3090,27 @@ bool render_ssobject(surgescript_object_t* object, void* param)
     }
 }
 
+/* set the Region of Interest (ROI) of the SurgeScript Entity Manager */
+void set_entitymanager_roi(int x, int y, int width, int height)
+{
+    surgescript_object_t* entity_manager = entitymanager_ssobject();
+    surgescript_var_t* args[4] = {
+        surgescript_var_set_number(surgescript_var_create(), x),
+        surgescript_var_set_number(surgescript_var_create(), y),
+        surgescript_var_set_number(surgescript_var_create(), width),
+        surgescript_var_set_number(surgescript_var_create(), height)
+    };
 
+    surgescript_object_call_function(
+        entity_manager, "setROI",
+        (const surgescript_var_t**)args, 4, NULL
+    );
+
+    surgescript_var_destroy(args[3]);
+    surgescript_var_destroy(args[2]);
+    surgescript_var_destroy(args[1]);
+    surgescript_var_destroy(args[0]);
+}
 
 
 
@@ -3497,6 +3554,12 @@ void editor_update()
 
     v2d_t cam = editor_camera;
     entitymanager_set_active_region(
+        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
+        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
+        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
+        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+    );
+    set_entitymanager_roi(
         (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
         (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
         VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
