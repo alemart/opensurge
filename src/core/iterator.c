@@ -1,0 +1,184 @@
+/*
+ * Open Surge Engine
+ * iterator.c - general-purpose iterator
+ * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
+ * http://opensurge2d.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <string.h>
+#include <stdint.h>
+#include "iterator.h"
+#include "util.h"
+
+
+/* iterator struct */
+struct iterator_t
+{
+    void* state; /* first element */
+    void (*state_dtor)(void*);
+
+    void* (*next)(void*);
+    bool (*has_next)(void*);
+};
+
+/* ArrayIterator */
+typedef struct arrayiterator_state_t arrayiterator_state_t;
+struct arrayiterator_state_t
+{
+    void* array;
+    size_t length;
+    size_t element_size_in_bytes;
+    unsigned current_index;
+};
+
+static void* arrayiterator_copy_ctor(void* state);
+static void arrayiterator_dtor(void* state);
+static void* arrayiterator_next(void* state);
+static bool arrayiterator_has_next(void* state);
+
+
+
+/*
+ * iterator_create()
+ * Creates a new general-purpose iterator
+ */
+iterator_t* iterator_create(void* ctor_data, void* (*state_ctor)(void* ctor_data), void (*state_dtor)(void* state), void* (*next_fn)(void* state), bool (*has_next_fn)(void* state))
+{
+    iterator_t* it = mallocx(sizeof *it);
+
+    it->state = state_ctor(ctor_data);
+    it->state_dtor = state_dtor;
+
+    it->next = next_fn;
+    it->has_next = has_next_fn;
+
+    return it;
+}
+
+/*
+ * iterator_create_from_array()
+ * Creates a new iterator suitable for iterating over a fixed-size array
+ */
+iterator_t* iterator_create_from_array(void* array, size_t length, size_t element_size_in_bytes)
+{
+    arrayiterator_state_t state = {
+        .array = array,
+        .length = length,
+        .element_size_in_bytes = element_size_in_bytes,
+        .current_index = 0
+    };
+
+    return iterator_create(&state, arrayiterator_copy_ctor, arrayiterator_dtor, arrayiterator_next, arrayiterator_has_next);
+}
+
+/*
+ * iterator_destroy()
+ * Destroys an iterator
+ */
+iterator_t* iterator_destroy(iterator_t* it)
+{
+    it->state_dtor(it->state);
+    free(it);
+
+    return NULL;
+}
+
+/*
+ * iterator_has_next()
+ * Returns true if the iteration isn't over
+ */
+bool iterator_has_next(iterator_t* it)
+{
+    return it->has_next(it->state);
+}
+
+/*
+ * iterator_next()
+ * Returns the next element of the collection and advances the iteration pointer
+ * Returns NULL if there is no next element
+ */
+void* iterator_next(iterator_t* it)
+{
+    return it->next(it->state);
+}
+
+/*
+ * iterator_foreach()
+ * For each element of the collection, invoke a callback
+ * If the callback returns false, the iteration stops
+ */
+bool iterator_foreach(iterator_t* it, void* data, bool (*callback)(void* element, void* data))
+{
+    void* element = NULL;
+
+    while(it->has_next(it->state)) {
+        element = it->next(it->state);
+        if(!callback(element, data))
+            return false; /* stop prematurely */
+    }
+
+    /* we have iterated over the entire collection */
+    return true;
+}
+
+
+
+
+/*
+ * ArrayIterator
+ */
+
+/* copy constructor */
+void* arrayiterator_copy_ctor(void* state)
+{
+    #define is_aligned(ptr, byte_count) (((uintptr_t)(const void *)(ptr)) % (byte_count) == 0)
+    arrayiterator_state_t* s = (arrayiterator_state_t*)state;
+    size_t size = sizeof *s;
+
+    /* alignment check for ARM */
+    if(!is_aligned(s->array, 4))
+        fatal_error("Unaligned pointer %p in %s", s->array, __func__);
+
+    return memcpy(mallocx(size), s, size);
+    #undef is_aligned
+}
+
+/* destructor */
+void arrayiterator_dtor(void* state)
+{
+    arrayiterator_state_t* s = (arrayiterator_state_t*)state;
+
+    free(s);
+}
+
+/* returns the next element of the collection and advances the iteration pointer */
+void* arrayiterator_next(void* state)
+{
+    arrayiterator_state_t* s = (arrayiterator_state_t*)state;
+
+    if(s->current_index < s->length)
+        return (uint8_t*)(s->array) + s->element_size_in_bytes * (s->current_index++);
+    else
+        return NULL;
+}
+
+/* should the iteration continue? */
+bool arrayiterator_has_next(void* state)
+{
+    arrayiterator_state_t* s = (arrayiterator_state_t*)state;
+
+    return s->current_index < s->length;
+}
