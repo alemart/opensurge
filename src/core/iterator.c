@@ -141,19 +141,34 @@ bool iterator_foreach(iterator_t* it, void* data, bool (*callback)(void* element
  * ArrayIterator
  */
 
+#if defined(__ANDROID__)
+#define WANT_ALIGNMENT_CHECK 1
+#else
+#define WANT_ALIGNMENT_CHECK 0
+#endif
+
 /* copy constructor */
 void* arrayiterator_copy_ctor(void* state)
 {
-    #define is_aligned(ptr, byte_count) (((uintptr_t)(const void *)(ptr)) % (byte_count) == 0)
     arrayiterator_state_t* s = (arrayiterator_state_t*)state;
     size_t size = sizeof *s;
 
+    #if WANT_ALIGNMENT_CHECK
+    #define ALIGNMENT_SIZE 4 /* in bytes */
+    #define is_aligned(ptr, byte_count) (((uintptr_t)(const void *)(ptr)) % (byte_count) == 0)
+
     /* alignment check for ARM */
-    if(!is_aligned(s->array, 4))
-        fatal_error("Unaligned pointer %p in %s", s->array, __func__);
+    if(!is_aligned(s->array, ALIGNMENT_SIZE))
+        fatal_error("%s: unaligned pointer %p", __func__, s->array);
+    else if(s->element_size_in_bytes % ALIGNMENT_SIZE != 0)
+        fatal_error("%s: element size %lu may trigger unaligned accesses in %p", __func__, s->element_size_in_bytes, s->array);
+
+    /* reminder: use memcpy() for unaligned accesses? */
+
+    #undef is_aligned
+    #endif /* WANT_ALIGNMENT_CHECK */
 
     return memcpy(mallocx(size), s, size);
-    #undef is_aligned
 }
 
 /* destructor */
