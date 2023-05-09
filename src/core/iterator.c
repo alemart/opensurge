@@ -27,11 +27,11 @@
 /* iterator struct */
 struct iterator_t
 {
-    void* state; /* first element */
-    void (*state_dtor)(void*);
+    iterator_state_t* state; /* first element */
+    void (*state_dtor)(iterator_state_t*);
 
-    void* (*next)(void*);
-    bool (*has_next)(void*);
+    void* (*next)(iterator_state_t*);
+    bool (*has_next)(iterator_state_t*);
 };
 
 /* ArrayIterator */
@@ -41,13 +41,13 @@ struct arrayiterator_state_t
     void* array;
     size_t length;
     size_t element_size_in_bytes;
-    unsigned current_index;
+    unsigned int current_index;
 };
 
-static void* arrayiterator_copy_ctor(void* state);
-static void arrayiterator_dtor(void* state);
-static void* arrayiterator_next(void* state);
-static bool arrayiterator_has_next(void* state);
+static iterator_state_t* arrayiterator_copy_ctor(void* ctor_data);
+static void arrayiterator_dtor(iterator_state_t* state);
+static void* arrayiterator_next(iterator_state_t* state);
+static bool arrayiterator_has_next(iterator_state_t* state);
 
 
 
@@ -55,7 +55,7 @@ static bool arrayiterator_has_next(void* state);
  * iterator_create()
  * Creates a new general-purpose iterator
  */
-iterator_t* iterator_create(void* ctor_data, void* (*state_ctor)(void* ctor_data), void (*state_dtor)(void* state), void* (*next_fn)(void* state), bool (*has_next_fn)(void* state))
+iterator_t* iterator_create(void* ctor_data, iterator_state_t* (*state_ctor)(void*), void (*state_dtor)(iterator_state_t*), void* (*next_fn)(iterator_state_t*), bool (*has_next_fn)(iterator_state_t*))
 {
     iterator_t* it = mallocx(sizeof *it);
 
@@ -148,9 +148,9 @@ bool iterator_foreach(iterator_t* it, void* data, bool (*callback)(void* element
 #endif
 
 /* copy constructor */
-void* arrayiterator_copy_ctor(void* state)
+iterator_state_t* arrayiterator_copy_ctor(void* ctor_data)
 {
-    arrayiterator_state_t* s = (arrayiterator_state_t*)state;
+    arrayiterator_state_t* s = (arrayiterator_state_t*)ctor_data;
     size_t size = sizeof *s;
 
     #if WANT_ALIGNMENT_CHECK
@@ -172,7 +172,7 @@ void* arrayiterator_copy_ctor(void* state)
 }
 
 /* destructor */
-void arrayiterator_dtor(void* state)
+void arrayiterator_dtor(iterator_state_t* state)
 {
     arrayiterator_state_t* s = (arrayiterator_state_t*)state;
 
@@ -180,7 +180,7 @@ void arrayiterator_dtor(void* state)
 }
 
 /* returns the next element of the collection and advances the iteration pointer */
-void* arrayiterator_next(void* state)
+void* arrayiterator_next(iterator_state_t* state)
 {
     arrayiterator_state_t* s = (arrayiterator_state_t*)state;
 
@@ -191,7 +191,7 @@ void* arrayiterator_next(void* state)
 }
 
 /* should the iteration continue? */
-bool arrayiterator_has_next(void* state)
+bool arrayiterator_has_next(iterator_state_t* state)
 {
     arrayiterator_state_t* s = (arrayiterator_state_t*)state;
 
