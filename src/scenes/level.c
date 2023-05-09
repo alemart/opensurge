@@ -51,6 +51,7 @@
 #include "../core/font.h"
 #include "../core/prefs.h"
 #include "../core/darray.h"
+#include "../core/iterator.h"
 #include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
@@ -179,8 +180,8 @@ static void update_level_height_samples(int level_width, int level_height);
 static float level_timer;
 static music_t *music;
 static bgtheme_t *backgroundtheme;
-static int quit_level;
 static image_t *quit_level_img;
+static int quit_level;
 static int must_load_another_level;
 static int must_restart_this_level;
 static int must_push_a_quest;
@@ -227,7 +228,7 @@ STATIC_DARRAY(obstacle_t*, mock_obstacles); /* dynamically generated obstacles *
 static void create_obstaclemap();
 static void destroy_obstaclemap();
 static void clear_obstaclemap();
-static void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, surgescript_object_t* (*get_bricklike_ssobject)(int));
+static void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, iterator_t* bricklike_iterator);
 static obstacle_t* item2obstacle(const item_t* item);
 static obstacle_t* object2obstacle(const object_t* object);
 static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
@@ -235,24 +236,17 @@ static collisionmask_t* create_collisionmask_of_bricklike_object(const surgescri
 static void destroy_collisionmask_of_bricklike_object(void* mask);
 
 /* Scripting */
-#define TRANSFORM_MAX_DEPTH 128
-#define BRICKLIKE_MAX_COUNT 1024
-
 static surgescript_object_t* cached_level_ssobject = NULL;
 static surgescript_object_t* cached_entity_manager = NULL;
 
 static inline surgescript_object_t* level_ssobject();
 static inline surgescript_object_t* entitymanager_ssobject();
-static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
-static bool notify_ssobject(surgescript_object_t* object, void* param);
-static void notify_ssobjects(const char* fun_name);
-
 static void update_ssobjects();
-static void update_ssobject(surgescript_object_t* object, void* param);
-static void after_update_ssobject(surgescript_object_t* object, void* param);
+static void late_update_ssobjects();
 static void render_ssobjects();
-static bool render_ssobject(surgescript_object_t* object, void* param);
 static void set_entitymanager_roi(int x, int y, int width, int height);
+static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
+static void notify_ssobjects(const char* fun_name);
 
 static bool entity_info_exists(const surgescript_object_t* object);
 static void entity_info_remove(const surgescript_object_t* object);
@@ -261,24 +255,11 @@ static uint64_t entity_info_id(const surgescript_object_t* object);
 static void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id);
 static bool entity_info_is_persistent(const surgescript_object_t* object);
 static void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent);
-static bool entity_info_is_sleeping(const surgescript_object_t* object);
-static void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping);
-
-static void add_bricklike_ssobject(surgescript_object_t* object);
-static surgescript_object_t* get_bricklike_ssobject(int index);
-static inline void clear_bricklike_ssobjects();
-static surgescript_objecthandle_t bricklike_ssobject[BRICKLIKE_MAX_COUNT];
-static int bricklike_ssobject_count = 0;
-
-STATIC_DARRAY(surgescript_objecthandle_t, late_update_queue);
-static void init_late_update_queue();
-static void release_late_update_queue();
-static void clear_late_update_queue();
-static void late_update_ssobjects();
+/*static bool entity_info_is_sleeping(const surgescript_object_t* object);
+static void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping);*/
 
 /* debug mode */
 #define debug_mode_want_to_activate() editorcmd_is_triggered(editor_cmd, "enter-debug-mode")
-#define debug_mode_find_object() (level_is_in_debug_mode() ? level_child_object("Debug Mode") : NULL) /* avoid searching if possible */
 
 
 
@@ -1081,6 +1062,7 @@ void level_init(void *path_to_lev_file)
     player = NULL;
     music = NULL;
     backgroundtheme = NULL;
+    quit_level_img = NULL;
 
     level_timer = 0.0f;
     quit_level = FALSE;
@@ -1096,6 +1078,10 @@ void level_init(void *path_to_lev_file)
     wants_to_leave = FALSE;
     wants_to_pause = FALSE;
 
+    /* cached objects */
+    cached_level_ssobject = NULL;
+    cached_entity_manager = NULL;
+
     /* dialog box */
     dlgbox_active = FALSE;
     dlgbox_starttime = 0;
@@ -1104,9 +1090,6 @@ void level_init(void *path_to_lev_file)
     actor_change_animation(dlgbox, sprite_get_animation("Message Box", 0));
     dlgbox_title = font_create("dialogbox");
     dlgbox_message = font_create("dialogbox");
-
-    /* quit level img */
-    quit_level_img = NULL;
 
     /* helpers */
     clear_level_state(&saved_state);
@@ -1119,11 +1102,6 @@ void level_init(void *path_to_lev_file)
 
     entitymanager_init();
     create_obstaclemap();
-    clear_bricklike_ssobjects();
-    init_late_update_queue();
-
-    cached_level_ssobject = NULL;
-    cached_entity_manager = NULL;
 
     /* load level file */
     level_load(filepath);
@@ -1168,8 +1146,6 @@ void level_release()
     cached_level_ssobject = NULL;
     cached_entity_manager = NULL;
 
-    release_late_update_queue();
-    clear_bricklike_ssobjects();
     destroy_obstaclemap();
     entitymanager_release();
 
@@ -1407,7 +1383,11 @@ void level_update()
     }
 
     /* update obstacle map */
-    update_obstaclemap(major_bricks, major_items, major_enemies, get_bricklike_ssobject);
+    extern iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
+
+    iterator_t* bricklike_iterator = entitymanager_bricklike_iterator(entitymanager_ssobject());
+    update_obstaclemap(major_bricks, major_items, major_enemies, bricklike_iterator);
+    iterator_destroy(bricklike_iterator);
 
     /* update particles */
     particle_update(major_bricks);
@@ -1419,7 +1399,6 @@ void level_update()
     }
 
     /* update scripts */
-    clear_bricklike_ssobjects();
     update_ssobjects();
 
     /* update players */
@@ -1503,7 +1482,7 @@ void level_update()
     if(!got_dying_player && !level_cleared)
         level_timer += timer_get_delta();
 
-    /* "ungetting" major entities */
+    /* release major entities */
     entitymanager_release_retrieved_brick_list(major_bricks);
     entitymanager_release_retrieved_item_list(major_items);
     entitymanager_release_retrieved_object_list(major_enemies);
@@ -2268,7 +2247,11 @@ bool level_is_in_debug_mode()
 }
 
 
-/* private functions */
+
+
+/*
+ * Private functions
+ */
 
 
 /* renders the entities of the level: bricks, enemies, items, players, etc. */
@@ -2764,7 +2747,7 @@ void clear_obstaclemap()
 }
 
 /* update the obstacle map */
-void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, surgescript_object_t* (*get_bricklike_ssobject)(int))
+void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, iterator_t* bricklike_iterator)
 {
     /* clear */
     clear_obstaclemap();
@@ -2803,19 +2786,17 @@ void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_
     }
 
     /* add brick-like objects */
-    const surgescript_object_t* bricklike_object;
-    for(int i = 0; NULL != (bricklike_object = get_bricklike_ssobject(i)); i++) {
+    surgescript_objectmanager_t* manager = surgescript_object_manager(level_ssobject());
+    while(iterator_has_next(bricklike_iterator)) {
+        surgescript_objecthandle_t* bricklike_handle = iterator_next(bricklike_iterator);
 
-        if(surgescript_object_is_killed(bricklike_object))
-            continue;
-
-        if(scripting_brick_enabled(bricklike_object) && scripting_brick_mask(bricklike_object)) {
+        if(surgescript_objectmanager_exists(manager, *bricklike_handle)) {
+            surgescript_object_t* bricklike_object = surgescript_objectmanager_get(manager, *bricklike_handle);
             obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
 
             darray_push(mock_obstacles, mock_obstacle);
             obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
         }
-
     }
 }
 
@@ -2870,223 +2851,66 @@ void destroy_collisionmask_of_bricklike_object(void* mask)
 
 
 
-/* scripting */
+/*
+ * SurgeScript helpers
+ */
 
-/* update surgescript */
+/* get the Level object (SurgeScript) */
+surgescript_object_t* level_ssobject()
+{
+    if(cached_level_ssobject == NULL)
+        cached_level_ssobject = scripting_util_surgeengine_component(surgescript_vm(), "Level");
+    return cached_level_ssobject;
+}
+
+/* get the EntityManager object (SurgeScript) */
+surgescript_object_t* entitymanager_ssobject()
+{
+    if(cached_entity_manager == NULL)
+        cached_entity_manager = scripting_level_entitymanager(level_ssobject());
+    return cached_entity_manager;
+}
+
+/* update SurgeScript */
 void update_ssobjects()
 {
-#if 1
     surgescript_vm_t* vm = surgescript_vm();
-    if(surgescript_vm_is_active(vm)) {
-        surgescript_vm_update(vm);
-    }
-#else
-    surgescript_vm_t* vm = surgescript_vm();
-    v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
 
     if(surgescript_vm_is_active(vm))
-        surgescript_vm_update_ex(vm, origin, update_ssobject, after_update_ssobject);
-#endif
-}
-
-void update_ssobject(surgescript_object_t* object, void* param)
-{
-    /* initialization */
-    surgescript_transform_t* transform = surgescript_transform_create();
-    int depth = surgescript_object_depth(object);
-
-    if(depth < TRANSFORM_MAX_DEPTH) {
-        /* get the transform origin */
-        v2d_t origin = ((v2d_t*)param)[depth];
-
-        /* are we dealing with a level entity? */
-        if(surgescript_object_has_tag(object, "entity")) {
-            /* get the position of the object */
-            surgescript_object_peek_transform(object, transform);
-            surgescript_transform_apply2d(transform, &origin.x, &origin.y);
-
-            /* check whether the entity should be updated, disposed or what */
-            if(
-                level_inside_screen(origin.x, origin.y, 1, 1) ||
-                surgescript_object_has_tag(object, "awake") ||
-                surgescript_object_has_tag(object, "detached")
-            ) {
-                /* the entity is not sleeping */
-                entity_info_set_sleeping(object, false);
-
-                /* the entity should be updated */
-                surgescript_object_set_active(object, true);
-
-                /* is it a brick-like object? */
-                if(strcmp(surgescript_object_name(object), "Brick") == 0)
-                    add_bricklike_ssobject(object);
-
-                /* does this entity implement lateUpdate() ? */
-                if(surgescript_object_has_function(object, "lateUpdate"))
-                    darray_push(late_update_queue, surgescript_object_handle(object));
-            }
-            else if(!surgescript_object_has_tag(object, "disposable")) {
-                /* the entity should no longer be active and
-                   should be repositioned to its spawn point */
-                if(entity_info_exists(object)) {
-                    if(entity_info_is_persistent(object) && !entity_info_is_sleeping(object)) {
-                        v2d_t spawn_point = entity_info_spawnpoint(object);
-                        if(!level_inside_screen(spawn_point.x, spawn_point.y, 1, 1)) {
-                            /* put it to sleep */
-                            entity_info_set_sleeping(object, true);
-
-                            /* reposition the entity */
-                            if(v2d_magnitude(v2d_subtract(origin, spawn_point)) >= 1.0f)
-                                scripting_util_set_world_position(object, origin = spawn_point);
-
-                            /* notify it */
-                            notify_ssobject(object, "onReset");
-                        }
-                    }
-                }
-
-                /* deactivate the object */
-                surgescript_object_set_active(object, false);
-            }
-            else {
-                /* the entity should be disposed */
-                surgescript_object_kill(object);
-                entity_info_remove(object);
-            }
-        }
-
-        /* set the transform origin for the next depth level */
-        if(1 + depth < TRANSFORM_MAX_DEPTH)
-            ((v2d_t*)param)[1 + depth] = origin;
-    }
-    else
-        scripting_error(object, "TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
-
-    /* done */
-    surgescript_transform_destroy(transform);
-}
-
-void after_update_ssobject(surgescript_object_t* object, void* param)
-{
-    if(!surgescript_object_is_active(object) && surgescript_object_has_tag(object, "entity"))
-        surgescript_object_set_active(object, true); /* the object may reawaken in the future */
+        surgescript_vm_update(vm);
 }
 
 /* call lateUpdate() for each SurgeScript entity that implements it */
 void late_update_ssobjects()
 {
-#if 1
     surgescript_vm_t* vm = surgescript_vm();
 
     if(surgescript_vm_is_active(vm)) {
         surgescript_object_t* entity_manager = entitymanager_ssobject();
         surgescript_object_call_function(entity_manager, "lateUpdate", NULL, 0, NULL);
     }
-#else
-    surgescript_vm_t* vm = surgescript_vm();
-    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-
-    for(int i = 0; i < darray_length(late_update_queue); i++) {
-        surgescript_objecthandle_t handle = late_update_queue[i];
-
-        if(surgescript_objectmanager_exists(manager, handle)) {
-            surgescript_object_t* object = surgescript_objectmanager_get(manager, handle);
-
-            if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
-                /* function lateUpdate() is guaranteed to exist */
-                surgescript_object_call_function(object, "lateUpdate", NULL, 0, NULL);
-            }
-        }
-    }
-
-    clear_late_update_queue();
-#endif
 }
-
-
 
 /* render objects */
-
 void render_ssobjects()
 {
-#if 1
     surgescript_vm_t* vm = surgescript_vm();
+
     if(surgescript_vm_is_active(vm)) {
         surgescript_object_t* entity_manager = entitymanager_ssobject();
-        surgescript_object_call_function(entity_manager, "render", NULL, 0, NULL);
-    }
-#else
-    surgescript_vm_t* vm = surgescript_vm();
-    if(surgescript_vm_is_active(vm)) {
-        surgescript_object_t* level = level_ssobject();
-        surgescript_object_t* debug_mode = debug_mode_find_object();
-        surgescript_object_traverse_tree_ex(level, debug_mode, render_ssobject);
-    }
-#endif
-}
+        surgescript_var_t* arg_mode = surgescript_var_create();
+        surgescript_var_t* arg_gizmos = surgescript_var_create();
+        const surgescript_var_t* args[] = { arg_mode, arg_gizmos };
 
-bool render_ssobject(surgescript_object_t* object, void* param)
-{
-    /* skip inactive & deleted objects and its children */
-    if(!surgescript_object_is_active(object) || surgescript_object_is_killed(object))
-        return false;
+        int mode = (level_editmode() ? 2 : (level_is_in_debug_mode() ? 1 : 0));
+        bool gizmos = level_is_displaying_gizmos();
 
-    /* is this object an entity? */
-    bool is_entity = surgescript_object_has_tag(object, "entity");
+        surgescript_var_set_number(arg_mode, mode);
+        surgescript_var_set_bool(arg_gizmos, gizmos);
+        surgescript_object_call_function(entity_manager, "render", args, 2, NULL);
 
-    if(editor_is_enabled()) {
-        /* level editor */
-        if(is_entity && !surgescript_object_has_tag(object, "private"))
-            renderqueue_enqueue_ssobject_debug(object);
-
-        /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
-            provoke any data or state changes within SurgeScript */
-        /*if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-            renderqueue_enqueue_ssobject_gizmo(object);*/
-
-        return true;
-    }
-    else {
-        /* gameplay */
-        if(is_entity && entity_info_exists(object) && entity_info_is_sleeping(object)) {
-            /* no need to render sleeping objects */
-            return false; /* won't render their children */
-        }
-        else {
-            const surgescript_object_t* debug_mode_object = (const surgescript_object_t*)param;
-            bool debug_mode = (debug_mode_object != NULL);
-
-            /* debug mode */
-            if(debug_mode) {
-                if(is_entity) {
-                    surgescript_objecthandle_t debug_mode_handle = surgescript_object_handle(debug_mode_object);
-
-                    /* skip detached entities */
-                    if(surgescript_object_has_tag(object, "detached")) {
-                        if(!surgescript_object_is_ascendant(object, debug_mode_handle) && object != debug_mode_object)
-                            return false;
-                    }
-
-                    /* render special entities that are normally invisible */
-                    if(surgescript_object_has_tag(object, "special")) {
-                        if(!surgescript_object_has_tag(object, "private"))
-                            renderqueue_enqueue_ssobject_debug(object);
-                    }
-
-                }
-            }
-
-            /* will render objects tagged "renderable" */
-            if(surgescript_object_has_tag(object, "renderable"))
-                renderqueue_enqueue_ssobject(object);
-
-            /* will render objects tagged "gizmo" */
-            if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-                renderqueue_enqueue_ssobject_gizmo(object);
-
-            /* visit the children */
-            return true;
-        }
+        surgescript_var_destroy(arg_gizmos);
+        surgescript_var_destroy(arg_mode);
     }
 }
 
@@ -3110,89 +2934,6 @@ void set_entitymanager_roi(int x, int y, int width, int height)
     surgescript_var_destroy(args[2]);
     surgescript_var_destroy(args[1]);
     surgescript_var_destroy(args[0]);
-}
-
-
-
-/* brick-like objects */
-void add_bricklike_ssobject(surgescript_object_t* object)
-{
-    /* add it to the bricklike_ssobject array */
-    if(bricklike_ssobject_count < BRICKLIKE_MAX_COUNT) {
-        if(!surgescript_object_is_killed(object))
-            bricklike_ssobject[bricklike_ssobject_count++] = surgescript_object_handle(object);
-    }
-}
-
-surgescript_object_t* get_bricklike_ssobject(int index)
-{
-    if(index >= 0 && index < bricklike_ssobject_count) {
-        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(surgescript_vm());
-        surgescript_objecthandle_t handle = bricklike_ssobject[index];
-        if(surgescript_objectmanager_exists(manager, handle)) {
-            surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
-            if(!surgescript_object_is_killed(obj)) {
-                if(strcmp(surgescript_object_name(obj), "Brick") == 0) /* make sure it's a brick */
-                    return obj;
-            }
-        }
-
-        /* quick fix */
-        return get_bricklike_ssobject(index + 1);
-
-        /* a bricklike object may have been removed between its
-           addition to the bricklike_ssobject array and its
-           retrieval by this function (who knows, maybe a parent
-           object gets destroyed).
-
-           TODO: filter out invalid bricks before querying */
-    }
-
-    return NULL;
-}
-
-inline void clear_bricklike_ssobjects()
-{
-    bricklike_ssobject_count = 0;
-}
-
-
-/* queue for storing SurgeScript entities that implement lateUpdate() */
-void init_late_update_queue()
-{
-    darray_init(late_update_queue);
-}
-
-void release_late_update_queue()
-{
-    darray_release(late_update_queue);
-}
-
-void clear_late_update_queue()
-{
-    darray_clear(late_update_queue);
-}
-
-
-
-/*
- * SurgeScript object utilities
- */
-
-/* get the Level object (SurgeScript) */
-surgescript_object_t* level_ssobject()
-{
-    if(cached_level_ssobject == NULL)
-        cached_level_ssobject = scripting_util_surgeengine_component(surgescript_vm(), "Level");
-    return cached_level_ssobject;
-}
-
-/* get the EntityManager object (SurgeScript) */
-surgescript_object_t* entitymanager_ssobject()
-{
-    if(cached_entity_manager == NULL)
-        cached_entity_manager = scripting_level_entitymanager(level_ssobject());
-    return cached_entity_manager;
 }
 
 /* spawns a ssobject */
@@ -3243,23 +2984,21 @@ surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
     return surgescript_objectmanager_get(manager, new_object_handle);
 }
 
-/* notify an entity: call a function (if it exists) */
-bool notify_ssobject(surgescript_object_t* object, void* param)
-{
-    const char* fun_name = (const char*)param;
-
-    if(surgescript_object_has_tag(object, "entity")) {
-        if(surgescript_object_has_function(object, fun_name))
-            surgescript_object_call_function(object, fun_name, NULL, 0, NULL);
-    }
-
-    return true;
-}
-
 /* notifies all SurgeScript entities of the level */
 void notify_ssobjects(const char* fun_name)
 {
-    surgescript_object_traverse_tree_ex(level_ssobject(), (void*)fun_name, notify_ssobject);
+    surgescript_vm_t* vm = surgescript_vm();
+
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_var_t* arg = surgescript_var_create();
+        const surgescript_var_t* args[] = { arg };
+
+        surgescript_var_set_string(arg, fun_name);
+        surgescript_object_call_function(entity_manager, "notifyEntities", args, 1, NULL);
+
+        surgescript_var_destroy(arg);
+    }
 }
 
 
@@ -3269,47 +3008,6 @@ void notify_ssobjects(const char* fun_name)
 /*
  * Additional info of SurgeScript entities
  */
-v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
-{
-    extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-uint64_t entity_info_id(const surgescript_object_t* object)
-{
-    extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-bool entity_info_is_persistent(const surgescript_object_t* object)
-{
-    extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-bool entity_info_is_sleeping(const surgescript_object_t* object)
-{
-    extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-    return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
-{
-    extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
-    entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
-}
-
-void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
-{
-    extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
-    entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
-}
-
-void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
-{
-    extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
-    entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
-}
 
 bool entity_info_exists(const surgescript_object_t* object)
 {
@@ -3322,6 +3020,50 @@ void entity_info_remove(const surgescript_object_t* object)
     extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     entitymanager_remove_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
 }
+
+v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
+{
+    extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+uint64_t entity_info_id(const surgescript_object_t* object)
+{
+    extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
+{
+    extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
+    entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
+}
+
+bool entity_info_is_persistent(const surgescript_object_t* object)
+{
+    extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
+{
+    extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
+    entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
+}
+
+/*
+bool entity_info_is_sleeping(const surgescript_object_t* object)
+{
+    extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+    return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
+{
+    extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
+    entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
+}
+*/
 
 
 

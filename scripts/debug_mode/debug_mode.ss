@@ -64,7 +64,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 
 // The Debug Mode object manages its plugins
-object "Debug Mode"
+object "Debug Mode" is "private", "awake", "entity"
 {
     plugins = [];
     indicesOfPluginsScheduledForRemoval = [];
@@ -178,9 +178,9 @@ object "Debug Mode"
     // internal use
     fun constructor()
     {
-        // this object must be unique and a child of Level
-        assert(parent === Level);
+        // this object must be unique and a descendant of Level
         assert(parent.children(this.__name).length == 1);
+        assert(Level.findObjects(this.__name).length == 1); // slow?
 
         // enable the Debug Mode flag
         Level.debugMode = true;

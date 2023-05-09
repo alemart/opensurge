@@ -148,23 +148,32 @@ collisionmask_t* scripting_brick_mask(const surgescript_object_t* object)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_var_t* arg = surgescript_var_create();
-    const surgescript_var_t* args[] = { arg };
+    const bricklike_data_t* data = get_data(object);
 
-    /* get the Entity Manager */
-    surgescript_var_t* entity_manager_var = surgescript_heap_at(heap, ENTITYMANAGER_ADDR);
-    surgescript_objecthandle_t entity_manager_handle = surgescript_var_get_objecthandle(entity_manager_var);
-    surgescript_object_t* entity_manager = surgescript_objectmanager_get(manager, entity_manager_handle);
+    /* is the brick enabled? */
+    if(data->enabled && data->mask != NULL) {
+        surgescript_heap_t* heap = surgescript_object_heap(object);
+        surgescript_objectmanager_t* manager = surgescript_object_manager(object);
 
-    /* notify the Entity Manager */
-    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
-    surgescript_var_set_objecthandle(arg, this_handle);
-    surgescript_object_call_function(entity_manager, "addBricklikeObject", args, 1, NULL);
+        /* allocate variable */
+        surgescript_var_t* arg = surgescript_var_create();
+        const surgescript_var_t* args[] = { arg };
+
+        /* get the Entity Manager */
+        surgescript_var_t* entity_manager_var = surgescript_heap_at(heap, ENTITYMANAGER_ADDR);
+        surgescript_objecthandle_t entity_manager_handle = surgescript_var_get_objecthandle(entity_manager_var);
+        surgescript_object_t* entity_manager = surgescript_objectmanager_get(manager, entity_manager_handle);
+
+        /* notify the Entity Manager */
+        surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
+        surgescript_var_set_objecthandle(arg, this_handle);
+        surgescript_object_call_function(entity_manager, "addBricklikeObject", args, 1, NULL);
+
+        /* deallocate variable */
+        surgescript_var_destroy(arg);
+    }
 
     /* done */
-    surgescript_var_destroy(arg);
     return NULL;
 }
 

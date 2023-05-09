@@ -29,6 +29,7 @@
 #include "../core/stringutil.h"
 #include "../core/video.h"
 #include "../core/darray.h"
+#include "../core/iterator.h"
 #include "../scenes/level.h"
 
 typedef struct entityinfo_t entityinfo_t;
@@ -83,6 +84,7 @@ void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, sur
 bool entitymanager_is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 void entitymanager_set_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_inside_roi);
 bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t position);
+iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
 
 /* SurgeScript API */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -102,8 +104,8 @@ static surgescript_var_t* fun_activeentities(surgescript_object_t* object, const
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_consumelateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t AWAKEENTITYCONTAINER_ADDR = 0;
 static const surgescript_heapptr_t UNAWAKEENTITYCONTAINER_ADDR = 1;
 
@@ -122,8 +124,8 @@ static inline entityinfo_t* quick_lookup(surgescript_object_t* entity_manager, s
 void scripting_register_entitymanager(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "EntityManager", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "EntityManager", "render", fun_render, 0);
     surgescript_vm_bind(vm, "EntityManager", "update", fun_update, 0);
+    surgescript_vm_bind(vm, "EntityManager", "render", fun_render, 2);
     surgescript_vm_bind(vm, "EntityManager", "lateUpdate", fun_lateupdate, 0);
     surgescript_vm_bind(vm, "EntityManager", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "EntityManager", "destructor", fun_destructor, 0);
@@ -138,8 +140,8 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_bind(vm, "EntityManager", "setROI", fun_setroi, 4);
     surgescript_vm_bind(vm, "EntityManager", "addToLateUpdateQueue", fun_addtolateupdatequeue, 1);
-    surgescript_vm_bind(vm, "EntityManager", "consumeLateUpdateQueue", fun_consumelateupdatequeue, 0);
     surgescript_vm_bind(vm, "EntityManager", "addBricklikeObject", fun_addbricklikeobject, 1);
+    surgescript_vm_bind(vm, "EntityManager", "notifyEntities", fun_notifyentities, 1);
 }
 
 
@@ -526,40 +528,40 @@ surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const 
     return NULL;
 }
 
-/* consume the late update queue */
-surgescript_var_t* fun_consumelateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    entitydb_t* db = get_db(object);
-
-    /* for each entity in the late update queue, call entity.lateUpdate() */
-    for(int i = 0; i < darray_length(db->late_update_queue); i++) {
-        surgescript_objecthandle_t entity_handle = db->late_update_queue[i];
-        if(surgescript_objectmanager_exists(manager, entity_handle)) { /* validity check */
-            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
-            if(!surgescript_object_is_killed(entity)) {
-                surgescript_object_call_function(entity, "lateUpdate", NULL, 0, NULL);
-            }
-        }
-    }
-
-    /* clear the queue */
-    darray_clear(db->late_update_queue);
-
-    /* done! */
-    return NULL;
-}
-
 /* add a brick-like object */
 surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-#if 0
-    entitydb_t* db = get_db(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* bricklike = surgescript_objectmanager_get(manager, handle);
+    entitydb_t* db = get_db(object);
 
-    darray_push(db->bricklike_objects, handle);
-#endif
+    /* validate the object before adding it to the list */
+    if(0 == strcmp(surgescript_object_name(bricklike), "Brick"))
+        darray_push(db->bricklike_objects, handle);
 
+    return NULL;
+}
+
+/* notify entities: given the name of a function with no arguments, call it in all entities */
+surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+
+    /* notify entities of the unawake container */
+    surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
+    surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
+    surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
+    surgescript_object_call_function(unawake_container, "notifyEntities", param, num_params, NULL);
+
+    /* notify entities of the awake container */
+    surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
+    surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
+    surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
+    surgescript_object_call_function(awake_container, "notifyEntities", param, num_params, NULL);
+
+    /* done! */
     return NULL;
 }
 
@@ -568,6 +570,13 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
+    entitydb_t* db = get_db(object);
+
+    /* clear the late update queue */
+    darray_clear(db->late_update_queue);
+
+    /* clear the brick-like object list */
+    darray_clear(db->bricklike_objects);
 
     /* update unawake container */
     surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
@@ -588,10 +597,21 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
 /* late update */
 surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* late update */
-    surgescript_object_call_function(object, "consumeLateUpdateQueue", NULL, 0, NULL);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    entitydb_t* db = get_db(object);
 
-    /* done */
+    /* for each entity in the late update queue, call entity.lateUpdate() */
+    for(int i = 0; i < darray_length(db->late_update_queue); i++) {
+        surgescript_objecthandle_t entity_handle = db->late_update_queue[i];
+        if(surgescript_objectmanager_exists(manager, entity_handle)) { /* validity check */
+            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+            if(!surgescript_object_is_killed(entity)) {
+                surgescript_object_call_function(entity, "lateUpdate", NULL, 0, NULL);
+            }
+        }
+    }
+
+    /* done! */
     return NULL;
 }
 
@@ -605,13 +625,13 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
     surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-    surgescript_object_call_function(unawake_container, "render", NULL, 0, NULL);
+    surgescript_object_call_function(unawake_container, "render", param, num_params, NULL);
 
     /* render entities of the awake container */
     surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
     surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
-    surgescript_object_call_function(awake_container, "render", NULL, 0, NULL);
+    surgescript_object_call_function(awake_container, "render", param, num_params, NULL);
 
     /* done */
     return NULL;
@@ -767,4 +787,16 @@ bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t pos
     int x = position.x, y = position.y;
 
     return x >= db->roi.left && x <= db->roi.right && y >= db->roi.top && y <= db->roi.bottom;
+}
+
+/* create an iterator for iterating over the collection of brick-like objects */
+iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager)
+{
+    entitydb_t* db = get_db(entity_manager);
+
+    return iterator_create_from_array(
+        db->bricklike_objects,
+        darray_length(db->bricklike_objects),
+        sizeof *(db->bricklike_objects)
+    );
 }

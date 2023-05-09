@@ -160,8 +160,8 @@ void* arrayiterator_copy_ctor(void* state)
     /* alignment check for ARM */
     if(!is_aligned(s->array, ALIGNMENT_SIZE))
         fatal_error("%s: unaligned pointer %p", __func__, s->array);
-    else if(s->element_size_in_bytes % ALIGNMENT_SIZE != 0)
-        fatal_error("%s: element size %lu may trigger unaligned accesses in %p", __func__, s->element_size_in_bytes, s->array);
+    /*else if(s->element_size_in_bytes % ALIGNMENT_SIZE != 0) // iterate over char, short...?
+        fatal_error("%s: element size %lu may trigger unaligned accesses in %p", __func__, s->element_size_in_bytes, s->array);*/
 
     /* reminder: use memcpy() for unaligned accesses? */
 

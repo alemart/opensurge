@@ -23,7 +23,6 @@
 #include "scripting.h"
 #include "../core/util.h"
 #include "../entities/renderqueue.h"
-#include "../scenes/level.h"
 
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -34,14 +33,17 @@ static surgescript_var_t* fun_reparent(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_awake_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
+enum { RENDERFLAG_SPECIALS = 0x1, RENDERFLAG_GIZMOS = 0x2 };
 static bool render_subtree(surgescript_object_t* object, void* data);
+static inline void notify_entity(surgescript_object_t* entity, const char* fun_name);
+static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
 
-#define get_entity_manager(object) ((surgescript_object_t*)surgescript_object_userdata(object))
 extern bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
@@ -63,9 +65,10 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "EntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "EntityContainer", "reparent", fun_reparent, 1);
-    surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 0);
+    surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 2);
     surgescript_vm_bind(vm, "EntityContainer", "selectActiveEntities", fun_selectactiveentities, 1);
     surgescript_vm_bind(vm, "EntityContainer", "setROI", fun_setroi, 4);
+    surgescript_vm_bind(vm, "EntityContainer", "notifyEntities", fun_notifyentities, 1);
     surgescript_vm_bind(vm, "EntityContainer", "__releaseChildren", fun_releasechildren, 0);
 
     /* AwakeEntityContainer "inherits" from EntityContainer */
@@ -74,9 +77,10 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AwakeEntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "reparent", fun_awake_reparent, 1);
-    surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 0);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "setROI", fun_setroi, 4);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "notifyEntities", fun_notifyentities, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "__releaseChildren", fun_releasechildren, 0);
 }
 
@@ -142,9 +146,6 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
                 surgescript_object_call_function(entity_manager, "addToLateUpdateQueue", args, 1, NULL);
             }
 
-            /* TODO brick-like */
-            ;
-
         }
         else if(!surgescript_object_has_tag(entity, "disposable")) {
 
@@ -170,8 +171,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
                     /* update roi flag? */
 
                     /* notify the object */
-                    if(surgescript_object_has_function(entity, "onReset"))
-                        surgescript_object_call_function(entity, "onReset", NULL, 0, NULL);
+                    notify_entity(entity, "onReset");
 
                 }
 
@@ -197,38 +197,32 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
-    surgescript_var_t* arg = surgescript_var_create();
-    const surgescript_var_t* args[] = { arg };
-    bool must_display_gizmos = false;
+    int mode = surgescript_var_get_number(param[0]);
+    bool must_display_gizmos = surgescript_var_get_bool(param[1]);
+    bool is_in_debug_mode = (mode == 1);
+    bool is_in_level_editor = (mode == 2);
     int child_count = surgescript_object_child_count(object);
 
-    /* for each entity */
-    for(int i = 0; i < child_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    /* render */
+    if(is_in_level_editor) {
 
-        /* cut processing time */
-        if(!surgescript_object_is_active(entity))
-            continue;
+        /* LEVEL EDITOR */
 
-        /* skip deleted entities */
-        else if(surgescript_object_is_killed(entity))
-            continue;
+        /* for each entity */
+        for(int i = 0; i < child_count; i++) {
+            surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
+            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
 
-        /* clip it out */
-        else if(!(
-            entitymanager_is_entity_inside_roi(entity_manager, entity_handle) ||
-            surgescript_object_has_tag(entity, "detached")
-        ))
-            continue;
-
-        /* render */
-        if(level_editmode()) {
-
-            /* LEVEL EDITOR */
+            /* skip deleted entities */
+            if(surgescript_object_is_killed(entity))
+                continue;
 
             /* skip private entities */
-            if(surgescript_object_has_tag(entity, "private") || surgescript_object_has_tag(entity, "detached"))
+            if(surgescript_object_has_tag(entity, "private"))
+                continue;
+
+            /* skip detached entities */
+            if(surgescript_object_has_tag(entity, "detached"))
                 continue;
 
             /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
@@ -236,29 +230,78 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
             /* render the entity */
             renderqueue_enqueue_ssobject_debug(entity);
-
         }
-        else if(level_is_in_debug_mode()) {
 
-            /* DEBUG MODE */
+    }
+    else if(is_in_debug_mode) {
 
+        /* DEBUG MODE */
+
+        /* for each entity */
+        for(int i = 0; i < child_count; i++) {
+            surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
+            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+            /* skip deleted entities */
+            if(surgescript_object_is_killed(entity))
+                continue;
+
+            /* skip inactive entities */
+            if(!surgescript_object_is_active(entity))
+                continue;
+#if 0
+            /* skip sleeping entities */
+            if(entitymanager_is_entity_sleeping(entity_manager, entity_handle))
+                continue;
+#endif
+            /* skip detached entities */
+            if(surgescript_object_has_tag(entity, "detached")) {
+                if(0 != strcmp(surgescript_object_name(entity), "Debug Mode"))
+                    continue;
+            }
+
+            /* search the sub-tree for renderables */
+            int render_flags = RENDERFLAG_SPECIALS | (must_display_gizmos ? RENDERFLAG_GIZMOS : 0);
+            surgescript_object_traverse_tree_ex(entity, &render_flags, render_subtree);
         }
-        else {
 
-            /* REGULAR GAMEPLAY */
+    }
+    else {
 
-            /* skip inactive / sleeping entities */
-            if(!surgescript_object_is_active(entity) || entitymanager_is_entity_sleeping(entity_manager, entity_handle))
+        /* REGULAR GAMEPLAY */
+
+        /* for each entity */
+        for(int i = 0; i < child_count; i++) {
+            surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
+            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+            /* skip deleted entities */
+            if(surgescript_object_is_killed(entity))
+                continue;
+
+            /* skip inactive entities */
+            if(!surgescript_object_is_active(entity))
+                continue;
+#if 0
+            /* skip sleeping entities */
+            if(entitymanager_is_entity_sleeping(entity_manager, entity_handle))
+                continue;
+#endif
+            /* skip entities that can be clipped */
+            if(!(
+                entitymanager_is_entity_inside_roi(entity_manager, entity_handle) || /* note: it depends on the size of the entity... what about large ones? */
+                surgescript_object_has_tag(entity, "detached")
+            ))
                 continue;
 
             /* search the sub-tree for renderables */
-            surgescript_object_traverse_tree_ex(entity, &must_display_gizmos, render_subtree);
-
+            int render_flags = must_display_gizmos ? RENDERFLAG_GIZMOS : 0;
+            surgescript_object_traverse_tree_ex(entity, &render_flags, render_subtree);
         }
+
     }
 
     /* done */
-    surgescript_var_destroy(arg);
     return NULL;
 }
 
@@ -382,6 +425,29 @@ surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const 
     return NULL;
 }
 
+/* notify entities: given the name of a function with no arguments, call it in all entities */
+surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* note that we don't notify the descendants of these entities that also happen to be entities */
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const char* fun_name = surgescript_var_fast_get_string(param[0]);
+
+    /* for each entity */
+    int entity_count = surgescript_object_child_count(object);
+    for(int i = 0; i < entity_count; i++) {
+        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
+        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+        /* notify entity */
+        notify_entity(entity, fun_name);
+    }
+
+    /* done */
+    return NULL;
+}
+
+
+
 
 /*
  * awake variant
@@ -485,7 +551,9 @@ surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, 
 
 bool render_subtree(surgescript_object_t* object, void* data)
 {
-    bool must_display_gizmos = *((bool*)data);
+    int flags = *((int*)data);
+    bool must_render_gizmos = (0 != (flags & RENDERFLAG_GIZMOS));
+    bool must_render_specials = (0 != (flags & RENDERFLAG_SPECIALS));
 
     /* skip inactive objects */
     if(!surgescript_object_is_active(object) || surgescript_object_is_killed(object))
@@ -495,10 +563,31 @@ bool render_subtree(surgescript_object_t* object, void* data)
     if(surgescript_object_has_tag(object, "renderable"))
         renderqueue_enqueue_ssobject(object);
 
+    /* render special entities that are normally invisible */
+    if(must_render_specials) {
+        if(surgescript_object_has_tag(object, "special")) {
+            if(!surgescript_object_has_tag(object, "private"))
+                renderqueue_enqueue_ssobject_debug(object);
+        }
+    }
+
     /* will render objects tagged "gizmo" */
-    if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-        renderqueue_enqueue_ssobject_gizmo(object);
+    if(must_render_gizmos) {
+        if(surgescript_object_has_tag(object, "gizmo"))
+            renderqueue_enqueue_ssobject_gizmo(object);
+    }
 
     /* visit the children */
     return true;
+}
+
+void notify_entity(surgescript_object_t* entity, const char* fun_name)
+{
+    if(surgescript_object_has_function(entity, fun_name))
+        surgescript_object_call_function(entity, fun_name, NULL, 0, NULL);
+}
+
+surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container)
+{
+    return (surgescript_object_t*)surgescript_object_userdata(entity_container);
 }
