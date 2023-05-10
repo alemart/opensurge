@@ -350,8 +350,8 @@ static int editor_ssobj_sortfun(const void* a, const void* b);
 static void editor_ssobj_register(const char* entity_name, void* data); /* internal */
 static int editor_ssobj_index(const char* entity_name); /* an index k such that editor_ssobj[k] is entity_name */
 static const char* editor_ssobj_name(int entity_index); /* the inverse of editor_ssobj_index() */
-static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
-static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
+static void editor_remove_entity(uint64_t entity_id);
+static void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** best_candidate);
 
 /* editor: bricks */
 static int* editor_brick; /* an array of all valid brick numbers */
@@ -1032,12 +1032,14 @@ bool level_save_ssobject(surgescript_object_t* object, void* param)
     if(surgescript_object_is_killed(object))
         return false;
 
-    if(entity_info_is_persistent(object)) {
-        const char* object_name = surgescript_object_name(object);
-        v2d_t spawn_point = entity_info_spawnpoint(object);
-        uint64_t entity_id = entity_info_id(object);
+    if(surgescript_object_has_tag(object, "entity")) {
+        if(entity_info_is_persistent(object)) {
+            const char* object_name = surgescript_object_name(object);
+            v2d_t spawn_point = entity_info_spawnpoint(object);
+            uint64_t entity_id = entity_info_id(object);
 
-        al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
+            al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
+        }
     }
 
     return true;
@@ -1316,10 +1318,10 @@ void level_update()
     /* getting the major entities */
     /* note: bricks should use a larger margin when compared to SurgeScript entities */
     entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - (DEFAULT_MARGIN*3)/2,
-        (int)cam.y - VIDEO_SCREEN_H/2 - (DEFAULT_MARGIN*3)/2,
-        VIDEO_SCREEN_W + (DEFAULT_MARGIN*3),
-        VIDEO_SCREEN_H + (DEFAULT_MARGIN*3)
+        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
+        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
+        3*VIDEO_SCREEN_W,
+        3*VIDEO_SCREEN_H
     );
     set_entitymanager_roi(
         (int)cam.x - VIDEO_SCREEN_W,
@@ -1383,8 +1385,6 @@ void level_update()
     }
 
     /* update obstacle map */
-    extern iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
-
     iterator_t* bricklike_iterator = entitymanager_bricklike_iterator(entitymanager_ssobject());
     update_obstaclemap(major_bricks, major_items, major_enemies, bricklike_iterator);
     iterator_destroy(bricklike_iterator);
@@ -1523,10 +1523,10 @@ void level_render()
        Let's make sure that we keep our active region updated. */
     v2d_t cam = camera_get_position(); /* we're not in editor mode */
     entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
+        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
+        3*VIDEO_SCREEN_W,
+        3*VIDEO_SCREEN_H
     );
     set_entitymanager_roi(
         (int)cam.x - VIDEO_SCREEN_W,
@@ -1776,7 +1776,6 @@ surgescript_object_t* level_create_object(const char* object_name, v2d_t positio
  */
 surgescript_object_t* level_get_entity_by_id(const char* entity_id)
 {
-    extern surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id);
     surgescript_object_t* level = level_ssobject();
     surgescript_objectmanager_t* manager = surgescript_object_manager(level);
 
@@ -3011,56 +3010,47 @@ void notify_ssobjects(const char* fun_name)
 
 bool entity_info_exists(const surgescript_object_t* object)
 {
-    extern bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     return entitymanager_has_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
 void entity_info_remove(const surgescript_object_t* object)
 {
-    extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     entitymanager_remove_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
 v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
 {
-    extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
 uint64_t entity_info_id(const surgescript_object_t* object)
 {
-    extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
 void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
 {
-    extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
     entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
 }
 
 bool entity_info_is_persistent(const surgescript_object_t* object)
 {
-    extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
 void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
 {
-    extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
     entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
 }
 
 /*
 bool entity_info_is_sleeping(const surgescript_object_t* object)
 {
-    extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
     return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
 }
 
 void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
 {
-    extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
     entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
 }
 */
@@ -3296,16 +3286,16 @@ void editor_update()
 
     v2d_t cam = editor_camera;
     entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+        (int)cam.x - VIDEO_SCREEN_W,
+        (int)cam.y - VIDEO_SCREEN_H,
+        2*VIDEO_SCREEN_W,
+        2*VIDEO_SCREEN_H
     );
     set_entitymanager_roi(
-        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
+        (int)cam.x - VIDEO_SCREEN_W,
+        (int)cam.y - VIDEO_SCREEN_H,
+        2*VIDEO_SCREEN_W,
+        2*VIDEO_SCREEN_H
     );
 
     /* getting major entities */
@@ -3526,7 +3516,21 @@ void editor_update()
             /* SurgeScript entity */
             case EDT_SSOBJ: {
                 surgescript_object_t* ssobject = NULL;
-                surgescript_object_traverse_tree_ex(level_ssobject(), &ssobject, editor_pick_ssobj);
+                surgescript_object_t* entity_manager = entitymanager_ssobject();
+                surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+
+                iterator_t* it = entitymanager_activeentities_iterator(entity_manager);
+                while(iterator_has_next(it)) {
+                    surgescript_var_t** var = iterator_next(it);
+                    surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(*var);
+
+                    if(surgescript_objectmanager_exists(manager, entity_handle)) {
+                        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+                        editor_pick_entity(entity, &ssobject);
+                    }
+                }
+                iterator_destroy(it);
+
                 if(ssobject != NULL) {
                     int index = editor_ssobj_index(surgescript_object_name(ssobject));
                     if(!pick_object) {
@@ -4537,17 +4541,21 @@ void editor_tooltip_update()
     font_set_visible(editor_tooltip_font, false);
     if(editor_cursor_entity_type == EDT_SSOBJ) {
         surgescript_object_t* target = NULL;
-        surgescript_object_t* level = level_ssobject();
-        surgescript_objectmanager_t* manager = surgescript_object_manager(level);
-        int n = surgescript_object_child_count(level);
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
 
         /* locate a target (onmouseover) */
-        for(int i = 0; i < n; i++) {
-            surgescript_objecthandle_t handle = surgescript_object_nth_child(level, i);
-            surgescript_object_t* child = surgescript_objectmanager_get(manager, handle);
-            if(entity_info_exists(child))
-                editor_pick_ssobj(child, &target);
+        iterator_t* it = entitymanager_activeentities_iterator(entity_manager);
+        while(iterator_has_next(it)) {
+            surgescript_var_t** var = iterator_next(it);
+            surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(*var);
+
+            if(surgescript_objectmanager_exists(manager, entity_handle)) {
+                surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+                editor_pick_entity(entity, &target);
+            }
         }
+        iterator_destroy(it);
 
         /* found a target */
         if(target != NULL && !surgescript_object_is_killed(target)) {
@@ -5069,7 +5077,7 @@ void editor_action_commit(editor_action_t action)
 
             case EDT_SSOBJ: {
                 /* delete SurgeScript entity */
-                surgescript_object_traverse_tree_ex(level_ssobject(), &action, editor_remove_ssobj);
+                editor_remove_entity(action.ssobj_id);
                 break;
             }
         }
@@ -5094,56 +5102,44 @@ void editor_action_commit(editor_action_t action)
     }
 }
 
-bool editor_remove_ssobj(surgescript_object_t* object, void* data)
+void editor_remove_entity(uint64_t entity_id)
 {
-    if(surgescript_object_is_active(object)) {
-        if(entity_info_is_persistent(object)) {
-            const char* object_name = surgescript_object_name(object);
-            editor_action_t *action = (editor_action_t*)data;
-            if(editor_ssobj_index(object_name) == action->obj_id) {
-                v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
-                if(nearly_zero(v2d_magnitude(delta))) {
-                    surgescript_object_kill(object);
-                    entity_info_remove(object);
-                }
-            }
-        }
+    surgescript_object_t* entity_manager = entitymanager_ssobject();
+    surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+    surgescript_objecthandle_t entity_handle = entitymanager_find_entity_by_id(entity_manager, entity_id);
 
-        return true;
+    if(surgescript_objectmanager_exists(manager, entity_handle)) {
+        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+        surgescript_object_kill(entity);
+        entity_info_remove(entity);
     }
     else
-        return false;
+        video_showmessage("Can't remove entity %llx", entity_id);
 }
 
-bool editor_pick_ssobj(surgescript_object_t* object, void* data)
+void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** best_candidate)
 {
-    if(surgescript_object_is_active(object)) {
-        if(entity_info_is_persistent(object)) {
-            v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-            float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
+    if(entity_info_is_persistent(object) && !surgescript_object_has_tag(object, "detached")) {
+        v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+        float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
 
-            /* find the bounding box of the entity */
-            const char* name = surgescript_object_name(object);
-            const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
-            const image_t* img = sprite_get_image(anim, 0);
-            v2d_t worldpos = scripting_util_world_position(object);
-            v2d_t hot_spot = anim->hot_spot;
-            a[0] = worldpos.x - hot_spot.x;
-            a[1] = worldpos.y - hot_spot.y;
-            a[2] = a[0] + image_width(img);
-            a[3] = a[1] + image_height(img);
+        /* find the bounding box of the entity */
+        const char* name = surgescript_object_name(object);
+        const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
+        const image_t* img = sprite_get_image(anim, 0);
+        v2d_t worldpos = scripting_util_world_position(object);
+        v2d_t hot_spot = anim->hot_spot;
+        a[0] = worldpos.x - hot_spot.x;
+        a[1] = worldpos.y - hot_spot.y;
+        a[2] = a[0] + image_width(img);
+        a[3] = a[1] + image_height(img);
 
-            /* got collision between the cursor and the entity */
-            if(bounding_box(a, b)) {
-                surgescript_object_t** result = (surgescript_object_t**)data;
-                if(NULL == *result || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*result))
-                    *result = object;
-            }
+        /* got collision between the cursor and the entity */
+        if(bounding_box(a, b)) {
+            if(NULL == *best_candidate || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*best_candidate))
+                *best_candidate = object;
         }
-
-        return true;
     }
-    else
-        return false;
 }

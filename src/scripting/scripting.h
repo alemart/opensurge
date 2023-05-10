@@ -22,6 +22,7 @@
 #define _SCRIPTING_H
 
 #include <surgescript.h>
+#include "util/iterators.h"
 #include "../core/v2d.h"
 #include "../entities/brick.h"
 
@@ -80,5 +81,19 @@ extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* 
 extern const struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 
 extern surgescript_object_t* scripting_level_entitymanager(const surgescript_object_t* object);
+
+extern bool entitymanager_has_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+extern void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+extern surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id);
+extern uint64_t entitymanager_get_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+extern void entitymanager_set_entity_id(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, uint64_t entity_id);
+extern v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+extern bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
+extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
+extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
+extern bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t position);
+extern arrayiterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
+extern ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
 
 #endif

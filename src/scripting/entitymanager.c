@@ -39,7 +39,6 @@ struct entityinfo_t {
     v2d_t spawn_point; /* spawn point */
     bool is_persistent; /* usually placed via level editor; will be saved in the .lev file */
     bool is_sleeping; /* inactive? */
-    bool is_inside_roi; /* this flag will only be valid on entities that belong to active containers */
 };
 
 typedef struct entitydb_t entitydb_t;
@@ -81,10 +80,9 @@ bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, su
 void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_persistent);
 bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
-bool entitymanager_is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
-void entitymanager_set_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_inside_roi);
 bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t position);
-iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
+arrayiterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
+ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
 
 /* SurgeScript API */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -310,8 +308,7 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
             surgescript_object_has_tag(entity, "private") ||
             /*surgescript_object_has_tag(entity, "detached") ||*/
             level_is_setup_object(entity_name)
-        ),
-        .is_inside_roi = entitymanager_is_inside_roi(object, spawn_point)
+        )
     });
 
     /* store entity info */
@@ -412,21 +409,23 @@ surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surges
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t array_handle = surgescript_objectmanager_spawn_array(manager);
     surgescript_var_t* array_var = surgescript_var_set_objecthandle(surgescript_var_create(), array_handle);
-    const surgescript_var_t* args[] = { array_var };
+    surgescript_var_t* skip_inactive_var = surgescript_var_set_bool(surgescript_var_create(), !level_editmode());
+    const surgescript_var_t* args[] = { array_var, skip_inactive_var };
 
     /* get unawakened active entities */
     surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
     surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-    surgescript_object_call_function(unawake_container, "selectActiveEntities", args, 1, NULL);
+    surgescript_object_call_function(unawake_container, "selectActiveEntities", args, 2, NULL);
 
     /* get awake entities */
     surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
     surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
-    surgescript_object_call_function(awake_container, "selectActiveEntities", args, 1, NULL);
+    surgescript_object_call_function(awake_container, "selectActiveEntities", args, 2, NULL);
 
     /* done */
+    surgescript_var_destroy(skip_inactive_var);
     return array_var;
 }
 
@@ -467,9 +466,6 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     entitydb_t* db = get_db(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_var_t* args[4] = { NULL, NULL, NULL, NULL };
     double x = surgescript_var_get_number(param[0]);
     double y = surgescript_var_get_number(param[1]);
     double width = surgescript_var_get_number(param[2]);
@@ -480,10 +476,12 @@ surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_va
     double right = x + max(width, 1.0) - 1.0;
     double bottom = y + max(height, 1.0) - 1.0;
 
+#if 0
     /* no need to update the ROI?
        save some processing time */
     if(db->roi.left == (int)left && db->roi.top == (int)top && db->roi.right == (int)right && db->roi.bottom == (int)bottom)
         return NULL;
+#endif
 
     /* set the coordinates of the ROI */
     db->roi.left = left;
@@ -491,29 +489,9 @@ surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_va
     db->roi.right = right;
     db->roi.bottom = bottom;
 
-    /* prepare args[] */
-    surgescript_var_set_number((args[0] = surgescript_var_create()), left);
-    surgescript_var_set_number((args[1] = surgescript_var_create()), top);
-    surgescript_var_set_number((args[2] = surgescript_var_create()), right);
-    surgescript_var_set_number((args[3] = surgescript_var_create()), bottom);
-
-    /* update the ROI of the awake container */
-    surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
-    surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
-    surgescript_object_call_function(awake_container, "setROI", (const surgescript_var_t**)args, 4, NULL);
-
-    /* update the ROI of the unawake container */
-    surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
-    surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-    surgescript_object_call_function(unawake_container, "setROI", (const surgescript_var_t**)args, 4, NULL);
+    /* ... */
 
     /* done */
-    surgescript_var_destroy(args[3]);
-    surgescript_var_destroy(args[2]);
-    surgescript_var_destroy(args[1]);
-    surgescript_var_destroy(args[0]);
     return NULL;
 }
 
@@ -743,21 +721,6 @@ void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, sur
         info->is_sleeping = is_sleeping;
 }
 
-/* is the entity inside the region of interest? */
-bool entitymanager_is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle)
-{
-    entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
-    return info != NULL ? info->is_inside_roi : true;
-}
-
-/* change the inside_roi flag of an entity */
-void entitymanager_set_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_inside_roi)
-{
-    entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
-    if(info != NULL)
-        info->is_inside_roi = is_inside_roi;
-}
-
 /* find entity by ID. This may return a null handle! */
 surgescript_objecthandle_t entitymanager_find_entity_by_id(surgescript_object_t* entity_manager, uint64_t entity_id)
 {
@@ -789,8 +752,8 @@ bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t pos
     return x >= db->roi.left && x <= db->roi.right && y >= db->roi.top && y <= db->roi.bottom;
 }
 
-/* create an iterator for iterating over the collection of brick-like objects */
-iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager)
+/* create an iterator for iterating over the collection of (handles of) brick-like objects */
+arrayiterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager)
 {
     entitydb_t* db = get_db(entity_manager);
 
@@ -799,4 +762,25 @@ iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manage
         darray_length(db->bricklike_objects),
         sizeof *(db->bricklike_objects)
     );
+}
+
+/* create an iterator for iterating over the collection of (handles of) active entities
+   (i.e., awake, inside the ROI...) */
+ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+
+    /* call entityManager.activeEntities(), which returns a temporary SurgeScript Array */
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_object_call_function(entity_manager, "activeEntities", NULL, 0, ret);
+    surgescript_objecthandle_t array_handle = surgescript_var_get_objecthandle(ret);
+    surgescript_var_destroy(ret);
+
+    /* sanity check */
+    if(!surgescript_objectmanager_exists(manager, array_handle))
+        return iterator_create_from_array(NULL, 0, 0); /* empty */
+
+    /* iterate over the temporary SurgeScript Array */
+    surgescript_object_t* array = surgescript_objectmanager_get(manager, array_handle);
+    return iterator_create_from_disposable_surgescript_array(array);
 }

@@ -115,7 +115,7 @@ object "Debug Mode - Item Selector" is "debug-mode-plugin", "debug-mode-observab
         hs = Math.abs(selectionOrigin.y - selectionPoint.y);
 
         // find all selected entities
-        entities = Level.childrenWithTag("entity");
+        entities = Level.activeEntities();
         foreach(entity in entities) {
             if(!entity.hasTag("private") && !entity.hasTag("detached")) {
                 entityTransform = entity.child("Transform") || entity.spawn("Transform");
