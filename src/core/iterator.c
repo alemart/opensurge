@@ -34,21 +34,6 @@ struct iterator_t
     bool (*has_next)(iterator_state_t*);
 };
 
-/* ArrayIterator */
-typedef struct arrayiterator_state_t arrayiterator_state_t;
-struct arrayiterator_state_t
-{
-    void* array;
-    size_t length;
-    size_t element_size_in_bytes;
-    unsigned int current_index;
-};
-
-static iterator_state_t* arrayiterator_copy_ctor(void* ctor_data);
-static void arrayiterator_dtor(iterator_state_t* state);
-static void* arrayiterator_next(iterator_state_t* state);
-static bool arrayiterator_has_next(iterator_state_t* state);
-
 
 
 /*
@@ -66,22 +51,6 @@ iterator_t* iterator_create(void* ctor_data, iterator_state_t* (*state_ctor)(voi
     it->has_next = has_next_fn;
 
     return it;
-}
-
-/*
- * iterator_create_from_array()
- * Creates a new iterator suitable for iterating over a fixed-size array
- */
-iterator_t* iterator_create_from_array(void* array, size_t length, size_t element_size_in_bytes)
-{
-    arrayiterator_state_t state = {
-        .array = array,
-        .length = length,
-        .element_size_in_bytes = element_size_in_bytes,
-        .current_index = 0
-    };
-
-    return iterator_create(&state, arrayiterator_copy_ctor, arrayiterator_dtor, arrayiterator_next, arrayiterator_has_next);
 }
 
 /*
@@ -107,7 +76,7 @@ bool iterator_has_next(iterator_t* it)
 
 /*
  * iterator_next()
- * Returns the next element of the collection and advances the iteration pointer
+ * Returns a pointer to the next element of the collection and advances the iteration pointer
  * Returns NULL if there is no next element
  */
 void* iterator_next(iterator_t* it)
@@ -137,9 +106,46 @@ bool iterator_foreach(iterator_t* it, void* data, bool (*callback)(void* element
 
 
 
+
 /*
  * ArrayIterator
  */
+
+typedef struct arrayiterator_state_t arrayiterator_state_t;
+struct arrayiterator_state_t
+{
+    void* array;
+    size_t length;
+    size_t element_size_in_bytes;
+    unsigned int current_index;
+};
+
+static iterator_state_t* arrayiterator_copy_ctor(void* ctor_data);
+static void arrayiterator_dtor(iterator_state_t* state);
+static void* arrayiterator_next(iterator_state_t* state);
+static bool arrayiterator_has_next(iterator_state_t* state);
+
+
+/*
+ * iterator_create_from_array()
+ * Creates a new iterator suitable for iterating over a fixed-size array
+ */
+iterator_t* iterator_create_from_array(void* array, size_t length, size_t element_size_in_bytes)
+{
+    arrayiterator_state_t state = {
+        .array = array,
+        .length = length,
+        .element_size_in_bytes = element_size_in_bytes,
+        .current_index = 0
+    };
+
+    return iterator_create(&state, arrayiterator_copy_ctor, arrayiterator_dtor, arrayiterator_next, arrayiterator_has_next);
+}
+
+
+
+
+/* private */
 
 #if defined(__ANDROID__)
 #define WANT_ALIGNMENT_CHECK 1

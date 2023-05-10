@@ -45,12 +45,15 @@ typedef struct iterator_t iterator_t;
 typedef void iterator_state_t;
 
 iterator_t* iterator_create(void* ctor_data, iterator_state_t* (*state_ctor)(void*), void (*state_dtor)(iterator_state_t*), void* (*next_fn)(iterator_state_t*), bool (*has_next_fn)(iterator_state_t*)); /* creates a new general-purpose iterator */
-iterator_t* iterator_create_from_array(void* array, size_t length, size_t element_size_in_bytes); /* creates a new iterator suitable for iterating over a fixed-size array */
 iterator_t* iterator_destroy(iterator_t* it); /* destroys an iterator */
 
 bool iterator_has_next(iterator_t* it); /* returns true if the iteration isn't over */
-void* iterator_next(iterator_t* it); /* returns the next element of the collection and advances the iteration pointer */
+void* iterator_next(iterator_t* it); /* returns a pointer to the next element of the collection and advances the iteration pointer */
 bool iterator_foreach(iterator_t* it, void* data, bool (*callback)(void* element, void* data)); /* for each element of the collection, invoke a callback */
+
+/* iterate over C arrays */
+typedef iterator_t arrayiterator_t;
+arrayiterator_t* iterator_create_from_array(void* array, size_t length, size_t element_size_in_bytes); /* creates a new iterator suitable for iterating over a fixed-size array */
 
 /*
 #define ITERATOR_STATE(it) (*((iterator_state_t**)(it)))
