@@ -342,7 +342,7 @@ surgescript_object_t* scripting_util_get_component(surgescript_object_t* object,
 surgescript_object_t* scripting_util_spawn_temp(surgescript_vm_t* vm, const char* object_name)
 {
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-    surgescript_objecthandle_t handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+    surgescript_objecthandle_t handle = surgescript_objectmanager_spawn_temp(manager, object_name);
     return surgescript_objectmanager_get(manager, handle);
 }
 
