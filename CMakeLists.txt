@@ -334,6 +334,7 @@ SET(GAME_SRCS
   src/scenes/quest.c
   src/scenes/stageselect.c
 
+  src/scripting/util/iterators.c
   src/scripting/scripting.c
   src/scripting/application.c
   src/scripting/surgeengine.c
@@ -464,6 +465,7 @@ SET(GAME_HEADERS
   src/scenes/quest.h
   src/scenes/stageselect.h
 
+  src/scripting/util/iterators.h
   src/scripting/scripting.h
   src/physics/obstacle.h
   src/physics/obstaclemap.h
