@@ -72,7 +72,7 @@ static int get_object_ypos(const enemy_t *object);
 static int get_object_width(const enemy_t *object);
 static int get_object_height(const enemy_t *object);
 
-#define IS_MOVING_BRICK(brick) (brick_behavior(brick) == BRB_CIRCULAR)
+#define IS_MOVING_BRICK(brick) (brick_has_movement_path(brick))
 
 /* public methods */
 void entitymanager_init()

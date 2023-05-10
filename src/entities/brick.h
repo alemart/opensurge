@@ -112,6 +112,8 @@ v2d_t brick_spawnpoint(const brick_t* brk); /* brick spawn point */
 v2d_t brick_size(const brick_t* brk); /* brick size, in pixels */
 void brick_kill(brick_t* brk); /* kills a brick */
 int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
+bool brick_has_movement_path(const brick_t* brk); /* checks if a brick has a movement path */
+bool brick_has_mask(const brick_t* brk); /* checks if a brick has a collision mask */
 
 /* brick utilities */
 int brick_exists(int id); /* does a brick with the given id exist in the brickset? */

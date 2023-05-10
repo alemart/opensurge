@@ -649,9 +649,10 @@ void brick_render_mask(const brick_t *brk, v2d_t camera_position)
 void brick_render_path(const brick_t *brk, v2d_t camera_position)
 {
     v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
+    v2d_t size = brick_size(brk);
     color_t color = color_rgb(255, 0, 0);
-    int w = brick_size(brk).x;
-    int h = brick_size(brk).y;
+    int w = size.x;
+    int h = size.y;
 
     switch(brk->brick_ref->behavior) {
         case BRB_CIRCULAR: {
@@ -815,6 +816,30 @@ void brick_kill(brick_t* brk)
 int brick_is_alive(const brick_t* brk)
 {
     return brk->state != BRS_DEAD;
+}
+
+/*
+ * brick_is_moving()
+ * Checks if a brick has a movement path
+ */
+bool brick_has_movement_path(const brick_t* brk)
+{
+    if(brk->brick_ref != NULL)
+        return brk->brick_ref->behavior == BRB_CIRCULAR || brk->brick_ref->behavior == BRB_PENDULAR;
+    else
+        return false;
+}
+
+/*
+ * brick_has_mask()
+ * Checks if a brick has a collision mask
+ */
+bool brick_has_mask(const brick_t* brk)
+{
+    if(brk->brick_ref != NULL)
+        return brk->brick_ref->mask != NULL;
+    else
+        return false;
 }
 
 /*
