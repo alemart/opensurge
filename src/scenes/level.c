@@ -277,7 +277,6 @@ static void editor_render();
 static bool editor_is_enabled();
 static bool editor_want_to_activate();
 static void editor_update_background();
-static void editor_render_background();
 static void editor_waterline_render(int ycoord, color_t color);
 static void editor_save();
 static void editor_scroll();
@@ -2264,8 +2263,7 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
     renderqueue_begin( camera_get_position() );
 
         /* render background */
-        if(!editor_is_enabled())
-            renderqueue_enqueue_background(backgroundtheme);
+        renderqueue_enqueue_background(backgroundtheme);
 
         /* render bricks */
         if(!editor_is_enabled() && !level_is_in_debug_mode()) {
@@ -3616,14 +3614,11 @@ void editor_render()
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
     
-    /* background */
-    editor_render_background();
+    /* render the level */
+    render_level(major_bricks, major_items, major_enemies);
 
     /* render the grid */
     editor_grid_render();
-
-    /* render level */
-    render_level(major_bricks, major_items, major_enemies);
 
     /* draw editor water line */
     editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
@@ -3746,16 +3741,6 @@ bool editor_want_to_activate()
 void editor_update_background()
 {
     background_update(backgroundtheme);
-}
-
-/*
- * editor_render_background()
- * Renders the background of the level editor
- */
-void editor_render_background()
-{
-    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, EDITOR_UI_COLOR());
-    background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
 }
 
 

@@ -598,11 +598,17 @@ void renderqueue_end()
     if(buffer_size == 0)
         return;
 
+    /* quickly sort the buffer (stable sorting) */
+    merge_sort(sorted_buffer, buffer_size, sizeof(*sorted_buffer), cmp_fun);
+
     /* start reporting */
     REPORT_BEGIN();
     REPORT("Render queue stats");
     REPORT("------------------");
     REPORT("Depth test: % 3s", use_depth_buffer ? "yes" : "no");
+
+    /* clear the screen */
+    al_clear_to_color(al_map_rgb_f(0.0f, 0.0f, 0.0f));
 
     /* use the shader of the render queue */
     if(shader != NULL)
@@ -622,7 +628,6 @@ void renderqueue_end()
         al_set_render_state(ALLEGRO_DEPTH_TEST, 1);
 
         /* clear the depth buffer */
-        /*al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));*/ /* should we clear? */
         al_clear_depth_buffer(1);
 
         /* initialize the z-transform */
@@ -739,7 +744,7 @@ void renderqueue_end()
     /* end of report */
     float savings = 1.0f - (float)draw_calls / (float)buffer_size;
     REPORT("Total     :=%3d", buffer_size);
-    REPORT("Draw calls: %3d <saved %.2f%%>", draw_calls, 100.0f * savings);
+    REPORT("Draw calls: %3d <-%.2f%%>", draw_calls, 100.0f * savings);
     REPORT_END();
 
     /* go back to the default shader set by Allegro */
@@ -764,6 +769,13 @@ void renderqueue_enqueue_brick(brick_t *brick)
         .vtable = &VTABLE[TYPE_BRICK]
     };
 
+    /* clip it out */
+    v2d_t position = brick_position(brick);
+    v2d_t size = brick_size(brick);
+    if(!level_inside_screen(position.x, position.y, size.x, size.y))
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -778,6 +790,17 @@ void renderqueue_enqueue_brick_mask(brick_t *brick)
         .vtable = &VTABLE[TYPE_BRICK_MASK]
     };
 
+    /* no need to render a mask */
+    if(!brick_has_mask(brick))
+        return;
+
+    /* clip it out */
+    v2d_t position = brick_position(brick);
+    v2d_t size = brick_size(brick);
+    if(!level_inside_screen(position.x, position.y, size.x, size.y))
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -792,6 +815,13 @@ void renderqueue_enqueue_brick_debug(brick_t *brick)
         .vtable = &VTABLE[TYPE_BRICK_DEBUG]
     };
 
+    /* clip it out */
+    v2d_t position = brick_position(brick);
+    v2d_t size = brick_size(brick);
+    if(!level_inside_screen(position.x, position.y, size.x, size.y))
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -806,6 +836,17 @@ void renderqueue_enqueue_brick_path(brick_t *brick)
         .vtable = &VTABLE[TYPE_BRICK_PATH]
     };
 
+    /* no need to render a path */
+    if(!brick_has_movement_path(brick))
+        return;
+
+    /* clip it out */
+    v2d_t position = brick_position(brick);
+    v2d_t size = brick_size(brick);
+    if(!level_inside_screen(position.x, position.y, size.x, size.y))
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -1020,49 +1061,20 @@ void enqueue(const renderqueue_entry_t* entry)
     memcpy(e, entry, sizeof(*entry));
     sorted_buffer[buffer_size] = e;
     sorted_indices[buffer_size] = buffer_size;
+    buffer_size++;
 
     /* cache the values of the new entry for purposes of comparison to other entries */
     e->cached.zindex = e->vtable->zindex(e->renderable);
     e->cached.type = e->vtable->type(e->renderable);
     e->cached.ypos = e->vtable->ypos(e->renderable);
     e->cached.is_translucent = e->vtable->is_translucent(e->renderable);
-
-    /*
-       keep the buffer sorted using insertion sort, which is
-       stable, works well with nearly sorted(?) input and is
-       good enough for small arrays
-       
-       at the time of this writing, we can expect arrays of
-       length 100 - 200, approximately, to be sorted on each frame
-
-       is it worthwhile to replace this simple and compact
-       implementation for merge_sort(), which relies on memcpy()?
-       idea for future work: adaptive approach.
-
-       we want stable sorting in order to preserve the z-order of
-       elements that are deemed "equal" by the comparison function
-
-       maybe we can also use heapsort and keep an additional index
-       for stability.
-    */
-    int j = buffer_size - 1;
-    while(j >= 0 && cmp_fun(e, sorted_buffer[j]) < 0) {
-        sorted_buffer[j+1] = sorted_buffer[j];
-        sorted_indices[j+1] = sorted_indices[j];
-        --j;
-    }
-    sorted_buffer[j+1] = e;
-    sorted_indices[j+1] = buffer_size;
-
-    /* done! */
-    buffer_size++;
 }
 
 /* compares two entries of the render queue */
 int cmp_fun(const void* i, const void* j)
 {
-    const renderqueue_entry_t* a = (const renderqueue_entry_t*)i;
-    const renderqueue_entry_t* b = (const renderqueue_entry_t*)j;
+    const renderqueue_entry_t* a = *((const renderqueue_entry_t**)i);
+    const renderqueue_entry_t* b = *((const renderqueue_entry_t**)j);
 
     /* zindex check */
     float za = a->cached.zindex;
@@ -1243,7 +1255,7 @@ bool is_translucent_foreground(renderable_t r) { return false; }
 
 bool is_translucent_water(renderable_t r) { return true; }
 bool is_translucent_ssobject_gizmo(renderable_t r) { return false; }
-bool is_translucent_ssobject_debug(renderable_t r) { return is_translucent_ssobject(r); }
+bool is_translucent_ssobject_debug(renderable_t r) { return false; /*is_translucent_ssobject(r);*/ /* no state changes within SurgeScript */ }
 bool is_translucent_ssobject(renderable_t r)
 {
     if(surgescript_object_has_function(r.ssobject, "get_alpha")) {
