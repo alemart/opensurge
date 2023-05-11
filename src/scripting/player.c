@@ -137,6 +137,8 @@ static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_moveby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* PlayerManager */
 static surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -156,14 +158,19 @@ static surgescript_var_t* fun_manager_call(surgescript_object_t* object, const s
 
 /* internals */
 #define SHOW_COLLIDERS 0 /* set it to 1 to display the colliders */
+
 static const surgescript_heapptr_t NAME_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static const surgescript_heapptr_t INPUT_ADDR = 4;
-static const surgescript_heapptr_t COMPANION_BASE_ADDR = 5; /* must be the last address */
+static const surgescript_heapptr_t MOVEBYDX_ADDR = 5;
+static const surgescript_heapptr_t MOVEBYDY_ADDR = 6;
+static const surgescript_heapptr_t COMPANION_BASE_ADDR = 7; /* must be the last address of Player */
+
 static const surgescript_heapptr_t MANAGER_PLAYERCOUNT_ADDR = 0;
-static const surgescript_heapptr_t MANAGER_PLAYERBASE_ADDR = 1; /* must be the last address */
+static const surgescript_heapptr_t MANAGER_PLAYERBASE_ADDR = 1; /* must be the last address of PlayerManager */
+
 static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
@@ -193,7 +200,7 @@ void scripting_register_player(surgescript_vm_t* vm)
 
     /* read-only properties */
     surgescript_vm_bind(vm, "Player", "get_name", fun_getname, 0);
-    surgescript_vm_bind(vm, "Player", "get_activity", fun_getactivity, 0);
+    surgescript_vm_bind(vm, "Player", "get_activity", fun_getactivity, 0); /* deprecated */
     surgescript_vm_bind(vm, "Player", "get_attacking", fun_getattacking, 0);
     surgescript_vm_bind(vm, "Player", "get_midair", fun_getmidair, 0);
     surgescript_vm_bind(vm, "Player", "get_blinking", fun_getblinking, 0);
@@ -272,6 +279,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "focus", fun_focus, 0);
     surgescript_vm_bind(vm, "Player", "hasFocus", fun_hasfocus, 0);
     surgescript_vm_bind(vm, "Player", "hlock", fun_hlock, 1);
+    surgescript_vm_bind(vm, "Player", "moveBy", fun_moveby, 2);
+    surgescript_vm_bind(vm, "Player", "move", fun_move, 1);
 
     /* animation methods */
     surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
@@ -354,11 +363,15 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(COLLIDER_ADDR == surgescript_heap_malloc(heap));
     ssassert(ANIMATION_ADDR == surgescript_heap_malloc(heap));
     ssassert(INPUT_ADDR == surgescript_heap_malloc(heap));
+    ssassert(MOVEBYDX_ADDR == surgescript_heap_malloc(heap));
+    ssassert(MOVEBYDY_ADDR == surgescript_heap_malloc(heap));
 
     surgescript_var_set_null(surgescript_heap_at(heap, NAME_ADDR));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR), animation);
     surgescript_var_set_null(surgescript_heap_at(heap, INPUT_ADDR));
+    surgescript_var_set_number(surgescript_heap_at(heap, MOVEBYDX_ADDR), 0.0);
+    surgescript_var_set_number(surgescript_heap_at(heap, MOVEBYDY_ADDR), 0.0);
     surgescript_object_set_userdata(object, NULL);
 
     /* spawn the collider */
@@ -516,6 +529,7 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    /* update the player components and pointer */
     update_player(object);
     return NULL;
 }
@@ -523,6 +537,23 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* lateUpdate() */
 surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    player_t* player = get_player(object);
+
+    /* move the player by an offset after the physics update */
+    surgescript_var_t* dx_var = surgescript_heap_at(heap, MOVEBYDX_ADDR);
+    surgescript_var_t* dy_var = surgescript_heap_at(heap, MOVEBYDY_ADDR);
+    double dx = surgescript_var_get_number(dx_var);
+    double dy = surgescript_var_get_number(dy_var);
+    surgescript_var_set_number(dx_var, 0.0);
+    surgescript_var_set_number(dy_var, 0.0);
+
+    if(player != NULL) {
+        player->actor->position.x += dx;
+        player->actor->position.y += dy;
+    }
+
+    /* update the player components and pointer */
     update_player(object);
     return NULL;
 }
@@ -562,7 +593,7 @@ surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_v
         return NULL;
 }
 
-/* get a string representing the state of the player */
+/* (deprecated) get a string representing the state of the player */
 surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
@@ -1466,6 +1497,61 @@ surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescript_var
     return NULL;
 }
 
+/* move the player by a (dx,dy) offset after the physics update */
+surgescript_var_t* fun_moveby(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* dx_var = surgescript_heap_at(heap, MOVEBYDX_ADDR);
+    surgescript_var_t* dy_var = surgescript_heap_at(heap, MOVEBYDY_ADDR);
+    double dx = surgescript_var_get_number(dx_var);
+    double dy = surgescript_var_get_number(dy_var);
+    double new_dx = surgescript_var_get_number(param[0]);
+    double new_dy = surgescript_var_get_number(param[1]);
+
+    /* We'll consider all calls to player.moveBy() in the current
+       framestep and LATER move the player by the resulting vector.
+       This method is analogous to player.transform.translateBy(),
+       which moves the player before the physics update (unless
+       it's called in lateUpdate()) */
+    dx += new_dx;
+    dy += new_dy;
+
+    /* store the updated vector */
+    surgescript_var_set_number(dx_var, dx);
+    surgescript_var_set_number(dy_var, dy);
+    return NULL;
+}
+
+/* move the player by a Vector2 offset after the physics update */
+surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* dx_var = surgescript_heap_at(heap, MOVEBYDX_ADDR);
+    surgescript_var_t* dy_var = surgescript_heap_at(heap, MOVEBYDY_ADDR);
+    double dx = surgescript_var_get_number(dx_var);
+    double dy = surgescript_var_get_number(dy_var);
+    double new_dx, new_dy;
+
+    /* read the offset vector */
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t v2_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2_handle);
+    scripting_vector2_read(v2, &new_dx, &new_dy);
+
+    /* We'll consider all calls to player.move() in the current
+       framestep and LATER move the player by the resulting vector.
+       This method is analogous to player.transform.translate(),
+       which moves the player before the physics update (unless
+       it's called in lateUpdate()) */
+    dx += new_dx;
+    dy += new_dy;
+
+    /* store the updated vector */
+    surgescript_var_set_number(dx_var, dx);
+    surgescript_var_set_number(dy_var, dy);
+    return NULL;
+}
+
 /* render gizmos */
 surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1512,7 +1598,7 @@ surgescript_object_t* get_collider(surgescript_object_t* object)
     return surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(col));
 }
 
-/* updates the player pointer */
+/* updates the player pointer and components */
 void update_player(surgescript_object_t* object)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
