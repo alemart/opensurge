@@ -67,7 +67,7 @@ struct collisionmanager_t
 #define COLLIDER_FLAG_NOTIFYONCOLLISION     0x2
 #define COLLIDER_FLAG_NOTIFYONOVERLAP       0x4
 #define COLLIDER_FLAG_ISDISABLED            0x8
-#define COLLIDER_COLOR()                    (color_rgb(255, 255, 0))
+#define COLLIDER_COLOR(enabled)             (color_rgba(255, 255, 0, (enabled) ? 255 : 127))
 static const surgescript_heapptr_t CENTER_ADDR = 0;
 static const surgescript_heapptr_t ANCHOR_ADDR = 1;
 static inline collider_t* safe_get_collider(surgescript_object_t* object);
@@ -736,7 +736,7 @@ surgescript_var_t* fun_collisionbox_onrendergizmos(surgescript_object_t* object,
     boxcollider_t* collider = surgescript_object_userdata(object);
 
     if(scripting_util_is_object_inside_screen(object)) {
-        color_t color = COLLIDER_COLOR();
+        color_t color = COLLIDER_COLOR(!(collider->collider.flags & COLLIDER_FLAG_ISDISABLED));
         /*v2d_t center = ((collider_t*)collider)->worldpos;*/ /* this cached value may become outdated if an ancestor object changes its position in lateUpdate() */
         v2d_t center = scripting_util_world_position(object);
         v2d_t camera = scripting_util_object_camera(object);
@@ -960,7 +960,7 @@ surgescript_var_t* fun_collisionball_onrendergizmos(surgescript_object_t* object
         double r = collider->radius;
         center.x -= (camera.x - half_screen.x);
         center.y -= (camera.y - half_screen.y);
-        image_ellipse(center.x, center.y, r, r, COLLIDER_COLOR());
+        image_ellipse(center.x, center.y, r, r, COLLIDER_COLOR(!(collider->collider.flags & COLLIDER_FLAG_ISDISABLED)));
     }
 
     return NULL;
