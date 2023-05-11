@@ -77,7 +77,7 @@ object "Elevator" is "entity", "gimmick"
         for(i = 0; i < Player.count; i++) {
             player = Player[i];
             if(collider.collidesWith(player.collider))
-                player.transform.translateBy(0, dy);
+                player.moveBy(0, dy);
         }
     }
 
