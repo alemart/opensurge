@@ -110,7 +110,7 @@ object ".compat_switch" is "private", "entity"
         closestDistance = Math.infinity;
         position = transform.position;
 
-        entities = Level.children(entityName);
+        entities = Level.findEntities(entityName);
         foreach(entity in entities) {
             distance = position.distanceTo(entityPosition(entity));
             if(distance < closestDistance) {

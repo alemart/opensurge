@@ -96,7 +96,7 @@ object "Elevator" is "entity", "gimmick"
     fun setup()
     {
         // setup the elevator
-        cables = Level.children("Elevator Cable");
+        cables = Level.findEntities("Elevator Cable");
         sign = shouldMoveUp() ? -1.0 : 1.0;
     }
 
