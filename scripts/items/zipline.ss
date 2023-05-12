@@ -34,15 +34,17 @@ object "Zipline Grabber" is "entity", "gimmick"
 
     state "main"
     {
-        // setup
-        actor.anim = anim;
-        actor.zindex = 0.5;
-        changeZiplinesAnim(anim);
         state = "idle";
     }
 
     state "idle"
     {
+    }
+
+    state "prepare to zip"
+    {
+        // we let onOverlap() find a zipline
+        state = "zipping";
     }
 
     state "zipping"
@@ -80,14 +82,21 @@ object "Zipline Grabber" is "entity", "gimmick"
         transform.translateBy(0, speed * Time.delta);
     }
 
+    fun constructor()
+    {
+        actor.anim = anim;
+        actor.zindex = 0.5;
+        changeZiplinesAnim(anim);
+    }
+
     fun startZipping(player)
     {
         if(state == "idle") {
             lockPlayer(player);
-            zipline = null;
             grab.play();
             zipSound.play();
-            state = "zipping";
+            zipline = null;
+            state = "prepare to zip";
         }
     }
 
@@ -131,11 +140,11 @@ object "Zipline Grabber" is "entity", "gimmick"
 
     fun changeZiplinesAnim(anim)
     {
-        rzips = Level.children("Zipline Right");
+        rzips = Level.findEntities("Zipline Right");
         foreach(zipline in rzips)
             zipline.setAnim(anim);
 
-        lzips = Level.children("Zipline Left");
+        lzips = Level.findEntities("Zipline Left");
         foreach(zipline in lzips)
             zipline.setAnim(anim);
     }
