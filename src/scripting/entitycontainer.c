@@ -140,8 +140,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
             /* reset the entity */
             if(
                 entitymanager_has_entity_info(entity_manager, entity_handle) &&
-                entitymanager_is_entity_persistent(entity_manager, entity_handle) &&
-                !entitymanager_is_entity_sleeping(entity_manager, entity_handle)
+                entitymanager_is_entity_persistent(entity_manager, entity_handle)
             ) {
 
                 v2d_t spawn_point = entitymanager_get_entity_spawn_point(entity_manager, entity_handle);
@@ -150,7 +149,6 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
                     /* move it back to its spawn point */
                     surgescript_transform_t* transform = surgescript_object_transform(entity);
                     surgescript_transform_setposition2d(transform, spawn_point.x, spawn_point.y);
-                    /* update roi flag? */
 
                     /* notify the object */
                     notify_entity(entity, "onReset");
