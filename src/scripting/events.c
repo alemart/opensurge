@@ -74,10 +74,10 @@ object 'EntityEvent' is 'event' \n\
             else \n\
                 Console.print(this.__name + ': undefined function ' + method); \n\
         } \n\
-        else if((entity = Level.child(target)) !== null) { " /* select by entity name */ " \n\
+        else if((entity = Level.findEntity(target)) !== null) { " /* select by entity name */ " \n\
             if(entity.hasFunction(method)) { \n\
                 if(entity.__arity(method) == params.length) { \n\
-                    entities = Level.children(target); \n\
+                    entities = Level.findEntities(target); \n\
                     length = entities.length; \n\
                     for(i = 0; i < length; i++) { \n\
                         entity = entities[i]; \n\
