@@ -72,6 +72,7 @@ static const surgescript_heapptr_t CENTER_ADDR = 0;
 static const surgescript_heapptr_t ANCHOR_ADDR = 1;
 #define unsafe_get_collider(object) ((collider_t*)surgescript_object_userdata(object))
 static inline collider_t* safe_get_collider(surgescript_object_t* object);
+static inline bool is_collider(const surgescript_object_t* object);
 static inline bool quick_bounding_box_test(const collider_t* a, const collider_t* b);
 static inline void quickly_get_bounding_box(const collider_t* collider, double* left, double* top, double* right, double* bottom);
 
@@ -194,13 +195,20 @@ void scripting_register_collisions(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "CollisionManager", "__notify", fun_manager_notify, 1);
 }
 
+/* checks if an object is a collider */
+bool is_collider(const surgescript_object_t* object)
+{
+    /*return surgescript_object_has_tag(object, "collider"); // unreliable */
+    const char* name = surgescript_object_name(object);
+    return (0 == strcmp(name, "CollisionBox") || 0 == strcmp(name, "CollisionBall"));
+}
+
 /* Returns the collider structure if the given object is a collider,
    or a crash if it isn't */
 collider_t* safe_get_collider(surgescript_object_t* object)
 {
-    /*if(!surgescript_object_has_tag(object, "collider")) { // unreliable */
-    const char* name = surgescript_object_name(object);
-    if(!(0 == strcmp(name, "CollisionBox") || 0 == strcmp(name, "CollisionBall"))) {
+    if(!is_collider(object)) {
+        const char* name = surgescript_object_name(object);
         scripting_error(object, "\"%s\" isn't a collider", name);
         return NULL;
     }
@@ -329,9 +337,15 @@ surgescript_var_t* fun_manager_destroy(surgescript_object_t* object, const surge
 /* notify: I'm told that a collider is available at this moment (game step) */
 surgescript_var_t* fun_manager_notify(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t collider_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* collider = surgescript_objectmanager_get(manager, collider_handle);
     collisionmanager_t* colmgr = surgescript_object_userdata(object);
-    surgescript_objecthandle_t collider = surgescript_var_get_objecthandle(param[0]);
-    darray_push(colmgr->colliders, collider);
+
+    /* validate the input */
+    if(is_collider(collider))
+        darray_push(colmgr->colliders, collider_handle);
+
     return NULL;
 }
 
