@@ -33,10 +33,9 @@ object "Open Contribute web page"
 
     fun call()
     {
-        //if(SurgeTheRabbit.isGooglePlayBuild())
-        //    return;
-
-        if(Platform.isAndroid)
+        if(!SurgeTheRabbit.canAcceptDonations())
+            return;
+        else if(Platform.isAndroid)
             return;
 
         asked = Prefs[key] || false;

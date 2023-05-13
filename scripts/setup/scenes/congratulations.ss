@@ -22,7 +22,7 @@ object "Congratulations"
     text = spawn("CongratulationsText");
     title = spawn("CongratulationsTitle");
     menu = spawn("MenuBuilder").at(Screen.width / 2, Screen.height - 36).withButtons(
-        !SurgeTheRabbit.isGooglePlayBuild() ?
+        SurgeTheRabbit.canAcceptDonations() ?
             ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_DONATE", "$CONGRATULATIONS_BACK" ] :
             ["$CONGRATULATIONS_SHARE", "$CONGRATULATIONS_BACK" ]
     ).withSpacing(211).withAxisAngle(0).build();
@@ -66,7 +66,7 @@ object "Congratulations"
         }
         else if(buttonIndex == 1) {
             // donate or go back
-            if(!SurgeTheRabbit.isGooglePlayBuild())
+            if(SurgeTheRabbit.canAcceptDonations())
                 SurgeTheRabbit.donate();
 
             fadeTo("back");

@@ -15,11 +15,8 @@ object "SurgeTheRabbit"
 
     fun donate()
     {
-        if(isGooglePlayBuild()) {
-            /* adding an external donation page to an Android app published
-               in the Google Play Store is a violation of their policy */
+        if(!canAcceptDonations())
             return;
-        }
 
         url = website + "/contribute?v=" + SurgeEngine.version;
         Web.launchURL(url);
@@ -51,5 +48,12 @@ object "SurgeTheRabbit"
     fun isGooglePlayBuild()
     {
         return SurgeEngine.version.indexOf("googleplay") >= 0;
+    }
+
+    fun canAcceptDonations()
+    {
+        /* adding an external donation page to an Android app published
+           in the Google Play Store is a violation of their policy */
+        return !isGooglePlayBuild();
     }
 }

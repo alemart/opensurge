@@ -288,9 +288,7 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
             spawn("Title Screen - Menu Item - Share").setOffset(Vector2.right.scaledBy(offset += spacing))
         );
 
-        if(!SurgeTheRabbit.isGooglePlayBuild()) {
-            /* adding an external donation page to an Android app published
-               in the Google Play Store is a violation of their policy */
+        if(SurgeTheRabbit.canAcceptDonations()) {
             items.push(
                 spawn("Title Screen - Menu Item - Donate").setOffset(Vector2.right.scaledBy(offset += spacing))
             );

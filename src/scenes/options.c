@@ -79,6 +79,11 @@ static group_t *create_grouptree();
 #define IS_GOOGLEPLAY_BUILD() 0
 #endif
 
+/* check if we can accept donations in this build
+   adding an external donation page to an Android app published
+   in the Google Play Store is a violation of their policy */
+#define CAN_ACCEPT_DONATIONS() (!(IS_GOOGLEPLAY_BUILD()))
+
 /* deprecated? */
 #define ENABLE_RESOLUTION 0
 
@@ -1126,11 +1131,8 @@ group_t *create_grouptree()
     group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_credits_create());
     group_addchild(game, group_website_create());
-    if(!IS_GOOGLEPLAY_BUILD()) {
-        /* adding an external donation page to an Android app published
-           in the Google Play Store is a violation of their policy */
+    if(CAN_ACCEPT_DONATIONS())
         group_addchild(game, group_donate_create());
-    }
 
     /* section: root */
     root = group_root_create();
