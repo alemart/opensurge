@@ -131,15 +131,10 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
         }
         else if(!surgescript_object_has_tag(entity, "disposable")) {
 
-            /* the entity is no longer active */
-            surgescript_object_set_active(entity, false);
-
-            /* put it to sleep */
-            entitymanager_set_entity_sleeping(entity_manager, entity_handle, true);
-
             /* reset the entity */
             if(
-                entitymanager_has_entity_info(entity_manager, entity_handle) &&
+                /*entitymanager_has_entity_info(entity_manager, entity_handle) &&*/ /* <-- no need */
+                !entitymanager_is_entity_sleeping(entity_manager, entity_handle) &&
                 entitymanager_is_entity_persistent(entity_manager, entity_handle)
             ) {
 
@@ -153,9 +148,15 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
                     /* notify the object */
                     notify_entity(entity, "onReset");
 
+                    /* put it to sleep */
+                    entitymanager_set_entity_sleeping(entity_manager, entity_handle, true);
+
                 }
 
             }
+
+            /* the entity is no longer active */
+            surgescript_object_set_active(entity, false);
 
         }
         else {
@@ -321,7 +322,7 @@ surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_
     surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
 
-    /* we guarantee that only unawake and attached entities are children of this container */
+    /* we guarantee that only unawake and non-detached entities are children of this container */
     if(surgescript_object_has_tag(entity, "entity") && !(
         surgescript_object_has_tag(entity, "awake") ||
         surgescript_object_has_tag(entity, "detached")
@@ -329,6 +330,12 @@ surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_
 
         /* reparent */
         surgescript_object_reparent(entity, this_handle, 0);
+
+        /* inactivate (just in case) */
+        surgescript_object_t* entity_manager = get_entity_manager(object);
+        if(!is_entity_inside_roi(entity_manager, entity)) {
+            surgescript_object_set_active(entity, false);
+        }
 
     }
 
@@ -445,8 +452,10 @@ surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescrip
         /* the entity must be active */
         surgescript_object_set_active(entity, true);
 
+#if 0 /* this entity should never sleep... */
         /* the entity is not sleeping */
         entitymanager_set_entity_sleeping(entity_manager, entity_handle, false);
+#endif
 
         /* does this entity implement lateUpdate() ? */
         if(surgescript_object_has_function(entity, "lateUpdate")) {

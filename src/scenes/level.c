@@ -255,8 +255,6 @@ static uint64_t entity_info_id(const surgescript_object_t* object);
 static void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id);
 static bool entity_info_is_persistent(const surgescript_object_t* object);
 static void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent);
-/*static bool entity_info_is_sleeping(const surgescript_object_t* object);
-static void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping);*/
 
 /* debug mode */
 #define debug_mode_want_to_activate() editorcmd_is_triggered(editor_cmd, "enter-debug-mode")
@@ -2273,7 +2271,9 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
         else {
             for(bnode=major_bricks; bnode; bnode=bnode->next) {
                 renderqueue_enqueue_brick_debug(bnode->data);
+                #if !defined(__ANDROID__)
                 renderqueue_enqueue_brick_path(bnode->data);
+                #endif
             }
         }
 
@@ -3040,18 +3040,6 @@ void entity_info_set_persistent(const surgescript_object_t* object, bool is_pers
 {
     entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
 }
-
-/*
-bool entity_info_is_sleeping(const surgescript_object_t* object)
-{
-    return entitymanager_is_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object));
-}
-
-void entity_info_set_sleeping(const surgescript_object_t* object, bool is_sleeping)
-{
-    entitymanager_set_entity_sleeping(entitymanager_ssobject(), surgescript_object_handle(object), is_sleeping);
-}
-*/
 
 
 

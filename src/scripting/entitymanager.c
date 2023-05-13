@@ -38,7 +38,7 @@ struct entityinfo_t {
     uint64_t id; /* uniquely identifies the entity in the Level */
     v2d_t spawn_point; /* spawn point */
     bool is_persistent; /* usually placed via level editor; will be saved in the .lev file */
-    bool is_sleeping; /* inactive? */
+    bool is_sleeping; /* sleeping / inactive? */
 };
 
 typedef struct entitydb_t entitydb_t;
@@ -695,7 +695,7 @@ v2d_t entitymanager_get_entity_spawn_point(surgescript_object_t* entity_manager,
 bool entitymanager_is_entity_persistent(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle)
 {
     entityinfo_t* info = quick_lookup(entity_manager, entity_handle);
-    return info != NULL ? info->is_persistent : false;
+    return info != NULL ? info->is_persistent : false; /* return false if the entity info is missing */
 }
 
 /* change the persistent flag of an entity */
