@@ -63,6 +63,7 @@ enum brickstate_t {
 struct brickdata_t {
     spriteinfo_t *data; /* this is not stored in the main hash */
     const image_t *image; /* pointer to a brick image in the animation */
+    int image_width, image_height; /* cached image size */
     char* maskfile; /* collision mask file (may be NULL) */
     collisionmask_t *mask; /* collision mask (may be NULL) */
     image_t* maskimg; /* mask image for rendering (may be NULL) */
@@ -794,10 +795,7 @@ v2d_t brick_spawnpoint(const brick_t* brk)
  */
 v2d_t brick_size(const brick_t* brk)
 {
-    if(brk->brick_ref && brk->brick_ref->image)
-        return v2d_new(image_width(brk->brick_ref->image), image_height(brk->brick_ref->image));
-    else
-        return v2d_new(0, 0);
+    return brk->brick_ref ? v2d_new(brk->brick_ref->image_width, brk->brick_ref->image_height) : v2d_new(0, 0);
 }
 
 /*
@@ -1080,11 +1078,12 @@ bool can_be_clipped_out(const brick_t* brick, v2d_t topleft)
 /* new brick theme */
 brickdata_t* brickdata_new()
 {
-    int i;
     brickdata_t *obj = mallocx(sizeof *obj);
 
     obj->data = NULL;
     obj->image = NULL;
+    obj->image_width = 0;
+    obj->image_height = 0;
     obj->mask = NULL;
     obj->maskfile = NULL;
     obj->maskimg = NULL;
@@ -1092,7 +1091,7 @@ brickdata_t* brickdata_new()
     obj->behavior = BRB_DEFAULT;
     obj->zindex = 0.5f;
 
-    for(i=0; i<BRICKBEHAVIOR_MAXARGS; i++)
+    for(int i = 0; i < BRICKBEHAVIOR_MAXARGS; i++)
         obj->behavior_arg[i] = 0.0f;
 
     return obj;
@@ -1205,6 +1204,10 @@ int traverse(const parsetree_statement_t *stmt)
         brickdata[brick_id]->image = brickdata[brick_id]->data->frame_data[
             brickdata[brick_id]->data->animation_data[0]->data[0]
         ];
+
+        /* cache preview image size */
+        brickdata[brick_id]->image_width = image_width(brickdata[brick_id]->image);
+        brickdata[brick_id]->image_height = image_height(brickdata[brick_id]->image);
     }
     else
         fatal_error("Can't load bricks: unknown identifier '%s'", identifier);
