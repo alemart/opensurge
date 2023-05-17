@@ -28,6 +28,7 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_tostring(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -54,6 +55,7 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityContainer", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "EntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "EntityContainer", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "EntityContainer", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "EntityContainer", "reparent", fun_reparent, 1);
     surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 2);
     surgescript_vm_bind(vm, "EntityContainer", "selectActiveEntities", fun_selectactiveentities, 2);
@@ -65,6 +67,7 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AwakeEntityContainer", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "reparent", fun_awake_reparent, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
@@ -312,6 +315,16 @@ surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_v
 {
     /* disabled */
     return NULL;
+}
+
+/* toString function */
+surgescript_var_t* fun_tostring(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objecthandle_t handle = surgescript_object_handle(object);
+    char buf[32];
+
+    snprintf(buf, sizeof(buf), "[EntityContainer:%x]", handle);
+    return surgescript_var_set_string(surgescript_var_create(), buf);
 }
 
 /* make this container a parent of an entity */
