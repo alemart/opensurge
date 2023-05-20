@@ -93,7 +93,7 @@ extern void entitymanager_set_entity_persistent(surgescript_object_t* entity_man
 extern bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 extern void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
 extern bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t position);
-extern arrayiterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
-extern ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
+extern iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
+extern iterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
 
 #endif

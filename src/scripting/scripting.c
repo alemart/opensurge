@@ -59,6 +59,7 @@ extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
 extern void scripting_register_entitycontainer(surgescript_vm_t* vm);
 extern void scripting_register_entitymanager(surgescript_vm_t* vm);
+extern void scripting_register_entitytree(surgescript_vm_t* vm);
 extern void scripting_register_events(surgescript_vm_t* vm);
 extern void scripting_register_input(surgescript_vm_t* vm);
 extern void scripting_register_lang(surgescript_vm_t* vm);
@@ -415,6 +416,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_console(vm);
     scripting_register_entitycontainer(vm);
     scripting_register_entitymanager(vm);
+    scripting_register_entitytree(vm);
     scripting_register_events(vm);
     scripting_register_input(vm);
     scripting_register_lang(vm);

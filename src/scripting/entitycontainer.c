@@ -31,6 +31,7 @@ static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surges
 static surgescript_var_t* fun_tostring(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_bubbleupentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -57,6 +58,7 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "EntityContainer", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "EntityContainer", "reparent", fun_reparent, 1);
+    surgescript_vm_bind(vm, "EntityContainer", "bubbleUpEntities", fun_bubbleupentities, 1);
     surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 2);
     surgescript_vm_bind(vm, "EntityContainer", "selectActiveEntities", fun_selectactiveentities, 2);
     surgescript_vm_bind(vm, "EntityContainer", "notifyEntities", fun_notifyentities, 1);
@@ -69,6 +71,7 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AwakeEntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "reparent", fun_awake_reparent, 1);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "bubbleUpEntities", fun_bubbleupentities, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "notifyEntities", fun_notifyentities, 1);
@@ -353,6 +356,40 @@ surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_
     }
 
     /* done */
+    return NULL;
+}
+
+/* given a sector of an EntityTree, call sector.bubbleUp(entity) for each entity stored in this container */
+surgescript_var_t* fun_bubbleupentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t sector_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* sector = surgescript_objectmanager_get(manager, sector_handle);
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    /* validity check */
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+    ssassert(sector_handle == parent_handle);
+    /*ssassert(0 == strcmp(surgescript_object_name(sector), "EntityTreeLeaf"));*/
+
+    /* for each entity */
+    int child_count = surgescript_object_child_count(object);
+    for(int i = 0; i < child_count; i++) {
+        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
+        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+        /* skip entity? */
+        if(surgescript_object_is_killed(entity))
+            continue;
+
+        /* call sector.bubbleUp(entity) */
+        surgescript_var_set_objecthandle(arg, entity_handle);
+        surgescript_object_call_function(sector, "bubbleUp", args, 1, NULL);
+    }
+
+    /* done */
+    surgescript_var_destroy(arg);
     return NULL;
 }
 
