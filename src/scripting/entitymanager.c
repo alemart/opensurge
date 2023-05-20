@@ -24,6 +24,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
+#include "../core/logfile.h"
 #include "../core/v2d.h"
 #include "../core/util.h"
 #include "../core/stringutil.h"
@@ -110,7 +111,7 @@ static const surgescript_heapptr_t UNAWAKEENTITYCONTAINERARRAY_ADDR = 2;
 static const surgescript_heapptr_t ENTITYTREE_ADDR = 3;
 
 /* helpers */
-#define WANT_SPACE_PARTITIONING         0 /* whether or not to optimize unawake entities with space partitioning */
+#define WANT_SPACE_PARTITIONING         1 /* whether or not to optimize unawake entities with space partitioning */
 #define generate_entity_id()            (random64() & UINT64_C(0xFFFFFFFF)) /* in Open Surge 0.6.0.x and 0.5.x, we used all 64 bits */
 #define get_db(entity_manager)          ((entitydb_t*)surgescript_object_userdata(entity_manager))
 #define get_info(db, entity_handle)     ((entityinfo_t*)fasthash_get((db)->info, (entity_handle)))
@@ -603,6 +604,11 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
     surgescript_object_traverse_tree(awake_container, surgescript_object_update);
 
 #if WANT_SPACE_PARTITIONING
+    /* get the entity tree */
+    surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
+    surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
+    surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
+
     /* clear the unawake entity container array */
     surgescript_var_t* unawake_container_array_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR);
     surgescript_objecthandle_t unawake_container_array_handle = surgescript_var_get_objecthandle(unawake_container_array_var);
@@ -610,11 +616,27 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
 
     surgescript_object_call_function(unawake_container_array, "clear", NULL, 0, NULL);
 
-    /* update the entity tree */
-    surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
-    surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
-    surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
+    /* update the size of the world */
+    v2d_t world_size = level_size();
+    surgescript_var_t* world_width_var = surgescript_var_set_number(surgescript_var_create(), world_size.x);
+    surgescript_var_t* world_height_var = surgescript_var_set_number(surgescript_var_create(), world_size.y);
+    surgescript_var_t* world_size_has_changed = surgescript_var_create();
 
+    const surgescript_var_t* world_size_args[] = { world_width_var, world_height_var };
+    surgescript_object_call_function(entity_tree, "updateWorldSize", world_size_args, 2, world_size_has_changed);
+
+    if(surgescript_var_get_bool(world_size_has_changed)) {
+        /* if the world size has changed, then we must
+           relocate all entities of all containers */
+        logfile_message("EntityManager: world size has changed. Relocating all entities...");
+        foreach_unawake_container(object, "bubbleUpEntities", NULL, 0);
+    }
+
+    surgescript_var_destroy(world_size_has_changed);
+    surgescript_var_destroy(world_height_var);
+    surgescript_var_destroy(world_width_var);
+
+    /* update the entity tree */
     surgescript_var_t* output_array_var = surgescript_var_clone(unawake_container_array_var);
     surgescript_var_t* top_var = surgescript_var_set_number(surgescript_var_create(), db->roi.top);
     surgescript_var_t* left_var = surgescript_var_set_number(surgescript_var_create(), db->roi.left);
@@ -629,6 +651,17 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
     surgescript_var_destroy(left_var);
     surgescript_var_destroy(top_var);
     surgescript_var_destroy(output_array_var);
+
+    /* bubble up entities */
+    iterator_t* it = iterator_create_from_surgescript_array(unawake_container_array);
+    while(iterator_has_next(it)) {
+        surgescript_var_t** unawake_container_var = iterator_next(it);
+        surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(*unawake_container_var);
+        surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
+
+        surgescript_object_call_function(unawake_container, "bubbleUpEntities", NULL, 0, NULL);
+    }
+    iterator_destroy(it);
 #else
     /* update the unawake container */
     surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);

@@ -672,10 +672,11 @@ surgescript_var_t* fun_leaf_updateworldsize(surgescript_object_t* object, const 
     sector_t* sector = unsafe_get_sector(object);
 
     /* update world size */
-    sector_update_rect(sector, world_width, world_height);
+    if(!sector_update_rect(sector, world_width, world_height))
+        return surgescript_var_set_bool(surgescript_var_create(), false);
 
     /* done */
-    return NULL;
+    return surgescript_var_set_bool(surgescript_var_create(), true);
 }
 
 /* non-leaf-variant of update world size */
@@ -689,7 +690,7 @@ surgescript_var_t* fun_updateworldsize(surgescript_object_t* object, const surge
 
     /* update world size */
     if(!sector_update_rect(sector, world_width, world_height))
-        return NULL; /* no change */
+        return surgescript_var_set_bool(surgescript_var_create(), false); /* no change; return quickly */
 
     /* recurse on each allocated subsector */
     for(int j = 0; j < 4; j++) {
@@ -704,7 +705,7 @@ surgescript_var_t* fun_updateworldsize(surgescript_object_t* object, const surge
     }
 
     /* done */
-    return NULL;
+    return surgescript_var_set_bool(surgescript_var_create(), true);
 }
 
 /* leaf-variant of bubble up */
@@ -776,7 +777,6 @@ surgescript_var_t* fun_leaf_bubbledown(surgescript_object_t* object, const surge
     /* get the entity */
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(param[0]);
-    sector_t* sector = unsafe_get_sector(object);
 
     /* get the entity container of this leaf sector */
     surgescript_heap_t* heap = surgescript_object_heap(object);
@@ -896,11 +896,8 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
 surgescript_var_t* fun_leaf_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t sector_handle = surgescript_object_handle(object);
     surgescript_objecthandle_t array_handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* array = surgescript_objectmanager_get(manager, array_handle);
-    surgescript_var_t* arg = surgescript_var_create();
-    const surgescript_var_t* args[] = { arg };
 
     /* get the entity container of this leaf sector */
     surgescript_heap_t* heap = surgescript_object_heap(object);
@@ -911,16 +908,16 @@ surgescript_var_t* fun_leaf_update(surgescript_object_t* object, const surgescri
     /* update the entities */
     surgescript_object_traverse_tree(container, surgescript_object_update); /* the ROI test is done in the container */
 
-    /* bubble up the entities */
-    surgescript_var_set_objecthandle(arg, sector_handle);
-    surgescript_object_call_function(container, "bubbleUpEntities", args, 1, NULL);
-
     /* add the entity container of this leaf sector to the output array */
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
     surgescript_var_set_objecthandle(arg, container_handle);
     surgescript_object_call_function(array, "push", args, 1, NULL);
 
-    /* done */
     surgescript_var_destroy(arg);
+
+    /* done */
     return NULL;
 }
 
@@ -1046,16 +1043,16 @@ sector_t* sector_ctor(int index, int world_width, int world_height)
     sector->is_leaf = is_leaf;
     sector->vt = is_leaf ? &LEAF_VTABLE : &NONLEAF_VTABLE;
 
-    sector->cached_world_width = world_width;
-    sector->cached_world_height = world_height;
-    sector->cached_rect = find_sector_rect(sector->addr, world_width, world_height);
+    sector->cached_world_width = 0;
+    sector->cached_world_height = 0;
+    sector->cached_rect = (sectorrect_t){ 0, 0, 0, 0 };
 
     if(!is_leaf) {
         for(int j = 0; j < 4; j++) {
             int child_index = 1 + 4 * index + j;
             sector->child[j].index = child_index;
             sector->child[j].addr = find_sector_address(child_index);
-            sector->child[j].cached_rect = find_sector_rect(sector->child[j].addr, world_width, world_height);
+            sector->child[j].cached_rect = (sectorrect_t){ 0, 0, 0, 0 };
         }
     }
     else {
@@ -1067,6 +1064,7 @@ sector_t* sector_ctor(int index, int world_width, int world_height)
         }
     }
 
+    sector_update_rect(sector, world_width, world_height);
     return sector;
 }
 
@@ -1078,14 +1076,29 @@ sector_t* sector_dtor(sector_t* sector)
 
 bool sector_update_rect(sector_t* sector, int world_width, int world_height)
 {
+    /* is the world too small? */
+    const int min_world_width = max(1 << TREE_HEIGHT, MIN_WORLD_WIDTH);
+    const int min_world_height = max(1 << TREE_HEIGHT, MIN_WORLD_HEIGHT);
+
+    if(world_width < min_world_width)
+        world_width = min_world_width;
+    if(world_height < min_world_height)
+        world_height = min_world_height;
+
     /* update only if needed */
     if(world_width != sector->cached_world_width || world_height != sector->cached_world_height) {
         sector->cached_world_width = world_width;
         sector->cached_world_height = world_height;
         sector->cached_rect = find_sector_rect(sector->addr, world_width, world_height);
 
-        for(int j = 0; j < 4; j++)
-            sector->child[j].cached_rect = find_sector_rect(sector->child[j].addr, world_width, world_height);
+        if(!is_leaf_sector(sector->index)) { /* is this test really needed? */
+            for(int j = 0; j < 4; j++)
+                sector->child[j].cached_rect = find_sector_rect(sector->child[j].addr, world_width, world_height);
+        }
+        else {
+            for(int j = 0; j < 4; j++)
+                sector->child[j].cached_rect = sector->cached_rect;
+        }
 
         return true;
     }
