@@ -427,13 +427,6 @@
 #include "scripting.h"
 #include "../core/util.h"
 
-typedef struct sector_t sector_t;
-typedef struct sectoraddr_t sectoraddr_t;
-typedef struct sectorrect_t sectorrect_t;
-typedef struct sectorvtable_t sectorvtable_t;
-typedef enum sectorquadrant_t sectorquadrant_t;
-typedef surgescript_var_t* (*sectorfun_t)(surgescript_object_t*,const surgescript_var_t**,int);
-
 /* the height of the quaternary tree - must be greater than zero
    the number of nodes in the tree grows exponentially (we allocate lazily) */
 #define TREE_HEIGHT 5 /* log2(W / w); W = 32768 (max_level_width), w = 1024 (~roi_width) */
@@ -442,10 +435,26 @@ typedef surgescript_var_t* (*sectorfun_t)(surgescript_object_t*,const surgescrip
 #define MIN_WORLD_WIDTH 8192 /* 2:1 ratio; 256x128 leaf area sector with H = 5; think about disposable entities */
 #define MIN_WORLD_HEIGHT 4096
 
+/* validate minimum required size for space partitioning */
+#if (MIN_WORLD_WIDTH) < (1 << (TREE_HEIGHT)) || (MIN_WORLD_HEIGHT) < (1 << (TREE_HEIGHT))
+#error Invalid MIN_WORLD_WIDTH / MIN_WORLD_HEIGHT
+#endif
+
 /* default world size */
 #define DEFAULT_WORLD_WIDTH 32768 /* 2:1 ratio */
 #define DEFAULT_WORLD_HEIGHT 16384 /* water at y ~ 10,000 */
 
+
+
+/* types & utilities */
+typedef struct sector_t sector_t;
+typedef struct sectoraddr_t sectoraddr_t;
+typedef struct sectorrect_t sectorrect_t;
+typedef struct sectorvtable_t sectorvtable_t;
+typedef enum sectorquadrant_t sectorquadrant_t;
+typedef surgescript_var_t* (*sectorfun_t)(surgescript_object_t*,const surgescript_var_t**,int);
+
+/* sector quadrant */
 enum sectorquadrant_t
 {
     TOPLEFT = 0,
@@ -454,6 +463,7 @@ enum sectorquadrant_t
     BOTTOMRIGHT = 3
 };
 
+/* sector rectangle */
 struct sectorrect_t
 {
     /* coordinates are inclusive */
@@ -463,12 +473,14 @@ struct sectorrect_t
     int right;
 };
 
+/* sector address */
 struct sectoraddr_t
 {
     uint32_t path;
     int depth;
 };
 
+/* sector vtable */
 struct sectorvtable_t
 {
     /* we use this vtable to bypass the SurgeScript
@@ -479,13 +491,14 @@ struct sectorvtable_t
     sectorfun_t update_world_size;
 };
 
+/* sector struct */
 struct sector_t
 {
     int index;
     sectoraddr_t addr;
 
-    bool is_leaf;
     const sectorvtable_t* vt;
+    int flags;
 
     int cached_world_width;
     int cached_world_height;
@@ -499,6 +512,11 @@ struct sector_t
     } child[4];
 };
 
+/* sector flags */
+#define SECTOR_HAS_SUBSECTOR(quadrant)  (1 << (quadrant))
+#define SECTOR_IS_LEAF                  (1 << 4)
+
+/* sector helpers */
 static sector_t* sector_ctor(int index, int world_width, int world_height);
 static sector_t* sector_dtor(sector_t* sector);
 static bool sector_update_rect(sector_t* sector, int world_width, int world_height);
@@ -510,6 +528,7 @@ static inline bool is_leaf_sector(int index);
 
 
 
+/* SurgeScript functions & utilities */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -825,6 +844,7 @@ surgescript_var_t* fun_bubbledown(surgescript_object_t* object, const surgescrip
             if(surgescript_var_is_null(child_var)) {
                 surgescript_objecthandle_t child_handle = spawn_child(object, j);
                 surgescript_var_set_objecthandle(child_var, child_handle);
+                sector->flags |= SECTOR_HAS_SUBSECTOR(j);
             }
 
             /* call subsector.bubbleDown(entity) */
@@ -870,17 +890,17 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
     /* for each subsector */
     for(int j = 0; j < 4; j++) {
 
+        /* is the subsector allocated? */
+        if(!(sector->flags & SECTOR_HAS_SUBSECTOR(j)))
+            continue; /* not allocated; skip */
+
         /* does the subsector intersect with the ROI? */
         if(disjoint_rects(sector->child[j].cached_rect, roi))
-            continue;
-
-        /* is the subsector allocated? */
-        const surgescript_var_t* child_var = surgescript_heap_at(heap, CHILD_ADDR[j]);
-        if(surgescript_var_is_null(child_var))
-            continue;
+            continue; /* it doesn't; skip */
 
         /* recursion */
-        surgescript_objecthandle_t child_handle = surgescript_var_get_objecthandle(child_var);
+        const surgescript_var_t* child_var = surgescript_heap_at(heap, CHILD_ADDR[j]);
+        surgescript_objecthandle_t child_handle = surgescript_var_get_objecthandle(child_var); /* not null, because the subsector is allocated */
         surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
         sector_t* child_sector = unsafe_get_sector(child);
 
@@ -943,13 +963,10 @@ sectoraddr_t find_sector_address(int index)
 
 sectorrect_t find_sector_rect(sectoraddr_t addr, int world_width, int world_height)
 {
-    const int min_world_width = max(1 << TREE_HEIGHT, MIN_WORLD_WIDTH);
-    const int min_world_height = max(1 << TREE_HEIGHT, MIN_WORLD_HEIGHT);
-
-    if(world_width < min_world_width)
-        world_width = min_world_width;
-    if(world_height < min_world_height)
-        world_height = min_world_height;
+    if(world_width < MIN_WORLD_WIDTH)
+        world_width = MIN_WORLD_WIDTH;
+    if(world_height < MIN_WORLD_HEIGHT)
+        world_height = MIN_WORLD_HEIGHT;
 
     sectorrect_t rect = {
         .left = 0,
@@ -1011,7 +1028,7 @@ bool is_leaf_sector(int index)
     first_0 = last_d = 0. Since indices are always incremented by one, it follows
     that first_d = last_(d-1) + 1 for d > 0. Since level d has 4^d sectors, we have
     last_d - first_d + 1 = 4^d, or alternatively, last_d = last_(d-1) + 4^d for d > 0.
-    We use the last equation to establish the following recurrence formula:
+    We use these equations to establish the following recurrence formula:
 
     l_d = { l_(d-1) + 4^d      if d > 0
           { 0                  if d = 0
@@ -1040,8 +1057,8 @@ sector_t* sector_ctor(int index, int world_width, int world_height)
     sector->index = index;
     sector->addr = find_sector_address(index);
 
-    sector->is_leaf = is_leaf;
     sector->vt = is_leaf ? &LEAF_VTABLE : &NONLEAF_VTABLE;
+    sector->flags = is_leaf ? SECTOR_IS_LEAF : 0;
 
     sector->cached_world_width = 0;
     sector->cached_world_height = 0;
@@ -1077,13 +1094,10 @@ sector_t* sector_dtor(sector_t* sector)
 bool sector_update_rect(sector_t* sector, int world_width, int world_height)
 {
     /* is the world too small? */
-    const int min_world_width = max(1 << TREE_HEIGHT, MIN_WORLD_WIDTH);
-    const int min_world_height = max(1 << TREE_HEIGHT, MIN_WORLD_HEIGHT);
-
-    if(world_width < min_world_width)
-        world_width = min_world_width;
-    if(world_height < min_world_height)
-        world_height = min_world_height;
+    if(world_width < MIN_WORLD_WIDTH)
+        world_width = MIN_WORLD_WIDTH;
+    if(world_height < MIN_WORLD_HEIGHT)
+        world_height = MIN_WORLD_HEIGHT;
 
     /* update only if needed */
     if(world_width != sector->cached_world_width || world_height != sector->cached_world_height) {
@@ -1091,7 +1105,7 @@ bool sector_update_rect(sector_t* sector, int world_width, int world_height)
         sector->cached_world_height = world_height;
         sector->cached_rect = find_sector_rect(sector->addr, world_width, world_height);
 
-        if(!is_leaf_sector(sector->index)) { /* is this test really needed? */
+        if(!(sector->flags & SECTOR_IS_LEAF)) {
             for(int j = 0; j < 4; j++)
                 sector->child[j].cached_rect = find_sector_rect(sector->child[j].addr, world_width, world_height);
         }
@@ -1127,7 +1141,7 @@ surgescript_objecthandle_t spawn_child(surgescript_object_t* parent, sectorquadr
 
     int child_index = 1 + 4 * parent_sector->index + quadrant; /* quadrant = 0, 1, 2, 3 */
     sector_t* child_sector = sector_ctor(child_index, world_width, world_height);
-    const char* child_name = child_sector->is_leaf ? "EntityTreeLeaf" : "EntityTree";
+    const char* child_name = (child_sector->flags & SECTOR_IS_LEAF) ? "EntityTreeLeaf" : "EntityTree";
 
     surgescript_objectmanager_t* manager = surgescript_object_manager(parent);
     surgescript_objecthandle_t parent_handle = surgescript_object_handle(parent);
