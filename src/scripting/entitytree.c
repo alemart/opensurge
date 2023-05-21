@@ -487,7 +487,7 @@ struct sectorvtable_t
        call stack and gain extra speed */
     sectorfun_t bubble_up;
     sectorfun_t bubble_down;
-    sectorfun_t update;
+    sectorfun_t update_roi;
     sectorfun_t update_world_size;
 };
 
@@ -536,12 +536,12 @@ static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_bubbleup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_bubbledown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_updateroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_updateworldsize(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_leaf_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_leaf_bubbleup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_leaf_bubbledown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_leaf_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_leaf_updateroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_leaf_updateworldsize(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ENTITYCONTAINER_ADDR = 0; /* leaf nodes only */
 static const surgescript_heapptr_t CHILD_ADDR[] = { /* non-leaf nodes only */
@@ -558,14 +558,14 @@ static v2d_t get_clipped_position(surgescript_object_t* entity, float world_widt
 static const sectorvtable_t LEAF_VTABLE = {
     .bubble_up = fun_leaf_bubbleup,
     .bubble_down = fun_leaf_bubbledown,
-    .update = fun_leaf_update,
+    .update_roi = fun_leaf_updateroi,
     .update_world_size = fun_leaf_updateworldsize
 };
 
 static const sectorvtable_t NONLEAF_VTABLE = {
     .bubble_up = fun_bubbleup,
     .bubble_down = fun_bubbledown,
-    .update = fun_update,
+    .update_roi = fun_updateroi,
     .update_world_size = fun_updateworldsize
 };
 
@@ -587,7 +587,7 @@ void scripting_register_entitytree(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityTree", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "EntityTree", "bubbleUp", fun_bubbleup, 1);
     surgescript_vm_bind(vm, "EntityTree", "bubbleDown", fun_bubbledown, 1);
-    surgescript_vm_bind(vm, "EntityTree", "update", fun_update, 5);
+    surgescript_vm_bind(vm, "EntityTree", "updateROI", fun_updateroi, 5);
     surgescript_vm_bind(vm, "EntityTree", "updateWorldSize", fun_updateworldsize, 2);
 
     /* EntityTreeLeaf "inherits" from EntityTree */
@@ -598,7 +598,7 @@ void scripting_register_entitytree(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityTreeLeaf", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "EntityTreeLeaf", "bubbleUp", fun_leaf_bubbleup, 1);
     surgescript_vm_bind(vm, "EntityTreeLeaf", "bubbleDown", fun_leaf_bubbledown, 1);
-    surgescript_vm_bind(vm, "EntityTreeLeaf", "update", fun_leaf_update, 5);
+    surgescript_vm_bind(vm, "EntityTreeLeaf", "updateROI", fun_leaf_updateroi, 5);
     surgescript_vm_bind(vm, "EntityTreeLeaf", "updateWorldSize", fun_leaf_updateworldsize, 2);
 }
 
@@ -662,10 +662,7 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* put it to sleep */
-    surgescript_object_set_active(object, false);
-
-    /* done */
+    /* do nothing */
     return NULL;
 }
 
@@ -868,8 +865,8 @@ surgescript_var_t* fun_bubbledown(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* non-leaf-variant of update: find intersecting leaf nodes */
-surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* non-leaf-variant of updateROI: find intersecting leaf sectors and put nodes to sleep */
+surgescript_var_t* fun_updateroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
@@ -887,6 +884,9 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
         .right = right
     };
 
+    /* awaken this sector */
+    surgescript_object_set_active(object, true);
+
     /* for each subsector */
     for(int j = 0; j < 4; j++) {
 
@@ -894,17 +894,21 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
         if(!(sector->flags & SECTOR_HAS_SUBSECTOR(j)))
             continue; /* not allocated; skip */
 
-        /* does the subsector intersect with the ROI? */
-        if(disjoint_rects(sector->child[j].cached_rect, roi))
-            continue; /* it doesn't; skip */
-
-        /* recursion */
+        /* get the allocated subsector */
         const surgescript_var_t* child_var = surgescript_heap_at(heap, CHILD_ADDR[j]);
         surgescript_objecthandle_t child_handle = surgescript_var_get_objecthandle(child_var); /* not null, because the subsector is allocated */
         surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
-        sector_t* child_sector = unsafe_get_sector(child);
 
-        child_sector->vt->update(child, param, num_params);
+        /* does the subsector intersect with the ROI? */
+        if(disjoint_rects(sector->child[j].cached_rect, roi)) {
+            /* no, it doesn't */
+            surgescript_object_set_active(child, false); /* put it to sleep */
+            continue; /* skip */
+        }
+
+        /* recursion */
+        sector_t* child_sector = unsafe_get_sector(child);
+        child_sector->vt->update_roi(child, param, num_params);
 
     }
 
@@ -912,21 +916,20 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
     return NULL;
 }
 
-/* leaf-variant of update */
-surgescript_var_t* fun_leaf_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* leaf-variant of updateROI */
+surgescript_var_t* fun_leaf_updateroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t array_handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* array = surgescript_objectmanager_get(manager, array_handle);
 
+    /* awaken this sector */
+    surgescript_object_set_active(object, true);
+
     /* get the entity container of this leaf sector */
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* container_var = surgescript_heap_at(heap, ENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t container_handle = surgescript_var_get_objecthandle(container_var);
-    surgescript_object_t* container = surgescript_objectmanager_get(manager, container_handle);
-
-    /* update the entities */
-    surgescript_object_traverse_tree(container, surgescript_object_update); /* the ROI test is done in the container */
 
     /* add the entity container of this leaf sector to the output array */
     surgescript_var_t* arg = surgescript_var_create();

@@ -159,7 +159,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
                     surgescript_transform_t* transform = surgescript_object_transform(entity);
                     surgescript_transform_setposition2d(transform, spawn_point.x, spawn_point.y);
 
-                    /* notify the object */
+                    /* notify the entity */
                     notify_entity(entity, "onReset");
 
                     /* put it to sleep */

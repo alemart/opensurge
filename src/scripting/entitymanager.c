@@ -89,7 +89,6 @@ ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* e
 /* SurgeScript API */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -103,6 +102,7 @@ static surgescript_var_t* fun_findentities(surgescript_object_t* object, const s
 static surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -130,7 +130,6 @@ static void foreach_unawake_container_callback(surgescript_objecthandle_t contai
 void scripting_register_entitymanager(surgescript_vm_t* vm)
 {
     surgescript_vm_bind(vm, "EntityManager", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "EntityManager", "update", fun_update, 0);
     surgescript_vm_bind(vm, "EntityManager", "render", fun_render, 2);
     surgescript_vm_bind(vm, "EntityManager", "lateUpdate", fun_lateupdate, 0);
     surgescript_vm_bind(vm, "EntityManager", "constructor", fun_constructor, 0);
@@ -145,6 +144,7 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "activeEntities", fun_activeentities, 0);
     surgescript_vm_bind(vm, "EntityManager", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_bind(vm, "EntityManager", "setROI", fun_setroi, 4);
+    surgescript_vm_bind(vm, "EntityManager", "__refreshEntityTree", fun_refreshentitytree, 0);
     surgescript_vm_bind(vm, "EntityManager", "addToLateUpdateQueue", fun_addtolateupdatequeue, 1);
     surgescript_vm_bind(vm, "EntityManager", "addBricklikeObject", fun_addbricklikeobject, 1);
     surgescript_vm_bind(vm, "EntityManager", "notifyEntities", fun_notifyentities, 1);
@@ -156,10 +156,13 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* don't visit my children when traversing the object tree.
-       Instead, call update(). I will update the sub-tree in which
-       I am the root in my own special way. */
-    surgescript_object_set_active(object, false);
+    entitydb_t* db = get_db(object);
+
+    /* clear the late update queue */
+    darray_clear(db->late_update_queue);
+
+    /* clear the brick-like object list */
+    darray_clear(db->bricklike_objects);
 
     /* done */
     return NULL;
@@ -221,6 +224,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t entity_tree = surgescript_objectmanager_spawn(manager, this_handle, "EntityTree", NULL);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYTREE_ADDR), entity_tree);
 #else
+    /* unused */
     surgescript_var_set_null(surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR));
     surgescript_var_set_null(surgescript_heap_at(heap, ENTITYTREE_ADDR));
 #endif
@@ -515,18 +519,19 @@ surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_va
     double right = x + max(width, 1.0) - 1.0;
     double bottom = y + max(height, 1.0) - 1.0;
 
-#if 0
     /* no need to update the ROI?
        save some processing time */
     if(db->roi.left == (int)left && db->roi.top == (int)top && db->roi.right == (int)right && db->roi.bottom == (int)bottom)
         return NULL;
-#endif
 
     /* set the coordinates of the ROI */
     db->roi.left = left;
     db->roi.top = top;
     db->roi.right = right;
     db->roi.bottom = bottom;
+
+    /* maintain the entity tree */
+    surgescript_object_call_function(object, "__refreshEntityTree", NULL, 0, NULL);
 
     /* done */
     return NULL;
@@ -585,36 +590,36 @@ surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surges
     return NULL;
 }
 
-/* update the sub-tree in which I am the root */
-surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* refresh the entity tree: partition the space */
+surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+#if WANT_SPACE_PARTITIONING
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     entitydb_t* db = get_db(object);
 
-    /* clear the late update queue */
-    darray_clear(db->late_update_queue);
-
-    /* clear the brick-like object list */
-    darray_clear(db->bricklike_objects);
-
-    /* update the awake container */
-    surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
-    surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
-    surgescript_object_traverse_tree(awake_container, surgescript_object_update);
-
-#if WANT_SPACE_PARTITIONING
     /* get the entity tree */
     surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
     surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
     surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
 
-    /* clear the unawake entity container array */
+    /* get the unawake entity container array */
     surgescript_var_t* unawake_container_array_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR);
     surgescript_objecthandle_t unawake_container_array_handle = surgescript_var_get_objecthandle(unawake_container_array_var);
     surgescript_object_t* unawake_container_array = surgescript_objectmanager_get(manager, unawake_container_array_handle);
 
+    /* bubble up entities (from the previous update cycle) */
+    iterator_t* it = iterator_create_from_surgescript_array(unawake_container_array);
+    while(iterator_has_next(it)) {
+        surgescript_var_t** unawake_container_var = iterator_next(it);
+        surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(*unawake_container_var);
+        surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
+
+        surgescript_object_call_function(unawake_container, "bubbleUpEntities", NULL, 0, NULL);
+    }
+    iterator_destroy(it);
+
+    /* clear the unawake entity container array */
     surgescript_object_call_function(unawake_container_array, "clear", NULL, 0, NULL);
 
     /* update the size of the world */
@@ -637,7 +642,7 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
     surgescript_var_destroy(world_height_var);
     surgescript_var_destroy(world_width_var);
 
-    /* update the entity tree */
+    /* update the ROI of the entity tree, as well as the unawake container array */
     surgescript_var_t* output_array_var = surgescript_var_clone(unawake_container_array_var);
     surgescript_var_t* top_var = surgescript_var_set_number(surgescript_var_create(), db->roi.top);
     surgescript_var_t* left_var = surgescript_var_set_number(surgescript_var_create(), db->roi.left);
@@ -645,30 +650,20 @@ surgescript_var_t* fun_update(surgescript_object_t* object, const surgescript_va
     surgescript_var_t* right_var = surgescript_var_set_number(surgescript_var_create(), db->roi.right);
 
     const surgescript_var_t* args[] = { output_array_var, top_var, left_var, bottom_var, right_var };
-    surgescript_object_call_function(entity_tree, "update", args, 5, NULL);
+    surgescript_object_call_function(entity_tree, "updateROI", args, 5, NULL);
 
     surgescript_var_destroy(right_var);
     surgescript_var_destroy(bottom_var);
     surgescript_var_destroy(left_var);
     surgescript_var_destroy(top_var);
     surgescript_var_destroy(output_array_var);
-
-    /* bubble up entities */
-    iterator_t* it = iterator_create_from_surgescript_array(unawake_container_array);
-    while(iterator_has_next(it)) {
-        surgescript_var_t** unawake_container_var = iterator_next(it);
-        surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(*unawake_container_var);
-        surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-
-        surgescript_object_call_function(unawake_container, "bubbleUpEntities", NULL, 0, NULL);
-    }
-    iterator_destroy(it);
 #else
-    /* update the unawake container */
-    surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
-    surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-    surgescript_object_traverse_tree(unawake_container, surgescript_object_update);
+
+    /* no space partitioning */
+    (void)foreach_unawake_container;
+    (void)foreach_unawake_container_callback;
+    (void)foreach_unawake_container_inside_roi;
+
 #endif
 
     /* done */

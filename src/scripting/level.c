@@ -240,14 +240,9 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_object_t* entity_manager = get_entity_manager(object);
-
     /* internal updates */
     update_music(object);
     update_time(object);
-
-    /* update entities */
-    surgescript_object_call_function(entity_manager, "update", NULL, 0, NULL);
 
     /* done! */
     return NULL;
