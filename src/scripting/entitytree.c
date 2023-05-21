@@ -513,7 +513,7 @@ struct sector_t
 };
 
 /* sector flags */
-#define SECTOR_HAS_SUBSECTOR(quadrant)  (1 << (quadrant))
+#define SECTOR_HAS_SUBSECTOR(quadrant)  (1 << (quadrant)) /* quadrant = 0, 1, 2, 3 */
 #define SECTOR_IS_LEAF                  (1 << 4)
 
 /* sector helpers */

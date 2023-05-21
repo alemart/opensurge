@@ -82,6 +82,7 @@ void entitymanager_set_entity_persistent(surgescript_object_t* entity_manager, s
 bool entitymanager_is_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 void entitymanager_set_entity_sleeping(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle, bool is_sleeping);
 bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t position);
+void entitymanager_get_roi(surgescript_object_t* entity_manager, int* top, int* left, int* bottom, int* right);
 arrayiterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
 ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
 
@@ -840,6 +841,17 @@ bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t pos
     int x = position.x, y = position.y;
 
     return x >= db->roi.left && x <= db->roi.right && y >= db->roi.top && y <= db->roi.bottom;
+}
+
+/* get the (inclusive) coordinates of the region of interest */
+void entitymanager_get_roi(surgescript_object_t* entity_manager, int* top, int* left, int* bottom, int* right)
+{
+    const entitydb_t* db = get_db(entity_manager);
+
+    *top = db->roi.top;
+    *left = db->roi.left;
+    *bottom = db->roi.bottom;
+    *right = db->roi.right;
 }
 
 /* create an iterator for iterating over the collection of (handles of) brick-like objects */

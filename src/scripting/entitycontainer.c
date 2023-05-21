@@ -22,6 +22,8 @@
 #include <string.h>
 #include "scripting.h"
 #include "../core/util.h"
+#include "../core/video.h"
+#include "../core/sprite.h"
 #include "../entities/renderqueue.h"
 
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -44,7 +46,12 @@ enum { RENDERFLAG_SPECIALS = 0x1, RENDERFLAG_GIZMOS = 0x2 };
 static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
 static bool render_subtree(surgescript_object_t* object, void* data);
 static inline void notify_entity(surgescript_object_t* entity, const char* fun_name);
-static bool is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_object_t* entity);
+static inline v2d_t entity_position(surgescript_object_t* entity);
+static inline bool is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_object_t* entity);
+static inline bool is_entity_inside_screen(surgescript_object_t* entity_manager, surgescript_object_t* entity);
+static bool is_entity_position_inside_screen(surgescript_object_t* entity_manager, surgescript_object_t* entity, v2d_t entity_position);
+static bool is_sprite_inside_screen(v2d_t camera_position, const char* sprite_name, v2d_t sprite_position, float sprite_rotation, v2d_t sprite_scale);
+
 
 /*
  * scripting_register_entitycontainer()
@@ -145,7 +152,8 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
             ) {
 
                 v2d_t spawn_point = entitymanager_get_entity_spawn_point(entity_manager, entity_handle);
-                if(!entitymanager_is_inside_roi(entity_manager, spawn_point)) {
+                /*if(!entitymanager_is_inside_roi(entity_manager, spawn_point)) {*/ /* <-- not good enough; misses a lot */
+                if(!is_entity_position_inside_screen(entity_manager, entity, spawn_point)) {
 
                     /* move it back to its spawn point */
                     surgescript_transform_t* transform = surgescript_object_transform(entity);
@@ -190,6 +198,15 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     bool is_in_level_editor = (mode == 2);
     int child_count = surgescript_object_child_count(object);
 
+    /* can we clip out an entity? */
+    #if 1
+    /* it depends on the size of the entity... what about large ones? */
+    #define can_clip_entity(entity) (!is_entity_inside_roi(entity_manager, (entity)))
+    #else
+    /* a more expensive test */
+    #define can_clip_entity(entity) (!is_entity_inside_screen(entity_manager, (entity)))
+    #endif
+
     /* render */
     if(is_in_level_editor) {
 
@@ -214,8 +231,8 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
             else if(surgescript_object_has_tag(entity, "detached"))
                 continue;
 
-            /* skip entities that can be clipped (not detached) */
-            else if(!is_entity_inside_roi(entity_manager, entity))
+            /* skip entities that can be clipped */
+            else if(can_clip_entity(entity))
                 continue;
 
             /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
@@ -255,8 +272,8 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
                     continue;
             }
 
-            /* skip entities that can be clipped (not detached) */
-            else if(!is_entity_inside_roi(entity_manager, entity))
+            /* skip entities that can be clipped */
+            else if(can_clip_entity(entity))
                 continue;
 
             /* search the sub-tree for renderables */
@@ -289,10 +306,10 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
                 continue;
 #endif
             /* skip entities that can be clipped */
-            if(!(
-                is_entity_inside_roi(entity_manager, entity) || /* note: it depends on the size of the entity... what about large ones? */
-                surgescript_object_has_tag(entity, "detached")
-            ))
+            if(
+                can_clip_entity(entity) &&
+                !surgescript_object_has_tag(entity, "detached")
+            )
                 continue;
 
             /* search the sub-tree for renderables */
@@ -304,6 +321,8 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
     /* done */
     return NULL;
+
+    #undef can_clip_entity
 }
 
 /* spawn function */
@@ -461,8 +480,7 @@ surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const 
         else if(skip_inactive_entities && !surgescript_object_is_active(entity))
             continue;
 
-        /* clip it out?
-           what if it's an entity of large dimensions compared to the screen size? */
+        /* clip it out? */
         else if(!is_entity_inside_roi(entity_manager, entity))
             continue;
 
@@ -648,14 +666,129 @@ void notify_entity(surgescript_object_t* entity, const char* fun_name)
         surgescript_object_call_function(entity, fun_name, NULL, 0, NULL);
 }
 
-bool is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_object_t* entity)
+v2d_t entity_position(surgescript_object_t* entity)
 {
-    surgescript_transform_t* transform = surgescript_object_transform(entity);
+    const surgescript_transform_t* transform = surgescript_object_transform(entity);
 
     /* (x,y) is in world space if the entity is a direct child of an entity container */
     float xpos, ypos;
     surgescript_transform_getposition2d(transform, &xpos, &ypos);
 
+    return v2d_new(xpos, ypos);
+}
+
+bool is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_object_t* entity)
+{
     /* ROI test */
-    return entitymanager_is_inside_roi(entity_manager, v2d_new(xpos, ypos));
+    return entitymanager_is_inside_roi(entity_manager, entity_position(entity));
+}
+
+bool is_entity_inside_screen(surgescript_object_t* entity_manager, surgescript_object_t* entity)
+{
+    return is_entity_position_inside_screen(entity_manager, entity, entity_position(entity));
+}
+
+bool is_entity_position_inside_screen(surgescript_object_t* entity_manager, surgescript_object_t* entity, v2d_t entity_position)
+{
+    /* guess the position of the camera */
+    int top, left, bottom, right, center_x, center_y;
+    entitymanager_get_roi(entity_manager, &top, &left, &bottom, &right);
+    center_x = (left + (right + 1)) / 2;
+    center_y = (top + (bottom + 1)) / 2;
+
+    v2d_t camera_position = v2d_new(center_x, center_y);
+
+    /* guess the sprite of the entity */
+    const char* sprite_name = surgescript_object_name(entity);
+
+    /* get the position, rotation and scale of the entity in world space */
+    const surgescript_transform_t* transform = surgescript_object_transform(entity);
+    float sx, sy, deg;
+
+    deg = surgescript_transform_getrotation2d(transform); /* local rotation == global rotation */
+    surgescript_transform_getscale2d(transform, &sx, &sy);
+
+    v2d_t sprite_position = entity_position;
+    v2d_t sprite_scale = v2d_new(sx, sy);
+    float sprite_rotation = deg * DEG2RAD;
+
+    /* this is only an approximation, because we don't know the actual size of
+       the entity (e.g., what kind of graphics does it display? are there any
+       other entities attached to it? and so on...)
+
+       Nonetheless, this works well enough in practice and is fast to compute
+       (comparatively speaking). */
+    return is_sprite_inside_screen(camera_position, sprite_name, sprite_position, sprite_rotation, sprite_scale);
+}
+
+bool is_sprite_inside_screen(v2d_t camera_position, const char* sprite_name, v2d_t sprite_position, float sprite_rotation, v2d_t sprite_scale)
+{
+    const animation_t* anim = sprite_animation_exists(sprite_name, 0) ? sprite_get_animation(sprite_name, 0) : sprite_get_animation(NULL, 0);
+    const image_t* img = sprite_get_image(anim, 0);
+    v2d_t hot_spot = anim->hot_spot;
+    v2d_t sprite_size = v2d_new(image_width(img), image_height(img));
+    v2d_t screen_size = video_get_screen_size();
+
+    /* rectangle of the screen in world coordinates (inclusive) */
+    float screen_top = camera_position.y - screen_size.y * 0.5f;
+    float screen_left = camera_position.x - screen_size.x * 0.5f;
+    float screen_bottom = screen_top + (screen_size.y - 1.0f);
+    float screen_right = screen_left + (screen_size.x - 1.0f);
+
+    /* rectangle of the scaled sprite in world coordinates (inclusive) */
+    float scaled_sprite_top = sprite_position.y - hot_spot.y * sprite_scale.y;
+    float scaled_sprite_left = sprite_position.x - hot_spot.x * sprite_scale.x;
+    float scaled_sprite_bottom = scaled_sprite_top + (sprite_size.y - 1.0f) * sprite_scale.y;
+    float scaled_sprite_right = scaled_sprite_left + (sprite_size.x - 1.0f) * sprite_scale.x;
+
+    /* rectangle of the sprite: assume that there is no rotation */
+    float sprite_top = scaled_sprite_top;
+    float sprite_left = scaled_sprite_left;
+    float sprite_bottom = scaled_sprite_bottom;
+    float sprite_right = scaled_sprite_right;
+
+    /* it turns out that there is rotation
+       pick the bounding box of the rotated sprite */
+    if(sprite_rotation != 0.0f) {
+
+        v2d_t scaled_sprite_topleft = v2d_new(scaled_sprite_left, scaled_sprite_top);
+        v2d_t scaled_sprite_topright = v2d_new(scaled_sprite_right, scaled_sprite_top);
+        v2d_t scaled_sprite_bottomleft = v2d_new(scaled_sprite_left, scaled_sprite_bottom);
+        v2d_t scaled_sprite_bottomright = v2d_new(scaled_sprite_right, scaled_sprite_bottom);
+
+        float radians = -sprite_rotation; /* the y-axis grows downwards. sin(-x) = -sin(x) and cos(-x) = cos(x). */
+        v2d_t rotated_sprite_corner[4] = {
+            scaled_sprite_topleft,
+            scaled_sprite_topright,
+            scaled_sprite_bottomleft,
+            scaled_sprite_bottomright
+        };
+        v2d_rotate_all(rotated_sprite_corner, 4, radians);
+
+        v2d_t min01 = v2d_new(
+            min(rotated_sprite_corner[0].x, rotated_sprite_corner[1].x),
+            min(rotated_sprite_corner[0].y, rotated_sprite_corner[1].y)
+        ), min23 = v2d_new(
+            min(rotated_sprite_corner[2].x, rotated_sprite_corner[3].x),
+            min(rotated_sprite_corner[2].y, rotated_sprite_corner[3].y)
+        ), max01 = v2d_new(
+            min(rotated_sprite_corner[0].x, rotated_sprite_corner[1].x),
+            min(rotated_sprite_corner[0].y, rotated_sprite_corner[1].y)
+        ), max23 = v2d_new(
+            max(rotated_sprite_corner[2].x, rotated_sprite_corner[3].x),
+            max(rotated_sprite_corner[2].y, rotated_sprite_corner[3].y)
+        );
+
+        sprite_top = min(min01.y, min23.y);
+        sprite_left = min(min01.x, min23.x);
+        sprite_bottom = max(max01.y, max23.y);
+        sprite_right = max(max01.x, max23.x);
+
+    }
+
+    /* bounding box test */
+    return !(
+        sprite_right < screen_left || sprite_left > screen_right ||
+        sprite_bottom < screen_top || sprite_top > screen_bottom
+    );
 }
