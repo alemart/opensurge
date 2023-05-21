@@ -242,7 +242,7 @@ object "Pipe Sensor" is "private", "entity"
     }
 }
 
-object "Pipe Manager" is "private", "awake", "entity"
+object "Pipe Manager"
 {
     public speed = 600; // in px/s
     pipeInSfx = Sound("samples/pipe_in.wav");

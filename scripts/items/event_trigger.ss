@@ -238,7 +238,7 @@ object "Event Trigger Base" is "private", "entity", "special"
     }
 }
 
-object "Event Trigger Manager" is "private", "awake", "entity"
+object "Event Trigger Manager"
 {
     triggers = [ null, null, null, null, null, null, null, null, null ];
 

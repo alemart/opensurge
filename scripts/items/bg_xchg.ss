@@ -69,7 +69,7 @@ object "Background Restorer" is "entity", "special"
     }
 }
 
-object "Background Exchange Manager" is "private", "awake", "entity"
+object "Background Exchange Manager"
 {
     // this object simply keeps the state
     originalBackgroundOf = { };

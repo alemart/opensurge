@@ -332,9 +332,9 @@ object "WaterController.BreathingBehavior"
 object "WaterController.SurfaceAnimation"
 {
     surfaces = [
-        Level.spawn("Water Surface").setOffset(-1),
-        Level.spawn("Water Surface").setOffset(0),
-        Level.spawn("Water Surface").setOffset(1)
+        Level.spawnEntity("Water Surface", Vector2.zero).setOffset(-1),
+        Level.spawnEntity("Water Surface", Vector2.zero).setOffset(0),
+        Level.spawnEntity("Water Surface", Vector2.zero).setOffset(1)
     ];
 
     state "main"
