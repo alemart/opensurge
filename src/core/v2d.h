@@ -34,6 +34,7 @@ v2d_t v2d_add(v2d_t u, v2d_t v); /* returns u+v */
 v2d_t v2d_subtract(v2d_t u, v2d_t v); /* returns u-v */
 v2d_t v2d_multiply(v2d_t u, float h); /* returns h*u */
 v2d_t v2d_rotate(v2d_t v, float radians); /* returns v rotated by an angle */
+void v2d_rotate_all(v2d_t* v, int n, float radians); /* rotates v[0..n-1] by an angle */
 v2d_t v2d_normalize(v2d_t v); /* returns a normalized copy of v */
 float v2d_magnitude(v2d_t v); /* returns the length of v */
 float v2d_dot(v2d_t u, v2d_t v); /* returns the dot product u.v */

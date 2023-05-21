@@ -80,10 +80,29 @@ float v2d_dot(v2d_t u, v2d_t v)
  */
 v2d_t v2d_rotate(v2d_t v, float radians)
 {
+    float c = cosf(radians), s = sinf(radians);
+
     return v2d_new(
-        v.x * cosf(radians) - v.y * sinf(radians),
-        v.y * cosf(radians) + v.x * sinf(radians)
+        v.x * c - v.y * s,
+        v.y * c + v.x * s
     );
+}
+
+
+/*
+ * v2d_rotate_all()
+ * Rotates n vectors, v[0..n-1], by an angle
+ */
+void v2d_rotate_all(v2d_t* v, int n, float radians)
+{
+    float c = cosf(radians), s = sinf(radians);
+
+    for(int i = 0; i < n; i++) {
+        v[i] = v2d_new(
+            v[i].x * c - v[i].y * s,
+            v[i].y * c + v[i].x * s
+        );
+    }
 }
 
 
