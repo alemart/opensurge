@@ -89,13 +89,10 @@ static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1; /* Level.spawnpoint */
 static const surgescript_heapptr_t SETUP_ADDR = 2; /* object "Setup Level" */
 static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3; /* Level.onUnload functor */
 static const surgescript_heapptr_t TIME_ADDR = 4; /* Level.time */
-static const surgescript_heapptr_t ISDEBUGGING_ADDR = 5; /* Debug Mode on/off flag (fast access) */
-static const surgescript_heapptr_t DEBUGMODE_ADDR = 6; /* Debug Mode handle (if any) */
-static const surgescript_heapptr_t STORAGE_ADDR = 7; /* LevelStorage object */
-static const surgescript_heapptr_t ENTITYMANAGER_ADDR = 8; /* EntityManager */
+static const surgescript_heapptr_t STORAGE_ADDR = 5; /* LevelStorage object */
+static const surgescript_heapptr_t ENTITYMANAGER_ADDR = 6; /* EntityManager */
 #define LAST_ADDR ENTITYMANAGER_ADDR /* must be an alias to the last address */
 #define WANT_BACKWARDS_COMPATIBLE_CHILD_FUNCTION 1 /* backwards compatibility with engine versions 0.5.x - 0.6.0.x */
-static const char DEBUG_MODE_OBJECT_NAME[] = "Debug Mode";
 static const char code_in_surgescript[];
 static void update_music(surgescript_object_t* object);
 static void update_time(surgescript_object_t* object);
@@ -202,14 +199,6 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* Level time */
     ssassert(TIME_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, TIME_ADDR), 0.0);
-
-    /* Fast-access Debug Mode on/off flag */
-    ssassert(ISDEBUGGING_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_bool(surgescript_heap_at(heap, ISDEBUGGING_ADDR), false);
-
-    /* DebugMode handle */
-    ssassert(DEBUGMODE_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_null(surgescript_heap_at(heap, DEBUGMODE_ADDR));
 
     /* LevelStorage */
     ssassert(STORAGE_ADDR == surgescript_heap_malloc(heap));
@@ -669,58 +658,25 @@ surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var
 surgescript_var_t* fun_get_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* this method must be fast! It's used often. */
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_t* flag = surgescript_heap_at(heap, ISDEBUGGING_ADDR);
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+    surgescript_var_t* ret = surgescript_var_create();
 
-    /* we just read a flag */
-    return surgescript_var_clone(flag);
+    surgescript_object_call_function(entity_manager, "isInDebugMode", NULL, 0, ret);
+
+    return ret;
 }
 
 /* enable/disable the Debug Mode */
 surgescript_var_t* fun_set_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_t* flag = surgescript_heap_at(heap, ISDEBUGGING_ADDR);
-    surgescript_var_t* debug_mode_handle_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
-    bool new_value = surgescript_var_get_bool(param[0]);
-    bool old_value = surgescript_var_get_bool(flag);
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+    bool want_to_enter = surgescript_var_get_bool(param[0]);
 
-#if 1
-    /* skip - nothing to do */
-    if(new_value == old_value)
-        return NULL;
-#endif
+    if(want_to_enter)
+        surgescript_object_call_function(entity_manager, "enterDebugMode", NULL, 0, NULL);
+    else
+        surgescript_object_call_function(entity_manager, "exitDebugMode", NULL, 0, NULL);
 
-    /* update the flag */
-    surgescript_var_set_bool(flag, new_value);
-
-    /* enter or exit the Debug Mode */
-    bool want_debug_mode = new_value;
-    if(want_debug_mode) {
-        if(surgescript_var_is_null(debug_mode_handle_var)) {
-
-            /* enter the Debug Mode: call this.spawn("Debug Mode") */
-            surgescript_var_t* debug_mode_name = surgescript_var_set_string(surgescript_var_create(), DEBUG_MODE_OBJECT_NAME);
-            const surgescript_var_t* spawn_param[] = { debug_mode_name };
-            surgescript_object_call_function(object, "spawn", spawn_param, 1, debug_mode_handle_var);
-            surgescript_var_destroy(debug_mode_name);
-
-        }
-    }
-    else {
-        if(!surgescript_var_is_null(debug_mode_handle_var)) {
-
-            /* exit the Debug Mode: call debug.exit() */
-            surgescript_objecthandle_t debug_mode_handle = surgescript_var_get_objecthandle(debug_mode_handle_var);
-            surgescript_object_t* debug_mode = surgescript_objectmanager_get(manager, debug_mode_handle);
-            surgescript_object_call_function(debug_mode, "exit", NULL, 0, NULL);
-            surgescript_var_set_null(debug_mode_handle_var);
-
-        }
-    }
-
-    /* done! */
     return NULL;
 }
 

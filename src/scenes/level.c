@@ -2895,19 +2895,7 @@ void render_ssobjects()
 
     if(surgescript_vm_is_active(vm)) {
         surgescript_object_t* entity_manager = entitymanager_ssobject();
-        surgescript_var_t* arg_mode = surgescript_var_create();
-        surgescript_var_t* arg_gizmos = surgescript_var_create();
-        const surgescript_var_t* args[] = { arg_mode, arg_gizmos };
-
-        int mode = (level_editmode() ? 2 : (level_is_in_debug_mode() ? 1 : 0));
-        bool gizmos = level_is_displaying_gizmos();
-
-        surgescript_var_set_number(arg_mode, mode);
-        surgescript_var_set_bool(arg_gizmos, gizmos);
-        surgescript_object_call_function(entity_manager, "render", args, 2, NULL);
-
-        surgescript_var_destroy(arg_gizmos);
-        surgescript_var_destroy(arg_mode);
+        surgescript_object_call_function(entity_manager, "render", NULL, 0, NULL);
     }
 }
 

@@ -42,7 +42,16 @@ static surgescript_var_t* fun_awake_main(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_awake_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
-enum { RENDERFLAG_SPECIALS = 0x1, RENDERFLAG_GIZMOS = 0x2 };
+static surgescript_var_t* fun_debug_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_debug_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_debug_isindebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_debug_enterdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_debug_exitdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_debug_getdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_heapptr_t DEBUGMODE_ADDR = 0; /* DebugEntityContainer only */
+static const char DEBUGMODE_OBJECT_NAME[] = "Debug Mode";
+
+enum { RENDERFLAGS_WANT_EDITOR = 0x1, RENDERFLAGS_WANT_GIZMOS = 0x2 };
 static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
 static bool render_subtree(surgescript_object_t* object, void* data);
 static inline void notify_entity(surgescript_object_t* entity, const char* fun_name);
@@ -59,6 +68,7 @@ static bool is_sprite_inside_screen(v2d_t camera_position, const char* sprite_na
  */
 void scripting_register_entitycontainer(surgescript_vm_t* vm)
 {
+    /* a container of entities */
     surgescript_vm_bind(vm, "EntityContainer", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "EntityContainer", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "EntityContainer", "spawn", fun_spawn, 1);
@@ -66,12 +76,12 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityContainer", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "EntityContainer", "reparent", fun_reparent, 1);
     surgescript_vm_bind(vm, "EntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
-    surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 2);
+    surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 1);
     surgescript_vm_bind(vm, "EntityContainer", "selectActiveEntities", fun_selectactiveentities, 2);
     surgescript_vm_bind(vm, "EntityContainer", "notifyEntities", fun_notifyentities, 1);
     surgescript_vm_bind(vm, "EntityContainer", "__releaseChildren", fun_releasechildren, 0);
 
-    /* AwakeEntityContainer "inherits" from EntityContainer */
+    /* AwakeEntityContainer holds awake entities and "extends" EntityContainer */
     surgescript_vm_bind(vm, "AwakeEntityContainer", "state:main", fun_awake_main, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "spawn", fun_spawn, 1);
@@ -79,10 +89,28 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AwakeEntityContainer", "toString", fun_tostring, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "reparent", fun_awake_reparent, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
-    surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 2);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "notifyEntities", fun_notifyentities, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "__releaseChildren", fun_releasechildren, 0);
+
+    /* DebugEntityContainer holds the entities of the Debug Mode and "extends" AwakeEntityContainer */
+    surgescript_vm_bind(vm, "DebugEntityContainer", "state:main", fun_awake_main, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "constructor", fun_debug_constructor, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "toString", fun_tostring, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "reparent", fun_awake_reparent, 1);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "render", fun_debug_render, 1);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "notifyEntities", fun_notifyentities, 1);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "__releaseChildren", fun_releasechildren, 0);
+
+    surgescript_vm_bind(vm, "DebugEntityContainer", "isInDebugMode", fun_debug_isindebugmode, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "enterDebugMode", fun_debug_enterdebugmode, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "exitDebugMode", fun_debug_exitdebugmode, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "get_debugMode", fun_debug_getdebugmode, 0);
 }
 
 /* constructor */
@@ -192,11 +220,8 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
-    int mode = surgescript_var_get_number(param[0]);
-    bool must_display_gizmos = surgescript_var_get_bool(param[1]);
-    bool is_in_debug_mode = (mode == 1);
-    bool is_in_level_editor = (mode == 2);
     int child_count = surgescript_object_child_count(object);
+    int flags = surgescript_var_get_rawbits(param[0]);
 
     /* can we clip out an entity? */
     #if 1
@@ -208,7 +233,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
     #endif
 
     /* render */
-    if(is_in_level_editor) {
+    if(flags & RENDERFLAGS_WANT_EDITOR) {
 
         /* LEVEL EDITOR */
 
@@ -235,50 +260,11 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
             else if(can_clip_entity(entity))
                 continue;
 
-            /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
+            /* we're in the editor. Objects tagged "gizmo" should not
                provoke any data or state changes within SurgeScript */
 
             /* render the entity */
             renderqueue_enqueue_ssobject_debug(entity);
-        }
-
-    }
-    else if(is_in_debug_mode) {
-
-        /* DEBUG MODE */
-
-        /* for each entity */
-        for(int i = 0; i < child_count; i++) {
-            surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
-
-            /* skip deleted entities */
-            if(surgescript_object_is_killed(entity)) {
-                entitymanager_remove_entity_info(entity_manager, entity_handle);
-                continue;
-            }
-
-            /* skip inactive entities */
-            else if(!surgescript_object_is_active(entity))
-                continue;
-#if 0
-            /* skip sleeping entities */
-            else if(entitymanager_is_entity_sleeping(entity_manager, entity_handle))
-                continue;
-#endif
-            /* skip detached entities */
-            else if(surgescript_object_has_tag(entity, "detached")) {
-                if(0 != strcmp(surgescript_object_name(entity), "Debug Mode"))
-                    continue;
-            }
-
-            /* skip entities that can be clipped */
-            else if(can_clip_entity(entity))
-                continue;
-
-            /* search the sub-tree for renderables */
-            int render_flags = RENDERFLAG_SPECIALS | (must_display_gizmos ? RENDERFLAG_GIZMOS : 0);
-            surgescript_object_traverse_tree_ex(entity, &render_flags, render_subtree);
         }
 
     }
@@ -313,8 +299,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
                 continue;
 
             /* search the sub-tree for renderables */
-            int render_flags = must_display_gizmos ? RENDERFLAG_GIZMOS : 0;
-            surgescript_object_traverse_tree_ex(entity, &render_flags, render_subtree);
+            surgescript_object_traverse_tree_ex(entity, &flags, render_subtree);
         }
 
     }
@@ -565,23 +550,8 @@ surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescrip
 /* make this container a parent of an entity */
 surgescript_var_t* fun_awake_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
-    surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(param[0]);
-    surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
-
-    /* we guarantee that only awake or detached entities are children of this container */
-    if(surgescript_object_has_tag(entity, "entity") && (
-        surgescript_object_has_tag(entity, "awake") ||
-        surgescript_object_has_tag(entity, "detached")
-    )) {
-
-        /* reparent */
-        surgescript_object_reparent(entity, this_handle, 0);
-
-    }
-
-    /* done */
+    /* not needed, not desirable?
+       we don't want to mess around with reparent() */
     return NULL;
 }
 
@@ -619,6 +589,133 @@ surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, 
 
 
 
+
+
+/*
+ * debug variant
+ */
+
+/* constructor */
+surgescript_var_t* fun_debug_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* call the constructor of the super class */
+    ssassert(NULL == fun_constructor(object, param, num_params));
+
+    /* allocate the debug mode variable */
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    ssassert(DEBUGMODE_ADDR == surgescript_heap_malloc(heap));
+
+    surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
+    surgescript_var_set_null(debug_mode_var);
+
+    /* done */
+    return NULL;
+}
+
+/* render the entities in the container of the Debug Mode */
+surgescript_var_t* fun_debug_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int flags = surgescript_var_get_rawbits(param[0]);
+
+    /* search the sub-tree for renderables */
+    surgescript_object_traverse_tree_ex(object, &flags, render_subtree);
+
+    /* done */
+    return NULL;
+}
+
+/* are we in the Debug Mode? */
+surgescript_var_t* fun_debug_isindebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* this method must be fast, because it's used often */
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
+
+    if(surgescript_var_is_null(debug_mode_var)) /* skip quickly */
+        return surgescript_var_set_bool(surgescript_var_create(), false);
+
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t debug_mode_handle = surgescript_var_get_objecthandle(debug_mode_var);
+    bool object_exists = surgescript_objectmanager_exists(manager, debug_mode_handle);
+
+    return surgescript_var_set_bool(surgescript_var_create(), object_exists);
+}
+
+/* enter the Debug Mode */
+surgescript_var_t* fun_debug_enterdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t debug_mode_handle = surgescript_var_get_objecthandle(debug_mode_var);
+
+    /* nothing to do */
+    if(surgescript_objectmanager_exists(manager, debug_mode_handle))
+        return NULL;
+
+    /* nothing to do: additional check for calling this in the constructor of the Debug Mode */
+    surgescript_objecthandle_t null_handle = surgescript_objectmanager_null(manager);
+    if(surgescript_object_child(object, DEBUGMODE_OBJECT_NAME) != null_handle)
+        return NULL;
+
+    /* spawn the Debug Mode object */
+    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
+    debug_mode_handle = surgescript_objectmanager_spawn(manager, this_handle, DEBUGMODE_OBJECT_NAME, NULL);
+
+    /* store the reference */
+    surgescript_var_set_objecthandle(debug_mode_var, debug_mode_handle);
+    return NULL;
+}
+
+/* exit the Debug Mode */
+surgescript_var_t* fun_debug_exitdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
+
+    /* nothing to do */
+    if(surgescript_var_is_null(debug_mode_var))
+        return NULL;
+
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t debug_mode_handle = surgescript_var_get_objecthandle(debug_mode_var);
+
+    /* nothing to do */
+    if(!surgescript_objectmanager_exists(manager, debug_mode_handle))
+        return NULL;
+
+    /* call debugMode.exit() */
+    surgescript_object_t* debug_mode = surgescript_objectmanager_get(manager, debug_mode_handle);
+    surgescript_object_call_function(debug_mode, "exit", NULL, 0, NULL);
+
+    /* set the handle to null */
+    surgescript_var_set_null(debug_mode_var);
+    return NULL;
+}
+
+/* get the handle to the Debug Mode object (may be null) */
+surgescript_var_t* fun_debug_getdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
+
+    /* not in Debug Mode? */
+    if(surgescript_var_is_null(debug_mode_var))
+        return surgescript_var_set_null(surgescript_var_create());
+
+    /* additional check, just to be sure (i.e., during garbage collection) */
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t debug_mode_handle = surgescript_var_get_objecthandle(debug_mode_var);
+    if(!surgescript_objectmanager_exists(manager, debug_mode_handle))
+        return surgescript_var_set_null(surgescript_var_create());
+
+    /* we've got a valid handle */
+    return surgescript_var_clone(debug_mode_var);
+}
+
+
+
+
 /*
  * helpers
  */
@@ -631,8 +728,7 @@ surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container)
 bool render_subtree(surgescript_object_t* object, void* data)
 {
     int flags = *((int*)data);
-    bool must_render_gizmos = (0 != (flags & RENDERFLAG_GIZMOS));
-    bool must_render_specials = (0 != (flags & RENDERFLAG_SPECIALS));
+    bool want_gizmos = (0 != (flags & RENDERFLAGS_WANT_GIZMOS));
 
     /* skip inactive objects */
     if(!surgescript_object_is_active(object) || surgescript_object_is_killed(object))
@@ -642,16 +738,8 @@ bool render_subtree(surgescript_object_t* object, void* data)
     if(surgescript_object_has_tag(object, "renderable"))
         renderqueue_enqueue_ssobject(object);
 
-    /* render special entities that are normally invisible */
-    if(must_render_specials) {
-        if(surgescript_object_has_tag(object, "special")) {
-            if(!surgescript_object_has_tag(object, "private"))
-                renderqueue_enqueue_ssobject_debug(object);
-        }
-    }
-
     /* will render objects tagged "gizmo" */
-    if(must_render_gizmos) {
+    if(want_gizmos) {
         if(surgescript_object_has_tag(object, "gizmo"))
             renderqueue_enqueue_ssobject_gizmo(object);
     }
@@ -716,8 +804,7 @@ bool is_entity_position_inside_screen(surgescript_object_t* entity_manager, surg
        the entity (e.g., what kind of graphics does it display? are there any
        other entities attached to it? and so on...)
 
-       Nonetheless, this works well enough in practice and is fast to compute
-       (comparatively speaking). */
+       Nonetheless, this works well enough in practice and is fast to compute */
     return is_sprite_inside_screen(camera_position, sprite_name, sprite_position, sprite_rotation, sprite_scale);
 }
 
