@@ -53,7 +53,8 @@ static const char DEBUGMODE_OBJECT_NAME[] = "Debug Mode";
 enum { RENDERFLAGS_WANT_EDITOR = 0x1, RENDERFLAGS_WANT_GIZMOS = 0x2 };
 static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
 static bool render_subtree(surgescript_object_t* object, void* data);
-static inline void notify_entity(surgescript_object_t* entity, const char* fun_name);
+static bool add_to_late_update_queue(surgescript_object_t* entity_or_component, void* data);
+static bool notify_entity(surgescript_object_t* entity_or_component, void* data);
 static inline v2d_t entity_position(surgescript_object_t* entity);
 static inline bool is_entity_inside_roi(surgescript_object_t* entity_manager, surgescript_object_t* entity);
 static inline bool is_entity_inside_screen(surgescript_object_t* entity_manager, surgescript_object_t* entity);
@@ -152,7 +153,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
     surgescript_var_t* arg = surgescript_var_create();
-    const surgescript_var_t* args[] = { arg };
+    void* data[] = { entity_manager, arg };
 
     /* for each entity */
     int child_count = surgescript_object_child_count(object);
@@ -175,11 +176,8 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
             /* the entity is not sleeping */
             entitymanager_set_entity_sleeping(entity_manager, entity_handle, false);
 
-            /* does this entity implement lateUpdate() ? */
-            if(surgescript_object_has_function(entity, "lateUpdate")) {
-                surgescript_var_set_objecthandle(arg, entity_handle);
-                surgescript_object_call_function(entity_manager, "addToLateUpdateQueue", args, 1, NULL);
-            }
+            /* does this entity or its descendants implement lateUpdate() ? */
+            surgescript_object_traverse_tree_ex(entity, data, add_to_late_update_queue);
 
         }
         else if(!surgescript_object_has_tag(entity, "disposable")) {
@@ -199,8 +197,8 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
                     surgescript_transform_t* transform = surgescript_object_transform(entity);
                     surgescript_transform_setposition2d(transform, spawn_point.x, spawn_point.y);
 
-                    /* notify the entity */
-                    notify_entity(entity, "onReset");
+                    /* notify the entity and its descendants */
+                    surgescript_object_traverse_tree_ex(entity, "onReset", notify_entity);
 
                     /* put it to sleep */
                     entitymanager_set_entity_sleeping(entity_manager, entity_handle, true);
@@ -494,7 +492,6 @@ surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const 
 /* notify entities: given the name of a function with no arguments, call it in all entities */
 surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* note that we don't notify the descendants of these entities that also happen to be entities */
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const char* fun_name = surgescript_var_fast_get_string(param[0]);
 
@@ -504,8 +501,8 @@ surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surges
         surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
         surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
 
-        /* notify entity */
-        notify_entity(entity, fun_name);
+        /* notify the entity and its descendants */
+        surgescript_object_traverse_tree_ex(entity, (void*)fun_name, notify_entity);
     }
 
     /* done */
@@ -525,7 +522,7 @@ surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescrip
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
     surgescript_var_t* arg = surgescript_var_create();
-    const surgescript_var_t* args[] = { arg };
+    void* data[] = { entity_manager, arg };
     int child_count = surgescript_object_child_count(object);
 
     /* for each entity */
@@ -547,11 +544,8 @@ surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescrip
         entitymanager_set_entity_sleeping(entity_manager, entity_handle, false);
 #endif
 
-        /* does this entity implement lateUpdate() ? */
-        if(surgescript_object_has_function(entity, "lateUpdate")) {
-            surgescript_var_set_objecthandle(arg, entity_handle);
-            surgescript_object_call_function(entity_manager, "addToLateUpdateQueue", args, 1, NULL);
-        }
+        /* does this entity or its descendants implement lateUpdate() ? */
+        surgescript_object_traverse_tree_ex(entity, data, add_to_late_update_queue);
     }
 
     /* done */
@@ -611,6 +605,17 @@ surgescript_var_t* fun_debug_constructor(surgescript_object_t* object, const sur
 
     surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
     surgescript_var_set_null(debug_mode_var);
+
+    /* we register the Debug Mode as an entity due to internal tree traversal routines,
+       such as notify entities, late update... kinda hackish? :\ but it belongs to an
+       ENTITY container! :P */
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+
+    surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "entity");
+    surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "awake");
+    surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "detached");
+    surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "private");
 
     /* done */
     return NULL;
@@ -752,10 +757,47 @@ bool render_subtree(surgescript_object_t* object, void* data)
     return true;
 }
 
-void notify_entity(surgescript_object_t* entity, const char* fun_name)
+bool add_to_late_update_queue(surgescript_object_t* entity_or_component, void* data)
 {
+    /* skip if not entity */
+    if(!surgescript_object_has_tag(entity_or_component, "entity"))
+        return false; /* save processing time; entities that are descendants of non-entities will be skipped */
+
+    /* does this entity implement lateUpdate() ? */
+    surgescript_object_t* entity = entity_or_component;
+    if(surgescript_object_has_function(entity, "lateUpdate")) {
+
+        /* get data */
+        surgescript_object_t* entity_manager = (surgescript_object_t*)(((void**)data)[0]);
+        surgescript_var_t* arg = (surgescript_var_t*)(((void**)data)[1]);
+        const surgescript_var_t* args[] = { arg };
+
+        /* add entity to the late update queue */
+        surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
+        surgescript_var_set_objecthandle(arg, entity_handle);
+        surgescript_object_call_function(entity_manager, "addToLateUpdateQueue", args, 1, NULL);
+
+    }
+
+    /* continue iteration */
+    return true;
+}
+
+bool notify_entity(surgescript_object_t* entity_or_component, void* data)
+{
+    const char* fun_name = (const char*)data;
+
+    /* skip if not entity */
+    if(!surgescript_object_has_tag(entity_or_component, "entity"))
+        return false; /* save processing time; entities that are descendants of non-entities will be skipped */
+
+    /* notify the entity if there is such a function */
+    surgescript_object_t* entity = entity_or_component;
     if(surgescript_object_has_function(entity, fun_name))
         surgescript_object_call_function(entity, fun_name, NULL, 0, NULL);
+
+    /* continue iteration */
+    return true;
 }
 
 v2d_t entity_position(surgescript_object_t* entity)
