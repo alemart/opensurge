@@ -84,4 +84,10 @@
  */
 #define darray_clear(arr)                    (arr##_len = 0)
 
+/*
+ * darray_iterator()
+ * returns a new iterator linked to the array; do not modify the array while iterating
+ */
+#define darray_iterator(arr)                (iterator_create_from_array((arr), darray_length(arr), sizeof(*(arr))))
+
 #endif
