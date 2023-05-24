@@ -139,7 +139,6 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "EntityManager", "destructor", fun_destructor, 0);
     surgescript_vm_bind(vm, "EntityManager", "destroy", fun_destroy, 0);
-    surgescript_vm_bind(vm, "EntityManager", "spawn", fun_spawn, 1);
 
     surgescript_vm_bind(vm, "EntityManager", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "EntityManager", "render", fun_render, 0);
@@ -149,6 +148,7 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "setROI", fun_setroi, 4);
     surgescript_vm_bind(vm, "EntityManager", "__refreshEntityTree", fun_refreshentitytree, 0);
 
+    surgescript_vm_bind(vm, "EntityManager", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "EntityManager", "spawnEntity", fun_spawnentity, 2);
     surgescript_vm_bind(vm, "EntityManager", "entity", fun_entity, 1);
     surgescript_vm_bind(vm, "EntityManager", "entityId", fun_entityid, 1);
@@ -201,10 +201,8 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     const char* parent_name = surgescript_object_name(parent);
-    if(0 != strcmp(parent_name, "Level")) {
-        scripting_error(object, "Not a child of Level");
-        return NULL;
-    }
+
+    ssassert(0 == strcmp(parent_name, "Level"));
 
     /* allocate a database */
     entitydb_t* db = mallocx(sizeof *db);
@@ -287,8 +285,32 @@ surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_v
 /* spawn function */
 surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* disabled */
-    return NULL;
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const char* entity_name = surgescript_var_fast_get_string(param[0]);
+    surgescript_objecthandle_t entity_handle = 0;
+
+    /* zero = Vector2(0,0) */
+    surgescript_objecthandle_t zero_handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+    surgescript_object_t* zero = surgescript_objectmanager_get(manager, zero_handle);
+    scripting_vector2_update(zero, 0.0, 0.0);
+
+    /* call this.spawnEntity(setup_object_name, zero) */
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_var_t* args[2] = {
+        surgescript_var_set_string(surgescript_var_create(), entity_name),
+        surgescript_var_set_objecthandle(surgescript_var_create(), zero_handle)
+    };
+
+    surgescript_object_call_function(object, "spawnEntity", (const surgescript_var_t**)args, 2, ret);
+    entity_handle = surgescript_var_get_objecthandle(ret);
+
+    surgescript_var_destroy(args[1]);
+    surgescript_var_destroy(args[0]);
+    surgescript_var_destroy(ret);
+
+    /* done */
+    surgescript_object_kill(zero);
+    return surgescript_var_set_objecthandle(surgescript_var_create(), entity_handle); /* return ret; */
 }
 
 /* spawn an entity at a position in world space */
@@ -321,6 +343,10 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
         surgescript_tagsystem_add_tag(tag_system, entity_name, "private");
     }
 
+    /* get the Level object */
+    surgescript_objecthandle_t level_handle = surgescript_object_parent(object);
+    surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
+
     /* decide the parent container: is the new entity awake or not? */
     bool is_awake = (
         surgescript_tagsystem_has_tag(tag_system, entity_name, "awake") ||
@@ -333,7 +359,6 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     );
 
     /* spawn the entity */
-    /*surgescript_objecthandle_t entity_parent = surgescript_object_parent(object);*/
     surgescript_objecthandle_t entity_parent = parent_container;
     surgescript_objecthandle_t entity_handle = surgescript_objectmanager_spawn(manager, entity_parent, entity_name, NULL);
     surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
@@ -360,7 +385,7 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
         .is_persistent = !(
             surgescript_object_has_tag(entity, "private") ||
             /*surgescript_object_has_tag(entity, "detached") ||*/
-            level_is_setup_object(entity_name)
+            scripting_level_issetupobjectname(level, entity_name)
         )
     });
 

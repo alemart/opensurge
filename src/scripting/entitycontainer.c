@@ -39,7 +39,6 @@ static surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object,
 static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_awake_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_debug_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -68,7 +67,24 @@ static bool is_sprite_inside_screen(v2d_t camera_position, const char* sprite_na
  */
 void scripting_register_entitycontainer(surgescript_vm_t* vm)
 {
-    /* a container of entities */
+    /*
+
+    interface "IEntityContainer"
+    {
+        constructor();
+        spawn(objectName);
+        destroy();
+        toString();
+
+        render();
+        notifyEntities();
+        selectActiveEntities();
+        __releaseChildren();
+    }
+
+    */
+
+    /* EntityContainer is a container of entities and implements IEntityContainer */
     surgescript_vm_bind(vm, "EntityContainer", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "EntityContainer", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "EntityContainer", "spawn", fun_spawn, 1);
@@ -81,14 +97,12 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityContainer", "notifyEntities", fun_notifyentities, 1);
     surgescript_vm_bind(vm, "EntityContainer", "__releaseChildren", fun_releasechildren, 0);
 
-    /* AwakeEntityContainer holds awake entities and "extends" EntityContainer */
+    /* AwakeEntityContainer holds awake entities and implements IEntityContainer */
     surgescript_vm_bind(vm, "AwakeEntityContainer", "state:main", fun_awake_main, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "toString", fun_tostring, 0);
-    surgescript_vm_bind(vm, "AwakeEntityContainer", "reparent", fun_awake_reparent, 1);
-    surgescript_vm_bind(vm, "AwakeEntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "notifyEntities", fun_notifyentities, 1);
@@ -100,8 +114,6 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "DebugEntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "DebugEntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "DebugEntityContainer", "toString", fun_tostring, 0);
-    surgescript_vm_bind(vm, "DebugEntityContainer", "reparent", fun_awake_reparent, 1);
-    surgescript_vm_bind(vm, "DebugEntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
     surgescript_vm_bind(vm, "DebugEntityContainer", "render", fun_debug_render, 1);
     surgescript_vm_bind(vm, "DebugEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
     surgescript_vm_bind(vm, "DebugEntityContainer", "notifyEntities", fun_notifyentities, 1);
@@ -544,14 +556,6 @@ surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescrip
 
     /* done */
     surgescript_var_destroy(arg);
-    return NULL;
-}
-
-/* make this container a parent of an entity */
-surgescript_var_t* fun_awake_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    /* not needed, not desirable?
-       we don't want to mess around with reparent() */
     return NULL;
 }
 

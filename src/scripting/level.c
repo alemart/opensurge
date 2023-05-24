@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
+#include "../core/logfile.h"
 #include "../core/util.h"
 #include "../core/audio.h"
 #include "../core/video.h"
@@ -80,13 +81,16 @@ static surgescript_var_t* fun_setonunload(surgescript_object_t* object, const su
 static surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_storereference(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_registersetupobjectname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_spawnsetupobjects(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_spawnassetupobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_child(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_children(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_childwithtag(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_childrenwithtag(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t MUSIC_ADDR = 0; /* Level.music */
 static const surgescript_heapptr_t SPAWNPOINT_ADDR = 1; /* Level.spawnpoint */
-static const surgescript_heapptr_t SETUP_ADDR = 2; /* object "Setup Level" */
+static const surgescript_heapptr_t SETUPFUNCTOR_ADDR = 2; /* object "LevelSetupFunctor" */
 static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3; /* Level.onUnload functor */
 static const surgescript_heapptr_t TIME_ADDR = 4; /* Level.time */
 static const surgescript_heapptr_t STORAGE_ADDR = 5; /* LevelStorage object */
@@ -94,9 +98,31 @@ static const surgescript_heapptr_t ENTITYMANAGER_ADDR = 6; /* EntityManager */
 #define LAST_ADDR ENTITYMANAGER_ADDR /* must be an alias to the last address */
 #define WANT_BACKWARDS_COMPATIBLE_CHILD_FUNCTION 1 /* backwards compatibility with engine versions 0.5.x - 0.6.0.x */
 static const char code_in_surgescript[];
+
+/* level info */
+typedef struct levelinfo_t levelinfo_t;
+struct levelinfo_t {
+
+    /* quick reference to the EntityManager */
+    surgescript_object_t* entity_manager;
+
+    /* setup objects */
+    bool can_spawn_setup_objects; /* a lock that indicates whether or not we can spawn setup objects */
+    DARRAY(char*, setup_object_name); /* names of setup objects */
+
+};
+
+/* helpers */
+const char* DEFAULT_SETUP_OBJECTS[] = { "Default Setup" }; /* for backwards compatibility */
+static levelinfo_t* level_info_ctor(surgescript_object_t* entity_manager);
+static levelinfo_t* level_info_dtor(levelinfo_t* level_info);
+static inline levelinfo_t* get_level_info(const surgescript_object_t* level);
+static inline surgescript_object_t* get_entity_manager(const surgescript_object_t* level);
 static void update_music(surgescript_object_t* object);
 static void update_time(surgescript_object_t* object);
-static inline surgescript_object_t* get_entity_manager(const surgescript_object_t* object);
+static void warn_about_entity_descendant(surgescript_objecthandle_t entity_handle, void* data);
+
+
 
 /*
  * scripting_register_level()
@@ -151,6 +177,9 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "__callUnloadFunctor", fun_callunloadfunctor, 0);
     surgescript_vm_bind(vm, "Level", "__releaseChildren", fun_releasechildren, 0);
     surgescript_vm_bind(vm, "Level", "__storeReference", fun_storereference, 1);
+    surgescript_vm_bind(vm, "Level", "__registerSetupObjectName", fun_registersetupobjectname, 1);
+    surgescript_vm_bind(vm, "Level", "__spawnSetupObjects", fun_spawnsetupobjects, 0);
+    surgescript_vm_bind(vm, "Level", "__spawnAsSetupObject", fun_spawnassetupobject, 1);
     surgescript_vm_bind(vm, "Level", "child", fun_child, 1);
     surgescript_vm_bind(vm, "Level", "children", fun_children, 1);
     surgescript_vm_bind(vm, "Level", "childWithTag", fun_childwithtag, 1);
@@ -162,10 +191,42 @@ void scripting_register_level(surgescript_vm_t* vm)
  * scripting_level_entitymanager()
  * Get the SurgeScript EntityManager
  */
-surgescript_object_t* scripting_level_entitymanager(const surgescript_object_t* object)
+surgescript_object_t* scripting_level_entitymanager(const surgescript_object_t* level)
 {
-    return get_entity_manager(object);
+    return get_entity_manager(level);
 }
+
+/*
+ * scripting_level_setupobjects_iterator()
+ * Use it to iterate over the names of the level setup objects
+ */
+iterator_t* scripting_level_setupobjects_iterator(const surgescript_object_t* level)
+{
+    levelinfo_t* level_info = get_level_info(level);
+    return darray_iterator(level_info->setup_object_name);
+}
+
+/*
+ * scripting_level_issetupobjectname()
+ * Checks if the given name is a Level setup object name
+ */
+bool scripting_level_issetupobjectname(const surgescript_object_t* level, const char* object_name)
+{
+    /* this method must be fast, as it's used often (i.e., when spawning entities) */
+    const levelinfo_t* level_info = get_level_info(level);
+    bool found = false;
+
+    for(int i = darray_length(level_info->setup_object_name) - 1; i >= 0; i--) {
+        if(0 == strcmp(level_info->setup_object_name[i], object_name)) {
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
+
+
 
 
 
@@ -176,7 +237,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t me = surgescript_object_handle(object);
     surgescript_objecthandle_t spawnpoint = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
-    surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "Setup Level", NULL);
+    surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "LevelSetupFunctor", NULL);
     surgescript_objecthandle_t storage = surgescript_objectmanager_spawn(manager, me, "LevelStorage", NULL);
     surgescript_objecthandle_t entity_manager = surgescript_objectmanager_spawn(manager, me, "EntityManager", NULL);
 
@@ -189,8 +250,8 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, SPAWNPOINT_ADDR), spawnpoint);
 
     /* Setup functor */
-    ssassert(SETUP_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, SETUP_ADDR), setup);
+    ssassert(SETUPFUNCTOR_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, SETUPFUNCTOR_ADDR), setup);
 
     /* Unload functor */
     ssassert(UNLOADFUNCTOR_ADDR == surgescript_heap_malloc(heap));
@@ -208,9 +269,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(ENTITYMANAGER_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYMANAGER_ADDR), entity_manager);
 
-    /* store the pointer to the EntityManager for fast access */
+    /* allocate a level info structure */
     surgescript_object_t* entity_manager_ptr = surgescript_objectmanager_get(manager, entity_manager);
-    surgescript_object_set_userdata(object, entity_manager_ptr);
+    levelinfo_t* level_info = level_info_ctor(entity_manager_ptr);
+    surgescript_object_set_userdata(object, level_info);
 
     /* done */
     return NULL;
@@ -219,7 +281,9 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 /* destructor */
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* clear the pointer to the EntityManager */
+    /* deallocate the level info structure */
+    levelinfo_t* level_info = get_level_info(object);
+    level_info_dtor(level_info);
     surgescript_object_set_userdata(object, NULL);
 
     /* done! */
@@ -277,38 +341,34 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 
        In this case we don't support it. It will behave just like
        any other SurgeScript object and it will not be handled by
-       the Entity Manager.
-
-       We don't traverse the sub-tree to find possible entities,
-       as that case is unusual and this operation is expensive. */
+       the Entity Manager. */
 
     /* spawn the new object */
     surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t child = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
+    surgescript_objecthandle_t child_handle = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
+    surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
+
+    /* warn the user about spawning entities as descendants of non-entities that are children of Level */
+    /*surgescript_object_find_tagged_descendants(child, "entity", child, warn_entity_descendant);*/ /* potentially expensive; can't take time into account */
+    surgescript_object_tagged_children(child, "entity", child, warn_about_entity_descendant); /* cheap, reasonable approximation */
 
     /* store its reference, so it won't be Garbage Collected */
-    surgescript_var_t* arg = surgescript_var_set_objecthandle(surgescript_var_create(), child);
+    surgescript_var_t* arg = surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
     const surgescript_var_t* args[] = { arg };
     surgescript_object_call_function(object, "__storeReference", args, 1, NULL);
     surgescript_var_destroy(arg);
 
     /* done! */
-    return surgescript_var_set_objecthandle(surgescript_var_create(), child);
+    return surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
 }
 
 /* spawn an entity at a certain position in world coordinates */
 surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_var_t* new_entity_var = surgescript_var_create();
 
-    /* get the entityManager */
-    surgescript_var_t* entity_manager_handle_var = surgescript_heap_at(heap, ENTITYMANAGER_ADDR);
-    surgescript_objecthandle_t entity_manager_handle = surgescript_var_get_objecthandle(entity_manager_handle_var);
-    surgescript_object_t* entity_manager = surgescript_objectmanager_get(manager, entity_manager_handle);
-
     /* delegate to entityManager.spawnEntity() */
+    surgescript_object_t* entity_manager = get_entity_manager(object);
     surgescript_object_call_function(entity_manager, "spawnEntity", param, 2, new_entity_var);
 
     /* store the reference to the new entity, so it won't be Garbage Collected */
@@ -645,10 +705,21 @@ surgescript_var_t* fun_setup(surgescript_object_t* object, const surgescript_var
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, SETUP_ADDR));
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, SETUPFUNCTOR_ADDR));
     surgescript_object_t* setup = surgescript_objectmanager_get(manager, handle);
 
-    /* call setup.call(config) */
+    /* validate */
+    surgescript_objecthandle_t config_handle = surgescript_var_get_objecthandle(param[0]);
+    surgescript_object_t* config = surgescript_objectmanager_get(manager, config_handle);
+    if(0 != strcmp("Dictionary", surgescript_object_name(config))) {
+        char* str = surgescript_var_get_string(param[0], manager);
+        video_showmessage("Level.setup() expects a Dictionary, but received %s", str);
+        ssfree(str);
+
+        return surgescript_var_set_null(surgescript_var_create());
+    }
+
+    /* call setupFunctor.call(config) */
     surgescript_var_t* ret = surgescript_var_create();
     surgescript_object_call_function(setup, "call", param, num_params, ret);
     return ret;
@@ -768,6 +839,131 @@ surgescript_var_t* fun_storereference(surgescript_object_t* object, const surges
     /* done! */
     return NULL;
 }
+
+/* register the name of a Level setup object */
+surgescript_var_t* fun_registersetupobjectname(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* object_name = surgescript_var_fast_get_string(param[0]);
+    levelinfo_t* level_info = get_level_info(object);
+
+    /* skip if locked */
+    if(!level_info->can_spawn_setup_objects)
+        return NULL;
+
+    /* skip duplicates */
+    for(int i = darray_length(level_info->setup_object_name) - 1; i >= 0; i--) {
+        if(0 == strcmp(level_info->setup_object_name[i], object_name))
+            return NULL;
+    }
+
+    /* register the name */
+    char* cloned_object_name = str_dup(object_name);
+    darray_push(level_info->setup_object_name, cloned_object_name);
+
+    /* done */
+    return NULL;
+}
+
+/* spawn setup objects */
+surgescript_var_t* fun_spawnsetupobjects(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    levelinfo_t* level_info = get_level_info(object);
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    /* if there are no registered setup objects, register the
+       default setup objects for backwards compatibility */
+    if(0 == darray_length(level_info->setup_object_name)) {
+        const int n = sizeof(DEFAULT_SETUP_OBJECTS) / sizeof(DEFAULT_SETUP_OBJECTS[0]);
+        for(int i = 0; i < n; i++) {
+            char* cloned_object_name = str_dup(DEFAULT_SETUP_OBJECTS[i]);
+            darray_push(level_info->setup_object_name, cloned_object_name);
+        }
+    }
+
+    /* for each registered level setup object name */
+    for(int i = 0; i < darray_length(level_info->setup_object_name); i++) {
+
+        /* call this.__spawnAsSetupObject() */
+        surgescript_var_set_string(arg, level_info->setup_object_name[i]);
+        surgescript_object_call_function(object, "__spawnAsSetupObject", args, 1, NULL);
+
+    }
+
+    /* lock */
+    level_info->can_spawn_setup_objects = false;
+
+    /* done */
+    surgescript_var_destroy(arg);
+    return NULL;
+}
+
+/* spawn an object as a Level setup object */
+surgescript_var_t* fun_spawnassetupobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* in Open Surge 0.5.x and 0.6.0.x, setup objects were spawned as direct children of Level,
+       and so were ordinary entities. We had setup objects spawning entities, and it all worked
+       fine because entities were not handled separately by the EntityManager as they are now.
+       Entities can no longer be descendants of non-entities that are direct children of Level.
+       Such non-entities are not descendants of this EntityManager.
+
+       In order to preserve backwards compatibility, we'll consider setup objects to behave as
+       if they were awake entities. This means that entities can be descendants of setup objects,
+       which was a common use case. However, this also means that setup objects are no longer
+       direct children of Level - but that's seldom a compatibility concern. */
+
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    const char* setup_object_name = surgescript_var_fast_get_string(param[0]);
+
+    /* skip if locked */
+    const levelinfo_t* level_info = get_level_info(object);
+    if(!level_info->can_spawn_setup_objects)
+        return surgescript_var_set_null(surgescript_var_create());
+
+    /* skip if the object doesn't exist */
+    if(!surgescript_objectmanager_class_exists(manager, setup_object_name)) {
+        video_showmessage("Missing setup object: \"%s\"", setup_object_name);
+        return surgescript_var_set_null(surgescript_var_create());
+    }
+
+    /* validate if the setup object is already tagged "setup" */
+    if(!surgescript_tagsystem_has_tag(tag_system, setup_object_name, "setup"))
+        logfile_message("Setup object \"%s\" isn't tagged \"setup\"", setup_object_name);
+
+    /* add the "setup" tag */
+    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "setup");
+
+    /* validate if the setup object is already an entity */
+    if(surgescript_tagsystem_has_tag(tag_system, setup_object_name, "entity")) {
+        if(
+            !surgescript_tagsystem_has_tag(tag_system, setup_object_name, "awake") &&
+            !surgescript_tagsystem_has_tag(tag_system, setup_object_name, "detached")
+        ) {
+            /* this should not be a setup object */
+            video_showmessage("Setup object \"%s\" is an entity, but not awake nor detached", setup_object_name);
+        }
+    }
+
+    /* make the setup object an awake entity */
+    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "entity");
+    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "awake");
+    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "detached");
+    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "private");
+
+    /* call entityManager.spawn(setup_object_name) */
+    surgescript_var_t* new_entity_var = surgescript_var_create();
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+    surgescript_object_call_function(entity_manager, "spawn", param, 1, new_entity_var);
+
+    /* store the reference to the new entity, so it won't be Garbage Collected */
+    const surgescript_var_t* args[] = { new_entity_var };
+    surgescript_object_call_function(object, "__storeReference", args, 1, NULL);
+
+    /* done! */
+    return new_entity_var;
+}
+
 
 /* override Object.child() for backwards compatibility */
 surgescript_var_t* fun_child(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
@@ -913,16 +1109,52 @@ surgescript_var_t* fun_childrenwithtag(surgescript_object_t* object, const surge
 }
 
 
-/* -- utils -- */
+
+
+/*
+ * Helpers
+ */
+
+/* create a level info struct */
+levelinfo_t* level_info_ctor(surgescript_object_t* entity_manager)
+{
+    levelinfo_t* level_info = mallocx(sizeof *level_info);
+
+    level_info->entity_manager = entity_manager;
+
+    level_info->can_spawn_setup_objects = true; /* start unlocked */
+    darray_init(level_info->setup_object_name);
+
+    return level_info;
+}
+
+/* destroy a level info struct */
+levelinfo_t* level_info_dtor(levelinfo_t* level_info)
+{
+    /* release setup_object_name[] */
+    for(int i = darray_length(level_info->setup_object_name) - 1; i >= 0; i--)
+        free(level_info->setup_object_name[i]);
+    darray_release(level_info->setup_object_name);
+
+    /* release the struct */
+    free(level_info);
+    return NULL;
+}
+
+/* get the level info */
+levelinfo_t* get_level_info(const surgescript_object_t* level)
+{
+    return (levelinfo_t*)surgescript_object_userdata(level);
+}
 
 /* get the EntityManager */
-surgescript_object_t* get_entity_manager(const surgescript_object_t* object)
+surgescript_object_t* get_entity_manager(const surgescript_object_t* level)
 {
 #if 1
-    return (surgescript_object_t*)surgescript_object_userdata(object);
+    return get_level_info(level)->entity_manager;
 #else
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(level);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(level);
 
     surgescript_var_t* entity_manager_var = surgescript_heap_at(heap, ENTITYMANAGER_ADDR);
     surgescript_objecthandle_t entity_manager_handle = surgescript_var_get_objecthandle(entity_manager_var);
@@ -975,15 +1207,21 @@ void update_time(surgescript_object_t* object)
     surgescript_var_set_number(level_time, elapsed_time);
 }
 
+/* warn the user about spawning entities as descendants of non-entities that are children of Level */
+void warn_about_entity_descendant(surgescript_objecthandle_t entity_handle, void* data)
+{
+    surgescript_object_t* ascendant = (surgescript_object_t*)data;
+    surgescript_objectmanager_t* manager = surgescript_object_manager(ascendant);
+    surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+    video_showmessage("Entity \"%s\" must not be a descendant of \"%s\" (non-entity)", surgescript_object_name(entity), surgescript_object_name(ascendant));
+}
+
 /* SurgeScript code */
 static const char code_in_surgescript[] = "\
-using SurgeEngine.Level; \n\
-\n\
-object 'Setup Level' \n\
+object 'LevelSetupFunctor' \n\
 { \n\
-    state 'main' \n\
-    { \n\
-    } \n\
+    level = parent; \n\
 \n\
     fun call(config) \n\
     { \n\
@@ -991,8 +1229,8 @@ object 'Setup Level' \n\
         entities = { }; \n\
 \n\
         foreach(entry in config) { \n\
-            if(Level.entity(entry.key) == null) { \n\
-                objs = Level.findObjects(entry.key); \n\
+            if(level.entity(entry.key) == null) { \n\
+                objs = level.findObjects(entry.key); \n\
                 for(i = 0; i < objs.length; i++) \n\
                     setup(objs[i], entry.value); \n\
             } \n\
@@ -1001,7 +1239,7 @@ object 'Setup Level' \n\
         } \n\
  \n\
         foreach(entry in entities) { \n\
-            obj = Level.entity(entry.key); \n\
+            obj = level.entity(entry.key); \n\
             setup(obj, entry.value); \n\
         } \n\
     } \n\
@@ -1012,6 +1250,11 @@ object 'Setup Level' \n\
             if(obj.hasFunction('set_' + entry.key)) \n\
                 obj.__invoke('set_' + entry.key, [ entry.value ]); \n\
         } \n\
+    } \n\
+\n\
+    fun constructor() \n\
+    { \n\
+        assert(level.__name == 'Level'); \n\
     } \n\
 } \n\
 ";

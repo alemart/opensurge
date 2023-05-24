@@ -101,15 +101,6 @@ static void update_dialogregions();
 /* ------------------------
  * Setup objects
  * ------------------------ */
-#define DEFAULT_SETUP_OBJECT "Default Setup"
-typedef struct setupobject_list_t setupobject_list_t;
-struct setupobject_list_t {
-    char *object_name;
-    setupobject_list_t *next;
-};
-static setupobject_list_t *setupobject_list;
-static void init_setup_object_list();
-static void release_setup_object_list();
 static void add_to_setup_object_list(const char *object_name);
 static void spawn_setup_objects();
 static bool is_setup_object_list_empty();
@@ -651,12 +642,16 @@ int level_save(const char *filepath)
         al_fprintf(fp, "grouptheme \"%s\"\n", grouptheme);
 
     /* setup objects? */
-    if(setupobject_list != NULL) {
+    iterator_t* setup_iterator = scripting_level_setupobjects_iterator(level_ssobject());
+    if(iterator_has_next(setup_iterator)) {
         al_fprintf(fp, "setup");
-        for(setupobject_list_t* its = setupobject_list; its != NULL; its = its->next)
-            al_fprintf(fp, " \"%s\"", str_addslashes(its->object_name));
+        while(iterator_has_next(setup_iterator)) {
+            const char** object_name = iterator_next(setup_iterator);
+            al_fprintf(fp, " \"%s\"", str_addslashes(*object_name));
+        }
         al_fprintf(fp, "\n");
     }
+    iterator_destroy(setup_iterator);
 
     /* players */
     al_fprintf(fp, "players");
@@ -763,12 +758,6 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         else
             logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
     }
-    else if(strcmp(identifier, "grouptheme") == 0) {
-        if(param_count == 1)
-            str_cpy(grouptheme, param[0], sizeof(grouptheme));
-        else
-            logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
-    }
     else if(strcmp(identifier, "music") == 0) {
         if(param_count == 1)
             str_cpy(musicfile, param[0], sizeof(musicfile));
@@ -856,24 +845,6 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         else
             logfile_message("Level loader - command 'spawn_point' expects two parameters: xpos, ypos");
     }
-    else if(strcmp(identifier, "dialogbox") == 0) {
-        if(param_count == 6) {
-            if(dialogregion_size < DIALOGREGION_MAX) {
-                dialogregion_t *d = &(dialogregion[dialogregion_size++]);
-                d->disabled = FALSE;
-                d->rect_x = atoi(param[0]);
-                d->rect_y = atoi(param[1]);
-                d->rect_w = atoi(param[2]);
-                d->rect_h = atoi(param[3]);
-                str_cpy(d->title, param[4], sizeof(d->title));
-                str_cpy(d->message, param[5], sizeof(d->message));
-            }
-            else
-                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
-        }
-        else
-            logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
-    }
     else if(strcmp(identifier, "readonly") == 0) {
         if(!readonly) {
             if(param_count == 0)
@@ -883,6 +854,29 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         }
         else
             logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
+    }
+    else if(strcmp(identifier, "players") == 0) {
+        if(team_size == 0) {
+            if(param_count > 0) {
+                for(int i = 0; i < param_count; i++) {
+                    if(team_size < TEAM_MAX) {
+                        for(int j = 0; j < team_size; j++) {
+                            if(strcmp(team[j]->name, param[i]) == 0)
+                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filepath, fileline);
+                        }
+
+                        logfile_message("Loading player '%s'...", param[i]);
+                        team[team_size++] = player_create(param[i]);
+                    }
+                    else
+                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
+                }
+            }
+            else
+                logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
+        }
+        else
+            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring... (note: 'players' accepts one or more parameters)", fileline);
     }
     else if(strcmp(identifier, "brick") == 0) {
         if(param_count == 3 || param_count == 4 || param_count == 5) {
@@ -946,29 +940,6 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         else
             logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring... (note: the command accepts one or more parameters)", identifier, fileline);
     }
-    else if(strcmp(identifier, "players") == 0) {
-        if(team_size == 0) {
-            if(param_count > 0) {
-                for(int i = 0; i < param_count; i++) {
-                    if(team_size < TEAM_MAX) {
-                        for(int j = 0; j < team_size; j++) {
-                            if(strcmp(team[j]->name, param[i]) == 0)
-                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filepath, fileline);
-                        }
-
-                        logfile_message("Loading player '%s'...", param[i]);
-                        team[team_size++] = player_create(param[i]);
-                    }
-                    else
-                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
-                }
-            }
-            else
-                logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
-        }
-        else
-            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring... (note: 'players' accepts one or more parameters)", fileline);
-    }
     else if(strcmp(identifier, "item") == 0) {
         if(param_count == 3) {
             int type = atoi(param[0]);
@@ -1010,6 +981,30 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         }
         else
             logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
+    }
+    else if(strcmp(identifier, "grouptheme") == 0) {
+        if(param_count == 1)
+            str_cpy(grouptheme, param[0], sizeof(grouptheme));
+        else
+            logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
+    }
+    else if(strcmp(identifier, "dialogbox") == 0) {
+        if(param_count == 6) {
+            if(dialogregion_size < DIALOGREGION_MAX) {
+                dialogregion_t *d = &(dialogregion[dialogregion_size++]);
+                d->disabled = FALSE;
+                d->rect_x = atoi(param[0]);
+                d->rect_y = atoi(param[1]);
+                d->rect_w = atoi(param[2]);
+                d->rect_h = atoi(param[3]);
+                str_cpy(d->title, param[4], sizeof(d->title));
+                str_cpy(d->message, param[5], sizeof(d->message));
+            }
+            else
+                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
+        }
+        else
+            logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
     }
     else
         logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filepath, fileline);
@@ -1096,7 +1091,6 @@ void level_init(void *path_to_lev_file)
     renderqueue_init();
     particle_init();
     camera_init();
-    init_setup_object_list();
     init_level_size();
 
     entitymanager_init();
@@ -1149,7 +1143,6 @@ void level_release()
     entitymanager_release();
 
     release_level_size();
-    release_setup_object_list();
     camera_release();
     particle_release();
     renderqueue_release();
@@ -1288,8 +1281,14 @@ void level_update()
     }
 
     /* enable the debug mode */
-    if(debug_mode_want_to_activate())
-        level_enter_debug_mode();
+    if(debug_mode_want_to_activate()) {
+        if(readonly) {
+            video_showmessage("No way!"); /* can still enter via mobile mode */
+            sound_play(SFX_DENY);
+        }
+        else
+            level_enter_debug_mode();
+    }
 
     /* -------------------------------------- */
     /* updating the entities */
@@ -2605,77 +2604,58 @@ void update_dialogregions()
 
 /* setup objects */
 
-/* initializes the setup object list */
-void init_setup_object_list()
-{
-    setupobject_list = NULL;
-}
-
-/* releases the setup object list */
-void release_setup_object_list()
-{
-    setupobject_list_t *me, *next;
-
-    for(me=setupobject_list; me; me=next) {
-        next = me->next;
-        free(me->object_name);
-        free(me);
-    }
-}
-
 /* empty list? */
 bool is_setup_object_list_empty()
 {
-    return setupobject_list == NULL;
+    surgescript_object_t* level = level_ssobject();
+
+    iterator_t* it = scripting_level_setupobjects_iterator(level);
+    bool is_empty = !iterator_has_next(it);
+    iterator_destroy(it);
+
+    return is_empty;
 }
 
 /* adds a new object to the setup object list */
 /* (actually it inserts the new object in the first position of the linked list) */
 void add_to_setup_object_list(const char *object_name)
 {
-    setupobject_list_t *first_node = mallocx(sizeof *first_node);
-    first_node->object_name = str_dup(object_name);
-    first_node->next = setupobject_list;
-    setupobject_list = first_node;
+    surgescript_object_t* level = level_ssobject();
+
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    surgescript_var_set_string(arg, object_name);
+    surgescript_object_call_function(level, "__registerSetupObjectName", args, 1, NULL);
+
+    surgescript_var_destroy(arg);
+
+    /* use the legacy API?
+       TODO: remove this */
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+    if(!surgescript_objectmanager_class_exists(manager, object_name)) {
+        if(enemy_exists(object_name)) {
+            enemy_t* e = level_create_legacy_object(object_name, v2d_new(0, 0));
+            e->created_from_editor = FALSE;
+        }
+    }
 }
 
 /* spawns the setup objects */
 void spawn_setup_objects()
 {
-    setupobject_list_t *me;
-
-    if(setupobject_list == NULL)
-        add_to_setup_object_list(DEFAULT_SETUP_OBJECT);
-
-    for(me=setupobject_list; me; me=me->next) {
-        /* try to create an object using the SurgeScript API.
-           if this is not possible, use the legacy API. */
-        if(!level_create_object(me->object_name, v2d_new(0, 0))) {
-            if(enemy_exists(me->object_name)) {
-                enemy_t* e = level_create_legacy_object(me->object_name, v2d_new(0, 0));
-                e->created_from_editor = FALSE;
-            }
-            else {
-                logfile_message("Missing setup object: %s", me->object_name);
-                video_showmessage("Missing setup object: %s", me->object_name);
-            }
-        }
-    }
+    surgescript_object_t* level = level_ssobject();
+    surgescript_object_call_function(level, "__spawnSetupObjects", NULL, 0, NULL);
 }
 
 /* check if object_name is in the setup object list */
 bool is_setup_object(const char* object_name)
 {
-    for(setupobject_list_t* me = setupobject_list; me != NULL; me = me->next) {
-        if(str_icmp(object_name, me->object_name) == 0)
-            return true;
-    }
-
-    if(str_icmp(object_name, DEFAULT_SETUP_OBJECT) == 0)
-        return true;
-
-    return false;
+    surgescript_object_t* level = level_ssobject();
+    return scripting_level_issetupobjectname(level, object_name);
 }
+
+
 
 
 /* level state */
