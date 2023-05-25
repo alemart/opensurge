@@ -1132,7 +1132,7 @@ sector_t* safe_get_sector(surgescript_object_t* tree_node)
         return unsafe_get_sector(tree_node);
 
     /* this shouldn't happen */
-    fatal_error("Can't get EntityTree sector of %s", object_name);
+    scripting_error(tree_node, "Can't get EntityTree sector of %s", object_name);
     return NULL;
 }
 

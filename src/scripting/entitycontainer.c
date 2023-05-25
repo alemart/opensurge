@@ -137,7 +137,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     /* validate */
     const char* parent_name = surgescript_object_name(parent);
     if(!(0 == strcmp(parent_name, "EntityTreeLeaf") || 0 == strcmp(parent_name, "EntityManager")))
-        fatal_error("%s must not be a child of %s", surgescript_object_name(object), parent_name);
+        scripting_error(object, "%s must not be a child of %s", surgescript_object_name(object), parent_name);
 
     /* set the internal pointer */
     surgescript_objecthandle_t entity_manager_handle = surgescript_object_find_ascendant(object, "EntityManager");
