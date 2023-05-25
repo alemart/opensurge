@@ -52,6 +52,7 @@ static const char DEBUGMODE_OBJECT_NAME[] = "Debug Mode";
 
 enum { RENDERFLAGS_WANT_EDITOR = 0x1, RENDERFLAGS_WANT_GIZMOS = 0x2 };
 static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
+static bool render_subtree_faster(surgescript_object_t* object, void* data);
 static bool render_subtree(surgescript_object_t* object, void* data);
 static bool add_to_late_update_queue(surgescript_object_t* entity_or_component, void* data);
 static bool notify_entity(surgescript_object_t* entity_or_component, void* data);
@@ -309,7 +310,8 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
                 continue;
 
             /* search the sub-tree for renderables */
-            surgescript_object_traverse_tree_ex(entity, &flags, render_subtree);
+            bool want_gizmos = (0 != (flags & RENDERFLAGS_WANT_GIZMOS));
+            surgescript_object_traverse_tree_ex(entity, &flags, want_gizmos ? render_subtree : render_subtree_faster);
         }
 
     }
@@ -732,6 +734,20 @@ surgescript_var_t* fun_debug_getdebugmode(surgescript_object_t* object, const su
 surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container)
 {
     return (surgescript_object_t*)surgescript_object_userdata(entity_container);
+}
+
+bool render_subtree_faster(surgescript_object_t* object, void* data)
+{
+    /* save processing time:
+       renderables must be direct children of entities or entities themselves */
+    if(!(
+        surgescript_object_has_tag(object, "entity")
+     || surgescript_object_has_tag(object, "renderable")
+    /*|| surgescript_object_has_tag(object, "gizmo")*/
+    ))
+        return false;
+
+    return render_subtree(object, data);
 }
 
 bool render_subtree(surgescript_object_t* object, void* data)
