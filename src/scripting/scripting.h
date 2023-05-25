@@ -80,6 +80,8 @@ extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* 
 
 extern const struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 
+extern const void* scripting_levelobjectcontainer_token();
+
 extern surgescript_object_t* scripting_level_entitymanager(const surgescript_object_t* level);
 extern iterator_t* scripting_level_setupobjects_iterator(const surgescript_object_t* level);
 extern bool scripting_level_issetupobjectname(const surgescript_object_t* level, const char* object_name);

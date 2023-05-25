@@ -353,6 +353,7 @@ SET(GAME_SRCS
   src/scripting/lang.c
   src/scripting/level.c
   src/scripting/levelmanager.c
+  src/scripting/levelobjectcontainer.c
   src/scripting/levelstorage.c
   src/scripting/mobilegamepad.c
   src/scripting/mouse.c
