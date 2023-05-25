@@ -424,6 +424,7 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* name = surgescript_heap_at(heap, NAME_ADDR);
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
@@ -459,6 +460,12 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
                 /* spawn the object */
                 if(surgescript_objectmanager_class_exists(manager, companion_name)) {
+                    /* make the companion an entity, so that it
+                       abides by Entity-Component-System rules */
+                    surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
+                    surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
+                    surgescript_tagsystem_add_tag(tag_system, companion_name, "companion");
+
                     /* spawn the companion in SurgeScript */
                     if(surgescript_object_child(object, companion_name) == null_handle) {
                         companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);
