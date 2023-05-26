@@ -156,8 +156,8 @@ iterator_t* iterator_create_from_array(void* array, size_t length, size_t elemen
 /* copy constructor */
 iterator_state_t* arrayiterator_copy_ctor(void* ctor_data)
 {
-    arrayiterator_state_t* s = (arrayiterator_state_t*)ctor_data;
-    size_t size = sizeof *s;
+    const arrayiterator_state_t* s = (const arrayiterator_state_t*)ctor_data;
+    const size_t size = sizeof *s;
 
     #if WANT_ALIGNMENT_CHECK
     #define ALIGNMENT_SIZE 4 /* in bytes */
