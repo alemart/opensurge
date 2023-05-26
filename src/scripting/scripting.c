@@ -424,7 +424,6 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_level(vm);
     scripting_register_levelmanager(vm);
     scripting_register_levelobjectcontainer(vm);
-    scripting_register_levelstorage(vm);
     scripting_register_mobilegamepad(vm);
     scripting_register_mouse(vm);
     scripting_register_music(vm);
