@@ -2853,8 +2853,9 @@ void update_ssobjects()
 {
     surgescript_vm_t* vm = surgescript_vm();
 
-    if(surgescript_vm_is_active(vm))
+    if(surgescript_vm_is_active(vm)) {
         surgescript_vm_update(vm);
+    }
 }
 
 /* call lateUpdate() for each SurgeScript entity that implements it */

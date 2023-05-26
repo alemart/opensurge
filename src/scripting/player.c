@@ -394,14 +394,16 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     );
     #endif
 
-#if 1
+#if 0 /* FIXME */
     /* Player must be a child of an EntityContainer */
     if(strstr(surgescript_object_name(parent), "EntityContainer") == NULL)
         scripting_error(object, "Object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
-#else
+#elif 0
     /* Player must be a child of PlayerManager */
     if(strcmp(surgescript_object_name(parent), "PlayerManager") != 0)
         scripting_error(object, "Object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
+#else
+    (void)parent;
 #endif
 
     /* done */
@@ -460,11 +462,17 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
                 /* spawn the object */
                 if(surgescript_objectmanager_class_exists(manager, companion_name)) {
+                    /* check if the companion object is already tagged "companion" */
+                    if(!surgescript_tagsystem_has_tag(tag_system, companion_name, "companion"))
+                        logfile_message("Companion object \"%s\" isn't tagged \"companion\"", companion_name);
+
+                    /* add the "companion" tag */
+                    surgescript_tagsystem_add_tag(tag_system, companion_name, "companion");
+
                     /* make the companion an entity, so that it
                        abides by Entity-Component-System rules */
                     surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
                     surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
-                    surgescript_tagsystem_add_tag(tag_system, companion_name, "companion");
 
                     /* spawn the companion in SurgeScript */
                     if(surgescript_object_child(object, companion_name) == null_handle) {

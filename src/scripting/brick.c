@@ -182,22 +182,33 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t offset, me = surgescript_object_handle(object);
-    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
-    surgescript_objecthandle_t parent = surgescript_object_parent(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     bricklike_data_t* data;
 
+    /* get the parent object */
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+    const surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+
+    /* find the Level object */
+    surgescript_objecthandle_t level_handle = surgescript_object_find_ascendant(object, "Level");
+    if(!surgescript_objectmanager_exists(manager, level_handle)) {
+        scripting_error(object,
+            "Object \"%s\" cannot be a child of \"%s\"",
+            surgescript_object_name(object),
+            surgescript_object_name(parent)
+        );
+        return NULL;
+    }
+    const surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
+
     /* sanity check */
-    while(!surgescript_object_has_tag(surgescript_objectmanager_get(manager, parent), "entity")) {
-        parent = surgescript_object_parent(surgescript_objectmanager_get(manager, parent));
-        if(parent == root) {
-            scripting_error(object, 
-                "Object \"%s\" must be a descendant of an entity (parent is \"%s\")",
-                surgescript_object_name(object),
-                surgescript_object_name(surgescript_objectmanager_get(manager, surgescript_object_parent(object)))
-            );
-            break;
-        }
+    if(!surgescript_object_has_tag(parent, "entity")) {
+        scripting_error(object,
+            "Object \"%s\" must be a child of an entity (parent is \"%s\")",
+            surgescript_object_name(object),
+            surgescript_object_name(parent)
+        );
+        return NULL;
     }
 
     /* allocate the offset vector */
@@ -205,9 +216,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, OFFSET_ADDR), offset);
 
-    /* cache a reference to the Entity Manager */
+    /* cache a reference to the EntityManager */
     ssassert(ENTITYMANAGER_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYMANAGER_ADDR), surgescript_object_find_ascendant(object, "EntityManager"));
+    surgescript_objecthandle_t entity_manager_handle = surgescript_object_child(level, "EntityManager");
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYMANAGER_ADDR), entity_manager_handle);
 
     /* default values of the brick */
     data = mallocx(sizeof *data);

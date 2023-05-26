@@ -31,12 +31,15 @@ static surgescript_var_t* fun_constructor(surgescript_object_t* object, const su
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_tostring(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_bubbleupentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_resume(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_storeentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_removeentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
+static surgescript_var_t* fun_bubbleupentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 static surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -47,11 +50,14 @@ static surgescript_var_t* fun_debug_isindebugmode(surgescript_object_t* object, 
 static surgescript_var_t* fun_debug_enterdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_debug_exitdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_debug_getdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_heapptr_t DEBUGMODE_ADDR = 0; /* DebugEntityContainer only */
+static surgescript_heapptr_t LEVELOBJECTCONTAINER_ADDR = 0;
+static surgescript_heapptr_t DEBUGMODE_ADDR = 1; /* DebugEntityContainer only */
 static const char DEBUGMODE_OBJECT_NAME[] = "Debug Mode";
 
 enum { RENDERFLAGS_WANT_EDITOR = 0x1, RENDERFLAGS_WANT_GIZMOS = 0x2 };
 static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
+static inline surgescript_object_t* get_levelobjectcontainer(surgescript_object_t* entity_container);
+static inline iterator_t* levelobjectcontainer_iterator(surgescript_object_t* entity_container);
 static bool render_subtree_faster(surgescript_object_t* object, void* data);
 static bool render_subtree(surgescript_object_t* object, void* data);
 static bool add_to_late_update_queue(surgescript_object_t* entity_or_component, void* data);
@@ -78,10 +84,14 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
         destroy();
         toString();
 
-        render();
+        storyEntity(entity);
+        removeEntity(entity);
         notifyEntities();
         selectActiveEntities();
-        __releaseChildren();
+
+        render();
+        pause();
+        resume();
     }
 
     */
@@ -92,12 +102,15 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "EntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "EntityContainer", "toString", fun_tostring, 0);
-    surgescript_vm_bind(vm, "EntityContainer", "reparent", fun_reparent, 1);
-    surgescript_vm_bind(vm, "EntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
-    surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 1);
+    surgescript_vm_bind(vm, "EntityContainer", "pause", fun_pause, 0);
+    surgescript_vm_bind(vm, "EntityContainer", "resume", fun_resume, 0);
+    surgescript_vm_bind(vm, "EntityContainer", "storeEntity", fun_storeentity, 1);
+    surgescript_vm_bind(vm, "EntityContainer", "removeEntity", fun_removeentity, 1);
     surgescript_vm_bind(vm, "EntityContainer", "selectActiveEntities", fun_selectactiveentities, 2);
     surgescript_vm_bind(vm, "EntityContainer", "notifyEntities", fun_notifyentities, 1);
-    surgescript_vm_bind(vm, "EntityContainer", "__releaseChildren", fun_releasechildren, 0);
+    surgescript_vm_bind(vm, "EntityContainer", "render", fun_render, 1);
+
+    surgescript_vm_bind(vm, "EntityContainer", "bubbleUpEntities", fun_bubbleupentities, 0);
 
     /* AwakeEntityContainer holds awake entities and implements IEntityContainer */
     surgescript_vm_bind(vm, "AwakeEntityContainer", "state:main", fun_awake_main, 0);
@@ -105,10 +118,13 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AwakeEntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "toString", fun_tostring, 0);
-    surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 1);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "pause", fun_pause, 0);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "resume", fun_resume, 0);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "storeEntity", fun_storeentity, 1);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "removeEntity", fun_removeentity, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "notifyEntities", fun_notifyentities, 1);
-    surgescript_vm_bind(vm, "AwakeEntityContainer", "__releaseChildren", fun_releasechildren, 0);
+    surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 1);
 
     /* DebugEntityContainer holds the entities of the Debug Mode and "extends" AwakeEntityContainer */
     surgescript_vm_bind(vm, "DebugEntityContainer", "state:main", fun_awake_main, 0);
@@ -116,10 +132,13 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "DebugEntityContainer", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "DebugEntityContainer", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "DebugEntityContainer", "toString", fun_tostring, 0);
-    surgescript_vm_bind(vm, "DebugEntityContainer", "render", fun_debug_render, 1);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "pause", fun_pause, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "resume", fun_resume, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "storeEntity", fun_storeentity, 1);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "removeEntity", fun_removeentity, 1);
     surgescript_vm_bind(vm, "DebugEntityContainer", "selectActiveEntities", fun_awake_selectactiveentities, 2);
     surgescript_vm_bind(vm, "DebugEntityContainer", "notifyEntities", fun_notifyentities, 1);
-    surgescript_vm_bind(vm, "DebugEntityContainer", "__releaseChildren", fun_releasechildren, 0);
+    surgescript_vm_bind(vm, "DebugEntityContainer", "render", fun_debug_render, 1);
 
     surgescript_vm_bind(vm, "DebugEntityContainer", "isInDebugMode", fun_debug_isindebugmode, 0);
     surgescript_vm_bind(vm, "DebugEntityContainer", "enterDebugMode", fun_debug_enterdebugmode, 0);
@@ -131,6 +150,8 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
 
@@ -138,6 +159,11 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     const char* parent_name = surgescript_object_name(parent);
     if(!(0 == strcmp(parent_name, "EntityTreeLeaf") || 0 == strcmp(parent_name, "EntityManager")))
         scripting_error(object, "%s must not be a child of %s", surgescript_object_name(object), parent_name);
+
+    /* allocate a LevelContainerObject */
+    ssassert(LEVELOBJECTCONTAINER_ADDR == surgescript_heap_malloc(heap));
+    surgescript_objecthandle_t level_object_container = surgescript_objectmanager_spawn(manager, this_handle, "LevelObjectContainer", scripting_levelobjectcontainer_token());
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, LEVELOBJECTCONTAINER_ADDR), level_object_container);
 
     /* set the internal pointer */
     surgescript_objecthandle_t entity_manager_handle = surgescript_object_find_ascendant(object, "EntityManager");
@@ -151,16 +177,15 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
     surgescript_var_t* arg = surgescript_var_create();
     void* data[] = { entity_manager, arg };
 
     /* for each entity */
-    int child_count = surgescript_object_child_count(object);
-    for(int i = 0; i < child_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        surgescript_object_t* entity = iterator_next(it);
+        surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
         /* skip deleted entities */
         if(surgescript_object_is_killed(entity)) {
@@ -220,6 +245,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 
         }
     }
+    iterator_destroy(it);
 
     /* done */
     surgescript_var_destroy(arg);
@@ -229,9 +255,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* render the entities in this container */
 surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
-    int child_count = surgescript_object_child_count(object);
     int flags = surgescript_var_get_rawbits(param[0]);
 
     /* can we clip out an entity? */
@@ -249,9 +273,10 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
         /* LEVEL EDITOR */
 
         /* for each entity */
-        for(int i = 0; i < child_count; i++) {
-            surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+        iterator_t* it = levelobjectcontainer_iterator(object);
+        while(iterator_has_next(it)) {
+            surgescript_object_t* entity = iterator_next(it);
+            surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
             /* skip deleted entities */
             if(surgescript_object_is_killed(entity)) {
@@ -277,6 +302,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
             /* render the entity */
             renderqueue_enqueue_ssobject_debug(entity);
         }
+        iterator_destroy(it);
 
     }
     else {
@@ -284,9 +310,10 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
         /* REGULAR GAMEPLAY */
 
         /* for each entity */
-        for(int i = 0; i < child_count; i++) {
-            surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-            surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+        iterator_t* it = levelobjectcontainer_iterator(object);
+        while(iterator_has_next(it)) {
+            surgescript_object_t* entity = iterator_next(it);
+            surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
             /* skip deleted entities */
             if(surgescript_object_is_killed(entity)) {
@@ -313,6 +340,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
             bool want_gizmos = (0 != (flags & RENDERFLAGS_WANT_GIZMOS));
             surgescript_object_traverse_tree_ex(entity, &flags, want_gizmos ? render_subtree : render_subtree_faster);
         }
+        iterator_destroy(it);
 
     }
 
@@ -347,30 +375,63 @@ surgescript_var_t* fun_tostring(surgescript_object_t* object, const surgescript_
     return surgescript_var_set_string(surgescript_var_create(), buf);
 }
 
-/* make this container a parent of an entity */
-surgescript_var_t* fun_reparent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+/* pause the container */
+surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_object_set_active(object, false);
+    return NULL;
+}
+
+/* resume the container */
+surgescript_var_t* fun_resume(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_object_set_active(object, true);
+    return NULL;
+}
+
+/* store an entity in this container */
+surgescript_var_t* fun_storeentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
     surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(param[0]);
     surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
 
-    /* we guarantee that only unawake and non-detached entities are children of this container */
-    if(surgescript_object_has_tag(entity, "entity") && !(
-        surgescript_object_has_tag(entity, "awake") ||
-        surgescript_object_has_tag(entity, "detached")
-    )) {
-
-        /* reparent */
-        surgescript_object_reparent(entity, this_handle, 0);
-
-        /* inactivate (just in case) */
-        surgescript_object_t* entity_manager = get_entity_manager(object);
-        if(!is_entity_inside_roi(entity_manager, entity)) {
-            surgescript_object_set_active(entity, false);
-        }
-
+    /* we guarantee that only entities are stored in this container */
+    if(!surgescript_object_has_tag(entity, "entity")) {
+        const char* entity_name = surgescript_object_name(entity);
+        const char* container_name = surgescript_object_name(object);
+        scripting_error(object, "Can't store non-entity \"%s\" in a \"%s\"", entity_name, container_name);
+        return NULL;
     }
+
+    /* call levelObjectContainer.addObject(entity) */
+    surgescript_object_t* levelobjectcontainer = get_levelobjectcontainer(object);
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    surgescript_var_set_objecthandle(arg, entity_handle);
+    surgescript_object_call_function(levelobjectcontainer, "addObject", args, 1, NULL);
+
+    surgescript_var_destroy(arg);
+
+    /* done */
+    return NULL;
+}
+
+/* remove an entity from this container */
+surgescript_var_t* fun_removeentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(param[0]);
+
+    /* call levelObjectContainer.removeObject(entity) */
+    surgescript_object_t* levelobjectcontainer = get_levelobjectcontainer(object);
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    surgescript_var_set_objecthandle(arg, entity_handle);
+    surgescript_object_call_function(levelobjectcontainer, "removeObject", args, 1, NULL);
+
+    surgescript_var_destroy(arg);
 
     /* done */
     return NULL;
@@ -382,73 +443,27 @@ surgescript_var_t* fun_bubbleupentities(surgescript_object_t* object, const surg
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t sector_handle = surgescript_object_parent(object);
     surgescript_object_t* sector = surgescript_objectmanager_get(manager, sector_handle);
-    int child_count = surgescript_object_child_count(object);
     surgescript_var_t* arg = surgescript_var_create();
     const surgescript_var_t* args[] = { arg };
 
-    /* validate */
-    ssassert(0 == strcmp(surgescript_object_name(sector), "EntityTreeLeaf"));
-
-    /* allocate temporary array */
-    surgescript_objecthandle_t _tmp[256]; /* optimize with stack storage. use alloca() ? */
-    const size_t _tmp_maxlen = sizeof(_tmp) / sizeof(_tmp[0]);
-    surgescript_objecthandle_t* arr = child_count <= _tmp_maxlen ? _tmp : mallocx(child_count * sizeof(*arr));
-    int len = 0;
-
     /* for each entity */
-    for(int i = 0; i < child_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        const surgescript_object_t* entity = iterator_next(it);
+        surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
         /* skip entity? */
         if(surgescript_object_is_killed(entity))
             continue;
 
-        /* copy the entity to a temporary array
-           it may be reparented, so we don't bubble it up in this loop */
-        arr[len++] = entity_handle;
-    }
-
-    /* for each entity that can be reparented */
-    for(int i = 0; i < len; i++) {
-        surgescript_objecthandle_t entity_handle = arr[i];
-
         /* call sector.bubbleUp(entity) */
         surgescript_var_set_objecthandle(arg, entity_handle);
         surgescript_object_call_function(sector, "bubbleUp", args, 1, NULL);
     }
-
-    /* deallocate temporary array */
-    if(arr != _tmp)
-        free(arr);
+    iterator_destroy(it);
 
     /* done */
     surgescript_var_destroy(arg);
-    return NULL;
-}
-
-/* release all children */
-surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    int child_count = surgescript_object_child_count(object);
-    surgescript_objecthandle_t* children = mallocx(child_count * sizeof(*children));
-
-    /* release children immediately and call their destructors (if any) */
-    for(int i = child_count - 1; i >= 0; i--) {
-        surgescript_objecthandle_t child_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
-        surgescript_object_kill(child);
-        children[i] = child_handle; /* store the handle in a temporary array */
-    }
-
-    for(int i = child_count - 1; i >= 0; i--) {
-        surgescript_objecthandle_t child_handle = children[i];
-        surgescript_objectmanager_delete(manager, child_handle); /* release immediately */
-    }
-
-    /* done! */
-    free(children);
     return NULL;
 }
 
@@ -464,10 +479,10 @@ surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const 
     bool skip_inactive_entities = surgescript_var_get_bool(param[1]);
 
     /* for each entity */
-    int entity_count = surgescript_object_child_count(object);
-    for(int i = 0; i < entity_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        surgescript_object_t* entity = iterator_next(it);
+        surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
         /* skip entity? */
         if(surgescript_object_is_killed(entity))
@@ -485,6 +500,7 @@ surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const 
         surgescript_var_set_objecthandle(arg, entity_handle);
         surgescript_object_call_function(output_array, "push", args, 1, NULL);
     }
+    iterator_destroy(it);
 
     /* done */
     surgescript_var_destroy(arg);
@@ -494,18 +510,17 @@ surgescript_var_t* fun_selectactiveentities(surgescript_object_t* object, const 
 /* notify entities: given the name of a function with no arguments, call it in all entities */
 surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const char* fun_name = surgescript_var_fast_get_string(param[0]);
 
     /* for each entity */
-    int entity_count = surgescript_object_child_count(object);
-    for(int i = 0; i < entity_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        surgescript_object_t* entity = iterator_next(it);
 
         /* notify the entity and its descendants */
         surgescript_object_traverse_tree_ex(entity, (void*)fun_name, notify_entity);
     }
+    iterator_destroy(it);
 
     /* done */
     return NULL;
@@ -521,16 +536,15 @@ surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surges
 /* main state */
 surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_object_t* entity_manager = get_entity_manager(object);
     surgescript_var_t* arg = surgescript_var_create();
     void* data[] = { entity_manager, arg };
-    int child_count = surgescript_object_child_count(object);
 
     /* for each entity */
-    for(int i = 0; i < child_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        surgescript_object_t* entity = iterator_next(it);
+        surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
         /* is the entity removed? */
         if(surgescript_object_is_killed(entity)) {
@@ -549,6 +563,7 @@ surgescript_var_t* fun_awake_main(surgescript_object_t* object, const surgescrip
         /* does this entity or its descendants implement lateUpdate() ? */
         surgescript_object_traverse_tree_ex(entity, data, add_to_late_update_queue);
     }
+    iterator_destroy(it);
 
     /* done */
     surgescript_var_destroy(arg);
@@ -566,10 +581,10 @@ surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, 
     bool skip_inactive_entities = surgescript_var_get_bool(param[1]);
 
     /* for each entity */
-    int entity_count = surgescript_object_child_count(object);
-    for(int i = 0; i < entity_count; i++) {
-        surgescript_objecthandle_t entity_handle = surgescript_object_nth_child(object, i);
-        const surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        surgescript_object_t* entity = iterator_next(it);
+        surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
         /* skip entity? */
         if(surgescript_object_is_killed(entity))
@@ -581,6 +596,7 @@ surgescript_var_t* fun_awake_selectactiveentities(surgescript_object_t* object, 
         surgescript_var_set_objecthandle(arg, entity_handle);
         surgescript_object_call_function(output_array, "push", args, 1, NULL);
     }
+    iterator_destroy(it);
 
     /* done */
     surgescript_var_destroy(arg);
@@ -608,9 +624,8 @@ surgescript_var_t* fun_debug_constructor(surgescript_object_t* object, const sur
     surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
     surgescript_var_set_null(debug_mode_var);
 
-    /* we register the Debug Mode as an entity due to internal tree traversal routines,
-       such as notify entities, late update... kinda hackish? :\ but it belongs to an
-       ENTITY container! :P */
+    /* turn the Debug Mode into an entity, so that
+       it abides by Entity-Component-System rules */
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
 
@@ -734,6 +749,22 @@ surgescript_var_t* fun_debug_getdebugmode(surgescript_object_t* object, const su
 surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container)
 {
     return (surgescript_object_t*)surgescript_object_userdata(entity_container);
+}
+
+surgescript_object_t* get_levelobjectcontainer(surgescript_object_t* entity_container)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(entity_container);
+    const surgescript_heap_t* heap = surgescript_object_heap(entity_container);
+    const surgescript_var_t* container_var = surgescript_heap_at(heap, LEVELOBJECTCONTAINER_ADDR);
+    const surgescript_objecthandle_t container_handle = surgescript_var_get_objecthandle(container_var);
+
+    return surgescript_objectmanager_get(manager, container_handle);
+}
+
+iterator_t* levelobjectcontainer_iterator(surgescript_object_t* entity_container)
+{
+    surgescript_object_t* levelobjectcontainer = get_levelobjectcontainer(entity_container);
+    return scripting_levelobjectcontainer_iterator(levelobjectcontainer);
 }
 
 bool render_subtree_faster(surgescript_object_t* object, void* data)

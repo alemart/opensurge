@@ -101,7 +101,6 @@ static surgescript_var_t* fun_entityid(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -156,7 +155,6 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "findEntities", fun_findentities, 1);
     surgescript_vm_bind(vm, "EntityManager", "activeEntities", fun_activeentities, 0);
     surgescript_vm_bind(vm, "EntityManager", "notifyEntities", fun_notifyentities, 1);
-    surgescript_vm_bind(vm, "EntityManager", "__releaseChildren", fun_releasechildren, 0);
 
     surgescript_vm_bind(vm, "EntityManager", "isInDebugMode", fun_isindebugmode, 0);
     surgescript_vm_bind(vm, "EntityManager", "enterDebugMode", fun_enterdebugmode, 0);
@@ -244,7 +242,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t unawake_container_array = surgescript_objectmanager_spawn(manager, this_handle, "Array", NULL);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR), unawake_container_array);
 
-    /* spawn the EntityTree after the other containers to optimize Level.findObject() */
+    /* spawn the EntityTree */
     surgescript_objecthandle_t entity_tree = surgescript_objectmanager_spawn(manager, this_handle, "EntityTree", NULL);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYTREE_ADDR), entity_tree);
 #else
@@ -347,19 +345,8 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t level_handle = surgescript_object_parent(object);
     surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
 
-    /* decide the parent container: is the new entity awake or not? */
-    bool is_awake = (
-        surgescript_tagsystem_has_tag(tag_system, entity_name, "awake") ||
-        surgescript_tagsystem_has_tag(tag_system, entity_name, "detached")
-    );
-    surgescript_objecthandle_t parent_container = surgescript_var_get_objecthandle(
-        is_awake ?
-        surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR) :
-        surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR)
-    );
-
     /* spawn the entity */
-    surgescript_objecthandle_t entity_parent = parent_container;
+    surgescript_objecthandle_t entity_parent = level_handle;
     surgescript_objecthandle_t entity_handle = surgescript_objectmanager_spawn(manager, entity_parent, entity_name, NULL);
     surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
 
@@ -384,7 +371,7 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
         ),
         .is_persistent = !(
             surgescript_object_has_tag(entity, "private") ||
-            /*surgescript_object_has_tag(entity, "detached") ||*/
+            /*surgescript_object_has_tag(entity, "detached") ||*/ /* if it's detached, it's private - see above */
             scripting_level_issetupobjectname(level, entity_name)
         )
     });
@@ -394,21 +381,54 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     fasthash_put(db->info, info->handle, info);
     fasthash_put(db->id_to_handle, info->id, handle_ctor(info->handle));
 
+    /* decide the entity container: is the new entity awake or not? */
+    bool is_awake = (
+        surgescript_tagsystem_has_tag(tag_system, entity_name, "awake") ||
+        surgescript_tagsystem_has_tag(tag_system, entity_name, "detached")
+    );
+    surgescript_objecthandle_t entity_container_handle = surgescript_var_get_objecthandle(
+        is_awake ?
+        surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR) :
+        surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR)
+    );
+    surgescript_object_t* entity_container = surgescript_objectmanager_get(manager, entity_container_handle);
+
 #if WANT_SPACE_PARTITIONING
-    /* store it in the EntityTree if unawake */
     if(!is_awake) {
+        /* store the entity in a container of the EntityTree if unawake */
         surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
         surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
         surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
-
         surgescript_var_t* entity_var = surgescript_var_create();
-        surgescript_var_set_objecthandle(entity_var, entity_handle);
-
         const surgescript_var_t* args[] = { entity_var };
+
+        /* call entityTree.bubbleDown(entity) */
+        surgescript_var_set_objecthandle(entity_var, entity_handle);
         surgescript_object_call_function(entity_tree, "bubbleDown", args, 1, NULL);
 
         surgescript_var_destroy(entity_var);
     }
+    else {
+        /* store the entity in the awake container */
+        surgescript_var_t* arg = surgescript_var_create();
+        const surgescript_var_t* args[] = { arg };
+
+        /* call entityContainer.storeEntity(entity) */
+        surgescript_var_set_objecthandle(arg, entity_handle);
+        surgescript_object_call_function(entity_container, "storeEntity", args, 1, NULL);
+
+        surgescript_var_destroy(arg);
+    }
+#else
+    /* store the entity in the selected entity container */
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    /* call entityContainer.storeEntity(entity) */
+    surgescript_var_set_objecthandle(arg, entity_handle);
+    surgescript_object_call_function(entity_container, "storeEntity", args, 1, NULL);
+
+    surgescript_var_destroy(arg);
 #endif
 
     /* return the handle to the spawned entity */
@@ -452,7 +472,7 @@ surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* we first check if the object exists and if it's an entity
-       it it passes those tests, then we call this.findObject() */
+       it it passes those tests, then we search for it */
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
     const char* object_name = surgescript_var_fast_get_string(param[0]);
@@ -462,9 +482,18 @@ surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescrip
         surgescript_objectmanager_class_exists(manager, object_name) &&
         surgescript_tagsystem_has_tag(tag_system, object_name, "entity")
     ) {
-        /* find the entity down the object tree */
-        surgescript_object_call_function(object, "findObject", param, 1, ret);
-        return ret; /* will be null if no such entity is found */
+        /*
+         * TODO: develop a faster data structure?
+         * We just call Level.child() here
+         */
+
+        /* get the Level object */
+        surgescript_objecthandle_t level_handle = surgescript_object_parent(object);
+        surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
+
+        /* find the entity */
+        surgescript_object_call_function(level, "child", param, 1, ret);
+        return ret; /* will be null if no entity is found */
     }
     else {
         /* the object doesn't exist or is not an entity */
@@ -476,7 +505,7 @@ surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescrip
 surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     /* we first check if the objects exist and if they're entities
-       it they pass those tests, then we call this.findObjects() */
+       it they pass those tests, then we search for it */
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
     const char* object_name = surgescript_var_fast_get_string(param[0]);
@@ -486,9 +515,18 @@ surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescr
         surgescript_objectmanager_class_exists(manager, object_name) &&
         surgescript_tagsystem_has_tag(tag_system, object_name, "entity")
     ) {
-        /* find the entities down the object tree */
-        surgescript_object_call_function(object, "findObjects", param, 1, ret);
-        return ret; /* will be a new empty array if no such entities are found */
+        /*
+         * TODO: develop a faster data structure?
+         * We just call Level.children() here
+         */
+
+        /* get the Level object */
+        surgescript_objecthandle_t level_handle = surgescript_object_parent(object);
+        surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
+
+        /* find the entities */
+        surgescript_object_call_function(level, "children", param, 1, ret);
+        return ret; /* will be null if no entities are found */
     }
     else {
         /* the object doesn't exist or is not an entity */
@@ -575,14 +613,19 @@ surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const 
 /* add a brick-like object */
 surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[0]);
-    surgescript_object_t* bricklike = surgescript_objectmanager_get(manager, handle);
-    entitydb_t* db = get_db(object);
+
+    /* validate the input object */
+    if(!surgescript_objectmanager_exists(manager, handle))
+        return NULL;
 
     /* validate the object before adding it to the list */
-    if(0 == strcmp(surgescript_object_name(bricklike), "Brick"))
+    const surgescript_object_t* bricklike = surgescript_objectmanager_get(manager, handle);
+    if(0 == strcmp(surgescript_object_name(bricklike), "Brick")) {
+        entitydb_t* db = get_db(object);
         darray_push(db->bricklike_objects, handle);
+    }
 
     return NULL;
 }
@@ -683,40 +726,6 @@ surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescrip
             }
         }
     }
-
-    /* done! */
-    return NULL;
-}
-
-/* release all children */
-surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-
-    /* release children of the debug container */
-    surgescript_var_t* debug_container_var = surgescript_heap_at(heap, DEBUGENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t debug_container_handle = surgescript_var_get_objecthandle(debug_container_var);
-    surgescript_object_t* debug_container = surgescript_objectmanager_get(manager, debug_container_handle);
-    surgescript_object_call_function(debug_container, "exitDebugMode", NULL, 0, NULL);
-    surgescript_object_call_function(debug_container, "__releaseChildren", NULL, 0, NULL);
-
-    /* release children of the awake container */
-    surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
-    surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
-    surgescript_object_call_function(awake_container, "__releaseChildren", NULL, 0, NULL);
-
-#if WANT_SPACE_PARTITIONING
-    /* release children of all the unawake containers */
-    foreach_unawake_container(object, "__releaseChildren", NULL, 0);
-#else
-    /* release children of the unawake container */
-    surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
-    surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
-    surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-    surgescript_object_call_function(unawake_container, "__releaseChildren", NULL, 0, NULL);
-#endif
 
     /* done! */
     return NULL;
@@ -1124,25 +1133,25 @@ void pause_containers(surgescript_object_t* entity_manager, bool pause)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
     surgescript_heap_t* heap = surgescript_object_heap(entity_manager);
-    bool is_active = !pause;
+    const char* fun_name = pause ? "pause" : "resume";
 
     /* pause the awake container */
     surgescript_var_t* awake_container_var = surgescript_heap_at(heap, AWAKEENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t awake_container_handle = surgescript_var_get_objecthandle(awake_container_var);
     surgescript_object_t* awake_container = surgescript_objectmanager_get(manager, awake_container_handle);
-    surgescript_object_set_active(awake_container, is_active);
+    surgescript_object_call_function(awake_container, fun_name, NULL, 0, NULL);
 
     /* pause the unawake container */
     surgescript_var_t* unawake_container_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(unawake_container_var);
     surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-    surgescript_object_set_active(unawake_container, is_active);
+    surgescript_object_call_function(unawake_container, fun_name, NULL, 0, NULL);
 
 #if WANT_SPACE_PARTITIONING
     /* pause the EntityTree */
     surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
     surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
     surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
-    surgescript_object_set_active(entity_tree, is_active);
+    surgescript_object_set_active(entity_tree, !pause); /* TODO */
 #endif
 }

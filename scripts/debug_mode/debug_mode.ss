@@ -64,7 +64,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 
 // The Debug Mode object manages its plugins
-object "Debug Mode"
+object "Debug Mode" is "entity", "awake", "detached", "private"
 {
     plugins = [];
     indicesOfPluginsScheduledForRemoval = [];

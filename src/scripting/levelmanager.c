@@ -55,15 +55,35 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 {
     /* allocate space for storing references to child objects */
     surgescript_heap_t* heap = surgescript_object_heap(object);
+
     ssassert(LEVEL_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, LEVEL_ADDR));
+
     ssassert(PLAYERMANAGER_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_null(surgescript_heap_at(heap, PLAYERMANAGER_ADDR));
+
+    /* done */
     return NULL;
 }
 
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* do nothing */
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_var_t* level_var = surgescript_heap_at(heap, LEVEL_ADDR);
+
+    /* wake up the Level if it's loaded */
+    if(!surgescript_var_is_null(level_var)) {
+        surgescript_objecthandle_t level_handle = surgescript_var_get_objecthandle(level_var);
+        if(surgescript_objectmanager_exists(manager, level_handle)) {
+            /* assume the Level will never be destroyed before this object */
+            surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
+            surgescript_object_set_active(level, true);
+        }
+    }
+
+    /* done */
     return NULL;
 }
 
@@ -129,9 +149,8 @@ surgescript_var_t* fun_onlevelunload(surgescript_object_t* object, const surgesc
 
     #if 0
     /*
-    BUG: if we destroy the PlayerManager now, we can't use any Player instance in an
-    object destructor when unloading the level. We get a crash. Player instances are
-    children of PlayerManager.
+    BUG: if we destroy the PlayerManager now, we can't get any Player instance in an
+    object destructor when unloading the level. We get a crash.
 
     Let the garbage collector take care of the PlayerManager? This reference will be
     lost when loading a new level.

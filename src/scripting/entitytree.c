@@ -741,6 +741,19 @@ surgescript_var_t* fun_leaf_bubbleup(surgescript_object_t* object, const surgesc
     v2d_t entity_position = get_clipped_position(entity, world_width, world_height);
     if(!point_belongs_to_rect(sector->cached_rect, entity_position.x, entity_position.y)) {
 
+        /* get the entity container of this leaf sector */
+        surgescript_heap_t* heap = surgescript_object_heap(object);
+        surgescript_var_t* container_var = surgescript_heap_at(heap, ENTITYCONTAINER_ADDR);
+        surgescript_objecthandle_t container_handle = surgescript_var_get_objecthandle(container_var);
+        surgescript_object_t* container = surgescript_objectmanager_get(manager, container_handle);
+
+        /* remove this entity from its present container */
+        surgescript_var_t* arg = surgescript_var_create();
+        const surgescript_var_t* args[] = { arg };
+        surgescript_var_set_objecthandle(arg, entity_handle);
+        surgescript_object_call_function(container, "removeEntity", args, 1, NULL);
+        surgescript_var_destroy(arg);
+
         /* call parent.bubbleUp(entity) */
         surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
         surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
@@ -803,10 +816,8 @@ surgescript_var_t* fun_leaf_bubbledown(surgescript_object_t* object, const surge
     /* store the entity in the container of this sector */
     surgescript_var_t* arg = surgescript_var_create();
     const surgescript_var_t* args[] = { arg };
-
     surgescript_var_set_objecthandle(arg, entity_handle);
-    surgescript_object_call_function(container, "reparent", args, 1, NULL);
-
+    surgescript_object_call_function(container, "storeEntity", args, 1, NULL);
     surgescript_var_destroy(arg);
 
     /* done */
