@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
+#include "../core/util.h"
 
 /*
 
@@ -62,6 +63,31 @@ static bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t 
 static bool find_and_remove_link(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 static bool check_if_link_exists(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 
+/* iterator */
+typedef struct containeriterator_state_t containeriterator_state_t;
+struct containeriterator_state_t {
+
+    /* we assume that the container will not be destroyed
+       while iterating. That's a reasonable assumption. */
+    const surgescript_objectmanager_t* manager;
+    const surgescript_heap_t* heap;
+    surgescript_heapptr_t next;
+
+    surgescript_object_t* cached_object;
+    surgescript_heapptr_t cached_next;
+
+};
+static iterator_state_t* containeriterator_state_ctor(void* container_object);
+static void containeriterator_state_dtor(iterator_state_t* s);
+static void* containeriterator_state_next(iterator_state_t* s);
+static bool containeriterator_state_hasnext(iterator_state_t* s);
+
+
+
+
+/*
+ * Public functions
+ */
 
 /*
  * scripting_register_levelobjectcontainer()
@@ -86,12 +112,33 @@ void scripting_register_levelobjectcontainer(surgescript_vm_t* vm)
  * scripting_levelobjectcontainer_token()
  * Constructor token
  */
-const void* scripting_levelobjectcontainer_token()
+void* scripting_levelobjectcontainer_token()
 {
     return &token;
 }
 
+/*
+ * scripting_levelobjectcontainer_iterator()
+ * Creates an iterator linked to a LevelContainerObject
+ */
+iterator_t* scripting_levelobjectcontainer_iterator(surgescript_object_t* container)
+{
+    return iterator_create(
+        container,
+        containeriterator_state_ctor,
+        containeriterator_state_dtor,
+        containeriterator_state_next,
+        containeriterator_state_hasnext
+    );
+}
 
+
+
+
+
+/*
+ * SurgeScript API
+ */
 
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
@@ -187,9 +234,10 @@ surgescript_var_t* fun_addobject(surgescript_object_t* object, const surgescript
 
     /* get the new object */
     surgescript_objecthandle_t new_object_handle = surgescript_var_get_objecthandle(param[0]);
+    if(!surgescript_objectmanager_exists(manager, new_object_handle)) scripting_error(object, "foo");
     surgescript_object_t* new_object = surgescript_objectmanager_get(manager, new_object_handle);
 
-    /* the object must be a child of Level */
+    /* the object must be a child of Level, because we'll traverse its sub-tree */
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(new_object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     const char* parent_name = surgescript_object_name(parent);
@@ -306,4 +354,102 @@ bool check_if_link_exists(surgescript_var_t* handle_var, surgescript_heapptr_t p
 
     /* continue the iteration while we don't find the target handle */
     return handle != *target_handle;
+}
+
+
+
+/*
+ * Iterator
+ */
+
+/* state constructor */
+iterator_state_t* containeriterator_state_ctor(void* container_object)
+{
+    const surgescript_object_t* container = (const surgescript_object_t*)container_object;
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(container);
+    const surgescript_heap_t* heap = surgescript_object_heap(container);
+
+    containeriterator_state_t* state = mallocx(sizeof *state);
+    state->manager = manager;
+    state->heap = heap;
+    state->next = FIRST_STORED_OBJECT_ADDR;
+    state->cached_object = NULL;
+    state->cached_next = 0;
+
+    return state;
+}
+
+/* state destructor */
+void containeriterator_state_dtor(iterator_state_t* s)
+{
+    containeriterator_state_t* state = (containeriterator_state_t*)s;
+    free(state);
+}
+
+/* advance the iteration cursor */
+void* containeriterator_state_next(iterator_state_t* s)
+{
+    containeriterator_state_t* state = (containeriterator_state_t*)s;
+
+    /* do we have a cached object? don't recompute things */
+    if(state->cached_object != NULL) {
+        surgescript_object_t* stored_object = state->cached_object;
+        state->cached_object = NULL;
+        state->next = state->cached_next; /* advance the cursor */
+        return stored_object;
+    }
+
+    /* find the next object */
+    size_t heap_size = surgescript_heap_size(state->heap);
+    while(state->next < heap_size) {
+        surgescript_heapptr_t current = state->next++; /* advance the cursor */
+
+        if(surgescript_heap_validaddress(state->heap, current)) {
+            const surgescript_var_t* data = surgescript_heap_at(state->heap, current);
+
+            if(!surgescript_var_is_null(data)) { /* data is either null or objecthandle */
+                surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(data);
+
+                if(surgescript_objectmanager_exists(state->manager, handle)) {
+                    /* success */
+                    surgescript_object_t* stored_object = surgescript_objectmanager_get(state->manager, handle);
+                    return stored_object;
+                }
+            }
+        }
+    }
+
+    /* end of iteration */
+    return NULL;
+}
+
+/* is the iteration over? */
+bool containeriterator_state_hasnext(iterator_state_t* s)
+{
+    containeriterator_state_t* state = (containeriterator_state_t*)s;
+    size_t heap_size = surgescript_heap_size(state->heap);
+
+    /* is there a next object? */
+    surgescript_heapptr_t test_next = state->next;
+    while(test_next < heap_size) {
+        surgescript_heapptr_t current = test_next++;
+
+        if(surgescript_heap_validaddress(state->heap, current)) {
+            const surgescript_var_t* data = surgescript_heap_at(state->heap, current);
+
+            if(!surgescript_var_is_null(data)) { /* data is either null or objecthandle */
+                surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(data);
+
+                if(surgescript_objectmanager_exists(state->manager, handle)) {
+                    /* success */
+                    state->cached_object = surgescript_objectmanager_get(state->manager, handle);
+                    state->cached_next = test_next;
+                    return true;
+                }
+            }
+        }
+    }
+
+    /* no more valid objects */
+    return false;
 }
