@@ -116,9 +116,12 @@ static levelinfo_t* level_info_ctor(surgescript_object_t* entity_manager);
 static levelinfo_t* level_info_dtor(levelinfo_t* level_info);
 static inline levelinfo_t* get_level_info(const surgescript_object_t* level);
 static inline surgescript_object_t* get_entity_manager(const surgescript_object_t* level);
+static inline surgescript_object_t* get_container(const surgescript_object_t* level);
 static void update_music(surgescript_object_t* object);
 static void update_time(surgescript_object_t* object);
 static void warn_about_entity_descendant(surgescript_objecthandle_t entity_handle, void* data);
+static inline bool is_in_debug_mode(const surgescript_object_t* level);
+static inline void pause_containers(const surgescript_object_t* level, bool pause);
 
 
 
@@ -180,6 +183,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "__registerSetupObjectName", fun_registersetupobjectname, 1);
     surgescript_vm_bind(vm, "Level", "__spawnSetupObjects", fun_spawnsetupobjects, 0);
     surgescript_vm_bind(vm, "Level", "__spawnAsSetupObject", fun_spawnassetupobject, 1);
+
     surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
 }
 
@@ -357,6 +361,9 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     update_music(object);
     update_time(object);
 
+    /* pause the containers when in Debug Mode */
+    pause_containers(object, is_in_debug_mode(object));
+
     /* update built-ins */
     for(surgescript_heapptr_t ptr = 0; ptr <= LAST_ADDR; ptr++) {
         const surgescript_var_t* builtin_var = surgescript_heap_at(heap, ptr);
@@ -424,13 +431,8 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     /*surgescript_object_find_tagged_descendants(child, "entity", child, warn_entity_descendant);*/ /* potentially expensive; can't take time into account */
     surgescript_object_tagged_children(child, "entity", child, warn_about_entity_descendant); /* cheap, reasonable approximation */
 
-    /* get the LevelObjectContainer */
-    const surgescript_heap_t* heap = surgescript_object_heap(object);
-    const surgescript_var_t* container_var = surgescript_heap_at(heap, CONTAINER_ADDR);
-    surgescript_objecthandle_t container_handle = surgescript_var_get_objecthandle(container_var);
-    surgescript_object_t* container = surgescript_objectmanager_get(manager, container_handle);
-
     /* add to the LevelObjectContainer */
+    surgescript_object_t* container = get_container(object);
     surgescript_var_t* arg = surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
     const surgescript_var_t* args[] = { arg };
     surgescript_object_call_function(container, "addObject", args, 1, NULL);
@@ -1012,7 +1014,6 @@ surgescript_var_t* fun_spawnassetupobject(surgescript_object_t* object, const su
 
 
 
-
 /*
  * Helpers
  */
@@ -1064,6 +1065,19 @@ surgescript_object_t* get_entity_manager(const surgescript_object_t* level)
 
     return entity_manager;
 #endif
+}
+
+/* get the LevelObjectContainer */
+surgescript_object_t* get_container(const surgescript_object_t* level)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+    const surgescript_heap_t* heap = surgescript_object_heap(level);
+
+    const surgescript_var_t* container_var = surgescript_heap_at(heap, CONTAINER_ADDR);
+    surgescript_objecthandle_t container_handle = surgescript_var_get_objecthandle(container_var);
+    surgescript_object_t* container = surgescript_objectmanager_get(manager, container_handle);
+
+    return container;
 }
 
 /* updates the reference to Level.music */
@@ -1120,7 +1134,42 @@ void warn_about_entity_descendant(surgescript_objecthandle_t entity_handle, void
     video_showmessage("Entity \"%s\" must not be a descendant of \"%s\" (non-entity)", surgescript_object_name(entity), surgescript_object_name(ascendant));
 }
 
-/* SurgeScript code */
+/* are we in the Debug Mode? */
+bool is_in_debug_mode(const surgescript_object_t* level)
+{
+    surgescript_object_t* entity_manager = get_entity_manager(level);
+    surgescript_var_t* ret = surgescript_var_create();
+
+    surgescript_object_call_function(entity_manager, "isInDebugMode", NULL, 0, ret);
+    bool value = surgescript_var_get_bool(ret);
+
+    surgescript_var_destroy(ret);
+    return value;
+}
+
+/* pause or resume the object containers */
+void pause_containers(const surgescript_object_t* level, bool pause)
+{
+    surgescript_object_t* entity_manager = get_entity_manager(level);
+    surgescript_object_t* container = get_container(level);
+
+    if(pause) {
+        surgescript_object_call_function(entity_manager, "pauseContainers", NULL, 0, NULL);
+        surgescript_object_call_function(container, "pause", NULL, 0, NULL);
+    }
+    else {
+        surgescript_object_call_function(container, "resume", NULL, 0, NULL);
+        surgescript_object_call_function(entity_manager, "resumeContainers", NULL, 0, NULL);
+    }
+}
+
+
+
+
+
+/*
+ * SurgeScript code
+ */
 static const char code_in_surgescript[] = "\
 object 'LevelSetupFunctor' \n\
 { \n\

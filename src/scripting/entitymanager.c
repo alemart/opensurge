@@ -34,7 +34,7 @@
  *
  * Level setup objects and player companion objects are special cases. They are
  * always considered to be entities, regardless if they are tagged "entity" or
- * not.
+ * not, for backwards compatibility purposes.
  */
 
 #define FASTHASH_INLINE
@@ -104,7 +104,6 @@ bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2d_t pos
 void entitymanager_get_roi(surgescript_object_t* entity_manager, int* top, int* left, int* bottom, int* right);
 arrayiterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
 ssarrayiterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
-bool entitymanager_is_in_debug_mode(surgescript_object_t* entity_manager);
 
 /* SurgeScript API */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -129,6 +128,8 @@ static surgescript_var_t* fun_isindebugmode(surgescript_object_t* object, const 
 static surgescript_var_t* fun_enterdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_exitdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_pausecontainers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_resumecontainers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t AWAKEENTITYCONTAINER_ADDR = 0;
 static const surgescript_heapptr_t UNAWAKEENTITYCONTAINER_ADDR = 1;
 static const surgescript_heapptr_t DEBUGENTITYCONTAINER_ADDR = 2;
@@ -145,6 +146,7 @@ static void foreach_unawake_container_inside_roi(surgescript_object_t* entity_ma
 static void foreach_unawake_container(surgescript_object_t* entity_manager, const char* fun_name, const surgescript_var_t** param, int num_params);
 static void foreach_unawake_container_callback(surgescript_objecthandle_t container_handle, void* data);
 static void pause_containers(surgescript_object_t* entity_manager, bool pause);
+static bool is_in_debug_mode(surgescript_object_t* entity_manager);
 
 
 
@@ -179,6 +181,9 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "enterDebugMode", fun_enterdebugmode, 0);
     surgescript_vm_bind(vm, "EntityManager", "exitDebugMode", fun_exitdebugmode, 0);
     surgescript_vm_bind(vm, "EntityManager", "get_debugMode", fun_getdebugmode, 0);
+
+    surgescript_vm_bind(vm, "EntityManager", "pauseContainers", fun_pausecontainers, 0);
+    surgescript_vm_bind(vm, "EntityManager", "resumeContainers", fun_resumecontainers, 0);
 }
 
 
@@ -194,15 +199,6 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 
     /* clear the brick-like object list */
     darray_clear(db->bricklike_objects);
-
-    /* pause the game when in Debug Mode */
-    if(entitymanager_is_in_debug_mode(object)) {
-        /* what about moving bricks? What about
-           children of Level that are not entities? */
-        pause_containers(object, true);
-    }
-    else
-        pause_containers(object, false);
 
     /* done */
     return NULL;
@@ -793,7 +789,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
 
     /* set the rendering flags */
     int flags = 0;
-    flags |= (level_editmode() || entitymanager_is_in_debug_mode(object)) ? 0x1 : 0;
+    flags |= (level_editmode() || is_in_debug_mode(object)) ? 0x1 : 0;
     flags |= level_is_displaying_gizmos() ? 0x2 : 0;
     surgescript_var_set_rawbits(arg, flags);
 
@@ -886,6 +882,20 @@ surgescript_var_t* fun_getdebugmode(surgescript_object_t* object, const surgescr
     surgescript_var_t* ret = surgescript_var_create();
     surgescript_object_call_function(debug_container, "get_debugMode", NULL, 0, ret);
     return ret;
+}
+
+/* pause the entity containers */
+surgescript_var_t* fun_pausecontainers(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    pause_containers(object, true);
+    return NULL;
+}
+
+/* resume the entity containers */
+surgescript_var_t* fun_resumecontainers(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    pause_containers(object, false);
+    return NULL;
 }
 
 
@@ -1052,18 +1062,6 @@ iterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_m
     return iterator_create_from_disposable_surgescript_array(array);
 }
 
-/* are we in the Debug Mode? */
-bool entitymanager_is_in_debug_mode(surgescript_object_t* entity_manager)
-{
-    surgescript_var_t* ret = surgescript_var_create();
-
-    surgescript_object_call_function(entity_manager, "isInDebugMode", NULL, 0, ret);
-    bool value = surgescript_var_get_bool(ret);
-
-    surgescript_var_destroy(ret);
-    return value;
-}
-
 
 
 /*
@@ -1173,4 +1171,19 @@ void pause_containers(surgescript_object_t* entity_manager, bool pause)
     surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
     surgescript_object_set_active(entity_tree, !pause); /* TODO */
 #endif
+
+    /* do not pause the debug container */
+    ;
+}
+
+/* are we in the Debug Mode? */
+bool is_in_debug_mode(surgescript_object_t* entity_manager)
+{
+    surgescript_var_t* ret = surgescript_var_create();
+
+    surgescript_object_call_function(entity_manager, "isInDebugMode", NULL, 0, ret);
+    bool value = surgescript_var_get_bool(ret);
+
+    surgescript_var_destroy(ret);
+    return value;
 }

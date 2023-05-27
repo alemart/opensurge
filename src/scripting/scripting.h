@@ -101,6 +101,5 @@ extern bool entitymanager_is_inside_roi(surgescript_object_t* entity_manager, v2
 extern void entitymanager_get_roi(surgescript_object_t* entity_manager, int* top, int* left, int* bottom, int* right);
 extern iterator_t* entitymanager_bricklike_iterator(surgescript_object_t* entity_manager);
 extern iterator_t* entitymanager_activeentities_iterator(surgescript_object_t* entity_manager);
-extern bool entitymanager_is_in_debug_mode(surgescript_object_t* entity_manager);
 
 #endif
