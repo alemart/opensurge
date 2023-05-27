@@ -18,6 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * A SurgeScript object is considered to be an entity if it meets all of the
+ * following conditions:
+ *
+ * 1. the object is tagged "entity"
+ * 2. the object is a direct child of Level or a direct child of another entity
+ *
+ * Objects that are direct children of entities but that are not tagged "entity"
+ * are considered to be components. Components are meant to modify the entities
+ * in some way.
+ *
+ * Components may not have any entities as descendants. For example: a child of
+ * a component is not considered to be an entity, even if it's tagged "entity".
+ *
+ * Level setup objects and player companion objects are special cases. They are
+ * always considered to be entities, regardless if they are tagged "entity" or
+ * not.
+ */
+
 #define FASTHASH_INLINE
 #include "../core/fasthash.h"
 
