@@ -360,6 +360,7 @@ SET(GAME_SRCS
   src/scripting/obstaclemap.c
   src/scripting/platform.c
   src/scripting/player.c
+  src/scripting/playermanager.c
   src/scripting/prefs.c
   src/scripting/screen.c
   src/scripting/sensor.c

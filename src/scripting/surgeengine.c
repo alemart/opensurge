@@ -81,7 +81,7 @@ object 'SurgeEngine' \n\
 \n\
     fun get_Player() \n\
     { \n\
-        return LevelManager.playerManager; \n\
+        return LevelManager.currentLevel.__playerManager; \n\
     } \n\
 \n\
     fun get_Behavior() { return Behaviors; } \n\

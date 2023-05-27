@@ -165,9 +165,12 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t level_object_container = surgescript_objectmanager_spawn(manager, this_handle, "LevelObjectContainer", scripting_levelobjectcontainer_token());
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, LEVELOBJECTCONTAINER_ADDR), level_object_container);
 
-    /* set the internal pointer */
+    /* get the EntityManager */
     surgescript_objecthandle_t entity_manager_handle = surgescript_object_find_ascendant(object, "EntityManager");
+    ssassert(surgescript_objectmanager_exists(manager, entity_manager_handle));
     surgescript_object_t* entity_manager = surgescript_objectmanager_get(manager, entity_manager_handle);
+
+    /* set the internal pointer */
     surgescript_object_set_userdata(object, entity_manager);
 
     /* done */
@@ -806,12 +809,14 @@ bool render_subtree(surgescript_object_t* object, void* data)
 
 bool add_to_late_update_queue(surgescript_object_t* entity_or_component, void* data)
 {
-    /* skip if not entity */
+    /* skip if the object is not an entity */
     if(!surgescript_object_has_tag(entity_or_component, "entity"))
         return false; /* save processing time; entities that are descendants of non-entities will be skipped */
 
+    /* the object is an entity */
+    const surgescript_object_t* entity = entity_or_component;
+
     /* does this entity implement lateUpdate() ? */
-    surgescript_object_t* entity = entity_or_component;
     if(surgescript_object_has_function(entity, "lateUpdate")) {
 
         /* get data */

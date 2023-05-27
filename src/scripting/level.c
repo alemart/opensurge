@@ -78,8 +78,11 @@ static surgescript_var_t* fun_get_debugmode(surgescript_object_t* object, const 
 static surgescript_var_t* fun_set_debugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setonunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_onunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_unload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getplayermanager(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_registersetupobjectname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawnsetupobjects(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawnassetupobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -90,7 +93,8 @@ static const surgescript_heapptr_t UNLOADFUNCTOR_ADDR = 3; /* Level.onUnload fun
 static const surgescript_heapptr_t TIME_ADDR = 4; /* Level.time */
 static const surgescript_heapptr_t CONTAINER_ADDR = 5; /* LevelObjectContainer */
 static const surgescript_heapptr_t ENTITYMANAGER_ADDR = 6; /* EntityManager */
-#define LAST_ADDR ENTITYMANAGER_ADDR /* must be an alias to the last address */
+static const surgescript_heapptr_t PLAYERMANAGER_ADDR = 7; /* PlayerManager */
+#define LAST_ADDR PLAYERMANAGER_ADDR /* must be an alias to the last address */
 static const char code_in_surgescript[];
 
 /* level info */
@@ -168,8 +172,11 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "setup", fun_setup, 1);
     surgescript_vm_bind(vm, "Level", "get_debugMode", fun_get_debugmode, 0);
     surgescript_vm_bind(vm, "Level", "set_debugMode", fun_set_debugmode, 1);
+    surgescript_vm_bind(vm, "Level", "__onLoad", fun_onload, 0);
+    surgescript_vm_bind(vm, "Level", "__onUnload", fun_onunload, 0);
     surgescript_vm_bind(vm, "Level", "__callUnloadFunctor", fun_callunloadfunctor, 0);
-    surgescript_vm_bind(vm, "Level", "__releaseChildren", fun_releasechildren, 0);
+    surgescript_vm_bind(vm, "Level", "__releaseChildren", fun_unload, 0);
+    surgescript_vm_bind(vm, "Level", "get___playerManager", fun_getplayermanager, 0);
     surgescript_vm_bind(vm, "Level", "__registerSetupObjectName", fun_registersetupobjectname, 1);
     surgescript_vm_bind(vm, "Level", "__spawnSetupObjects", fun_spawnsetupobjects, 0);
     surgescript_vm_bind(vm, "Level", "__spawnAsSetupObject", fun_spawnassetupobject, 1);
@@ -232,6 +239,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t setup = surgescript_objectmanager_spawn(manager, me, "LevelSetupFunctor", NULL);
     surgescript_objecthandle_t container = surgescript_objectmanager_spawn(manager, me, "LevelObjectContainer", scripting_levelobjectcontainer_token());
     surgescript_objecthandle_t entity_manager = surgescript_objectmanager_spawn(manager, me, "EntityManager", NULL);
+    surgescript_objecthandle_t player_manager = surgescript_objectmanager_spawn(manager, me, "PlayerManager", NULL);
 
     /* Level music */
     ssassert(MUSIC_ADDR == surgescript_heap_malloc(heap));
@@ -261,6 +269,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(ENTITYMANAGER_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ENTITYMANAGER_ADDR), entity_manager);
 
+    /* PlayerManager */
+    ssassert(PLAYERMANAGER_ADDR == surgescript_heap_malloc(heap));
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, PLAYERMANAGER_ADDR), player_manager);
+
     /* allocate a level info structure */
     surgescript_object_t* entity_manager_ptr = surgescript_objectmanager_get(manager, entity_manager);
     levelinfo_t* level_info = level_info_ctor(entity_manager_ptr);
@@ -279,6 +291,59 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
     surgescript_object_set_userdata(object, NULL);
 
     /* done! */
+    return NULL;
+}
+
+/* called as soon as the level is loaded */
+surgescript_var_t* fun_onload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+#if 0
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    /* spawn the PlayerGroup in a container */
+    surgescript_var_set_string(arg, "PlayerGroup");
+    surgescript_object_call_function(object, "spawn", args, 1, ret);
+    surgescript_var_copy(surgescript_heap_at(heap, PLAYERMANAGER_ADDR), ret);
+
+    /* done */
+    surgescript_var_destroy(arg);
+    surgescript_var_destroy(ret);
+#endif
+    return NULL;
+}
+
+/* called as soon as the level is unloaded */
+surgescript_var_t* fun_onunload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_var_t* player_manager_handle_var = surgescript_heap_at(heap, PLAYERMANAGER_ADDR);
+    surgescript_objecthandle_t player_manager_handle = surgescript_var_get_objecthandle(player_manager_handle_var);
+    surgescript_object_t* player_manager = surgescript_objectmanager_get(manager, player_manager_handle);
+
+    /* call Level.onUnload(), if applicable */
+    surgescript_object_call_function(object, "__callUnloadFunctor", NULL, 0, NULL);
+
+    /* unload the PlayerManager */
+    surgescript_object_call_function(player_manager, "__unload", NULL, 0, NULL);
+
+    /* release all user-added children of the Level, but not the Level object itself */
+    surgescript_object_call_function(object, "__releaseChildren", NULL, 0, NULL);
+
+    #if 0
+    /*
+    If we destroy the PlayerManager now, we can't get any Player instance in an
+    object destructor when unloading the level. We get a crash.
+    */
+    surgescript_object_kill(player_manager);
+    surgescript_var_set_null(surgescript_heap_at(heap, PLAYERMANAGER_ADDR));
+    #endif
+
+    /* done */
     return NULL;
 }
 
@@ -782,7 +847,7 @@ surgescript_var_t* fun_callunloadfunctor(surgescript_object_t* object, const sur
 }
 
 /* release all children, which will call their destructors on the next update cycle */
-surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_unload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
@@ -825,6 +890,15 @@ surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surge
     /* done */
     darray_release(handles);
     return NULL;
+}
+
+/* get the PlayerManager */
+surgescript_var_t* fun_getplayermanager(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_var_t* player_group_var = surgescript_heap_at(heap, PLAYERMANAGER_ADDR);
+ 
+    return surgescript_var_clone(player_group_var);
 }
 
 /* register the name of a Level setup object */

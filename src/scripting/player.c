@@ -38,7 +38,7 @@
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_unload(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -57,7 +57,6 @@ static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const su
 static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinput(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getdying(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -140,22 +139,6 @@ static surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescr
 static surgescript_var_t* fun_moveby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
-/* PlayerManager */
-static surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_getactive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_getbyname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_getbyid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_getcount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_exists(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_get(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_manager_call(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-
 /* internals */
 #define SHOW_COLLIDERS 0 /* set it to 1 to display the colliders */
 
@@ -168,9 +151,6 @@ static const surgescript_heapptr_t MOVEBYDX_ADDR = 5;
 static const surgescript_heapptr_t MOVEBYDY_ADDR = 6;
 static const surgescript_heapptr_t COMPANION_BASE_ADDR = 7; /* must be the last address of Player */
 
-static const surgescript_heapptr_t MANAGER_PLAYERCOUNT_ADDR = 0;
-static const surgescript_heapptr_t MANAGER_PLAYERBASE_ADDR = 1; /* must be the last address of PlayerManager */
-
 static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
@@ -179,14 +159,13 @@ static void update_collider(surgescript_object_t* object, int width, int height)
 static void update_animation(surgescript_object_t* object, const animation_t* animation);
 static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
-static void release_children(surgescript_objecthandle_t handle, void* mgr);
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 #define STAY_MIDAIR(player) (player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
 
 
 /*
  * scripting_register_player()
- * Register the routines for Player
+ * Register the routines of Player
  */
 void scripting_register_player(surgescript_vm_t* vm)
 {
@@ -293,31 +272,15 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
     
     /* general-purpose methods */
+    surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
     surgescript_vm_bind(vm, "Player", "constructor", fun_constructor, 0);
     surgescript_vm_bind(vm, "Player", "destructor", fun_destructor, 0);
-    surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
-    surgescript_vm_bind(vm, "Player", "__releaseChildren", fun_releasechildren, 0);
-    surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
-    surgescript_vm_bind(vm, "Player", "lateUpdate", fun_lateupdate, 0);
     surgescript_vm_bind(vm, "Player", "destroy", fun_destroy, 0);
+    surgescript_vm_bind(vm, "Player", "lateUpdate", fun_lateupdate, 0);
+    surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
+    surgescript_vm_bind(vm, "Player", "__releaseChildren", fun_unload, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
     surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 0);
-
-    /* misc */
-    surgescript_vm_bind(vm, "PlayerManager", "state:main", fun_manager_main, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "destroy", fun_manager_destroy, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "constructor", fun_manager_constructor, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "destructor", fun_manager_destructor, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "__releaseChildren", fun_manager_releasechildren, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "__spawnPlayers", fun_manager_spawnplayers, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "get_count", fun_manager_getcount, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "get_active", fun_manager_getactive, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "__getById", fun_manager_getbyid, 1);
-    surgescript_vm_bind(vm, "PlayerManager", "__getByName", fun_manager_getbyname, 1);
-    surgescript_vm_bind(vm, "PlayerManager", "get_initialLives", fun_manager_getinitiallives, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "exists", fun_manager_exists, 1);
-    surgescript_vm_bind(vm, "PlayerManager", "get", fun_manager_get, 1);
-    surgescript_vm_bind(vm, "PlayerManager", "call", fun_manager_call, 1);
 }
 
 /*
@@ -394,17 +357,9 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     );
     #endif
 
-#if 0 /* FIXME */
-    /* Player must be a child of an EntityContainer */
-    if(strstr(surgescript_object_name(parent), "EntityContainer") == NULL)
-        scripting_error(object, "Object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
-#elif 0
-    /* Player must be a child of PlayerManager */
-    if(strcmp(surgescript_object_name(parent), "PlayerManager") != 0)
-        scripting_error(object, "Object \"%s\" cannot be a child of \"%s\".", surgescript_object_name(object), surgescript_object_name(parent));
-#else
-    (void)parent;
-#endif
+    /* Player must be a child of Level */
+    if(strcmp(surgescript_object_name(parent), "Level") != 0)
+        scripting_error(object, "%s cannot be a child of %s", surgescript_object_name(object), surgescript_object_name(parent));
 
     /* done */
     surgescript_var_destroy(tmp[4]);
@@ -474,7 +429,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
                     surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
                     surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
 
-                    /* spawn the companion in SurgeScript */
+                    /* spawn the companion */
                     if(surgescript_object_child(object, companion_name) == null_handle) {
                         companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);
                         surgescript_var_set_objecthandle(surgescript_heap_at(heap, addr), companion);
@@ -502,7 +457,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 }
 
 /* __releaseChildren: release all user-added children of this instance of Player (e.g., companions, added on init or not) */
-surgescript_var_t* fun_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_unload(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
@@ -552,7 +507,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* lateUpdate() */
 surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
     player_t* player = get_player(object);
 
     /* move the player by an offset after the physics update */
@@ -863,12 +818,6 @@ surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescri
     );
 }
 
-/* the initial number of lives */
-surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    return surgescript_var_set_number(surgescript_var_create(), PLAYER_INITIAL_LIVES);
-}
-
 /* player speed, in px/s (maps to either xsp or gsp, if the player is in the air or not) */
 surgescript_var_t* fun_getspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1155,7 +1104,7 @@ surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* returns the name of the current shield, or "none" if no shield is present */
+/* returns the name of the current shield, or null if no shield is present */
 surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
@@ -1183,10 +1132,12 @@ surgescript_var_t* fun_getshield(surgescript_object_t* object, const surgescript
 /* grants the player a shield */
 surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    bool no_shield = surgescript_var_is_null(param[0]);
+    const char* shield = surgescript_var_fast_get_string(param[0]);
     player_t* player = get_player(object);
+
     if(player != NULL) {
-        const char* shield = surgescript_var_fast_get_string(param[0]);
-        if(strcmp(shield, "none") == 0)
+        if(no_shield)
             player_grant_shield(player, SH_NONE);
         else if(strcmp(shield, "shield") == 0)
             player_grant_shield(player, SH_SHIELD);
@@ -1201,6 +1152,7 @@ surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript
         else if(strcmp(shield, "wind") == 0)
             player_grant_shield(player, SH_WINDSHIELD);
     }
+
     return NULL;
 }
 
@@ -1698,271 +1650,4 @@ void update_animation(surgescript_object_t* object, const animation_t* animation
 {
     surgescript_object_t* animation_object = get_animation(object);
     scripting_animation_overwrite_ptr(animation_object, animation);
-}
-
-
-
-
-
-
-
-/* Manager */
-
-
-/* PlayerManager: main state */
-surgescript_var_t* fun_manager_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    /* do nothing */
-    return NULL;
-}
-
-/* PlayerManager: constructor */
-surgescript_var_t* fun_manager_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-
-    ssassert(MANAGER_PLAYERCOUNT_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_number(surgescript_heap_at(heap, MANAGER_PLAYERCOUNT_ADDR), 0);
-
-    /*
-
-    memory layout:
-
-    [ PLAYER_COUNT | handle_to_first_player | handle_to_second_player | ... ]
-
-                     ^ base_addr
-
-    */
-
-    return NULL;
-}
-
-/* PlayerManager: destructor */
-surgescript_var_t* fun_manager_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    /*video_showmessage("Called PlayerManager.destructor()");*/
-    return NULL;
-}
-
-/* PlayerManager: release all user-added children of all instances of Player */
-surgescript_var_t* fun_manager_releasechildren(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-#if 1
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_t* player_count_var = surgescript_heap_at(heap, MANAGER_PLAYERCOUNT_ADDR);
-    int player_count = (int)surgescript_var_get_number(player_count_var);
-
-    for(int i = 0; i < player_count; i++) {
-        surgescript_var_t* player_var = surgescript_heap_at(heap, MANAGER_PLAYERBASE_ADDR + i);
-        surgescript_objecthandle_t player_handle = surgescript_var_get_objecthandle(player_var);
-        surgescript_object_t* player = surgescript_objectmanager_get(manager, player_handle);
-
-        surgescript_object_call_function(player, "__releaseChildren", NULL, 0, NULL);
-
-        surgescript_var_set_null(player_var);
-    }
-
-    surgescript_var_set_number(player_count_var, 0);
-
-    (void)release_children;
-#else
-    // no longer children of PlayerManager
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_object_children(object, "Player", manager, release_children);
-#endif
-
-    return NULL;
-}
-
-/* Helper: call player.__releaseChildren() */
-void release_children(surgescript_objecthandle_t handle, void* mgr)
-{
-    surgescript_objectmanager_t* manager = (surgescript_objectmanager_t*)mgr;
-    surgescript_object_t* player = surgescript_objectmanager_get(manager, handle);
-    surgescript_object_call_function(player, "__releaseChildren", NULL, 0, NULL);
-}
-
-/* can't destroy the PlayerManager */
-surgescript_var_t* fun_manager_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    return NULL;
-}
-
-/* spawn (initial) Player objects */
-surgescript_var_t* fun_manager_spawnplayers(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_object_t* level = scripting_util_surgeengine_component(surgescript_vm(), "Level");
-    surgescript_var_t* player_handle = surgescript_var_create();
-    surgescript_var_t* my_param = surgescript_var_create();
-    const surgescript_var_t* p[] = { my_param };
-    player_t* player;
-
-    /* get player count */
-    surgescript_var_t* player_count_var = surgescript_heap_at(heap, MANAGER_PLAYERCOUNT_ADDR);
-    int player_count = (int)surgescript_var_get_number(player_count_var);
-    ssassert(0 == player_count); /* validate */
-
-    /* spawn player i = 0, 1, ... */
-    for(int i = 0; (player = level_get_player_by_id(i)) != NULL; i++) {
-        surgescript_var_set_string(my_param, "Player");
-#if 1
-        surgescript_object_call_function(level, "spawn", p, 1, player_handle);
-#else
-        surgescript_object_call_function(object, "spawn", p, 1, player_handle);
-#endif
-
-        surgescript_heapptr_t player_addr = surgescript_heap_malloc(heap);
-        surgescript_var_t* player_var = surgescript_heap_at(heap, player_addr);
-        ssassert(player_addr == MANAGER_PLAYERBASE_ADDR + player_count); /* validate */
-        surgescript_var_copy(player_var, player_handle); /* heap_malloc */
-        surgescript_var_set_number(player_count_var, ++player_count);
-
-        surgescript_var_set_string(my_param, player_name(player));
-        surgescript_object_call_function(
-            surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(player_handle)),
-            "__init", p, 1, NULL
-        );
-    }
-
-    /* done */
-    surgescript_var_destroy(my_param);
-    surgescript_var_destroy(player_handle);
-    return NULL;
-}
-
-/* the number of players in the scene */
-surgescript_var_t* fun_manager_getcount(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-#if 1
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_t* player_count_var = surgescript_heap_at(heap, MANAGER_PLAYERCOUNT_ADDR);
-
-    return surgescript_var_clone(player_count_var);
-#else
-    return surgescript_var_set_number(surgescript_var_create(), surgescript_object_child_count(object));
-#endif
-}
-
-/* get the active player (i-th child) */
-surgescript_var_t* fun_manager_getactive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    player_t* current_player = level_player(), *player;
-
-    for(int i = 0; (player = level_get_player_by_id(i)) != NULL; i++) {
-        if(player == current_player) {
-#if 1
-            surgescript_var_t* handle_var = surgescript_heap_at(heap, MANAGER_PLAYERBASE_ADDR + i);
-            surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(handle_var);
-#else
-            surgescript_objecthandle_t handle = surgescript_object_nth_child(object, i);
-#endif
-            return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
-        }
-    }
-
-    return NULL;
-}
-
-/* get player by id (0, 1, ..., NUM_PLAYERS - 1) */
-surgescript_var_t* fun_manager_getbyid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    int id = (int)surgescript_var_get_number(param[0]);
-    player_t* player = level_get_player_by_id(id);
-
-    if(player != NULL) {
-#if 1
-        surgescript_heap_t* heap = surgescript_object_heap(object);
-        surgescript_var_t* handle_var = surgescript_heap_at(heap, MANAGER_PLAYERBASE_ADDR + id);
-        surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(handle_var);
-#else
-        surgescript_objecthandle_t handle = surgescript_object_nth_child(object, id);
-#endif
-        return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
-    }
-
-    return NULL;
-}
-
-/* get player by name (returns null if not found) */
-surgescript_var_t* fun_manager_getbyname(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    const char* name = surgescript_var_fast_get_string(param[0]);
-    player_t* player;
-
-    for(int i = 0; (player = level_get_player_by_id(i)) != NULL; i++) {
-        if(str_icmp(player_name(player), name) == 0) { /* will accept case-insensitive matches (e.g. "none" is "None") */
-#if 1
-            surgescript_var_t* handle_var = surgescript_heap_at(heap, MANAGER_PLAYERBASE_ADDR + i);
-            surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(handle_var);
-#else
-            surgescript_objecthandle_t handle = surgescript_object_nth_child(object, i);
-#endif
-            return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
-        }
-    }
-
-    return NULL;
-}
-
-/* the initial number of lives */
-surgescript_var_t* fun_manager_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    return fun_getinitiallives(object, param, num_params); /* just an alias */
-}
-
-/* does the given player exist in the scene? */
-surgescript_var_t* fun_manager_exists(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_var_t* ret = fun_manager_getbyname(object, param, num_params);
-    bool exists = (ret != NULL) && !surgescript_var_is_null(ret);
-
-    if(ret != NULL)
-        surgescript_var_destroy(ret);
-
-    return surgescript_var_set_bool(surgescript_var_create(), exists);
-}
-
-/* [] operator: get player by ID. Crash on error */
-surgescript_var_t* fun_manager_get(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    int id = (int)surgescript_var_get_number(param[0]);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t null_handle = surgescript_objectmanager_null(manager);
-    surgescript_objecthandle_t handle = null_handle;
-
-    surgescript_var_t* ret = fun_manager_getbyid(object, param, num_params);
-    if(ret != NULL) {
-        handle = surgescript_var_get_objecthandle(ret);
-        surgescript_var_destroy(ret);
-    }
-
-    if(handle == null_handle)
-        scripting_error(object, "Can't find Player #%d: no such player in the scene.", id);
-
-    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
-}
-
-/* () operator: get player by name. Crash on error */
-surgescript_var_t* fun_manager_call(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    const char* name = surgescript_var_fast_get_string(param[0]);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t null_handle = surgescript_objectmanager_null(manager);
-    surgescript_objecthandle_t handle = null_handle;
-
-    surgescript_var_t* ret = fun_manager_getbyname(object, param, num_params);
-    if(ret != NULL) {
-        handle = surgescript_var_get_objecthandle(ret);
-        surgescript_var_destroy(ret);
-    }
-
-    if(handle == null_handle)
-        scripting_error(object, "Can't find Player \"%s\": no such player in the scene.", name);
-
-    return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
