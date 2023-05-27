@@ -908,6 +908,7 @@ surgescript_var_t* fun_updateroi(surgescript_object_t* object, const surgescript
         /* get the allocated subsector */
         const surgescript_var_t* child_var = surgescript_heap_at(heap, CHILD_ADDR[j]);
         surgescript_objecthandle_t child_handle = surgescript_var_get_objecthandle(child_var); /* not null, because the subsector is allocated */
+        ssassert(surgescript_objectmanager_exists(manager, child_handle));
         surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
 
         /* does the subsector intersect with the ROI? */

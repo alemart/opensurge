@@ -80,6 +80,9 @@ struct entitydb_t {
     /* brick-like objects */
     DARRAY(surgescript_objecthandle_t, bricklike_objects);
 
+    /* space partitioning flag */
+    bool dirty_partition;
+
 };
 
 static entityinfo_t NULL_ENTRY = { .handle = 0, .id = 0 };
@@ -227,6 +230,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 
     darray_init(db->late_update_queue);
     darray_init(db->bricklike_objects);
+    db->dirty_partition = false;
 
     db->roi.left = 0;
     db->roi.top = 0;
@@ -422,6 +426,10 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
         surgescript_object_call_function(entity_tree, "bubbleDown", args, 1, NULL);
 
         surgescript_var_destroy(entity_var);
+
+        /* new subsectors may have been allocated;
+           mark the space partition as dirty */
+        db->dirty_partition = true;
     }
     else {
         /* store the entity in the awake container */
@@ -591,15 +599,21 @@ surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_va
     double width = surgescript_var_get_number(param[2]);
     double height = surgescript_var_get_number(param[3]);
 
-    double left = x;
-    double top = y;
-    double right = x + max(width, 1.0) - 1.0;
-    double bottom = y + max(height, 1.0) - 1.0;
+    int left = x;
+    int top = y;
+    int right = x + max(width, 1.0) - 1.0;
+    int bottom = y + max(height, 1.0) - 1.0;
 
     /* no need to update the ROI?
        save some processing time */
-    if(db->roi.left == (int)left && db->roi.top == (int)top && db->roi.right == (int)right && db->roi.bottom == (int)bottom)
-        return NULL;
+#if WANT_SPACE_PARTITIONING
+    if(!db->dirty_partition) {
+#else
+    if(1) {
+#endif
+        if(db->roi.left == left && db->roi.top == top && db->roi.right == right && db->roi.bottom == bottom)
+            return NULL;
+    }
 
     /* set the coordinates of the ROI */
     db->roi.left = left;
@@ -649,8 +663,8 @@ surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const su
 surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
 #if WANT_SPACE_PARTITIONING
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
     entitydb_t* db = get_db(object);
 
     /* get the entity tree */
@@ -674,9 +688,6 @@ surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const sur
     }
     iterator_destroy(it);
 
-    /* clear the unawake entity container array */
-    surgescript_object_call_function(unawake_container_array, "clear", NULL, 0, NULL);
-
     /* update the size of the world */
     v2d_t world_size = level_size();
     surgescript_var_t* world_width_var = surgescript_var_set_number(surgescript_var_create(), world_size.x);
@@ -697,6 +708,9 @@ surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const sur
     surgescript_var_destroy(world_height_var);
     surgescript_var_destroy(world_width_var);
 
+    /* clear the unawake entity container array */
+    surgescript_object_call_function(unawake_container_array, "clear", NULL, 0, NULL);
+
     /* update the ROI of the entity tree, as well as the unawake container array */
     surgescript_var_t* output_array_var = surgescript_var_clone(unawake_container_array_var);
     surgescript_var_t* top_var = surgescript_var_set_number(surgescript_var_create(), db->roi.top);
@@ -712,6 +726,10 @@ surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const sur
     surgescript_var_destroy(left_var);
     surgescript_var_destroy(top_var);
     surgescript_var_destroy(output_array_var);
+
+    /* the space partition is clean again, i.e.,
+       the unawake entity container array has the correct entries */
+    db->dirty_partition = false;
 #else
 
     /* no space partitioning */
@@ -728,8 +746,8 @@ surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const sur
 /* late update */
 surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    entitydb_t* db = get_db(object);
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const entitydb_t* db = get_db(object);
 
     /* for each entity in the late update queue, call entity.lateUpdate() */
     for(int i = 0; i < darray_length(db->late_update_queue); i++) {
@@ -749,8 +767,8 @@ surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescrip
 /* notify entities: given the name of a function with no arguments, call it in all entities */
 surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
 
     /* notify entities of the debug container */
     surgescript_var_t* debug_container_var = surgescript_heap_at(heap, DEBUGENTITYCONTAINER_ADDR);
@@ -782,8 +800,8 @@ surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surges
 /* render the entities */
 surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* arg = surgescript_var_create();
     const surgescript_var_t* args[] = { arg };
 
@@ -828,6 +846,7 @@ surgescript_var_t* fun_isindebugmode(surgescript_object_t* object, const surgesc
     const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_heap_t* heap = surgescript_object_heap(object);
 
+    /* get the debug container */
     const surgescript_var_t* debug_container_var = surgescript_heap_at(heap, DEBUGENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t debug_container_handle = surgescript_var_get_objecthandle(debug_container_var);
     surgescript_object_t* debug_container = surgescript_objectmanager_get(manager, debug_container_handle);
@@ -844,6 +863,7 @@ surgescript_var_t* fun_enterdebugmode(surgescript_object_t* object, const surges
     const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_heap_t* heap = surgescript_object_heap(object);
 
+    /* get the debug container */
     const surgescript_var_t* debug_container_var = surgescript_heap_at(heap, DEBUGENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t debug_container_handle = surgescript_var_get_objecthandle(debug_container_var);
     surgescript_object_t* debug_container = surgescript_objectmanager_get(manager, debug_container_handle);
@@ -859,6 +879,7 @@ surgescript_var_t* fun_exitdebugmode(surgescript_object_t* object, const surgesc
     const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_heap_t* heap = surgescript_object_heap(object);
 
+    /* get the debug container */
     const surgescript_var_t* debug_container_var = surgescript_heap_at(heap, DEBUGENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t debug_container_handle = surgescript_var_get_objecthandle(debug_container_var);
     surgescript_object_t* debug_container = surgescript_objectmanager_get(manager, debug_container_handle);
@@ -874,6 +895,7 @@ surgescript_var_t* fun_getdebugmode(surgescript_object_t* object, const surgescr
     const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_heap_t* heap = surgescript_object_heap(object);
 
+    /* get the debug container */
     const surgescript_var_t* debug_container_var = surgescript_heap_at(heap, DEBUGENTITYCONTAINER_ADDR);
     surgescript_objecthandle_t debug_container_handle = surgescript_var_get_objecthandle(debug_container_var);
     surgescript_object_t* debug_container = surgescript_objectmanager_get(manager, debug_container_handle);
