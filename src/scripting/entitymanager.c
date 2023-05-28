@@ -123,7 +123,6 @@ static surgescript_var_t* fun_findentity(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addtolateupdatequeue(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_notifyentities(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -150,6 +149,7 @@ static void foreach_unawake_container(surgescript_object_t* entity_manager, cons
 static void foreach_unawake_container_callback(surgescript_objecthandle_t container_handle, void* data);
 static void pause_containers(surgescript_object_t* entity_manager, bool pause);
 static bool is_in_debug_mode(surgescript_object_t* entity_manager);
+static void refresh_entity_tree(surgescript_object_t* entity_manager);
 
 
 
@@ -169,7 +169,6 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "EntityManager", "addToLateUpdateQueue", fun_addtolateupdatequeue, 1);
     surgescript_vm_bind(vm, "EntityManager", "addBricklikeObject", fun_addbricklikeobject, 1);
     surgescript_vm_bind(vm, "EntityManager", "setROI", fun_setroi, 4);
-    surgescript_vm_bind(vm, "EntityManager", "__refreshEntityTree", fun_refreshentitytree, 0);
 
     surgescript_vm_bind(vm, "EntityManager", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "EntityManager", "spawnEntity", fun_spawnentity, 2);
@@ -625,7 +624,7 @@ surgescript_var_t* fun_setroi(surgescript_object_t* object, const surgescript_va
     db->roi.bottom = bottom;
 
     /* maintain the entity tree */
-    surgescript_object_call_function(object, "__refreshEntityTree", NULL, 0, NULL);
+    refresh_entity_tree(object);
 
     /* done */
     return NULL;
@@ -659,90 +658,6 @@ surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const su
         darray_push(db->bricklike_objects, handle);
     }
 
-    return NULL;
-}
-
-/* refresh the entity tree: partition the space */
-surgescript_var_t* fun_refreshentitytree(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-#if WANT_SPACE_PARTITIONING
-    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    const surgescript_heap_t* heap = surgescript_object_heap(object);
-    entitydb_t* db = get_db(object);
-
-    /* get the entity tree */
-    surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
-    surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
-    surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
-
-    /* get the unawake entity container array */
-    surgescript_var_t* unawake_container_array_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR);
-    surgescript_objecthandle_t unawake_container_array_handle = surgescript_var_get_objecthandle(unawake_container_array_var);
-    surgescript_object_t* unawake_container_array = surgescript_objectmanager_get(manager, unawake_container_array_handle);
-
-    /* bubble up entities (from the previous update cycle) */
-    iterator_t* it = iterator_create_from_surgescript_array(unawake_container_array);
-    while(iterator_has_next(it)) {
-        surgescript_var_t** unawake_container_var = iterator_next(it);
-        surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(*unawake_container_var);
-        surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
-
-        surgescript_object_call_function(unawake_container, "bubbleUpEntities", NULL, 0, NULL);
-    }
-    iterator_destroy(it);
-
-    /* update the size of the world */
-    v2d_t world_size = level_size();
-    surgescript_var_t* world_width_var = surgescript_var_set_number(surgescript_var_create(), world_size.x);
-    surgescript_var_t* world_height_var = surgescript_var_set_number(surgescript_var_create(), world_size.y);
-    surgescript_var_t* world_size_has_changed = surgescript_var_create();
-
-    const surgescript_var_t* world_size_args[] = { world_width_var, world_height_var };
-    surgescript_object_call_function(entity_tree, "updateWorldSize", world_size_args, 2, world_size_has_changed);
-
-    if(surgescript_var_get_bool(world_size_has_changed)) {
-        /* if the world size has changed, then we must
-           relocate all entities of all containers */
-        logfile_message("EntityManager: world size has changed. Relocating all entities...");
-        foreach_unawake_container(object, "bubbleUpEntities", NULL, 0);
-    }
-
-    surgescript_var_destroy(world_size_has_changed);
-    surgescript_var_destroy(world_height_var);
-    surgescript_var_destroy(world_width_var);
-
-    /* clear the unawake entity container array */
-    surgescript_object_call_function(unawake_container_array, "clear", NULL, 0, NULL);
-
-    /* update the ROI of the entity tree, as well as the unawake container array */
-    surgescript_var_t* output_array_var = surgescript_var_clone(unawake_container_array_var);
-    surgescript_var_t* top_var = surgescript_var_set_number(surgescript_var_create(), db->roi.top);
-    surgescript_var_t* left_var = surgescript_var_set_number(surgescript_var_create(), db->roi.left);
-    surgescript_var_t* bottom_var = surgescript_var_set_number(surgescript_var_create(), db->roi.bottom);
-    surgescript_var_t* right_var = surgescript_var_set_number(surgescript_var_create(), db->roi.right);
-
-    const surgescript_var_t* args[] = { output_array_var, top_var, left_var, bottom_var, right_var };
-    surgescript_object_call_function(entity_tree, "updateROI", args, 5, NULL);
-
-    surgescript_var_destroy(right_var);
-    surgescript_var_destroy(bottom_var);
-    surgescript_var_destroy(left_var);
-    surgescript_var_destroy(top_var);
-    surgescript_var_destroy(output_array_var);
-
-    /* the space partition is clean again, i.e.,
-       the unawake entity container array has the correct entries */
-    db->dirty_partition = false;
-#else
-
-    /* no space partitioning */
-    (void)foreach_unawake_container;
-    (void)foreach_unawake_container_callback;
-    (void)foreach_unawake_container_inside_roi;
-
-#endif
-
-    /* done */
     return NULL;
 }
 
@@ -1211,4 +1126,85 @@ bool is_in_debug_mode(surgescript_object_t* entity_manager)
 
     surgescript_var_destroy(ret);
     return value;
+}
+
+/* refresh the entity tree: partition the space and update the unawake entity container array */
+void refresh_entity_tree(surgescript_object_t* entity_manager)
+{
+#if WANT_SPACE_PARTITIONING
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+    const surgescript_heap_t* heap = surgescript_object_heap(entity_manager);
+    entitydb_t* db = get_db(entity_manager);
+
+    /* get the entity tree */
+    surgescript_var_t* entity_tree_var = surgescript_heap_at(heap, ENTITYTREE_ADDR);
+    surgescript_objecthandle_t entity_tree_handle = surgescript_var_get_objecthandle(entity_tree_var);
+    surgescript_object_t* entity_tree = surgescript_objectmanager_get(manager, entity_tree_handle);
+
+    /* get the unawake entity container array */
+    surgescript_var_t* unawake_container_array_var = surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR);
+    surgescript_objecthandle_t unawake_container_array_handle = surgescript_var_get_objecthandle(unawake_container_array_var);
+    surgescript_object_t* unawake_container_array = surgescript_objectmanager_get(manager, unawake_container_array_handle);
+
+    /* bubble up entities (from the previous update cycle) */
+    iterator_t* it = iterator_create_from_surgescript_array(unawake_container_array);
+    while(iterator_has_next(it)) {
+        surgescript_var_t** unawake_container_var = iterator_next(it);
+        surgescript_objecthandle_t unawake_container_handle = surgescript_var_get_objecthandle(*unawake_container_var);
+        surgescript_object_t* unawake_container = surgescript_objectmanager_get(manager, unawake_container_handle);
+
+        surgescript_object_call_function(unawake_container, "bubbleUpEntities", NULL, 0, NULL);
+    }
+    iterator_destroy(it);
+
+    /* update the size of the world */
+    v2d_t world_size = level_size();
+    surgescript_var_t* world_width_var = surgescript_var_set_number(surgescript_var_create(), world_size.x);
+    surgescript_var_t* world_height_var = surgescript_var_set_number(surgescript_var_create(), world_size.y);
+    surgescript_var_t* world_size_has_changed = surgescript_var_create();
+
+    const surgescript_var_t* world_size_args[] = { world_width_var, world_height_var };
+    surgescript_object_call_function(entity_tree, "updateWorldSize", world_size_args, 2, world_size_has_changed);
+
+    if(surgescript_var_get_bool(world_size_has_changed)) {
+        /* if the world size has changed, then we must
+           relocate all entities of all containers */
+        logfile_message("EntityManager: world size has changed. Relocating all entities...");
+        foreach_unawake_container(entity_manager, "bubbleUpEntities", NULL, 0);
+    }
+
+    surgescript_var_destroy(world_size_has_changed);
+    surgescript_var_destroy(world_height_var);
+    surgescript_var_destroy(world_width_var);
+
+    /* clear the unawake entity container array */
+    surgescript_object_call_function(unawake_container_array, "clear", NULL, 0, NULL);
+
+    /* update the ROI of the entity tree, as well as the unawake container array */
+    surgescript_var_t* output_array_var = surgescript_var_clone(unawake_container_array_var);
+    surgescript_var_t* top_var = surgescript_var_set_number(surgescript_var_create(), db->roi.top);
+    surgescript_var_t* left_var = surgescript_var_set_number(surgescript_var_create(), db->roi.left);
+    surgescript_var_t* bottom_var = surgescript_var_set_number(surgescript_var_create(), db->roi.bottom);
+    surgescript_var_t* right_var = surgescript_var_set_number(surgescript_var_create(), db->roi.right);
+
+    const surgescript_var_t* args[] = { output_array_var, top_var, left_var, bottom_var, right_var };
+    surgescript_object_call_function(entity_tree, "updateROI", args, 5, NULL);
+
+    surgescript_var_destroy(right_var);
+    surgescript_var_destroy(bottom_var);
+    surgescript_var_destroy(left_var);
+    surgescript_var_destroy(top_var);
+    surgescript_var_destroy(output_array_var);
+
+    /* the space partition is clean again, i.e.,
+       the unawake entity container array has the correct entries */
+    db->dirty_partition = false;
+#else
+
+    /* no space partitioning */
+    (void)foreach_unawake_container;
+    (void)foreach_unawake_container_callback;
+    (void)foreach_unawake_container_inside_roi;
+
+#endif
 }
