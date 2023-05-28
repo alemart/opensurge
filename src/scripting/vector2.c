@@ -24,8 +24,9 @@
 #include <errno.h>
 #include <float.h>
 #include <math.h>
-#include "../util/util.h"
 #include "../core/v2d.h"
+#include "../util/numeric.h"
+#include "../util/util.h"
 
 /* Vector2 structure */
 typedef struct surgescript_vector2_t surgescript_vector2_t;

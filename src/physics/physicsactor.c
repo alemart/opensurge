@@ -28,6 +28,7 @@
 #include "../core/video.h"
 #include "../core/input.h"
 #include "../core/timer.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 
 /* physicsactor class */

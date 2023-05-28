@@ -22,6 +22,7 @@
 #include <math.h>
 #include "actor.h"
 #include "brick.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../core/global.h"
 #include "../core/input.h"

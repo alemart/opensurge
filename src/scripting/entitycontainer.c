@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../core/video.h"
 #include "../core/sprite.h"

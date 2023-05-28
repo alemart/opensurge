@@ -35,20 +35,11 @@
 #undef max
 #endif
 
-#ifdef PI
-#undef PI
-#endif
-
 #ifndef STRINGIFY
 #define STRINGIFY(x)            _STRINGIFY(x)
 #define _STRINGIFY(x)           #x
 #endif
 
-#define PI                      3.14159265358979323846
-#define TWO_PI                  6.283185307179586
-#define PI_OVER_TWO             1.5707963267948966
-#define RAD2DEG                 57.29577951308232
-#define DEG2RAD                 0.01745329251994329576
 #define LARGE_INT               (1 << 30)
 
 /* Useful macros */
@@ -58,9 +49,6 @@
 #define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
 #define clip01(val)             ((val) - ((val)<0.0f)*(val) + ((val)>1.0f)*(1.0f-(val))) /* clip((val), 0.0f, 1.0f) */
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
-#define sign(x)                 copysignf(1.0f, (x))
-#define nearly_zero(x)          (fabs(x)<=0.00001f)
-#define nearly_equal(a,b)       (fabs((a)-(b))<=0.00001f*max(fabs(a),fabs(b)))
 #define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" STRINGIFY(__LINE__))
 #define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" STRINGIFY(__LINE__))
 
@@ -72,8 +60,6 @@ void* __reallocx(void *ptr, size_t bytes, const char* location);
 int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game engine */
 void fatal_error(const char *fmt, ...); /* crash the program with a message */
 void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
-float lerp(float a, float b, float t); /* linear interpolation */
-float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
 uint64_t random64(); /* pseudo-random 64-bit number */
 FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 filename support */
 const char* allegro_version_string(); /* version of the Allegro library */

@@ -26,6 +26,7 @@
 #include "timer.h"
 #include "inputmap.h"
 #include "mobile_gamepad.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 

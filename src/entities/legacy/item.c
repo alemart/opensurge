@@ -38,6 +38,7 @@
 #include "../../core/font.h"
 #include "../../core/audio.h"
 
+#include "../../util/numeric.h"
 #include "../../util/util.h"
 #include "../../util/stringutil.h"
 

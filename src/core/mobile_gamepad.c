@@ -26,6 +26,7 @@
 #include "video.h"
 #include "timer.h"
 #include "v2d.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../entities/actor.h"
 #include "../scenes/level.h"

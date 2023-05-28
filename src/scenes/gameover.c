@@ -20,6 +20,7 @@
 
 #include "gameover.h"
 #include "quest.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../core/font.h"
 #include "../core/scene.h"

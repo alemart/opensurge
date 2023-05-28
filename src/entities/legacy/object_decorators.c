@@ -29,6 +29,7 @@
 #include "../camera.h"
 #include "../player.h"
 #include "../sfx.h"
+#include "../../util/numeric.h"
 #include "../../util/util.h"
 #include "../../util/stringutil.h"
 #include "../../core/global.h"

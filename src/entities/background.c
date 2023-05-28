@@ -29,6 +29,7 @@
 #include "../core/logfile.h"
 #include "../core/timer.h"
 #include "../core/nanoparser.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 

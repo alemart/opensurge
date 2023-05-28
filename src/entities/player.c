@@ -39,6 +39,7 @@
 #include "../core/sprite.h"
 #include "../scenes/level.h"
 #include "../util/darray.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../physics/physicsactor.h"

@@ -35,6 +35,7 @@
 #include "../core/asset.h"
 #include "../core/logfile.h"
 #include "../core/mobile_gamepad.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../entities/actor.h"
 #include "../scenes/level.h"

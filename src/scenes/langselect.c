@@ -37,6 +37,7 @@
 #include "../core/font.h"
 #include "../core/prefs.h"
 #include "../core/mobile_gamepad.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../entities/actor.h"

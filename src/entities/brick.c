@@ -35,6 +35,7 @@
 #include "../core/audio.h"
 #include "../core/sprite.h"
 #include "../core/nanoparser.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../physics/collisionmask.h"

@@ -163,30 +163,6 @@ void fatal_error(const char *fmt, ...)
 
 
 /*
- * lerp()
- * Linear interpolation from a to b
- * 0 <= t <= 1
- */
-float lerp(float a, float b, float t)
-{
-    t = clip01(t);
-    return a + (b - a) * t;
-}
-
-/*
- * lerp_angle()
- * Linear interpolation from alpha to beta, both given in radians
- * 0 <= t <= 1
- */
-float lerp_angle(float alpha, float beta, float t)
-{
-    v2d_t a = v2d_new(cosf(alpha), sinf(alpha));
-    v2d_t b = v2d_new(cosf(beta), sinf(beta));
-    v2d_t c = v2d_lerp(a, b, t);
-    return atan2f(c.y, c.x);
-}
-
-/*
  * random64()
  * xorshift random number generator
  */
