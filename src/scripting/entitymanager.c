@@ -203,6 +203,9 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     /* clear the brick-like object list */
     darray_clear(db->bricklike_objects);
 
+    /* FIXME: maybe we should update the awake & detached entities AFTER unawake ones?
+       e.g., camera scripts. */
+
     /* done */
     return NULL;
 }

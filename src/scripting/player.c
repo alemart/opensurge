@@ -174,7 +174,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
     surgescript_tagsystem_add_tag(tag_system, "Player", "entity");
     surgescript_tagsystem_add_tag(tag_system, "Player", "private");
-    /*surgescript_tagsystem_add_tag(tag_system, "Player", "awake");*/
+    surgescript_tagsystem_add_tag(tag_system, "Player", "awake");
     surgescript_tagsystem_add_tag(tag_system, "Player", "player");
     surgescript_tagsystem_add_tag(tag_system, "Player", "gizmo");
 
