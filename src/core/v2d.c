@@ -20,7 +20,7 @@
 
 #include <math.h>
 #include "v2d.h"
-#include "global.h"
+#include "../util/numeric.h"
 #include "../util/util.h"
 
 
@@ -128,8 +128,13 @@ v2d_t v2d_normalize(v2d_t v)
  */
 v2d_t v2d_lerp(v2d_t u, v2d_t v, float t)
 {
-    t = clip01(t);
-    return v2d_new(u.x + (v.x - u.x) * t, u.y + (v.y - u.y) * t);
+    if(t < 0.0f)
+        t = 0.0f;
+    else if(t > 1.0f)
+        t = 1.0f;
+
+    float r = 1.0f - t;
+    return v2d_new(r * u.x + t * v.x, r * u.y + t * v.y);
 }
 
 
