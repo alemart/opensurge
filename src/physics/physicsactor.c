@@ -23,12 +23,12 @@
 #include "sensor.h"
 #include "obstaclemap.h"
 #include "obstacle.h"
-#include "../core/util.h"
 #include "../core/image.h"
 #include "../core/color.h"
 #include "../core/video.h"
 #include "../core/input.h"
 #include "../core/timer.h"
+#include "../util/util.h"
 
 /* physicsactor class */
 struct physicsactor_t

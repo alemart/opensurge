@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "scripting.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../entities/player.h"
 #include "../scenes/level.h"
 

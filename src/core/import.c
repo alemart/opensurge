@@ -26,8 +26,8 @@
 #include <ctype.h>
 #include "import.h"
 #include "global.h"
-#include "stringutil.h"
 #include "asset.h"
+#include "../util/stringutil.h"
 
 #if defined(__ANDROID__)
 #define WANT_IMPORT_WIZARD 0

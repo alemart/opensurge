@@ -21,13 +21,13 @@
 #include <allegro5/allegro.h>
 #include "input.h"
 #include "engine.h"
-#include "util.h"
 #include "video.h"
 #include "logfile.h"
 #include "timer.h"
 #include "inputmap.h"
-#include "stringutil.h"
 #include "mobile_gamepad.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* <base class>: generic input */
 struct input_t {

@@ -22,7 +22,7 @@
 #include "video.h"
 #include "image.h"
 #include "timer.h"
-#include "util.h"
+#include "../util/util.h"
 
 /* Fade-in & fade-out */
 static enum { FADEFX_NONE, FADEFX_IN, FADEFX_OUT } type;

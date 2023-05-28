@@ -22,9 +22,9 @@
 #include "physicsactor.h"
 #include "obstacle.h"
 #include "obstaclemap.h"
-#include "../core/util.h"
 #include "../core/video.h"
 #include "../core/image.h"
+#include "../util/util.h"
 
 /* auxiliary structure: stores world coordinates */
 typedef struct swpos_t

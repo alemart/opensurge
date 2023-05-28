@@ -25,9 +25,9 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-#include "darray.h"
+#include "../util/darray.h"
+#include "../util/util.h"
 #include "prefs.h"
-#include "util.h"
 #include "logfile.h"
 #include "global.h"
 #include "asset.h"

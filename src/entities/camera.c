@@ -20,7 +20,7 @@
 
 #include <math.h>
 #include "camera.h"
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/video.h"
 #include "../core/timer.h"
 #include "../scenes/level.h"

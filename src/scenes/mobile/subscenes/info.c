@@ -24,10 +24,10 @@
 #include "../../../core/image.h"
 #include "../../../core/color.h"
 #include "../../../core/font.h"
-#include "../../../core/util.h"
-#include "../../../core/stringutil.h"
 #include "../../../core/asset.h"
 #include "../../../core/global.h"
+#include "../../../util/util.h"
+#include "../../../util/stringutil.h"
 
 #if defined(__ANDROID__)
 #include <allegro5/allegro_android.h>

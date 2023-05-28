@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "v2d.h"
 #include "image.h"
-#include "darray.h"
+#include "../util/darray.h"
 #include "nanoparser.h"
 
 typedef struct animation_t animation_t;

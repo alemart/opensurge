@@ -23,7 +23,7 @@
 #include "obstaclemap.h"
 #include "obstacle.h"
 #include "physicsactor.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* sensor class */
 struct sensor_t

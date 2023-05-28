@@ -44,14 +44,15 @@
 #include "../core/timer.h"
 #include "../core/sprite.h"
 #include "../core/asset.h"
-#include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/lang.h"
 #include "../core/nanoparser.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/darray.h"
-#include "../core/iterator.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/darray.h"
+#include "../util/iterator.h"
 #include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
@@ -68,9 +69,6 @@
 #include "../physics/obstaclemap.h"
 #include "../scripting/scripting.h"
 #include "../scenes/editorpal.h"
-
-#define FASTHASH_INLINE
-#include "../core/fasthash.h"
 
 /* ------------------------
  * Dialog Regions

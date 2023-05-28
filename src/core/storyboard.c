@@ -19,8 +19,8 @@
  */
 
 #include "storyboard.h"
-#include "util.h"
 #include "scene.h"
+#include "../util/util.h"
 #include "../scenes/quest.h"
 #include "../scenes/level.h"
 #include "../scenes/gameover.h"

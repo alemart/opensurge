@@ -22,9 +22,9 @@
 #include "../core/hashtable.h"
 #include "../core/nanoparser.h"
 #include "../core/asset.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/audio.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* private functions */
 static character_t *character_new(const char *name); /* creates a new character_t instance */
@@ -126,9 +126,9 @@ character_t *character_new(const char *name)
     c->sample.release = NULL;
     c->sample.charge_pitch = 1.5f;
 
-    c->ability.roll = TRUE;
-    c->ability.charge = TRUE;
-    c->ability.brake = TRUE;
+    c->ability.roll = true;
+    c->ability.charge = true;
+    c->ability.brake = true;
 
     return c;
 }

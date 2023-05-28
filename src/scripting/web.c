@@ -22,7 +22,7 @@
 #include <string.h>
 #include "scripting.h"
 #include "../core/web.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

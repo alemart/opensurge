@@ -21,12 +21,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "lang.h"
-#include "util.h"
+#include "global.h"
 #include "asset.h"
-#include "stringutil.h"
 #include "logfile.h"
 #include "hashtable.h"
 #include "nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* fake string type */
 typedef struct { char* data; } stringadapter_t;

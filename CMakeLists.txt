@@ -279,20 +279,17 @@ ENDIF()
 # adding sources
 SET(GAME_SRCS
   src/core/nanoparser.c
-  src/core/utf8/utf8.c
   src/core/physfs/ignorecase.c
   src/core/asset.c
   src/core/audio.c
   src/core/color.c
   src/core/commandline.c
-  src/core/csv.c
   src/core/engine.c
   src/core/font.c
   src/core/image.c
   src/core/import.c
   src/core/input.c
   src/core/inputmap.c
-  src/core/iterator.c
   src/core/lang.c
   src/core/logfile.c
   src/core/mobile_gamepad.c
@@ -305,11 +302,16 @@ SET(GAME_SRCS
   src/core/fadefx.c
   src/core/sprite.c
   src/core/storyboard.c
-  src/core/stringutil.c
   src/core/timer.c
-  src/core/util.c
   src/core/v2d.c
   src/core/video.c
+
+  src/util/csv.c
+  src/util/fasthash.c
+  src/util/iterator.c
+  src/util/stringutil.c
+  src/util/utf8.c
+  src/util/util.c
 
   src/scenes/mobile/subscenes/info.c
   src/scenes/mobile/subscenes/credits.c
@@ -407,15 +409,12 @@ SET(GAME_SRCS
 # adding headers
 SET(GAME_HEADERS
   src/core/nanoparser.h
-  src/core/utf8/utf8.h
   src/core/physfs/ignorecase.h
   src/core/asset.h
   src/core/audio.h
   src/core/color.h
   src/core/commandline.h
-  src/core/csv.h
   src/core/engine.h
-  src/core/fasthash.h
   src/core/font.h
   src/core/global.h
   src/core/hashtable.h
@@ -423,7 +422,6 @@ SET(GAME_HEADERS
   src/core/import.h
   src/core/input.h
   src/core/inputmap.h
-  src/core/iterator.h
   src/core/lang.h
   src/core/logfile.h
   src/core/mobile_gamepad.h
@@ -437,11 +435,17 @@ SET(GAME_HEADERS
   src/core/spatialhash.h
   src/core/sprite.h
   src/core/storyboard.h
-  src/core/stringutil.h
   src/core/timer.h
-  src/core/util.h
   src/core/video.h
   src/core/v2d.h
+
+  src/util/csv.h
+  src/util/darray.h
+  src/util/fasthash.h
+  src/util/iterator.h
+  src/util/stringutil.h
+  src/util/utf8.h
+  src/util/util.h
 
   src/scenes/mobile/subscenes/info.h
   src/scenes/mobile/subscenes/credits.h

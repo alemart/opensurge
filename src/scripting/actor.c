@@ -25,7 +25,7 @@
 #include "../core/v2d.h"
 #include "../core/video.h"
 #include "../core/image.h"
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../entities/actor.h"
 #include "../entities/camera.h"
 

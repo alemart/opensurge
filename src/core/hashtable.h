@@ -28,9 +28,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
-#include "util.h"
-#include "stringutil.h"
 #include "logfile.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* utilities */
 #define __H_CAPACITY               727 /* prime number */

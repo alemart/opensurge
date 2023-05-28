@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include "obstacle.h"
 #include "collisionmask.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* obstacle flags */
 const int OF_SOLID = 0x0;
@@ -152,7 +152,7 @@ int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir
 
 /* detects a pixel-perfect collision between an obstacle and a sensor
  * (x1, y1, x2, y2) are given in world-coordinates; also, x1 <= x2 and y1 <= y2 */
-int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
+bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
 {
     const collisionmask_t* mask = obstacle->mask;
     int o_x1 = obstacle->xpos;
@@ -178,7 +178,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
                     py = y1 - o_y1;
                     flip(obstacle, &px, &py, NULL);
                     if(collisionmask_at(mask, px, py, pitch))
-                        return TRUE;
+                        return true;
                 }
             }
         }
@@ -192,7 +192,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
                     py = y - o_y1;
                     flip(obstacle, &px, &py, NULL);
                     if(collisionmask_at(mask, px, py, pitch))
-                        return TRUE;
+                        return true;
                 }
             }
         }
@@ -206,7 +206,7 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
     }
 
     /* no collision */
-    return FALSE;
+    return false;
 }
 
 

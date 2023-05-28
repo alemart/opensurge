@@ -20,8 +20,8 @@
 
 #include <math.h>
 #include "v2d.h"
-#include "util.h"
 #include "global.h"
+#include "../util/util.h"
 
 
 /*

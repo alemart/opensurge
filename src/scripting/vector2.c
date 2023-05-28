@@ -24,7 +24,7 @@
 #include <errno.h>
 #include <float.h>
 #include <math.h>
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/v2d.h"
 
 /* Vector2 structure */

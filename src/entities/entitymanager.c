@@ -25,7 +25,7 @@
 #include "legacy/item.h"
 #include "legacy/enemy.h"
 #include "../core/spatialhash.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* defining the spatial hashes */
 SPATIALHASH_GENERATE_CODE(brick_t)

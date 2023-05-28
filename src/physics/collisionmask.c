@@ -23,7 +23,7 @@
 #include "collisionmask.h"
 #include "../core/video.h"
 #include "../core/image.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* private stuff ;) */
 #define MEM_ALIGNMENT               sizeof(void*) /* 4 */ /* must be a power of two */

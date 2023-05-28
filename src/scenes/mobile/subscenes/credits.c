@@ -28,10 +28,10 @@
 #include "../../../core/input.h"
 #include "../../../core/color.h"
 #include "../../../core/font.h"
-#include "../../../core/util.h"
-#include "../../../core/stringutil.h"
 #include "../../../core/asset.h"
 #include "../../../core/global.h"
+#include "../../../util/util.h"
+#include "../../../util/stringutil.h"
 
 typedef struct mobile_subscene_credits_t mobile_subscene_credits_t;
 struct mobile_subscene_credits_t {

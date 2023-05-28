@@ -19,7 +19,7 @@
  */
 
 #include "object_machine.h"
-#include "../../core/util.h"
+#include "../../util/util.h"
 #include "../../scenes/level.h"
 
 /* object basic machine class */

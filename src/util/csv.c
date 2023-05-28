@@ -20,8 +20,8 @@
 
 #include <string.h>
 #include "stringutil.h"
-#include "logfile.h"
 #include "csv.h"
+#include "../core/logfile.h"
 
 /* Maximum supported number of fields per line */
 #define CSV_MAX_FIELDS 64

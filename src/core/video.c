@@ -28,14 +28,14 @@
 #include "engine.h"
 #include "timer.h"
 #include "logfile.h"
-#include "util.h"
 #include "global.h"
-#include "stringutil.h"
 #include "font.h"
 #include "lang.h"
 #include "mobile_gamepad.h"
 #include "asset.h"
 #include "nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>

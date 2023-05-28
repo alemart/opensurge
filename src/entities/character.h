@@ -21,7 +21,8 @@
 #ifndef _CHARACTER_H
 #define _CHARACTER_H
 
-#include "../core/darray.h"
+#include <stdbool.h>
+#include "../util/darray.h"
 
 struct sound_t;
 
@@ -76,9 +77,9 @@ struct character_t {
     } sample;
 
     struct {
-        int roll;
-        int charge;
-        int brake;
+        bool roll;
+        bool charge;
+        bool brake;
     } ability;
 
     DARRAY(char*, companion_name);

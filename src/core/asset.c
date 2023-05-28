@@ -26,9 +26,9 @@
 #include "physfs/ignorecase.h"
 #include "asset.h"
 #include "global.h"
-#include "util.h"
-#include "stringutil.h"
 #include "logfile.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* The default directory of the game assets provided by upstream (*nix only) */
 #ifndef GAME_DATADIR

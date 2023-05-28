@@ -20,14 +20,14 @@
 
 #include <string.h>
 #include "sprite.h"
-#include "util.h"
-#include "stringutil.h"
 #include "image.h"
 #include "logfile.h"
 #include "asset.h"
 #include "hashtable.h"
 #include "resourcemanager.h"
 #include "nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* private stuff ;) */
 HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);

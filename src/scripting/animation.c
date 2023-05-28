@@ -21,7 +21,7 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/sprite.h"
 #include "../entities/actor.h"
 #include "../entities/player.h"

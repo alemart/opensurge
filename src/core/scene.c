@@ -21,8 +21,8 @@
 #include <stdbool.h>
 #include "scene.h"
 #include "../core/video.h"
-#include "../core/util.h"
 #include "../core/logfile.h"
+#include "../util/util.h"
 
 
 /* private stuff */

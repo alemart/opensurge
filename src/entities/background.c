@@ -26,11 +26,11 @@
 #include "../core/sprite.h"
 #include "../core/video.h"
 #include "../core/asset.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/timer.h"
 #include "../core/nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* forward declarations */
 typedef struct bglayer_t bglayer_t;

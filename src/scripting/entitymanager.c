@@ -38,18 +38,18 @@
  */
 
 #define FASTHASH_INLINE
-#include "../core/fasthash.h"
+#include "../util/fasthash.h"
 
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
 #include "../core/logfile.h"
 #include "../core/v2d.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/video.h"
-#include "../core/darray.h"
-#include "../core/iterator.h"
+#include "../util/darray.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/iterator.h"
 #include "../scenes/level.h"
 
 typedef struct entityinfo_t entityinfo_t;

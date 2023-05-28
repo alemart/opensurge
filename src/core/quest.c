@@ -24,13 +24,13 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include "global.h"
-#include "util.h"
-#include "stringutil.h"
 #include "logfile.h"
 #include "quest.h"
 #include "asset.h"
 #include "nanoparser.h"
-#include "darray.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/darray.h"
 
 
 /* quest structure */

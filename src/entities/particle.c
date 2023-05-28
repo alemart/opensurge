@@ -23,8 +23,8 @@
 #include "../scenes/level.h"
 #include "../core/video.h"
 #include "../core/image.h"
-#include "../core/util.h"
 #include "../core/timer.h"
+#include "../util/util.h"
 
 /* private stuff ;) */
 typedef struct particle_t particle_t;

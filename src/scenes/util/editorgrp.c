@@ -26,9 +26,9 @@
 #include "../../entities/legacy/enemy.h"
 #include "../../core/logfile.h"
 #include "../../core/asset.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
 #include "../../core/nanoparser.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 /* internal data */
 #define EDITORGRP_MAX_GROUPS        512

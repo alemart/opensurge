@@ -22,9 +22,9 @@
 #include <stdint.h>
 #include "scripting.h"
 #include "../core/v2d.h"
-#include "../core/darray.h"
 #include "../core/image.h"
 #include "../core/video.h"
+#include "../util/darray.h"
 
 /* private */
 typedef enum { COLLIDER_TYPE_BOX, COLLIDER_TYPE_BALL } collidertype_t;

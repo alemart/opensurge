@@ -21,7 +21,7 @@
 #include <string.h>
 #include "editorcmd.h"
 #include "../../core/input.h"
-#include "../../core/util.h"
+#include "../../util/util.h"
 
 /* commands */
 typedef struct command_t command_t;

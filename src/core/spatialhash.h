@@ -22,8 +22,9 @@
 #define _SPATIALHASH_H
 
 #include <stdbool.h>
-#include "util.h"
+#include "global.h"
 #include "logfile.h"
+#include "../util/util.h"
 
 /* utilities */
 #define SPATIALHASH_GRID_WIDTH      64

@@ -22,9 +22,9 @@
 #include <math.h>
 #include "actor.h"
 #include "brick.h"
+#include "../util/util.h"
 #include "../core/global.h"
 #include "../core/input.h"
-#include "../core/util.h"
 #include "../core/logfile.h"
 #include "../core/video.h"
 #include "../core/timer.h"

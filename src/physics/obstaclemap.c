@@ -21,9 +21,9 @@
 #include "obstaclemap.h"
 #include "obstacle.h"
 #include "physicsactor.h"
-#include "../core/util.h"
 #include "../core/video.h"
-#include "../core/darray.h"
+#include "../util/darray.h"
+#include "../util/util.h"
 
 /* an obstacle map is just a set of obstacles */
 struct obstaclemap_t

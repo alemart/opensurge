@@ -27,11 +27,12 @@
 #include <math.h>
 #include <surgescript.h>
 #include <physfs.h>
-#include "v2d.h"
 #include "util.h"
-#include "timer.h"
-#include "logfile.h"
-#include "resourcemanager.h"
+#include "../core/global.h"
+#include "../core/v2d.h"
+#include "../core/timer.h"
+#include "../core/logfile.h"
+#include "../core/resourcemanager.h"
 
 #if defined(__ANDROID__)
 #define ALLEGRO_UNSTABLE /* required for al_android_get_jni_env(), al_android_get_activity() */

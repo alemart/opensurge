@@ -22,7 +22,7 @@
 #define _SCRIPTING_ITERATORS_H
 
 #include <surgescript.h>
-#include "../../core/iterator.h"
+#include "../../util/iterator.h"
 
 /* iterate over SurgeScript Arrays */
 typedef iterator_t ssarrayiterator_t;

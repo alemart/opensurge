@@ -21,11 +21,11 @@
 #include <stdlib.h>
 #include "audio.h"
 #include "asset.h"
-#include "stringutil.h"
 #include "resourcemanager.h"
 #include "logfile.h"
 #include "timer.h"
-#include "util.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 #define ALLEGRO_UNSTABLE
 #include <allegro5/allegro.h>

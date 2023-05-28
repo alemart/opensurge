@@ -33,7 +33,7 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/scene.h"
-#include "../core/stringutil.h"
+#include "../util/stringutil.h"
 #include "../scripting/scripting.h"
 
 

@@ -23,8 +23,8 @@
 #include <ctype.h>
 #include "levparser.h"
 #include "../../core/asset.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 #define LINE_MAXLEN 1024
 #define MAX_PARAMS 16

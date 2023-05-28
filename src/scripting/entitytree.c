@@ -425,7 +425,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "scripting.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* the height of the quaternary tree - must be greater than zero
    the number of nodes in the tree grows exponentially (we allocate lazily) */

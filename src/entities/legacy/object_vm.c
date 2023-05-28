@@ -19,8 +19,8 @@
  */
 
 #include "object_vm.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 /* private stuff */
 typedef struct objectmachine_list_t objectmachine_list_t;

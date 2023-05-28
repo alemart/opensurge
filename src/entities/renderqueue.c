@@ -31,10 +31,10 @@
 #include "legacy/item.h"
 #include "legacy/enemy.h"
 #include "../core/logfile.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/video.h"
 #include "../core/image.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../scenes/level.h"
 #include "../scripting/scripting.h"
 

@@ -22,9 +22,9 @@
 #include <string.h>
 #include <math.h>
 #include "scripting.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/logfile.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../scenes/level.h"
 #include "../entities/actor.h"
 #include "../entities/camera.h"
@@ -1314,13 +1314,13 @@ surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_va
             surgescript_object_t* hazard = surgescript_objectmanager_get(manager, hazard_handle);
             if(strcmp(surgescript_object_name(hazard), "Actor") == 0) {
                 actor_t* hazard_actor = scripting_actor_ptr(hazard);
-                player_bounce_ex(player, hazard_actor, FALSE);
+                player_bounce_ex(player, hazard_actor, false);
             }
             else
                 scripting_warning(object, "%s.bounce(hazard) requires hazard to be an Actor | null, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));
         }
         else
-            player_bounce(player, -1.0f, FALSE);
+            player_bounce(player, -1.0f, false);
     }
     return NULL;
 }
@@ -1336,7 +1336,7 @@ surgescript_var_t* fun_bounceback(surgescript_object_t* object, const surgescrip
             surgescript_object_t* hazard = surgescript_objectmanager_get(manager, hazard_handle);
             if(strcmp(surgescript_object_name(hazard), "Actor") == 0) {
                 actor_t* hazard_actor = scripting_actor_ptr(hazard);
-                player_bounce_ex(player, hazard_actor, TRUE);
+                player_bounce_ex(player, hazard_actor, true);
             }
             else
                 scripting_warning(object, "%s.bounceBack(hazard) requires hazard to be an Actor, but hazard is %s.", surgescript_object_name(object), surgescript_object_name(hazard));

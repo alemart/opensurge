@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "iterators.h"
-#include "../../core/util.h"
+#include "../../util/util.h"
 
 /* SurgeScriptArrayIterator */
 typedef struct ssarrayiterator_state_t ssarrayiterator_state_t;

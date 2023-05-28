@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <surgescript.h>
 #include "scripting.h"
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/sprite.h"

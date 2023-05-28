@@ -20,7 +20,7 @@
 
 #include <surgescript.h>
 #include <string.h>
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/audio.h"
 
 /* private */

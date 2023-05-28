@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "global.h"
 
 /* redefinitions */
 #ifdef min
@@ -38,6 +37,11 @@
 
 #ifdef PI
 #undef PI
+#endif
+
+#ifndef STRINGIFY
+#define STRINGIFY(x)            _STRINGIFY(x)
+#define _STRINGIFY(x)           #x
 #endif
 
 #define PI                      3.14159265358979323846

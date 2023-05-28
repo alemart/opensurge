@@ -19,8 +19,8 @@
  */
 
 #include <string.h>
-#include "stringutil.h"
 #include "color.h"
+#include "../util/stringutil.h"
 
 /*
  * color_rgb()

@@ -22,12 +22,12 @@
 #include <string.h>
 #include "quest.h"
 #include "level.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/scene.h"
 #include "../core/quest.h"
 #include "../core/logfile.h"
 #include "../core/storyboard.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* private data */
 #define STACK_MAX 25 /* maximum number of active quests */

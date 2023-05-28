@@ -24,11 +24,11 @@
 #include <stdint.h>
 #include "image.h"
 #include "video.h"
-#include "stringutil.h"
 #include "logfile.h"
 #include "asset.h"
-#include "util.h"
 #include "resourcemanager.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>

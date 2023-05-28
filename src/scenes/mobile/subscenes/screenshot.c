@@ -20,7 +20,7 @@
 
 #include "screenshot.h"
 #include "../../../core/image.h"
-#include "../../../core/util.h"
+#include "../../../util/util.h"
 
 typedef struct mobile_subscene_screenshot_t mobile_subscene_screenshot_t;
 struct mobile_subscene_screenshot_t {

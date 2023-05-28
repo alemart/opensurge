@@ -22,11 +22,11 @@
 #include <string.h>
 #include <stdbool.h>
 #include "options.h"
+#include "stageselect.h"
 #include "util/grouptree.h"
+#include "../core/global.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/fadefx.h"
 #include "../core/color.h"
 #include "../core/video.h"
@@ -39,10 +39,11 @@
 #include "../core/prefs.h"
 #include "../core/web.h"
 #include "../core/mobile_gamepad.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
 #include "../entities/sfx.h"
-#include "stageselect.h"
 
 
 /* public data */

@@ -20,10 +20,10 @@
 
 #include <stdbool.h>
 #include "editorhelp.h"
+#include "../util/util.h"
 #include "../core/font.h"
 #include "../core/scene.h"
 #include "../core/audio.h"
-#include "../core/util.h"
 #include "../core/color.h"
 #include "../core/video.h"
 #include "../core/image.h"

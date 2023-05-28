@@ -38,10 +38,10 @@
 #endif
 
 #include "web.h"
-#include "util.h"
 #include "video.h"
 #include "logfile.h"
-#include "stringutil.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 
 

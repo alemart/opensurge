@@ -21,8 +21,8 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
+#include "../util/util.h"
 #include "../core/v2d.h"
-#include "../core/util.h"
 #include "../core/image.h"
 #include "../entities/camera.h"
 #include "../physics/obstacle.h"

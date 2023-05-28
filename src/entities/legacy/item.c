@@ -31,14 +31,15 @@
 
 #include "../../core/v2d.h"
 #include "../../core/global.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
 #include "../../core/timer.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
 #include "../../core/color.h"
 #include "../../core/font.h"
 #include "../../core/audio.h"
+
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 #include "../../scenes/quest.h"
 #include "../../scenes/level.h"

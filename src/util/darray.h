@@ -24,12 +24,17 @@
 #include <stdlib.h>
 #include "util.h"
 
+/* memory allocation */
+#define darray_malloc                       mallocx
+#define darray_realloc                      reallocx
+#define darray_free                         free
+
 /*
  * DARRAY()
  * declares a dynamic array of a given type
  */
-#define DARRAY(type, arr)                    type* arr; size_t arr##_len, arr##_cap;
-#define STATIC_DARRAY(type, arr)             static type* arr; static size_t arr##_len, arr##_cap;
+#define DARRAY(type, arr)                   type* arr; size_t arr##_len, arr##_cap;
+#define STATIC_DARRAY(type, arr)            static type* arr; static size_t arr##_len, arr##_cap;
 
 /*
  * darray_init()
@@ -42,21 +47,21 @@
  * releases the array
  */
 #define darray_release(arr)                  \
-    do { arr##_len = arr##_cap = 0; free(arr); arr = NULL; } while(0)
+    do { arr##_len = arr##_cap = 0; darray_free(arr); arr = NULL; } while(0)
 
 /*
  * darray_init_ex()
  * initializes the array with a given capacity
  */
 #define darray_init_ex(arr, cap)             \
-    (arr##_len = 0, arr##_cap = ((cap) > 0 ? (cap) : 4), arr = mallocx(arr##_cap * sizeof(*(arr))))
+    (arr##_len = 0, arr##_cap = ((cap) > 0 ? (cap) : 4), arr = darray_malloc(arr##_cap * sizeof(*(arr))))
 
 /*
  * darray_push()
  * pushes element 'x' into the array, returning the new length of the array
  */
 #define darray_push(arr, x)                  \
-    (*(((arr##_len >= arr##_cap) ? (arr = reallocx(arr, (arr##_cap *= 2) * sizeof(*(arr)))) : arr) + (arr##_len)) = (x), ++arr##_len)
+    (*(((arr##_len >= arr##_cap) ? (arr = darray_realloc(arr, (arr##_cap *= 2) * sizeof(*(arr)))) : arr) + (arr##_len)) = (x), ++arr##_len)
 
 /*
  * darray_pop()

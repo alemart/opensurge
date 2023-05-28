@@ -29,18 +29,18 @@
 #include "../core/global.h"
 #include "../core/video.h"
 #include "../core/image.h"
-#include "../core/stringutil.h"
 #include "../core/logfile.h"
 #include "../core/asset.h"
-#include "../core/util.h"
 #include "../core/timer.h"
 #include "../core/audio.h"
 #include "../core/sprite.h"
 #include "../core/nanoparser.h"
-#include "../scenes/level.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../physics/collisionmask.h"
 #include "../physics/obstacle.h"
 #include "../physics/physicsactor.h"
+#include "../scenes/level.h"
 
 /* constants */
 #define BRKDATA_MAX             16384 /* up to BRKDATA_MAX bricks per theme are supported */

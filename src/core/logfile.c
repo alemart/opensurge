@@ -23,8 +23,8 @@
 #include <stdarg.h>
 #include "logfile.h"
 #include "global.h"
-#include "util.h"
 #include "asset.h"
+#include "../util/util.h"
 
 
 

@@ -26,10 +26,10 @@
 #include <surgescript.h>
 #include "commandline.h"
 #include "global.h"
-#include "stringutil.h"
 #include "video.h"
 #include "asset.h"
 #include "import.h"
+#include "../util/stringutil.h"
 
 #ifdef _WIN32
 #include <windows.h>
