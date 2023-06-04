@@ -309,6 +309,7 @@ SET(GAME_SRCS
   src/util/csv.c
   src/util/fasthash.c
   src/util/iterator.c
+  src/util/numeric.c
   src/util/stringutil.c
   src/util/utf8.c
   src/util/util.c
@@ -443,6 +444,7 @@ SET(GAME_HEADERS
   src/util/darray.h
   src/util/fasthash.h
   src/util/iterator.h
+  src/util/numeric.h
   src/util/stringutil.h
   src/util/utf8.h
   src/util/util.h
