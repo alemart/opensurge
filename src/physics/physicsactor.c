@@ -118,6 +118,7 @@ static inline int delta_angle(int alpha, int beta);
 static const int CLOUD_OFFSET = 12;
 
 /* physics simulation */
+#define WANT_JUMP_ATTENUATION 0
 #define USE_FIXED_TIMESTEP 1
 static const float FIXED_TIMESTEP = 0.0166667f; /* 60 fps */
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt);
@@ -1183,9 +1184,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 ) &&
                 !pa->touching_ceiling /* don't bother jumping if near a ceiling */
             ) {
+#if WANT_JUMP_ATTENUATION
+                /* reduce the jump height when moving uphill */
                 float grv_attenuation = (pa->gsp * SIN(pa->angle) < 0.0f) ? 1.0f : 0.5f;
                 pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
                 pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle) * grv_attenuation;
+#else
+                pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
+                pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle);
+#endif
                 pa->gsp = 0.0f;
                 pa->state = PAS_JUMPING;
                 FORCE_ANGLE(0x0);
