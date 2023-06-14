@@ -62,8 +62,6 @@ enum brickflip_t {
 /* forward declarations */
 struct actor_t;
 struct player_t;
-struct item_list_t;
-struct enemy_list_t;
 struct obstacle_t;
 struct brickdata_t;
 struct brick_t;
@@ -92,7 +90,7 @@ int brickset_loaded(); /* is a brickset loaded? */
 /* brick interface */
 brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t flip_flags); /* creates a new brick */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
-void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
+void brick_update(brick_t *brk, struct player_t** team, int team_size); /* updates a brick */
 void brick_render(const brick_t *brk, v2d_t camera_position); /* renders a brick */
 void brick_render_debug(const brick_t *brk, v2d_t camera_position); /* renders a brick (editor) */
 void brick_render_mask(const brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */

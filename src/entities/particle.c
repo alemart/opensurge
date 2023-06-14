@@ -114,7 +114,7 @@ void particle_add(const struct image_t* source_image, int source_x, int source_y
  * particle_update()
  * Updates all the particles
  */
-void particle_update(const struct brick_list_t* brick_list)
+void particle_update()
 {
     particle_list_t *it, *prev, *next;
     particle_t* particle;

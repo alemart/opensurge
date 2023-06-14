@@ -24,7 +24,6 @@
 #include <stdbool.h>
 #include "../core/v2d.h"
 
-struct brick_list_t;
 struct image_t;
 
 /* initializes the particle system */
@@ -37,7 +36,7 @@ void particle_release();
 void particle_add(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed);
 
 /* updates all the particles */
-void particle_update(const struct brick_list_t* brick_list);
+void particle_update();
 
 /* renders the particles */
 void particle_render(v2d_t camera_position);

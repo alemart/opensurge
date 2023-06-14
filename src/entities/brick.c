@@ -251,7 +251,7 @@ brick_t* brick_destroy(brick_t *brk)
  * brick_update()
  * Updates a brick
  */
-void brick_update(brick_t *brk, player_t** team, int team_size, brick_list_t *brick_list, item_list_t *item_list, enemy_list_t *enemy_list)
+void brick_update(brick_t *brk, player_t** team, int team_size)
 {
     int i, brk_width, brk_height;
 

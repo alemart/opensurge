@@ -1376,7 +1376,7 @@ void level_update()
     /* update bricks */
     for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
         brick_t* brick = bnode->data;
-        brick_update(brick, team, team_size, major_bricks, major_items, major_enemies);
+        brick_update(brick, team, team_size);
     }
 
     /* update obstacle map */
@@ -1385,7 +1385,7 @@ void level_update()
     iterator_destroy(bricklike_iterator);
 
     /* update particles */
-    particle_update(major_bricks);
+    particle_update();
 
     /* early update: players */
     if(entitymanager_get_number_of_bricks() > 0) {
