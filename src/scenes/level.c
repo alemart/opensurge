@@ -2426,8 +2426,6 @@ void spawn_players()
     if(team_size == 0) {
         video_showmessage("No players have been specified!");
         team[team_size++] = player_create("Surge");
-        team[team_size++] = player_create("Neon"); /* TODO: remove */
-        team[team_size++] = player_create("Charge");
     }
 
     /* set the spawn point and the initial position of the players */
