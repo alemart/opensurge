@@ -22,8 +22,9 @@
 #include <string.h>
 #include <math.h>
 #include "scripting.h"
-#include "../core/font.h"
 #include "../core/video.h"
+#include "../core/font.h"
+#include "../core/image.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../entities/camera.h"
@@ -34,6 +35,8 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gettexturehandle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfont(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -102,7 +105,9 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Text", "get_size", fun_getsize, 0);
     surgescript_vm_bind(vm, "Text", "onRender", fun_onrender, 0);
-    surgescript_vm_bind(vm, "Text", "get_filepathOfRenderable", fun_getfilepathofrenderable, 0);
+    surgescript_vm_bind(vm, "Text", "get___filepathOfRenderable", fun_getfilepathofrenderable, 0);
+    surgescript_vm_bind(vm, "Text", "get___textureHandle", fun_gettexturehandle, 0);
+    surgescript_vm_bind(vm, "Text", "get___isTranslucent", fun_getistranslucent, 0);
 }
 
 /*
@@ -216,17 +221,47 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
     return NULL;
 }
 
-/* the filepath of this renderable */
+/* the filepath of this renderable (used by the render queue) */
 surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    font_t* font = get_font(object);
-    if(font != NULL) {
-        const char* filepath = font_get_filepath(font);
-        return surgescript_var_set_string(surgescript_var_create(), filepath);
-    }
+    const font_t* font = get_font(object);
 
     /* this should happen only before calling __init() */
-    return surgescript_var_set_string(surgescript_var_create(), "");
+    if(font == NULL)
+        return surgescript_var_set_string(surgescript_var_create(), "");
+
+    const char* filepath = font_get_filepath(font);
+    return surgescript_var_set_string(surgescript_var_create(), filepath);
+}
+
+/* the texture handle of this renderable (used by the render queue) */
+surgescript_var_t* fun_gettexturehandle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const font_t* font = get_font(object);
+
+    /* is the font valid? */
+    if(font != NULL) {
+        const image_t* image = font_get_image(font);
+
+        /* is this a bitmap font? */
+        if(image != NULL) {
+            texturehandle_t tex = image_texture(image);
+            return surgescript_var_set_rawbits(surgescript_var_create(), tex);
+        }
+    }
+
+    return surgescript_var_set_null(surgescript_var_create());
+}
+
+/* is this renderable translucent? (used by the render queue) */
+surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* we'll consider this renderable to be translucent if it's not a bitmap font,
+       e.g., a TrueType font (there is likely some antialiasing taking place...) */
+    const font_t* font = get_font(object);
+    bool is_translucent = (font != NULL) && (font_get_image(font) == NULL);
+
+    return surgescript_var_set_bool(surgescript_var_create(), is_translucent);
 }
 
 /* set zindex */

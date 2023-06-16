@@ -37,6 +37,8 @@ static surgescript_var_t* fun_destructor(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_canbeclippedout(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gettexturehandle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -104,7 +106,9 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
     surgescript_vm_bind(vm, "Actor", "__canBeClippedOut", fun_canbeclippedout, 0);
-    surgescript_vm_bind(vm, "Actor", "get_filepathOfRenderable", fun_getfilepathofrenderable, 0);
+    surgescript_vm_bind(vm, "Actor", "get___filepathOfRenderable", fun_getfilepathofrenderable, 0);
+    surgescript_vm_bind(vm, "Actor", "get___textureHandle", fun_gettexturehandle, 0);
+    surgescript_vm_bind(vm, "Actor", "get___isTranslucent", fun_getistranslucent, 0);
 
     /* animation methods */
     surgescript_vm_bind(vm, "Actor", "get_animation", fun_getanimation, 0);
@@ -233,7 +237,7 @@ surgescript_var_t* fun_canbeclippedout(surgescript_object_t* object, const surge
     return surgescript_var_set_bool(surgescript_var_create(), can_be_clipped_out);
 }
 
-/* the filepath of this renderable */
+/* the filepath of this renderable (used by the render queue) */
 surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     const actor_t* actor = scripting_actor_ptr(object);
@@ -241,6 +245,25 @@ surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, con
     const char* filepath = image_filepath(image);
 
     return surgescript_var_set_string(surgescript_var_create(), filepath);
+}
+
+/* the texture handle of this renderable (used by the render queue) */
+surgescript_var_t* fun_gettexturehandle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = scripting_actor_ptr(object);
+    const image_t* image = actor_image(actor);
+    texturehandle_t tex = image_texture(image);
+
+    return surgescript_var_set_rawbits(surgescript_var_create(), tex);
+}
+
+/* is this renderable translucent? (used by the render queue) */
+surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = scripting_actor_ptr(object);
+    bool is_translucent = (actor->alpha < 1.0f); /* doesn't take individual pixels into account */
+
+    return surgescript_var_set_bool(surgescript_var_create(), is_translucent);
 }
 
 /* __init: set sprite name */

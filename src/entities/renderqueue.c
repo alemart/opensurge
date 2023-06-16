@@ -80,6 +80,7 @@ struct renderable_vtable_t {
     void (*render)(renderable_t,v2d_t);
     float (*zindex)(renderable_t);
     int (*ypos)(renderable_t);
+    texturehandle_t (*texture)(renderable_t);
     const char* (*path)(renderable_t, char*, size_t);
     int (*type)(renderable_t);
     bool (*is_translucent)(renderable_t);
@@ -99,6 +100,7 @@ struct renderqueue_entry_t {
         float zindex;
         int type;
         int ypos;
+        texturehandle_t texture;
         bool is_translucent;
     } cached;
 
@@ -154,6 +156,21 @@ static int ypos_background(renderable_t r);
 static int ypos_foreground(renderable_t r);
 static int ypos_water(renderable_t r);
 
+static texturehandle_t texture_particles(renderable_t r);
+static texturehandle_t texture_player(renderable_t r);
+static texturehandle_t texture_item(renderable_t r);
+static texturehandle_t texture_object(renderable_t r);
+static texturehandle_t texture_brick(renderable_t r);
+static texturehandle_t texture_brick_mask(renderable_t r);
+static texturehandle_t texture_brick_debug(renderable_t r);
+static texturehandle_t texture_brick_path(renderable_t r);
+static texturehandle_t texture_ssobject(renderable_t r);
+static texturehandle_t texture_ssobject_gizmo(renderable_t r);
+static texturehandle_t texture_ssobject_debug(renderable_t r);
+static texturehandle_t texture_background(renderable_t r);
+static texturehandle_t texture_foreground(renderable_t r);
+static texturehandle_t texture_water(renderable_t r);
+
 static const char* path_particles(renderable_t r, char* dest, size_t dest_size);
 static const char* path_player(renderable_t r, char* dest, size_t dest_size);
 static const char* path_item(renderable_t r, char* dest, size_t dest_size);
@@ -204,6 +221,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_brick,
         .render = render_brick,
         .ypos = ypos_brick,
+        .texture = texture_brick,
         .path = path_brick,
         .type = type_brick,
         .is_translucent = is_translucent_brick
@@ -213,6 +231,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_brick_mask,
         .render = render_brick_mask,
         .ypos = ypos_brick_mask,
+        .texture = texture_brick_mask,
         .path = path_brick_mask,
         .type = type_brick_mask,
         .is_translucent = is_translucent_brick_mask
@@ -222,6 +241,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_brick_debug,
         .render = render_brick_debug,
         .ypos = ypos_brick_debug,
+        .texture = texture_brick_debug,
         .path = path_brick_debug,
         .type = type_brick_debug,
         .is_translucent = is_translucent_brick_debug
@@ -231,6 +251,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_brick_path,
         .render = render_brick_path,
         .ypos = ypos_brick_path,
+        .texture = texture_brick_path,
         .path = path_brick_path,
         .type = type_brick_path,
         .is_translucent = is_translucent_brick_path
@@ -240,6 +261,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_item,
         .render = render_item,
         .ypos = ypos_item,
+        .texture = texture_item,
         .path = path_item,
         .type = type_item,
         .is_translucent = is_translucent_item
@@ -249,6 +271,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_object,
         .render = render_object,
         .ypos = ypos_object,
+        .texture = texture_object,
         .path = path_object,
         .type = type_object,
         .is_translucent = is_translucent_object
@@ -258,6 +281,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_player,
         .render = render_player,
         .ypos = ypos_player,
+        .texture = texture_player,
         .path = path_player,
         .type = type_player,
         .is_translucent = is_translucent_player
@@ -267,6 +291,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_particles,
         .render = render_particles,
         .ypos = ypos_particles,
+        .texture = texture_particles,
         .path = path_particles,
         .type = type_particles,
         .is_translucent = is_translucent_particles
@@ -276,6 +301,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_ssobject,
         .render = render_ssobject,
         .ypos = ypos_ssobject,
+        .texture = texture_ssobject,
         .path = path_ssobject,
         .type = type_ssobject,
         .is_translucent = is_translucent_ssobject
@@ -285,6 +311,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_ssobject_debug,
         .render = render_ssobject_debug,
         .ypos = ypos_ssobject_debug,
+        .texture = texture_ssobject_debug,
         .path = path_ssobject_debug,
         .type = type_ssobject_debug,
         .is_translucent = is_translucent_ssobject_debug
@@ -294,6 +321,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_ssobject_gizmo,
         .render = render_ssobject_gizmo,
         .ypos = ypos_ssobject_gizmo,
+        .texture = texture_ssobject_gizmo,
         .path = path_ssobject_gizmo,
         .type = type_ssobject_gizmo,
         .is_translucent = is_translucent_ssobject_gizmo
@@ -303,6 +331,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_background,
         .render = render_background,
         .ypos = ypos_background,
+        .texture = texture_background,
         .path = path_background,
         .type = type_background,
         .is_translucent = is_translucent_background
@@ -312,6 +341,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_foreground,
         .render = render_foreground,
         .ypos = ypos_foreground,
+        .texture = texture_foreground,
         .path = path_foreground,
         .type = type_foreground,
         .is_translucent = is_translucent_foreground
@@ -321,6 +351,7 @@ static const renderable_vtable_t VTABLE[] = {
         .zindex = zindex_water,
         .render = render_water,
         .ypos = ypos_water,
+        .texture = texture_water,
         .path = path_water,
         .type = type_water,
         .is_translucent = is_translucent_water
@@ -427,6 +458,7 @@ static const char fs_glsl_with_alpha_testing[] = ""
 #define ZINDEX_LARGE              99999.0f /* will be displayed in front of others */
 #define INITIAL_BUFFER_CAPACITY   256
 #define LOG(...)                  logfile_message("Render queue - " __VA_ARGS__)
+static const texturehandle_t NO_TEXTURE = ~0u;
 static int cmp_fun(const void* i, const void* j);
 static int cmp_zbuf_fun(const void* i, const void* j);
 static inline float brick_zindex_offset(const brick_t *brick);
@@ -462,14 +494,12 @@ defined as follows:
 
 group_index[n-1] = 1
 
-group_index[i] = 1 + group_index[i+1], if path[i] == path[i+1]
+group_index[i] = 1 + group_index[i+1], if texture[i] == texture[i+1]
                  1 otherwise                               for all 0 <= i < n-1
 
-where path[i] is the path of the image file (if any) of the i-th entry of the
-*sorted* render queue. If the paths are the same, then the bitmaps of the two
-entries are either the same or one is a descendant of the other, thanks to our
-resource manager (see src/core/image.h and src/core/resourcemanager.h). Simply
-put, if the paths are the same, we will group the entries.
+where texture[i] is the internal texture of the image of the i-th entry of the
+*sorted* render queue. If the textures are the same, then we will group the
+entries.
 
 Let's also define the special off-bounds value group_index[-1] = 1. This is
 implemented as a circular array, i.e., group_index[-1] = group_index[n-1] = 1.
@@ -617,8 +647,8 @@ void renderqueue_end()
 #if USE_DEFERRED_DRAWING
 
     ALLEGRO_TRANSFORM ztransform;
-    static char path[2][1024];
     int translucent_start = buffer_size;
+    char entry_path[256];
 
     if(use_depth_buffer) {
 
@@ -643,7 +673,7 @@ void renderqueue_end()
 
         /* after sorting, partition the buffer into opaque and translucent objects */
         for(int i = buffer_size - 1; i >= 0; i--) {
-            if(sorted_buffer[i]->vtable->is_translucent(sorted_buffer[i]->renderable))
+            if(sorted_buffer[i]->cached.is_translucent)
                 translucent_start = i;
             else
                 break;
@@ -654,13 +684,16 @@ void renderqueue_end()
     /* fill the group_index[] array */
     sorted_buffer[buffer_size - 1]->group_index = 1;
     for(int i = buffer_size - 2; i >= 0; i--) {
-        sorted_buffer[i]->vtable->path(sorted_buffer[i]->renderable, path[0], sizeof(path[0]));
-        sorted_buffer[i+1]->vtable->path(sorted_buffer[i+1]->renderable, path[1], sizeof(path[1]));
 
-        if(0 == strcmp(path[0], path[1]))
+        /* same texture? */
+        if(
+            sorted_buffer[i]->cached.texture != NO_TEXTURE && /* won't group if NO_TEXTURE */
+            sorted_buffer[i]->cached.texture == sorted_buffer[i+1]->cached.texture
+        )
             sorted_buffer[i]->group_index = 1 + sorted_buffer[i+1]->group_index;
         else
             sorted_buffer[i]->group_index = 1;
+
     }
 
     /* render the entries */
@@ -681,8 +714,8 @@ void renderqueue_end()
             ++draw_calls;
             if(want_report()) {
                 char c = (curr == prev) ? '+' : ' '; /* curr == prev only if group_index == 1 */
-                sorted_buffer[j]->vtable->path(sorted_buffer[j]->renderable, path[0], sizeof(path[0]));
-                REPORT("Batch size:%c%3d %s", c, sorted_buffer[j]->group_index, path[0]);
+                sorted_buffer[j]->vtable->path(sorted_buffer[j]->renderable, entry_path, sizeof(entry_path));
+                REPORT("Batch size:%c%3d %s", c, sorted_buffer[j]->group_index, entry_path);
             }
         }
 
@@ -1067,6 +1100,7 @@ void enqueue(const renderqueue_entry_t* entry)
     e->cached.zindex = e->vtable->zindex(e->renderable);
     e->cached.type = e->vtable->type(e->renderable);
     e->cached.ypos = e->vtable->ypos(e->renderable);
+    e->cached.texture = e->vtable->texture(e->renderable);
     e->cached.is_translucent = e->vtable->is_translucent(e->renderable);
 }
 
@@ -1112,16 +1146,11 @@ int cmp_zbuf_fun(const void* i, const void* j)
     if(la != lb)
         return la - lb;
 
-    /* read paths - TODO not optimal... */
-    static char path[2][1024];
-    int texcmp = strcmp(
-        a->vtable->path(a->renderable, path[0], sizeof(path[0])),
-        b->vtable->path(b->renderable, path[1], sizeof(path[1]))
-    );
-
     /* sort by texture first, for optimal batching */
-    if(texcmp != 0)
-        return texcmp;
+    texturehandle_t ta = a->cached.texture;
+    texturehandle_t tb = b->cached.texture;
+    if(ta != tb)
+        return (ta > tb) - (ta < tb); /* compare unsigned integers */
 
     /* if the entries share the same texture, sort
        front-to-back, so that the depth testing can
@@ -1258,13 +1287,14 @@ bool is_translucent_ssobject_gizmo(renderable_t r) { return false; }
 bool is_translucent_ssobject_debug(renderable_t r) { return false; /*is_translucent_ssobject(r);*/ /* no state changes within SurgeScript */ }
 bool is_translucent_ssobject(renderable_t r)
 {
-    if(surgescript_object_has_function(r.ssobject, "get_alpha")) {
+    if(surgescript_object_has_function(r.ssobject, "get___isTranslucent")) {
         surgescript_var_t* ret = surgescript_var_create();
-        surgescript_object_call_function(r.ssobject, "get_alpha", NULL, 0, ret);
-        double alpha = surgescript_var_get_number(ret);
-        surgescript_var_destroy(ret);
 
-        return alpha < 1.0;
+        surgescript_object_call_function(r.ssobject, "get___isTranslucent", NULL, 0, ret);
+        bool is_translucent = surgescript_var_get_bool(ret);
+
+        surgescript_var_destroy(ret);
+        return is_translucent;
     }
 
     return false;
@@ -1284,10 +1314,10 @@ const char* path_water(renderable_t r, char* dest, size_t dest_size) { return st
 
 const char* path_ssobject(renderable_t r, char* dest, size_t dest_size)
 {
-    if(surgescript_object_has_function(r.ssobject, "get_filepathOfRenderable")) {
+    if(surgescript_object_has_function(r.ssobject, "get___filepathOfRenderable")) {
         surgescript_var_t* ret = surgescript_var_create();
 
-        surgescript_object_call_function(r.ssobject, "get_filepathOfRenderable", NULL, 0, ret);
+        surgescript_object_call_function(r.ssobject, "get___filepathOfRenderable", NULL, 0, ret);
         str_cpy(dest, surgescript_var_fast_get_string(ret), dest_size);
 
         surgescript_var_destroy(ret);
@@ -1313,6 +1343,56 @@ const char* path_ssobject_gizmo(renderable_t r, char* dest, size_t dest_size)
     return str_cpy(dest, random_path('G'), dest_size);
 }
 
+texturehandle_t texture_particles(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_player(renderable_t r) { return NO_TEXTURE; /* TODO? */ }
+texturehandle_t texture_item(renderable_t r) { return NO_TEXTURE; /* legacy TODO: remove */ }
+texturehandle_t texture_object(renderable_t r) { return NO_TEXTURE; /* legacy TODO: remove */ }
+texturehandle_t texture_brick_mask(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_brick_path(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_ssobject_gizmo(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_background(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_foreground(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_water(renderable_t r) { return NO_TEXTURE; }
+
+texturehandle_t texture_brick(renderable_t r)
+{
+    const brick_t* brk = r.brick;
+    const image_t* img = brick_image(brk);
+
+    return image_texture(img);
+}
+
+texturehandle_t texture_brick_debug(renderable_t r)
+{
+    return texture_brick(r);
+}
+
+texturehandle_t texture_ssobject_debug(renderable_t r)
+{
+    /* this routine is based on render_ssobject_debug() */
+    const char* name = surgescript_object_name(r.ssobject);
+    const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
+    const image_t* img = sprite_get_image(anim, 0);
+
+    return image_texture(img);
+}
+
+texturehandle_t texture_ssobject(renderable_t r)
+{
+    texturehandle_t tex = NO_TEXTURE;
+
+    if(surgescript_object_has_function(r.ssobject, "get___textureHandle")) {
+        surgescript_var_t* ret = surgescript_var_create();
+
+        surgescript_object_call_function(r.ssobject, "get___textureHandle", NULL, 0, ret);
+        if(!surgescript_var_is_null(ret)) /* is there a texture handle? */
+            tex = surgescript_var_get_rawbits(ret);
+
+        surgescript_var_destroy(ret);
+    }
+
+    return tex;
+}
 
 
 
