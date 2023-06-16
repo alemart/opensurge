@@ -49,6 +49,10 @@ struct heightsampler_t
 {
     /* height of the world at fixed-size intervals */
     DARRAY(int, height_at);
+
+    /* smooth_height_at[j] = smooth_height_at[j-1] if j >= 1 and height_at[j] == 0 (no sampling data)
+                             height_at[j]          otherwise */
+    DARRAY(int, smooth_height_at);
 };
 
 /* A bucket of bricks */
@@ -313,6 +317,11 @@ void brickmanager_world_size(const brickmanager_t* manager, int* world_width, in
  */
 int brickmanager_world_height_at_interval(const brickmanager_t* manager, int left_xpos, int right_xpos)
 {
+    /* no sampling data? */
+    if(manager->brick_count == 0)
+        return LARGE_INT;
+
+    /* return sampling data */
     return sampler_query(manager->sampler, left_xpos, right_xpos);
 }
 
@@ -709,13 +718,17 @@ heightsampler_t* sampler_ctor()
     heightsampler_t* sampler = mallocx(sizeof *sampler);
 
     darray_init(sampler->height_at);
+    darray_init(sampler->smooth_height_at);
+
     darray_push(sampler->height_at, 0);
+    darray_push(sampler->smooth_height_at, 0);
 
     return sampler;
 }
 
 heightsampler_t* sampler_dtor(heightsampler_t* sampler)
 {
+    darray_release(sampler->smooth_height_at);
     darray_release(sampler->height_at);
     free(sampler);
 
@@ -725,7 +738,10 @@ heightsampler_t* sampler_dtor(heightsampler_t* sampler)
 void sampler_clear(heightsampler_t* sampler)
 {
     darray_clear(sampler->height_at);
+    darray_clear(sampler->smooth_height_at);
+
     darray_push(sampler->height_at, 0);
+    darray_push(sampler->smooth_height_at, 0);
 }
 
 void sampler_add(heightsampler_t* sampler, const brick_t* brick)
@@ -737,17 +753,30 @@ void sampler_add(heightsampler_t* sampler, const brick_t* brick)
     if(center_x < 0)
         center_x = 0;
 
+    /* find the index corresponding to the brick */
     int index = center_x / SAMPLER_WIDTH;
     if(index > SAMPLER_MAX_INDEX)
         index = SAMPLER_MAX_INDEX; /* limit memory usage */
 
     /* ensure index < darray_length(sampler->height_at) */
     while(index >= darray_length(sampler->height_at))
-        darray_push(sampler->height_at, 0); /* fill with zeros */
+        darray_push(sampler->height_at, 0); /* fill with zeros (meaning: no sampling data) */
 
+    /* update height_at[] */
     int bottom = spawn_point.y + size.y;
     if(bottom > sampler->height_at[index])
         sampler->height_at[index] = bottom;
+
+    /* fill smooth_height_at[] */
+    /* assert(darray_length(sampler->smooth_height_at) >= 1); */
+    for(int j = darray_length(sampler->smooth_height_at); j < darray_length(sampler->height_at); j++) {
+        darray_push(sampler->smooth_height_at, 0);
+        sampler->smooth_height_at[j] = sampler->smooth_height_at[j-1]; /* j >= 1 always */
+    }
+
+    /* update smooth_height_at[] */
+    if(sampler->height_at[index] != 0)
+        sampler->smooth_height_at[index] = sampler->height_at[index];
 }
 
 int sampler_query(heightsampler_t* sampler, int left, int right)
@@ -757,7 +786,7 @@ int sampler_query(heightsampler_t* sampler, int left, int right)
         return 0;
 
     /* pick indices */
-    int m = darray_length(sampler->height_at) - 1;
+    int m = darray_length(sampler->smooth_height_at) - 1; /* m >= 0 always */
     int l = left / SAMPLER_WIDTH;
     int r = right / SAMPLER_WIDTH;
 
@@ -773,11 +802,12 @@ int sampler_query(heightsampler_t* sampler, int left, int right)
     
     /* now we have 0 <= l, r <= m */
 
-    /* query the height at the given interval */
+    /* query the height at the given interval
+       method: clamp to edge */
     int max_height = 0;
     for(int i = l; i <= r; i++) {
-        if(sampler->height_at[i] > max_height)
-            max_height = sampler->height_at[i];
+        if(sampler->smooth_height_at[i] > max_height)
+            max_height = sampler->smooth_height_at[i];
     }
 
     /* done */
