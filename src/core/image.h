@@ -22,6 +22,7 @@
 #define _IMAGE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "color.h"
 #include "v2d.h"
 
@@ -34,6 +35,9 @@ typedef enum imageflags_t {
     IF_HFLIP = 1, /* powers of 2 */
     IF_VFLIP = 2
 } imageflags_t;
+
+/* opaque texture handle */
+typedef uint32_t texturehandle_t; /* GLuint */
 
 /* image management */
 image_t* image_load(const char* path); /* will be unloaded automatically */
@@ -53,6 +57,7 @@ void image_enable_linear_filtering(image_t* img); /* enable linear filtering */
 void image_disable_linear_filtering(image_t* img); /* disable linear filtering */
 const char* image_filepath(const image_t* img); /* relative path of the originating file, if defined */
 bool image_same_root(const image_t* a, const image_t* b); /* checks if two images have the same root (ascendant) */
+texturehandle_t image_texture(const image_t* img); /* get texture handle */
 
 /* pixel manipulation */
 void image_lock(image_t* img);

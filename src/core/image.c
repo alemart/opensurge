@@ -33,6 +33,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_opengl.h>
 
 /* convert imageflags_t to ALLEGRO_FLIP flags */
 #define FLIPPY(flags) ((((flags) & IF_HFLIP) != 0) * ALLEGRO_FLIP_HORIZONTAL + (((flags) & IF_VFLIP) != 0) * ALLEGRO_FLIP_VERTICAL)
@@ -796,4 +797,15 @@ bool image_same_root(const image_t* a, const image_t* b)
         rootB = al_get_parent_bitmap(rootB);
 
     return (rootA == rootB);
+}
+
+/*
+ * image_texture()
+ * Gets a handle that identifies the texture used internally by the image
+ */
+texturehandle_t image_texture(const image_t* img)
+{
+    /* we require ALLEGRO_OPENGL to be a display flag */
+    texturehandle_t tex = al_get_opengl_texture(img->data);
+    return tex;
 }
