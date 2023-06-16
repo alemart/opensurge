@@ -21,6 +21,7 @@
 #ifndef _RENDERQUEUE_H
 #define _RENDERQUEUE_H
 
+#include <stdbool.h>
 #include "../core/v2d.h"
 
 /*
@@ -62,5 +63,8 @@ void renderqueue_enqueue_ssobject_debug(struct surgescript_object_t* object);
 void renderqueue_enqueue_background(struct bgtheme_t* background);
 void renderqueue_enqueue_foreground(struct bgtheme_t* foreground);
 void renderqueue_enqueue_water();
+
+/* misc */
+bool renderqueue_toggle_stats_report();
 
 #endif

@@ -26,6 +26,7 @@
 #include "timer.h"
 #include "inputmap.h"
 #include "mobile_gamepad.h"
+#include "../entities/renderqueue.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
@@ -959,9 +960,18 @@ void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
 /* handle hotkeys */
 void handle_hotkey(int keycode)
 {
-    /* toggle fullscreen */
-    if(keycode == ALLEGRO_KEY_F11)
-        video_set_fullscreen(!video_is_fullscreen());
+    switch(keycode) {
+        /* toggle fullscreen */
+        case ALLEGRO_KEY_F11:
+            video_set_fullscreen(!video_is_fullscreen());
+            break;
+
+        /* toggle render queue stats report */
+        case ALLEGRO_KEY_F10:
+            if(!renderqueue_toggle_stats_report())
+                video_showmessage("Can't toggle stats report");
+            break;
+    }
 }
 
 /* log joysticks */

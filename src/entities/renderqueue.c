@@ -448,10 +448,11 @@ static const char fs_glsl_with_alpha_testing[] = ""
 /*#define use_depth_buffer false*/
 
 /* render queue stats reporting */
-#define want_report()             0
-#define REPORT(...)               do { if(want_report()) video_showmessage(__VA_ARGS__); } while(0)
-#define REPORT_BEGIN()            do { if(want_report()) video_clearmessages(); } while(0)
-#define REPORT_END()              REPORT("")
+#define REPORT_CLEAR()            video_clearmessages()
+#define REPORT(...)               do { if(want_report) video_showmessage(__VA_ARGS__); } while(0)
+#define REPORT_BEGIN()            do { if(want_report) REPORT_CLEAR(); } while(0)
+#define REPORT_END()              (void)0
+static bool want_report = false;
 
 /* utilities */
 #define ZINDEX_OFFSET(n)          (0.000001f * (float)(n)) /* ZINDEX_OFFSET(1) is the mininum zindex offset */
@@ -571,6 +572,9 @@ void renderqueue_init()
         shader = NULL;
     }
 
+    /* no reporting */
+    want_report = false;
+
     /* done! */
     LOG("initialized!");
 }
@@ -599,6 +603,11 @@ void renderqueue_release()
 
     buffer_capacity = 0;
     buffer_size = 0;
+
+    if(want_report) {
+        want_report = false;
+        REPORT_CLEAR();
+    }
 
     LOG("released!");
 }
@@ -712,7 +721,7 @@ void renderqueue_end()
         /* reporting */
         if(curr >= prev) {
             ++draw_calls;
-            if(want_report()) {
+            if(want_report) {
                 char c = (curr == prev) ? '+' : ' '; /* curr == prev only if group_index == 1 */
                 sorted_buffer[j]->vtable->path(sorted_buffer[j]->renderable, entry_path, sizeof(entry_path));
                 REPORT("Batch size:%c%3d %s", c, sorted_buffer[j]->group_index, entry_path);
@@ -1069,6 +1078,30 @@ void renderqueue_enqueue_water()
 }
 
 
+
+/*
+ * renderqueue_toggle_stats_report()
+ * Show/hide the stats report for development purposes
+ */
+bool renderqueue_toggle_stats_report()
+{
+    /* error: uninitialized render queue */
+    if(buffer == NULL) {
+        LOG("Can't toggle stats report");
+        return false;
+    }
+
+    /* toggle */
+    want_report = !want_report;
+    LOG("Stats report is %s", want_report ? "enabled" : "disabled");
+
+    /* clear messages */
+    if(!want_report)
+        REPORT_CLEAR();
+
+    /* success */
+    return true;
+}
 
 
 
