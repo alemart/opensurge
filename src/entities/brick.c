@@ -1032,20 +1032,28 @@ float brick_zindex_preview(int id)
 /* Animates a brick */
 void animate_brick(brick_t *brk)
 {
-    spriteinfo_t *sprite = brk->brick_ref->data;
+    const spriteinfo_t *sprite = brk->brick_ref->data;
 
-    if(sprite != NULL) { /* if brk is not a fake brick */
-        bool loop = sprite->animation_data[0]->repeat;
-        int f, c = sprite->animation_data[0]->frame_count;
+    /* fake brick? */
+    if(sprite == NULL)
+        return;
 
-        if(!loop)
-            brk->animation_frame = min(c-1, brk->animation_frame + sprite->animation_data[0]->fps * timer_get_delta());
-        else
-            brk->animation_frame = (int)(sprite->animation_data[0]->fps * timer_get_elapsed()) % c;
+    /* does this brick have only one animation frame?
+       skip everything (this is probably the case!) */
+    if(sprite->animation_data[0]->frame_count == 1)
+        return;
 
-        f = clip((int)brk->animation_frame, 0, c-1);
-        brk->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
-    }
+    /* animate */
+    bool loop = sprite->animation_data[0]->repeat;
+    int c = sprite->animation_data[0]->frame_count;
+
+    if(!loop)
+        brk->animation_frame = min(c-1, brk->animation_frame + sprite->animation_data[0]->fps * timer_get_delta());
+    else
+        brk->animation_frame = (int)(sprite->animation_data[0]->fps * timer_get_elapsed()) % c;
+
+    int f = clip((int)brk->animation_frame, 0, c-1);
+    brk->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
 }
 
 /* Checks if the player is standing on top of a platform */
