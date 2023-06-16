@@ -20,12 +20,12 @@
  */
 
 #include "entitymanager.h"
-#include "brick.h"
-#include "actor.h"
-#include "legacy/item.h"
-#include "legacy/enemy.h"
-#include "../core/spatialhash.h"
-#include "../util/util.h"
+#include "../brick.h"
+#include "../actor.h"
+#include "item.h"
+#include "enemy.h"
+#include "../../core/spatialhash.h"
+#include "../../util/util.h"
 
 /* defining the spatial hashes */
 SPATIALHASH_GENERATE_CODE(brick_t)
