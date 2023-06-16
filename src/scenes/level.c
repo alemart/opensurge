@@ -57,6 +57,7 @@
 #include "../core/mobile_gamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
+#include "../entities/brickmanager.h"
 #include "../entities/player.h"
 #include "../entities/camera.h"
 #include "../entities/background.h"
@@ -157,20 +158,12 @@ static void save_level_state(levelstate_t* state);
 static void restore_level_state(const levelstate_t* state);
 static void clear_level_state(levelstate_t* state);
 
-/* level size */
-static int level_width;/* width of this level (in pixels) */
-static int level_height; /* height of this level (in pixels) */
-static int *height_at, height_at_count; /* level height at different sample points */
-static void init_level_size();
-static void release_level_size();
-static void update_level_size();
-static void update_level_height_samples(int level_width, int level_height);
-
 /* internal data */
 static float level_timer;
 static music_t *music;
 static bgtheme_t *backgroundtheme;
 static image_t *quit_level_img;
+static brickmanager_t* brick_manager;
 static int quit_level;
 static int must_load_another_level;
 static int must_restart_this_level;
@@ -202,11 +195,14 @@ static bool level_save_ssobject(surgescript_object_t* object, void* param);
 
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
+static void update_level_size();
 static void restart(int preserve_level_state);
-static void render_players();
 static void update_music();
+static void render_bricks();
+static void render_bricks_debug();
+static void render_players();
 static void spawn_players();
-static void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
+static void render_level(const item_list_t *major_items, const enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
 static void render_hud(); /* gui / hud related */
 static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
@@ -218,7 +214,7 @@ STATIC_DARRAY(obstacle_t*, mock_obstacles); /* dynamically generated obstacles *
 static void create_obstaclemap();
 static void destroy_obstaclemap();
 static void clear_obstaclemap();
-static void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, iterator_t* bricklike_iterator);
+static void update_obstaclemap(const item_list_t* item_list, const object_list_t* object_list);
 static obstacle_t* item2obstacle(const item_t* item);
 static obstacle_t* object2obstacle(const object_t* object);
 static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
@@ -501,7 +497,7 @@ void level_load(const char *filepath)
     music_stop(); /* stop any music that's playing */
     music = *musicfile ? music_load(musicfile) : NULL;
 
-    /* compute the level size */
+    /* recompute the level size */
     update_level_size();
 
     /* background */
@@ -537,22 +533,15 @@ void level_unload()
         logfile_message("The level scripts have been cleared.");
     }
 
-    /* destroying the players */
+    /* release the players */
     logfile_message("Unloading the players...");
     for(int i = 0; i < team_size; i++)
         player_destroy(team[i]);
     team_size = 0;
     player = NULL;
 
-    /* unloading the background */
-    logfile_message("Unloading the background...");
-    backgroundtheme = background_unload(backgroundtheme);
-
-    /* unloading the brickset */
-    logfile_message("Unloading the brickset...");
-    brickset_unload();
-
-    /* note: the bricks are released when the entity manager is released */
+    /* misc */
+    camera_unlock();
 
     /* music */
     logfile_message("Stopping the music...");
@@ -561,8 +550,17 @@ void level_unload()
         music_unref(music);
     }
 
-    /* misc */
-    camera_unlock();
+    /* remove all bricks */
+    logfile_message("Removing all bricks...");
+    brickmanager_remove_all_bricks(brick_manager);
+
+    /* unload the brickset */
+    logfile_message("Unloading the brickset...");
+    brickset_unload();
+
+    /* unload the background */
+    logfile_message("Unloading the background...");
+    backgroundtheme = background_unload(backgroundtheme);
 
     /* success! */
     logfile_message("The level has been unloaded.");
@@ -594,12 +592,7 @@ int level_save(const char *filepath)
         return FALSE;
     }
 
-    /* retrieve objects */
-    brick_list_t* brick_list = entitymanager_retrieve_all_bricks();
-    item_list_t* item_list = entitymanager_retrieve_all_items();
-    enemy_list_t* object_list = entitymanager_retrieve_all_objects();
-
-    /* level disclaimer */
+    /* level header */
     al_fprintf(fp,
     "// ------------------------------------------------------------\n"
     "// %s %s level\n"
@@ -684,25 +677,34 @@ int level_save(const char *filepath)
 
     /* brick list */
     al_fprintf(fp, "\n// bricks\n");
-    for(brick_list_t* itb = brick_list; itb != NULL; itb = itb->next)  {
-        if(brick_is_alive(itb->data)) {
-            al_fprintf(fp,
-                "brick %d %d %d%s%s%s%s\n",
-                brick_id(itb->data),
-                (int)(brick_spawnpoint(itb->data).x), (int)(brick_spawnpoint(itb->data).y),
-                brick_layer(itb->data) != BRL_DEFAULT ? " " : "",
-                brick_layer(itb->data) != BRL_DEFAULT ? brick_util_layername(brick_layer(itb->data)) : "",
-                brick_flip(itb->data) != BRF_NOFLIP ? " " : "",
-                brick_flip(itb->data) != BRF_NOFLIP ? brick_util_flipstr(brick_flip(itb->data)) : ""
-            );
-        }
+    iterator_t* brick_iterator = brickmanager_retrieve_all_bricks(brick_manager);
+    while(iterator_has_next(brick_iterator)) {
+        const brick_t* brick = iterator_next(brick_iterator);
+        v2d_t spawn_point = brick_spawnpoint(brick);
+        bricklayer_t layer = brick_layer(brick);
+        brickflip_t flip = brick_flip(brick);
+
+        al_fprintf(fp,
+            "brick %d %d %d%s%s%s%s\n",
+
+            brick_id(brick),
+            (int)(spawn_point.x), (int)(spawn_point.y),
+
+            layer != BRL_DEFAULT ? " " : "",
+            layer != BRL_DEFAULT ? brick_util_layername(layer) : "",
+
+            flip != BRF_NOFLIP ? " " : "",
+            flip != BRF_NOFLIP ? brick_util_flipstr(flip) : ""
+        );
     }
+    iterator_destroy(brick_iterator);
 
     /* SurgeScript entity list */
     al_fprintf(fp, "\n// entities\n");
     surgescript_object_traverse_tree_ex(level_ssobject(), fp, level_save_ssobject);
 
     /* item list */
+    item_list_t* item_list = entitymanager_retrieve_all_items();
     if(item_list) {
         al_fprintf(fp, "\n// legacy items\n");
         for(item_list_t* iti = item_list; iti != NULL; iti = iti->next) {
@@ -710,8 +712,10 @@ int level_save(const char *filepath)
                 al_fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
         }
     }
+    item_list = entitymanager_release_retrieved_item_list(item_list);
 
     /* legacy object list */
+    enemy_list_t* object_list = entitymanager_retrieve_all_objects();
     if(object_list) {
         al_fprintf(fp, "\n// legacy objects\n");
         for(enemy_list_t* ite = object_list; ite != NULL; ite = ite->next) {
@@ -719,16 +723,14 @@ int level_save(const char *filepath)
                 al_fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
         }
     }
-
-    /* done! */
-    al_fprintf(fp, "\n// EOF");
-    al_fclose(fp);
-    logfile_message("level_save() ok");
-
-    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
-    item_list = entitymanager_release_retrieved_item_list(item_list);
     object_list = entitymanager_release_retrieved_object_list(object_list);
 
+    /* end of file */
+    al_fprintf(fp, "\n// EOF");
+    al_fclose(fp);
+
+    /* done! */
+    logfile_message("level_save() ok");
     return TRUE;
 }
 
@@ -1075,6 +1077,9 @@ void level_init(void *path_to_lev_file)
     cached_level_ssobject = NULL;
     cached_entity_manager = NULL;
 
+    /* create the brick manager */
+    brick_manager = brickmanager_create();
+
     /* dialog box */
     dlgbox_active = FALSE;
     dlgbox_starttime = 0;
@@ -1090,7 +1095,6 @@ void level_init(void *path_to_lev_file)
     renderqueue_init();
     particle_init();
     camera_init();
-    init_level_size();
 
     entitymanager_init();
     create_obstaclemap();
@@ -1130,6 +1134,10 @@ void level_release()
     font_destroy(dlgbox_message);
     actor_destroy(dlgbox);
 
+    /* release the brick manager and all bricks */
+    logfile_message("Releasing the brick manager...");
+    brick_manager = brickmanager_destroy(brick_manager);
+
     /* quit level img */
     if(quit_level_img != NULL)
         image_destroy(quit_level_img);
@@ -1141,7 +1149,6 @@ void level_release()
     destroy_obstaclemap();
     entitymanager_release();
 
-    release_level_size();
     camera_release();
     particle_release();
     renderqueue_release();
@@ -1167,7 +1174,7 @@ void level_update()
     int got_dying_player = FALSE;
     int block_quit = FALSE, block_pause = FALSE;
     float dt = timer_get_delta();
-    brick_list_t *major_bricks, *bnode;
+    brick_list_t *major_bricks;
     item_list_t *major_items, *inode;
     enemy_list_t *major_enemies, *enode;
     v2d_t cam = level_editmode() ? editor_camera : camera_get_position();
@@ -1205,6 +1212,9 @@ void level_update()
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)quest_to_be_pushed);
         return;
     }
+
+    /* update the brick manager */
+    brickmanager_update(brick_manager);
 
     /* music */
     update_music();
@@ -1312,6 +1322,12 @@ void level_update()
 
     /* getting the major entities */
     /* note: bricks should use a larger margin when compared to SurgeScript entities */
+    brickmanager_set_roi(brick_manager,
+        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
+        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
+        3*VIDEO_SCREEN_W,
+        3*VIDEO_SCREEN_H
+    );
     entitymanager_set_active_region(
         (int)cam.x - (VIDEO_SCREEN_W*3)/2,
         (int)cam.y - (VIDEO_SCREEN_H*3)/2,
@@ -1327,7 +1343,7 @@ void level_update()
 
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
-    major_bricks = entitymanager_retrieve_active_bricks();
+    major_bricks = major_enemies != NULL || major_items != NULL ? brickmanager_retrieve_active_bricks_as_list(brick_manager) : NULL; /* for backwards compatibility only */
 
     /* update legacy items */
     for(inode = major_items; inode != NULL; inode = inode->next) {
@@ -1374,21 +1390,21 @@ void level_update()
     }
 
     /* update bricks */
-    for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
-        brick_t* brick = bnode->data;
+    iterator_t* brick_iterator = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(brick_iterator)) {
+        brick_t* brick = iterator_next(brick_iterator);
         brick_update(brick, team, team_size);
     }
+    iterator_destroy(brick_iterator);
 
     /* update obstacle map */
-    iterator_t* bricklike_iterator = entitymanager_bricklike_iterator(entitymanager_ssobject());
-    update_obstaclemap(major_bricks, major_items, major_enemies, bricklike_iterator);
-    iterator_destroy(bricklike_iterator);
+    update_obstaclemap(major_items, major_enemies);
 
     /* update particles */
     particle_update();
 
     /* early update: players */
-    if(entitymanager_get_number_of_bricks() > 0) {
+    if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++)
             player_early_update(team[i]);
     }
@@ -1397,7 +1413,7 @@ void level_update()
     update_ssobjects();
 
     /* update players */
-    if(entitymanager_get_number_of_bricks() > 0) {
+    if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++) {
             float x = team[i]->actor->position.x;
             float y = team[i]->actor->position.y;
@@ -1478,9 +1494,9 @@ void level_update()
         level_timer += timer_get_delta();
 
     /* release major entities */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    major_bricks = brickmanager_release_list(major_bricks);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -1491,7 +1507,6 @@ void level_update()
  */
 void level_render()
 {
-    brick_list_t *major_bricks;
     item_list_t *major_items;
     enemy_list_t *major_enemies;
 
@@ -1517,6 +1532,12 @@ void level_render()
        entitymanager_set_active_region() was called (i.e., via scripting).
        Let's make sure that we keep our active region updated. */
     v2d_t cam = camera_get_position(); /* we're not in editor mode */
+    brickmanager_set_roi(brick_manager,
+        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
+        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
+        3*VIDEO_SCREEN_W,
+        3*VIDEO_SCREEN_H
+    );
     entitymanager_set_active_region(
         (int)cam.x - (VIDEO_SCREEN_W*3)/2,
         (int)cam.y - (VIDEO_SCREEN_H*3)/2,
@@ -1531,7 +1552,6 @@ void level_render()
     );
 
     /* retrieve lists of active entities */
-    major_bricks = entitymanager_retrieve_active_bricks();
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
 
@@ -1539,15 +1559,14 @@ void level_render()
     image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(0,0,0));
 
     /* render level */
-    render_level(major_bricks, major_items, major_enemies);
+    render_level(major_items, major_enemies);
 
     /* render the built-in HUD */
     render_hud();
 
     /* release lists of active entites */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -1716,7 +1735,7 @@ player_t* level_get_player_by_id(int id)
 brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip)
 {
     brick_t *brick = brick_create(id, position, layer, flip);
-    entitymanager_store_brick(brick);
+    brickmanager_add_brick(brick_manager, brick);
     return brick;
 }
 
@@ -1885,6 +1904,10 @@ actor_t* level_get_camera_focus()
  */
 v2d_t level_size()
 {
+    int level_width, level_height;
+
+    brickmanager_world_size(brick_manager, &level_width, &level_height);
+
     return v2d_new(level_width, level_height);
 }
 
@@ -1896,27 +1919,11 @@ v2d_t level_size()
  */
 int level_height_at(int xpos)
 {
-    const int WINDOW_SIZE = VIDEO_SCREEN_W * 2;
-    int a, b, i, best, sample_width;
+    const int half_window = VIDEO_SCREEN_W * 1.5f;
+    int left_xpos = xpos - half_window;
+    int right_xpos = xpos + half_window;
 
-    if(height_at != NULL && xpos >= 0 && xpos < level_width) {
-        /* clipping interval indices */
-        sample_width = max(0, level_width) / max(1, height_at_count - 1);
-        a = ((xpos - WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
-        b = ((xpos + WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
-        a = clip(a, 0, height_at_count - 1);
-        b = clip(b, 0, height_at_count - 1);
-
-        /* get the best height in [a,b] */
-        best = height_at[b];
-        for(i = a; i < b; i++) {
-            if(height_at[i] > best)
-                best = height_at[i];
-        }
-        return best;
-    }
-    
-    return level_height;
+    return brickmanager_world_height_at_interval(brick_manager, left_xpos, right_xpos);
 }
 
 
@@ -2249,12 +2256,8 @@ bool level_is_in_debug_mode()
 
 
 /* renders the entities of the level: bricks, enemies, items, players, etc. */
-void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies)
+void render_level(const item_list_t *major_items, const enemy_list_t *major_enemies)
 {
-    brick_list_t *bnode;
-    item_list_t *inode;
-    enemy_list_t *enode;
-
     /* starting up the render queue... */
     renderqueue_begin( camera_get_position() );
 
@@ -2262,34 +2265,12 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
         renderqueue_enqueue_background(backgroundtheme);
 
         /* render bricks */
-        if(!editor_is_enabled() && !level_is_in_debug_mode()) {
-            for(bnode=major_bricks; bnode; bnode=bnode->next)
-                renderqueue_enqueue_brick(bnode->data);
-        }
-        else {
-            for(bnode=major_bricks; bnode; bnode=bnode->next) {
-                renderqueue_enqueue_brick_debug(bnode->data);
-                #if !defined(__ANDROID__)
-                renderqueue_enqueue_brick_path(bnode->data);
-                #endif
-            }
-        }
+        if(editor_is_enabled() || level_is_in_debug_mode())
+            render_bricks_debug();
+        else
+            render_bricks();
 
-        /* render the masks of the bricks */
-        if(must_render_brick_masks) {
-            for(bnode=major_bricks; bnode; bnode=bnode->next)
-                renderqueue_enqueue_brick_mask(bnode->data);
-        }
-
-        /* render items */
-        for(inode=major_items; inode; inode=inode->next)
-            renderqueue_enqueue_item(inode->data);
-
-        /* render legacy objects */
-        for(enode=major_enemies; enode; enode=enode->next)
-            renderqueue_enqueue_object(enode->data);
-
-        /* render surgescript objects */
+        /* render SurgeScript objects */
         render_ssobjects();
 
         /* render particles */
@@ -2306,9 +2287,18 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
         if(!editor_is_enabled())
             renderqueue_enqueue_foreground(backgroundtheme);
 
+        /* render legacy items */
+        for(const item_list_t* inode=major_items; inode; inode=inode->next)
+            renderqueue_enqueue_item(inode->data);
+
+        /* render legacy objects */
+        for(const enemy_list_t* enode=major_enemies; enode; enode=enode->next)
+            renderqueue_enqueue_object(enode->data);
+
     /* okay, enough! let's render */
     renderqueue_end();
 }
+
 
 /* true if a given region is inside the screen position */
 int inside_screen(int x, int y, int w, int h, int margin)
@@ -2321,107 +2311,17 @@ int inside_screen(int x, int y, int w, int h, int margin)
         cam.x+VIDEO_SCREEN_W/2 + margin,
         cam.y+VIDEO_SCREEN_H/2 + margin
     };
+
     return bounding_box(a,b);
 }
 
-/* initializes the level size structure */
-void init_level_size()
-{
-    level_width = 0;
-    level_height = 0;
 
-    height_at_count = 0;
-    height_at = NULL;
-}
-
-/* releases the level size structure */
-void release_level_size()
-{
-    level_width = 0;
-    level_height = 0;
-
-    height_at_count = 0;
-    if(height_at != NULL)
-        free(height_at);
-    height_at = NULL;
-}
-
-/* updates the level size structure, i.e.,
-   calculates the size of the current level */
+/* recalculates the size of the current level */
 void update_level_size()
 {
-    int max_x, max_y;
-    v2d_t bottomright;
-    brick_list_t *p, *brick_list;
-
-    /* get all bricks */
-    brick_list = entitymanager_retrieve_all_bricks();
-
-    /* compute the bounding box */
-    max_x = max_y = -LARGE_INT;
-    for(p=brick_list; p; p=p->next) {
-        bottomright = v2d_add(brick_spawnpoint(p->data), brick_size(p->data));
-        max_x = max(max_x, (int)bottomright.x);
-        max_y = max(max_y, (int)bottomright.y);
-    }
-
-    /* validation */
-    level_width = max(max_x, VIDEO_SCREEN_W);
-    level_height = max(max_y, VIDEO_SCREEN_H);
-    if(brick_list == NULL) { /* no bricks have been found */
-        /* this is probably a special scene */
-        level_width = level_height = LARGE_INT;
-        update_level_height_samples(0, LARGE_INT);
-    }
-    else
-        update_level_height_samples(level_width, level_height);
-
-    /* done! */
-    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
+    brickmanager_recalculate_world_size(brick_manager);
 }
 
-/* samples the level height at different points (xpos) */
-void update_level_height_samples(int level_width, int level_height)
-{
-    const int SAMPLE_WIDTH = VIDEO_SCREEN_W / 4;
-    const int MAX_SAMPLES = 10240; /* limit memory usage */
-    int j, num_samples = 1 + (max(0, level_width) / SAMPLE_WIDTH);
-
-    /* limit the number of samples */
-    if(num_samples > MAX_SAMPLES)
-        num_samples = MAX_SAMPLES;
-
-    /* allocate the height_at vector */
-    if(height_at != NULL)
-        free(height_at);
-    height_at = mallocx(num_samples * sizeof(*height_at));
-    height_at_count = num_samples;
-
-    /* sample the height of the level at different points */
-    for(j = 0; j < num_samples; j++) {
-        brick_list_t *p, *brick_list;
-
-        entitymanager_set_active_region(
-            j * SAMPLE_WIDTH - (SAMPLE_WIDTH + 1) / 2,
-            -LARGE_INT/2,
-            SAMPLE_WIDTH,
-            LARGE_INT
-        );
-
-        brick_list = entitymanager_retrieve_active_unmoving_bricks();
-        {
-            height_at[j] = 0;
-            for(p = brick_list; p; p = p->next) {
-                int bottom = (int)(brick_spawnpoint(p->data).y + brick_size(p->data).y);
-                if(bottom > height_at[j])
-                    height_at[j] = bottom;
-            }
-            if(brick_list == NULL) /* no bricks have been found */
-                height_at[j] = (j > 0) ? height_at[j-1] : level_height;
-        }
-        brick_list = entitymanager_release_retrieved_brick_list(brick_list);
-    }
-}
 
 /* restarts the level preserving the current
  * state (spawn point, waterlevel, etc.) */
@@ -2446,8 +2346,52 @@ void restart(int preserve_level_state)
 }
 
 
-/* reconfigures the input devices of the
- * players after switching characters */
+/* updates the music */
+void update_music()
+{
+    if(music != NULL && !music_is_playing()) {
+        if(music_current() == NULL || (music_current() == music && !music_is_paused())) {
+            if(!level_cleared && !player_is_dying(player))
+                music_play(music, true);
+        }
+    }
+}
+
+
+/* renders the bricks */
+void render_bricks()
+{
+    iterator_t* it = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(it)) {
+        brick_t* brick = iterator_next(it);
+
+        renderqueue_enqueue_brick(brick);
+
+        if(must_render_brick_masks)
+            renderqueue_enqueue_brick_mask(brick);
+    }
+    iterator_destroy(it);
+}
+
+
+/* renders the bricks (level editor) */
+void render_bricks_debug()
+{
+    iterator_t* it = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(it)) {
+        brick_t* brick = iterator_next(it);
+
+        renderqueue_enqueue_brick_debug(brick);
+        renderqueue_enqueue_brick_path(brick);
+
+        if(must_render_brick_masks)
+            renderqueue_enqueue_brick_mask(brick);
+    }
+    iterator_destroy(it);
+}
+
+
+/* reconfigures the input devices of the players after switching characters */
 void reconfigure_players_input_devices()
 {
     for(int i = 0; i < team_size; i++) {
@@ -2473,30 +2417,20 @@ void render_players()
 }
 
 
-/* updates the music */
-void update_music()
-{
-    if(music != NULL && !music_is_playing()) {
-        if(music_current() == NULL || (music_current() == music && !music_is_paused())) {
-            if(!level_cleared && !player_is_dying(player))
-                music_play(music, true);
-        }
-    }
-}
-
-
 /* puts the players at the spawn point */
 void spawn_players()
 {
+    int level_width = level_size().x;
+
     /* default players */
-    /* TODO: crash with an error message? */
     if(team_size == 0) {
-        logfile_message("Loading the default players...");
+        video_showmessage("No players have been specified!");
         team[team_size++] = player_create("Surge");
-        team[team_size++] = player_create("Neon");
+        team[team_size++] = player_create("Neon"); /* TODO: remove */
         team[team_size++] = player_create("Charge");
     }
 
+    /* set the spawn point and the initial position of the players */
     for(int i = 0; i < team_size; i++) {
         int j = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
 
@@ -2723,19 +2657,38 @@ void clear_obstaclemap()
 }
 
 /* update the obstacle map */
-void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_list, const object_list_t* object_list, iterator_t* bricklike_iterator)
+void update_obstaclemap(const item_list_t* item_list, const object_list_t* object_list)
 {
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(level_ssobject());
+
     /* clear */
     clear_obstaclemap();
 
     /* add bricks */
-    for(; brick_list != NULL; brick_list = brick_list->next) {
-        const brick_t* brick = brick_list->data;
+    iterator_t* brick_iterator = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(brick_iterator)) {
+        const brick_t* brick = iterator_next(brick_iterator);
         const obstacle_t* obstacle = brick_obstacle(brick);
 
         if(obstacle != NULL)
             obstaclemap_add_obstacle(obstaclemap, obstacle);
     }
+    iterator_destroy(brick_iterator);
+
+    /* add brick-like objects */
+    iterator_t* bricklike_iterator = entitymanager_bricklike_iterator(entitymanager_ssobject());
+    while(iterator_has_next(bricklike_iterator)) {
+        surgescript_objecthandle_t* bricklike_handle = iterator_next(bricklike_iterator);
+
+        if(surgescript_objectmanager_exists(manager, *bricklike_handle)) {
+            surgescript_object_t* bricklike_object = surgescript_objectmanager_get(manager, *bricklike_handle);
+            obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
+
+            darray_push(mock_obstacles, mock_obstacle);
+            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
+        }
+    }
+    iterator_destroy(bricklike_iterator);
 
     /* add legacy items */
     for(; item_list; item_list = item_list->next) {
@@ -2755,20 +2708,6 @@ void update_obstaclemap(const brick_list_t* brick_list, const item_list_t* item_
 
         if(object->obstacle && object->mask) {
             obstacle_t* mock_obstacle = object2obstacle(object);
-
-            darray_push(mock_obstacles, mock_obstacle);
-            obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
-        }
-    }
-
-    /* add brick-like objects */
-    surgescript_objectmanager_t* manager = surgescript_object_manager(level_ssobject());
-    while(iterator_has_next(bricklike_iterator)) {
-        surgescript_objecthandle_t* bricklike_handle = iterator_next(bricklike_iterator);
-
-        if(surgescript_objectmanager_exists(manager, *bricklike_handle)) {
-            surgescript_object_t* bricklike_object = surgescript_objectmanager_get(manager, *bricklike_handle);
-            obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
 
             darray_push(mock_obstacles, mock_obstacle);
             obstaclemap_add_obstacle(obstaclemap, mock_obstacle);
@@ -3141,8 +3080,8 @@ void editor_release()
 void editor_update()
 {
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    item_list_t *it, *major_items;
-    brick_list_t *major_bricks;
+    brick_list_t* major_bricks;
+    item_list_t *major_items;
     enemy_list_t *major_enemies;
     int pick_object, delete_object = FALSE;
     int selected_item;
@@ -3239,6 +3178,12 @@ void editor_update()
     /* ----------------------------------------- */
 
     v2d_t cam = editor_camera;
+    brickmanager_set_roi(brick_manager,
+        (int)cam.x - VIDEO_SCREEN_W,
+        (int)cam.y - VIDEO_SCREEN_H,
+        2*VIDEO_SCREEN_W,
+        2*VIDEO_SCREEN_H
+    );
     entitymanager_set_active_region(
         (int)cam.x - VIDEO_SCREEN_W,
         (int)cam.y - VIDEO_SCREEN_H,
@@ -3252,13 +3197,13 @@ void editor_update()
         2*VIDEO_SCREEN_H
     );
 
-    /* getting major entities */
+    /* get legacy entities */
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
-    major_bricks = entitymanager_retrieve_active_bricks();
+    major_bricks = major_enemies != NULL || major_items != NULL ? brickmanager_retrieve_active_bricks_as_list(brick_manager) : NULL; /* for backwards compatibility only */
 
     /* update items */
-    for(it=major_items; it!=NULL; it=it->next)
+    for(item_list_t* it=major_items; it!=NULL; it=it->next)
         item_update(it->data, team, team_size, major_bricks, major_items, major_enemies);
 
     /* change class / entity / object category */
@@ -3356,33 +3301,36 @@ void editor_update()
         switch(editor_cursor_entity_type) {
             /* brick */
             case EDT_BRICK: {
-                brick_t* candidate = NULL;
-                int candidate_got_collision = FALSE;
+                const brick_t* candidate = NULL;
+                bool candidate_got_collision = false;
 
-                for(brick_list_t* itb = major_bricks; itb != NULL; itb = itb->next) {
-                    v2d_t brk_topleft = brick_position(itb->data);
-                    v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(itb->data));
+                iterator_t* it = brickmanager_retrieve_active_bricks(brick_manager);
+                while(iterator_has_next(it)) {
+                    const brick_t* brick = iterator_next(it);
+                    v2d_t brk_topleft = brick_position(brick);
+                    v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(brick));
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
 
                     if(bounding_box(a,b)) {
-                        const obstacle_t* obstacle = brick_obstacle(itb->data);
+                        const obstacle_t* obstacle = brick_obstacle(brick);
 
                         /* pick the best brick that is in front of the others */
                         if(
                             (candidate == NULL) ||
                             (obstacle == NULL && !candidate_got_collision && (
-                                brick_obstacle(candidate) != NULL || brick_zindex(itb->data) >= brick_zindex(candidate)
+                                brick_obstacle(candidate) != NULL || brick_zindex(brick) >= brick_zindex(candidate)
                             )) ||
                             (obstacle != NULL && obstacle_got_collision(obstacle, b[0], b[1], b[2], b[3]) && (
-                                !candidate_got_collision || brick_zindex(itb->data) >= brick_zindex(candidate)
+                                !candidate_got_collision || brick_zindex(brick) >= brick_zindex(candidate)
                             ))
                         ) {
-                            candidate = itb->data;
+                            candidate = brick;
                             candidate_got_collision = (obstacle != NULL) && obstacle_got_collision(obstacle, b[0], b[1], b[2], b[3]);
                         }
                     }
                 }
+                iterator_destroy(it);
 
                 if(candidate != NULL) {
                     if(pick_object) {
@@ -3546,10 +3494,10 @@ void editor_update()
     );
     font_set_text(editor_properties_font, "$EDITOR_UI_TOOL");
 
-    /* "ungetting" major entities */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    /* release major entities */
+    major_bricks = brickmanager_release_list(major_bricks);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -3560,18 +3508,13 @@ void editor_update()
  */
 void editor_render()
 {
-    brick_list_t *major_bricks;
-    item_list_t *major_items;
-    enemy_list_t *major_enemies;
     image_t *cursor;
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-
-    major_bricks = entitymanager_retrieve_active_bricks();
-    major_items = entitymanager_retrieve_active_items();
-    major_enemies = entitymanager_retrieve_active_objects();
+    item_list_t* major_items = entitymanager_retrieve_active_items();
+    enemy_list_t* major_enemies = entitymanager_retrieve_active_objects();
     
     /* render the level */
-    render_level(major_bricks, major_items, major_enemies);
+    render_level(major_items, major_enemies);
 
     /* render the grid */
     editor_grid_render();
@@ -3612,9 +3555,8 @@ void editor_render()
     editor_status_render();
 
     /* done */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -4700,17 +4642,22 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
 
     /* are we removing a brick? Store its layer & flip flags */
     if(!is_new_object && obj_type == EDT_BRICK) {
-        brick_list_t *it, *brick_list = entitymanager_retrieve_all_bricks();
-        for(it=brick_list; it; it=it->next) {
-            if(brick_id(it->data) == o.obj_id) {
-                float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), o.obj_position));
+        iterator_t* it = brickmanager_retrieve_all_bricks(brick_manager);
+        while(iterator_has_next(it)) {
+            brick_t* brick = iterator_next(it);
+
+            if(brick_id(brick) == o.obj_id) {
+                v2d_t delta = v2d_subtract(brick_position(brick), o.obj_position);
+                float dist = v2d_magnitude(delta);
+
                 if(nearly_zero(dist)) {
-                    o.layer = brick_layer(it->data);
-                    o.flip = brick_flip(it->data);
-                    brick_kill(it->data);
+                    o.layer = brick_layer(brick);
+                    o.flip = brick_flip(brick);
+                    brick_kill(brick);
                 }
             }
         }
+        iterator_destroy(it);
     }
 
     return o;
@@ -4971,15 +4918,19 @@ void editor_action_commit(editor_action_t action)
         switch(action.obj_type) {
             case EDT_BRICK: {
                 /* delete brick */
-                brick_list_t *brick_list = entitymanager_retrieve_all_bricks(); /* FIXME: retrieve relevant entities only? */
-                for(brick_list_t *it = brick_list; it != NULL; it = it->next) {
-                    if(brick_id(it->data) == action.obj_id) {
-                        float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), action.obj_position));
+                iterator_t* it = brickmanager_retrieve_all_bricks(brick_manager);
+                while(iterator_has_next(it)) {
+                    brick_t* brick = iterator_next(it);
+
+                    if(brick_id(brick) == action.obj_id) {
+                        v2d_t delta = v2d_subtract(brick_position(brick), action.obj_position);
+                        float dist = v2d_magnitude(delta);
+
                         if(nearly_zero(dist))
-                            brick_kill(it->data);
+                            brick_kill(brick);
                     }
                 }
-                entitymanager_release_retrieved_brick_list(brick_list);
+                iterator_destroy(it);
                 break;
             }
 
@@ -4993,7 +4944,7 @@ void editor_action_commit(editor_action_t action)
                             it->data->state = IS_DEAD;
                     }
                 }
-                entitymanager_release_retrieved_item_list(item_list);
+                item_list = entitymanager_release_retrieved_item_list(item_list);
                 break;
             }
 
@@ -5007,7 +4958,7 @@ void editor_action_commit(editor_action_t action)
                             it->data->state = ES_DEAD;
                     }
                 }
-                entitymanager_release_retrieved_object_list(enemy_list);
+                enemy_list = entitymanager_release_retrieved_object_list(enemy_list);
                 break;
             }
 

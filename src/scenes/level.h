@@ -41,7 +41,6 @@ struct image_t;
 struct actor_t;
 struct player_t;
 struct brick_t;
-struct brick_list_t;
 struct item_t;
 struct item_list_t;
 struct enemy_t;

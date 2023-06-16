@@ -394,6 +394,7 @@ SET(GAME_SRCS
   src/entities/actor.c
   src/entities/background.c
   src/entities/brick.c
+  src/entities/brickmanager.c
   src/entities/camera.c
   src/entities/character.c
   src/entities/entitymanager.c
@@ -495,6 +496,7 @@ SET(GAME_HEADERS
   src/entities/actor.h
   src/entities/background.h
   src/entities/brick.h
+  src/entities/brickmanager.h
   src/entities/camera.h
   src/entities/character.h
   src/entities/entitymanager.h

@@ -44,7 +44,6 @@ enum playershield_t {
 /* types & structs */
 struct actor_t;
 struct animation_t;
-struct brick_list_t;
 struct item_list_t;
 struct enemy_list_t;
 struct physicsactor_t;
