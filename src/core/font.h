@@ -29,6 +29,9 @@ typedef struct font_t font_t;
 typedef enum fontalign_t fontalign_t;
 enum fontalign_t { FONTALIGN_LEFT, FONTALIGN_CENTER, FONTALIGN_RIGHT };
 
+/* forward declarations */
+struct image_t;
+
 /* public functions */
 font_t* font_create(const char* font_name); /* creates a new font instance. font_name is a font in the *.fnt scripts */
 void font_destroy(font_t* f); /* destroys an existing font instance */
@@ -50,6 +53,7 @@ void font_set_align(font_t* f, fontalign_t align); /* set the align */
 int font_get_maxlength(const font_t* f); /* get the maximum number of characters that can be displayed, ignoring color tags and blanks */
 void font_set_maxlength(font_t* f, int maxlength); /* set the maximum number of characters, ignoring color tags and blanks */
 const char* font_get_filepath(const font_t* f); /* get the relative path of the file (image, truetype font...) that originates this font */
+const struct image_t* font_get_image(const font_t* f); /* get the image atlas if it's a bitmap font; otherwise NULL is returned */
 
 /* misc */
 void font_init(bool allow_font_smoothing); /* initializes the font module */

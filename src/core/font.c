@@ -116,6 +116,7 @@ struct fontdrv_t { /* abstract font: base class */
     v2d_t (*textsize)(const fontdrv_t*,const char*); /* text size, in pixels */
     v2d_t (*charspacing)(const fontdrv_t*); /* a pair (hspace, vspace) */
     const char* (*filepath)(const fontdrv_t*); /* relative path of the font */
+    const image_t* (*image)(const fontdrv_t*); /* image atlas (if any) */
     void (*release)(fontdrv_t*); /* release the fontdrv_t */
 };
 static fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int spacing[2]);
@@ -124,6 +125,7 @@ static fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antial
 typedef struct fontdrv_bmp_t fontdrv_bmp_t;
 struct fontdrv_bmp_t { /* bitmap font */
     fontdrv_t base;
+    const image_t* atlas; /* image atlas */
     image_t* bmp[256]; /* bitmap character indexed by its unicode number */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(bmp[j]) | j >= 0 }) */
@@ -133,6 +135,7 @@ static void fontdrv_bmp_textout(const fontdrv_t* fnt, const char* text, int x, i
 static v2d_t fontdrv_bmp_textsize(const fontdrv_t* fnt, const char* string);
 static v2d_t fontdrv_bmp_charspacing(const fontdrv_t* fnt);
 static const char* fontdrv_bmp_filepath(const fontdrv_t* fnt);
+static const image_t* fontdrv_bmp_image(const fontdrv_t* fnt);
 static void fontdrv_bmp_release(fontdrv_t* fnt);
 
 typedef struct fontdrv_ttf_t fontdrv_ttf_t;
@@ -148,6 +151,7 @@ static void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, i
 static v2d_t fontdrv_ttf_textsize(const fontdrv_t* fnt, const char* string);
 static v2d_t fontdrv_ttf_charspacing(const fontdrv_t* fnt);
 static const char* fontdrv_ttf_filepath(const fontdrv_t* fnt);
+static const image_t* fontdrv_ttf_image(const fontdrv_t* fnt);
 static void fontdrv_ttf_release(fontdrv_t* fnt);
 
 /* ------------------------------- */
@@ -645,6 +649,16 @@ void font_set_maxlength(font_t* f, int maxlength)
 const char* font_get_filepath(const font_t* f)
 {
     return f->drv->filepath(f->drv);
+}
+
+/*
+ * font_get_image()
+ * Get the image atlas if it's a bitmap font;
+ * otherwise NULL is returned
+ */
+const image_t* font_get_image(const font_t* f)
+{
+    return f->drv->image(f->drv);
 }
 
 
@@ -1446,7 +1460,11 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
     ((fontdrv_t*)f)->textsize = fontdrv_bmp_textsize;
     ((fontdrv_t*)f)->charspacing = fontdrv_bmp_charspacing;
     ((fontdrv_t*)f)->filepath = fontdrv_bmp_filepath;
+    ((fontdrv_t*)f)->image = fontdrv_bmp_image;
     ((fontdrv_t*)f)->release = fontdrv_bmp_release;
+
+    /* set the image atlas */
+    f->atlas = img;
 
     /* configure the spritesheet */
     f->line_height = 0;
@@ -1549,6 +1567,13 @@ const char* fontdrv_bmp_filepath(const fontdrv_t* fnt)
     return f->filepath;
 }
 
+const image_t* fontdrv_bmp_image(const fontdrv_t* fnt)
+{
+    const fontdrv_bmp_t* f = (const fontdrv_bmp_t*)fnt;
+
+    return f->atlas;
+}
+
 /* ------------------------------------------------- */
 /* ttf fonts */
 /* ------------------------------------------------- */
@@ -1561,6 +1586,7 @@ fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bo
     ((fontdrv_t*)f)->textsize = fontdrv_ttf_textsize;
     ((fontdrv_t*)f)->charspacing = fontdrv_ttf_charspacing;
     ((fontdrv_t*)f)->filepath = fontdrv_ttf_filepath;
+    ((fontdrv_t*)f)->image = fontdrv_ttf_image;
     ((fontdrv_t*)f)->release = fontdrv_ttf_release;
 
     /* store font attributes */
@@ -1667,6 +1693,12 @@ const char* fontdrv_ttf_filepath(const fontdrv_t* fnt)
     const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
 
     return f->filepath;
+}
+
+const image_t* fontdrv_ttf_image(const fontdrv_t* fnt)
+{
+    /* there is no image atlas */
+    return NULL;
 }
 
 bool has_loaded_ttf(const fontdrv_ttf_t* f)
