@@ -24,7 +24,7 @@
 #include "../actor.h"
 #include "item.h"
 #include "enemy.h"
-#include "../../core/spatialhash.h"
+#include "spatialhash.h"
 #include "../../util/util.h"
 
 /* defining the spatial hashes */

@@ -434,7 +434,6 @@ SET(GAME_HEADERS
   src/core/scene.h
   src/core/screenshot.h
   src/core/fadefx.h
-  src/core/spatialhash.h
   src/core/sprite.h
   src/core/storyboard.h
   src/core/timer.h
@@ -483,6 +482,7 @@ SET(GAME_HEADERS
   src/physics/sensorstate.h
   src/physics/collisionmask.h
 
+  src/entities/legacy/spatialhash.h
   src/entities/legacy/entitymanager.h
   src/entities/legacy/enemy.h
   src/entities/legacy/item.h
