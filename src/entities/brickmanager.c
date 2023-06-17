@@ -75,7 +75,7 @@ struct brickmanager_t
     brickbucket_t* awake_bucket;
 
     /* references to all allocated buckets (for quick access) */
-    DARRAY(const brickbucket_t*,bucket_ref);
+    DARRAY(const brickbucket_t*, bucket_ref);
 
     /* current region of interest */
     brickrect_t roi;
@@ -94,14 +94,17 @@ struct brickmanager_t
 /* Iterator state */
 struct brickiteratorstate_t
 {
-    /* a vector of non-empty buckets */
-    DARRAY(const brickbucket_t*,bucket);
+    /* a vector of references to non-empty buckets */
+    DARRAY(const brickbucket_t*, bucket);
 
     /* bucket cursor */
     int b;
 
     /* brick index corresponding to bucket b */
     int i;
+
+    /* a possibly empty bucket of references to awake bricks inside the ROI */
+    brickbucket_t* own_bucket;
 };
 
 /* Utilities */
@@ -115,6 +118,7 @@ static inline uint64_t brick2hash(const brick_t* brick);
 static brickbucket_t* bucket_ctor();
 static brickbucket_t* bucket_dtor(brickbucket_t* bucket);
 static void bucket_dtor_adapter(void* bucket);
+static brickbucket_t* bucket_dtor_refonly(brickbucket_t* bucket);
 static inline void bucket_add(brickbucket_t* bucket, brick_t* brick);
 static int bucket_wash(brickbucket_t* bucket);
 static void bucket_clear(brickbucket_t* bucket);
@@ -132,6 +136,9 @@ static void sampler_add(heightsampler_t* sampler, const brick_t* brick);
 static int sampler_query(heightsampler_t* sampler, int left, int right);
 
 static void update_world_size(brickmanager_t* manager, const brick_t* brick);
+
+static bool is_brick_inside_roi(const brick_t* brick, const brickrect_t* roi);
+static void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in_bucket, const brickrect_t* roi);
 
 static brick_list_t* add_to_list(brick_list_t* list, brick_t* brick);
 static brick_list_t* release_list(brick_list_t* list);
@@ -410,13 +417,17 @@ iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager)
 {
     /* create a new iterator state */
     brickiteratorstate_t state = { .b = 0, .i = 0 };
+    state.own_bucket = bucket_ctor();
     darray_init(state.bucket);
 
+    /* get the ROI */
+    const brickrect_t* roi = &(manager->roi);
+
     /* for each bucket inside the ROI */
-    int left = manager->roi.left;
-    int top = manager->roi.top;
-    int right = manager->roi.right;
-    int bottom = manager->roi.bottom;
+    int left = roi->left;
+    int top = roi->top;
+    int right = roi->right;
+    int bottom = roi->bottom;
 
     right += GRID_SIZE - 1;
     bottom += GRID_SIZE - 1;
@@ -432,9 +443,10 @@ iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager)
         }
     }
 
-    /* add the awake bucket if it's not empty */
-    if(!bucket_is_empty(manager->awake_bucket))
-        darray_push(state.bucket, manager->awake_bucket);
+    /* individually filter the awake bricks inside the ROI */
+    filter_bricks_inside_roi(state.own_bucket, manager->awake_bucket, roi);
+    if(!bucket_is_empty(state.own_bucket))
+        darray_push(state.bucket, state.own_bucket);
 
     /* return a new iterator */
     return iterator_create(
@@ -454,6 +466,7 @@ iterator_t* brickmanager_retrieve_all_bricks(const brickmanager_t* manager)
 {
     /* create a new iterator state */
     brickiteratorstate_t state = { .b = 0, .i = 0 };
+    state.own_bucket = bucket_ctor();
     darray_init(state.bucket);
 
     /* we'll iterate over all non-empty buckets */
@@ -587,6 +600,16 @@ void bucket_dtor_adapter(void* bucket)
     bucket_dtor((brickbucket_t*)bucket);
 }
 
+brickbucket_t* bucket_dtor_refonly(brickbucket_t* bucket)
+{
+    /* we won't release any bricks of this bucket,
+       as they are references only */
+    darray_clear(bucket->brick);
+
+    /* call the original destructor with an empty bucket */
+    return bucket_dtor(bucket);
+}
+
 void bucket_add(brickbucket_t* bucket, brick_t* brick)
 {
     darray_push(bucket->brick, brick);
@@ -637,7 +660,9 @@ void brickiteratorstate_dtor(void* s)
 {
     brickiteratorstate_t* state = (brickiteratorstate_t*)s;
 
+    bucket_dtor_refonly(state->own_bucket);
     darray_release(state->bucket);
+
     free(state);
 }
 
@@ -670,6 +695,12 @@ void* brickiteratorstate_next(void* s)
     At the time of this writing, this is not an issue at all
     and we're interested in performance and in the simplicity
     of the code.
+
+    Note: we do filter out individual bricks that are stored
+    in the awake bucket, but we do it as a pre-processing step
+    and with performance in mind. Bricks stored in the awake
+    bucket may be far away from the ROI, and we don't need to
+    return them.
 
     */
 
@@ -832,6 +863,36 @@ void update_world_size(brickmanager_t* manager, const brick_t* brick)
         manager->world_height = bottom;
 }
 
+
+
+/* ROI & filtering */
+
+bool is_brick_inside_roi(const brick_t* brick, const brickrect_t* roi)
+{
+    /* note that we use the position, which may change, instead of the spawn point! */
+    v2d_t position = brick_position(brick);
+    v2d_t size = brick_size(brick);
+
+    int left = position.x;
+    int top = position.y;
+    int right = position.x + size.x - 1.0f;
+    int bottom = position.y + size.y - 1.0f;
+
+    return !(
+        right < roi->left || left > roi->right ||
+        bottom < roi->top || top > roi->bottom
+    );
+}
+
+void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in_bucket, const brickrect_t* roi)
+{
+    for(int i = 0; i < darray_length(in_bucket->brick); i++) {
+        brick_t* brick = in_bucket->brick[i];
+
+        if(is_brick_inside_roi(brick, roi))
+            bucket_add(out_bucket, brick); /* add a reference to the output bucket */
+    }
+}
 
 
 
