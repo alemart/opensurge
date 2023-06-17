@@ -1092,7 +1092,7 @@ void level_init(void *path_to_lev_file)
     /* helpers */
     clear_level_state(&saved_state);
 
-    renderqueue_init();
+    renderqueue_init(false);
     particle_init();
     camera_init();
 

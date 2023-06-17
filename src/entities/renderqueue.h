@@ -24,14 +24,6 @@
 #include <stdbool.h>
 #include "../core/v2d.h"
 
-/*
- * a render queue is used to render entities in the correct order (according to their z-indexes).
- * Just add the entities to the queue and it will do all the hard work for you
- *
- * ps: if two entities have the same z-index, the entity that was enqueued first will be
- * rendered first
- */
-
 /* forward declarations */
 struct brick_t;
 struct item_t;
@@ -41,7 +33,7 @@ struct bgtheme_t;
 struct surgescript_object_t;
 
 /* initialization & deinitialization */
-void renderqueue_init();
+void renderqueue_init(bool want_depth_buffer);
 void renderqueue_release();
 
 /* rendering */

@@ -442,11 +442,6 @@ static const char fs_glsl_with_alpha_testing[] = ""
     "}\n"
 "";
 
-/* testing */
-#define use_depth_buffer 0
-/*#define use_depth_buffer true*/
-/*#define use_depth_buffer false*/
-
 /* render queue stats reporting */
 #define REPORT_CLEAR()            video_clearmessages()
 #define REPORT(...)               do { if(want_report) video_showmessage(__VA_ARGS__); } while(0)
@@ -467,6 +462,7 @@ static void enqueue(const renderqueue_entry_t* entry);
 static const char* random_path(char prefix);
 
 /* internal data */
+static bool use_depth_buffer = false;
 static ALLEGRO_SHADER* shader = NULL;
 static renderqueue_entry_t* buffer = NULL; /* storage */
 static int* sorted_indices = NULL; /* a permutation of 0, 1, ... n-1, where n = buffer_size */
@@ -537,9 +533,15 @@ https://liballeg.org/a5docs/trunk/graphics.html#deferred-drawing
  * renderqueue_init()
  * Initializes the render queue
  */
-void renderqueue_init()
+void renderqueue_init(bool want_depth_buffer)
 {
-    LOG("initializing...");
+    LOG("initializing %s depth buffer...", want_depth_buffer ? "with" : "without");
+
+    /* do we want the depth buffer? */
+    use_depth_buffer = want_depth_buffer;
+
+    /* no reporting */
+    want_report = false;
 
     /* initialize the camera */
     camera = v2d_new(0, 0);
@@ -571,9 +573,6 @@ void renderqueue_init()
         al_destroy_shader(shader);
         shader = NULL;
     }
-
-    /* no reporting */
-    want_report = false;
 
     /* done! */
     LOG("initialized!");
