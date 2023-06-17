@@ -74,6 +74,27 @@ static int option_count;
 static group_t *root;
 static group_t *create_grouptree();
 
+/* resolution */
+#if defined(__ANDROID__)
+#define ENABLE_RESOLUTION 0
+#else
+#define ENABLE_RESOLUTION 0 /* deprecated? */
+#endif
+
+/* fullscreen */
+#if defined(__ANDROID__)
+#define ENABLE_FULLSCREEN 0
+#else
+#define ENABLE_FULLSCREEN 1
+#endif
+
+/* website */
+#if defined(__ANDROID__)
+#define ENABLE_WEBSITE 1
+#else
+#define ENABLE_WEBSITE 0
+#endif
+
 /* check if this build targets the Google Play Store */
 #if defined(__ANDROID__)
 #define IS_GOOGLEPLAY_BUILD() (strstr(GAME_VERSION_STRING, "googleplay") != NULL)
@@ -86,8 +107,7 @@ static group_t *create_grouptree();
    in the Google Play Store is a violation of their policy */
 #define CAN_ACCEPT_DONATIONS() (!(IS_GOOGLEPLAY_BUILD()))
 
-/* deprecated? */
-#define ENABLE_RESOLUTION 0
+
 
 
 
@@ -266,6 +286,8 @@ void save_preferences()
 #if ENABLE_RESOLUTION
     prefs_set_int(prefs, ".resolution", video_get_resolution());
 #endif
+
+    prefs_set_int(prefs, ".videoquality", video_get_quality());
     prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 }
@@ -728,6 +750,110 @@ static group_t *group_resolution_create()
     return group_create(group_resolution_init, group_resolution_release, group_resolution_update, group_resolution_render);
 }
 
+
+
+/* "Quality" label */
+static void group_quality_init(group_t *g)
+{
+    group_highlightable_init(g, "OPTIONS_QUALITY", option_count++);
+}
+
+static void group_quality_release(group_t *g)
+{
+    group_highlightable_release(g);
+}
+
+static int group_quality_is_highlighted(group_t *g)
+{
+    return group_highlightable_is_highlighted(g);
+}
+
+static void group_quality_update(group_t *g)
+{
+    /* helper macro */
+    #define CHANGE_QUALITY(strategy) do { \
+        videoquality_t old_quality = video_get_quality(); \
+        videoquality_t new_quality = strategy[old_quality]; \
+        \
+        if(new_quality != old_quality) { \
+            video_set_quality(new_quality); \
+            sound_play(SFX_CONFIRM); \
+        } \
+    } while(0)
+
+    const videoquality_t increase[] = {
+        [VIDEOQUALITY_LOW] = VIDEOQUALITY_MEDIUM,
+        [VIDEOQUALITY_MEDIUM] = VIDEOQUALITY_HIGH,
+        [VIDEOQUALITY_HIGH] = VIDEOQUALITY_HIGH
+    }, decrease[] = {
+        [VIDEOQUALITY_LOW] = VIDEOQUALITY_LOW,
+        [VIDEOQUALITY_MEDIUM] = VIDEOQUALITY_LOW,
+        [VIDEOQUALITY_HIGH] = VIDEOQUALITY_MEDIUM
+    }, cycle[] = {
+        [VIDEOQUALITY_LOW] = VIDEOQUALITY_MEDIUM,
+        [VIDEOQUALITY_MEDIUM] = VIDEOQUALITY_HIGH,
+        [VIDEOQUALITY_HIGH] = VIDEOQUALITY_LOW
+    };
+
+    /* base class */
+    group_highlightable_update(g);
+
+    /* derived class */
+    if(group_quality_is_highlighted(g)) {
+        if(!fadefx_is_fading()) {
+
+            if(input_button_pressed(input, IB_RIGHT))
+                CHANGE_QUALITY(increase);
+
+            if(input_button_pressed(input, IB_LEFT))
+                CHANGE_QUALITY(decrease);
+
+            if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3))
+                CHANGE_QUALITY(cycle);
+
+        }
+    }
+
+    #undef CHANGE_QUALITY
+}
+
+static void group_quality_render(group_t *g, v2d_t camera_position)
+{
+    /* base class */
+    group_highlightable_render(g, camera_position);
+
+    /* derived class */
+    videoquality_t quality = video_get_quality();
+    font_t* f = font_create("MenuText");
+    font_set_position(f, v2d_new(OFFSET_X + 175, font_get_position(g->font).y));
+
+    font_set_text(f,
+        "%s%s%s %s%s%s %s%s%s",
+
+        quality == VIDEOQUALITY_LOW ? "<color=$COLOR_HIGHLIGHT>" : "",
+        "$OPTIONS_QUALITY_LOW",
+        quality == VIDEOQUALITY_LOW ? "</color>" : "",
+
+        quality == VIDEOQUALITY_MEDIUM ? "<color=$COLOR_HIGHLIGHT>" : "",
+        "$OPTIONS_QUALITY_MEDIUM",
+        quality == VIDEOQUALITY_MEDIUM ? "</color>" : "",
+
+        quality == VIDEOQUALITY_HIGH ? "<color=$COLOR_HIGHLIGHT>" : "",
+        "$OPTIONS_QUALITY_HIGH",
+        quality == VIDEOQUALITY_HIGH ? "</color>" : ""
+    );
+
+    font_render(f, camera_position);
+    font_destroy(f);
+}
+
+static group_t *group_quality_create()
+{
+    return group_create(group_quality_init, group_quality_release, group_quality_update, group_quality_render);
+}
+
+
+
 /* "Game" label */
 static void group_game_init(group_t *g)
 {
@@ -1110,6 +1236,7 @@ group_t *create_grouptree()
 
     /* section: graphics */
     graphics = group_graphics_create();
+    group_addchild(graphics, group_quality_create());
 
 #if ENABLE_RESOLUTION
     group_addchild(graphics, group_resolution_create());
@@ -1117,7 +1244,7 @@ group_t *create_grouptree()
     (void)group_resolution_create;
 #endif
 
-#if !defined(__ANDROID__)
+#if ENABLE_FULLSCREEN
     group_addchild(graphics, group_fullscreen_create());
 #else
     (void)group_fullscreen_create;
@@ -1132,7 +1259,13 @@ group_t *create_grouptree()
     group_addchild(game, group_stageselect_create());
     group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_credits_create());
+
+#if ENABLE_WEBSITE
     group_addchild(game, group_website_create());
+#else
+    (void)group_website_create;
+#endif
+
     if(CAN_ACCEPT_DONATIONS())
         group_addchild(game, group_donate_create());
 

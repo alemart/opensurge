@@ -1089,10 +1089,13 @@ void level_init(void *path_to_lev_file)
     dlgbox_title = font_create("dialogbox");
     dlgbox_message = font_create("dialogbox");
 
+    /* render queue */
+    bool want_depth_buffer = (video_get_quality() < VIDEOQUALITY_MEDIUM);
+    renderqueue_init(want_depth_buffer);
+
     /* helpers */
     clear_level_state(&saved_state);
 
-    renderqueue_init(false);
     particle_init();
     camera_init();
 
@@ -1151,9 +1154,11 @@ void level_release()
 
     camera_release();
     particle_release();
-    renderqueue_release();
 
     clear_level_state(&saved_state);
+
+    /* render queue */
+    renderqueue_release();
 
     /* done! */
     logfile_message("level_release() ok");

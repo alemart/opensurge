@@ -92,6 +92,9 @@ static struct {
     /* current mode */
     videomode_t mode;
 
+    /* current quality */
+    videoquality_t quality;
+
     /* fullscreen mode? */
     bool is_fullscreen;
 
@@ -101,6 +104,7 @@ static struct {
 } settings = {
     .resolution = VIDEORESOLUTION_1X,
     .mode = VIDEOMODE_DEFAULT,
+    .quality = VIDEOQUALITY_MEDIUM,
     .is_fullscreen = false,
     .is_fps_visible = false,
 };
@@ -159,6 +163,12 @@ static const char* VIDEOMODE_NAME[] = {
     [VIDEOMODE_DEFAULT] = "default",
     [VIDEOMODE_FILL] = "fill",
     [VIDEOMODE_BESTFIT] = "best-fit"
+};
+
+static const char* VIDEOQUALITY_NAME[] = {
+    [VIDEOQUALITY_LOW] = "low",
+    [VIDEOQUALITY_MEDIUM] = "medium",
+    [VIDEOQUALITY_HIGH] = "high"
 };
 
 #define DRAW_TEXT(x, y, flags, fmt, ...) do { \
@@ -405,6 +415,34 @@ void video_set_mode(videomode_t mode)
 videomode_t video_get_mode()
 {
     return settings.mode;
+}
+
+/*
+ * video_set_quality()
+ * Set the video quality
+ */
+void video_set_quality(videoquality_t quality)
+{
+    /* no need to change anything */
+    if(quality == settings.quality)
+        return;
+
+    /* change the video quality */
+    LOG("Setting the video quality to %s", VIDEOQUALITY_NAME[quality]);
+    settings.quality = quality;
+
+    /* TODO */
+    if(quality > VIDEOQUALITY_MEDIUM)
+        video_showmessage("%s video quality: coming soon!", VIDEOQUALITY_NAME[quality]);
+}
+
+/*
+ * video_get_quality()
+ * Get the current video quality
+ */
+videoquality_t video_get_quality()
+{
+    return settings.quality;
 }
 
 /*

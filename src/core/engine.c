@@ -345,12 +345,24 @@ void init_managers(const commandline_t* cmd)
     video_set_resolution(
         commandline_getint(cmd->video_resolution, video_best_fit_resolution())
     );
+    video_set_quality(
+        commandline_getint(cmd->video_quality, prefs_has_item(prefs, ".videoquality") ?
+            prefs_get_int(prefs, ".videoquality") :
+            VIDEOQUALITY_DEFAULT
+        )
+    );
     video_set_fullscreen(
-        commandline_getint(cmd->fullscreen, prefs_get_bool(prefs, ".fullscreen"))
+        commandline_getint(cmd->fullscreen, prefs_has_item(prefs, ".fullscreen") ?
+            prefs_get_bool(prefs, ".fullscreen") :
+            false
+        )
     );
     video_set_fps_visible(
-        commandline_getint(cmd->show_fps, prefs_get_bool(prefs, ".showfps")) &&
-        !commandline_getint(cmd->hide_fps, FALSE)
+        !commandline_getint(cmd->hide_fps, FALSE) &&
+        commandline_getint(cmd->show_fps, prefs_has_item(prefs, ".showfps") ?
+            prefs_get_bool(prefs, ".showfps") :
+            false
+        )
     );
 
     audio_init();

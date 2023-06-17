@@ -71,6 +71,7 @@ commandline_t commandline_parse(int argc, char **argv)
 
     /* initializing values */
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
+    cmd.video_quality = COMMANDLINE_UNDEFINED;
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
     cmd.show_fps = COMMANDLINE_UNDEFINED;
     cmd.hide_fps = COMMANDLINE_UNDEFINED;
@@ -107,7 +108,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --fullscreen                     fullscreen mode\n"
                 "    --windowed                       windowed mode\n"
                 "    --resolution X                   set the scale of the window size, where X = 1, 2, 3 or 4\n"
-                "    --color-depth X                  set the color depth to X bits/pixel, where X = 16, 24 or 32\n"
+                "    --quality Q                      set the video quality Q to \"low\", \"medium\" or \"high\"\n"
                 "    --show-fps                       show the FPS (frames per second) counter\n"
                 "    --hide-fps                       hide the FPS counter\n"
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
@@ -141,6 +142,9 @@ commandline_t commandline_parse(int argc, char **argv)
             exit(0);
         }
 
+        else if(strcmp(argv[i], "--tiny") == 0) /* obsolete */
+            cmd.video_resolution = VIDEORESOLUTION_1X;
+
         else if(strcmp(argv[i], "--resolution") == 0) {
             if(++i < argc && *(argv[i]) != '-') {
                 if(strcmp(argv[i], "1") == 0)
@@ -152,12 +156,26 @@ commandline_t commandline_parse(int argc, char **argv)
                 else if(strcmp(argv[i], "4") == 0)
                     cmd.video_resolution = VIDEORESOLUTION_4X;
                 else
-                    crash("Invalid resolution: %s", argv[i]);
+                    crash("Invalid video resolution: %s", argv[i]);
             }
+            else
+                crash("%s: missing --resolution parameter", program);
         }
 
-        else if(strcmp(argv[i], "--tiny") == 0) /* obsolete */
-            cmd.video_resolution = VIDEORESOLUTION_1X;
+        else if(strcmp(argv[i], "--quality") == 0) {
+            if(++i < argc && *(argv[i]) != '-') {
+                if(strcmp(argv[i], "low") == 0)
+                    cmd.video_quality = VIDEOQUALITY_LOW;
+                else if(strcmp(argv[i], "medium") == 0)
+                    cmd.video_quality = VIDEOQUALITY_MEDIUM;
+                else if(strcmp(argv[i], "high") == 0)
+                    cmd.video_quality = VIDEOQUALITY_HIGH;
+                else
+                    crash("Invalid video quality: %s", argv[i]);
+            }
+            else
+                crash("%s: missing --quality parameter", program);
+        }
 
         else if(strcmp(argv[i], "--fullscreen") == 0)
             cmd.fullscreen = TRUE;

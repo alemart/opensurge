@@ -61,6 +61,18 @@ typedef enum videomode_t {
 void video_set_mode(videomode_t mode);
 videomode_t video_get_mode();
 
+/* video quality */
+typedef enum videoquality_t {
+    VIDEOQUALITY_LOW,
+    VIDEOQUALITY_MEDIUM,
+    VIDEOQUALITY_HIGH
+} videoquality_t;
+
+#define VIDEOQUALITY_DEFAULT VIDEOQUALITY_MEDIUM
+
+void video_set_quality(videoquality_t quality);
+videoquality_t video_get_quality();
+
 /* fullscreen mode */
 void video_set_fullscreen(bool fullscreen);
 bool video_is_fullscreen();

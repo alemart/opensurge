@@ -29,6 +29,7 @@ struct commandline_t
 {
     /* video options */
     int video_resolution;
+    int video_quality;
     int fullscreen;
     int show_fps;
     int hide_fps;
