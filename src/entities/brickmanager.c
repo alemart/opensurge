@@ -60,6 +60,9 @@ struct brickbucket_t
 {
     /* a vector of bricks */
     DARRAY(brick_t*, brick);
+
+    /* a destructor of individual bricks */
+    brick_t* (*brick_dtor)(brick_t*);
 };
 
 /* Brick Manager */
@@ -115,10 +118,9 @@ struct brickiteratorstate_t
 static inline uint64_t position_to_hash(int x, int y);
 static inline uint64_t brick2hash(const brick_t* brick);
 
-static brickbucket_t* bucket_ctor();
+static brickbucket_t* bucket_ctor(brick_t* (*brick_dtor)(brick_t*));
 static brickbucket_t* bucket_dtor(brickbucket_t* bucket);
 static void bucket_dtor_adapter(void* bucket);
-static brickbucket_t* bucket_dtor_refonly(brickbucket_t* bucket);
 static inline void bucket_add(brickbucket_t* bucket, brick_t* brick);
 static int bucket_wash(brickbucket_t* bucket);
 static void bucket_clear(brickbucket_t* bucket);
@@ -139,6 +141,8 @@ static void update_world_size(brickmanager_t* manager, const brick_t* brick);
 
 static bool is_brick_inside_roi(const brick_t* brick, const brickrect_t* roi);
 static void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in_bucket, const brickrect_t* roi);
+
+static brick_t* brick_fake_destroy(brick_t* brick);
 
 static brick_list_t* add_to_list(brick_list_t* list, brick_t* brick);
 static brick_list_t* release_list(brick_list_t* list);
@@ -161,7 +165,7 @@ brickmanager_t* brickmanager_create()
     brickmanager_t* manager = mallocx(sizeof *manager);
 
     manager->hashtable = fasthash_create(bucket_dtor_adapter, 12);
-    manager->awake_bucket = bucket_ctor();
+    manager->awake_bucket = bucket_ctor(brick_destroy);
     darray_init(manager->bucket_ref);
     darray_push(manager->bucket_ref, manager->awake_bucket);
     manager->sampler = sampler_ctor();
@@ -206,7 +210,7 @@ void brickmanager_add_brick(brickmanager_t* manager, struct brick_t* brick)
 
         /* lazily allocate a new bucket if one doesn't exist */
         if(bucket == NULL) {
-            bucket = bucket_ctor();
+            bucket = bucket_ctor(brick_destroy);
             fasthash_put(manager->hashtable, key, bucket);
             darray_push(manager->bucket_ref, bucket);
         }
@@ -417,7 +421,7 @@ iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager)
 {
     /* create a new iterator state */
     brickiteratorstate_t state = { .b = 0, .i = 0 };
-    state.own_bucket = bucket_ctor();
+    state.own_bucket = bucket_ctor(brick_fake_destroy); /* a bucket of references only */
     darray_init(state.bucket);
 
     /* get the ROI */
@@ -466,7 +470,7 @@ iterator_t* brickmanager_retrieve_all_bricks(const brickmanager_t* manager)
 {
     /* create a new iterator state */
     brickiteratorstate_t state = { .b = 0, .i = 0 };
-    state.own_bucket = bucket_ctor();
+    state.own_bucket = bucket_ctor(brick_fake_destroy);
     darray_init(state.bucket);
 
     /* we'll iterate over all non-empty buckets */
@@ -573,10 +577,12 @@ uint64_t brick2hash(const brick_t* brick)
 
 /* buckets */
 
-brickbucket_t* bucket_ctor()
+brickbucket_t* bucket_ctor(brick_t* (*brick_dtor)(brick_t*))
 {
     brickbucket_t* bucket = mallocx(sizeof *bucket);
+
     darray_init(bucket->brick);
+    bucket->brick_dtor = brick_dtor;
 
     return bucket;
 }
@@ -585,7 +591,7 @@ brickbucket_t* bucket_dtor(brickbucket_t* bucket)
 {
     /* release all bricks of the bucket */
     for(int i = darray_length(bucket->brick) - 1; i >= 0; i--)
-        brick_destroy(bucket->brick[i]);
+        bucket->brick_dtor(bucket->brick[i]);
 
     /* release the bucket */
     darray_release(bucket->brick);
@@ -600,16 +606,6 @@ void bucket_dtor_adapter(void* bucket)
     bucket_dtor((brickbucket_t*)bucket);
 }
 
-brickbucket_t* bucket_dtor_refonly(brickbucket_t* bucket)
-{
-    /* we won't release any bricks of this bucket,
-       as they are references only */
-    darray_clear(bucket->brick);
-
-    /* call the original destructor with an empty bucket */
-    return bucket_dtor(bucket);
-}
-
 void bucket_add(brickbucket_t* bucket, brick_t* brick)
 {
     darray_push(bucket->brick, brick);
@@ -622,7 +618,7 @@ int bucket_wash(brickbucket_t* bucket)
     /* remove dead bricks */
     for(int i = darray_length(bucket->brick) - 1; i >= 0; i--) {
         if(!brick_is_alive(bucket->brick[i])) {
-            brick_destroy(bucket->brick[i]);
+            bucket->brick_dtor(bucket->brick[i]);
             darray_remove(bucket->brick, i);
             count++;
         }
@@ -635,7 +631,7 @@ int bucket_wash(brickbucket_t* bucket)
 void bucket_clear(brickbucket_t* bucket)
 {
     for(int i = darray_length(bucket->brick) - 1; i >= 0 ; i--)
-        brick_destroy(bucket->brick[i]);
+        bucket->brick_dtor(bucket->brick[i]);
 
     darray_clear(bucket->brick);
 }
@@ -644,6 +640,7 @@ bool bucket_is_empty(const brickbucket_t* bucket)
 {
     return 0 == darray_length(bucket->brick);
 }
+
 
 
 /* brick iterator state */
@@ -660,7 +657,7 @@ void brickiteratorstate_dtor(void* s)
 {
     brickiteratorstate_t* state = (brickiteratorstate_t*)s;
 
-    bucket_dtor_refonly(state->own_bucket);
+    bucket_dtor(state->own_bucket);
     darray_release(state->bucket);
 
     free(state);
@@ -892,6 +889,19 @@ void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in
         if(is_brick_inside_roi(brick, roi))
             bucket_add(out_bucket, brick); /* add a reference to the output bucket */
     }
+}
+
+
+
+/* bucket brick destructor */
+
+brick_t* brick_fake_destroy(brick_t* brick)
+{
+    /* do nothing. We'll just destroy a reference,
+       not the brick itself */
+    (void)brick;
+
+    return NULL;
 }
 
 
