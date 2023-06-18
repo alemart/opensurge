@@ -142,7 +142,7 @@ object "Water Surface" is "entity", "private", "awake"
 // --------------------------------------------------------------
 
 // this object controls water behavior: bubbles, breathing timer, and so on
-object "Water Controller"
+object "Water Controller" is "private", "awake", "detached", "entity"
 {
     breathingBehavior = spawn("WaterController.BreathingBehavior");
     underwaterTimer = spawn("WaterController.UnderwaterTimer");
