@@ -1040,6 +1040,11 @@ void renderqueue_enqueue_background(bgtheme_t* background)
         .vtable = &VTABLE[TYPE_BACKGROUND]
     };
 
+    /* skip if there are no layers to render */
+    if(background_number_of_bg_layers(background) == 0)
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -1054,6 +1059,11 @@ void renderqueue_enqueue_foreground(bgtheme_t* foreground)
         .vtable = &VTABLE[TYPE_FOREGROUND]
     };
 
+    /* skip if there are no layers to render */
+    if(background_number_of_fg_layers(foreground) == 0)
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 

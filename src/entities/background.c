@@ -228,7 +228,23 @@ const char* background_filepath(const bgtheme_t *bgtheme)
     return bgtheme->filepath;
 }
 
+/*
+ * background_number_of_bg_layers()
+ * Number of background layers
+ */
+int background_number_of_bg_layers(const bgtheme_t* bgtheme)
+{
+    return bgtheme->background_count;
+}
 
+/*
+ * background_number_of_fg_layers()
+ * Number of foreground layers
+ */
+int background_number_of_fg_layers(const bgtheme_t* bgtheme)
+{
+    return bgtheme->foreground_count;
+}
 
 
 
