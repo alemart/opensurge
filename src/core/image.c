@@ -773,33 +773,6 @@ const char* image_filepath(const image_t* img)
 }
 
 /*
- * image_same_root()
- * Checks if two images have the same root (ascendant)
- */
-bool image_same_root(const image_t* a, const image_t* b)
-{
-    ALLEGRO_BITMAP* rootA = a->data;
-    ALLEGRO_BITMAP* rootB = b->data;
-
-    /*
-     * According to the Allegro docs, al_get_parent_bitmap()
-     * "always returns the real bitmap, and never a sub-bitmap".
-     * 
-     * So, do we actually need these while loops?
-     * 
-     * https://liballeg.org/a5docs/trunk/graphics.html#al_get_parent_bitmap
-     */
-
-    while(al_get_parent_bitmap(rootA) != NULL)
-        rootA = al_get_parent_bitmap(rootA);
-
-    while(al_get_parent_bitmap(rootB) != NULL)
-        rootB = al_get_parent_bitmap(rootB);
-
-    return (rootA == rootB);
-}
-
-/*
  * image_texture()
  * Gets a handle that identifies the texture used internally by the image
  */

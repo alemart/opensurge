@@ -490,7 +490,7 @@ void group_layers(bgtheme_t *bgtheme)
         const image_t* a = layer_image(layer[i]);
         const image_t* b = layer_image(layer[i+1]);
 
-        if(image_same_root(a, b))
+        if(image_texture(a) == image_texture(b))
             layer[i]->group_index = 1 + layer[i+1]->group_index;
     }
 
@@ -499,7 +499,7 @@ void group_layers(bgtheme_t *bgtheme)
         const image_t* a = layer_image(layer[i]);
         const image_t* b = layer_image(layer[i+1]);
 
-        if(image_same_root(a, b))
+        if(image_texture(a) == image_texture(b))
             layer[i]->group_index = 1 + layer[i+1]->group_index;
     }
 }
