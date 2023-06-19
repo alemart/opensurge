@@ -40,12 +40,14 @@ typedef enum imageflags_t {
 typedef uint32_t texturehandle_t; /* GLuint */
 
 /* image management */
-image_t* image_load(const char* path); /* will be unloaded automatically */
 image_t* image_create(int width, int height); /* create an image */
 image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* creates a shared sub-image */
 image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer); /* create an optimized drawing target */
 void image_destroy(image_t* img); /* call this after image_create() */
-int image_unload(image_t* img); /* use if you want to save memory... */
+
+/* load from file */
+image_t* image_load(const char* path); /* will be unloaded automatically */
+int image_unload(const image_t* img); /* use if you want to save memory... */
 
 /* utilities */
 int image_width(const image_t* img); /* the width of the image */

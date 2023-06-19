@@ -574,7 +574,7 @@ void validate_animation(animation_t *anim)
 void load_sprite_images(spriteinfo_t *spr)
 {
     int i, cur_x, cur_y;
-    image_t *sheet;
+    const image_t *sheet;
 
     spr->frame_count = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
     spr->frame_data = mallocx(spr->frame_count * sizeof(*(spr->frame_data)));

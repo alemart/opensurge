@@ -1360,7 +1360,7 @@ collisionmask_t *read_collisionmask(const parsetree_program_t *block)
 {
     maskdetails_t s = { NULL, 0, 0, 0, 0 };
     collisionmask_t* mask = NULL;
-    image_t* maskimg = NULL;
+    const image_t* maskimg = NULL;
 
     nanoparser_traverse_program_ex(block, (void*)(&s), traverse_collisionmask);
     if(s.source_file == NULL)

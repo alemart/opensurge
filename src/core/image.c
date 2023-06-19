@@ -253,7 +253,7 @@ image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer)
  *
  * Returns the no. of references to the image
  */
-int image_unload(image_t* img)
+int image_unload(const image_t* img)
 {
     if(img->path != NULL)
        return resourcemanager_unref_image(img->path);

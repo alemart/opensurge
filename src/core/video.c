@@ -540,7 +540,7 @@ void video_clearmessages()
  */
 void video_display_loading_screen()
 {
-    image_t *img = image_load(LOADING_IMAGE);
+    const image_t *img = image_load(LOADING_IMAGE);
     font_t* fnt = font_create(LOADING_FONT);
     v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
 
@@ -553,6 +553,7 @@ void video_display_loading_screen()
     video_render(NULL);
     
     font_destroy(fnt);
+    image_unload(img);
 }
 
 /*
