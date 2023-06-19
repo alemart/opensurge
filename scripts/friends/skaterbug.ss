@@ -65,6 +65,7 @@ object "Skaterbug" is "entity", "friend", "gimmick"
 
     state "jumping"
     {
+        Console.print(parent);
         // move
         move();
 

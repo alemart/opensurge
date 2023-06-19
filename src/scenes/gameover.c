@@ -74,7 +74,7 @@ void gameover_init(void *foo)
 
     /* misc */
     gameover_spacing = gameover_width[2] - gameover_width[1] - gameover_width[0];
-    gameover_bg = image_clone(video_get_backbuffer());
+    gameover_bg = video_take_snapshot();
     gameover_timer = 0;
 
     /* music */

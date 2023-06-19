@@ -88,7 +88,7 @@ void editorhelp_init(void *foo)
     int box_xpos, box_ypos, box_width, box_height;
 
     /* setup background & input device */
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
     in = input_create_user("editorhelp");
 
     /* configure the text columns */

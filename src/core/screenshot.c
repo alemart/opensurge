@@ -60,7 +60,7 @@ void screenshot_update()
     if(input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE2)) {
         const char *filename = screenshot_filename(next_screenshot_id++);
         logfile_message("New screenshot: \"%s\"", filename);
-        snapshot = image_snapshot();
+        snapshot = video_take_snapshot();
         image_save(snapshot, filename);
         image_destroy(snapshot);
         video_showmessage("New screenshot: %s", filename);

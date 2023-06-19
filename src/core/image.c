@@ -280,32 +280,6 @@ image_t* image_clone(const image_t* src)
 }
 
 /*
- * image_snapshot()
- * Take a snapshot of the game. Remember to
- * destroy the created image after usage.
- */
-image_t* image_snapshot()
-{
-    ALLEGRO_STATE state;
-    image_t* img = mallocx(sizeof *img);
-    ALLEGRO_BITMAP* screen = al_get_backbuffer(al_get_current_display());
-    al_store_state(&state, ALLEGRO_STATE_BITMAP);
-
-    /*al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);*/ /* doesn't work properly */
-    img->w = al_get_bitmap_width(screen);
-    img->h = al_get_bitmap_height(screen);
-    img->path = NULL;
-    if(NULL == (img->data = al_create_bitmap(img->w, img->h)))
-        fatal_error("Failed to take snapshot");
-    al_set_target_bitmap(img->data);
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_draw_bitmap(screen, 0.0f, 0.0f, 0);
-
-    al_restore_state(&state);
-    return img;
-}
-
-/*
  * image_enable_linear_filtering()
  * Enable linear filtering
  */

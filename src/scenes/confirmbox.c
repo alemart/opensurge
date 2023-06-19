@@ -69,7 +69,7 @@ void confirmbox_init(void *confirmbox)
     setup_message((confirmboxdata_t*)confirmbox);
 
     /* setup gfx */
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
     box = sprite_get_image(sprite_get_animation("Confirm Box", 0), 0);
     boxpos = v2d_new( (VIDEO_SCREEN_W - image_width(box))/2 , VIDEO_SCREEN_H );
     arrow = actor_create();

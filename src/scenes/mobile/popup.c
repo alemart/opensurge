@@ -75,7 +75,7 @@ void mobilepopup_init(void *subscene_ptr)
 {
     LOG("Opening");
 
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
     mouse_input = input_create_mouse();
     input = input_create_user(NULL);
 

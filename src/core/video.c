@@ -306,12 +306,12 @@ void video_render(void (*render_overlay)())
     /* flip display */
     al_flip_display();
 
+#if USE_ROUNDROBIN_BACKBUFFER
     /* clearing just after flipping may provide a slight performance increase
        in some drivers (?). Allegro should call glClear() behind the scenes */
     al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
     al_clear_depth_buffer(1);
 
-#if USE_ROUNDROBIN_BACKBUFFER
     /* use a round-robin scheme for a (possible) performance improvement,
        in an attempt to avoid pipeline stalling */
     backbuffer_index = 1 - backbuffer_index;
@@ -578,6 +578,22 @@ v2d_t video_convert_window_to_screen(v2d_t window_coordinates)
     al_transform_coordinates(&transform, &screen_coordinates.x, &screen_coordinates.y);
 
     return screen_coordinates;
+}
+
+/*
+ * video_take_snapshot()
+ * Take a screenshot (a copy of the backbuffer)
+ * Destroy the returned image after usage
+ */
+image_t* video_take_snapshot()
+{
+#if USE_ROUNDROBIN_BACKBUFFER
+    int index = 1 - backbuffer_index;
+#else
+    int index = backbuffer_index;
+#endif
+    const image_t* snapshot = backbuffer[index];
+    return image_clone(snapshot);
 }
 
 

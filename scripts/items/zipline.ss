@@ -49,6 +49,7 @@ object "Zipline Grabber" is "entity", "gimmick"
 
     state "zipping"
     {
+        Console.print(parent);
         if(zipline != null) {
             // move
             dt = Time.delta;

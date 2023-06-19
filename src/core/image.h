@@ -52,7 +52,6 @@ int image_width(const image_t* img); /* the width of the image */
 int image_height(const image_t* img); /* the height of the image */
 void image_save(const image_t* img, const char *path); /* saves the image to a file */
 image_t* image_clone(const image_t* src); /* clones an image */
-image_t* image_snapshot(); /* take a snapshot */
 void image_enable_linear_filtering(image_t* img); /* enable linear filtering */
 void image_disable_linear_filtering(image_t* img); /* disable linear filtering */
 const char* image_filepath(const image_t* img); /* relative path of the originating file, if defined */

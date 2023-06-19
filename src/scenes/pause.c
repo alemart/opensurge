@@ -328,7 +328,7 @@ void pause_init(void *_)
     LOG("Paused the game");
 
     /* take a snapshot of the game */
-    snapshot = image_clone(video_get_backbuffer());
+    snapshot = video_take_snapshot();
 
     /* create an input object */
     input = input_create_user(NULL);

@@ -104,7 +104,7 @@ void editorpal_init(void *config_ptr)
     cursor_position = v2d_new(0, 0);
 
     /* configure the background */
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
 
     /* misc */
     selected_item = NO_ITEM;

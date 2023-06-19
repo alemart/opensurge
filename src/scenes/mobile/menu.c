@@ -162,7 +162,7 @@ void mobilemenu_init(void *game_screenshot)
 
     state = APPEARING;
     screenshot = (const image_t*)game_screenshot;
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
     mouse_input = input_create_mouse();
     input = input_create_user(NULL);
     warp_trick_elapsed = 0.0f;

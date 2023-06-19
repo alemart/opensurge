@@ -1246,7 +1246,7 @@ void level_update()
 
         if(quit_level_img != NULL)
             image_destroy(quit_level_img);
-        quit_level_img = image_clone(video_get_backbuffer());
+        quit_level_img = video_take_snapshot();
 
         wants_to_leave = FALSE;
         music_pause();
