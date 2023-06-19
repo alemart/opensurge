@@ -1520,6 +1520,8 @@ void fontdrv_bmp_release(fontdrv_t* fnt)
             image_destroy(f->bmp[i]);
     }
 
+    image_unload(f->atlas);
+
     free(f->filepath);
     free(f);
 }
