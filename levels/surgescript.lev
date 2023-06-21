@@ -17,7 +17,7 @@ players "None"
 
 // Setup objects are spawned the moment
 // the level is loaded. List them below:
-setup "SurgeScript Demo App" "List Menu"
+setup "SurgeScript Demo App"
 
 // When copying this file, you may remove
 // the line below to access the level editor

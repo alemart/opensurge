@@ -9,7 +9,7 @@
 
 character "Charge"
 {
-    companions                      "Dash Smoke" "Brake Smoke" "Follow the Leader"
+    companions                      "Dash Smoke" "Brake Smoke"
 
     multipliers
     {
