@@ -53,6 +53,7 @@ extern void scripting_register_actor(surgescript_vm_t* vm);
 extern void scripting_register_androidplatform(surgescript_vm_t* vm);
 extern void scripting_register_animation(surgescript_vm_t* vm);
 extern void scripting_register_brick(surgescript_vm_t* vm);
+extern void scripting_register_brickparticle(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
@@ -411,6 +412,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_androidplatform(vm);
     scripting_register_animation(vm);
     scripting_register_brick(vm);
+    scripting_register_brickparticle(vm);
     scripting_register_camera(vm);
     scripting_register_collisions(vm);
     scripting_register_console(vm);

@@ -62,6 +62,7 @@ enum brickstate_t {
 
 /* brick theme: meta data of bricks */
 struct brickdata_t {
+    int id; /* brick ID */
     spriteinfo_t *data; /* this is not stored in the main hash */
     const image_t *image; /* pointer to a brick image in the animation */
     int image_width, image_height; /* cached image size */
@@ -97,7 +98,7 @@ struct maskdetails_t {
 /* private stuff */
 static void animate_brick(brick_t *brk);
 static brickdata_t *brickdata_get(int id);
-static brickdata_t* brickdata_new();
+static brickdata_t* brickdata_new(int brick_id);
 static brickdata_t* brickdata_delete(brickdata_t *obj);
 static void validate_brickdata(const brickdata_t *obj);
 static int traverse(const parsetree_statement_t *stmt);
@@ -112,6 +113,7 @@ static inline obstaclelayer_t get_obstacle_layer(const brick_t* brick);
 static inline int get_image_flags(const brick_t* brick);
 static bool is_player_standing_on_platform(const player_t *player, const brick_t *brk);
 static bool can_be_clipped_out(const brick_t* brick, v2d_t topleft);
+static surgescript_object_t* create_particle(const brick_t* brick, int source_x, int source_y, int width, int height, v2d_t position, v2d_t velocity);
 static int brickdata_count = 0; /* size of brickdata[] */
 static brickdata_t* brickdata[BRKDATA_MAX]; /* brick data */
 
@@ -285,19 +287,19 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                         for(int bi=0; bi<bw; bi++) {
                             for(int bj=0; bj<bh; bj++) {
                                 v2d_t brk_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
-                                v2d_t brk_speed = v2d_new(
+                                v2d_t brk_vel = v2d_new(
                                     dx >= 0 ? (90 + 60*(1+bi)/bw) : -(90 + 60*(bw-bi)/bw),
                                     -(120 + 60*(bh-bj)/bh)
                                 );
 
-                                level_create_particle(
-                                    brk->image,
+                                create_particle(
+                                    brk,
                                     (bi * brk_width) / bw,
                                     (bj * brk_height) / bh,
                                     brk_width / bw,
                                     brk_height / bh,
                                     brk_pos,
-                                    brk_speed
+                                    brk_vel
                                 );
                             }
                         }
@@ -337,8 +339,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                         v2d_t piece_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
                         v2d_t piece_speed = v2d_new(0, (1+bj)*15 + (right_oriented?bi:bw-bi)*15);
 
-                        level_create_particle(
-                            brk->image,
+                        create_particle(
+                            brk,
                             (bi * brk_width) / bw,
                             (bj * brk_height) / bh,
                             brk_width / bw,
@@ -477,19 +479,19 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                     for(int bi = 0; bi < bw; bi++) {
                         for(int bj = 0; bj < bh; bj++) {
                             v2d_t brk_pos = v2d_new(brk->x + (bi*brk_width)/bw, brk->y + (bj*brk_height)/bh);
-                            v2d_t brk_speed = v2d_new(
+                            v2d_t brk_vel = v2d_new(
                                 60.0f * ((bi + 0.5f) / bw - 0.5f),
                                 -(120 + 60*(bh-bj)/bh)
                             );
 
-                            level_create_particle(
-                                brk->image,
+                            create_particle(
+                                brk,
                                 (bi * brk_width) / bw,
                                 (bj * brk_height) / bh,
                                 brk_width / bw,
                                 brk_height / bh,
                                 brk_pos,
-                                brk_speed
+                                brk_vel
                             );
                         }
                     }
@@ -573,16 +575,16 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
             if(brk->state == BRS_ACTIVE && brk->value[0] >= seconds_til_fall) {
                 /* create particle */
                 v2d_t brk_pos = v2d_new(brk->x, brk->y);
-                v2d_t brk_speed = v2d_new(0, 120);
+                v2d_t brk_vel = v2d_new(0, 120);
 
-                level_create_particle(
-                    brk->image,
+                create_particle(
+                    brk,
                     0,
                     0,
                     image_width(brk->image),
                     image_height(brk->image),
                     brk_pos,
-                    brk_speed
+                    brk_vel
                 );
 
                 /* destroy brick */
@@ -686,12 +688,10 @@ void brick_render_path(const brick_t *brk, v2d_t camera_position)
  */
 int brick_id(const brick_t* brk)
 {
-    for(int i = 0; i < brickdata_count; i++) {
-        if(brk->brick_ref == brickdata[i])
-            return i;
-    }
+    if(brk->brick_ref == NULL)
+        return -1; /* not found */
 
-    return -1; /* not found */
+    return brk->brick_ref->id;
 }
 
 /*
@@ -1082,13 +1082,61 @@ bool can_be_clipped_out(const brick_t* brick, v2d_t topleft)
     return (x + w <= 0 || x >= sw || y + h <= 0 || y >= sh);
 }
 
+/* create a brick particle */
+surgescript_object_t* create_particle(const brick_t* brick, int source_x, int source_y, int width, int height, v2d_t position, v2d_t velocity)
+{
+    /* create the particle */
+    surgescript_object_t* particle = level_create_object("BrickParticle", position);
+
+    /* create auxiliary variables */
+    surgescript_var_t* id = surgescript_var_create();
+    surgescript_var_t* x = surgescript_var_create();
+    surgescript_var_t* y = surgescript_var_create();
+    surgescript_var_t* w = surgescript_var_create();
+    surgescript_var_t* h = surgescript_var_create();
+
+    /* call particle.setBrick(brick_id, source_x, source_y, width, height) */
+    const surgescript_var_t* args1[] = {
+        surgescript_var_set_number(id, brick_id(brick)),
+        surgescript_var_set_number(x, source_x),
+        surgescript_var_set_number(y, source_y),
+        surgescript_var_set_number(w, width),
+        surgescript_var_set_number(h, height)
+    };
+    surgescript_object_call_function(particle, "setBrick", args1, 5, NULL);
+
+    /* call particle.setVelocity(xvel, yvel) */
+    const surgescript_var_t* args2[] = {
+        surgescript_var_set_number(x, velocity.x),
+        surgescript_var_set_number(y, velocity.y)
+    };
+    surgescript_object_call_function(particle, "setVelocity", args2, 2, NULL);
+
+    /* call particle.set_zindex(zindex) */
+    const surgescript_var_t* args3[] = {
+        surgescript_var_set_number(x, brick_zindex(brick))
+    };
+    surgescript_object_call_function(particle, "set_zindex", args3, 1, NULL);
+
+    /* release auxiliary variables */
+    surgescript_var_destroy(h);
+    surgescript_var_destroy(w);
+    surgescript_var_destroy(y);
+    surgescript_var_destroy(x);
+    surgescript_var_destroy(id);
+
+    /* return the particle */
+    return particle;
+}
+
 
 
 /* new brick theme */
-brickdata_t* brickdata_new()
+brickdata_t* brickdata_new(int brick_id)
 {
     brickdata_t *obj = mallocx(sizeof *obj);
 
+    obj->id = brick_id;
     obj->data = NULL;
     obj->image = NULL;
     obj->image_width = 0;
@@ -1205,7 +1253,7 @@ int traverse(const parsetree_statement_t *stmt)
             brickdata[brick_id] = brickdata_delete(brickdata[brick_id]);
 
         brickdata_count = max(brickdata_count, brick_id+1);
-        brickdata[brick_id] = brickdata_new();
+        brickdata[brick_id] = brickdata_new(brick_id);
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)brickdata[brick_id], traverse_brick_attributes);
         validate_brickdata(brickdata[brick_id]);
 
