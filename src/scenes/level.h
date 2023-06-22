@@ -23,8 +23,8 @@
 
 #include <surgescript.h>
 #include <stdbool.h>
-#include "../core/v2d.h"
 #include "../core/color.h"
+#include "../util/v2d.h"
 #include "../entities/brick.h"
 
 /* scene methods */

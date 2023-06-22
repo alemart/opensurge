@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include "intro.h"
 #include "../core/global.h"
-#include "../core/v2d.h"
 #include "../core/timer.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
@@ -33,6 +32,7 @@
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
+#include "../util/v2d.h"
 #include "../entities/mobilegamepad.h"
 #include "../entities/sfx.h"
 

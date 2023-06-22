@@ -32,6 +32,7 @@
 #include "../../util/numeric.h"
 #include "../../util/util.h"
 #include "../../util/stringutil.h"
+#include "../../util/v2d.h"
 #include "../../core/global.h"
 #include "../../core/asset.h"
 #include "../../core/audio.h"
@@ -41,7 +42,6 @@
 #include "../../core/image.h"
 #include "../../core/font.h"
 #include "../../core/input.h"
-#include "../../core/v2d.h"
 #include "../../scenes/level.h"
 #include "../../physics/obstacle.h"
 

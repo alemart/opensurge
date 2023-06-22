@@ -22,7 +22,7 @@
 #ifndef _ENEMY_H
 #define _ENEMY_H
 
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 
 /* forward declarations */
 struct actor_t;

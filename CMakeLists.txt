@@ -302,7 +302,6 @@ SET(GAME_SRCS
   src/core/sprite.c
   src/core/storyboard.c
   src/core/timer.c
-  src/core/v2d.c
   src/core/video.c
 
   src/util/csv.c
@@ -312,6 +311,7 @@ SET(GAME_SRCS
   src/util/stringutil.c
   src/util/utf8.c
   src/util/util.c
+  src/util/v2d.c
 
   src/scenes/mobile/subscenes/info.c
   src/scenes/mobile/subscenes/credits.c
@@ -437,7 +437,6 @@ SET(GAME_HEADERS
   src/core/storyboard.h
   src/core/timer.h
   src/core/video.h
-  src/core/v2d.h
 
   src/util/csv.h
   src/util/darray.h
@@ -447,6 +446,7 @@ SET(GAME_HEADERS
   src/util/stringutil.h
   src/util/utf8.h
   src/util/util.h
+  src/util/v2d.h
 
   src/scenes/mobile/subscenes/info.h
   src/scenes/mobile/subscenes/credits.h

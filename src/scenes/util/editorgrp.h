@@ -21,7 +21,7 @@
 #ifndef _EDITORGRP_H
 #define _EDITORGRP_H
 
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 #include "../../entities/brick.h"
 
 /* entity types */

@@ -29,7 +29,6 @@
 #include "../actor.h"
 #include "../sfx.h"
 
-#include "../../core/v2d.h"
 #include "../../core/global.h"
 #include "../../core/timer.h"
 #include "../../core/video.h"
@@ -38,6 +37,7 @@
 #include "../../core/font.h"
 #include "../../core/audio.h"
 
+#include "../../util/v2d.h"
 #include "../../util/numeric.h"
 #include "../../util/util.h"
 #include "../../util/stringutil.h"

@@ -28,8 +28,8 @@
 #include <surgescript.h>
 #include <physfs.h>
 #include "util.h"
+#include "v2d.h"
 #include "../core/global.h"
-#include "../core/v2d.h"
 #include "../core/timer.h"
 #include "../core/logfile.h"
 #include "../core/resourcemanager.h"

@@ -21,7 +21,7 @@
 #ifndef _BACKGROUND_H
 #define _BACKGROUND_H
 
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 
 typedef struct bgtheme_t bgtheme_t;
 

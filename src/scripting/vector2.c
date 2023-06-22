@@ -24,7 +24,7 @@
 #include <errno.h>
 #include <float.h>
 #include <math.h>
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 

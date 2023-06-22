@@ -27,7 +27,7 @@
 #include "../core/logfile.h"
 #include "../core/video.h"
 #include "../core/timer.h"
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 

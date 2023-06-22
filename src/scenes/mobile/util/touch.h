@@ -21,7 +21,7 @@
 #ifndef _MOBILEUTILTOUCH_H
 #define _MOBILEUTILTOUCH_H
 
-#include "../../../core/v2d.h"
+#include "../../../util/v2d.h"
 
 struct input_t;
 

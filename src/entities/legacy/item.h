@@ -21,7 +21,7 @@
 #ifndef _ITEM_H
 #define _ITEM_H
 
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 
 /* item list */
 #define ITEMDATA_MAX        84 /* number of existing items */

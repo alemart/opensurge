@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "color.h"
-#include "v2d.h"
+#include "../util/v2d.h"
 
 /* opaque image type */
 typedef struct image_t image_t;

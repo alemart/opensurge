@@ -24,7 +24,7 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "brick.h"
 
 /* constants */

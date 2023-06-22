@@ -44,8 +44,8 @@
 #include <string.h>
 #include "scripting.h"
 #include "../core/logfile.h"
-#include "../core/v2d.h"
 #include "../core/video.h"
+#include "../util/v2d.h"
 #include "../util/darray.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"

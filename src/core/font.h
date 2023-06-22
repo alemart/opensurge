@@ -22,7 +22,7 @@
 #define _FONT_H
 
 #include <stdbool.h>
-#include "v2d.h"
+#include "../util/v2d.h"
 
 /* font type */
 typedef struct font_t font_t;

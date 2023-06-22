@@ -21,7 +21,7 @@
 #ifndef _BRICK_H
 #define _BRICK_H
 
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "../core/color.h"
 
 /* brick type */

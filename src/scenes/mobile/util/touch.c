@@ -19,7 +19,7 @@
  */
 
 #include "touch.h"
-#include "../../../core/v2d.h"
+#include "../../../util/v2d.h"
 #include "../../../core/video.h"
 #include "../../../core/input.h"
 

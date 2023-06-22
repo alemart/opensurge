@@ -22,7 +22,7 @@
 #define _INPUT_H
 
 #include <stdbool.h>
-#include "v2d.h"
+#include "../util/v2d.h"
 
 /* forward declarations */
 typedef enum inputbutton_t inputbutton_t;

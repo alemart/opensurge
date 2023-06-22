@@ -19,7 +19,7 @@
  */
 
 #include "numeric.h"
-#include "../core/v2d.h"
+#include "v2d.h"
 
 
 

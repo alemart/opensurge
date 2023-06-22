@@ -22,7 +22,7 @@
 #define _EDITORCMD_H
 
 #include <stdbool.h>
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 
 typedef struct editorcmd_t editorcmd_t;
 

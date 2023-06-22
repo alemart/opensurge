@@ -22,9 +22,9 @@
 #include <string.h>
 #include <math.h>
 #include "scripting.h"
-#include "../core/v2d.h"
 #include "../core/video.h"
 #include "../core/image.h"
+#include "../util/v2d.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 #include "../entities/actor.h"

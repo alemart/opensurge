@@ -21,7 +21,7 @@
 #ifndef _MOBILESUBSCENE_H
 #define _MOBILESUBSCENE_H
 
-#include "../../../core/v2d.h"
+#include "../../../util/v2d.h"
 
 typedef struct mobile_subscene_t mobile_subscene_t;
 struct mobile_subscene_t {

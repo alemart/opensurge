@@ -22,7 +22,7 @@
 #define _RENDERQUEUE_H
 
 #include <stdbool.h>
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 
 /* forward declarations */
 struct brick_t;

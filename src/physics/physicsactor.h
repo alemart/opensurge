@@ -22,7 +22,7 @@
 #define _PHYSICSACTOR_H
 
 #include <stdbool.h>
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 
 /*
  * a physics actor is a sprite that respects the laws of

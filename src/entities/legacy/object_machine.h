@@ -21,7 +21,7 @@
 #ifndef _OBJECT_MACHINE_H
 #define _OBJECT_MACHINE_H
 
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 #include "../player.h"
 #include "../brick.h"
 #include "../actor.h"

@@ -21,7 +21,7 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
 
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "../core/color.h"
 
 /*

@@ -23,7 +23,7 @@
 
 #include <surgescript.h>
 #include "util/iterators.h"
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "../entities/brick.h"
 
 /* scripting API */

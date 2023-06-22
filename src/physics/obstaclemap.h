@@ -22,7 +22,7 @@
 #define _OBSTACLEMAP_H
 
 #include <stdbool.h>
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 
 /*
  * an obstacle map is a set of obstacles

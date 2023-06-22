@@ -22,7 +22,7 @@
 #define _VIDEO_H
 
 #include <stdbool.h>
-#include "v2d.h"
+#include "../util/v2d.h"
 #include "color.h"
 
 struct image_t;

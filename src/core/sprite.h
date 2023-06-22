@@ -22,11 +22,10 @@
 #define _SPRITE_H
 
 #include <stdbool.h>
-#include <stdio.h>
-#include "v2d.h"
-#include "image.h"
-#include "../util/darray.h"
 #include "nanoparser.h"
+#include "image.h"
+#include "../util/v2d.h"
+#include "../util/darray.h"
 
 typedef struct animation_t animation_t;
 typedef struct spriteinfo_t spriteinfo_t;

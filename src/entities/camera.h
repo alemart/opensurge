@@ -22,7 +22,7 @@
 #define _CAMERA_H
 
 #include <stdbool.h>
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 
 /* initializes the camera */
 void camera_init();
