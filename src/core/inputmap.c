@@ -24,10 +24,10 @@
 #include "logfile.h"
 #include "resourcemanager.h"
 #include "asset.h"
-#include "hashtable.h"
 #include "nanoparser.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/hashtable.h"
 
 /* storage */
 typedef struct inputmapnode_t inputmapnode_t;

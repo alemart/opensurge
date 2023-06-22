@@ -419,7 +419,6 @@ SET(GAME_HEADERS
   src/core/engine.h
   src/core/font.h
   src/core/global.h
-  src/core/hashtable.h
   src/core/image.h
   src/core/import.h
   src/core/input.h
@@ -441,6 +440,7 @@ SET(GAME_HEADERS
   src/util/csv.h
   src/util/darray.h
   src/util/fasthash.h
+  src/util/hashtable.h
   src/util/iterator.h
   src/util/numeric.h
   src/util/stringutil.h

@@ -36,9 +36,9 @@
 #include "../../core/logfile.h"
 #include "../../core/asset.h"
 #include "../../core/video.h"
-#include "../../core/hashtable.h"
 #include "../../util/util.h"
 #include "../../util/stringutil.h"
+#include "../../util/hashtable.h"
 #include "../../physics/collisionmask.h"
 #include "../../scenes/level.h"
 

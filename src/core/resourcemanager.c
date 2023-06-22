@@ -19,10 +19,10 @@
  */
 
 #include "resourcemanager.h"
-#include "hashtable.h"
 #include "image.h"
 #include "audio.h"
 #include "logfile.h"
+#include "../util/hashtable.h"
 
 /* code generation */
 HASHTABLE_GENERATE_CODE(image_t, image_destroy);

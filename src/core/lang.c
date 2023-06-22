@@ -24,10 +24,10 @@
 #include "global.h"
 #include "asset.h"
 #include "logfile.h"
-#include "hashtable.h"
 #include "nanoparser.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/hashtable.h"
 
 /* fake string type */
 typedef struct { char* data; } stringadapter_t;

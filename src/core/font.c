@@ -35,11 +35,11 @@
 #include "asset.h"
 #include "lang.h"
 #include "logfile.h"
-#include "hashtable.h"
 #include "nanoparser.h"
 #include "input.h"
 #include "../util/utf8.h"
 #include "../util/stringutil.h"
+#include "../util/hashtable.h"
 #include "../entities/player.h"
 #include "../scenes/level.h"
 
