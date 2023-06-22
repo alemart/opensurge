@@ -61,7 +61,6 @@
 #include "../entities/player.h"
 #include "../entities/camera.h"
 #include "../entities/background.h"
-#include "../entities/particle.h"
 #include "../entities/renderqueue.h"
 #include "../entities/sfx.h"
 #include "../entities/legacy/entitymanager.h"
@@ -1096,9 +1095,7 @@ void level_init(void *path_to_lev_file)
     /* helpers */
     clear_level_state(&saved_state);
 
-    particle_init();
     camera_init();
-
     entitymanager_init();
     create_obstaclemap();
 
@@ -1151,9 +1148,7 @@ void level_release()
 
     destroy_obstaclemap();
     entitymanager_release();
-
     camera_release();
-    particle_release();
 
     clear_level_state(&saved_state);
 
@@ -1405,9 +1400,6 @@ void level_update()
     /* update obstacle map */
     update_obstaclemap(major_items, major_enemies);
 
-    /* update particles */
-    particle_update();
-
     /* early update: players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++)
@@ -1574,20 +1566,6 @@ void level_render()
     major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
-
-/*
- * level_create_particle()
- * Creates a new particle
- */
-void level_create_particle(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed)
-{
-    if(editor_is_enabled()) {
-        /* no, you can't create a new particle! */
-        return;
-    }
-
-    particle_add(source_image, source_x, source_y, width, height, position, speed);
-}
 
 /*
  * level_file()
@@ -2277,9 +2255,6 @@ void render_level(const item_list_t *major_items, const enemy_list_t *major_enem
 
         /* render SurgeScript objects */
         render_ssobjects();
-
-        /* render particles */
-        renderqueue_enqueue_particles();
 
         /* render the players */
         render_players();

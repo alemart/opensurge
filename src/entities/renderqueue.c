@@ -23,7 +23,6 @@
 #include <string.h>
 #include <math.h>
 #include "renderqueue.h"
-#include "particle.h"
 #include "player.h"
 #include "brick.h"
 #include "actor.h"
@@ -48,7 +47,6 @@ enum {
     TYPE_BRICK_MASK,
     TYPE_BRICK_DEBUG,
     TYPE_BRICK_PATH,
-    TYPE_PARTICLE,
 
     TYPE_SSOBJECT,
     TYPE_SSOBJECT_GIZMO,
@@ -111,7 +109,6 @@ struct renderqueue_entry_t {
 #endif
 
 /* vtables */
-static float zindex_particles(renderable_t r);
 static float zindex_player(renderable_t r);
 static float zindex_item(renderable_t r);
 static float zindex_object(renderable_t r);
@@ -126,7 +123,6 @@ static float zindex_background(renderable_t r);
 static float zindex_foreground(renderable_t r);
 static float zindex_water(renderable_t r);
 
-static void render_particles(renderable_t r, v2d_t camera_position);
 static void render_player(renderable_t r, v2d_t camera_position);
 static void render_item(renderable_t r, v2d_t camera_position);
 static void render_object(renderable_t r, v2d_t camera_position);
@@ -141,7 +137,6 @@ static void render_background(renderable_t r, v2d_t camera_position);
 static void render_foreground(renderable_t r, v2d_t camera_position);
 static void render_water(renderable_t r, v2d_t camera_position);
 
-static int ypos_particles(renderable_t r);
 static int ypos_player(renderable_t r);
 static int ypos_item(renderable_t r);
 static int ypos_object(renderable_t r);
@@ -156,7 +151,6 @@ static int ypos_background(renderable_t r);
 static int ypos_foreground(renderable_t r);
 static int ypos_water(renderable_t r);
 
-static texturehandle_t texture_particles(renderable_t r);
 static texturehandle_t texture_player(renderable_t r);
 static texturehandle_t texture_item(renderable_t r);
 static texturehandle_t texture_object(renderable_t r);
@@ -171,7 +165,6 @@ static texturehandle_t texture_background(renderable_t r);
 static texturehandle_t texture_foreground(renderable_t r);
 static texturehandle_t texture_water(renderable_t r);
 
-static const char* path_particles(renderable_t r, char* dest, size_t dest_size);
 static const char* path_player(renderable_t r, char* dest, size_t dest_size);
 static const char* path_item(renderable_t r, char* dest, size_t dest_size);
 static const char* path_object(renderable_t r, char* dest, size_t dest_size);
@@ -186,7 +179,6 @@ static const char* path_background(renderable_t r, char* dest, size_t dest_size)
 static const char* path_foreground(renderable_t r, char* dest, size_t dest_size);
 static const char* path_water(renderable_t r, char* dest, size_t dest_size);
 
-static int type_particles(renderable_t r);
 static int type_player(renderable_t r);
 static int type_item(renderable_t r);
 static int type_object(renderable_t r);
@@ -201,7 +193,6 @@ static int type_background(renderable_t r);
 static int type_foreground(renderable_t r);
 static int type_water(renderable_t r);
 
-static bool is_translucent_particles(renderable_t r);
 static bool is_translucent_player(renderable_t r);
 static bool is_translucent_item(renderable_t r);
 static bool is_translucent_object(renderable_t r);
@@ -285,16 +276,6 @@ static const renderable_vtable_t VTABLE[] = {
         .path = path_player,
         .type = type_player,
         .is_translucent = is_translucent_player
-    },
-
-    [TYPE_PARTICLE] = {
-        .zindex = zindex_particles,
-        .render = render_particles,
-        .ypos = ypos_particles,
-        .texture = texture_particles,
-        .path = path_particles,
-        .type = type_particles,
-        .is_translucent = is_translucent_particles
     },
 
     [TYPE_SSOBJECT] = {
@@ -947,24 +928,6 @@ void renderqueue_enqueue_player(player_t *player)
 }
 
 /*
- * renderqueue_enqueue_particles()
- * Enqueues the level particles
- */
-void renderqueue_enqueue_particles()
-{
-    renderqueue_entry_t entry = {
-        .renderable.dummy = NULL,
-        .vtable = &VTABLE[TYPE_PARTICLE]
-    };
-
-    /* skip if there are no particles to render */
-    if(particle_is_empty())
-        return;
-
-    enqueue(&entry);
-}
-
-/*
  * renderqueue_enqueue_ssobject()
  * Enqueues a SurgeScript object
  */
@@ -1279,7 +1242,6 @@ const char* random_path(char prefix)
 
 /* ----- private strategies ----- */
 
-int type_particles(renderable_t r) { return TYPE_PARTICLE; }
 int type_player(renderable_t r) { return TYPE_PLAYER; }
 int type_item(renderable_t r) { return TYPE_ITEM; }
 int type_object(renderable_t r) { return TYPE_OBJECT; }
@@ -1294,7 +1256,6 @@ int type_background(renderable_t r) { return TYPE_BACKGROUND; }
 int type_foreground(renderable_t r) { return TYPE_FOREGROUND; }
 int type_water(renderable_t r) { return TYPE_WATER; }
 
-float zindex_particles(renderable_t r) { return 1.0f; }
 float zindex_player(renderable_t r) { return player_is_dying(r.player) ? (1.0f - ZINDEX_OFFSET(1)) : 0.5f; }
 float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f); }
 float zindex_object(renderable_t r) { return r.object->zindex; }
@@ -1309,7 +1270,6 @@ float zindex_background(renderable_t r) { return 0.0f; }
 float zindex_foreground(renderable_t r) { return 1.0f; }
 float zindex_water(renderable_t r) { return 1.0f; }
 
-int ypos_particles(renderable_t r) { return 0; }
 int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
 int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
 int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
@@ -1324,7 +1284,6 @@ int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes *
 int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_water(renderable_t r) { return 0; } /* not needed */
 
-bool is_translucent_particles(renderable_t r) { return false; }
 bool is_translucent_player(renderable_t r) { return false; }
 bool is_translucent_item(renderable_t r) { return false; }
 bool is_translucent_object(renderable_t r) { return false; }
@@ -1353,7 +1312,6 @@ bool is_translucent_ssobject(renderable_t r)
     return false;
 }
 
-const char* path_particles(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<particles>", dest_size); }
 const char* path_player(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, image_filepath(actor_image(r.player->actor)), dest_size); }
 const char* path_item(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<legacy-item>", dest_size); }
 const char* path_object(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<legacy-object>", dest_size); }
@@ -1396,7 +1354,6 @@ const char* path_ssobject_gizmo(renderable_t r, char* dest, size_t dest_size)
     return str_cpy(dest, random_path('G'), dest_size);
 }
 
-texturehandle_t texture_particles(renderable_t r) { return NO_TEXTURE; }
 texturehandle_t texture_player(renderable_t r) { return NO_TEXTURE; /* TODO? */ }
 texturehandle_t texture_item(renderable_t r) { return NO_TEXTURE; /* legacy TODO: remove */ }
 texturehandle_t texture_object(renderable_t r) { return NO_TEXTURE; /* legacy TODO: remove */ }
@@ -1450,11 +1407,6 @@ texturehandle_t texture_ssobject(renderable_t r)
 
 
 /* --- private rendering routines --- */
-
-void render_particles(renderable_t r, v2d_t camera_position)
-{
-    particle_render(camera_position);
-}
 
 void render_player(renderable_t r, v2d_t camera_position)
 {

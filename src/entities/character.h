@@ -88,7 +88,7 @@ struct character_t {
 /* initializes the character system */
 void charactersystem_init();
 
-/* releases the particle system */
+/* releases the character system */
 void charactersystem_release();
 
 /* gets the meta data of a character */

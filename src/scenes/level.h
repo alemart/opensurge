@@ -28,7 +28,7 @@
 #include "../entities/brick.h"
 
 /* scene methods */
-void level_init(void *path_to_lev_file); /* pass an string containing the path to the .lev file */
+void level_init(void *path_to_lev_file); /* pass a string containing the path to the .lev file */
 void level_update();
 void level_render();
 void level_release();
@@ -67,7 +67,6 @@ struct player_t* level_get_player_by_id(int id);
 
 /* level objects */
 struct brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip);
-void level_create_particle(const struct image_t* source_image, int source_x, int source_y, int width, int height, v2d_t position, v2d_t speed);
 struct item_t* level_create_legacy_item(int id, v2d_t position);
 struct enemy_t* level_create_legacy_object(const char *name, v2d_t position);
 surgescript_object_t* level_create_object(const char* object_name, v2d_t position);
@@ -87,7 +86,7 @@ struct music_t* level_music();
 
 /* management */
 void level_change(const char* path_to_lev_file); /* change the level */
-int level_persist(); /* saves the current level */
+int level_persist(); /* save the current level */
 void level_clear(struct actor_t *end_sign);
 int level_has_been_cleared();
 void level_jump_to_next_stage();

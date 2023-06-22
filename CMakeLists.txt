@@ -400,7 +400,6 @@ SET(GAME_SRCS
   src/entities/camera.c
   src/entities/character.c
   src/entities/player.c
-  src/entities/particle.c
   src/entities/renderqueue.c
 
   src/misc/icon.c
@@ -502,7 +501,6 @@ SET(GAME_HEADERS
   src/entities/camera.h
   src/entities/character.h
   src/entities/player.h
-  src/entities/particle.h
   src/entities/renderqueue.h
   src/entities/sfx.h
 
