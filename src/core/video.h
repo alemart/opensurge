@@ -91,5 +91,6 @@ void video_display_loading_screen();
 const char* video_get_window_title();
 v2d_t video_convert_window_to_screen(v2d_t window_coordinates);
 struct image_t* video_take_snapshot();
+bool video_use_default_shader();
 
 #endif

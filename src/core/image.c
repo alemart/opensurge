@@ -86,9 +86,6 @@ image_t* image_load(const char* path)
             return NULL;
         }
 
-        /* convert mask to alpha */
-        al_convert_mask_to_alpha(img->data, al_map_rgb(255, 0, 255));
-
         /* adding the image to the resource manager */
         img->path = str_dup(path);
         resourcemanager_add_image(img->path, img);

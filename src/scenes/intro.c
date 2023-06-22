@@ -67,11 +67,12 @@ void intro_init(void *foo)
     in = input_create_user(NULL);
 
     /* create box */
-    box = image_create(VIDEO_SCREEN_W * 3 / 2, VIDEO_SCREEN_H * 9 / 10);
     target = image_drawing_target();
+    box = image_create(VIDEO_SCREEN_W * 3 / 2, VIDEO_SCREEN_H * 9 / 10);
     image_set_drawing_target(box);
     image_clear(color_hex(SECONDARY_COLOR));
     image_set_drawing_target(target);
+    video_use_default_shader();
 
     /* create font */
     fnt = font_create(INTRO_FONT);

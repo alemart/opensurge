@@ -366,18 +366,18 @@ static const char vs_glsl[] = ""
     "#define projview " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX "\n"
     "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n"
     "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n"
-    "\n"
+
     "attribute vec4 a_position;\n"
     "attribute vec4 a_color;\n"
     "attribute vec2 a_texcoord;\n"
-    "\n"
+
     "varying vec4 v_color;\n"
     "varying vec2 v_texcoord;\n"
-    "\n"
+
     "uniform mat4 projview;\n"
     "uniform mat4 texmatrix;\n"
     "uniform bool use_texmatrix;\n"
-    "\n"
+
     "void main()\n"
     "{\n"
     "   mat4 m = use_texmatrix ? texmatrix : mat4(1.0);\n"
@@ -394,18 +394,22 @@ static const char fs_glsl_without_alpha_testing[] = ""
     "#ifdef GL_ES\n"
     "precision lowp float;\n"
     "#endif\n"
-    "\n"
+
     "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
     "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
-    "\n"
+
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
     "varying vec4 v_color;\n" /* tint */
     "varying vec2 v_texcoord;\n"
-    "\n"
+
+    "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
+
     "void main()\n"
     "{\n"
     "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
+    "   p *= float(p.rgb != MASK_COLOR);\n" /* set all components to zero; we use a premultiplied alpha workflow */
+
     "   gl_FragColor = v_color * p;\n"
     "}\n"
 "";
@@ -414,18 +418,21 @@ static const char fs_glsl_with_alpha_testing[] = ""
     "#ifdef GL_ES\n"
     "precision lowp float;\n"
     "#endif\n"
-    "\n"
+
     "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
     "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
-    "\n"
+
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
     "varying vec4 v_color;\n" /* tint */
     "varying vec2 v_texcoord;\n"
-    "\n"
+
+    "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
+
     "void main()\n"
     "{\n"
     "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
+    "   p *= float(p.rgb != MASK_COLOR);\n" /* we set alpha = 0 too */
 
         /* alpha test: discard the fragment (and don't write to the depth buffer) if alpha is zero */
     "   if(p.a == 0.0)\n"
@@ -558,7 +565,10 @@ void renderqueue_init(bool want_depth_buffer)
     LOG("will %s alpha testing", use_depth_buffer ? "perform" : "not perform");
 
     shader = al_create_shader(ALLEGRO_SHADER_GLSL);
-    if(!al_attach_shader_source(shader, ALLEGRO_VERTEX_SHADER, vs_glsl)) {
+    if(shader == NULL) {
+        LOG("Can't create GLSL shader.");
+    }
+    else if(!al_attach_shader_source(shader, ALLEGRO_VERTEX_SHADER, vs_glsl)) {
         LOG("Can't compile the vertex shader. %s", al_get_shader_log(shader));
         al_destroy_shader(shader);
         shader = NULL;
@@ -586,6 +596,7 @@ void renderqueue_release()
 {
     LOG("releasing...");
 
+    video_use_default_shader();
     if(shader != NULL) {
         al_destroy_shader(shader);
         shader = NULL;
@@ -788,9 +799,9 @@ void renderqueue_end()
     REPORT("Draw calls: %3d <-%.2f%%>", draw_calls, 100.0f * savings);
     REPORT_END();
 
-    /* go back to the default shader set by Allegro */
+    /* go back to the default shader */
     if(shader != NULL)
-        al_use_shader(NULL);
+        video_use_default_shader();
 
     /* clean up */
     buffer_size = 0;
