@@ -23,12 +23,12 @@
 #include <physfs.h>
 #include <stdio.h>
 #include <string.h>
-#include "physfs/ignorecase.h"
 #include "asset.h"
 #include "global.h"
 #include "logfile.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../third_party/ignorecase.h"
 
 /* The default directory of the game assets provided by upstream (*nix only) */
 #ifndef GAME_DATADIR

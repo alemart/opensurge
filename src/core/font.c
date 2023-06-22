@@ -37,11 +37,11 @@
 #include "logfile.h"
 #include "nanoparser.h"
 #include "input.h"
-#include "../util/utf8.h"
 #include "../util/stringutil.h"
 #include "../util/hashtable.h"
 #include "../entities/player.h"
 #include "../scenes/level.h"
+#include "../third_party/utf8.h"
 
 /* private stuff */
 #define FONT_STACKCAPACITY          8        /* color stack capacity */

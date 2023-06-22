@@ -279,7 +279,6 @@ ENDIF()
 # adding sources
 SET(GAME_SRCS
   src/core/nanoparser.c
-  src/core/physfs/ignorecase.c
   src/core/asset.c
   src/core/audio.c
   src/core/color.c
@@ -309,7 +308,6 @@ SET(GAME_SRCS
   src/util/iterator.c
   src/util/numeric.c
   src/util/stringutil.c
-  src/util/utf8.c
   src/util/util.c
   src/util/v2d.c
 
@@ -402,6 +400,9 @@ SET(GAME_SRCS
   src/entities/player.c
   src/entities/renderqueue.c
 
+  src/third_party/ignorecase.c
+  src/third_party/utf8.c
+
   src/misc/icon.c
   ${CMAKE_CURRENT_BINARY_DIR}/src/misc/credits.c
 
@@ -411,7 +412,6 @@ SET(GAME_SRCS
 # adding headers
 SET(GAME_HEADERS
   src/core/nanoparser.h
-  src/core/physfs/ignorecase.h
   src/core/asset.h
   src/core/audio.h
   src/core/color.h
@@ -444,7 +444,6 @@ SET(GAME_HEADERS
   src/util/iterator.h
   src/util/numeric.h
   src/util/stringutil.h
-  src/util/utf8.h
   src/util/util.h
   src/util/v2d.h
 
@@ -503,6 +502,9 @@ SET(GAME_HEADERS
   src/entities/player.h
   src/entities/renderqueue.h
   src/entities/sfx.h
+
+  src/third_party/ignorecase.h
+  src/third_party/utf8.h
 
   src/misc/iconwin.rc
 )
