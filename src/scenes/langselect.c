@@ -36,12 +36,12 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/mobile_gamepad.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/sfx.h"
 
 

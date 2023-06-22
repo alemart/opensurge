@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * mobile_gamepad.h - virtual gamepad for mobile devices
+ * mobilegamepad.h - virtual gamepad for mobile devices
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -20,16 +20,16 @@
 
 #include <allegro5/allegro.h>
 #include <stdbool.h>
-#include "mobile_gamepad.h"
-#include "engine.h"
-#include "logfile.h"
-#include "video.h"
-#include "timer.h"
-#include "v2d.h"
+#include "mobilegamepad.h"
+#include "actor.h"
+#include "../scenes/level.h"
+#include "../core/engine.h"
+#include "../core/logfile.h"
+#include "../core/video.h"
+#include "../core/timer.h"
+#include "../core/v2d.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
-#include "../entities/actor.h"
-#include "../scenes/level.h"
 
 
 

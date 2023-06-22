@@ -25,7 +25,7 @@
 #include "logfile.h"
 #include "timer.h"
 #include "inputmap.h"
-#include "mobile_gamepad.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/renderqueue.h"
 #include "../util/numeric.h"
 #include "../util/util.h"

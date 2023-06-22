@@ -33,8 +33,8 @@
 #include "../../core/input.h"
 #include "../../core/logfile.h"
 #include "../../entities/actor.h"
+#include "../../entities/mobilegamepad.h"
 #include "../../entities/sfx.h"
-#include "../../core/mobile_gamepad.h"
 #include "../../scenes/level.h"
 #include "../../scenes/quest.h"
 

@@ -31,7 +31,7 @@
 #include "../core/image.h"
 #include "../core/timer.h"
 #include "../core/lang.h"
-#include "../core/mobile_gamepad.h"
+#include "../entities/mobilegamepad.h"
 
 
 /* private data */

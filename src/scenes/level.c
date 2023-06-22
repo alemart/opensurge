@@ -54,7 +54,7 @@
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../util/iterator.h"
-#include "../core/mobile_gamepad.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
 #include "../entities/brickmanager.h"

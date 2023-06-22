@@ -34,12 +34,12 @@
 #include "../core/font.h"
 #include "../core/asset.h"
 #include "../core/logfile.h"
-#include "../core/mobile_gamepad.h"
 #include "../util/csv.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/sfx.h"
 
 

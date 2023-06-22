@@ -33,7 +33,7 @@
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
-#include "../core/mobile_gamepad.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/sfx.h"
 
 /* private data */

@@ -20,7 +20,7 @@
 
 #include <surgescript.h>
 #include "../core/global.h"
-#include "../core/mobile_gamepad.h"
+#include "../entities/mobilegamepad.h"
 
 /* private */
 static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

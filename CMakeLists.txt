@@ -292,7 +292,6 @@ SET(GAME_SRCS
   src/core/inputmap.c
   src/core/lang.c
   src/core/logfile.c
-  src/core/mobile_gamepad.c
   src/core/web.c
   src/core/prefs.c
   src/core/quest.c
@@ -399,6 +398,7 @@ SET(GAME_SRCS
   src/entities/brickmanager.c
   src/entities/camera.c
   src/entities/character.c
+  src/entities/mobilegamepad.c
   src/entities/player.c
   src/entities/renderqueue.c
 
@@ -426,7 +426,6 @@ SET(GAME_HEADERS
   src/core/inputmap.h
   src/core/lang.h
   src/core/logfile.h
-  src/core/mobile_gamepad.h
   src/core/web.h
   src/core/prefs.h
   src/core/quest.h
@@ -500,6 +499,7 @@ SET(GAME_HEADERS
   src/entities/brickmanager.h
   src/entities/camera.h
   src/entities/character.h
+  src/entities/mobilegamepad.h
   src/entities/player.h
   src/entities/renderqueue.h
   src/entities/sfx.h

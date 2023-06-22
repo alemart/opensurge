@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * mobile_gamepad.h - virtual gamepad for mobile devices
+ * mobilegamepad.h - virtual gamepad for mobile devices
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -43,14 +43,14 @@ enum {
 enum {
     MOBILEGAMEPAD_DISABLED          = 0,
     MOBILEGAMEPAD_WANT_TOUCH_INPUT  = 1,
-    MOBILEGAMEPAD_WANT_MOUSE_INPUT  = 1 << 1,
+    MOBILEGAMEPAD_WANT_MOUSE_INPUT  = 1 << 1
+};
 
 #if defined(__ANDROID__)
-    MOBILEGAMEPAD_DEFAULT_FLAGS     = MOBILEGAMEPAD_WANT_TOUCH_INPUT
+#define MOBILEGAMEPAD_DEFAULT_FLAGS (MOBILEGAMEPAD_WANT_TOUCH_INPUT)
 #else
-    MOBILEGAMEPAD_DEFAULT_FLAGS     = MOBILEGAMEPAD_WANT_TOUCH_INPUT | MOBILEGAMEPAD_WANT_MOUSE_INPUT
+#define MOBILEGAMEPAD_DEFAULT_FLAGS (MOBILEGAMEPAD_WANT_TOUCH_INPUT | MOBILEGAMEPAD_WANT_MOUSE_INPUT)
 #endif
-};
 
 /* state of the mobile gamepad */
 typedef struct mobilegamepad_state_t mobilegamepad_state_t;
