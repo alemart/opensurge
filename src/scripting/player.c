@@ -427,8 +427,10 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
                     /* make the companion an entity, so that it
                        abides by Entity-Component-System rules */
-                    surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
-                    surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
+                    if(!surgescript_tagsystem_has_tag(tag_system, companion_name, "entity")) {
+                        surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
+                        surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
+                    }
 
                     /* spawn the companion */
                     if(surgescript_object_child(object, companion_name) == null_handle) {
