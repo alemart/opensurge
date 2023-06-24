@@ -73,7 +73,7 @@ void *__mallocx(size_t bytes, const char* location)
     void *p = malloc(bytes);
 
     if(!p)
-        fatal_error("Out of memory in mallocx(%u) at %s", bytes, location);
+        fatal_error("Out of memory in %s(%u) at %s", __func__, bytes, location);
 
     return p;
 }
@@ -89,7 +89,7 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
     void *p = realloc(ptr, bytes);
 
     if(!p)
-        fatal_error("Out of memory in reallocx(%u) at %s", bytes, location);
+        fatal_error("Out of memory in %s(%u) at %s", __func__, bytes, location);
 
     return p;
 }
@@ -103,9 +103,9 @@ void* __reallocx(void *ptr, size_t bytes, const char* location)
  * game_version_compare()
  * Compares the given parameters to the version
  * of the game. Returns:
- * < 0 (game version is inferior),
+ * < 0 (game version is less than),
  * = 0 (same version),
- * > 0 (game version is superior)
+ * > 0 (game version is greater than)
  */
 int game_version_compare(int sup_version, int sub_version, int wip_version)
 {
