@@ -62,6 +62,7 @@ texturehandle_t image_texture(const image_t* img); /* get texture handle */
 /* pixel manipulation */
 void image_lock(image_t* img);
 void image_unlock(image_t* img);
+bool image_is_locked(const image_t* img);
 color_t image_getpixel(const image_t* img, int x, int y);
 void image_putpixel(int x, int y, color_t color);
 

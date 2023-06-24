@@ -349,6 +349,15 @@ void image_unlock(image_t* img)
     al_unlock_bitmap(img->data);
 }
 
+/*
+ * image_is_locked()
+ * Is the image locked?
+ */
+bool image_is_locked(const image_t* img)
+{
+    /* this may not work properly if the input is a sub-image */
+    return al_is_bitmap_locked(img->data);
+}
 
 /*
  * image_width()
