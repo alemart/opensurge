@@ -1113,10 +1113,13 @@ surgescript_object_t* create_particle(const brick_t* brick, int source_x, int so
     surgescript_object_call_function(particle, "setVelocity", args2, 2, NULL);
 
     /* call particle.set_zindex(zindex) */
+    /*
+    // the zindex of the brick is already set by setBrick()
     const surgescript_var_t* args3[] = {
-        surgescript_var_set_number(x, brick_zindex(brick))
+        surgescript_var_set_number(x, 1.0)
     };
     surgescript_object_call_function(particle, "set_zindex", args3, 1, NULL);
+    */
 
     /* release auxiliary variables */
     surgescript_var_destroy(h);

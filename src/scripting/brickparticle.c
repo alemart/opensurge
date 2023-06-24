@@ -20,13 +20,14 @@
 
 #include <surgescript.h>
 #include "scripting.h"
-#include "../entities/brick.h"
-#include "../entities/camera.h"
 #include "../core/timer.h"
 #include "../core/image.h"
 #include "../core/video.h"
 #include "../util/v2d.h"
 #include "../util/util.h"
+#include "../entities/brick.h"
+#include "../entities/camera.h"
+#include "../scenes/level.h"
 
 /* brick particle data */
 typedef struct particledata_t particledata_t;
@@ -39,7 +40,6 @@ struct particledata_t
 };
 
 /* constants */
-static const float GRAVITY = (56.0f / 256.0f) * 60.0f * 60.0f; /* px/s^2 */
 static const double DEFAULT_ZINDEX = 0.5;
 
 /* SurgeScript functions */
@@ -109,7 +109,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     float dt = timer_get_delta();
 
     /* update velocity */
-    float grv = GRAVITY;
+    float grv = level_gravity();
     pd->velocity.y += grv * dt;
 
     /* update position */
@@ -193,6 +193,7 @@ surgescript_var_t* fun_setbrick(surgescript_object_t* object, const surgescript_
         const image_t* brick_image = brick_image_preview(brick_id);
         int brick_width = image_width(brick_image);
         int brick_height = image_height(brick_image);
+        float zindex = brick_zindex_preview(brick_id);
 
         particledata_t* pd = get_particledata(object);
         pd->image = brick_image;
@@ -200,6 +201,7 @@ surgescript_var_t* fun_setbrick(surgescript_object_t* object, const surgescript_
         pd->height = clip(height, 0, brick_height);
         pd->src_x = clip(src_x, 0, brick_width - pd->width);
         pd->src_y = clip(src_y, 0, brick_height - pd->height);
+        pd->zindex = max(0.0f, zindex);
     }
 
     return NULL;
