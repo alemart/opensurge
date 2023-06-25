@@ -21,6 +21,8 @@
 #ifndef _BRICKMANAGER_H
 #define _BRICKMANAGER_H
 
+#include "../util/rect.h"
+
 /* forward declarations */
 typedef struct brickmanager_t brickmanager_t;
 struct brickmanager_t;
@@ -39,7 +41,7 @@ void brickmanager_remove_all_bricks(brickmanager_t* manager);
 int brickmanager_number_of_bricks(const brickmanager_t* manager);
 
 /* retrieval */
-void brickmanager_set_roi(brickmanager_t* manager, int x, int y, int width, int height); /* set region of interest */
+void brickmanager_set_roi(brickmanager_t* manager, rect_t roi); /* set region of interest */
 struct iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager); /* efficient retrieval based on a Region Of Interest (ROI) */
 struct iterator_t* brickmanager_retrieve_all_bricks(const brickmanager_t* manager);
 

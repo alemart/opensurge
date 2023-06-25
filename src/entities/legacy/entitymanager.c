@@ -132,12 +132,12 @@ void entitymanager_store_object(enemy_t *object)
     object_count++;
 }
 
-void entitymanager_set_active_region(int rectangle_xpos, int rectangle_ypos, int rectangle_width, int rectangle_height)
+void entitymanager_set_active_region(rect_t roi)
 {
-    active_rectangle_xpos = rectangle_xpos;
-    active_rectangle_ypos = rectangle_ypos;
-    active_rectangle_width = rectangle_width;
-    active_rectangle_height = rectangle_height;
+    active_rectangle_xpos = roi.x;
+    active_rectangle_ypos = roi.y;
+    active_rectangle_width = roi.width;
+    active_rectangle_height = roi.height;
 }
 
 brick_list_t* entitymanager_retrieve_active_bricks()

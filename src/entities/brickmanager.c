@@ -367,8 +367,12 @@ void brickmanager_recalculate_world_size(brickmanager_t* manager)
  * Sets the current Region Of Interest (ROI) in world space.
  * Coordinates are inclusive.
  */
-void brickmanager_set_roi(brickmanager_t* manager, int x, int y, int width, int height)
+void brickmanager_set_roi(brickmanager_t* manager, rect_t roi)
 {
+    int x = roi.x;
+    int y = roi.y;
+    int width = roi.width;
+    int height = roi.height;
     int world_width = manager->world_width;
     int world_height = manager->world_height;
 

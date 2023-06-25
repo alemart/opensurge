@@ -51,6 +51,7 @@
 #include "../core/prefs.h"
 #include "../util/darray.h"
 #include "../util/numeric.h"
+#include "../util/rect.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../util/iterator.h"
@@ -157,6 +158,9 @@ static void save_level_state(levelstate_t* state);
 static void restore_level_state(const levelstate_t* state);
 static void clear_level_state(levelstate_t* state);
 
+/* region of interest */
+static rect_t create_roi(v2d_t camera, int margin);
+
 /* internal data */
 static float level_timer;
 static music_t *music;
@@ -229,7 +233,7 @@ static inline surgescript_object_t* entitymanager_ssobject();
 static void update_ssobjects();
 static void late_update_ssobjects();
 static void render_ssobjects();
-static void set_entitymanager_roi(int x, int y, int width, int height);
+static void set_entitymanager_roi(rect_t roi);
 static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
 static void notify_ssobjects(const char* fun_name);
 
@@ -1322,24 +1326,13 @@ void level_update()
 
     /* getting the major entities */
     /* note: bricks should use a larger margin when compared to SurgeScript entities */
-    brickmanager_set_roi(brick_manager,
-        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
-        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
-        3*VIDEO_SCREEN_W,
-        3*VIDEO_SCREEN_H
-    );
-    entitymanager_set_active_region(
-        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
-        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
-        3*VIDEO_SCREEN_W,
-        3*VIDEO_SCREEN_H
-    );
-    set_entitymanager_roi(
-        (int)cam.x - VIDEO_SCREEN_W,
-        (int)cam.y - VIDEO_SCREEN_H,
-        2*VIDEO_SCREEN_W,
-        2*VIDEO_SCREEN_H
-    );
+    const int BRICK_MARGIN = 128;
+    rect_t brick_roi = create_roi(cam, BRICK_MARGIN);
+    rect_t entity_roi = create_roi(cam, 0);
+
+    brickmanager_set_roi(brick_manager, brick_roi);
+    set_entitymanager_roi(entity_roi);
+    entitymanager_set_active_region(entity_roi); /* legacy */
 
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
@@ -1529,24 +1522,11 @@ void level_render()
        entitymanager_set_active_region() was called (i.e., via scripting).
        Let's make sure that we keep our active region updated. */
     v2d_t cam = camera_get_position(); /* we're not in editor mode */
-    brickmanager_set_roi(brick_manager,
-        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
-        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
-        3*VIDEO_SCREEN_W,
-        3*VIDEO_SCREEN_H
-    );
-    entitymanager_set_active_region(
-        (int)cam.x - (VIDEO_SCREEN_W*3)/2,
-        (int)cam.y - (VIDEO_SCREEN_H*3)/2,
-        3*VIDEO_SCREEN_W,
-        3*VIDEO_SCREEN_H
-    );
-    set_entitymanager_roi(
-        (int)cam.x - VIDEO_SCREEN_W,
-        (int)cam.y - VIDEO_SCREEN_H,
-        2*VIDEO_SCREEN_W,
-        2*VIDEO_SCREEN_H
-    );
+    rect_t roi = create_roi(cam, 0);
+
+    brickmanager_set_roi(brick_manager, roi);
+    set_entitymanager_roi(roi);
+    entitymanager_set_active_region(roi); /* legacy */
 
     /* retrieve lists of active entities */
     major_items = entitymanager_retrieve_active_items();
@@ -2604,6 +2584,29 @@ void clear_level_state(levelstate_t* state)
 
 
 
+/* region of interest */
+
+/* create a region of interest */
+rect_t create_roi(v2d_t camera, int margin)
+{
+    const int DEFAULT_ROI_MARGIN = 256;
+    int m = DEFAULT_ROI_MARGIN + margin;
+
+    v2d_t screen_size = video_get_screen_size();
+    v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
+
+    int dx = (int)half_screen_size.x + m;
+    int dy = (int)half_screen_size.y + m;
+
+    return rect_new(
+        (int)camera.x - dx,
+        (int)camera.y - dy,
+        2*dx,
+        2*dy
+    );
+}
+
+
 /* obstacle map */
 
 /* create the obstacle map */
@@ -2797,14 +2800,14 @@ void render_ssobjects()
 }
 
 /* set the Region of Interest (ROI) of the SurgeScript Entity Manager */
-void set_entitymanager_roi(int x, int y, int width, int height)
+void set_entitymanager_roi(rect_t roi)
 {
     surgescript_object_t* entity_manager = entitymanager_ssobject();
     surgescript_var_t* args[4] = {
-        surgescript_var_set_number(surgescript_var_create(), x),
-        surgescript_var_set_number(surgescript_var_create(), y),
-        surgescript_var_set_number(surgescript_var_create(), width),
-        surgescript_var_set_number(surgescript_var_create(), height)
+        surgescript_var_set_number(surgescript_var_create(), roi.x),
+        surgescript_var_set_number(surgescript_var_create(), roi.y),
+        surgescript_var_set_number(surgescript_var_create(), roi.width),
+        surgescript_var_set_number(surgescript_var_create(), roi.height)
     };
 
     surgescript_object_call_function(
@@ -3155,25 +3158,13 @@ void editor_update()
 
     /* ----------------------------------------- */
 
+    /* set the region of interest */
     v2d_t cam = editor_camera;
-    brickmanager_set_roi(brick_manager,
-        (int)cam.x - VIDEO_SCREEN_W,
-        (int)cam.y - VIDEO_SCREEN_H,
-        2*VIDEO_SCREEN_W,
-        2*VIDEO_SCREEN_H
-    );
-    entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W,
-        (int)cam.y - VIDEO_SCREEN_H,
-        2*VIDEO_SCREEN_W,
-        2*VIDEO_SCREEN_H
-    );
-    set_entitymanager_roi(
-        (int)cam.x - VIDEO_SCREEN_W,
-        (int)cam.y - VIDEO_SCREEN_H,
-        2*VIDEO_SCREEN_W,
-        2*VIDEO_SCREEN_H
-    );
+    rect_t roi = create_roi(cam, 0);
+
+    brickmanager_set_roi(brick_manager, roi);
+    set_entitymanager_roi(roi);
+    entitymanager_set_active_region(roi); /* legacy */
 
     /* get legacy entities */
     major_enemies = entitymanager_retrieve_active_objects();
