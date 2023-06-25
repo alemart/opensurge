@@ -28,24 +28,29 @@ typedef struct point_t {
 } point_t;
 
 /* Constructor */
-#define point_new(x, y) (point_t){ (x), (y) }
+#define point_new(x, y) ((point_t){ (x), (y) })
 
 /* Equality test */
-#define point_equals(p1, p2) ((p1) == (p2))
+#define point_equals(p1, p2) ( \
+    (p1).x == (p2).x && \
+    (p1).y == (p2).y \
+)
 
 /* Addition p1 + p2 */
-#define point_add(p1, p2) (point_t){ \
+#define point_add(p1, p2) point_new( \
     (p1).x + (p2).x, \
     (p1).y + (p2).y \
-}
+)
 
 /* Subtraction p1 - p2 */
-#define point_subtract(p1, p2) (point_t){ \
+#define point_subtract(p1, p2) point_new( \
     (p1).x - (p2).x, \
     (p1).y - (p2).y \
-}
+)
 
 /* Dot product */
-#define point_dot(p1, p2) ((p1).x * (p2).x + (p1).y * (p2).y)
+#define point_dot(p1, p2) ( \
+    (p1).x * (p2).x + (p1).y * (p2).y \
+)
 
 #endif

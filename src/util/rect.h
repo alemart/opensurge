@@ -30,13 +30,20 @@ typedef struct rect_t {
 } rect_t;
 
 /* Constructor */
-#define rect_new(x, y, width, height) (rect_t){ (x), (y), (width), (height) }
+#define rect_new(x, y, width, height) ((rect_t){ (x), (y), (width), (height) })
 
 /* Area of the rectangle */
-#define rect_area(r) ((r).width * (r).height)
+#define rect_area(r) ( \
+    (r).width * (r).height \
+)
 
 /* Equality test */
-#define rect_equals(r1, r2) ((r1) == (r2))
+#define rect_equals(r1, r2) ( \
+    (r1).x == (r2).x && \
+    (r1).y == (r2).y && \
+    (r1).width == (r2).width && \
+    (r1).height == (r2).height \
+)
 
 /* Does rectangle r contains point p?
    p is a point_t or a v2d_t */
@@ -46,11 +53,22 @@ typedef struct rect_t {
 )
 
 /* Do rectangles r1 and r2 overlap? */
-#define rect_overlaps(r1, r2) !( \
+#define rect_overlaps(r1, r2) (!( \
     (r1).x >= (r2).x + (r2).width || \
     (r2).x >= (r1).x + (r1).width || \
     (r1).y >= (r2).y + (r2).height || \
     (r2).y >= (r1).y + (r1).height \
+))
+
+/* Rectangle intersection */
+#define rect_intersect(r1, r2) ( \
+    !rect_overlaps((r1), (r2)) ? rect_new(0, 0, 0, 0) : \
+    rect_new( \
+        (r1).x > (r2).x ? (r1).x : (r2).x, \
+        (r1).y > (r2).y ? (r1).y : (r2).y, \
+        ((r1).x + (r1).width < (r2).x + (r2).width ? (r1).x + (r1).width : (r2).x + (r2).width) - ((r1).x > (r2).x ? (r1).x : (r2).x), \
+        ((r1).y + (r1).height < (r2).y + (r2).height ? (r1).y + (r1).height : (r2).y + (r2).height) - ((r1).y > (r2).y ? (r1).y : (r2).y) \
+    ) \
 )
 
 #endif
