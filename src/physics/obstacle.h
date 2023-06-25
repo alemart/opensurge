@@ -33,8 +33,12 @@ struct obstacle_t;
 typedef struct obstacle_t obstacle_t;
 
 /* obstacle flags */
-extern const int OF_SOLID, OF_CLOUD;
-extern const int OF_HFLIP, OF_VFLIP;
+enum {
+    OF_SOLID = 0x0,
+    OF_CLOUD = 0x1,
+    OF_HFLIP = 0x2,
+    OF_VFLIP = 0x4
+};
 
 /* obstacle layer */
 typedef enum obstaclelayer_t obstaclelayer_t;

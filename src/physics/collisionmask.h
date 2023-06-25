@@ -21,6 +21,8 @@
 #ifndef _COLLISIONMASK_H
 #define _COLLISIONMASK_H
 
+#include <stdint.h>
+#include <stdbool.h>
 #include "../core/color.h"
 
 struct image_t;
@@ -40,8 +42,9 @@ int collisionmask_pitch(const collisionmask_t* mask);
 
 /* collision checking */
 /* WARNING: no boundary checking and no (mask == NULL) checking!! (for faster access) */
-#define collisionmask_at(mask, x, y, pitch) *(*((char**)(mask)) + (y) * (pitch) + (x)) /* fast */
-int collisionmask_peek(const collisionmask_t* mask, int x, int y); /* mask value with boundary checking (slower) */
+#define collisionmask_at(mask, x, y, pitch) (*(*((const uint8_t**)(mask)) + (y) * (pitch) + (x))) /* fast pixel test */
+bool collisionmask_pixel_test(const collisionmask_t* mask, int x, int y); /* slower pixel test with boundary checking */
+bool collisionmask_area_test(const collisionmask_t* mask, int left, int top, int right, int bottom); /* fast area test */
 
 /* locating the ground */
 typedef enum { GD_DOWN, GD_LEFT, GD_UP, GD_RIGHT } grounddir_t;
