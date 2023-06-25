@@ -111,7 +111,7 @@ struct brickiteratorstate_t
 };
 
 /* Utilities */
-#define GRID_SIZE 512 /* width and height of a cell of the spatial hash */
+#define GRID_SIZE 128 /* width and height of a cell of the spatial hash */
 #define SAMPLER_WIDTH 128 /* width of the fixed-size intervals of the sampler */
 #define SAMPLER_MAX_INDEX 16384 /* >= MAX_LEVEL_WIDTH / SAMPLER_WIDTH */
 
