@@ -633,8 +633,8 @@ void renderqueue_end()
 
     /* start reporting */
     REPORT_BEGIN();
-    REPORT("Render queue stats");
-    REPORT("------------------");
+    REPORT("Batching stats");
+    REPORT("--------------");
     REPORT("Depth test: % 3s", use_depth_buffer ? "yes" : "no");
 
     /* clear the screen */
