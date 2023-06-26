@@ -47,10 +47,11 @@ bool collisionmask_pixel_test(const collisionmask_t* mask, int x, int y); /* slo
 bool collisionmask_area_test(const collisionmask_t* mask, int left, int top, int right, int bottom); /* fast area test */
 
 /* locating the ground */
+#define FLIPPED_GROUNDDIR(dir) (((dir) + 2) & 3) /* flip a grounddir_t */
 typedef enum { GD_DOWN, GD_LEFT, GD_UP, GD_RIGHT } grounddir_t;
 int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, grounddir_t ground_direction);
 
-/* utilities */
+/* misc */
 struct image_t* collisionmask_to_image(const collisionmask_t* mask, color_t color);
 
 #endif

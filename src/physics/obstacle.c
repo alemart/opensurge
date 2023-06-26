@@ -26,8 +26,7 @@
 /* obstacle struct */
 struct obstacle_t
 {
-    int xpos;
-    int ypos;
+    point_t position; /* position in world space */
 
     uint16_t width;
     uint16_t height;
@@ -49,31 +48,19 @@ struct obstacle_t
         y = (obstacle)->height - y - 1; \
 } while(0)
 
-/* Safely access the lookup table of flipped ground directions */
-#define FLIPPED_GROUNDDIR(dir) FLIPPED_GROUNDDIR_TABLE[(dir) & 0x3]
-
-/* Lookup table of flipped ground directions */
-static const grounddir_t FLIPPED_GROUNDDIR_TABLE[] = {
-    [GD_DOWN] = GD_UP,
-    [GD_LEFT] = GD_RIGHT,
-    [GD_UP] = GD_DOWN,
-    [GD_RIGHT] = GD_LEFT
-};
-
 
 
 /* public methods */
-obstacle_t* obstacle_create(const collisionmask_t* mask, int xpos, int ypos, obstaclelayer_t layer, int flags)
+obstacle_t* obstacle_create(const collisionmask_t* mask, point_t position, obstaclelayer_t layer, int flags)
 {
-    return obstacle_create_ex(mask, xpos, ypos, layer, flags, NULL, NULL);
+    return obstacle_create_ex(mask, position, layer, flags, NULL, NULL);
 }
 
-obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata)
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, point_t position, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
-    o->xpos = xpos;
-    o->ypos = ypos;
+    o->position = position;
 
     o->layer = layer;
     o->flags = flags;
@@ -84,6 +71,9 @@ obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, 
 
     o->dtor = dtor;
     o->dtor_userdata = dtor_userdata;
+
+    if(o->mask == NULL || o->width == 0 || o->height == 0)
+        fatal_error("Obstacle with no mask / zero area"); /* this must never happen */
 
     return o;
 }
@@ -97,19 +87,14 @@ obstacle_t* obstacle_destroy(obstacle_t *obstacle)
     return NULL;
 }
 
-void obstacle_get_position(const obstacle_t *obstacle, int *xpos, int *ypos)
+point_t obstacle_get_position(const obstacle_t *obstacle)
 {
-    if(xpos != NULL)
-        *xpos = obstacle->xpos;
-
-    if(ypos != NULL)
-        *ypos = obstacle->ypos;
+    return obstacle->position;
 }
 
-void obstacle_set_position(obstacle_t* obstacle, int xpos, int ypos)
+void obstacle_set_position(obstacle_t* obstacle, point_t position)
 {
-    obstacle->xpos = xpos;
-    obstacle->ypos = ypos;
+    obstacle->position = position;
 }
 
 bool obstacle_is_solid(const obstacle_t *obstacle)
@@ -138,8 +123,8 @@ obstaclelayer_t obstacle_get_layer(const obstacle_t *obstacle)
 int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir_t ground_direction)
 {
     /* no need to perform any clipping */
-    x -= obstacle->xpos;
-    y -= obstacle->ypos;
+    x -= obstacle->position.x;
+    y -= obstacle->position.y;
     FLIP(obstacle, x, y);
 
     /* flip the ground direction */
@@ -157,17 +142,17 @@ int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir
         case GD_UP:
             y = collisionmask_locate_ground(obstacle->mask, x, y, ground_direction);
             FLIP(obstacle, x, y);
-            return obstacle->ypos + y;
+            return obstacle->position.y + y;
 
         case GD_LEFT:
         case GD_RIGHT:
             x = collisionmask_locate_ground(obstacle->mask, x, y, ground_direction);
             FLIP(obstacle, x, y);
-            return obstacle->xpos + x;
+            return obstacle->position.x + x;
     }
 
     /* this shouldn't happen */
-    return obstacle->ypos + obstacle->height - 1;
+    return obstacle->position.y + obstacle->height - 1;
 }
 
 /* detects a pixel-perfect collision between an obstacle and a sensor
@@ -175,8 +160,8 @@ int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir
 bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
 {
     /* this function needs to be highly performant! */
-    int o_x1 = obstacle->xpos;
-    int o_y1 = obstacle->ypos;
+    int o_x1 = obstacle->position.x;
+    int o_y1 = obstacle->position.y;
     int o_x2 = o_x1 + obstacle->width;
     int o_y2 = o_y1 + obstacle->height;
 
@@ -195,7 +180,7 @@ bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, 
                 int _y2 = min(y2, o_y2 - 1) - o_y1;
                 int _x = x1 - o_x1;
 
-                if((obstacle->flags & (OF_HFLIP | OF_VFLIP)) == 0) {
+                if((obstacle->flags & OF_VHFLIP) == 0) {
                     /* fast collision detection */
                     return collisionmask_area_test(mask, _x, _y1, _x, _y2);
                 }
@@ -215,7 +200,7 @@ bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, 
                 int _x2 = min(x2, o_x2 - 1) - o_x1;
                 int _y = y1 - o_y1;
 
-                if((obstacle->flags & (OF_HFLIP | OF_VFLIP)) == 0) {
+                if((obstacle->flags & OF_VHFLIP) == 0) {
                     /* fast collision detection */
                     return collisionmask_area_test(mask, _x1, _y, _x2, _y);
                 }
