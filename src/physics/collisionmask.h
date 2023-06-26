@@ -41,14 +41,13 @@ int collisionmask_height(const collisionmask_t* mask);
 int collisionmask_pitch(const collisionmask_t* mask);
 
 /* collision checking */
-/* WARNING: no boundary checking and no (mask == NULL) checking!! (for faster access) */
-#define collisionmask_at(mask, x, y, pitch) (*(*((const uint8_t**)(mask)) + (y) * (pitch) + (x))) /* fast pixel test */
+#define collisionmask_at(mask, x, y, pitch) (*(*((const uint8_t**)(mask)) + (y) * (pitch) + (x))) /* fast pixel test with no boundary checking and no (mask == NULL) checking!! */
 bool collisionmask_pixel_test(const collisionmask_t* mask, int x, int y); /* slower pixel test with boundary checking */
 bool collisionmask_area_test(const collisionmask_t* mask, int left, int top, int right, int bottom); /* fast area test */
 
 /* locating the ground */
-#define FLIPPED_GROUNDDIR(dir) (((dir) + 2) & 3) /* flip a grounddir_t */
-typedef enum { GD_DOWN, GD_LEFT, GD_UP, GD_RIGHT } grounddir_t;
+typedef enum grounddir_t { GD_DOWN, GD_LEFT, GD_UP, GD_RIGHT } grounddir_t;
+#define FLIPPED_GROUNDDIR(dir) (grounddir_t)(((dir) + 2) & 3) /* flip a grounddir_t */
 int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, grounddir_t ground_direction);
 
 /* misc */

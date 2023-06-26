@@ -144,7 +144,7 @@ brick_list_t* entitymanager_retrieve_active_bricks()
 {
     brick_list_t *list = NULL;
 
-    if(bricks != NULL) {
+    if(bricks != NULL && brick_count > 0) {
         spatialhash_brick_t_foreach(
             bricks,
             active_rectangle_xpos,
@@ -163,7 +163,7 @@ brick_list_t* entitymanager_retrieve_active_unmoving_bricks()
 {
     brick_list_t *list = NULL;
 
-    if(bricks != NULL) {
+    if(bricks != NULL && brick_count > 0) {
         spatialhash_brick_t_foreach(
             bricks,
             active_rectangle_xpos,
@@ -181,7 +181,7 @@ brick_list_t* entitymanager_retrieve_active_unmoving_bricks()
 item_list_t* entitymanager_retrieve_active_items()
 {
     item_list_t *list = NULL;
-    if(items != NULL)
+    if(items != NULL && item_count > 0)
         spatialhash_item_t_foreach(items, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_items);
     return list;
 }
@@ -189,7 +189,7 @@ item_list_t* entitymanager_retrieve_active_items()
 enemy_list_t* entitymanager_retrieve_active_objects()
 {
     enemy_list_t *list = NULL;
-    if(objects != NULL)
+    if(objects != NULL && object_count > 0)
         spatialhash_enemy_t_foreach(objects, active_rectangle_xpos, active_rectangle_ypos, active_rectangle_width, active_rectangle_height, (void*)(&list), retrieve_objects);
     return list;
 }
@@ -197,7 +197,7 @@ enemy_list_t* entitymanager_retrieve_active_objects()
 brick_list_t* entitymanager_retrieve_all_bricks()
 {
     brick_list_t *list = NULL;
-    if(bricks != NULL)
+    if(bricks != NULL && brick_count > 0)
         spatialhash_brick_t_forall(bricks, (void*)(&list), retrieve_bricks);
     return list;
 }
@@ -205,7 +205,7 @@ brick_list_t* entitymanager_retrieve_all_bricks()
 item_list_t* entitymanager_retrieve_all_items()
 {
     item_list_t *list = NULL;
-    if(items != NULL)
+    if(items != NULL && item_count > 0)
         spatialhash_item_t_forall(items, (void*)(&list), retrieve_items);
     return list;
 }
@@ -213,7 +213,7 @@ item_list_t* entitymanager_retrieve_all_items()
 enemy_list_t* entitymanager_retrieve_all_objects()
 {
     enemy_list_t *list = NULL;
-    if(objects != NULL)
+    if(objects != NULL && object_count > 0)
         spatialhash_enemy_t_forall(objects, (void*)(&list), retrieve_objects);
     return list;
 }

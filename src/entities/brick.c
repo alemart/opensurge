@@ -261,9 +261,6 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
     if((brk == NULL) || (brk->brick_ref == NULL))
         return;
 
-    /* animate the brick */
-    animate_brick(brk);
-
     /* move the brick */
     brk_width = image_width(brk->brick_ref->image);
     brk_height = image_height(brk->brick_ref->image);
@@ -606,13 +603,15 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
  * brick_render()
  * Renders a brick
  */
-void brick_render(const brick_t *brk, v2d_t camera_position)
+void brick_render(brick_t *brk, v2d_t camera_position)
 {
     if(brk->brick_ref->behavior != BRB_MARKER) {
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
 
-        if(!can_be_clipped_out(brk, topleft))
+        if(!can_be_clipped_out(brk, topleft)) {
+            animate_brick(brk);
             image_draw(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, get_image_flags(brk));
+        }
     }
 }
 
@@ -620,11 +619,13 @@ void brick_render(const brick_t *brk, v2d_t camera_position)
  * brick_render_debug()
  * Renders a brick (editor)
  */
-void brick_render_debug(const brick_t *brk, v2d_t camera_position)
+void brick_render_debug(brick_t *brk, v2d_t camera_position)
 {
     v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
 
     if(!can_be_clipped_out(brk, topleft)) {
+        animate_brick(brk);
+
         if(brk->layer != BRL_DEFAULT)
             image_draw_lit(brk->image, brk->x - (int)topleft.x, brk->y - (int)topleft.y, brick_util_layercolor(brk->layer), get_image_flags(brk));
         else

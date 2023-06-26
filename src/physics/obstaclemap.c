@@ -90,7 +90,7 @@ see the number of iterations performed by the collision detection routine, as
 well as the number of buckets required by the partition.
 
 */
-static const int BUCKET_LENGTH = 64; /* leads to a ~6x-10x (or more!) speedup compared to brute force */
+static const int BUCKET_LENGTH = 64; /* leads to a huge speedup compared to brute force (the actual factor also depends on the number of incoming obstacles, which depends on the settings of the Brick Manager) */
 #define WANT_PERFORMANCE_REPORT 0 /* for testing only */
 
 /*

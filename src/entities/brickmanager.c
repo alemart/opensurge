@@ -111,7 +111,7 @@ struct brickiteratorstate_t
 };
 
 /* Utilities */
-#define GRID_SIZE 128 /* width and height of a cell of the spatial hash */
+#define GRID_SIZE 256 /* width and height of a cell of the spatial hash; this impacts the number of fasthash queries per frame (quadratically), as well as the number of returned bricks */
 #define SAMPLER_WIDTH 128 /* width of the fixed-size intervals of the sampler */
 #define SAMPLER_MAX_INDEX 16384 /* >= MAX_LEVEL_WIDTH / SAMPLER_WIDTH */
 
@@ -200,9 +200,10 @@ brickmanager_t* brickmanager_destroy(brickmanager_t* manager)
 void brickmanager_add_brick(brickmanager_t* manager, struct brick_t* brick)
 {
     brickbucket_t* bucket = NULL;
+    bool is_moving_brick = brick_has_movement_path(brick);
 
     /* select a bucket */
-    if(!brick_has_movement_path(brick)) {
+    if(!is_moving_brick) {
 
         /* find the appropriate bucket for the brick */
         uint64_t key = brick2hash(brick);
@@ -467,6 +468,35 @@ iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager)
 }
 
 /*
+ * brickmanager_retrieve_active_moving_bricks()
+ * Efficiently retrieve moving bricks inside the current Region Of Interest (ROI)
+ */
+iterator_t* brickmanager_retrieve_active_moving_bricks(const brickmanager_t* manager)
+{
+    /* create a new iterator state */
+    brickiteratorstate_t state = { .b = 0, .i = 0 };
+    state.own_bucket = bucket_ctor(brick_fake_destroy); /* a bucket of references only */
+    darray_init(state.bucket);
+
+    /* get the ROI */
+    const brickrect_t* roi = &(manager->roi);
+
+    /* individually filter the awake bricks inside the ROI */
+    filter_bricks_inside_roi(state.own_bucket, manager->awake_bucket, roi);
+    if(!bucket_is_empty(state.own_bucket))
+        darray_push(state.bucket, state.own_bucket);
+
+    /* return a new iterator */
+    return iterator_create(
+        &state,
+        brickiteratorstate_copy_ctor,
+        brickiteratorstate_dtor,
+        brickiteratorstate_next,
+        brickiteratorstate_has_next
+    );
+}
+
+/*
  * brickmanager_retrieve_all_bricks()
  * Retrieves all bricks
  */
@@ -474,7 +504,7 @@ iterator_t* brickmanager_retrieve_all_bricks(const brickmanager_t* manager)
 {
     /* create a new iterator state */
     brickiteratorstate_t state = { .b = 0, .i = 0 };
-    state.own_bucket = bucket_ctor(brick_fake_destroy);
+    state.own_bucket = bucket_ctor(brick_fake_destroy); /* a bucket of references only */
     darray_init(state.bucket);
 
     /* we'll iterate over all non-empty buckets */

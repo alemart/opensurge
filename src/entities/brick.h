@@ -91,8 +91,8 @@ int brickset_loaded(); /* is a brickset loaded? */
 brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t flip_flags); /* creates a new brick */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
 void brick_update(brick_t *brk, struct player_t** team, int team_size); /* updates a brick */
-void brick_render(const brick_t *brk, v2d_t camera_position); /* renders a brick */
-void brick_render_debug(const brick_t *brk, v2d_t camera_position); /* renders a brick (editor) */
+void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
+void brick_render_debug(brick_t *brk, v2d_t camera_position); /* renders a brick (editor) */
 void brick_render_mask(const brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */
 void brick_render_path(const brick_t *brk, v2d_t camera_position); /* renders the path of a moving brick (editor) */
 

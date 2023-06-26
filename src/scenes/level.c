@@ -1326,7 +1326,7 @@ void level_update()
 
     /* getting the major entities */
     /* note: bricks should use a larger margin when compared to SurgeScript entities */
-    const int BRICK_MARGIN = 128;
+    const int BRICK_MARGIN = 64;
     rect_t brick_roi = create_roi(cam, BRICK_MARGIN);
     rect_t entity_roi = create_roi(cam, 0);
 
@@ -1383,8 +1383,10 @@ void level_update()
     }
 
     /* update bricks */
-    iterator_t* brick_iterator = brickmanager_retrieve_active_bricks(brick_manager);
+    iterator_t* brick_iterator = brickmanager_retrieve_active_moving_bricks(brick_manager);
     while(iterator_has_next(brick_iterator)) {
+        /* no need to update static bricks.
+           We won't even retrieve them! */
         brick_t* brick = iterator_next(brick_iterator);
         brick_update(brick, team, team_size);
     }

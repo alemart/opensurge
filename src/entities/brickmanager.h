@@ -41,8 +41,9 @@ void brickmanager_remove_all_bricks(brickmanager_t* manager);
 int brickmanager_number_of_bricks(const brickmanager_t* manager);
 
 /* retrieval */
-void brickmanager_set_roi(brickmanager_t* manager, rect_t roi); /* set region of interest */
-struct iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager); /* efficient retrieval based on a Region Of Interest (ROI) */
+void brickmanager_set_roi(brickmanager_t* manager, rect_t roi); /* set region of interest (ROI) */
+struct iterator_t* brickmanager_retrieve_active_bricks(const brickmanager_t* manager); /* efficient retrieval based on a ROI */
+struct iterator_t* brickmanager_retrieve_active_moving_bricks(const brickmanager_t* manager); /* retrieve moving bricks within the ROI */
 struct iterator_t* brickmanager_retrieve_all_bricks(const brickmanager_t* manager);
 
 /* world size */
