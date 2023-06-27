@@ -160,6 +160,11 @@ static void clear_level_state(levelstate_t* state);
 
 /* region of interest */
 static rect_t create_roi(v2d_t camera, int margin);
+static const int ROI_MARGIN_UPDATE_ENTITY = 256;
+static const int ROI_MARGIN_UPDATE_BRICK = ROI_MARGIN_UPDATE_ENTITY + 64; /* bricks should use a larger margin than entities */
+static const int ROI_MARGIN_RENDER_ENTITY = 128;
+static const int ROI_MARGIN_RENDER_BRICK = 128;
+static const int ROI_MARGIN_EDITOR = 128;
 
 /* internal data */
 static float level_timer;
@@ -246,7 +251,7 @@ static bool entity_info_is_persistent(const surgescript_object_t* object);
 static void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent);
 
 /* debug mode */
-#define debug_mode_want_to_activate() editorcmd_is_triggered(editor_cmd, "enter-debug-mode")
+#define debug_mode_want_to_activate() (!mobilegamepad_is_available() && editorcmd_is_triggered(editor_cmd, "enter-debug-mode"))
 
 
 
@@ -1295,12 +1300,10 @@ void level_update()
 
     /* enable the debug mode */
     if(debug_mode_want_to_activate()) {
-        if(readonly) {
-            video_showmessage("No way!"); /* can still enter via mobile mode */
-            sound_play(SFX_DENY);
-        }
-        else
-            level_enter_debug_mode();
+
+        /* no readonly check */
+        level_enter_debug_mode();
+
     }
 
     /* -------------------------------------- */
@@ -1325,10 +1328,8 @@ void level_update()
     }
 
     /* getting the major entities */
-    /* note: bricks should use a larger margin when compared to SurgeScript entities */
-    const int BRICK_MARGIN = 64;
-    rect_t brick_roi = create_roi(cam, BRICK_MARGIN);
-    rect_t entity_roi = create_roi(cam, 0);
+    rect_t brick_roi = create_roi(cam, ROI_MARGIN_UPDATE_BRICK);
+    rect_t entity_roi = create_roi(cam, ROI_MARGIN_UPDATE_ENTITY);
 
     brickmanager_set_roi(brick_manager, brick_roi);
     set_entitymanager_roi(entity_roi);
@@ -1524,11 +1525,12 @@ void level_render()
        entitymanager_set_active_region() was called (i.e., via scripting).
        Let's make sure that we keep our active region updated. */
     v2d_t cam = camera_get_position(); /* we're not in editor mode */
-    rect_t roi = create_roi(cam, 0);
+    rect_t brick_roi = create_roi(cam, ROI_MARGIN_RENDER_BRICK);
+    rect_t entity_roi = create_roi(cam, ROI_MARGIN_RENDER_ENTITY);
 
-    brickmanager_set_roi(brick_manager, roi);
-    set_entitymanager_roi(roi);
-    entitymanager_set_active_region(roi); /* legacy */
+    brickmanager_set_roi(brick_manager, brick_roi);
+    set_entitymanager_roi(entity_roi);
+    entitymanager_set_active_region(entity_roi); /* legacy */
 
     /* retrieve lists of active entities */
     major_items = entitymanager_retrieve_active_items();
@@ -2591,14 +2593,9 @@ void clear_level_state(levelstate_t* state)
 /* create a region of interest */
 rect_t create_roi(v2d_t camera, int margin)
 {
-    const int DEFAULT_ROI_MARGIN = 256;
-    int m = DEFAULT_ROI_MARGIN + margin;
-
     v2d_t screen_size = video_get_screen_size();
-    v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
-
-    int dx = (int)half_screen_size.x + m;
-    int dy = (int)half_screen_size.y + m;
+    int dx = (int)screen_size.x / 2 + margin;
+    int dy = (int)screen_size.y / 2 + margin;
 
     return rect_new(
         (int)camera.x - dx,
@@ -3165,11 +3162,12 @@ void editor_update()
 
     /* set the region of interest */
     v2d_t cam = editor_camera;
-    rect_t roi = create_roi(cam, 0);
+    rect_t brick_roi = create_roi(cam, ROI_MARGIN_EDITOR);
+    rect_t entity_roi = brick_roi;
 
-    brickmanager_set_roi(brick_manager, roi);
-    set_entitymanager_roi(roi);
-    entitymanager_set_active_region(roi); /* legacy */
+    brickmanager_set_roi(brick_manager, brick_roi);
+    set_entitymanager_roi(entity_roi);
+    entitymanager_set_active_region(entity_roi); /* legacy */
 
     /* get legacy entities */
     major_enemies = entitymanager_retrieve_active_objects();

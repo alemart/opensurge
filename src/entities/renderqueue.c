@@ -622,7 +622,7 @@ void renderqueue_begin(v2d_t camera_position)
  */
 void renderqueue_end()
 {
-    int draw_calls = 0;
+    int batch_count = 0;
 
     /* skip if the buffer is empty */
     if(buffer_size == 0)
@@ -711,7 +711,7 @@ void renderqueue_end()
 
         /* reporting */
         if(curr >= prev) {
-            ++draw_calls;
+            ++batch_count;
             if(want_report) {
                 char c = (curr == prev) ? '+' : ' '; /* curr == prev only if group_index == 1 */
                 sorted_buffer[j]->vtable->path(sorted_buffer[j]->renderable, entry_path, sizeof(entry_path));
@@ -766,7 +766,7 @@ void renderqueue_end()
     /* render the entries without deferred drawing */
     for(int j = 0; j < buffer_size; j++) {
         sorted_buffer[j]->vtable->render(sorted_buffer[j]->renderable, camera);
-        ++draw_calls; /* will be equal to buffer_size */
+        ++batch_count; /* will be equal to buffer_size */
     }
 
     REPORT("No batching!");
@@ -775,9 +775,9 @@ void renderqueue_end()
 #endif
 
     /* end of report */
-    float savings = 1.0f - (float)draw_calls / (float)buffer_size;
+    float savings = 1.0f - (float)batch_count / (float)buffer_size;
     REPORT("Total     :=%3d", buffer_size);
-    REPORT("Draw calls: %3d <-%.2f%%>", draw_calls, 100.0f * savings);
+    REPORT("Batches   : %3d %.2f", batch_count, 100.0f * savings);
     REPORT_END();
 
     /* go back to the default shader */
@@ -802,11 +802,13 @@ void renderqueue_enqueue_brick(brick_t *brick)
         .vtable = &VTABLE[TYPE_BRICK]
     };
 
+#if 0
     /* clip it out */
     v2d_t position = brick_position(brick);
     v2d_t size = brick_size(brick);
     if(!level_inside_screen(position.x, position.y, size.x, size.y))
         return;
+#endif
 
     /* enqueue */
     enqueue(&entry);

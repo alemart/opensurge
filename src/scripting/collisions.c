@@ -246,6 +246,11 @@ void quickly_get_bounding_box(const collider_t* collider, double* left, double* 
 
             break;
         }
+
+        default:
+            *left = *right = center_x;
+            *top = *bottom = center_y;
+            break;
     }
 }
 
