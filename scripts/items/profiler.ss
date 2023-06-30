@@ -24,12 +24,12 @@ object "Profiler" is "entity", "awake", "special"
         stats.refresh();
 
         // update stats
-        uiTimes.updateUI("Time spent (ms)", stats.timespent, sortByDesc.with(stats.timespent));
+        uiTimes.updateUI("Time spent (approx ms)", stats.timespent, sortByDesc.with(stats.timespent));
         uiStats.updateUI("Profiler", stats.generic, null);
         uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
         uiTimes.transform.position = Vector2(0, 0);
-        uiStats.transform.position = Vector2(160, 0);
-        uiDensity.transform.position = Vector2(320, 0);
+        uiStats.transform.position = Vector2(320, 0);
+        uiDensity.transform.position = Vector2(160, 0);
 
         // done
         state = "wait";
@@ -72,8 +72,14 @@ object "Profiler.Stats"
         timespent.destroy();
         generic.destroy();
         computeDensity(Level, density = {}, 1, 1);
-        computeTimespent(Level, timespent = {}, 1, 1);
+        computeTimespent(Level, timespent = {}, count = {}, 1, 1);
         computeGeneric(generic = {}, objectCount, timeInterval);
+
+        // compute average timespent per group
+        foreach(entry in timespent) {
+            key = entry.key;
+            timespent[key] /= count[key];
+        }
 
         lastRefresh = Time.time;
     }
@@ -103,11 +109,10 @@ object "Profiler.Stats"
 
     fun computeDensity(obj, tree, id, depth)
     {
-        if(obj.__name == "Profiler") return 0;
         key = obj.__name; //hash(obj, id);
         result = 1;
-        count = obj.childCount;
-        for(i = 0; i < count; i++) {
+        n = obj.childCount;
+        for(i = 0; i < n; i++) {
             child = obj.child(i);
             if(child.__active)
                 result += computeDensity(child, tree, ++id, 1+depth);
@@ -117,20 +122,21 @@ object "Profiler.Stats"
         return result;
     }
 
-    fun computeTimespent(obj, tree, id, depth)
+    fun computeTimespent(obj, tree, countTree, id, depth)
     {
-        if(obj.__name == "Profiler") return 0;
         key = obj.__name; //hash(obj, id);
         totalTime = 0;
-        count = obj.childCount;
-        for(i = 0; i < count; i++) {
+        n = obj.childCount;
+        for(i = 0; i < n; i++) {
             child = obj.child(i);
             if(child.__active)
-                totalTime += computeTimespent(child, tree, ++id, 1+depth);
+                totalTime += computeTimespent(child, tree, countTree, ++id, 1+depth);
         }
         totalTime += 1000 * this.__timespent;
-        if(depth <= maxDepth)
+        if(depth <= maxDepth) {
             tree[key] += totalTime;
+            countTree[key] += 1;
+        }
         return totalTime;
     }
 
@@ -150,7 +156,7 @@ object "Profiler.Stats"
 object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
 {
     public readonly transform = Transform();
-    text = Text("sans");
+    text = Text("BoxyBold");
 
     fun constructor()
     {
