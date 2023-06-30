@@ -336,7 +336,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
             /* skip entities that can be clipped */
             if(
                 can_clip_entity(entity) &&
-                !surgescript_object_has_tag(entity, "detached")
+                !(surgescript_object_has_tag(entity, "awake") || surgescript_object_has_tag(entity, "detached"))
             )
                 continue;
 
@@ -417,6 +417,9 @@ surgescript_var_t* fun_storeentity(surgescript_object_t* object, const surgescri
     surgescript_object_call_function(levelobjectcontainer, "addObject", args, 1, NULL);
 
     surgescript_var_destroy(arg);
+
+    /* start inactive (better measurements) */
+    surgescript_object_set_active(entity, false);
 
     /* done */
     return NULL;
