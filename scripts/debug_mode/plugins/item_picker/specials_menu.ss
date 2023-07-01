@@ -61,8 +61,6 @@ object "Debug Mode - Item Picker - Specials Menu" is "debug-mode-plugin"
         itemPicker
             .add(entity("Layer Green"))
             .add(entity("Layer Yellow"))
-            .add(entity("Walk on Water Left"))
-            .add(entity("Walk on Water Right"))
             .add(entity("Tube In"))
             .add(entity("Tube Out"))
             .add(entity("Pipe In"))
@@ -71,6 +69,9 @@ object "Debug Mode - Item Picker - Specials Menu" is "debug-mode-plugin"
             .add(entity("Pipe Right"))
             .add(entity("Pipe Down"))
             .add(entity("Pipe Left"))
+            .add(entity("Walk on Water Left"))
+            .add(entity("Walk on Water Right"))
+            .add(entity("Profiler"))
         ;
 
         /*
