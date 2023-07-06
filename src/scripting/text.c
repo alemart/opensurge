@@ -293,19 +293,26 @@ surgescript_var_t* fun_settext(surgescript_object_t* object, const surgescript_v
     font_t* font = get_font(object);
     if(font != NULL) {
         surgescript_heap_t* heap = surgescript_object_heap(object);
+        const char* prev_text = surgescript_var_fast_get_string(surgescript_heap_at(heap, TEXT_ADDR));
         const char* str = surgescript_var_fast_get_string(param[0]);
         if(*str == 0) {
             /* convert non-string to string */
             const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
             char* text = surgescript_var_get_string(param[0], manager);
-            font_set_text(font, "%s", text);
+
+            if(0 != strcmp(text, prev_text)) /* basic speedup */
+                font_set_text(font, "%s", text);
+
             surgescript_var_set_string(surgescript_heap_at(heap, TEXT_ADDR), text);
             ssfree(text);
         }
         else {
             /* the input is already a string */
             const char* text = str;
-            font_set_text(font, "%s", text);
+
+            if(0 != strcmp(text, prev_text)) /* basic speedup */
+                font_set_text(font, "%s", text);
+
             surgescript_var_set_string(surgescript_heap_at(heap, TEXT_ADDR), text);
         }
     }
