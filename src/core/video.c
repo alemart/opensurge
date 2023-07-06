@@ -616,17 +616,24 @@ void video_clearmessages()
 void video_display_loading_screen()
 {
     const image_t *img = image_load(LOADING_IMAGE);
-    font_t* fnt = font_create(LOADING_FONT);
-    v2d_t cam = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
 
-    image_clear(color_rgb(0, 0, 0));
-    image_blit(img, 0, 0, (VIDEO_SCREEN_W - image_width(img)) / 2, (VIDEO_SCREEN_H - image_height(img)) / 2, image_width(img), image_height(img));
+    /* prepare the font */
+    font_t* fnt = font_create(LOADING_FONT);
     font_set_align(fnt, FONTALIGN_CENTER);
     font_set_text(fnt, "%s", LOADING_TEXT);
-    font_set_position(fnt, v2d_subtract(cam, v2d_new(0, font_get_textsize(fnt).y / 2)));
-    font_render(fnt, cam);
+    font_set_position(fnt, v2d_subtract(camera, v2d_new(0, font_get_textsize(fnt).y / 2)));
+
+    /* make sure we're using the default shader */
+    use_default_shader();
+
+    /* render */
+    image_clear(color_rgb(0, 0, 0));
+    image_draw(img, (VIDEO_SCREEN_W - image_width(img)) / 2, (VIDEO_SCREEN_H - image_height(img)) / 2, IF_NONE);
+    font_render(fnt, camera);
     video_render(NULL);
-    
+
+    /* cleanup */
     font_destroy(fnt);
     image_unload(img);
 }
