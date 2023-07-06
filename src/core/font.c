@@ -525,7 +525,7 @@ void font_render(font_t* f, v2d_t camera_position)
         rect_t target_rect = rect_new(0, 0, target_width, target_height);
 
         /* clip out the entire text if possible */
-        point_t initial_position = point_new(position.x, position.y);
+        point_t initial_position = point_new(floorf(position.x + 0.5f), floorf(position.y + 0.5f));
         v2d_t total_size = f->preprocessed_text.total_size;
         rect_t bounding_box = rect_new(initial_position.x, initial_position.y, total_size.x, total_size.y);
         if(!rect_overlaps(target_rect, bounding_box))
@@ -1930,6 +1930,7 @@ fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bo
 void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, color_t color)
 {
     const fontdrv_ttf_t* f = (const fontdrv_ttf_t*)fnt;
+    int flags = ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER;
 
     if(!has_loaded_ttf(f))
         load_ttf((fontdrv_ttf_t*)f);
@@ -1937,14 +1938,14 @@ void fontdrv_ttf_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
     /* draw shadow */
     if(f->shadow) {
         ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
-        al_draw_text(f->font, black, x, y + 1.0f, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
-        al_draw_text(f->font, black, x + 1.0f, y + 1.0f, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
+        al_draw_text(f->font, black, x, y + 1.0f, flags, text);
+        al_draw_text(f->font, black, x + 1.0f, y + 1.0f, flags, text);
         if(f->size >= 18) /* TODO: configurable shadows */
-            al_draw_text(f->font, black, x + 2.0f, y + 2.0f, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
+            al_draw_text(f->font, black, x + 2.0f, y + 2.0f, flags, text);
     }
 
     /* draw text */
-    al_draw_text(f->font, color._color, x, y, ALLEGRO_ALIGN_LEFT | ALLEGRO_ALIGN_INTEGER, text);
+    al_draw_text(f->font, color._color, x, y, flags, text);
 }
 
 void fontdrv_ttf_release(fontdrv_t* fnt)
