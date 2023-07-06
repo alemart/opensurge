@@ -99,7 +99,8 @@ object "Tube" is "private", "special", "entity"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            parent.onTubeCollision(player);
+            if(!player.frozen)
+                parent.onTubeCollision(player);
         }
     }
 
@@ -107,7 +108,8 @@ object "Tube" is "private", "special", "entity"
     {
         if(otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
-            parent.onTubeOverlap(player);
+            if(!player.frozen)
+                parent.onTubeOverlap(player);
         }
     }
 }
@@ -125,12 +127,14 @@ object "Tube - Player Watcher" is "special", "companion"
         if(Math.abs(player.gsp) < pushThreshold)
             player.gsp = pushSpeed * Math.sign(player.gsp);
 
+        // the player is out of the tube: we're done
+        // (or we froze it with some other script)
+        if(player.input.enabled || player.frozen)
+            destroy();
+
         // the player may get unrolled if he or she falls inside the tube
-        if(!player.rolling)
+        else if(!player.rolling)
             player.roll();
 
-        // the player is out of the tube: we're done
-        if(player.input.enabled)
-            destroy();
     }
 }
