@@ -33,7 +33,6 @@ struct commandline_t
     int fullscreen;
     int show_fps;
     int hide_fps;
-    int allow_font_smoothing;
 
     /* other options */
     int mobile;

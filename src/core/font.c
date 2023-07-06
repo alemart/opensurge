@@ -52,7 +52,6 @@
 #define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
 #define FONT_BLANKSMAXSIZE          8192     /* max buffer size for find_blanks() */
 #define FONT_COLORBREAKPOINT     ((char)0x2) /* a control character that delimits a change of color */
-static bool allow_antialias = true;          /* allow antialiasing for all TTF fonts? */
 
 /* macros */
 #define IS_VAR_ANYCHAR(c)           ((isalnum((unsigned char)(c))) || ((c) == '_'))
@@ -250,14 +249,13 @@ static void unload_ttf(fontdrv_ttf_t* f);
  * font_init()
  * Initializes the font module
  */
-void font_init(bool allow_font_smoothing)
+void font_init()
 {
     /* initializing Allegro's TTF addon */
     if(!al_init_ttf_addon())
         fatal_error("Can't initialize Allegro's TTF addon");
 
     /* basic initialization */
-    allow_antialias = allow_font_smoothing;
     fontdrv_list_init();
 
     /* reading the font scripts */
@@ -1918,7 +1916,7 @@ fontdrv_t* fontdrv_ttf_new(const char* source_file, int size, bool antialias, bo
     /* store font attributes */
     f->filepath = str_dup(source_file);
     f->size = max(size, 0); /* height of glyphs in pixels */
-    f->antialias = allow_antialias && antialias;
+    f->antialias = antialias;
     f->shadow = shadow;
     f->line_height = 0;
 

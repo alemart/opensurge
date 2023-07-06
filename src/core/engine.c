@@ -385,7 +385,7 @@ void init_accessories(const commandline_t* cmd)
     if(custom_lang && *custom_lang)
         lang_loadfile(custom_lang);
 
-    font_init(commandline_getint(cmd->allow_font_smoothing, TRUE));
+    font_init();
     video_display_loading_screen();
 
     sprite_init();

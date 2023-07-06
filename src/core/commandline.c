@@ -75,7 +75,6 @@ commandline_t commandline_parse(int argc, char **argv)
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
     cmd.show_fps = COMMANDLINE_UNDEFINED;
     cmd.hide_fps = COMMANDLINE_UNDEFINED;
-    cmd.allow_font_smoothing = COMMANDLINE_UNDEFINED;
 
     cmd.mobile = COMMANDLINE_UNDEFINED;
     cmd.verbose = COMMANDLINE_UNDEFINED;
@@ -119,7 +118,6 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --import \"/path/to/game\"         import an Open Surge game from the specified folder\n"
                 "    --import-wizard                  import an Open Surge game using a wizard\n"
                 "    --mobile                         enable mobile device simulation\n"
-                "    --no-font-smoothing              disable antialiased fonts\n"
                 "    --verbose                        print logs to stdout\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
                 GAME_HEADER, program
@@ -188,9 +186,6 @@ commandline_t commandline_parse(int argc, char **argv)
 
         else if(strcmp(argv[i], "--hide-fps") == 0)
             cmd.hide_fps = TRUE;
-
-        else if(strcmp(argv[i], "--no-font-smoothing") == 0)
-            cmd.allow_font_smoothing = FALSE;
 
         else if(strcmp(argv[i], "--mobile") == 0)
             cmd.mobile = TRUE;
