@@ -33,7 +33,6 @@
 
 
 /* private stuff */
-#define is_transition_animation(anim) ((anim)->next != NULL) /* is anim a transition animation? */
 static void update_animation(actor_t *act);
 static bool can_be_clipped_out(const actor_t* act, v2d_t topleft);
 
@@ -171,12 +170,12 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
        unless anim is also a transition (in
        which case we change the animation) */
     if(act->animation != NULL && act->animation->next == anim) {
-        if(!(is_transition_animation(anim) || actor_animation_finished(act)))
+        if(!(animation_is_transition(anim) || actor_animation_finished(act)))
             return;
     }
 
     /* is there a transition from act->animation to anim? */
-    const animation_t* transition = sprite_get_transition(act->animation, anim);
+    const animation_t* transition = animation_get_transition(act->animation, anim);
     if(transition != NULL) {
         act->next_animation = anim; /* anim may not be act->animation->next, as this may be a transition to "any" animation */
         anim = transition; /* change to the transition animation */
@@ -239,7 +238,7 @@ bool actor_is_transition_animation_playing(const actor_t *act)
     if(!act->animation)
         return false;
 
-    return is_transition_animation(act->animation);
+    return animation_is_transition(act->animation);
 }
 
 
@@ -274,7 +273,7 @@ const image_t* actor_image(const actor_t *act)
     if(!act->animation)
         fatal_error("actor_image(): no animation is playing");
 
-    return sprite_get_image(act->animation, (int)(act->animation_frame));
+    return animation_get_image(act->animation, (int)(act->animation_frame));
 }
 
 /*

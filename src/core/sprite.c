@@ -77,7 +77,7 @@ struct animtransition_t
 
 /*
  * sprite_init()
- * Initializes the sprite module
+ * Initializes the sprite system
  */
 void sprite_init()
 {
@@ -93,7 +93,7 @@ void sprite_init()
 
 /*
  * sprite_release()
- * Releases the sprite module
+ * Releases the sprite system
  */
 void sprite_release()
 {
@@ -111,7 +111,7 @@ void sprite_release()
  */
 const animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
 {
-    spriteinfo_t *sprite;
+    const spriteinfo_t *sprite;
 
     /* default sprite? */
     if(sprite_name == NULL)
@@ -139,9 +139,10 @@ const animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
  * sprite_animation_exists()
  * Checks if an animation exists (for a given sprite)
  */
-int sprite_animation_exists(const char* sprite_name, int anim_id)
+bool sprite_animation_exists(const char* sprite_name, int anim_id)
 {
-    spriteinfo_t *info = hashtable_spriteinfo_t_find(sprites, sprite_name);
+    const spriteinfo_t *info = hashtable_spriteinfo_t_find(sprites, sprite_name);
+
     return info != NULL && (
         anim_id >= 0 && anim_id < info->animation_count &&
         info->animation_data[anim_id] != NULL
@@ -150,11 +151,11 @@ int sprite_animation_exists(const char* sprite_name, int anim_id)
 
 
 /*
- * sprite_get_image()
+ * animation_get_image()
  * Receives an animation and the desired frame number.
  * Returns an image.
  */
-const image_t* sprite_get_image(const animation_t *anim, int frame_id)
+const image_t* animation_get_image(const animation_t *anim, int frame_id)
 {
     if(frame_id < 0)
         frame_id = 0;
@@ -166,11 +167,11 @@ const image_t* sprite_get_image(const animation_t *anim, int frame_id)
 
 
 /*
- * sprite_get_transition()
+ * animation_get_transition()
  * Gets a transition animation.
  * Returns NULL if there is no such transition
  */
-const animation_t* sprite_get_transition(const animation_t* from, const animation_t* to)
+const animation_t* animation_get_transition(const animation_t* from, const animation_t* to)
 {
     /* skip everything: there are no transitions in this sprite */
     if(!from || !to || darray_length(from->sprite->transition) == 0)

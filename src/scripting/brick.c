@@ -262,7 +262,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     char* sprite_name = surgescript_var_get_string(param[0], manager);
     int anim_id = BRICKLIKE_ANIMATION_ID;
     const animation_t* animation = sprite_animation_exists(sprite_name, anim_id) ? sprite_get_animation(sprite_name, anim_id) : sprite_get_animation(NULL, 0);
-    const image_t* brick_image = sprite_get_image(animation, 0); /* get the first frame of the animation */
+    const image_t* brick_image = animation_get_image(animation, 0); /* get the first frame of the animation */
     bricklike_data_t* data = get_data(object);
 
     if(data->mask != NULL) {

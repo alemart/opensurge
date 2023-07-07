@@ -27,12 +27,9 @@
 #include "../util/v2d.h"
 #include "../util/darray.h"
 
-typedef struct animation_t animation_t;
 typedef struct spriteinfo_t spriteinfo_t;
-
-/* animtransition */
-/* a helper struct representing a transition from one animation to another */
-struct animtransition_t;
+typedef struct animation_t animation_t;
+struct animtransition_t; /* a helper struct representing a transition from one animation to another */
 
 /* animation */
 /* this represents an animation */
@@ -73,25 +70,35 @@ struct spriteinfo_t {
 
 
 
-/* === sprite management: public methods === */
 
-/* initializes the sprite module */
+/*
+ * Sprite system
+ */
+
+/* initializes the sprite system */
 void sprite_init();
 
-/* releases the sprite module */
+/* releases the sprite system */
 void sprite_release();
 
 /* gets the required animation - crashes if not found */
 const animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
 
 /* checks if an animation exists */
-int sprite_animation_exists(const char* sprite_name, int anim_id);
+bool sprite_animation_exists(const char* sprite_name, int anim_id);
+
+
+
+
+/*
+ * Animation system
+ */
 
 /* returns the specified frame of the given animation */
-const struct image_t* sprite_get_image(const animation_t* anim, int frame_id);
+const struct image_t* animation_get_image(const animation_t* anim, int frame_id);
 
 /* gets a transition animation - returns NULL if there is no such transition */
-const animation_t* sprite_get_transition(const animation_t* from, const animation_t* to);
+const animation_t* animation_get_transition(const animation_t* from, const animation_t* to);
 
 /* is anim a transition animation? */
 bool animation_is_transition(const animation_t* anim);
@@ -99,15 +106,14 @@ bool animation_is_transition(const animation_t* anim);
 
 
 
+/*
+ * Sprite metadata
+ */
 
-
-
-/* === spriteinfo_t class: public methods === */
-
-/* creates an anonymous spriteinfo_t object by parsing the passed tree */
+/* creates an anonymous spriteinfo_t by parsing the input tree */
 spriteinfo_t* spriteinfo_create(const parsetree_program_t* tree);
 
-/* if you have called spriteinfo_create(), call this too when you're done with the sprite */
+/* releases a spriteinfo_t */
 void spriteinfo_destroy(spriteinfo_t* info);
 
 #endif

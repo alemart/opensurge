@@ -77,9 +77,9 @@ void editorpal_init(void *config_ptr)
         item = mallocx(item_count * sizeof(*item));
         for(i = 0; i < item_count; i++) {
             if(sprite_animation_exists(config.ssobj.name[i], 0))
-                item[i] = sprite_get_image(sprite_get_animation(config.ssobj.name[i], 0), 0);
+                item[i] = animation_get_image(sprite_get_animation(config.ssobj.name[i], 0), 0);
             else
-                item[i] = sprite_get_image(sprite_get_animation(NULL, 0), 0);
+                item[i] = animation_get_image(sprite_get_animation(NULL, 0), 0);
         }
     }
     else if(config.type == EDITORPAL_BRICK) {
@@ -89,7 +89,7 @@ void editorpal_init(void *config_ptr)
             if(brick_exists(config.brick.id[i]))
                 item[i] = brick_image_preview(config.brick.id[i]);
             else
-                item[i] = sprite_get_image(sprite_get_animation(NULL, 0), 0); /* shouldn't happen */
+                item[i] = animation_get_image(sprite_get_animation(NULL, 0), 0); /* shouldn't happen */
         }
     }
     else {
@@ -98,7 +98,7 @@ void editorpal_init(void *config_ptr)
     }
 
     /* configure the mouse cursor */
-    cursor_image = sprite_get_image(sprite_get_animation(CURSOR_SPRITE, 0), 0);
+    cursor_image = animation_get_image(sprite_get_animation(CURSOR_SPRITE, 0), 0);
     cursor_input = input_create_mouse();
     cursor_font = font_create("EditorUI");
     cursor_position = v2d_new(0, 0);

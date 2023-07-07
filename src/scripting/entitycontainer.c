@@ -913,7 +913,7 @@ bool is_entity_position_inside_screen(surgescript_object_t* entity_manager, surg
 bool is_sprite_inside_screen(v2d_t camera_position, const char* sprite_name, v2d_t sprite_position, float sprite_rotation, v2d_t sprite_scale)
 {
     const animation_t* anim = sprite_animation_exists(sprite_name, 0) ? sprite_get_animation(sprite_name, 0) : sprite_get_animation(NULL, 0);
-    const image_t* img = sprite_get_image(anim, 0);
+    const image_t* img = animation_get_image(anim, 0);
     v2d_t hot_spot = anim->hot_spot;
     v2d_t sprite_size = v2d_new(image_width(img), image_height(img));
     v2d_t screen_size = video_get_screen_size();
