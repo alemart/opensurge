@@ -43,7 +43,8 @@
 #define OPTION_2      1
 #define MAX_OPTIONS   2
 
-static image_t *box, *background;
+static image_t *background;
+static const image_t *box;
 static v2d_t boxpos;
 static font_t *textfnt;
 static font_t *optionfnt[MAX_OPTIONS][2];

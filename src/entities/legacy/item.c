@@ -2883,7 +2883,7 @@ int get_anim_id(const char *player_name)
 typedef struct loop_t loop_t;
 struct loop_t {
     item_t item; /* base class */
-    animation_t *animation;
+    const animation_t *animation;
     bricklayer_t layer_to_be_activated;
 
     int *player_was_touching_me;
@@ -3561,7 +3561,7 @@ item_t* spring_create(void (*strategy)(item_t*,player_t*), const char *sprite_na
 void spring_init(item_t *item)
 {
     spring_t *me = (spring_t*)item;
-    image_t* img;
+    const image_t* img;
     v2d_t v;
 
     item->always_active = FALSE;

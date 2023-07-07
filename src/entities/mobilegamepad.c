@@ -584,8 +584,8 @@ void enable_linear_filtering()
     animate_actors(); /* set up images */
 
     for(int i = 0; i < NUM_CONTROLS; i++) {
-        image_t* image = actor_image(actor[i]);
-        image_enable_linear_filtering(image);
+        const image_t* image = actor_image(actor[i]);
+        image_enable_linear_filtering((image_t*)image);
     }
 }
 

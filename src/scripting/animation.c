@@ -59,7 +59,7 @@ static const surgescript_heapptr_t ACTIONOFFSET_ADDR = 5;
 static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
 static void notify_change(const surgescript_object_t* object);
 static actor_t* get_animation_actor(const surgescript_object_t* object);
-static animation_t* null_animation();
+static const animation_t* null_animation();
 
 /*
  * scripting_register_animation()
@@ -135,7 +135,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     const char* parent_name = scripting_util_parent_name(object);
-    animation_t* animation = null_animation();
+    const animation_t* animation = null_animation();
 
     /* internal data */
     ssassert(ANIMID_ADDR == surgescript_heap_malloc(heap));
@@ -150,7 +150,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_null(surgescript_heap_at(heap, ANCHOR_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ACTIONSPOT_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ACTIONOFFSET_ADDR)); /* lazy evaluation */
-    surgescript_object_set_userdata(object, animation);
+    surgescript_object_set_userdata(object, (void*)animation);
 
     /* sanity check */
     if(strcmp(parent_name, "Actor") != 0 && strcmp(parent_name, "Player") != 0) {
@@ -189,12 +189,12 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 
     /* update animation pointer */
     if(sprite_animation_exists(sprite_name, anim_id)) {
-        animation_t* animation = sprite_get_animation(sprite_name, anim_id);
-        surgescript_object_set_userdata(object, animation);
+        const animation_t* animation = sprite_get_animation(sprite_name, anim_id);
+        surgescript_object_set_userdata(object, (void*)animation);
     }
     else {
-        animation_t* animation = null_animation();
-        surgescript_object_set_userdata(object, animation);
+        const animation_t* animation = null_animation();
+        surgescript_object_set_userdata(object, (void*)animation);
     }
 
     /* done! */
@@ -219,14 +219,14 @@ surgescript_var_t* fun_setid(surgescript_object_t* object, const surgescript_var
     /* update data */
     const char* sprite_name = surgescript_var_fast_get_string(surgescript_heap_at(heap, SPRITENAME_ADDR));
     if(sprite_animation_exists(sprite_name, anim_id)) {
-        animation_t* animation = sprite_get_animation(sprite_name, anim_id);
+        const animation_t* animation = sprite_get_animation(sprite_name, anim_id);
         surgescript_var_set_number(anim_ref, anim_id);
-        surgescript_object_set_userdata(object, animation);
+        surgescript_object_set_userdata(object, (void*)animation);
     }
     else {
-        animation_t* animation = null_animation();
+        const animation_t* animation = null_animation();
         surgescript_var_set_number(anim_ref, anim_id);
-        surgescript_object_set_userdata(object, animation);
+        surgescript_object_set_userdata(object, (void*)animation);
     }
 
     /* done! */
@@ -481,7 +481,7 @@ void notify_change(const surgescript_object_t* object)
 }
 
 /* returns a pre-defined NULL animation */
-animation_t* null_animation()
+const animation_t* null_animation()
 {
     return sprite_get_animation(NULL, 0);
 }

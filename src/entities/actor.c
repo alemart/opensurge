@@ -132,7 +132,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
 void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, bool repeat_x, bool repeat_y)
 {
     if(act->visible && act->animation != NULL) {
-        image_t *img = actor_image(act);
+        const image_t *img = actor_image(act);
         int w = image_width(img);
         int h = image_height(img);
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
@@ -269,7 +269,7 @@ int actor_animation_frame(const actor_t* act)
  * Returns the current image of the
  * animation of this actor
  */
-image_t* actor_image(const actor_t *act)
+const image_t* actor_image(const actor_t *act)
 {
     if(!act->animation)
         fatal_error("actor_image(): no animation is playing");

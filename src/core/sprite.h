@@ -82,13 +82,13 @@ void sprite_init();
 void sprite_release();
 
 /* gets the required animation - crashes if not found */
-animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
+const animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
 
 /* checks if an animation exists */
 int sprite_animation_exists(const char* sprite_name, int anim_id);
 
 /* returns the specified frame of the given animation */
-struct image_t* sprite_get_image(const animation_t* anim, int frame_id);
+const struct image_t* sprite_get_image(const animation_t* anim, int frame_id);
 
 /* gets a transition animation - returns NULL if there is no such transition */
 const animation_t* sprite_get_transition(const animation_t* from, const animation_t* to);

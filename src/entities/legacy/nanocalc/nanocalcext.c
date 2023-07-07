@@ -205,7 +205,7 @@ int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_
 {
     actor_t *me = o->actor, *other;
     v2d_t p = v2d_add(me->position, offset);
-    image_t *img;
+    const image_t *img;
 
     if(!actor_brick_at(me, bs, offset)) {
         for(; is; is = is->next) {

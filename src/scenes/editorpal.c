@@ -45,7 +45,7 @@ static editorpal_config_t config;
 static input_t *pal_input;
 static font_t *error_font;
 static font_t *cursor_font;
-static image_t* cursor_image;
+static const image_t* cursor_image;
 static input_t* cursor_input;
 static v2d_t cursor_position;
 static image_t* background;

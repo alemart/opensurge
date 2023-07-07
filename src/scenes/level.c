@@ -3480,7 +3480,7 @@ void editor_update()
  */
 void editor_render()
 {
-    image_t *cursor;
+    const image_t *cursor;
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     item_list_t* major_items = entitymanager_retrieve_active_items();
     enemy_list_t* major_enemies = entitymanager_retrieve_active_objects();

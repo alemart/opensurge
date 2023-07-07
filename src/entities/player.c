@@ -58,7 +58,7 @@
     if((player)->pa_old_state != (s) && physicsactor_get_state((player)->pa) == (s))
 
 #define CHANGE_ANIM(player, id) do { \
-    animation_t *an = sprite_get_animation((player)->character->animation.sprite_name, (player)->character->animation.id); \
+    const animation_t *an = sprite_get_animation((player)->character->animation.sprite_name, (player)->character->animation.id); \
     float sf = (player)->actor->animation_speed_factor; \
     actor_change_animation((player)->actor, an); \
     actor_change_animation_speed_factor((player)->actor, sf); \
@@ -815,7 +815,7 @@ int player_collision(const player_t *player, const actor_t *actor)
     int player_box_width, player_box_height;
     v2d_t player_box_center, actor_box_topleft;
     float player_box[4], actor_box[4];
-    image_t *img = actor_image(actor);
+    const image_t *img = actor_image(actor);
 
     physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
     if(player_is_frozen(player))

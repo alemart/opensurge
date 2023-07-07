@@ -109,7 +109,7 @@ void sprite_release()
  * specified sprite name and animation number.
  * Tip: to use a default sprite, set sprite_name to NULL
  */
-animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
+const animation_t *sprite_get_animation(const char *sprite_name, int anim_id)
 {
     spriteinfo_t *sprite;
 
@@ -154,9 +154,13 @@ int sprite_animation_exists(const char* sprite_name, int anim_id)
  * Receives an animation and the desired frame number.
  * Returns an image.
  */
-image_t *sprite_get_image(const animation_t *anim, int frame_id)
+const image_t* sprite_get_image(const animation_t *anim, int frame_id)
 {
-    frame_id = clip(frame_id, 0, anim->frame_count-1);
+    if(frame_id < 0)
+        frame_id = 0;
+    else if(frame_id >= anim->frame_count)
+        frame_id = anim->frame_count - 1;
+
     return anim->sprite->frame_data[ anim->data[frame_id] ];
 }
 

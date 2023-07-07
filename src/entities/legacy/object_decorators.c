@@ -4787,7 +4787,7 @@ int onplayerrectcollision_should_trigger_event(eventstrategy_t *event, object_t 
     actor_t *act = object->actor;
     player_t *player = enemy_get_observed_player(object);
     actor_t *pa = player->actor;
-    image_t *pi = actor_image(pa);
+    const image_t *pi = actor_image(pa);
     int x1 = (int)expression_evaluate(me->x1);
     int x2 = (int)expression_evaluate(me->x2);
     int y1 = (int)expression_evaluate(me->y1);
@@ -6627,7 +6627,7 @@ void change_the_animation(objectmachine_t *obj)
     object_t *object = obj->get_object_instance(obj);
     objectdecorator_setanimationstrategy_anim_t *s = (objectdecorator_setanimationstrategy_anim_t*)(me->strategy);
     int animation_id = (int)expression_evaluate(s->animation_id);
-    animation_t *anim = sprite_get_animation(s->sprite_name, animation_id);
+    const animation_t *anim = sprite_get_animation(s->sprite_name, animation_id);
 
     actor_change_animation(object->actor, anim);
 }
