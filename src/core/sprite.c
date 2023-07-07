@@ -166,7 +166,7 @@ image_t *sprite_get_image(const animation_t *anim, int frame_id)
  * Gets a transition animation.
  * Returns NULL if there is no such transition
  */
-animation_t* sprite_get_transition(const animation_t* from, const animation_t* to)
+const animation_t* sprite_get_transition(const animation_t* from, const animation_t* to)
 {
     /* skip everything: there are no transitions in this sprite */
     if(!from || !to || darray_length(from->sprite->transition) == 0)
@@ -195,7 +195,7 @@ animation_t* sprite_get_transition(const animation_t* from, const animation_t* t
             )
         )) {
             /* validate */
-            animation_t* anim = sprite->animation_data[ sprite->transition[i]->anim_id ];
+            const animation_t* anim = sprite->animation_data[ sprite->transition[i]->anim_id ];
             if(is_transition_animation(anim))
                 return anim;
         }
@@ -493,9 +493,8 @@ void setup_transitions(spriteinfo_t *sprite)
         int to_id = sprite->transition[i]->to_id;
 
         if(to_id == TRANSITION_ANY_ANIM) {
-            /* This is a transition to "any". We'll change
-               the ->next pointer at the appropriate time.
-               For now, we just don't want it to be NULL,
+            /* This is a transition to "any". We don't
+               want the anim->next pointer to be NULL,
                so we know this is a transition animation. */
             anim->next = anim;
         }

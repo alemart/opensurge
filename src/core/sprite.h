@@ -46,7 +46,7 @@ struct animation_t {
     v2d_t hot_spot; /* hot spot */
     v2d_t action_spot; /* action spot */
     int repeat_from; /* if repeat is true, jump back to this frame of the animation. Defaults to zero */
-    const animation_t *next; /* will be NULL, unless this is a transition */
+    const animation_t *next; /* will be NULL, unless this is a transition animation */
 };
 
 /* sprite info */
@@ -91,7 +91,7 @@ int sprite_animation_exists(const char* sprite_name, int anim_id);
 struct image_t* sprite_get_image(const animation_t* anim, int frame_id);
 
 /* gets a transition animation - returns NULL if there is no such transition */
-animation_t* sprite_get_transition(const animation_t* from, const animation_t* to);
+const animation_t* sprite_get_transition(const animation_t* from, const animation_t* to);
 
 /* is anim a transition animation? */
 bool animation_is_transition(const animation_t* anim);

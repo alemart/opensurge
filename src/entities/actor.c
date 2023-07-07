@@ -53,6 +53,7 @@ actor_t* actor_create()
     act->input = NULL;
 
     act->animation = NULL;
+    act->next_animation = NULL;
     act->animation_frame = 0.0f;
     act->animation_speed_factor = 1.0f;
     act->synchronized_animation = false;
@@ -170,15 +171,15 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
        unless anim is also a transition (in
        which case we change the animation) */
     if(act->animation != NULL && act->animation->next == anim) {
-        if(!(actor_animation_finished(act) || is_transition_animation(anim)))
+        if(!(is_transition_animation(anim) || actor_animation_finished(act)))
             return;
     }
 
     /* is there a transition from act->animation to anim? */
-    animation_t* transition = sprite_get_transition(act->animation, anim);
+    const animation_t* transition = sprite_get_transition(act->animation, anim);
     if(transition != NULL) {
-        transition->next = anim; /* this may be a transition to "any" animation */
-        anim = transition;
+        act->next_animation = anim; /* anim may not be act->animation->next, as this may be a transition to "any" animation */
+        anim = transition; /* change to the transition animation */
     }
 
     /* change & reset the animation */
@@ -321,14 +322,18 @@ void update_animation(actor_t *act)
         if((int)act->animation_frame >= act->animation->frame_count) {
             /* the animation has finished playing */
             if(act->animation->repeat) {
+                /* repeat the animation */
                 act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
             }
             else {
+                /* the animation has ended */
                 act->animation_frame = act->animation->frame_count - 1;
 
                 /* is the current animation a transition? */
-                if(is_transition_animation(act->animation))
-                    actor_change_animation(act, act->animation->next);
+                if(act->next_animation != NULL) {
+                    actor_change_animation(act, act->next_animation);
+                    act->next_animation = NULL;
+                }
             }
         }
     }

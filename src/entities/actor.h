@@ -41,7 +41,8 @@ typedef struct actor_t {
     input_t *input; /* NULL by default (no input) */
 
     /* animation */
-    const animation_t *animation;
+    const animation_t* animation; /* current animation; possibly NULL */
+    const animation_t* next_animation; /* used by transitions; possibly NULL */
     float animation_frame; /* controlled by a timer */
     float animation_speed_factor; /* default value: 1.0 */
     bool synchronized_animation; /* synchronized animation? */
