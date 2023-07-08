@@ -64,12 +64,12 @@ static float f_alpha() { return target->actor->alpha; } /* alpha of the target o
 static float f_angle() { return target->actor->angle * 57.2957795131f; } /* angle of the target object */
 static float f_scale_x() { return target->actor->scale.x; } /* scale x */
 static float f_scale_y() { return target->actor->scale.y; } /* scale y */
-static float f_animation_frame() { return floor(target->actor->animation_frame); } /* animation frame */
+static float f_animation_frame() { return actor_animation_frame(target->actor); } /* animation frame */
 static float f_animation_speed_factor() { return target->actor->animation_speed_factor; }
-static float f_animation_repeats() { return target->actor->animation->repeat ? 1.0f : 0.0f; }
-static float f_animation_fps() { return (float)target->actor->animation->fps; }
-static float f_animation_frame_count() { return (float)target->actor->animation->frame_count; }
-static float f_animation_id() { return (float)target->actor->animation->id; }
+static float f_animation_repeats() { return animation_repeats(target->actor->animation) ? 1.0f : 0.0f; }
+static float f_animation_fps() { return animation_fps(target->actor->animation); }
+static float f_animation_frame_count() { return animation_frame_count(target->actor->animation); }
+static float f_animation_id() { return animation_id(target->actor->animation); }
 static float f_zindex() { return target->zindex; }
 static float f_spawnpoint_x() { return target->actor->spawn_point.x; }
 static float f_spawnpoint_y() { return target->actor->spawn_point.y; }

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * sprite.h - code for the sprites/animations
+ * sprite.h - sprite manager
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -22,29 +22,14 @@
 #define _SPRITE_H
 
 #include <stdbool.h>
-#include "nanoparser.h"
+#include "animation.h"
 #include "image.h"
 #include "../util/v2d.h"
 #include "../util/darray.h"
 
 typedef struct spriteinfo_t spriteinfo_t;
-typedef struct animation_t animation_t;
-struct animtransition_t; /* a helper struct representing a transition from one animation to another */
-
-/* animation */
-/* this represents an animation */
-struct animation_t {
-    const spriteinfo_t* sprite; /* this animation belongs to this sprite */
-    int id; /* id of the animation */
-    bool repeat; /* repeat animation? */
-    float fps; /* frames per second */
-    int frame_count; /* how many frames does this animation have? */
-    int* data; /* frame vector */
-    v2d_t hot_spot; /* hot spot */
-    v2d_t action_spot; /* action spot */
-    int repeat_from; /* if repeat is true, jump back to this frame of the animation. Defaults to zero */
-    const animation_t *next; /* will be NULL, unless this is a transition animation */
-};
+struct animation_t;
+struct parsetree_program_t;
 
 /* sprite info */
 /* spriteinfo_t represents only ONE sprite (meta data), with several animations */
@@ -60,14 +45,16 @@ struct spriteinfo_t {
     v2d_t default_action_spot; /* default unflipped action spot for all animations */
 
     int frame_count; /* every frame related to this sprite */
-    image_t **frame_data; /* image_t* vector */
+    struct image_t** frame_data; /* image_t* vector */
 
     int animation_count;
-    animation_t **animation_data; /* vector of animation_t* */
+    struct animation_t** animation_data; /* vector of animation_t* */
 
     DARRAY(struct animtransition_t*, transition); /* transitions */
+    DARRAY(struct animtransition_t*, preprocessed_transition); /* transitions without "any" sorted by from_id and then by to_id */
+    int* transition_from; /* transition_from[i] is the first index of preprocessed_transition having from_id == i, if it exists */
+    int transition_from_length; /* length of transition_from[] */
 };
-
 
 
 
@@ -82,27 +69,10 @@ void sprite_init();
 void sprite_release();
 
 /* gets the required animation - crashes if not found */
-const animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
+const struct animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
 
 /* checks if an animation exists */
 bool sprite_animation_exists(const char* sprite_name, int anim_id);
-
-
-
-
-/*
- * Animation system
- */
-
-/* returns the specified frame of the given animation */
-const struct image_t* animation_get_image(const animation_t* anim, int frame_id);
-
-/* gets a transition animation - returns NULL if there is no such transition */
-const animation_t* animation_get_transition(const animation_t* from, const animation_t* to);
-
-/* is anim a transition animation? */
-bool animation_is_transition(const animation_t* anim);
-
 
 
 
@@ -110,10 +80,19 @@ bool animation_is_transition(const animation_t* anim);
  * Sprite metadata
  */
 
-/* creates an anonymous spriteinfo_t by parsing the input tree */
-spriteinfo_t* spriteinfo_create(const parsetree_program_t* tree);
+/* creates a spriteinfo_t given a parse tree */
+spriteinfo_t* spriteinfo_create(const struct parsetree_program_t* tree);
 
 /* releases a spriteinfo_t */
 void spriteinfo_destroy(spriteinfo_t* info);
+
+/* get an animation frame of the sprite */
+const struct image_t* spriteinfo_get_animation_frame(const spriteinfo_t* info, int frame_index);
+
+/* get an animation of the sprite */
+const struct animation_t* spriteinfo_get_animation(const spriteinfo_t* info, int anim_id);
+
+/* finds a transition animation in a sprite - returns NULL if there isn't any */
+const struct animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info, int from_id, int to_id);
 
 #endif

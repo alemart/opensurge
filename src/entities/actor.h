@@ -37,19 +37,21 @@ typedef struct actor_t {
     v2d_t spawn_point;
     v2d_t position;
     v2d_t speed;
-    float angle; /* angle = ang( actor's x-axis , real x-axis ), in radians */
     input_t *input; /* NULL by default (no input) */
 
     /* animation */
     const animation_t* animation; /* current animation; possibly NULL */
     const animation_t* next_animation; /* used by transitions; possibly NULL */
-    float animation_frame; /* controlled by a timer */
+    double animation_timer; /* given in seconds */
     float animation_speed_factor; /* default value: 1.0 */
     bool synchronized_animation; /* synchronized animation? */
-    int mirror; /* see the IF_* flags at image.h */
+
+    /* transformations */
     bool visible; /* is this actor visible? */
-    float alpha; /* 0.0f (invisible) <= alpha <= 1.0f (opaque) */
     v2d_t hot_spot; /* sprite "anchor" in pixel coordinates */
+    int mirror; /* see the IF_* flags at image.h */
+    float alpha; /* 0.0f (invisible) <= alpha <= 1.0f (opaque) */
+    float angle; /* angle = ang( actor's x-axis , real x-axis ), in radians */
     v2d_t scale; /* scale */
 
 } actor_t;

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * sprite.c - code for the sprites/animations
+ * sprite.c - sprite manager
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include "sprite.h"
+#include "animation.h"
 #include "image.h"
 #include "logfile.h"
 #include "asset.h"
@@ -29,46 +30,46 @@
 #include "../util/stringutil.h"
 #include "../util/hashtable.h"
 
-/* private stuff ;) */
-HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
-static HASHTABLE(spriteinfo_t, sprites);
-static const int MAX_ANIMATIONS = 256; /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
+/* constants & utilities */
+#define MAX_ANIMATIONS 256 /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
+#define is_valid_anim_id(id) ((id) >= 0 && (id) < MAX_ANIMATIONS) /* is id a valid animation ID? */
+#define is_transition_anim_id(id) ((id) >= MAX_ANIMATIONS) /* is id a transition animation ID? */
+
 static const int DEFAULT_ANIM = 0;
-static const float DEFAULT_FPS = 8.0f;
 static const char DEFAULT_SPRITE[] = "null";
 static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
 static const int OVERRIDE_PREFIX_LENGTH = sizeof(OVERRIDE_PREFIX) - 1;
 static const int TRANSITION_ANY_ANIM = -1; /* special value representing a transition to/from any animation */
-typedef struct animtransition_t animtransition_t;
 
-/* private functions */
-#define is_valid_anim_id(id) ((id) >= 0 && (id) < MAX_ANIMATIONS) /* is id a valid animation ID? */
-#define is_transition_animation(anim) ((anim)->next != NULL) /* is anim a transition animation? */
-static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
-static void validate_animation(animation_t *anim); /* validates the animation */
-static spriteinfo_t *spriteinfo_new(); /* creates a new spriteinfo_t instance */
-static spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite); /* deletes an existing spriteinfo_t instance */
-static animation_t *allocate_sprite_anim(spriteinfo_t *sprite, int anim_id); /* allocate an animation ID in a spriteinfo_t instance */
-static animation_t *animation_new(const spriteinfo_t *sprite, int anim_id); /* creates a new animation_t instance */
-static animation_t *animation_delete(animation_t *anim); /* deletes anim */
-static animtransition_t *transition_new(int anim_id, int from_id, int to_id); /* creates a transition */
-static animtransition_t *transition_delete(animtransition_t *transition); /* deletes transition */
-static int transition_cmp(const void *t1, const void *t2); /* comparison function for sorting */
-static void setup_transitions(spriteinfo_t *sprite);
-static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by reading the spritesheet */
-static int scanfile(const char* vpath, void* param); /* file system callback */
-static int traverse(const parsetree_statement_t *stmt, void *vpath);
-static int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo);
-static int traverse_animation_attributes(const parsetree_statement_t *stmt, void *animation);
-
-/* animation transition */
-/* it's an animation that plays between two other animations: from anim[from_id] to anim[to_id] */
-struct animtransition_t
+/* transitions are animations that play between two other animations */
+typedef struct animtransition_t
 {
     int anim_id; /* ID of the transition animation */
     int from_id; /* ID of the previous animation */
     int to_id; /* ID of the next animation */
-};
+    bool is_valid; /* validity flag */
+} animtransition_t;
+
+static animtransition_t *transition_new(int anim_id, int from_id, int to_id); /* creates a transition */
+static animtransition_t *transition_delete(animtransition_t *transition); /* deletes transition */
+
+/* private functions */
+static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
+static spriteinfo_t *spriteinfo_new(); /* creates a new spriteinfo_t instance */
+static spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite); /* deletes an existing spriteinfo_t instance */
+static animation_t *allocate_sprite_anim(spriteinfo_t *sprite, int anim_id); /* allocate an animation ID in a spriteinfo_t instance */
+static int transition_cmp(const void *t1, const void *t2); /* comparison function for sorting */
+static void validate_transitions(const spriteinfo_t *sprite);
+static void preprocess_transitions(spriteinfo_t *sprite);
+static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by reading the spritesheet */
+static int scanfile(const char* vpath, void* param); /* file system callback */
+static int traverse(const parsetree_statement_t *stmt, void *vpath);
+static int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo);
+static void inspect_transitions(const spriteinfo_t* sprite);
+
+/* hash table that stores the metadata of the sprites */
+HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
+static HASHTABLE(spriteinfo_t, sprites);
 
 
 
@@ -150,93 +151,21 @@ bool sprite_animation_exists(const char* sprite_name, int anim_id)
 }
 
 
-/*
- * animation_get_image()
- * Receives an animation and the desired frame number.
- * Returns an image.
- */
-const image_t* animation_get_image(const animation_t *anim, int frame_id)
-{
-    if(frame_id < 0)
-        frame_id = 0;
-    else if(frame_id >= anim->frame_count)
-        frame_id = anim->frame_count - 1;
-
-    return anim->sprite->frame_data[ anim->data[frame_id] ];
-}
-
-
-/*
- * animation_get_transition()
- * Gets a transition animation.
- * Returns NULL if there is no such transition
- */
-const animation_t* animation_get_transition(const animation_t* from, const animation_t* to)
-{
-    /* skip everything: there are no transitions in this sprite */
-    if(!from || !to || darray_length(from->sprite->transition) == 0)
-        return NULL;
-
-    /* transitions are only available within the same sprite definition */
-    if(from->sprite != to->sprite)
-        return NULL;
-
-    /* linear search */
-    const spriteinfo_t* sprite = from->sprite;
-    for(int i = 0; i < darray_length(sprite->transition); i++) {
-        if((
-            sprite->transition[i]->from_id == from->id ||
-            (
-                /* match any animation, except a transition animation */
-                sprite->transition[i]->from_id == TRANSITION_ANY_ANIM &&
-                !is_transition_animation(from)
-            )
-        ) && (
-            sprite->transition[i]->to_id == to->id ||
-            (
-                /* match any animation, except a transition animation */
-                sprite->transition[i]->to_id == TRANSITION_ANY_ANIM &&
-                !is_transition_animation(to)
-            )
-        )) {
-            /* validate */
-            const animation_t* anim = sprite->animation_data[ sprite->transition[i]->anim_id ];
-            if(is_transition_animation(anim))
-                return anim;
-        }
-    }
-
-    /* not found */
-    return NULL;
-}
-
-
-/*
- * animation_is_transition()
- * is anim a transition animation?
- */
-bool animation_is_transition(const animation_t* anim)
-{
-    return anim != NULL && is_transition_animation(anim);
-    /*return anim != NULL && anim->id >= MAX_ANIMATIONS;*/
-}
-
-
 
 /*
  * spriteinfo_create()
- * Creates and stores on the memory a spriteinfo_t
- * object by parsing the passed tree
+ * Creates a spriteinfo_t given a parse tree
  */
 spriteinfo_t* spriteinfo_create(const parsetree_program_t *tree)
 {
     spriteinfo_t *sprite = spriteinfo_new();
-
     nanoparser_traverse_program_ex(tree, (void*)sprite, traverse_sprite_attributes);
-    setup_transitions(sprite);
+
     validate_sprite(sprite);
+    preprocess_transitions(sprite);
     load_sprite_images(sprite);
 
+    (void)inspect_transitions;
     return sprite;
 }
 
@@ -249,16 +178,90 @@ void spriteinfo_destroy(spriteinfo_t *info)
     spriteinfo_delete(info);
 }
 
+/*
+ * spriteinfo_get_animation_frame()
+ * Gets an animation frame of the sprite
+ */
+const image_t* spriteinfo_get_animation_frame(const spriteinfo_t* info, int frame_index)
+{
+    if(frame_index < 0 || frame_index >= info->frame_count) {
+        fatal_error("Can't get the frame whose index is %d of sprite \"%s\". Valid range is [0,%d].", frame_index, info->source_file, info->frame_count-1);
+        return NULL;
+    }
 
+    return info->frame_data[frame_index];
+}
 
+/*
+ * spriteinfo_get_animation()
+ * Gets an animation of the sprite
+ */
+const animation_t* spriteinfo_get_animation(const spriteinfo_t* info, int anim_id)
+{
+    if(anim_id < 0 || anim_id >= info->animation_count || info->animation_data[anim_id] == NULL) {
+        fatal_error("Can't get animation %d of sprite \"%s\"", anim_id, info->source_file);
+        return NULL;
+    }
 
+    return info->animation_data[anim_id];
+}
 
+/*
+ * spriteinfo_find_transition_animation()
+ * Finds a transition animation in a sprite
+ * Returns NULL if there isn't any
+ */
+const animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info, int from_id, int to_id)
+{
+    /* skip everything: there are no transitions in this sprite */
+    if(darray_length(info->transition) == 0)
+        return NULL;
 
+    /* perform a linear search on the set of all transition animations from
+       (from->id). Find a transition to (to->id). This set is typically very
+       small, UNLESS a declaration such as "transition any to x" is present in
+       the .spr file. In the latter case, we perform a binary search because
+       the set is ordered by ascending "to_id".
 
+       Note: a "transition any to x" declaration is, in most cases, unnecessary
+       and can be replaced by the first few frames of anim x, using repeat_from
+       if x repeats. If x must repeat with a different repeat_from index, then
+       a transition from any to x is applicable. How rare is that? Very rare.
+       It's not just a matter of necessity, however. Such a transition can be
+       used for clarity in the script. */
+    assertx(from_id >= 0 && from_id + 1 < info->transition_from_length);
 
+    int start = info->transition_from[from_id];
+    int end = info->transition_from[from_id + 1];
+    int count = end - start; /* zero if there are no transitions from (from_id) */
 
+    if(count < 8) {
+        /* linear search */
+        for(int i = start; i < end; i++) {
+            const animtransition_t* transition = info->preprocessed_transition[i];
+            if(transition->to_id == to_id)
+                return info->animation_data[transition->anim_id];
+        }
+    }
+    else {
+        /* binary search */
+        --end;
+        while(start <= end) {
+            int middle = (start + end) / 2;
+            const animtransition_t* transition = info->preprocessed_transition[middle];
 
+            if(transition->to_id == to_id)
+                return info->animation_data[transition->anim_id];
+            else if(transition->to_id > to_id)
+                end = middle - 1;
+            else
+                start = middle + 1;
+        }
+    }
 
+    /* not found */
+    return NULL;
+}
 
 
 
@@ -300,11 +303,17 @@ spriteinfo_t *spriteinfo_new()
     sprite->frame_h = 1;
     sprite->default_hot_spot = v2d_new(0, 0);
     sprite->default_action_spot = v2d_new(0, 0);
+
     sprite->frame_count = 0;
     sprite->frame_data = NULL;
+
     sprite->animation_count = 0;
     sprite->animation_data = NULL;
+
     darray_init(sprite->transition);
+    darray_init(sprite->preprocessed_transition);
+    sprite->transition_from = NULL; /* lazy allocation */
+    sprite->transition_from_length = 0;
 
     return sprite;
 }
@@ -315,18 +324,27 @@ spriteinfo_t *spriteinfo_new()
  */
 spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite)
 {
-    int i;
+    extern animation_t *animation_destroy(animation_t *anim);
+
+    /* delete transition_from[] */
+    if(sprite->transition_from != NULL)
+        free(sprite->transition_from);
+
+    /* delete the preprocessed transitions */
+    for(int i = 0; i < darray_length(sprite->preprocessed_transition); i++)
+        transition_delete(sprite->preprocessed_transition[i]);
+    darray_release(sprite->preprocessed_transition);
 
     /* delete the transitions */
-    for(i = 0; i < darray_length(sprite->transition); i++)
-        sprite->transition[i] = transition_delete(sprite->transition[i]);
+    for(int i = 0; i < darray_length(sprite->transition); i++)
+        transition_delete(sprite->transition[i]);
     darray_release(sprite->transition);
 
     /* delete the animations */
     if(sprite->animation_data != NULL) {
-        for(i = 0; i < sprite->animation_count; i++) {
+        for(int i = 0; i < sprite->animation_count; i++) {
             if(sprite->animation_data[i] != NULL)
-                sprite->animation_data[i] = animation_delete(sprite->animation_data[i]);
+                sprite->animation_data[i] = animation_destroy(sprite->animation_data[i]);
         }
         free(sprite->animation_data);
         sprite->animation_data = NULL;
@@ -334,7 +352,7 @@ spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite)
 
     /* delete the images */
     if(sprite->frame_data != NULL) {
-        for(i = 0; i < sprite->frame_count; i++)
+        for(int i = 0; i < sprite->frame_count; i++)
             image_destroy(sprite->frame_data[i]);
         free(sprite->frame_data);
         sprite->frame_data = NULL;
@@ -364,6 +382,8 @@ spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite)
  */
 animation_t *allocate_sprite_anim(spriteinfo_t *sprite, int anim_id)
 {
+    extern animation_t *animation_create(const spriteinfo_t *sprite, int anim_id, bool is_transition, int frame_width, int frame_height, v2d_t default_hot_spot, v2d_t default_action_spot);
+    extern animation_t *animation_destroy(animation_t *anim);
     const int HARD_LIMIT = 2 * MAX_ANIMATIONS; /* transitions are numbered from MAX_ANIMATIONS to HARD_LIMIT-1 */
 
     /* validate anim_id */
@@ -378,7 +398,7 @@ animation_t *allocate_sprite_anim(spriteinfo_t *sprite, int anim_id)
 
     /* delete existing animation, if we're overwriting any */
     if(anim_id >= 0 && anim_id < sprite->animation_count && NULL != sprite->animation_data[anim_id])
-        sprite->animation_data[anim_id] = animation_delete(sprite->animation_data[anim_id]);
+        sprite->animation_data[anim_id] = animation_destroy(sprite->animation_data[anim_id]);
 
     /* resize animation_data[] */
     int old_count = sprite->animation_count;
@@ -388,46 +408,18 @@ animation_t *allocate_sprite_anim(spriteinfo_t *sprite, int anim_id)
         sprite->animation_data[i] = NULL;
 
     /* allocate & return the new animation */
-    sprite->animation_data[anim_id] = animation_new(sprite, anim_id);
+    sprite->animation_data[anim_id] = animation_create(
+        sprite,
+        anim_id,
+        is_transition_anim_id(anim_id),
+        sprite->frame_w,
+        sprite->frame_h,
+        sprite->default_hot_spot,
+        sprite->default_action_spot
+    );
+
     return sprite->animation_data[anim_id];
 }
-
-/*
- * animation_new()
- * Creates a new empty animation_t instance
- */
-animation_t *animation_new(const spriteinfo_t *sprite, int anim_id)
-{
-    animation_t *anim = mallocx(sizeof *anim);
-
-    anim->sprite = sprite;
-    anim->id = anim_id;
-    anim->repeat = false;
-    anim->fps = DEFAULT_FPS;
-    anim->frame_count = 0;
-    anim->data = NULL; /* this will be malloc'd later */
-    anim->hot_spot = sprite->default_hot_spot;
-    anim->action_spot = sprite->default_action_spot;
-    anim->repeat_from = 0;
-    anim->next = NULL;
-
-    return anim;
-}
-
-
-/*
- * animation_delete()
- * Deletes an existing animation_t instance
- */
-animation_t* animation_delete(animation_t *anim)
-{
-    if(anim->data != NULL)
-        free(anim->data);
-
-    free(anim);
-    return NULL;
-}
-
 
 /*
  * transition_new()
@@ -440,6 +432,7 @@ animtransition_t *transition_new(int anim_id, int from_id, int to_id)
     transition->anim_id = anim_id;
     transition->from_id = from_id;
     transition->to_id = to_id;
+    transition->is_valid = false;
 
     return transition;
 }
@@ -456,25 +449,14 @@ animtransition_t *transition_delete(animtransition_t *transition)
 
 /*
  * transition_cmp()
- * Compare two animtransition_t instances,
- * for sorting purposes
+ * Comparison function (sorting)
  */
 int transition_cmp(const void *t1, const void *t2)
 {
     const animtransition_t *a = *((const animtransition_t**)t1);
     const animtransition_t *b = *((const animtransition_t**)t2);
-    bool a_any = (a->from_id == TRANSITION_ANY_ANIM || a->to_id == TRANSITION_ANY_ANIM);
-    bool b_any = (b->from_id == TRANSITION_ANY_ANIM || b->to_id == TRANSITION_ANY_ANIM);
 
-    /* transitions from/to "any" animation have less precedence than others */
-    if(!a_any && b_any)
-        return -1;
-    if(a_any && !b_any)
-        return 1;
-    if(a_any && b_any)
-        return 0;
-
-    /* sort by from_id and then by to_id */
+    /* sort by ascending from_id and then by ascending to_id */
     if(a->from_id != b->from_id)
         return a->from_id - b->from_id;
     else
@@ -482,47 +464,166 @@ int transition_cmp(const void *t1, const void *t2)
 }
 
 /*
- * setup_transitions()
- * Setup the transition animations of a sprite
+ * validate_transitions()
+ * Validate the transition animations of a sprite
  */
-void setup_transitions(spriteinfo_t *sprite)
+void validate_transitions(const spriteinfo_t *sprite)
 {
-    int i, n = darray_length(sprite->transition);
+    #define STRINGIFY_FIELD(x,k) (x == TRANSITION_ANY_ANIM ? "any" : str_from_int((x), buf[k], sizeof(buf[k])))
+    char buf[2][32];
 
-    /* sort transitions */
-    merge_sort(sprite->transition, n, sizeof(*(sprite->transition)), transition_cmp);
+    for(int i = 0; i < darray_length(sprite->transition); i++) {
+        animtransition_t* transition = sprite->transition[i];
 
-    /* setup anim->next pointers */
-    for(i = 0; i < n; i++) {
-        animation_t *anim = sprite->animation_data[ sprite->transition[i]->anim_id ];
-        int to_id = sprite->transition[i]->to_id;
+        /* validate the from_id and the to_id fields */
+        if(!(
+        (
+            /* require a valid to_id field */
+            (transition->to_id == TRANSITION_ANY_ANIM) ||
+            (transition->to_id >= 0 && transition->to_id < sprite->animation_count && sprite->animation_data[transition->to_id] != NULL)
+        ) && (
+            /* require a valid from_id field */
+            (transition->from_id == TRANSITION_ANY_ANIM) ||
+            (transition->from_id >= 0 && transition->from_id < sprite->animation_count && sprite->animation_data[transition->from_id] != NULL)
+        ) && (
+            /* can't transition to itself */
+            (transition->from_id != transition->to_id)
+        ) && (
+            /* can't transition any to any */
+            /*!(transition->to_id == TRANSITION_ANY_ANIM && transition->from_id == TRANSITION_ANY_ANIM)*/
+            1 /* redundant */
+        )
+        )) {
+            logfile_message("WARNING: found an invalid animation transition from %s to %s at \"%s\"", STRINGIFY_FIELD(transition->from_id, 0), STRINGIFY_FIELD(transition->to_id, 1), sprite->source_file);
+            transition->is_valid = false;
+            continue;
+        }
 
-        if(to_id == TRANSITION_ANY_ANIM) {
-            /* This is a transition to "any". We don't
-               want the anim->next pointer to be NULL,
-               so we know this is a transition animation. */
-            anim->next = anim;
+        /* the transition is valid */
+        transition->is_valid = true;
+    }
+
+    #undef STRINGIFY_FIELD
+}
+
+
+/*
+ * preprocess_transitions()
+ * Preprocess the animation transitions
+ */
+void preprocess_transitions(spriteinfo_t *sprite)
+{
+    int anim_id[MAX_ANIMATIONS];
+    int anim_id_length = 0;
+
+    /* skip if there is nothing to do */
+    if(darray_length(sprite->transition) == 0)
+        return;
+
+    /* set the validity flag of all transitions */
+    validate_transitions(sprite);
+
+    /* find all valid animation IDs */
+    assertx(MAX_ANIMATIONS <= 256);
+    for(int i = 0; i < MAX_ANIMATIONS; i++) {
+        if(sprite->animation_data[i] != NULL)
+            anim_id[anim_id_length++] = i;
+    }
+
+    /* no valid animations; this shouldn't happen */
+    if(anim_id_length == 0)
+        return;
+
+    /* get the minimum integer greater than the largest animation ID */
+    int sup_anim_id = 1 + anim_id[anim_id_length - 1]; /* no more than MAX_ANIMATIONS */
+
+    /* first, let's copy all transitions from x to y (non-any) */
+    for(int i = 0; i < darray_length(sprite->transition); i++) {
+        const animtransition_t* transition = sprite->transition[i];
+
+        /* skip invalid transitions */
+        if(!transition->is_valid)
+            continue;
+
+        /* skip transitions from/to "any" */
+        else if(transition->from_id == TRANSITION_ANY_ANIM || transition->to_id == TRANSITION_ANY_ANIM)
+            continue;
+
+        /* copy transition from x to y */
+        animtransition_t* copy = transition_new(transition->anim_id, transition->from_id, transition->to_id);
+        copy->is_valid = true;
+        darray_push(sprite->preprocessed_transition, copy);
+    }
+
+    /* second, preprocess transitions to/from "any" other animation number */
+    for(int i = 0; i < darray_length(sprite->transition); i++) {
+        const animtransition_t* transition = sprite->transition[i];
+
+        /* skip invalid transitions */
+        if(!transition->is_valid)
+            continue;
+
+        /* copy transitions from any */
+        if(transition->from_id == TRANSITION_ANY_ANIM) {
+            for(int j = 0; j < anim_id_length; j++) {
+                if(anim_id[j] != transition->to_id) { /* replace "from any" by all valid animations */
+                    animtransition_t* new_transition = transition_new(transition->anim_id, anim_id[j], transition->to_id);
+                    new_transition->is_valid = true;
+                    darray_push(sprite->preprocessed_transition, new_transition);
+                }
+            }
         }
-        else if(to_id >= 0 && to_id < sprite->animation_count) {
-            /* regular transition */
-            anim->next = sprite->animation_data[to_id];
+
+        /* copy transitions to any */
+        else if(transition->to_id == TRANSITION_ANY_ANIM) {
+            for(int j = 0; j < anim_id_length; j++) {
+                if(anim_id[j] != transition->from_id) { /* replace "to any" by all valid animations */
+                    animtransition_t* new_transition = transition_new(transition->anim_id, transition->from_id, anim_id[j]);
+                    new_transition->is_valid = true;
+                    darray_push(sprite->preprocessed_transition, new_transition);
+                }
+            }
         }
-        else {
-            /* this shouldn't happen */
-            logfile_message("WARNING: found an incorrect transition to anim %d (valid range: [0, %d]) at \"%s\"", to_id, sprite->animation_count - 1, sprite->source_file);
-            anim->next = NULL;
-        }
+
+        /* there are no transitions from any to any */
+
+    }
+
+    /* sort transitions with a stable sorting algorithm, so
+       that transitions from/to "any" have lower precedence */
+    int n = darray_length(sprite->preprocessed_transition);
+    merge_sort(sprite->preprocessed_transition, n, sizeof(*(sprite->preprocessed_transition)), transition_cmp);
+
+    /* allocate transition_from[] and initialize it with -1s */
+    assertx(sprite->transition_from == NULL);
+    sprite->transition_from_length = 1 + sup_anim_id;
+    sprite->transition_from = mallocx((1 + sup_anim_id) * sizeof(int));
+    for(int i = 0; i <= sup_anim_id; i++)
+        sprite->transition_from[i] = -1;
+
+    /* fill transition_from[] */
+    for(int i = n-1; i >= 0; i--) {
+        const animtransition_t* transition = sprite->preprocessed_transition[i];
+        assertx(transition->from_id >= 0 && transition->from_id < sup_anim_id);
+        sprite->transition_from[transition->from_id] = i;
+    }
+
+    /* get rid of all -1s */
+    sprite->transition_from[sup_anim_id] = n;
+    for(int i = sup_anim_id - 1; i >= 0; i--) {
+        if(sprite->transition_from[i] == -1)
+            sprite->transition_from[i] = sprite->transition_from[i+1]; /* one minus the other (count) is zero */
     }
 }
 
 
 /*
  * validate_sprite()
- * Validates the sprite
+ * Validate (and possibly fix) the sprite
  */
 void validate_sprite(spriteinfo_t *spr)
 {
-    int i, j, n;
+    extern void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet);
 
     if(spr->frame_w > spr->rect_w || spr->frame_h > spr->rect_h) {
         logfile_message("Sprite error: frame_size (%d,%d) can't be larger than source_rect size (%d,%d)", spr->frame_w, spr->frame_h, spr->rect_w, spr->rect_h);
@@ -541,34 +642,13 @@ void validate_sprite(spriteinfo_t *spr)
     if(spr->animation_count < 1 || spr->animation_data == NULL)
         fatal_error("Sprite error: sprites must contain at least one animation");
 
-    n = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
-    for(i=0; i<spr->animation_count; i++) {
-        if(spr->animation_data[i] == NULL) continue;
-        for(j=0; j<spr->animation_data[i]->frame_count; j++) {
-            if(!(spr->animation_data[i]->data[j] >= 0 && spr->animation_data[i]->data[j] < n)) {
-                logfile_message("Sprite error: invalid frame '%d' of animation %d. Animation frames must be in the range [%d, %d]", spr->animation_data[i]->data[j], i, 0, n-1);
-                spr->animation_data[i]->data[j] = clip(spr->animation_data[i]->data[j], 0, n-1);
-                logfile_message("Adjusting animation frame to %d", spr->animation_data[i]->data[j]);
-            }
-        }
+    int number_of_frames_in_the_sheet = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
+    for(int i = 0; i < spr->animation_count; i++) {
+        if(spr->animation_data[i] != NULL)
+            animation_validate(spr->animation_data[i], number_of_frames_in_the_sheet);
     }
 }
 
-
-/*
- * validate_animation()
- * Validates the animation
- */
-void validate_animation(animation_t *anim)
-{
-    if(anim->frame_count == 0)
-        fatal_error("Animation error: invalid 'data' field. You must specify the frames of the animation");
-
-    if(anim->repeat_from < 0 || anim->repeat_from >= anim->frame_count) {
-        anim->repeat_from = clip(anim->repeat_from, 0, anim->frame_count-1);
-        logfile_message("Animation error: the 'repeat_from' field has been adjusted to %d", anim->repeat_from);
-    }
-}
 
 
 /*
@@ -598,7 +678,7 @@ void load_sprite_images(spriteinfo_t *spr)
         }
     }
 
-    image_unload(sheet);
+    /*image_unload(sheet);*/
 }
 
 /*
@@ -661,6 +741,7 @@ int traverse(const parsetree_statement_t *stmt, void *vpath)
  */
 int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo)
 {
+    extern int traverse_animation_attributes(const parsetree_statement_t *stmt, void *animation);
     const char *identifier;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2, *p3, *p4;
@@ -744,9 +825,8 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         /* allocate animation */
         allocate_sprite_anim(s, anim_id);
 
-        /* read & validate animation */
+        /* read the animation */
         nanoparser_traverse_program_ex(nanoparser_get_program(p2), s->animation_data[anim_id], traverse_animation_attributes);
-        validate_animation(s->animation_data[anim_id]);
     }
     else if(str_icmp(identifier, "transition") == 0) {
         int anim_id, from_id, to_id;
@@ -792,13 +872,8 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         allocate_sprite_anim(s, anim_id);
         darray_push(s->transition, transition_new(anim_id, from_id, to_id)); /* register the transition */
 
-        /* read & validate animation */
+        /* read the animation */
         nanoparser_traverse_program_ex(nanoparser_get_program(p4), s->animation_data[anim_id], traverse_animation_attributes);
-        validate_animation(s->animation_data[anim_id]);
-
-        /* transition animations shouldn't repeat... */
-        if(s->animation_data[anim_id]->repeat)
-            logfile_message("WARNING: a transition animation is set to repeat\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
         fatal_error("Can't load sprites. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -807,63 +882,42 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
 }
 
 /*
- * traverse_animation_attributes()
- * Animation attributes traversal
+ * inspect_transitions()
+ * Debug only
  */
-int traverse_animation_attributes(const parsetree_statement_t *stmt, void *animation)
+void inspect_transitions(const spriteinfo_t* sprite)
 {
-    const char *identifier;
-    const parsetree_parameter_t *param_list;
-    const parsetree_parameter_t *p1, *p2, *pj;
-    animation_t *anim = (animation_t*)animation;
-    int j;
+#if 0
+    printf("Inspecting %s\n",sprite->source_file);
 
-    identifier = nanoparser_get_identifier(stmt);
-    param_list = nanoparser_get_parameter_list(stmt);
+    printf("\n-- TRANSITIONS --\n");
+    for(int i = 0; i < darray_length(sprite->transition); i++) {
+        const animtransition_t* transition = sprite->transition[i];
+        printf("[%d] from %d to %d == %d\n", i, transition->from_id, transition->to_id, transition->anim_id);
+    }
 
-    if(str_icmp(identifier, "repeat") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "repeat flag must be a boolean (true or false)");
-        anim->repeat = atob(nanoparser_get_string(p1));
+    printf("\n-- PREPROCESSED TRANSITIONS --\n");
+    for(int i = 0; i < darray_length(sprite->preprocessed_transition); i++) {
+        const animtransition_t* transition = sprite->preprocessed_transition[i];
+        printf("[%d] from %d to %d == %d\n", i, transition->from_id, transition->to_id, transition->anim_id);
     }
-    else if(str_icmp(identifier, "fps") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "fps must be a positive number");
-        anim->fps = max(1e-5, atof(nanoparser_get_string(p1)));
-    }
-    else if(str_icmp(identifier, "repeat_from") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "repeat_from must be a non-negative number");
-        anim->repeat_from = max(0, atoi(nanoparser_get_string(p1)));
-    }
-    else if(str_icmp(identifier, "hot_spot") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        p2 = nanoparser_get_nth_parameter(param_list, 2);
-        nanoparser_expect_string(p1, "hot_spot receives two numbers: xpos, ypos");
-        nanoparser_expect_string(p2, "hot_spot receives two numbers: xpos, ypos");
-        anim->hot_spot.x = (float)atoi(nanoparser_get_string(p1));
-        anim->hot_spot.y = (float)atoi(nanoparser_get_string(p2));
-    }
-    else if(str_icmp(identifier, "action_spot") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        p2 = nanoparser_get_nth_parameter(param_list, 2);
-        nanoparser_expect_string(p1, "action_spot receives two numbers: xpos, ypos");
-        nanoparser_expect_string(p2, "action_spot receives two numbers: xpos, ypos");
-        anim->action_spot.x = (float)atoi(nanoparser_get_string(p1));
-        anim->action_spot.y = (float)atoi(nanoparser_get_string(p2));
-    }
-    else if(str_icmp(identifier, "data") == 0) {
-        anim->frame_count = nanoparser_get_number_of_parameters(param_list);
-        if(anim->frame_count < 1)
-            fatal_error("Can't load sprites. Animation 'data' field is missing\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-        
-        anim->data = reallocx(anim->data, anim->frame_count * sizeof(*(anim->data)));
-        for(j=1; j<=anim->frame_count; j++) {
-            pj = nanoparser_get_nth_parameter(param_list, j);
-            nanoparser_expect_string(pj, "Animation 'data' field is a list of frame numbers");
-            anim->data[j-1] = max(0, atoi(nanoparser_get_string(pj)));
+
+    if(sprite->transition_from == NULL)
+        return;
+
+    printf("\n-- START / COUNT --\n");
+    for(int i = 0; i < sprite->transition_from_length-1; i++) {
+        int start = sprite->transition_from[i];
+        int end = sprite->transition_from[i+1];
+        int count = end - start;
+
+        printf("from %d:\t\t%d transitions\t\t(indexed from %d to %d)\n", i, count, start, end-1);
+        for(int j = start; j < end; j++) {
+            const animtransition_t* transition = sprite->preprocessed_transition[j];
+            printf("-- from %d to %d play %d\n", transition->from_id, transition->to_id, transition->anim_id);
         }
     }
-
-    return 0;
+#else
+    (void)sprite;
+#endif
 }

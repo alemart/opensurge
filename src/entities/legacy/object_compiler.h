@@ -22,6 +22,7 @@
 #define _OBJECT_COMPILER_H
 
 #include "object_vm.h"
+#include "../../core/nanoparser.h"
 
 void objectcompiler_compile(object_t *obj, const parsetree_program_t *script);
 

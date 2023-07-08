@@ -116,8 +116,8 @@ void scripting_animation_overwrite_ptr(surgescript_object_t* object, const anima
     if(animation_is_transition(animation))
         return;
 
-    if(surgescript_var_get_number(anim_id) != animation->id) {
-        surgescript_var_set_number(anim_id, animation->id);
+    if(surgescript_var_get_number(anim_id) != animation_id(animation)) {
+        surgescript_var_set_number(anim_id, animation_id(animation));
         surgescript_object_set_userdata(object, (void*)animation);
     }
 }
@@ -252,7 +252,7 @@ surgescript_var_t* fun_getsprite(surgescript_object_t* object, const surgescript
 surgescript_var_t* fun_getfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     const animation_t* animation = scripting_animation_ptr(object);
-    return surgescript_var_set_number(surgescript_var_create(), animation->fps);
+    return surgescript_var_set_number(surgescript_var_create(), animation_fps(animation));
 }
 
 /* animation finished? */
@@ -266,7 +266,7 @@ surgescript_var_t* fun_getfinished(surgescript_object_t* object, const surgescri
 surgescript_var_t* fun_getrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     const animation_t* animation = scripting_animation_ptr(object);
-    return surgescript_var_set_bool(surgescript_var_create(), animation->repeat);
+    return surgescript_var_set_bool(surgescript_var_create(), animation_repeats(animation));
 }
 
 /* the (x,y) coordinates of the hotspot */
@@ -278,6 +278,7 @@ surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescrip
     surgescript_objecthandle_t handle;
     surgescript_object_t* v2;
     const animation_t* animation = scripting_animation_ptr(object);
+    v2d_t anim_hot_spot = animation_hot_spot(animation);
 
     /* lazy evaluation */
     if(surgescript_var_is_null(hot_spot)) {
@@ -290,7 +291,7 @@ surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescrip
 
     /* get hotspot */
     v2 = surgescript_objectmanager_get(manager, handle);
-    scripting_vector2_update(v2, animation->hot_spot.x, animation->hot_spot.y);
+    scripting_vector2_update(v2, anim_hot_spot.x, anim_hot_spot.y);
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
@@ -303,8 +304,9 @@ surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript
     surgescript_objecthandle_t handle;
     surgescript_object_t* v2;
     const animation_t* animation = scripting_animation_ptr(object);
-    double width = animation->sprite->frame_w;
-    double height = animation->sprite->frame_h;
+    v2d_t hot_spot = animation_hot_spot(animation);
+    double width = animation_frame_width(animation);
+    double height = animation_frame_height(animation);
 
     /* lazy evaluation */
     if(surgescript_var_is_null(anchor)) {
@@ -317,7 +319,7 @@ surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surgescript
 
     /* get anchor */
     v2 = surgescript_objectmanager_get(manager, handle);
-    scripting_vector2_update(v2, animation->hot_spot.x / width, animation->hot_spot.y / height);
+    scripting_vector2_update(v2, hot_spot.x / width, hot_spot.y / height);
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
@@ -400,7 +402,7 @@ surgescript_var_t* fun_setframe(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_getframecount(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     const animation_t* animation = scripting_animation_ptr(object);
-    return surgescript_var_set_number(surgescript_var_create(), animation->frame_count);
+    return surgescript_var_set_number(surgescript_var_create(), animation_frame_count(animation));
 }
 
 /* animation speed factor (multiplier, defaults to 1.0) */

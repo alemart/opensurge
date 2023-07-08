@@ -1346,7 +1346,7 @@ const char* path_ssobject_debug(renderable_t r, char* dest, size_t dest_size)
     /* this routine is based on render_ssobject_debug() */
     const char* name = surgescript_object_name(r.ssobject);
     const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
-    const image_t* img = animation_get_image(anim, 0);
+    const image_t* img = animation_image(anim, 0);
 
     return str_cpy(dest, image_filepath(img), dest_size);
 }
@@ -1384,7 +1384,7 @@ texturehandle_t texture_ssobject_debug(renderable_t r)
     /* this routine is based on render_ssobject_debug() */
     const char* name = surgescript_object_name(r.ssobject);
     const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
-    const image_t* img = animation_get_image(anim, 0);
+    const image_t* img = animation_image(anim, 0);
 
     return image_texture(img);
 }
@@ -1462,8 +1462,8 @@ void render_ssobject_debug(renderable_t r, v2d_t camera_position)
        any changes within its state or data */
     const char* name = surgescript_object_name(r.ssobject);
     const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
-    const image_t* img = animation_get_image(anim, 0);
-    v2d_t hot_spot = anim->hot_spot;
+    const image_t* img = animation_image(anim, 0);
+    v2d_t hot_spot = animation_hot_spot(anim);
     v2d_t position = scripting_util_world_position(r.ssobject);
 
     if(level_inside_screen(position.x - hot_spot.x, position.y - hot_spot.y, image_width(img), image_height(img))) {

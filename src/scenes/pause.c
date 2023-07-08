@@ -859,7 +859,7 @@ void legacy_render()
     if(!sprite_animation_exists(LEGACY_SPRITE_NAME, 0))
         return;
 
-    const image_t *icon = animation_get_image(sprite_get_animation(LEGACY_SPRITE_NAME, 0), 0);
+    const image_t *icon = animation_image(sprite_get_animation(LEGACY_SPRITE_NAME, 0), 0);
     v2d_t size = v2d_new(image_width(icon), image_height(icon));
 
     float frequency = PI_OVER_TWO;

@@ -3505,7 +3505,7 @@ void editor_render()
         editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(editor_grid_snap(editor_cursor), topleft));
 
         /* drawing the cursor arrow */
-        cursor = animation_get_image(sprite_get_animation("Mouse Cursor", 0), 0);
+        cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
@@ -3516,7 +3516,7 @@ void editor_render()
     }
     else {
         /* drawing an eraser */
-        cursor = animation_get_image(sprite_get_animation("Eraser", 0), 0);
+        cursor = animation_image(sprite_get_animation("Eraser", 0), 0);
         image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
 
@@ -4075,8 +4075,8 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
                 anim = sprite_get_animation(object_name, 0);
             else
                 anim = sprite_get_animation(NULL, 0);
-            cursor = animation_get_image(anim, 0);
-            offset = anim->hot_spot;
+            cursor = animation_image(anim, 0);
+            offset = animation_hot_spot(anim);
             break;
         }
     }
@@ -4992,9 +4992,9 @@ void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** bes
         /* find the bounding box of the entity */
         const char* name = surgescript_object_name(object);
         const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
-        const image_t* img = animation_get_image(anim, 0);
+        const image_t* img = animation_image(anim, 0);
         v2d_t worldpos = scripting_util_world_position(object);
-        v2d_t hot_spot = anim->hot_spot;
+        v2d_t hot_spot = animation_hot_spot(anim);
         a[0] = worldpos.x - hot_spot.x;
         a[1] = worldpos.y - hot_spot.y;
         a[2] = a[0] + image_width(img);

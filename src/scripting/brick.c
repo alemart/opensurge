@@ -262,7 +262,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     char* sprite_name = surgescript_var_get_string(param[0], manager);
     int anim_id = BRICKLIKE_ANIMATION_ID;
     const animation_t* animation = sprite_animation_exists(sprite_name, anim_id) ? sprite_get_animation(sprite_name, anim_id) : sprite_get_animation(NULL, 0);
-    const image_t* brick_image = animation_get_image(animation, 0); /* get the first frame of the animation */
+    const image_t* brick_image = animation_image(animation, 0); /* get the first frame of the animation */
     bricklike_data_t* data = get_data(object);
 
     if(data->mask != NULL) {
@@ -274,7 +274,7 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     image_lock((image_t*)brick_image);
     data->mask = collisionmask_create(brick_image, 0, 0, image_width(brick_image), image_height(brick_image));
     data->maskimg = NULL;
-    data->hot_spot = animation->hot_spot;
+    data->hot_spot = animation_hot_spot(animation);
     image_unlock((image_t*)brick_image);
 
     ssfree(sprite_name);

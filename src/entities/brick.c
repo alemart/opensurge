@@ -82,7 +82,6 @@ struct brick_t { /* a real, concrete brick */
     int sx, sy; /* spawn point */
     brickstate_t state; /* brick state: BRS_* */
     float value[BRICK_MAXVALUES]; /* alterable values */
-    float animation_frame; /* controlled by a timer */
     bricklayer_t layer; /* loop system: BRL_* */
     brickflip_t flip; /* flip bitwise flags */
     obstacle_t* obstacle; /* used by the physics system */
@@ -223,7 +222,6 @@ brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t fl
 
     b->x = b->sx = (int)position.x;
     b->y = b->sy = (int)position.y;
-    b->animation_frame = 0;
     b->state = BRS_IDLE;
     b->layer = layer;
     b->flip = flip_flags;
@@ -1039,22 +1037,9 @@ void animate_brick(brick_t *brk)
     if(sprite == NULL)
         return;
 
-    /* does this brick have only one animation frame?
-       skip everything (this is probably the case!) */
-    if(sprite->animation_data[0]->frame_count == 1)
-        return;
-
     /* animate */
-    bool loop = sprite->animation_data[0]->repeat;
-    int c = sprite->animation_data[0]->frame_count;
-
-    if(!loop)
-        brk->animation_frame = min(c-1, brk->animation_frame + sprite->animation_data[0]->fps * timer_get_delta());
-    else
-        brk->animation_frame = (int)(sprite->animation_data[0]->fps * timer_get_elapsed()) % c;
-
-    int f = clip((int)brk->animation_frame, 0, c-1);
-    brk->image = sprite->frame_data[ sprite->animation_data[0]->data[f] ];
+    const animation_t* anim = spriteinfo_get_animation(sprite, 0);
+    brk->image = animation_image_at_time(anim, timer_get_elapsed());
 }
 
 /* Checks if the player is standing on top of a platform */
@@ -1264,9 +1249,9 @@ int traverse(const parsetree_statement_t *stmt)
         validate_brickdata(brickdata[brick_id]);
 
         /* setup preview image */
-        brickdata[brick_id]->image = brickdata[brick_id]->data->frame_data[
-            brickdata[brick_id]->data->animation_data[0]->data[0]
-        ];
+        brickdata[brick_id]->image = animation_image(
+            brickdata[brick_id]->data->animation_data[0], 0
+        );
 
         /* cache preview image size */
         brickdata[brick_id]->image_width = image_width(brickdata[brick_id]->image);

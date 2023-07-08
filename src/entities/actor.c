@@ -47,20 +47,21 @@ actor_t* actor_create()
 
     act->spawn_point = v2d_new(0, 0);
     act->position = act->spawn_point;
-    act->angle = 0.0f;
     act->speed = v2d_new(0,0);
     act->input = NULL;
 
     act->animation = NULL;
     act->next_animation = NULL;
-    act->animation_frame = 0.0f;
+    act->animation_timer = 0.0;
     act->animation_speed_factor = 1.0f;
     act->synchronized_animation = false;
+
+    act->hot_spot = v2d_new(0, 0);
     act->mirror = IF_NONE;
     act->visible = true;
-    act->alpha = 1.0f;
-    act->hot_spot = v2d_new(0, 0);
+    act->angle = 0.0f;
     act->scale = v2d_new(1.0f, 1.0f);
+    act->alpha = 1.0f;
 
     return act;
 }
@@ -165,27 +166,53 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
     if(act->animation == anim || anim == NULL)
         return;
 
-    /* are we playing a transition to anim? If so,
-       we wait until the end of the transition,
-       unless anim is also a transition (in
-       which case we change the animation) */
-    if(act->animation != NULL && act->animation->next == anim) {
-        if(!(animation_is_transition(anim) || actor_animation_finished(act)))
-            return;
-    }
+    /* are we playing an animation? */
+    if(act->animation != NULL) {
 
-    /* is there a transition from act->animation to anim? */
-    const animation_t* transition = animation_get_transition(act->animation, anim);
-    if(transition != NULL) {
-        act->next_animation = anim; /* anim may not be act->animation->next, as this may be a transition to "any" animation */
-        anim = transition; /* change to the transition animation */
+        /* handle transitions */
+        const animation_t* transition = animation_find_transition(act->animation, anim);
+        if(transition == NULL) {
+            /* if there is no transition and/or if the current animation is a transition */
+            if(animation_is_transition(act->animation)) {
+                /* the current animation is a transition */
+                if(anim == act->next_animation) {
+                    /* is the transition over? */
+                    if(animation_is_over(act->animation, act->animation_timer)) {
+                        /* the transition is over */
+                        /*anim = act->next_animation;*/ /* anim is already the next animation */
+                        act->next_animation = NULL;
+                    }
+                    else {
+                        /* wait for the current transition to finish */
+                        return;
+                    }
+                }
+                else {
+                    /* the current animation is a transition, but we're going
+                       to interrupt it. A new animation (anim) will show up. */
+                    ;
+                }
+            }
+            else {
+                /* the current animation is not a transition */
+                ; /* just change the animation - there are no transitions */
+            }
+        }
+        else {
+            /* there is a transition. This means that both anim and the current
+               animation are NOT transitions. */
+            act->next_animation = anim;
+            anim = transition;
+        }
+
     }
 
     /* change & reset the animation */
     act->animation = anim;
-    act->hot_spot = anim->hot_spot;
-    act->animation_frame = 0.0f;
+    act->hot_spot = animation_hot_spot(anim);
+    act->animation_timer = 0.0;
     act->animation_speed_factor = 1.0f;
+    act->synchronized_animation = false;
 }
 
 
@@ -196,7 +223,15 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
  */
 void actor_change_animation_frame(actor_t *act, int frame)
 {
-    act->animation_frame = clip(frame, 0, act->animation->frame_count - 1);
+    /* no animation */
+    if(act->animation == NULL)
+        return;
+
+    /* changing the frame won't work if the animation is synchronized */
+    act->synchronized_animation = false;
+
+    /* change the frame */
+    act->animation_timer = animation_start_time_of_frame(act->animation, frame);
 }
 
 
@@ -220,11 +255,10 @@ void actor_change_animation_speed_factor(actor_t *act, float factor)
  */
 bool actor_animation_finished(const actor_t *act)
 {
-    if(!act->animation)
+    if(act->animation == NULL)
         return false;
 
-    float frame = act->animation_frame + (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
-    return (!act->animation->repeat && (int)frame >= act->animation->frame_count);
+    return animation_is_over(act->animation, act->animation_timer);
 }
 
 
@@ -235,7 +269,7 @@ bool actor_animation_finished(const actor_t *act)
  */
 bool actor_is_transition_animation_playing(const actor_t *act)
 {
-    if(!act->animation)
+    if(act->animation == NULL)
         return false;
 
     return animation_is_transition(act->animation);
@@ -249,6 +283,7 @@ bool actor_is_transition_animation_playing(const actor_t *act)
  */
 void actor_synchronize_animation(actor_t *act, bool sync)
 {
+    /* only makes sense if the currently playing animation loops */
     act->synchronized_animation = sync;
 }
 
@@ -259,7 +294,10 @@ void actor_synchronize_animation(actor_t *act, bool sync)
  */
 int actor_animation_frame(const actor_t* act)
 {
-    return (int)(act->animation_frame);
+    if(act->animation == NULL)
+        return 0;
+
+    return animation_frame_at_time(act->animation, act->animation_timer);
 }
 
 
@@ -270,10 +308,12 @@ int actor_animation_frame(const actor_t* act)
  */
 const image_t* actor_image(const actor_t *act)
 {
-    if(!act->animation)
+    if(act->animation == NULL) {
         fatal_error("actor_image(): no animation is playing");
+        return NULL;
+    }
 
-    return animation_get_image(act->animation, (int)(act->animation_frame));
+    return animation_image_at_time(act->animation, act->animation_timer);
 }
 
 /*
@@ -282,14 +322,15 @@ const image_t* actor_image(const actor_t *act)
  */
 v2d_t actor_action_spot(const actor_t* act)
 {
-    if(!act->animation)
+    if(act->animation == NULL)
         return v2d_new(0, 0);
 
-    v2d_t hot_spot = act->animation->hot_spot;
-    v2d_t offset = v2d_subtract(act->animation->action_spot, hot_spot);
+    v2d_t hot_spot = animation_hot_spot(act->animation);
+    v2d_t action_spot = animation_action_spot(act->animation);
+    v2d_t offset = v2d_subtract(action_spot, hot_spot);
     v2d_t sign = v2d_new(
-        act->mirror & IF_HFLIP ? -1.0f : 1.0f,
-        act->mirror & IF_VFLIP ? -1.0f : 1.0f
+        (int)((act->mirror & IF_HFLIP) == 0) * 2 - 1,
+        (int)((act->mirror & IF_VFLIP) == 0) * 2 - 1
     );
 
     /* flip the action spot relative to the hot spot */
@@ -312,34 +353,24 @@ v2d_t actor_action_offset(const actor_t* act)
 /* this logic updates the animation of an actor */
 void update_animation(actor_t *act)
 {
+    /* nothing to do */
     if(act->animation == NULL)
         return;
 
-    if(!(act->synchronized_animation) || !(act->animation->repeat)) {
-        /* the animation isn't synchronized: every object updates its animation at its own pace */
-        act->animation_frame += (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
-        if((int)act->animation_frame >= act->animation->frame_count) {
-            /* the animation has finished playing */
-            if(act->animation->repeat) {
-                /* repeat the animation */
-                act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
-            }
-            else {
-                /* the animation has ended */
-                act->animation_frame = act->animation->frame_count - 1;
+    /* update the animation time */
+    if(act->synchronized_animation)
+        act->animation_timer = timer_get_elapsed() * act->animation_speed_factor;
+    else
+        act->animation_timer += timer_get_delta() * act->animation_speed_factor;
 
-                /* is the current animation a transition? */
-                if(act->next_animation != NULL) {
-                    actor_change_animation(act, act->next_animation);
-                    act->next_animation = NULL;
-                }
-            }
+    /* handle transitions with non-repeating animations */
+    if(act->next_animation != NULL) {
+        if(animation_is_over(act->animation, act->animation_timer)) {
+            const animation_t* next = act->next_animation;
+            act->next_animation = NULL;
+            actor_change_animation(act, next);
+            /*return;*/
         }
-    }
-    else {
-        /* the animation is synchronized: this only makes sense if the animation does repeat */
-        act->animation_frame = (act->animation->fps * act->animation_speed_factor) * (0.001f * timer_get_ticks());
-        act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
     }
 }
 
