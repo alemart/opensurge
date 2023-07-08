@@ -1236,8 +1236,8 @@ void preprocess_split(fonttext_t* out, const fontdrv_t* drv, fontalign_t align)
         (float)(align == FONTALIGN_CENTER) * 0.5f + (float)(align == FONTALIGN_RIGHT)
     );
 
-    ssassert(darray_length(out->line_width) > 0);
-    ssassert(darray_length(out->color_sequence) > 0);
+    assertx(darray_length(out->line_width) > 0);
+    assertx(darray_length(out->color_sequence) > 0);
 
     darray_clear(out->text_segment);
     darray_clear(out->color);
