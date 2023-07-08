@@ -46,9 +46,9 @@
 #define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define min(a,b)                ((a)<(b)?(a):(b))
 #define max(a,b)                ((a)>(b)?(a):(b))
-#define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
+#define clip(val,a,b)           (((val)<(a))?(a):(((val)>(b))?(b):(val))) /* we assume a <= b */
 #define clip01(val)             ((val) - ((val)<0.0f)*(val) + ((val)>1.0f)*(1.0f-(val))) /* clip((val), 0.0f, 1.0f) */
-#define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
+#define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* legacy macro; a[4],b[4] = (x,y,x+w,y+h) */
 #define mallocx(bytes)          __mallocx((bytes), __FILE__, __LINE__)
 #define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__, __LINE__)
 #define assertx(expr)           do { if(!(expr)) fatal_error("In %s:%d: %s", __FILE__, __LINE__, ": assertion `" STRINGIFY(expr) "` failed."); } while(0)
