@@ -1526,10 +1526,12 @@ void level_render()
        Let's make sure that we keep our active region updated. */
     v2d_t cam = camera_get_position(); /* we're not in editor mode */
     rect_t brick_roi = create_roi(cam, ROI_MARGIN_RENDER_BRICK);
-    rect_t entity_roi = create_roi(cam, ROI_MARGIN_RENDER_ENTITY);
+    /*rect_t entity_roi = create_roi(cam, ROI_MARGIN_RENDER_ENTITY);*/ /* we don't want to unnecessarily bubble things up and down in the entity tree */
+    rect_t entity_roi = create_roi(cam, ROI_MARGIN_UPDATE_ENTITY); /* use the same ROI of the update cycle (if possible) to skip updating the entity tree */
+    (void)ROI_MARGIN_RENDER_ENTITY;
 
-    brickmanager_set_roi(brick_manager, brick_roi);
-    set_entitymanager_roi(entity_roi);
+    brickmanager_set_roi(brick_manager, brick_roi); /* this call is cheap */
+    set_entitymanager_roi(entity_roi); /* this call may be expensive if the ROI has changed */
     entitymanager_set_active_region(entity_roi); /* legacy */
 
     /* retrieve lists of active entities */
