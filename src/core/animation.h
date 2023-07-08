@@ -32,6 +32,11 @@ struct image_t;
 
 
 
+/*
+ * animations are defined in a stateless way
+ */
+
+
 /* the ID of the animation, as declared in a .spr file */
 int animation_id(const animation_t* anim);
 

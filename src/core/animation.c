@@ -44,6 +44,7 @@ struct animation_t {
 
 /* constants */
 static const float DEFAULT_FPS = 8.0f;
+static const float MIN_FPS = 1e-5;
 
 
 
@@ -169,7 +170,7 @@ const image_t* animation_image_at_time(const animation_t* anim, double seconds)
  */
 int animation_frame_at_time(const animation_t* anim, double seconds)
 {
-    int frame_number = (double)anim->fps * seconds;
+    int frame_number = floor((double)anim->fps * seconds);
 
     if(frame_number >= anim->frame_count) {
         /* let's make sure that
@@ -342,6 +343,11 @@ void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet)
         }
     }
 
+    if(anim->fps < MIN_FPS) {
+        logfile_message("Animation warning: 'fps' value %f is invalid.", anim->fps);
+        anim->fps = MIN_FPS;
+    }
+
     if(!anim->repeat && anim->repeat_from != 0) {
         logfile_message("Animation warning: 'repeat_from' has been set, but animation %d does not repeat", anim->id);
         anim->repeat_from = 0;
@@ -374,18 +380,18 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
 
     if(str_icmp(identifier, "repeat") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "repeat flag must be a boolean (true or false)");
+        nanoparser_expect_string(p1, "repeat must be true or false");
         anim->repeat = atob(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "fps") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "fps must be a positive number");
-        anim->fps = max(1e-5, atof(nanoparser_get_string(p1)));
+        anim->fps = atof(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "repeat_from") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "repeat_from must be a non-negative number");
-        anim->repeat_from = max(0, atoi(nanoparser_get_string(p1)));
+        anim->repeat_from = atoi(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "hot_spot") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
@@ -406,13 +412,13 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
     else if(str_icmp(identifier, "data") == 0) {
         anim->frame_count = nanoparser_get_number_of_parameters(param_list);
         if(anim->frame_count < 1)
-            fatal_error("Can't load sprites. Animation 'data' field is missing\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-        
-        anim->data = reallocx(anim->data, anim->frame_count * sizeof(*(anim->data)));
+            fatal_error("Can't load sprites. Animation 'data' field is missing in \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+        anim->data = reallocx(anim->data, anim->frame_count * sizeof(int));
         for(int j = 1; j <= anim->frame_count; j++) {
             pj = nanoparser_get_nth_parameter(param_list, j);
             nanoparser_expect_string(pj, "Animation 'data' field is a list of frame numbers");
-            anim->data[j-1] = max(0, atoi(nanoparser_get_string(pj)));
+            anim->data[j-1] = atoi(nanoparser_get_string(pj));
         }
     }
 

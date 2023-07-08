@@ -303,8 +303,7 @@ int actor_animation_frame(const actor_t* act)
 
 /*
  * actor_image()
- * Returns the current image of the
- * animation of this actor
+ * Returns the current image of the animation of this actor
  */
 const image_t* actor_image(const actor_t *act)
 {
