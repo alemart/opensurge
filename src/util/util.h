@@ -49,12 +49,13 @@
 #define clip(val,a,b)           (((val)<(a) && (val)<(b)) ? min((a),(b)) : (((val)>(a) && (val)>(b)) ? max((a),(b)) : (val)))
 #define clip01(val)             ((val) - ((val)<0.0f)*(val) + ((val)>1.0f)*(1.0f-(val))) /* clip((val), 0.0f, 1.0f) */
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* a[4],b[4] = (x,y,x+w,y+h) */
-#define mallocx(bytes)          __mallocx((bytes), __FILE__ ":" STRINGIFY(__LINE__))
-#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__ ":" STRINGIFY(__LINE__))
+#define mallocx(bytes)          __mallocx((bytes), __FILE__, __LINE__)
+#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__, __LINE__)
+#define assertx(expr)           do { if(!(expr)) fatal_error("In %s:%d: %s", __FILE__, __LINE__, ": assertion `" STRINGIFY(expr) "` failed."); } while(0)
 
 /* Memory management */
-void* __mallocx(size_t bytes, const char* location);
-void* __reallocx(void *ptr, size_t bytes, const char* location);
+void* __mallocx(size_t bytes, const char* location, int line);
+void* __reallocx(void *ptr, size_t bytes, const char* location, int line);
 
 /* General utilities */
 int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game engine */

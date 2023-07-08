@@ -68,12 +68,12 @@ static void android_show_alert_dialog(const char* title, const char* message);
  * Similar to malloc(), but aborts the
  * program if it does not succeed.
  */
-void *__mallocx(size_t bytes, const char* location)
+void *__mallocx(size_t bytes, const char* location, int line)
 {
     void *p = malloc(bytes);
 
     if(!p)
-        fatal_error("Out of memory in %s(%u) at %s", __func__, bytes, location);
+        fatal_error("Out of memory in %s(%u) at %s:%d", __func__, bytes, location, line);
 
     return p;
 }
@@ -84,12 +84,12 @@ void *__mallocx(size_t bytes, const char* location)
  * Similar to realloc(), but abots the
  * program if it does not succeed.
  */
-void* __reallocx(void *ptr, size_t bytes, const char* location)
+void* __reallocx(void *ptr, size_t bytes, const char* location, int line)
 {
     void *p = realloc(ptr, bytes);
 
     if(!p)
-        fatal_error("Out of memory in %s(%u) at %s", __func__, bytes, location);
+        fatal_error("Out of memory in %s(%u) at %s:%d", __func__, bytes, location, line);
 
     return p;
 }
@@ -120,7 +120,7 @@ int game_version_compare(int sup_version, int sub_version, int wip_version)
  */
 void fatal_error(const char *fmt, ...)
 {
-    char buf[1024];
+    static char buf[1024];
     va_list args;
 
     /* format message */
