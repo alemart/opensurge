@@ -34,7 +34,7 @@ object "Profiler" is "entity", "awake", "special"
         stats.refresh();
 
         // display stats
-        uiTimes.updateUI("Time % (avg / sum)", stats.timespent, sortByDesc.with(stats.timespent));
+        uiTimes.updateUI("Time (avg / sum)", stats.timespent, sortByDesc.with(stats.timespent));
         uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
         uiStats.updateUI("General", stats.generic, null);
 
@@ -90,7 +90,7 @@ object "Profiler.Stats"
         // compute relative times
         maxTimeSpent = timespent[root.__name];
         if(maxTimeSpent > 0) {
-            maxAvgTimeSpent = maxTimeSpent / count[root.__name];
+            maxAvgTimeSpent = maxTimeSpent / count[root.__name]; // count[root] is usually 1
             foreach(entry in timespent) {
                 key = entry.key;
                 value = entry.value;
