@@ -15,21 +15,28 @@ object "Profiler" is "entity", "awake", "special"
     uiDensity = spawn("Profiler.UI.Tree");
     uiTimes = spawn("Profiler.UI.Tree");
     stats = spawn("Profiler.Stats");
+    sortByDesc = spawn("Profiler.UI.Tree.SortByDesc");
     refreshTime = 2.0;
 
     state "main"
     {
-        count = System.objectCount;
-        sortByDesc = spawn("Profiler.UI.Tree.SortByDesc");
+        uiTimes.transform.position = Vector2(0, 0);
+        uiDensity.transform.position = Vector2(160, 0);
+        uiStats.transform.position = Vector2(310, 0);
+
+        // wait a frame
+        state = "update";
+    }
+
+    state "update"
+    {
+        // recompute stats
         stats.refresh();
 
-        // update stats
-        uiTimes.updateUI("Time spent (approx ms)", stats.timespent, sortByDesc.with(stats.timespent));
-        uiStats.updateUI("Profiler", stats.generic, null);
+        // display stats
+        uiTimes.updateUI("Time % (avg / sum)", stats.timespent, sortByDesc.with(stats.timespent));
         uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
-        uiTimes.transform.position = Vector2(0, 0);
-        uiStats.transform.position = Vector2(320, 0);
-        uiDensity.transform.position = Vector2(160, 0);
+        uiStats.updateUI("General", stats.generic, null);
 
         // done
         state = "wait";
@@ -38,7 +45,7 @@ object "Profiler" is "entity", "awake", "special"
     state "wait"
     {
         if(timeout(refreshTime))
-            state = "main";
+            state = "update";
     }
 }
 
@@ -50,17 +57,22 @@ object "Profiler.Stats"
     frames = 0;
     lastRefresh = 0;
     prevObjectCount = 0;
-    maxDepth = 3;
+    root = null;
+    maxDepth = 3; // increase to inspect more objects (slower)
 
     state "main"
     {
+        // change to inspect a particular object
+        root = Level;
+        //root = Level.findObject("Default HUD");
+
+        // count the number of frames
+        state = "counting frames";
+    }
+
+    state "counting frames"
+    {
         frames++;
-        generic.destroy();
-        density.destroy();
-        timespent.destroy();
-        generic = {};
-        density = {};
-        timespent = {};
     }
 
     fun refresh()
@@ -71,14 +83,24 @@ object "Profiler.Stats"
         density.destroy();
         timespent.destroy();
         generic.destroy();
-        computeDensity(Level, density = {}, 1, 1);
-        computeTimespent(Level, timespent = {}, count = {}, 1, 1);
+        computeDensity(root, density = {}, 1, 1);
+        computeTimespent(root, timespent = {}, count = {}, 1, 1);
         computeGeneric(generic = {}, objectCount, timeInterval);
 
-        // compute average timespent per group
-        foreach(entry in timespent) {
-            key = entry.key;
-            timespent[key] /= count[key];
+        // compute relative times
+        maxTimeSpent = timespent[root.__name];
+        if(maxTimeSpent > 0) {
+            maxAvgTimeSpent = maxTimeSpent / count[root.__name];
+            foreach(entry in timespent) {
+                key = entry.key;
+                value = entry.value;
+                avg = value / count[key];
+
+                value *= 100 / maxTimeSpent;
+                avg *= 100 / maxAvgTimeSpent;
+
+                timespent[key] = formatDecimal(avg) + " / " + formatDecimal(value);
+            }
         }
 
         lastRefresh = Time.time;
@@ -96,7 +118,10 @@ object "Profiler.Stats"
 
         // profiler object overhead
         objectDelta = System.objectCount - objectCount;
-        stats["Overhead"] = objectDelta + " (" + Math.floor(100 * objectDelta / objectCount) + "%)";
+        stats["Overhead"] = objectDelta + " (" + formatDecimal(100 * objectDelta / objectCount) + "%)";
+
+        // garbage collection
+        stats["Garbage"] = System.gc.objectCount;
 
         // fps rate
         fps = frames / timeInterval;
@@ -111,14 +136,14 @@ object "Profiler.Stats"
     {
         key = obj.__name; //hash(obj, id);
         result = 1;
-        n = obj.childCount;
+        n = obj.__childCount;
         for(i = 0; i < n; i++) {
             child = obj.child(i);
-            if(child.__active)
+            //if(child.__active)
                 result += computeDensity(child, tree, ++id, 1+depth);
         }
         if(depth <= maxDepth)
-            tree[key] = Math.max(tree[key], result);
+            tree[key] += result;
         return result;
     }
 
@@ -126,13 +151,13 @@ object "Profiler.Stats"
     {
         key = obj.__name; //hash(obj, id);
         totalTime = 0;
-        n = obj.childCount;
+        n = obj.__childCount;
         for(i = 0; i < n; i++) {
             child = obj.child(i);
             if(child.__active)
                 totalTime += computeTimespent(child, tree, countTree, ++id, 1+depth);
         }
-        totalTime += 1000 * this.__timespent;
+        totalTime += this.__timespent;
         if(depth <= maxDepth) {
             tree[key] += totalTime;
             countTree[key] += 1;
@@ -147,6 +172,7 @@ object "Profiler.Stats"
 
     fun formatDecimal(num)
     {
+        if(typeof(num) !== "number") return num;
         str = (Math.round(num * 100) * 0.01).toString();
         j = str.indexOf(".");
         return j >= 0 ? str.substr(0, j+3) : str;
@@ -162,6 +188,7 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
     {
         transform.position = Vector2(0, 0);
         text.zindex = Math.infinity;
+        text.maxWidth = 160;
     }
 
     fun updateUI(title, tree, order)
@@ -171,10 +198,19 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
         length = keys.length;
         for(i = 0; i < length; i++) {
             key = keys[i];
-            str += key + ": " + tree[key] + "\n";
+            value = formatDecimal(tree[key]);
+            str += key + ": " + value + "\n";
         }
         text.text = str;
         keys.destroy();
+    }
+
+    fun formatDecimal(num)
+    {
+        if(typeof(num) !== "number") return num;
+        str = (Math.round(num * 100) * 0.01).toString();
+        j = str.indexOf(".");
+        return j >= 0 ? str.substr(0, j+3) : str;
     }
 }
 
@@ -182,5 +218,6 @@ object "Profiler.UI.Tree.SortByDesc"
 {
     tree = null;
     fun with(dict) { tree = dict; return this; }
-    fun call(a, b) { return tree[b] - tree[a]; }
+    fun call(a, b) { return f(tree[b]) - f(tree[a]); }
+    fun f(s) { return (typeof(s) === "number") ? s : ((j = s.indexOf(" ")) >= 0 ? Number(s.substr(0, j)) : Number(s)); }
 }
