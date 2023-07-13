@@ -141,6 +141,7 @@ static void update_world_size(brickmanager_t* manager, const brick_t* brick);
 
 static bool is_brick_inside_roi(const brick_t* brick, const brickrect_t* roi);
 static void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in_bucket, const brickrect_t* roi);
+static void filter_non_default_bricks(brickbucket_t* out_bucket, const brickbucket_t* in_bucket);
 
 static brick_t* brick_fake_destroy(brick_t* brick);
 
@@ -481,8 +482,31 @@ iterator_t* brickmanager_retrieve_active_moving_bricks(const brickmanager_t* man
     /* get the ROI */
     const brickrect_t* roi = &(manager->roi);
 
+    /* for each bucket inside the ROI */
+    int left = roi->left;
+    int top = roi->top;
+    int right = roi->right;
+    int bottom = roi->bottom;
+
+    right += GRID_SIZE - 1;
+    bottom += GRID_SIZE - 1;
+
+    for(int y = top; y <= bottom; y += GRID_SIZE) {
+        for(int x = left; x <= right; x += GRID_SIZE) {
+            uint64_t key = position_to_hash(x, y);
+            const brickbucket_t* bucket = fasthash_get(manager->hashtable, key);
+
+            /* we must consider bricks with non-default behavior as "moving" */
+            /* we add the bucket if it exists and if it's not empty */
+            if(bucket != NULL && !bucket_is_empty(bucket))
+                filter_non_default_bricks(state.own_bucket, bucket);
+        }
+    }
+
     /* individually filter the awake bricks inside the ROI */
     filter_bricks_inside_roi(state.own_bucket, manager->awake_bucket, roi);
+
+    /* add own_bucket if it's not empty */
     if(!bucket_is_empty(state.own_bucket))
         darray_push(state.bucket, state.own_bucket);
 
@@ -925,6 +949,15 @@ void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in
     }
 }
 
+void filter_non_default_bricks(brickbucket_t* out_bucket, const brickbucket_t* in_bucket)
+{
+    for(int i = 0; i < darray_length(in_bucket->brick); i++) {
+        brick_t* brick = in_bucket->brick[i];
+
+        if(brick_behavior(brick) != BRB_DEFAULT)
+            bucket_add(out_bucket, brick); /* add a reference to the output bucket */
+    }
+}
 
 
 /* bucket brick destructor */
