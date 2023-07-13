@@ -1245,6 +1245,7 @@ bool inspect_subtree(const surgescript_object_t* root, bool is_root_entity, cons
                 /* warn the user */
                 const char* child_name = surgescript_object_name(child);
                 video_showmessage("\"%s\" violates the definition of entity", child_name);
+                logfile_message("EntityManager: \"%s\" violates the definition of entity", child_name);
 
                 #if 0
                 /* look deeper */
@@ -1271,6 +1272,7 @@ bool inspect_subtree(const surgescript_object_t* root, bool is_root_entity, cons
     if(fixed_root) {
         const char* root_name = surgescript_object_name(root);
         video_showmessage("\"%s\" should be tagged \"entity\"", root_name);
+        logfile_message("EntityManager: \"%s\" should be tagged \"entity\"", root_name);
     }
 
     /* done */

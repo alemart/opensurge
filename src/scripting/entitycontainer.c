@@ -428,7 +428,7 @@ surgescript_var_t* fun_storeentity(surgescript_object_t* object, const surgescri
 
     /* start inactive if outside the ROI */
     surgescript_object_t* entity_manager = get_entity_manager(object);
-    if(!is_entity_inside_roi(entity_manager, entity)) /* consumes extra cycles */
+    if(!is_entity_inside_roi(entity_manager, entity))
         surgescript_object_set_active(entity, false);
 #endif
 
