@@ -150,6 +150,7 @@ static void foreach_unawake_container_callback(surgescript_objecthandle_t contai
 static void pause_containers(surgescript_object_t* entity_manager, bool pause);
 static bool is_in_debug_mode(surgescript_object_t* entity_manager);
 static void refresh_entity_tree(surgescript_object_t* entity_manager);
+static bool inspect_subtree(const surgescript_object_t* root, bool is_root_entity, const surgescript_objectmanager_t* manager, surgescript_tagsystem_t* tag_system, int depth);
 
 
 
@@ -456,6 +457,9 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
     surgescript_var_destroy(arg);
 #endif
 
+    /* apply backwards-compatibility fix */
+    inspect_subtree(entity, true, manager, tag_system, 0);
+
     /* return the handle to the spawned entity */
     return surgescript_var_set_objecthandle(surgescript_var_create(), entity_handle);
 }
@@ -503,10 +507,7 @@ surgescript_var_t* fun_findentity(surgescript_object_t* object, const surgescrip
     const char* object_name = surgescript_var_fast_get_string(param[0]);
     surgescript_var_t* ret = surgescript_var_create();
 
-    if(
-        surgescript_objectmanager_class_exists(manager, object_name) &&
-        surgescript_tagsystem_has_tag(tag_system, object_name, "entity")
-    ) {
+    if(surgescript_tagsystem_has_tag(tag_system, object_name, "entity")) {
         /*
          * TODO: develop a faster data structure?
          * We just call Level.child() here
@@ -536,10 +537,7 @@ surgescript_var_t* fun_findentities(surgescript_object_t* object, const surgescr
     const char* object_name = surgescript_var_fast_get_string(param[0]);
     surgescript_var_t* ret = surgescript_var_create();
 
-    if(
-        surgescript_objectmanager_class_exists(manager, object_name) &&
-        surgescript_tagsystem_has_tag(tag_system, object_name, "entity")
-    ) {
+    if(surgescript_tagsystem_has_tag(tag_system, object_name, "entity")) {
         /*
          * TODO: develop a faster data structure?
          * We just call Level.children() here
@@ -1207,4 +1205,74 @@ void refresh_entity_tree(surgescript_object_t* entity_manager)
     (void)foreach_unawake_container_inside_roi;
 
 #endif
+}
+
+/* Check if the subtree whose root is "root" has any descendants tagged
+   "entity" that are not direct children of "root". If so, tag them as a
+   temporary fix, for backwards compatibility with Open Surge 0.6.0.x or
+   earlier. In addition, warn the user.
+
+   This traverses the subtree. It is only applied at spawn time. This should
+   be fixed manually by the user. */
+bool inspect_subtree(const surgescript_object_t* root, bool is_root_entity, const surgescript_objectmanager_t* manager, surgescript_tagsystem_t* tag_system, int depth)
+{
+    /* do some pruning. this is just a diagnostic tool and we're not supposed
+       to waste time here */
+    const int MAX_DEPTH = 2; /* depth = 0, 1, 2... */
+    int new_depth = 1 + depth;
+
+    bool fixed_descendant = false, fixed_root = false;
+    int n = surgescript_object_child_count(root);
+
+    for(int i = 0; i < n; i++) {
+        surgescript_objecthandle_t child_handle = surgescript_object_nth_child(root, i);
+
+        if(surgescript_objectmanager_exists(manager, child_handle)) {
+            const surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
+            bool is_child_entity = surgescript_object_has_tag(child, "entity");
+
+            /* we found an object that is not an entity and that has a child tagged "entity".
+               This is a violation of the definition. */
+            if(!is_root_entity && is_child_entity) {
+
+                /* make the object an entity as a temporary fix */
+                const char* root_name = surgescript_object_name(root);
+                surgescript_tagsystem_add_tag(tag_system, root_name, "entity");
+                surgescript_tagsystem_add_tag(tag_system, root_name, "private");
+                surgescript_tagsystem_add_tag(tag_system, root_name, "awake");
+                surgescript_tagsystem_add_tag(tag_system, root_name, "detached");
+
+                /* warn the user */
+                const char* child_name = surgescript_object_name(child);
+                video_showmessage("\"%s\" violates the definition of entity", child_name);
+
+                #if 0
+                /* look deeper */
+                new_depth = 0;
+                #else
+                /* don't look deeper. this is just a diagnostic for the modder
+                   and should not interfere with normal gameplay. */
+                #endif
+
+                /* mark the root as "fixed" */
+                fixed_root = true;
+
+            }
+
+            /* traverse the subtree whose root is child */
+            if(new_depth <= MAX_DEPTH) {
+                if(inspect_subtree(child, is_child_entity, manager, tag_system, new_depth))
+                    fixed_descendant = true;
+            }
+        }
+    }
+
+    /* ask for user intervention */
+    if(fixed_root) {
+        const char* root_name = surgescript_object_name(root);
+        video_showmessage("\"%s\" should be tagged \"entity\"", root_name);
+    }
+
+    /* done */
+    return fixed_root || fixed_descendant;
 }
