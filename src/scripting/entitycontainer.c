@@ -418,8 +418,19 @@ surgescript_var_t* fun_storeentity(surgescript_object_t* object, const surgescri
 
     surgescript_var_destroy(arg);
 
+#if 1
+    /* IMPORTANT: if we change the ROI between the update and the render cycles,
+       the entities will blink when moving between different containers because
+       we're inactivating them!!! */
+
     /* start inactive (better measurements) */
-    surgescript_object_set_active(entity, false);
+    /*surgescript_object_set_active(entity, false);*/
+
+    /* start inactive if outside the ROI */
+    surgescript_object_t* entity_manager = get_entity_manager(object);
+    if(!is_entity_inside_roi(entity_manager, entity)) /* consumes extra cycles */
+        surgescript_object_set_active(entity, false);
+#endif
 
     /* done */
     return NULL;
