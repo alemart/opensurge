@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * point.h - 2D points with integer coordinates
+ * point2d.h - 2D points with integer coordinates
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,38 +18,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _POINT_H
-#define _POINT_H
+#ifndef _POINT2D_H
+#define _POINT2D_H
 
 /* Point struct */
-typedef struct point_t {
+typedef struct point2d_t {
     int x;
     int y;
-} point_t;
+} point2d_t;
 
 /* Constructor */
-#define point_new(x, y) ((point_t){ (x), (y) })
+#define point2d_new(x, y) ((point2d_t){ (x), (y) })
 
 /* Equality test */
-#define point_equals(p1, p2) ( \
+#define point2d_equals(p1, p2) ( \
     (p1).x == (p2).x && \
     (p1).y == (p2).y \
 )
 
 /* Addition p1 + p2 */
-#define point_add(p1, p2) point_new( \
+#define point2d_add(p1, p2) point2d_new( \
     (p1).x + (p2).x, \
     (p1).y + (p2).y \
 )
 
 /* Subtraction p1 - p2 */
-#define point_subtract(p1, p2) point_new( \
+#define point2d_subtract(p1, p2) point2d_new( \
     (p1).x - (p2).x, \
     (p1).y - (p2).y \
 )
 
 /* Dot product */
-#define point_dot(p1, p2) ( \
+#define point2d_dot(p1, p2) ( \
     (p1).x * (p2).x + (p1).y * (p2).y \
 )
 

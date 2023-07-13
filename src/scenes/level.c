@@ -2703,7 +2703,7 @@ obstacle_t* item2obstacle(const item_t* item)
 {
     const collisionmask_t* mask = item->mask;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
-    return obstacle_create(mask, point_new(position.x, position.y), OL_DEFAULT, OF_SOLID);
+    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_SOLID);
 }
 
 /* converts a legacy object to an obstacle */
@@ -2711,7 +2711,7 @@ obstacle_t* object2obstacle(const object_t* object)
 {
     const collisionmask_t* mask = object->mask;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
-    return obstacle_create(mask, point_new(position.x, position.y), OL_DEFAULT, OF_SOLID);
+    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_SOLID);
 }
 
 /* converts a brick-like SurgeScript object to an obstacle */
@@ -2725,7 +2725,7 @@ obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
     collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
     return obstacle_create_ex(
         clone,
-        point_new(position.x, position.y),
+        point2d_new(position.x, position.y),
         layer, flags,
         destroy_collisionmask_of_bricklike_object, clone
     );

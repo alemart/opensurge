@@ -46,7 +46,7 @@ typedef struct rect_t {
 )
 
 /* Does rectangle r contains point p?
-   p is a point_t or a v2d_t */
+   p is a point2d_t or a v2d_t */
 #define rect_contains(r, p) ( \
     (p).x >= (r).x && (p).x < (r).x + (r).width && \
     (p).y >= (r).y && (p).y < (r).y + (r).height \

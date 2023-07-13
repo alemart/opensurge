@@ -23,7 +23,7 @@
 
 #include <stdbool.h>
 #include "collisionmask.h"
-#include "../util/point.h"
+#include "../util/point2d.h"
 
 /*
  * an obstacle may be anything "physical": a non-passable brick,
@@ -51,13 +51,13 @@ enum obstaclelayer_t {
 };
 
 /* create and destroy */
-obstacle_t* obstacle_create(const collisionmask_t *mask, point_t position, obstaclelayer_t layer, int flags);
-obstacle_t* obstacle_create_ex(const collisionmask_t* mask, point_t position, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata);
+obstacle_t* obstacle_create(const collisionmask_t *mask, point2d_t position, obstaclelayer_t layer, int flags);
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, point2d_t position, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata);
 obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 
 /* public methods */
-point_t obstacle_get_position(const obstacle_t *obstacle); /* get position (in world coordinates) */
-void obstacle_set_position(obstacle_t* obstacle, point_t position); /* set position (in world coordinates) */
+point2d_t obstacle_get_position(const obstacle_t *obstacle); /* get position (in world coordinates) */
+void obstacle_set_position(obstacle_t* obstacle, point2d_t position); /* set position (in world coordinates) */
 bool obstacle_is_solid(const obstacle_t *obstacle); /* is it solid or oneway? */
 int obstacle_get_width(const obstacle_t *obstacle); /* width of the bounding box */
 int obstacle_get_height(const obstacle_t *obstacle); /* height of the bounding box */

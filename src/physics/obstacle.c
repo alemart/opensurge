@@ -26,7 +26,7 @@
 /* obstacle struct */
 struct obstacle_t
 {
-    point_t position; /* position in world space */
+    point2d_t position; /* position in world space */
 
     uint16_t width;
     uint16_t height;
@@ -51,12 +51,12 @@ struct obstacle_t
 
 
 /* public methods */
-obstacle_t* obstacle_create(const collisionmask_t* mask, point_t position, obstaclelayer_t layer, int flags)
+obstacle_t* obstacle_create(const collisionmask_t* mask, point2d_t position, obstaclelayer_t layer, int flags)
 {
     return obstacle_create_ex(mask, position, layer, flags, NULL, NULL);
 }
 
-obstacle_t* obstacle_create_ex(const collisionmask_t* mask, point_t position, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata)
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, point2d_t position, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
@@ -87,12 +87,12 @@ obstacle_t* obstacle_destroy(obstacle_t *obstacle)
     return NULL;
 }
 
-point_t obstacle_get_position(const obstacle_t *obstacle)
+point2d_t obstacle_get_position(const obstacle_t *obstacle)
 {
     return obstacle->position;
 }
 
-void obstacle_set_position(obstacle_t* obstacle, point_t position)
+void obstacle_set_position(obstacle_t* obstacle, point2d_t position)
 {
     obstacle->position = position;
 }

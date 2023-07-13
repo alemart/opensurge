@@ -445,7 +445,7 @@ SET(GAME_HEADERS
   src/util/hashtable.h
   src/util/iterator.h
   src/util/numeric.h
-  src/util/point.h
+  src/util/point2d.h
   src/util/rect.h
   src/util/stringutil.h
   src/util/util.h

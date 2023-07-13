@@ -391,7 +391,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* move the obstacle after moving the player(s) */
             if(brk->obstacle != NULL)
-                obstacle_set_position(brk->obstacle, point_new(brk->x, brk->y));
+                obstacle_set_position(brk->obstacle, point2d_new(brk->x, brk->y));
 
             /* done */
             break;
@@ -437,7 +437,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* move the obstacle after moving the player(s) */
             if(brk->obstacle != NULL)
-                obstacle_set_position(brk->obstacle, point_new(brk->x, brk->y));
+                obstacle_set_position(brk->obstacle, point2d_new(brk->x, brk->y));
 
             /* done */
             break;
@@ -559,7 +559,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* set the obstacle */
             if(brk->obstacle != NULL)
-                obstacle_set_position(brk->obstacle, point_new(brk->x, brk->y));
+                obstacle_set_position(brk->obstacle, point2d_new(brk->x, brk->y));
 
             /* move the player */
             /* NOTE: handle multiple players at once? is it really needed? */
@@ -1182,7 +1182,7 @@ obstacle_t* create_obstacle(const brick_t* brick)
         const collisionmask_t* mask = brick->brick_ref->mask;
         int flags = get_obstacle_flags(brick);
         obstaclelayer_t layer = get_obstacle_layer(brick);
-        point_t position = point_new(brick->x, brick->y);
+        point2d_t position = point2d_new(brick->x, brick->y);
 
         return obstacle_create(mask, position, layer, flags);
     }
