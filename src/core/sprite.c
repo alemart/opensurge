@@ -235,7 +235,7 @@ const animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info
     int end = info->transition_from[from_id + 1];
     int count = end - start; /* zero if there are no transitions from (from_id) */
 
-    if(count < 8) {
+    if(count < 6) {
         /* linear search */
         for(int i = start; i < end; i++) {
             const animtransition_t* transition = info->preprocessed_transition[i];

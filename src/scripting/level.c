@@ -986,22 +986,21 @@ surgescript_var_t* fun_spawnassetupobject(surgescript_object_t* object, const su
     /* add the "setup" tag */
     surgescript_tagsystem_add_tag(tag_system, setup_object_name, "setup");
 
-    /* validate if the setup object is already an entity */
-    if(surgescript_tagsystem_has_tag(tag_system, setup_object_name, "entity")) {
-        if(
-            !surgescript_tagsystem_has_tag(tag_system, setup_object_name, "awake") &&
-            !surgescript_tagsystem_has_tag(tag_system, setup_object_name, "detached")
-        ) {
-            /* this should not be a setup object */
-            video_showmessage("Setup object \"%s\" is an entity, but not awake nor detached", setup_object_name);
-        }
+    /* make the setup object an awake entity for backwards-compatibility purposes */
+    if(!surgescript_tagsystem_has_tag(tag_system, setup_object_name, "entity")) {
+        surgescript_tagsystem_add_tag(tag_system, setup_object_name, "entity");
+        surgescript_tagsystem_add_tag(tag_system, setup_object_name, "awake");
+        surgescript_tagsystem_add_tag(tag_system, setup_object_name, "detached");
+        surgescript_tagsystem_add_tag(tag_system, setup_object_name, "private");
     }
-
-    /* make the setup object an awake entity */
-    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "entity");
-    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "awake");
-    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "detached");
-    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "private");
+    else if(
+        /* validate: setup object was already an entity */
+        !surgescript_tagsystem_has_tag(tag_system, setup_object_name, "awake") &&
+        !surgescript_tagsystem_has_tag(tag_system, setup_object_name, "detached")
+    ) {
+        /* this should not be a setup object */
+        video_showmessage("Setup object \"%s\" is an entity, but not awake nor detached", setup_object_name);
+    }
 
     /* call entityManager.spawn(setup_object_name) */
     surgescript_var_t* new_entity_var = surgescript_var_create();
