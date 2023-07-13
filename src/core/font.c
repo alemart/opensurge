@@ -40,7 +40,7 @@
 #include "../util/stringutil.h"
 #include "../util/hashtable.h"
 #include "../util/darray.h"
-#include "../util/point.h"
+#include "../util/point2d.h"
 #include "../util/rect.h"
 #include "../entities/player.h"
 #include "../scenes/level.h"
@@ -191,7 +191,7 @@ struct fonttext_t
     /* the text is split into single-line, single-color segments */
     DARRAY(const char*, text_segment); /* preprocessed text segment */
     DARRAY(color_t, color); /* color of each segment */
-    DARRAY(point_t, offset); /* (x,y) offset to be applied before each segment is rendered */
+    DARRAY(point2d_t, offset); /* (x,y) offset to be applied before each segment is rendered */
     DARRAY(v2d_t, size); /* the size in pixels of each segment */
 
     /* helpers */
@@ -488,7 +488,8 @@ void font_set_width(font_t* f, int w)
     f->max_width = w;
 
     /* preprocess text */
-    f->preprocessed_text.is_dirty = is_dirty;
+    if(!f->preprocessed_text.is_dirty)
+        f->preprocessed_text.is_dirty = is_dirty;
 }
 
 
@@ -525,7 +526,7 @@ void font_render(font_t* f, v2d_t camera_position)
         rect_t target_rect = rect_new(0, 0, target_width, target_height);
 
         /* clip out the entire text if possible */
-        point_t initial_position = point_new(floorf(position.x + 0.5f), floorf(position.y + 0.5f));
+        point2d_t initial_position = point2d_new(floorf(position.x + 0.5f), floorf(position.y + 0.5f));
         v2d_t total_size = f->preprocessed_text.total_size;
         rect_t bounding_box = rect_new(initial_position.x, initial_position.y, total_size.x, total_size.y);
         if(!rect_overlaps(target_rect, bounding_box))
@@ -535,7 +536,7 @@ void font_render(font_t* f, v2d_t camera_position)
         for(int i = 0; i < darray_length(f->preprocessed_text.text_segment); i++) {
             const char* text_segment = f->preprocessed_text.text_segment[i];
             color_t color = f->preprocessed_text.color[i];
-            point_t offset = f->preprocessed_text.offset[i];
+            point2d_t offset = f->preprocessed_text.offset[i];
             v2d_t size = f->preprocessed_text.size[i];
 
             /* skip empty segments, as in "</color>[__empty__]\n" */
@@ -543,7 +544,7 @@ void font_render(font_t* f, v2d_t camera_position)
                 continue;
 
             /* find the position of the segment in screen space */
-            point_t segment_position = point_add(initial_position, offset);
+            point2d_t segment_position = point2d_add(initial_position, offset);
             rect_t segment_rect = rect_new(segment_position.x, segment_position.y, size.x, size.y);
 
             /* clip out the segment if possible */
@@ -641,7 +642,8 @@ void font_use_substring(font_t* f, int index_of_first_char, int max_length)
     f->max_length = max_length;
 
     /* preprocess text */
-    f->preprocessed_text.is_dirty = is_dirty;
+    if(!f->preprocessed_text.is_dirty)
+        f->preprocessed_text.is_dirty = is_dirty;
 }
 
 
@@ -666,7 +668,8 @@ void font_set_align(font_t* f, fontalign_t align)
     f->align = align;
 
     /* preprocess text */
-    f->preprocessed_text.is_dirty = is_dirty;
+    if(!f->preprocessed_text.is_dirty)
+        f->preprocessed_text.is_dirty = is_dirty;
 }
 
 /*
@@ -694,7 +697,8 @@ void font_set_maxlength(font_t* f, int max_length)
     f->max_length = max_length;
 
     /* preprocess text */
-    f->preprocessed_text.is_dirty = is_dirty;
+    if(!f->preprocessed_text.is_dirty)
+        f->preprocessed_text.is_dirty = is_dirty;
 }
 
 /*
@@ -1226,7 +1230,7 @@ void preprocess_split(fonttext_t* out, const fontdrv_t* drv, fontalign_t align)
     const color_t DEFAULT_COLOR = color_rgb(255, 255, 255); /* we use multiplicative blending */
     const char* current_segment = out->buffer;
     color_t color = DEFAULT_COLOR;
-    point_t offset = point_new(0, 0);
+    point2d_t offset = point2d_new(0, 0);
     int color_cursor = 0;
     int line_cursor = 0;
     int line_width = 0;
