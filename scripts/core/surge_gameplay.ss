@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Level;
 
-object "Surge Gameplay"
+object "Surge Gameplay" is "setup"
 {
     // handles character switching
     switchController = spawn("Switch Controller");
