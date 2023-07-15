@@ -124,8 +124,8 @@ object "Profiler.Stats"
         stats["Garbage"] = System.gc.objectCount;
 
         // fps rate
-        fps = frames / timeInterval;
-        stats["FPS"] = formatDecimal(fps);
+        stats["FPS"] = formatDecimal(frames / timeInterval);
+        stats["FPS Inv."] = frames > 0 ? timeInterval / frames : 0;
         frames = 0;
 
         // time
@@ -198,7 +198,7 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
         length = keys.length;
         for(i = 0; i < length; i++) {
             key = keys[i];
-            value = formatDecimal(tree[key]);
+            value = tree[key];
             str += key + ": " + value + "\n";
         }
         text.text = str;
