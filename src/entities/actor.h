@@ -64,7 +64,6 @@ void actor_destroy(actor_t *act);
 /* rendering */
 const image_t* actor_image(const actor_t *act);
 void actor_render(actor_t *act, v2d_t camera_position);
-void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, bool repeat_x, bool repeat_y);
 
 /* animation */
 void actor_change_animation(actor_t *act, const animation_t *anim);

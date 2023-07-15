@@ -126,37 +126,6 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
 
 /*
- * actor_render_repeat_xy()
- * Tiled rendering
- */
-void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, bool repeat_x, bool repeat_y)
-{
-    if(act->visible && act->animation != NULL) {
-        const image_t *img = actor_image(act);
-        int w = image_width(img);
-        int h = image_height(img);
-        v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
-
-        /* update animation */
-        update_animation(act);
-
-        /* compute the position of the top-left tile */
-        v2d_t final_pos;
-        final_pos.x = ((int)act->position.x % (repeat_x ? w : INT_MAX)) - act->hot_spot.x - topleft.x - (repeat_x ? w : 0);
-        final_pos.y = ((int)act->position.y % (repeat_y ? h : INT_MAX)) - act->hot_spot.y - topleft.y - (repeat_y ? h : 0);
-
-        /* render cols x rows tiles */
-        int cols = repeat_x ? (VIDEO_SCREEN_W / w + 3) : 1;
-        int rows = repeat_y ? (VIDEO_SCREEN_H / h + 3) : 1;
-        for(int i = 0; i < cols; i++) {
-            for(int j = 0; j < rows; j++)
-                image_draw(img, (int)final_pos.x + i*w, (int)final_pos.y + j*h, act->mirror);
-        }
-    }
-}
-
-
-/*
  * actor_change_animation()
  * Changes the animation of an actor
  */
