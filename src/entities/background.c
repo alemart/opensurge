@@ -32,6 +32,7 @@
 #include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../third_party/fast_draw.h"
 
 /* forward declarations */
 typedef struct bglayer_t bglayer_t;
@@ -39,8 +40,6 @@ typedef struct bgbehavior_t bgbehavior_t;
 typedef struct bgbehavior_default_t bgbehavior_default_t;
 typedef struct bgbehavior_circular_t bgbehavior_circular_t;
 typedef struct bgbehavior_linear_t bgbehavior_linear_t;
-
-
 
 /* bgtheme struct: represents a .bg file */
 struct bgtheme_t {
@@ -51,14 +50,10 @@ struct bgtheme_t {
     char* filepath; /* filepath of the background */
 };
 
-
-
-
-
 /* bglayer struct: a background (or foreground) layer */
 struct bglayer_t {
-    actor_t *actor; /* actor */
     spriteinfo_t *data; /* this is not stored in the main hash */
+    const animation_t* animation; /* animation 0 of the sprite of the layer */
 
     v2d_t initial_position; /* initial position */
     v2d_t scroll_speed; /* scroll speed */
@@ -119,15 +114,26 @@ static void bgbehavior_linear_update(bgbehavior_t *behavior); /* private method 
 
 
 /* internal utilities */
+
+/* preprocessing */
 #define IS_FOREGROUND_LAYER(layer)    ((layer)->zindex > 0.5f)
 static void sort_layers(bgtheme_t *bgtheme);
 static int sort_cmp(const void *a, const void *b);
 static void split_layers(bgtheme_t *bgtheme);
 static void group_layers(bgtheme_t *bgtheme);
-static void render_layers(const bgtheme_t *theme, v2d_t camera_position, bool foreground);
+
+/* rendering */
+#define WANT_FAST_DRAW 1
+typedef void (*renderstrategy_t)(const image_t*,v2d_t,void*);
+static void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, void* data, renderstrategy_t render_image);
+static void render_without_cache(const image_t* image, v2d_t position, void* data);
+static void render_with_cache(const image_t* image, v2d_t position, void* data);
+
+/* .bg files */
 static int traverse(const parsetree_statement_t *stmt, void *bgtheme);
 static int traverse_layer_attributes(const parsetree_statement_t *stmt, void *bglayer);
-static void validate_layer(const bglayer_t *layer);
+static void validate_layer(const bglayer_t* layer);
+static void validate_theme(const bgtheme_t* theme);
 
 
 
@@ -159,6 +165,7 @@ bgtheme_t* background_load(const char *filepath)
     tree = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(tree, (void*)bgtheme, traverse);
     tree = nanoparser_deconstruct_tree(tree);
+    validate_theme(bgtheme);
 
     /* prepare for rendering */
     sort_layers(bgtheme);
@@ -196,7 +203,7 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
 void background_update(bgtheme_t *bgtheme)
 {
     for(int i = 0; i < bgtheme->layer_count; i++) {
-        bglayer_t *layer = bgtheme->layer[i];
+        const bglayer_t *layer = bgtheme->layer[i];
         bgbehavior_update(layer->behavior);
     }
 }
@@ -207,7 +214,28 @@ void background_update(bgtheme_t *bgtheme)
  */
 void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    render_layers(bgtheme, camera_position, false);
+    bglayer_t** layers = bgtheme->layer;
+    int layer_count = bgtheme->background_count;
+
+#if WANT_FAST_DRAW
+    FAST_DRAW_CACHE* cache = fd_create_cache(layer_count, true, false);
+    render_layers(layers, layer_count, camera_position, cache, render_with_cache);
+    fd_flush_cache(cache); /* invokes al_draw_indexed_prim() */
+    fd_destroy_cache(cache);
+
+    /*
+
+    there is overhead when invoking al_draw_prim()
+
+    [1] https://www.allegro.cc/forums/thread/613609
+    [2] https://www.allegro.cc/forums/thread/614949
+
+    */
+#else
+    image_hold_drawing(true);
+    render_layers(layers, layer_count, camera_position, NULL, render_without_cache);
+    image_hold_drawing(false);
+#endif
 }
 
 /*
@@ -216,7 +244,12 @@ void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
  */
 void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    render_layers(bgtheme, camera_position, true);
+    bglayer_t** layers = bgtheme->layer + bgtheme->background_count;
+    int layer_count = bgtheme->foreground_count;
+
+    image_hold_drawing(true);
+    render_layers(layers, layer_count, camera_position, NULL, render_without_cache);
+    image_hold_drawing(false);
 }
 
 /*
@@ -257,8 +290,8 @@ bglayer_t *bglayer_new()
 {
     bglayer_t *layer = mallocx(sizeof *layer);
 
-    layer->actor = actor_create();
     layer->data = NULL;
+    layer->animation = NULL;
     layer->initial_position = v2d_new(0.0f, 0.0f);
     layer->scroll_speed = v2d_new(0.0f, 0.0f);
     layer->repeat_x = false;
@@ -275,8 +308,9 @@ bglayer_t *bglayer_delete(bglayer_t *layer)
 {
     if(layer->data != NULL)
         spriteinfo_destroy(layer->data);
+
     layer->behavior = bgbehavior_delete(layer->behavior);
-    actor_destroy(layer->actor);
+
     free(layer);
     return NULL;
 }
@@ -408,40 +442,70 @@ void bgbehavior_linear_update(bgbehavior_t *behavior)
 
 
 
+/* rendering */
 
-/* render background or foreground layers */
-void render_layers(const bgtheme_t *bgtheme, v2d_t camera_position, bool foreground)
+/* render layers of the background or of the foreground */
+void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, void* data, renderstrategy_t render_image)
 {
-    v2d_t halfscreen = v2d_multiply(video_get_screen_size(), 0.5f);
-    v2d_t topleft = v2d_subtract(camera_position, halfscreen);
-    int count = !foreground ? bgtheme->background_count : bgtheme->foreground_count;
-    int start = !foreground ? 0 : bgtheme->background_count;
-    /*int end = start + count;*/
-    bool held = false;
+    v2d_t screen_size = video_get_screen_size();
+    v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
+    v2d_t topleft = v2d_subtract(camera_position, half_screen_size);
+    float animation_time = timer_get_elapsed();
 
-    for(int i = 0; i < count; i++) {
-        const bglayer_t* layer = bgtheme->layer[start + i];
-        const bglayer_t* prev_layer = bgtheme->layer[start + ((i + (count-1)) % count)];
+    for(int i = 0; i < layer_count; i++) {
+        const bglayer_t* layer = layers[i];
+        const animation_t* animation = layer->animation;
+        float frame_width = animation_frame_width(animation);
+        float frame_height = animation_frame_height(animation);
 
         /* compute the position the layer in screen space */
         v2d_t scroll = v2d_compmult(layer->scroll_speed, topleft);
         v2d_t offset = v2d_add(layer->behavior->offset, scroll);
-        layer->actor->position = v2d_add(layer->initial_position, offset);
-        layer->actor->position.x = floorf(0.5 + layer->actor->position.x); /* round to nearest integer */
-        layer->actor->position.y = floorf(0.5 + layer->actor->position.y);
+        v2d_t position = v2d_add(layer->initial_position, offset);
+        position.x = floorf(0.5 + position.x); /* round to nearest integer */
+        position.y = floorf(0.5 + position.y);
 
-        /* enable deferred drawing */
-        if(layer->group_index > prev_layer->group_index)
-            image_hold_drawing(held = true);
+        /* tiled rendering? */
+        int rows = 1, cols = 1;
+        if(layer->repeat_x) {
+            position.x = fmodf(position.x, frame_width) - frame_width;
+            cols = 3 + (int)(screen_size.x / frame_width);
+        }
+        if(layer->repeat_y) {
+            position.y = fmodf(position.y, frame_height) - frame_height;
+            rows = 3 + (int)(screen_size.y / frame_height);
+        }
 
         /* render */
-        actor_render_repeat_xy(layer->actor, halfscreen, layer->repeat_x, layer->repeat_y);
-
-        /* disable deferred drawing */
-        if(held && layer->group_index == 1)
-            image_hold_drawing(held = false);
+        const image_t* image = animation_image_at_time(animation, animation_time);
+        for(int y = 0; y < rows; y++) {
+            for(int x = 0; x < cols; x++) {
+                v2d_t image_position = v2d_new(position.x + x * frame_width, position.y + y * frame_height);
+                render_image(image, image_position, data);
+            }
+        }
     }
 }
+
+/* render an image */
+void render_without_cache(const image_t* image, v2d_t position, void* data)
+{
+    image_draw(image, position.x, position.y, IF_NONE);
+    (void)data;
+}
+
+/* render an image with FastDraw */
+void render_with_cache(const image_t* image, v2d_t position, void* data)
+{
+    FAST_DRAW_CACHE* cache = (FAST_DRAW_CACHE*)data;
+    fd_draw_bitmap(cache, IMAGE2BITMAP(image), position.x, position.y);
+}
+
+
+
+
+
+/* preprocessing */
 
 /* sort layers by their z-indexes */
 void sort_layers(bgtheme_t *bgtheme)
@@ -487,7 +551,7 @@ void split_layers(bgtheme_t *bgtheme)
 /* group layers for deferred drawing */
 void group_layers(bgtheme_t *bgtheme)
 {
-    #define layer_image(layer) actor_image((layer)->actor)
+    #define layer_image(layer) animation_image((layer)->animation, 0)
     bglayer_t** layer = bgtheme->layer;
 
     /*
@@ -518,6 +582,12 @@ void group_layers(bgtheme_t *bgtheme)
         if(image_texture(a) == image_texture(b))
             layer[i]->group_index = 1 + layer[i+1]->group_index;
     }
+
+    /* warn if unoptimized */
+    if(bgtheme->background_count > 0 && layer[0]->group_index < bgtheme->background_count)
+        logfile_message("BACKGROUND: unoptimized multi-atlas background \"%s\"", bgtheme->filepath);
+
+    #undef layer_image
 }
 
 
@@ -525,6 +595,7 @@ void group_layers(bgtheme_t *bgtheme)
 
 
 
+/* .bg files */
 
 /* traverse a .bg file */
 int traverse(const parsetree_statement_t *stmt, void *bgtheme)
@@ -549,7 +620,6 @@ int traverse(const parsetree_statement_t *stmt, void *bgtheme)
 
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), layer, traverse_layer_attributes);
         validate_layer(layer);
-        actor_change_animation(layer->actor, layer->data->animation_data[0]);
     }
     else
         fatal_error("Can't read background layer. Unknown identifier: '%s'", identifier);
@@ -654,6 +724,7 @@ int traverse_layer_attributes(const parsetree_statement_t *stmt, void *bglayer)
         if(layer->data != NULL)
             spriteinfo_destroy(layer->data);
         layer->data = spriteinfo_create(nanoparser_get_program(p1));
+        layer->animation = spriteinfo_get_animation(layer->data, 0);
     }
     else
         fatal_error("Can't read background attributes. Unknown identifier: '%s'", identifier);
@@ -664,6 +735,13 @@ int traverse_layer_attributes(const parsetree_statement_t *stmt, void *bglayer)
 /* validate a layer */
 void validate_layer(const bglayer_t *layer)
 {
-    if(layer->data == NULL)
+    if(layer->data == NULL || layer->animation == NULL)
         fatal_error("Can't read background layer: no sprite data given");
+}
+
+/* validate a background theme */
+void validate_theme(const bgtheme_t* theme)
+{
+    if(theme->layer == NULL || theme->layer_count == 0)
+        fatal_error("Invalid background: no layers were specified in \"%s\"", theme->filepath);
 }
