@@ -30,6 +30,7 @@
 #include "../core/timer.h"
 #include "../core/nanoparser.h"
 #include "../util/numeric.h"
+#include "../util/rect.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../third_party/fast_draw.h"
@@ -451,6 +452,7 @@ void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_posit
     v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, half_screen_size);
     float animation_time = timer_get_elapsed();
+    rect_t screen_rect = rect_new(0, 0, screen_size.x, screen_size.y);
 
     for(int i = 0; i < layer_count; i++) {
         const bglayer_t* layer = layers[i];
@@ -481,7 +483,10 @@ void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_posit
         for(int y = 0; y < rows; y++) {
             for(int x = 0; x < cols; x++) {
                 v2d_t image_position = v2d_new(position.x + x * frame_width, position.y + y * frame_height);
-                render_image(image, image_position, data);
+                rect_t image_rect = rect_new(image_position.x, image_position.y, frame_width, frame_height);
+
+                if(rect_overlaps(image_rect, screen_rect)) /* clipping */
+                    render_image(image, image_position, data);
             }
         }
     }
