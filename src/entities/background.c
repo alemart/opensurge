@@ -33,7 +33,12 @@
 #include "../util/rect.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+
+/* FastDraw */
+#define WANT_FAST_DRAW 1
+#if WANT_FAST_DRAW
 #include "../third_party/fast_draw.h"
+#endif
 
 /* forward declarations */
 typedef struct bglayer_t bglayer_t;
@@ -49,6 +54,9 @@ struct bgtheme_t {
     int background_count; /* number of background layers */
     int foreground_count; /* number of foreground layers */
     char* filepath; /* filepath of the background */
+#if WANT_FAST_DRAW
+    int draw_count; /* number of draws */
+#endif
 };
 
 /* bglayer struct: a background (or foreground) layer */
@@ -124,7 +132,6 @@ static void split_layers(bgtheme_t *bgtheme);
 static void group_layers(bgtheme_t *bgtheme);
 
 /* rendering */
-#define WANT_FAST_DRAW 1
 typedef void (*renderstrategy_t)(const image_t*,v2d_t,void*);
 static void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, void* data, renderstrategy_t render_image);
 static void render_without_cache(const image_t* image, v2d_t position, void* data);
@@ -161,6 +168,9 @@ bgtheme_t* background_load(const char *filepath)
     bgtheme->layer_count = 0;
     bgtheme->background_count = 0;
     bgtheme->foreground_count = 0;
+#if WANT_FAST_DRAW
+    bgtheme->draw_count = 1;
+#endif
 
     /* read the .bg file */
     tree = nanoparser_construct_tree(fullpath);
@@ -213,20 +223,28 @@ void background_update(bgtheme_t *bgtheme)
  * background_render_bg()
  * Renders the background
  */
-void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
+void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position)
 {
     bglayer_t** layers = bgtheme->layer;
     int layer_count = bgtheme->background_count;
 
 #if WANT_FAST_DRAW
-    FAST_DRAW_CACHE* cache = fd_create_cache(layer_count, true, false);
-    render_layers(layers, layer_count, camera_position, cache, render_with_cache);
-    fd_flush_cache(cache); /* invokes al_draw_indexed_prim() */
-    fd_destroy_cache(cache);
+    FAST_DRAW_CACHE* cache = fd_create_cache(bgtheme->draw_count, true, false);
+    int draw_count = 0;
+
+    if(cache != NULL) {
+        render_layers(layers, layer_count, camera_position, (void*[]){ cache, &draw_count }, render_with_cache);
+        if(draw_count > bgtheme->draw_count)
+            bgtheme->draw_count = draw_count;
+
+        fd_flush_cache(cache); /* invokes al_draw_indexed_prim() */
+        fd_destroy_cache(cache);
+    }
 
     /*
 
-    there is overhead when invoking al_draw_prim()
+    there is overhead (CPU) when invoking al_draw_prim()
+    this is meant for GPU optimization
 
     [1] https://www.allegro.cc/forums/thread/613609
     [2] https://www.allegro.cc/forums/thread/614949
@@ -236,6 +254,8 @@ void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
     image_hold_drawing(true);
     render_layers(layers, layer_count, camera_position, NULL, render_without_cache);
     image_hold_drawing(false);
+
+    (void)render_with_cache;
 #endif
 }
 
@@ -243,7 +263,7 @@ void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
  * background_render_fg()
  * Renders the foreground
  */
-void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
+void background_render_fg(bgtheme_t *bgtheme, v2d_t camera_position)
 {
     bglayer_t** layers = bgtheme->layer + bgtheme->background_count;
     int layer_count = bgtheme->foreground_count;
@@ -503,8 +523,13 @@ void render_without_cache(const image_t* image, v2d_t position, void* data)
 /* render an image with FastDraw */
 void render_with_cache(const image_t* image, v2d_t position, void* data)
 {
-    FAST_DRAW_CACHE* cache = (FAST_DRAW_CACHE*)data;
+#if WANT_FAST_DRAW
+    FAST_DRAW_CACHE* cache = (FAST_DRAW_CACHE*)(((void**)data)[0]);
+    int* draw_count = (int*)(((void**)data)[1]);
+
     fd_draw_bitmap(cache, IMAGE2BITMAP(image), position.x, position.y);
+    ++(*draw_count);
+#endif
 }
 
 

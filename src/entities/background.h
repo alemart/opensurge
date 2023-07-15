@@ -29,8 +29,8 @@ bgtheme_t* background_load(const char *filepath); /* loads a bg/fg theme from a 
 bgtheme_t* background_unload(bgtheme_t *bgtheme); /* unloads the bg/fg theme */
 
 void background_update(bgtheme_t *bgtheme); /* updates the given theme */
-void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position); /* renders the background */
-void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position); /* renders the foreground */
+void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position); /* renders the background */
+void background_render_fg(bgtheme_t *bgtheme, v2d_t camera_position); /* renders the foreground */
 
 const char* background_filepath(const bgtheme_t *bgtheme); /* get the filepath of the background */
 int background_number_of_bg_layers(const bgtheme_t* bgtheme); /* number of background layers */
