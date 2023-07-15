@@ -401,6 +401,7 @@ SET(GAME_SRCS
   src/entities/player.c
   src/entities/renderqueue.c
 
+  src/third_party/fast_draw.c
   src/third_party/ignorecase.c
   src/third_party/utf8.c
 
@@ -507,6 +508,7 @@ SET(GAME_HEADERS
   src/entities/renderqueue.h
   src/entities/sfx.h
 
+  src/third_party/fast_draw.h
   src/third_party/ignorecase.h
   src/third_party/utf8.h
 
