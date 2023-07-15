@@ -248,6 +248,7 @@ void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
     bglayer_t** layers = bgtheme->layer + bgtheme->background_count;
     int layer_count = bgtheme->foreground_count;
 
+    /* foregrounds typically have few layers */
     image_hold_drawing(true);
     render_layers(layers, layer_count, camera_position, NULL, render_without_cache);
     image_hold_drawing(false);
@@ -451,8 +452,8 @@ void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_posit
     v2d_t screen_size = video_get_screen_size();
     v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, half_screen_size);
-    float animation_time = timer_get_elapsed();
     rect_t screen_rect = rect_new(0, 0, screen_size.x, screen_size.y);
+    float animation_time = timer_get_elapsed();
 
     for(int i = 0; i < layer_count; i++) {
         const bglayer_t* layer = layers[i];
