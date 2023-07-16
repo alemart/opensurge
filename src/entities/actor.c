@@ -325,21 +325,20 @@ void update_animation(actor_t *act)
     if(act->animation == NULL)
         return;
 
+    /* handle transitions with non-repeating animations */
+    if(act->next_animation != NULL) {
+        if(animation_is_over(act->animation, act->animation_timer)) {
+            /* change the animation before updating the timer, otherwise it may jitter */
+            actor_change_animation(act, act->next_animation);
+            return;
+        }
+    }
+
     /* update the animation time */
     if(act->synchronized_animation)
         act->animation_timer = timer_get_elapsed() * act->animation_speed_factor;
     else
         act->animation_timer += timer_get_delta() * act->animation_speed_factor;
-
-    /* handle transitions with non-repeating animations */
-    if(act->next_animation != NULL) {
-        if(animation_is_over(act->animation, act->animation_timer)) {
-            const animation_t* next = act->next_animation;
-            act->next_animation = NULL;
-            actor_change_animation(act, next);
-            /*return;*/
-        }
-    }
 }
 
 /* Checks if the actor can be clipped out (rendering) */
