@@ -52,6 +52,7 @@ struct sound_t {
 
 /* private stuff */
 static const int PREFERRED_NUMBER_OF_SAMPLES = 32; /* how many samples can be played at the same time */
+static int preload_sample(const char* vpath, void* data); /* preload sample */
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
 
 /*
@@ -518,4 +519,32 @@ void audio_update()
             current_music = NULL;
         }
     }
+}
+
+/*
+ * audio_preload()
+ * Preload samples
+ */
+void audio_preload()
+{
+    assertx(resourcemanager_is_initialized());
+    logfile_message("Preloading samples...");
+
+    /* preload the samples, so that we don't access the disk during gameplay */
+    asset_foreach_file("samples/", ".wav", preload_sample, NULL, true);
+    /*asset_foreach_file("samples/", ".ogg", preload_sample, NULL, true);*/
+}
+
+
+
+/* private */
+
+
+/* preload sample */
+int preload_sample(const char* vpath, void* data)
+{
+    logfile_message("Preloading sample \"%s\"...", vpath);
+    sound_load(vpath);
+
+    return 0;
 }

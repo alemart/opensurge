@@ -31,6 +31,7 @@ typedef struct sound_t sound_t;
 void audio_init();
 void audio_update();
 void audio_release();
+void audio_preload();
 
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */
