@@ -177,8 +177,9 @@ static const char* BLACKLIST[] = {
     EXACT("logo.png"),
 
     /* deleted files from previous builds */
-    EXACT("preferences.dat"),
-    EXACT("scripts/core/motd.ss"),
+    EXACT("preferences.dat"), /* 0.5.0 */
+    EXACT("scripts/core/motd.ss"), /* 0.6.1 */
+    PREFIX("images/backgrounds/waterworks-zone-indoors-"), /* 0.6.1 */
 
     /* NULL-terminated list */
     NULL
