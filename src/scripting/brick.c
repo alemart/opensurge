@@ -262,7 +262,8 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     char* sprite_name = surgescript_var_get_string(param[0], manager);
     int anim_id = BRICKLIKE_ANIMATION_ID;
     const animation_t* animation = sprite_animation_exists(sprite_name, anim_id) ? sprite_get_animation(sprite_name, anim_id) : sprite_get_animation(NULL, 0);
-    const image_t* brick_image = animation_image(animation, 0); /* get the first frame of the animation */
+    const image_t* image = animation_image(animation, 0); /* get the first frame of the animation */
+    v2d_t hot_spot = animation_hot_spot(animation);
     bricklike_data_t* data = get_data(object);
 
     if(data->mask != NULL) {
@@ -271,12 +272,39 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
             image_destroy(data->maskimg);
     }
 
-    image_lock((image_t*)brick_image);
-    data->mask = collisionmask_create(brick_image, 0, 0, image_width(brick_image), image_height(brick_image));
+    data->mask = NULL;
     data->maskimg = NULL;
-    data->hot_spot = animation_hot_spot(animation);
-    image_unlock((image_t*)brick_image);
+    data->hot_spot = hot_spot;
 
+#if 1
+    /* ----- ugly hack ----- */
+    int x = 0;
+    int y = 0;
+    int width = image_width(image);
+    int height = image_height(image);
+    image_t* brick_image = (image_t*)image;
+    ALLEGRO_BITMAP* bmp = IMAGE2BITMAP(brick_image);
+
+    if(al_get_parent_bitmap(bmp) != NULL) {
+        /* apparently, locking won't work without this ugly hack
+           FIXME think of a more elegant solution */
+        x = al_get_bitmap_x(bmp);
+        y = al_get_bitmap_y(bmp);
+        IMAGE2BITMAP(brick_image) = al_get_parent_bitmap(bmp);
+    }
+
+    image_lock(brick_image, "r");
+    data->mask = collisionmask_create(brick_image, x, y, width, height);
+    image_unlock(brick_image);
+
+    IMAGE2BITMAP(brick_image) = bmp;
+#else
+    image_lock((image_t*)image, "r");
+    data->mask = collisionmask_create(image, 0, 0, image_width(image), image_height(image));
+    image_unlock((image_t*)image);
+#endif
+
+    /* done! */
     ssfree(sprite_name);
     return NULL;
 }

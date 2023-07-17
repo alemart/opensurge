@@ -1407,7 +1407,7 @@ collisionmask_t *read_collisionmask(const parsetree_program_t *block)
 
     /* specify a custom collision mask for this particular brick (deprecated) */
     maskimg = image_load(s.source_file);
-    image_lock(maskimg);
+    image_lock(maskimg, "r");
     mask = collisionmask_create(maskimg, s.x, s.y, s.w, s.h);
     image_unlock(maskimg);
     image_unload(maskimg);
@@ -1433,7 +1433,7 @@ void create_collisionmasks()
                     image_unload(mask);
                 }
                 mask = image_load(maskfile);
-                image_lock(mask);
+                image_lock(mask, "r");
                 prev_maskfile = maskfile;
             }
 

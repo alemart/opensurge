@@ -60,7 +60,7 @@ const char* image_filepath(const image_t* img); /* relative path of the originat
 texturehandle_t image_texture(const image_t* img); /* get texture handle */
 
 /* pixel manipulation */
-void image_lock(image_t* img);
+void image_lock(image_t* img, const char* mode);
 void image_unlock(image_t* img);
 bool image_is_locked(const image_t* img);
 color_t image_getpixel(const image_t* img, int x, int y);

@@ -335,9 +335,40 @@ void image_disable_linear_filtering(image_t* img)
  * image_lock()
  * Locks the image, enabling fast in-memory pixel access
  */
-void image_lock(image_t* img)
+void image_lock(image_t* img, const char* mode)
 {
-    al_lock_bitmap(img->data, al_get_bitmap_format(img->data), ALLEGRO_LOCK_READWRITE);
+    int flags = 0;
+
+    /* valid modes: "rw", "r", "w" */
+    enum {
+        READ = ('r' << 8),
+        WRITE = ('w' << 8),
+        READWRITE = ('r' << 8) | 'w'
+    };
+
+    bool valid_length = (mode[0] != '\0') && (mode[1] == '\0' || mode[2] == '\0');
+    int mode_hash = valid_length ? (mode[0] << 8) | mode[1] : -1;
+    switch(mode_hash) {
+        case READ:
+            flags = ALLEGRO_LOCK_READONLY;
+            break;
+
+        case WRITE:
+            flags = ALLEGRO_LOCK_WRITEONLY;
+            break;
+
+        case READWRITE:
+            flags = ALLEGRO_LOCK_READWRITE;
+            break;
+
+        default:
+            fatal_error("Invalid mode for %s: %s", __func__, mode);
+            break;
+    }
+
+    /* lock the bitmap */
+    if(!al_lock_bitmap(img->data, al_get_bitmap_format(img->data), flags))
+        logfile_message("WARNING: can't lock image \"%s\" (mode: %s)", img->path, mode);
 }
 
 /*

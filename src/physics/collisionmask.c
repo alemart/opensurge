@@ -459,7 +459,7 @@ image_t* collisionmask_to_image(const collisionmask_t* mask, color_t color)
     image_clear(transparent);
 
     /* draw the mask */
-    image_lock(img);
+    image_lock(img, "w");
     for(j = 0; j < mask->height; j++) {
         for(i = 0; i < mask->width; i++) {
             if(collisionmask_at(mask, i, j, mask->pitch))
