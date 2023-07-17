@@ -234,7 +234,10 @@ surgescript_var_t* fun_addobject(surgescript_object_t* object, const surgescript
 
     /* get the new object */
     surgescript_objecthandle_t new_object_handle = surgescript_var_get_objecthandle(param[0]);
-    if(!surgescript_objectmanager_exists(manager, new_object_handle)) scripting_error(object, "foo");
+    if(!surgescript_objectmanager_exists(manager, new_object_handle)) {
+        scripting_error(object, "%s.addObject() received an invalid object (0x%x)", new_object_handle);
+        return NULL;
+    }
     surgescript_object_t* new_object = surgescript_objectmanager_get(manager, new_object_handle);
 
     /* the object must be a child of Level, because we'll traverse its sub-tree */
