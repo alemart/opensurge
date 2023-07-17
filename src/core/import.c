@@ -180,6 +180,7 @@ static const char* BLACKLIST[] = {
     EXACT("preferences.dat"), /* 0.5.0 */
     EXACT("scripts/core/motd.ss"), /* 0.6.1 */
     PREFIX("images/backgrounds/waterworks-zone-indoors-"), /* 0.6.1 */
+    EXACT("images/allegro.png"), /* 0.6.1 */
 
     /* NULL-terminated list */
     NULL
