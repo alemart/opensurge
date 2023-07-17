@@ -54,6 +54,7 @@ struct bgtheme_t {
     int background_count; /* number of background layers */
     int foreground_count; /* number of foreground layers */
     char* filepath; /* filepath of the background */
+    double animation_time; /* animation time, in seconds */
 #if WANT_FAST_DRAW
     int draw_count; /* number of draws */
 #endif
@@ -133,7 +134,7 @@ static void group_layers(bgtheme_t *bgtheme);
 
 /* rendering */
 typedef void (*renderstrategy_t)(const image_t*,v2d_t,void*);
-static void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, void* data, renderstrategy_t render_image);
+static void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, double animation_time, void* data, renderstrategy_t render_image);
 static void render_without_cache(const image_t* image, v2d_t position, void* data);
 static void render_with_cache(const image_t* image, v2d_t position, void* data);
 
@@ -168,6 +169,7 @@ bgtheme_t* background_load(const char *filepath)
     bgtheme->layer_count = 0;
     bgtheme->background_count = 0;
     bgtheme->foreground_count = 0;
+    bgtheme->animation_time = 0.0;
 #if WANT_FAST_DRAW
     bgtheme->draw_count = 1;
 #endif
@@ -213,10 +215,14 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
  */
 void background_update(bgtheme_t *bgtheme)
 {
+    /* update layers */
     for(int i = 0; i < bgtheme->layer_count; i++) {
         const bglayer_t *layer = bgtheme->layer[i];
         bgbehavior_update(layer->behavior);
     }
+
+    /* update animation time */
+    bgtheme->animation_time += timer_get_delta();
 }
 
 /*
@@ -227,13 +233,14 @@ void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position)
 {
     bglayer_t** layers = bgtheme->layer;
     int layer_count = bgtheme->background_count;
+    double animation_time = bgtheme->animation_time;
 
 #if WANT_FAST_DRAW
     FAST_DRAW_CACHE* cache = fd_create_cache(bgtheme->draw_count, true, false);
     int draw_count = 0;
 
     if(cache != NULL) {
-        render_layers(layers, layer_count, camera_position, (void*[]){ cache, &draw_count }, render_with_cache);
+        render_layers(layers, layer_count, camera_position, animation_time, (void*[]){ cache, &draw_count }, render_with_cache);
         if(draw_count > bgtheme->draw_count)
             bgtheme->draw_count = draw_count;
 
@@ -252,7 +259,7 @@ void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position)
     */
 #else
     image_hold_drawing(true);
-    render_layers(layers, layer_count, camera_position, NULL, render_without_cache);
+    render_layers(layers, layer_count, camera_position, animation_time, NULL, render_without_cache);
     image_hold_drawing(false);
 
     (void)render_with_cache;
@@ -267,10 +274,11 @@ void background_render_fg(bgtheme_t *bgtheme, v2d_t camera_position)
 {
     bglayer_t** layers = bgtheme->layer + bgtheme->background_count;
     int layer_count = bgtheme->foreground_count;
+    double animation_time = bgtheme->animation_time;
 
     /* foregrounds typically have few layers */
     image_hold_drawing(true);
-    render_layers(layers, layer_count, camera_position, NULL, render_without_cache);
+    render_layers(layers, layer_count, camera_position, animation_time, NULL, render_without_cache);
     image_hold_drawing(false);
 }
 
@@ -467,13 +475,12 @@ void bgbehavior_linear_update(bgbehavior_t *behavior)
 /* rendering */
 
 /* render layers of the background or of the foreground */
-void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, void* data, renderstrategy_t render_image)
+void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, double animation_time, void* data, renderstrategy_t render_image)
 {
     v2d_t screen_size = video_get_screen_size();
     v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, half_screen_size);
     rect_t screen_rect = rect_new(0, 0, screen_size.x, screen_size.y);
-    float animation_time = timer_get_elapsed();
 
     for(int i = 0; i < layer_count; i++) {
         const bglayer_t* layer = layers[i];
