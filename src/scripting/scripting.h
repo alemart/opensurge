@@ -30,10 +30,13 @@
 void scripting_init(int argc, const char** argv);
 void scripting_release();
 void scripting_reload();
-bool scripting_testmode();
+
 surgescript_vm_t* surgescript_vm(); /* SurgeScript VM instance */
+void scripting_launch_vm();
 void scripting_pause_vm();
 void scripting_resume_vm();
+
+bool scripting_testmode();
 
 /* scripting utilities */
 surgescript_objecthandle_t scripting_util_require_component(const surgescript_object_t* object, const char* component_name);

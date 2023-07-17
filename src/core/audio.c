@@ -543,8 +543,6 @@ void audio_preload()
 /* preload sample */
 int preload_sample(const char* vpath, void* data)
 {
-    logfile_message("Preloading sample \"%s\"...", vpath);
     sound_load(vpath);
-
     return 0;
 }

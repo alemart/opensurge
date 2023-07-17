@@ -721,6 +721,12 @@ bool foreach_file(ALLEGRO_PATH* path, const char* extension_filter, int (*callba
     const char* virtual_path = al_path_cstr(path, '/');
     char** list = PHYSFS_enumerateFiles(virtual_path); /* get sorted items without duplicates */
 
+    /* PHYSFS_enumerate() maintains a global mutex:
+       https://github.com/icculus/physfs/issues/13
+
+       PHYSFS_enumerateFiles() is based on the former, but just accumulates a
+       list of strings. We do not load any files during enumeration, only after. */
+
     /* for each entry */
     for(char** it = list; *it != NULL && !stop; it++) {
         PHYSFS_Stat stat;

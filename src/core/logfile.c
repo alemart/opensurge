@@ -58,12 +58,18 @@
    removing the preceding comma of __VA_ARGS__ when it expands to nothing */
 #define CALL(...) KALL(__VA_ARGS__, CALLX, CALLX, CALL0)(__VA_ARGS__)
 #define CALL0(fn) do { \
+    if(mutex == NULL) break; \
+    al_lock_mutex(mutex); \
     if(logfile != NULL) { (fn)(logfile); } \
     if(console != NULL) { (fn)(console); } \
+    al_unlock_mutex(mutex); \
 } while(0)
 #define CALLX(fn, ...) do { \
+    if(mutex == NULL) break; \
+    al_lock_mutex(mutex); \
     if(logfile != NULL) { (fn)(logfile, __VA_ARGS__); } \
     if(console != NULL) { (fn)(console, __VA_ARGS__); } \
+    al_unlock_mutex(mutex); \
 } while(0)
 #define KALL(_0, _1, _2, fn, ...) fn
 
@@ -75,6 +81,8 @@ static void close_logfile();
 static ALLEGRO_FILE* console = NULL;
 static bool open_console();
 static void close_console();
+
+static ALLEGRO_MUTEX* mutex = NULL;
 
 
 
@@ -89,6 +97,9 @@ static void close_console();
  */
 void logfile_init(int flags)
 {
+    /* create mutex */
+    mutex = al_create_mutex();
+
 #if !defined(__ANDROID__)
     /* open the output streams */
     if(flags & LOGFILE_TXT)
@@ -152,6 +163,9 @@ void logfile_message(const char* fmt, ...)
     __android_log_vprint(ANDROID_LOG_INFO, GAME_UNIXNAME, fmt, args);
     va_end(args);
 
+    /* logging functions from the Android NDK are atomic according to:
+       https://groups.google.com/g/android-ndk/c/lRG-wp1gQV0/m/cnpXcpjOBAAJ */
+
 #endif
 }
 
@@ -170,6 +184,9 @@ void logfile_release(int flags)
 
     if(flags & LOGFILE_CONSOLE)
         close_console();
+
+    al_destroy_mutex(mutex);
+    mutex = NULL;
 }
 
 

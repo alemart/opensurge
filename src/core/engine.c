@@ -57,6 +57,7 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_physfs.h>
 #if !defined(__ANDROID__)
 #include <allegro5/allegro_native_dialog.h>
 #else
@@ -110,6 +111,8 @@ static void init_basic_stuff(const commandline_t* cmd);
 static void init_managers(const commandline_t* cmd);
 static void init_accessories(const commandline_t* cmd);
 static void push_initial_scene(const commandline_t* cmd);
+static void* preload_audio_samples(ALLEGRO_THREAD* thread, void* arg);
+static void* load_surgescript(ALLEGRO_THREAD* thread, void* arg);
 static void release_accessories();
 static void release_managers();
 static void release_basic_stuff();
@@ -377,6 +380,11 @@ void init_managers(const commandline_t* cmd)
  */
 void init_accessories(const commandline_t* cmd)
 {
+    /* create threads */
+    ALLEGRO_THREAD* script_thread = al_create_thread(load_surgescript, (void*)cmd);
+    ALLEGRO_THREAD* audio_thread = al_create_thread(preload_audio_samples, NULL);
+
+    /* load translations, fonts and display a loading screen */
     const char* custom_lang = commandline_getstring(cmd->language_filepath,
         prefs_has_item(prefs, ".langpath") ? prefs_get_string(prefs, ".langpath") : NULL
     );
@@ -388,17 +396,29 @@ void init_accessories(const commandline_t* cmd)
     font_init();
     video_display_loading_screen();
 
-    sprite_init();
-    audio_preload();
-    mobilegamepad_init(commandline_getint(cmd->mobile, FALSE) ? MOBILEGAMEPAD_DEFAULT_FLAGS : MOBILEGAMEPAD_DISABLED);
-    charactersystem_init();
-    objects_init();
+    /* load resources in different threads */
+    al_start_thread(script_thread); /* initialize SurgeScript */
+    al_start_thread(audio_thread); /* preload audio samples */
+
+    /* load images in the same thread of the ALLEGRO_DISPLAY */
+    sprite_init(); /* load sprites */
+
+    /* load various accessories */
     storyboard_init();
+    scenestack_init();
     screenshot_init();
     fadefx_init();
-    scripting_init(cmd->user_argc, cmd->user_argv);
-    
-    scenestack_init();
+    charactersystem_init();
+    mobilegamepad_init(commandline_getint(cmd->mobile, FALSE) ? MOBILEGAMEPAD_DEFAULT_FLAGS : MOBILEGAMEPAD_DISABLED);
+
+    /* wait for the threads & release them */
+    al_join_thread(script_thread, NULL);
+    al_join_thread(audio_thread, NULL); /* probably already finished */
+    al_destroy_thread(audio_thread);
+    al_destroy_thread(script_thread);
+
+    /* launch the SurgeScript Virtual Machine */
+    scripting_launch_vm();
 }
 
 
@@ -650,7 +670,32 @@ void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data)
         al_drop_next_event(a5_event_queue);
 }
 
+/*
+ * load_surgescript()
+ * Initialize SurgeScript. Compile .ss scripts
+ */
+void* load_surgescript(ALLEGRO_THREAD* thread, void* arg)
+{
+    const commandline_t* cmd = (const commandline_t*)arg;
 
+    al_set_physfs_file_interface();
+    scripting_init(cmd->user_argc, cmd->user_argv);
+    objects_init(); /* legacy scripting */
+
+    return NULL;
+}
+
+/*
+ * preload_audio_samples()
+ * Preload audio samples
+ */
+void* preload_audio_samples(ALLEGRO_THREAD* thread, void* arg)
+{
+    al_set_physfs_file_interface();
+    audio_preload();
+
+    return NULL;
+}
 
 
 

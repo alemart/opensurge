@@ -40,9 +40,9 @@ static void log_fun(const char* message);
 static void err_fun(const char* message);
 static void compile_scripts(surgescript_vm_t* vm);
 static int compile_script(const char* filepath, void* param);
+static char* read_file(const char* filepath);
 static bool found_test_script(const surgescript_vm_t* vm);
 static void check_if_compatible();
-static char* read_file(const char* filepath);
 static void parse_surgescript_options(surgescript_vm_t* vm, int argc, char** argv);
 
 /* SurgeEngine */
@@ -108,9 +108,6 @@ void scripting_init(int argc, const char** argv)
 
     /* compile scripts */
     compile_scripts(vm);
-
-    /* launch VM */
-    surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
 }
 
 /*
@@ -135,6 +132,18 @@ void scripting_release()
 
     /* destroy VM */
     vm = surgescript_vm_destroy(vm);
+}
+
+/*
+ * scripting_launch_vm()
+ * Launches the SurgeScript VM
+ */
+void scripting_launch_vm()
+{
+    assertx(vm);
+
+    /* launch VM */
+    surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
 }
 
 /*
@@ -461,7 +470,7 @@ void compile_scripts(surgescript_vm_t* vm)
     }
 }
 
-/* reads and compiles a script */
+/* compile a .ss script from the scripts/ folder */
 int compile_script(const char* filepath, void* param)
 {
     const char* fullpath = asset_path(filepath);
