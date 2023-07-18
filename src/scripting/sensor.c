@@ -81,8 +81,8 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Sensor", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Sensor", "onTransformChange", fun_ontransformchange, 0);
-    surgescript_vm_bind(vm, "Sensor", "onRender", fun_onrender, 0);
-    surgescript_vm_bind(vm, "Sensor", "onRenderGizmos", fun_onrendergizmos, 0);
+    surgescript_vm_bind(vm, "Sensor", "onRender", fun_onrender, 2);
+    surgescript_vm_bind(vm, "Sensor", "onRenderGizmos", fun_onrendergizmos, 2);
 }
 
 
@@ -114,8 +114,13 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_object_set_userdata(object, NULL);
 
     /* the parent object can't be detached */
-    if(surgescript_object_has_tag(parent, "detached"))
-        scripting_error(object, "An object (\"%s\") that spawns a Sensor cannot be \"detached\".", scripting_util_parent_name(object));
+    if(surgescript_object_has_tag(parent, "detached")) {
+        scripting_error(object,
+            "An object (\"%s\") that spawns a %s cannot be \"detached\"",
+            scripting_util_parent_name(object),
+            surgescript_object_name(object)
+        );
+    }
 
     /* done! */
     return NULL;
@@ -200,7 +205,10 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     sensor_t* sensor = get_sensor(object);
-    sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, scripting_util_parent_camera(object));
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
+    sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, camera);
     return NULL;
 }
 

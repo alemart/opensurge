@@ -85,7 +85,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Brick", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Brick", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Brick", "set_offset", fun_setoffset, 1);
-    surgescript_vm_bind(vm, "Brick", "onRenderGizmos", fun_onrendergizmos, 0);
+    surgescript_vm_bind(vm, "Brick", "onRenderGizmos", fun_onrendergizmos, 2);
 }
 
 /*
@@ -212,6 +212,16 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
         return NULL;
     }
 
+    /* the parent object can't be detached */
+    if(surgescript_object_has_tag(parent, "detached")) {
+        scripting_error(object,
+            "An object (\"%s\") that spawns a %s cannot be \"detached\"",
+            surgescript_object_name(parent),
+            surgescript_object_name(object)
+        );
+        return NULL;
+    }
+
     /* allocate the offset vector */
     ssassert(OFFSET_ADDR == surgescript_heap_malloc(heap));
     offset = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
@@ -287,6 +297,9 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     bricklike_data_t* data = get_data(object);
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
 
     if(data->mask != NULL && scripting_util_is_object_inside_screen(object)) {
         /* lazy creation of the mask image */
@@ -298,7 +311,7 @@ surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surges
         /* compute the position */
         v2d_t world_pos = v2d_subtract(scripting_util_world_position(object), data->hot_spot);
         v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
-        v2d_t camera_offset = v2d_subtract(scripting_util_parent_camera(object), half_screen);
+        v2d_t camera_offset = v2d_subtract(camera, half_screen);
         v2d_t screen_pos = v2d_subtract(world_pos, camera_offset);
 
         /* render mask */

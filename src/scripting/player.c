@@ -282,7 +282,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Player", "__releaseChildren", fun_unload, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
-    surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 0);
+    surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 2);
 }
 
 /*
@@ -1529,11 +1529,12 @@ surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
 
-    if(player != NULL) {
-        v2d_t camera = scripting_util_object_camera(object);
+    if(player != NULL)
         physicsactor_render_sensors(player->pa, camera);
-    }
 
     return NULL;
 }

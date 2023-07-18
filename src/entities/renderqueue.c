@@ -1447,12 +1447,24 @@ void render_brick_path(renderable_t r, v2d_t camera_position)
 
 void render_ssobject(renderable_t r, v2d_t camera_position)
 {
-    surgescript_object_call_function(r.ssobject, "onRender", NULL, 0, NULL);
+    surgescript_var_t* cam_x = surgescript_var_set_number(surgescript_var_create(), camera_position.x);
+    surgescript_var_t* cam_y = surgescript_var_set_number(surgescript_var_create(), camera_position.y);
+
+    surgescript_object_call_function(r.ssobject, "onRender", (const surgescript_var_t*[]){ cam_x, cam_y }, 2, NULL);
+
+    surgescript_var_destroy(cam_y);
+    surgescript_var_destroy(cam_x);
 }
 
 void render_ssobject_gizmo(renderable_t r, v2d_t camera_position)
 {
-    surgescript_object_call_function(r.ssobject, "onRenderGizmos", NULL, 0, NULL);
+    surgescript_var_t* cam_x = surgescript_var_set_number(surgescript_var_create(), camera_position.x);
+    surgescript_var_t* cam_y = surgescript_var_set_number(surgescript_var_create(), camera_position.y);
+
+    surgescript_object_call_function(r.ssobject, "onRenderGizmos", (const surgescript_var_t*[]){ cam_x, cam_y }, 2, NULL);
+
+    surgescript_var_destroy(cam_y);
+    surgescript_var_destroy(cam_x);
 }
 
 void render_ssobject_debug(renderable_t r, v2d_t camera_position)

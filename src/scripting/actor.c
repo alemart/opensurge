@@ -104,7 +104,7 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
-    surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 2);
     surgescript_vm_bind(vm, "Actor", "__canBeClippedOut", fun_canbeclippedout, 0);
     surgescript_vm_bind(vm, "Actor", "get___filepathOfRenderable", fun_getfilepathofrenderable, 0);
     surgescript_vm_bind(vm, "Actor", "get___textureHandle", fun_gettexturehandle, 0);
@@ -190,10 +190,15 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* render */
 surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
-    v2d_t camera = !is_detached ? camera_get_position() : v2d_multiply(video_get_screen_size(), 0.5f);
     actor_t* actor = scripting_actor_ptr(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
+    bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
+
+    if(is_detached)
+        camera = v2d_multiply(video_get_screen_size(), 0.5f);
 
     actor->position = scripting_util_world_position(object);
     actor->angle = scripting_util_world_angle(object) * DEG2RAD;

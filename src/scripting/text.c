@@ -104,7 +104,7 @@ void scripting_register_text(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Text", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Text", "set_offset", fun_setoffset, 1);
     surgescript_vm_bind(vm, "Text", "get_size", fun_getsize, 0);
-    surgescript_vm_bind(vm, "Text", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Text", "onRender", fun_onrender, 2);
     surgescript_vm_bind(vm, "Text", "get___filepathOfRenderable", fun_getfilepathofrenderable, 0);
     surgescript_vm_bind(vm, "Text", "get___textureHandle", fun_gettexturehandle, 0);
     surgescript_vm_bind(vm, "Text", "get___isTranslucent", fun_getistranslucent, 0);
@@ -211,13 +211,20 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     font_t* font = get_font(object);
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
+
     if(font != NULL) {
         const surgescript_heap_t* heap = surgescript_object_heap(object);
         bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
-        v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
+        if(is_detached)
+            camera = v2d_multiply(video_get_screen_size(), 0.5f);
+
         font_set_position(font, scripting_util_world_position(object));
         font_render(font, camera);
     }
+
     return NULL;
 }
 

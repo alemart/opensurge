@@ -89,7 +89,7 @@ void scripting_register_brickparticle(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "BrickParticle", "get___filepathOfRenderable", fun_getfilepathofrenderable, 0);
     surgescript_vm_bind(vm, "BrickParticle", "get___textureHandle", fun_gettexturehandle, 0);
     surgescript_vm_bind(vm, "BrickParticle", "get___isTranslucent", fun_getistranslucent, 0);
-    surgescript_vm_bind(vm, "BrickParticle", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "BrickParticle", "onRender", fun_onrender, 2);
 }
 
 
@@ -126,8 +126,10 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* render */
 surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
     v2d_t position = v2d_new(0.0f, 0.0f);
-    v2d_t camera = camera_get_position();
 
     /* nothing to do? */
     const particledata_t* pd = get_particledata(object);
@@ -161,6 +163,16 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+
+    /* BrickParticle must be a child of Level */
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+    const surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    if(strcmp(surgescript_object_name(parent), "Level") != 0) {
+        scripting_error(object, "%s cannot be a child of %s", surgescript_object_name(object), surgescript_object_name(parent));
+        return NULL;
+    }
+
     /* create particle data */
     particledata_t* pd = create_particledata();
     surgescript_object_set_userdata(object, pd);
