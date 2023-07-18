@@ -444,32 +444,30 @@ int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, groun
 /*
  * collisionmask_to_image()
  * Creates a binary image with colored solid pixels and transparent passable pixels
- * You must destroy the image_t* yourself after usage
+ * You must destroy the image_t* after usage
  */
 image_t* collisionmask_to_image(const collisionmask_t* mask, color_t color)
 {
     image_t* target = image_drawing_target();
-    image_t* img;
-    int i, j;
-
-    /* prepare to draw */
+    image_t* img = image_create(mask->width, mask->height);
     color_t transparent = color_rgba(0, 0, 0, 0);
-    img = image_create(mask->width, mask->height);
-    image_set_drawing_target(img);
-    image_clear(transparent);
 
     /* draw the mask */
-    image_lock(img, "w");
-    for(j = 0; j < mask->height; j++) {
-        for(i = 0; i < mask->width; i++) {
-            if(collisionmask_at(mask, i, j, mask->pitch))
-                image_putpixel(i, j, color);
+    image_set_drawing_target(img);
+    image_clear(transparent);
+    image_lock(img, "rw");
+
+    for(int y = 0; y < mask->height; y++) {
+        for(int x = 0; x < mask->width; x++) {
+            if(collisionmask_at(mask, x, y, mask->pitch))
+                image_putpixel(x, y, color);
         }
     }
+
     image_unlock(img);
+    image_set_drawing_target(target);
 
     /* done */
-    image_set_drawing_target(target);
     return img;
 }
 
