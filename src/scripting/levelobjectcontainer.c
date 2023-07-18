@@ -297,6 +297,10 @@ surgescript_var_t* fun_hasobject(surgescript_object_t* object, const surgescript
 
 bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data)
 {
+    /* skip initial entries */
+    if(ptr < FIRST_STORED_OBJECT_ADDR)
+        return true;
+
     /* skip if null */
     if(surgescript_var_is_null(handle_var))
         return true;
@@ -326,6 +330,10 @@ bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, vo
 
 bool find_and_remove_link(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data)
 {
+    /* skip initial entries */
+    if(ptr < FIRST_STORED_OBJECT_ADDR)
+        return true;
+
     /* skip if null */
     if(surgescript_var_is_null(handle_var))
         return true;
@@ -347,6 +355,10 @@ bool find_and_remove_link(surgescript_var_t* handle_var, surgescript_heapptr_t p
 
 bool check_if_link_exists(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data)
 {
+    /* skip initial entries */
+    if(ptr < FIRST_STORED_OBJECT_ADDR)
+        return true;
+
     /* skip if null */
     if(surgescript_var_is_null(handle_var))
         return true;
