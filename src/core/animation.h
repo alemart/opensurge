@@ -29,6 +29,7 @@ typedef struct animation_t animation_t;
 
 /* forward declarations */
 struct image_t;
+struct spriteinfo_t;
 
 
 
@@ -37,7 +38,7 @@ struct image_t;
  */
 
 
-/* the ID of the animation, as declared in a .spr file */
+/* the ID of the animation, as declared in a .spr file (typically) */
 int animation_id(const animation_t* anim);
 
 /* the FPS rate of the animation (frames per second) */
@@ -63,6 +64,9 @@ v2d_t animation_hot_spot(const animation_t* anim);
 
 /* the unflipped action spot of the animation, in pixels */
 v2d_t animation_action_spot(const animation_t* anim);
+
+/* the sprite to which this animation belongs */
+const struct spriteinfo_t* animation_sprite(const animation_t* anim);
 
 /* returns the specified frame of the given animation */
 const struct image_t* animation_image(const animation_t* anim, int frame_number);

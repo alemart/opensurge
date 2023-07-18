@@ -52,7 +52,7 @@ static const float MIN_FPS = 1e-5;
 
 /*
  * animation_id()
- * The ID of the animation, as declared in a .spr file
+ * The ID of the animation, as declared in a .spr file (typically)
  */
 int animation_id(const animation_t* anim)
 {
@@ -129,6 +129,15 @@ v2d_t animation_hot_spot(const animation_t* anim)
 v2d_t animation_action_spot(const animation_t* anim)
 {
     return anim->action_spot;
+}
+
+/*
+ * animation_sprite()
+ * The sprite to which this animation belongs
+ */
+const spriteinfo_t* animation_sprite(const animation_t* anim)
+{
+    return anim->sprite;
 }
 
 /*
