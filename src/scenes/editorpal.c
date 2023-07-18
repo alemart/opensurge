@@ -27,6 +27,7 @@
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/sprite.h"
+#include "../core/animation.h"
 #include "../core/input.h"
 #include "../core/lang.h"
 #include "../core/global.h"

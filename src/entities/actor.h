@@ -25,6 +25,8 @@
 #include "../util/v2d.h"
 #include "../core/sprite.h"
 #include "../core/input.h"
+#include "../core/image.h"
+#include "../core/animation.h"
 
 /* forward declarations */
 struct brick_t;

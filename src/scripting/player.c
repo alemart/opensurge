@@ -24,6 +24,7 @@
 #include "scripting.h"
 #include "../core/logfile.h"
 #include "../util/numeric.h"
+#include "../util/darray.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../scenes/level.h"

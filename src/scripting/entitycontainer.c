@@ -24,7 +24,9 @@
 #include "../util/numeric.h"
 #include "../util/util.h"
 #include "../core/video.h"
+#include "../core/image.h"
 #include "../core/sprite.h"
+#include "../core/animation.h"
 #include "../entities/renderqueue.h"
 
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);

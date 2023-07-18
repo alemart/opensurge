@@ -34,6 +34,7 @@
 #include "../core/timer.h"
 #include "../core/audio.h"
 #include "../core/sprite.h"
+#include "../core/animation.h"
 #include "../core/nanoparser.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
@@ -1224,6 +1225,7 @@ int traverse(const parsetree_statement_t *stmt)
     const char *identifier;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2;
+    const animation_t *anim;
     int brick_id;
 
     identifier = nanoparser_get_identifier(stmt);
@@ -1249,9 +1251,8 @@ int traverse(const parsetree_statement_t *stmt)
         validate_brickdata(brickdata[brick_id]);
 
         /* setup preview image */
-        brickdata[brick_id]->image = animation_image(
-            brickdata[brick_id]->data->animation_data[0], 0
-        );
+        anim = spriteinfo_get_animation(brickdata[brick_id]->data, 0);
+        brickdata[brick_id]->image = animation_image(anim, 0);
 
         /* cache preview image size */
         brickdata[brick_id]->image_width = image_width(brickdata[brick_id]->image);
@@ -1424,8 +1425,11 @@ void create_collisionmasks()
     /* creates the collision masks */
     for(i = 0; i < brickdata_count; i++) {
         if(brickdata[i] != NULL && brickdata[i]->type != BRK_PASSABLE && brickdata[i]->mask == NULL) {
-            const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : brickdata[i]->data->source_file;
-            spriteinfo_t* sprite = brickdata[i]->data;
+            const spriteinfo_t* sprite = brickdata[i]->data;
+            const char* maskfile = brickdata[i]->maskfile ? brickdata[i]->maskfile : spriteinfo_source_file(sprite);
+            rect_t source_rect = spriteinfo_source_rect(sprite);
+            int frame_width = spriteinfo_frame_width(sprite);
+            int frame_height = spriteinfo_frame_height(sprite);
 
             if(mask == NULL || 0 != str_icmp(prev_maskfile, maskfile)) {
                 if(mask != NULL) {
@@ -1439,10 +1443,10 @@ void create_collisionmasks()
 
             brickdata[i]->mask = collisionmask_create(
                 mask,
-                sprite->rect_x,
-                sprite->rect_y,
-                sprite->frame_w,
-                sprite->frame_h
+                source_rect.x,
+                source_rect.y,
+                frame_width,
+                frame_height
             );
         }
     }

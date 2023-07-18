@@ -25,6 +25,7 @@
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/sprite.h"
+#include "../core/animation.h"
 #include "../entities/brick.h"
 #include "../scenes/level.h"
 #include "../physics/collisionmask.h"

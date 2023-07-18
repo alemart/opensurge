@@ -22,39 +22,13 @@
 #define _SPRITE_H
 
 #include <stdbool.h>
-#include "animation.h"
-#include "image.h"
-#include "../util/v2d.h"
-#include "../util/darray.h"
+#include "../util/rect.h"
 
+/* forward declarations */
 typedef struct spriteinfo_t spriteinfo_t;
-struct animation_t;
 struct parsetree_program_t;
-
-/* sprite info */
-/* spriteinfo_t represents only ONE sprite (meta data), with several animations */
-struct spriteinfo_t {
-    char* source_file; /* path to image file */
-    int rect_x; /* source rectangle: xpos */
-    int rect_y; /* source rectangle: ypos */
-    int rect_w; /* source rectangle: width */
-    int rect_h; /* source rectangle: height */
-    int frame_w; /* frame width */
-    int frame_h; /* frame height */
-    v2d_t default_hot_spot; /* default hot spot for all animations */
-    v2d_t default_action_spot; /* default unflipped action spot for all animations */
-
-    int frame_count; /* every frame related to this sprite */
-    struct image_t** frame_data; /* image_t* vector */
-
-    int animation_count;
-    struct animation_t** animation_data; /* vector of animation_t* */
-
-    DARRAY(struct animtransition_t*, transition); /* transitions */
-    DARRAY(struct animtransition_t*, preprocessed_transition); /* transitions without "any" sorted by from_id and then by to_id */
-    int* transition_from; /* transition_from[i] is the first index of preprocessed_transition having from_id == i, if it exists */
-    int transition_from_length; /* length of transition_from[] */
-};
+struct animation_t;
+struct image_t;
 
 
 
@@ -68,11 +42,12 @@ void sprite_init();
 /* releases the sprite system */
 void sprite_release();
 
+/* checks if an animation exists */
+bool sprite_animation_exists(const char* sprite_name, int anim_id);
+
 /* gets the required animation - crashes if not found */
 const struct animation_t* sprite_get_animation(const char* sprite_name, int anim_id);
 
-/* checks if an animation exists */
-bool sprite_animation_exists(const char* sprite_name, int anim_id);
 
 
 
@@ -94,5 +69,17 @@ const struct animation_t* spriteinfo_get_animation(const spriteinfo_t* info, int
 
 /* finds a transition animation in a sprite - returns NULL if there isn't any */
 const struct animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info, int from_id, int to_id);
+
+/* the source file (image) of the sprite */
+const char* spriteinfo_source_file(const spriteinfo_t* info);
+
+/* the source rect of the sprite */
+rect_t spriteinfo_source_rect(const spriteinfo_t* info);
+
+/* the width of a frame of the sprite */
+int spriteinfo_frame_width(const spriteinfo_t* info);
+
+/* the height of a frame of the sprite */
+int spriteinfo_frame_height(const spriteinfo_t* info);
 
 #endif

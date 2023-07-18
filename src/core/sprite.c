@@ -26,8 +26,10 @@
 #include "asset.h"
 #include "resourcemanager.h"
 #include "nanoparser.h"
+#include "../util/v2d.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/darray.h"
 #include "../util/hashtable.h"
 
 /* constants & utilities */
@@ -52,6 +54,31 @@ typedef struct animtransition_t
 
 static animtransition_t *transition_new(int anim_id, int from_id, int to_id); /* creates a transition */
 static animtransition_t *transition_delete(animtransition_t *transition); /* deletes transition */
+
+/* sprite info */
+/* spriteinfo_t represents only ONE sprite (metadata), with several animations */
+struct spriteinfo_t {
+    char* source_file; /* path to image file */
+    int rect_x; /* source rectangle: xpos */
+    int rect_y; /* source rectangle: ypos */
+    int rect_w; /* source rectangle: width */
+    int rect_h; /* source rectangle: height */
+    int frame_w; /* frame width */
+    int frame_h; /* frame height */
+    v2d_t default_hot_spot; /* default hot spot for all animations */
+    v2d_t default_action_spot; /* default unflipped action spot for all animations */
+
+    int frame_count; /* every frame related to this sprite */
+    image_t** frame_data; /* image_t* vector */
+
+    int animation_count;
+    animation_t** animation_data; /* vector of animation_t* */
+
+    DARRAY(animtransition_t*, transition); /* transitions */
+    DARRAY(animtransition_t*, preprocessed_transition); /* transitions without "any" sorted by from_id and then by to_id */
+    int* transition_from; /* transition_from[i] is the first index of preprocessed_transition having from_id == i, if it exists */
+    int transition_from_length; /* length of transition_from[] */
+};
 
 /* private functions */
 static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
@@ -263,6 +290,41 @@ const animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info
     return NULL;
 }
 
+/*
+ * spriteinfo_source_file()
+ * The source file (image) of the sprite
+ */
+const char* spriteinfo_source_file(const spriteinfo_t* info)
+{
+    return info->source_file;
+}
+
+/*
+ * spriteinfo_source_rect()
+ * The source rect of the sprite
+ */
+rect_t spriteinfo_source_rect(const spriteinfo_t* info)
+{
+    return rect_new(info->rect_x, info->rect_y, info->rect_w, info->rect_h);
+}
+
+/*
+ * spriteinfo_frame_width()
+ * The width of a frame of the sprite
+ */
+int spriteinfo_frame_width(const spriteinfo_t* info)
+{
+    return info->frame_w;
+}
+
+/*
+ * spriteinfo_frame_height()
+ * The height of a frame of the sprite
+ */
+int spriteinfo_frame_height(const spriteinfo_t* info)
+{
+    return info->frame_h;
+}
 
 
 

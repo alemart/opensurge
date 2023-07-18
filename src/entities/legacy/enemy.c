@@ -36,6 +36,7 @@
 #include "../../core/logfile.h"
 #include "../../core/asset.h"
 #include "../../core/video.h"
+#include "../../util/darray.h"
 #include "../../util/util.h"
 #include "../../util/stringutil.h"
 #include "../../util/hashtable.h"
