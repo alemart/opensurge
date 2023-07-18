@@ -31,6 +31,7 @@
 #include "../util/stringutil.h"
 #include "../util/darray.h"
 #include "../util/hashtable.h"
+#include "../physics/collisionmask.h"
 
 /* constants & utilities */
 #define MAX_ANIMATIONS 256 /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
@@ -70,6 +71,7 @@ struct spriteinfo_t {
 
     int frame_count; /* every frame related to this sprite */
     image_t** frame_data; /* image_t* vector */
+    const image_t* spritesheet; /* reference to the spritesheet */
 
     int animation_count;
     animation_t** animation_data; /* vector of animation_t* */
@@ -212,7 +214,7 @@ void spriteinfo_destroy(spriteinfo_t *info)
 const image_t* spriteinfo_get_animation_frame(const spriteinfo_t* info, int frame_index)
 {
     if(frame_index < 0 || frame_index >= info->frame_count) {
-        fatal_error("Can't get the frame whose index is %d of sprite \"%s\". Valid range is [0,%d].", frame_index, info->source_file, info->frame_count-1);
+        fatal_error("%s: can't get the frame whose index is %d of sprite \"%s\". Valid range is [0,%d].", __func__, frame_index, info->source_file, info->frame_count-1);
         return NULL;
     }
 
@@ -326,6 +328,38 @@ int spriteinfo_frame_height(const spriteinfo_t* info)
     return info->frame_h;
 }
 
+/*
+ * spriteinfo_to_collisionmask()
+ * Create a collision mask from a frame of the spritesheet
+ */
+collisionmask_t* spriteinfo_to_collisionmask(const spriteinfo_t* info, int frame_index)
+{
+    if(frame_index < 0 || frame_index >= info->frame_count) {
+        fatal_error("%s: can't get the frame whose index is %d of sprite \"%s\". Valid range is [0,%d].", __func__, frame_index, info->source_file, info->frame_count-1);
+        return NULL;
+    }
+
+#if 0
+    /* apparently, locking doesn't work properly with sub-bitmaps */
+    image_t* image = info->frame_data[frame_index];
+    image_lock(image, "r");
+    collisionmask_t* mask = collisionmask_create(image, 0, 0, info->frame_w, info->frame_h);
+    image_unlock(image);
+#else
+    /* let's lock the entire spritesheet and recompute the coordinates of the frame */
+    image_t* spritesheet = (image_t*)info->spritesheet;
+    int w = info->rect_w / info->frame_w;
+    int x = info->rect_x + (frame_index % w) * info->frame_w;
+    int y = info->rect_y + (frame_index / w) * info->frame_h;
+
+    image_lock(spritesheet, "r");
+    collisionmask_t* mask = collisionmask_create(spritesheet, x, y, info->frame_w, info->frame_h);
+    image_unlock(spritesheet);
+#endif
+
+    return mask;
+}
+
 
 
 
@@ -368,6 +402,7 @@ spriteinfo_t *spriteinfo_new()
 
     sprite->frame_count = 0;
     sprite->frame_data = NULL;
+    sprite->spritesheet = NULL;
 
     sprite->animation_count = 0;
     sprite->animation_data = NULL;
@@ -687,6 +722,36 @@ void validate_sprite(spriteinfo_t *spr)
 {
     extern void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet);
 
+    if(spr->source_file == NULL)
+        fatal_error("Sprite error: unspecified source_file");
+    else if(spr->spritesheet == NULL)
+        fatal_error("Invalid spritesheet \"%s\"", spr->source_file);
+    else if(spr->rect_x >= image_width(spr->spritesheet) || spr->rect_y >= image_height(spr->spritesheet))
+        fatal_error("Invalid source_rect (%d,%d,%d,%d) for %d x %d image \"%s\"", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h, image_width(spr->spritesheet), image_height(spr->spritesheet), spr->source_file);
+
+    if(spr->rect_x < 0 || spr->rect_y < 0 || spr->rect_w <= 0 || spr->rect_h <= 0) {
+        logfile_message("Sprite error: invalid source_rect (%d,%d,%d,%d)", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h);
+        spr->rect_x = max(0, spr->rect_x);
+        spr->rect_y = max(0, spr->rect_y);
+        spr->rect_w = max(1, spr->rect_w);
+        spr->rect_h = max(1, spr->rect_h);
+        logfile_message("Adjusting source_rect to (%d,%d,%d,%d)", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h);
+    }
+
+    if(spr->rect_x + spr->rect_w > image_width(spr->spritesheet) || spr->rect_y + spr->rect_h > image_height(spr->spritesheet)) {
+        logfile_message("Sprite error: source_rect (%d,%d,%d,%d) exceeds %d x %d image \"%s\"", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h, image_width(spr->spritesheet), image_height(spr->spritesheet), spr->source_file);
+        spr->rect_w = min(image_width(spr->spritesheet) - spr->rect_x, spr->rect_w);
+        spr->rect_h = min(image_height(spr->spritesheet) - spr->rect_y, spr->rect_h);
+        logfile_message("Adjusting source_rect to (%d,%d,%d,%d)", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h);
+    }
+
+    if(spr->frame_w <= 0 || spr->frame_h <= 0) {
+        logfile_message("Sprite error: invalid frame_size (%d,%d)", spr->frame_w, spr->frame_h);
+        spr->frame_w = max(1, spr->frame_w);
+        spr->frame_h = max(1, spr->frame_h);
+        logfile_message("Adjusting frame_size to (%d,%d)", spr->frame_w, spr->frame_h);
+    }
+
     if(spr->frame_w > spr->rect_w || spr->frame_h > spr->rect_h) {
         logfile_message("Sprite error: frame_size (%d,%d) can't be larger than source_rect size (%d,%d)", spr->frame_w, spr->frame_h, spr->rect_w, spr->rect_h);
         spr->frame_w = min(spr->frame_w, spr->rect_w);
@@ -719,28 +784,23 @@ void validate_sprite(spriteinfo_t *spr)
  */
 void load_sprite_images(spriteinfo_t *spr)
 {
-    int i, cur_x, cur_y;
-    const image_t *sheet;
+    int cur_x, cur_y;
 
+    /* allocate frames */
     spr->frame_count = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
     spr->frame_data = mallocx(spr->frame_count * sizeof(*(spr->frame_data)));
 
-    /* reading the images... */
-    if(NULL == (sheet = image_load(spr->source_file)))
-        fatal_error("FATAL ERROR: couldn't load spritesheet \"%s\"", spr->source_file);
-
+    /* read each frame */
     cur_x = spr->rect_x;
     cur_y = spr->rect_y;
-    for(i=0; i<spr->frame_count; i++) {
-        spr->frame_data[i] = image_create_shared(sheet, cur_x, cur_y, spr->frame_w, spr->frame_h);
+    for(int i = 0; i < spr->frame_count; i++) {
+        spr->frame_data[i] = image_create_shared(spr->spritesheet, cur_x, cur_y, spr->frame_w, spr->frame_h);
         cur_x += spr->frame_w;
-        if(cur_x >= spr->rect_x+spr->rect_w) {
+        if(cur_x >= spr->rect_x + spr->rect_w) {
             cur_x = spr->rect_x;
             cur_y += spr->frame_h;
         }
     }
-
-    /*image_unload(sheet);*/
 }
 
 /*
@@ -824,6 +884,7 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         if(s->source_file != NULL)
             free(s->source_file);
         s->source_file = str_dup(nanoparser_get_string(p1));
+        s->spritesheet = image_load(s->source_file);
     }
     else if(str_icmp(identifier, "source_rect") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);

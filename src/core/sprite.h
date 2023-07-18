@@ -27,6 +27,7 @@
 /* forward declarations */
 typedef struct spriteinfo_t spriteinfo_t;
 struct parsetree_program_t;
+struct collisionmask_t;
 struct animation_t;
 struct image_t;
 
@@ -81,5 +82,8 @@ int spriteinfo_frame_width(const spriteinfo_t* info);
 
 /* the height of a frame of the sprite */
 int spriteinfo_frame_height(const spriteinfo_t* info);
+
+/* create a collision mask from a frame of the spritesheet */
+struct collisionmask_t* spriteinfo_to_collisionmask(const spriteinfo_t* info, int frame_index);
 
 #endif
