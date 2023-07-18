@@ -222,6 +222,20 @@ double animation_start_time_of_frame(const animation_t* anim, int frame_number)
 }
 
 /*
+ * animation_frame_index()
+ * The index of an animation frame in the spritesheet
+ */
+int animation_frame_index(const animation_t* anim, int frame_number)
+{
+    if(frame_number < 0)
+        frame_number = 0;
+    else if(frame_number >= anim->frame_count)
+        frame_number = anim->frame_count - 1;
+
+    return anim->data[frame_number];
+}
+
+/*
  * animation_duration()
  * The duration of an animation, in seconds
  */

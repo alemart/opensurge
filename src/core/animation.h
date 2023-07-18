@@ -76,6 +76,9 @@ int animation_frame_at_time(const animation_t* anim, double seconds);
 /* the time in which the given animation frame starts playing, in seconds */
 double animation_start_time_of_frame(const animation_t* anim, int frame_number);
 
+/* the index of an animation frame in the spritesheet */
+int animation_frame_index(const animation_t* anim, int frame_number);
+
 /* the duration of an animation, in seconds */
 double animation_duration(const animation_t* anim);
 
