@@ -374,7 +374,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 
         /* play the sample */
         if(al_play_sample(sample->sample, vol, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id)) {
-            sample->end_time = (0.001f * timer_get_ticks()) + sample->duration; /* when does it end? */
+            sample->end_time = timer_get_elapsed() + sample->duration; /* when does it end? */
             sample->valid_id = true;
             sample->volume = vol;
         }
