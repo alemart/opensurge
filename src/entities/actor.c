@@ -159,7 +159,7 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
                 else {
                     /* the current animation is a transition, but we're going
                        to interrupt it. A new animation (anim) will show up. */
-                    ;
+                    act->next_animation = NULL;
                 }
             }
             else {
