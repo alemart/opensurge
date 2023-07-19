@@ -1719,6 +1719,11 @@ item_t* level_create_legacy_item(int id, v2d_t position)
     item->actor->spawn_point = position;
     item->actor->position = position;
     entitymanager_store_item(item);
+
+    /* deprecation warning */
+    video_showmessage("Legacy item %d will not be supported!", id);
+    logfile_message("Legacy item %d will not be supported!", id);
+
     return item;
 }
 
@@ -1736,6 +1741,11 @@ enemy_t* level_create_legacy_object(const char *name, v2d_t position)
     object->actor->position = position;
     object->created_from_editor = (name[0] != '.');
     entitymanager_store_object(object);
+
+    /* deprecation warning */
+    video_showmessage("Legacy \"%s\" will not be supported!", name);
+    logfile_message("Legacy \"%s\" will not be supported!", name);
+
     return object;
 }
 
