@@ -400,9 +400,9 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     pa->inside_wall = (at_U != NULL && obstacle_is_solid(at_U));
 
     /* run the physics simulation */
-#if USE_FIXED_TIMESTEP != 0
+#if USE_FIXED_TIMESTEP
     pa->reference_time += dt;
-    if(pa->reference_time - pa->fixed_time <= FIXED_TIMESTEP) {
+    if(pa->reference_time <= pa->fixed_time + FIXED_TIMESTEP) {
         /* will run with a fixed timestep at 60 fps only */
         run_simulation(pa, obstaclemap, FIXED_TIMESTEP); /* improved precision */
         pa->fixed_time += FIXED_TIMESTEP;
@@ -416,9 +416,6 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     run_simulation(pa, obstaclemap, dt);
     (void)FIXED_TIMESTEP;
 #endif
-
-    /* reset input */
-    input_reset(pa->input);
 }
 
 void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position)
