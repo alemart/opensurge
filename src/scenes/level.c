@@ -439,7 +439,7 @@ static void editor_action_init();
 static void editor_action_release();
 static void editor_action_undo();
 static void editor_action_redo();
-static void editor_action_commit(editor_action_t action);
+static editor_action_t editor_action_commit(editor_action_t action);
 static void editor_action_register(editor_action_t action); /* internal */
 static editor_action_list_t* editor_action_delete_list(editor_action_list_t *list); /* internal */
 
@@ -3247,7 +3247,7 @@ void editor_update()
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
         editor_action_t eda = editor_action_spawnpoint_new(TRUE, nsp, spawn_point);
-        editor_action_commit(eda);
+        eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
@@ -3255,14 +3255,14 @@ void editor_update()
     if(editorcmd_is_triggered(editor_cmd, "change-waterlevel")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
         editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, waterlevel);
-        editor_action_commit(eda);
+        eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
     /* put item */
     if(editorcmd_is_triggered(editor_cmd, "put-item")) {
         editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, editor_grid_snap(editor_cursor));
-        editor_action_commit(eda);
+        eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
@@ -3312,7 +3312,7 @@ void editor_update()
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_BRICK, brick_id(candidate), brick_position(candidate));
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                 }
@@ -3344,7 +3344,7 @@ void editor_update()
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_ITEM, candidate->type, candidate->actor->position);
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                 }
@@ -3375,7 +3375,7 @@ void editor_update()
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_ENEMY, candidate_key, candidate->actor->position);
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                 }
@@ -3410,7 +3410,7 @@ void editor_update()
                     if(!pick_object) {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, index, scripting_util_world_position(ssobject));
                         eda.ssobj_id = entity_info_id(ssobject);
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                     else if(index >= 0) {
@@ -4810,7 +4810,7 @@ void editor_action_redo()
 }
 
 /* commit action */
-void editor_action_commit(editor_action_t action)
+editor_action_t editor_action_commit(editor_action_t action)
 {
     if(action.type == EDA_NEWOBJECT) {
         /* new object */
@@ -4857,6 +4857,9 @@ void editor_action_commit(editor_action_t action)
                 }
                 editor_ssobj_picked_entity.id = 0;
                 editor_ssobj_picked_entity.name[0] = '\0';
+
+                /* change action.ssobj_id */
+                action.ssobj_id = entity_info_id(ssobj);
                 break;
             }
 
@@ -4964,6 +4967,9 @@ void editor_action_commit(editor_action_t action)
         /* restore waterlevel */
         level_set_waterlevel(action.obj_old_position.y);
     }
+
+    /* return a possibly changed action */
+    return action;
 }
 
 void editor_remove_entity(uint64_t entity_id)
