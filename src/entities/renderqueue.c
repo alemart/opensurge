@@ -471,8 +471,8 @@ According to the Allegro 5 manual (see the link below), deferred bitmap drawing
 as sub-bitmaps from a tilesheet or simply identical bitmaps".
 
 In order to optimize the rendering process, we'll group the entries of the
-render queue that share the same or a parent bitmap and enable deferred bitmap
-drawing whenever we see fit.
+render queue that share the same or a parent bitmap. We'll call each group a
+batch.
 
 Each of the n entries of the render queue is associated with a group_index
 defined as follows:
@@ -484,7 +484,7 @@ group_index[i] = 1 + group_index[i+1], if texture[i] == texture[i+1]
 
 where texture[i] is the internal texture of the image of the i-th entry of the
 *sorted* render queue. If the textures are the same, then we will group the
-entries.
+entries. The render queue is sorted primarily by the z-index of its entries.
 
 Let's also define the special off-bounds value group_index[-1] = 1. This is
 implemented as a circular array, i.e., group_index[-1] = group_index[n-1] = 1.
