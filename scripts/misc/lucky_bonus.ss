@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
 using SurgeEngine.Level;
+using SurgeEngine.Vector2;
 
 object "Lucky Bonus"
 {
@@ -25,7 +26,7 @@ object "Lucky Bonus"
 
     state "lucky"
     {
-        Level.spawn("Lucky Collectible").setPlayer(player).setPhase(counter);
+        Level.spawnEntity("Lucky Collectible", Vector2.zero).setPlayer(player).setPhase(counter);
         state = "main";
     }
 
