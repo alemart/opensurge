@@ -17,6 +17,8 @@ object "Profiler" is "entity", "awake", "special"
     stats = spawn("Profiler.Stats");
     sortByDesc = spawn("Profiler.UI.Tree.SortByDesc");
     refreshTime = 2.0;
+    alternationTime = 8.0;
+    counter = 0;
 
     state "main"
     {
@@ -31,10 +33,12 @@ object "Profiler" is "entity", "awake", "special"
     state "update"
     {
         // recompute stats
-        stats.refresh();
+        cycle = Math.ceil(alternationTime / refreshTime);
+        wantAvg = ((counter++) % (2 * cycle)) < cycle;
+        stats.refresh(wantAvg);
 
         // display stats
-        uiTimes.updateUI("Time (avg / sum)", stats.timespent, sortByDesc.with(stats.timespent));
+        uiTimes.updateUI(wantAvg ? "Time (avg)" : "Time (sum)", stats.timespent, sortByDesc.with(stats.timespent));
         uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
         uiStats.updateUI("General", stats.generic, null);
 
@@ -58,13 +62,14 @@ object "Profiler.Stats"
     lastRefresh = 0;
     prevObjectCount = 0;
     root = null;
-    maxDepth = 3; // increase to inspect more objects (slower)
+    maxDepth = 16; // increase to inspect more objects (slower)
 
     state "main"
     {
         // change to inspect a particular object
         root = Level;
         //root = Level.findObject("Default HUD");
+        //root = System;
 
         // count the number of frames
         state = "counting frames";
@@ -75,7 +80,7 @@ object "Profiler.Stats"
         frames++;
     }
 
-    fun refresh()
+    fun refresh(wantAverageTimes)
     {
         timeInterval = Math.max(Time.time - lastRefresh, 0.0001);
         objectCount = System.objectCount;
@@ -84,22 +89,29 @@ object "Profiler.Stats"
         timespent.destroy();
         generic.destroy();
         computeDensity(root, density = {}, 1, 1);
-        computeTimespent(root, timespent = {}, count = {}, 1, 1);
+        computeTimespent(root, absTimeSpent = {}, count = {}, 1, 1);
         computeGeneric(generic = {}, objectCount, timeInterval);
 
         // compute relative times
-        maxTimeSpent = timespent[root.__name];
+        timespent = {};
+        maxTimeSpent = absTimeSpent[root.__name];
         if(maxTimeSpent > 0) {
             maxAvgTimeSpent = maxTimeSpent / count[root.__name]; // count[root] is usually 1
-            foreach(entry in timespent) {
+            foreach(entry in absTimeSpent) {
                 key = entry.key;
-                value = entry.value;
-                avg = value / count[key];
+                val = entry.value;
+                cnt = count[key];
 
-                value *= 100 / maxTimeSpent;
-                avg *= 100 / maxAvgTimeSpent;
-
-                timespent[key] = formatDecimal(avg) + " / " + formatDecimal(value);
+                if(wantAverageTimes) {
+                    avg = val / cnt;
+                    avg *= 100 / maxAvgTimeSpent;
+                    timespent[key] = avg;
+                }
+                else {
+                    val *= 100 / maxTimeSpent;
+                    key = "[" + cnt + "] " + key;
+                    timespent[key] = val;
+                }
             }
         }
 
@@ -134,8 +146,8 @@ object "Profiler.Stats"
 
     fun computeDensity(obj, tree, id, depth)
     {
-        key = obj.__name; //hash(obj, id);
         result = 1;
+        key = obj.__name;
         n = obj.__childCount;
         for(i = 0; i < n; i++) {
             child = obj.child(i);
@@ -149,8 +161,8 @@ object "Profiler.Stats"
 
     fun computeTimespent(obj, tree, countTree, id, depth)
     {
-        key = obj.__name; //hash(obj, id);
         totalTime = 0;
+        key = obj.__name;
         n = obj.__childCount;
         for(i = 0; i < n; i++) {
             child = obj.child(i);
@@ -163,11 +175,6 @@ object "Profiler.Stats"
             countTree[key] += 1;
         }
         return totalTime;
-    }
-
-    fun hash(obj, uid)
-    {
-        return obj.__name + "/" + uid;
     }
 
     fun formatDecimal(num)
