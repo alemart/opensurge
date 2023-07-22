@@ -132,6 +132,7 @@ static surgescript_var_t* fun_exitdebugmode(surgescript_object_t* object, const 
 static surgescript_var_t* fun_getdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_pausecontainers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_resumecontainers(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t AWAKEENTITYCONTAINER_ADDR = 0;
 static const surgescript_heapptr_t UNAWAKEENTITYCONTAINER_ADDR = 1;
 static const surgescript_heapptr_t DEBUGENTITYCONTAINER_ADDR = 2;
@@ -187,6 +188,8 @@ void scripting_register_entitymanager(surgescript_vm_t* vm)
 
     surgescript_vm_bind(vm, "EntityManager", "pauseContainers", fun_pausecontainers, 0);
     surgescript_vm_bind(vm, "EntityManager", "resumeContainers", fun_resumecontainers, 0);
+
+    surgescript_vm_bind(vm, "EntityManager", "get_level", fun_getlevel, 0);
 }
 
 
@@ -834,6 +837,21 @@ surgescript_var_t* fun_resumecontainers(surgescript_object_t* object, const surg
 {
     pause_containers(object, false);
     return NULL;
+}
+
+/* get a reference to the Level object */
+surgescript_var_t* fun_getlevel(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+
+    /* validate: Level must be the parent object */
+    const surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+    const char* parent_name = surgescript_object_name(parent);
+    ssassert(0 == strcmp(parent_name, "Level"));
+
+    /* done */
+    return surgescript_var_set_objecthandle(surgescript_var_create(), parent_handle);
 }
 
 
