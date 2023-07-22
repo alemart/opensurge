@@ -58,9 +58,10 @@ static surgescript_heapptr_t DEBUGMODE_ADDR = 1; /* DebugEntityContainer only */
 static const char DEBUGMODE_OBJECT_NAME[] = "Debug Mode";
 
 enum { RENDERFLAGS_WANT_EDITOR = 0x1, RENDERFLAGS_WANT_GIZMOS = 0x2 };
-static inline surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container);
-static inline surgescript_object_t* get_levelobjectcontainer(surgescript_object_t* entity_container);
-static inline iterator_t* levelobjectcontainer_iterator(surgescript_object_t* entity_container);
+static inline surgescript_object_t* get_entity_manager(const surgescript_object_t* entity_container);
+static inline surgescript_object_t* get_levelobjectcontainer(const surgescript_object_t* entity_container);
+static inline iterator_t* levelobjectcontainer_iterator(const surgescript_object_t* entity_container);
+static surgescript_objecthandle_t get_level_handle(const surgescript_object_t* entity_container);
 static bool render_subtree_faster(surgescript_object_t* object, void* data);
 static bool render_subtree(surgescript_object_t* object, void* data);
 static bool add_to_late_update_queue(surgescript_object_t* entity_or_component, void* data);
@@ -129,7 +130,7 @@ void scripting_register_entitycontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AwakeEntityContainer", "notifyEntities", fun_notifyentities, 1);
     surgescript_vm_bind(vm, "AwakeEntityContainer", "render", fun_render, 1);
 
-    /* DebugEntityContainer holds the entities of the Debug Mode and "extends" AwakeEntityContainer */
+    /* DebugEntityContainer holds the Debug Mode object and "extends" AwakeEntityContainer */
     surgescript_vm_bind(vm, "DebugEntityContainer", "state:main", fun_awake_main, 0);
     surgescript_vm_bind(vm, "DebugEntityContainer", "constructor", fun_debug_constructor, 0);
     surgescript_vm_bind(vm, "DebugEntityContainer", "spawn", fun_spawn, 1);
@@ -282,13 +283,10 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
         iterator_t* it = levelobjectcontainer_iterator(object);
         while(iterator_has_next(it)) {
             surgescript_object_t* entity = iterator_next(it);
-            surgescript_objecthandle_t entity_handle = surgescript_object_handle(entity);
 
             /* skip deleted entities */
-            if(surgescript_object_is_killed(entity)) {
-                entitymanager_remove_entity_info(entity_manager, entity_handle);
+            if(surgescript_object_is_killed(entity))
                 continue;
-            }
 
             /* skip private entities */
             else if(surgescript_object_has_tag(entity, "private"))
@@ -663,8 +661,20 @@ surgescript_var_t* fun_debug_render(surgescript_object_t* object, const surgescr
 {
     int flags = surgescript_var_get_rawbits(param[0]);
 
-    /* search the sub-tree for renderables */
-    surgescript_object_traverse_tree_ex(object, &flags, render_subtree);
+    /* for each entity */
+    iterator_t* it = levelobjectcontainer_iterator(object);
+    while(iterator_has_next(it)) {
+        /* note: single iteration; only the Debug Mode itself? */
+        surgescript_object_t* entity = iterator_next(it);
+
+        /* skip deleted entities */
+        if(surgescript_object_is_killed(entity))
+            continue;
+
+        /* render the entity */
+        surgescript_object_traverse_tree_ex(entity, &flags, render_subtree);
+    }
+    iterator_destroy(it);
 
     /* done */
     return NULL;
@@ -690,6 +700,7 @@ surgescript_var_t* fun_debug_isindebugmode(surgescript_object_t* object, const s
 /* enter the Debug Mode */
 surgescript_var_t* fun_debug_enterdebugmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+    const void* PRIVATE_TOKEN = (void*)0xc0decafe;
     const surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* debug_mode_var = surgescript_heap_at(heap, DEBUGMODE_ADDR);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
@@ -701,15 +712,33 @@ surgescript_var_t* fun_debug_enterdebugmode(surgescript_object_t* object, const 
 
     /* nothing to do: additional check for calling this in the constructor of the Debug Mode */
     surgescript_objecthandle_t null_handle = surgescript_objectmanager_null(manager);
-    if(surgescript_object_child(object, DEBUGMODE_OBJECT_NAME) != null_handle)
+    surgescript_objecthandle_t level_handle = get_level_handle(object);
+    surgescript_object_t* level = surgescript_objectmanager_get(manager, level_handle);
+    surgescript_objecthandle_t child_handle = surgescript_object_child(level, DEBUGMODE_OBJECT_NAME);
+    if(child_handle != null_handle) {
+        /* users must not spawn the Debug Mode directly
+           we expect the Debug Mode to be entered via this.enterDebugMode()
+           because we're going to store it in this DebugEntityContainer */
+        const surgescript_object_t* debug_mode = surgescript_objectmanager_get(manager, child_handle);
+        const void* token = surgescript_object_userdata(debug_mode);
+
+        if(token != PRIVATE_TOKEN)
+            scripting_error(debug_mode, "Do not spawn %s yourself!", surgescript_object_name(debug_mode));
+
+        /* everything is alright */
         return NULL;
+    }
 
     /* spawn the Debug Mode object */
-    surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
-    debug_mode_handle = surgescript_objectmanager_spawn(manager, this_handle, DEBUGMODE_OBJECT_NAME, NULL);
+    debug_mode_handle = surgescript_objectmanager_spawn(manager, level_handle, DEBUGMODE_OBJECT_NAME, (void*)PRIVATE_TOKEN);
 
     /* store the reference */
     surgescript_var_set_objecthandle(debug_mode_var, debug_mode_handle);
+
+    /* call this.storeEntity(debugMode) */
+    surgescript_object_call_function(object, "storeEntity", (const surgescript_var_t*[]){ debug_mode_var }, 1, NULL);
+
+    /* done */
     return NULL;
 }
 
@@ -734,8 +763,13 @@ surgescript_var_t* fun_debug_exitdebugmode(surgescript_object_t* object, const s
     surgescript_object_t* debug_mode = surgescript_objectmanager_get(manager, debug_mode_handle);
     surgescript_object_call_function(debug_mode, "exit", NULL, 0, NULL);
 
+    /* call this.removeEntity(debugMode) */
+    surgescript_object_call_function(object, "removeEntity", (const surgescript_var_t*[]){ debug_mode_var }, 1, NULL);
+
     /* set the handle to null */
     surgescript_var_set_null(debug_mode_var);
+
+    /* done */
     return NULL;
 }
 
@@ -766,12 +800,12 @@ surgescript_var_t* fun_debug_getdebugmode(surgescript_object_t* object, const su
  * helpers
  */
 
-surgescript_object_t* get_entity_manager(surgescript_object_t* entity_container)
+surgescript_object_t* get_entity_manager(const surgescript_object_t* entity_container)
 {
     return (surgescript_object_t*)surgescript_object_userdata(entity_container);
 }
 
-surgescript_object_t* get_levelobjectcontainer(surgescript_object_t* entity_container)
+surgescript_object_t* get_levelobjectcontainer(const surgescript_object_t* entity_container)
 {
     const surgescript_objectmanager_t* manager = surgescript_object_manager(entity_container);
     const surgescript_heap_t* heap = surgescript_object_heap(entity_container);
@@ -781,10 +815,23 @@ surgescript_object_t* get_levelobjectcontainer(surgescript_object_t* entity_cont
     return surgescript_objectmanager_get(manager, container_handle);
 }
 
-iterator_t* levelobjectcontainer_iterator(surgescript_object_t* entity_container)
+iterator_t* levelobjectcontainer_iterator(const surgescript_object_t* entity_container)
 {
     surgescript_object_t* levelobjectcontainer = get_levelobjectcontainer(entity_container);
     return scripting_levelobjectcontainer_iterator(levelobjectcontainer);
+}
+
+surgescript_objecthandle_t get_level_handle(const surgescript_object_t* entity_container)
+{
+    surgescript_object_t* entity_manager = get_entity_manager(entity_container);
+    surgescript_var_t* ret = surgescript_var_create();
+    surgescript_objecthandle_t handle;
+
+    surgescript_object_call_function(entity_manager, "get_level", NULL, 0, ret);
+
+    handle = surgescript_var_get_objecthandle(ret);
+    surgescript_var_destroy(ret);
+    return handle;
 }
 
 bool render_subtree_faster(surgescript_object_t* object, void* data)

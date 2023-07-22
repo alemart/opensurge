@@ -178,10 +178,9 @@ object "Debug Mode" is "entity", "awake", "detached", "private"
     // internal use
     fun constructor()
     {
-        // this object must be unique and a descendant of Level
-        assert(parent.__name == "DebugEntityContainer");
+        // validate
+        assert(parent === Level);
         assert(parent.children(this.__name).length == 1);
-        assert(Level.findObjects(this.__name).length == 1); // slow?
 
         // enable the Debug Mode flag
         Level.debugMode = true;
