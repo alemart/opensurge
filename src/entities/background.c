@@ -524,7 +524,6 @@ void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_posit
 void render_without_cache(const image_t* image, v2d_t position, void* data)
 {
     image_draw(image, position.x, position.y, IF_NONE);
-    (void)data;
 }
 
 /* render an image with FastDraw */

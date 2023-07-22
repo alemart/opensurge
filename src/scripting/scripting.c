@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "scripting.h"
 #include "../core/global.h"
-#include "../core/logfile.h"
 #include "../core/asset.h"
 #include "../core/video.h"
 #include "../util/v2d.h"
@@ -35,8 +34,6 @@ static char** vm_argv = NULL;
 static int vm_argc = 0;
 static bool test_mode = false;
 static int pause_counter = 0;
-static void log_fun(const char* message);
-static void err_fun(const char* message);
 static void compile_scripts(surgescript_vm_t* vm);
 static int compile_script(const char* filepath, void* param);
 static char* read_file(const char* filepath);
@@ -90,7 +87,6 @@ extern void scripting_register_web(surgescript_vm_t* vm);
 void scripting_init(int argc, const char** argv)
 {
     /* create VM */
-    surgescript_util_set_error_functions(log_fun, err_fun);
     check_if_compatible();
     vm = surgescript_vm_create();
 
@@ -170,11 +166,11 @@ bool scripting_testmode()
  */
 void scripting_reload()
 {
-    logfile_message("Reloading scripts...");
+    surgescript_util_log("Reloading scripts...");
 
     /* reset the SurgeScript VM */
     if(!surgescript_vm_reset(vm)) {
-        logfile_message("Failed to reload the scripts");
+        surgescript_util_log("Failed to reload the scripts");
         return;
     }
 
@@ -191,7 +187,7 @@ void scripting_reload()
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
 
     /* done */
-    logfile_message("The scripts have been reloaded!");
+    surgescript_util_log("The scripts have been reloaded!");
 }
 
 /*
@@ -201,7 +197,7 @@ void scripting_reload()
 void scripting_pause_vm()
 {
     if(pause_counter++ == 0) {
-        logfile_message("Pausing the SurgeScript VM");
+        surgescript_util_log("Pausing the SurgeScript VM");
         surgescript_vm_pause(vm);
     }
 }
@@ -213,7 +209,7 @@ void scripting_pause_vm()
 void scripting_resume_vm()
 {
     if(--pause_counter == 0) {
-        logfile_message("Resuming the SurgeScript VM");
+        surgescript_util_log("Resuming the SurgeScript VM");
         surgescript_vm_resume(vm);
     }
 
@@ -351,7 +347,7 @@ void scripting_error(const surgescript_object_t* object, const char* fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    fatal_error("A scripting error was triggered in \"%s\".\n\n%s", object_name, buf);
+    surgescript_util_fatal("A scripting error was triggered in \"%s\".\n\n%s", object_name, buf);
 }
 
 /* display a scripting error without crashing the application */
@@ -366,7 +362,7 @@ void scripting_warning(const surgescript_object_t* object, const char* fmt, ...)
     va_end(args);
 
     video_showmessage("%s: %s", object_name, buf);
-    logfile_message("A scripting warning was triggered in \"%s\": %s", object_name, buf);
+    surgescript_util_log("A scripting warning was triggered in \"%s\": %s", object_name, buf);
 }
 
 
@@ -377,19 +373,7 @@ void scripting_warning(const surgescript_object_t* object, const char* fmt, ...)
 void check_if_compatible()
 {
     if(surgescript_util_versioncode(NULL) < surgescript_util_versioncode(SURGESCRIPT_MIN_VERSION))
-        fatal_error("This build requires at least SurgeScript %s (using: %s)", SURGESCRIPT_MIN_VERSION, surgescript_util_version());
-}
-
-/* log function */
-void log_fun(const char* message)
-{
-    logfile_message("%s", message);
-}
-
-/* scripting error */
-void err_fun(const char* message)
-{
-    fatal_error("%s", message);
+        surgescript_util_fatal("This build requires at least SurgeScript %s (using: %s)", SURGESCRIPT_MIN_VERSION, surgescript_util_version());
 }
 
 /* register SurgeEngine builtins */
@@ -444,7 +428,7 @@ void compile_scripts(surgescript_vm_t* vm)
 
     /* if no test script is present... */
     if(found_test_script(vm)) {
-        logfile_message("Got a test script...");
+        surgescript_util_log("Got a test script...");
         test_mode = true;
     }
     else {
@@ -488,12 +472,12 @@ char* read_file(const char* filepath)
     /* open the file in binary mode, so that offsets don't get messed up */
     ALLEGRO_FILE* fp = al_fopen(filepath, "rb");
     if(!fp) {
-        fatal_error("Can't read file \"%s\". errno = %d", filepath, al_get_errno());
+        surgescript_util_fatal("Can't read file \"%s\". errno = %d", filepath, al_get_errno());
         return NULL;
     }
 
     /* read file to data[] */
-    logfile_message("Reading script %s...", filepath);
+    surgescript_util_log("Reading script %s...", filepath);
     do {
         data_size += BUFSIZE;
         data = reallocx(data, data_size + 1);
@@ -510,7 +494,7 @@ char* read_file(const char* filepath)
 void parse_surgescript_options(surgescript_vm_t* vm, int argc, char** argv)
 {
     for(int i = 0; i < argc; i++) {
-        logfile_message("Found SurgeScript option %s", argv[i]);
+        surgescript_util_log("Found SurgeScript option %s", argv[i]);
 
         if(strcmp(argv[i], "--ss-allow-duplicates") == 0) {
             surgescript_parser_t* parser = surgescript_vm_parser(vm);

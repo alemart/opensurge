@@ -58,18 +58,12 @@
    removing the preceding comma of __VA_ARGS__ when it expands to nothing */
 #define CALL(...) KALL(__VA_ARGS__, CALLX, CALLX, CALL0)(__VA_ARGS__)
 #define CALL0(fn) do { \
-    if(mutex == NULL) break; \
-    al_lock_mutex(mutex); \
     if(logfile != NULL) { (fn)(logfile); } \
     if(console != NULL) { (fn)(console); } \
-    al_unlock_mutex(mutex); \
 } while(0)
 #define CALLX(fn, ...) do { \
-    if(mutex == NULL) break; \
-    al_lock_mutex(mutex); \
     if(logfile != NULL) { (fn)(logfile, __VA_ARGS__); } \
     if(console != NULL) { (fn)(console, __VA_ARGS__); } \
-    al_unlock_mutex(mutex); \
 } while(0)
 #define KALL(_0, _1, _2, fn, ...) fn
 
@@ -97,8 +91,9 @@ static ALLEGRO_MUTEX* mutex = NULL;
  */
 void logfile_init(int flags)
 {
-    /* create mutex */
-    mutex = al_create_mutex();
+    /* create a mutex */
+    if(mutex == NULL)
+        mutex = al_create_mutex();
 
 #if !defined(__ANDROID__)
     /* open the output streams */
@@ -139,22 +134,30 @@ void logfile_init(int flags)
 void logfile_message(const char* fmt, ...)
 {
 #if !defined(__ANDROID__)
+#define LOCK(mutex)     do { if((mutex) != NULL) al_lock_mutex(mutex); } while(0)
+#define UNLOCK(mutex)   do { if((mutex) != NULL) al_unlock_mutex(mutex); } while(0)
 
-    va_list args;
+    LOCK(mutex);
+    {
+        va_list args;
 
-    /* print the message */
-    va_start(args, fmt);
-    CALL(al_vfprintf, fmt, args);
-    va_end(args);
+        /* print the message */
+        va_start(args, fmt);
+        CALL(al_vfprintf, fmt, args);
+        va_end(args);
 
-    /* break line */
-    CALL(al_fputs, LINE_BREAK);
-    CALL(al_fflush);
+        /* break line */
+        CALL(al_fputs, LINE_BREAK);
+        CALL(al_fflush);
 
-    /* "PhysFS does not support the text-mode reading and writing,
-        which means that Windows-style newlines will not be preserved."
-        https://liballeg.org/a5docs/trunk/physfs.html */
+        /* "PhysFS does not support the text-mode reading and writing,
+            which means that Windows-style newlines will not be preserved."
+            https://liballeg.org/a5docs/trunk/physfs.html */
+    }
+    UNLOCK(mutex);
 
+#undef UNLOCK
+#undef LOCK
 #else
 
     va_list args;
@@ -185,8 +188,10 @@ void logfile_release(int flags)
     if(flags & LOGFILE_CONSOLE)
         close_console();
 
-    al_destroy_mutex(mutex);
-    mutex = NULL;
+    if(mutex != NULL) {
+        al_destroy_mutex(mutex);
+        mutex = NULL;
+    }
 }
 
 

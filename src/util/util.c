@@ -120,7 +120,7 @@ int game_version_compare(int sup_version, int sub_version, int wip_version)
  */
 void fatal_error(const char *fmt, ...)
 {
-    static char buf[1024];
+    char buf[1024];
     va_list args;
 
     /* format message */
@@ -147,8 +147,11 @@ void fatal_error(const char *fmt, ...)
 #endif
 
     /* clear up resources */
-    if(resourcemanager_is_initialized())
+    if(resourcemanager_is_initialized()) {
+        /* this must only be called from the main thread,
+           as it releases OpenGL textures */
         resourcemanager_release();
+    }
 
     /* release Allegro */
     al_uninstall_system();

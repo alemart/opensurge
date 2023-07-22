@@ -356,6 +356,7 @@ SET(GAME_SRCS
   src/scripting/level.c
   src/scripting/levelmanager.c
   src/scripting/levelobjectcontainer.c
+  src/scripting/loaderthread.c
   src/scripting/mobilegamepad.c
   src/scripting/mouse.c
   src/scripting/music.c
@@ -477,6 +478,7 @@ SET(GAME_HEADERS
   src/scenes/stageselect.h
 
   src/scripting/util/iterators.h
+  src/scripting/loaderthread.h
   src/scripting/scripting.h
   src/physics/obstacle.h
   src/physics/obstaclemap.h
