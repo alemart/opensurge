@@ -245,7 +245,7 @@ surgescript_var_t* fun_addobject(surgescript_object_t* object, const surgescript
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     const char* parent_name = surgescript_object_name(parent);
     if(0 != strcmp(parent_name, "Level")) {
-        scripting_error(object, "%s.addObject() requires \"%s\" to be a child of %s", surgescript_object_name(object), surgescript_object_name(new_object), parent_name);
+        scripting_error(object, "%s.addObject() requires \"%s\" to be a child of Level, not of \"%s\"", surgescript_object_name(object), surgescript_object_name(new_object), parent_name);
         return NULL;
     }
 
