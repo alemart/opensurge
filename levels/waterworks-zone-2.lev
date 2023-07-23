@@ -15,7 +15,7 @@ theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-indoors.bg"
 spawn_point 128 8960
 music "musics/waterworks.ogg"
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Waterworks Zone"
+setup "Waterworks Zone" "Default Cleared Animation" "Default Title Card" "Default HUD" "Default Pause and Quit" "Default Camera" "Surge Gameplay"
 players "Surge"
 waterlevel 10000
 watercolor 144 99 255 128
@@ -2688,6 +2688,8 @@ brick 1 5728 9840
 brick 926 5856 9744
 brick 925 5856 9712
 brick 268 5728 9776
+brick 926 5616 9872
+brick 925 5616 9840
 brick 103 5936 9584
 brick 104 5952 9584
 brick 275 6080 9680
