@@ -80,7 +80,7 @@ void camera_update()
     v2d_t ds;
 
     /* updating the boundaries */
-    if(level_editmode()) /* no boundaries in the editor */
+    if(level_editmode() || level_is_in_debug_mode()) /* no boundaries in the editor */
         disable_boundaries();
     else if(!camera.is_locked) /* the level size may have changed since the last frame */
         reset_boundaries();
