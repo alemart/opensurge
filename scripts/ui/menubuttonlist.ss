@@ -13,7 +13,7 @@ using SurgeEngine.Video.Screen;
 
 // To create your own Menu,
 // see the MenuBuilder object
-object "MenuButtonList"
+object "MenuButtonList" is "private", "awake", "entity"
 {
     buttons = [];
     currentButtonIndex = 0;
