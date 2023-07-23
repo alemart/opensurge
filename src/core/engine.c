@@ -469,10 +469,10 @@ void release_accessories()
  */
 void release_managers()
 {
-    input_release();
-    video_release();
-    resourcemanager_release();
+    resourcemanager_release(); /* release bitmaps BEFORE the display! */
+    video_release(); /* release the display */
     audio_release();
+    input_release();
     timer_release();
 }
 
