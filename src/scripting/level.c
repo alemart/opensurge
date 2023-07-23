@@ -356,13 +356,19 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 {
     const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_heap_t* heap = surgescript_object_heap(object);
+    bool debug_mode = is_in_debug_mode(object);
 
     /* internal updates */
     update_music(object);
     update_time(object);
 
     /* pause the containers when in Debug Mode */
-    pause_containers(object, is_in_debug_mode(object));
+    if(debug_mode) {
+        pause_containers(object, true);
+    }
+    else {
+        pause_containers(object, false);
+    }
 
     /* update built-ins */
     for(surgescript_heapptr_t ptr = 0; ptr <= LAST_ADDR; ptr++) {

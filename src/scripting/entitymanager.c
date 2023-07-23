@@ -566,9 +566,12 @@ surgescript_var_t* fun_activeentities(surgescript_object_t* object, const surges
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+
+    /* selectActiveEntities() takes two parameters: object[] output_array, bool skip_inactive_objects */
+    bool skip_inactive_objects = !(level_editmode() || is_in_debug_mode(object));
     surgescript_objecthandle_t array_handle = surgescript_objectmanager_spawn_array(manager);
     surgescript_var_t* array_var = surgescript_var_set_objecthandle(surgescript_var_create(), array_handle);
-    surgescript_var_t* skip_inactive_var = surgescript_var_set_bool(surgescript_var_create(), !level_editmode());
+    surgescript_var_t* skip_inactive_var = surgescript_var_set_bool(surgescript_var_create(), skip_inactive_objects);
     const surgescript_var_t* args[] = { array_var, skip_inactive_var };
 
     /* get awake entities */
