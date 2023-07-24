@@ -1,4 +1,4 @@
-# [![Open Surge Engine](logo.png)](https://opensurge2d.org)
+# Surge Engine
 
 [![Latest release](https://img.shields.io/github/v/release/alemart/opensurge?color=blue)](https://github.com/alemart/opensurge/releases)
 [![License](https://img.shields.io/github/license/alemart/opensurge?color=brightgreen)](#license)
@@ -6,60 +6,23 @@
 [![Discord server](https://img.shields.io/discord/493384707937927178?color=5662f6&logo=discord&logoColor=white)](https://discord.gg/w8JqM7m)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?label=Sponsor%20me&logo=github%20sponsors&style=social)](https://github.com/sponsors/alemart)
 
-**Surge the Rabbit** is a fun 2D retro platformer inspired by 16 bit classics and **Open Surge Engine** is its game engine, designed for you to unleash your creativity!
+Unleash your creativity with **Surge Engine**, an open source game engine for retro games! It features **Surge the Rabbit**, a free retro platformer with a charismatic character. Players MOD it to create their own games.
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
-
-- Website: https://opensurge2d.org
-- Wiki: https://wiki.opensurge2d.org
-- SurgeScript: https://docs.opensurge2d.org
-- Repository: https://github.com/alemart/opensurge
-- Video tutorials: [YouTube](https://youtube.com/alemart88)
-- Chat: [Discord](https://discord.gg/w8JqM7m)
-
----
-
-## Play
-
-**Surge the Rabbit** is the base game distributed with the Open Surge Engine. Stop the global takeover planned by evil wizard Gimacian the Dark and use it as a stepping stone to create your own games!
-
-* Download the game at [opensurge2d.org](https://opensurge2d.org)
+[Download now](https://opensurge2d.org) | [Create your games](https://wiki.opensurge2d.org/Introduction_to_Modding) | [Learn scripting](https://docs.opensurge2d.org) | [Watch videos](https://youtube.com/alemart88)
 
 <img src="https://opensurge2d.org/surge-demo.gif" alt="Open Surge demo" width="480">
 
-## Create your games / Modding
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
 
-Make your dreams come true with the **Open Surge Engine**! Create your own amazing games and learn how to code with [SurgeScript](https://docs.opensurge2d.org), a scripting language for games that is fun to use! Create new levels, items, bosses, playable characters, gameplay mechanics, cutscenes and more!
-
-* Get started at [Introduction to Modding](https://wiki.opensurge2d.org/Introduction_to_Modding)
-
-## Controls
-
-You can play using a keyboard or a joystick. Default controls:
-
-| Keyboard      | Joystick                  | Action                 |
-| --------------|---------------------------|------------------------|
-| Arrow keys    | Left analog stick / D-Pad | Move                   |
-| Space         | A / B / X / Y             | Jump                   |
-| Enter         | Start                     | Pause                  |
-| Esc           | Back                      | Quit                   |
-| Left Ctrl     | L / R                     | Switch character       |
-| Equal (=)     | -                         | Take snapshot          |
-| F12           | -                         | Open the level editor* |
-
-`*`: open the editor during gameplay, in a level.
+---
 
 ## About
 
-Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a computer scientist from Brazil. Nowadays, Open Surge has contributors all over the world!
+The project is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). It has been started by [Alexandre Martins](http://github.com/alemart), a computer scientist from Brazil. Nowadays, it has contributors all over the world!
 
 ## Contribute
 
 See [CONTRIBUTING](https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md).
-
-## Educators
-
-If you're using Open Surge in the classroom, we'll love to hear from you! If you need help, get in touch via chat.
 
 ## Advanced users
 
@@ -129,8 +92,8 @@ Tip: since version 0.6.1 you can use the command-line option `--verbose` to see 
 Dependencies:
 
 * [Allegro](http://liballeg.org) version 5.2.7 or later
-* [SurgeScript](http://github.com/alemart/surgescript) version 0.6.0 or later
-* [PhysicsFS](https://icculus.org/physfs) version 3.2.0 or later
+* [SurgeScript](http://github.com/alemart/surgescript) version 0.6.0
+* [PhysicsFS](https://icculus.org/physfs) version 3.2.0
 
 Compile as usual:
 

@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Surge the Rabbit
+Name=Surge Engine
 GenericName=Game Engine
 GenericName[de]=Spiel-Engine
-Comment=Play a fun 2D retro platformer inspired by 16 bit classics
-Keywords=game;gaming;maker;fun;2d;retro;platform;platformer;jump;run;action;arcade;side-scroller;play;create;children;kids;teens;
+Comment=Unleash your creativity with Surge Engine, an open source game engine for retro games!
+Keywords=games;engine;allegro;retro;platformer;platform;side-scroller;action;arcade;fun;cool;game;gaming;create;creator;maker;homebrew;programming;art;
 Exec=opensurge
 Icon=@DESKTOP_ICON_FULLPATH@
 Terminal=false
