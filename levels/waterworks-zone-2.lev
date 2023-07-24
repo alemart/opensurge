@@ -15,7 +15,7 @@ theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-indoors.bg"
 spawn_point 128 8960
 music "musics/waterworks.ogg"
-setup "Waterworks Zone" "Default Cleared Animation" "Default Title Card" "Default HUD" "Default Pause and Quit" "Default Camera" "Surge Gameplay"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Waterworks Zone"
 players "Surge"
 waterlevel 10000
 watercolor 144 99 255 128
@@ -537,6 +537,7 @@ brick 3 17824 10624
 brick 110 17792 10624
 brick 110 17792 10640
 brick 280 17760 10576
+brick 260 17768 10544
 brick 933 17472 10656
 brick 933 17632 10496
 brick 280 17760 10368
@@ -1032,10 +1033,10 @@ brick 1 28832 10112
 brick 275 27376 10000
 brick 998 27376 10000
 brick 997 27376 10128
-brick 998 27888 10000
 brick 181 27904 9936
 brick 182 28032 9936
 brick 997 27888 10128
+brick 999 27888 10000
 brick 192 27888 10000
 brick 926 27376 9936
 brick 925 27376 9904
@@ -1084,8 +1085,8 @@ brick 261 24560 9904
 brick 183 24576 9936
 brick 184 24704 9936
 brick 193 24832 10000
-brick 998 24816 10000
 brick 997 24816 10128
+brick 999 24816 10000
 brick 997 24304 10128
 brick 180 23872 9936
 brick 180 24000 9936
@@ -5335,7 +5336,6 @@ entity "Collectible" 16848 10320 "faddb5e2e0d0486f"
 entity "Collectible" 17136 10384 "18af1a373e70133f"
 entity "Collectible" 17008 10480 "a61bb2dd77dddcd9"
 entity "Collectible" 17136 10576 "e9dd9fa2639e7120"
-entity "Spikes" 17008 10688 "5a719db4056505c2"
 entity "Collectible" 17856 10336 "4f51ba0f6a04ff49"
 entity "Collectible" 17888 10336 "9722a3ed63e804f7"
 entity "Collectible" 17920 10336 "a1c736ef51cc093e"
@@ -5651,5 +5651,14 @@ entity "Powerup 1up" 19392 9456 "6a5a3338"
 entity "Collectible" 19488 9936 "b882358a"
 entity "Collectible" 19456 9936 "cf0d1361"
 entity "Collectible" 19424 9936 "bbb5f107"
+entity "Layer Green" 18224 9808 "3450c198"
+entity "Layer Green" 18224 9776 "320d061b"
+entity "Layer Green" 18224 9744 "2245fad7"
+entity "Layer Green" 18224 9712 "37e124e2"
+entity "Layer Green" 18192 9712 "a50d9e2b"
+entity "Collectible" 17008 10672 "bf4b6fd7"
+entity "Collectible" 14968 10816 "a84ecc8"
+entity "Collectible" 15080 10816 "bc11d711"
+entity "Water Bubbles" 17776 10368 "1e0010ff"
 
 // EOF
