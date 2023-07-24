@@ -21,6 +21,14 @@ LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 
 
 //
+// Modders:
+//
+// Add your strings to languages/extends/english.lng,
+// not to this file. Read languages/extends/README.txt
+// for more information.
+//
+
+//
 // Translators:
 //
 // Before starting your work, please check out the
