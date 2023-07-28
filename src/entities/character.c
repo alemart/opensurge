@@ -46,7 +46,16 @@ HASHTABLE_GENERATE_CODE(character_t, character_delete);
 static HASHTABLE(character_t, characters);
 
 
-/* public */
+
+/*
+ * public
+ */
+
+
+/*
+ * charactersystem_init()
+ * Initializes the character system
+ */
 void charactersystem_init()
 {
     int character_count = 0;
@@ -63,12 +72,20 @@ void charactersystem_init()
     logfile_message("All %d characters have been loaded!", character_count);
 }
 
+/*
+ * charactersystem_release()
+ * Releases the character system
+ */
 void charactersystem_release()
 {
     logfile_message("Releasing characters...");
     characters = hashtable_character_t_destroy(characters);
 }
 
+/*
+ * charactersystem_get()
+ * Gets a character by its name. Crashes on error
+ */
 const character_t* charactersystem_get(const char* character_name)
 {
     const character_t *c = hashtable_character_t_find(characters, character_name);
@@ -79,7 +96,23 @@ const character_t* charactersystem_get(const char* character_name)
     return c;
 }
 
-/* private */
+/*
+ * charactersystem_exists()
+ * Checks if a character exists
+ */
+bool charactersystem_exists(const char* character_name)
+{
+    const character_t *c = hashtable_character_t_find(characters, character_name);
+    return c != NULL;
+}
+
+
+
+
+/*
+ * private
+ */
+
 character_t *character_new(const char *name)
 {
     character_t *c = mallocx(sizeof *c);

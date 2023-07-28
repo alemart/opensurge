@@ -24,8 +24,10 @@
 #include <stdbool.h>
 #include "../util/darray.h"
 
+/* forward declarations */
 struct sound_t;
 
+/* character metadata */
 typedef struct character_t character_t;
 struct character_t {
     char *name;
@@ -91,7 +93,10 @@ void charactersystem_init();
 /* releases the character system */
 void charactersystem_release();
 
-/* gets the meta data of a character */
+/* gets a character by its name */
 const character_t* charactersystem_get(const char* character_name);
+
+/* checks if a character exists */
+bool charactersystem_exists(const char* character_name);
 
 #endif
