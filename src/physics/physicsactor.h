@@ -78,6 +78,7 @@ enum obstaclelayer_t;
 /* API */
 physicsactor_t* physicsactor_create(v2d_t position);
 physicsactor_t* physicsactor_destroy(physicsactor_t *pa);
+void physicsactor_reset_model_parameters(physicsactor_t* pa);
 
 void physicsactor_update(physicsactor_t *pa, const struct obstaclemap_t *obstaclemap);
 void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position);

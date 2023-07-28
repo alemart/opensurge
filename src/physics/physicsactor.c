@@ -235,7 +235,6 @@ static const int slp_table[23][23] = {
 physicsactor_t* physicsactor_create(v2d_t position)
 {
     physicsactor_t *pa = mallocx(sizeof *pa);
-    const float fpsmul = 60.0f;
 
     /* initializing... */
     pa->position = position;
@@ -263,45 +262,9 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->reference_time = 0.0f;
     pa->fixed_time = 0.0f;
 
-    /* initializing some constants ;-) */
+    /* initialize the physics model */
+    physicsactor_reset_model_parameters(pa);
 
-    /*
-      +--------------------+----------------+-----------------+
-      | model parameter    |  magic number  | fps multitplier |
-      +--------------------+----------------+-----------------+
-     */
-    pa->acc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
-    pa->dec =                 (32.0f/64.0f) * fpsmul * fpsmul ;
-    pa->frc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
-    pa->initialtopspeed =       6.0f        * fpsmul * 1.0f   ;
-    pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
-    pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
-    pa->air =                  (6.0f/64.0f) * fpsmul * fpsmul ;
-    pa->airdrag =             (31.0f/32.0f) * 1.0f   * 1.0f   ;
-    pa->jmp =                   -6.5f       * fpsmul * 1.0f   ;
-    pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
-    pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
-    pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
-    pa->grv =                 (14.0f/64.0f) * fpsmul * fpsmul ;
-    pa->slp =                  (8.0f/64.0f) * fpsmul * fpsmul ;
-    pa->chrg =                  12.0f       * fpsmul * 1.0f   ;
-    pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
-    pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
-    pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
-    pa->rollfrc =              (1.5f/64.0f) * fpsmul * fpsmul ;
-    pa->rolldec =              (8.0f/64.0f) * fpsmul * fpsmul ;
-    pa->rolluphillslp =        (5.0f/64.0f) * fpsmul * fpsmul ;
-    pa->rolldownhillslp =     (20.0f/64.0f) * fpsmul * fpsmul ;
-    pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
-    pa->brakingthreshold =      4.0f        * fpsmul * 1.0f   ;
-    pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
-    pa->airdragxthreshold =    (8.0f/64.0f) * fpsmul * 1.0f   ;
-    pa->chrgthreshold =        (1.0f/64.0f) * 1.0f   * 1.0f   ;
-    pa->waittime =              3.0f        * 1.0f   * 1.0f   ;
-
-    /* recompute airdrag coefficients */
-    physicsactor_set_airdrag(pa, pa->airdrag);
-    
     /* sensors */
     pa->A_normal = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
     pa->B_normal = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
@@ -352,6 +315,48 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
     input_destroy(pa->input);
     free(pa);
     return NULL;
+}
+
+void physicsactor_reset_model_parameters(physicsactor_t* pa)
+{
+    const float fpsmul = 60.0f;
+
+    /*
+      +--------------------+----------------+-----------------+
+      | model parameter    |  magic number  | fps multitplier |
+      +--------------------+----------------+-----------------+
+     */
+    pa->acc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
+    pa->dec =                 (32.0f/64.0f) * fpsmul * fpsmul ;
+    pa->frc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
+    pa->initialtopspeed =       6.0f        * fpsmul * 1.0f   ;
+    pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
+    pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
+    pa->air =                  (6.0f/64.0f) * fpsmul * fpsmul ;
+    pa->airdrag =             (31.0f/32.0f) * 1.0f   * 1.0f   ;
+    pa->jmp =                   -6.5f       * fpsmul * 1.0f   ;
+    pa->jmprel =                -4.0f       * fpsmul * 1.0f   ;
+    pa->diejmp =                -7.0f       * fpsmul * 1.0f   ;
+    pa->hitjmp =                -4.0f       * fpsmul * 1.0f   ;
+    pa->grv =                 (14.0f/64.0f) * fpsmul * fpsmul ;
+    pa->slp =                  (8.0f/64.0f) * fpsmul * fpsmul ;
+    pa->chrg =                  12.0f       * fpsmul * 1.0f   ;
+    pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
+    pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
+    pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
+    pa->rollfrc =             (6.0f/256.0f) * fpsmul * fpsmul ;
+    pa->rolldec =              (8.0f/64.0f) * fpsmul * fpsmul ;
+    pa->rolluphillslp =        (5.0f/64.0f) * fpsmul * fpsmul ;
+    pa->rolldownhillslp =     (20.0f/64.0f) * fpsmul * fpsmul ;
+    pa->falloffthreshold =      0.625f      * fpsmul * 1.0f   ;
+    pa->brakingthreshold =      4.0f        * fpsmul * 1.0f   ;
+    pa->airdragthreshold =      -4.0f       * fpsmul * 1.0f   ;
+    pa->airdragxthreshold =    (8.0f/64.0f) * fpsmul * 1.0f   ;
+    pa->chrgthreshold =        (1.0f/64.0f) * 1.0f   * 1.0f   ;
+    pa->waittime =              3.0f        * 1.0f   * 1.0f   ;
+
+    /* recompute airdrag coefficients */
+    physicsactor_set_airdrag(pa, pa->airdrag);
 }
 
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
