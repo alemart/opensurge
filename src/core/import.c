@@ -177,10 +177,12 @@ static const char* BLACKLIST[] = {
     EXACT("logo.png"),
 
     /* deleted files from previous builds */
-    EXACT("preferences.dat"), /* 0.5.0 */
-    EXACT("scripts/core/motd.ss"), /* 0.6.1 */
-    PREFIX("images/backgrounds/waterworks-zone-indoors-"), /* 0.6.1 */
-    EXACT("images/allegro.png"), /* 0.6.1 */
+    EXACT("preferences.dat"), /* 0.2.0 => 0.5.0 */
+    EXACT("scripts/core/motd.ss"), /* 0.5.0 => 0.6.1 */
+    PREFIX("images/backgrounds/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
+    PREFIX("images/bricks/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
+    PREFIX("images/backgrounds/waterworks-zone-indoors-"), /* 0.6.1 => 0.6.1 */
+    EXACT("images/allegro.png"), /* 0.2.0 => 0.6.1 */
 
     /* NULL-terminated list */
     NULL
@@ -381,7 +383,8 @@ void import_wizard()
     do {
 
         ALERT("Good.");
-        ALERT("Now I want you to confirm it to me %d more times, just for fun :)", repetitions);
+        if(YES != CONFIRM("Now I want you to confirm it to me %d more times, just for fun :)", repetitions))
+            break;
 
         for(int i = 1; i <= repetitions; i++) {
             if(YES != CONFIRM("%s\n\n%d / %d", BACKUP_MESSAGE, i, repetitions)) {
