@@ -116,6 +116,8 @@ static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* animation methods */
 static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -248,6 +250,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_score", fun_setscore, 1);
     surgescript_vm_bind(vm, "Player", "get_aggressive", fun_getaggressive, 0);
     surgescript_vm_bind(vm, "Player", "set_aggressive", fun_setaggressive, 1);
+    surgescript_vm_bind(vm, "Player", "get_invulnerable", fun_getinvulnerable, 0);
+    surgescript_vm_bind(vm, "Player", "set_invulnerable", fun_setinvulnerable, 1);
 
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
@@ -1303,6 +1307,24 @@ surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgesc
     if(player != NULL) {
         bool aggressive = surgescript_var_get_bool(param[0]);
         player_set_aggressive(player, aggressive);
+    }
+    return NULL;
+}
+
+/* is the player invulnerable? an invulnerable player won't take damage */
+surgescript_var_t* fun_getinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_invulnerable(player));
+}
+
+/* set the invulnerability flag */
+surgescript_var_t* fun_setinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool invulnerable = surgescript_var_get_bool(param[0]);
+        player_set_invulnerable(player, invulnerable);
     }
     return NULL;
 }

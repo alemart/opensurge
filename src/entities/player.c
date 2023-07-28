@@ -112,8 +112,8 @@ player_t *player_create(const char *character_name)
     p->character = c;
     p->disable_movement = FALSE;
     p->disable_roll = FALSE;
-    p->disable_collectible_loss = FALSE;
     p->disable_animation_control = FALSE;
+    p->invulnerable = FALSE;
     p->aggressive = FALSE;
     p->visible = TRUE;
     p->actor = actor_create();
@@ -515,7 +515,7 @@ void player_hit(player_t *player, float direction)
     if(player->invincible || physicsactor_get_state(player->pa) == PAS_GETTINGHIT || player->blinking || player_is_dying(player))
         return;
 
-    if(player_get_collectibles() > 0 || player->shield_type != SH_NONE) {
+    if(player_get_collectibles() > 0 || player->shield_type != SH_NONE || player->invulnerable) {
         if(direction != 0.0f)
             player->actor->speed.x = fabs(physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
         player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
@@ -524,11 +524,15 @@ void player_hit(player_t *player, float direction)
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_hit(player->pa);
 
-        if(player->shield_type != SH_NONE) {
+        if(player->invulnerable) {
+            ; /* do nothing */
+            sound_play(SFX_DAMAGE);
+        }
+        else if(player->shield_type != SH_NONE) {
             player->shield_type = SH_NONE;
             sound_play(SFX_DAMAGE);
         }
-        else if(!player->disable_collectible_loss) {
+        else {
             float a = 101.25f, spd = 240.0f;
             int r = min(32, player_get_collectibles());
 
@@ -566,8 +570,6 @@ void player_hit(player_t *player, float direction)
             player_set_collectibles(0);
             sound_play(SFX_GETHIT);
         }
-        else
-            sound_play(SFX_DAMAGE);
     }
     else
         player_kill(player);
@@ -599,6 +601,7 @@ void player_kill(player_t *player)
         player_set_turbo(player, FALSE);
         player_set_blinking(player, FALSE);
         player_set_aggressive(player, FALSE);
+        player_set_invulnerable(player, FALSE);
         player->shield_type = SH_NONE;
         player->actor->speed = v2d_new(0, physicsactor_get_diejmp(player->pa));
 
@@ -1205,6 +1208,24 @@ int player_is_aggressive(const player_t* player)
 void player_set_aggressive(player_t* player, int aggressive)
 {
     player->aggressive = aggressive;
+}
+
+/*
+ * player_is_invulnerable()
+ * Is the player invulnerable? An invulnerable player won't take damage
+ */
+int player_is_invulnerable(const player_t* player)
+{
+    return player->invulnerable;
+}
+
+/*
+ * player_set_invulnerable()
+ * Set the invulnerability flag
+ */
+void player_set_invulnerable(player_t* player, int invulnerable)
+{
+    player->invulnerable = invulnerable;
 }
 
 /*
