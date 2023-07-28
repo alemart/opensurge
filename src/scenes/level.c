@@ -176,6 +176,7 @@ static int quit_level;
 static int must_load_another_level;
 static int must_restart_this_level;
 static int must_push_a_quest;
+static int must_quit_with_gameover;
 static char quest_to_be_pushed[PATH_MAXLEN];
 static float dead_player_timeout;
 static actor_t *camera_focus; /* camera */
@@ -1072,6 +1073,7 @@ void level_init(void *path_to_lev_file)
     must_load_another_level = FALSE;
     must_restart_this_level = FALSE;
     must_push_a_quest = FALSE;
+    must_quit_with_gameover = FALSE;
     must_render_brick_masks = FALSE;
     must_display_gizmos = FALSE;
     dead_player_timeout = 0.0f;
@@ -1103,6 +1105,7 @@ void level_init(void *path_to_lev_file)
 
     /* helpers */
     clear_level_state(&saved_state);
+    mobilegamepad_fadein();
 
     camera_init();
     entitymanager_init();
@@ -1187,6 +1190,7 @@ void level_update()
     item_list_t *major_items, *inode;
     enemy_list_t *major_enemies, *enode;
     v2d_t cam = level_editmode() ? editor_camera : camera_get_position();
+    (void)dt;
 
     entitymanager_remove_dead_bricks();
     entitymanager_remove_dead_items();
@@ -1219,6 +1223,14 @@ void level_update()
         scenestack_pop();
         quest_set_next_level(quest_next_level() - 1); /* will return to the current level */
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)quest_to_be_pushed);
+        return;
+    }
+
+    /* must quit the level and show the game over screen? */
+    if(must_quit_with_gameover) {
+        must_quit_with_gameover = FALSE;
+        scenestack_pop();
+        scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
         return;
     }
 
@@ -1448,39 +1460,6 @@ void level_update()
     /* update dialog box */
     update_dialogregions();
     update_dlgbox();
-
-    /* someone is dying */
-    if(got_dying_player) {
-        /* fade out the music */
-        music_set_volume(music_get_volume() - 0.5*dt);
-
-        /* hide the mobile gamepad */
-        mobilegamepad_fadeout();
-
-        /* restart the level */
-        if(((dead_player_timeout += dt) >= 2.5f)) {
-
-            /* decide what to do next */
-            if(player_get_lives() > 1) {
-                /* restart the level! */
-                if(fadefx_is_over()) {
-                    player_set_lives(player_get_lives()-1);
-                    restart(TRUE);
-                    mobilegamepad_fadein();
-                    return;
-                }
-                fadefx_out(color_rgb(0,0,0), 1.0);
-            }
-            else {
-                /* game over */
-                scenestack_pop();
-                scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
-                mobilegamepad_fadein();
-                return;
-            }
-
-        }
-    }
 
     /* level timer */
     if(!got_dying_player && !level_cleared)
@@ -2109,6 +2088,15 @@ void level_abort()
     /* schedules a quest pop */
     quest_abort();
     level_jump_to_next_stage();
+}
+
+/*
+ * level_quit_with_gameover()
+ * Quits the level and show the game over screen
+ */
+void level_quit_with_gameover()
+{
+    must_quit_with_gameover = TRUE;
 }
 
 /*

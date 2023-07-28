@@ -28,6 +28,7 @@
 #include "brick.h"
 #include "camera.h"
 #include "character.h"
+#include "mobilegamepad.h"
 #include "sfx.h"
 #include "legacy/item.h"
 #include "legacy/enemy.h"
@@ -37,6 +38,7 @@
 #include "../core/logfile.h"
 #include "../core/input.h"
 #include "../core/sprite.h"
+#include "../core/fadefx.h"
 #include "../scenes/level.h"
 #include "../util/darray.h"
 #include "../util/numeric.h"
@@ -76,6 +78,7 @@ static const float PLAYER_MAX_BLINK = 2.0f;           /* how long does the playe
 static const float PLAYER_UNDERWATER_BREATH = 30.0f;  /* how long can the player stay underwater before drowning, in seconds */
 static const float PLAYER_TURBO_TIME = 20.0f;         /* super speed time, in seconds */
 static const float PLAYER_INVINCIBILITY_TIME = 20.0f; /* invincibility time, in seconds */
+static const float PLAYER_DEAD_RESTART_TIME = 2.5f;   /* time to restart the level when the player is killed */
 
 /* private data */
 static int collectibles;         /* shared collectibles */
@@ -158,6 +161,7 @@ player_t *player_create(const char *character_name)
     p->underwater = FALSE;
     p->underwater_timer = 0.0f;
     p->breath_time = PLAYER_UNDERWATER_BREATH;
+    p->dead_timer = 0.0f;
 
     /* character system: setting the multipliers */
     physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);
@@ -381,6 +385,45 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
     /* play sounds */
     play_sounds(player);
+
+    /* restart the level if dead */
+    if(player_is_dying(player)) {
+        const float FADEOUT_TIME = 1.0f;
+        const float MUSIC_FADEOUT_TIME = 0.5f;
+
+        /* fade out the music */
+        float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
+        float current_volume = music_get_volume();
+        if(new_volume < current_volume)
+            music_set_volume(new_volume);
+
+        /* hide the mobile gamepad */
+        mobilegamepad_fadeout();
+
+        /* decide what to do next */
+        if(player->dead_timer >= PLAYER_DEAD_RESTART_TIME) {
+
+            if(player_get_lives() <= 1) {
+                /* game over */
+                level_quit_with_gameover();
+            }
+            /*else if(fadefx_is_over()) { // skips a frame */
+            else if(player->dead_timer + dt >= PLAYER_DEAD_RESTART_TIME + FADEOUT_TIME) {
+                /* restart the level */
+                player_set_lives(player_get_lives() - 1);
+                level_restart();
+            }
+            else {
+                /* fade out */
+                color_t black = color_rgb(0, 0, 0);
+                fadefx_out(black, FADEOUT_TIME);
+            }
+
+        }
+
+        /* update the dead timer */
+        player->dead_timer += dt;
+    }
 }
 
 /*

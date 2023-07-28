@@ -91,6 +91,7 @@ struct player_t {
     int blinking;
     float blink_timer;
     float blink_visibility_timer;
+    float dead_timer;
     int thrown_while_rolling;
     int visible;
     const struct character_t* character;

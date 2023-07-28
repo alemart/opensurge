@@ -95,6 +95,7 @@ void level_pause();
 void level_restart();
 void level_abort();
 void level_push_quest(const char* path_to_qst_file);
+void level_quit_with_gameover();
 
 /* level state */
 void level_save_state();
