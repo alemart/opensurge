@@ -466,6 +466,21 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds)
         pa->horizontal_control_lock_timer = seconds;
 }
 
+bool physicsactor_ressurrect(physicsactor_t *pa, v2d_t position)
+{
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED) {
+        pa->gsp = 0.0f;
+        pa->xsp = 0.0f;
+        pa->ysp = 0.0f;
+        pa->facing_right = true;
+        pa->state = PAS_STOPPED;
+        physicsactor_set_position(pa, position);
+        return true;
+    }
+
+    return false;
+}
+
 bool physicsactor_is_midair(const physicsactor_t *pa)
 {
     return pa->midair;
