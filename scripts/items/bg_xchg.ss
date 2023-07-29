@@ -79,9 +79,9 @@ object "Background Exchange Manager"
     {
         // initialize
         for(i = 0; i < Player.count; i++) {
-            playerName = Player[i].name;
-            originalBackgroundOf[playerName] = Level.bgtheme;
-            currentBackgroundOf[playerName] = Level.background;
+            playerId = Player[i].id;
+            originalBackgroundOf[playerId] = Level.bgtheme;
+            currentBackgroundOf[playerId] = Level.background;
         }
 
         // done
@@ -91,18 +91,18 @@ object "Background Exchange Manager"
     state "watch"
     {
         // update background on player change
-        currentBackground = currentBackgroundOf[Player.active.name];
+        currentBackground = currentBackgroundOf[Player.active.id];
         if(Level.background != currentBackground && currentBackground)
             Level.background = currentBackground;
     }
 
     fun changeBackgroundOfPlayer(player, background)
     {
-        currentBackgroundOf[player.name] = background;
+        currentBackgroundOf[player.id] = background;
     }
 
     fun restoreBackgroundOfPlayer(player)
     {
-        currentBackgroundOf[player.name] = originalBackgroundOf[player.name];
+        currentBackgroundOf[player.id] = originalBackgroundOf[player.id];
     }
 }

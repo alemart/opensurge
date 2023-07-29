@@ -34,9 +34,9 @@ object "Debug Mode - Player Locker" is "debug-mode-plugin"
     {
         for(i = Player.count - 1; i >= 0; i--) {
             player = Player[i];
-            frozenPhysics[player.name] = player.frozen;
-            enabledInput[player.name] = player.input.enabled;
-            enabledCollider[player.name] = player.collider.enabled;
+            frozenPhysics[player.id] = player.frozen;
+            enabledInput[player.id] = player.input.enabled;
+            enabledCollider[player.id] = player.collider.enabled;
         }
     }
 
@@ -44,9 +44,9 @@ object "Debug Mode - Player Locker" is "debug-mode-plugin"
     {
         for(i = Player.count - 1; i >= 0; i--) {
             player = Player[i];
-            player.frozen = frozenPhysics[player.name];
-            player.input.enabled = enabledInput[player.name];
-            player.collider.enabled = enabledCollider[player.name];
+            player.frozen = frozenPhysics[player.id];
+            player.input.enabled = enabledInput[player.id];
+            player.collider.enabled = enabledCollider[player.id];
         }
     }
 }

@@ -88,7 +88,7 @@ object "Pipe Out" is "entity", "special"
 
     state "main"
     {
-        brick.enabled = (isBlocked[Player.active.name] || false);
+        brick.enabled = (isBlocked[Player.active.id] || false);
     }
 
     state "block"
@@ -96,7 +96,7 @@ object "Pipe Out" is "entity", "special"
         if(!playerCollider.collidesWith(pipeSensor.collider)) {
             player = playerCollider.entity;
             if(!player.midair || player.ysp >= 0) {
-                isBlocked[player.name] = true;
+                isBlocked[player.id] = true;
                 state = "main";
             }
         }
@@ -258,7 +258,7 @@ object "Pipe Manager"
         // for each player, create a Pipe Traveler
         for(i = 0; i < Player.count; i++) {
             player = Player[i];
-            travelers[player.name] = spawn("Pipe Traveler").setPlayer(player);
+            travelers[player.id] = spawn("Pipe Traveler").setPlayer(player);
         }
 
         // done
@@ -274,10 +274,10 @@ object "Pipe Manager"
     //
     fun travelerOf(player)
     {
-        if(!travelers.has(player.name))
-            travelers[player.name] = spawn("Pipe Traveler").setPlayer(player);
+        if(!travelers.has(player.id))
+            travelers[player.id] = spawn("Pipe Traveler").setPlayer(player);
 
-        return travelers[player.name];
+        return travelers[player.id];
     }
 
     //

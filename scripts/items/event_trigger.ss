@@ -265,7 +265,7 @@ object "Event Trigger Manager"
     fun trigger(groupId, player)
     {
         if(groupId >= 0 && groupId < triggers.length)
-            triggers[groupId] = player.name;
+            triggers[groupId] = player.id;
     }
 
     fun reactivate(groupId)
