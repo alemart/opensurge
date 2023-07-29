@@ -119,6 +119,7 @@ player_t *player_create(int id, const char *character_name)
     p->disable_roll = FALSE;
     p->disable_animation_control = FALSE;
     p->invulnerable = FALSE;
+    p->immortal = FALSE;
     p->aggressive = FALSE;
     p->visible = TRUE;
     p->actor = actor_create();
@@ -367,7 +368,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 #else
     if(player_is_dying(player)) {
 #endif
-        bool can_ressurrect = false;
+        bool can_ressurrect = player->immortal;
         const float FADEOUT_TIME = 1.0f;
 
         if(!can_ressurrect) {
@@ -1297,6 +1298,25 @@ int player_is_invulnerable(const player_t* player)
 void player_set_invulnerable(player_t* player, int invulnerable)
 {
     player->invulnerable = invulnerable;
+}
+
+/*
+ * player_is_immortal()
+ * Is the player immortal? If an immortal player appears to be killed, it
+ * will appear to be ressurrected on its spawn point without losing a life
+ */
+int player_is_immortal(const player_t* player)
+{
+    return player->immortal;
+}
+
+/*
+ * player_set_immortal()
+ * Set the immortality flag
+ */
+void player_set_immortal(player_t* player, int immortal)
+{
+    player->immortal = immortal;
 }
 
 /*

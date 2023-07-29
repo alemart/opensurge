@@ -121,6 +121,8 @@ static surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* animation methods */
 static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -262,6 +264,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_aggressive", fun_setaggressive, 1);
     surgescript_vm_bind(vm, "Player", "get_invulnerable", fun_getinvulnerable, 0);
     surgescript_vm_bind(vm, "Player", "set_invulnerable", fun_setinvulnerable, 1);
+    surgescript_vm_bind(vm, "Player", "get_immortal", fun_getimmortal, 0);
+    surgescript_vm_bind(vm, "Player", "set_immortal", fun_setimmortal, 1);
 
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
@@ -1321,6 +1325,25 @@ surgescript_var_t* fun_setinvulnerable(surgescript_object_t* object, const surge
     return NULL;
 }
 
+/* is the player immortal? if an immortal player appears to be killed, it will
+   appear to be ressurrected on its spawn point without losing a life */
+surgescript_var_t* fun_getimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_immortal(player));
+}
+
+/* set the immortality flag */
+surgescript_var_t* fun_setimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool immortal = surgescript_var_get_bool(param[0]);
+        player_set_immortal(player, immortal);
+    }
+    return NULL;
+}
+
 /* rebound: bounce(hazard) - will bounce upwards */
 surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1438,7 +1461,7 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
 
         /* error if a player is dying */
         for(int i = 0; (p = level_get_player_by_id(i)) != NULL; i++) {
-            if(player_is_dying(p))
+            if(player_is_dying(p) && !player_is_immortal(p))
                 return surgescript_var_set_bool(surgescript_var_create(), false);
         }
 

@@ -1184,8 +1184,7 @@ void level_release()
 void level_update()
 {
     int i, cbox;
-    int got_dying_player = FALSE;
-    int block_quit = FALSE, block_pause = FALSE;
+    bool got_dying_player = false;
     float dt = timer_get_delta();
     brick_list_t *major_bricks;
     item_list_t *major_items, *inode;
@@ -1235,6 +1234,12 @@ void level_update()
         return;
     }
 
+    /* got a dying player? */
+    for(i = 0; i < team_size && !got_dying_player; i++) {
+        if(player_is_dying(team[i]) && !player_is_immortal(team[i]))
+            got_dying_player = true;
+    }
+
     /* update the brick manager */
     brickmanager_update(brick_manager);
 
@@ -1254,10 +1259,7 @@ void level_update()
     }
 
     /* displaying message: "do you really want to quit?" */
-    block_quit = FALSE;
-    for(i=0; i<team_size && !block_quit; i++)
-        block_quit = player_is_dying(team[i]);
-
+    bool block_quit = got_dying_player;
     if(wants_to_leave && !block_quit) {
         confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2", 2 };
 
@@ -1289,10 +1291,7 @@ void level_update()
     }
 
     /* pause game */
-    block_pause = block_pause || (level_timer < 1.0f);
-    for(i=0; i<team_size; i++)
-        block_pause = block_pause || player_is_dying(team[i]);
-
+    bool block_pause = got_dying_player || (level_timer < 1.0f);
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
         scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
@@ -1322,12 +1321,6 @@ void level_update()
     /* -------------------------------------- */
     /* updating the entities */
     /* -------------------------------------- */
-
-    /* got dying player? */
-    for(i = 0; i < team_size; i++) {
-        if(player_is_dying(team[i]))
-            got_dying_player = TRUE;
-    }
 
     /* update background */
     background_update(backgroundtheme);
@@ -2316,7 +2309,7 @@ void update_music()
 {
     if(music != NULL && !music_is_playing()) {
         if(music_current() == NULL || (music_current() == music && !music_is_paused())) {
-            if(!level_cleared && !player_is_dying(player))
+            if(!level_cleared && !(player_is_dying(player) && !player_is_immortal(player)))
                 music_play(music, true);
         }
     }
