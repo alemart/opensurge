@@ -131,6 +131,7 @@ static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_getactionspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactionoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_resetanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -170,6 +171,7 @@ static void read_transform(surgescript_object_t* object, v2d_t* position, float*
 static void spawn_companions(surgescript_object_t* object, const player_t* player);
 static void destroy_companions(surgescript_object_t* object);
 static bool destroy_companion(surgescript_var_t* var, surgescript_heapptr_t ptr, void* ctx);
+static void init_animation(surgescript_object_t* animation, const char* sprite_name);
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 #define STAY_MIDAIR(player) (player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
 
@@ -285,6 +287,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_actionSpot", fun_getactionspot, 0);
     surgescript_vm_bind(vm, "Player", "get_actionOffset", fun_getactionoffset, 0);
     surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
+    surgescript_vm_bind(vm, "Player", "__resetAnimation", fun_resetanimation, 0);
     
     /* general-purpose methods */
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
@@ -410,11 +413,9 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     /* initialize specifics */
     if((player = get_player(object)) != NULL) {
         /* initialize the Animation */
-        surgescript_var_t* sprite_name = surgescript_var_set_string(surgescript_var_create(), player_sprite_name(player));
         surgescript_object_t* animation = get_animation(object);
-        const surgescript_var_t* p[] = { sprite_name };
-        surgescript_object_call_function(animation, "__init", p, 1, NULL);
-        surgescript_var_destroy(sprite_name);
+        const char* sprite_name = player_sprite_name(player);
+        init_animation(animation, sprite_name);
 
         /* initialize the Input object */
         surgescript_var_set_objecthandle(surgescript_heap_at(heap, INPUT_ADDR),
@@ -1029,6 +1030,20 @@ surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const sur
     return NULL;
 }
 
+/* reinitialize the Animation object */
+surgescript_var_t* fun_resetanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+
+    if(player != NULL) {
+        surgescript_object_t* animation = get_animation(object);
+        const char* sprite_name = player_sprite_name(player);
+        init_animation(animation, sprite_name);
+    }
+
+    return NULL;
+}
+
 /* get the number of collectibles (shared between all players) */
 surgescript_var_t* fun_getcollectibles(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1530,29 +1545,9 @@ surgescript_var_t* fun_transforminto(surgescript_object_t* object, const surgesc
     const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* character_name = surgescript_var_get_string(param[0], manager);
     player_t* player = get_player(object);
-    bool success;
 
-    if(player == NULL) {
-        /* no player */
-        success = false;
-    }
-    else if(0 == str_icmp(player_name(player), character_name)) {
-        /* no need to transform; we're already that character */
-        success = true;
-    }
-    else {
-        /* transform the player */
-        success = player_transform(player, object, character_name);
-
-        /* reinitialize the Animation object */
-        if(success) {
-            surgescript_var_t* sprite_name = surgescript_var_set_string(surgescript_var_create(), player_sprite_name(player));
-            surgescript_object_t* animation = get_animation(object);
-            const surgescript_var_t* p[] = { sprite_name };
-            surgescript_object_call_function(animation, "__init", p, 1, NULL);
-            surgescript_var_destroy(sprite_name);
-        }
-    }
+    /* transform the player */
+    bool success = (player != NULL) && player_transform_into(player, object, character_name);
 
     /* done */
     ssfree(character_name);
@@ -1594,7 +1589,6 @@ surgescript_var_t* fun_destroycompanions(surgescript_object_t* object, const sur
 
     return NULL;
 }
-
 
 
 
@@ -1801,4 +1795,15 @@ bool destroy_companion(surgescript_var_t* var, surgescript_heapptr_t ptr, void* 
     /* done! */
     surgescript_var_set_null(var);
     return true;
+}
+
+/* initialize the Animation object */
+void init_animation(surgescript_object_t* animation, const char* sprite_name)
+{
+    surgescript_var_t* arg = surgescript_var_set_string(surgescript_var_create(), sprite_name);
+
+    const surgescript_var_t* args[] = { arg };
+    surgescript_object_call_function(animation, "__init", args, 1, NULL);
+
+    surgescript_var_destroy(arg);
 }

@@ -886,11 +886,11 @@ int player_senses_layer(const player_t* player, bricklayer_t layer)
 }
 
 /*
- * player_transform()
+ * player_transform_into()
  * Transforms the player into a different character
  * Returns TRUE on success
  */
-int player_transform(player_t *player, surgescript_object_t *player_object, const char *character_name)
+int player_transform_into(player_t *player, surgescript_object_t *player_object, const char *character_name)
 {
     /* if the player must be transformed to itself, then we consider
        the transformation to be successful, but we do nothing */
@@ -907,20 +907,27 @@ int player_transform(player_t *player, surgescript_object_t *player_object, cons
 
     /* let's change the character and update the parameters of the
        physics model */
-    int turbo = player->turbo;
+    int turbocharged = player->turbo;
     int underwater = player->underwater;
 
     player->character = charactersystem_get(character_name);
     set_default_multipliers(player->pa, player->character);
 
-    if(turbo)
+    if(turbocharged)
         set_turbocharged_multipliers(player->pa, true);
 
     if(underwater)
         set_underwater_multipliers(player->pa, true);
 
+    /* restore the controls (this is probably desirable) */
+    player->disable_movement = FALSE;
+    input_enable(player->actor->input);
+
     /* update animation */
     update_animation(player);
+
+    /* reset the Animation object in SurgeScript */
+    surgescript_object_call_function(player_object, "__resetAnimation", NULL, 0, NULL);
 
     /* respawn the companion objects */
     surgescript_object_call_function(player_object, "__spawnCompanions", NULL, 0, NULL);

@@ -118,7 +118,7 @@ void player_lock_horizontally_for(player_t *player, float seconds);
 int player_collision(const player_t *player, const struct actor_t *actor);
 int player_overlaps(const player_t *player, int x, int y, int width, int height);
 int player_senses_layer(const player_t* player, bricklayer_t layer);
-int player_transform(player_t *player, struct surgescript_object_t *player_object, const char *character_name);
+int player_transform_into(player_t *player, struct surgescript_object_t *player_object, const char *character_name);
 
 void player_enter_water(player_t *player);
 void player_leave_water(player_t *player);
