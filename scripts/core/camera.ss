@@ -28,6 +28,9 @@ object "Default Camera" is "entity", "awake", "private"
 
     state "frozen"
     {
+        // unfreeze if the player ressurrects
+        if(!player.dying)
+            state = "main";
     }
 
     fun lateUpdate()

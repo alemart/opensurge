@@ -367,22 +367,33 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 #else
     if(player_is_dying(player)) {
 #endif
+        bool can_ressurrect = false;
         const float FADEOUT_TIME = 1.0f;
-        const float MUSIC_FADEOUT_TIME = 0.5f;
 
-        /* fade out the music */
-        float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
-        float current_volume = music_get_volume();
-        if(new_volume < current_volume)
-            music_set_volume(new_volume);
+        if(!can_ressurrect) {
+            /* fade out the music */
+            const float MUSIC_FADEOUT_TIME = 0.5f;
+            float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
+            float current_volume = music_get_volume();
+            if(new_volume < current_volume)
+                music_set_volume(new_volume);
 
-        /* hide the mobile gamepad */
-        mobilegamepad_fadeout();
+            /* hide the mobile gamepad */
+            mobilegamepad_fadeout();
+        }
 
         /* decide what to do next */
         if(player->dead_timer >= PLAYER_DEAD_RESTART_TIME) {
 
-            if(player_get_lives() <= 1) {
+            if(can_ressurrect) {
+                /* ressurrect */
+                v2d_t ressurrected_position = level_spawnpoint();
+                physicsactor_ressurrect(player->pa, ressurrected_position);
+                player->actor->position = ressurrected_position;
+                player->actor->speed = v2d_new(0.0f, 0.0f);
+                player->dead_timer = 0.0f;
+            }
+            else if(player_get_lives() <= 1) {
                 /* game over */
                 level_quit_with_gameover();
             }

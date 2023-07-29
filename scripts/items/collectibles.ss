@@ -271,6 +271,9 @@ object "Lucky Collectible" is "private", "entity", "awake"
 
     state "done"
     {
+        // destroy if the player is ressurrected
+        if(!luckyPlayer.dying)
+            destroy();
     }
 
 
