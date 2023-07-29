@@ -56,7 +56,7 @@ typedef enum playershield_t playershield_t;
 /* player structure */
 struct player_t {
     /* general */
-    char *name;
+    int id;
     struct actor_t *actor;
     int disable_movement;
     int disable_roll;
@@ -98,7 +98,7 @@ struct player_t {
 };
 
 /* public functions */
-player_t* player_create(const char *character_name);
+player_t* player_create(int id, const char *character_name);
 player_t* player_destroy(player_t *player);
 void player_early_update(player_t *player);
 void player_update(player_t *player, const struct obstaclemap_t* obstaclemap);
@@ -118,6 +118,7 @@ void player_lock_horizontally_for(player_t *player, float seconds);
 int player_collision(const player_t *player, const struct actor_t *actor);
 int player_overlaps(const player_t *player, int x, int y, int width, int height);
 int player_senses_layer(const player_t* player, bricklayer_t layer);
+int player_transform(player_t *player, struct surgescript_object_t *player_object, const char *character_name);
 
 void player_enter_water(player_t *player);
 void player_leave_water(player_t *player);
@@ -169,6 +170,7 @@ int player_is_looking_up(const player_t *player);
 int player_is_waiting(const player_t *player);
 int player_is_winning(const player_t *player);
 
+int player_id(const player_t* player);
 const char* player_name(const player_t* player);
 const struct animation_t* player_animation(const player_t* player);
 void player_override_animation(player_t* player, const struct animation_t* animation);

@@ -46,8 +46,11 @@ static surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_spawncompanions(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_destroycompanions(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* read-only properties */
+static surgescript_var_t* fun_getid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactivity(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getattacking(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -142,11 +145,12 @@ static surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surge
 static surgescript_var_t* fun_hlock(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_moveby(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_transforminto(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* internals */
 #define SHOW_COLLIDERS 0 /* set it to 1 to display the colliders */
 
-static const surgescript_heapptr_t NAME_ADDR = 0;
+static const surgescript_heapptr_t ID_ADDR = 0;
 static const surgescript_heapptr_t TRANSFORM_ADDR = 1;
 static const surgescript_heapptr_t COLLIDER_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
@@ -163,6 +167,9 @@ static void update_collider(surgescript_object_t* object, int width, int height)
 static void update_animation(surgescript_object_t* object, const animation_t* animation);
 static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
+static void spawn_companions(surgescript_object_t* object, const player_t* player);
+static void destroy_companions(surgescript_object_t* object);
+static bool destroy_companion(surgescript_var_t* var, surgescript_heapptr_t ptr, void* ctx);
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 #define STAY_MIDAIR(player) (player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
 
@@ -182,6 +189,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_tagsystem_add_tag(tag_system, "Player", "gizmo");
 
     /* read-only properties */
+    surgescript_vm_bind(vm, "Player", "get_id", fun_getid, 0);
     surgescript_vm_bind(vm, "Player", "get_name", fun_getname, 0);
     surgescript_vm_bind(vm, "Player", "get_activity", fun_getactivity, 0); /* deprecated */
     surgescript_vm_bind(vm, "Player", "get_attacking", fun_getattacking, 0);
@@ -266,6 +274,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "hlock", fun_hlock, 1);
     surgescript_vm_bind(vm, "Player", "moveBy", fun_moveby, 2);
     surgescript_vm_bind(vm, "Player", "move", fun_move, 1);
+    surgescript_vm_bind(vm, "Player", "transformInto", fun_transforminto, 1);
 
     /* animation methods */
     surgescript_vm_bind(vm, "Player", "get_animation", fun_getanimation, 0);
@@ -285,6 +294,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "lateUpdate", fun_lateupdate, 0);
     surgescript_vm_bind(vm, "Player", "__init", fun_init, 1);
     surgescript_vm_bind(vm, "Player", "__releaseChildren", fun_unload, 0);
+    surgescript_vm_bind(vm, "Player", "__spawnCompanions", fun_spawncompanions, 0);
+    surgescript_vm_bind(vm, "Player", "__destroyCompanions", fun_destroycompanions, 0);
     surgescript_vm_bind(vm, "Player", "onTransformChange", fun_ontransformchange, 1);
     surgescript_vm_bind(vm, "Player", "onRenderGizmos", fun_onrendergizmos, 2);
 }
@@ -300,8 +311,8 @@ player_t* scripting_player_ptr(const surgescript_object_t* object)
 
     if(player == NULL) {
         surgescript_heap_t* heap = surgescript_object_heap(object);
-        const char* name = surgescript_var_fast_get_string(surgescript_heap_at(heap, NAME_ADDR));
-        scripting_error(object, "Player not found - \"%s\"", name);
+        int id = surgescript_var_get_number(surgescript_heap_at(heap, ID_ADDR));
+        scripting_error(object, "Player not found - ID: %d", id);
     }
 
     return player;
@@ -327,7 +338,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
         surgescript_var_set_number(surgescript_var_create(), 0.0f)
     };
 
-    ssassert(NAME_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ID_ADDR == surgescript_heap_malloc(heap));
     ssassert(TRANSFORM_ADDR == surgescript_heap_malloc(heap));
     ssassert(COLLIDER_ADDR == surgescript_heap_malloc(heap));
     ssassert(ANIMATION_ADDR == surgescript_heap_malloc(heap));
@@ -335,7 +346,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(MOVEBYDX_ADDR == surgescript_heap_malloc(heap));
     ssassert(MOVEBYDY_ADDR == surgescript_heap_malloc(heap));
 
-    surgescript_var_set_null(surgescript_heap_at(heap, NAME_ADDR));
+    surgescript_var_set_null(surgescript_heap_at(heap, ID_ADDR));
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, TRANSFORM_ADDR), transform);
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, ANIMATION_ADDR), animation);
     surgescript_var_set_null(surgescript_heap_at(heap, INPUT_ADDR));
@@ -383,18 +394,17 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* __init: pass a character name */
+/* __init: pass a player ID */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_t* name = surgescript_heap_at(heap, NAME_ADDR);
+    surgescript_var_t* id = surgescript_heap_at(heap, ID_ADDR);
     surgescript_objecthandle_t handle = surgescript_object_handle(object);
     player_t* player = NULL;
 
-    /* grab player by name */
-    surgescript_var_set_string(name, surgescript_var_fast_get_string(param[0]));
+    /* grab player by ID */
+    surgescript_var_set_number(id, surgescript_var_get_number(param[0]));
     update_player(object);
 
     /* initialize specifics */
@@ -412,53 +422,10 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
         );
 
         /* spawn the companion objects */
-        if(player_companion_name(player, 0) != NULL) {
-            const char* companion_name = NULL;
-            surgescript_objecthandle_t companion, null_handle = surgescript_objectmanager_null(manager);
-            for(int i = 0; (companion_name = player_companion_name(player, i)) != NULL; i++) {
-                /* allocate memory */
-                surgescript_heapptr_t addr = COMPANION_BASE_ADDR + i;
-                if(!surgescript_heap_validaddress(heap, addr))
-                    ssassert(addr == surgescript_heap_malloc(heap));
-
-                /* spawn the object */
-                if(surgescript_objectmanager_class_exists(manager, companion_name)) {
-                    /* check if the companion object is already tagged "companion" */
-                    if(!surgescript_tagsystem_has_tag(tag_system, companion_name, "companion"))
-                        logfile_message("Companion object \"%s\" isn't tagged \"companion\"", companion_name);
-
-                    /* add the "companion" tag */
-                    surgescript_tagsystem_add_tag(tag_system, companion_name, "companion");
-
-                    /* make the companion an entity, so that it
-                       abides by Entity-Component-System rules */
-                    if(!surgescript_tagsystem_has_tag(tag_system, companion_name, "entity")) {
-                        surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
-                        surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
-                    }
-
-                    /* spawn the companion */
-                    if(surgescript_object_child(object, companion_name) == null_handle) {
-                        companion = surgescript_objectmanager_spawn(manager, handle, companion_name, NULL);
-                        surgescript_var_set_objecthandle(surgescript_heap_at(heap, addr), companion);
-                    }
-                }
-                else if(enemy_exists(companion_name)) {
-                    /* the companion doesn't exist in SurgeScript: use the legacy API */
-                    logfile_message("Warning: no SurgeScript object found for companion \"%s\" of player \"%s\"", companion_name, player_name(player));
-                    surgescript_var_set_null(surgescript_heap_at(heap, addr));
-                    level_create_legacy_object(companion_name, v2d_new(0, 0));
-                }
-                else {
-                    /* the companion doesn't exist */
-                    surgescript_var_set_null(surgescript_heap_at(heap, addr));
-                    scripting_warning(object, "Can't find companion \"%s\" of player \"%s\"", companion_name, player_name(player));
-                }
-            }
-        }
+        spawn_companions(object, player);
     }
     else
-        scripting_error(object, "Player.__init(): can't get the Player pointer for \"%s\"", surgescript_var_fast_get_string(name));
+        scripting_error(object, "Player.__init(): can't get the Player pointer. ID: %d", surgescript_var_get_number(id));
 
     /* done! */
     return surgescript_var_set_bool(surgescript_var_create(), true);
@@ -559,6 +526,16 @@ surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const sur
         player->actor->scale = scale;
     }
     return NULL;
+}
+
+/* gets a unique ID of the player in the Level */
+surgescript_var_t* fun_getid(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        return surgescript_var_set_number(surgescript_var_create(), player_id(player));
+    else
+        return NULL;
 }
 
 /* gets the name of the player */
@@ -1547,6 +1524,41 @@ surgescript_var_t* fun_move(surgescript_object_t* object, const surgescript_var_
     return NULL;
 }
 
+/* transform the player into a different character */
+surgescript_var_t* fun_transforminto(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    char* character_name = surgescript_var_get_string(param[0], manager);
+    player_t* player = get_player(object);
+    bool success;
+
+    if(player == NULL) {
+        /* no player */
+        success = false;
+    }
+    else if(0 == str_icmp(player_name(player), character_name)) {
+        /* no need to transform; we're already that character */
+        success = true;
+    }
+    else {
+        /* transform the player */
+        success = player_transform(player, object, character_name);
+
+        /* reinitialize the Animation object */
+        if(success) {
+            surgescript_var_t* sprite_name = surgescript_var_set_string(surgescript_var_create(), player_sprite_name(player));
+            surgescript_object_t* animation = get_animation(object);
+            const surgescript_var_t* p[] = { sprite_name };
+            surgescript_object_call_function(animation, "__init", p, 1, NULL);
+            surgescript_var_destroy(sprite_name);
+        }
+    }
+
+    /* done */
+    ssfree(character_name);
+    return surgescript_var_set_bool(surgescript_var_create(), success);
+}
+
 /* render gizmos */
 surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1557,6 +1569,28 @@ surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surges
 
     if(player != NULL)
         physicsactor_render_sensors(player->pa, camera);
+
+    return NULL;
+}
+
+/* spawn the companion objects */
+surgescript_var_t* fun_spawncompanions(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+
+    if(player != NULL)
+        spawn_companions(object, player);
+
+    return NULL;
+}
+
+/* destroy the companion objects */
+surgescript_var_t* fun_destroycompanions(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+
+    if(player != NULL)
+        destroy_companions(object);
 
     return NULL;
 }
@@ -1598,14 +1632,14 @@ surgescript_object_t* get_collider(surgescript_object_t* object)
 void update_player(surgescript_object_t* object)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_var_t* name = surgescript_heap_at(heap, NAME_ADDR);
+    surgescript_var_t* id = surgescript_heap_at(heap, ID_ADDR);
     player_t* player = NULL;
 
-    if(!surgescript_var_is_null(name)) {
+    if(!surgescript_var_is_null(id)) {
         /* we're dealing with a specific player */
-        const char* player_name = surgescript_var_fast_get_string(name);
-        if(*player_name)
-            player = level_get_player_by_name(player_name); /* may be NULL */
+        int player_id = surgescript_var_get_number(id);
+        if(player_id >= 0)
+            player = level_get_player_by_id(player_id); /* may be NULL */
     }
     else {
         /* active player */
@@ -1679,4 +1713,92 @@ void update_animation(surgescript_object_t* object, const animation_t* animation
 {
     surgescript_object_t* animation_object = get_animation(object);
     scripting_animation_overwrite_ptr(animation_object, animation);
+}
+
+/* spawn the companion objects of the player */
+void spawn_companions(surgescript_object_t* object, const player_t* player)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    surgescript_objecthandle_t null_handle = surgescript_objectmanager_null(manager);
+    const char* companion_name = NULL;
+
+    for(int i = 0; (companion_name = player_companion_name(player, i)) != NULL; i++) {
+        /* allocate memory if necessary */
+        surgescript_heapptr_t addr = COMPANION_BASE_ADDR + i;
+        if(!surgescript_heap_validaddress(heap, addr)) {
+            ssassert(addr == surgescript_heap_malloc(heap));
+            surgescript_var_set_null(surgescript_heap_at(heap, addr));
+        }
+
+        /* spawn the object */
+        if(surgescript_objectmanager_class_exists(manager, companion_name)) {
+            /* check if the companion object is already tagged "companion" */
+            if(!surgescript_tagsystem_has_tag(tag_system, companion_name, "companion"))
+                logfile_message("Companion object \"%s\" isn't tagged \"companion\"", companion_name);
+
+            /* add the "companion" tag */
+            surgescript_tagsystem_add_tag(tag_system, companion_name, "companion");
+
+            /* make the companion an entity, so that it
+                abides by Entity-Component-System rules */
+            if(!surgescript_tagsystem_has_tag(tag_system, companion_name, "entity")) {
+                surgescript_tagsystem_add_tag(tag_system, companion_name, "entity");
+                surgescript_tagsystem_add_tag(tag_system, companion_name, "private");
+            }
+
+            /* spawn the companion */
+            if(surgescript_object_child(object, companion_name) == null_handle) {
+                surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
+                surgescript_objecthandle_t companion = surgescript_objectmanager_spawn(manager, this_handle, companion_name, NULL);
+                surgescript_var_t* companion_var = surgescript_heap_at(heap, addr);
+
+                ssassert(surgescript_var_is_null(companion_var));
+                surgescript_var_set_objecthandle(companion_var, companion);
+            }
+        }
+        else if(enemy_exists(companion_name)) {
+            /* the companion doesn't exist in SurgeScript: use the legacy API */
+            logfile_message("Warning: no SurgeScript object found for companion \"%s\" of player \"%s\"", companion_name, player_name(player));
+            surgescript_var_set_null(surgescript_heap_at(heap, addr));
+            level_create_legacy_object(companion_name, v2d_new(0, 0));
+        }
+        else {
+            /* the companion doesn't exist */
+            surgescript_var_set_null(surgescript_heap_at(heap, addr));
+            scripting_warning(object, "Can't find companion \"%s\" of player \"%s\"", companion_name, player_name(player));
+        }
+    }
+}
+
+/* destroy the companion objects of the player */
+void destroy_companions(surgescript_object_t* object)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+
+    surgescript_heap_scan_all(heap, manager, destroy_companion);
+}
+
+/* destroy a companion object */
+bool destroy_companion(surgescript_var_t* var, surgescript_heapptr_t ptr, void* ctx)
+{
+    /* not a companion object? */
+    if(ptr < COMPANION_BASE_ADDR)
+        return true;
+
+    /* get the companion */
+    const surgescript_objectmanager_t* manager = (const surgescript_objectmanager_t*)ctx;
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(var); /* may be null */
+
+    /* destroy the companion */
+    if(surgescript_objectmanager_exists(manager, handle)) { /* we may destroy companions multiple times; pointers may change and this may be null */
+        surgescript_object_t* companion = surgescript_objectmanager_get(manager, handle);
+        surgescript_object_kill(companion);
+    }
+
+    /* done! */
+    surgescript_var_set_null(var);
+    return true;
 }

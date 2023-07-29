@@ -657,7 +657,7 @@ int level_save(const char *filepath)
     /* players */
     al_fprintf(fp, "players");
     for(int i = 0; i < team_size; i++)
-        al_fprintf(fp, " \"%s\"", str_addslashes(team[i]->name));
+        al_fprintf(fp, " \"%s\"", str_addslashes(player_name(team[i])));
     al_fprintf(fp, "\n");
 
     /* read only? */
@@ -871,12 +871,13 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
                 for(int i = 0; i < param_count; i++) {
                     if(team_size < TEAM_MAX) {
                         for(int j = 0; j < team_size; j++) {
-                            if(strcmp(team[j]->name, param[i]) == 0)
+                            if(strcmp(player_name(team[j]), param[i]) == 0)
                                 fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filepath, fileline);
                         }
 
                         logfile_message("Loading player '%s'...", param[i]);
-                        team[team_size++] = player_create(param[i]);
+                        team[team_size] = player_create(team_size, param[i]);
+                        team_size++;
                     }
                     else
                         fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
@@ -1652,7 +1653,7 @@ player_t* level_get_player_by_name(const char* name)
 {
     /* simple search */
     for(int i = 0; i < team_size; i++) {
-        if(strcmp(team[i]->name, name) == 0)
+        if(strcmp(player_name(team[i]), name) == 0)
             return team[i];
     }
 
@@ -1662,13 +1663,15 @@ player_t* level_get_player_by_name(const char* name)
 
 /*
  * level_get_player_by_id()
- * Get a player by its ID (index on team[] array)
+ * Get a player by its ID
  * Returns NULL if there is no such player
  */
 player_t* level_get_player_by_id(int id)
 {
-    if(id >= 0 && id < team_size)
+    if(id >= 0 && id < team_size) {
+        assertx(team[id]->id == id); /* the index in team[] matches the id */
         return team[id];
+    }
     else
         return NULL;
 }
@@ -2387,7 +2390,8 @@ void spawn_players()
     /* default players */
     if(team_size == 0) {
         video_showmessage("No players have been specified!");
-        team[team_size++] = player_create("Surge");
+        team[0] = player_create(0, "Surge");
+        team_size = 1;
     }
 
     /* set the spawn point and the initial position of the players */

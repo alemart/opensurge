@@ -95,23 +95,25 @@ static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
 static int fix_angle(int degrees, int threshold);
 static int is_head_underwater(const player_t* player);
-static void turbocharge_player(player_t* player, float multiplier);
+static void set_default_multipliers(physicsactor_t* pa, const character_t* character);
+static void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged);
+static void set_underwater_multipliers(physicsactor_t* pa, bool underwater);
 
 
 /*
  * player_create()
  * Creates a player
  */
-player_t *player_create(const char *character_name)
+player_t *player_create(int id, const char *character_name)
 {
     int i;
     player_t *p = mallocx(sizeof *p);
     const character_t *c = charactersystem_get(character_name);
 
-    logfile_message("player_create(\"%s\")", character_name);
+    logfile_message("player_create(%d, \"%s\")", id, character_name);
 
     /* initializing... */
-    p->name = str_dup(character_name);
+    p->id = id;
     p->character = c;
     p->disable_movement = FALSE;
     p->disable_roll = FALSE;
@@ -156,6 +158,7 @@ player_t *player_create(const char *character_name)
     /* physics */
     p->pa = physicsactor_create(p->actor->position);
     p->pa_old_state = physicsactor_get_state(p->pa);
+    set_default_multipliers(p->pa, c);
 
     /* misc */
     p->underwater = FALSE;
@@ -163,38 +166,11 @@ player_t *player_create(const char *character_name)
     p->breath_time = PLAYER_UNDERWATER_BREATH;
     p->dead_timer = 0.0f;
 
-    /* character system: setting the multipliers */
-    physicsactor_set_acc(p->pa, physicsactor_get_acc(p->pa) * c->multiplier.acc);
-    physicsactor_set_dec(p->pa, physicsactor_get_dec(p->pa) * c->multiplier.dec);
-    physicsactor_set_frc(p->pa, physicsactor_get_frc(p->pa) * c->multiplier.frc);
-    physicsactor_set_grv(p->pa, physicsactor_get_grv(p->pa) * c->multiplier.grv);
-    physicsactor_set_slp(p->pa, physicsactor_get_slp(p->pa) * c->multiplier.slp);
-    physicsactor_set_jmp(p->pa, physicsactor_get_jmp(p->pa) * c->multiplier.jmp);
-    physicsactor_set_chrg(p->pa, physicsactor_get_chrg(p->pa) * c->multiplier.chrg);
-    physicsactor_set_jmprel(p->pa, physicsactor_get_jmprel(p->pa) * c->multiplier.jmp);
-    physicsactor_set_initialtopspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
-    physicsactor_set_topspeed(p->pa, physicsactor_get_topspeed(p->pa) * c->multiplier.topspeed);
-    physicsactor_set_rolluphillslp(p->pa, physicsactor_get_rolluphillslp(p->pa) * c->multiplier.slp);
-    physicsactor_set_rolldownhillslp(p->pa, physicsactor_get_rolldownhillslp(p->pa) * c->multiplier.slp);
-    physicsactor_set_rollfrc(p->pa, physicsactor_get_rollfrc(p->pa) * c->multiplier.frc);
-    physicsactor_set_rolldec(p->pa, physicsactor_get_rolldec(p->pa) * c->multiplier.dec);
-    physicsactor_set_air(p->pa, physicsactor_get_air(p->pa) * c->multiplier.airacc);
-    physicsactor_set_airdrag(p->pa, physicsactor_get_airdrag(p->pa) / max(c->multiplier.airdrag, 0.001f));
-
-    /* character system: configuring the abilities */
-    if(!c->ability.roll)
-        physicsactor_set_rollthreshold(p->pa, 20000.0f);
-    if(!c->ability.brake)
-        physicsactor_set_brakingthreshold(p->pa, 20000.0f);
-    if(!c->ability.charge)
-        physicsactor_set_chrg(p->pa, 0.0f);
-
     /* success! */
     collectibles = 0;
-    logfile_message("Created player \"%s\"", p->name);
+    logfile_message("Created player \"%s\"", c->name);
     return p;
 }
-
 
 /*
  * player_destroy()
@@ -215,7 +191,6 @@ player_t* player_destroy(player_t *player)
     physicsactor_destroy(player->pa);
 
     /* done */
-    free(player->name);
     free(player);
     return NULL;
 }
@@ -387,7 +362,11 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     play_sounds(player);
 
     /* restart the level if dead */
+#if 0
+    if(!player->disable_movement && player_is_dying(player)) {
+#else
     if(player_is_dying(player)) {
+#endif
         const float FADEOUT_TIME = 1.0f;
         const float MUSIC_FADEOUT_TIME = 0.5f;
 
@@ -432,8 +411,18 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
  */
 void player_early_update(player_t *player)
 {
-    /* animation */
-    update_animation(player);
+    /* update animation */
+    do {
+        if(player->disable_animation_control) {
+            player->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
+            break;
+        }
+
+        if(player->disable_movement)
+            break;
+
+        update_animation(player);
+    } while(0);
 }
 
 
@@ -669,7 +658,7 @@ void player_roll(player_t *player)
 
 /*
  * player_enable_roll()
- * enables player rolling
+ * enables player rolling - OBSOLETE
  */
 void player_enable_roll(player_t *player)
 {
@@ -682,7 +671,7 @@ void player_enable_roll(player_t *player)
 
 /*
  * player_disable_roll()
- * disables player rolling
+ * disables player rolling - OBSOLETE
  */
 void player_disable_roll(player_t *player)
 {
@@ -745,22 +734,9 @@ void player_enter_water(player_t *player)
         return;
 
     if(!player_is_underwater(player)) {
-        physicsactor_t *pa = player->pa;
-
+        set_underwater_multipliers(player->pa, true);
         player->actor->speed.x /= 2.0f;
         player->actor->speed.y /= 4.0f;
-
-        physicsactor_set_acc(pa, physicsactor_get_acc(pa) / 2.0f);
-        physicsactor_set_dec(pa, physicsactor_get_dec(pa) / 2.0f);
-        physicsactor_set_frc(pa, physicsactor_get_frc(pa) / 2.0f);
-        physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) / 2.0f);
-        physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) / 2.0f);
-        physicsactor_set_air(pa, physicsactor_get_air(pa) / 2.0f);
-        physicsactor_set_grv(pa, physicsactor_get_grv(pa) / 3.5f);
-        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) / 1.85f);
-        physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) / 2.0f);
-        physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) / 2.0f);
-        physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) / 2.0f);
 
         sound_play(SFX_WATERIN);
         player->underwater_timer = 0.0f;
@@ -775,22 +751,9 @@ void player_enter_water(player_t *player)
 void player_leave_water(player_t *player)
 {
     if(player_is_underwater(player)) {
-        physicsactor_t *pa = player->pa;
-
+        set_underwater_multipliers(player->pa, false);
         if(!player_is_springing(player) && !player_is_dying(player))
             player->actor->speed.y *= 2.0f;
-
-        physicsactor_set_acc(pa, physicsactor_get_acc(pa) * 2.0f);
-        physicsactor_set_dec(pa, physicsactor_get_dec(pa) * 2.0f);
-        physicsactor_set_frc(pa, physicsactor_get_frc(pa) * 2.0f);
-        physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * 2.0f);
-        physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * 2.0f);
-        physicsactor_set_air(pa, physicsactor_get_air(pa) * 2.0f);
-        physicsactor_set_grv(pa, physicsactor_get_grv(pa) * 3.5f);
-        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * 1.85f);
-        physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) * 2.0f);
-        physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) * 2.0f);
-        physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) * 2.0f);
 
         sound_play(SFX_WATEROUT);
         player->underwater = FALSE;
@@ -821,7 +784,10 @@ void player_reset_underwater_timer(player_t *player)
  */
 float player_seconds_remaining_to_drown(const player_t *player)
 {
-    return player->underwater && player->shield_type != SH_WATERSHIELD ? max(0.0f, player->breath_time - player->underwater_timer) : INFINITY;
+    if(player->underwater && player->shield_type != SH_WATERSHIELD)
+        return max(0.0f, player->breath_time - player->underwater_timer);
+    else
+        return INFINITY;
 }
 
 /*
@@ -917,6 +883,50 @@ int player_overlaps(const player_t *player, int x, int y, int width, int height)
 int player_senses_layer(const player_t* player, bricklayer_t layer)
 {
     return (layer == BRL_DEFAULT) || (player->layer == layer);
+}
+
+/*
+ * player_transform()
+ * Transforms the player into a different character
+ * Returns TRUE on success
+ */
+int player_transform(player_t *player, surgescript_object_t *player_object, const char *character_name)
+{
+    /* if the player must be transformed to itself, then we consider
+       the transformation to be successful, but we do nothing */
+    if(0 == str_icmp(player_name(player), character_name))
+        return TRUE;
+
+    /* if the target character doesn't exist, then the transformation
+       is not successful */
+    if(!charactersystem_exists(character_name))
+        return FALSE;
+
+    /* destroy the companion objects */
+    surgescript_object_call_function(player_object, "__destroyCompanions", NULL, 0, NULL);
+
+    /* let's change the character and update the parameters of the
+       physics model */
+    int turbo = player->turbo;
+    int underwater = player->underwater;
+
+    player->character = charactersystem_get(character_name);
+    set_default_multipliers(player->pa, player->character);
+
+    if(turbo)
+        set_turbocharged_multipliers(player->pa, true);
+
+    if(underwater)
+        set_underwater_multipliers(player->pa, true);
+
+    /* update animation */
+    update_animation(player);
+
+    /* respawn the companion objects */
+    surgescript_object_call_function(player_object, "__spawnCompanions", NULL, 0, NULL);
+
+    /* successful transformation! */
+    return TRUE;
 }
 
 /*
@@ -1130,11 +1140,11 @@ void player_set_turbo(player_t* player, int turbo)
     if(turbo) {
         player->turbo = TRUE;
         player->turbo_timer = 0.0f;
-        turbocharge_player(player, 2.0f);
+        set_turbocharged_multipliers(player->pa, true);
     }
     else {
         player->turbo = FALSE;
-        turbocharge_player(player, 0.5f);
+        set_turbocharged_multipliers(player->pa, false);
     }
 }
 
@@ -1368,6 +1378,14 @@ void player_set_score(int s)
     score = max(0, s);
 }
 
+/*
+ * player_id()
+ * A number that uniquely identifies the player in the Level
+ */
+int player_id(const player_t* player)
+{
+    return player->id;
+}
 
 /*
  * player_name()
@@ -1375,7 +1393,7 @@ void player_set_score(int s)
  */
 const char* player_name(const player_t* player)
 {
-    return player->name;
+    return player->character->name;
 }
 
 /*
@@ -1458,15 +1476,6 @@ void update_shield(player_t *player)
 /* updates the animation of the player */
 void update_animation(player_t *player)
 {
-    if(player->disable_animation_control) {
-        player->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
-        return;
-    }
-
-    if(player->disable_movement)
-        return;
-
-    /* animations */
     physicsactorstate_t state = physicsactor_get_state(player->pa);
     float xsp = fabs(physicsactor_get_xsp(player->pa));
     float gsp = fabs(physicsactor_get_gsp(player->pa));
@@ -1743,15 +1752,72 @@ int is_head_underwater(const player_t* player)
     return (int)lerp(bottom, top, head_factor) >= level_waterlevel();
 }
 
-/* turbocharge player physics based on some multiplier */
-void turbocharge_player(player_t* player, float multiplier)
+/* turbocharged physics */
+void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged)
 {
-    physicsactor_t* pa = player->pa;
-    multiplier = max(0.0f, multiplier);
+    float multiplier = turbocharged ? 2.0f : 0.5f;
 
     physicsactor_set_acc(pa, physicsactor_get_acc(pa) * multiplier);
     physicsactor_set_frc(pa, physicsactor_get_frc(pa) * multiplier);
     physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
     physicsactor_set_air(pa, physicsactor_get_air(pa) * multiplier);
     physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * multiplier);
+}
+
+/* underwater physics */
+void set_underwater_multipliers(physicsactor_t* pa, bool underwater)
+{
+    float multiplier = underwater ? 0.5f : 2.0f;
+
+    physicsactor_set_acc(pa, physicsactor_get_acc(pa) * multiplier);
+    physicsactor_set_dec(pa, physicsactor_get_dec(pa) * multiplier);
+    physicsactor_set_frc(pa, physicsactor_get_frc(pa) * multiplier);
+    physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * multiplier);
+    physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
+    physicsactor_set_air(pa, physicsactor_get_air(pa) * multiplier);
+    physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) * multiplier);
+    physicsactor_set_diejmp(pa, physicsactor_get_diejmp(pa) * multiplier);
+    physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) * multiplier);
+
+    if(underwater) {
+        physicsactor_set_grv(pa, physicsactor_get_grv(pa) / 3.5f);
+        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) / 1.85f);
+    }
+    else {
+        physicsactor_set_grv(pa, physicsactor_get_grv(pa) * 3.5f);
+        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * 1.85f);
+    }
+}
+
+/* initialize the character multipliers (physics) */
+void set_default_multipliers(physicsactor_t* pa, const character_t* character)
+{
+    /* reset the parameters of the physics model */
+    physicsactor_reset_model_parameters(pa);
+
+    /* set the multipliers */
+    physicsactor_set_acc(pa, physicsactor_get_acc(pa) * character->multiplier.acc);
+    physicsactor_set_dec(pa, physicsactor_get_dec(pa) * character->multiplier.dec);
+    physicsactor_set_frc(pa, physicsactor_get_frc(pa) * character->multiplier.frc);
+    physicsactor_set_grv(pa, physicsactor_get_grv(pa) * character->multiplier.grv);
+    physicsactor_set_slp(pa, physicsactor_get_slp(pa) * character->multiplier.slp);
+    physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * character->multiplier.jmp);
+    physicsactor_set_chrg(pa, physicsactor_get_chrg(pa) * character->multiplier.chrg);
+    physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) * character->multiplier.jmp);
+    physicsactor_set_initialtopspeed(pa, physicsactor_get_topspeed(pa) * character->multiplier.topspeed);
+    physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * character->multiplier.topspeed);
+    physicsactor_set_rolluphillslp(pa, physicsactor_get_rolluphillslp(pa) * character->multiplier.slp);
+    physicsactor_set_rolldownhillslp(pa, physicsactor_get_rolldownhillslp(pa) * character->multiplier.slp);
+    physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * character->multiplier.frc);
+    physicsactor_set_rolldec(pa, physicsactor_get_rolldec(pa) * character->multiplier.dec);
+    physicsactor_set_air(pa, physicsactor_get_air(pa) * character->multiplier.airacc);
+    physicsactor_set_airdrag(pa, physicsactor_get_airdrag(pa) / max(character->multiplier.airdrag, 0.001f));
+
+    /* configure the abilities */
+    if(!character->ability.roll)
+        physicsactor_set_rollthreshold(pa, 20000.0f);
+    if(!character->ability.brake)
+        physicsactor_set_brakingthreshold(pa, 20000.0f);
+    if(!character->ability.charge)
+        physicsactor_set_chrg(pa, 0.0f);
 }

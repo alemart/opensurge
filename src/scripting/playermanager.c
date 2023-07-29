@@ -207,7 +207,7 @@ surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const surgescr
         surgescript_var_set_objecthandle(player_var, player_handle);
 
         /* initialize the player */
-        surgescript_var_set_string(my_param, player_name(player));
+        surgescript_var_set_number(my_param, player_id(player));
         surgescript_object_call_function(
             surgescript_objectmanager_get(manager, player_handle),
             "__init", p, 1, NULL
