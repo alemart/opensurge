@@ -2009,7 +2009,7 @@ void dnadoor_update(item_t* item, player_t** team, int team_size, brick_list_t* 
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
         if(!player_is_dying(player) && dnadoor_hittest(player, item)) {
-            if(str_icmp(player->name, me->authorized_player_name) == 0) {
+            if(str_icmp(player_name(player), me->authorized_player_name) == 0) {
                 item->obstacle = FALSE;
                 collision = player_collision(player, act);
             }
@@ -2249,11 +2249,11 @@ void endsign_update(item_t* item, player_t** team, int team_size, brick_list_t* 
         if(actor_animation_finished(act)) {
             int anim_id;
 
-            if(str_icmp(me->who->name, "Surge") == 0)
+            if(str_icmp(player_name(me->who), "Surge") == 0)
                 anim_id = 2;
-            else if(str_icmp(me->who->name, "Neon") == 0)
+            else if(str_icmp(player_name(me->who), "Neon") == 0)
                 anim_id = 3;
-            else if(str_icmp(me->who->name, "Charge") == 0)
+            else if(str_icmp(player_name(me->who), "Charge") == 0)
                 anim_id = 4;
             else
                 anim_id = 5;
@@ -2856,7 +2856,7 @@ void itembox_update(item_t* item, player_t** team, int team_size, brick_list_t* 
     }
 
     /* animation */
-    me->anim_id = me->anim_id < 3 ? get_anim_id( level_player()->name ) : me->anim_id;
+    me->anim_id = me->anim_id < 3 ? get_anim_id( player_name(level_player()) ) : me->anim_id;
     actor_change_animation(item->actor, sprite_get_animation("SD_ITEMBOX", me->anim_id));
 }
 

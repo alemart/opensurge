@@ -3830,7 +3830,7 @@ void observe_player(observeplayerstrategy_t *strategy, player_t **team, int team
     player_t *player = NULL;
 
     for(i=0; i<team_size; i++) {
-        if(str_icmp(team[i]->name, strategy->player_name) == 0)
+        if(str_icmp(player_name(team[i]), strategy->player_name) == 0)
             player = team[i];
     }
 
@@ -4837,7 +4837,7 @@ int onobservedplayer_should_trigger_event(eventstrategy_t *event, object_t *obje
 {
     onobservedplayer_t *x = (onobservedplayer_t*)event;
     player_t *player = enemy_get_observed_player(object);
-    return str_icmp(player->name, x->player_name) == 0;
+    return str_icmp(player_name(player), x->player_name) == 0;
 }
 
 /* onplayerevent_t strategy */
@@ -7606,7 +7606,7 @@ void switchcharacter_update(objectmachine_t *obj, player_t **team, int team_size
 
     if(me->name != NULL) {
         for(i=0; i<team_size && new_player == NULL; i++) {
-            if(str_icmp(team[i]->name, me->name) == 0)
+            if(str_icmp(player_name(team[i]), me->name) == 0)
                 new_player = team[i];
         }
     }
