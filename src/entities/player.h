@@ -65,6 +65,7 @@ struct player_t {
     int invulnerable;
     int immortal;
     int aggressive;
+    int secondary;
     int got_glasses;
 
     /* shields */
@@ -153,6 +154,8 @@ int player_is_invulnerable(const player_t* player);
 void player_set_invulnerable(player_t* player, int invulnerable);
 int player_is_immortal(const player_t* player);
 void player_set_immortal(player_t* player, int immortal);
+int player_is_secondary(const player_t* player);
+void player_set_secondary(player_t* player, int secondary);
 
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);

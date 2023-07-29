@@ -358,7 +358,10 @@ object "Item Box" is "entity", "private"
     // can the player crush the item box?
     fun canCrush(player)
     {
-        /* player.attacking won't cut it (it's true when invincible) */
+        if(player.secondary)
+            return false;
+
+        // player.attacking won't cut it (it's true when invincible)
         return player.jumping || player.rolling || player.charging || player.aggressive;
     }
 

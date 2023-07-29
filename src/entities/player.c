@@ -120,6 +120,7 @@ player_t *player_create(int id, const char *character_name)
     p->disable_animation_control = FALSE;
     p->invulnerable = FALSE;
     p->immortal = FALSE;
+    p->secondary = FALSE;
     p->aggressive = FALSE;
     p->visible = TRUE;
     p->actor = actor_create();
@@ -1317,6 +1318,26 @@ int player_is_immortal(const player_t* player)
 void player_set_immortal(player_t* player, int immortal)
 {
     player->immortal = immortal;
+}
+
+/*
+ * player_is_secondary()
+ * Is the player secondary? A secondary player plays a secondary role and
+ * interacts with items in different ways. It cannot smash item boxes, activate
+ * goal signs, etc. These differences are specified in the scripting layer.
+ */
+int player_is_secondary(const player_t* player)
+{
+    return player->secondary;
+}
+
+/*
+ * player_set_secondary()
+ * Set the secondary flag
+ */
+void player_set_secondary(player_t* player, int secondary)
+{
+    player->secondary = secondary;
 }
 
 /*

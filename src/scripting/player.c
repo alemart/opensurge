@@ -123,6 +123,8 @@ static surgescript_var_t* fun_getinvulnerable(surgescript_object_t* object, cons
 static surgescript_var_t* fun_setinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getsecondary(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setsecondary(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* animation methods */
 static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -266,6 +268,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_invulnerable", fun_setinvulnerable, 1);
     surgescript_vm_bind(vm, "Player", "get_immortal", fun_getimmortal, 0);
     surgescript_vm_bind(vm, "Player", "set_immortal", fun_setimmortal, 1);
+    surgescript_vm_bind(vm, "Player", "get_secondary", fun_getsecondary, 0);
+    surgescript_vm_bind(vm, "Player", "set_secondary", fun_setsecondary, 1);
 
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
@@ -1340,6 +1344,26 @@ surgescript_var_t* fun_setimmortal(surgescript_object_t* object, const surgescri
     if(player != NULL) {
         bool immortal = surgescript_var_get_bool(param[0]);
         player_set_immortal(player, immortal);
+    }
+    return NULL;
+}
+
+/* is the player secondary? a secondary player plays a secondary role and
+   interacts with items in different ways. It cannot smash item boxes, activate
+   goal signs, etc. These differences are specified in the scripting layer. */
+surgescript_var_t* fun_getsecondary(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_secondary(player));
+}
+
+/* set the secondary flag */
+surgescript_var_t* fun_setsecondary(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool secondary = surgescript_var_get_bool(param[0]);
+        player_set_secondary(player, secondary);
     }
     return NULL;
 }
