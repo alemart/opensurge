@@ -13,6 +13,7 @@ using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Collisions.CollisionBox;
+using SurgeEngine.Events.Event;
 
 //
 // The following powerups use the "Item Box" object
@@ -53,7 +54,7 @@ object "Powerup Invincibility" is "entity", "basic", "powerup"
     }
 }
 
-// Enhanced speed (turbo)
+// Turbocharged speed
 object "Powerup Speed" is "entity", "basic", "powerup"
 {
     itemBox = spawn("Item Box").setAnimation(6);
@@ -277,6 +278,106 @@ object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
         lucky = Level.spawn("Lucky Bonus");
         lucky.bonus = Math.max(bonus, 0);
         lucky.player = player;
+    }
+}
+
+// Transformation
+object "Powerup Transformation" is "entity", "basic", "powerup"
+{
+    public character = "Surge"; // name of the character
+    public duration = -1; // duration of the transformation, in seconds (a negative value means forever)
+                          // suggested duration: 20 seconds
+
+    itemBox = spawn("Item Box").setAnimation(19);
+    watcher = null;
+
+    state "main"
+    {
+    }
+
+    fun onItemBoxCrushed(player)
+    {
+        originalCharacter = player.name;
+
+        if(!player.transformInto(character)) {
+            Console.print("Can't transform \"" + originalCharacter + "\" into \"" + character + "\"");
+            return;
+        }
+
+        Level.spawnEntity("Explosion", player.collider.center);
+
+        if(duration >= 0) {
+            watcher = Level.spawn("Powerup Transformation - Player Watcher")
+                     .setPlayer(player)
+                     .setCharacter(originalCharacter)
+                     .setDuration(duration);
+        }
+    }
+}
+
+// Make the player return to its original form after a transformation
+object "Powerup Transformation - Player Watcher"
+{
+    player = null;
+    duration = 0;
+    character = "";
+    sfx = Sound("samples/destroy.wav");
+
+    state "main"
+    {
+        if(player === null)
+            Application.crash(this.__name + ": unset player");
+
+        state = "watch";
+    }
+
+    state "watch"
+    {
+        if(timeout(duration))
+            state = "detransform";
+    }
+
+    state "detransform"
+    {
+        player.transformInto(character);
+        Level.spawnEntity("Explosion", player.collider.center);
+        sfx.play();
+
+        destroy();
+    }
+
+    fun setPlayer(p)
+    {
+        player = p;
+        return this;
+    }
+
+    fun setDuration(d)
+    {
+        duration = Math.max(0, d);
+        return this;
+    }
+
+    fun setCharacter(s)
+    {
+        character = String(s);
+        return this;
+    }
+}
+
+// Event Trigger
+object "Powerup Event Trigger" is "entity", "basic", "powerup"
+{
+    public onTrigger = Event();
+    itemBox = spawn("Item Box").setAnimation(20);
+
+    state "main"
+    {
+    }
+
+    fun onItemBoxCrushed(player)
+    {
+        onTrigger();
     }
 }
 
