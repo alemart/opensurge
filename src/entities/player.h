@@ -27,11 +27,8 @@
 #include "../util/v2d.h"
 #include "brick.h"
 
-/* constants */
-extern const int PLAYER_INITIAL_LIVES;       /* initial lives */
-
 /* shield types */
-enum playershield_t {
+typedef enum playershield_t {
     SH_NONE,            /* no shield */
     SH_SHIELD,          /* regular shield */
     SH_FIRESHIELD,      /* fire shield */
@@ -39,9 +36,15 @@ enum playershield_t {
     SH_WATERSHIELD,     /* water shield */
     SH_ACIDSHIELD,      /* acid shield */
     SH_WINDSHIELD       /* wind shield */
-};
+} playershield_t;
 
-/* types & structs */
+/* modes of gameplay */
+typedef enum playermode_t {
+    PM_COOPERATIVE,     /* cooperative play */
+    PM_CLASSIC          /* classic mode */
+} playermode_t;
+
+/* forward declarations */
 struct actor_t;
 struct animation_t;
 struct item_list_t;
@@ -50,10 +53,12 @@ struct physicsactor_t;
 struct obstaclemap_t;
 struct character_t;
 struct surgescript_object_t;
-typedef struct player_t player_t;
-typedef enum playershield_t playershield_t;
+
+/* constants */
+extern const int PLAYER_INITIAL_LIVES;       /* initial lives */
 
 /* player structure */
+typedef struct player_t player_t;
 struct player_t {
     /* general */
     int id;
@@ -121,6 +126,8 @@ int player_collision(const player_t *player, const struct actor_t *actor);
 int player_overlaps(const player_t *player, int x, int y, int width, int height);
 int player_senses_layer(const player_t* player, bricklayer_t layer);
 int player_transform_into(player_t *player, struct surgescript_object_t *player_object, const char *character_name);
+int player_has_focus(const player_t* player);
+void player_focus(player_t* player);
 
 void player_enter_water(player_t *player);
 void player_leave_water(player_t *player);
@@ -184,10 +191,12 @@ const char* player_sprite_name(const player_t* player);
 const char* player_companion_name(const player_t* player, int index);
 
 int player_get_collectibles();
-void player_set_collectibles(int c);
+void player_set_collectibles(int value);
 int player_get_lives();
-void player_set_lives(int l);
+void player_set_lives(int value);
 int player_get_score();
-void player_set_score(int s);
+void player_set_score(int value);
+void player_set_mode(playermode_t new_mode);
+playermode_t player_get_mode();
 
 #endif

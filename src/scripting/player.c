@@ -1504,7 +1504,7 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
             return surgescript_var_set_bool(surgescript_var_create(), false);
 
         /* success */
-        level_change_player(player);
+        player_focus(player);
         return surgescript_var_set_bool(surgescript_var_create(), true);
     }
 
@@ -1516,7 +1516,7 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
 surgescript_var_t* fun_hasfocus(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
-    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && level_player() == player);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_has_focus(player));
 }
 
 /* hlock: locks the horizontal input of the player for a few seconds */

@@ -81,9 +81,10 @@ static const float PLAYER_INVINCIBILITY_TIME = 20.0f; /* invincibility time, in 
 static const float PLAYER_DEAD_RESTART_TIME = 2.5f;   /* time to restart the level when the player is killed */
 
 /* private data */
-static int collectibles;         /* shared collectibles */
-static int lives;                /* shared lives */
-static int score;                /* shared score */
+static int collectibles = 0;                /* shared collectibles */
+static int lives = PLAYER_INITIAL_LIVES;    /* shared lives */
+static int score = 0;                       /* shared score */
+static playermode_t mode = PM_COOPERATIVE;  /* mode of gameplay */
 
 /* misc */
 static void update_shield(player_t *player);
@@ -283,12 +284,6 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
                 player_set_turbo(player, FALSE);
         }
 
-        /* am I hurt? Gotta have the focus */
-        if(player_is_getting_hit(player) || player_is_dying(player)) {
-            if(level_player() != player)
-                level_change_player(player);
-        }
-
         /* pitfalls */
         if(act->position.y >= level_height_at(act->position.x))
             player_kill(player);
@@ -310,8 +305,8 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         /* misc */
         player->on_movable_platform = FALSE;
 
-        /* the active player can't get off camera */
-        if(player == level_player()) {
+        /* the focused player can't get off camera */
+        if(player_has_focus(player)) {
             v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
             v2d_t cam_bottomright = camera_clip(level_size());
 
@@ -334,6 +329,32 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
             }
         }
 
+        /* modes of gameplay */
+        switch(mode) {
+
+            /* cooperative play */
+            case PM_COOPERATIVE: {
+                /* am I hurt? Gotta have the focus */
+                if(player_is_getting_hit(player) || player_is_dying(player)) {
+                    if(!player_has_focus(player))
+                        player_focus(player);
+                }
+                break;
+            }
+
+            /* classic mode */
+            case PM_CLASSIC: {
+                /* make non-focused players invulnerable, immortal and secondary.
+                   we continuously update the flags (both on and off) because we
+                   take character switching into account. */
+                int has_focus = player_has_focus(player);
+                player_set_invulnerable(player, !has_focus);
+                player_set_immortal(player, !has_focus);
+                player_set_secondary(player, !has_focus);
+                break;
+            }
+
+        }
     }
     /* else if player is frozen, blinking and invisible ...? */
 
@@ -950,13 +971,37 @@ int player_transform_into(player_t *player, surgescript_object_t *player_object,
 }
 
 /*
+ * player_has_focus()
+ * Does the specified player have the focus?
+ */
+int player_has_focus(const player_t* player)
+{
+    return level_player() == player;
+}
+
+/*
+ * player_focus()
+ * Give focus to a player
+ */
+void player_focus(player_t* player)
+{
+    if(!player_has_focus(player))
+        level_change_player(player);
+}
+
+/*
  * player_is_attacking()
  * Returns TRUE if a given player is attacking;
  * FALSE otherwise
  */
 int player_is_attacking(const player_t *player)
 {
-    return !player_is_dying(player) && (player->aggressive || player->invincible || physicsactor_get_state(player->pa) == PAS_JUMPING || physicsactor_get_state(player->pa) == PAS_ROLLING || physicsactor_get_state(player->pa) == PAS_CHARGING);
+    if(!player_is_dying(player)) {
+        physicsactorstate_t state = physicsactor_get_state(player->pa);
+        return player->aggressive || player->invincible || state == PAS_JUMPING || state == PAS_ROLLING || state == PAS_CHARGING;
+    }
+
+    return FALSE;
 }
 
 
@@ -993,7 +1038,8 @@ int player_is_getting_hit(const player_t *player)
  */
 int player_is_dying(const player_t *player)
 {
-    return physicsactor_get_state(player->pa) == PAS_DEAD || physicsactor_get_state(player->pa) == PAS_DROWNED;
+    physicsactorstate_t state = physicsactor_get_state(player->pa);
+    return state == PAS_DEAD || state == PAS_DROWNED;
 }
 
 
@@ -1366,77 +1412,6 @@ void player_set_blinking(player_t* player, int blink)
     }
 }
 
-
-
-
-
-
-
-/*
- * player_get_collectibles()
- * Returns the amount of collectibles
- * the player has got so far
- */
-int player_get_collectibles()
-{
-    return collectibles;
-}
-
-
-
-/*
- * player_set_collectibles()
- * Sets a new amount of collectibles
- */
-void player_set_collectibles(int c)
-{
-    collectibles = max(c, 0);
-}
-
-
-
-/*
- * player_get_lives()
- * How many lives does the player have?
- */
-int player_get_lives()
-{
-    return lives;
-}
-
-
-
-/*
- * player_set_lives()
- * Sets the number of lives
- */
-void player_set_lives(int l)
-{
-    lives = max(0, l);
-}
-
-
-
-/*
- * player_get_score()
- * Returns the score
- */
-int player_get_score()
-{
-    return score;
-}
-
-
-
-/*
- * player_set_score()
- * Sets the score
- */
-void player_set_score(int s)
-{
-    score = max(0, s);
-}
-
 /*
  * player_id()
  * A number that uniquely identifies the player in the Level
@@ -1483,7 +1458,6 @@ const char* player_sprite_name(const player_t* player)
     return player->character->animation.sprite_name;
 }
 
-
 /*
  * player_companion_name()
  * The name of the i-th companion object, or NULL if there is no such companion
@@ -1496,6 +1470,86 @@ const char* player_companion_name(const player_t* player, int index)
     else
         return NULL;
 }
+
+
+
+
+
+/*
+ * player_get_collectibles()
+ * Returns the amount of collectibles
+ * the player has got so far
+ */
+int player_get_collectibles()
+{
+    return collectibles;
+}
+
+/*
+ * player_set_collectibles()
+ * Sets a new amount of collectibles
+ */
+void player_set_collectibles(int value)
+{
+    collectibles = max(0, value);
+}
+
+/*
+ * player_get_lives()
+ * How many lives does the player have?
+ */
+int player_get_lives()
+{
+    return lives;
+}
+
+/*
+ * player_set_lives()
+ * Sets the number of lives
+ */
+void player_set_lives(int value)
+{
+    lives = max(0, value);
+}
+
+/*
+ * player_get_score()
+ * Returns the score
+ */
+int player_get_score()
+{
+    return score;
+}
+
+/*
+ * player_set_score()
+ * Sets the score
+ */
+void player_set_score(int value)
+{
+    score = max(0, value);
+}
+
+/*
+ * player_set_mode()
+ * Set the mode of gameplay
+ */
+void player_set_mode(playermode_t new_mode)
+{
+    mode = new_mode;
+}
+
+/*
+ * player_get_mode()
+ * Get the current mode of gameplay
+ */
+playermode_t player_get_mode()
+{
+    return mode;
+}
+
+
+
 
 
 /* private functions */
@@ -1768,8 +1822,6 @@ void animate_invincibility_stars(player_t* player)
         actor_change_animation_speed_factor(player->star[i], 1.0f + i * 0.25f);
     }
 }
-
-
 
 /* given two angles in [0, 2pi], return their difference */
 float delta_angle(float alpha, float beta)
