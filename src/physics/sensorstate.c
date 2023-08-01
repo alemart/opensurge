@@ -45,6 +45,7 @@ static const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstac
 static void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2);
 
+/* rotation methods */
 static const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter);
 static void render_floormode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos_floormode(v2d_t actor_position, int x1, int y1, int x2, int y2);
@@ -58,48 +59,56 @@ static const obstacle_t* check_leftwallmode(v2d_t actor_position, const obstacle
 static void render_leftwallmode(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos_leftwallmode(v2d_t actor_position, int x1, int y1, int x2, int y2);
 
+/* stateless states :P */
+static sensorstate_t floormode = {
+    check_floormode,
+    render_floormode,
+    worldpos_floormode
+};
+
+static sensorstate_t rightwallmode = {
+    check_rightwallmode,
+    render_rightwallmode,
+    worldpos_rightwallmode
+};
+
+static sensorstate_t ceilingmode = {
+    check_ceilingmode,
+    render_ceilingmode,
+    worldpos_ceilingmode
+};
+
+static sensorstate_t leftwallmode = {
+    check_leftwallmode,
+    render_leftwallmode,
+    worldpos_leftwallmode
+};
+
 
 
 /* public methods */
 sensorstate_t* sensorstate_create_floormode()
 {
-    sensorstate_t *s = mallocx(sizeof *s);
-    s->check = check_floormode;
-    s->render = render_floormode;
-    s->worldpos = worldpos_floormode;
-    return s;
+    return &floormode;
 }
 
 sensorstate_t* sensorstate_create_rightwallmode()
 {
-    sensorstate_t *s = mallocx(sizeof *s);
-    s->check = check_rightwallmode;
-    s->render = render_rightwallmode;
-    s->worldpos = worldpos_rightwallmode;
-    return s;
+    return &rightwallmode;
 }
 
 sensorstate_t* sensorstate_create_ceilingmode()
 {
-    sensorstate_t *s = mallocx(sizeof *s);
-    s->check = check_ceilingmode;
-    s->render = render_ceilingmode;
-    s->worldpos = worldpos_ceilingmode;
-    return s;
+    return &ceilingmode;
 }
 
 sensorstate_t* sensorstate_create_leftwallmode()
 {
-    sensorstate_t *s = mallocx(sizeof *s);
-    s->check = check_leftwallmode;
-    s->render = render_leftwallmode;
-    s->worldpos = worldpos_leftwallmode;
-    return s;
+    return &leftwallmode;
 }
 
 sensorstate_t* sensorstate_destroy(sensorstate_t *sensorstate)
 {
-    free(sensorstate);
     return NULL;
 }
 
@@ -137,15 +146,18 @@ const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstaclemap, 
 
 void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color)
 {
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(camera_position, half_screen);
+
     x1 += (int)actor_position.x;
     y1 += (int)actor_position.y;
     x2 += (int)actor_position.x;
     y2 += (int)actor_position.y;
 
-    x1 -= (int)(camera_position.x - VIDEO_SCREEN_W/2);
-    y1 -= (int)(camera_position.y - VIDEO_SCREEN_H/2);
-    x2 -= (int)(camera_position.x - VIDEO_SCREEN_W/2);
-    y2 -= (int)(camera_position.y - VIDEO_SCREEN_H/2);
+    x1 -= (int)topleft.x;
+    y1 -= (int)topleft.y;
+    x2 -= (int)topleft.x;
+    y2 -= (int)topleft.y;
 
     image_rectfill(min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2), color);
     if(x1 != x2 || y1 != y2)
@@ -162,8 +174,11 @@ swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2)
     };
 }
 
+
+/* rotation methods */
 const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
+    /* clockwise rotation of 0 degrees. pivot = (0,0) */
     return check(actor_position, obstaclemap, x1, y1, x2, y2, MM_FLOOR, layer_filter);
 }
 
@@ -179,6 +194,7 @@ swpos_t worldpos_floormode(v2d_t actor_position, int x1, int y1, int x2, int y2)
 
 const obstacle_t* check_rightwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
+    /* clockwise rotation of 90 degrees. pivot = (0,0) */
     return check(actor_position, obstaclemap, y1, -x1, y2, -x2, MM_RIGHTWALL, layer_filter);
 }
 
@@ -194,6 +210,7 @@ swpos_t worldpos_rightwallmode(v2d_t actor_position, int x1, int y1, int x2, int
 
 const obstacle_t* check_ceilingmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
+    /* clockwise rotation of 180 degrees. pivot = (0,0) */
     return check(actor_position, obstaclemap, -x1, -y1, -x2, -y2, MM_CEILING, layer_filter);
 }
 
@@ -209,6 +226,7 @@ swpos_t worldpos_ceilingmode(v2d_t actor_position, int x1, int y1, int x2, int y
 
 const obstacle_t* check_leftwallmode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter)
 {
+    /* clockwise rotation of 270 degrees. pivot = (0,0) */
     return check(actor_position, obstaclemap, -y1, x1, -y2, x2, MM_LEFTWALL, layer_filter);
 }
 
