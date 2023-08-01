@@ -747,34 +747,67 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 /* call UPDATE_SENSORS whenever you update pa->position or pa->angle */
 #define UPDATE_SENSORS() \
     do { \
+        /* read sensors */ \
         at_A = sensor_check(sensor_A(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
         at_B = sensor_check(sensor_B(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
         at_C = sensor_check(sensor_C(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
         at_D = sensor_check(sensor_D(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
         at_M = sensor_check(sensor_M(pa), pa->position, pa->movmode, pa->layer, obstaclemap); \
-        if(at_A != NULL && !obstacle_is_solid(at_A)) { \
-            int x, y; \
-            sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
-            if(obstacle_got_collision(at_A, x, y, x, y) && pa->midair) { \
-                int ygnd = obstacle_ground_position(at_A, x, y, GD_DOWN); \
-                at_A = (pa->ysp >= 0.0f && y < ygnd + CLOUD_OFFSET) ? at_A : NULL; \
-            } \
-            else if(pa->midair || at_A == at_M) \
-                at_A = NULL; \
-        } \
-        if(at_B != NULL && !obstacle_is_solid(at_B)) { \
-            int x, y; \
-            sensor_worldpos(sensor_B(pa), pa->position, pa->movmode, NULL, NULL, &x, &y); \
-            if(obstacle_got_collision(at_B, x, y, x, y) && pa->midair) { \
-                int ygnd = obstacle_ground_position(at_B, x, y, GD_DOWN); \
-                at_B = (pa->ysp >= 0.0f && y < ygnd + CLOUD_OFFSET) ? at_B : NULL; \
-            } \
-            else if(pa->midair || at_B == at_M) \
-                at_B = NULL; \
-        } \
+        \
+        /* C, D, M: ignore clouds */ \
         at_C = (at_C != NULL && obstacle_is_solid(at_C)) ? at_C : NULL; \
         at_D = (at_D != NULL && obstacle_is_solid(at_D)) ? at_D : NULL; \
         at_M = (at_M != NULL && obstacle_is_solid(at_M)) ? at_M : NULL; \
+        \
+        /* A, B: ignore clouds when moving upwards */ \
+        if(pa->ysp < 0.0f) { \
+            v2d_t vel = v2d_normalize(v2d_new(pa->xsp, -pa->ysp)); \
+            if(vel.y > 0.707) { \
+                at_A = (at_A != NULL && obstacle_is_solid(at_A)) ? at_A : NULL; \
+                at_B = (at_B != NULL && obstacle_is_solid(at_B)) ? at_B : NULL; \
+            } \
+        } \
+        \
+        /* A: ignore if it's a cloud and if the tail of the sensor is not touching it */ \
+        if(at_A != NULL && !obstacle_is_solid(at_A)) { \
+            point2d_t tail = sensor_tail(sensor_A(pa), pa->position, pa->movmode); \
+            if(!obstacle_point_collision(at_A, tail)) \
+                at_A = NULL; \
+            else if(pa->midair && pa->movmode == MM_FLOOR) { \
+                int ygnd = obstacle_ground_position(at_A, tail.x, tail.y, GD_DOWN); \
+                at_A = (tail.y < ygnd + CLOUD_OFFSET) ? at_A : NULL; \
+            } \
+        } \
+        \
+        /* B: ignore if it's a cloud and if the tail of the sensor is not touching it */ \
+        if(at_B != NULL && !obstacle_is_solid(at_B)) { \
+            point2d_t tail = sensor_tail(sensor_B(pa), pa->position, pa->movmode); \
+            if(!obstacle_point_collision(at_B, tail)) \
+                at_B = NULL; \
+            else if(pa->midair && pa->movmode == MM_FLOOR) { \
+                int ygnd = obstacle_ground_position(at_B, tail.x, tail.y, GD_DOWN); \
+                at_B = (tail.y < ygnd + CLOUD_OFFSET) ? at_B : NULL; \
+            } \
+        } \
+        \
+        /* A, B: special logic when both are clouds and A != B */ \
+        if(at_A != NULL && at_B != NULL && at_A != at_B && !obstacle_is_solid(at_A) && !obstacle_is_solid(at_B)) { \
+            if(pa->movmode == MM_FLOOR) { \
+                int x2_a, y2_a, x2_b, y2_b, gnd_a, gnd_b; \
+                sensor_worldpos(sensor_A(pa), pa->position, pa->movmode, NULL, NULL, &x2_a, &y2_a); \
+                sensor_worldpos(sensor_B(pa), pa->position, pa->movmode, NULL, NULL, &x2_b, &y2_b); \
+                gnd_a = obstacle_ground_position(at_A, x2_a, y2_a, GD_DOWN); \
+                gnd_b = obstacle_ground_position(at_B, x2_b, y2_b, GD_DOWN); \
+                if(abs(gnd_a - gnd_b) > 8) { \
+                    if(gnd_a < gnd_b) \
+                        at_A = NULL; \
+                    else \
+                        at_B = NULL; \
+                } \
+            } \
+        } \
+        \
+        /* set flags */ \
         pa->midair = (at_A == NULL) && (at_B == NULL); \
         pa->touching_ceiling = (at_C != NULL) || (at_D != NULL); \
     } while(0)
@@ -1131,7 +1164,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         /* you're way too fast... */
         pa->gsp = clip(pa->gsp, -2.5f * pa->initialtopspeed, 2.5f * pa->initialtopspeed);
         /* topspeed is halved when underwater. This creates the quirk of significantly reducing speed
-           when landing on the ground with high speed if underwater */
+           when landing on the ground with high speed if underwater; so we use initialtopspeed instead */
 
         /* speed */
         pa->xsp = pa->gsp * COS(pa->angle);
@@ -1554,6 +1587,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     /* reset the angle & update the midair_timer */
     if(pa->midair) {
         pa->midair_timer += dt;
+        pa->gsp = 0.0f; /* reset gsp, otherwise we may restore it when landing on the ground */
         FORCE_ANGLE(0x0);
     }
     else

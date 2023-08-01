@@ -471,11 +471,12 @@ bool find_partition_limits(const obstaclemap_t* obstaclemap, int x1, int x2, int
     return true;
 }
 
-/* considering that a and b overlap, which one should we pick? */
+/* considering that the sensor collides with both a and b, which one should we pick? */
 /* we know that x1 <= x2 and y1 <= y2; these values already come rotated according to the movmode */
 const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, int x1, int y1, int x2, int y2, movmode_t mm)
 {
     int x, y, ha, hb;
+    bool sa, sb;
 
     /* NULL pointers should be handled */
     if(a == NULL)
@@ -483,72 +484,80 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
     if(b == NULL)
         return a;
 
-    /* solid obstacles are more preferable than one-way platforms */
-    if(!obstacle_is_solid(a) && obstacle_is_solid(b))
-        return b;
-    if(!obstacle_is_solid(b) && obstacle_is_solid(a))
-        return a;
+    /* check the solidity of the obstacles */
+    sa = obstacle_is_solid(a);
+    sb = obstacle_is_solid(b);
 
-    #if 1
-    /* one-way platforms only: get the shortest obstacle */
-    if(!obstacle_is_solid(a) && !obstacle_is_solid(b)) {
+    /* if both obstacles are solid, get the tallest obstacle */
+    if(sa && sb) {
         switch(mm) {
             case MM_FLOOR:
-                ha = obstacle_ground_position(a, x2, y2, GD_DOWN);
-                hb = obstacle_ground_position(b, x2, y2, GD_DOWN);
-                return ha >= hb ? a : b;
+                x = x2; /* x2 == x1 */
+                y = y2; /* y2 == max(y1, y2) */
+                ha = obstacle_ground_position(a, x, y, GD_DOWN);
+                hb = obstacle_ground_position(b, x, y, GD_DOWN);
+                return ha < hb ? a : b;
 
             case MM_RIGHTWALL:
-                ha = obstacle_ground_position(a, x2, y2, GD_RIGHT);
-                hb = obstacle_ground_position(b, x2, y2, GD_RIGHT);
-                return ha >= hb ? a : b;
+                x = x2; /* x2 == max(x1, x2) */
+                y = y1; /* y1 == y2 */
+                ha = obstacle_ground_position(a, x, y, GD_RIGHT);
+                hb = obstacle_ground_position(b, x, y, GD_RIGHT);
+                return ha < hb ? a : b;
 
             case MM_CEILING:
-                ha = obstacle_ground_position(a, x2, y1, GD_UP);
-                hb = obstacle_ground_position(b, x2, y1, GD_UP);
-                return ha < hb ? a : b;
-                
+                x = x2; /* x2 == x1 */
+                y = y1; /* y1 == min(y1, y2) */
+                ha = obstacle_ground_position(a, x, y, GD_UP);
+                hb = obstacle_ground_position(b, x, y, GD_UP);
+                return ha >= hb ? a : b;
+
             case MM_LEFTWALL:
-                ha = obstacle_ground_position(a, x1, y2, GD_LEFT);
-                hb = obstacle_ground_position(b, x1, y2, GD_LEFT);
-                return ha < hb ? a : b;
+                x = x1; /* x1 == min(x1, x2) */
+                y = y1; /* y1 == y2 */
+                ha = obstacle_ground_position(a, x, y, GD_LEFT);
+                hb = obstacle_ground_position(b, x, y, GD_LEFT);
+                return ha >= hb ? a : b;
         }
     }
-    #endif
 
-    /* get the tallest obstacle */
-    switch(mm) {
-        case MM_FLOOR:
-            x = x2; /* x1 == x2 */
-            y = y2; /* y2 == max(y1, y2) */
-            ha = obstacle_ground_position(a, x, y, GD_DOWN);
-            hb = obstacle_ground_position(b, x, y, GD_DOWN);
-            return ha < hb ? a : b;
+    /* if both obstacles are one-way platforms, get the one with the shortest
+       distance to the tail (x,y) of the sensor. The tail is likely in contact
+       with an obstacle - in this case there won't be a discontinuity. */
+    if(!sa && !sb) {
+        switch(mm) {
+            case MM_FLOOR:
+                x = x2; /* x2 == x1 */
+                y = y2; /* y2 == max(y1, y2) */
+                ha = obstacle_ground_position(a, x, y, GD_DOWN);
+                hb = obstacle_ground_position(b, x, y, GD_DOWN);
+                return abs(ha - y) < abs(hb - y) ? a : b;
 
-        case MM_LEFTWALL:
-            x = x1; /* x1 == min(x1, x2) */
-            y = y2; /* y1 == y2 */
-            ha = obstacle_ground_position(a, x, y, GD_LEFT);
-            hb = obstacle_ground_position(b, x, y, GD_LEFT);
-            return ha >= hb ? a : b;
+            case MM_RIGHTWALL:
+                x = x2; /* x2 == max(x1, x2) */
+                y = y1; /* y1 == y2 */
+                ha = obstacle_ground_position(a, x, y, GD_RIGHT);
+                hb = obstacle_ground_position(b, x, y, GD_RIGHT);
+                return abs(ha - y) < abs(hb - y) ? a : b;
 
-        case MM_CEILING:
-            x = x2; /* x1 == x2 */
-            y = y1; /* y1 == min(y1, y2) */
-            ha = obstacle_ground_position(a, x, y, GD_UP);
-            hb = obstacle_ground_position(b, x, y, GD_UP);
-            return ha >= hb ? a : b;
+            case MM_CEILING:
+                x = x1; /* x1 == x2 */
+                y = y1; /* y1 = min(y1, y2) */
+                ha = obstacle_ground_position(a, x, y, GD_UP);
+                hb = obstacle_ground_position(b, x, y, GD_UP);
+                return abs(ha - y) < abs(hb - y) ? a : b;
 
-        case MM_RIGHTWALL:
-            x = x2; /* x2 == max(x1, x2) */
-            y = y2; /* y1 == y2 */
-            ha = obstacle_ground_position(a, x, y, GD_RIGHT);
-            hb = obstacle_ground_position(b, x, y, GD_RIGHT);
-            return ha < hb ? a : b;
+            case MM_LEFTWALL:
+                x = x1; /* x1 = min(x1, x2) */
+                y = y2; /* y2 == y1 */
+                ha = obstacle_ground_position(a, x, y, GD_LEFT);
+                hb = obstacle_ground_position(b, x, y, GD_LEFT);
+                return abs(ha - y) < abs(hb - y) ? a : b;
+        }
     }
 
-    /* this shouldn't happen */
-    return a;
+    /* solid obstacles have preference over one-way platforms */
+    return sa ? a : b;
 }
 
 /* whether or not the given obstacle should be ignored, given a layer filter */
