@@ -226,3 +226,9 @@ bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, 
     /* no collision */
     return false;
 }
+
+/* check for collision with a point in world space */
+bool obstacle_point_collision(const obstacle_t *obstacle, point2d_t point)
+{
+    return obstacle_got_collision(obstacle, point.x, point.y, point.x, point.y);
+}
