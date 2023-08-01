@@ -1915,7 +1915,6 @@ void set_default_multipliers(physicsactor_t* pa, const character_t* character)
     physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * character->multiplier.jmp);
     physicsactor_set_chrg(pa, physicsactor_get_chrg(pa) * character->multiplier.chrg);
     physicsactor_set_jmprel(pa, physicsactor_get_jmprel(pa) * character->multiplier.jmp);
-    physicsactor_set_initialtopspeed(pa, physicsactor_get_topspeed(pa) * character->multiplier.topspeed);
     physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * character->multiplier.topspeed);
     physicsactor_set_rolluphillslp(pa, physicsactor_get_rolluphillslp(pa) * character->multiplier.slp);
     physicsactor_set_rolldownhillslp(pa, physicsactor_get_rolldownhillslp(pa) * character->multiplier.slp);

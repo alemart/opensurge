@@ -41,7 +41,7 @@ struct physicsactor_t
     float acc; /* acceleration */
     float dec; /* deceleration */
     float frc; /* friction */
-    float initialtopspeed; /* initial top speed */
+    float capspeed; /* cap speed */
     float topspeed; /* top speed */
     float topyspeed; /* top y speed */
     float air; /* air acceleration */
@@ -329,7 +329,7 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
     pa->acc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
     pa->dec =                 (32.0f/64.0f) * fpsmul * fpsmul ;
     pa->frc =                  (3.0f/64.0f) * fpsmul * fpsmul ;
-    pa->initialtopspeed =       6.0f        * fpsmul * 1.0f   ;
+    pa->capspeed =             16.0f        * fpsmul * 1.0f   ;
     pa->topspeed =              6.0f        * fpsmul * 1.0f   ;
     pa->topyspeed =             12.0f       * fpsmul * 1.0f   ;
     pa->air =                  (6.0f/64.0f) * fpsmul * fpsmul ;
@@ -375,7 +375,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         const float thr = 60.0f;
         input_reset(pa->input);
 
-        pa->gsp = clip(pa->gsp, -1.8f * pa->initialtopspeed, 1.8f * pa->initialtopspeed);
+        pa->gsp = clip(pa->gsp, -0.67f * pa->capspeed, 0.67f * pa->capspeed);
         if(pa->state == PAS_ROLLING)
             pa->state = PAS_BRAKING;
 
@@ -611,7 +611,6 @@ GENERATE_GETTER_AND_SETTER_OF(gsp)
 GENERATE_GETTER_AND_SETTER_OF(acc)
 GENERATE_GETTER_AND_SETTER_OF(dec)
 GENERATE_GETTER_AND_SETTER_OF(frc)
-GENERATE_GETTER_AND_SETTER_OF(initialtopspeed)
 GENERATE_GETTER_AND_SETTER_OF(topspeed)
 GENERATE_GETTER_AND_SETTER_OF(topyspeed)
 GENERATE_GETTER_AND_SETTER_OF(air)
@@ -946,7 +945,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt)
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M;
-    int was_midair;
+    bool was_midair;
 
     UPDATE_SENSORS();
 
@@ -1162,9 +1161,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(!pa->midair) {
 
         /* you're way too fast... */
-        pa->gsp = clip(pa->gsp, -2.5f * pa->initialtopspeed, 2.5f * pa->initialtopspeed);
-        /* topspeed is halved when underwater. This creates the quirk of significantly reducing speed
-           when landing on the ground with high speed if underwater; so we use initialtopspeed instead */
+        pa->gsp = clip(pa->gsp, -pa->capspeed, pa->capspeed);
 
         /* speed */
         pa->xsp = pa->gsp * COS(pa->angle);
@@ -1587,8 +1584,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     /* reset the angle & update the midair_timer */
     if(pa->midair) {
         pa->midair_timer += dt;
-        pa->gsp = 0.0f; /* reset gsp, otherwise we may restore it when landing on the ground */
         FORCE_ANGLE(0x0);
+
+        /* reset gsp, otherwise we may restore it when landing on the ground */
+        if(pa->ysp < 0.0f)
+            pa->gsp = 0.0f;
     }
     else
         pa->midair_timer = 0.0f;
