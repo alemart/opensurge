@@ -22,6 +22,7 @@
 #define _SENSOR_H
 
 #include "../util/v2d.h"
+#include "../util/point2d.h"
 #include "../core/color.h"
 
 /*
@@ -41,14 +42,18 @@ sensor_t* sensor_create_horizontal(int y, int x1, int x2, color_t color); /* fac
 sensor_t* sensor_create_vertical(int x, int y1, int y2, color_t color); /* factory method: new vertical sensor */
 sensor_t* sensor_destroy(sensor_t *sensor);
 
-/* public methods */
-const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, enum obstaclelayer_t layer_filter, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */
-void sensor_render(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, v2d_t camera_position);
-void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int *x1, int *y1, int *x2, int *y2);
+/* non-rotation-based methods */
 int sensor_get_x1(const sensor_t *sensor);
 int sensor_get_y1(const sensor_t *sensor);
 int sensor_get_x2(const sensor_t *sensor);
 int sensor_get_y2(const sensor_t *sensor);
 color_t sensor_get_color(const sensor_t *sensor);
+
+/* rotation-based methods */
+const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, enum obstaclelayer_t layer_filter, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */
+void sensor_render(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, v2d_t camera_position);
+void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int *x1, int *y1, int *x2, int *y2);
+point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm);
+point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm);
 
 #endif

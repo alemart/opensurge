@@ -116,6 +116,20 @@ void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, movmode_t mm,
     if(y2) *y2 = yb;
 }
 
+point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm)
+{
+    point2d_t p;
+    sensor_worldpos(sensor, actor_position, mm, &p.x, &p.y, NULL, NULL);
+    return p;
+}
+
+point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm)
+{
+    point2d_t p;
+    sensor_worldpos(sensor, actor_position, mm, NULL, NULL, &p.x, &p.y);
+    return p;
+}
+
 int sensor_get_x1(const sensor_t *sensor)
 {
     return sensor->x1;
