@@ -30,6 +30,9 @@ typedef struct point2d_t {
 /* Constructor */
 #define point2d_new(x, y) ((point2d_t){ (x), (y) })
 
+/* Convert from v2d_t */
+#define point2d_from_v2d(v) point2d_new((v).x, (v).y) /* truncate */
+
 /* Equality test */
 #define point2d_equals(p1, p2) ( \
     (p1).x == (p2).x && \
