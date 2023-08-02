@@ -21,6 +21,7 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
 
+#include <stdbool.h>
 #include "../util/v2d.h"
 #include "../util/point2d.h"
 #include "../core/color.h"
@@ -48,6 +49,8 @@ int sensor_get_y1(const sensor_t *sensor);
 int sensor_get_x2(const sensor_t *sensor);
 int sensor_get_y2(const sensor_t *sensor);
 color_t sensor_get_color(const sensor_t *sensor);
+bool sensor_is_enabled(const sensor_t* sensor);
+void sensor_set_enabled(sensor_t* sensor, bool enabled);
 
 /* rotation-based methods */
 const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, enum obstaclelayer_t layer_filter, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */

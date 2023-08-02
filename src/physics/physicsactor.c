@@ -1813,6 +1813,12 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
     sensor_t* m = sensor_M(pa);
     sensor_t* n = sensor_N(pa);
 
+    /* disable sensors for efficiency */
+    sensor_set_enabled(c, pa->midair);
+    sensor_set_enabled(d, pa->midair);
+    sensor_set_enabled(m, pa->midair || pa->gsp < 0.0f);
+    sensor_set_enabled(n, pa->midair || pa->gsp > 0.0f);
+
     /* read sensors */
     *at_A = sensor_check(a, pa->position, pa->movmode, pa->layer, obstaclemap);
     *at_B = sensor_check(b, pa->position, pa->movmode, pa->layer, obstaclemap);

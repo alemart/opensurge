@@ -44,6 +44,7 @@ struct sensorstate_t
 static const obstacle_t* check(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, movmode_t mm, obstaclelayer_t layer_filter);
 static void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2, int y2, color_t color);
 static swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2);
+static color_t make_inverse_color(color_t color);
 
 /* rotation methods */
 static const obstacle_t* check_floormode(v2d_t actor_position, const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter);
@@ -161,7 +162,7 @@ void render(v2d_t actor_position, v2d_t camera_position, int x1, int y1, int x2,
 
     image_rectfill(min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2), color);
     if(x1 != x2 || y1 != y2)
-        image_rectfill(x2, y2, x2, y2, color_rgb(255, 192, 0)); /* render the tail (x2,y2) differently */
+        image_rectfill(x2, y2, x2, y2, make_inverse_color(color)); /* render the tail (x2,y2) differently */
 }
 
 swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2)
@@ -172,6 +173,13 @@ swpos_t worldpos(v2d_t actor_position, int x1, int y1, int x2, int y2)
         .x2 = x2 + (int)actor_position.x,
         .y2 = y2 + (int)actor_position.y
     };
+}
+
+color_t make_inverse_color(color_t color)
+{
+    uint8_t r, g, b, a;
+    color_unmap(color, &r, &g, &b, &a);
+    return color_rgba(255 - r, 255 - g, 255 - b, a);
 }
 
 
