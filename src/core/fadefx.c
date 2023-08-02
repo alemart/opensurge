@@ -72,7 +72,7 @@ void fadefx_update()
         alpha = clip(alpha, 0, 255);
         alpha = (type == FADEFX_IN) ? (255 - alpha) : alpha;
         color_unmap(fade_color, &r, &g, &b, NULL);
-        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgba(r, g, b, alpha));
+        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_premul_rgba(r, g, b, alpha));
         
         /* the fade effect is over */
         if(just_ended) {

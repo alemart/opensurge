@@ -36,6 +36,7 @@ color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
  * color_rgba()
  * Generates a color from its RGBA components
  * 0 <= r, g, b, a <= 255
+ * Note: color_premul_rgba() may be preferable over this
  */
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
@@ -62,6 +63,7 @@ color_t color_premul_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
  * color_hex()
  * Converts a 3, 6 or 8-character RGB[A] hex string to a color
  * Example: "fff" becomes white; "ff8800" becomes orange
+ * Note: this will return a color with premultiplied alpha
  */
 color_t color_hex(const char* hex_string)
 {
@@ -93,7 +95,7 @@ color_t color_hex(const char* hex_string)
     }
 
     /* done! */
-    return color_rgba(r, g, b, a);
+    return color_premul_rgba(r, g, b, a);
 }
 
 /*

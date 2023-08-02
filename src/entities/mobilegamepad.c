@@ -419,7 +419,7 @@ void mobilegamepad_render()
         al_get_mouse_state(&mouse);
 
         float r = video_get_window_size().x * 0.01f;
-        image_ellipsefill(mouse.x, mouse.y, r, r, color_rgba(255, 255, 0, 64));
+        image_ellipsefill(mouse.x, mouse.y, r, r, color_premul_rgba(255, 255, 0, 192));
 
     }
 }

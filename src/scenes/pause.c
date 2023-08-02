@@ -260,7 +260,7 @@ static const char* DRAG_HANDLE_SPRITE_NAME = "Pause Menu - Drag Handle";
 static const int DRAG_HANDLE_ANIMATION_NUMBER = 0;
 static const float DRAG_HANDLE_FADE_TIME = 0.125f; /* in seconds */
 
-#define OVERLAY_COLOR color_rgba(0, 0, 0, 192)
+#define OVERLAY_COLOR color_premul_rgba(0, 0, 0, 192)
 static enum {
     OVERLAY_CLOSING,    /* move down; not dragging */
     OVERLAY_DRAGGING,   /* dragging the handle */

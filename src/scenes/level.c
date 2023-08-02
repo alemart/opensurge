@@ -357,7 +357,7 @@ static int editor_brick_id(int index); /* the index-th valid brick - at editor_b
 
 /* editor: UI */
 #define EDITOR_UI_COLOR()              color_rgb(40, 44, 52)
-#define EDITOR_UI_COLOR_TRANS(alpha)   color_rgba(40, 44, 52, (alpha))
+#define EDITOR_UI_COLOR_TRANS(alpha)   color_premul_rgba(40, 44, 52, (alpha))
 
 /* editor: grid */
 static int editor_grid_size = 1;
