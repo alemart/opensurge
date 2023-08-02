@@ -1592,6 +1592,7 @@ void update_animation(player_t *player)
     physicsactorstate_t state = physicsactor_get_state(player->pa);
     float xsp = fabs(physicsactor_get_xsp(player->pa));
     float gsp = fabs(physicsactor_get_gsp(player->pa));
+    bool midair = physicsactor_is_midair(player->pa);
 
     switch(state) {
         case PAS_STOPPED:    CHANGE_ANIM(player, stopped);    break;
@@ -1615,10 +1616,10 @@ void update_animation(player_t *player)
     }
 
     if(state == PAS_WALKING || state == PAS_RUNNING)
-        actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, gsp));
-    else if(state == PAS_ROLLING && !physicsactor_is_midair(player->pa))
+        actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, midair ? xsp : gsp));
+    else if(state == PAS_ROLLING && !midair)
         actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
-    else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && physicsactor_is_midair(player->pa))))
+    else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && midair)))
         actor_change_animation_speed_factor(player->actor, 1.0f);
     else if(state == PAS_JUMPING && player->actor->animation_speed_factor < 1.0f)
         actor_change_animation_speed_factor(player->actor, 1.0f);
