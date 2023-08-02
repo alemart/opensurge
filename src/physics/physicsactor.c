@@ -273,24 +273,24 @@ physicsactor_t* physicsactor_create(v2d_t position)
     /* sensors */
     pa->A_normal = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
     pa->B_normal = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
-    pa->C_normal = sensor_create_vertical(-9, -24, 0, color_rgb(0,128,0));
-    pa->D_normal = sensor_create_vertical(9, -24, 0, color_rgb(128,128,0));
+    pa->C_normal = sensor_create_vertical(-9, -24, 0, color_rgb(0,255,0));
+    pa->D_normal = sensor_create_vertical(9, -24, 0, color_rgb(255,255,0));
     pa->M_normal = sensor_create_horizontal(4, -10, 0, color_rgb(255,0,0)); /* use x(sensor A) + 1 */
     pa->N_normal = sensor_create_horizontal(4, 0, 10, color_rgb(255,64,255));
     pa->U_normal = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255)); /* smash sensor */
 
     pa->A_intheair = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
     pa->B_intheair = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
-    pa->C_intheair = sensor_create_vertical(-9, -24, 0, color_rgb(0,128,0));
-    pa->D_intheair = sensor_create_vertical(9, -24, 0, color_rgb(128,128,0));
+    pa->C_intheair = sensor_create_vertical(-9, -24, 0, color_rgb(0,255,0));
+    pa->D_intheair = sensor_create_vertical(9, -24, 0, color_rgb(255,255,0));
     pa->M_intheair = sensor_create_horizontal(0, -11, 0, color_rgb(255,0,0)); /* use x(sensor M_normal) + 1 */
     pa->N_intheair = sensor_create_horizontal(0, 0, 11, color_rgb(255,64,255));
     pa->U_intheair = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
 
     pa->A_jumproll = sensor_create_vertical(-5, 0, 19, color_rgb(0,255,0));
     pa->B_jumproll = sensor_create_vertical(5, 0, 19, color_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-5, -10, 0, color_rgb(0,128,0));
-    pa->D_jumproll = sensor_create_vertical(5, -10, 0, color_rgb(128,128,0));
+    pa->C_jumproll = sensor_create_vertical(-5, -10, 0, color_rgb(0,255,0));
+    pa->D_jumproll = sensor_create_vertical(5, -10, 0, color_rgb(255,255,0));
     pa->M_jumproll = sensor_create_horizontal(0, -11, 0, color_rgb(255,0,0));
     pa->N_jumproll = sensor_create_horizontal(0, 0, 11, color_rgb(255,64,255));
     pa->U_jumproll = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
@@ -1814,10 +1814,22 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
     sensor_t* n = sensor_N(pa);
 
     /* disable sensors for efficiency */
-    sensor_set_enabled(c, pa->midair);
-    sensor_set_enabled(d, pa->midair);
-    sensor_set_enabled(m, pa->midair || pa->gsp < 0.0f);
-    sensor_set_enabled(n, pa->midair || pa->gsp > 0.0f);
+    if(!pa->midair) {
+        sensor_set_enabled(a, true);
+        sensor_set_enabled(b, true);
+        sensor_set_enabled(c, false);
+        sensor_set_enabled(d, false);
+        sensor_set_enabled(m, pa->gsp < 0.0f);
+        sensor_set_enabled(n, pa->gsp > 0.0f);
+    }
+    else {
+        sensor_set_enabled(a, pa->ysp >= 0.0f);
+        sensor_set_enabled(b, pa->ysp >= 0.0f);
+        sensor_set_enabled(c, pa->ysp < 0.0f);
+        sensor_set_enabled(d, pa->ysp < 0.0f);
+        sensor_set_enabled(m, pa->xsp < 0.0f);
+        sensor_set_enabled(n, pa->xsp > 0.0f);
+    }
 
     /* read sensors */
     *at_A = sensor_check(a, pa->position, pa->movmode, pa->layer, obstaclemap);
@@ -1835,8 +1847,7 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 
     /* A, B: ignore clouds when moving upwards */
     if(pa->ysp < 0.0f) {
-        v2d_t vel = v2d_normalize(v2d_new(pa->xsp, -pa->ysp));
-        if(vel.y > 0.707) {
+        if(-pa->ysp > fabsf(pa->xsp)) {
             *at_A = (*at_A != NULL && obstacle_is_solid(*at_A)) ? *at_A : NULL;
             *at_B = (*at_B != NULL && obstacle_is_solid(*at_B)) ? *at_B : NULL;
         }

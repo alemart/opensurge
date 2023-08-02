@@ -109,7 +109,7 @@ void sensor_render(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, v
     color_t color = sensor->color;
 
     if(!sensor->enabled)
-        color = make_translucent_color(color, 0.125f);
+        color = make_translucent_color(color, 0.25f);
 
     sensorstate_render(s, actor_position, camera_position, sensor->x1, sensor->y1, sensor->x2, sensor->y2, color);
 }
@@ -206,5 +206,5 @@ color_t make_translucent_color(color_t color, float alpha)
 {
     uint8_t r, g, b, a;
     color_unmap(color, &r, &g, &b, &a);
-    return color_rgba(r, g, b, (uint8_t)(255.0f * alpha));
+    return color_premul_rgba(r, g, b, (uint8_t)(255.0f * alpha));
 }
