@@ -130,8 +130,6 @@ float physicsactor_get_frc(const physicsactor_t *pa); /* friction */
 void physicsactor_set_frc(physicsactor_t *pa, float value);
 float physicsactor_get_topspeed(const physicsactor_t *pa); /* top speed */
 void physicsactor_set_topspeed(physicsactor_t *pa, float value);
-float physicsactor_get_topyspeed(const physicsactor_t *pa); /* top y speed */
-void physicsactor_set_topyspeed(physicsactor_t *pa, float value);
 float physicsactor_get_air(const physicsactor_t *pa); /* air acceleration */
 void physicsactor_set_air(physicsactor_t *pa, float value);
 float physicsactor_get_airdrag(const physicsactor_t *pa); /* air drag */
