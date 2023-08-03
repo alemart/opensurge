@@ -33,6 +33,7 @@ typedef struct obstaclemap_t obstaclemap_t;
 struct obstacle_t;
 enum obstaclelayer_t;
 enum movmode_t;
+enum grounddir_t;
 
 /* create & destroy */
 obstaclemap_t* obstaclemap_create();
@@ -47,5 +48,6 @@ void obstaclemap_clear(obstaclemap_t* obstaclemap); /* removes all obstacles fro
 bool obstaclemap_obstacle_exists(const obstaclemap_t* obstaclemap, int x, int y, enum obstaclelayer_t layer_filter); /* checks if an obstacle exists at (x,y) */
 bool obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y, enum obstaclelayer_t layer_filter); /* checks if a solid obstacle exists at (x,y) */
 const struct obstacle_t* obstaclemap_get_best_obstacle_at(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, enum movmode_t mm, enum obstaclelayer_t layer_filter); /* x2 > x1 && y2 > y1; NULL may be returned */
+const struct obstacle_t* obstaclemap_find_ground(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, enum obstaclelayer_t layer_filter, enum grounddir_t ground_direction, int* out_ground_position); /* x2 > x1 && y2 > y1; returns NULL if there is no ground */
 
 #endif

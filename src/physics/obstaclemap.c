@@ -122,6 +122,7 @@ static const int WORLD_LIMIT = LARGE_INT;
 static const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, int x1, int y1, int x2, int y2, movmode_t mm);
 static inline bool ignore_obstacle(const obstacle_t *obstacle, obstaclelayer_t layer_filter);
 static bool find_partition_limits(const obstaclemap_t* obstaclemap, int x1, int x2, int* begin, int* end);
+static const obstacle_t* pick_tallest_ground(const obstacle_t* a, const obstacle_t* b, int x1, int y1, int x2, int y2, grounddir_t ground_direction, int* out_gnd);
 
 
 
@@ -388,6 +389,36 @@ bool obstaclemap_solid_exists(const obstaclemap_t* obstaclemap, int x, int y, ob
     return false;
 }
 
+/*
+ * obstaclemap_find_ground()
+ * Find the tallest ground based on the specified parameters
+ * We expect x1 <= x2 and y1 <= y2
+ * Returns NULL if there is no ground
+ */
+const obstacle_t* obstaclemap_find_ground(const obstaclemap_t *obstaclemap, int x1, int y1, int x2, int y2, obstaclelayer_t layer_filter, grounddir_t ground_direction, int* out_ground_position)
+{
+    int begin, end;
+    const obstacle_t *tallest_ground = NULL;
+
+    /* validate the input */
+    if(x1 > x2 || y1 > y2)
+        return NULL;
+
+    /* find the limits of the partition */
+    if(!find_partition_limits(obstaclemap, x1, x2, &begin, &end))
+        return NULL;
+
+    /* find the tallest ground */
+    for(int j = begin; j < end; j++) {
+        const obstacle_t *obstacle = obstaclemap->sorted_obstacle[j];
+
+        if(!ignore_obstacle(obstacle, layer_filter) && obstacle_got_collision(obstacle, x1, y1, x2, y2))
+            tallest_ground = pick_tallest_ground(obstacle, tallest_ground, x1, y1, x2, y2, ground_direction, out_ground_position);
+    }
+
+    /* done! */
+    return tallest_ground;
+}
 
 
 
@@ -558,6 +589,43 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 
     /* solid obstacles have preference over one-way platforms */
     return sa ? a : b;
+}
+
+/* pick the tallest ground between a and b. the sensor is assumed to collide with both. we assume x1 <= x2 and y1 <= y2 */
+const obstacle_t* pick_tallest_ground(const obstacle_t* a, const obstacle_t* b, int x1, int y1, int x2, int y2, grounddir_t ground_direction, int* out_gnd)
+{
+    int x, y, ha, hb;
+
+    /* we analyze from the HEAD (x,y) of the sensor because the sensor is
+       assumed to be large and because the tail may surpass the ground */
+    switch(ground_direction) {
+        case GD_DOWN:   x = x1; y = y1; break; /* x1 == x2 and y1 == min(y1, y2) */
+        case GD_UP:     x = x2; y = y2; break; /* x2 == x1 and y2 == max(y1, y2) */
+        case GD_RIGHT:  x = x1; y = y1; break; /* x1 == min(x1, x2) and y1 == y2 */
+        case GD_LEFT:   x = x2; y = y2; break; /* x2 == max(x1, x2) and y2 == y1 */
+    }
+
+    /* check for NULLs */
+    if(a == NULL) {
+        *out_gnd = obstacle_ground_position(b, x, y, ground_direction);
+        return b;
+    }
+
+    if(b == NULL) {
+        *out_gnd = obstacle_ground_position(a, x, y, ground_direction);
+        return a;
+    }
+
+    /* which obstacle is the tallest? */
+    ha = obstacle_ground_position(a, x, y, ground_direction);
+    hb = obstacle_ground_position(b, x, y, ground_direction);
+    switch(ground_direction) {
+        case GD_DOWN:   *out_gnd = min(ha, hb); break;
+        case GD_UP:     *out_gnd = max(ha, hb); break;
+        case GD_RIGHT:  *out_gnd = min(ha, hb); break;
+        case GD_LEFT:   *out_gnd = max(ha, hb); break;
+    }
+    return *out_gnd == ha ? a : b;
 }
 
 /* whether or not the given obstacle should be ignored, given a layer filter */
