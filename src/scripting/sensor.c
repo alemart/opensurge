@@ -244,6 +244,7 @@ surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescrip
     /* changed the variable? */
     if(enabled != currently_enabled) {
         surgescript_var_set_bool(surgescript_heap_at(heap, ENABLED_ADDR), enabled);
+        sensor_set_enabled(get_sensor(object), enabled);
         update(object);
     }
 

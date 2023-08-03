@@ -25,14 +25,16 @@
 #include "physicsactor.h"
 #include "../util/util.h"
 
-/* sensor class */
+/* sensor struct */
 struct sensor_t
 {
-    /* a sensor is a segment (x1,y1)~(x2,y2) such that x1=x2 or y1=y2 */
-    int x1, y1, x2, y2; /* coordinates relative to the physics actor */
+    /* a sensor is an oriented segment [head ---> tail] such that
+       head.x == tail.x or head.y == tail.y */
+    point2d_t local_head, local_tail; /* coordinates relative to the physics actor */
     color_t color; /* color of the sensor (used for rendering) */
     bool enabled; /* is the sensor enabled? it is by default */
 
+    /* states */
     sensorstate_t *floormode;
     sensorstate_t *rightwallmode;
     sensorstate_t *ceilingmode;
@@ -40,18 +42,24 @@ struct sensor_t
 };
 
 /* private stuff ;-) */
-static sensorstate_t* get_active_state(const sensor_t *sensor, movmode_t mm);
+static sensorstate_t* select_state(const sensor_t *sensor, movmode_t mm);
 static color_t make_translucent_color(color_t color, float alpha);
 
-/* public methods */
-sensor_t* sensor_create_horizontal(int y, int x1, int x2, color_t color)
+
+/*
+ * public
+ */
+
+/*
+ * sensor_create_horizontal()
+ * Create a horizontal sensor
+ */
+sensor_t* sensor_create_horizontal(int y, int head_x, int tail_x, color_t color)
 {
     sensor_t *s = mallocx(sizeof *s);
 
-    s->x1 = min(x1,x2);
-    s->y1 = y;
-    s->x2 = max(x1,x2);
-    s->y2 = y;
+    s->local_head = point2d_new(head_x, y);
+    s->local_tail = point2d_new(tail_x, y);
     s->color = color;
     s->enabled = true;
 
@@ -63,14 +71,16 @@ sensor_t* sensor_create_horizontal(int y, int x1, int x2, color_t color)
     return s;
 }
 
-sensor_t* sensor_create_vertical(int x, int y1, int y2, color_t color)
+/*
+ * sensor_create_vertical()
+ * Create a vertical sensor
+ */
+sensor_t* sensor_create_vertical(int x, int head_y, int tail_y, color_t color)
 {
     sensor_t *s = mallocx(sizeof *s);
 
-    s->x1 = x;
-    s->y1 = min(y1,y2);
-    s->x2 = x;
-    s->y2 = max(y1,y2);
+    s->local_head = point2d_new(x, head_y);
+    s->local_tail = point2d_new(x, tail_y);
     s->color = color;
     s->enabled = true;
 
@@ -82,6 +92,10 @@ sensor_t* sensor_create_vertical(int x, int y1, int y2, color_t color)
     return s;
 }
 
+/*
+ * sensor_destroy()
+ * Destroy a sensor
+ */
 sensor_t* sensor_destroy(sensor_t *sensor)
 {
     sensorstate_destroy(sensor->floormode);
@@ -93,33 +107,141 @@ sensor_t* sensor_destroy(sensor_t *sensor)
     return NULL;
 }
 
+/*
+ * sensor_get_x1()
+ * Read local coordinate x1
+ */
+int sensor_get_x1(const sensor_t *sensor)
+{
+    return sensor->local_head.x;
+}
 
+/*
+ * sensor_get_y1()
+ * Read local coordinate y1
+ */
+int sensor_get_y1(const sensor_t *sensor)
+{
+    return sensor->local_head.y;
+}
+
+/*
+ * sensor_get_x2()
+ * Read local coordinate x2
+ */
+int sensor_get_x2(const sensor_t *sensor)
+{
+    return sensor->local_tail.x;
+}
+
+/*
+ * sensor_get_y2()
+ * Read local coordinate y2
+ */
+int sensor_get_y2(const sensor_t *sensor)
+{
+    return sensor->local_tail.y;
+}
+
+/*
+ * sensor_local_head()
+ * The position of the head of the sensor relative to the physics actor;
+ * not rotated
+ */
+point2d_t sensor_local_head(const sensor_t* sensor)
+{
+    return sensor->local_head;
+}
+
+/*
+ * sensor_local_tail()
+ * The position of the tail of the sensor relative to the physics actor;
+ * not rotated
+ */
+point2d_t sensor_local_tail(const sensor_t* sensor)
+{
+    return sensor->local_tail;
+}
+
+/*
+ * sensor_color()
+ * The color of the sensor
+ */
+color_t sensor_color(const sensor_t *sensor)
+{
+    return sensor->color;
+}
+
+/*
+ * sensor_is_enabled()
+ * Will the sensor detect collisions?
+ */
+bool sensor_is_enabled(const sensor_t* sensor)
+{
+    return sensor->enabled;
+}
+
+/*
+ * sensor_set_enable()
+ * Enable or disable the sensor
+ */
+void sensor_set_enabled(sensor_t* sensor, bool enabled)
+{
+    sensor->enabled = enabled;
+}
+
+/*
+ * sensor_check()
+ * Find an obstacle that collides with the sensor
+ * Returns NULL if there is no such obstacle
+ */
 const obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, obstaclelayer_t layer_filter, const obstaclemap_t *obstaclemap)
 {
     if(!sensor->enabled)
         return NULL;
 
-    sensorstate_t *s = get_active_state(sensor, mm);
-    return sensorstate_check(s, actor_position, obstaclemap, sensor->x1, sensor->y1, sensor->x2, sensor->y2, layer_filter);
+    int x1 = sensor->local_head.x;
+    int y1 = sensor->local_head.y;
+    int x2 = sensor->local_tail.x;
+    int y2 = sensor->local_tail.y;
+
+    sensorstate_t *s = select_state(sensor, mm);
+    return sensorstate_check(s, actor_position, obstaclemap, x1, y1, x2, y2, layer_filter);
 }
 
+/*
+ * sensor_render()
+ * Render the sensor
+ */
 void sensor_render(const sensor_t *sensor, v2d_t actor_position, movmode_t mm, v2d_t camera_position)
 {
-    sensorstate_t *s = get_active_state(sensor, mm);
-    color_t color = sensor->color;
+    int x1 = sensor->local_head.x;
+    int y1 = sensor->local_head.y;
+    int x2 = sensor->local_tail.x;
+    int y2 = sensor->local_tail.y;
 
+    color_t color = sensor->color;
     if(!sensor->enabled)
         color = make_translucent_color(color, 0.25f);
 
-    sensorstate_render(s, actor_position, camera_position, sensor->x1, sensor->y1, sensor->x2, sensor->y2, color);
+    sensorstate_t *s = select_state(sensor, mm);
+    sensorstate_render(s, actor_position, camera_position, x1, y1, x2, y2, color);
 }
 
+/*
+ * sensor_worldpos()
+ * Read the position of the sensor in world space, performing the appropriate
+ * rotations according to the movmode. Output coordinates are NOT guaranteed to
+ * be such that x1 <= x2 and y1 <= y2. (x1,y1) is the head; (x2,y2), the tail
+ */
 void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, movmode_t mm, int *x1, int *y1, int *x2, int *y2)
 {
-    sensorstate_t *s = get_active_state(sensor, mm);
-    int xa = sensor->x1, ya = sensor->y1;
-    int xb = sensor->x2, yb = sensor->y2;
+    int xa = sensor->local_head.x;
+    int ya = sensor->local_head.y;
+    int xb = sensor->local_tail.x;
+    int yb = sensor->local_tail.y;
 
+    sensorstate_t *s = select_state(sensor, mm);
     sensorstate_worldpos(s, actor_position, &xa, &ya, &xb, &yb);
 
     if(x1) *x1 = xa;
@@ -128,6 +250,11 @@ void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, movmode_t mm,
     if(y2) *y2 = yb;
 }
 
+/*
+ * sensor_head()
+ * Read the position of the head of the sensor in world space, performing the
+ * appropriate rotations according to the movmode
+ */
 point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm)
 {
     point2d_t p;
@@ -135,6 +262,11 @@ point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode
     return p;
 }
 
+/*
+ * sensor_tail()
+ * Read the position of the head of the sensor in world space, performing the
+ * appropriate rotations according to the movmode
+ */
 point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm)
 {
     point2d_t p;
@@ -142,39 +274,45 @@ point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode
     return p;
 }
 
-int sensor_get_x1(const sensor_t *sensor)
+/*
+ * sensor_extend()
+ * Analogous to sensor_worldpos(), except that the returned segment will:
+ *
+ * a) have its head be the tail of the sensor
+ * b) grow from the tail of the sensor away from its head
+ * c) have length extended_length (given as input)
+ *
+ * If extended_length is negative, the returned segment will grow from the tail
+ * of the sensor towards its head and will have length -extended_length
+ */
+void sensor_extend(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int extended_length, point2d_t* extended_head, point2d_t* extended_tail)
 {
-    return sensor->x1;
-}
+    /* read the head and the tail in world space */
+    point2d_t head, tail;
+    sensor_worldpos(sensor, actor_position, mm, &head.x, &head.y, &tail.x, &tail.y);
 
-int sensor_get_y1(const sensor_t *sensor)
-{
-    return sensor->y1;
-}
+    /* compute the normalized direction of the sensor:
+       (0,-1), (1,0), (0,1), (-1,0)
 
-int sensor_get_x2(const sensor_t *sensor)
-{
-    return sensor->x2;
-}
+       if head == tail, that's a single point that will not be extended */
+    point2d_t dir = point2d_subtract(tail, head); /* either vertical or horizontal */
+    dir.x = (dir.x > 0) - (dir.x < 0);
+    dir.y = (dir.y > 0) - (dir.y < 0);
+    assertx(dir.x * dir.x + dir.y * dir.y <= 1); /* unit vector or zero */
 
-int sensor_get_y2(const sensor_t *sensor)
-{
-    return sensor->y2;
-}
+    /* compute lambda */
+    int lambda;
+    if(extended_length > 0)
+        lambda = extended_length - 1; /* non-negative */
+    else if(extended_length < 0)
+        lambda = extended_length + 1; /* non-positive */
+    else
+        lambda = 0;
 
-color_t sensor_get_color(const sensor_t *sensor)
-{
-    return sensor->color;
-}
-
-bool sensor_is_enabled(const sensor_t* sensor)
-{
-    return sensor->enabled;
-}
-
-void sensor_set_enabled(sensor_t* sensor, bool enabled)
-{
-    sensor->enabled = enabled;
+    /* extend the sensor */
+    *extended_head = tail;
+    extended_tail->x = extended_head->x + dir.x * lambda;
+    extended_tail->y = extended_head->y + dir.y * lambda;
 }
 
 
@@ -183,7 +321,7 @@ void sensor_set_enabled(sensor_t* sensor, bool enabled)
  * private
  */
 
-sensorstate_t* get_active_state(const sensor_t *sensor, movmode_t mm)
+sensorstate_t* select_state(const sensor_t *sensor, movmode_t mm)
 {
     switch(mm) {
         case MM_FLOOR:
