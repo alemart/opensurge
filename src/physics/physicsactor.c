@@ -1194,7 +1194,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             pa->gsp = (s * pa->chrg) * (0.67f + pa->charge_intensity * 0.33f);
             pa->state = PAS_ROLLING;
             pa->charge_intensity = 0.0f;
-            pa->jump_lock_timer = 0.09375f;
+            pa->jump_lock_timer = 6.0f / TARGET_FPS;
         }
         else
             pa->gsp = 0.0f;
@@ -1815,20 +1815,22 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 
     /* disable sensors for efficiency */
     if(!pa->midair) {
+        bool wanna_jump = input_button_pressed(pa->input, IB_FIRE1); /* maybe; may be charging also, or doing some other special move... */
         sensor_set_enabled(a, true);
         sensor_set_enabled(b, true);
-        sensor_set_enabled(c, false);
-        sensor_set_enabled(d, false);
+        sensor_set_enabled(c, wanna_jump);
+        sensor_set_enabled(d, wanna_jump);
         sensor_set_enabled(m, pa->gsp < 0.0f);
         sensor_set_enabled(n, pa->gsp > 0.0f);
     }
     else {
-        sensor_set_enabled(a, pa->ysp >= 0.0f);
-        sensor_set_enabled(b, pa->ysp >= 0.0f);
-        sensor_set_enabled(c, pa->ysp < 0.0f);
-        sensor_set_enabled(d, pa->ysp < 0.0f);
-        sensor_set_enabled(m, pa->xsp < 0.0f);
-        sensor_set_enabled(n, pa->xsp > 0.0f);
+        float abs_xsp = fabsf(pa->xsp), abs_ysp = fabsf(pa->ysp);
+        sensor_set_enabled(a, pa->ysp >= -abs_xsp); /* ysp >= 0.0f */
+        sensor_set_enabled(b, pa->ysp >= -abs_xsp); /* ysp >= 0.0f */
+        sensor_set_enabled(c, pa->ysp < abs_xsp);   /* ysp < 0.0f */
+        sensor_set_enabled(d, pa->ysp < abs_xsp);   /* ysp < 0.0f */
+        sensor_set_enabled(m, pa->xsp < abs_ysp);   /* xsp < 0.0f */
+        sensor_set_enabled(n, pa->xsp > -abs_ysp);  /* xsp > 0.0f */
     }
 
     /* read sensors */
