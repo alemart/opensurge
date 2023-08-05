@@ -31,8 +31,7 @@
 typedef struct physicsactor_t physicsactor_t;
 
 /*
- * a physics actor may be in one of the following
- * states:
+ * a physics actor may be in one of the following states:
  */
 typedef enum physicsactorstate_t physicsactorstate_t;
 enum physicsactorstate_t
@@ -109,7 +108,7 @@ void physicsactor_look_up(physicsactor_t *pa);
 void physicsactor_jump(physicsactor_t *pa);
 
 void physicsactor_kill(physicsactor_t *pa);
-void physicsactor_hit(physicsactor_t *pa);
+void physicsactor_hit(physicsactor_t *pa, float direction);
 void physicsactor_bounce(physicsactor_t *pa);
 void physicsactor_spring(physicsactor_t *pa);
 void physicsactor_roll(physicsactor_t *pa);
@@ -130,6 +129,8 @@ float physicsactor_get_frc(const physicsactor_t *pa); /* friction */
 void physicsactor_set_frc(physicsactor_t *pa, float value);
 float physicsactor_get_topspeed(const physicsactor_t *pa); /* top speed */
 void physicsactor_set_topspeed(physicsactor_t *pa, float value);
+float physicsactor_get_capspeed(const physicsactor_t *pa); /* cap speed */
+void physicsactor_set_capspeed(physicsactor_t *pa, float value);
 float physicsactor_get_air(const physicsactor_t *pa); /* air acceleration */
 void physicsactor_set_air(physicsactor_t *pa, float value);
 float physicsactor_get_airdrag(const physicsactor_t *pa); /* air drag */

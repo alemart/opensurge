@@ -582,13 +582,12 @@ void player_hit(player_t *player, float direction)
         return;
 
     if(player_get_collectibles() > 0 || player->shield_type != SH_NONE || player->invulnerable) {
-        if(direction != 0.0f)
-            player->actor->speed.x = fabs(physicsactor_get_hitjmp(player->pa) * 0.5f) * sign(direction);
-        player->actor->speed.y = physicsactor_get_hitjmp(player->pa);
         player_detach_from_ground(player);
 
         player->pa_old_state = physicsactor_get_state(player->pa);
-        physicsactor_hit(player->pa);
+        physicsactor_hit(player->pa, direction);
+        player->actor->speed.x = physicsactor_get_xsp(player->pa);
+        player->actor->speed.y = physicsactor_get_ysp(player->pa);
 
         if(player->invulnerable) {
             ; /* do nothing */
@@ -1874,6 +1873,11 @@ void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged)
     physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
     physicsactor_set_air(pa, physicsactor_get_air(pa) * multiplier);
     physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * multiplier);
+
+    if(turbocharged)
+        physicsactor_set_capspeed(pa, physicsactor_get_capspeed(pa) * 1.25f);
+    else
+        physicsactor_set_capspeed(pa, physicsactor_get_capspeed(pa) / 1.25f);
 }
 
 /* underwater physics */
