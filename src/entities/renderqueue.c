@@ -1266,8 +1266,8 @@ float zindex_brick_mask(renderable_t r) { return ZINDEX_LARGE + brick_zindex_off
 float zindex_brick_debug(renderable_t r) { return zindex_brick(r); }
 float zindex_brick_path(renderable_t r) { return zindex_brick_mask(r) + 1.0f; }
 float zindex_ssobject(renderable_t r) { return scripting_util_object_zindex(r.ssobject); }
-float zindex_ssobject_debug(renderable_t r) { return scripting_util_object_zindex(r.ssobject); } /* TODO: check children */
-float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE; }
+float zindex_ssobject_debug(renderable_t r) { return zindex_ssobject(r); } /* TODO: check children */
+float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE + zindex_ssobject(r); }
 float zindex_background(renderable_t r) { return 0.0f; }
 float zindex_foreground(renderable_t r) { return 1.0f; }
 float zindex_water(renderable_t r) { return 1.0f; }
