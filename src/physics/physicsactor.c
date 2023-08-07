@@ -115,6 +115,7 @@ struct physicsactor_t
 
 /* private stuff ;-) */
 static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
+static char pick_the_best_floor(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
 static const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* sensor, int extended_sensor_length, int* out_ground_position);
 static inline int distance_between_angle_sensors(const physicsactor_t* pa);
@@ -132,6 +133,7 @@ static const grounddir_t _MM_TO_GD[4] = {
 /* physics simulation */
 #define WANT_JUMP_ATTENUATION   0
 #define WANT_FIXED_TIMESTEP     1
+#define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit */
 #define TARGET_FPS              60.0f
 #define FIXED_TIMESTEP          (1.0f / TARGET_FPS)
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt);
@@ -295,10 +297,10 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->N_intheair = sensor_create_horizontal(0, 0, 10, color_rgb(255,64,255));
     pa->U_intheair = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
 
-    pa->A_jumproll = sensor_create_vertical(-7, 0, 15, color_rgb(0,255,0));
-    pa->B_jumproll = sensor_create_vertical(7, 0, 15, color_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-7, -15, 0, color_rgb(0,255,0));
-    pa->D_jumproll = sensor_create_vertical(7, -15, 0, color_rgb(255,255,0));
+    pa->A_jumproll = sensor_create_vertical(-7, 5, 20, color_rgb(0,255,0));
+    pa->B_jumproll = sensor_create_vertical(7, 5, 20, color_rgb(255,255,0));
+    pa->C_jumproll = sensor_create_vertical(-7, -15, 5, color_rgb(0,255,0));
+    pa->D_jumproll = sensor_create_vertical(7, -15, 5, color_rgb(255,255,0));
     pa->M_jumproll = sensor_create_horizontal(0, -8, 0, color_rgb(255,0,0));
     pa->N_jumproll = sensor_create_horizontal(0, 0, 8, color_rgb(255,64,255));
     pa->U_jumproll = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
@@ -452,6 +454,11 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds)
         pa->hlock_timer = seconds;
 }
 
+float physicsactor_hlock_timer(const physicsactor_t *pa)
+{
+    return pa->hlock_timer;
+}
+
 bool physicsactor_ressurrect(physicsactor_t *pa, v2d_t position)
 {
     if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED) {
@@ -492,6 +499,11 @@ void physicsactor_enable_winning_pose(physicsactor_t *pa)
     pa->winning_pose = true;
 }
 
+void physicsactor_detach_from_ground(physicsactor_t *pa)
+{
+    pa->want_to_detach_from_ground = true;
+}
+
 movmode_t physicsactor_get_movmode(const physicsactor_t *pa)
 {
     return pa->movmode;
@@ -509,9 +521,8 @@ void physicsactor_set_layer(physicsactor_t *pa, obstaclelayer_t layer)
 
 int physicsactor_roll_delta(const physicsactor_t* pa)
 {
-    /* the difference of the height of the (old ground) sensors */
-    return 1;
-    /*return sensor_get_y2(pa->A_normal) - sensor_get_y2(pa->A_jumproll);*/
+    /* the difference of the height of the ground sensors */
+    return sensor_get_y2(pa->A_normal) - sensor_get_y2(pa->A_jumproll);
 }
 
 float physicsactor_charge_intensity(const physicsactor_t* pa)
@@ -1260,8 +1271,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         pa->gsp = clip(pa->gsp, -pa->capspeed, pa->capspeed);
 
         /* convert gsp to xsp and ysp */
-        pa->xsp = pa->gsp * COS(pa->angle);
-        pa->ysp = pa->gsp * -SIN(pa->angle);
+        if(!pa->want_to_detach_from_ground) {
+            pa->xsp = pa->gsp * COS(pa->angle);
+            pa->ysp = pa->gsp * -SIN(pa->angle);
+        }
 
     }
 
@@ -1574,36 +1587,51 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
         /* if the player is on the ground or has just left the ground, stick to it! */
         if(!pa->midair || !pa->was_midair || cnt > 0) {
+            int gnd_pos_a, gnd_pos_b, gnd_pos;
+            const obstacle_t *gnd_a, *gnd_b;
 
             /* get the ground sensors */
             const sensor_t* a = sensor_A(pa);
             const sensor_t* b = sensor_B(pa);
 
-            /* compute an extended length measured from the tail of the sensors */
-            float abs_xsp = fabsf(pa->xsp), abs_ysp = fabsf(pa->ysp);
-            float max_abs_speed = max(abs_xsp, abs_ysp); /* <= fabsf(pa->gsp) */
-            int max_abs_ds = (int)ceilf(max_abs_speed * dt);
-            const int min_length = 14, max_length = 32;
-            const int tail_depth = 1; /* the extension starts from the tail (inclusive), and the tail touches the ground */
-            int extended_length = clip(max_abs_ds + 4, min_length, max_length) + (tail_depth - 1);
-
-            /* find the nearest ground using both sensors */
-            int gnd_pos_a, gnd_pos_b, gnd_pos;
-            const obstacle_t* gnd_a = find_ground_with_extended_sensor(pa, obstaclemap, a, extended_length, &gnd_pos_a);
-            const obstacle_t* gnd_b = find_ground_with_extended_sensor(pa, obstaclemap, b, extended_length, &gnd_pos_b);
-
-            if(gnd_a && gnd_b) {
-                switch(pa->movmode) {
-                    case MM_FLOOR:      gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
-                    case MM_RIGHTWALL:  gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
-                    case MM_CEILING:    gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
-                    case MM_LEFTWALL:   gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
-                }
+            /* find the nearest ground that already collide with the sensors */
+            gnd_a = at_A;
+            gnd_b = at_B;
+            if(gnd_a || gnd_b) {
+                char best = pick_the_best_floor(pa, gnd_a, gnd_b, a, b);
+                const obstacle_t* gnd = (best == 'a') ? gnd_a : gnd_b;
+                const sensor_t* a_or_b = (best == 'a') ? a : b;
+                point2d_t tail = sensor_tail(a_or_b, pa->position, pa->movmode);
+                gnd_pos = obstacle_ground_position(gnd, tail.x, tail.y, MM_TO_GD(pa->movmode));
             }
-            else if(gnd_a)
-                gnd_pos = gnd_pos_a;
-            else if(gnd_b)
-                gnd_pos = gnd_pos_b;
+            else {
+
+                /* compute an extended length measured from the tail of the sensors */
+                float abs_xsp = fabsf(pa->xsp), abs_ysp = fabsf(pa->ysp);
+                float max_abs_speed = max(abs_xsp, abs_ysp); /* <= fabsf(pa->gsp) */
+                int max_abs_ds = (int)ceilf(max_abs_speed * dt);
+                const int min_length = 14, max_length = 32;
+                const int tail_depth = AB_SENSOR_OFFSET + 1; /* the extension starts from the tail (inclusive), and the tail touches the ground */
+                int extended_length = clip(max_abs_ds + 4, min_length, max_length) + (tail_depth - 1);
+
+                /* find the nearest ground using both sensors */
+                gnd_a = find_ground_with_extended_sensor(pa, obstaclemap, a, extended_length, &gnd_pos_a);
+                gnd_b = find_ground_with_extended_sensor(pa, obstaclemap, b, extended_length, &gnd_pos_b);
+
+                if(gnd_a && gnd_b) {
+                    switch(pa->movmode) {
+                        case MM_FLOOR:      gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
+                        case MM_RIGHTWALL:  gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
+                        case MM_CEILING:    gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
+                        case MM_LEFTWALL:   gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
+                    }
+                }
+                else if(gnd_a)
+                    gnd_pos = gnd_pos_a;
+                else if(gnd_b)
+                    gnd_pos = gnd_pos_b;
+
+            }
 
             /* reposition the player */
             if(gnd_a || gnd_b) {
@@ -1612,15 +1640,22 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
 
                 /* put the tail of the sensor on the ground */
+                const int offset = AB_SENSOR_OFFSET;
                 switch(pa->movmode) {
                     case MM_FLOOR:
+                        pa->position.y = (int)position.y + (gnd_pos - tail.y) + offset;
+                        break;
+
                     case MM_CEILING:
-                        pa->position.y = (int)position.y + (gnd_pos - tail.y);
+                        pa->position.y = (int)position.y + (gnd_pos - tail.y) - offset;
                         break;
 
                     case MM_RIGHTWALL:
+                        pa->position.x = (int)position.x + (gnd_pos - tail.x) + offset;
+                        break;
+
                     case MM_LEFTWALL:
-                        pa->position.x = (int)position.x + (gnd_pos - tail.x);
+                        pa->position.x = (int)position.x + (gnd_pos - tail.x) - offset;
                         break;
                 }
 
@@ -1844,6 +1879,45 @@ void update_movmode(physicsactor_t* pa)
         pa->movmode = MM_CEILING;
     else if(pa->angle > 0xA0 && pa->angle < 0xE0)
         pa->movmode = MM_RIGHTWALL;
+}
+
+/* which one is the best floor, a or b? we evaluate the sensors also */
+char pick_the_best_floor(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor)
+{
+    point2d_t sa, sb;
+    int ha, hb;
+
+    if(a == NULL)
+        return 'b';
+    else if(b == NULL)
+        return 'a';
+
+    sa = sensor_head(a_sensor, pa->position, pa->movmode);
+    sb = sensor_head(b_sensor, pa->position, pa->movmode);
+
+    switch(pa->movmode) {
+        case MM_FLOOR:
+            ha = obstacle_ground_position(a, sa.x, sa.y, GD_DOWN);
+            hb = obstacle_ground_position(b, sb.x, sb.y, GD_DOWN);
+            return ha <= hb ? 'a' : 'b';
+
+        case MM_LEFTWALL:
+            ha = obstacle_ground_position(a, sa.x, sa.y, GD_LEFT);
+            hb = obstacle_ground_position(b, sb.x, sb.y, GD_LEFT);
+            return ha >= hb ? 'a' : 'b';
+
+        case MM_CEILING:
+            ha = obstacle_ground_position(a, sa.x, sa.y, GD_UP);
+            hb = obstacle_ground_position(b, sb.x, sb.y, GD_UP);
+            return ha >= hb ? 'a' : 'b';
+
+        case MM_RIGHTWALL:
+            ha = obstacle_ground_position(a, sa.x, sa.y, GD_RIGHT);
+            hb = obstacle_ground_position(b, sb.x, sb.y, GD_RIGHT);
+            return ha <= hb ? 'a' : 'b';
+    }
+
+    return 'a';
 }
 
 /* which one is the best ceiling, c or d? we evaluate the sensors also */

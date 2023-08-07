@@ -541,34 +541,7 @@ int player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_objec
  */
 void player_detach_from_ground(player_t *player)
 {
-    /* this is meant to counter the "sticky physics" */
-    if(!player_is_midair(player)) {
-        movmode_t movmode = physicsactor_get_movmode(player->pa);
-        if(movmode == MM_FLOOR) {
-            if(!player_is_rolling(player))
-                player->actor->position.y -= 2;
-            else
-                player->actor->position.y -= 5;
-        }
-        else if(movmode == MM_CEILING) {
-            if(!player_is_rolling(player))
-                player->actor->position.y += 2;
-            else
-                player->actor->position.y += 5;
-        }
-        else if(movmode == MM_LEFTWALL) {
-            if(!player_is_rolling(player))
-                player->actor->position.x += 2;
-            else
-                player->actor->position.x += 5;
-        }
-        else if(movmode == MM_RIGHTWALL) {
-            if(!player_is_rolling(player))
-                player->actor->position.x -= 2;
-            else
-                player->actor->position.x -= 5;
-        }
-    }
+    physicsactor_detach_from_ground(player->pa);
 }
 
 /*
