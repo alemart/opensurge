@@ -134,6 +134,9 @@ object "Power Pluggy Base" is "private", "entity"
         if(state != "rotating")
             return;
 
+        // unfreeze the player
+        player.frozen = false;
+
         // look at the player
         // compute the angle between the player and the rotation axis of the Power Pluggy
         ds = player.transform.position.minus(transform.position);
@@ -196,6 +199,11 @@ object "Power Pluggy Base" is "private", "entity"
         player.roll();
         player.input.enabled = false;
 
+        // freeze the player for a single frame if too fast
+        // (we're enabling a brick on this frame)
+        if(Math.abs(player.gsp) > 960)
+            player.frozen = true;
+
         //Console.print("ENTER");
     }
 
@@ -208,7 +216,7 @@ object "Power Pluggy Base" is "private", "entity"
 
 object "Power Pluggy Collider" is "private", "entity"
 {
-    collider = CollisionBall(12);
+    collider = CollisionBall(14);
     transform = Transform();
 
     fun setOffset(offset)

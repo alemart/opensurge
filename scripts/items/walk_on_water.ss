@@ -144,9 +144,9 @@ object "Walk on Water Watcher" is "companion", "private", "entity"
     fun canRemainWalkingOnWater(player)
     {
         return (
-            !player.midair &&
+            Math.abs(player.gsp) >= minSpeed &&
             !player.underwater &&
-            Math.abs(player.gsp) >= minSpeed
+            (!player.midair || player.ysp >= 0)
         );
     }
 }
@@ -157,15 +157,21 @@ object "Walk on Water Brick" is "private", "awake", "entity"
     brick = Brick("Walk on Water Brick");
     transform = Transform();
 
-    fun lateUpdate()
+    fun updatePosition()
     {
         dy = Level.waterlevel - transform.position.y;
         transform.translateBy(0, dy);
     }
 
+    fun lateUpdate()
+    {
+        updatePosition();
+    }
+
     fun constructor()
     {
         brick.type = "solid";
+        updatePosition();
     }
 }
 
