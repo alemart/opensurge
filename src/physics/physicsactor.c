@@ -1181,14 +1181,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         const sensor_t* sensor = at_A ? sensor_A(pa) : sensor_B(pa);
         v2d_t position = v2d_new(floorf(pa->position.x), floorf(pa->position.y));
         point2d_t tail = sensor_tail(sensor, position, pa->movmode);
-
-        int delta = (int)position.x - tail.x;
-        int midpoint = (int)position.x + delta / 2;
-        point2d_t sweet_spot = point2d_new(midpoint, tail.y + 8);
+        point2d_t sweet_spot = point2d_new((int)position.x, tail.y);
 
         if(NULL == obstaclemap_get_best_obstacle_at(obstaclemap, sweet_spot.x, sweet_spot.y, sweet_spot.x, sweet_spot.y, pa->movmode, pa->layer)) {
             pa->state = PAS_LEDGE;
-            pa->facing_right = (at_B == NULL);
+            /*pa->facing_right = (at_B == NULL);*/ /* this may not be desirable */
         }
     }
 
