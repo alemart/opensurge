@@ -40,19 +40,29 @@ object "Default Camera" is "entity", "awake", "private"
             // compute the delta
             delta = player.transform.position.minus(transform.position);
 
+            // compute a dynamic speed cap
+            // the camera will lag behind if the player is too fast
+            cap = 16; // suitable when |gsp| <= 960 px/s (default cap speed)
+            if(Math.abs(player.speed) > 960) {
+                // don't let the player move too far away from the camera (ROI)
+                if(Math.abs(delta.x - 8) >= Screen.width / 2 + 100)
+                    cap = Math.abs(player.speed) / 60;
+            }
+
             // move within a box
             if(delta.x > 8)
-                transform.translateBy(Math.min(16, delta.x - 8), 0);
+                transform.translateBy(Math.min(cap, delta.x - 8), 0);
             else if(delta.x < -8)
-                transform.translateBy(Math.max(-16, delta.x + 8), 0);
+                transform.translateBy(Math.max(-cap, delta.x + 8), 0);
+
             if(player.midair || player.frozen) {
                 if(delta.y > 32)
-                    transform.translateBy(0, Math.min(16, delta.y - 32));
+                    transform.translateBy(0, Math.min(cap, delta.y - 32));
                 else if(delta.y < -32)
-                    transform.translateBy(0, Math.max(-16, delta.y + 32));
+                    transform.translateBy(0, Math.max(-cap, delta.y + 32));
             }
             else {
-                dy = Math.abs(player.gsp) >= 360 ? 16 : 6;
+                dy = Math.abs(player.gsp) >= 480 ? cap : 6;
                 if(delta.y >= 1)
                     transform.translateBy(0, Math.min(dy, delta.y - 1));
                 else if(delta.y <= -1)
