@@ -984,6 +984,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      * horizontal control lock
      *
      */
+
     if(pa->hlock_timer > 0.0f) {
         pa->hlock_timer -= dt;
         if(pa->hlock_timer < 0.0f)
@@ -1269,7 +1270,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     /*
      *
-     * ground speed
+     * speed cap
      *
      */
 
@@ -1285,6 +1286,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         }
 
     }
+    else {
+
+        /* cap xsp */
+        pa->xsp = clip(pa->xsp, -pa->capspeed, pa->capspeed);
+
+        /* cap ysp */
+        /*pa->ysp = min(pa->ysp, pa->capspeed);*/ /* do we want this? */
+
+    }
 
     /*
      *
@@ -1296,13 +1306,19 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
         /* air acceleration */
         if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT)) {
-            if(pa->xsp < pa->topspeed)
-                pa->xsp = min(pa->xsp + pa->air * dt, pa->topspeed);
+            if(pa->xsp < pa->topspeed) {
+                pa->xsp += pa->air * dt;
+                if(pa->xsp > pa->topspeed)
+                    pa->xsp = pa->topspeed;
+            }
         }
 
         if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
-            if(pa->xsp > -pa->topspeed)
-                pa->xsp = max(pa->xsp - pa->air * dt, -pa->topspeed);
+            if(pa->xsp > -pa->topspeed) {
+                pa->xsp -= pa->air * dt;
+                if(pa->xsp < -pa->topspeed)
+                    pa->xsp = -pa->topspeed;
+            }
         }
 
         /* air drag */
@@ -1314,10 +1330,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         }
 
         /* gravity */
-        float grv = (pa->state != PAS_GETTINGHIT) ? pa->grv : (pa->grv / 7.0f) * 6.0f;
-        pa->ysp += grv * dt;
-        if(pa->ysp > pa->topyspeed)
-            pa->ysp = pa->topyspeed;
+        if(pa->ysp < pa->topyspeed) {
+            float grv = (pa->state != PAS_GETTINGHIT) ? pa->grv : (pa->grv / 7.0f) * 6.0f;
+            pa->ysp += grv * dt;
+            if(pa->ysp > pa->topyspeed)
+                pa->ysp = pa->topyspeed;
+        }
+
     }
 
     /*
@@ -1726,6 +1745,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             }
         }
         else {
+            /* walk / run */
             pa->state = WALKING_OR_RUNNING(pa);
         }
     }
@@ -1802,8 +1822,8 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         sensor_set_enabled(b, true);
         sensor_set_enabled(c, wanna_jump);
         sensor_set_enabled(d, wanna_jump);
-        sensor_set_enabled(m, wanna_middle && (pa->gsp < 0.0f || (nearly_zero(pa->gsp) && pa->angle == 0x0))); /* regular movement & moving platforms */
-        sensor_set_enabled(n, wanna_middle && (pa->gsp > 0.0f || (nearly_zero(pa->gsp) && pa->angle == 0x0)));
+        sensor_set_enabled(m, wanna_middle && (pa->gsp <= pa->walkthreshold)); /* gsp <= 0.0f */ /* regular movement & moving platforms */
+        sensor_set_enabled(n, wanna_middle && (pa->gsp >= -pa->walkthreshold)); /* gsp >= 0.0f */
     }
     else {
         float abs_xsp = fabsf(pa->xsp), abs_ysp = fabsf(pa->ysp);
