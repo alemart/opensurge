@@ -27,7 +27,7 @@ sprite "Speed Smoke"
     source_file     "images/speed_smoke.png"
     source_rect     0 0 832 64
     frame_size      64 64
-    hot_spot        32 48
+    hot_spot        32 47
 
     animation 0
     {
