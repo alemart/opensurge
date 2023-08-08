@@ -34,7 +34,7 @@
 /* physicsactor class */
 struct physicsactor_t
 {
-    v2d_t position; /* center of the sprite */
+    v2d_t position; /* position of the physics actor */
     float xsp; /* x speed */
     float ysp; /* y speed */
     float gsp; /* ground speed */
@@ -67,11 +67,12 @@ struct physicsactor_t
     float chrgthreshold; /* charge intensity threshold */
     float waittime; /* wait time in seconds */
     int angle; /* angle (0-255 clockwise) */
+    int prev_angle; /* previous angle */
     bool midair; /* is the player midair? */
     bool was_midair; /* was the player midair in the previous frame of the simulation? */
     bool facing_right; /* is the player facing right? */
     bool touching_ceiling; /* is the player touching a ceiling? */
-    bool inside_wall; /* inside a solid brick, possibly smashed */
+    bool smashed; /* inside a solid brick, smashed */
     bool winning_pose; /* winning pose enabled? */
     float hlock_timer; /* horizontal control lock timer, in seconds */
     float jump_lock_timer; /* jump lock timer, in seconds */
@@ -118,8 +119,11 @@ static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t 
 static char pick_the_best_floor(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
 static const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* sensor, int extended_sensor_length, int* out_ground_position);
+static bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap);
 static inline int distance_between_angle_sensors(const physicsactor_t* pa);
 static inline int delta_angle(int alpha, int beta);
+static int interpolate_angle(int alpha, int beta, float t);
+static int extrapolate_angle(int curr_angle, int prev_angle, float t);
 static const int CLOUD_OFFSET = 12;
 
 #define MM_TO_GD(mm) _MM_TO_GD[(mm) & 3]
@@ -133,7 +137,7 @@ static const grounddir_t _MM_TO_GD[4] = {
 /* physics simulation */
 #define WANT_JUMP_ATTENUATION   0
 #define WANT_FIXED_TIMESTEP     1
-#define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit */
+#define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit (unstable pa->midair) */
 #define TARGET_FPS              60.0f
 #define FIXED_TIMESTEP          (1.0f / TARGET_FPS)
 static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float dt);
@@ -257,6 +261,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->ysp = 0.0f;
     pa->gsp = 0.0f;
     pa->angle = 0x0;
+    pa->prev_angle = 0x0;
     pa->movmode = MM_FLOOR;
     pa->state = PAS_STOPPED;
     pa->layer = OL_DEFAULT;
@@ -266,6 +271,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->jump_lock_timer = 0.0f;
     pa->facing_right = true;
     pa->touching_ceiling = false;
+    pa->smashed = false;
     pa->input = input_create_computer();
     pa->wait_timer = 0.0f;
     pa->winning_pose = false;
@@ -301,8 +307,8 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->B_jumproll = sensor_create_vertical(7, 5, 20, color_rgb(255,255,0));
     pa->C_jumproll = sensor_create_vertical(-7, -15, 5, color_rgb(0,255,0));
     pa->D_jumproll = sensor_create_vertical(7, -15, 5, color_rgb(255,255,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -8, 0, color_rgb(255,0,0));
-    pa->N_jumproll = sensor_create_horizontal(0, 0, 8, color_rgb(255,64,255));
+    pa->M_jumproll = sensor_create_horizontal(0, -10, 0, color_rgb(255,0,0));
+    pa->N_jumproll = sensor_create_horizontal(0, 0, 10, color_rgb(255,64,255));
     pa->U_jumproll = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
 
     /* success!!! ;-) */
@@ -385,11 +391,6 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
     float dt = timer_get_delta();
-    const obstacle_t *at_U = NULL;
-
-    /* inside a solid brick? */
-    at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, pa->layer, obstaclemap);
-    pa->inside_wall = (at_U != NULL && obstacle_is_solid(at_U));
 
     /* run the physics simulation */
 #if WANT_FIXED_TIMESTEP
@@ -489,9 +490,9 @@ bool physicsactor_is_facing_right(const physicsactor_t *pa)
     return pa->facing_right;
 }
 
-bool physicsactor_is_inside_wall(const physicsactor_t *pa)
+bool physicsactor_is_smashed(const physicsactor_t *pa)
 {
-    return pa->inside_wall;
+    return pa->smashed;
 }
 
 void physicsactor_enable_winning_pose(physicsactor_t *pa)
@@ -779,27 +780,32 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
         int hoff = half_dist + (1 - half_dist % 2); /* odd number */ \
         int min_hoff = pa->was_midair ? 3 : 1; \
         int max_delta = min(hoff * 2, SLOPE_LIMIT); \
-        int current_angle = pa->angle; \
         int angular_tolerance = 0x14; \
+        int current_angle = pa->angle; \
         int dx = 0, dy = 0; \
         \
-        v2d_t speed = v2d_new(pa->xsp, pa->ysp); \
-        v2d_t ds = v2d_multiply(speed, dt); \
         float abs_gsp = fabsf(pa->gsp); \
         bool within_default_capspeed = (abs_gsp <= 16.0f * TARGET_FPS); \
         bool within_increased_capspeed = (abs_gsp <= 20.0f * TARGET_FPS); \
-        float prediction_factor = within_default_capspeed ? 0.5f : (within_increased_capspeed ? 0.7f : 0.75f); \
-        v2d_t predicted_offset = v2d_multiply(ds, prediction_factor); \
+        \
+        v2d_t speed = v2d_new(pa->xsp, pa->ysp); \
+        v2d_t ds = v2d_multiply(speed, dt); \
+        float linear_prediction_factor = within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.6f); \
+        v2d_t predicted_offset = v2d_multiply(ds, linear_prediction_factor); \
         v2d_t predicted_position = v2d_add(pa->position, predicted_offset); \
         \
+        float angular_prediction_factor = within_default_capspeed ? 0.0f : (within_increased_capspeed ? 0.0f : 0.2f); \
+        int predicted_angle = extrapolate_angle(pa->angle, pa->prev_angle, angular_prediction_factor); \
+        (void)interpolate_angle; \
+        \
         do { \
-            pa->angle = current_angle; /* assume continuity */ \
-            UPDATE_ANGLE_STEP(hoff, search_base, pa->angle, predicted_position, max_iterations, dx, dy); \
+            pa->angle = predicted_angle; /* assume continuity */ \
+            UPDATE_ANGLE_STEP(hoff, search_base, predicted_angle, predicted_position, max_iterations, dx, dy); \
             hoff -= 2; /* increase precision */ \
         } while(hoff >= min_hoff && (at_M == NULL && at_N == NULL) && (dx < -max_delta || dx > max_delta || dy < -max_delta || dy > max_delta || delta_angle(pa->angle, current_angle) > angular_tolerance)); \
     } while(0)
 
-#define UPDATE_ANGLE_STEP(hoff, search_base, prev_angle, curr_position, max_iterations, out_dx, out_dy) \
+#define UPDATE_ANGLE_STEP(hoff, search_base, guess_angle, curr_position, max_iterations, out_dx, out_dy) \
     do { \
         const obstacle_t* gnd = NULL; \
         bool found_a = false, found_b = false; \
@@ -807,12 +813,12 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
         \
         for(int i = 0; i < (max_iterations) && !(found_a && found_b); i++) { \
             float h = (search_base) + i; \
-            float x = floorf(curr_position.x) + h * SIN(prev_angle) + 0.5f; \
-            float y = floorf(curr_position.y) + h * COS(prev_angle) + 0.5f; \
+            float x = floorf(curr_position.x) + h * SIN(guess_angle) + 0.5f; \
+            float y = floorf(curr_position.y) + h * COS(guess_angle) + 0.5f; \
             \
             if(!found_a) { \
-                xa = x - (hoff) * COS(prev_angle); \
-                ya = y + (hoff) * SIN(prev_angle); \
+                xa = x - (hoff) * COS(guess_angle); \
+                ya = y + (hoff) * SIN(guess_angle); \
                 gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer); \
                 found_a = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
                     (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + CLOUD_OFFSET) || \
@@ -823,8 +829,8 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
             } \
             \
             if(!found_b) { \
-                xb = x + (hoff) * COS(prev_angle); \
-                yb = y - (hoff) * SIN(prev_angle); \
+                xb = x + (hoff) * COS(guess_angle); \
+                yb = y - (hoff) * SIN(guess_angle); \
                 gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer); \
                 found_b = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
                     (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + CLOUD_OFFSET) || \
@@ -866,7 +872,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
                 y = yb - ya; \
                 if(x != 0 || y != 0) { \
                     int ang = SLOPE(y, x); \
-                    if(ga == gb || delta_angle(ang, prev_angle) <= 0x25) { \
+                    if(ga == gb || delta_angle(ang, guess_angle) <= 0x25) { \
                         pa->angle = ang; \
                         pa->angle_sensor[0] = v2d_new(xa, ya); \
                         pa->angle_sensor[1] = v2d_new(xb, yb); \
@@ -881,6 +887,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 #define FORCE_ANGLE(new_angle) \
     do { \
         pa->angle = (new_angle); \
+        pa->prev_angle = pa->angle; \
         UPDATE_MOVMODE(); \
         UPDATE_SENSORS(); \
     } while(0)
@@ -898,9 +905,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M, *at_N;
 
-    /* initialize and save previous midair state */
+    /* save previous state */
     UPDATE_SENSORS();
     pa->was_midair = pa->midair;
+    pa->prev_angle = pa->angle;
 
     /*
      *
@@ -1271,7 +1279,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         pa->gsp = clip(pa->gsp, -pa->capspeed, pa->capspeed);
 
         /* convert gsp to xsp and ysp */
-        if(!pa->want_to_detach_from_ground) {
+        if(!pa->want_to_detach_from_ground) { /* if not springing, etc. */
             pa->xsp = pa->gsp * COS(pa->angle);
             pa->ysp = pa->gsp * -SIN(pa->angle);
         }
@@ -1508,6 +1516,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 pa->state = PAS_STOPPED;
         }
     }
+
+    /*
+     *
+     * getting smashed
+     *
+     */
+
+    if(!pa->smashed)
+        pa->smashed = is_smashed(pa, obstaclemap);
 
     /*
      *
@@ -1785,8 +1802,8 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         sensor_set_enabled(b, true);
         sensor_set_enabled(c, wanna_jump);
         sensor_set_enabled(d, wanna_jump);
-        sensor_set_enabled(m, wanna_middle && pa->gsp < 0.0f);
-        sensor_set_enabled(n, wanna_middle && pa->gsp > 0.0f);
+        sensor_set_enabled(m, wanna_middle && (pa->gsp < 0.0f || (nearly_zero(pa->gsp) && pa->angle == 0x0))); /* regular movement & moving platforms */
+        sensor_set_enabled(n, wanna_middle && (pa->gsp > 0.0f || (nearly_zero(pa->gsp) && pa->angle == 0x0)));
     }
     else {
         float abs_xsp = fabsf(pa->xsp), abs_ysp = fabsf(pa->ysp);
@@ -1974,6 +1991,51 @@ const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, con
     return obstaclemap_find_ground(obstaclemap, x1, y1, x2, y2, pa->layer, MM_TO_GD(pa->movmode), out_ground_position);
 }
 
+/* check if the physics actor is smashed */
+bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
+{
+    /* first, we check if sensor U is overlapping a solid obstacle */
+    const obstacle_t* at_U = sensor_check(sensor_U(pa), pa->position, pa->movmode, pa->layer, obstaclemap);
+    if(!(at_U != NULL && obstacle_is_solid(at_U))) /* sensor U is assumed to be enabled */
+        return false; /* quit if no collision */
+
+    /* next, we check other sensors to make sure */
+    sensor_t* a = sensor_A(pa);
+    sensor_t* b = sensor_B(pa);
+    sensor_t* c = sensor_C(pa);
+    sensor_t* d = sensor_D(pa);
+
+    bool a_enabled = sensor_is_enabled(a);
+    bool b_enabled = sensor_is_enabled(b);
+    bool c_enabled = sensor_is_enabled(c);
+    bool d_enabled = sensor_is_enabled(d);
+
+    sensor_set_enabled(a, true);
+    sensor_set_enabled(b, true);
+    sensor_set_enabled(c, true);
+    sensor_set_enabled(d, true);
+
+    const obstacle_t* at_A = sensor_check(a, pa->position, pa->movmode, pa->layer, obstaclemap);
+    const obstacle_t* at_B = sensor_check(b, pa->position, pa->movmode, pa->layer, obstaclemap);
+    const obstacle_t* at_C = sensor_check(c, pa->position, pa->movmode, pa->layer, obstaclemap);
+    const obstacle_t* at_D = sensor_check(d, pa->position, pa->movmode, pa->layer, obstaclemap);
+
+    bool smashed =  ((
+        (at_A != NULL && obstacle_is_solid(at_A)) &&
+        (at_B != NULL && obstacle_is_solid(at_B))
+    ) && (
+        (at_C != NULL && obstacle_is_solid(at_C)) && /* '||' is too sensitive */
+        (at_D != NULL && obstacle_is_solid(at_D))
+    ));
+
+    sensor_set_enabled(d, d_enabled);
+    sensor_set_enabled(c, c_enabled);
+    sensor_set_enabled(b, b_enabled);
+    sensor_set_enabled(a, a_enabled);
+
+    return smashed;
+}
+
 /* renders an angle sensor */
 void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position)
 {
@@ -1989,9 +2051,9 @@ void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_
 /* distance between the angle sensors */
 int distance_between_angle_sensors(const physicsactor_t* pa)
 {
-    const float default_capspeed = 16.0f * TARGET_FPS;
+    const float DEFAULT_CAPSPEED = 16.0f * TARGET_FPS;
 
-    if(fabsf(pa->gsp) <= default_capspeed)
+    if(fabsf(pa->gsp) <= DEFAULT_CAPSPEED)
         return 13;
     else
         return 11; /* very high speeds */
@@ -2003,4 +2065,21 @@ int delta_angle(int alpha, int beta)
     alpha &= 0xFF; beta &= 0xFF;
     int diff = alpha > beta ? alpha - beta : beta - alpha;
     return diff > 0x80 ? 0xFF - diff + 1 : diff;
+}
+
+/* linear interpolation between angles; t in [0,1] */
+int interpolate_angle(int alpha, int beta, float t)
+{
+    int mul = roundf(t * 256.0f);
+    int delta = (delta_angle(alpha, beta) * mul) / 256;
+    return (alpha + delta) & 0xFF;
+}
+
+/* angle extrapolation; t in [0,1] */
+int extrapolate_angle(int curr_angle, int prev_angle, float t)
+{
+    int mul = roundf(256.0f * t);
+    int delta = (delta_angle(curr_angle, prev_angle) * mul) / 256;
+    int theta = (curr_angle < prev_angle) ? 0xFF - delta + 1 : delta;
+    return (curr_angle + theta) & 0xFF;
 }

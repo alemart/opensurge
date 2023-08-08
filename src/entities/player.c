@@ -289,7 +289,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
             player_kill(player);
 
         /* smashed / crushed */
-        if(!physicsactor_is_midair(player->pa) && physicsactor_is_touching_ceiling(player->pa) && physicsactor_is_inside_wall(player->pa))
+        if(physicsactor_is_smashed(player->pa))
             player_kill(player);
 
         /* winning pose */
