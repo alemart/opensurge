@@ -67,7 +67,7 @@ struct collisionmanager_t
 #define COLLIDER_FLAG_NOTIFYONCOLLISION     0x2
 #define COLLIDER_FLAG_NOTIFYONOVERLAP       0x4
 #define COLLIDER_FLAG_ISDISABLED            0x8
-#define COLLIDER_COLOR(flags)               (color_premul_rgba(255, 255, 0, (flags) & COLLIDER_FLAG_ISDISABLED ? 127 : 255))
+#define COLLIDER_COLOR(flags)               (color_premul_rgba(255, 255, 0, (flags) & COLLIDER_FLAG_ISDISABLED ? 63 : 127))
 static const surgescript_heapptr_t CENTER_ADDR = 0;
 static const surgescript_heapptr_t ANCHOR_ADDR = 1;
 #define unsafe_get_collider(object) ((collider_t*)surgescript_object_userdata(object))
