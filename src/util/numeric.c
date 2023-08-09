@@ -47,7 +47,13 @@ float lerp_angle(float alpha, float beta, float t)
 {
     v2d_t a = v2d_new(cosf(alpha), sinf(alpha));
     v2d_t b = v2d_new(cosf(beta), sinf(beta));
-    v2d_t c = v2d_lerp(a, b, t);
 
+    float dot = v2d_dot(a, b);
+    if(nearly_equal(dot, -1.0f)) {
+        /* alpha == beta + k * pi, k odd */
+        return alpha + PI * t; /* why not alpha - PI * t? */
+    }
+
+    v2d_t c = v2d_lerp(a, b, t);
     return atan2f(c.y, c.x);
 }
