@@ -168,7 +168,7 @@ static inline player_t* get_player(const surgescript_object_t* object);
 static inline surgescript_object_t* get_collider(surgescript_object_t* object);
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 static void update_player(surgescript_object_t* object);
-static void update_collider(surgescript_object_t* object, int width, int height);
+static void update_collider(surgescript_object_t* object, int width, int height, v2d_t offset);
 static void update_animation(surgescript_object_t* object, const animation_t* animation);
 static void update_transform(surgescript_object_t* object, v2d_t position, float angle, v2d_t scale);
 static void read_transform(surgescript_object_t* object, v2d_t* position, float* angle, v2d_t* scale);
@@ -1696,11 +1696,14 @@ void update_player(surgescript_object_t* object)
     /* update the collider */
     if(player != NULL) {
         int width = 1, height = 1;
-        physicsactor_bounding_box(player->pa, &width, &height, NULL);
-        update_collider(object, width, height);
+        v2d_t center = v2d_new(0, 0);
+        physicsactor_bounding_box(player->pa, &width, &height, &center);
+
+        v2d_t offset = v2d_subtract(center, physicsactor_get_position(player->pa));
+        update_collider(object, width, height, offset);
     }
     else
-        update_collider(object, 1, 1);
+        update_collider(object, 1, 1, v2d_new(0.0f, 0.0f));
 
     /* update the animation */
     if(player != NULL)
@@ -1737,16 +1740,25 @@ void read_transform(surgescript_object_t* object, v2d_t* position, float* angle,
 }
 
 /* update the collider */
-void update_collider(surgescript_object_t* object, int width, int height)
+void update_collider(surgescript_object_t* object, int width, int height, v2d_t offset)
 {
     surgescript_object_t* collider = get_collider(object);
-    surgescript_var_t* w = surgescript_var_set_number(surgescript_var_create(), width);
-    surgescript_var_t* h = surgescript_var_set_number(surgescript_var_create(), height);
-    const surgescript_var_t* tmp[2] = { w, h };
+    surgescript_var_t* x = surgescript_var_create();
+    surgescript_var_t* y = surgescript_var_create();
+    const surgescript_var_t* tmp[2] = { x, y };
+
+    surgescript_var_set_number(x, width);
     surgescript_object_call_function(collider, "set_width", tmp+0, 1, NULL);
+
+    surgescript_var_set_number(y, height);
     surgescript_object_call_function(collider, "set_height", tmp+1, 1, NULL);
-    surgescript_var_destroy(h);
-    surgescript_var_destroy(w);
+
+    surgescript_var_set_number(x, 0.5 - (double)offset.x / (double)width);
+    surgescript_var_set_number(y, 0.5 - (double)offset.y / (double)height);
+    surgescript_object_call_function(collider, "setAnchor", tmp, 2, NULL);
+
+    surgescript_var_destroy(y);
+    surgescript_var_destroy(x);
 }
 
 /* update the animation */
