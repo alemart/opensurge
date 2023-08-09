@@ -927,10 +927,22 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M, *at_N;
 
+    /*
+     *
+     * initialization
+     *
+     */
+
     /* save previous state */
     UPDATE_SENSORS();
     pa->was_midair = pa->midair;
     pa->prev_angle = pa->angle;
+
+    /* disable simultaneous left + right input */
+    if(input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT)) {
+        input_simulate_button_up(pa->input, IB_LEFT);
+        input_simulate_button_up(pa->input, IB_RIGHT);
+    }
 
     /*
      *
@@ -1047,7 +1059,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             pa->gsp += pa->slp * -SIN(pa->angle) * dt;
 
         /* acceleration */
-        if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT) && pa->gsp >= 0.0f) {
+        if(input_button_down(pa->input, IB_RIGHT) && pa->gsp >= 0.0f) {
             if(pa->gsp < pa->topspeed) {
                 pa->gsp += pa->acc * dt;
                 if(pa->gsp >= pa->topspeed) {
@@ -1058,7 +1070,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                     pa->state = PAS_WALKING;
             }
         }
-        else if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT) && pa->gsp <= 0.0f) {
+        else if(input_button_down(pa->input, IB_LEFT) && pa->gsp <= 0.0f) {
             if(pa->gsp > -pa->topspeed) {
                 pa->gsp -= pa->acc * dt;
                 if(pa->gsp <= -pa->topspeed) {
@@ -1124,7 +1136,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             else if(pa->state == PAS_PUSHING || pa->state == PAS_LOOKINGUP || pa->state == PAS_DUCKING)
                 ;
             else if(input_button_down(pa->input, IB_LEFT) || input_button_down(pa->input, IB_RIGHT))
-                pa->state = input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT) ? PAS_STOPPED : PAS_WALKING;
+                pa->state = PAS_WALKING;
             else if(pa->state != PAS_WAITING)
                 pa->state = PAS_STOPPED;
             else if((pa->state == PAS_STOPPED || pa->state == PAS_WAITING) && !nearly_zero(pa->gsp))
@@ -1327,15 +1339,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(pa->midair) {
 
         /* air acceleration */
-        if(input_button_down(pa->input, IB_RIGHT) && !input_button_down(pa->input, IB_LEFT)) {
+        if(input_button_down(pa->input, IB_RIGHT)) {
             if(pa->xsp < pa->topspeed) {
                 pa->xsp += pa->air * dt;
                 if(pa->xsp > pa->topspeed)
                     pa->xsp = pa->topspeed;
             }
         }
-
-        if(input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
+        else if(input_button_down(pa->input, IB_LEFT)) {
             if(pa->xsp > -pa->topspeed) {
                 pa->xsp -= pa->air * dt;
                 if(pa->xsp < -pa->topspeed)
