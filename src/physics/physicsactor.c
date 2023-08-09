@@ -85,29 +85,25 @@ struct physicsactor_t
     physicsactorstate_t state; /* state */
     movmode_t movmode; /* current movement mode, based on the angle */
     obstaclelayer_t layer; /* current layer */
-    input_t *input; /* input device */
+    input_t* input; /* input device */
 
-    sensor_t *A_normal; /* sensors */
-    sensor_t *B_normal;
-    sensor_t *C_normal;
-    sensor_t *D_normal;
-    sensor_t *M_normal;
-    sensor_t *N_normal;
-    sensor_t *U_normal;
-    sensor_t *A_intheair;
-    sensor_t *B_intheair;
-    sensor_t *C_intheair;
-    sensor_t *D_intheair;
-    sensor_t *M_intheair;
-    sensor_t *N_intheair;
-    sensor_t *U_intheair;
-    sensor_t *A_jumproll;
-    sensor_t *B_jumproll;
-    sensor_t *C_jumproll;
-    sensor_t *D_jumproll;
-    sensor_t *M_jumproll;
-    sensor_t *N_jumproll;
-    sensor_t *U_jumproll;
+    sensor_t* A_normal; /* sensors */
+    sensor_t* B_normal;
+    sensor_t* C_normal;
+    sensor_t* D_normal;
+    sensor_t* M_normal;
+    sensor_t* N_normal;
+    sensor_t* U_normal;
+    sensor_t* A_jumproll;
+    sensor_t* B_jumproll;
+    sensor_t* C_jumproll;
+    sensor_t* D_jumproll;
+    sensor_t* M_jumproll;
+    sensor_t* N_jumproll;
+    sensor_t* M_flatgnd;
+    sensor_t* N_flatgnd;
+    sensor_t* M_rollflatgnd;
+    sensor_t* N_rollflatgnd;
     v2d_t angle_sensor[2];
 
     float reference_time; /* used in fixed_update */
@@ -286,30 +282,42 @@ physicsactor_t* physicsactor_create(v2d_t position)
     /* initialize the physics model */
     physicsactor_reset_model_parameters(pa);
 
-    /* sensors */
-    pa->A_normal = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
-    pa->B_normal = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
-    pa->C_normal = sensor_create_vertical(-9, -20, 0, color_rgb(0,255,0));
-    pa->D_normal = sensor_create_vertical(9, -20, 0, color_rgb(255,255,0));
-    pa->M_normal = sensor_create_horizontal(4, -10, 0, color_rgb(255,0,0)); /* use x(sensor A) + 1 */
-    pa->N_normal = sensor_create_horizontal(4, 0, 10, color_rgb(255,64,255));
-    pa->U_normal = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
+    /* let's initialize the sensors with a simple box model */
 
-    pa->A_intheair = sensor_create_vertical(-9, 0, 20, color_rgb(0,255,0));
-    pa->B_intheair = sensor_create_vertical(9, 0, 20, color_rgb(255,255,0));
-    pa->C_intheair = sensor_create_vertical(-9, -20, 0, color_rgb(0,255,0));
-    pa->D_intheair = sensor_create_vertical(9, -20, 0, color_rgb(255,255,0));
-    pa->M_intheair = sensor_create_horizontal(0, -10, 0, color_rgb(255,0,0));
-    pa->N_intheair = sensor_create_horizontal(0, 0, 10, color_rgb(255,64,255));
-    pa->U_intheair = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
+    /* set box size (W,H) and half box size (w,h) relative to sensors A, B, C, D.
+       These sensors are vertical and symmetric; hence,
+       W = w - (-w) + 1 = 2*w + 1 => w = (W-1)/2; also, h = (H-1)/2 */
+    const int default_width = 19, default_height = 39; /* pick odd numbers */
+    const int roll_width = 15, roll_height = 29; /* this is expected to be smaller than the default box */
+    const int roll_y_offset = 5; /* offset from the sensor origin */
 
-    pa->A_jumproll = sensor_create_vertical(-7, 5, 20, color_rgb(0,255,0));
-    pa->B_jumproll = sensor_create_vertical(7, 5, 20, color_rgb(255,255,0));
-    pa->C_jumproll = sensor_create_vertical(-7, -15, 5, color_rgb(0,255,0));
-    pa->D_jumproll = sensor_create_vertical(7, -15, 5, color_rgb(255,255,0));
-    pa->M_jumproll = sensor_create_horizontal(0, -10, 0, color_rgb(255,0,0));
-    pa->N_jumproll = sensor_create_horizontal(0, 0, 10, color_rgb(255,64,255));
-    pa->U_jumproll = sensor_create_horizontal(-4, 0, 0, color_rgb(255,255,255));
+    int w = (default_width - 1) / 2, h = (default_height - 1) / 2;
+    int rw = (roll_width - 1) / 2, rh = (roll_height - 1) / 2;
+    int ry = roll_y_offset;
+
+    h += AB_SENSOR_OFFSET; /* grow heights */
+    rh += AB_SENSOR_OFFSET;
+
+    /* set up the sensors */
+    pa->A_normal = sensor_create_vertical(-w, 0, h, color_rgb(0,255,0));
+    pa->B_normal = sensor_create_vertical(w, 0, h, color_rgb(255,255,0));
+    pa->C_normal = sensor_create_vertical(-w, 0, -h, color_rgb(64,255,255));
+    pa->D_normal = sensor_create_vertical(w, 0, -h, color_rgb(255,255,255));
+    pa->M_normal = sensor_create_horizontal(0, 0, -(w+1), color_rgb(255,0,0)); /* use x(sensor A) + 1 */
+    pa->N_normal = sensor_create_horizontal(0, 0, w+1, color_rgb(255,64,255));
+    pa->U_normal = sensor_create_horizontal(-4, 0, 0, color_rgb(0,192,255));
+
+    pa->A_jumproll = sensor_create_vertical(-rw, ry, ry+rh, sensor_color(pa->A_normal));
+    pa->B_jumproll = sensor_create_vertical(rw, ry, ry+rh, sensor_color(pa->B_normal));
+    pa->C_jumproll = sensor_create_vertical(-rw, ry, ry-rh, sensor_color(pa->C_normal));
+    pa->D_jumproll = sensor_create_vertical(rw, ry, ry-rh, sensor_color(pa->D_normal));
+    pa->M_jumproll = sensor_create_horizontal(ry, 0, -(w+1), sensor_color(pa->M_normal));
+    pa->N_jumproll = sensor_create_horizontal(ry, 0, w+1, sensor_color(pa->N_normal));
+
+    pa->M_flatgnd = sensor_create_horizontal(8, 0, -(w+1), sensor_color(pa->M_normal));
+    pa->N_flatgnd = sensor_create_horizontal(8, 0, w+1, sensor_color(pa->N_normal));
+    pa->M_rollflatgnd = sensor_create_horizontal(max(ry,8), ry, -(w+1), sensor_color(pa->M_normal));
+    pa->N_rollflatgnd = sensor_create_horizontal(max(ry,8), ry, w+1, sensor_color(pa->N_normal));
 
     /* success!!! ;-) */
     return pa;
@@ -325,21 +333,17 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
     sensor_destroy(pa->N_normal);
     sensor_destroy(pa->U_normal);
 
-    sensor_destroy(pa->A_intheair);
-    sensor_destroy(pa->B_intheair);
-    sensor_destroy(pa->C_intheair);
-    sensor_destroy(pa->D_intheair);
-    sensor_destroy(pa->M_intheair);
-    sensor_destroy(pa->N_intheair);
-    sensor_destroy(pa->U_intheair);
-
     sensor_destroy(pa->A_jumproll);
     sensor_destroy(pa->B_jumproll);
     sensor_destroy(pa->C_jumproll);
     sensor_destroy(pa->D_jumproll);
     sensor_destroy(pa->M_jumproll);
     sensor_destroy(pa->N_jumproll);
-    sensor_destroy(pa->U_jumproll);
+
+    sensor_destroy(pa->M_flatgnd);
+    sensor_destroy(pa->N_flatgnd);
+    sensor_destroy(pa->M_rollflatgnd);
+    sensor_destroy(pa->N_rollflatgnd);
 
     input_destroy(pa->input);
     free(pa);
@@ -662,24 +666,32 @@ void physicsactor_set_airdrag(physicsactor_t *pa, float value)
 
 
 /* sensors */
-#define GENERATE_SENSOR_GETTER(x) \
+#define GENERATE_SENSOR_GETTER(x, standing, jumping, rolling, in_the_air, standing_on_flat_ground, rolling_on_flat_ground) \
 sensor_t* sensor_##x(const physicsactor_t *pa) \
 { \
-    if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) \
-        return pa->x##_jumproll; \
+    if(pa->state == PAS_ROLLING) { \
+        if(!pa->midair && pa->angle % 0x40 == 0) \
+            return pa->x##_##rolling_on_flat_ground; \
+        else \
+            return pa->x##_##rolling; \
+    } \
+    else if(pa->state == PAS_JUMPING) \
+        return pa->x##_##jumping; \
     else if(pa->midair || pa->state == PAS_SPRINGING) \
-        return pa->x##_intheair; \
+        return pa->x##_##in_the_air; \
+    else if(!pa->midair && pa->angle % 0x40 == 0) \
+        return pa->x##_##standing_on_flat_ground; \
     else \
-        return pa->x##_normal; \
+        return pa->x##_##standing; \
 }
 
-GENERATE_SENSOR_GETTER(A)
-GENERATE_SENSOR_GETTER(B)
-GENERATE_SENSOR_GETTER(C)
-GENERATE_SENSOR_GETTER(D)
-GENERATE_SENSOR_GETTER(M)
-GENERATE_SENSOR_GETTER(N)
-GENERATE_SENSOR_GETTER(U)
+GENERATE_SENSOR_GETTER(A, normal, jumproll, jumproll, normal, normal,  jumproll)
+GENERATE_SENSOR_GETTER(B, normal, jumproll, jumproll, normal, normal,  jumproll)
+GENERATE_SENSOR_GETTER(C, normal, jumproll, jumproll, normal, normal,  jumproll)
+GENERATE_SENSOR_GETTER(D, normal, jumproll, jumproll, normal, normal,  jumproll)
+GENERATE_SENSOR_GETTER(M, normal, jumproll, jumproll, normal, flatgnd, rollflatgnd)
+GENERATE_SENSOR_GETTER(N, normal, jumproll, jumproll, normal, flatgnd, rollflatgnd)
+GENERATE_SENSOR_GETTER(U, normal, normal,   normal,   normal, normal,  normal)
 
 
 /* get bounding box */
@@ -687,48 +699,58 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 {
     const sensor_t* sensor_a = sensor_A(pa);
     const sensor_t* sensor_d = sensor_D(pa);
-    const sensor_t* sensor_m = sensor_M(pa);
-    const sensor_t* sensor_n = sensor_N(pa);
 
-    point2d_t a = sensor_tail(sensor_a, pa->position, pa->movmode);
-    point2d_t d = sensor_head(sensor_d, pa->position, pa->movmode);
-    point2d_t m = sensor_head(sensor_m, pa->position, pa->movmode);
-    point2d_t n = sensor_tail(sensor_n, pa->position, pa->movmode);
+    /* find size */
+    point2d_t a = sensor_local_tail(sensor_a);
+    point2d_t d = sensor_local_tail(sensor_d);
+    int w = d.x - a.x + 1;
+    int h = a.y - d.y + 1;
 
-    int w, h;
+    /* adjust size */
+    h -= 2 * AB_SENSOR_OFFSET; /* subtract two offsets: one from A, another from D */
+    h -= 6;
+    w -= 2;
+
+    /* find center */
+    int x = (int)floorf(pa->position.x);
+    int y = (int)floorf(pa->position.y);
+
+    /* rotate and apply offset */
+    point2d_t offset = sensor_local_head(sensor_d);
+    int rw, rh;
     switch(pa->movmode) {
         case MM_FLOOR:
-            w = n.x - m.x + 1;
-            h = a.y - d.y + 1;
+            rw = w;
+            rh = h;
+            y += offset.y;
             break;
 
         case MM_CEILING:
-            w = m.x - n.x + 1;
-            h = d.y - a.y + 1;
+            rw = w;
+            rh = h;
+            y -= offset.y;
             break;
 
         case MM_RIGHTWALL:
-            w = a.x - d.x + 1;
-            h = m.y - n.y + 1;
+            rw = h;
+            rh = w;
+            x += offset.y;
             break;
 
         case MM_LEFTWALL:
-            w = d.x - a.x + 1;
-            h = n.y - m.y + 1;
+            rw = h;
+            rh = w;
+            x -= offset.y;
             break;
     }
 
-    if(sensor_a == pa->A_jumproll) {
-        w *= 0.9f;
-        h *= 0.85f;
-    }
-
+    /* return values */
     if(width != NULL)
-        *width = max(w, 1);
+        *width = max(rw, 1);
     if(height != NULL)
-        *height = max(h, 1);
+        *height = max(rh, 1);
     if(center != NULL)
-        *center = pa->position;
+        *center = v2d_new(x, y);
 }
 
 /* check if the physicsactor is standing on a specific platform (obstacle) */
@@ -1181,7 +1203,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         const sensor_t* sensor = at_A ? sensor_A(pa) : sensor_B(pa);
         v2d_t position = v2d_new(floorf(pa->position.x), floorf(pa->position.y));
         point2d_t tail = sensor_tail(sensor, position, pa->movmode);
-        point2d_t sweet_spot = point2d_new((int)position.x, tail.y);
+
+        int delta = (int)position.x - tail.x;
+        int midpoint = (int)position.x + delta / 2;
+        point2d_t sweet_spot = point2d_new(midpoint, tail.y + 8);
 
         if(NULL == obstaclemap_get_best_obstacle_at(obstaclemap, sweet_spot.x, sweet_spot.y, sweet_spot.x, sweet_spot.y, pa->movmode, pa->layer)) {
             pa->state = PAS_LEDGE;
@@ -1474,8 +1499,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(at_M != NULL) {
         const sensor_t* sensor = sensor_M(pa);
         v2d_t position = v2d_new(floorf(pa->position.x), floorf(pa->position.y));
-        point2d_t head = sensor_head(sensor, position, pa->movmode);
-        point2d_t local_head = point2d_subtract(head, point2d_from_v2d(position));
+        point2d_t tail = sensor_tail(sensor, position, pa->movmode);
+        point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
         bool reset_angle = false;
         int wall;
 
@@ -1486,29 +1511,29 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         /* reposition the player */
         switch(pa->movmode) {
             case MM_FLOOR:
-                wall = obstacle_ground_position(at_M, head.x, head.y, GD_LEFT);
-                pa->position.x = wall - local_head.x + 1;
+                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_LEFT);
+                pa->position.x = wall - local_tail.x + 1;
                 pa->xsp = max(pa->xsp, 0.0f);
                 reset_angle = false;
                 break;
 
             case MM_CEILING:
-                wall = obstacle_ground_position(at_M, head.x, head.y, GD_RIGHT);
-                pa->position.x = wall - local_head.x - 1;
+                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_RIGHT);
+                pa->position.x = wall - local_tail.x - 1;
                 pa->xsp = min(pa->xsp, 0.0f);
                 reset_angle = true;
                 break;
 
             case MM_RIGHTWALL:
-                wall = obstacle_ground_position(at_M, head.x, head.y, GD_DOWN);
-                pa->position.y = wall - local_head.y - 1;
+                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_DOWN);
+                pa->position.y = wall - local_tail.y - 1;
                 pa->ysp = min(pa->ysp, 0.0f);
                 reset_angle = true;
                 break;
 
             case MM_LEFTWALL:
-                wall = obstacle_ground_position(at_M, head.x, head.y, GD_UP);
-                pa->position.y = wall - local_head.y + 1;
+                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_UP);
+                pa->position.y = wall - local_tail.y + 1;
                 pa->ysp = max(pa->ysp, 0.0f);
                 reset_angle = true;
                 break;
@@ -1592,12 +1617,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
             /* find the position of the sensor after setting the angle to 0 */
             v2d_t position = v2d_new(floorf(pa->position.x), floorf(pa->position.y));
-            point2d_t head = sensor_head(c_or_d, position, pa->movmode);
-            point2d_t local_head = point2d_subtract(head, point2d_from_v2d(position));
+            point2d_t tail = sensor_tail(c_or_d, position, pa->movmode);
+            point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
 
             /* reposition the player */
-            int ceiling_position = obstacle_ground_position(ceiling, head.x, head.y, GD_UP);
-            pa->position.y = ceiling_position - local_head.y + 1;
+            int ceiling_position = obstacle_ground_position(ceiling, tail.x, tail.y, GD_UP);
+            pa->position.y = ceiling_position - local_tail.y + 1;
 
             /* update the sensors */
             pa->midair = true; /* enable the ceiling sensors */
@@ -1965,8 +1990,8 @@ char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const 
     else if(d == NULL)
         return 'c';
 
-    sc = sensor_head(c_sensor, pa->position, pa->movmode);
-    sd = sensor_head(d_sensor, pa->position, pa->movmode);
+    sc = sensor_tail(c_sensor, pa->position, pa->movmode);
+    sd = sensor_tail(d_sensor, pa->position, pa->movmode);
 
     switch(pa->movmode) {
         case MM_FLOOR:
