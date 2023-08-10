@@ -720,21 +720,28 @@ void preprocess_transitions(spriteinfo_t *sprite)
  */
 void validate_sprite(spriteinfo_t *spr)
 {
-    extern void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet);
-
+    /* check for fatal errors */
     if(spr->source_file == NULL)
         fatal_error("Sprite error: unspecified source_file");
     else if(spr->spritesheet == NULL)
-        fatal_error("Invalid spritesheet \"%s\"", spr->source_file);
-    else if(spr->rect_x >= image_width(spr->spritesheet) || spr->rect_y >= image_height(spr->spritesheet))
-        fatal_error("Invalid source_rect (%d,%d,%d,%d) for %d x %d image \"%s\"", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h, image_width(spr->spritesheet), image_height(spr->spritesheet), spr->source_file);
+        fatal_error("Sprite error: invalid spritesheet \"%s\"", spr->source_file);
+    else if(spr->animation_count < 1 || spr->animation_data == NULL)
+        fatal_error("Sprite error: sprites must contain at least one animation");
 
+    /* validate the source_rect and the frame_size - and adjust if necessary */
     if(spr->rect_x < 0 || spr->rect_y < 0 || spr->rect_w <= 0 || spr->rect_h <= 0) {
         logfile_message("Sprite error: invalid source_rect (%d,%d,%d,%d)", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h);
         spr->rect_x = max(0, spr->rect_x);
         spr->rect_y = max(0, spr->rect_y);
         spr->rect_w = max(1, spr->rect_w);
         spr->rect_h = max(1, spr->rect_h);
+        logfile_message("Adjusting source_rect to (%d,%d,%d,%d)", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h);
+    }
+
+    if(spr->rect_x >= image_width(spr->spritesheet) || spr->rect_y >= image_height(spr->spritesheet)) {
+        logfile_message("Sprite error: source_rect (%d,%d,%d,%d) is out of bounds of %d x %d image \"%s\"", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h, image_width(spr->spritesheet), image_height(spr->spritesheet), spr->source_file);
+        spr->rect_x = min(spr->rect_x, image_width(spr->spritesheet) - 1);
+        spr->rect_y = min(spr->rect_y, image_height(spr->spritesheet) - 1);
         logfile_message("Adjusting source_rect to (%d,%d,%d,%d)", spr->rect_x, spr->rect_y, spr->rect_w, spr->rect_h);
     }
 
@@ -766,10 +773,10 @@ void validate_sprite(spriteinfo_t *spr)
         logfile_message("Adjusting source_rect size to (%d,%d)", spr->rect_w, spr->rect_h);
     }
 
-    if(spr->animation_count < 1 || spr->animation_data == NULL)
-        fatal_error("Sprite error: sprites must contain at least one animation");
-
+    /* validate individual animations */
+    extern void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet);
     int number_of_frames_in_the_sheet = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
+
     for(int i = 0; i < spr->animation_count; i++) {
         if(spr->animation_data[i] != NULL)
             animation_validate(spr->animation_data[i], number_of_frames_in_the_sheet);
