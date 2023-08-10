@@ -111,7 +111,7 @@ void physicsactor_jump(physicsactor_t *pa);
 
 void physicsactor_kill(physicsactor_t *pa);
 void physicsactor_hit(physicsactor_t *pa, float direction);
-void physicsactor_bounce(physicsactor_t *pa);
+bool physicsactor_bounce(physicsactor_t *pa, float direction);
 void physicsactor_spring(physicsactor_t *pa);
 void physicsactor_roll(physicsactor_t *pa);
 void physicsactor_drown(physicsactor_t *pa);

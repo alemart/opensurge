@@ -3169,11 +3169,11 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
             float border = 30.0f;
             if(ta->position.x > rx - border && ta->position.x < rx) {
                 ta->position.x = rx - border;
-                ta->speed.x = 0.0f;
+                player_set_speed(team[i], 0.0f);
             }
             if(ta->position.x > rx + rw && ta->position.x < rx + rw + border) {
                 ta->position.x = rx + rw + border;
-                ta->speed.x = 0.0f;
+                player_set_speed(team[i], 0.0f);
             }
         }
         else {
@@ -3204,11 +3204,13 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
         ta = player->actor;
         if(ta->position.x < rx) {
             ta->position.x = rx;
-            ta->speed.x = max(0.0f, ta->speed.x);
+            if(player_speed(player) < 0.0f)
+                player_set_speed(player, 0.0f);
         }
         if(ta->position.x > rx + rw) {
             ta->position.x = rx + rw;
-            ta->speed.x = min(0.0f, ta->speed.x);
+            if(player_speed(player) > 0.0f)
+                player_set_speed(player, 0.0f);
         }
         ta->position.y = clip(ta->position.y, ry, ry + rh);
     }
@@ -7124,12 +7126,14 @@ void setplayerspeed_render(objectmachine_t *obj, v2d_t camera_position)
 /* private strategies */
 void set_xspeed(player_t *player, expression_t *speed)
 {
-    player->actor->speed.x = expression_evaluate(speed);
+    float value = expression_evaluate(speed);
+    player_set_speed(player, value);
 }
 
 void set_yspeed(player_t *player, expression_t *speed)
 {
-    player->actor->speed.y = expression_evaluate(speed);
+    float value = expression_evaluate(speed);
+    player_set_ysp(player, value);
 }
 
 /* objectdecorator_setscale_t class */

@@ -269,7 +269,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
             for(i=0; i<team_size; i++) {
                 if(
                     (player_is_aggressive(team[i]) || player_is_charging(team[i])) ||
-                    (player_is_rolling(team[i]) /*&& fabs(team[i]->actor->speed.x) >= 240.0f*/)
+                    (player_is_rolling(team[i]) /*&& fabs(player_speed(team[i]) >= 240.0f*/)
                 ) {
                     if(
                         player_senses_layer(team[i], brk->layer) &&
@@ -493,8 +493,10 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                     }
 
                     /* bounce player */
-                    if(player_bounce(team[i], -1.0f, FALSE))
-                        team[i]->actor->speed.y = -180.0f;
+                    if(player_bounce(team[i], -1.0f, FALSE)) {
+                        player_set_ysp(team[i], -180.0f);
+                        player_detach_from_ground(team[i]);
+                    }
 
                     /* destroy brick */
                     sound_play(SFX_BREAK);

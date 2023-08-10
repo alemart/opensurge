@@ -164,6 +164,15 @@ void player_set_immortal(player_t* player, int immortal);
 int player_is_secondary(const player_t* player);
 void player_set_secondary(player_t* player, int secondary);
 
+float player_speed(const player_t* player);
+void player_set_speed(player_t* player, float value);
+float player_gsp(const player_t* player);
+void player_set_gsp(player_t* player, float value);
+float player_xsp(const player_t* player);
+void player_set_xsp(player_t* player, float value);
+float player_ysp(const player_t* player);
+void player_set_ysp(player_t* player, float value);
+
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);
 int player_is_running(const player_t *player);

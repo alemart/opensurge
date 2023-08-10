@@ -34,6 +34,7 @@
 #include "legacy/enemy.h"
 #include "../core/global.h"
 #include "../core/audio.h"
+#include "../core/video.h"
 #include "../core/timer.h"
 #include "../core/logfile.h"
 #include "../core/input.h"
@@ -99,6 +100,7 @@ static int is_head_underwater(const player_t* player);
 static void set_default_multipliers(physicsactor_t* pa, const character_t* character);
 static void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged);
 static void set_underwater_multipliers(physicsactor_t* pa, bool underwater);
+static void create_bouncing_collectibles(int number_of_collectibles, v2d_t position);
 
 
 /*
@@ -218,12 +220,16 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         player->pa_old_state = physicsactor_get_state(pa);
         physics_adapter(player, obstaclemap);
 
-        /* underwater logic: enter / leave water */
-        /* FIXME: scripting */
-        if(!player->underwater && act->position.y >= level_waterlevel())
-            player_enter_water(player);
-        else if(player->underwater && act->position.y < level_waterlevel())
-            player_leave_water(player);
+        /* enter / leave water */
+        /* FIXME scripting flag */
+        if(act->position.y >= level_waterlevel()) {
+            if(!player->underwater)
+                player_enter_water(player);
+        }
+        else {
+            if(player->underwater)
+                player_leave_water(player);
+        }
 
         /* underwater logic */
         if(player->underwater) {
@@ -256,7 +262,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         if(player->blinking) {
             player->blink_timer += timer_get_delta();
 
-            if(player->blink_timer - player->blink_visibility_timer >= 0.067f) {
+            if(player->blink_timer >= player->blink_visibility_timer + 0.067f) {
                 player->blink_visibility_timer = player->blink_timer;
                 act->visible = !act->visible;
             }
@@ -305,7 +311,8 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         /* misc */
         player->on_movable_platform = FALSE;
 
-        /* the focused player can't get off camera */
+        /* the focused player can't get off the boundaries of the camera
+           (when boundaries are enabled) */
         if(player_has_focus(player)) {
             v2d_t cam_topleft = camera_clip(v2d_new(0, 0));
             v2d_t cam_bottomright = camera_clip(level_size());
@@ -313,18 +320,18 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
             /* lock horizontally */
             if(act->position.x > cam_bottomright.x - padding + eps) {
                 act->position.x = cam_bottomright.x - padding;
-                act->speed.x *= 0.5f;
+                player_set_speed(player, player_speed(player) * 0.5f);
             }
             else if(act->position.x < cam_topleft.x + padding - eps) {
                 act->position.x = cam_topleft.x + padding;
-                act->speed.x *= 0.5f;
+                player_set_speed(player, player_speed(player) * 0.5f);
             }
 
             /* lock on top; won't prevent pits */
             if(!player_is_dying(player)) {
                 if(act->position.y < cam_topleft.y + padding - eps) {
                     act->position.y = cam_topleft.y + padding;
-                    act->speed.y *= 0.5f;
+                    player_set_ysp(player, player_ysp(player) * 0.5f);
                 }
             }
         }
@@ -361,16 +368,16 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     /* can't leave the world */
     if(act->position.x < padding - eps) {
         act->position.x = padding;
-        act->speed.x *= 0.5f;
+        player_set_speed(player, player_speed(player) * 0.5f);
     }
     else if(act->position.x > level_size().x - padding + eps) {
         act->position.x = level_size().x - padding;
-        act->speed.x *= 0.5f;
+        player_set_speed(player, player_speed(player) * 0.5f);
     }
 
     if(act->position.y < padding - eps) {
         act->position.y = padding;
-        act->speed.y *= 0.5f;
+        player_set_ysp(player, player_ysp(player) * 0.5f);
     }
 
     /* invincibility stars */
@@ -413,7 +420,6 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
                 v2d_t ressurrected_position = level_spawnpoint();
                 physicsactor_ressurrect(player->pa, ressurrected_position);
                 player->actor->position = ressurrected_position;
-                player->actor->speed = v2d_new(0.0f, 0.0f);
                 player->dead_timer = 0.0f;
             }
             else if(player_get_lives() <= 1) {
@@ -500,23 +506,10 @@ void player_render(player_t *player, v2d_t camera_position)
  */
 int player_bounce(player_t *player, float direction, int is_heavy_object)
 {
-    if(player_is_midair(player) && !player_is_dying(player)) {
-        actor_t *act = player->actor;
-        
-        if(direction <= 0.0f && act->speed.y >= 0.0f)
-            act->speed.y = -fabs(act->speed.y);
-        else if(is_heavy_object)
-            act->speed.y = fabs(act->speed.y) / 2.0f;
-        else
-            act->speed.y += 60.0f * sign(act->speed.y);
+    (void)is_heavy_object; /* obsolete */
 
-        player->pa_old_state = physicsactor_get_state(player->pa);
-        physicsactor_bounce(player->pa);
-
-        return TRUE;
-    }
-
-    return FALSE;
+    player->pa_old_state = physicsactor_get_state(player->pa);
+    return physicsactor_bounce(player->pa, direction);
 }
 
 
@@ -551,66 +544,36 @@ void player_detach_from_ground(player_t *player)
  */
 void player_hit(player_t *player, float direction)
 {
-    if(player->invincible || physicsactor_get_state(player->pa) == PAS_GETTINGHIT || player->blinking || player_is_dying(player))
+    /* do nothing */
+    if(player->invincible || player->blinking || player_is_getting_hit(player) || player_is_dying(player))
         return;
 
-    if(player_get_collectibles() > 0 || player->shield_type != SH_NONE || player->invulnerable) {
-        player_detach_from_ground(player);
-
-        player->pa_old_state = physicsactor_get_state(player->pa);
-        physicsactor_hit(player->pa, direction);
-        player->actor->speed.x = physicsactor_get_xsp(player->pa);
-        player->actor->speed.y = physicsactor_get_ysp(player->pa);
-
-        if(player->invulnerable) {
-            ; /* do nothing */
-            sound_play(SFX_DAMAGE);
-        }
-        else if(player->shield_type != SH_NONE) {
-            player->shield_type = SH_NONE;
-            sound_play(SFX_DAMAGE);
-        }
-        else {
-            float a = 101.25f, spd = 240.0f;
-            int r = min(32, player_get_collectibles());
-
-            /* create collectibles */
-            for(int i = 0; i < r; i++) {
-                v2d_t velocity = v2d_new(
-                    -sinf(DEG2RAD * a) * spd * (1 - 2 * (i % 2)),
-                    cosf(DEG2RAD * a) * spd
-                );
-                surgescript_object_t* collectible = level_create_object("Bouncing Collectible", player->actor->position);
-
-                if(collectible != NULL) {
-                    surgescript_var_t* x = surgescript_var_create();
-                    surgescript_var_t* y = surgescript_var_create();
-                    const surgescript_var_t* param[2] = {
-                        surgescript_var_set_number(x, velocity.x),
-                        surgescript_var_set_number(y, velocity.y),
-                    };
-                    surgescript_object_call_function(collectible, "setVelocity", param, 2, NULL);
-                    surgescript_var_destroy(y);
-                    surgescript_var_destroy(x);
-                }
-                else {
-                    item_t* b = level_create_legacy_item(IT_BOUNCINGCOLLECT, player->actor->position);
-                    bouncingcollectible_set_velocity(b, velocity);
-                }
-
-                a += 22.5f * (i % 2);
-                if(i == 16) {
-                    spd *= 0.5f;
-                    a -= 180.0f;
-                }
-            }
-
-            player_set_collectibles(0);
-            sound_play(SFX_GETHIT);
-        }
-    }
-    else
+    /* kill the player */
+    if(player_get_collectibles() <= 0 && player->shield_type == SH_NONE && !player->invulnerable) {
         player_kill(player);
+        return;
+    }
+
+    /* get hit */
+    player->pa_old_state = physicsactor_get_state(player->pa);
+    physicsactor_hit(player->pa, direction);
+
+    if(player->invulnerable) {
+        ; /* do nothing */
+        sound_play(SFX_DAMAGE);
+    }
+    else if(player->shield_type != SH_NONE) {
+        /* lose shield */
+        player->shield_type = SH_NONE;
+        sound_play(SFX_DAMAGE);
+    }
+    else {
+        /* create collectibles */
+        int number_of_collectibles = min(32, player_get_collectibles());
+        create_bouncing_collectibles(number_of_collectibles, player->actor->position);
+        player_set_collectibles(0);
+        sound_play(SFX_GETHIT);
+    }
 }
 
 /*
@@ -641,7 +604,6 @@ void player_kill(player_t *player)
         player_set_aggressive(player, FALSE);
         player_set_invulnerable(player, FALSE);
         player->shield_type = SH_NONE;
-        player->actor->speed = v2d_new(0, physicsactor_get_diejmp(player->pa));
 
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_kill(player->pa);
@@ -708,7 +670,6 @@ void player_spring(player_t *player)
 void player_drown(player_t *player)
 {
     if(player_is_underwater(player) && !player_is_dying(player)) {
-        player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_drown(player->pa);
         sound_play(SFX_DROWN);
@@ -723,7 +684,6 @@ void player_breathe(player_t *player)
 {
     if(player_is_underwater(player) && physicsactor_get_state(player->pa) != PAS_BREATHING && !player_is_dying(player)) {
         player_reset_underwater_timer(player);
-        player->actor->speed = v2d_new(0, 0);
         player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_breathe(player->pa);
         sound_play(SFX_BREATHE);
@@ -740,13 +700,14 @@ void player_enter_water(player_t *player)
         return;
 
     if(!player_is_underwater(player)) {
-        set_underwater_multipliers(player->pa, true);
-        player->actor->speed.x /= 2.0f;
-        player->actor->speed.y /= 4.0f;
+        player_set_speed(player, player_speed(player) * 0.5f);
+        player_set_ysp(player, player_ysp(player) * 0.25f);
 
-        sound_play(SFX_WATERIN);
         player->underwater_timer = 0.0f;
         player->underwater = TRUE;
+
+        set_underwater_multipliers(player->pa, true);
+        sound_play(SFX_WATERIN);
     }
 }
 
@@ -757,12 +718,15 @@ void player_enter_water(player_t *player)
 void player_leave_water(player_t *player)
 {
     if(player_is_underwater(player)) {
-        set_underwater_multipliers(player->pa, false);
-        if(!player_is_springing(player) && !player_is_dying(player))
-            player->actor->speed.y *= 2.0f;
+        if(!player_is_springing(player) && !player_is_dying(player)) {
+            float double_ysp = player_ysp(player) * 2.0f;
+            player_set_ysp(player, max(double_ysp, -960.0f));
+        }
 
-        sound_play(SFX_WATEROUT);
         player->underwater = FALSE;
+
+        set_underwater_multipliers(player->pa, false);
+        sound_play(SFX_WATEROUT);
     }
 }
 
@@ -1243,6 +1207,11 @@ int player_is_frozen(const player_t* player)
  */
 void player_set_frozen(player_t* player, int frozen)
 {
+    if(frozen && !player->disable_movement) {
+        if(player_is_blinking(player))
+            player_set_blinking(player, FALSE);
+    }
+
     player->disable_movement = frozen;
 }
 
@@ -1382,6 +1351,96 @@ void player_set_blinking(player_t* player, int blink)
         player->blinking = FALSE;
         player->actor->visible = true;
     }
+}
+
+/*
+ * player_speed()
+ * Get the speed of the player (gsp or xsp), in pixels per second
+ */
+float player_speed(const player_t* player)
+{
+    if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
+        return player_xsp(player);
+    else
+        return player_gsp(player);
+}
+
+/*
+ * player_set_speed()
+ * Set the speed of the player (gsp or xsp), in pixels per second
+ */
+void player_set_speed(player_t* player, float value)
+{
+    if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
+        return player_set_xsp(player, value);
+    else
+        return player_set_gsp(player, value);
+}
+
+/*
+ * player_gsp()
+ * Get the ground speed of the player, in pixels per second
+ */
+float player_gsp(const player_t* player)
+{
+    return physicsactor_get_gsp(player->pa);
+}
+
+/*
+ * player_set_gsp()
+ * Set the ground speed of the player, in pixels per second
+ */
+void player_set_gsp(player_t* player, float value)
+{
+    physicsactor_set_gsp(player->pa, value);
+}
+
+/*
+ * player_xsp()
+ * Get the x-speed of the player, in pixels per second
+ */
+float player_xsp(const player_t* player)
+{
+    return physicsactor_get_xsp(player->pa);
+}
+
+/*
+ * player_set_xsp()
+ * Set the x-speed of the player, in pixels per second
+ */
+void player_set_xsp(player_t* player, float value)
+{
+    if(!player_is_midair(player) && !nearly_zero(value)) {
+        movmode_t movmode = physicsactor_get_movmode(player->pa);
+        if((movmode == MM_RIGHTWALL && value < 0.0f) || (movmode == MM_LEFTWALL && value > 0.0f))
+            player_detach_from_ground(player);
+    }
+
+    physicsactor_set_xsp(player->pa, value);
+}
+
+/*
+ * player_ysp()
+ * Get the y-speed of the player, in pixels per second
+ */
+float player_ysp(const player_t* player)
+{
+    return physicsactor_get_ysp(player->pa);
+}
+
+/*
+ * player_set_ysp()
+ * Set the y-speed of the player, in pixels per second
+ */
+void player_set_ysp(player_t* player, float value)
+{
+    if(!player_is_midair(player) && !nearly_zero(value)) {
+        movmode_t movmode = physicsactor_get_movmode(player->pa);
+        if((movmode == MM_FLOOR && value < 0.0f) || (movmode == MM_CEILING && value > 0.0f))
+            player_detach_from_ground(player);
+    }
+
+    physicsactor_set_ysp(player->pa, value);
 }
 
 /*
@@ -1635,12 +1694,9 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
 
-    /* converting variables */
+    /* set position
+       TODO remove */
     physicsactor_set_position(pa, act->position);
-    if(!(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player)))
-        physicsactor_set_gsp(pa, act->speed.x);
-    physicsactor_set_xsp(pa, act->speed.x);
-    physicsactor_set_ysp(pa, act->speed.y);
 
     /* capturing input */
     if(input_button_down(act->input, IB_RIGHT))
@@ -1662,15 +1718,17 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
     else
         physicsactor_set_layer(pa, OL_DEFAULT);
 
-    /* updating the physics actor */
+    /* physics update */
     physicsactor_update(pa, obstaclemap);
 
-    /* unconverting variables */
-    act->position = physicsactor_get_position(pa);
-    if(player_is_midair(player) || player_is_getting_hit(player) || player_is_dying(player))
-        act->speed = v2d_new(physicsactor_get_xsp(pa), physicsactor_get_ysp(pa));
+    /* mirroring */
+    if(physicsactor_is_facing_right(pa))
+        act->mirror &= ~IF_HFLIP;
     else
-        act->speed = v2d_new(physicsactor_get_gsp(pa), 0.0f);
+        act->mirror |= IF_HFLIP;
+
+    /* update position */
+    act->position = physicsactor_get_position(pa);
 
     /* smoothing the angle */
     if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
@@ -1689,9 +1747,6 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
     }
     else
         act->angle = 0.0f;
-
-    /* mirroring */
-    act->mirror = !physicsactor_is_facing_right(pa) ? IF_HFLIP : IF_NONE;
 }
 
 /* hotspot "gambiarra" */
@@ -1908,4 +1963,42 @@ void set_default_multipliers(physicsactor_t* pa, const character_t* character)
         physicsactor_set_brakingthreshold(pa, 20000.0f);
     if(!character->ability.charge)
         physicsactor_set_chrg(pa, 0.0f);
+}
+
+/* create bouncing collectibles at the specified position */
+void create_bouncing_collectibles(int number_of_collectibles, v2d_t position)
+{
+    const char* object_name = "Bouncing Collectible";
+    const int collectibles_per_circle = 16;
+    const float angle_increment = 360.0f / (float)collectibles_per_circle;
+    float angle = 101.25f, speed = 240.0f;
+
+    surgescript_var_t* x = surgescript_var_create();
+    surgescript_var_t* y = surgescript_var_create();
+    const surgescript_var_t* param[2] = { x, y };
+
+    for(int i = 1; i <= number_of_collectibles; i++) {
+        int k = 1 - (i % 2);
+        float radians = DEG2RAD * angle, s = 1 - 2 * k;
+        v2d_t velocity = v2d_new(cosf(radians) * speed * s, -sinf(radians) * speed);
+
+        surgescript_object_t* collectible = level_create_object(object_name, position);
+        if(collectible == NULL) {
+            video_showmessage("Can't find object \"%s\"", object_name);
+            break;
+        }
+
+        surgescript_var_set_number(x, velocity.x);
+        surgescript_var_set_number(y, velocity.y);
+        surgescript_object_call_function(collectible, "setVelocity", param, 2, NULL);
+
+        angle += angle_increment * k;
+        if(i % collectibles_per_circle == 0) {
+            speed *= 0.5f;
+            angle -= 180.0f;
+        }
+    }
+
+    surgescript_var_destroy(y);
+    surgescript_var_destroy(x);
 }

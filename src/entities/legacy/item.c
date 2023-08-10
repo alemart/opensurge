@@ -1005,7 +1005,7 @@ void state_idle_handle(state_t *state, item_t *item, player_t **team, int team_s
             actor_change_animation(act, sprite_get_animation("SD_ENDLEVEL", 1));
             sound_play(SFX_BOSSHIT);
             player_bounce_ex(player, act, FALSE);
-            player->actor->speed.x *= -0.5;
+            player_set_speed(player, player_speed(player) * -0.5f);
 
             if(++(s->hit_count) >= 3) /* 3 hits and you're done */
                 animalprison_set_state(item, state_exploding_new());
@@ -1476,7 +1476,8 @@ void bump(item_t *bumper, player_t *player)
 
 
 
-    v0 = player->actor->speed; /* initial speed of the player */
+    v0.x = player_xsp(player); /* initial speed of the player */
+    v0.y = player_ysp(player);
     v0.x = (v0.x < 0) ? min(-300, v0.x) : max(300, v0.x);
 
 
@@ -1492,13 +1493,16 @@ void bump(item_t *bumper, player_t *player)
 
 
 
-    player->actor->speed = v2d_multiply(
+    v2d_t new_speed = v2d_multiply(
         v2d_add(
             v0,
             v2d_multiply(separation_speed, -mass_ratio)
         ),
         1.0f / (mass_ratio + 1.0f)
     );
+
+    player_set_xsp(player, new_speed.x);
+    player_set_ysp(player, new_speed.y);
 
     act->speed = v2d_multiply(
         v2d_add(v0, separation_speed),
@@ -3534,7 +3538,7 @@ void volatilespring_strategy(item_t *item, player_t *player)
 /* springs using the classic strategy are activated when you jump on them */
 void classicspring_strategy(item_t *item, player_t *player)
 {
-    if(player->actor->speed.y >= 1.0f || !nearly_zero(player->actor->angle))
+    if(player_ysp(player) >= 1.0f || !nearly_zero(player->actor->angle))
         activate_spring((spring_t*)item, player);
 }
 
@@ -3645,12 +3649,17 @@ void springfy_player(player_t *player, v2d_t strength)
 {
     actor_t *act = player->actor;
 
-    if(!nearly_zero(strength.y) && !nearly_zero(strength.x))
-        act->speed = strength;
-    else if(!nearly_zero(strength.y))
-        act->speed.y = strength.y;
+    if(!nearly_zero(strength.y) && !nearly_zero(strength.x)) {
+        player_set_xsp(player, strength.x);
+        player_set_ysp(player, strength.y);
+        player_detach_from_ground(player);
+    }
+    else if(!nearly_zero(strength.y)) {
+        player_set_ysp(player, strength.y);
+        player_detach_from_ground(player);
+    }
     else if(!nearly_zero(strength.x)) {
-        act->speed.x = strength.x;
+        player_set_speed(player, strength.x);
         player_lock_horizontally_for(player, 0.27f);
     }
 }
@@ -4103,7 +4112,9 @@ void teleporter_render(item_t* item, v2d_t camera_position)
 void teleport_player_to(player_t *player, v2d_t position)
 {
     player->actor->position = position;
-    player->actor->speed = v2d_new(0,0);
     player->actor->angle = 0;
+    player_set_gsp(player, 0.0f);
+    player_set_xsp(player, 0.0f);
+    player_set_ysp(player, 0.0f);
 }
 

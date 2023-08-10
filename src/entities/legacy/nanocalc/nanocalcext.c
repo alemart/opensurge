@@ -82,8 +82,8 @@ static float f_player_xpos() { return PLAYER->actor->position.x; }
 static float f_player_ypos() { return PLAYER->actor->position.y; }
 static float f_player_spawnpoint_x() { return PLAYER->actor->spawn_point.x; }
 static float f_player_spawnpoint_y() { return PLAYER->actor->spawn_point.y; }
-static float f_player_xspeed() { return PLAYER->actor->speed.x; }
-static float f_player_yspeed() { return PLAYER->actor->speed.y; }
+static float f_player_xspeed() { return player_speed(PLAYER); }
+static float f_player_yspeed() { return player_ysp(PLAYER); }
 static float f_player_angle() { return PLAYER->actor->angle * 57.2957795131f; }
 static float f_player_direction() { return PLAYER->actor->mirror & IF_HFLIP ? -1.0f : 1.0f; }
 static float f_player_seconds_remaining_to_drown() { return player_seconds_remaining_to_drown(PLAYER); }
