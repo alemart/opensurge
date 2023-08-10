@@ -1901,11 +1901,6 @@ void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged)
     physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
     physicsactor_set_air(pa, physicsactor_get_air(pa) * multiplier);
     physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * multiplier);
-
-    if(turbocharged)
-        physicsactor_set_capspeed(pa, physicsactor_get_capspeed(pa) * 1.25f);
-    else
-        physicsactor_set_capspeed(pa, physicsactor_get_capspeed(pa) / 1.25f);
 }
 
 /* underwater physics */
