@@ -72,15 +72,18 @@ enum movmode_t
 /* forward declarations */
 struct obstaclemap_t;
 struct obstacle_t;
+struct input_t;
 enum obstaclelayer_t;
 
 /* API */
 physicsactor_t* physicsactor_create(v2d_t position);
 physicsactor_t* physicsactor_destroy(physicsactor_t *pa);
-void physicsactor_reset_model_parameters(physicsactor_t* pa);
 
 void physicsactor_update(physicsactor_t *pa, const struct obstaclemap_t *obstaclemap);
 void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position);
+
+void physicsactor_capture_input(physicsactor_t *pa, const struct input_t *in); /* call before physicsactor_update() */
+void physicsactor_reset_model_parameters(physicsactor_t* pa);
 
 bool physicsactor_is_facing_right(const physicsactor_t *pa);
 bool physicsactor_is_touching_ceiling(const physicsactor_t *pa);
@@ -102,12 +105,6 @@ int physicsactor_roll_delta(const physicsactor_t* pa); /* roll delta (sensors) *
 float physicsactor_charge_intensity(const physicsactor_t* pa); /* in [0,1] */
 void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height, v2d_t *center); /* center may be NULL */
 bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const struct obstacle_t *obstacle);
-
-void physicsactor_walk_right(physicsactor_t *pa); /* call before physicsactor_update() */
-void physicsactor_walk_left(physicsactor_t *pa);
-void physicsactor_duck(physicsactor_t *pa);
-void physicsactor_look_up(physicsactor_t *pa);
-void physicsactor_jump(physicsactor_t *pa);
 
 void physicsactor_kill(physicsactor_t *pa);
 void physicsactor_hit(physicsactor_t *pa, float direction);

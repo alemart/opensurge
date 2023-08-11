@@ -536,29 +536,9 @@ float physicsactor_charge_intensity(const physicsactor_t* pa)
     return pa->charge_intensity;
 }
 
-void physicsactor_walk_right(physicsactor_t *pa)
+void physicsactor_capture_input(physicsactor_t *pa, const input_t *in)
 {
-    input_simulate_button_down(pa->input, IB_RIGHT);
-}
-
-void physicsactor_walk_left(physicsactor_t *pa)
-{
-    input_simulate_button_down(pa->input, IB_LEFT);
-}
-
-void physicsactor_duck(physicsactor_t *pa)
-{
-    input_simulate_button_down(pa->input, IB_DOWN);
-}
-
-void physicsactor_look_up(physicsactor_t *pa)
-{
-    input_simulate_button_down(pa->input, IB_UP);
-}
-
-void physicsactor_jump(physicsactor_t *pa)
-{
-    input_simulate_button_down(pa->input, IB_FIRE1);
+    input_copy(pa->input, in);
 }
 
 void physicsactor_kill(physicsactor_t *pa)

@@ -1721,16 +1721,7 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
     physicsactor_set_position(pa, act->position);
 
     /* capturing input */
-    if(input_button_down(act->input, IB_RIGHT))
-        physicsactor_walk_right(pa);
-    if(input_button_down(act->input, IB_LEFT))
-        physicsactor_walk_left(pa);
-    if(input_button_down(act->input, IB_DOWN))
-        physicsactor_duck(pa);
-    if(input_button_down(act->input, IB_UP))
-        physicsactor_look_up(pa);
-    if(input_button_down(act->input, IB_FIRE1))
-        physicsactor_jump(pa);
+    physicsactor_capture_input(pa, act->input);
 
     /* set the layer of the physics actor */
     if(player->layer == BRL_GREEN)
