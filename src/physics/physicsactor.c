@@ -1430,7 +1430,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 pa->xsp = pa->jmp * SIN(pa->angle) + pa->gsp * COS(pa->angle);
                 pa->ysp = pa->jmp * COS(pa->angle) - pa->gsp * SIN(pa->angle);
 #endif
-                pa->gsp = 0.0f;
                 pa->state = PAS_JUMPING;
                 pa->want_to_detach_from_ground = true;
                 FORCE_ANGLE(0x0);
@@ -1459,8 +1458,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     UPDATE_SENSORS();
 
     /* stop if we land after getting hit */
-    if(!pa->midair && pa->was_midair) {
-        if(pa->state == PAS_GETTINGHIT) {
+    if(pa->state == PAS_GETTINGHIT) {
+        if(!pa->midair && pa->was_midair) {
             pa->gsp = pa->xsp = 0.0f;
             pa->state = PAS_STOPPED;
         }
@@ -1840,10 +1839,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(pa->midair) {
         pa->midair_timer += dt;
         FORCE_ANGLE(0x0);
-
-        /* reset gsp, otherwise we may restore it when landing on the ground */
-        if(pa->ysp < 0.0f)
-            pa->gsp = 0.0f;
     }
     else
         pa->midair_timer = 0.0f;
