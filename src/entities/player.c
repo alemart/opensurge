@@ -1691,10 +1691,6 @@ void play_sounds(player_t* player)
         sound_play(player->character->sample.brake);
     }
 
-    ON_STATE(PAS_CHARGING) {
-        sound_play(player->character->sample.charge);
-    }
-
     ON_STATE(PAS_ROLLING) {
         if(player->pa_old_state != PAS_CHARGING)
             sound_play(player->character->sample.roll);
