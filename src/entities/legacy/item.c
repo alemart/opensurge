@@ -3647,8 +3647,6 @@ void spring_render(item_t* item, v2d_t camera_position)
 /* 'springfy' player */
 void springfy_player(player_t *player, v2d_t strength)
 {
-    actor_t *act = player->actor;
-
     if(!nearly_zero(strength.y) && !nearly_zero(strength.x)) {
         player_set_xsp(player, strength.x);
         player_set_ysp(player, strength.y);
