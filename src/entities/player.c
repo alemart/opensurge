@@ -56,20 +56,6 @@
 /* Smoothing the angle (the greater the value, the faster it rotates) */
 #define ANGLE_SMOOTHING 3
 
-/* macros */
-#define ON_STATE(player, s) \
-    if((player)->pa_old_state != (s) && physicsactor_get_state((player)->pa) == (s))
-
-#define CHANGE_ANIM(player, id) do { \
-    const animation_t *an = sprite_get_animation((player)->character->animation.sprite_name, (player)->character->animation.id); \
-    float sf = (player)->actor->animation_speed_factor; \
-    actor_change_animation((player)->actor, an); \
-    actor_change_animation_speed_factor((player)->actor, sf); \
-} while(0)
-
-#define ANIM_SPEED_FACTOR(k, spd) \
-    1.5f * min(1, (max((spd), 100)) / (k)) /* 24 / 16 */
-
 /* public constants */
 const int PLAYER_INITIAL_LIVES = 5;    /* initial lives */
 
@@ -90,6 +76,7 @@ static playermode_t mode = PM_COOPERATIVE;  /* mode of gameplay */
 /* misc */
 static void update_shield(player_t *player);
 static void update_animation(player_t *player);
+static void update_animation_speed(player_t *player);
 static void play_sounds(player_t *player);
 static void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap);
 static inline float delta_angle(float alpha, float beta);
@@ -126,9 +113,6 @@ player_t *player_create(int id, const char *character_name)
     p->secondary = FALSE;
     p->aggressive = FALSE;
     p->visible = TRUE;
-    p->actor = actor_create();
-    p->actor->input = input_create_user(NULL);
-    CHANGE_ANIM(p, stopped);
 
     /* auxiliary variables */
     p->on_movable_platform = FALSE;
@@ -139,6 +123,11 @@ player_t *player_create(int id, const char *character_name)
     p->blinking = FALSE;
     p->blink_timer = 0.0f;
     p->blink_visibility_timer = 0.0f;
+
+    /* actor */
+    p->actor = actor_create();
+    p->actor->input = input_create_user(NULL);
+    actor_change_animation(p->actor, sprite_get_animation(c->animation.sprite_name, c->animation.stopped));
 
     /* shield */
     p->shield = actor_create();
@@ -1620,58 +1609,93 @@ void update_shield(player_t *player)
 /* updates the animation of the player */
 void update_animation(player_t *player)
 {
-    physicsactorstate_t state = physicsactor_get_state(player->pa);
-    float xsp = fabs(physicsactor_get_xsp(player->pa));
-    float gsp = fabs(physicsactor_get_gsp(player->pa));
-    bool midair = physicsactor_is_midair(player->pa);
+    #define CHANGE_ANIM(id) do { \
+        const character_t* character = player->character; \
+        const animation_t* anim = sprite_get_animation(character->animation.sprite_name, character->animation.id); \
+        actor_change_animation(player->actor, anim); \
+    } while(0)
 
+    physicsactorstate_t state = physicsactor_get_state(player->pa);
+
+    /* change animation */
     switch(state) {
-        case PAS_STOPPED:    CHANGE_ANIM(player, stopped);    break;
-        case PAS_WALKING:    CHANGE_ANIM(player, walking);    break;
-        case PAS_RUNNING:    CHANGE_ANIM(player, running);    break;
-        case PAS_JUMPING:    CHANGE_ANIM(player, jumping);    break;
-        case PAS_SPRINGING:  CHANGE_ANIM(player, springing);  break;
-        case PAS_ROLLING:    CHANGE_ANIM(player, rolling);    break;
-        case PAS_CHARGING:   CHANGE_ANIM(player, charging);   break;
-        case PAS_PUSHING:    CHANGE_ANIM(player, pushing);    break;
-        case PAS_GETTINGHIT: CHANGE_ANIM(player, gettinghit); break;
-        case PAS_DEAD:       CHANGE_ANIM(player, dead);       break;
-        case PAS_BRAKING:    CHANGE_ANIM(player, braking);    break;
-        case PAS_LEDGE:      CHANGE_ANIM(player, ledge);      break;
-        case PAS_DROWNED:    CHANGE_ANIM(player, drowned);    break;
-        case PAS_BREATHING:  CHANGE_ANIM(player, breathing);  break;
-        case PAS_WAITING:    CHANGE_ANIM(player, waiting);    break;
-        case PAS_DUCKING:    CHANGE_ANIM(player, ducking);    break;
-        case PAS_LOOKINGUP:  CHANGE_ANIM(player, lookingup);  break;
-        case PAS_WINNING:    CHANGE_ANIM(player, winning);    break;
+        case PAS_STOPPED:    CHANGE_ANIM(stopped);    break;
+        case PAS_WALKING:    CHANGE_ANIM(walking);    break;
+        case PAS_RUNNING:    CHANGE_ANIM(running);    break;
+        case PAS_JUMPING:    CHANGE_ANIM(jumping);    break;
+        case PAS_SPRINGING:  CHANGE_ANIM(springing);  break;
+        case PAS_ROLLING:    CHANGE_ANIM(rolling);    break;
+        case PAS_CHARGING:   CHANGE_ANIM(charging);   break;
+        case PAS_PUSHING:    CHANGE_ANIM(pushing);    break;
+        case PAS_GETTINGHIT: CHANGE_ANIM(gettinghit); break;
+        case PAS_DEAD:       CHANGE_ANIM(dead);       break;
+        case PAS_BRAKING:    CHANGE_ANIM(braking);    break;
+        case PAS_LEDGE:      CHANGE_ANIM(ledge);      break;
+        case PAS_DROWNED:    CHANGE_ANIM(drowned);    break;
+        case PAS_BREATHING:  CHANGE_ANIM(breathing);  break;
+        case PAS_WAITING:    CHANGE_ANIM(waiting);    break;
+        case PAS_DUCKING:    CHANGE_ANIM(ducking);    break;
+        case PAS_LOOKINGUP:  CHANGE_ANIM(lookingup);  break;
+        case PAS_WINNING:    CHANGE_ANIM(winning);    break;
     }
 
-    if(state == PAS_WALKING || state == PAS_RUNNING)
-        actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(480, midair ? xsp : gsp));
-    else if(state == PAS_ROLLING && !midair)
-        actor_change_animation_speed_factor(player->actor, ANIM_SPEED_FACTOR(300, max(gsp, xsp)));
-    else if(!((state == PAS_JUMPING) || (state == PAS_ROLLING && midair)))
-        actor_change_animation_speed_factor(player->actor, 1.0f);
-    else if(state == PAS_JUMPING && player->actor->animation_speed_factor < 1.0f)
-        actor_change_animation_speed_factor(player->actor, 1.0f);
+    /* handle variable animation speeds */
+    update_animation_speed(player);
+
+    #undef CHANGE_ANIM
+}
+
+/* variable animation speeds */
+void update_animation_speed(player_t *player)
+{
+    physicsactorstate_t state = physicsactor_get_state(player->pa);
+    const animation_t* anim = player->actor->animation;
+    float original_fps = animation_fps(anim);
+    float desired_fps;
+
+    /* piecewise linear functions on |gsp| are simple and look good */
+    float gsp = fabsf(physicsactor_get_gsp(player->pa));
+    switch(state) {
+        case PAS_WALKING:
+        case PAS_RUNNING:
+            desired_fps = clip(30.0f * (gsp / 480.0f), 7.5f, 30.0f);
+            break;
+
+        case PAS_JUMPING:
+        case PAS_ROLLING:
+            desired_fps = clip(60.0f * (gsp / 360.0f), 15.0f, 60.0f); /* also: |gsp| / 300 */
+            break;
+
+        default:
+            desired_fps = original_fps; /* non-variable */
+            break;
+    }
+
+    if(!animation_is_transition(anim)) {
+        float fps_ratio = desired_fps / original_fps;
+        actor_change_animation_speed_factor(player->actor, fps_ratio);
+    }
 }
 
 /* play sounds as needed */
 void play_sounds(player_t* player)
 {
-    ON_STATE(player, PAS_JUMPING) {
+    #define ON_STATE(s) \
+        if(player->pa_old_state != (s) && physicsactor_get_state(player->pa) == (s))
+
+    ON_STATE(PAS_JUMPING) {
         sound_play(player->character->sample.jump);
     }
 
-    ON_STATE(player, PAS_BRAKING) {
+    ON_STATE(PAS_BRAKING) {
         sound_play(player->character->sample.brake);
     }
 
-    ON_STATE(player, PAS_CHARGING) {
+    ON_STATE(PAS_CHARGING) {
         sound_play(player->character->sample.charge);
     }
 
-    ON_STATE(player, PAS_ROLLING) {
+    ON_STATE(PAS_ROLLING) {
         if(player->pa_old_state != PAS_CHARGING)
             sound_play(player->character->sample.roll);
         else
@@ -1686,6 +1710,8 @@ void play_sounds(player_t* player)
             sound_play_ex(sample, 1.0f, 0.0f, freq);
         }
     }
+
+    #undef ON_STATE
 }
 
 /* the interface between player_t and physicsactor_t */
