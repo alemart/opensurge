@@ -569,8 +569,14 @@ void input_reset(input_t *in)
 void input_copy(input_t *dest, const input_t *src)
 {
     /* we just copy the buttons, not the enabled/blocked flags */
-    memcpy(dest->state, src->state, sizeof(src->state));
-    memcpy(dest->oldstate, src->oldstate, sizeof(src->oldstate));
+    if(src->enabled) {
+        memcpy(dest->state, src->state, sizeof(src->state));
+        memcpy(dest->oldstate, src->oldstate, sizeof(src->oldstate));
+    }
+    else {
+        memset(dest->state, 0, sizeof(dest->state));
+        memset(dest->oldstate, 0, sizeof(dest->oldstate));
+    }
 }
 
 
