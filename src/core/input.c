@@ -562,6 +562,18 @@ void input_reset(input_t *in)
 }
 
 
+/*
+ * input_copy()
+ * Copy the state of the buttons of src to dest
+ */
+void input_copy(input_t *dest, const input_t *src)
+{
+    /* we just copy the buttons, not the enabled/blocked flags */
+    memcpy(dest->state, src->state, sizeof(src->state));
+    memcpy(dest->oldstate, src->oldstate, sizeof(src->oldstate));
+}
+
+
 
 /*
  * input_is_joystick_available()
