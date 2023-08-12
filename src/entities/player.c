@@ -53,9 +53,6 @@
 
 
 
-/* Smoothing the angle (the greater the value, the faster it rotates) */
-#define ANGLE_SMOOTHING 3
-
 /* public constants */
 const int PLAYER_INITIAL_LIVES = 5;    /* initial lives */
 
@@ -79,6 +76,8 @@ static void update_animation(player_t *player);
 static void update_animation_speed(player_t *player);
 static void play_sounds(player_t *player);
 static void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap);
+static float smooth_angle(const physicsactor_t* pa, float current_angle);
+static bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode);
 static inline float delta_angle(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
@@ -1842,22 +1841,49 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
     act->position = physicsactor_get_position(pa);
 
     /* smooth the angle */
-    if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
-        player_is_stopped(player) || player_is_waiting(player) ||
-        player_is_ducking(player) || player_is_looking_up(player) ||
-        player_is_jumping(player) || player_is_pushing(player) ||
-        player_is_rolling(player) || player_is_at_ledge(player)
-    )) && !player_is_dying(player)) {
-        float new_angle = DEG2RAD * fix_angle(physicsactor_get_angle(pa), 15);
-        if(delta_angle(new_angle, act->angle) < 1.6f) {
-            float t = (ANGLE_SMOOTHING * PI) * timer_get_delta();
-            act->angle = lerp_angle(act->angle, new_angle, t);
+    act->angle = smooth_angle(pa, act->angle);
+}
+
+/* angle interpolation */
+float smooth_angle(const physicsactor_t* pa, float current_angle)
+{
+    const float ninety = 90.0f * DEG2RAD;
+    const float min_t = 0.15f, max_t = 1.0f;
+    movmode_t movmode = physicsactor_get_movmode(pa);
+    physicsactorstate_t state = physicsactor_get_state(pa);
+
+    if(!require_angle_to_be_zero(state, movmode)) {
+        float new_angle = fix_angle(physicsactor_get_angle(pa), 15) * DEG2RAD;
+        float delta = delta_angle(new_angle, current_angle);
+
+        if(delta < ninety) {
+            float t = min_t + (delta / ninety) * (max_t - min_t);
+            return lerp_angle(current_angle, new_angle, t);
         }
-        else
-            act->angle = new_angle;
+
+        return new_angle;
     }
-    else
-        act->angle = 0.0f;
+
+    return 0.0f;
+}
+
+/* angle interpolation: helper function */
+bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode)
+{
+    switch(state) {
+        case PAS_WALKING:
+        case PAS_RUNNING:
+        case PAS_BRAKING:
+        case PAS_SPRINGING: /* springing is used for various things (scripting) */
+            return false;
+
+        case PAS_DEAD:
+        case PAS_DROWNED:
+            return true;
+
+        default:
+            return movmode == MM_FLOOR;
+    }
 }
 
 /* hotspot "gambiarra" */

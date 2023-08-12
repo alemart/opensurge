@@ -474,7 +474,11 @@ bool physicsactor_ressurrect(physicsactor_t *pa)
         pa->gsp = 0.0f;
         pa->xsp = 0.0f;
         pa->ysp = 0.0f;
+
+        pa->angle = 0x0;
+        pa->movmode = MM_FLOOR;
         pa->facing_right = true;
+
         pa->state = PAS_STOPPED;
         return true;
     }
@@ -548,6 +552,9 @@ void physicsactor_kill(physicsactor_t *pa)
     if(pa->state != PAS_DEAD && pa->state != PAS_DROWNED) {
         pa->xsp = 0.0f;
         pa->ysp = pa->diejmp;
+
+        pa->angle = 0x0;
+        pa->movmode = MM_FLOOR;
         pa->facing_right = true;
 
         pa->state = PAS_DEAD;
@@ -601,6 +608,10 @@ void physicsactor_drown(physicsactor_t *pa)
     if(pa->state != PAS_DROWNED && pa->state != PAS_DEAD) {
         pa->xsp = 0.0f;
         pa->ysp = 0.0f;
+
+        pa->angle = 0x0;
+        pa->movmode = MM_FLOOR;
+        pa->facing_right = true;
 
         pa->state = PAS_DROWNED;
     }
@@ -1384,7 +1395,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             if(fabsf(pa->xsp) >= pa->airdragxthreshold) {
                 /*pa->xsp *= powf(pa->airdrag, 60.0f * dt);*/
                 pa->xsp *= pa->airdrag_coefficient[0] * dt + pa->airdrag_coefficient[1];
-                video_showmessage("air drag %f",pa->xsp);
             }
         }
 
