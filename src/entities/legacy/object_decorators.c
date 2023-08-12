@@ -3168,11 +3168,11 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
             /* hey, you can't enter here! */
             float border = 30.0f;
             if(ta->position.x > rx - border && ta->position.x < rx) {
-                ta->position.x = rx - border;
+                player_set_xpos(team[i], rx - border);
                 player_set_speed(team[i], 0.0f);
             }
             if(ta->position.x > rx + rw && ta->position.x < rx + rw + border) {
-                ta->position.x = rx + rw + border;
+                player_set_xpos(team[i], rx + rw + border);
                 player_set_speed(team[i], 0.0f);
             }
         }
@@ -3203,16 +3203,16 @@ void lockcamera_update(objectmachine_t *obj, player_t **team, int team_size, bri
     if(me->has_locked_somebody) {
         ta = player->actor;
         if(ta->position.x < rx) {
-            ta->position.x = rx;
+            player_set_xpos(player, rx);
             if(player_speed(player) < 0.0f)
                 player_set_speed(player, 0.0f);
         }
         if(ta->position.x > rx + rw) {
-            ta->position.x = rx + rw;
+            player_set_xpos(player, rx + rw);
             if(player_speed(player) > 0.0f)
                 player_set_speed(player, 0.0f);
         }
-        ta->position.y = clip(ta->position.y, ry, ry + rh);
+        player_set_ypos(player, clip(ta->position.y, ry, ry + rh));
     }
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
@@ -3600,7 +3600,9 @@ void moveplayer_update(objectmachine_t *obj, player_t **team, int team_size, bri
     v2d_t ds = v2d_multiply(speed, dt);
     player_t *player = enemy_get_observed_player(obj->get_object_instance(obj));
 
-    player->actor->position = v2d_add(player->actor->position, ds);
+    v2d_t prev_pos = player_position(player);
+    v2d_t new_pos = v2d_add(prev_pos, ds);
+    player_set_position(player, new_pos);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }
@@ -7006,7 +7008,8 @@ void setplayerposition_update(objectmachine_t *obj, player_t **team, int team_si
     player_t *player = enemy_get_observed_player(object);
     v2d_t offset = v2d_new(expression_evaluate(me->offset_x), expression_evaluate(me->offset_y));
 
-    player->actor->position = v2d_add(object->actor->position, offset);
+    v2d_t new_pos = v2d_add(object->actor->position, offset);
+    player_set_position(player, new_pos);
 
     decorated_machine->update(decorated_machine, team, team_size, brick_list, item_list, object_list);
 }

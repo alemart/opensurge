@@ -254,15 +254,21 @@ brick_t* brick_destroy(brick_t *brk)
  */
 void brick_update(brick_t *brk, player_t** team, int team_size)
 {
-    int i, brk_width, brk_height;
+    int i, brk_width, brk_height, max_bw, max_bh;
 
     /* do we still need this? */
     if((brk == NULL) || (brk->brick_ref == NULL))
         return;
 
-    /* move the brick */
+    /* find the size of the brick */
     brk_width = image_width(brk->brick_ref->image);
     brk_height = image_height(brk->brick_ref->image);
+
+    /* limit the number of particles (if any) */
+    max_bw = min(8, brk_width);
+    max_bh = min(8, brk_height);
+
+    /* move the brick */
     switch(brk->brick_ref->behavior) {
         /* breakable bricks */
         case BRB_BREAKABLE: {
@@ -275,9 +281,9 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                         player_senses_layer(team[i], brk->layer) &&
                         player_overlaps(team[i], brk->x - 16, brk->y - 4, brk_width + 32, brk_height)
                     ) {
-                        int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
-                        int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
-                        float dx = team[i]->actor->position.x - brk->x;
+                        int bw = clip(brk->brick_ref->behavior_arg[0], 1, max_bw);
+                        int bh = clip(brk->brick_ref->behavior_arg[1], 1, max_bh);
+                        float dx = player_position(team[i]).x - brk->x;
 
                         /* create particles */
                         for(int bi=0; bi<bw; bi++) {
@@ -325,8 +331,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                 brk->state = BRS_ACTIVE;
 
             if((brk->state == BRS_ACTIVE) && ((brk->value[0] += timer_get_delta()) >= BRICK_FALL_TTL)) {
-                int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
-                int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
+                int bw = clip(brk->brick_ref->behavior_arg[0], 1, max_bw);
+                int bh = clip(brk->brick_ref->behavior_arg[1], 1, max_bh);
                 int right_oriented = ((int)brk->brick_ref->behavior_arg[2] >= 0);
 
                 /* create particles */
@@ -382,9 +388,11 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(is_player_standing_on_platform(team[i], brk)) {
+                            v2d_t position = player_position(team[i]);
+                            v2d_t new_position = v2d_add(position, v2d_new(dx, dy));
+
+                            player_set_position(team[i], new_position);
                             team[i]->on_movable_platform = TRUE;
-                            team[i]->actor->position.x += dx;
-                            team[i]->actor->position.y += dy;
                         }
                     }
                 }
@@ -428,9 +436,11 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                 if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(is_player_standing_on_platform(team[i], brk)) {
+                            v2d_t position = player_position(team[i]);
+                            v2d_t new_position = v2d_add(position, v2d_new(dx, dy));
+
+                            player_set_position(team[i], new_position);
                             team[i]->on_movable_platform = TRUE;
-                            team[i]->actor->position.x += dx;
-                            team[i]->actor->position.y += dy;
                         }
                     }
                 }
@@ -454,14 +464,13 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                 /* get the y-position of the feet of the player */
                 physicsactor_bounding_box(team[i]->pa, &w, &h, &center);
                 if(player_is_frozen(team[i]))
-                    center = team[i]->actor->position;
+                    center = player_position(team[i]);
                 feet = center.y + h/2 - 2;
 
                 /* check collision */
                 if(
                     (
-                        (player_is_jumping(team[i]) &&
-                        physicsactor_get_ysp(team[i]->pa) > 0.0f) ||
+                        (player_is_jumping(team[i]) && player_ysp(team[i]) > 0.0f) ||
                         ((player_is_charging(team[i]) || player_is_rolling(team[i])) &&
                         feet < brk->y)
                     ) &&
@@ -469,8 +478,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                     player_overlaps(team[i], brk->x, brk->y - 10, brk_width, min(8, brk_height))
                 ) {
                     /* create particles */
-                    int bw = clip(brk->brick_ref->behavior_arg[0], 1, brk_width);
-                    int bh = clip(brk->brick_ref->behavior_arg[1], 1, brk_height);
+                    int bw = clip(brk->brick_ref->behavior_arg[0], 1, max_bw);
+                    int bh = clip(brk->brick_ref->behavior_arg[1], 1, max_bh);
 
                     for(int bi = 0; bi < bw; bi++) {
                         for(int bj = 0; bj < bh; bj++) {
@@ -566,8 +575,10 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* move the player */
             /* NOTE: handle multiple players at once? is it really needed? */
-            if(player != NULL)
-                player->actor->position.y += dy;
+            if(player != NULL) {
+                float ypos = player_position(player).y;
+                player_set_ypos(player, ypos + dy);
+            }
 
             /* should the brick fall? */
             if(brk->state == BRS_ACTIVE && brk->value[0] >= seconds_til_fall) {

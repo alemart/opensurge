@@ -502,8 +502,11 @@ surgescript_var_t* fun_lateupdate(surgescript_object_t* object, const surgescrip
     surgescript_var_set_number(dy_var, 0.0);
 
     if(player != NULL) {
-        player->actor->position.x += dx;
-        player->actor->position.y += dy;
+        v2d_t offset = v2d_new(dx, dy);
+        v2d_t position = player_position(player);
+        v2d_t new_position = v2d_add(position, offset);
+
+        player_set_position(player, new_position);
     }
 
     /* update the player components and pointer */
@@ -520,8 +523,7 @@ surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_v
 /* onTransformChange(transform): the player transform was changed somewhere in the script */
 surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    /* tell the engine about the new position/angle of the player;
-       currently, the scale parameter is ignored */
+    /* tell the engine about the new position, angle & scale of the player */
     player_t* player = get_player(object);
     if(player != NULL) {
         v2d_t position, scale;
@@ -529,9 +531,9 @@ surgescript_var_t* fun_ontransformchange(surgescript_object_t* object, const sur
 
         /* assuming local position == world position */
         read_transform(object, &position, &angle, &scale);
-        player->actor->position = position;
-        player->actor->angle = angle * DEG2RAD;
-        player->actor->scale = scale;
+        player_set_position(player, position);
+        player_set_angle(player, angle * DEG2RAD);
+        player_set_scale(player, scale);
     }
     return NULL;
 }
@@ -892,7 +894,7 @@ surgescript_var_t* fun_getangle(surgescript_object_t* object, const surgescript_
 {
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL) ? FIXANG(player->actor->angle) : 0.0f
+        (player != NULL) ? FIXANG(player_angle(player)) : 0.0f
     );
 }
 
@@ -1453,7 +1455,7 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
         #endif
 
         /* player inside locked area? */
-        if(camera_is_locked() && camera_clip_test(player->actor->position))
+        if(camera_is_locked() && camera_clip_test(player_position(player)))
             return surgescript_var_set_bool(surgescript_var_create(), false);
 
         /* error if level cleared */
@@ -1646,7 +1648,7 @@ void update_player(surgescript_object_t* object)
 
     /* update the transform */
     if(player != NULL)
-        update_transform(object, player->actor->position, FIXANG(player->actor->angle), player->actor->scale);
+        update_transform(object, player_position(player), FIXANG(player_angle(player)), player_scale(player));
     else
         update_transform(object, v2d_new(0.0f, 0.0f), 0.0f, v2d_new(1.0f, 1.0f));
 

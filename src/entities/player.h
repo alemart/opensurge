@@ -173,6 +173,15 @@ void player_set_xsp(player_t* player, float value);
 float player_ysp(const player_t* player);
 void player_set_ysp(player_t* player, float value);
 
+v2d_t player_position(const player_t* player);
+void player_set_position(player_t* player, v2d_t position);
+void player_set_xpos(player_t* player, float xpos);
+void player_set_ypos(player_t* player, float ypos);
+float player_angle(const player_t* player);
+void player_set_angle(player_t* player, float radians);
+v2d_t player_scale(const player_t* player);
+void player_set_scale(player_t* player, v2d_t scale);
+
 int player_is_stopped(const player_t *player);
 int player_is_walking(const player_t *player);
 int player_is_running(const player_t *player);

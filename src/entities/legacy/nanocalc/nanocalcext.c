@@ -78,13 +78,13 @@ static float f_screen_height() { return (float)VIDEO_SCREEN_H; }
 static float f_width() { return image_width(actor_image(target->actor)); }
 static float f_height() { return image_height(actor_image(target->actor)); }
 static float f_direction() { return target->actor->mirror & IF_HFLIP ? -1.0f : 1.0f; }
-static float f_player_xpos() { return PLAYER->actor->position.x; }
-static float f_player_ypos() { return PLAYER->actor->position.y; }
+static float f_player_xpos() { return player_position(PLAYER).x; }
+static float f_player_ypos() { return player_position(PLAYER).y; }
 static float f_player_spawnpoint_x() { return PLAYER->actor->spawn_point.x; }
 static float f_player_spawnpoint_y() { return PLAYER->actor->spawn_point.y; }
 static float f_player_xspeed() { return player_speed(PLAYER); }
 static float f_player_yspeed() { return player_ysp(PLAYER); }
-static float f_player_angle() { return PLAYER->actor->angle * 57.2957795131f; }
+static float f_player_angle() { return player_angle(PLAYER) * 57.2957795131f; }
 static float f_player_direction() { return PLAYER->actor->mirror & IF_HFLIP ? -1.0f : 1.0f; }
 static float f_player_seconds_remaining_to_drown() { return player_seconds_remaining_to_drown(PLAYER); }
 static float f_music_volume() { return music_get_volume(); }

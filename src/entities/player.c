@@ -201,6 +201,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     physicsactor_t *pa = player->pa;
     float padding = 16.0f, eps = 1e-5;
     float dt = timer_get_delta();
+    v2d_t position;
 
     /* if the player movement is enabled... */
     if(!player->disable_movement) {
@@ -209,9 +210,12 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         player->pa_old_state = physicsactor_get_state(pa);
         physics_adapter(player, obstaclemap);
 
+        /* read new position */
+        position = player_position(player);
+
         /* enter / leave water */
         /* FIXME scripting flag */
-        if(act->position.y >= level_waterlevel()) {
+        if(position.y >= level_waterlevel()) {
             if(!player->underwater)
                 player_enter_water(player);
         }
@@ -235,8 +239,8 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
             /* timer countdown */
             if(player->shield_type != SH_WATERSHIELD && !player_is_winning(player) && (
-                act->position.y < level_waterlevel() || /* forced underwater via scripting OR... */
-                is_head_underwater(player)              /* the head of the player is underwater */
+                position.y < level_waterlevel() || /* forced underwater via scripting OR... */
+                is_head_underwater(player)         /* the head of the player is underwater */
             ))
                 player->underwater_timer += dt;
             else
@@ -280,7 +284,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         }
 
         /* pitfalls */
-        if(act->position.y >= level_height_at(act->position.x))
+        if(position.y >= level_height_at(position.x))
             player_kill(player);
 
         /* smashed / crushed */
@@ -307,22 +311,25 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
             v2d_t cam_bottomright = camera_clip(level_size());
 
             /* lock horizontally */
-            if(act->position.x > cam_bottomright.x - padding + eps) {
-                act->position.x = cam_bottomright.x - padding;
+            if(position.x > cam_bottomright.x - padding + eps) {
+                player_set_xpos(player, cam_bottomright.x - padding);
                 player_set_speed(player, player_speed(player) * 0.5f);
             }
-            else if(act->position.x < cam_topleft.x + padding - eps) {
-                act->position.x = cam_topleft.x + padding;
+            else if(position.x < cam_topleft.x + padding - eps) {
+                player_set_xpos(player, cam_topleft.x + padding);
                 player_set_speed(player, player_speed(player) * 0.5f);
             }
 
             /* lock on top; won't prevent pits */
             if(!player_is_dying(player)) {
-                if(act->position.y < cam_topleft.y + padding - eps) {
-                    act->position.y = cam_topleft.y + padding;
+                if(position.y < cam_topleft.y + padding - eps) {
+                    player_set_ypos(player, cam_topleft.y + padding);
                     player_set_ysp(player, player_ysp(player) * 0.5f);
                 }
             }
+
+            /* update position */
+            position = player_position(player);
         }
 
         /* modes of gameplay */
@@ -355,19 +362,21 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     /* else if player is frozen, blinking and invisible ...? */
 
     /* can't leave the world */
-    if(act->position.x < padding - eps) {
-        act->position.x = padding;
+    if(position.x < padding - eps) {
+        player_set_xpos(player, padding);
         player_set_speed(player, player_speed(player) * 0.5f);
     }
-    else if(act->position.x > level_size().x - padding + eps) {
-        act->position.x = level_size().x - padding;
+    else if(position.x > level_size().x - padding + eps) {
+        player_set_xpos(player, level_size().x - padding);
         player_set_speed(player, player_speed(player) * 0.5f);
     }
 
-    if(act->position.y < padding - eps) {
-        act->position.y = padding;
+    if(position.y < padding - eps) {
+        player_set_ypos(player, padding);
         player_set_ysp(player, player_ysp(player) * 0.5f);
     }
+
+    position = player_position(player); /* update position */
 
     /* invincibility stars */
     if(player->invincible)
@@ -406,10 +415,10 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
             if(can_ressurrect) {
                 /* ressurrect */
-                v2d_t ressurrected_position = level_spawnpoint();
-                physicsactor_ressurrect(player->pa, ressurrected_position);
-                player->actor->position = ressurrected_position;
+                player_set_position(player, level_spawnpoint());
+                physicsactor_ressurrect(player->pa);
                 player->dead_timer = 0.0f;
+                /*position = player_position(player);*/ /* update position */
             }
             else if(player_get_lives() <= 1) {
                 /* game over */
@@ -558,8 +567,8 @@ void player_hit(player_t *player, float direction)
     }
     else {
         /* create collectibles */
-        int number_of_collectibles = min(32, player_get_collectibles());
-        create_bouncing_collectibles(number_of_collectibles, player->actor->position);
+        int number_of_collectibles = player_get_collectibles();
+        create_bouncing_collectibles(number_of_collectibles, player_position(player));
         player_set_collectibles(0);
         sound_play(SFX_GETHIT);
     }
@@ -790,7 +799,7 @@ int player_collision(const player_t *player, const actor_t *actor)
 
     physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
     if(player_is_frozen(player))
-        player_box_center = player->actor->position;
+        player_box_center = player_position(player);
 
     player_box[0] = player_box_center.x - player_box_width / 2;
     player_box[1] = player_box_center.y - player_box_height / 2;
@@ -819,7 +828,7 @@ int player_overlaps(const player_t *player, int x, int y, int width, int height)
 
     physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
     if(player_is_frozen(player))
-        player_box_center = player->actor->position;
+        player_box_center = player_position(player);
 
     player_box[0] = player_box_center.x - player_box_width / 2;
     player_box[1] = player_box_center.y - player_box_height / 2;
@@ -1433,6 +1442,83 @@ void player_set_ysp(player_t* player, float value)
 }
 
 /*
+ * player_position()
+ * The position of the player in world space
+ */
+v2d_t player_position(const player_t* player)
+{
+    return physicsactor_get_position(player->pa);
+}
+
+/*
+ * player_set_position()
+ * The position of the player in world space
+ */
+void player_set_position(player_t* player, v2d_t position)
+{
+    physicsactor_set_position(player->pa, position);
+    player->actor->position = position;
+}
+
+/*
+ * player_set_xpos()
+ * A helper that sets the x position of the player in world space
+ */
+void player_set_xpos(player_t* player, float xpos)
+{
+    v2d_t position = player_position(player);
+    position.x = xpos;
+    player_set_position(player, position);
+}
+
+/*
+ * player_set_ypos()
+ * A helper that sets the y position of the player in world space
+ */
+void player_set_ypos(player_t* player, float ypos)
+{
+    v2d_t position = player_position(player);
+    position.y = ypos;
+    player_set_position(player, position);
+}
+
+/*
+ * player_angle()
+ * The display angle of the player (in radians)
+ */
+float player_angle(const player_t* player)
+{
+    return player->actor->angle;
+}
+
+/*
+ * player_set_angle()
+ * Set the display angle of the player (in radians)
+ */
+void player_set_angle(player_t* player, float radians)
+{
+    player->actor->angle = radians;
+}
+
+/*
+ * player_scale()
+ * The scale of the player in world space
+ */
+v2d_t player_scale(const player_t* player)
+{
+    return player->actor->scale;
+}
+
+/*
+ * player_set_scale()
+ * Set the scale of the player in world space. (1,1) is the default scale.
+ */
+void player_set_scale(player_t* player, v2d_t scale)
+{
+    player->actor->scale = scale;
+}
+
+/*
  * player_id()
  * A number that uniquely identifies the player in the Level
  */
@@ -1577,30 +1663,41 @@ playermode_t player_get_mode()
 /* updates the current shield */
 void update_shield(player_t *player)
 {
-    actor_t *sh = player->shield, *act = player->actor;
-    v2d_t off = v2d_new(0,0);
-    sh->position = v2d_add(act->position, v2d_rotate(off, -act->angle));
-    sh->scale = act->scale;
+    actor_t *sh = player->shield;
+
+    v2d_t position = player_position(player);
+    float angle = player_angle(player);
+    v2d_t scale = player_scale(player);
+
+    v2d_t offset = v2d_new(0,0); /* no rotation */
+    sh->position = v2d_add(position, v2d_rotate(offset, -angle));
+    sh->scale = scale;
 
     switch(player->shield_type) {
         case SH_SHIELD:
             actor_change_animation(sh, sprite_get_animation("Shield", 0));
             break;
+
         case SH_FIRESHIELD:
             actor_change_animation(sh, sprite_get_animation("Fire shield", 0));
             break;
+
         case SH_THUNDERSHIELD:
             actor_change_animation(sh, sprite_get_animation("Thunder shield", 0));
             break;
+
         case SH_WATERSHIELD:
             actor_change_animation(sh, sprite_get_animation("Water shield", 0));
             break;
+
         case SH_ACIDSHIELD:
             actor_change_animation(sh, sprite_get_animation("Acid shield", 0));
             break;
+
         case SH_WINDSHIELD:
             actor_change_animation(sh, sprite_get_animation("Wind shield", 0));
             break;
+
         case SH_NONE:
             break;
     }
@@ -1713,14 +1810,10 @@ void play_sounds(player_t* player)
 /* the interface between player_t and physicsactor_t */
 void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
 {
-    actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
+    actor_t *act = player->actor;
 
-    /* set position
-       TODO remove */
-    physicsactor_set_position(pa, act->position);
-
-    /* capturing input */
+    /* capture input */
     physicsactor_capture_input(pa, act->input);
 
     /* set the layer of the physics actor */
@@ -1743,7 +1836,7 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
     /* update position */
     act->position = physicsactor_get_position(pa);
 
-    /* smoothing the angle */
+    /* smooth the angle */
     if((physicsactor_get_movmode(pa) != MM_FLOOR || !(
         player_is_stopped(player) || player_is_waiting(player) ||
         player_is_ducking(player) || player_is_looking_up(player) ||
@@ -1851,7 +1944,7 @@ void animate_invincibility_stars(player_t* player)
     physicsactor_bounding_box(player->pa, &width, &height, &center);
     max_distance = min(width, height);
     if(player_is_frozen(player))
-        center = player->actor->position;
+        center = player_position(player);
 
     /* animate */
     for(i = 0; i < PLAYER_MAX_STARS; i++) {
@@ -1897,7 +1990,7 @@ int is_head_underwater(const player_t* player)
 
     physicsactor_bounding_box(player->pa, &player_box_width, &player_box_height, &player_box_center);
     if(player_is_frozen(player))
-        player_box_center = player->actor->position;
+        player_box_center = player_position(player);
 
     top = player_box_center.y - player_box_height / 2.0f;
     bottom = player_box_center.y + player_box_height / 2.0f;
@@ -1977,13 +2070,17 @@ void set_default_multipliers(physicsactor_t* pa, const character_t* character)
 void create_bouncing_collectibles(int number_of_collectibles, v2d_t position)
 {
     const char* object_name = "Bouncing Collectible";
-    const int collectibles_per_circle = 16;
-    const float angle_increment = 360.0f / (float)collectibles_per_circle;
+    const int max_circles = 2, max_collectibles_per_circle = 16;
+    const int max_collectibles = max_collectibles_per_circle * max_circles;
+    const float angle_increment = 360.0f / (float)max_collectibles_per_circle;
     float angle = 101.25f, speed = 240.0f;
 
     surgescript_var_t* x = surgescript_var_create();
     surgescript_var_t* y = surgescript_var_create();
     const surgescript_var_t* param[2] = { x, y };
+
+    if(number_of_collectibles > max_collectibles)
+        number_of_collectibles = max_collectibles;
 
     for(int i = 1; i <= number_of_collectibles; i++) {
         int k = 1 - (i % 2);
@@ -2001,7 +2098,7 @@ void create_bouncing_collectibles(int number_of_collectibles, v2d_t position)
         surgescript_object_call_function(collectible, "setVelocity", param, 2, NULL);
 
         angle += angle_increment * k;
-        if(i % collectibles_per_circle == 0) {
+        if(i % max_collectibles_per_circle == 0) {
             speed *= 0.5f;
             angle -= 180.0f;
         }

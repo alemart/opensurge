@@ -4109,8 +4109,8 @@ void teleporter_render(item_t* item, v2d_t camera_position)
 /* teleports the player to the given position */
 void teleport_player_to(player_t *player, v2d_t position)
 {
-    player->actor->position = position;
-    player->actor->angle = 0;
+    player_set_position(player, position);
+    player_set_angle(player, 0.0f);
     player_set_gsp(player, 0.0f);
     player_set_xsp(player, 0.0f);
     player_set_ysp(player, 0.0f);

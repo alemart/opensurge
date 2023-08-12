@@ -516,7 +516,7 @@ void level_load(const char *filepath)
     spawn_players();
     player_set_collectibles(0);
     level_change_player(team[0]);
-    camera_set_position(player->actor->position);
+    camera_set_position(player_position(player));
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
 
     /* spawn setup objects */
@@ -1414,13 +1414,15 @@ void level_update()
     /* update players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++) {
-            float x = team[i]->actor->position.x;
-            float y = team[i]->actor->position.y;
-            float w = image_width(actor_image(team[i]->actor));
-            float h = image_height(actor_image(team[i]->actor));
+            const image_t* image = actor_image(team[i]->actor);
+            v2d_t position = player_position(team[i]);
+            float x = position.x;
+            float y = position.y;
+            float w = image_width(image);
+            float h = image_height(image);
 
             /* updating... */
-            if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
+            if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
                     player_update(team[i], obstaclemap);
             }
@@ -2379,6 +2381,7 @@ void render_players()
 void spawn_players()
 {
     int level_width = level_size().x;
+    bool at_left_side = (int)spawn_point.x <= level_width / 2;
 
     /* default players */
     if(team_size == 0) {
@@ -2387,13 +2390,14 @@ void spawn_players()
         team_size = 1;
     }
 
-    /* set the spawn point and the initial position of the players */
+    /* set the initial position of the players */
     for(int i = 0; i < team_size; i++) {
-        int j = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
+        int j = at_left_side ? (team_size - 1) - i : i;
+        v2d_t offset = v2d_new(15 * j, 0);
+        v2d_t position = v2d_add(spawn_point, offset);
 
-        team[i]->actor->mirror = ((int)spawn_point.x <= level_width/2) ? IF_NONE : IF_HFLIP;
-        team[i]->actor->spawn_point.x = team[i]->actor->position.x = spawn_point.x + 15 * j;
-        team[i]->actor->spawn_point.y = team[i]->actor->position.y = spawn_point.y;
+        player_set_position(team[i], position);
+        team[i]->actor->spawn_point = position; /* legacy */
     }
 }
 

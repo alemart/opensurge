@@ -465,7 +465,7 @@ float physicsactor_hlock_timer(const physicsactor_t *pa)
     return pa->hlock_timer;
 }
 
-bool physicsactor_ressurrect(physicsactor_t *pa, v2d_t position)
+bool physicsactor_ressurrect(physicsactor_t *pa)
 {
     if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED) {
         pa->gsp = 0.0f;
@@ -473,7 +473,6 @@ bool physicsactor_ressurrect(physicsactor_t *pa, v2d_t position)
         pa->ysp = 0.0f;
         pa->facing_right = true;
         pa->state = PAS_STOPPED;
-        physicsactor_set_position(pa, position);
         return true;
     }
 

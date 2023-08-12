@@ -1272,7 +1272,7 @@ float zindex_background(renderable_t r) { return 0.0f; }
 float zindex_foreground(renderable_t r) { return 1.0f; }
 float zindex_water(renderable_t r) { return 1.0f; }
 
-int ypos_player(renderable_t r) { return 0; } /*(int)(r.player->actor->position.y);*/
+int ypos_player(renderable_t r) { return 0; } /*(int)(player_position(r.player).y);*/
 int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
 int ypos_object(renderable_t r) { return (int)(r.object->actor->position.y); }
 int ypos_brick(renderable_t r) { return brick_position(r.brick).y; }

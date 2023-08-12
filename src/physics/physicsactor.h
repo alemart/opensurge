@@ -95,7 +95,7 @@ v2d_t physicsactor_get_position(const physicsactor_t *pa); /* the position of th
 void physicsactor_set_position(physicsactor_t *pa, v2d_t position);
 void physicsactor_lock_horizontally_for(physicsactor_t *pa, float seconds); /* set the horizontal control lock timer */
 float physicsactor_hlock_timer(const physicsactor_t *pa); /* get the horizontal control lock timer (in seconds) */
-bool physicsactor_ressurrect(physicsactor_t *pa, v2d_t position);
+bool physicsactor_ressurrect(physicsactor_t *pa);
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
 void physicsactor_detach_from_ground(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(const physicsactor_t *pa);
