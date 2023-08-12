@@ -171,8 +171,10 @@ static sensor_t* sensor_U(const physicsactor_t *pa);
 
 /*
  * sine/cosine table
- * In this subsystem, the angle ranges in 0-255 and increases clockwise
- * conversion formula:
+ *
+ * In this subsystem, the angle range is [0,255] (increases clockwise)
+ * Conversion formula:
+ *
  *     degrees = ((256 - angle) * 1.40625) % 360
  *     angle = (256 - degrees / 1.40625) % 256
  *
@@ -375,7 +377,7 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
     pa->grv =                 (14.0f/64.0f) * fpsmul * fpsmul ;
     pa->slp =                  (8.0f/64.0f) * fpsmul * fpsmul ;
     pa->chrg =                  12.0f       * fpsmul * 1.0f   ;
-    pa->walkthreshold =         0.5f        * fpsmul * 1.0f   ;
+    pa->walkthreshold =         0.125f      * fpsmul * 1.0f   ;
     pa->unrollthreshold =       0.5f        * fpsmul * 1.0f   ;
     pa->rollthreshold =         1.0f        * fpsmul * 1.0f   ;
     pa->rollfrc =             (3.0f/128.0f) * fpsmul * fpsmul ;
@@ -546,6 +548,7 @@ void physicsactor_kill(physicsactor_t *pa)
     if(pa->state != PAS_DEAD && pa->state != PAS_DROWNED) {
         pa->xsp = 0.0f;
         pa->ysp = pa->diejmp;
+        pa->facing_right = true;
 
         pa->state = PAS_DEAD;
     }
@@ -795,7 +798,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
  */
 
 /* utility macros */
-#define WALKING_OR_RUNNING(pa)      ((fabs((pa)->gsp) >= (pa)->topspeed) ? PAS_RUNNING : PAS_WALKING)
+#define WALKING_OR_RUNNING(pa)      ((fabsf((pa)->gsp) >= (pa)->topspeed) ? PAS_RUNNING : PAS_WALKING)
 
 /* call UPDATE_SENSORS whenever you update pa->position or pa->angle */
 #define UPDATE_SENSORS()            update_sensors(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N)
@@ -1058,8 +1061,15 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(!pa->midair && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING) {
 
         /* slope factor */
-        if(fabs(pa->gsp) >= pa->walkthreshold || fabs(SIN(pa->angle)) >= 0.707f)
-            pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+        if(pa->movmode != MM_CEILING) {
+            if(fabsf(pa->gsp) >= pa->walkthreshold || fabsf(SIN(pa->angle)) >= 0.707f) { /* can't stand on steep slopes */
+                if(fabsf(pa->gsp) < pa->capspeed) {
+                    pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+                    if(fabsf(pa->gsp) > pa->capspeed)
+                        pa->gsp = pa->capspeed * sign(pa->gsp);
+                }
+            }
+        }
 
         /* acceleration */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp >= 0.0f) {
@@ -1092,7 +1102,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
             }
-            else if(fabs(pa->gsp) >= pa->brakingthreshold) {
+            else if(fabsf(pa->gsp) >= pa->brakingthreshold) {
                 if(pa->movmode == MM_FLOOR)
                     pa->state = PAS_BRAKING;
             }
@@ -1103,7 +1113,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
             }
-            else if(fabs(pa->gsp) >= pa->brakingthreshold) {
+            else if(fabsf(pa->gsp) >= pa->brakingthreshold) {
                 if(pa->movmode == MM_FLOOR)
                     pa->state = PAS_BRAKING;
             }
@@ -1112,8 +1122,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         /* braking & friction */
         if(pa->state == PAS_BRAKING) {
             /* braking */
-            float brk = pa->frc * (1.5f + 3.0f * fabs(SIN(pa->angle)));
-            if(fabs(pa->gsp) <= brk * dt) {
+            float brk = pa->frc * (1.5f + 3.0f * fabsf(SIN(pa->angle)));
+            if(fabsf(pa->gsp) <= brk * dt) {
                 pa->gsp = 0.0f;
                 pa->state = PAS_STOPPED;
             }
@@ -1123,7 +1133,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         else {
             /* friction */
             if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
-                if(fabs(pa->gsp) <= pa->frc * dt) {
+                if(fabsf(pa->gsp) <= pa->frc * dt) {
                     pa->gsp = 0.0f;
                     pa->state = PAS_STOPPED;
                 }
@@ -1133,7 +1143,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         }
 
         /* animation issues */
-        if(fabs(pa->gsp) < pa->walkthreshold) {
+        if(fabsf(pa->gsp) < pa->walkthreshold) {
             if(pa->state == PAS_PUSHING && !input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT))
                 pa->state = PAS_STOPPED;
             else if(pa->state == PAS_PUSHING || pa->state == PAS_LOOKINGUP || pa->state == PAS_DUCKING)
@@ -1142,7 +1152,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
                 pa->state = PAS_WALKING;
             else if(pa->state != PAS_WAITING)
                 pa->state = PAS_STOPPED;
-            else if((pa->state == PAS_STOPPED || pa->state == PAS_WAITING) && !nearly_zero(pa->gsp))
+            else if(!nearly_zero(pa->gsp))
                 pa->state = PAS_WALKING;
         }
         else {
@@ -1237,7 +1247,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     /* start rolling */
     if(!pa->midair && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
-        if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
+        if(fabsf(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
             pa->state = PAS_ROLLING;
     }
 
@@ -1245,10 +1255,18 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     if(!pa->midair && pa->state == PAS_ROLLING) {
 
         /* slope factor */
-        if(pa->gsp * SIN(pa->angle) >= 0.0f)
-            pa->gsp += pa->rolluphillslp * -SIN(pa->angle) * dt;
-        else
-            pa->gsp += pa->rolldownhillslp * -SIN(pa->angle) * dt;
+        if(pa->movmode != MM_CEILING) {
+            if(pa->gsp * SIN(pa->angle) >= 0.0f) {
+                /* rolling uphill */
+                pa->gsp += pa->rolluphillslp * -SIN(pa->angle) * dt;
+            }
+            else if(fabsf(pa->gsp) < pa->capspeed) {
+                /* rolling downhill */
+                pa->gsp += pa->rolldownhillslp * -SIN(pa->angle) * dt;
+                if(fabsf(pa->gsp) > pa->capspeed)
+                    pa->gsp = pa->capspeed * sign(pa->gsp);
+            }
+        }
 
         /* deceleration */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f)
@@ -1257,13 +1275,13 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             pa->gsp = max(0.0f, pa->gsp - pa->rolldec * dt);
 
         /* friction */
-        if(fabs(pa->gsp) > pa->rollfrc * dt)
+        if(fabsf(pa->gsp) > pa->rollfrc * dt)
             pa->gsp -= pa->rollfrc * sign(pa->gsp) * dt;
         else
             pa->gsp = 0.0f;
 
         /* unroll */
-        if(fabs(pa->gsp) < pa->unrollthreshold)
+        if(fabsf(pa->gsp) < pa->unrollthreshold)
             pa->state = PAS_STOPPED; /*PAS_WALKING;*/ /* anim transition: rolling -> stopped */
 
         /* facing right? */
@@ -1290,7 +1308,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         /* charging more...! */
         if(input_button_pressed(pa->input, IB_FIRE1))
             pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
-        else if(fabs(pa->charge_intensity) >= pa->chrgthreshold)
+        else if(fabsf(pa->charge_intensity) >= pa->chrgthreshold)
             pa->charge_intensity *= 0.999506551f - 1.84539309f * dt; /* attenuate charge intensity */
 
         /* release */
@@ -1307,15 +1325,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     /*
      *
-     * speed cap
+     * speed cap & conversions
      *
      */
 
     if(!pa->midair) {
 
         /* cap gsp; you're way too fast... */
-        float gnd_capspeed = min(pa->capspeed, HARD_CAPSPEED);
-        pa->gsp = clip(pa->gsp, -gnd_capspeed, gnd_capspeed);
+        pa->gsp = clip(pa->gsp, -HARD_CAPSPEED, HARD_CAPSPEED);
 
         /* convert gsp to xsp and ysp */
         if(!pa->want_to_detach_from_ground) { /* if not springing, etc. */
@@ -1330,12 +1347,11 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     }
     else {
 
-        const float air_capspeed = HARD_CAPSPEED;
-
         /* cap xsp & ysp */
-        /* Note: alternatively, this could be such that xsp^2 + ysp^2 <= air_capspeed^2 */
-        pa->xsp = clip(pa->xsp, -air_capspeed, air_capspeed);
-        pa->ysp = clip(pa->ysp, -air_capspeed, air_capspeed);
+        pa->xsp = clip(pa->xsp, -HARD_CAPSPEED, HARD_CAPSPEED);
+        pa->ysp = clip(pa->ysp, -HARD_CAPSPEED, HARD_CAPSPEED);
+
+        /* alternatively, this cap could be such that xsp^2 + ysp^2 <= capspeed^2 */
 
     }
 
@@ -1365,9 +1381,10 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
         /* air drag */
         if(pa->ysp < 0.0f && pa->ysp > pa->airdragthreshold && pa->state != PAS_GETTINGHIT) {
-            if(fabs(pa->xsp) >= pa->airdragxthreshold) {
+            if(fabsf(pa->xsp) >= pa->airdragxthreshold) {
                 /*pa->xsp *= powf(pa->airdrag, 60.0f * dt);*/
                 pa->xsp *= pa->airdrag_coefficient[0] * dt + pa->airdrag_coefficient[1];
+                video_showmessage("air drag %f",pa->xsp);
             }
         }
 
@@ -1619,7 +1636,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         /* reattach to the ceiling or bump the head */
         if(must_reattach) {
             /* adjust speeds */
-            pa->gsp = (fabs(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+            pa->gsp = (fabsf(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
             pa->xsp = pa->ysp = 0.0f;
 
             /* adjust the state */
@@ -1769,9 +1786,9 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 0.5f * -sign(SIN(pa->angle));
+            pa->gsp = fabsf(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 0.5f * -sign(SIN(pa->angle));
         else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+            pa->gsp = fabsf(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
 
         /* reset speeds */
         pa->xsp = pa->ysp = 0.0f;
@@ -1799,7 +1816,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     if(!pa->midair) {
         if(pa->movmode != MM_FLOOR && pa->hlock_timer == 0.0f) {
-            if(fabs(pa->gsp) < pa->falloffthreshold) {
+            if(fabsf(pa->gsp) < pa->falloffthreshold) {
                 pa->hlock_timer = 0.5f;
                 if(pa->angle >= 0x40 && pa->angle <= 0xC0) {
                     pa->gsp = 0.0f;
@@ -1825,7 +1842,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     /* remain on the winning state */
     if(pa->winning_pose && !pa->midair) {
-        if(fabs(pa->gsp) < pa->walkthreshold)
+        if(fabsf(pa->gsp) < pa->walkthreshold)
             pa->state = PAS_WINNING;
     }
 

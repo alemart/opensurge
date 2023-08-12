@@ -255,7 +255,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         if(player->blinking) {
             player->blink_timer += timer_get_delta();
 
-            if(player->blink_timer >= player->blink_visibility_timer + 0.067f) {
+            if(player->blink_timer >= player->blink_visibility_timer + 0.06f) {
                 player->blink_visibility_timer = player->blink_timer;
                 act->visible = !act->visible;
             }
@@ -1953,7 +1953,7 @@ void animate_invincibility_stars(player_t* player)
 
     /* animate */
     for(i = 0; i < PLAYER_MAX_STARS; i++) {
-        x = 1.0f - fmodf(timer_get_ticks() + (magic * i), 1000.0f) * 0.001f;
+        x = 1.0f - fmodf(timer_get_elapsed() + (magic * i), 1.0f);
         distance = max_distance * (1.0f - x * x * x);
         angle = -i * angpi;
         player->star[i]->alpha = x * x;
