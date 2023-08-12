@@ -1747,8 +1747,9 @@ void update_animation_speed(player_t *player)
 {
     physicsactorstate_t state = physicsactor_get_state(player->pa);
     const animation_t* anim = player->actor->animation;
+    int frame_count = animation_frame_count(anim);
     float original_fps = animation_fps(anim);
-    float desired_fps;
+    float desired_fps, fps_multiplier;
 
     /* piecewise linear functions on |gsp| are simple and look good */
     float gsp = fabsf(physicsactor_get_gsp(player->pa));
@@ -1756,21 +1757,25 @@ void update_animation_speed(player_t *player)
         case PAS_WALKING:
         case PAS_RUNNING:
             desired_fps = clip(30.0f * (gsp / 480.0f), 7.5f, 30.0f);
+            fps_multiplier = frame_count / 8.0f; /* the animation should have a single walk/run cycle */
             break;
 
         case PAS_JUMPING:
         case PAS_ROLLING:
             desired_fps = clip(60.0f * (gsp / 360.0f), 15.0f, 60.0f); /* also: |gsp| / 300 */
+            fps_multiplier = frame_count / 8.0f;
             break;
 
         default:
             desired_fps = original_fps; /* non-variable */
+            fps_multiplier = 1.0f;
             break;
     }
 
     if(!animation_is_transition(anim)) {
         float fps_ratio = desired_fps / original_fps;
-        actor_change_animation_speed_factor(player->actor, fps_ratio);
+        float speed_factor = fps_ratio * max(1.0f, fps_multiplier);
+        actor_change_animation_speed_factor(player->actor, speed_factor);
     }
 }
 
