@@ -289,7 +289,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
        These sensors are vertical and symmetric; hence,
        W = w - (-w) + 1 = 2*w + 1 => w = (W-1)/2; also, h = (H-1)/2 */
     const int default_width = 19, default_height = 39; /* pick odd numbers */
-    const int roll_width = 15, roll_height = 29; /* this is expected to be smaller than the default box */
+    const int roll_width = 15, roll_height = 29; /* this is expected to be smaller than the default box (about 75%) */
     const int roll_y_offset = 5; /* offset from the sensor origin */
 
     int w = (default_width - 1) / 2, h = (default_height - 1) / 2;
@@ -440,6 +440,7 @@ physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa)
 
 int physicsactor_get_angle(const physicsactor_t *pa)
 {
+    /* return angle in degrees: [0,360) counterclockwise */
     return (((256 - pa->angle) * 180) / 128) % 360;
 }
 
