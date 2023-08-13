@@ -34,9 +34,9 @@
 #define RAD2DEG                 57.29577951308232
 #define DEG2RAD                 0.01745329251994329576
 
-#define sign(x)                 copysignf(1.0f, (x)) /* -1.0f or 1.0f */
-#define nearly_zero(x)          (fabs(x)<=0.00001f)
-#define nearly_equal(a,b)       (fabs((a)-(b))<=0.00001f*max(fabs(a),fabs(b)))
+#define sign(x)                 copysign(1.0, (x)) /* -1.0 or 1.0 */
+#define nearly_zero(x)          (fabs(x)<=0.00001)
+#define nearly_equal(a,b)       (fabs((a)-(b))<=0.00001*max(fabs(a),fabs(b)))
 
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
