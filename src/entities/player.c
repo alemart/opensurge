@@ -449,17 +449,15 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 void player_early_update(player_t *player)
 {
     /* update animation */
-    do {
-        if(player->disable_animation_control) {
-            player->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
-            break;
-        }
+    if(player->disable_animation_control) {
+        player->disable_animation_control = FALSE; /* for set_player_animation (scripting) */
+        return;
+    }
 
-        if(player->disable_movement)
-            break;
+    if(player->disable_movement)
+        return;
 
-        update_animation(player);
-    } while(0);
+    update_animation(player);
 }
 
 

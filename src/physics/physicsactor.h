@@ -156,8 +156,6 @@ float physicsactor_get_rolluphillslp(const physicsactor_t *pa); /* roll uphill s
 void physicsactor_set_rolluphillslp(physicsactor_t *pa, float value);
 float physicsactor_get_rolldownhillslp(const physicsactor_t *pa); /* roll downhill slope */
 void physicsactor_set_rolldownhillslp(physicsactor_t *pa, float value);
-float physicsactor_get_walkthreshold(const physicsactor_t *pa); /* walk threshold */
-void physicsactor_set_walkthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_rollthreshold(const physicsactor_t *pa); /* roll threshold */
 void physicsactor_set_rollthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_unrollthreshold(const physicsactor_t *pa); /* unroll threshold */
