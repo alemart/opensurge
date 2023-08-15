@@ -63,6 +63,8 @@ static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getcapspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gethlocktime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinput(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getdying(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getstopped(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -208,6 +210,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
     surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
+    surgescript_vm_bind(vm, "Player", "get_capspeed", fun_getcapspeed, 0);
+    surgescript_vm_bind(vm, "Player", "get_hlockTime", fun_gethlocktime, 0);
     surgescript_vm_bind(vm, "Player", "get_input", fun_getinput, 0);
     surgescript_vm_bind(vm, "Player", "get_dying", fun_getdying, 0);
     surgescript_vm_bind(vm, "Player", "get_stopped", fun_getstopped, 0);
@@ -809,7 +813,25 @@ surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescri
 {
     player_t* player = get_player(object);
     return surgescript_var_set_number(surgescript_var_create(),
-        (player != NULL) ? physicsactor_get_topspeed(player->pa) : 0.0f
+        (player != NULL) ? physicsactor_get_topspeed(player->pa) : 0.0
+    );
+}
+
+/* cap speed, in px/s */
+surgescript_var_t* fun_getcapspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(),
+        (player != NULL) ? physicsactor_get_capspeed(player->pa) : 0.0
+    );
+}
+
+/* horizontal control lock time, in seconds */
+surgescript_var_t* fun_gethlocktime(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(),
+        (player != NULL) ? physicsactor_hlock_timer(player->pa) : 0.0
     );
 }
 
