@@ -297,7 +297,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         /* rolling misc */
         if(!player_is_midair(player))
             player->thrown_while_rolling = FALSE;
-        else if(physicsactor_get_ysp(pa) < 0.0f && player_is_rolling(player))
+        else if(player_ysp(player) < 0.0f && player_is_rolling(player))
             player->thrown_while_rolling = TRUE;
 
         /* misc */
@@ -627,7 +627,7 @@ void player_enable_roll(player_t *player)
 {
     physicsactor_t *pa = player->pa;
     if(player->disable_roll) {
-        physicsactor_set_rollthreshold(pa, physicsactor_get_rollthreshold(pa) - 1000.0f);
+        physicsactor_set_rollthreshold(pa, physicsactor_get_rollthreshold(pa) - 1000.0);
         player->disable_roll = FALSE;
     }
 }
@@ -640,7 +640,7 @@ void player_disable_roll(player_t *player)
 {
     if(!player->disable_roll) {
         physicsactor_t *pa = player->pa;
-        physicsactor_set_rollthreshold(pa, physicsactor_get_rollthreshold(pa) + 1000.0f);
+        physicsactor_set_rollthreshold(pa, physicsactor_get_rollthreshold(pa) + 1000.0);
         player->disable_roll = TRUE;
     }
 }
@@ -1749,7 +1749,7 @@ void update_animation_speed(player_t *player)
     float desired_fps, fps_multiplier;
 
     /* piecewise linear functions on |gsp| are simple and look good */
-    float gsp = fabsf(physicsactor_get_gsp(player->pa));
+    float gsp = fabsf(player_gsp(player));
     switch(state) {
         case PAS_WALKING:
         case PAS_RUNNING:
@@ -2029,7 +2029,7 @@ int is_head_underwater(const player_t* player)
 /* turbocharged physics */
 void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged)
 {
-    float multiplier = turbocharged ? 2.0f : 0.5f;
+    double multiplier = turbocharged ? 2.0 : 0.5;
 
     physicsactor_set_acc(pa, physicsactor_get_acc(pa) * multiplier);
     physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
@@ -2048,16 +2048,16 @@ void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged)
        being set due to a nearly stopped player. This mitigates but doesn't
        solve the issue, which is caused by the increased friction (frc) */
     if(turbocharged)
-        physicsactor_set_falloffthreshold(pa, physicsactor_get_falloffthreshold(pa) * 0.125f);
+        physicsactor_set_falloffthreshold(pa, physicsactor_get_falloffthreshold(pa) * 0.125);
     else
-        physicsactor_set_falloffthreshold(pa, physicsactor_get_falloffthreshold(pa) * 8.0f);
+        physicsactor_set_falloffthreshold(pa, physicsactor_get_falloffthreshold(pa) * 8.0);
 #endif
 }
 
 /* underwater physics */
 void set_underwater_multipliers(physicsactor_t* pa, bool underwater)
 {
-    float multiplier = underwater ? 0.5f : 2.0f;
+    double multiplier = underwater ? 0.5 : 2.0;
 
     physicsactor_set_acc(pa, physicsactor_get_acc(pa) * multiplier);
     physicsactor_set_dec(pa, physicsactor_get_dec(pa) * multiplier);
@@ -2070,12 +2070,12 @@ void set_underwater_multipliers(physicsactor_t* pa, bool underwater)
     physicsactor_set_hitjmp(pa, physicsactor_get_hitjmp(pa) * multiplier);
 
     if(underwater) {
-        physicsactor_set_grv(pa, physicsactor_get_grv(pa) / 3.5f);
-        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) / 1.85f);
+        physicsactor_set_grv(pa, physicsactor_get_grv(pa) / 3.5);
+        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) / 1.85);
     }
     else {
-        physicsactor_set_grv(pa, physicsactor_get_grv(pa) * 3.5f);
-        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * 1.85f);
+        physicsactor_set_grv(pa, physicsactor_get_grv(pa) * 3.5);
+        physicsactor_set_jmp(pa, physicsactor_get_jmp(pa) * 1.85);
     }
 }
 
@@ -2100,15 +2100,15 @@ void set_default_multipliers(physicsactor_t* pa, const character_t* character)
     physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * character->multiplier.frc);
     physicsactor_set_rolldec(pa, physicsactor_get_rolldec(pa) * character->multiplier.dec);
     physicsactor_set_air(pa, physicsactor_get_air(pa) * character->multiplier.airacc);
-    physicsactor_set_airdrag(pa, physicsactor_get_airdrag(pa) / max(character->multiplier.airdrag, 0.001f));
+    physicsactor_set_airdrag(pa, physicsactor_get_airdrag(pa) / max(character->multiplier.airdrag, 0.001));
 
     /* configure the abilities */
     if(!character->ability.roll)
-        physicsactor_set_rollthreshold(pa, 20000.0f);
+        physicsactor_set_rollthreshold(pa, 20000.0);
     if(!character->ability.brake)
-        physicsactor_set_brakingthreshold(pa, 20000.0f);
+        physicsactor_set_brakingthreshold(pa, 20000.0);
     if(!character->ability.charge)
-        physicsactor_set_chrg(pa, 0.0f);
+        physicsactor_set_chrg(pa, 0.0);
 }
 
 /* create bouncing collectibles at the specified position */
