@@ -82,6 +82,7 @@ struct physicsactor_t
     bool want_to_detach_from_ground; /* sticky physics helper */
     float charge_intensity; /* charge intensity */
     float airdrag_coefficient[2]; /* airdrag approx. coefficient */
+    int unstable_angle_counter; /* a helper */
     physicsactorstate_t state; /* state */
     movmode_t movmode; /* current movement mode, based on the angle */
     obstaclelayer_t layer; /* current layer */
@@ -279,6 +280,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->charge_intensity = 0.0f;
     pa->airdrag_coefficient[0] = 0.0f;
     pa->airdrag_coefficient[1] = 1.0f;
+    pa->unstable_angle_counter = 0;
     pa->reference_time = 0.0f;
     pa->fixed_time = 0.0f;
 
@@ -1056,26 +1058,20 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      *
      */
 
-    /* begin to charge */
-    if(pa->state == PAS_DUCKING) {
-        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1)) {
-            if(!nearly_zero(pa->chrg)) { /* check if the player has the ability to charge */
-                pa->state = PAS_CHARGING;
-                pa->charge_intensity = 0.0f;
-            }
-        }
-    }
-
     /* charging... */
     if(pa->state == PAS_CHARGING) {
+
+        /* attenuate charge intensity */
+        if(fabsf(pa->charge_intensity) >= pa->chrgthreshold)
+            pa->charge_intensity *= 0.999506551f - 1.84539309f * dt;
+            /*pa->charge_intensity *= powf(31.0f / 32.0f, 60.0f * dt);*/ /* 31 / 32 == airdrag */
+
         /* charging more...! */
         if(input_button_pressed(pa->input, IB_FIRE1))
             pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
-        else if(fabsf(pa->charge_intensity) >= pa->chrgthreshold)
-            pa->charge_intensity *= 0.999506551f - 1.84539309f * dt; /* attenuate charge intensity */
-            /*pa->charge_intensity *= powf(31.0f / 32.0f, 60.0f * dt);*/ /* 31 / 32 == airdrag */
 
         /* release */
+        pa->gsp = 0.0f;
         if(!input_button_down(pa->input, IB_DOWN)) {
             float direction = pa->facing_right ? 1.0f : -1.0f;
             float multiplier = direction * (pa->chrg / 3.0f);
@@ -1085,8 +1081,17 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             pa->jump_lock_timer = 6.0f / TARGET_FPS;
             pa->state = PAS_ROLLING;
         }
-        else
-            pa->gsp = 0.0f;
+
+    }
+
+    /* begin to charge */
+    if(pa->state == PAS_DUCKING) {
+        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1)) {
+            if(!nearly_zero(pa->chrg)) { /* check if the player has the ability to charge */
+                pa->state = PAS_CHARGING;
+                pa->charge_intensity = 0.0f;
+            }
+        }
     }
 
     /*
@@ -1271,7 +1276,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     if(
         !pa->midair && pa->movmode == MM_FLOOR &&
-        !(pa->state == PAS_LEDGE || pa->state == PAS_PUSHING) &&
+        !(pa->state == PAS_LEDGE || pa->state == PAS_PUSHING || pa->state == PAS_LOOKINGUP || pa->state == PAS_DUCKING || pa->state == PAS_CHARGING) &&
         ((at_A == NULL) ^ (at_B == NULL)) &&
         nearly_zero(pa->gsp)
     ) {
@@ -1665,13 +1670,12 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
 
     /* skip this section if we intend to leave the ground */
     if(!pa->want_to_detach_from_ground) {
-        int cnt = 0;
         movmode_t prev_movmode = pa->movmode;
 
         sticky_loop:
 
         /* if the player is on the ground or has just left the ground, stick to it! */
-        if(!pa->midair || !pa->was_midair || cnt > 0) {
+        if(!pa->midair || !pa->was_midair || pa->unstable_angle_counter > 0) {
             int gnd_pos_a, gnd_pos_b, gnd_pos;
             const obstacle_t *gnd_a, *gnd_b;
 
@@ -1760,12 +1764,36 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             SET_AUTO_ANGLE();
 
         /* repeat once if convenient; maybe we've changed the movmode */
-        if(pa->movmode != prev_movmode && 0 == cnt++)
+        if(pa->movmode != prev_movmode && 0 == pa->unstable_angle_counter) {
+            /* unstable_angle_counter:
+               avoid locking the player when moving slowly and getting unstable
+               movmodes in a transition. Unstable angle measurements provoke
+               unstable movmodes, as in: 0x5e, 0x62, 0x5e, 0x62, 0x5e...
+               (left wall, ceiling...) */
+            const float speed_threshold = 300.0f; /* not moving slowly */
+
+            if(fabsf(pa->gsp) < speed_threshold) {
+                /* we're moving slowly and MAY be getting unstable angles
+                   (probably not... maybe if turbocharged...) */
+                pa->unstable_angle_counter = 2;
+            }
+            else {
+                /* we have enough speed and intend to run this sticky physics
+                   routine on the next frame */
+                pa->unstable_angle_counter = 1;
+            }
+
+            /* repeat */
             goto sticky_loop;
+        }
     }
 
     /* reset flag */
     pa->want_to_detach_from_ground = false;
+
+    /* reset counter */
+    if(pa->unstable_angle_counter > 0)
+        --pa->unstable_angle_counter;
 
     /*
      *
