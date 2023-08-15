@@ -53,7 +53,7 @@ object "Dash Smoke" is "companion"
         if(!player.midair) {
             Level.spawnEntity(
                 "Speed Smoke",
-                player.collider.center.translatedBy(player.direction * -22, dy - 3)
+                player.collider.center.translatedBy(player.direction * -22, dy + 2)
             ).setDirection(player.direction).setScale(scale);
         }
     }
