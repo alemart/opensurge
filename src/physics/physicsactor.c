@@ -835,13 +835,14 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
         \
         v2d_t vel = v2d_new(pa->xsp, pa->ysp); \
         v2d_t ds = v2d_multiply(vel, dt); \
-        float linear_prediction_factor = within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.6f); \
+        float linear_prediction_factor = within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.67f); \
         v2d_t predicted_offset = v2d_multiply(ds, linear_prediction_factor); \
         v2d_t predicted_position = v2d_add(pa->position, predicted_offset); \
         \
-        float angular_prediction_factor = within_default_capspeed ? 0.0f : (within_increased_capspeed ? 0.0f : 0.2f); \
-        int predicted_angle = extrapolate_angle(pa->angle, pa->prev_angle, angular_prediction_factor); \
+        /*float angular_prediction_factor = within_default_capspeed ? 0.0f : (within_increased_capspeed ? 0.0f : 0.2f);*/ \
+        int predicted_angle = current_angle; /*extrapolate_angle(pa->angle, pa->prev_angle, angular_prediction_factor);*/ \
         (void)interpolate_angle; \
+        (void)extrapolate_angle; \
         \
         do { \
             pa->angle = predicted_angle; /* assume continuity */ \
