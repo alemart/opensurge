@@ -55,8 +55,8 @@ struct physicsactor_t
     float chrg; /* charge-and-release max speed */
     float rollfrc; /* roll friction */
     float rolldec; /* roll deceleration */
-    float rolluphillslp; /* roll uphill slope */
-    float rolldownhillslp; /* roll downhill slope */
+    float rolluphillslp; /* roll uphill slope factor */
+    float rolldownhillslp; /* roll downhill slope factor */
     float rollthreshold; /* roll threshold */
     float unrollthreshold; /* unroll threshold */
     float movethreshold; /* minimal movement threshold */
@@ -665,8 +665,6 @@ GENERATE_GETTER_AND_SETTER_OF(unrollthreshold)
 GENERATE_GETTER_AND_SETTER_OF(falloffthreshold)
 GENERATE_GETTER_AND_SETTER_OF(brakingthreshold)
 GENERATE_GETTER_AND_SETTER_OF(airdragthreshold)
-GENERATE_GETTER_AND_SETTER_OF(airdragxthreshold)
-GENERATE_GETTER_AND_SETTER_OF(chrgthreshold)
 GENERATE_GETTER_AND_SETTER_OF(waittime)
 
 float physicsactor_get_airdrag(const physicsactor_t *pa) { return pa->airdrag; }
@@ -976,12 +974,16 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      */
 
     if(pa->hlock_timer > 0.0f) {
-        pa->hlock_timer -= dt;
-        if(pa->hlock_timer < 0.0f)
-            pa->hlock_timer = 0.0f;
+        if(1) { /*if(!pa->midair) {*/
+            pa->hlock_timer -= dt;
+            if(pa->hlock_timer < 0.0f)
+                pa->hlock_timer = 0.0f;
+        }
 
-        input_simulate_button_up(pa->input, IB_LEFT);
-        input_simulate_button_up(pa->input, IB_RIGHT);
+        if(!pa->midair) {
+            input_simulate_button_up(pa->input, IB_LEFT);
+            input_simulate_button_up(pa->input, IB_RIGHT);
+        }
 
         if(!pa->midair && !nearly_zero(pa->gsp))
             pa->facing_right = (pa->gsp > 0.0f);
@@ -1040,11 +1042,95 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      *
      */
 
-    if(pa->state != PAS_ROLLING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
+    if(pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && (!nearly_zero(pa->gsp) || !nearly_zero(pa->xsp))) {
         if((pa->gsp > 0.0f || pa->midair) && input_button_down(pa->input, IB_RIGHT))
             pa->facing_right = true;
         else if((pa->gsp < 0.0f || pa->midair) && input_button_down(pa->input, IB_LEFT))
             pa->facing_right = false;
+    }
+
+    /*
+     *
+     * charge and release
+     *
+     */
+
+    /* begin to charge */
+    if(pa->state == PAS_DUCKING) {
+        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1)) {
+            if(!nearly_zero(pa->chrg)) { /* check if the player has the ability to charge */
+                pa->state = PAS_CHARGING;
+                pa->charge_intensity = 0.0f;
+            }
+        }
+    }
+
+    /* charging... */
+    if(pa->state == PAS_CHARGING) {
+        /* charging more...! */
+        if(input_button_pressed(pa->input, IB_FIRE1))
+            pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
+        else if(fabsf(pa->charge_intensity) >= pa->chrgthreshold)
+            pa->charge_intensity *= 0.999506551f - 1.84539309f * dt; /* attenuate charge intensity */
+            /*pa->charge_intensity *= powf(31.0f / 32.0f, 60.0f * dt);*/ /* 31 / 32 == airdrag */
+
+        /* release */
+        if(!input_button_down(pa->input, IB_DOWN)) {
+            float direction = pa->facing_right ? 1.0f : -1.0f;
+            float multiplier = direction * (pa->chrg / 3.0f);
+
+            pa->gsp = multiplier * (2.0f + pa->charge_intensity);
+            pa->charge_intensity = 0.0f;
+            pa->jump_lock_timer = 6.0f / TARGET_FPS;
+            pa->state = PAS_ROLLING;
+        }
+        else
+            pa->gsp = 0.0f;
+    }
+
+    /*
+     *
+     * slope factors
+     *
+     */
+
+    if(!pa->midair && pa->movmode != MM_CEILING) {
+
+        /* rolling */
+        if(pa->state == PAS_ROLLING) {
+
+            if(pa->gsp * SIN(pa->angle) >= 0.0f) {
+                /* rolling uphill */
+                pa->gsp += pa->rolluphillslp * -SIN(pa->angle) * dt;
+            }
+            else if(fabsf(pa->gsp) < pa->capspeed) {
+                /* rolling downhill */
+                pa->gsp += pa->rolldownhillslp * -SIN(pa->angle) * dt;
+                if(fabsf(pa->gsp) > pa->capspeed)
+                    pa->gsp = pa->capspeed * sign(pa->gsp);
+            }
+
+        }
+
+        /* not rolling */
+        else if(pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
+
+            /* apply if moving or if on a steep slope */
+            if(fabsf(pa->gsp) >= pa->movethreshold || fabsf(SIN(pa->angle)) >= 0.707f) {
+                if(fabsf(pa->gsp) < pa->capspeed) {
+                    /* |slp * -sin(angle)| may be less than (2 * default_frc)
+                       (friction when turbocharged), meaning: the friction
+                       may nullify the slope factor when turbocharged.
+                       Example: take angle = 45 degrees. In addition,
+                       hlock_timer may be set, thus locking the player. */
+                    pa->gsp += pa->slp * -SIN(pa->angle) * dt;
+                    if(fabsf(pa->gsp) > pa->capspeed)
+                        pa->gsp = pa->capspeed * sign(pa->gsp);
+                }
+            }
+
+        }
+
     }
 
     /*
@@ -1054,17 +1140,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      */
 
     if(!pa->midair && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
-
-        /* slope factor */
-        if(pa->movmode != MM_CEILING) {
-            if(fabsf(pa->gsp) >= pa->movethreshold || fabsf(SIN(pa->angle)) >= 0.707f) { /* can't stand on steep slopes */
-                if(fabsf(pa->gsp) < pa->capspeed) {
-                    pa->gsp += pa->slp * -SIN(pa->angle) * dt;
-                    if(fabsf(pa->gsp) > pa->capspeed)
-                        pa->gsp = pa->capspeed * sign(pa->gsp);
-                }
-            }
-        }
 
         /* acceleration */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp >= 0.0f) {
@@ -1125,16 +1200,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             else
                 pa->gsp -= brk * sign(pa->gsp) * dt;
         }
-        else {
+        else if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
             /* friction */
-            if(!input_button_down(pa->input, IB_LEFT) && !input_button_down(pa->input, IB_RIGHT)) {
-                if(fabsf(pa->gsp) <= pa->frc * dt) {
-                    pa->gsp = 0.0f;
-                    pa->state = PAS_STOPPED;
-                }
-                else
-                    pa->gsp -= pa->frc * sign(pa->gsp) * dt;
+            if(fabsf(pa->gsp) <= pa->frc * dt) {
+                pa->gsp = 0.0f;
+                pa->state = PAS_STOPPED;
             }
+            else
+                pa->gsp -= pa->frc * sign(pa->gsp) * dt;
         }
 
     }
@@ -1230,20 +1303,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
     /* roll */
     if(!pa->midair && pa->state == PAS_ROLLING) {
 
-        /* slope factor */
-        if(pa->movmode != MM_CEILING) {
-            if(pa->gsp * SIN(pa->angle) >= 0.0f) {
-                /* rolling uphill */
-                pa->gsp += pa->rolluphillslp * -SIN(pa->angle) * dt;
-            }
-            else if(fabsf(pa->gsp) < pa->capspeed) {
-                /* rolling downhill */
-                pa->gsp += pa->rolldownhillslp * -SIN(pa->angle) * dt;
-                if(fabsf(pa->gsp) > pa->capspeed)
-                    pa->gsp = pa->capspeed * sign(pa->gsp);
-            }
-        }
-
         /* deceleration */
         if(input_button_down(pa->input, IB_RIGHT) && pa->gsp < 0.0f)
             pa->gsp = min(0.0f, pa->gsp + pa->rolldec * dt);
@@ -1263,40 +1322,6 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         /* facing right? */
         if(!nearly_zero(pa->gsp))
             pa->facing_right = (pa->gsp > 0.0f);
-    }
-
-    /*
-     *
-     * charge and release
-     *
-     */
-
-    /* begin to charge */
-    if(pa->state == PAS_DUCKING) {
-        if(input_button_down(pa->input, IB_DOWN) && input_button_pressed(pa->input, IB_FIRE1)) {
-            if(!nearly_zero(pa->chrg)) /* check if the player has the ability to charge */
-                pa->state = PAS_CHARGING;
-        }
-    }
-
-    /* charging... */
-    if(pa->state == PAS_CHARGING) {
-        /* charging more...! */
-        if(input_button_pressed(pa->input, IB_FIRE1))
-            pa->charge_intensity = min(1.0f, pa->charge_intensity + 0.25f);
-        else if(fabsf(pa->charge_intensity) >= pa->chrgthreshold)
-            pa->charge_intensity *= 0.999506551f - 1.84539309f * dt; /* attenuate charge intensity */
-
-        /* release */
-        if(!input_button_down(pa->input, IB_DOWN)) {
-            float s = pa->facing_right ? 1.0f : -1.0f;
-            pa->gsp = (s * pa->chrg) * (0.67f + pa->charge_intensity * 0.33f);
-            pa->state = PAS_ROLLING;
-            pa->charge_intensity = 0.0f;
-            pa->jump_lock_timer = 6.0f / TARGET_FPS;
-        }
-        else
-            pa->gsp = 0.0f;
     }
 
     /*
@@ -1591,15 +1616,17 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
             pa->midair = false; /* enable the ground sensors */
             SET_AUTO_ANGLE();
 
-            /* reattach to the ceiling? */
-            if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F))
-                must_reattach = !pa->midair;
+            /* reattach to the ceiling if steep angle and moving upwards */
+            if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
+                if(-pa->ysp >= fabsf(pa->xsp))
+                    must_reattach = !pa->midair;
+            }
         }
 
         /* reattach to the ceiling or bump the head */
         if(must_reattach) {
             /* adjust speeds */
-            pa->gsp = (fabsf(pa->xsp) > -pa->ysp) ? -pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
             pa->xsp = pa->ysp = 0.0f;
 
             /* adjust the state */
@@ -1766,8 +1793,8 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      *
      */
 
-    if(!pa->midair) {
-        if(pa->movmode != MM_FLOOR && pa->hlock_timer == 0.0f) {
+    if(!pa->midair && pa->hlock_timer == 0.0f) {
+        if(pa->movmode != MM_FLOOR) {
             if(fabsf(pa->gsp) < pa->falloffthreshold) {
                 pa->hlock_timer = 0.5f;
                 if(pa->angle >= 0x40 && pa->angle <= 0xC0) {
@@ -1798,15 +1825,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
      *
      */
 
-    /* reset the angle & update the midair_timer */
-    if(pa->midair) {
-        pa->midair_timer += dt;
-        FORCE_ANGLE(0x0);
-    }
-    else
-        pa->midair_timer = 0.0f;
-
-    /* animation corrections when landing on the ground */
+    /* corrections when landing on the ground */
     if(!pa->midair && pa->was_midair) {
         if(pa->state == PAS_ROLLING) {
             /* unroll when landing on the ground */
@@ -1844,7 +1863,7 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         else {
             if(pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_LEDGE || pa->state == PAS_WALKING || pa->state == PAS_RUNNING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
                 pa->state = WALKING_OR_RUNNING(pa);
-            else if(pa->state == PAS_PUSHING && fabsf(pa->gsp) >= 60.0f)
+            else if(pa->state == PAS_PUSHING && fabsf(pa->gsp) >= 30.0f)
                 pa->state = PAS_WALKING;
         }
     }
@@ -1858,6 +1877,14 @@ void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, float 
         if(pa->state == PAS_WALKING && nearly_zero(pa->gsp))
             pa->state = PAS_STOPPED;
     }
+
+    /* reset the angle & update the midair_timer */
+    if(pa->midair) {
+        pa->midair_timer += dt;
+        FORCE_ANGLE(0x0);
+    }
+    else
+        pa->midair_timer = 0.0f;
 
     /* remain on the winning state */
     if(pa->winning_pose && !pa->midair) {

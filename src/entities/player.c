@@ -2032,10 +2032,26 @@ void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged)
     float multiplier = turbocharged ? 2.0f : 0.5f;
 
     physicsactor_set_acc(pa, physicsactor_get_acc(pa) * multiplier);
-    physicsactor_set_frc(pa, physicsactor_get_frc(pa) * multiplier);
     physicsactor_set_topspeed(pa, physicsactor_get_topspeed(pa) * multiplier);
     physicsactor_set_air(pa, physicsactor_get_air(pa) * multiplier);
+
+#if 1
+    /* do we *really* want to increase the friction? This causes undesirable
+       behavior. Example: when running very fast, beyond the default capspeed
+       and on flat ground, we'll move *slower* when turbocharged because we'll
+       lose speed due to the increased friction (frc and rollfrc) */
+    physicsactor_set_frc(pa, physicsactor_get_frc(pa) * multiplier);
     physicsactor_set_rollfrc(pa, physicsactor_get_rollfrc(pa) * multiplier);
+
+    /* a turbocharged player may get locked on steep slopes due to the slope
+       factor being nullified by the increased friction and the hlock_timer
+       being set due to a nearly stopped player. This mitigates but doesn't
+       solve the issue, which is caused by the increased friction (frc) */
+    if(turbocharged)
+        physicsactor_set_falloffthreshold(pa, physicsactor_get_falloffthreshold(pa) * 0.125f);
+    else
+        physicsactor_set_falloffthreshold(pa, physicsactor_get_falloffthreshold(pa) * 8.0f);
+#endif
 }
 
 /* underwater physics */

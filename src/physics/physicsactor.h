@@ -166,10 +166,6 @@ float physicsactor_get_brakingthreshold(const physicsactor_t *pa); /* braking an
 void physicsactor_set_brakingthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_airdragthreshold(const physicsactor_t *pa); /* air drag threshold */
 void physicsactor_set_airdragthreshold(physicsactor_t *pa, float value);
-float physicsactor_get_airdragxthreshold(const physicsactor_t *pa); /* air drag x-threshold */
-void physicsactor_set_airdragxthreshold(physicsactor_t *pa, float value);
-float physicsactor_get_chrgthreshold(const physicsactor_t *pa); /* charge intensity threshold */
-void physicsactor_set_chrgthreshold(physicsactor_t *pa, float value);
 float physicsactor_get_waittime(const physicsactor_t *pa); /* wait time in seconds */
 void physicsactor_set_waittime(physicsactor_t *pa, float value);
 
