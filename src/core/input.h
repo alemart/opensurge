@@ -78,6 +78,7 @@ bool input_button_released(const input_t *in, inputbutton_t button);
 
 void input_simulate_button_down(input_t *in, inputbutton_t button);
 void input_simulate_button_up(input_t *in, inputbutton_t button);
+void input_simulate_button_press(input_t *in, inputbutton_t button);
 
 void input_reset(input_t *in);
 void input_copy(input_t *dest, const input_t *src);

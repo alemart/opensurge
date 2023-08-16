@@ -550,6 +550,17 @@ void input_simulate_button_up(input_t *in, inputbutton_t button)
 }
 
 
+/*
+ * input_simulate_button_press()
+ * Simulate that a button is first pressed;
+ * useful for computer-controlled input objects
+ */
+void input_simulate_button_press(input_t *in, inputbutton_t button)
+{
+    in->oldstate[button] = false;
+    in->state[button] = true;
+}
+
 
 /*
  * input_reset()
@@ -578,6 +589,7 @@ void input_copy(input_t *dest, const input_t *src)
         memset(dest->oldstate, 0, sizeof(dest->oldstate));
     }
 }
+
 
 
 
