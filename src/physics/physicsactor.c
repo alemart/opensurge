@@ -119,6 +119,7 @@ struct physicsactor_t
 
     double reference_time; /* used in fixed_update */
     double fixed_time;
+    bool delayed_jump;
 };
 
 /* private stuff ;-) */
@@ -141,14 +142,13 @@ static const grounddir_t _MM_TO_GD[4] = {
 };
 
 /* physics simulation */
+#define WANT_DEBUG              0
 #define WANT_JUMP_ATTENUATION   0
-#define WANT_FIXED_TIMESTEP     1
 #define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit (unstable pa->midair) */
 #define CLOUD_OFFSET            12
-#define TARGET_FPS              60.0
-#define FIXED_TIMESTEP          (1.0 / TARGET_FPS)
+#define TARGET_FPS              60.0 /* target framerate of the simulation */
 #define HARD_CAPSPEED           (24.0 * TARGET_FPS)
-static void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
+static void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
 static void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
 static void update_movmode(physicsactor_t* pa);
 
@@ -329,6 +329,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->unstable_angle_counter = 0;
     pa->reference_time = 0.0;
     pa->fixed_time = 0.0;
+    pa->delayed_jump = false;
 
     /* initialize the physics model */
     physicsactor_reset_model_parameters(pa);
@@ -445,23 +446,47 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
 
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
-    float dt = timer_get_delta();
+    /* we run the simulation with a fixed timestep for better accuracy and consistency */
+    const double FIXED_TIMESTEP = 1.0 / TARGET_FPS;
 
-    /* run the physics simulation */
-#if WANT_FIXED_TIMESTEP
+    /* advance the reference time */
+    double dt = timer_get_delta();
     pa->reference_time += dt;
-    if(pa->reference_time <= pa->fixed_time + FIXED_TIMESTEP) {
-        /* will run with a fixed timestep, but only at TARGET_FPS */
-        run_simulation(pa, obstaclemap, FIXED_TIMESTEP); /* improved precision */
+
+    /* frame skipping */
+    bool skip_frame = (pa->fixed_time > pa->reference_time);
+    if(skip_frame) {
+        /* skip a frame if the engine is rendering more frames per second than
+           required by the simulation. If jump is first pressed, we save that
+           information and restore it when we decide not to skip a frame. */
+        pa->delayed_jump = pa->delayed_jump || input_button_pressed(pa->input, IB_FIRE1);
+    }
+    else if(pa->delayed_jump) {
+        /* simulate that the jump button is first pressed. We won't skip a frame now. */
+        input_simulate_button_press(pa->input, IB_FIRE1);
+        pa->delayed_jump = false;
+    }
+
+    /* run the simulation */
+    int counter = 0;
+    while(pa->fixed_time <= pa->reference_time) {
+        if(0 == counter++) {
+            /* run at most once per framestep in order to avoid jittering when
+               the engine framerate drops below TARGET_FPS. The simulation will
+               seem slower in this case. */
+            fixed_update(pa, obstaclemap, FIXED_TIMESTEP);
+        }
+
+        /* advance the fixed time */
         pa->fixed_time += FIXED_TIMESTEP;
     }
-    else {
-        /* prevent jittering at lower fps rates */
-        run_simulation(pa, obstaclemap, dt); /* can't use a fixed timestep */
-        pa->fixed_time = pa->reference_time;
-    }
-#else
-    run_simulation(pa, obstaclemap, dt);
+
+#if WANT_DEBUG
+    /* testing */
+    if(skip_frame)
+        video_showmessage("frame skip %lf", pa->reference_time);
+    else if(counter > 1)
+        video_showmessage("going slow (%d) %lf", counter, pa->reference_time);
 #endif
 }
 
@@ -1003,7 +1028,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
     } while(0)
 
 /* physics simulation */
-void run_simulation(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt)
+void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt)
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M, *at_N;
 
