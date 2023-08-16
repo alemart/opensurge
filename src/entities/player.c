@@ -74,7 +74,6 @@ static playermode_t mode = PM_COOPERATIVE;  /* mode of gameplay */
 static void update_shield(player_t *player);
 static void update_animation(player_t *player);
 static void update_animation_speed(player_t *player);
-static void play_sounds(player_t *player);
 static void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap);
 static float smooth_angle(const physicsactor_t* pa, float current_angle);
 static bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode);
@@ -87,6 +86,7 @@ static void set_default_multipliers(physicsactor_t* pa, const character_t* chara
 static void set_turbocharged_multipliers(physicsactor_t* pa, bool turbocharged);
 static void set_underwater_multipliers(physicsactor_t* pa, bool underwater);
 static void create_bouncing_collectibles(int number_of_collectibles, v2d_t position);
+static void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* context);
 
 
 /*
@@ -150,8 +150,8 @@ player_t *player_create(int id, const char *character_name)
 
     /* physics */
     p->pa = physicsactor_create(p->actor->position);
-    p->pa_old_state = physicsactor_get_state(p->pa);
     set_default_multipliers(p->pa, c);
+    physicsactor_subscribe(p->pa, on_physics_event, p);
 
     /* misc */
     p->underwater = FALSE;
@@ -206,7 +206,6 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     if(!player->disable_movement) {
 
         /* run physics simulation */
-        player->pa_old_state = physicsactor_get_state(pa);
         physics_adapter(player, obstaclemap);
 
         /* read new position */
@@ -263,9 +262,6 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
                 player_set_blinking(player, FALSE);
         }
 
-        if(physicsactor_get_state(pa) != PAS_GETTINGHIT && player->pa_old_state == PAS_GETTINGHIT)
-            player_set_blinking(player, TRUE);
-
         /* invincibility stars */
         if(player->invincible) {
             /* update timer & finish */
@@ -284,10 +280,6 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
         /* pitfalls */
         if(position.y >= level_height_at(position.x))
-            player_kill(player);
-
-        /* smashed / crushed */
-        if(physicsactor_is_smashed(player->pa))
             player_kill(player);
 
         /* winning pose */
@@ -385,19 +377,16 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     if(player->shield_type != SH_NONE)
         update_shield(player);
 
-    /* play sounds */
-    play_sounds(player);
-
     /* restart the level if dead */
 #if 0
     if(!player->disable_movement && player_is_dying(player)) {
 #else
     if(player_is_dying(player)) {
 #endif
-        bool can_ressurrect = player->immortal;
+        bool can_resurrect = player->immortal;
         const float FADEOUT_TIME = 1.0f;
 
-        if(!can_ressurrect) {
+        if(!can_resurrect) {
             /* fade out the music */
             const float MUSIC_FADEOUT_TIME = 0.5f;
             float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
@@ -412,12 +401,12 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         /* decide what to do next */
         if(player->dead_timer >= PLAYER_DEAD_RESTART_TIME) {
 
-            if(can_ressurrect) {
-                /* ressurrect */
-                player_set_position(player, level_spawnpoint());
-                physicsactor_ressurrect(player->pa);
+            if(can_resurrect) {
+                /* resurrect */
                 player->dead_timer = 0.0f;
+                physicsactor_resurrect(player->pa);
                 /*position = player_position(player);*/ /* update position */
+                return;
             }
             else if(player_get_lives() <= 1) {
                 /* game over */
@@ -503,7 +492,6 @@ int player_bounce(player_t *player, float direction, int is_heavy_object)
 {
     (void)is_heavy_object; /* obsolete */
 
-    player->pa_old_state = physicsactor_get_state(player->pa);
     return physicsactor_bounce(player->pa, direction);
 }
 
@@ -550,25 +538,7 @@ void player_hit(player_t *player, float direction)
     }
 
     /* get hit */
-    player->pa_old_state = physicsactor_get_state(player->pa);
     physicsactor_hit(player->pa, direction);
-
-    if(player->invulnerable) {
-        ; /* do nothing */
-        sound_play(SFX_DAMAGE);
-    }
-    else if(player->shield_type != SH_NONE) {
-        /* lose shield */
-        player->shield_type = SH_NONE;
-        sound_play(SFX_DAMAGE);
-    }
-    else {
-        /* create collectibles */
-        int number_of_collectibles = player_get_collectibles();
-        create_bouncing_collectibles(number_of_collectibles, player_position(player));
-        player_set_collectibles(0);
-        sound_play(SFX_GETHIT);
-    }
 }
 
 /*
@@ -592,18 +562,7 @@ void player_hit_ex(player_t *player, const actor_t *hazard)
  */
 void player_kill(player_t *player)
 {
-    if(!player_is_dying(player)) {
-        player_set_invincible(player, FALSE);
-        player_set_turbo(player, FALSE);
-        player_set_blinking(player, FALSE);
-        player_set_aggressive(player, FALSE);
-        player_set_invulnerable(player, FALSE);
-        player->shield_type = SH_NONE;
-
-        player->pa_old_state = physicsactor_get_state(player->pa);
-        physicsactor_kill(player->pa);
-        sound_play(player->character->sample.death);
-    }
+    physicsactor_kill(player->pa);
 }
 
 
@@ -613,10 +572,7 @@ void player_kill(player_t *player)
  */
 void player_roll(player_t *player)
 {
-    if(!player_is_dying(player)) {
-        player->pa_old_state = physicsactor_get_state(player->pa);
-        physicsactor_roll(player->pa);
-    }
+    physicsactor_roll(player->pa);
 }
 
 /*
@@ -651,24 +607,17 @@ void player_disable_roll(player_t *player)
  */
 void player_spring(player_t *player)
 {
-    if(!player_is_dying(player)) {
-        player->pa_old_state = physicsactor_get_state(player->pa);
-        physicsactor_spring(player->pa);
-    }
+    physicsactor_spring(player->pa);
 }
 
 /*
  * player_drown()
- * Drown (underwater). This will be
- * called automatically, internally.
+ * Drown (underwater). This will be called automatically, internally.
  */
 void player_drown(player_t *player)
 {
-    if(player_is_underwater(player) && !player_is_dying(player)) {
-        player->pa_old_state = physicsactor_get_state(player->pa);
+    if(player_is_underwater(player))
         physicsactor_drown(player->pa);
-        sound_play(SFX_DROWN);
-    }
 }
 
 /*
@@ -677,11 +626,9 @@ void player_drown(player_t *player)
  */
 void player_breathe(player_t *player)
 {
-    if(player_is_underwater(player) && physicsactor_get_state(player->pa) != PAS_BREATHING && !player_is_dying(player)) {
+    if(player_is_underwater(player)) {
         player_reset_underwater_timer(player);
-        player->pa_old_state = physicsactor_get_state(player->pa);
         physicsactor_breathe(player->pa);
-        sound_play(SFX_BREATHE);
     }
 }
 
@@ -1286,7 +1233,7 @@ void player_set_invulnerable(player_t* player, int invulnerable)
 /*
  * player_is_immortal()
  * Is the player immortal? If an immortal player appears to be killed, it
- * will appear to be ressurrected on its spawn point without losing a life
+ * will appear to be resurrected on its spawn point without losing a life
  */
 int player_is_immortal(const player_t* player)
 {
@@ -1776,39 +1723,6 @@ void update_animation_speed(player_t *player)
     }
 }
 
-/* play sounds as needed */
-void play_sounds(player_t* player)
-{
-    #define ON_STATE(s) \
-        if(player->pa_old_state != (s) && physicsactor_get_state(player->pa) == (s))
-
-    ON_STATE(PAS_JUMPING) {
-        sound_play(player->character->sample.jump);
-    }
-
-    ON_STATE(PAS_BRAKING) {
-        sound_play(player->character->sample.brake);
-    }
-
-    ON_STATE(PAS_ROLLING) {
-        if(player->pa_old_state != PAS_CHARGING)
-            sound_play(player->character->sample.roll);
-        else
-            sound_play(player->character->sample.release);
-    }
-
-    if(physicsactor_get_state(player->pa) == PAS_CHARGING) {
-        if(input_button_pressed(player->actor->input, IB_FIRE1)) {
-            sound_t* sample = player->character->sample.charge;
-            float max_pitch = player->character->sample.charge_pitch;
-            float freq = lerp(1.0f, max_pitch, physicsactor_charge_intensity(player->pa) - 0.25f);
-            sound_play_ex(sample, 1.0f, 0.0f, freq);
-        }
-    }
-
-    #undef ON_STATE
-}
-
 /* the interface between player_t and physicsactor_t */
 void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
 {
@@ -2151,4 +2065,92 @@ void create_bouncing_collectibles(int number_of_collectibles, v2d_t position)
 
     surgescript_var_destroy(y);
     surgescript_var_destroy(x);
+}
+
+/* handle physics event */
+void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* context)
+{
+    player_t* player = (player_t*)context;
+
+    switch(event) {
+        case PAE_JUMP:
+            sound_play(player->character->sample.jump);
+            break;
+
+        case PAE_ROLL:
+            sound_play(player->character->sample.roll);
+            break;
+
+        case PAE_CHARGE:
+        case PAE_RECHARGE: {
+            sound_t* sample = player->character->sample.charge;
+            float max_pitch = player->character->sample.charge_pitch;
+            float t = physicsactor_charge_intensity(player->pa) - 0.25f;
+            float freq = lerp(1.0f, max_pitch, t);
+            sound_play_ex(sample, 1.0f, 0.0f, freq);
+            break;
+        }
+
+        case PAE_RELEASE:
+            sound_play(player->character->sample.release);
+            break;
+
+        case PAE_BRAKE:
+            sound_play(player->character->sample.brake);
+            break;
+
+        case PAE_BREATHE:
+            sound_play(SFX_BREATHE);
+            break;
+
+        case PAE_BLINK:
+            player_set_blinking(player, TRUE);
+            break;
+
+        case PAE_HIT:
+            if(player->invulnerable) {
+                ; /* do nothing */
+                sound_play(SFX_DAMAGE);
+            }
+            else if(player->shield_type != SH_NONE) {
+                /* lose shield */
+                player->shield_type = SH_NONE;
+                sound_play(SFX_DAMAGE);
+            }
+            else {
+                /* create collectibles */
+                int number_of_collectibles = player_get_collectibles();
+                create_bouncing_collectibles(number_of_collectibles, player_position(player));
+                player_set_collectibles(0);
+                sound_play(SFX_GETHIT);
+            }
+
+            break;
+
+        case PAE_KILL:
+            player_set_invincible(player, FALSE);
+            player_set_turbo(player, FALSE);
+            player_set_blinking(player, FALSE);
+            player_set_aggressive(player, FALSE);
+            player_set_invulnerable(player, FALSE);
+            player->shield_type = SH_NONE;
+            sound_play(player->character->sample.death);
+            break;
+
+        case PAE_DROWN:
+            player_set_invincible(player, FALSE);
+            player_set_turbo(player, FALSE);
+            player_set_blinking(player, FALSE);
+            player_set_aggressive(player, FALSE);
+            player_set_invulnerable(player, FALSE);
+            sound_play(SFX_DROWN);
+            break;
+
+        case PAE_SMASH:
+            break;
+
+        case PAE_RESURRECT:
+            player_set_position(player, level_spawnpoint());
+            break;
+    }
 }

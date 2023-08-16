@@ -91,7 +91,6 @@ struct player_t {
 
     /* private */
     struct physicsactor_t *pa;
-    int pa_old_state;
     int underwater;
     float underwater_timer;
     float breath_time;

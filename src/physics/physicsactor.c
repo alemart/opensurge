@@ -31,6 +31,8 @@
 #include "../util/numeric.h"
 #include "../util/util.h"
 
+typedef struct physicsactorobserverlist_t physicsactorobserverlist_t;
+
 /* physicsactor class */
 struct physicsactor_t
 {
@@ -93,10 +95,10 @@ struct physicsactor_t
     bool winning_pose; /* winning pose enabled? */
     bool want_to_detach_from_ground; /* sticky physics helper */
     int unstable_angle_counter; /* a helper */
-    bool smashed; /* inside a solid brick, smashed */
 
     obstaclelayer_t layer; /* current layer */
     input_t* input; /* input device */
+    physicsactorobserverlist_t* observers; /* observers */
 
     sensor_t* A_normal; /* sensors */
     sensor_t* B_normal;
@@ -121,6 +123,18 @@ struct physicsactor_t
     double fixed_time;
     bool delayed_jump;
 };
+
+/* observer pattern */
+struct physicsactorobserverlist_t
+{
+    void (*callback)(physicsactor_t*,physicsactorevent_t,void*);
+    void* context;
+    physicsactorobserverlist_t* next;
+};
+
+static physicsactorobserverlist_t* create_observer(void (*callback)(physicsactor_t*,physicsactorevent_t,void*), void* context, physicsactorobserverlist_t* next);
+static physicsactorobserverlist_t* destroy_observers(physicsactorobserverlist_t* list);
+static void notify_observers(physicsactor_t* pa, physicsactorevent_t event);
 
 /* private stuff ;-) */
 static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
@@ -311,14 +325,15 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->state = PAS_STOPPED;
     pa->layer = OL_DEFAULT;
 
+    pa->input = input_create_computer();
+    pa->observers = NULL;
+
     pa->midair = true;
     pa->midair_timer = 0.0;
     pa->hlock_timer = 0.0;
     pa->jump_lock_timer = 0.0;
     pa->facing_right = true;
     pa->touching_ceiling = false;
-    pa->smashed = false;
-    pa->input = input_create_computer();
     pa->wait_timer = 0.0;
     pa->winning_pose = false;
     pa->breathe_timer = 0.0;
@@ -397,6 +412,7 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
     sensor_destroy(pa->M_rollflatgnd);
     sensor_destroy(pa->N_rollflatgnd);
 
+    destroy_observers(pa->observers);
     input_destroy(pa->input);
     free(pa);
     return NULL;
@@ -510,6 +526,15 @@ void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position
     sensor_render(sensor_U(pa), position, pa->movmode, camera_position);
 }
 
+void physicsactor_subscribe(physicsactor_t* pa, void (*callback)(physicsactor_t*,physicsactorevent_t,void*), void* context)
+{
+    pa->observers = create_observer(
+        callback,
+        context,
+        pa->observers
+    );
+}
+
 physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa)
 {
     return pa->state;
@@ -546,7 +571,7 @@ double physicsactor_hlock_timer(const physicsactor_t *pa)
     return pa->hlock_timer;
 }
 
-bool physicsactor_ressurrect(physicsactor_t *pa)
+bool physicsactor_resurrect(physicsactor_t *pa)
 {
     if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED) {
         pa->gsp = 0.0;
@@ -558,6 +583,7 @@ bool physicsactor_ressurrect(physicsactor_t *pa)
         pa->facing_right = true;
 
         pa->state = PAS_STOPPED;
+        notify_observers(pa, PAE_RESURRECT);
         return true;
     }
 
@@ -577,11 +603,6 @@ bool physicsactor_is_touching_ceiling(const physicsactor_t *pa)
 bool physicsactor_is_facing_right(const physicsactor_t *pa)
 {
     return pa->facing_right;
-}
-
-bool physicsactor_is_smashed(const physicsactor_t *pa)
-{
-    return pa->smashed;
 }
 
 void physicsactor_enable_winning_pose(physicsactor_t *pa)
@@ -636,6 +657,7 @@ void physicsactor_kill(physicsactor_t *pa)
         pa->facing_right = true;
 
         pa->state = PAS_DEAD;
+        notify_observers(pa, PAE_KILL);
     }
 }
 
@@ -643,6 +665,11 @@ void physicsactor_hit(physicsactor_t *pa, double direction)
 {
     /* direction: >0 right; <0 left */
 
+    /* do nothing if dead or drowned */
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+        return;
+
+    /* get hit if not already hit */
     if(pa->state != PAS_GETTINGHIT) {
         double dir = (direction != 0.0) ? sign(direction) : (pa->facing_right ? -1.0 : 1.0);
         pa->xsp = pa->hitjmp * 0.5 * -dir;
@@ -650,12 +677,17 @@ void physicsactor_hit(physicsactor_t *pa, double direction)
 
         physicsactor_detach_from_ground(pa);
         pa->state = PAS_GETTINGHIT;
+        notify_observers(pa, PAE_HIT);
     }
 }
 
 bool physicsactor_bounce(physicsactor_t *pa, double direction)
 {
     /* direction: >0 down; <0 up */
+
+    /* do nothing if dead or drowned */
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+        return false;
 
     /* do nothing if on the ground */
     if(!pa->midair || pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
@@ -673,11 +705,17 @@ bool physicsactor_bounce(physicsactor_t *pa, double direction)
 
 void physicsactor_spring(physicsactor_t *pa)
 {
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+        return;
+
     pa->state = PAS_SPRINGING;
 }
 
 void physicsactor_roll(physicsactor_t *pa)
 {
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+        return;
+
     pa->state = PAS_ROLLING;
 }
 
@@ -692,17 +730,24 @@ void physicsactor_drown(physicsactor_t *pa)
         pa->facing_right = true;
 
         pa->state = PAS_DROWNED;
+        notify_observers(pa, PAE_DROWN);
     }
 }
 
 void physicsactor_breathe(physicsactor_t *pa)
 {
+    /* do nothing if dead or drowned */
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+        return;
+
+    /* breathe if not already breathing */
     if(pa->state != PAS_BREATHING) {
         pa->xsp = 0.0;
         pa->ysp = 0.0;
 
         pa->breathe_timer = 0.5;
         pa->state = PAS_BREATHING;
+        notify_observers(pa, PAE_BREATHE);
     }
 }
 
@@ -1106,9 +1151,11 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
         const double threshold = 60.0;
         input_reset(pa->input);
 
-        pa->gsp = clip(pa->gsp, -0.67 * pa->capspeed, 0.67 * pa->capspeed);
-        if(pa->state == PAS_ROLLING)
+        pa->gsp = clip(pa->gsp, -pa->capspeed, pa->capspeed);
+        if(pa->state == PAS_ROLLING) {
+            notify_observers(pa, PAE_BRAKE);
             pa->state = PAS_BRAKING;
+        }
 
         if(pa->gsp > threshold)
             input_simulate_button_down(pa->input, IB_LEFT);
@@ -1146,8 +1193,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             /*pa->charge_intensity *= pow(31.0 / 32.0, 60.0 * dt);*/ /* 31 / 32 == airdrag */
 
         /* charging more...! */
-        if(input_button_pressed(pa->input, IB_FIRE1))
+        if(input_button_pressed(pa->input, IB_FIRE1)) {
             pa->charge_intensity = min(1.0, pa->charge_intensity + 0.25);
+            notify_observers(pa, PAE_RECHARGE);
+        }
 
         /* release */
         pa->gsp = 0.0;
@@ -1159,6 +1208,8 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             pa->charge_intensity = 0.0;
             pa->jump_lock_timer = 6.0 / TARGET_FPS;
             pa->state = PAS_ROLLING;
+
+            notify_observers(pa, PAE_RELEASE);
         }
 
     }
@@ -1169,6 +1220,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             if(!nearly_zero(pa->chrg)) { /* check if the player has the ability to charge */
                 pa->state = PAS_CHARGING;
                 pa->charge_intensity = 0.0;
+                notify_observers(pa, PAE_CHARGE);
             }
         }
     }
@@ -1258,8 +1310,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                 pa->state = PAS_STOPPED;
             }
             else if(fabs(pa->gsp) >= pa->brakingthreshold) {
-                if(pa->movmode == MM_FLOOR)
+                if(pa->movmode == MM_FLOOR && pa->state != PAS_BRAKING) {
                     pa->state = PAS_BRAKING;
+                    notify_observers(pa, PAE_BRAKE);
+                }
             }
         }
         else if(input_button_down(pa->input, IB_LEFT) && pa->gsp > 0.0) {
@@ -1269,8 +1323,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                 pa->state = PAS_STOPPED;
             }
             else if(fabs(pa->gsp) >= pa->brakingthreshold) {
-                if(pa->movmode == MM_FLOOR)
+                if(pa->movmode == MM_FLOOR && pa->state != PAS_BRAKING) {
                     pa->state = PAS_BRAKING;
+                    notify_observers(pa, PAE_BRAKE);
+                }
             }
         }
 
@@ -1381,8 +1437,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* start rolling */
     if(!pa->midair && (pa->state == PAS_WALKING || pa->state == PAS_RUNNING)) {
-        if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN))
+        if(fabs(pa->gsp) >= pa->rollthreshold && input_button_down(pa->input, IB_DOWN)) {
             pa->state = PAS_ROLLING;
+            notify_observers(pa, PAE_ROLL);
+        }
     }
 
     /* roll */
@@ -1515,6 +1573,8 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                 pa->state = PAS_JUMPING;
                 pa->want_to_detach_from_ground = true;
                 FORCE_ANGLE(0x0);
+
+                notify_observers(pa, PAE_JUMP);
             }
         }
     }
@@ -1673,8 +1733,11 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
      *
      */
 
-    if(!pa->smashed)
-        pa->smashed = is_smashed(pa, obstaclemap);
+    if(is_smashed(pa, obstaclemap)) {
+        notify_observers(pa, PAE_SMASH);
+        physicsactor_kill(pa);
+        return;
+    }
 
     /*
      *
@@ -1948,6 +2011,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             /* stop when landing after getting hit */
             pa->gsp = pa->xsp = 0.0;
             pa->state = PAS_STOPPED;
+            notify_observers(pa, PAE_BLINK);
         }
         else {
             /* walk / run */
@@ -2306,4 +2370,39 @@ int extrapolate_angle(int curr_angle, int prev_angle, float t)
     int delta = (delta_angle(curr_angle, prev_angle) * mul) / 256;
     int theta = (curr_angle < prev_angle) ? 0xFF - delta + 1 : delta;
     return (curr_angle + theta) & 0xFF;
+}
+
+/* notify observers */
+void notify_observers(physicsactor_t* pa, physicsactorevent_t event)
+{
+    physicsactorobserverlist_t* observer = pa->observers;
+
+    while(observer != NULL) {
+        observer->callback(pa, event, observer->context);
+        observer = observer->next;
+    }
+}
+
+/* create an observer */
+physicsactorobserverlist_t* create_observer(void (*callback)(physicsactor_t*,physicsactorevent_t,void*), void* context, physicsactorobserverlist_t* next)
+{
+    physicsactorobserverlist_t* observer = mallocx(sizeof *observer);
+
+    observer->callback = callback;
+    observer->context = context;
+    observer->next = next;
+
+    return observer;
+}
+
+/* destroy observers */
+physicsactorobserverlist_t* destroy_observers(physicsactorobserverlist_t* list)
+{
+    while(list != NULL) {
+        physicsactorobserverlist_t* next = list->next;
+        free(list);
+        list = next;
+    }
+
+    return NULL;
 }

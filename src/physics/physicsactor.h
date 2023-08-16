@@ -69,6 +69,27 @@ enum movmode_t
     MM_LEFTWALL
 };
 
+/*
+ * events triggered by the physics actor
+ */
+typedef enum physicsactorevent_t physicsactorevent_t;
+enum physicsactorevent_t
+{
+    PAE_JUMP,
+    PAE_ROLL,
+    PAE_CHARGE,
+    PAE_RECHARGE,
+    PAE_RELEASE,
+    PAE_BRAKE,
+    PAE_BREATHE,
+    PAE_BLINK,
+    PAE_HIT,
+    PAE_KILL,
+    PAE_DROWN,
+    PAE_SMASH,
+    PAE_RESURRECT
+};
+
 /* forward declarations */
 struct obstaclemap_t;
 struct obstacle_t;
@@ -84,18 +105,18 @@ void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position
 
 void physicsactor_capture_input(physicsactor_t *pa, const struct input_t *in); /* call before physicsactor_update() */
 void physicsactor_reset_model_parameters(physicsactor_t* pa);
+void physicsactor_subscribe(physicsactor_t* pa, void (*callback)(physicsactor_t*,physicsactorevent_t,void*), void* context);
 
 bool physicsactor_is_facing_right(const physicsactor_t *pa);
 bool physicsactor_is_touching_ceiling(const physicsactor_t *pa);
 bool physicsactor_is_midair(const physicsactor_t *pa);
-bool physicsactor_is_smashed(const physicsactor_t *pa);
 physicsactorstate_t physicsactor_get_state(const physicsactor_t *pa);
 int physicsactor_get_angle(const physicsactor_t *pa); /* get the angle in degrees */
 v2d_t physicsactor_get_position(const physicsactor_t *pa); /* the position of the physics actor is the center of its sprite */
 void physicsactor_set_position(physicsactor_t *pa, v2d_t position);
 void physicsactor_lock_horizontally_for(physicsactor_t *pa, double seconds); /* set the horizontal control lock timer */
 double physicsactor_hlock_timer(const physicsactor_t *pa); /* get the horizontal control lock timer (in seconds) */
-bool physicsactor_ressurrect(physicsactor_t *pa);
+bool physicsactor_resurrect(physicsactor_t *pa);
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
 void physicsactor_detach_from_ground(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(const physicsactor_t *pa);
