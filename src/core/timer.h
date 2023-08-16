@@ -30,7 +30,6 @@ void timer_release();
 
 /* main utilities */
 float timer_get_delta();
-uint32_t timer_get_ticks();
 double timer_get_elapsed();
 double timer_get_now();
 int64_t timer_get_frames();

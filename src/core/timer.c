@@ -26,7 +26,7 @@
 /* internal data */
 static double start_time = 0.0;
 static double current_time = 0.0;
-static float delta_time = 0.0f;
+static double delta_time = 0.0;
 static int64_t frames = 0;
 
 static bool is_paused = false;
@@ -46,7 +46,7 @@ void timer_init()
         fatal_error("Allegro is not initialized");
 
     start_time = al_get_time();
-    current_time = 0.0f;
+    current_time = 0.0;
     delta_time = 0.0;
     frames = 0;
 
@@ -62,8 +62,8 @@ void timer_init()
  */
 void timer_update()
 {
-    static const float minimum_delta = 0.0166667f; /* 60 fps */
-    static const float maximum_delta = 0.017f; /* if 0.0166667f, you don't get physics with the fixed timestep; if too large (0.20f), there may be issues with collisions */
+    const double minimum_delta = 1.0 / 60.0; /* 60 fps */
+    const double maximum_delta = 1.0 / 50.0; /* 50 fps */
     static double old_time = 0.0;
 
     /* paused timer? */
@@ -107,18 +107,7 @@ void timer_release()
  */
 float timer_get_delta()
 {
-    return delta_time;
-}
-
-
-/*
- * timer_get_ticks()
- * Elapsed milliseconds since the application has started,
- * measured at the beginning of the current framestep
- */
-uint32_t timer_get_ticks()
-{
-    return (uint32_t)(1000.0 * current_time);
+    return (float)delta_time;
 }
 
 
