@@ -47,7 +47,7 @@ static const struct tm* timeinfo() { time_t raw = time(NULL); return localtime(&
 static int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_t *os, v2d_t offset);
 
 /* BIFs */
-static float f_elapsed_time() { return 0.001f * timer_get_ticks(); } /* elapsed time, in seconds */
+static float f_elapsed_time() { return timer_get_elapsed(); } /* elapsed time, in seconds */
 static float f_dt() { return timer_get_delta(); } /* time difference between 2 consecutive frames */
 static float f_fps() { return (float)video_fps(); } /* frames per second */
 static float f_collectibles() { return (float)player_get_collectibles(); } /* number of collectibles */

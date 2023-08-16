@@ -1952,7 +1952,7 @@ void level_call_dialogbox(const char *title, const char *message)
         return;
 
     dlgbox_active = TRUE;
-    dlgbox_starttime = timer_get_ticks();
+    dlgbox_starttime = timer_get_elapsed() * 1000.0;
     font_set_text(dlgbox_title, "%s", title);
     font_set_text(dlgbox_message, "%s", message);
     font_set_width(dlgbox_message, image_width(actor_image(dlgbox)) - 14);
@@ -2431,7 +2431,7 @@ void update_dlgbox()
 {
     float speed = VIDEO_SCREEN_H / 2; /* y speed */
     float dt = timer_get_delta();
-    uint32_t t = timer_get_ticks();
+    uint32_t t = timer_get_elapsed() * 1000.0;
 
     if(dlgbox_active) {
         if(t >= dlgbox_starttime + DLGBOX_MAXTIME) {
@@ -3620,7 +3620,7 @@ void editor_update_background()
  */
 void editor_waterline_render(int ycoord, color_t color)
 {
-    int x, x0 = 19 - (timer_get_ticks() / 25) % 20;
+    int x, x0 = 19 - (int)(timer_get_elapsed() * 40.0) % 20;
 
     for(x=x0-10; x<VIDEO_SCREEN_W; x+=20)
         image_line(x, ycoord, x+10, ycoord, color);

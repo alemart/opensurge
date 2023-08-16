@@ -408,7 +408,7 @@ void sound_stop(sound_t *sample)
 bool sound_is_playing(sound_t *sample)
 {
     if(sample != NULL)
-        return (0.001f * timer_get_ticks()) < sample->end_time;
+        return timer_get_elapsed() < sample->end_time;
     else
         return false;
 

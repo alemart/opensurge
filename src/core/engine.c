@@ -122,7 +122,7 @@ static void calc_error(const char *msg);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
-static const uint32_t GC_INTERVAL = 10000; /* in ms (garbage collector) */
+static const double GC_INTERVAL = 10.0; /* in seconds (garbage collector) */
 static ALLEGRO_TIMER* a5_timer = NULL;
 static bool force_quit = false;
 
@@ -266,10 +266,10 @@ void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
  */
 void clean_garbage()
 {
-    static uint32_t last = 0;
-    uint32_t now = timer_get_ticks();
+    static double last = 0.0;
+    double now = timer_get_elapsed();
 
-    /* run the GC every GC_INTERVAL milliseconds (approximately) */
+    /* run the GC every GC_INTERVAL seconds (approximately) */
     if(now >= last + GC_INTERVAL) {
         last = now;
         resourcemanager_release_unused_resources();

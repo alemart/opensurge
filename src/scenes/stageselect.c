@@ -122,7 +122,7 @@ void stageselect_init(void *should_enable_debug)
     input = input_create_user(NULL);
     selected_stage = NULL;
     music = music_load(OPTIONS_MUSICFILE);
-    can_play_music = (!enable_debug || timer_get_ticks() >= 10000);
+    can_play_music = (!enable_debug || timer_get_elapsed() >= 10.0);
 
     title = font_create("MenuTitle");
     font_set_text(title, "%s", !enable_debug ? "$STAGESELECT_TITLE" : "$STAGESELECT_DEBUG");
