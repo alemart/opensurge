@@ -472,6 +472,26 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     /* frame skipping */
     bool skip_frame = (pa->fixed_time > pa->reference_time);
     if(skip_frame) {
+#if 1
+        /* Don't skip a frame, even though the engine is running faster than
+           required by the simulation. Frame skipping generates jittering.
+
+           Suppose that the player is running at a very high speed, say 1200
+           px/s. That's 20 pixels per frame at 60 fps. If we skip a frame, the
+           player will not move by that distance in that frame, but will move
+           in the "adjacent" frames in time. A camera script, unaware of the
+           frame skipping, will catch up with the player and cause jitter.
+
+           If the target framerate of the physics simulation is equal to the
+           target framerate of the engine, then frame skipping will seldom
+           happen. It is acceptable to process an additional step of the
+           simulation instead of skipping a frame in this case. The result is
+           visually smooth. The differences in distances/speeds, compared to
+           what would be if the target framerate of the simulation was strictly
+           enforced, are negligible: proportional to a small FIXED_TIMESTEP and
+           happening only occasionally compared to the total number of frames. */
+        pa->reference_time = pa->fixed_time + FIXED_TIMESTEP * 0.5;
+#else
         /* skip a frame if the engine is rendering more frames per second than
            required by the simulation. If jump is first pressed, we save that
            information and restore it when we decide not to skip a frame. */
@@ -481,6 +501,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         /* simulate that the jump button is first pressed. We won't skip a frame now. */
         input_simulate_button_press(pa->input, IB_FIRE1);
         pa->delayed_jump = false;
+#endif
     }
 
     /* run the simulation */
