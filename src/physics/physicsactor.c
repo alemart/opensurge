@@ -2064,7 +2064,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* fix invalid states */
     if(pa->midair) {
-        if(pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
+        if(pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_BRAKING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
             pa->state = WALKING_OR_RUNNING(pa);
     }
     else {

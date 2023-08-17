@@ -1891,7 +1891,7 @@ void animate_invincibility_stars(player_t* player)
 
     /* animate */
     for(i = 0; i < PLAYER_MAX_STARS; i++) {
-        x = 1.0f - fmodf(timer_get_elapsed() + (magic * i), 1.0f);
+        x = 1.0f - fmodf((float)timer_get_elapsed() * 1000.0f + (magic * i), 1000.0f) * 0.001f;
         distance = max_distance * (1.0f - x * x * x);
         angle = -i * angpi;
         player->star[i]->alpha = x * x;
