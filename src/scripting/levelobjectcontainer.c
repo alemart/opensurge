@@ -40,6 +40,7 @@ the root of the SurgeScript object tree).
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_passive_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_pause(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -62,6 +63,7 @@ static int token = 0;
 static bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 static bool find_and_remove_link(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 static bool check_if_link_exists(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
+static void recycle_memory(surgescript_object_t* container);
 
 /* iterator */
 typedef struct containeriterator_state_t containeriterator_state_t;
@@ -106,6 +108,13 @@ void scripting_register_levelobjectcontainer(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "LevelObjectContainer", "addObject", fun_addobject, 1);
     surgescript_vm_bind(vm, "LevelObjectContainer", "removeObject", fun_removeobject, 1);
     surgescript_vm_bind(vm, "LevelObjectContainer", "hasObject", fun_hasobject, 1);
+
+    /* a passive container is only suitable for preventing garbage collection */
+    surgescript_vm_bind(vm, "PassiveLevelObjectContainer", "state:main", fun_passive_main, 0);
+    surgescript_vm_bind(vm, "PassiveLevelObjectContainer", "constructor", fun_constructor, 0);
+    surgescript_vm_bind(vm, "PassiveLevelObjectContainer", "spawn", fun_spawn, 1);
+    surgescript_vm_bind(vm, "PassiveLevelObjectContainer", "destroy", fun_constructor, 0);
+    surgescript_vm_bind(vm, "PassiveLevelObjectContainer", "addObject", fun_addobject, 1);
 }
 
 /*
@@ -164,29 +173,23 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
-    surgescript_heapptr_t idx = surgescript_var_get_rawbits(surgescript_heap_at(heap, IDX_ADDR));
-    size_t heap_size = surgescript_heap_size(heap);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
 
-    /* continuously scan the memory for broken references */
-    if(idx >= FIRST_STORED_OBJECT_ADDR && idx < heap_size) {
-        surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-
-        /* an object stored in heap[idx] has been destroyed */
-        if(surgescript_heap_validaddress(heap, idx) && (
-            surgescript_var_is_null(surgescript_heap_at(heap, idx)) ||
-            !surgescript_objectmanager_exists(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, idx)))
-        ))
-            surgescript_heap_free(heap, idx); /* release the memory, so it can be reused */
-    }
-
-    /* update the scan index on the object memory */
-    if(++idx >= heap_size)
-        idx = FIRST_STORED_OBJECT_ADDR;
-    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
+    /* recycle memory */
+    recycle_memory(object);
 
     /* traverse the sub-tree of each stored object */
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_scan_all(heap, manager, traverse_links);
+
+    /* done */
+    return NULL;
+}
+
+/* main state (passive container) */
+surgescript_var_t* fun_passive_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /* recycle memory */
+    recycle_memory(object);
 
     /* done */
     return NULL;
@@ -240,7 +243,7 @@ surgescript_var_t* fun_addobject(surgescript_object_t* object, const surgescript
     }
     surgescript_object_t* new_object = surgescript_objectmanager_get(manager, new_object_handle);
 
-    /* the object must be a child of Level, because we'll traverse its sub-tree */
+    /* the object must be a child of Level */
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(new_object);
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
     const char* parent_name = surgescript_object_name(parent);
@@ -294,6 +297,30 @@ surgescript_var_t* fun_hasobject(surgescript_object_t* object, const surgescript
 /*
  * Helpers
  */
+
+void recycle_memory(surgescript_object_t* container)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(container);
+    surgescript_heapptr_t idx = surgescript_var_get_rawbits(surgescript_heap_at(heap, IDX_ADDR));
+    size_t heap_size = surgescript_heap_size(heap);
+
+    /* continuously scan the memory for broken references */
+    if(idx >= FIRST_STORED_OBJECT_ADDR && idx < heap_size) {
+        surgescript_objectmanager_t* manager = surgescript_object_manager(container);
+
+        /* an object stored in heap[idx] has been destroyed */
+        if(surgescript_heap_validaddress(heap, idx) && (
+            surgescript_var_is_null(surgescript_heap_at(heap, idx)) ||
+            !surgescript_objectmanager_exists(manager, surgescript_var_get_objecthandle(surgescript_heap_at(heap, idx)))
+        ))
+            surgescript_heap_free(heap, idx); /* release the memory, so it can be reused */
+    }
+
+    /* update the scan index on the object memory */
+    if(++idx >= heap_size)
+        idx = FIRST_STORED_OBJECT_ADDR;
+    surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
+}
 
 bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data)
 {

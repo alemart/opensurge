@@ -138,6 +138,7 @@ static const surgescript_heapptr_t UNAWAKEENTITYCONTAINER_ADDR = 1;
 static const surgescript_heapptr_t DEBUGENTITYCONTAINER_ADDR = 2;
 static const surgescript_heapptr_t ENTITYTREE_ADDR = 3;
 static const surgescript_heapptr_t UNAWAKEENTITYCONTAINERARRAY_ADDR = 4;
+static const surgescript_heapptr_t NOTGARBAGECONTAINER_ADDR = 5;
 
 /* helpers */
 #define WANT_SPACE_PARTITIONING         1 /* whether or not to optimize unawake entities with space partitioning */
@@ -152,6 +153,7 @@ static void pause_containers(surgescript_object_t* entity_manager, bool pause);
 static bool is_in_debug_mode(surgescript_object_t* entity_manager);
 static void refresh_entity_tree(surgescript_object_t* entity_manager);
 static bool inspect_subtree(const surgescript_object_t* root, bool is_root_entity, const surgescript_objectmanager_t* manager, surgescript_tagsystem_t* tag_system, int depth);
+static void prevent_garbage_collection(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle);
 
 
 
@@ -251,6 +253,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(DEBUGENTITYCONTAINER_ADDR == surgescript_heap_malloc(heap));
     ssassert(ENTITYTREE_ADDR == surgescript_heap_malloc(heap));
     ssassert(UNAWAKEENTITYCONTAINERARRAY_ADDR == surgescript_heap_malloc(heap));
+    ssassert(NOTGARBAGECONTAINER_ADDR == surgescript_heap_malloc(heap));
 
     /* spawn the entity containers */
     surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
@@ -275,6 +278,10 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_var_set_null(surgescript_heap_at(heap, UNAWAKEENTITYCONTAINERARRAY_ADDR));
     surgescript_var_set_null(surgescript_heap_at(heap, ENTITYTREE_ADDR));
 #endif
+
+    /* spawn an object container dedicated to the prevention of garbage collection */
+    surgescript_objecthandle_t notgarbage_container = surgescript_objectmanager_spawn(manager, this_handle, "PassiveLevelObjectContainer", scripting_levelobjectcontainer_token());
+    surgescript_var_set_objecthandle(surgescript_heap_at(heap, NOTGARBAGECONTAINER_ADDR), notgarbage_container);
 
     /* done */
     return NULL;
@@ -459,6 +466,9 @@ surgescript_var_t* fun_spawnentity(surgescript_object_t* object, const surgescri
 
     surgescript_var_destroy(arg);
 #endif
+
+    /* prevent garbage collection */
+    prevent_garbage_collection(object, entity_handle);
 
     /* apply backwards-compatibility fix */
     inspect_subtree(entity, true, manager, tag_system, 0);
@@ -1298,4 +1308,25 @@ bool inspect_subtree(const surgescript_object_t* root, bool is_root_entity, cons
 
     /* done */
     return fixed_root || fixed_descendant;
+}
+
+/* Prevent Garbage Collection
+
+   Even though entities are stored in entity containers, the reference links are continuously changing.
+   Due to the nature of the incremental mark-and-sweep garbage collection method currently implemented
+   in SurgeScript (version 0.6.0 at the time of this writing), entities may be accidentally removed
+   because the links may be changed while the algorithm is collecting data. Therefore, we will keep
+   new links in a different container and we will not change these. */
+void prevent_garbage_collection(surgescript_object_t* entity_manager, surgescript_objecthandle_t entity_handle)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+    surgescript_heap_t* heap = surgescript_object_heap(entity_manager);
+
+    surgescript_var_t* container_var = surgescript_heap_at(heap, NOTGARBAGECONTAINER_ADDR);
+    surgescript_objecthandle_t container_handle = surgescript_var_get_objecthandle(container_var);
+    surgescript_object_t* container = surgescript_objectmanager_get(manager, container_handle);
+
+    surgescript_var_t* param = surgescript_var_set_objecthandle(surgescript_var_create(), entity_handle);
+    surgescript_object_call_function(container, "addObject", (const surgescript_var_t*[]){ param }, 1, NULL);
+    surgescript_var_destroy(param);
 }
