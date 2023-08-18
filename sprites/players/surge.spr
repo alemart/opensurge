@@ -255,6 +255,7 @@ sprite "Surge"
         repeat      TRUE
         fps         20
         data        78 79
+        action_spot 26 23
     }
 
     // winning (victory)

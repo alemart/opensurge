@@ -15,11 +15,12 @@ using SurgeEngine.Collisions.CollisionBox;
 object "Zipline Grabber" is "entity", "gimmick"
 {
     public anim = 1;
+    zippingPlayerAnimation = 16; // player animation for "Zipping"
 
     actor = Actor("Zipline Grabber");
-    collider = CollisionBox(8, 1.5 * actor.height).setAnchor(
+    collider = CollisionBox(actor.width / 2, actor.height * 2).setAnchor(
         actor.animation.hotSpot.x / actor.width,
-        actor.animation.hotSpot.y / (1.5 * actor.height)
+        actor.animation.hotSpot.y / (actor.height * 2)
     );
     transform = Transform();
     grab = Sound("samples/zipline.wav");
@@ -28,8 +29,6 @@ object "Zipline Grabber" is "entity", "gimmick"
     maxSpeed = 640.0; // max speed in px/s
     zipline = null; // current zipline
     lockedPlayer = null;
-    zippingPlayerHands = Vector2(-0.35, -0.8); // relative position of the hands
-    zippingPlayerAnimation = 16; // player animation for "Zipping"
     direction = 1;
 
     state "main"
@@ -132,10 +131,21 @@ object "Zipline Grabber" is "entity", "gimmick"
 
     fun repositionPlayer(player)
     {
-        player.transform.position = transform.position.translatedBy(
-            -zippingPlayerHands.x * player.collider.width * player.direction,
-            -zippingPlayerHands.y * player.collider.height
-        );
+        // if the action spot of the zipping animation of the player is
+        // not defined*, use default values for the position of the hands
+        if(player.actionSpot.x == 0 && player.actionSpot.y == 0) {
+            player.transform.position = transform.position.translatedBy(
+                Math.round(0.35 * player.collider.width) * player.direction,
+                Math.round(0.80 * player.collider.height)
+            );
+            return;
+        }
+
+        // put the action spot of the zipping animation of the player at
+        // the action spot of the zipline grabber
+        player.transform.position = transform.position
+                                    .plus(actor.actionOffset)
+                                    .minus(player.actionOffset);
     }
 
     fun changeZiplinesAnim(anim)
