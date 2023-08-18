@@ -329,6 +329,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->observers = NULL;
 
     pa->midair = true;
+    pa->was_midair = true;
     pa->midair_timer = 0.0;
     pa->hlock_timer = 0.0;
     pa->jump_lock_timer = 0.0;
@@ -464,7 +465,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
     /* we run the simulation with a fixed timestep for better accuracy and consistency */
     const double FIXED_TIMESTEP = 1.0 / TARGET_FPS;
-
+#if 1
     /* advance the reference time */
     double dt = timer_get_delta();
     pa->reference_time += dt;
@@ -524,6 +525,12 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
         video_showmessage("frame skip %lf", pa->reference_time);
     else if(counter > 1)
         video_showmessage("going slow (%d) %lf", counter, pa->reference_time);
+#endif
+
+#else
+    /* running the simulation at most once per framestep and with no frame
+       skipping is equivalent to running the simulation once per framestep */
+    fixed_update(pa, obstaclemap, FIXED_TIMESTEP);
 #endif
 }
 
@@ -1106,8 +1113,8 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* save previous state */
     UPDATE_SENSORS();
-    pa->was_midair = pa->midair;
     pa->prev_angle = pa->angle;
+    pa->was_midair = pa->midair; /* set after UPDATE_SENSORS() */
 
     /* disable simultaneous left + right input */
     if(input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT)) {
@@ -1158,8 +1165,14 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
      *
      */
 
-    if(pa->state == PAS_GETTINGHIT)
+    if(pa->state == PAS_GETTINGHIT) {
         input_reset(pa->input);
+
+        /* just to make sure that we don't get locked in this state
+           maybe include a timer instead? */
+        if(!pa->midair && !pa->was_midair)
+            pa->state = PAS_STOPPED;
+    }
 
     /*
      *
@@ -1172,7 +1185,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
         const double threshold = 60.0;
         input_reset(pa->input);
 
-        pa->gsp = clip(pa->gsp, -pa->capspeed, pa->capspeed);
+        pa->gsp = clip(pa->gsp, -0.75 * pa->capspeed, 0.75 * pa->capspeed);
         if(pa->state == PAS_ROLLING) {
             notify_observers(pa, PAE_BRAKE);
             pa->state = PAS_BRAKING;
@@ -1432,7 +1445,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     if(
         !pa->midair && pa->movmode == MM_FLOOR &&
-        !(pa->state == PAS_LEDGE || pa->state == PAS_PUSHING || pa->state == PAS_LOOKINGUP || pa->state == PAS_DUCKING || pa->state == PAS_CHARGING) &&
+        !(pa->state == PAS_LEDGE || pa->state == PAS_PUSHING) &&
         ((at_A == NULL) ^ (at_B == NULL)) &&
         nearly_zero(pa->gsp)
     ) {
@@ -1952,6 +1965,14 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
         }
     }
 
+    /* reset the angle if midair */
+    if(pa->midair) {
+        /* if we're balancing on a ledge (of short height), we may be getting a
+          spurious angle, and hence a spurious movmode. pa->midair may be set to
+          true, even though we're on a ledge. That's due to the wall modes. */
+        FORCE_ANGLE(0x0); /* pa->midair may be set to false here */
+    }
+
     /* reset flag */
     pa->want_to_detach_from_ground = false;
 
@@ -1967,13 +1988,23 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     if(!pa->midair && pa->was_midair) {
 
-        /* set gsp based on the angle */
-        if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
+        /* if the player is moving mostly horizontally, set gsp to xsp */
+        if(fabs(pa->xsp) > pa->ysp)
+            pa->gsp = pa->xsp;
+
+        /* if not, set gsp based on the angle:
+
+           [0x00, 0x0F] U [0xF0, 0xFF]: flat ground
+           [0x10, 0x1F] U [0xE0, 0xEF]: slope
+           [0x20, 0x3F] U [0xC0, 0xDF]: steep slope
+
+           0x40, 0xC0 is +- ninety degrees... */
+        else if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
             pa->gsp = pa->xsp;
         else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * 0.5 * -sign(SIN(pa->angle));
+            pa->gsp = pa->ysp * 0.5 * -sign(SIN(pa->angle));
         else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
-            pa->gsp = fabs(pa->xsp) > pa->ysp ? pa->xsp : pa->ysp * -sign(SIN(pa->angle));
+            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
 
         /* reset speeds */
         pa->xsp = pa->ysp = 0.0;
@@ -2020,19 +2051,19 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* corrections when landing on the ground */
     if(!pa->midair && pa->was_midair) {
-        if(pa->state == PAS_ROLLING) {
+        if(pa->state == PAS_GETTINGHIT) {
+            /* stop when landing after getting hit */
+            pa->gsp = pa->xsp = 0.0;
+            pa->state = PAS_STOPPED;
+            notify_observers(pa, PAE_BLINK);
+        }
+        else if(pa->state == PAS_ROLLING) {
             /* unroll when landing on the ground */
             if(pa->midair_timer >= 0.2 && !input_button_down(pa->input, IB_DOWN)) {
                 pa->state = WALKING_OR_RUNNING(pa);
                 if(!nearly_zero(pa->gsp))
                     pa->facing_right = (pa->gsp > 0.0);
             }
-        }
-        else if(pa->state == PAS_GETTINGHIT) {
-            /* stop when landing after getting hit */
-            pa->gsp = pa->xsp = 0.0;
-            pa->state = PAS_STOPPED;
-            notify_observers(pa, PAE_BLINK);
         }
         else {
             /* walk / run */
@@ -2064,7 +2095,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* fix invalid states */
     if(pa->midair) {
-        if(pa->state == PAS_PUSHING || pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_BRAKING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
+        if(pa->state == PAS_PUSHING || pa->state == PAS_LEDGE || pa->state == PAS_STOPPED || pa->state == PAS_WAITING || pa->state == PAS_BRAKING || pa->state == PAS_DUCKING || pa->state == PAS_LOOKINGUP)
             pa->state = WALKING_OR_RUNNING(pa);
     }
     else {
@@ -2072,19 +2103,17 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             pa->state = PAS_STOPPED;
     }
 
-    /* reset the angle & update the midair_timer */
-    if(pa->midair) {
-        pa->midair_timer += dt;
-        FORCE_ANGLE(0x0);
-    }
-    else
-        pa->midair_timer = 0.0;
-
     /* remain on the winning state */
     if(pa->winning_pose && !pa->midair) {
         if(fabs(pa->gsp) < pa->movethreshold)
             pa->state = PAS_WINNING;
     }
+
+    /* update the midair_timer */
+    if(pa->midair)
+        pa->midair_timer += dt;
+    else
+        pa->midair_timer = 0.0;
 }
 
 /* call update_sensors() whenever you update pa->position or pa->angle */
