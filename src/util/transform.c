@@ -53,13 +53,12 @@ transform_t* transform_identity(transform_t* t)
 
 /*
  * transform_copy()
- * Copy src to t
+ * Copy src to dest
  */
-transform_t* transform_copy(transform_t* t, const transform_t* src)
+transform_t* transform_copy(transform_t* dest, const transform_t* src)
 {
-    *t = *src;
-
-    return t;
+    *dest = *src;
+    return dest;
 }
 
 /*
@@ -68,6 +67,21 @@ transform_t* transform_copy(transform_t* t, const transform_t* src)
  */
 transform_t* transform_translate(transform_t* t, v2d_t offset)
 {
+    /*
+
+    pre-multiply by
+
+    [ 1  .  .  tx ]
+    [ .  1  .  ty ]
+    [ .  .  1  .  ]
+    [ .  .  .  1  ]
+
+    */
+
+    /*float one = t->m[15];
+    t->m[12] += offset.x * one;
+    t->m[13] += offset.y * one;*/
+
     t->m[12] += offset.x;
     t->m[13] += offset.y;
 
@@ -80,16 +94,35 @@ transform_t* transform_translate(transform_t* t, v2d_t offset)
  */
 transform_t* transform_rotate(transform_t* t, float radians)
 {
+    /*
+
+    pre-multiply by
+
+    [ cos x  -sin x   .   . ]
+    [ sin x   cos x   .   . ]
+    [   .       .     1   . ]
+    [   .       .     .   1 ]
+
+    */
+
     float c = cosf(radians);
     float s = sinf(radians);
+    float p, q;
 
-    for(int i = 0; i < 4; i++) {
-        float p = t->m[4*i + 0];
-        float q = t->m[4*i + 1];
+    #define UPDATE_COLUMN(col) do { \
+        p = t->m[4*(col) + 0]; \
+        q = t->m[4*(col) + 1]; \
+        \
+        t->m[4*(col) + 0] = c * p - s * q; \
+        t->m[4*(col) + 1] = s * p + c * q; \
+    } while(0)
 
-        t->m[4*i + 0] = c * p - s * q;
-        t->m[4*i + 1] = s * p + c * q;
-    }
+    UPDATE_COLUMN(0);
+    UPDATE_COLUMN(1);
+    UPDATE_COLUMN(2);
+    UPDATE_COLUMN(3);
+
+    #undef UPDATE_COLUMN
 
     return t;
 }
@@ -100,6 +133,17 @@ transform_t* transform_rotate(transform_t* t, float radians)
  */
 transform_t* transform_scale(transform_t* t, v2d_t scale)
 {
+    /*
+
+    pre-multiply by
+
+    [ sx  .  .  . ]
+    [ .  sy  .  . ]
+    [ .   .  1  . ]
+    [ .   .  .  1 ]
+
+    */
+
     t->m[0] *= scale.x;
     t->m[1] *= scale.y;
 
@@ -117,16 +161,15 @@ transform_t* transform_scale(transform_t* t, v2d_t scale)
 
 /*
  * transform_compose()
- * Compose transforms A and B such that the resulting transform
- * T is set to A * B
+ * Pre-multiplies T by A, i.e., T := A * T
  */
-transform_t* transform_compose(transform_t* t, const transform_t* a, const transform_t* b)
+transform_t* transform_compose(transform_t* t, const transform_t* a)
 {
     #define DOT(row, col) ( \
-        a->m[(row) + 0] * b->m[(col) * 4 + 0] + \
-        a->m[(row) + 4] * b->m[(col) * 4 + 1] + \
-        a->m[(row) + 8] * b->m[(col) * 4 + 2] + \
-        a->m[(row) + 12] * b->m[(col) * 4 + 3] \
+        a->m[(row) + 0] * t->m[(col) * 4 + 0] + \
+        a->m[(row) + 4] * t->m[(col) * 4 + 1] + \
+        a->m[(row) + 8] * t->m[(col) * 4 + 2] + \
+        a->m[(row) + 12] * t->m[(col) * 4 + 3] \
     )
 
     *t = (const transform_t){ .m = {

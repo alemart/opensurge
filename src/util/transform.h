@@ -34,13 +34,13 @@ struct ALLEGRO_TRANSFORM;
 
 /* basic API */
 transform_t* transform_identity(transform_t* t); /* create an identity transform */
-transform_t* transform_copy(transform_t* t, const transform_t* src); /* copy src to t */
+transform_t* transform_copy(transform_t* dest, const transform_t* src); /* copy src to dest */
 transform_t* transform_translate(transform_t* t, v2d_t offset); /* translation */
 transform_t* transform_rotate(transform_t* t, float radians); /* rotation */
 transform_t* transform_scale(transform_t* t, v2d_t scale); /* scale */
 
 /* composition */
-transform_t* transform_compose(transform_t* t, const transform_t* a, const transform_t* b); /* T := A * B */
+transform_t* transform_compose(transform_t* t, const transform_t* a); /* T := A * T */
 
 /* misc */
 struct ALLEGRO_TRANSFORM* transform_to_allegro(struct ALLEGRO_TRANSFORM* al_transform, const transform_t* t);
