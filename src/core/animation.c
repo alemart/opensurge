@@ -861,6 +861,15 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
         if(percentage != UNDEFINED_PERCENTAGE)
             prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage = percentage;
 
+        /* do not mix manually defined percentages with automatically defined percentages */
+        if(prog_anim->keyframe_count >= 2) {
+            int p1 = prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage;
+            int p2 = prog_anim->keyframe[prog_anim->keyframe_count - 2].percentage;
+
+            if((p1 == UNDEFINED_PERCENTAGE) ^ (p2 == UNDEFINED_PERCENTAGE))
+                fatal_error("Specify all keyframe percentages or specify none. Do not mix manually defined percentages with automatically defined percentages in \"%s\" at line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        }
+
         /* traverse the keyframe block */
         nanoparser_traverse_program_ex(
             nanoparser_get_program(block),
