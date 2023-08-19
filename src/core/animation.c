@@ -57,7 +57,7 @@ struct proganim_keyframe_t {
     v2d_t translation; /* in pixels */
     float rotation; /* in degrees */
     v2d_t scale; /* percentage in the x and y axes */
-    float opacity; /* 1: unmodified; 0: fully translucent */
+    int translucency; /* 0: unmodified; 100: fully translucent */
 };
 
 struct proganim_t {
@@ -69,13 +69,15 @@ struct proganim_t {
 static proganim_t* proganim_create();
 static proganim_t* proganim_destroy(proganim_t* prog_anim);
 static transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double seconds, transform_t* out_transform);
-static float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds);
+static float proganim_interpolated_translucency(const proganim_t* prog_anim, double seconds);
 static void proganim_add_keyframe(proganim_t* prog_anim, proganim_keyframe_t keyframe);
-static int proganim_find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage);
+static void find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage, const proganim_keyframe_t** out_a, const proganim_keyframe_t** out_b);
 static int compare_keyframes(const void* a, const void* b);
+static float normalized_percentage(float percentage, const proganim_keyframe_t* a, const proganim_keyframe_t* b);
 static void validate_and_preprocess_proganim(proganim_t* prog_anim, float default_duration);
 static int traverse_keyframes(const parsetree_statement_t *stmt, void *context);
 static int traverse_keyframe(const parsetree_statement_t *stmt, void *context);
+static int parse_percentage(const parsetree_parameter_t* param);
 
 /* constants */
 static const float DEFAULT_FPS = 8.0f;
@@ -87,7 +89,7 @@ static const proganim_keyframe_t DEFAULT_KEYFRAME = {
     .translation = { 0.0f, 0.0f },
     .rotation = 0.0f,
     .scale = { 1.0f, 1.0f },
-    .opacity = 1.0f
+    .translucency = 0
 };
 
 #define UNDEFINED_DURATION 0.0f
@@ -384,21 +386,21 @@ transform_t* animation_interpolated_transform(const animation_t* anim, double se
 }
 
 /*
- * animation_interpolated_opacity()
- * The interpolated opacity of a keyframe-based animation
+ * animation_interpolated_translucency()
+ * The interpolated translucency of a keyframe-based animation
  */
-float animation_interpolated_opacity(const animation_t* anim, double seconds)
+float animation_interpolated_translucency(const animation_t* anim, double seconds)
 {
     /* not defined? */
     if(anim->prog_anim == NULL)
-        return 1.0f;
+        return 0.0f;
 
     /* repeat? */
     if(anim->repeat)
         seconds = fmod(seconds, anim->prog_anim->duration);
 
     /* interpolate! */
-    return proganim_interpolated_opacity(anim->prog_anim, seconds);
+    return proganim_interpolated_translucency(anim->prog_anim, seconds);
 }
 
 
@@ -478,14 +480,14 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
     double percentage = clip01(seconds / prog_anim->duration);
 
     /* get two keyframes suitable for interpolation */
-    int k = proganim_find_keyframes_suitable_for_interpolation(prog_anim, percentage);
-    const proganim_keyframe_t* keyframe_a = &prog_anim->keyframe[k];
-    const proganim_keyframe_t* keyframe_b = &prog_anim->keyframe[k+1];
+    const proganim_keyframe_t *keyframe_a, *keyframe_b;
+    find_keyframes_suitable_for_interpolation(prog_anim, percentage, &keyframe_a, &keyframe_b);
 
     /* interpolate */
-    v2d_t interpolated_translation = v2d_lerp(keyframe_a->translation, keyframe_b->translation, percentage);
-    float interpolated_rotation = lerp_angle(keyframe_a->rotation * DEG2RAD, keyframe_b->rotation * DEG2RAD, percentage);
-    v2d_t interpolated_scale = v2d_lerp(keyframe_a->scale, keyframe_b->scale, percentage);
+    float p = normalized_percentage(percentage, keyframe_a, keyframe_b);
+    v2d_t interpolated_translation = v2d_lerp(keyframe_a->translation, keyframe_b->translation, p);
+    float interpolated_rotation = lerp_angle(keyframe_a->rotation * DEG2RAD, keyframe_b->rotation * DEG2RAD, p);
+    v2d_t interpolated_scale = v2d_lerp(keyframe_a->scale, keyframe_b->scale, p);
 
     /* set the transform */
     transform_rotate(t, -interpolated_rotation);
@@ -495,19 +497,19 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
 }
 
 /*
- * proganim_interpolated_opacity()
- * The interpolated opacity of a programmatic animation computed at the given time
+ * proganim_interpolated_translucency()
+ * The interpolated translucency of a programmatic animation computed at the given time
  */
-float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds)
+float proganim_interpolated_translucency(const proganim_t* prog_anim, double seconds)
 {
     /* no keyframes? */
     if(prog_anim->keyframe_count == 0)
-        return DEFAULT_KEYFRAME.opacity;
+        return (float)DEFAULT_KEYFRAME.translucency * 0.01f;
 
     /* only 1 keyframe? */
     if(prog_anim->keyframe_count == 1) {
         const proganim_keyframe_t* keyframe = &prog_anim->keyframe[0];
-        return keyframe->opacity;
+        return (float)keyframe->translucency * 0.01f;
     }
 
     /* we have at least 2 keyframes */
@@ -516,20 +518,22 @@ float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds)
     double percentage = clip01(seconds / prog_anim->duration);
 
     /* get two keyframes suitable for interpolation */
-    int k = proganim_find_keyframes_suitable_for_interpolation(prog_anim, percentage);
-    const proganim_keyframe_t* keyframe_a = &prog_anim->keyframe[k];
-    const proganim_keyframe_t* keyframe_b = &prog_anim->keyframe[k+1];
+    const proganim_keyframe_t *keyframe_a, *keyframe_b;
+    find_keyframes_suitable_for_interpolation(prog_anim, percentage, &keyframe_a, &keyframe_b);
 
     /* interpolate */
-    float interpolated_opacity = lerp(keyframe_a->opacity, keyframe_b->opacity, percentage);
-    return interpolated_opacity;
+    float p = normalized_percentage(percentage, keyframe_a, keyframe_b);
+    float a = (float)keyframe_a->translucency * 0.01f;
+    float b = (float)keyframe_b->translucency * 0.01f;
+    float interpolated_translucency = lerp(a, b, p);
+    return interpolated_translucency;
 }
 
 /*
- * proganim_find_keyframes_suitable_for_interpolation()
- * Find k >= 0 such that keyframes k and k+1 are suitable for interpolation at the given percentage
+ * find_keyframes_suitable_for_interpolation()
+ * Find keyframes out_a and out_b suitable for interpolation at the given percentage
  */
-int proganim_find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage)
+void find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage, const proganim_keyframe_t** out_a, const proganim_keyframe_t** out_b)
 {
     int p = (int)floor(100.0 * percentage);
 
@@ -539,22 +543,43 @@ int proganim_find_keyframes_suitable_for_interpolation(const proganim_t* prog_an
     /* keyframes are sorted by percentages */
 
     /* out of bounds check */
-    if(p < prog_anim->keyframe[0].percentage)
-        return 0;
-    else if(p > prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage)
-        return prog_anim->keyframe_count - 2;
+    if(p < prog_anim->keyframe[0].percentage) {
+        *out_a = &prog_anim->keyframe[0];
+        *out_b = &prog_anim->keyframe[0];
+        return;
+    }
+    else if(p > prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage) {
+        *out_a = &prog_anim->keyframe[prog_anim->keyframe_count - 1];
+        *out_b = &prog_anim->keyframe[prog_anim->keyframe_count - 1];
+        return;
+    }
 
     /* find a suitable interval */
     for(int k = 0; k+1 < prog_anim->keyframe_count; k++) {
         int start_percentage = prog_anim->keyframe[k].percentage;
         int end_percentage = prog_anim->keyframe[k+1].percentage;
 
-        if(p >= start_percentage && p <= end_percentage)
-            return k;
+        if(p >= start_percentage && p <= end_percentage) {
+            *out_a = &prog_anim->keyframe[k];
+            *out_b = &prog_anim->keyframe[k+1];
+            return;
+        }
     }
 
     /* can't find an interval (this shouldn't happen) */
-    return prog_anim->keyframe_count - 2;
+    *out_a = &prog_anim->keyframe[prog_anim->keyframe_count - 1];
+    *out_b = &prog_anim->keyframe[prog_anim->keyframe_count - 1];
+}
+
+/* input: a->percentage <= percentage <= b->percentage; output: percentage normalized to [0,1] */
+float normalized_percentage(float percentage, const proganim_keyframe_t* a, const proganim_keyframe_t* b)
+{
+    /* we assume that a->percentage <= b->percentage */
+    if(a->percentage == b->percentage)
+        return 0.5f;
+
+    percentage = (percentage - (float)a->percentage * 0.01f) / ((float)(b->percentage - a->percentage) * 0.01f);
+    return clip01(percentage);
 }
 
 
@@ -683,9 +708,9 @@ void validate_and_preprocess_proganim(proganim_t* prog_anim, float default_durat
     for(int i = 0; i < prog_anim->keyframe_count; i++) {
         proganim_keyframe_t* keyframe = &(prog_anim->keyframe[i]);
 
-        if(keyframe->opacity < 0.0f || keyframe->opacity > 1.0f) {
-            logfile_message("Programmatic animation warning: 'opacity' %f is out of the valid range [0,1] in keyframe #%d", keyframe->opacity, i+1);
-            keyframe->opacity = clip01(keyframe->opacity);
+        if(keyframe->translucency < 0 || keyframe->translucency > 100) {
+            logfile_message("Programmatic animation warning: not a valid translucency for keyframe #%d: %d%%", i+1, keyframe->translucency);
+            keyframe->translucency = clip(keyframe->translucency, 0, 100);
         }
 
         if(keyframe->percentage == UNDEFINED_PERCENTAGE) {
@@ -695,7 +720,7 @@ void validate_and_preprocess_proganim(proganim_t* prog_anim, float default_durat
                 keyframe->percentage = 0;
         }
         else if(keyframe->percentage < 0 || keyframe->percentage > 100) {
-            logfile_message("Programmatic animation warning: keyframe #%d percentage should be between 0 and 100, inclusive, but has been set to %d%%", i+1, keyframe->percentage);
+            logfile_message("Programmatic animation warning: not a valid percentage for keyframe #%d: %d%%", i+1, keyframe->percentage);
             keyframe->percentage = clip(keyframe->percentage, 0, 100);
         }
     }
@@ -830,21 +855,10 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
                 break;
         }
 
-        /* read keyframe percentage: \d\d?\d?% */
+        /* read keyframe percentage */
         int percentage = UNDEFINED_PERCENTAGE;
-        if(percentage_string != NULL) {
-            const char* str = nanoparser_get_string(percentage_string);
-            int len = strlen(str);
-
-            if(len < 2 || len > 4 || !str_endswith(str, "%") || strspn(str, "0123456789") != len - 1)
-                fatal_error("Invalid keyframe percentage (\"%s\") in \"%s\" at line %d", str, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-
-            char buf[5] = { 0 };
-            str_cpy(buf, str, sizeof(buf));
-            buf[len-1] = '\0'; /* surely 2 <= len <= 4 */
-            percentage = atoi(buf);
-        }
-
+        if(percentage_string != NULL)
+            percentage = parse_percentage(percentage_string);
 #if 0
         /* create a new keyframe. Repeat the last one* (if any)
            (*) keyframes may come out of order (in terms of percentage) */
@@ -867,7 +881,18 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
             int p2 = prog_anim->keyframe[prog_anim->keyframe_count - 2].percentage;
 
             if((p1 == UNDEFINED_PERCENTAGE) ^ (p2 == UNDEFINED_PERCENTAGE))
-                fatal_error("Specify all keyframe percentages or specify none. Do not mix manually defined percentages with automatically defined percentages in \"%s\" at line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                nanoparser_crash(stmt, "Specify all keyframe percentages or specify none. Do not mix manually defined percentages with automatically defined percentages.");
+        }
+
+        /* declare keyframes in increasing order of percentages */
+        if(prog_anim->keyframe_count >= 2) {
+            int p1 = prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage;
+            int p2 = prog_anim->keyframe[prog_anim->keyframe_count - 2].percentage;
+
+            if(p1 != UNDEFINED_PERCENTAGE && p2 != UNDEFINED_PERCENTAGE) {
+                if(p1 < p2)
+                    nanoparser_crash(stmt, "Keyframes must be specified in increasing order of percentages.");
+            }
         }
 
         /* traverse the keyframe block */
@@ -919,13 +944,36 @@ int traverse_keyframe(const parsetree_statement_t* stmt, void* context)
         keyframe->scale.x = (float)atof(nanoparser_get_string(p1));
         keyframe->scale.y = (float)atof(nanoparser_get_string(p2));
     }
-    else if(str_icmp(identifier, "opacity") == 0) {
+    else if(str_icmp(identifier, "translucency") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "opacity receives a number: alpha");
-        keyframe->opacity = (float)atof(nanoparser_get_string(p1));
+        nanoparser_expect_string(p1, "translucency receives a number: percentage");
+        keyframe->translucency = parse_percentage(p1);
     }
     else
         fatal_error("Can't read keyframe. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
+}
+
+/*
+ * parse_percentage()
+ * Parse a percentage string
+ */
+int parse_percentage(const parsetree_parameter_t* param)
+{
+    const parsetree_statement_t* stmt = nanoparser_get_statement(param);
+    const char* str = nanoparser_get_string(param);
+    int len = strlen(str);
+
+    /* match percentage: /^\d\d?\d?%$/ */
+    if(len < 2 || len > 4 || !str_endswith(str, "%") || strspn(str, "0123456789") != len - 1)
+        fatal_error("Invalid keyframe percentage (\"%s\") in \"%s\" at line %d", str, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    /* copy to buf[] and remove '%' */
+    char buf[5] = { 0 };
+    str_cpy(buf, str, sizeof(buf));
+    buf[len-1] = '\0'; /* surely 2 <= len <= 4 */
+
+    /* convert to integer */
+    return atoi(buf);
 }

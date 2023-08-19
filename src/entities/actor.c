@@ -115,7 +115,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
             /* find alpha */
             float alpha = act->alpha;
             if(has_keyframes)
-                alpha *= animation_interpolated_opacity(act->animation, act->animation_timer);
+                alpha *= 1.0f - animation_interpolated_translucency(act->animation, act->animation_timer);
 
             /* render */
             if(nearly_equal(alpha, 1.0f))
@@ -387,7 +387,7 @@ void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t top
     if(act->animation != NULL && animation_has_keyframes(act->animation)) {
         transform_t prog;
         animation_interpolated_transform(act->animation, act->animation_timer, &prog);
-        transform_compose(&t, &prog, &t);
+        transform_compose(&t, &prog);
     }
 
     /* convert to ALLEGRO_TRANSFORM */
