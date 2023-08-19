@@ -421,7 +421,7 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
 
 void physicsactor_reset_model_parameters(physicsactor_t* pa)
 {
-    const double fpsmul = TARGET_FPS;
+    const double fpsmul = 60.0;
 
     /*
       +--------------------+----------------+-----------------+
