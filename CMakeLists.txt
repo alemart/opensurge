@@ -311,6 +311,7 @@ SET(GAME_SRCS
   src/util/stringutil.c
   src/util/util.c
   src/util/v2d.c
+  src/util/transform.c
 
   src/scenes/mobile/subscenes/info.c
   src/scenes/mobile/subscenes/credits.c
@@ -452,6 +453,7 @@ SET(GAME_HEADERS
   src/util/stringutil.h
   src/util/util.h
   src/util/v2d.h
+  src/util/transform.h
 
   src/scenes/mobile/subscenes/info.h
   src/scenes/mobile/subscenes/credits.h
