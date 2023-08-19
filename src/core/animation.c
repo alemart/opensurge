@@ -50,23 +50,14 @@ struct animation_t {
     proganim_t* prog_anim; /* programmatic animation (possibly NULL) */
 };
 
-/* programmatic animation */
+/* programmatic animations */
 typedef struct proganim_keyframe_t proganim_keyframe_t;
 struct proganim_keyframe_t {
     int percentage; /* 0 to 100 or UNDEFINED_PERCENTAGE */
     v2d_t translation; /* in pixels */
     float rotation; /* in degrees */
-    v2d_t scale; /* percentage in x,y axes */
+    v2d_t scale; /* percentage in the x and y axes */
     float opacity; /* 1: unmodified; 0: fully translucent */
-};
-
-#define UNDEFINED_PERCENTAGE -1
-static const proganim_keyframe_t IDENTITY_KEYFRAME = {
-    .percentage = UNDEFINED_PERCENTAGE,
-    .translation = { 0.0f, 0.0f },
-    .rotation = 0.0f,
-    .scale = { 1.0f, 1.0f },
-    .opacity = 1.0f
 };
 
 struct proganim_t {
@@ -82,13 +73,29 @@ static float proganim_interpolated_opacity(const proganim_t* prog_anim, double s
 static void proganim_add_keyframe(proganim_t* prog_anim, proganim_keyframe_t keyframe);
 static int proganim_find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage);
 static int compare_keyframes(const void* a, const void* b);
-static void validate_and_preprocess_proganim(proganim_t* prog_anim);
+static void validate_and_preprocess_proganim(proganim_t* prog_anim, float default_duration);
 static int traverse_keyframes(const parsetree_statement_t *stmt, void *context);
 static int traverse_keyframe(const parsetree_statement_t *stmt, void *context);
 
 /* constants */
 static const float DEFAULT_FPS = 8.0f;
 static const float MIN_FPS = 1e-5;
+
+#define UNDEFINED_PERCENTAGE -1
+static const proganim_keyframe_t DEFAULT_KEYFRAME = {
+    .percentage = UNDEFINED_PERCENTAGE,
+    .translation = { 0.0f, 0.0f },
+    .rotation = 0.0f,
+    .scale = { 1.0f, 1.0f },
+    .opacity = 1.0f
+};
+
+#define UNDEFINED_DURATION 0.0f
+static const proganim_t DEFAULT_PROGANIM = {
+    .duration = UNDEFINED_DURATION,
+    .keyframe = NULL,
+    .keyframe_count = 0
+};
 
 
 
@@ -409,9 +416,7 @@ proganim_t* proganim_create()
 {
     proganim_t* prog_anim = mallocx(sizeof *prog_anim);
 
-    prog_anim->duration = 0.0f;
-    prog_anim->keyframe = NULL;
-    prog_anim->keyframe_count = 0;
+    *prog_anim = DEFAULT_PROGANIM;
 
     return prog_anim;
 }
@@ -452,9 +457,9 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
 
     /* no keyframes? */
     if(prog_anim->keyframe_count == 0) {
-        /*transform_rotate(t, -IDENTITY_KEYFRAME.rotation * DEG2RAD);
-        transform_scale(t, IDENTITY_KEYFRAME.scale);
-        transform_translate(t, IDENTITY_KEYFRAME.translation);*/
+        /*transform_rotate(t, -DEFAULT_KEYFRAME.rotation * DEG2RAD);
+        transform_scale(t, DEFAULT_KEYFRAME.scale);
+        transform_translate(t, DEFAULT_KEYFRAME.translation);*/
         return t;
     }
 
@@ -497,7 +502,7 @@ float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds)
 {
     /* no keyframes? */
     if(prog_anim->keyframe_count == 0)
-        return IDENTITY_KEYFRAME.opacity;
+        return DEFAULT_KEYFRAME.opacity;
 
     /* only 1 keyframe? */
     if(prog_anim->keyframe_count == 1) {
@@ -644,21 +649,27 @@ void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet)
         anim->repeat = false;
     }
 
-    if(anim->prog_anim != NULL)
-        validate_and_preprocess_proganim(anim->prog_anim);
+    if(anim->prog_anim != NULL) {
+        float default_duration = (float)anim->frame_count / (float)anim->fps;
+        validate_and_preprocess_proganim(anim->prog_anim, default_duration);
+    }
 }
 
 /*
  * validate_and_preprocess_proganim()
  * Validate and preprocess a programmatic animation
  */
-void validate_and_preprocess_proganim(proganim_t* prog_anim)
+void validate_and_preprocess_proganim(proganim_t* prog_anim, float default_duration)
 {
     /* validate duration */
     if(prog_anim->duration < 0.0f) {
-        logfile_message("Programmatic animation warning: 'duration' should be a non-negative number, but it has been set to %f", prog_anim->duration);
-        prog_anim->duration = 0.0f;
+        logfile_message("Programmatic animation warning: 'duration' should be a positive number, but it has been set to %f", prog_anim->duration);
+        prog_anim->duration = UNDEFINED_DURATION;
     }
+
+    /* if the duration is undefined, set it to the default duration */
+    if(prog_anim->duration == UNDEFINED_DURATION)
+        prog_anim->duration = default_duration;
 
     /* validate the number of keyframes */
     if(prog_anim->keyframe_count == 0) {
@@ -793,7 +804,7 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
 
     if(str_icmp(identifier, "duration") == 0) {
         const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
-        nanoparser_expect_string(p1, "duration receives a non-negative number");
+        nanoparser_expect_string(p1, "duration receives a positive number");
         prog_anim->duration = atof(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "keyframe") == 0) {
@@ -838,12 +849,12 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
         /* create a new keyframe. Repeat the last one* (if any)
            (*) keyframes may come out of order (in terms of percentage) */
         if(prog_anim->keyframe_count == 0)
-            proganim_add_keyframe(prog_anim, IDENTITY_KEYFRAME);
+            proganim_add_keyframe(prog_anim, DEFAULT_KEYFRAME);
         else
             proganim_add_keyframe(prog_anim, prog_anim->keyframe[prog_anim->keyframe_count - 1]);
 #else
         /* create a new keyframe */
-        proganim_add_keyframe(prog_anim, IDENTITY_KEYFRAME);
+        proganim_add_keyframe(prog_anim, DEFAULT_KEYFRAME);
 #endif
 
         /* set keyframe percentage, if defined */
