@@ -490,6 +490,18 @@ const parsetree_program_t* nanoparser_get_program(const parsetree_parameter_t* p
         return NULL;
 }
 
+/*
+ * nanoparser_get_statement()
+ * Get the statement to which the given parameter belongs
+ */
+const parsetree_statement_t* nanoparser_get_statement(const parsetree_parameter_t* param)
+{
+    if(param != NULL)
+        return param->statement;
+    else
+        return NULL;
+}
+
 
 
 
@@ -1222,8 +1234,48 @@ void nanoparser_set_warning_function(void (*fun)(const char*))
 }
 
 /*
+ * nanoparser_crash()
+ * Trigger a crash related to a statement
+ */
+void nanoparser_crash(const parsetree_statement_t* statement, const char* fmt, ...)
+{
+    char message[ERROR_MAXLENGTH + 1];
+    va_list args;
+
+    va_start(args, fmt);
+    vsnprintf(message, sizeof(message), fmt, args);
+    va_end(args);
+
+    const char* file = nanoparser_get_file(statement);
+    int line = nanoparser_get_line_number(statement);
+    crash("In \"%s\" at line %d: %s", file, line, message);
+}
+
+/*
+ * nanoparser_warning()
+ * Trigger a warning related to a statement
+ */
+void nanoparser_warning(const parsetree_statement_t* statement, const char* fmt, ...)
+{
+    char message[ERROR_MAXLENGTH + 1];
+    va_list args;
+
+    va_start(args, fmt);
+    vsnprintf(message, sizeof(message), fmt, args);
+    va_end(args);
+
+    const char* file = nanoparser_get_file(statement);
+    int line = nanoparser_get_line_number(statement);
+    warning("In \"%s\" at line %d: %s", file, line, message);
+}
+
+
+
+
+
+/*
  * crash()
- * Crash the program with a formatted error message
+ * Internal crash function: crash the program with a formatted error message
  */
 void crash(const char* fmt, ...)
 {

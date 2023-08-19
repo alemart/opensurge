@@ -103,6 +103,9 @@ const char* nanoparser_get_string(const parsetree_parameter_t* param);
 /* Get the program associated with the given parameter, if any. Returns NULL if there is no such program */
 const parsetree_program_t* nanoparser_get_program(const parsetree_parameter_t* param);
 
+/* Get the statement to which the given parameter belongs */
+const parsetree_statement_t* nanoparser_get_statement(const parsetree_parameter_t* param);
+
 
 
 /*
@@ -114,6 +117,12 @@ void nanoparser_set_error_function(void (*fun)(const char*));
 
 /* Set a warning function */
 void nanoparser_set_warning_function(void (*fun)(const char*));
+
+/* Trigger a crash related to a statement */
+void nanoparser_crash(const parsetree_statement_t* statement, const char* fmt, ...);
+
+/* Trigger a warning related to a statement */
+void nanoparser_warning(const parsetree_statement_t* statement, const char* fmt, ...);
 
 
 
