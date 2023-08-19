@@ -35,6 +35,7 @@
 /* private stuff */
 static void update_animation(actor_t *act);
 static bool can_be_clipped_out(const actor_t* act, v2d_t topleft);
+static void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t topleft);
 
 
 /*
@@ -93,6 +94,31 @@ void actor_render(actor_t *act, v2d_t camera_position)
         /* update animation */
         update_animation(act);
 
+#if 1
+        /* clip out? */
+        if(nearly_zero(act->angle) && nearly_equal(act->scale.x, 1.0f) && nearly_equal(act->scale.y, 1.0f)) {
+            if(can_be_clipped_out(act, topleft))
+                return;
+        }
+
+        /* set transform */
+        ALLEGRO_TRANSFORM transform, prev_transform;
+        al_copy_transform(&prev_transform, al_get_current_transform());
+        actor_transform(&transform, act, topleft);
+        al_compose_transform(&transform, &prev_transform);
+
+        al_use_transform(&transform);
+        {
+
+            /* render */
+            if(nearly_equal(act->alpha, 1.0f))
+                image_draw(img, 0, 0, act->mirror);
+            else
+                image_draw_trans(img, 0, 0, act->alpha, act->mirror);
+
+        }
+        al_use_transform(&prev_transform);
+#else
         /* render */
         if(!nearly_zero(act->angle)) {
             if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f)) {
@@ -120,6 +146,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
             else
                 image_draw(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->mirror);
         }
+#endif
     }
 }
 
@@ -358,6 +385,26 @@ bool can_be_clipped_out(const actor_t* act, v2d_t topleft)
     return (x + w <= 0 || x >= sw || y + h <= 0 || y >= sh);
 }
 
+/* set a transform for an actor */
+void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t topleft)
+{
+    /* find the position of the actor in screen space */
+    v2d_t position = v2d_new(
+        floorf(act->position.x - topleft.x),
+        floorf(act->position.y - topleft.y)
+    );
+
+    /* initialize the transform */
+    al_identity_transform(transform);
+
+    /* set anchor */
+    al_translate_transform(transform, -act->hot_spot.x, -act->hot_spot.y);
+
+    /* rotate, scale & translate */
+    al_rotate_transform(transform, -act->angle);
+    al_scale_transform(transform, act->scale.x, act->scale.y);
+    al_translate_transform(transform, position.x, position.y);
+}
 
 
 
