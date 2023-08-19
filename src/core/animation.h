@@ -30,6 +30,7 @@ typedef struct animation_t animation_t;
 /* forward declarations */
 struct image_t;
 struct spriteinfo_t;
+struct transform_t;
 
 
 
@@ -94,5 +95,14 @@ bool animation_is_transition(const animation_t* anim);
 
 /* gets a transition animation - returns NULL if there is no such transition */
 const animation_t* animation_find_transition(const animation_t* from, const animation_t* to);
+
+/* is this a keyframe-based animation? */
+bool animation_has_keyframes(const animation_t* anim);
+
+/* the interpolated transform of a keyframe-based animation */
+struct transform_t* animation_interpolated_transform(const animation_t* anim, double seconds, struct transform_t* out_transform);
+
+/* the interpolated opacity of a keyframe-based animation */
+float animation_interpolated_opacity(const animation_t* anim, double seconds);
 
 #endif

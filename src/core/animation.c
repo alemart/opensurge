@@ -18,13 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
 #include "animation.h"
 #include "sprite.h"
 #include "image.h"
 #include "../core/nanoparser.h"
 #include "../core/logfile.h"
 #include "../util/util.h"
+#include "../util/numeric.h"
 #include "../util/stringutil.h"
+#include "../util/transform.h"
+
+typedef struct proganim_t proganim_t;
 
 /* animation structure */
 struct animation_t {
@@ -40,7 +47,44 @@ struct animation_t {
     v2d_t action_spot; /* action spot */
     int repeat_from; /* if repeat is true, jump back to this frame of the animation. Defaults to zero */
     bool is_transition; /* is this a transition animation? */
+    proganim_t* prog_anim; /* programmatic animation (possibly NULL) */
 };
+
+/* programmatic animation */
+typedef struct proganim_keyframe_t proganim_keyframe_t;
+struct proganim_keyframe_t {
+    int percentage; /* 0 to 100 or UNDEFINED_PERCENTAGE */
+    v2d_t translation; /* in pixels */
+    float rotation; /* in degrees */
+    v2d_t scale; /* percentage in x,y axes */
+    float opacity; /* 1: unmodified; 0: fully translucent */
+};
+
+#define UNDEFINED_PERCENTAGE -1
+static const proganim_keyframe_t IDENTITY_KEYFRAME = {
+    .percentage = UNDEFINED_PERCENTAGE,
+    .translation = { 0.0f, 0.0f },
+    .rotation = 0.0f,
+    .scale = { 1.0f, 1.0f },
+    .opacity = 1.0f
+};
+
+struct proganim_t {
+    float duration; /* in seconds */
+    proganim_keyframe_t* keyframe; /* array of keyframes */
+    int keyframe_count; /* length of keyframe[] */
+};
+
+static proganim_t* proganim_create();
+static proganim_t* proganim_destroy(proganim_t* prog_anim);
+static transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double seconds, transform_t* out_transform);
+static float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds);
+static void proganim_add_keyframe(proganim_t* prog_anim, proganim_keyframe_t keyframe);
+static int proganim_find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage);
+static int compare_keyframes(const void* a, const void* b);
+static void validate_and_preprocess_proganim(proganim_t* prog_anim);
+static int traverse_keyframes(const parsetree_statement_t *stmt, void *context);
+static int traverse_keyframe(const parsetree_statement_t *stmt, void *context);
 
 /* constants */
 static const float DEFAULT_FPS = 8.0f;
@@ -267,7 +311,12 @@ bool animation_is_over(const animation_t* anim, double seconds)
     if(anim->repeat)
         return false;
 
-    return seconds >= animation_duration(anim);
+    /* find the duration */
+    double normal_duration = animation_duration(anim);
+    double programmatic_duration = (anim->prog_anim != NULL) ? anim->prog_anim->duration : 0.0;
+
+    /* test if the animation is over */
+    return seconds >= max(normal_duration, programmatic_duration);
 }
 
 /*
@@ -296,6 +345,211 @@ const animation_t* animation_find_transition(const animation_t* from, const anim
 bool animation_is_transition(const animation_t* anim)
 {
     return anim->is_transition;
+}
+
+/*
+ * animation_has_keyframes()
+ * Is this a keyframe-based animation?
+ */
+bool animation_has_keyframes(const animation_t* anim)
+{
+    return anim->prog_anim != NULL;
+}
+
+/*
+ * animation_interpolated_transform()
+ * The interpolated transform of a keyframe-based animation
+ */
+transform_t* animation_interpolated_transform(const animation_t* anim, double seconds, transform_t* out_transform)
+{
+    /* not defined? */
+    if(anim->prog_anim == NULL) {
+        transform_identity(out_transform);
+        return out_transform;
+    }
+
+    /* repeat? */
+    if(anim->repeat)
+        seconds = fmod(seconds, anim->prog_anim->duration);
+
+    /* interpolate! */
+    return proganim_interpolated_transform(anim->prog_anim, seconds, out_transform);
+}
+
+/*
+ * animation_interpolated_opacity()
+ * The interpolated opacity of a keyframe-based animation
+ */
+float animation_interpolated_opacity(const animation_t* anim, double seconds)
+{
+    /* not defined? */
+    if(anim->prog_anim == NULL)
+        return 1.0f;
+
+    /* repeat? */
+    if(anim->repeat)
+        seconds = fmod(seconds, anim->prog_anim->duration);
+
+    /* interpolate! */
+    return proganim_interpolated_opacity(anim->prog_anim, seconds);
+}
+
+
+
+
+
+
+/* ----- programmatic animations ----- */
+
+/*
+ * proganim_create()
+ * Create a programmatic animation
+ */
+proganim_t* proganim_create()
+{
+    proganim_t* prog_anim = mallocx(sizeof *prog_anim);
+
+    prog_anim->duration = 0.0f;
+    prog_anim->keyframe = NULL;
+    prog_anim->keyframe_count = 0;
+
+    return prog_anim;
+}
+
+/*
+ * proganim_destroy()
+ * Destroy a programmatic animation
+ */
+proganim_t* proganim_destroy(proganim_t* prog_anim)
+{
+    if(prog_anim->keyframe != NULL)
+        free(prog_anim->keyframe);
+
+    free(prog_anim);
+    return NULL;
+}
+
+/*
+ * proganim_add_keyframe()
+ * Add a keyframe to a programmatic animation
+ */
+void proganim_add_keyframe(proganim_t* prog_anim, proganim_keyframe_t keyframe)
+{
+    int last = prog_anim->keyframe_count++;
+    prog_anim->keyframe = reallocx(prog_anim->keyframe, sizeof(proganim_keyframe_t) * prog_anim->keyframe_count);
+    prog_anim->keyframe[last] = keyframe;
+}
+
+/*
+ * proganim_interpolated_transform()
+ * The interpolated transform of a programmatic animation computed at the given time
+ */
+transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double seconds, transform_t* out_transform)
+{
+    /* initialize the transform */
+    transform_t* t = out_transform;
+    transform_identity(t);
+
+    /* no keyframes? */
+    if(prog_anim->keyframe_count == 0) {
+        /*transform_rotate(t, -IDENTITY_KEYFRAME.rotation * DEG2RAD);
+        transform_scale(t, IDENTITY_KEYFRAME.scale);
+        transform_translate(t, IDENTITY_KEYFRAME.translation);*/
+        return t;
+    }
+
+    /* only 1 keyframe? */
+    if(prog_anim->keyframe_count == 1) {
+        const proganim_keyframe_t* keyframe = &prog_anim->keyframe[0];
+        transform_rotate(t, -keyframe->rotation * DEG2RAD);
+        transform_scale(t, keyframe->scale);
+        transform_translate(t, keyframe->translation);
+        return t;
+    }
+
+    /* we have at least 2 keyframes */
+
+    /* find the current percentage */
+    double percentage = clip01(seconds / prog_anim->duration);
+
+    /* get two keyframes suitable for interpolation */
+    int k = proganim_find_keyframes_suitable_for_interpolation(prog_anim, percentage);
+    const proganim_keyframe_t* keyframe_a = &prog_anim->keyframe[k];
+    const proganim_keyframe_t* keyframe_b = &prog_anim->keyframe[k+1];
+
+    /* interpolate */
+    v2d_t interpolated_translation = v2d_lerp(keyframe_a->translation, keyframe_b->translation, percentage);
+    float interpolated_rotation = lerp_angle(keyframe_a->rotation * DEG2RAD, keyframe_b->rotation * DEG2RAD, percentage);
+    v2d_t interpolated_scale = v2d_lerp(keyframe_a->scale, keyframe_b->scale, percentage);
+
+    /* set the transform */
+    transform_rotate(t, -interpolated_rotation);
+    transform_scale(t, interpolated_scale);
+    transform_translate(t, interpolated_translation);
+    return t;
+}
+
+/*
+ * proganim_interpolated_opacity()
+ * The interpolated opacity of a programmatic animation computed at the given time
+ */
+float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds)
+{
+    /* no keyframes? */
+    if(prog_anim->keyframe_count == 0)
+        return IDENTITY_KEYFRAME.opacity;
+
+    /* only 1 keyframe? */
+    if(prog_anim->keyframe_count == 1) {
+        const proganim_keyframe_t* keyframe = &prog_anim->keyframe[0];
+        return keyframe->opacity;
+    }
+
+    /* we have at least 2 keyframes */
+
+    /* find the current percentage */
+    double percentage = clip01(seconds / prog_anim->duration);
+
+    /* get two keyframes suitable for interpolation */
+    int k = proganim_find_keyframes_suitable_for_interpolation(prog_anim, percentage);
+    const proganim_keyframe_t* keyframe_a = &prog_anim->keyframe[k];
+    const proganim_keyframe_t* keyframe_b = &prog_anim->keyframe[k+1];
+
+    /* interpolate */
+    float interpolated_opacity = lerp(keyframe_a->opacity, keyframe_b->opacity, percentage);
+    return interpolated_opacity;
+}
+
+/*
+ * proganim_find_keyframes_suitable_for_interpolation()
+ * Find k >= 0 such that keyframes k and k+1 are suitable for interpolation at the given percentage
+ */
+int proganim_find_keyframes_suitable_for_interpolation(const proganim_t* prog_anim, double percentage)
+{
+    int p = (int)floor(100.0 * percentage);
+
+    /* make sure that we have at least 2 keyframes */
+    assertx(prog_anim->keyframe_count >= 2);
+
+    /* keyframes are sorted by percentages */
+
+    /* out of bounds check */
+    if(p < prog_anim->keyframe[0].percentage)
+        return 0;
+    else if(p > prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage)
+        return prog_anim->keyframe_count - 2;
+
+    /* find a suitable interval */
+    for(int k = 0; k+1 < prog_anim->keyframe_count; k++) {
+        int start_percentage = prog_anim->keyframe[k].percentage;
+        int end_percentage = prog_anim->keyframe[k+1].percentage;
+
+        if(p >= start_percentage && p <= end_percentage)
+            return k;
+    }
+
+    /* can't find an interval (this shouldn't happen) */
+    return prog_anim->keyframe_count - 2;
 }
 
 
@@ -327,6 +581,7 @@ animation_t *animation_create(const spriteinfo_t *sprite, int anim_id, bool is_t
     anim->action_spot = default_action_spot;
     anim->repeat_from = 0;
     anim->is_transition = is_transition;
+    anim->prog_anim = NULL;
 
     return anim;
 }
@@ -340,6 +595,9 @@ animation_t* animation_destroy(animation_t *anim)
 {
     if(anim->data != NULL)
         free(anim->data);
+
+    if(anim->prog_anim != NULL)
+        proganim_destroy(anim->prog_anim);
 
     free(anim);
     return NULL;
@@ -385,6 +643,66 @@ void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet)
         logfile_message("Animation warning: transition animations must not repeat");
         anim->repeat = false;
     }
+
+    if(anim->prog_anim != NULL)
+        validate_and_preprocess_proganim(anim->prog_anim);
+}
+
+/*
+ * validate_and_preprocess_proganim()
+ * Validate and preprocess a programmatic animation
+ */
+void validate_and_preprocess_proganim(proganim_t* prog_anim)
+{
+    /* validate duration */
+    if(prog_anim->duration < 0.0f) {
+        logfile_message("Programmatic animation warning: 'duration' should be a non-negative number, but it has been set to %f", prog_anim->duration);
+        prog_anim->duration = 0.0f;
+    }
+
+    /* validate the number of keyframes */
+    if(prog_anim->keyframe_count == 0) {
+        /* this is acceptable if a duration is defined...
+           the animation is not considered to be over until the "duration" of
+           the programmatic animation is over, despite having no keyframes */
+        logfile_message("Programmatic animation warning: no keyframes have been defined");
+    }
+
+    /* validate keyframes & set percentages */
+    for(int i = 0; i < prog_anim->keyframe_count; i++) {
+        proganim_keyframe_t* keyframe = &(prog_anim->keyframe[i]);
+
+        if(keyframe->opacity < 0.0f || keyframe->opacity > 1.0f) {
+            logfile_message("Programmatic animation warning: 'opacity' %f is out of the valid range [0,1] in keyframe #%d", keyframe->opacity, i+1);
+            keyframe->opacity = clip01(keyframe->opacity);
+        }
+
+        if(keyframe->percentage == UNDEFINED_PERCENTAGE) {
+            if(prog_anim->keyframe_count > 1)
+                keyframe->percentage = (100 * i) / (prog_anim->keyframe_count - 1);
+            else
+                keyframe->percentage = 0;
+        }
+        else if(keyframe->percentage < 0 || keyframe->percentage > 100) {
+            logfile_message("Programmatic animation warning: keyframe #%d percentage should be between 0 and 100, inclusive, but has been set to %d%%", i+1, keyframe->percentage);
+            keyframe->percentage = clip(keyframe->percentage, 0, 100);
+        }
+    }
+
+    /* sort keyframes by percentage */
+    qsort(prog_anim->keyframe, prog_anim->keyframe_count, sizeof(proganim_keyframe_t), compare_keyframes);
+}
+
+/*
+ * compare_keyframes()
+ * Sorting function
+ */
+int compare_keyframes(const void* a, const void* b)
+{
+    const proganim_keyframe_t* keyframe_a = (const proganim_keyframe_t*)a;
+    const proganim_keyframe_t* keyframe_b = (const proganim_keyframe_t*)b;
+
+    return keyframe_a->percentage - keyframe_b->percentage;
 }
 
 /*
@@ -444,6 +762,150 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
             anim->data[j-1] = atoi(nanoparser_get_string(pj));
         }
     }
+    else if(str_icmp(identifier, "keyframes") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_program(p1, "keyframes expects a block");
+
+        if(anim->prog_anim != NULL)
+            fatal_error("Redefinition of keyframes block in \"%s\" at line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+        anim->prog_anim = proganim_create();
+        nanoparser_traverse_program_ex(nanoparser_get_program(p1), anim->prog_anim, traverse_keyframes);
+    }
+    else
+        fatal_error("Can't read animation. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    return 0;
+}
+
+/*
+ * traverse_keyframes()
+ * Traverse the attributes of a programmatic animation
+ */
+int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
+{
+    const char* identifier;
+    const parsetree_parameter_t* param_list;
+    proganim_t* prog_anim = (proganim_t*)context;
+
+    identifier = nanoparser_get_identifier(stmt);
+    param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "duration") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "duration receives a non-negative number");
+        prog_anim->duration = atof(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "keyframe") == 0) {
+        const parsetree_parameter_t* block = NULL;
+        const parsetree_parameter_t* percentage_string = NULL;
+
+        /* syntax: keyframe { ... } or keyframe <percentage> { ... } */
+        switch(nanoparser_get_number_of_parameters(param_list)) {
+            case 1:
+                block = nanoparser_get_nth_parameter(param_list, 1);
+                nanoparser_expect_program(block, "Must provide keyframe attributes");
+                break;
+
+            case 2:
+                percentage_string = nanoparser_get_nth_parameter(param_list, 1);
+                block = nanoparser_get_nth_parameter(param_list, 2);
+                nanoparser_expect_string(percentage_string, "Must provide keyframe percentage");
+                nanoparser_expect_program(block, "Must provide keyframe attributes");
+                break;
+
+            default:
+                fatal_error("Syntax error in \"%s\" at line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                break;
+        }
+
+        /* read keyframe percentage: \d\d?\d?% */
+        int percentage = UNDEFINED_PERCENTAGE;
+        if(percentage_string != NULL) {
+            const char* str = nanoparser_get_string(percentage_string);
+            int len = strlen(str);
+
+            if(len < 2 || len > 4 || !str_endswith(str, "%") || strspn(str, "0123456789") != len - 1)
+                fatal_error("Invalid keyframe percentage (\"%s\") in \"%s\" at line %d", str, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+            char buf[5] = { 0 };
+            str_cpy(buf, str, sizeof(buf));
+            buf[len-1] = '\0'; /* surely 2 <= len <= 4 */
+            percentage = atoi(buf);
+        }
+
+#if 0
+        /* create a new keyframe. Repeat the last one* (if any)
+           (*) keyframes may come out of order (in terms of percentage) */
+        if(prog_anim->keyframe_count == 0)
+            proganim_add_keyframe(prog_anim, IDENTITY_KEYFRAME);
+        else
+            proganim_add_keyframe(prog_anim, prog_anim->keyframe[prog_anim->keyframe_count - 1]);
+#else
+        /* create a new keyframe */
+        proganim_add_keyframe(prog_anim, IDENTITY_KEYFRAME);
+#endif
+
+        /* set keyframe percentage, if defined */
+        if(percentage != UNDEFINED_PERCENTAGE)
+            prog_anim->keyframe[prog_anim->keyframe_count - 1].percentage = percentage;
+
+        /* traverse the keyframe block */
+        nanoparser_traverse_program_ex(
+            nanoparser_get_program(block),
+            &(prog_anim->keyframe[prog_anim->keyframe_count - 1]),
+            traverse_keyframe
+        );
+    }
+    else
+        fatal_error("Can't read keyframes. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    return 0;
+}
+
+/*
+ * traverse_keyframe()
+ * Traverse the attributes of a keyframe of a programmatic animation
+ */
+int traverse_keyframe(const parsetree_statement_t* stmt, void* context)
+{
+    const char* identifier;
+    const parsetree_parameter_t* param_list;
+    const parsetree_parameter_t* p1;
+    const parsetree_parameter_t* p2;
+    proganim_keyframe_t* keyframe = (proganim_keyframe_t*)context;
+
+    identifier = nanoparser_get_identifier(stmt);
+    param_list = nanoparser_get_parameter_list(stmt);
+
+    if(str_icmp(identifier, "translation") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "translation receives two numbers: xpos, ypos");
+        nanoparser_expect_string(p2, "translation receives two numbers: xpos, ypos");
+        keyframe->translation.x = (float)atof(nanoparser_get_string(p1));
+        keyframe->translation.y = (float)atof(nanoparser_get_string(p2));
+    }
+    else if(str_icmp(identifier, "rotation") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "rotation receives a number: degrees");
+        keyframe->rotation = (float)atof(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "scale") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "scale receives two numbers: xscale, yscale");
+        nanoparser_expect_string(p2, "scale receives two numbers: xscale, yscale");
+        keyframe->scale.x = (float)atof(nanoparser_get_string(p1));
+        keyframe->scale.y = (float)atof(nanoparser_get_string(p2));
+    }
+    else if(str_icmp(identifier, "opacity") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "opacity receives a number: alpha");
+        keyframe->opacity = (float)atof(nanoparser_get_string(p1));
+    }
+    else
+        fatal_error("Can't read keyframe. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     return 0;
 }

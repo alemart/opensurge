@@ -24,6 +24,7 @@
 #include "brick.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
+#include "../util/transform.h"
 #include "../core/global.h"
 #include "../core/input.h"
 #include "../core/logfile.h"
@@ -90,15 +91,17 @@ void actor_render(actor_t *act, v2d_t camera_position)
     if(act->visible && act->animation != NULL) {
         const image_t* img = actor_image(act);
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
+        bool has_keyframes = animation_has_keyframes(act->animation);
 
         /* update animation */
         update_animation(act);
 
-#if 1
         /* clip out? */
-        if(nearly_zero(act->angle) && nearly_equal(act->scale.x, 1.0f) && nearly_equal(act->scale.y, 1.0f)) {
-            if(can_be_clipped_out(act, topleft))
-                return;
+        if(!has_keyframes) {
+            if(nearly_zero(act->angle) && nearly_equal(act->scale.x, 1.0f) && nearly_equal(act->scale.y, 1.0f)) {
+                if(can_be_clipped_out(act, topleft))
+                    return;
+            }
         }
 
         /* set transform */
@@ -109,44 +112,18 @@ void actor_render(actor_t *act, v2d_t camera_position)
 
         al_use_transform(&transform);
         {
+            /* find alpha */
+            float alpha = act->alpha;
+            if(has_keyframes)
+                alpha *= animation_interpolated_opacity(act->animation, act->animation_timer);
 
             /* render */
-            if(nearly_equal(act->alpha, 1.0f))
+            if(nearly_equal(alpha, 1.0f))
                 image_draw(img, 0, 0, act->mirror);
             else
-                image_draw_trans(img, 0, 0, act->alpha, act->mirror);
-
+                image_draw_trans(img, 0, 0, alpha, act->mirror);
         }
         al_use_transform(&prev_transform);
-#else
-        /* render */
-        if(!nearly_zero(act->angle)) {
-            if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f)) {
-                if(!nearly_equal(act->alpha, 1.0f))
-                    image_draw_scaled_rotated_trans(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->alpha, act->mirror);
-                else
-                    image_draw_scaled_rotated(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
-            }
-            else {
-                if(!nearly_equal(act->alpha, 1.0f))
-                    image_draw_rotated_trans(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->alpha, act->mirror);
-                else
-                    image_draw_rotated(img, (int)(act->position.x - topleft.x), (int)(act->position.y - topleft.y), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
-            }
-        }
-        else if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f)) {
-            if(!nearly_equal(act->alpha, 1.0f))
-                image_draw_scaled_trans(img, (int)(act->position.x - act->hot_spot.x*act->scale.x - topleft.x), (int)(act->position.y - act->hot_spot.y*act->scale.y - topleft.y), act->scale, act->alpha, act->mirror);
-            else
-                image_draw_scaled(img, (int)(act->position.x - act->hot_spot.x*act->scale.x - topleft.x), (int)(act->position.y - act->hot_spot.y*act->scale.y - topleft.y), act->scale, act->mirror);
-        }
-        else if(!can_be_clipped_out(act, topleft)) {
-            if(!nearly_equal(act->alpha, 1.0f))
-                image_draw_trans(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->alpha, act->mirror);
-            else
-                image_draw(img, (int)(act->position.x - act->hot_spot.x - topleft.x), (int)(act->position.y - act->hot_spot.y - topleft.y), act->mirror);
-        }
-#endif
     }
 }
 
@@ -388,22 +365,33 @@ bool can_be_clipped_out(const actor_t* act, v2d_t topleft)
 /* set a transform for an actor */
 void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t topleft)
 {
+    /* initialize the transform */
+    transform_t t;
+    transform_identity(&t);
+
     /* find the position of the actor in screen space */
     v2d_t position = v2d_new(
         floorf(act->position.x - topleft.x),
         floorf(act->position.y - topleft.y)
     );
 
-    /* initialize the transform */
-    al_identity_transform(transform);
-
     /* set anchor */
-    al_translate_transform(transform, -act->hot_spot.x, -act->hot_spot.y);
+    transform_translate(&t, v2d_new(-act->hot_spot.x, -act->hot_spot.y));
 
     /* rotate, scale & translate */
-    al_rotate_transform(transform, -act->angle);
-    al_scale_transform(transform, act->scale.x, act->scale.y);
-    al_translate_transform(transform, position.x, position.y);
+    transform_rotate(&t, -act->angle);
+    transform_scale(&t, act->scale);
+    transform_translate(&t, position);
+
+    /* programmatic animation */
+    if(act->animation != NULL && animation_has_keyframes(act->animation)) {
+        transform_t prog;
+        animation_interpolated_transform(act->animation, act->animation_timer, &prog);
+        transform_compose(&t, &prog, &t);
+    }
+
+    /* convert to ALLEGRO_TRANSFORM */
+    transform_to_allegro(transform, &t);
 }
 
 
