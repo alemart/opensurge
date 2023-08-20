@@ -199,7 +199,7 @@ void* arrayiterator_next(iterator_state_t* state)
 /* should the iteration continue? */
 bool arrayiterator_has_next(iterator_state_t* state)
 {
-    arrayiterator_state_t* s = (arrayiterator_state_t*)state;
+    const arrayiterator_state_t* s = (arrayiterator_state_t*)state;
 
     return s->current_index < s->length;
 }
