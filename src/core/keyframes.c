@@ -308,8 +308,12 @@ void proganim_validate(proganim_t* prog_anim)
         }
     }
 
+#if 0
     /* stable sort keyframes by percentage */
     merge_sort(prog_anim->keyframe, prog_anim->keyframe_count, sizeof(proganim_keyframe_t), compare_keyframes);
+#else
+    /* keyframes are already declared in a sorted way */
+#endif
 }
 
 /*
