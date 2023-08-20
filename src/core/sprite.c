@@ -26,11 +26,14 @@
 #include "asset.h"
 #include "resourcemanager.h"
 #include "nanoparser.h"
+#include "keyframes.h"
 #include "../util/v2d.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../util/darray.h"
 #include "../util/hashtable.h"
+#include "../util/dictionary.h"
+#include "../util/iterator.h"
 #include "../physics/collisionmask.h"
 
 /* constants & utilities */
@@ -80,6 +83,8 @@ struct spriteinfo_t {
     DARRAY(animtransition_t*, preprocessed_transition); /* transitions without "any" sorted by from_id and then by to_id */
     int* transition_from; /* transition_from[i] is the first index of preprocessed_transition having from_id == i, if it exists */
     int transition_from_length; /* length of transition_from[] */
+
+    dictionary_t* prog_anims; /* keyframe-based animations */
 };
 
 /* private functions */
@@ -95,6 +100,7 @@ static int scanfile(const char* vpath, void* param); /* file system callback */
 static int traverse(const parsetree_statement_t *stmt, void *vpath);
 static int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo);
 static void inspect_transitions(const spriteinfo_t* sprite);
+static void destroy_proganim(void* element, void* context);
 
 /* hash table that stores the metadata of the sprites */
 HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
@@ -293,6 +299,16 @@ const animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info
 }
 
 /*
+ * spriteinfo_get_proganim()
+ * Get a programmatic animation, or NULL if none is defined with the given name
+ */
+const proganim_t* spriteinfo_get_proganim(const spriteinfo_t* info, const char* name)
+{
+    const proganim_t* prog_anim = dictionary_get(info->prog_anims, name);
+    return prog_anim; /* possibly NULL */
+}
+
+/*
  * spriteinfo_source_file()
  * The source file (image) of the sprite
  */
@@ -412,6 +428,8 @@ spriteinfo_t *spriteinfo_new()
     sprite->transition_from = NULL; /* lazy allocation */
     sprite->transition_from_length = 0;
 
+    sprite->prog_anims = dictionary_create(true, destroy_proganim, sprite);
+
     return sprite;
 }
 
@@ -422,6 +440,9 @@ spriteinfo_t *spriteinfo_new()
 spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite)
 {
     extern animation_t *animation_destroy(animation_t *anim);
+
+    /* delete prog_anims */
+    dictionary_destroy(sprite->prog_anims);
 
     /* delete transition_from[] */
     if(sprite->transition_from != NULL)
@@ -781,6 +802,19 @@ void validate_sprite(spriteinfo_t *spr)
         if(spr->animation_data[i] != NULL)
             animation_validate(spr->animation_data[i], number_of_frames_in_the_sheet);
     }
+
+    /* validate individual keyframe-based animations */
+    extern void proganim_validate(proganim_t* prog_anim);
+
+    iterator_t* it = dictionary_keys(spr->prog_anims);
+    while(iterator_has_next(it)) {
+        const char* name = iterator_next(it);
+        logfile_message("Validating keyframe-based animation \"%s\"...", name);
+
+        proganim_t* prog_anim = dictionary_get(spr->prog_anims, name);
+        proganim_validate(prog_anim);
+    }
+    iterator_destroy(it);
 }
 
 
@@ -810,6 +844,23 @@ void load_sprite_images(spriteinfo_t *spr)
     }
 }
 
+
+/*
+ * destroy_proganim()
+ * Destroy a programmatic animation (dictionary)
+ */
+void destroy_proganim(void* element, void* context)
+{
+    extern proganim_t* proganim_destroy(proganim_t* prog_anim);
+    proganim_t* prog_anim = (proganim_t*)element;
+    spriteinfo_t* sprite = (spriteinfo_t*)context;
+
+    proganim_destroy(prog_anim);
+
+    (void)sprite;
+}
+
+
 /*
  * traverse()
  * Sprite block traversal
@@ -832,7 +883,7 @@ int traverse(const parsetree_statement_t *stmt, void *vpath)
         nanoparser_expect_program(p2, "Must provide sprite attributes");
 
         sprite_name = nanoparser_get_string(p1);
-        logfile_message("Loading sprite \"%s\" defined in \"%s\"", sprite_name, nanoparser_get_file(stmt));
+        nanoparser_warn(stmt, "Loading sprite \"%s\"", sprite_name);
 
         if(NULL == (sprite = hashtable_spriteinfo_t_find(sprites, sprite_name))) {
             /* register a new sprite */
@@ -844,21 +895,21 @@ int traverse(const parsetree_statement_t *stmt, void *vpath)
             bool must_override = (str_incmp((const char*)vpath, OVERRIDE_PREFIX, OVERRIDE_PREFIX_LENGTH) == 0);
 
             if(must_override) {
-                logfile_message("OVERRIDE: redefining sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                nanoparser_warn(stmt, "OVERRIDE: redefining sprite \"%s\"", sprite_name);
 
                 spriteinfo_t *new_sprite = spriteinfo_create(nanoparser_get_program(p2));
                 if(hashtable_spriteinfo_t_replace(sprites, sprite_name, new_sprite))
                     return 0; /* the sprite has been successfully redefined */
 
-                logfile_message("Can't override sprite \"%s\"", sprite_name); /* shouldn't happen */
+                nanoparser_warn(stmt, "Can't override sprite \"%s\"", sprite_name); /* shouldn't happen */
                 spriteinfo_destroy(new_sprite);
             }
-
-            logfile_message("WARNING: can't redefine sprite \"%s\" in \"%s\" near line %d", sprite_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            else
+                nanoparser_warn(stmt, "Can't redefine sprite \"%s\"", sprite_name);
         }
     }
     else
-        fatal_error("Can't load sprite. Unknown identifier \"%s\" in \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }
@@ -881,8 +932,8 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
     param_list = nanoparser_get_parameter_list(stmt);
 
     /* sanity check */
-    if(s->animation_data != NULL && str_icmp(identifier, "animation") != 0 && str_icmp(identifier, "transition") != 0)
-        fatal_error("Can't load sprite. Animations and transitions must be declared after the other parameters\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+    if(s->animation_data != NULL && str_icmp(identifier, "animation") != 0 && str_icmp(identifier, "transition") != 0 && str_icmp(identifier, "keyframes") != 0)
+        nanoparser_crash(stmt, "Can't load sprite. Animations, transitions and keyframes must be declared after the other parameters");
 
     /* read parameters */
     if(str_icmp(identifier, "source_file") == 0) {
@@ -946,11 +997,11 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
             p2 = p1;
         }
         else
-            fatal_error("No attributes provided to 'animation' block\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            nanoparser_crash(stmt, "Undefined animation block");
 
         /* validate anim_id */
         if(!is_valid_anim_id(anim_id))
-            fatal_error("Can't load sprites. Animation number must be in the range [0, %d]\nin \"%s\" near line %d", MAX_ANIMATIONS - 1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            nanoparser_crash(stmt, "Animation numbers must be in the range [0, %d]", MAX_ANIMATIONS - 1);
 
         /* allocate animation */
         allocate_sprite_anim(s, anim_id);
@@ -975,7 +1026,7 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         if(str_icmp("any", nanoparser_get_string(p1)) != 0) {
             from_id = atoi(nanoparser_get_string(p1));
             if(!is_valid_anim_id(from_id))
-                fatal_error("Invalid transition. Animation numbers must be in the range [0, %d]\nin \"%s\" near line %d", MAX_ANIMATIONS - 1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                nanoparser_crash(stmt, "Invalid transition. Animation numbers must be in the range [0, %d]", MAX_ANIMATIONS - 1);
         }
         else
             from_id = TRANSITION_ANY_ANIM;
@@ -983,19 +1034,19 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         if(str_icmp("any", nanoparser_get_string(p3)) != 0) {
             to_id = atoi(nanoparser_get_string(p3));
             if(!is_valid_anim_id(to_id))
-                fatal_error("Invalid transition. Animation numbers must be in the range [0, %d]\nin \"%s\" near line %d", MAX_ANIMATIONS - 1, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                nanoparser_crash(stmt, "Invalid transition. Animation numbers must be in the range [0, %d]", MAX_ANIMATIONS - 1);
         }
         else
             to_id = TRANSITION_ANY_ANIM;
 
         if(from_id == TRANSITION_ANY_ANIM && to_id == TRANSITION_ANY_ANIM)
-            fatal_error("Can't set a transition from \"any\" to \"any\"\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            nanoparser_crash(stmt, "Can't set a transition from \"any\" to \"any\"");
         else if(from_id == to_id)
-            fatal_error("Can't set a transition from itself to itself\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            nanoparser_crash(stmt, "Can't set a transition from itself to itself");
 
         /* validate syntax */
         if(str_icmp(nanoparser_get_string(p2), "to") != 0)
-            fatal_error("Syntax error: expected keyword \"to\"\nin \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            nanoparser_crash(stmt, "Syntax error: expected keyword \"to\"");
 
         /* allocate transition animation */
         anim_id = MAX_ANIMATIONS + darray_length(s->transition); /* allocate after MAX_ANIMATIONS */
@@ -1005,8 +1056,30 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         /* read the animation */
         nanoparser_traverse_program_ex(nanoparser_get_program(p4), s->animation_data[anim_id], traverse_animation_attributes);
     }
+    else if(str_icmp(identifier, "keyframes") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        nanoparser_expect_string(p1, "Must provide the name of the keyframe-based animation");
+        nanoparser_expect_program(p2, "Must provide the declaration of a keyframe-based animation");
+
+        /* validate name */
+        const char* name = nanoparser_get_string(p1);
+        if(*name == '\0')
+            nanoparser_crash(stmt, "Invalid name for a keyframe-based animation");
+
+        /* allocate a keyframe-based animation */
+        extern proganim_t* proganim_create();
+        proganim_t* prog_anim = proganim_create();
+
+        /* read the keyframes */
+        extern int traverse_keyframes(const parsetree_statement_t* stmt, void* context);
+        nanoparser_traverse_program_ex(nanoparser_get_program(p2), prog_anim, traverse_keyframes);
+
+        /* add the keyframe-based animation to the dictionary */
+        dictionary_put(s->prog_anims, name, prog_anim);
+    }
     else
-        fatal_error("Can't load sprites. Unknown identifier '%s'\nin \"%s\" near line %d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }

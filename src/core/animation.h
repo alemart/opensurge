@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include "../util/v2d.h"
 
-/* opaque types */
+/* opaque type */
 typedef struct animation_t animation_t;
 
 /* forward declarations */
@@ -102,7 +102,7 @@ bool animation_has_keyframes(const animation_t* anim);
 /* the interpolated transform of a keyframe-based animation */
 struct transform_t* animation_interpolated_transform(const animation_t* anim, double seconds, struct transform_t* out_transform);
 
-/* the interpolated translucency of a keyframe-based animation */
-float animation_interpolated_translucency(const animation_t* anim, double seconds);
+/* the interpolated opacity of a keyframe-based animation */
+float animation_interpolated_opacity(const animation_t* anim, double seconds);
 
 #endif

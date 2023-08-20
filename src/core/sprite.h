@@ -29,6 +29,7 @@ typedef struct spriteinfo_t spriteinfo_t;
 struct parsetree_program_t;
 struct collisionmask_t;
 struct animation_t;
+struct proganim_t;
 struct image_t;
 
 
@@ -70,6 +71,9 @@ const struct animation_t* spriteinfo_get_animation(const spriteinfo_t* info, int
 
 /* finds a transition animation in a sprite - returns NULL if there isn't any */
 const struct animation_t* spriteinfo_find_transition_animation(const spriteinfo_t* info, int from_id, int to_id);
+
+/* get a programmatic animation, or NULL if none is defined with the given name */
+const struct proganim_t* spriteinfo_get_proganim(const spriteinfo_t* info, const char* name);
 
 /* the source file (image) of the sprite */
 const char* spriteinfo_source_file(const spriteinfo_t* info);

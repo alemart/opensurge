@@ -115,7 +115,7 @@ void actor_render(actor_t *act, v2d_t camera_position)
             /* find alpha */
             float alpha = act->alpha;
             if(has_keyframes)
-                alpha *= 1.0f - animation_interpolated_translucency(act->animation, act->animation_timer);
+                alpha *= animation_interpolated_opacity(act->animation, act->animation_timer);
 
             /* render */
             if(nearly_equal(alpha, 1.0f))
