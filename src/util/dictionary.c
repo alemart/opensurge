@@ -23,6 +23,7 @@
 #include "stringutil.h"
 #include "util.h"
 #include "darray.h"
+#include "iterator.h"
 
 /* dictionary entry */
 typedef struct dictentry_t dictentry_t;
@@ -47,6 +48,19 @@ struct dictionary_t
 static int binary_search(const dictionary_t* dict, const char* key);
 static void release_entry(dictionary_t* dict, int entry_index);
 static void null_dtor(void* element, void* dtor_context);
+
+/* DictionaryIterator */
+typedef struct dictiterator_state_t dictiterator_state_t;
+struct dictiterator_state_t
+{
+    const dictionary_t* dict;
+    int current_index;
+};
+
+static iterator_state_t* dictiterator_copy_ctor(void* ctor_data);
+static void dictiterator_dtor(iterator_state_t* state);
+static void* dictiterator_next(iterator_state_t* state);
+static bool dictiterator_has_next(iterator_state_t* state);
 
 
 
@@ -141,8 +155,22 @@ void dictionary_put(dictionary_t* dict, const char* key, void* element)
     }
 
     /* this simple implementation works, but it won't be very efficient for
-       a dictionary with hundreds or thousands of elements UNLESS these
-       elements are fed in sorted order. */
+       a dictionary with hundreds or thousands of elements UNLESS it is
+       fed in sorted order. */
+}
+
+/*
+ * dictionary_keys()
+ * Returns an iterator to the keys of the dictionary
+ */
+iterator_t* dictionary_keys(const dictionary_t* dict)
+{
+    dictiterator_state_t state = {
+        .dict = dict,
+        .current_index = 0
+    };
+
+    return iterator_create(&state, dictiterator_copy_ctor, dictiterator_dtor, dictiterator_next, dictiterator_has_next);
 }
 
 
@@ -187,4 +215,43 @@ void release_entry(dictionary_t* dict, int entry_index)
 void null_dtor(void* element, void* dtor_context)
 {
     /* do nothing */
+}
+
+/* DictionaryIterator: copy constructor */
+iterator_state_t* dictiterator_copy_ctor(void* ctor_data)
+{
+    const dictiterator_state_t* s = (const dictiterator_state_t*)ctor_data;
+    const size_t size = sizeof *s;
+
+    return memcpy(mallocx(size), s, size);
+}
+
+/* DictionaryIterator: destructor */
+void dictiterator_dtor(iterator_state_t* state)
+{
+    dictiterator_state_t* s = (dictiterator_state_t*)state;
+    free(s);
+}
+
+/* DictionaryIterator: return the next element and advance the iteration pointer */
+void* dictiterator_next(iterator_state_t* state)
+{
+    dictiterator_state_t* s = (dictiterator_state_t*)state;
+    const dictionary_t* dict = s->dict;
+
+    if(s->current_index < darray_length(dict->entry)) {
+        const dictentry_t* entry = &dict->entry[s->current_index++];
+        return entry->key;
+    }
+
+    return NULL;
+}
+
+/* DictionaryIterator: can we still advance the iteration pointer? */
+bool dictiterator_has_next(iterator_state_t* state)
+{
+    const dictiterator_state_t* s = (dictiterator_state_t*)state;
+    const dictionary_t* dict = s->dict;
+
+    return s->current_index < darray_length(dict->entry);
 }

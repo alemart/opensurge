@@ -26,10 +26,14 @@
 /* opaque type */
 typedef struct dictionary_t dictionary_t;
 
+/* forward declarations */
+struct iterator_t;
+
 /* API */
 dictionary_t* dictionary_create(bool want_case_sensitive_keys, void (*element_dtor)(void*,void*), void* dtor_context);
 dictionary_t* dictionary_destroy(dictionary_t* dict);
 void* dictionary_get(const dictionary_t* dict, const char* key);
 void dictionary_put(dictionary_t* dict, const char* key, void* element);
+struct iterator_t* dictionary_keys(const dictionary_t* dict);
 
 #endif
