@@ -122,7 +122,7 @@ void nanoparser_set_warning_function(void (*fun)(const char*));
 void nanoparser_crash(const parsetree_statement_t* statement, const char* fmt, ...);
 
 /* Trigger a warning related to a statement */
-void nanoparser_warning(const parsetree_statement_t* statement, const char* fmt, ...);
+void nanoparser_warn(const parsetree_statement_t* statement, const char* fmt, ...);
 
 
 

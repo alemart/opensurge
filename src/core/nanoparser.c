@@ -1252,10 +1252,10 @@ void nanoparser_crash(const parsetree_statement_t* statement, const char* fmt, .
 }
 
 /*
- * nanoparser_warning()
+ * nanoparser_warn()
  * Trigger a warning related to a statement
  */
-void nanoparser_warning(const parsetree_statement_t* statement, const char* fmt, ...)
+void nanoparser_warn(const parsetree_statement_t* statement, const char* fmt, ...)
 {
     char message[ERROR_MAXLENGTH + 1];
     va_list args;
