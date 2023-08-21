@@ -105,24 +105,19 @@ double proganim_duration(const proganim_t* prog_anim)
  */
 transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double seconds, bool repeat, transform_t* out_transform)
 {
-    /* initialize the transform */
     transform_t* t = out_transform;
-    transform_identity(t);
 
     /* no keyframes? */
     if(prog_anim->keyframe_count == 0) {
-        /*transform_rotate(t, -DEFAULT_KEYFRAME.rotation * DEG2RAD);
-        transform_scale(t, DEFAULT_KEYFRAME.scale);
-        transform_translate(t, DEFAULT_KEYFRAME.translation);*/
+        /*transform_build(t, DEFAULT_KEYFRAME.translation, -DEFAULT_KEYFRAME.rotation * DEG2RAD, DEFAULT_KEYFRAME.scale, v2d_new(0.0f, 0.0f));*/
+        transform_identity(t);
         return t;
     }
 
     /* only 1 keyframe? */
     if(prog_anim->keyframe_count == 1) {
         const proganim_keyframe_t* keyframe = &prog_anim->keyframe[0];
-        transform_rotate(t, -keyframe->rotation * DEG2RAD);
-        transform_scale(t, keyframe->scale);
-        transform_translate(t, keyframe->translation);
+        transform_build(t, keyframe->translation, -keyframe->rotation * DEG2RAD, keyframe->scale, v2d_new(0.0f, 0.0f));
         return t;
     }
 
@@ -146,9 +141,7 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
     v2d_t interpolated_scale = v2d_lerp(keyframe_a->scale, keyframe_b->scale, p);
 
     /* set the transform */
-    transform_rotate(t, -interpolated_rotation);
-    transform_scale(t, interpolated_scale);
-    transform_translate(t, interpolated_translation);
+    transform_build(t, interpolated_translation, -interpolated_rotation, interpolated_scale, v2d_new(0.0f, 0.0f));
     return t;
 }
 

@@ -52,6 +52,49 @@ transform_t* transform_identity(transform_t* t)
 }
 
 /*
+ * transform_build()
+ * Build a standard transform
+ */
+transform_t* transform_build(transform_t* t, v2d_t translation, float rotation, v2d_t scale, v2d_t anchor_point)
+{
+    /*
+
+    Perform the following operations in order, starting from an identity matrix:
+
+    1. Translate by (-anchor_point)
+    2. Rotate
+    3. Scale
+    4. Translate
+
+    */
+
+    float c = cosf(rotation);
+    float s = sinf(rotation);
+
+    t->m[0] = scale.x * c;
+    t->m[1] = scale.y * s;
+    t->m[2] = 0.0f;
+    t->m[3] = 0.0f;
+
+    t->m[4] = scale.x * -s;
+    t->m[5] = scale.y * c;
+    t->m[6] = 0.0f;
+    t->m[7] = 0.0f;
+
+    t->m[8] = 0.0f;
+    t->m[9] = 0.0f;
+    t->m[10] = 1.0f;
+    t->m[11] = 0.0f;
+
+    t->m[12] = translation.x + scale.x * (c * -anchor_point.x - s * -anchor_point.y);
+    t->m[13] = translation.y + scale.y * (s * -anchor_point.x + c * -anchor_point.y);
+    t->m[14] = 0.0f;
+    t->m[15] = 1.0f;
+
+   return t;
+}
+
+/*
  * transform_copy()
  * Copy src to dest
  */

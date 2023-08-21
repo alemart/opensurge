@@ -365,23 +365,15 @@ bool can_be_clipped_out(const actor_t* act, v2d_t topleft)
 /* set a transform for an actor */
 void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t topleft)
 {
-    /* initialize the transform */
-    transform_t t;
-    transform_identity(&t);
-
     /* find the position of the actor in screen space */
     v2d_t position = v2d_new(
         floorf(act->position.x - topleft.x),
         floorf(act->position.y - topleft.y)
     );
 
-    /* set anchor */
-    transform_translate(&t, v2d_new(-act->hot_spot.x, -act->hot_spot.y));
-
-    /* rotate, scale & translate */
-    transform_rotate(&t, -act->angle);
-    transform_scale(&t, act->scale);
-    transform_translate(&t, position);
+    /* build the transform */
+    transform_t t;
+    transform_build(&t, position, -act->angle, act->scale, act->hot_spot);
 
     /* programmatic animation */
     if(act->animation != NULL && animation_has_keyframes(act->animation)) {

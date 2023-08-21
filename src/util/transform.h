@@ -34,6 +34,7 @@ struct ALLEGRO_TRANSFORM;
 
 /* basic API */
 transform_t* transform_identity(transform_t* t); /* create an identity transform */
+transform_t* transform_build(transform_t* t, v2d_t translation, float rotation, v2d_t scale, v2d_t anchor_point); /* build a standard transform */
 transform_t* transform_copy(transform_t* dest, const transform_t* src); /* copy src to dest */
 transform_t* transform_translate(transform_t* t, v2d_t offset); /* translation */
 transform_t* transform_rotate(transform_t* t, float radians); /* rotation */
