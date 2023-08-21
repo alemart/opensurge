@@ -155,6 +155,46 @@ bool str_iendswith(const char* str, const char* suffix)
 
 
 /*
+ * str_is_numeric()
+ * Checks if str is numeric
+ */
+bool str_is_numeric(const char* str)
+{
+    const char* p = str;
+
+    /* match +- */
+    if(*p == '-' || *p == '+')
+        str = ++p;
+
+    /* match digits */
+    while(isdigit(*p))
+        p++;
+
+    /* match . */
+    if(*p == '.') {
+        str = ++p;
+
+        /* match digits */
+        while(isdigit(*p))
+            p++;
+    }
+
+    /* expect the end of the string */
+    return (*p == '\0') && (p > str);
+}
+
+
+/*
+ * str_is_boolean()
+ * Checks if str is a boolean
+ */
+bool str_is_boolean(const char* str)
+{
+    return (0 == str_icmp(str, "true")) || (0 == str_icmp(str, "false"));
+}
+
+
+/*
  * str_cpy()
  * Safe version of strcpy(). Returns dest.
  * If we have something like char str[32], then
