@@ -306,6 +306,7 @@ void proganim_validate(proganim_t* prog_anim)
     merge_sort(prog_anim->keyframe, prog_anim->keyframe_count, sizeof(proganim_keyframe_t), compare_keyframes);
 #else
     /* keyframes are already declared in a sorted way */
+    (void)compare_keyframes;
 #endif
 }
 
